@@ -3,7 +3,13 @@ import produce from 'immer'
 import { Connection, PublicKey } from '@solana/web3.js'
 
 import { EndpointInfo, WalletAdapter } from '../@types/types'
-import { getOwnedTokenAccounts } from '../utils/tokens'
+import {
+  getOwnedTokenAccounts,
+  getMint,
+  ProgramAccount,
+  TokenAccount,
+  MintAccount,
+} from '../utils/tokens'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -33,7 +39,8 @@ interface WalletStore extends State {
   }
   current: WalletAdapter | undefined
   providerUrl: string
-  balances: Array<{ account: any; publicKey: PublicKey }>
+  tokenAccounts: ProgramAccount<TokenAccount>[]
+  mints: { [pubkey: string]: MintAccount }
   set: (x: any) => void
   actions: any
 }
@@ -48,9 +55,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   },
   current: null,
   providerUrl: null,
-  balances: [],
+  tokenAccounts: [],
+  mints: {},
   actions: {
-    async fetchWalletBalances() {
+    async fetchWalletTokenAccounts() {
       const connection = get().connection.current
       const connected = get().connected
       const wallet = get().current
@@ -63,14 +71,39 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           walletOwner
         )
 
-        console.log('fetched wallet balances', ownedTokenAccounts)
-
         set((state) => {
-          state.balances = ownedTokenAccounts
+          state.tokenAccounts = ownedTokenAccounts
         })
       } else {
         set((state) => {
-          state.balances = []
+          state.tokenAccounts = []
+        })
+      }
+    },
+    async fetchWalletMints() {
+      const connection = get().connection.current
+      const connected = get().connected
+      const tokenAccounts = get().tokenAccounts
+      const mints = get().mints
+      const set = get().set
+
+      if (connected) {
+        var fetchMints = tokenAccounts.map((a) =>
+          getMint(connection, a.account.mint)
+        )
+        const mintResults = await Promise.all(fetchMints)
+
+        const newMints: { [pubkey: string]: MintAccount } = {}
+        mintResults.forEach(
+          (m) => (newMints[m.publicKey.toBase58()] = m.account)
+        )
+
+        set((state) => {
+          state.mints = newMints
+        })
+      } else {
+        set((state) => {
+          state.mints = {}
         })
       }
     },

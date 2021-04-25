@@ -1,27 +1,26 @@
-import { Connection, PublicKey } from '@solana/web3.js'
 import * as bs58 from 'bs58'
-import {
-  AccountLayout as TokenLayout,
-  AccountInfo as TokenAccount,
-} from '@solana/spl-token'
+import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
+import { AccountLayout, AccountInfo, MintInfo, u64 } from '@solana/spl-token'
 
-export const TOKEN_PROGRAM_ID = new PublicKey(
-  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-)
-
+export type TokenAccount = AccountInfo
+export type MintAccount = MintInfo
 export type ProgramAccount<T> = {
   publicKey: PublicKey
   account: T
 }
 
+export const TOKEN_PROGRAM_ID = new PublicKey(
+  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
+)
+
 export function parseTokenAccountData(
   data: Buffer
-): { mint: PublicKey; owner: PublicKey; amount: number } {
-  const { mint, owner, amount } = TokenLayout.decode(data)
+): { mint: PublicKey; owner: PublicKey; amount: u64 } {
+  const { mint, owner, amount } = AccountLayout.decode(data)
   return {
     mint: new PublicKey(mint),
     owner: new PublicKey(owner),
-    amount,
+    amount: u64.fromBuffer(amount),
   }
 }
 
@@ -59,12 +58,28 @@ export function getOwnedAccountsFilters(publicKey: PublicKey) {
   return [
     {
       memcmp: {
-        offset: TokenLayout.offsetOf('owner'),
+        offset: AccountLayout.offsetOf('owner'),
         bytes: publicKey.toBase58(),
       },
     },
     {
-      dataSize: TokenLayout.span,
+      dataSize: AccountLayout.span,
     },
   ]
+}
+
+export async function getMint(
+  connection: Connection,
+  publicKey: PublicKey
+): Promise<ProgramAccount<MintAccount>> {
+  const result = await connection.getParsedAccountInfo(publicKey)
+  const account = (result.value.data as ParsedAccountData).parsed.info
+  account.freezeAuthority =
+    account.freezeAuthority && new PublicKey(account.freezeAuthority)
+  account.mintAuthority =
+    account.mintAuthority && new PublicKey(account.mintAuthority)
+  return {
+    publicKey,
+    account,
+  }
 }

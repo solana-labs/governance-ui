@@ -104,12 +104,14 @@ export default function useWallet() {
           '...' +
           wallet.publicKey.toString().substr(-5),
       })
-      actions.fetchWalletBalances()
+      await actions.fetchWalletTokenAccounts()
+      await actions.fetchWalletMints()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
         state.connected = false
-        state.balances = []
+        state.tokenAccounts = []
+        state.mints = {}
       })
       notify({
         type: 'info',
@@ -126,8 +128,9 @@ export default function useWallet() {
     }
   }, [wallet, setWalletStore])
 
-  useInterval(() => {
-    actions.fetchWalletBalances()
+  useInterval(async () => {
+    await actions.fetchWalletTokenAccounts()
+    await actions.fetchWalletMints()
   }, 20 * SECONDS)
 
   return { connected, wallet }
