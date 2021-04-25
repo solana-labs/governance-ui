@@ -18,13 +18,15 @@ const Balances = () => {
   }
 
   const displayedBalances = tokenAccounts
-    .map((a) => `${a.publicKey.toBase58()}: ${calculateBalance(a)}`)
-    .sort()
+    .map((a) => ({ id: a.publicKey.toBase58(), balance: calculateBalance(a) }))
+    .sort((a, b) => (a.id > b.id ? 1 : -1))
 
   return (
     <ul>
-      {displayedBalances.map((b, i) => (
-        <li key={i}>{b}</li>
+      {displayedBalances.map((b) => (
+        <li key={b.id}>
+          {b.id}: {b.balance}
+        </li>
       ))}
     </ul>
   )
