@@ -9,7 +9,7 @@ export function useLocalStorageStringState(
   const state =
     typeof window !== 'undefined'
       ? localStorage.getItem(key) || defaultState
-      : ''
+      : defaultState || ''
 
   const [, notify] = useState(key + '\n' + state)
 
