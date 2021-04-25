@@ -1,6 +1,11 @@
-import * as bs58 from 'bs58'
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
-import { AccountLayout, AccountInfo, MintInfo, u64 } from '@solana/spl-token'
+import {
+  AccountInfo,
+  AccountLayout,
+  MintInfo,
+  MintLayout,
+  u64,
+} from '@solana/spl-token'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -9,77 +14,91 @@ export type ProgramAccount<T> = {
   account: T
 }
 
-export const TOKEN_PROGRAM_ID = new PublicKey(
-  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
-)
-
-export function parseTokenAccountData(
-  data: Buffer
-): { mint: PublicKey; owner: PublicKey; amount: u64 } {
-  const { mint, owner, amount } = AccountLayout.decode(data)
-  return {
-    mint: new PublicKey(mint),
-    owner: new PublicKey(owner),
-    amount: u64.fromBuffer(amount),
-  }
-}
-
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<ProgramAccount<TokenAccount>[]> {
-  const filters = getOwnedAccountsFilters(publicKey)
-  // @ts-ignore
-  const resp = await connection._rpcRequest('getProgramAccounts', [
-    TOKEN_PROGRAM_ID.toBase58(),
-    {
-      commitment: connection.commitment,
-      filters,
-    },
-  ])
-  if (resp.error) {
-    throw new Error(
-      'failed to get token accounts owned by ' +
-        publicKey.toBase58() +
-        ': ' +
-        resp.error.message
-    )
-  }
-  return resp.result.map(({ pubkey, account: { data } }) => {
-    data = bs58.decode(data)
-    return {
-      publicKey: new PublicKey(pubkey),
-      account: parseTokenAccountData(data),
-    }
+  const results = await connection.getTokenAccountsByOwner(publicKey, {
+    programId: TOKEN_PROGRAM_ID,
   })
-}
-
-export function getOwnedAccountsFilters(publicKey: PublicKey) {
-  return [
-    {
-      memcmp: {
-        offset: AccountLayout.offsetOf('owner'),
-        bytes: publicKey.toBase58(),
-      },
-    },
-    {
-      dataSize: AccountLayout.span,
-    },
-  ]
+  return results.value.map((r) => {
+    const publicKey = r.pubkey
+    const data = Buffer.from(r.account.data)
+    const account = parseTokenAccountData(publicKey, data)
+    return { publicKey, account }
+  })
 }
 
 export async function getMint(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<ProgramAccount<MintAccount>> {
-  const result = await connection.getParsedAccountInfo(publicKey)
-  const account = (result.value.data as ParsedAccountData).parsed.info
-  account.freezeAuthority =
-    account.freezeAuthority && new PublicKey(account.freezeAuthority)
-  account.mintAuthority =
-    account.mintAuthority && new PublicKey(account.mintAuthority)
+  const result = await connection.getAccountInfo(publicKey)
+  const data = Buffer.from(result.data)
+  const account = parseMintAccountData(data)
   return {
     publicKey,
     account,
   }
+}
+
+// copied from @solana/spl-token
+
+const TOKEN_PROGRAM_ID = new PublicKey(
+  'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
+)
+
+function parseTokenAccountData(account: PublicKey, data: Buffer): TokenAccount {
+  const accountInfo = AccountLayout.decode(data)
+  accountInfo.address = account
+  accountInfo.mint = new PublicKey(accountInfo.mint)
+  accountInfo.owner = new PublicKey(accountInfo.owner)
+  accountInfo.amount = u64.fromBuffer(accountInfo.amount)
+
+  if (accountInfo.delegateOption === 0) {
+    accountInfo.delegate = null
+    accountInfo.delegatedAmount = new u64()
+  } else {
+    accountInfo.delegate = new PublicKey(accountInfo.delegate)
+    accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount)
+  }
+
+  accountInfo.isInitialized = accountInfo.state !== 0
+  accountInfo.isFrozen = accountInfo.state === 2
+
+  if (accountInfo.isNativeOption === 1) {
+    accountInfo.rentExemptReserve = u64.fromBuffer(accountInfo.isNative)
+    accountInfo.isNative = true
+  } else {
+    accountInfo.rentExemptReserve = null
+    accountInfo.isNative = false
+  }
+
+  if (accountInfo.closeAuthorityOption === 0) {
+    accountInfo.closeAuthority = null
+  } else {
+    accountInfo.closeAuthority = new PublicKey(accountInfo.closeAuthority)
+  }
+
+  return accountInfo
+}
+
+function parseMintAccountData(data: Buffer) {
+  const mintInfo = MintLayout.decode(data)
+
+  if (mintInfo.mintAuthorityOption === 0) {
+    mintInfo.mintAuthority = null
+  } else {
+    mintInfo.mintAuthority = new PublicKey(mintInfo.mintAuthority)
+  }
+
+  mintInfo.supply = u64.fromBuffer(mintInfo.supply)
+  mintInfo.isInitialized = mintInfo.isInitialized != 0
+
+  if (mintInfo.freezeAuthorityOption === 0) {
+    mintInfo.freezeAuthority = null
+  } else {
+    mintInfo.freezeAuthority = new PublicKey(mintInfo.freezeAuthority)
+  }
+  return mintInfo
 }

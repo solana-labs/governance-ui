@@ -5,7 +5,7 @@ import useWalletStore from '../stores/useWalletStore'
 const Balances = () => {
   var { tokenAccounts, mints } = useWalletStore((state) => state)
 
-  function fixedPointNumber(value, decimals) {
+  function fixedPointToNumber(value: BN, decimals: number) {
     const divisor = new BN(10).pow(new BN(decimals))
     const quotient = value.div(divisor)
     const remainder = value.mod(divisor)
@@ -14,7 +14,7 @@ const Balances = () => {
 
   function calculateBalance(a) {
     const mint = mints[a.account.mint.toBase58()]
-    return mint ? fixedPointNumber(a.account.amount, mint.decimals) : 0
+    return mint ? fixedPointToNumber(a.account.amount, mint.decimals) : 0
   }
 
   const displayedBalances = tokenAccounts
