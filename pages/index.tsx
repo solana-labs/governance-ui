@@ -1,10 +1,10 @@
 import Notifications from '../components/Notification'
-import ConnectWalletButton from '../components/ConnectWalletButton'
+import TopBar from '../components/TopBar'
 
 const Index = () => {
   return (
     <div className={`bg-th-bkg-1 text-th-fgd-1 transition-all `}>
-      <ConnectWalletButton />
+      <TopBar />
       <Notifications />
     </div>
   )

@@ -19,6 +19,8 @@ const NotificationList = () => {
         })
       }, 5000)
 
+      console.log('notifications', notifications)
+
       return () => {
         clearInterval(id)
       }
