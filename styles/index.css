@@ -1,3 +1,40 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* theme */
+
+:root {
+  --primary: theme('colors.mango-theme.yellow');
+  --red: theme('colors.mango-theme.red.DEFAULT');
+  --red-dark: theme('colors.mango-theme.red.dark');
+  --green: theme('colors.mango-theme.green.DEFAULT');
+  --green-dark: theme('colors.mango-theme.green.dark');
+  --bkg-1: theme('colors.mango-theme["bkg-1"]');
+  --bkg-2: theme('colors.mango-theme["bkg-2"]');
+  --bkg-3: theme('colors.mango-theme["bkg-3"]');
+  --fgd-1: theme('colors.mango-theme["fgd-1"]');
+  --fgd-2: theme('colors.mango-theme["fgd-2"]');
+  --fgd-3: theme('colors.mango-theme["fgd-3"]');
+  --fgd-4: theme('colors.mango-theme["fgd-4"]');
+}
+
+/* base */
+
+* {
+  @apply m-0 p-0;
+}
+
+body {
+  @apply bg-th-bkg-1 text-th-fgd-1 text-base font-body tracking-wide;
+}
+
+/* type */
+
+h2 {
+  @apply text-xl mb-2 font-bold;
+}
+
+p {
+  @apply text-th-fgd-3;
+}
