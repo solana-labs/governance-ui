@@ -51,7 +51,7 @@ const TopBar = () => {
   }
 
   return (
-    <nav className={`bg-th-bkg-2`}>
+    <nav className={`bg-bkg-1`}>
       <div className={`px-4 sm:px-6 lg:px-8`}>
         <div className={`flex justify-between h-16`}>
           <div className={`flex`}>
@@ -66,11 +66,11 @@ const TopBar = () => {
                   <Menu>
                     {({ open }) => (
                       <div className="relative">
-                        <Menu.Button className="w-48 h-11 pl-2 pr-2.5 border border-th-green hover:border-th-fgd-1 focus:outline-none rounded-md text-th-fgd-4 hover:text-th-fgd-1">
+                        <Menu.Button className="w-48 h-11 pl-2 pr-2.5 border border-green hover:border-fgd-1 focus:outline-none rounded-md text-fgd-4 hover:text-fgd-1">
                           <div className="flex flex-row items-center justify-between">
                             <div className="flex items-center">
-                              <WalletIcon className="w-5 h-5 mr-2 fill-current text-th-green" />
-                              <Code className="p-1 text-th-fgd-3 font-light">
+                              <WalletIcon className="w-5 h-5 mr-2 fill-current text-green" />
+                              <Code className="p-1 text-fgd-3 font-light">
                                 {isCopied
                                   ? 'Copied!'
                                   : wallet.publicKey.toString().substr(0, 5) +
@@ -85,11 +85,11 @@ const TopBar = () => {
                             )}
                           </div>
                         </Menu.Button>
-                        <Menu.Items className="z-20 p-1 absolute right-0 top-11 bg-th-bkg-1 divide-y divide-th-bkg-3 shadow-lg outline-none rounded-md w-48">
+                        <Menu.Items className="z-20 p-1 absolute right-0 top-11 bg-bkg-1 divide-y divide-bkg-3 shadow-lg outline-none rounded-md w-48">
                           {WALLET_OPTIONS.map(({ name, icon }) => (
                             <Menu.Item key={name}>
                               <button
-                                className="flex flex-row items-center w-full p-2 hover:bg-th-bkg-2 hover:cursor-pointer font-normal"
+                                className="flex flex-row items-center w-full p-2 hover:bg-bkg-2 hover:cursor-pointer font-normal"
                                 onClick={() => handleWalletMenu(name)}
                               >
                                 <div className="w-5 h-5 mr-2">{icon}</div>

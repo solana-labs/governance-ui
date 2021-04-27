@@ -1,5 +1,4 @@
 import BN from 'bn.js'
-
 import useWalletStore from '../stores/useWalletStore'
 
 const Balances = () => {
@@ -13,7 +12,7 @@ const Balances = () => {
   }
 
   function calculateBalance(a) {
-    const mint = mints[a.account.mint.toBase58()]
+    const mint = mints[a.account?.mint?.toBase58()]
     return mint ? fixedPointToNumber(a.account.amount, mint.decimals) : 0
   }
 

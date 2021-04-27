@@ -28,7 +28,7 @@ const Modal = ({ isOpen, onClose, children, hideClose = false }) => {
 
           {isOpen ? (
             <div
-              className="inline-block bg-th-bkg-2 
+              className="inline-block bg-bkg-2 
               rounded-lg text-left shadow-lg transform transition-all 
               sm:my-8 align-middle sm:max-w-md w-full"
             >
@@ -36,7 +36,7 @@ const Modal = ({ isOpen, onClose, children, hideClose = false }) => {
                 <div className="w-full flex justify-end p-2 pb-0">
                   <button
                     onClick={onClose}
-                    className={`text-th-fgd-1 hover:text-th-primary focus:outline-none`}
+                    className={`text-fgd-1 hover:text-primary focus:outline-none`}
                   >
                     <XIcon className={`h-5 w-5`} />
                   </button>
@@ -55,7 +55,7 @@ const Modal = ({ isOpen, onClose, children, hideClose = false }) => {
 
 const Header = ({ children }) => {
   return (
-    <div className={`flex justify-center bg-th-bkg-2 p-2 pt-0`}>{children}</div>
+    <div className={`flex justify-center bg-bkg-2 p-2 pt-0`}>{children}</div>
   )
 }
 
