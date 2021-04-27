@@ -11,13 +11,12 @@
     "tc": "yarn type-check --watch",
     "type-check": "tsc --pretty --noEmit",
     "format": "prettier --write .",
-    "lint": "eslint . --ext ts --ext tsx --ext js",
+    "lint": "eslint . --ext ts --ext tsx --ext js --ext jsx",
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test"
   },
   "lint-staged": {
-    "*.@(ts|tsx)": [
-      "yarn lint",
+    "*.@(ts|tsx|js|jsx)": [
       "yarn format"
     ]
   },
