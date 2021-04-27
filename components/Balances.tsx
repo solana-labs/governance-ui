@@ -3,7 +3,7 @@ import BN from 'bn.js'
 import useWalletStore from '../stores/useWalletStore'
 
 const Balances = () => {
-  var { tokenAccounts, mints } = useWalletStore((state) => state)
+  const { tokenAccounts, mints } = useWalletStore((state) => state)
 
   function fixedPointToNumber(value: BN, decimals: number) {
     const divisor = new BN(10).pow(new BN(decimals))

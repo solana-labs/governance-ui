@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 
 import { EndpointInfo, WalletAdapter } from '../@types/types'
 import {
@@ -84,11 +84,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection.current
       const connected = get().connected
       const tokenAccounts = get().tokenAccounts
-      const mints = get().mints
       const set = get().set
 
       if (connected) {
-        var fetchMints = tokenAccounts.map((a) =>
+        const fetchMints = tokenAccounts.map((a) =>
           getMint(connection, a.account.mint)
         )
         const mintResults = await Promise.all(fetchMints)

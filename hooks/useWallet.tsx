@@ -56,7 +56,6 @@ export default function useWallet() {
   )
 
   useEffect(() => {
-    console.log('provider url changed', selectedProviderUrl)
     if (selectedProviderUrl) {
       setSavedProviderUrl(selectedProviderUrl)
     }
@@ -66,7 +65,6 @@ export default function useWallet() {
     if (provider) {
       const updateWallet = () => {
         // hack to also update wallet synchronously in case it disconnects
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         const wallet = new (provider.adapter || Wallet)(
           savedProviderUrl,
           endpoint

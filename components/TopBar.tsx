@@ -6,10 +6,7 @@ import {
   ChevronDownIcon,
   DuplicateIcon,
   LogoutIcon,
-  MenuIcon,
-  XIcon,
 } from '@heroicons/react/outline'
-import { useRouter } from 'next/router'
 import ConnectWalletButton from './ConnectWalletButton'
 import WalletIcon from './WalletIcon'
 import useWalletStore from '../stores/useWalletStore'
@@ -27,7 +24,6 @@ const WALLET_OPTIONS = [
 ]
 
 const TopBar = () => {
-  const { asPath } = useRouter()
   const { connected, current: wallet } = useWalletStore((s) => s)
   const [isCopied, setIsCopied] = useState(false)
 

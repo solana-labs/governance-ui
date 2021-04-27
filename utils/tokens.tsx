@@ -1,4 +1,4 @@
-import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import {
   AccountInfo,
   AccountLayout,

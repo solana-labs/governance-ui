@@ -8,7 +8,9 @@ export function SolletExtensionAdapter(_, network) {
   }
 
   return {
-    on: () => {},
+    on: () => {
+      /* do nothing */
+    },
     connect: () => {
       notify({
         message: 'Sollet Extension Error',

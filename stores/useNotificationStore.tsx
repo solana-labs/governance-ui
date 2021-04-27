@@ -11,7 +11,7 @@ interface NotificationStore extends State {
   set: (x: any) => void
 }
 
-const useNotificationStore = create<NotificationStore>((set, get) => ({
+const useNotificationStore = create<NotificationStore>((set, _get) => ({
   notifications: [],
   set: (fn) => set(produce(fn)),
 }))
