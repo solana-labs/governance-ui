@@ -3,9 +3,8 @@ import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
 import { getUsdcBalance } from '../utils'
 import Input from './Input'
-import Slider from 'rc-slider'
-import 'rc-slider/assets/index.css'
 import Button from './Button'
+import Slider from './Slider'
 import Loading from './Loading'
 import WalletIcon from './WalletIcon'
 
@@ -80,6 +79,7 @@ const ContributionModal = () => {
             </div>
             <Button
               className="bg-bkg-4 font-normal rounded text-fgd-3 text-xs py-0.5 px-2"
+              disabled={!connected}
               onClick={() => setContributionAmount(100)}
               secondary
             >
@@ -96,31 +96,9 @@ const ContributionModal = () => {
             />
           </div>
           <Slider
-            min={0}
             value={contributionAmount}
             onChange={(v) => setContributionAmount(v)}
             step={usdcBalance / 100}
-            marks={{
-              0: 0,
-              25: 25,
-              50: 50,
-              75: '75',
-              100: '100',
-            }}
-            // railStyle={{
-            //   height: 2,
-            // }}
-            // handleStyle={{
-            //   height: 28,
-            //   width: 28,
-            //   marginLeft: -14,
-            //   marginTop: -14,
-            //   backgroundColor: 'red',
-            //   border: 0,
-            // }}
-            // trackStyle={{
-            //   background: 'none',
-            // }}
           />
         </div>
         <Button
@@ -146,15 +124,18 @@ const ContributionModal = () => {
           </div>
         </Button>
       ) : (
-        <Button
-          className="rounded-full"
-          onClick={() => handleConnectDisconnect()}
-        >
-          <div className="flex items-center text-sm">
-            <LinkIcon className="h-4 w-4 mr-1" />
-            Connect Wallet
-          </div>
-        </Button>
+        <div className="relative">
+          <Button
+            className="rounded-full h-9 w-44 z-20 relative"
+            onClick={() => handleConnectDisconnect()}
+          >
+            <div className="flex items-center justify-center text-sm">
+              <LinkIcon className="h-4 w-4 mr-1" />
+              Connect Wallet
+            </div>
+          </Button>
+          <div className="absolute animate-ping-small bg-secondary-2-light top-0 rounded-full h-9 w-44 z-10" />
+        </div>
       )}
     </div>
   )

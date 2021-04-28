@@ -2,6 +2,10 @@
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --primary: theme('colors.primary.light');
+}
+
 /* base */
 
 * {

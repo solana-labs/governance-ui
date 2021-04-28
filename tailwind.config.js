@@ -28,6 +28,17 @@ module.exports = {
         'fgd-3': '#B9B5CE',
         'fgd-4': '#706C81',
       },
+      animation: {
+        'ping-small': 'ping-small 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
+      },
+      keyframes: {
+        'ping-small': {
+          '75%, 100%': {
+            transform: 'scale(1.06, 1.25)',
+            opacity: 0,
+          },
+        },
+      },
     },
   },
   variants: {
