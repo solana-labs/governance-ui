@@ -5,7 +5,8 @@ import Slider from 'rc-slider'
 import 'rc-slider/assets/index.css'
 
 type StyledSliderProps = {
-  enableTransition: boolean
+  enableTransition?: boolean
+  disabled?: boolean
 }
 
 const StyledSlider = styled(Slider)<StyledSliderProps>`
@@ -14,12 +15,10 @@ const StyledSlider = styled(Slider)<StyledSliderProps>`
   }
 
   .rc-slider-track {
-    ${tw`bg-gradient-to-r from-secondary-1-light via-primary-light to-secondary-2-light h-2.5 rounded-full`}
+    ${tw`bg-gradient-to-r from-secondary-1-dark via-primary-light to-secondary-2-light h-2.5 rounded-full ring-1 ring-primary-light ring-inset`}
 
     ${({ enableTransition }) =>
       enableTransition && tw`transition-all duration-500`}
-  
-    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
   }
 
   .rc-slider-step {
@@ -29,11 +28,11 @@ const StyledSlider = styled(Slider)<StyledSliderProps>`
   .rc-slider-handle {
     ${tw`bg-fgd-1 border-4 border-primary-dark h-4 w-4`}
 
-    ${({ enableTransition }) =>
-      enableTransition && tw`transition-all duration-500`}
-
     box-shadow: 0px 0px 8px 0px rgba(0, 0, 0, 0.3);
     margin-top: -3px;
+
+    ${({ enableTransition }) =>
+      enableTransition && tw`transition-all duration-500`}
   }
 
   .rc-slider-mark-text {
@@ -52,12 +51,16 @@ const StyledSlider = styled(Slider)<StyledSliderProps>`
   .rc-slider-mark-text:last-of-type {
     padding-right: 24px;
   }
+
+  ${({ disabled }) => disabled && 'background-color: transparent'}
 `
 
 type SliderProps = {
   onChange: (...args: any[]) => any
   step: number
   value: number
+  disabled: boolean
+  max?: number
 }
 
 const marks = {
@@ -72,12 +75,15 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
   onChange,
   step,
   value,
+  disabled,
+  max,
 }) => {
   const [enableTransition, setEnableTransition] = useState(true)
 
   return (
     <StyledSlider
       min={0}
+      max={max}
       value={value || 0}
       onChange={onChange}
       step={step}
@@ -85,6 +91,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
       enableTransition={enableTransition}
       onBeforeChange={() => setEnableTransition(false)}
       onAfterChange={() => setEnableTransition(true)}
+      disabled={disabled}
     />
   )
 }

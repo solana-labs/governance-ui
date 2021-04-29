@@ -4,6 +4,7 @@ import { WALLET_PROVIDERS, DEFAULT_PROVIDER } from '../hooks/useWallet'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import WalletSelect from './WalletSelect'
 import WalletIcon from './WalletIcon'
+import Button from './Button'
 
 const StyledWalletTypeLabel = styled.div`
   font-size: 0.6rem;
@@ -43,3 +44,15 @@ const ConnectWalletButton = () => {
 }
 
 export default ConnectWalletButton
+
+export const ConnectWalletButtonSmall = ({ children, onClick }) => (
+  <div className="relative">
+    <Button
+      className="rounded-full h-9 w-44 z-30 relative"
+      onClick={() => onClick()}
+    >
+      <div className="flex items-center justify-center text-sm">{children}</div>
+    </Button>
+    <div className="absolute animate-ping-small bg-secondary-2-light top-0 rounded-full h-9 w-44 z-20" />
+  </div>
+)
