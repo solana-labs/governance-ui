@@ -31,6 +31,8 @@ const StyledButton = styled.button<StyledButtonProps>`
       ${tw`ring-4 ring-secondary-2-light ring-opacity-40`}
     }
   }
+
+  ${({ secondary }) => secondary && tw`bg-none`}
 `
 
 interface ButtonProps {
@@ -52,13 +54,7 @@ const Button: FunctionComponent<ButtonProps> = ({
     <StyledButton
       onClick={onClick}
       disabled={disabled}
-      className={`${className} ${
-        secondary || disabled
-          ? 'bg-bkg-4'
-          : 'bg-gradient-to-br from-secondary-1-light via-secondary-1-dark to-secondary-2-light'
-      } relative z-10 bg-bkg-4 border-none default-transition px-6 py-2 rounded-lg text-fgd-1
-      active:border-primary hover:bg-bkg-3 focus:outline-none
-      disabled:cursor-not-allowed`}
+      className={`${className} bg-gradient-to-br from-secondary-1-light via-secondary-1-dark to-secondary-2-light relative z-10 default-transition px-6 py-2 rounded-lg text-fgd-1 hover:bg-bkg-3 focus:outline-none disabled:cursor-not-allowed`}
       secondary={secondary}
       {...props}
     >

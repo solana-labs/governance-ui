@@ -1,4 +1,4 @@
-import { FunctionComponent, useState } from 'react'
+import { FunctionComponent, useEffect, useState } from 'react'
 import tw from 'twin.macro'
 import styled from '@emotion/styled'
 import Slider from 'rc-slider'
@@ -55,20 +55,56 @@ const StyledSlider = styled(Slider)<StyledSliderProps>`
   ${({ disabled }) => disabled && 'background-color: transparent'}
 `
 
+const StyledSliderButtonWrapper = styled.div`
+  ${tw`absolute left-0 top-4 w-full`}
+`
+
+type StyledSliderButtonProps = {
+  styleValue: number
+  sliderValue: number
+}
+
+const StyledSliderButton = styled.button<StyledSliderButtonProps>`
+  ${tw`bg-none font-display transition-all duration-300 hover:text-primary-light focus:outline-none`}
+  font-size: 0.6rem;
+  position: absolute;
+  display: inline-block;
+  vertical-align: middle;
+  text-align: center;
+  left: 0%;
+
+  :nth-of-type(2) {
+    left: 23%;
+    transform: translateX(-23%);
+  }
+
+  :nth-of-type(3) {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  :nth-of-type(4) {
+    left: 76%;
+    transform: translateX(-76%);
+  }
+
+  :nth-of-type(5) {
+    left: 100%;
+    transform: translateX(-100%);
+  }
+
+  ${({ styleValue, sliderValue }) => styleValue < sliderValue && tw`opacity-40`}
+  ${({ styleValue, sliderValue }) =>
+    styleValue === sliderValue && tw`animate-pulse text-primary-light`}
+`
+
 type SliderProps = {
   onChange: (...args: any[]) => any
   step: number
   value: number
   disabled: boolean
   max?: number
-}
-
-const marks = {
-  0: '0%',
-  25: '25%',
-  50: '50%',
-  75: '75%',
-  100: '100%',
+  maxButtonTransition?: boolean
 }
 
 const AmountSlider: FunctionComponent<SliderProps> = ({
@@ -77,22 +113,79 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
   value,
   disabled,
   max,
+  maxButtonTransition,
 }) => {
-  const [enableTransition, setEnableTransition] = useState(true)
+  const [enableTransition, setEnableTransition] = useState(false)
+
+  useEffect(() => {
+    if (maxButtonTransition) {
+      setEnableTransition(true)
+    }
+  }, [maxButtonTransition])
+
+  useEffect(() => {
+    if (enableTransition) {
+      const transitionTimer = setTimeout(() => {
+        setEnableTransition(false)
+      }, 500)
+      return () => clearTimeout(transitionTimer)
+    }
+  }, [enableTransition])
+
+  const handleSliderButtonClick = (value) => {
+    onChange(value)
+    setEnableTransition(true)
+  }
 
   return (
-    <StyledSlider
-      min={0}
-      max={max}
-      value={value || 0}
-      onChange={onChange}
-      step={step}
-      marks={marks}
-      enableTransition={enableTransition}
-      onBeforeChange={() => setEnableTransition(false)}
-      onAfterChange={() => setEnableTransition(true)}
-      disabled={disabled}
-    />
+    <div className="relative">
+      <StyledSlider
+        min={0}
+        max={max}
+        value={value || 0}
+        onChange={onChange}
+        step={step}
+        enableTransition={enableTransition}
+        disabled={disabled}
+      />
+      <StyledSliderButtonWrapper>
+        <StyledSliderButton
+          onClick={() => handleSliderButtonClick(0)}
+          styleValue={0}
+          sliderValue={value}
+        >
+          0%
+        </StyledSliderButton>
+        <StyledSliderButton
+          onClick={() => handleSliderButtonClick(25)}
+          styleValue={25}
+          sliderValue={value}
+        >
+          25%
+        </StyledSliderButton>
+        <StyledSliderButton
+          onClick={() => handleSliderButtonClick(50)}
+          styleValue={50}
+          sliderValue={value}
+        >
+          50%
+        </StyledSliderButton>
+        <StyledSliderButton
+          onClick={() => handleSliderButtonClick(75)}
+          styleValue={75}
+          sliderValue={value}
+        >
+          75%
+        </StyledSliderButton>
+        <StyledSliderButton
+          onClick={() => handleSliderButtonClick(100)}
+          styleValue={100}
+          sliderValue={value}
+        >
+          100%
+        </StyledSliderButton>
+      </StyledSliderButtonWrapper>
+    </div>
   )
 }
 

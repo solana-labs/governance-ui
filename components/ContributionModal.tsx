@@ -1,11 +1,8 @@
 import { useEffect, useState } from 'react'
 import styled from '@emotion/styled'
 import tw from 'twin.macro'
-import {
-  LinkIcon,
-  LockClosedIcon,
-  LockOpenIcon,
-} from '@heroicons/react/outline'
+import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/outline'
+import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
 import { getUsdcBalance } from '../utils'
 import Input from './Input'
@@ -26,16 +23,18 @@ const ContributionModal = () => {
   const wallet = useWalletStore((s) => s.current)
   const usdcBalance = getUsdcBalance()
 
-  const [contributionAmount, setContributionAmount] = useState(null)
-  const [sliderPercentage, setSliderPercentage] = useState(null)
+  const [contributionAmount, setContributionAmount] = useState(0)
+  const [sliderPercentage, setSliderPercentage] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [editContribution, setEditContribution] = useState(false)
   const [loading, setLoading] = useState(true)
+  const [maxButtonTransition, setMaxButtonTransition] = useState(false)
 
   const handleConnectDisconnect = () => {
     if (connected) {
-      setContributionAmount(null)
+      // setContributionAmount(0)
+      // setSliderPercentage(0)
       setSubmitted(false)
       setEditContribution(false)
       wallet.disconnect()
@@ -67,7 +66,14 @@ const ContributionModal = () => {
   const handleMax = () => {
     setContributionAmount(usdcBalance)
     setSliderPercentage(100)
+    setMaxButtonTransition(true)
   }
+
+  useEffect(() => {
+    if (maxButtonTransition) {
+      setMaxButtonTransition(false)
+    }
+  }, [maxButtonTransition])
 
   useEffect(() => {
     setLoading(true)
@@ -85,6 +91,8 @@ const ContributionModal = () => {
       return () => clearTimeout(submitTimer)
     }
   }, [submitting])
+
+  const disableFormInputs = submitted || !connected || loading
 
   return (
     <StyledModalWrapper>
@@ -153,7 +161,7 @@ const ContributionModal = () => {
               <div className="flex">
                 {submitted ? (
                   <Button
-                    className="bg-secondary-2-light hover:bg-secondary-2-dark font-normal rounded text-fgd-1 text-xs py-0.5 px-1.5 mr-2"
+                    className="ring-1 ring-secondary-1-light ring-inset hover:ring-secondary-1-dark hover:bg-transparent hover:text-secondary-1-dark font-normal rounded text-secondary-1-light text-xs py-0.5 px-1.5 mr-2"
                     disabled={!connected}
                     onClick={() => handleEditContribution()}
                     secondary
@@ -165,7 +173,7 @@ const ContributionModal = () => {
                   className={`${
                     submitted && 'opacity-30'
                   } bg-bkg-4 font-normal rounded text-fgd-3 text-xs py-0.5 px-1.5`}
-                  disabled={!connected || submitted}
+                  disabled={disableFormInputs}
                   onClick={() => handleMax()}
                   secondary
                 >
@@ -182,7 +190,7 @@ const ContributionModal = () => {
               ) : null}
               <Input
                 className={(submitted || editContribution) && 'pl-7'}
-                disabled={!connected || submitted || loading}
+                disabled={disableFormInputs}
                 type="text"
                 onChange={(e) => onChangeAmountInput(e.target.value)}
                 value={loading ? '' : contributionAmount}
@@ -196,16 +204,17 @@ const ContributionModal = () => {
             >
               <div className="pb-20">
                 <Slider
-                  disabled={submitted || !connected || loading}
+                  disabled={disableFormInputs}
                   value={sliderPercentage}
                   onChange={(v) => onChangeSlider(v)}
                   step={1}
+                  maxButtonTransition={maxButtonTransition}
                 />
               </div>
               <Button
                 onClick={() => handleSetContribution()}
                 className="w-full py-2.5"
-                disabled={!connected || submitted}
+                disabled={disableFormInputs}
               >
                 <div className={`flex items-center justify-center`}>
                   Set Contribution
