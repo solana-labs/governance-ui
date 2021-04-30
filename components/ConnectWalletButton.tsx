@@ -53,6 +53,6 @@ export const ConnectWalletButtonSmall = ({ children, onClick }) => (
     >
       <div className="flex items-center justify-center text-sm">{children}</div>
     </Button>
-    <div className="absolute animate-ping-small bg-secondary-2-light top-0 rounded-full h-9 w-44 z-20" />
+    <div className="absolute animate-connect-wallet-ping bg-secondary-2-light top-0 rounded-full h-9 w-44 z-20" />
   </div>
 )
