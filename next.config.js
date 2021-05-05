@@ -5,6 +5,9 @@ module.exports = {
       test: /\.svg$/,
       use: ['@svgr/webpack'],
     })
+    config.node = {
+      fs: 'empty',
+    }
 
     return config
   },

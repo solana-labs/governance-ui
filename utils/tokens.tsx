@@ -57,7 +57,7 @@ function parseTokenAccountData(account: PublicKey, data: Buffer): TokenAccount {
 
   if (accountInfo.delegateOption === 0) {
     accountInfo.delegate = null
-    accountInfo.delegatedAmount = new u64()
+    accountInfo.delegatedAmount = new u64(0)
   } else {
     accountInfo.delegate = new PublicKey(accountInfo.delegate)
     accountInfo.delegatedAmount = u64.fromBuffer(accountInfo.delegatedAmount)

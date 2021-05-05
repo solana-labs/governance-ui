@@ -1,0 +1,392 @@
+{
+  "version": "0.0.0",
+  "name": "ido_pool",
+  "instructions": [
+    {
+      "name": "initializePool",
+      "accounts": [
+        {
+          "name": "poolAccount",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "redeemableMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "usdcMint",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolWatermelon",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolUsdc",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "distributionAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "creatorWatermelon",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "rent",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "numIdoTokens",
+          "type": "u64"
+        },
+        {
+          "name": "nonce",
+          "type": "u8"
+        },
+        {
+          "name": "startIdoTs",
+          "type": "i64"
+        },
+        {
+          "name": "endDepositsTs",
+          "type": "i64"
+        },
+        {
+          "name": "endIdoTs",
+          "type": "i64"
+        }
+      ]
+    },
+    {
+      "name": "exchangeUsdcForRedeemable",
+      "accounts": [
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "redeemableMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolUsdc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userUsdc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userRedeemable",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "exchangeRedeemableForUsdc",
+      "accounts": [
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "redeemableMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolUsdc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userUsdc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userRedeemable",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "exchangeRedeemableForWatermelon",
+      "accounts": [
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "redeemableMint",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "poolWatermelon",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "userWatermelon",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "userRedeemable",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "withdrawPoolUsdc",
+      "accounts": [
+        {
+          "name": "poolAccount",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolSigner",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "poolUsdc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "distributionAuthority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "creatorUsdc",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "tokenProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "PoolAccount",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "redeemableMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "poolWatermelon",
+            "type": "publicKey"
+          },
+          {
+            "name": "watermelonMint",
+            "type": "publicKey"
+          },
+          {
+            "name": "poolUsdc",
+            "type": "publicKey"
+          },
+          {
+            "name": "distributionAuthority",
+            "type": "publicKey"
+          },
+          {
+            "name": "nonce",
+            "type": "u8"
+          },
+          {
+            "name": "numIdoTokens",
+            "type": "u64"
+          },
+          {
+            "name": "startIdoTs",
+            "type": "i64"
+          },
+          {
+            "name": "endDepositsTs",
+            "type": "i64"
+          },
+          {
+            "name": "endIdoTs",
+            "type": "i64"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 100,
+      "name": "InitTime",
+      "msg": "IDO times are non-sequential"
+    },
+    {
+      "code": 101,
+      "name": "StartIdoTime",
+      "msg": "IDO has not started"
+    },
+    {
+      "code": 102,
+      "name": "EndDepositsTime",
+      "msg": "Deposits period has ended"
+    },
+    {
+      "code": 103,
+      "name": "EndIdoTime",
+      "msg": "IDO has ended"
+    },
+    {
+      "code": 104,
+      "name": "IdoNotOver",
+      "msg": "IDO has not finished yet"
+    },
+    {
+      "code": 105,
+      "name": "LowUsdc",
+      "msg": "Insufficient USDC"
+    },
+    {
+      "code": 106,
+      "name": "LowRedeemable",
+      "msg": "Insufficient redeemable tokens"
+    },
+    {
+      "code": 107,
+      "name": "UsdcNotEqRedeem",
+      "msg": "USDC total and redeemable total don't match"
+    },
+    {
+      "code": 108,
+      "name": "InvalidNonce",
+      "msg": "Given nonce is invalid"
+    }
+  ],
+  "metadata": {
+    "address": "4vZP5tE6sjKrSSuFwSxvmx76kc99BCVUeDo1dYT5tXAF"
+  }
+}
