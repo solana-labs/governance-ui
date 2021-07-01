@@ -9,14 +9,16 @@ function fixedPointToNumber(value: BN, decimals: number) {
 }
 
 export function getUsdcBalance() {
-  const { tokenAccounts, mints } = useWalletStore((state) => state)
+  const { tokenAccounts, mints, vault } = useWalletStore((state) => state)
+
+  if (!vault) return 0
 
   const calculateBalance = (a) => {
     const mint = mints[a.account?.mint?.toBase58()]
     return mint ? fixedPointToNumber(a.account.amount, mint.decimals) : 0
   }
 
-  const usdcAddress = 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v'
+  const usdcAddress = vault.mint.toBase58()
 
   const usdcAccount = tokenAccounts.filter(
     (a) => a.account.mint.toBase58() === usdcAddress

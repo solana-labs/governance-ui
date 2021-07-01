@@ -54,6 +54,11 @@
           "name": "rent",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "clock",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -341,52 +346,57 @@
   ],
   "errors": [
     {
-      "code": 100,
-      "name": "InitTime",
+      "code": 300,
+      "name": "IdoFuture",
+      "msg": "IDO must start in the future"
+    },
+    {
+      "code": 301,
+      "name": "SeqTimes",
       "msg": "IDO times are non-sequential"
     },
     {
-      "code": 101,
+      "code": 302,
       "name": "StartIdoTime",
       "msg": "IDO has not started"
     },
     {
-      "code": 102,
+      "code": 303,
       "name": "EndDepositsTime",
       "msg": "Deposits period has ended"
     },
     {
-      "code": 103,
+      "code": 304,
       "name": "EndIdoTime",
       "msg": "IDO has ended"
     },
     {
-      "code": 104,
+      "code": 305,
       "name": "IdoNotOver",
       "msg": "IDO has not finished yet"
     },
     {
-      "code": 105,
+      "code": 306,
       "name": "LowUsdc",
       "msg": "Insufficient USDC"
     },
     {
-      "code": 106,
+      "code": 307,
       "name": "LowRedeemable",
       "msg": "Insufficient redeemable tokens"
     },
     {
-      "code": 107,
+      "code": 308,
       "name": "UsdcNotEqRedeem",
       "msg": "USDC total and redeemable total don't match"
     },
     {
-      "code": 108,
+      "code": 309,
       "name": "InvalidNonce",
       "msg": "Given nonce is invalid"
     }
   ],
   "metadata": {
-    "address": "4vZP5tE6sjKrSSuFwSxvmx76kc99BCVUeDo1dYT5tXAF"
+    "address": "5JTPKQJPkvrMzfDyEHX6EiaEYbR5QxXDkNQ66BoadgUn"
   }
 }

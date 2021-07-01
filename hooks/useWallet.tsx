@@ -102,9 +102,12 @@ export default function useWallet() {
           '...' +
           wallet.publicKey.toString().substr(-5),
       })
-      //await actions.fetchWalletTokenAccounts()
-      //await actions.fetchWalletMints()
       await actions.fetchPool()
+      await actions.fetchVault()
+      await Promise.all([
+        actions.fetchWalletTokenAccounts(),
+        actions.fetchVaultMint(),
+      ])
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
@@ -128,8 +131,7 @@ export default function useWallet() {
   }, [wallet, setWalletStore])
 
   useInterval(async () => {
-    //await actions.fetchWalletTokenAccounts()
-    //await actions.fetchWalletMints()
+    await actions.fetchVault()
   }, 20 * SECONDS)
 
   return { connected, wallet }

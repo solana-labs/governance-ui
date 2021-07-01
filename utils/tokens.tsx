@@ -42,6 +42,19 @@ export async function getMint(
   }
 }
 
+export async function getTokenAccount(
+  connection: Connection,
+  publicKey: PublicKey
+): Promise<ProgramAccount<TokenAccount>> {
+  const result = await connection.getAccountInfo(publicKey)
+  const data = Buffer.from(result.data)
+  const account = parseTokenAccountData(publicKey, data)
+  return {
+    publicKey,
+    account,
+  }
+}
+
 // copied from @solana/spl-token
 
 const TOKEN_PROGRAM_ID = new PublicKey(

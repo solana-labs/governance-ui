@@ -103,6 +103,7 @@ const ContributionModal = () => {
 
   useEffect(() => {
     if (submitting) {
+      // TODO: add submission here
       const submitTimer = setTimeout(() => {
         setSubmitted(true)
         setSubmitting(false)
