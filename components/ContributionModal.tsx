@@ -4,13 +4,13 @@ import tw from 'twin.macro'
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/outline'
 import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
-import { getUsdcBalance } from '../utils'
 import Input from './Input'
 import Button from './Button'
 import { ConnectWalletButtonSmall } from './ConnectWalletButton'
 import Slider from './Slider'
 import Loading from './Loading'
 import WalletIcon from './WalletIcon'
+import useLargestAccounts from '../hooks/useLargestAccounts'
 
 const StyledModalWrapper = styled.div`
   height: 414px;
@@ -40,9 +40,15 @@ const StyledModalBorder = styled.div<StyledModalBorderProps>`
 `
 
 const ContributionModal = () => {
+  const actions = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
-  const usdcBalance = getUsdcBalance()
+  const largestAccounts = useLargestAccounts()
+
+  const usdcBalance = largestAccounts.usdc?.balance || 0
+  const redeemableBalance = largestAccounts.redeemable?.balance || 0
+
+  console.log({ usdcBalance, redeemableBalance })
 
   const [contributionAmount, setContributionAmount] = useState(0)
   const [sliderPercentage, setSliderPercentage] = useState(0)
@@ -51,6 +57,11 @@ const ContributionModal = () => {
   const [editContribution, setEditContribution] = useState(false)
   const [loading, setLoading] = useState(true)
   const [maxButtonTransition, setMaxButtonTransition] = useState(false)
+
+  useEffect(() => {
+    console.log('setContributionAmount from redeemableBalance')
+    setContributionAmount(redeemableBalance)
+  }, [redeemableBalance])
 
   const handleConnectDisconnect = () => {
     if (connected) {
@@ -103,12 +114,9 @@ const ContributionModal = () => {
 
   useEffect(() => {
     if (submitting) {
-      // TODO: add submission here
-      const submitTimer = setTimeout(() => {
-        setSubmitted(true)
-        setSubmitting(false)
-      }, 2000)
-      return () => clearTimeout(submitTimer)
+      actions.submitContribution(contributionAmount)
+      setSubmitted(true)
+      setSubmitting(false)
     }
   }, [submitting])
 

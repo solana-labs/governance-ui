@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import * as anchor from '@project-serum/anchor'
 
 import { EndpointInfo, WalletAdapter } from '../@types/types'
@@ -16,6 +16,11 @@ import {
   MintAccount,
   getTokenAccount,
 } from '../utils/tokens'
+import { findLargestBalanceAccountForMint } from '../hooks/useLargestAccounts'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { token } from '@project-serum/anchor/dist/utils'
+import { createAssociatedTokenAccount } from '../utils/associated'
+import { sendTransaction } from '../utils/send'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -27,10 +32,10 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url: 'https://devnet.solana.com',
-    websocket: 'https://devnet.solana.com',
-    programId: 'E5s3D6B3PJinuB9kb3dicxfi3qUNLUGX6hoPawhbqagt',
-    poolKey: '',
+    url: 'https://api.devnet.solana.com',
+    websocket: 'https://api.devnet.solana.com',
+    programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV',
+    poolKey: 'ZfSZf2xrNLBrfY37TwJLoHv9qdKBQpkbZuPrq5FT8U9',
   },
   {
     name: 'localnet',
@@ -41,7 +46,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
 ]
 
-const CLUSTER = 'localnet'
+const CLUSTER = 'devnet'
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')
@@ -72,10 +77,13 @@ interface WalletStore extends State {
   }
   current: WalletAdapter | undefined
   providerUrl: string
+  provider: anchor.Provider | undefined
+  program: anchor.Program | undefined
+  pool: PoolAccount | undefined
+  mangoVault: TokenAccount | undefined
+  usdcVault: TokenAccount | undefined
   tokenAccounts: ProgramAccount<TokenAccount>[]
   mints: { [pubkey: string]: MintAccount }
-  pool: PoolAccount | undefined
-  vault: TokenAccount | undefined
   set: (x: any) => void
   actions: any
 }
@@ -91,10 +99,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   },
   current: null,
   providerUrl: null,
+  provider: undefined,
+  program: undefined,
+  pool: undefined,
+  mangoVault: undefined,
+  usdcVault: undefined,
   tokenAccounts: [],
   mints: {},
-  pool: undefined,
-  vault: undefined,
   actions: {
     async fetchPool() {
       const connection = get().connection.current
@@ -110,15 +121,23 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           anchor.Provider.defaultOptions()
         )
         const program = new anchor.Program(poolIdl, programId, provider)
-        console.log(program)
-
         const pool = (await program.account.poolAccount.fetch(
           POOL_PK
         )) as PoolAccount
-        console.log(pool)
+
+        const [usdcVault, mangoVault] = await Promise.all([
+          getTokenAccount(connection, pool.poolUsdc),
+          getTokenAccount(connection, pool.poolWatermelon),
+        ])
+
+        console.log({ program, pool, usdcVault, mangoVault })
 
         set((state) => {
+          state.provider = provider
+          state.program = program
           state.pool = pool
+          state.usdcVault = usdcVault.account
+          state.mangoVault = mangoVault.account
         })
       }
     },
@@ -135,6 +154,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           walletOwner
         )
 
+        console.log('fetchWalletTokenAccounts', ownedTokenAccounts)
+
         set((state) => {
           state.tokenAccounts = ownedTokenAccounts
         })
@@ -144,7 +165,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         })
       }
     },
-    async fetchVault() {
+    async fetchUsdcVault() {
       const connection = get().connection.current
       const pool = get().pool
       const set = get().set
@@ -155,23 +176,123 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         connection,
         pool.poolUsdc
       )
-      console.log('fetchVault', vault)
+      console.log('fetchUsdcVault', vault)
 
       set((state) => {
-        state.vault = vault
+        state.usdcVault = vault
       })
     },
-    async fetchVaultMint() {
+    async fetchMints() {
       const connection = get().connection.current
-      const vault = get().vault
+      const pool = get().pool
+      const mangoVault = get().mangoVault
+      const usdcVault = get().usdcVault
       const set = get().set
 
-      const { account: mint } = await getMint(connection, vault.mint)
-      console.log('fetchVaultMint', mint)
+      const mintKeys = [mangoVault.mint, usdcVault.mint, pool.redeemableMint]
+      const mints = await Promise.all(
+        mintKeys.map((pk) => getMint(connection, pk))
+      )
+      console.log('fetchMints', mints)
 
       set((state) => {
-        state.mints[vault.mint.toBase58()] = mint
+        for (const pa of mints) {
+          state.mints[pa.publicKey.toBase58()] = pa.account
+          console.log('mint', pa.publicKey.toBase58(), pa.account)
+        }
       })
+    },
+    async submitContribution(amount: number) {
+      console.log('submitContribution', amount)
+
+      const actions = get().actions
+      await actions.fetchWalletTokenAccounts()
+
+      const {
+        program,
+        provider,
+        pool,
+        tokenAccounts,
+        mints,
+        usdcVault,
+        current: wallet,
+        connection: { current: connection },
+      } = get()
+      const usdcDecimals = mints[usdcVault.mint.toBase58()].decimals
+      const redeemable = findLargestBalanceAccountForMint(
+        mints,
+        tokenAccounts,
+        pool.redeemableMint
+      )
+      const usdc = findLargestBalanceAccountForMint(
+        mints,
+        tokenAccounts,
+        usdcVault.mint
+      )
+
+      const difference = amount - (redeemable?.balance || 0)
+      const [poolSigner] = await anchor.web3.PublicKey.findProgramAddress(
+        [pool.watermelonMint.toBuffer()],
+        program.programId
+      )
+
+      if (difference > 0) {
+        const depositAmount = new anchor.BN(
+          difference * Math.pow(10, usdcDecimals)
+        )
+        console.log(depositAmount.toString(), 'exchangeUsdcForReemable')
+
+        let redeemableAccPk = redeemable?.account?.publicKey
+        const transaction = new Transaction()
+        if (!redeemable) {
+          const [ins, pk] = await createAssociatedTokenAccount(
+            wallet.publicKey,
+            wallet.publicKey,
+            pool.redeemableMint
+          )
+          transaction.add(ins)
+          redeemableAccPk = pk
+        }
+        transaction.add(
+          program.instruction.exchangeUsdcForRedeemable(depositAmount, {
+            accounts: {
+              poolAccount: POOL_PK,
+              poolSigner: poolSigner,
+              redeemableMint: pool.redeemableMint,
+              poolUsdc: pool.poolUsdc,
+              userAuthority: provider.wallet.publicKey,
+              userUsdc: usdc.account.publicKey,
+              userRedeemable: redeemableAccPk,
+              tokenProgram: TOKEN_PROGRAM_ID,
+              clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+            },
+          })
+        )
+        await sendTransaction({ transaction, wallet, connection })
+      } else if (difference < 0) {
+        const withdrawAmount = new anchor.BN(
+          difference * -1 * Math.pow(10, usdcDecimals)
+        )
+        console.log(withdrawAmount.toString(), 'exchangeRedeemableForUsdc')
+        await program.rpc.exchangeRedeemableForUsdc(withdrawAmount, {
+          accounts: {
+            poolAccount: POOL_PK,
+            poolSigner: poolSigner,
+            redeemableMint: pool.redeemableMint,
+            poolUsdc: pool.poolUsdc,
+            userAuthority: provider.wallet.publicKey,
+            userUsdc: usdc.account.publicKey,
+            userRedeemable: redeemable.account.publicKey,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+          },
+        })
+      } else {
+        console.log('difference = 0 no submission needed', difference)
+        return
+      }
+
+      await actions.fetchWalletTokenAccounts()
     },
   },
   set: (fn) => set(produce(fn)),
