@@ -61,6 +61,9 @@ const ContributionModal = () => {
   useEffect(() => {
     console.log('setContributionAmount from redeemableBalance')
     setContributionAmount(redeemableBalance)
+    if (redeemableBalance > 0) {
+      setSubmitted(true)
+    }
   }, [redeemableBalance])
 
   const handleConnectDisconnect = () => {
