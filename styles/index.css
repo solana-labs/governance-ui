@@ -1,3 +1,33 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+:root {
+  --primary: theme('colors.primary.light');
+}
+
+/* base */
+
+* {
+  @apply m-0 p-0;
+}
+
+body {
+  @apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
+}
+
+h2 {
+  @apply text-xl mb-1 font-bold;
+}
+
+p {
+  @apply text-fgd-4 text-sm;
+}
+
+button {
+  @apply font-bold;
+}
+
+.default-transition {
+  @apply transition-all duration-300;
+}

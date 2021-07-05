@@ -19,6 +19,8 @@ export interface EndpointInfo {
   name: string
   url: string
   websocket: string
+  programId: string
+  poolKey: string
 }
 
 export interface WalletContextValues {

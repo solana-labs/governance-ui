@@ -53,30 +53,30 @@ const Notification = ({ type, message, description, txid }) => {
 
   return (
     <div
-      className={`max-w-sm w-full bg-th-bkg-3 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`}
+      className={`max-w-sm w-full bg-bkg-3 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`}
     >
       <div className={`p-4`}>
         <div className={`flex items-center`}>
           <div className={`flex-shrink-0`}>
             {type === 'success' ? (
-              <CheckCircleIcon className={`text-th-green h-9 w-9 mr-1`} />
+              <CheckCircleIcon className={`text-green h-9 w-9 mr-1`} />
             ) : null}
             {type === 'info' && (
-              <XCircleIcon className={`text-th-primary h-9 w-9 mr-1`} />
+              <XCircleIcon className={`text-primary h-9 w-9 mr-1`} />
             )}
             {type === 'error' && (
-              <InformationCircleIcon className={`text-th-red h-9 w-9 mr-1`} />
+              <InformationCircleIcon className={`text-red h-9 w-9 mr-1`} />
             )}
           </div>
           <div className={`ml-2 w-0 flex-1`}>
-            <div className={`text-lg text-th-fgd-1`}>{message}</div>
+            <div className={`text-lg text-fgd-1`}>{message}</div>
             {description ? (
-              <p className={`mt-0.5 text-base text-th-fgd-2`}>{description}</p>
+              <p className={`mt-0.5 text-base text-fgd-2`}>{description}</p>
             ) : null}
             {txid ? (
               <a
                 href={'https://explorer.solana.com/tx/' + txid}
-                className="text-th-primary"
+                className="text-primary"
               >
                 View transaction {txid.slice(0, 8)}...
                 {txid.slice(txid.length - 8)}
@@ -86,7 +86,7 @@ const Notification = ({ type, message, description, txid }) => {
           <div className={`ml-4 flex-shrink-0 self-start flex`}>
             <button
               onClick={() => setShowNotification(false)}
-              className={`bg-th-bkg-3 rounded-md inline-flex text-fgd-3 hover:text-th-fgd-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-th-primary`}
+              className={`bg-bkg-3 rounded-md inline-flex text-fgd-3 hover:text-fgd-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
             >
               <span className={`sr-only`}>Close</span>
               <svg
