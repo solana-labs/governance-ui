@@ -118,9 +118,11 @@ const ContributionModal = () => {
 
   useEffect(() => {
     if (submitting) {
-      actions.submitContribution(contributionAmount)
-      setSubmitted(true)
-      setSubmitting(false)
+      (async () => {
+        await actions.submitContribution(contributionAmount)
+        setSubmitted(true)
+        setSubmitting(false)
+      })()
     }
   }, [submitting])
 
