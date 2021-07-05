@@ -128,11 +128,12 @@ const ContributionModal = () => {
 
   useEffect(() => {
     if (submitting) {
-      (async () => {
+      const handleSubmit = async () => {
         await actions.submitContribution(contributionAmount)
         setSubmitted(true)
         setSubmitting(false)
-      })()
+      }
+      handleSubmit()
     }
   }, [submitting])
 

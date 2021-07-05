@@ -127,10 +127,11 @@ export default function useWallet() {
 
   // fetch pool on page load
   useEffect(() => {
-    ;(async () => {
+    const pageLoad = async () => {
       await actions.fetchPool()
       actions.fetchMints()
-    })()
+    }
+    pageLoad()
   }, [])
 
   // refresh usdc vault regularly
