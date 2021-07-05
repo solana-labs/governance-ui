@@ -103,10 +103,7 @@ export default function useWallet() {
           wallet.publicKey.toString().substr(-5),
       })
       await actions.fetchPool()
-      await Promise.all([
-        actions.fetchWalletTokenAccounts(),
-        actions.fetchMints(),
-      ])
+      await actions.fetchWalletTokenAccounts()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
@@ -129,8 +126,17 @@ export default function useWallet() {
     }
   }, [wallet, setWalletStore])
 
+  // fetch pool on page load
+  useEffect(() => {
+    (async () => {
+      await actions.fetchPool()
+      actions.fetchMints()
+    })()
+  }, [])
+
+  // refresh usdc vault regularly
   useInterval(async () => {
-    await actions.fetchUsdcVault()
+    actions.fetchUsdcVault()
   }, 20 * SECONDS)
 
   return { connected, wallet }

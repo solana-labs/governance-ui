@@ -108,12 +108,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   actions: {
     async fetchPool() {
       const connection = get().connection.current
-      const connected = get().connected
       const wallet = get().current
       const programId = get().connection.programId
 
-      console.log('fetchPool', connected, poolIdl)
-      if (connection && connected) {
+      console.log('fetchPool', connection, poolIdl)
+      if (connection) {
         const provider = new anchor.Provider(
           connection,
           wallet,
@@ -292,6 +291,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
 
       await actions.fetchWalletTokenAccounts()
+      actions.fetchUsdcVault()
     },
   },
   set: (fn) => set(produce(fn)),

@@ -11,6 +11,8 @@ import Slider from './Slider'
 import Loading from './Loading'
 import WalletIcon from './WalletIcon'
 import useLargestAccounts from '../hooks/useLargestAccounts'
+import useVaults from '../hooks/useVaults'
+import moment from 'moment'
 
 const StyledModalWrapper = styled.div`
   height: 414px;
@@ -44,6 +46,14 @@ const ContributionModal = () => {
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const largestAccounts = useLargestAccounts()
+  const vaults = useVaults()
+
+  const pool = useWalletStore((s) => s.pool)
+  const startIdo = pool ? moment.unix(pool.startIdoTs.toNumber()) : undefined
+  const endIdo = pool ? moment.unix(pool.endIdoTs.toNumber()) : undefined
+  const endDeposits = pool
+    ? moment.unix(pool.endDepositsTs.toNumber())
+    : undefined
 
   const usdcBalance = largestAccounts.usdc?.balance || 0
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
@@ -280,6 +290,23 @@ const ContributionModal = () => {
         )}
       </StyledModalWrapper>
       <StyledModalBorder animate={submitted && connected} />
+      <p>
+        Start: {startIdo?.fromNow()} ({startIdo?.format()})
+      </p>
+      <p>
+        End Deposits: {endDeposits?.fromNow()} ({endDeposits?.format()})
+      </p>
+      <p>
+        End Withdraws: {endIdo?.fromNow()} ({endIdo?.format()})
+      </p>
+      <p>Current USDC in Pool: {vaults.usdc?.balance || 'N/A'}</p>
+      <p>Locked MNGO in Pool: {vaults.mango?.balance || 'N/A'}</p>
+      <p>
+        Estimated Price per Token:{' '}
+        {vaults.usdc && vaults.mango
+          ? vaults.usdc.balance / vaults.mango.balance
+          : 'N/A'}
+      </p>
     </div>
   )
 }
