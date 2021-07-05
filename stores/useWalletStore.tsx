@@ -18,7 +18,6 @@ import {
 } from '../utils/tokens'
 import { findLargestBalanceAccountForMint } from '../hooks/useLargestAccounts'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { token } from '@project-serum/anchor/dist/utils'
 import { createAssociatedTokenAccount } from '../utils/associated'
 import { sendTransaction } from '../utils/send'
 

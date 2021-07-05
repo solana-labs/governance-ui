@@ -1,19 +1,14 @@
 import { notify } from './notifications'
 import {
   Account,
-  AccountInfo,
   Commitment,
   Connection,
-  PublicKey,
   RpcResponseAndContext,
   SimulatedTransactionResponse,
   Transaction,
   TransactionSignature,
 } from '@solana/web3.js'
 import Wallet from '@project-serum/sol-wallet-adapter'
-import { Buffer } from 'buffer'
-import assert from 'assert'
-import { struct } from 'superstruct'
 
 class TransactionError extends Error {
   public txid: string
