@@ -47,11 +47,11 @@ const ContributionModal = () => {
 
   const usdcBalance = largestAccounts.usdc?.balance || 0
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
+  const totalBalance = usdcBalance + redeemableBalance
 
-  console.log({ usdcBalance, redeemableBalance })
+  console.log({ usdcBalance, redeemableBalance, totalBalance })
 
   const [contributionAmount, setContributionAmount] = useState(0)
-  const [sliderPercentage, setSliderPercentage] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
   const [editContribution, setEditContribution] = useState(false)
@@ -85,17 +85,14 @@ const ContributionModal = () => {
 
   const onChangeAmountInput = (amount) => {
     setContributionAmount(amount)
-    setSliderPercentage((amount / usdcBalance) * 100)
   }
 
   const onChangeSlider = (percentage) => {
-    setContributionAmount((percentage / 100) * usdcBalance)
-    setSliderPercentage(percentage)
+    setContributionAmount(Math.round(percentage * totalBalance) / 100)
   }
 
   const handleMax = () => {
-    setContributionAmount(usdcBalance)
-    setSliderPercentage(100)
+    setContributionAmount(totalBalance)
     setMaxButtonTransition(true)
   }
 
@@ -107,10 +104,10 @@ const ContributionModal = () => {
 
   useEffect(() => {
     setLoading(true)
-    if (usdcBalance) {
+    if (largestAccounts.usdc) {
       setLoading(false)
     }
-  }, [usdcBalance])
+  }, [largestAccounts])
 
   useEffect(() => {
     if (submitting) {
@@ -234,7 +231,7 @@ const ContributionModal = () => {
                 <div className="pb-20">
                   <Slider
                     disabled={disableFormInputs}
-                    value={sliderPercentage}
+                    value={(100 * contributionAmount) / totalBalance}
                     onChange={(v) => onChangeSlider(v)}
                     step={1}
                     maxButtonTransition={maxButtonTransition}
