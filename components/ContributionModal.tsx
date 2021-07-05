@@ -49,8 +49,7 @@ const ContributionModal = () => {
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
   const totalBalance = usdcBalance + redeemableBalance
 
-  console.log({ usdcBalance, redeemableBalance, totalBalance })
-
+  const [walletAmount, setWalletAmount] = useState(0)
   const [contributionAmount, setContributionAmount] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -59,12 +58,13 @@ const ContributionModal = () => {
   const [maxButtonTransition, setMaxButtonTransition] = useState(false)
 
   useEffect(() => {
-    console.log('setContributionAmount from redeemableBalance')
+    console.log('refresh modal on balance change')
+    setWalletAmount(usdcBalance)
     setContributionAmount(redeemableBalance)
     if (redeemableBalance > 0) {
       setSubmitted(true)
     }
-  }, [redeemableBalance])
+  }, [totalBalance])
 
   const handleConnectDisconnect = () => {
     if (connected) {
@@ -87,14 +87,18 @@ const ContributionModal = () => {
   }
 
   const onChangeAmountInput = (amount) => {
+    setWalletAmount(totalBalance - amount)
     setContributionAmount(amount)
   }
 
   const onChangeSlider = (percentage) => {
-    setContributionAmount(Math.round(percentage * totalBalance) / 100)
+    const newContribution = Math.round(percentage * totalBalance) / 100
+    setWalletAmount(totalBalance - newContribution)
+    setContributionAmount(newContribution)
   }
 
   const handleMax = () => {
+    setWalletAmount(0)
     setContributionAmount(totalBalance)
     setMaxButtonTransition(true)
   }
@@ -173,7 +177,7 @@ const ContributionModal = () => {
                       <div className="bg-bkg-4 rounded w-10 h-4 animate-pulse" />
                     ) : (
                       <span className="font-display text-fgd-1 ml-1">
-                        {usdcBalance}
+                        {walletAmount}
                       </span>
                     )
                   ) : (
@@ -243,7 +247,7 @@ const ContributionModal = () => {
                 <Button
                   onClick={() => handleSetContribution()}
                   className="w-full py-2.5"
-                  disabled={disableFormInputs}
+                  disabled={disableFormInputs || walletAmount < 0}
                 >
                   <div className={`flex items-center justify-center`}>
                     Set Contribution
