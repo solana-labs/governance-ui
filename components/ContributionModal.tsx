@@ -217,7 +217,7 @@ const ContributionModal = () => {
                   ) : null}
                   <Button
                     className={`${
-                      submitted && 'opacity-30'
+                      disableFormInputs && 'opacity-30'
                     } bg-bkg-4 font-normal rounded text-fgd-3 text-xs py-0.5 px-1.5`}
                     disabled={disableFormInputs}
                     onClick={() => handleMax()}

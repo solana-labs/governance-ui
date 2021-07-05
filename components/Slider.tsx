@@ -96,6 +96,7 @@ const StyledSliderButton = styled.button<StyledSliderButtonProps>`
   ${({ styleValue, sliderValue }) => styleValue < sliderValue && tw`opacity-40`}
   ${({ styleValue, sliderValue }) =>
     styleValue === sliderValue && tw`animate-pulse text-primary-light`}
+  ${({ disabled }) => disabled && 'cursor: default'}
 `
 
 type SliderProps = {
@@ -153,6 +154,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
           onClick={() => handleSliderButtonClick(0)}
           styleValue={0}
           sliderValue={value}
+          disabled={disabled}
         >
           0%
         </StyledSliderButton>
@@ -160,6 +162,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
           onClick={() => handleSliderButtonClick(25)}
           styleValue={25}
           sliderValue={value}
+          disabled={disabled}
         >
           25%
         </StyledSliderButton>
@@ -167,6 +170,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
           onClick={() => handleSliderButtonClick(50)}
           styleValue={50}
           sliderValue={value}
+          disabled={disabled}
         >
           50%
         </StyledSliderButton>
@@ -174,6 +178,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
           onClick={() => handleSliderButtonClick(75)}
           styleValue={75}
           sliderValue={value}
+          disabled={disabled}
         >
           75%
         </StyledSliderButton>
@@ -181,6 +186,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
           onClick={() => handleSliderButtonClick(100)}
           styleValue={100}
           sliderValue={value}
+          disabled={disabled}
         >
           100%
         </StyledSliderButton>
