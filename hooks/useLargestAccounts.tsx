@@ -18,13 +18,6 @@ export function findLargestBalanceAccountForMint(
   const account = accounts[maxBalanceAccountIndex]
   const balance = balances[maxBalanceAccountIndex]
 
-  console.log(
-    'findLargestBalanceAccountForMint',
-    maxBalanceAccountIndex,
-    account,
-    balance
-  )
-
   return { account, balance }
 }
 

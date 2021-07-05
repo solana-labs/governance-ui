@@ -152,8 +152,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           walletOwner
         )
 
-        console.log('fetchWalletTokenAccounts', ownedTokenAccounts)
-
         set((state) => {
           state.tokenAccounts = ownedTokenAccounts
         })

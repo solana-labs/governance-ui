@@ -109,7 +109,6 @@ export default function useWallet() {
       setWalletStore((state) => {
         state.connected = false
         state.tokenAccounts = []
-        state.mints = {}
       })
       notify({
         type: 'info',
@@ -128,7 +127,7 @@ export default function useWallet() {
 
   // fetch pool on page load
   useEffect(() => {
-    (async () => {
+    ;(async () => {
       await actions.fetchPool()
       actions.fetchMints()
     })()
