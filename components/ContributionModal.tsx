@@ -1,5 +1,9 @@
 import { useEffect, useState } from 'react'
-import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/outline'
+import {
+  ExclamationCircleIcon,
+  LockClosedIcon,
+  LockOpenIcon,
+} from '@heroicons/react/outline'
 import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
 import Input from './Input'
@@ -38,6 +42,7 @@ const ContributionModal = () => {
   const [editContribution, setEditContribution] = useState(false)
   const [loading, setLoading] = useState(true)
   const [maxButtonTransition, setMaxButtonTransition] = useState(false)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   useEffect(() => {
     console.log('refresh modal on balance change')
@@ -74,14 +79,26 @@ const ContributionModal = () => {
   }
 
   const onChangeSlider = (percentage) => {
-    const newContribution = Math.round(percentage * totalBalance) / 100
+    let newContribution = Math.round(percentage * totalBalance) / 100
+    if (endDeposits.isBefore()) {
+      newContribution = Math.min(newContribution, redeemableBalance)
+      setErrorMessage('Deposits ended, contribution can not increase')
+      setTimeout(() => setErrorMessage(null), 5000)
+    }
+
     setWalletAmount(totalBalance - newContribution)
     setContributionAmount(newContribution)
   }
 
   const handleMax = () => {
-    setWalletAmount(0)
-    setContributionAmount(totalBalance)
+    if (endDeposits.isAfter()) {
+      setWalletAmount(0)
+      setContributionAmount(totalBalance)
+    } else {
+      setWalletAmount(usdcBalance)
+      setContributionAmount(redeemableBalance)
+    }
+
     setMaxButtonTransition(true)
   }
 
@@ -247,7 +264,7 @@ const ContributionModal = () => {
                   !submitted ? 'opacity-100' : 'opacity-30'
                 } transiton-all duration-1000`}
               >
-                <div className="pb-20">
+                <div className="pb-8">
                   <Slider
                     disabled={disableFormInputs}
                     value={(100 * contributionAmount) / totalBalance}
@@ -255,6 +272,14 @@ const ContributionModal = () => {
                     step={1}
                     maxButtonTransition={maxButtonTransition}
                   />
+                </div>
+                <div className="h-12">
+                  {errorMessage && (
+                    <div className="flex items-center pt-1.5 text-th-red">
+                      <ExclamationCircleIcon className="h-4 w-4 mr-1.5" />
+                      {errorMessage}
+                    </div>
+                  )}
                 </div>
                 <Button
                   onClick={() => handleSetContribution()}
