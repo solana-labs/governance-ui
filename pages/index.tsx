@@ -7,8 +7,10 @@ const Index = () => {
     <div className={`bg-bkg-1 text-fgd-1 transition-all`}>
       <TopBar />
       <Notifications />
-      <div className="grid grid-cols-1 place-items-center">
-        <ContributionModal />
+      <div className="flex justify-center">
+        <div className="max-w-screen-md grid grid-cols-12 gap-4 w-full">
+          <ContributionModal />
+        </div>
       </div>
     </div>
   )
