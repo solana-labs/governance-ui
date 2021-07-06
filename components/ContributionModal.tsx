@@ -1,6 +1,4 @@
 import { useEffect, useState } from 'react'
-import styled from '@emotion/styled'
-import tw from 'twin.macro'
 import { LockClosedIcon, LockOpenIcon } from '@heroicons/react/outline'
 import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
@@ -13,33 +11,7 @@ import WalletIcon from './WalletIcon'
 import useLargestAccounts from '../hooks/useLargestAccounts'
 import useVaults from '../hooks/useVaults'
 import moment from 'moment'
-
-const StyledModalWrapper = styled.div`
-  height: 414px;
-  ${tw`bg-bkg-2 flex flex-col items-center relative rounded-lg shadow-lg p-7 w-96`}
-`
-type StyledModalBorderProps = {
-  animate: boolean
-}
-
-const StyledModalBorder = styled.div<StyledModalBorderProps>`
-  height: 416px;
-  width: 386px;
-  top: -1px;
-  left: -1px;
-  z-index: -1;
-  position: absolute;
-
-  :after {
-    content: '';
-    background-size: 300% 300%;
-    ${tw`bg-bkg-3 absolute top-0 left-0 right-0 bottom-0 rounded-lg`}
-
-    ${({ animate }) =>
-      animate &&
-      tw`animate-gradient opacity-60 bg-gradient-to-br from-secondary-1-light via-secondary-3-light to-primary-light`}
-  }
-`
+import Countdown from 'react-countdown'
 
 const ContributionModal = () => {
   const actions = useWalletStore((s) => s.actions)
@@ -49,7 +21,7 @@ const ContributionModal = () => {
   const vaults = useVaults()
 
   const pool = useWalletStore((s) => s.pool)
-  const startIdo = pool ? moment.unix(pool.startIdoTs.toNumber()) : undefined
+  // const startIdo = pool ? moment.unix(pool.startIdoTs.toNumber()) : undefined
   const endIdo = pool ? moment.unix(pool.endIdoTs.toNumber()) : undefined
   const endDeposits = pool
     ? moment.unix(pool.endDepositsTs.toNumber())
@@ -139,13 +111,40 @@ const ContributionModal = () => {
 
   const disableFormInputs = submitted || !connected || loading
 
+  const renderCountdown = ({ hours, minutes, seconds, completed }) => {
+    const now = new Date().getTime() / 1000
+    const message =
+      now > pool.endDepositsTs.toNumber() && now < pool.endIdoTs.toNumber()
+        ? 'Deposits are closed'
+        : 'The IDO has ended'
+    if (completed) {
+      return <p className="text-secondary-2-light">{message}</p>
+    } else {
+      return (
+        <div className="font-bold pt-2 text-fgd-1 text-base">
+          <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded">
+            {hours < 10 ? `0${hours}` : hours}
+          </span>
+          :
+          <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded">
+            {minutes < 10 ? `0${minutes}` : minutes}
+          </span>
+          :
+          <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded">
+            {seconds < 10 ? `0${seconds}` : seconds}
+          </span>
+        </div>
+      )
+    }
+  }
+
   return (
-    <div className="relative z-10">
-      <StyledModalWrapper>
+    <>
+      <div className="bg-bkg-2 border border-bkg-3 col-span-7 p-7 rounded-lg shadow-lg">
         <div className="pb-4 text-center">
           {!submitted && !submitting && !editContribution ? (
             <>
-              <h2>Plant your seed</h2>
+              <h2>Plant Your Seed</h2>
               <p>This is the start of something big.</p>
             </>
           ) : null}
@@ -172,7 +171,7 @@ const ContributionModal = () => {
           ) : null}
         </div>
         {submitting ? (
-          <div className="flex items-center h-full">
+          <div className="flex h-64 items-center justify-center">
             <Loading className="h-6 w-6 mb-3 text-primary-light" />
           </div>
         ) : (
@@ -268,47 +267,93 @@ const ContributionModal = () => {
                 </Button>
               </div>
             </div>
-            {connected ? (
-              <Button
-                className="rounded-full bg-bkg-4 text-fgd-3 font-normal"
-                onClick={() => handleConnectDisconnect()}
-                secondary
-              >
-                <div className="flex items-center text-sm">
-                  <LinkIcon className="h-4 w-4 mr-1" />
-                  Disconnect
-                </div>
-              </Button>
-            ) : (
-              <ConnectWalletButtonSmall onClick={handleConnectDisconnect}>
-                <div className="flex items-center justify-center text-sm">
-                  <LinkIcon className="h-4 w-4 mr-1" />
-                  Connect Wallet
-                </div>
-              </ConnectWalletButtonSmall>
-            )}
+            <div className="flex justify-center">
+              {connected ? (
+                <Button
+                  className="rounded-full bg-bkg-4 text-fgd-3 font-normal"
+                  onClick={() => handleConnectDisconnect()}
+                  secondary
+                >
+                  <div className="flex items-center text-sm">
+                    <LinkIcon className="h-4 w-4 mr-1" />
+                    Disconnect
+                  </div>
+                </Button>
+              ) : (
+                <ConnectWalletButtonSmall onClick={handleConnectDisconnect}>
+                  <div className="flex items-center justify-center text-sm">
+                    <LinkIcon className="h-4 w-4 mr-1" />
+                    Connect Wallet
+                  </div>
+                </ConnectWalletButtonSmall>
+              )}
+            </div>
           </>
         )}
-      </StyledModalWrapper>
-      <StyledModalBorder animate={submitted && connected} />
-      <p>
-        Start: {startIdo?.fromNow()} ({startIdo?.format()})
-      </p>
-      <p>
-        End Deposits: {endDeposits?.fromNow()} ({endDeposits?.format()})
-      </p>
-      <p>
-        End Withdraws: {endIdo?.fromNow()} ({endIdo?.format()})
-      </p>
-      <p>Current USDC in Pool: {vaults.usdc?.balance || 'N/A'}</p>
-      <p>Locked MNGO in Pool: {vaults.mango?.balance || 'N/A'}</p>
-      <p>
-        Estimated Price per Token:{' '}
-        {vaults.usdc && vaults.mango
-          ? vaults.usdc.balance / vaults.mango.balance
-          : 'N/A'}
-      </p>
-    </div>
+      </div>
+      <div className="bg-gradient-to-br from-secondary-4-dark to-secondary-4-light border border-bkg-3 col-span-5 p-7 rounded-lg shadow-lg">
+        <div className="border-b border-bkg-4 pb-4 text-center">
+          <p className="text-fgd-3">Estimated Token Price</p>
+          <div className="flex items-center justify-center pt-0.5">
+            <img
+              alt=""
+              width="20"
+              height="20"
+              src="/icons/usdc.svg"
+              className={`mr-2`}
+            />
+            <div className="font-bold text-fgd-1 text-xl">
+              {vaults.usdc && vaults.mango
+                ? `$${vaults.usdc.balance / vaults.mango.balance}`
+                : 'N/A'}
+            </div>
+          </div>
+        </div>
+        <div className="border-b border-bkg-4 py-4 text-center">
+          <p className="text-fgd-3">Total USDC Deposited</p>
+          <div className="flex items-center justify-center pt-0.5">
+            <div className="font-bold text-fgd-1 text-base">
+              {`$${vaults.usdc?.balance.toLocaleString()}` || 'N/A'}
+            </div>
+          </div>
+        </div>
+        <div className="border-b border-bkg-4 py-4 text-center">
+          <p className="text-fgd-3">Locked MNGO in Pool</p>
+          <div className="flex items-center justify-center pt-0.5">
+            <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="mango" />
+            <div className="font-bold text-fgd-1 text-base">
+              {vaults.mango?.balance.toLocaleString() || 'N/A'}
+            </div>
+          </div>
+        </div>
+        <div className="border-b border-bkg-4 py-4 text-center">
+          <p className="text-fgd-3">Deposits Close</p>
+          {pool ? (
+            <Countdown
+              date={endDeposits?.format()}
+              renderer={renderCountdown}
+            />
+          ) : null}
+        </div>
+        <div className="pt-4 text-center">
+          <p className="text-fgd-3">Withdrawals Close</p>
+          {pool ? (
+            <Countdown date={endIdo?.format()} renderer={renderCountdown} />
+          ) : null}
+        </div>
+        {/* <p>
+          Start: {startIdo?.fromNow()} ({startIdo?.format()})
+        </p>
+        <p>
+          End Deposits: {endDeposits?.fromNow()} ({endDeposits?.format()})
+        </p>
+        <p>
+          End Withdraws: {endIdo?.fromNow()} ({endIdo?.format()})
+        </p>
+        <p>Current USDC in Pool: {vaults.usdc?.balance || 'N/A'}</p>
+        <p>Locked MNGO in Pool: {vaults.mango?.balance || 'N/A'}</p> */}
+      </div>
+    </>
   )
 }
 
