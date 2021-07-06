@@ -76,6 +76,10 @@ const ContributionModal = () => {
   const onChangeAmountInput = (amount) => {
     setWalletAmount(totalBalance - amount)
     setContributionAmount(amount)
+    if (endDeposits.isBefore() && amount > redeemableBalance) {
+      setErrorMessage('Deposits ended, contribution can not increase')
+      setTimeout(() => setErrorMessage(null), 5000)
+    }
   }
 
   const onChangeSlider = (percentage) => {
@@ -275,7 +279,7 @@ const ContributionModal = () => {
                 </div>
                 <div className="h-12">
                   {errorMessage && (
-                    <div className="flex items-center pt-1.5 text-th-red">
+                    <div className="flex items-center pt-1.5 text-secondary-2-light">
                       <ExclamationCircleIcon className="h-4 w-4 mr-1.5" />
                       {errorMessage}
                     </div>
