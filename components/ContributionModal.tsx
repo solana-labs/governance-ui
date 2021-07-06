@@ -34,6 +34,9 @@ const ContributionModal = () => {
   const usdcBalance = largestAccounts.usdc?.balance || 0
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
   const totalBalance = usdcBalance + redeemableBalance
+  // const mangoRedeemable = vaults.usdc
+  //   ? (redeemableBalance * vaults.mango.balance) / vaults.usdc.balance
+  //   : 0
 
   const [walletAmount, setWalletAmount] = useState(0)
   const [contributionAmount, setContributionAmount] = useState(0)
@@ -78,16 +81,16 @@ const ContributionModal = () => {
     setContributionAmount(amount)
     if (endDeposits.isBefore() && amount > redeemableBalance) {
       setErrorMessage('Deposits ended, contribution can not increase')
-      setTimeout(() => setErrorMessage(null), 5000)
+      setTimeout(() => setErrorMessage(null), 4000)
     }
   }
 
   const onChangeSlider = (percentage) => {
     let newContribution = Math.round(percentage * totalBalance) / 100
-    if (endDeposits.isBefore()) {
-      newContribution = Math.min(newContribution, redeemableBalance)
+    if (endDeposits.isBefore() && newContribution > redeemableBalance) {
+      newContribution = redeemableBalance
       setErrorMessage('Deposits ended, contribution can not increase')
-      setTimeout(() => setErrorMessage(null), 5000)
+      setTimeout(() => setErrorMessage(null), 4000)
     }
 
     setWalletAmount(totalBalance - newContribution)
@@ -131,6 +134,10 @@ const ContributionModal = () => {
   }, [submitting])
 
   const disableFormInputs = submitted || !connected || loading
+
+  const dontAddMore =
+    endDeposits.isBefore() && contributionAmount > redeemableBalance
+  const disableSubmit = disableFormInputs || walletAmount < 0 || dontAddMore
 
   const renderCountdown = ({ hours, minutes, seconds, completed }) => {
     const now = new Date().getTime() / 1000
@@ -268,7 +275,7 @@ const ContributionModal = () => {
                   !submitted ? 'opacity-100' : 'opacity-30'
                 } transiton-all duration-1000`}
               >
-                <div className="pb-8">
+                <div className="pb-12">
                   <Slider
                     disabled={disableFormInputs}
                     value={(100 * contributionAmount) / totalBalance}
@@ -277,7 +284,7 @@ const ContributionModal = () => {
                     maxButtonTransition={maxButtonTransition}
                   />
                 </div>
-                <div className="h-12">
+                <div className="h-12 pb-4">
                   {errorMessage && (
                     <div className="flex items-center pt-1.5 text-secondary-2-light">
                       <ExclamationCircleIcon className="h-4 w-4 mr-1.5" />
@@ -288,10 +295,12 @@ const ContributionModal = () => {
                 <Button
                   onClick={() => handleSetContribution()}
                   className="w-full py-2.5"
-                  disabled={disableFormInputs || walletAmount < 0}
+                  disabled={disableSubmit}
                 >
                   <div className={`flex items-center justify-center`}>
-                    Set Contribution
+                    {dontAddMore
+                      ? 'Sorry you can’t add anymore 🥲'
+                      : 'Set Contribution'}
                   </div>
                 </Button>
               </div>

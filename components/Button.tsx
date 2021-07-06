@@ -54,7 +54,7 @@ const Button: FunctionComponent<ButtonProps> = ({
     <StyledButton
       onClick={onClick}
       disabled={disabled}
-      className={`${className} bg-gradient-to-br from-secondary-1-light via-secondary-1-dark to-secondary-2-light relative z-10 default-transition px-6 py-2 rounded-lg text-fgd-1 hover:bg-bkg-3 focus:outline-none disabled:cursor-not-allowed`}
+      className={`${className} bg-gradient-to-br from-secondary-1-light via-secondary-1-dark to-secondary-2-light relative z-10 default-transition px-6 py-2 rounded-lg text-fgd-1 hover:bg-bkg-3 focus:outline-none disabled:cursor-not-allowed disabled:opacity-60`}
       secondary={secondary}
       {...props}
     >
