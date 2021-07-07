@@ -2,6 +2,7 @@ import Notifications from '../components/Notification'
 import TopBar from '../components/TopBar'
 import ContributionModal from '../components/ContributionModal'
 import PoolInfoCards from '../components/PoolInfoCards'
+import HeroSection from '../components/HeroSection'
 
 const Index = () => {
   return (
@@ -9,6 +10,7 @@ const Index = () => {
       <TopBar />
       <Notifications />
 
+      <HeroSection />
       <PoolInfoCards />
       <div className="flex justify-center">
         <div className="max-w-screen-md grid grid-cols-12 gap-4 w-full">
