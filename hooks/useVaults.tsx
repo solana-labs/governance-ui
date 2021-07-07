@@ -22,5 +22,19 @@ export default function useVaults() {
     [mangoVault, mints]
   )
 
-  return { usdc, mango }
+  const usdcBalance = useMemo(
+    () => (usdc ? `${Math.round(usdc.balance).toLocaleString()}` : 'N/A'),
+    [usdc]
+  )
+  const mangoBalance = useMemo(
+    () => `${mango?.balance.toLocaleString()}` || 'N/A',
+    [mango]
+  )
+
+  const estimatedPrice = useMemo(
+    () => (usdc && mango ? `$${usdc.balance / mango.balance}` : 'N/A'),
+    [usdc, mango]
+  )
+
+  return { usdc, mango, usdcBalance, mangoBalance, estimatedPrice }
 }

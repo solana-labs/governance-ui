@@ -9,13 +9,13 @@ import useWalletStore from '../stores/useWalletStore'
 import Input from './Input'
 import Button from './Button'
 import { ConnectWalletButtonSmall } from './ConnectWalletButton'
+import PoolCountdown from './PoolCountdown'
 import Slider from './Slider'
 import Loading from './Loading'
 import WalletIcon from './WalletIcon'
 import useLargestAccounts from '../hooks/useLargestAccounts'
 import useVaults from '../hooks/useVaults'
-import moment from 'moment'
-import Countdown from 'react-countdown'
+import usePool from '../hooks/usePool'
 
 const ContributionModal = () => {
   const actions = useWalletStore((s) => s.actions)
@@ -23,13 +23,7 @@ const ContributionModal = () => {
   const wallet = useWalletStore((s) => s.current)
   const largestAccounts = useLargestAccounts()
   const vaults = useVaults()
-
-  const pool = useWalletStore((s) => s.pool)
-  // const startIdo = pool ? moment.unix(pool.startIdoTs.toNumber()) : undefined
-  const endIdo = pool ? moment.unix(pool.endIdoTs.toNumber()) : undefined
-  const endDeposits = pool
-    ? moment.unix(pool.endDepositsTs.toNumber())
-    : undefined
+  const { endIdo, endDeposits } = usePool()
 
   const usdcBalance = largestAccounts.usdc?.balance || 0
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
@@ -79,7 +73,7 @@ const ContributionModal = () => {
   const onChangeAmountInput = (amount) => {
     setWalletAmount(totalBalance - amount)
     setContributionAmount(amount)
-    if (endDeposits.isBefore() && amount > redeemableBalance) {
+    if (endDeposits?.isBefore() && amount > redeemableBalance) {
       setErrorMessage('Deposits ended, contribution can not increase')
       setTimeout(() => setErrorMessage(null), 4000)
     }
@@ -87,7 +81,7 @@ const ContributionModal = () => {
 
   const onChangeSlider = (percentage) => {
     let newContribution = Math.round(percentage * totalBalance) / 100
-    if (endDeposits.isBefore() && newContribution > redeemableBalance) {
+    if (endDeposits?.isBefore() && newContribution > redeemableBalance) {
       newContribution = redeemableBalance
       setErrorMessage('Deposits ended, contribution can not increase')
       setTimeout(() => setErrorMessage(null), 4000)
@@ -98,7 +92,7 @@ const ContributionModal = () => {
   }
 
   const handleMax = () => {
-    if (endDeposits.isAfter()) {
+    if (endDeposits?.isAfter()) {
       setWalletAmount(0)
       setContributionAmount(totalBalance)
     } else {
@@ -136,35 +130,8 @@ const ContributionModal = () => {
   const disableFormInputs = submitted || !connected || loading
 
   const dontAddMore =
-    endDeposits.isBefore() && contributionAmount > redeemableBalance
+    endDeposits?.isBefore() && contributionAmount > redeemableBalance
   const disableSubmit = disableFormInputs || walletAmount < 0 || dontAddMore
-
-  const renderCountdown = ({ hours, minutes, seconds, completed }) => {
-    const now = new Date().getTime() / 1000
-    const message =
-      now > pool.endDepositsTs.toNumber() && now < pool.endIdoTs.toNumber()
-        ? 'Deposits are closed'
-        : 'The IDO has ended'
-    if (completed) {
-      return <p className="text-secondary-2-light">{message}</p>
-    } else {
-      return (
-        <div className="font-bold pt-2 text-fgd-1 text-base">
-          <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded">
-            {hours < 10 ? `0${hours}` : hours}
-          </span>
-          :
-          <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded">
-            {minutes < 10 ? `0${minutes}` : minutes}
-          </span>
-          :
-          <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded">
-            {seconds < 10 ? `0${seconds}` : seconds}
-          </span>
-        </div>
-      )
-    }
-  }
 
   return (
     <>
@@ -341,9 +308,7 @@ const ContributionModal = () => {
               className={`mr-2`}
             />
             <div className="font-bold text-fgd-1 text-xl">
-              {vaults.usdc && vaults.mango
-                ? `$${vaults.usdc.balance / vaults.mango.balance}`
-                : 'N/A'}
+              {vaults.estimatedPrice}
             </div>
           </div>
         </div>
@@ -351,7 +316,7 @@ const ContributionModal = () => {
           <p className="text-fgd-3">Total USDC Deposited</p>
           <div className="flex items-center justify-center pt-0.5">
             <div className="font-bold text-fgd-1 text-base">
-              {`$${vaults.usdc?.balance.toLocaleString()}` || 'N/A'}
+              {vaults.usdcBalance}
             </div>
           </div>
         </div>
@@ -360,24 +325,17 @@ const ContributionModal = () => {
           <div className="flex items-center justify-center pt-0.5">
             <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="mango" />
             <div className="font-bold text-fgd-1 text-base">
-              {vaults.mango?.balance.toLocaleString() || 'N/A'}
+              {vaults.mangoBalance}
             </div>
           </div>
         </div>
         <div className="border-b border-bkg-4 py-4 text-center">
           <p className="text-fgd-3">Deposits Close</p>
-          {pool ? (
-            <Countdown
-              date={endDeposits?.format()}
-              renderer={renderCountdown}
-            />
-          ) : null}
+          <PoolCountdown date={endDeposits} />
         </div>
         <div className="pt-4 text-center">
           <p className="text-fgd-3">Withdrawals Close</p>
-          {pool ? (
-            <Countdown date={endIdo?.format()} renderer={renderCountdown} />
-          ) : null}
+          <PoolCountdown date={endIdo} />
         </div>
         {/* <p>
           Start: {startIdo?.fromNow()} ({startIdo?.format()})
