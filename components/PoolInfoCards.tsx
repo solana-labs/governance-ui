@@ -30,7 +30,7 @@ const PoolInfoCards = () => {
 
       <Card title="Total $MNGO for sale">
         <div className="flex">
-          <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="MNGO" />
+          <img className="h-5 mr-1 w-auto" src="/logo.svg" alt="MNGO" />
           <div className="font-bold text-fgd-1 text-base">
             {vaults.mangoBalance}
           </div>
@@ -44,7 +44,7 @@ const PoolInfoCards = () => {
             width="20"
             height="20"
             src="/icons/usdc.svg"
-            className={`mr-2`}
+            className={`mr-1`}
           />{' '}
           <div className="font-bold text-fgd-1 text-base">
             {vaults.usdcBalance}
@@ -59,7 +59,7 @@ const PoolInfoCards = () => {
             width="20"
             height="20"
             src="/icons/usdc.svg"
-            className={`mr-2`}
+            className={`mr-1`}
           />{' '}
           <div className="font-bold text-fgd-1 text-base">
             {vaults.estimatedPrice.substring(0, 9)}

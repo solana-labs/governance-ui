@@ -9,5 +9,9 @@ export default function usePool() {
     ? moment.unix(pool.endDepositsTs.toNumber())
     : undefined
 
+  // // override for testing
+  // endDeposits = moment().add(1, 'days')
+  // endIdo = moment().add(2, 'days')
+
   return { pool, startIdo, endIdo, endDeposits }
 }
