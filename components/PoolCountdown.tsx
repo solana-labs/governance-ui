@@ -3,9 +3,10 @@ import Countdown from 'react-countdown'
 import moment from 'moment'
 import { ClockIcon } from '@heroicons/react/outline'
 
-const PoolCountdown = (props: { date: moment.Moment }) => {
+const PoolCountdown = (props: { className?: string; date: moment.Moment }) => {
   const { endIdo, endDeposits } = usePool()
-  const renderCountdown = ({ hours, minutes, seconds, completed }) => {
+  const renderCountdown = ({ days, hours, minutes, seconds, completed }) => {
+    hours += days * 24
     const message =
       endDeposits?.isBefore() && endIdo?.isAfter()
         ? 'Deposits are closed'
@@ -14,7 +15,9 @@ const PoolCountdown = (props: { date: moment.Moment }) => {
       return <p className="text-secondary-2-light">{message}</p>
     } else {
       return (
-        <div className="font-bold text-fgd-1 text-base flex items-center">
+        <div
+          className={`${props.className} font-bold text-fgd-1 text-base flex items-center`}
+        >
           <ClockIcon className="w-5 h-5 mr-1" />
           <span>
             {/* <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded"> */}

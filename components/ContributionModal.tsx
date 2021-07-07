@@ -331,11 +331,11 @@ const ContributionModal = () => {
         </div>
         <div className="border-b border-bkg-4 py-4 text-center">
           <p className="text-fgd-3">Deposits Close</p>
-          <PoolCountdown date={endDeposits} />
+          <PoolCountdown date={endDeposits} className="justify-center pt-1" />
         </div>
         <div className="pt-4 text-center">
           <p className="text-fgd-3">Withdrawals Close</p>
-          <PoolCountdown date={endIdo} />
+          <PoolCountdown date={endIdo} className="justify-center pt-1" />
         </div>
         {/* <p>
           Start: {startIdo?.fromNow()} ({startIdo?.format()})
