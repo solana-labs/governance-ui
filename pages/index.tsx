@@ -1,24 +1,19 @@
+import SalePage from './SalePage'
+import RedeemPage from './RedeemPage'
 import Notifications from '../components/Notification'
 import TopBar from '../components/TopBar'
-import ContributionModal from '../components/ContributionModal'
-import PoolInfoCards from '../components/PoolInfoCards'
-import HeroSection from '../components/HeroSection'
-import LandingContent from '../components/LandingContent'
+
+import usePool from '../hooks/usePool'
 
 const Index = () => {
+  const { endIdo } = usePool()
+
   return (
     <div className={`bg-bkg-1 text-fgd-1 transition-all`}>
       <TopBar />
       <Notifications />
-
-      <HeroSection />
-      <PoolInfoCards />
-      <LandingContent />
-      <div className="flex justify-center">
-        <div className="max-w-screen-md grid grid-cols-12 gap-4 w-full">
-          <ContributionModal />
-        </div>
-      </div>
+      {endIdo?.isAfter() && <SalePage />}
+      {endIdo?.isBefore() && <RedeemPage />}
     </div>
   )
 }

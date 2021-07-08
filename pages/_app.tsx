@@ -33,7 +33,7 @@ function App({ Component, pageProps }) {
         <meta name="twitter:description" content={description} />
         <meta name="twitter:image" content="/twitter-image.png" />
 
-        <link rel="manifest" href="/manifest.json"></link>
+        {/* <link rel="manifest" href="/manifest.json"></link> */}
       </Head>
       <ThemeProvider defaultTheme="Mango">
         <Component {...pageProps} />

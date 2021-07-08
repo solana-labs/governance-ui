@@ -291,6 +291,74 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       await actions.fetchWalletTokenAccounts()
       actions.fetchUsdcVault()
     },
+    async redeem() {
+      console.log('redeem')
+
+      const actions = get().actions
+      await actions.fetchWalletTokenAccounts()
+
+      const {
+        program,
+        pool,
+        tokenAccounts,
+        mints,
+        current: wallet,
+        connection: { current: connection },
+      } = get()
+      const redeemable = findLargestBalanceAccountForMint(
+        mints,
+        tokenAccounts,
+        pool.redeemableMint
+      )
+      const watermelon = findLargestBalanceAccountForMint(
+        mints,
+        tokenAccounts,
+        pool.watermelonMint
+      )
+
+      console.log(redeemable, watermelon, 'exchangeRedeemableForMango')
+
+      const [poolSigner] = await anchor.web3.PublicKey.findProgramAddress(
+        [pool.watermelonMint.toBuffer()],
+        program.programId
+      )
+
+      const transaction = new Transaction()
+
+      let watermelonAccount = watermelon?.account?.publicKey
+      if (!watermelonAccount) {
+        const [ins, pk] = await createAssociatedTokenAccount(
+          wallet.publicKey,
+          wallet.publicKey,
+          pool.watermelonMint
+        )
+        transaction.add(ins)
+        watermelonAccount = pk
+      }
+
+      transaction.add(
+        program.instruction.exchangeRedeemableForWatermelon(
+          redeemable.account.account.amount,
+          {
+            accounts: {
+              poolAccount: POOL_PK,
+              poolSigner,
+              redeemableMint: pool.redeemableMint,
+              poolWatermelon: pool.poolWatermelon,
+              userAuthority: wallet.publicKey,
+              userWatermelon: watermelonAccount,
+              userRedeemable: redeemable.account.publicKey,
+              tokenProgram: TOKEN_PROGRAM_ID,
+              clock: anchor.web3.SYSVAR_CLOCK_PUBKEY,
+            },
+          }
+        )
+      )
+
+      await sendTransaction({ transaction, wallet, connection })
+
+      await actions.fetchPool()
+    },
   },
   set: (fn) => set(produce(fn)),
 }))
