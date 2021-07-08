@@ -1,3 +1,6 @@
+import { ChevronRightIcon } from '@heroicons/react/solid'
+import GradientText from './GradientText'
+
 const LandingContent = () => {
   return (
     <div className="bg-th-bkg-3 transform -skew-y-3 pt-12 md:pt-48 pb-32 lg:pb-48 mb-48 lg:mb-48 -mt-64">
@@ -38,45 +41,27 @@ const LandingContent = () => {
 
           <div className="w-full overflow-hidden xl:my-4 xl:px-16 xl:w-1/2">
             <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
-              What is the{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-yellow-300 to-green-300">
-                $MNGO
-              </span>{' '}
-              token?
+              What is the <GradientText>$MNGO</GradientText> token?
             </h2>
             <p className="mb-8 text-gray-400 leading-relaxed">
               We believe that substantial rewards to a strong developer
               community and liquidity incentives are the essential drivers for
               growth and therefore the foundation of the Mango DAO. Mango
               Governance tokens ($MNGO) will serve as the incentive for those
-              who can proove their work is useful to the DAO.
+              who can proove their work is useful to the DAO. So far tokens were
+              until now only provided to contributors who helped to build out
+              the protocol.
             </p>
             <button
-              className="inline-flex items-center px-8 py-2 text-lg text-white font-bold bg-gradient-to-br from-yellow-200 via-lime-400 to-green-500 hover:bg-blue-600 rounded-full transition duration-200"
-              href="#"
+              className="inline-flex items-center px-2 py-2 pr-4 text-lg text-white font-bold rounded-xl"
+              style={{ backgroundColor: 'rgba(44, 41, 66, 1)' }}
             >
-              <span className="pr-4">Check out the whitepaper</span>
-              <svg
-                width="9"
-                height="16"
-                viewBox="0 0 9 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <path
-                  d="M1 1.6665L7.8963 7.99984L1 14.3332"
-                  stroke="white"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                />
-              </svg>
+              <div className="m-2 p-2 rounded-full bg-opacity-10 bg-white">
+                <img alt="paper" width="10" height="9" src="/icons/paper.svg" />
+              </div>
+              Check out the whitepaper &nbsp;
+              <ChevronRightIcon className="w-6 h-6" />
             </button>
-            <p className="text-white leading-relaxed py-4">
-              <span className="text-yellow-300">$MNGO</span> tokens were until
-              now only provided to contributors who helped to build out the
-              protocol.
-            </p>
           </div>
         </div>
 

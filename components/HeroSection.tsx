@@ -1,3 +1,5 @@
+import GradientText from './GradientText'
+
 const HeroSection = () => {
   return (
     <section className="bg-hero-img bg-no-repeat bg-cover">
@@ -5,7 +7,7 @@ const HeroSection = () => {
         <div className="relative pt-32 mb-32">
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
-              Join the Mango DAO
+              Join the <GradientText>Mango DAO</GradientText>
             </h2>
             <p className="md:mx-24">
               The Mango DAO is an experiment in self governance to merge the
