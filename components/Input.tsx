@@ -1,7 +1,7 @@
 interface InputProps {
   type: string
   value: any
-  onChange: (e) => void
+  onChange?: (e) => void
   className?: string
   disabled?: boolean
   [x: string]: any

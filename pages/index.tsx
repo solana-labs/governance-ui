@@ -1,4 +1,4 @@
-import SalePage from './SalePage'
+import ContributionPage from './ContributionPage'
 import RedeemPage from './RedeemPage'
 import Notifications from '../components/Notification'
 import TopBar from '../components/TopBar'
@@ -12,7 +12,7 @@ const Index = () => {
     <div className={`bg-bkg-1 text-fgd-1 transition-all`}>
       <TopBar />
       <Notifications />
-      {endIdo?.isAfter() && <SalePage />}
+      {endIdo?.isAfter() && <ContributionPage />}
       {endIdo?.isBefore() && <RedeemPage />}
     </div>
   )

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
+import Input from './Input'
 import { ConnectWalletButtonSmall } from './ConnectWalletButton'
 import Loading from './Loading'
 import useLargestAccounts from '../hooks/useLargestAccounts'
@@ -14,12 +15,11 @@ const RedeemModal = () => {
   const largestAccounts = useLargestAccounts()
   const vaults = useVaults()
 
+  const totalRaised = vaults.usdc?.balance
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
   const mangoAvailable = vaults.usdc
     ? (redeemableBalance * vaults.mango.balance) / vaults.usdc.balance
     : 0
-
-  console.log('balance', redeemableBalance, mangoAvailable)
 
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -58,12 +58,12 @@ const RedeemModal = () => {
 
   return (
     <>
-      <div className="bg-bkg-2 border border-bkg-3 col-span-7 p-7 rounded-lg shadow-lg">
+      <div className="bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-lg">
         <div className="pb-4 text-center">
           {!submitting ? (
             <>
               <h2>Redeem your MNGO</h2>
-              <p>Welcome to the DAO, let&apos;s build together.</p>
+              {/* <p>Welcome to the DAO, let&apos;s build together.</p> */}
             </>
           ) : null}
 
@@ -80,11 +80,41 @@ const RedeemModal = () => {
           </div>
         ) : (
           <>
+            <div>
+              <span>Total raised</span>
+              <Input
+                className="border-0"
+                disabled
+                type="number"
+                value={totalRaised}
+                suffix="USDC"
+              />
+            </div>
             <div
               className={`${
                 connected ? 'opacity-100' : 'opacity-30'
               } pb-6 transiton-all duration-1000 w-full`}
             >
+              <div>
+                <span>Your contribution</span>
+                <Input
+                  className="border-0"
+                  disabled
+                  type="number"
+                  value={redeemableBalance}
+                  suffix="USDC"
+                />
+              </div>
+              <div>
+                <span>Redeemable amount</span>
+                <Input
+                  className="border-0"
+                  disabled
+                  type="number"
+                  value={mangoAvailable}
+                  suffix="MNGO"
+                />
+              </div>
               <div>
                 <Button
                   onClick={() => handleRedeem()}

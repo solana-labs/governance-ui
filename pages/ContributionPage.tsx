@@ -3,7 +3,7 @@ import PoolInfoCards from '../components/PoolInfoCards'
 import HeroSection from '../components/HeroSection'
 import LandingContent from '../components/LandingContent'
 
-const SalePage = () => {
+const ContributionPage = () => {
   return (
     <>
       <HeroSection />
@@ -18,4 +18,4 @@ const SalePage = () => {
   )
 }
 
-export default SalePage
+export default ContributionPage
