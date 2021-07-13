@@ -15,7 +15,11 @@ const RedeemModal = () => {
   const largestAccounts = useLargestAccounts()
   const vaults = useVaults()
 
+  const numberFormat = new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: 6,
+  })
   const totalRaised = vaults.usdc?.balance
+  // const redeemableBalance = 9667.6464734
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
   const mangoAvailable = vaults.usdc
     ? (redeemableBalance * vaults.mango.balance) / vaults.usdc.balance
@@ -81,41 +85,65 @@ const RedeemModal = () => {
         ) : (
           <>
             <div>
-              <span>Total raised</span>
+              <span className="text-fgd-4 text-xs">Total raised</span>
               <Input
                 className="border-0"
                 disabled
-                type="number"
-                value={totalRaised}
-                suffix="USDC"
+                type="text"
+                value={numberFormat.format(totalRaised)}
+                suffix={
+                  <img
+                    alt=""
+                    width="16"
+                    height="16"
+                    src="/icons/usdc.svg"
+                    className="inline"
+                  />
+                }
               />
             </div>
             <div
               className={`${
                 connected ? 'opacity-100' : 'opacity-30'
-              } pb-6 transiton-all duration-1000 w-full`}
+              } pb-6 transiton-all duration-1000 w-full `}
             >
-              <div>
-                <span>Your contribution</span>
+              <div className="py-1">
+                <span className="text-fgd-4 text-xs">Your contribution</span>
                 <Input
                   className="border-0"
                   disabled
-                  type="number"
-                  value={redeemableBalance}
-                  suffix="USDC"
+                  type="text"
+                  value={numberFormat.format(redeemableBalance)}
+                  suffix={
+                    <img
+                      alt=""
+                      width="16"
+                      height="16"
+                      src="/icons/usdc.svg"
+                      className="inline"
+                    />
+                  }
                 />
               </div>
-              <div>
-                <span>Redeemable amount</span>
+              <div className="py-1">
+                <span className="text-fgd-4 text-xs">Redeemable amount</span>
                 <Input
                   className="border-0"
                   disabled
-                  type="number"
-                  value={mangoAvailable}
-                  suffix="MNGO"
+                  type="text"
+                  value={numberFormat.format(mangoAvailable)}
+                  suffix={
+                    <img
+                      alt=""
+                      width="16"
+                      height="16"
+                      src="/logo.svg"
+                      className="inline"
+                    />
+                  }
                 />
               </div>
-              <div>
+              <div className="py-6">
                 <Button
                   onClick={() => handleRedeem()}
                   className="w-full py-2.5"
@@ -142,7 +170,7 @@ const RedeemModal = () => {
               ) : (
                 <ConnectWalletButtonSmall onClick={handleConnectDisconnect}>
                   <div className="flex items-center justify-center text-sm">
-                    <LinkIcon className="h-4 w-4 mr-1" />
+                    <LinkIcon className="h-4 w-4" />
                     Connect Wallet
                   </div>
                 </ConnectWalletButtonSmall>
