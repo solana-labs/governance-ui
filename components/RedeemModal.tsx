@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import Input from './Input'
@@ -156,25 +155,11 @@ const RedeemModal = () => {
               </div>
             </div>
             <div className="flex justify-center">
-              {connected ? (
-                <Button
-                  className="rounded-full bg-bkg-4 text-fgd-3 font-normal"
-                  onClick={() => handleConnectDisconnect()}
-                  secondary
-                >
-                  <div className="flex items-center text-sm">
-                    <LinkIcon className="h-4 w-4 mr-1" />
-                    Disconnect
-                  </div>
-                </Button>
-              ) : (
-                <ConnectWalletButtonSmall onClick={handleConnectDisconnect}>
-                  <div className="flex items-center justify-center text-sm">
-                    <LinkIcon className="h-4 w-4" />
-                    Connect Wallet
-                  </div>
-                </ConnectWalletButtonSmall>
-              )}
+              <ConnectWalletButtonSmall
+                className="flex pl-6"
+                connected={connected}
+                onClick={handleConnectDisconnect}
+              />
             </div>
           </>
         )}

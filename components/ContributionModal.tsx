@@ -4,7 +4,6 @@ import {
   LockClosedIcon,
   LockOpenIcon,
 } from '@heroicons/react/outline'
-import { LinkIcon } from '@heroicons/react/solid'
 import useWalletStore from '../stores/useWalletStore'
 import Input from './Input'
 import Button from './Button'
@@ -16,6 +15,10 @@ import WalletIcon from './WalletIcon'
 import useLargestAccounts from '../hooks/useLargestAccounts'
 import useVaults from '../hooks/useVaults'
 import usePool from '../hooks/usePool'
+import styled from '@emotion/styled'
+import 'twin.macro'
+
+const SmallButton = styled.button``
 
 const ContributionModal = () => {
   const actions = useWalletStore((s) => s.actions)
@@ -200,25 +203,23 @@ const ContributionModal = () => {
                 </div>
                 <div className="flex">
                   {submitted ? (
-                    <Button
+                    <SmallButton
                       className="ring-1 ring-secondary-1-light ring-inset hover:ring-secondary-1-dark hover:bg-transparent hover:text-secondary-1-dark font-normal rounded text-secondary-1-light text-xs py-0.5 px-1.5 mr-2"
                       disabled={!connected}
                       onClick={() => handleEditContribution()}
-                      secondary
                     >
                       Unlock
-                    </Button>
+                    </SmallButton>
                   ) : null}
-                  <Button
+                  <SmallButton
                     className={`${
                       disableFormInputs && 'opacity-30'
-                    } bg-bkg-4 font-normal rounded text-fgd-3 text-xs py-0.5 px-1.5`}
+                    } bg-bkg-4 hover:bg-bkg-3 font-normal rounded text-fgd-3 text-xs py-0.5 px-1.5`}
                     disabled={disableFormInputs}
                     onClick={() => handleMax()}
-                    secondary
                   >
                     Max
-                  </Button>
+                  </SmallButton>
                 </div>
               </div>
               <div className="flex items-center pb-4 relative">
@@ -273,25 +274,11 @@ const ContributionModal = () => {
               </div>
             </div>
             <div className="flex justify-center">
-              {connected ? (
-                <Button
-                  className="rounded-full bg-bkg-4 text-fgd-3 font-normal"
-                  onClick={() => handleConnectDisconnect()}
-                  secondary
-                >
-                  <div className="flex items-center text-sm">
-                    <LinkIcon className="h-4 w-4 mr-1" />
-                    Disconnect
-                  </div>
-                </Button>
-              ) : (
-                <ConnectWalletButtonSmall onClick={handleConnectDisconnect}>
-                  <div className="flex items-center justify-center text-sm">
-                    <LinkIcon className="h-4 w-4 mr-1" />
-                    Connect Wallet
-                  </div>
-                </ConnectWalletButtonSmall>
-              )}
+              <ConnectWalletButtonSmall
+                className="flex pl-6"
+                connected={connected}
+                onClick={handleConnectDisconnect}
+              />
             </div>
           </>
         )}

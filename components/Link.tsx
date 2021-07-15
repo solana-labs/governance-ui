@@ -2,8 +2,9 @@ import { FunctionComponent } from 'react'
 import styled from '@emotion/styled'
 import tw from 'twin.macro'
 
-const StyledButton = styled.button`
-  ${tw`relative z-10 px-8 py-2 rounded-full text-fgd-1`}
+const StyledButton = styled.a`
+  font-weight: 700;
+  cursor: pointer;
 
   :hover {
     ${tw`underline`}
@@ -28,23 +29,17 @@ const ChevronRightIcon = ({ className }) => (
 )
 
 interface LinkProps {
-  onClick?: (x?) => void
-  disabled?: boolean
   className?: string
 }
 
 const Link: FunctionComponent<LinkProps> = ({
   children,
-  onClick,
-  disabled = false,
   className,
   ...props
 }) => {
   return (
     <StyledButton
-      onClick={onClick}
-      disabled={disabled}
-      className={`${className} pr-5 flex z-10 px-8 py-2 text-fgd-1`}
+      className={`${className} pr-5 flex z-10 px-8 py-2 text-fgd-1 relative rounded-full`}
       {...props}
     >
       {children}

@@ -1,8 +1,6 @@
 import ContributionPage from './ContributionPage'
 import RedeemPage from './RedeemPage'
 import Notifications from '../components/Notification'
-import Button from '../components/Button'
-import Link from '../components/Link'
 import TopBar from '../components/TopBar'
 
 import usePool from '../hooks/usePool'

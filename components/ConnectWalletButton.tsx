@@ -4,6 +4,7 @@ import { WALLET_PROVIDERS, DEFAULT_PROVIDER } from '../hooks/useWallet'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 import WalletSelect from './WalletSelect'
 import WalletIcon from './WalletIcon'
+import { LinkIcon } from '@heroicons/react/solid'
 import Button from './Button'
 
 const StyledWalletTypeLabel = styled.div`
@@ -45,14 +46,18 @@ const ConnectWalletButton = () => {
 
 export default ConnectWalletButton
 
-export const ConnectWalletButtonSmall = ({ children, onClick }) => (
+export const ConnectWalletButtonSmall = ({ connected, ...props }) => (
   <div className="relative">
     <Button
       className="rounded-full h-9 w-44 z-30 relative"
-      onClick={() => onClick()}
+      gray={connected}
+      {...props}
     >
-      <div className="flex items-center justify-center text-sm">{children}</div>
+      <LinkIcon className="h-4 w-4 relative top-1 mr-2" />
+      {connected ? 'Disconnect' : 'Connect Wallet'}
     </Button>
-    <div className="absolute animate-connect-wallet-ping bg-secondary-2-light top-0 rounded-full h-9 w-44 z-20" />
+    {!connected && (
+      <div className="absolute animate-connect-wallet-ping bg-secondary-2-light top-0 rounded-full h-10 w-48" />
+    )}
   </div>
 )
