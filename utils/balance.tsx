@@ -20,7 +20,7 @@ export function calculateBalance(
 export function calculateSupply(
   mints: { [pk: string]: MintAccount },
   pk: PublicKey
-): number {
+): number | undefined {
   const mint = mints[pk.toBase58()]
-  return mint ? fixedPointToNumber(mint.supply, mint.decimals) : 0
+  return mint && fixedPointToNumber(mint.supply, mint.decimals)
 }

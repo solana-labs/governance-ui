@@ -12,7 +12,7 @@ const RedeemModal = () => {
   const actions = useWalletStore((s) => s.actions)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-  const redeemableMint = useWalletStore((s) => s.pool.redeemableMint)
+  const redeemableMint = useWalletStore((s) => s.pool?.redeemableMint)
   const mints = useWalletStore((s) => s.mints)
   const largestAccounts = useLargestAccounts()
   const vaults = useVaults()
@@ -22,9 +22,10 @@ const RedeemModal = () => {
   })
   const totalRaised = vaults.usdc?.balance
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
-  const redeemableSupply = calculateSupply(mints, redeemableMint)
+  const redeemableSupply =
+    redeemableMint && calculateSupply(mints, redeemableMint)
   const mangoAvailable =
-    vaults.mango && redeemableSupply > 0
+    vaults.mango && redeemableSupply
       ? (redeemableBalance * vaults.mango.balance) / redeemableSupply
       : 0
 
