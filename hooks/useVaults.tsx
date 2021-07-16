@@ -32,7 +32,7 @@ export default function useVaults() {
   )
 
   const estimatedPrice = useMemo(
-    () => (usdc && mango ? `$${usdc.balance / mango.balance}` : 'N/A'),
+    () => (usdc && mango ? usdc.balance / mango.balance : undefined),
     [usdc, mango]
   )
 

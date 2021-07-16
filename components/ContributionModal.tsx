@@ -44,6 +44,10 @@ const ContributionModal = () => {
   const [maxButtonTransition, setMaxButtonTransition] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
 
+  const priceFormat = new Intl.NumberFormat('en-US', {
+    maximumSignificantDigits: 4,
+  })
+
   useEffect(() => {
     console.log('refresh modal on balance change')
     setWalletAmount(usdcBalance)
@@ -291,7 +295,7 @@ const ContributionModal = () => {
               className={`mr-2`}
             />
             <div className="font-bold text-fgd-1 text-xl">
-              {vaults.estimatedPrice}
+              {priceFormat.format(vaults.estimatedPrice)}
             </div>
           </div>
         </div>

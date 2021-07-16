@@ -18,6 +18,10 @@ const PoolInfoCards = () => {
   const { endIdo, endDeposits } = usePool()
   const vaults = useVaults()
 
+  const numberFormat = new Intl.NumberFormat('en-US', {
+    maximumFractionDigits: 10,
+  })
+
   return (
     <div className="flex flex-row justify-center mb-12">
       <Card title="Deposits closing in">
@@ -62,7 +66,9 @@ const PoolInfoCards = () => {
             className={`mr-1`}
           />{' '}
           <div className="font-bold text-fgd-1 text-base">
-            {vaults.estimatedPrice.substring(0, 9)}
+            {vaults.estimatedPrice
+              ? numberFormat.format(vaults.estimatedPrice)
+              : 'N/A'}
           </div>
         </div>
       </Card>
