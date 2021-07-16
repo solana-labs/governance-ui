@@ -35,7 +35,7 @@ export const ENDPOINTS: EndpointInfo[] = [
     url: 'https://api.devnet.solana.com',
     websocket: 'https://api.devnet.solana.com',
     programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV',
-    poolKey: '4xUb7aXUHGu8tHKsCQkAfLBGRExEJBuQPuDBKGP4PtUh',
+    poolKey: '82ndgp58GXpwuLrEc9svHFdhiEsPaZoNUEWwgc79WHqk',
   },
   {
     name: 'localnet',
