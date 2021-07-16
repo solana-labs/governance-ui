@@ -1,63 +1,89 @@
-import styled from '@emotion/styled'
-import useWalletStore from '../stores/useWalletStore'
-import { WALLET_PROVIDERS, DEFAULT_PROVIDER } from '../hooks/useWallet'
-import useLocalStorageState from '../hooks/useLocalStorageState'
-import WalletSelect from './WalletSelect'
-import WalletIcon from './WalletIcon'
+import { Menu } from '@headlessui/react'
 import { LinkIcon } from '@heroicons/react/solid'
+import useWallet, { WALLET_PROVIDERS } from '../hooks/useWallet'
 import Button from './Button'
 
-const StyledWalletTypeLabel = styled.div`
-  font-size: 0.6rem;
-`
+const ChevronDownIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    {...props}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M19 9l-7 7-7-7"
+    ></path>
+  </svg>
+)
 
-const ConnectWalletButton = () => {
-  const wallet = useWalletStore((s) => s.current)
-  const [savedProviderUrl] = useLocalStorageState(
-    'walletProvider',
-    DEFAULT_PROVIDER.url
-  )
+const CheckIcon = (props) => (
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    {...props}
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      d="M5 13l4 4L19 7"
+    ></path>
+  </svg>
+)
+
+const ConnectWalletButton = (props) => {
+  const { connected, provider, setSavedProviderUrl } = useWallet()
 
   return (
-    <div className="flex justify-between border border-primary-light hover:border-fgd-1 rounded-md h-11 w-48">
-      <button
-        onClick={() => wallet.connect()}
-        disabled={!wallet}
-        className="focus:outline-none disabled:text-fgd-4 disabled:cursor-wait"
+    <div className="flex">
+      <Button
+        className={`h-9 z-30 px-8 flex items-center`}
+        gray={connected}
+        {...props}
       >
-        <div className="flex flex-row items-center px-2 justify-center h-full rounded-l default-transition text-primary-light text-sm hover:bg-primary hover:text-fgd-1">
-          <WalletIcon className="w-5 h-5 mr-3 fill-current" />
-          <div>
-            <span className="whitespace-nowrap">Connect Wallet</span>
-            <StyledWalletTypeLabel className="font-normal text-fgd-1 text-left leading-3">
-              {WALLET_PROVIDERS.filter((p) => p.url === savedProviderUrl).map(
-                ({ name }) => name
-              )}
-            </StyledWalletTypeLabel>
-          </div>
-        </div>
-      </button>
-      <div className="relative h-full">
-        <WalletSelect isPrimary />
+        <LinkIcon className="h-4 w-4 mr-2" />
+        {connected ? 'Disconnect' : 'Connect Wallet'}
+      </Button>
+
+      <div className="relative pl-2">
+        <Menu>
+          {({ open }) => (
+            <>
+              <Menu.Button className="cursor-pointer rounded-full h-9 w-9 py-2 px-2 bg-bkg-4 hover:bg-bkg-3 focus:outline-none">
+                {open ? (
+                  <ChevronDownIcon className="w-4 h-4 m-auto stroke-3" />
+                ) : (
+                  <img src={provider?.icon} className="w-4 h-4 m-auto" />
+                )}
+              </Menu.Button>
+              <Menu.Items className="z-20 p-1 absolute right-0 top-12 bg-bkg-1 shadow-lg border-2 border-bkg-3 outline-none rounded-2xl">
+                {WALLET_PROVIDERS.map(({ name, url, icon }) => (
+                  <Menu.Item key={name}>
+                    <button
+                      className="flex p-2 h-9 hover:bg-bkg-2 hover:cursor-pointer hover:rounded-2xl font-normal focus:outline-none"
+                      onClick={() => setSavedProviderUrl(url)}
+                      style={{ width: '14rem' }}
+                    >
+                      <img src={icon} className="h-4 w-4 mr-2" />
+                      <span className="text-sm">{name}</span>
+
+                      {provider?.url === url ? (
+                        <CheckIcon className="h-4 w-4 text-green-400 stroke-3" />
+                      ) : null}
+                    </button>
+                  </Menu.Item>
+                ))}
+              </Menu.Items>
+            </>
+          )}
+        </Menu>
       </div>
     </div>
   )
 }
 
 export default ConnectWalletButton
-
-export const ConnectWalletButtonSmall = ({ connected, ...props }) => (
-  <div className="relative">
-    <Button
-      className="rounded-full h-9 w-44 z-30 relative"
-      gray={connected}
-      {...props}
-    >
-      <LinkIcon className="h-4 w-4 relative top-1 mr-2" />
-      {connected ? 'Disconnect' : 'Connect Wallet'}
-    </Button>
-    {!connected && (
-      <div className="absolute animate-connect-wallet-ping bg-secondary-2-light top-0 rounded-full h-10 w-48" />
-    )}
-  </div>
-)

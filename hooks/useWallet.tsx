@@ -139,5 +139,5 @@ export default function useWallet() {
     actions.fetchUsdcVault()
   }, 20 * SECONDS)
 
-  return { connected, wallet }
+  return { connected, wallet, provider, setSavedProviderUrl }
 }

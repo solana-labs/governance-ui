@@ -110,6 +110,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection.current
       const wallet = get().current
       const programId = get().connection.programId
+      const set = get().set
 
       console.log('fetchPool', connection, poolIdl)
       if (connection) {

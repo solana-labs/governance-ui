@@ -7,7 +7,7 @@ import {
 import useWalletStore from '../stores/useWalletStore'
 import Input from './Input'
 import Button from './Button'
-import { ConnectWalletButtonSmall } from './ConnectWalletButton'
+import ConnectWalletButton from './ConnectWalletButton'
 import PoolCountdown from './PoolCountdown'
 import Slider from './Slider'
 import Loading from './Loading'
@@ -273,12 +273,8 @@ const ContributionModal = () => {
                 </Button>
               </div>
             </div>
-            <div className="flex justify-center">
-              <ConnectWalletButtonSmall
-                className="flex pl-6"
-                connected={connected}
-                onClick={handleConnectDisconnect}
-              />
+            <div className="flex items-center justify-center">
+              <ConnectWalletButton onClick={handleConnectDisconnect} />
             </div>
           </>
         )}

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import Input from './Input'
-import { ConnectWalletButtonSmall } from './ConnectWalletButton'
+import ConnectWalletButton from './ConnectWalletButton'
 import Loading from './Loading'
 import useLargestAccounts from '../hooks/useLargestAccounts'
 import useVaults from '../hooks/useVaults'
@@ -155,11 +155,7 @@ const RedeemModal = () => {
               </div>
             </div>
             <div className="flex justify-center">
-              <ConnectWalletButtonSmall
-                className="flex pl-6"
-                connected={connected}
-                onClick={handleConnectDisconnect}
-              />
+              <ConnectWalletButton onClick={handleConnectDisconnect} />
             </div>
           </>
         )}
