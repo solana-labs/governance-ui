@@ -20,6 +20,7 @@ import { findLargestBalanceAccountForMint } from '../hooks/useLargestAccounts'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { createAssociatedTokenAccount } from '../utils/associated'
 import { sendTransaction } from '../utils/send'
+import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -97,7 +98,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     programId: PROGRAM_ID,
   },
   current: null,
-  providerUrl: null,
+  providerUrl: DEFAULT_PROVIDER.url,
   provider: undefined,
   program: undefined,
   pool: undefined,
@@ -112,7 +113,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const programId = get().connection.programId
       const set = get().set
 
-      console.log('fetchPool', connection, poolIdl)
+      // console.log('fetchPool', connection, poolIdl)
       if (connection) {
         const provider = new anchor.Provider(
           connection,
@@ -129,7 +130,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           getTokenAccount(connection, pool.poolWatermelon),
         ])
 
-        console.log({ program, pool, usdcVault, mangoVault })
+        // console.log('fetchPool', { program, pool, usdcVault, mangoVault })
 
         set((state) => {
           state.provider = provider
@@ -146,6 +147,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const wallet = get().current
       const walletOwner = wallet?.publicKey
       const set = get().set
+
+      console.log(
+        'fetchWalletTokenAccounts',
+        connected,
+        walletOwner?.toString()
+      )
 
       if (connected && walletOwner) {
         const ownedTokenAccounts = await getOwnedTokenAccounts(
@@ -190,12 +197,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const mints = await Promise.all(
         mintKeys.map((pk) => getMint(connection, pk))
       )
-      console.log('fetchMints', mints)
+      // console.log('fetchMints', mints)
 
       set((state) => {
         for (const pa of mints) {
           state.mints[pa.publicKey.toBase58()] = pa.account
-          console.log('mint', pa.publicKey.toBase58(), pa.account)
+          // console.log('mint', pa.publicKey.toBase58(), pa.account)
         }
       })
     },
@@ -293,8 +300,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       actions.fetchUsdcVault()
     },
     async redeem() {
-      console.log('redeem')
-
       const actions = get().actions
       await actions.fetchWalletTokenAccounts()
 
@@ -306,6 +311,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         current: wallet,
         connection: { current: connection },
       } = get()
+
       const redeemable = findLargestBalanceAccountForMint(
         mints,
         tokenAccounts,
@@ -317,7 +323,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         pool.watermelonMint
       )
 
-      console.log(redeemable, watermelon, 'exchangeRedeemableForMango')
+      console.log('exchangeRedeemableForMango', redeemable, watermelon)
 
       const [poolSigner] = await anchor.web3.PublicKey.findProgramAddress(
         [pool.watermelonMint.toBuffer()],

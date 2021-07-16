@@ -9,8 +9,8 @@ import useVaults from '../hooks/useVaults'
 
 const RedeemModal = () => {
   const actions = useWalletStore((s) => s.actions)
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
+  const connected = useWalletStore((s) => s.connected)
   const largestAccounts = useLargestAccounts()
   const vaults = useVaults()
 

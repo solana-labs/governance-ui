@@ -1,41 +1,17 @@
 import { useEffect, useMemo } from 'react'
-import Wallet from '@project-serum/sol-wallet-adapter'
 
 import { WalletAdapter } from '../@types/types'
 import useWalletStore from '../stores/useWalletStore'
 import { notify } from '../utils/notifications'
 import {
-  PhantomWalletAdapter,
-  SolletExtensionAdapter,
+  DEFAULT_PROVIDER,
+  getWalletProviderByUrl,
 } from '../utils/wallet-adapters'
+
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
 
 const SECONDS = 1000
-const ASSET_URL =
-  'https://cdn.jsdelivr.net/gh/solana-labs/oyster@main/assets/wallets'
-
-export const WALLET_PROVIDERS = [
-  {
-    name: 'Sollet.io',
-    url: 'https://www.sollet.io',
-    icon: `${ASSET_URL}/sollet.svg`,
-  },
-  {
-    name: 'Sollet Extension',
-    url: 'https://www.sollet.io/extension',
-    icon: `${ASSET_URL}/sollet.svg`,
-    adapter: SolletExtensionAdapter as any,
-  },
-  {
-    name: 'Phantom',
-    url: 'https://www.phantom.app',
-    icon: `https://www.phantom.app/img/logo.png`,
-    adapter: PhantomWalletAdapter,
-  },
-]
-
-export const DEFAULT_PROVIDER = WALLET_PROVIDERS[0]
 
 export default function useWallet() {
   const {
@@ -50,13 +26,12 @@ export default function useWallet() {
     'walletProvider',
     DEFAULT_PROVIDER.url
   )
-  const provider = useMemo(
-    () => WALLET_PROVIDERS.find(({ url }) => url === savedProviderUrl),
-    [savedProviderUrl]
-  )
+  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
+    selectedProviderUrl,
+  ])
 
   useEffect(() => {
-    if (selectedProviderUrl) {
+    if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
       setSavedProviderUrl(selectedProviderUrl)
     }
   }, [selectedProviderUrl])
@@ -65,8 +40,8 @@ export default function useWallet() {
     if (provider) {
       const updateWallet = () => {
         // hack to also update wallet synchronously in case it disconnects
-        const wallet = new (provider.adapter || Wallet)(
-          savedProviderUrl,
+        const wallet = new provider.adapter(
+          provider.url,
           endpoint
         ) as WalletAdapter
         setWalletStore((state) => {
@@ -86,7 +61,7 @@ export default function useWallet() {
         updateWallet()
       }
     }
-  }, [provider, savedProviderUrl, endpoint])
+  }, [provider, endpoint])
 
   useEffect(() => {
     if (!wallet) return
@@ -116,14 +91,14 @@ export default function useWallet() {
       })
     })
     return () => {
-      if (wallet && wallet.connected) {
+      if (wallet) {
         wallet.disconnect()
       }
       setWalletStore((state) => {
         state.connected = false
       })
     }
-  }, [wallet, setWalletStore])
+  }, [wallet])
 
   // fetch pool on page load
   useEffect(() => {
@@ -139,5 +114,5 @@ export default function useWallet() {
     actions.fetchUsdcVault()
   }, 20 * SECONDS)
 
-  return { connected, wallet, provider, setSavedProviderUrl }
+  return { connected, wallet }
 }

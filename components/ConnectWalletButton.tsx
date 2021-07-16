@@ -1,6 +1,11 @@
 import { Menu } from '@headlessui/react'
 import { LinkIcon } from '@heroicons/react/solid'
-import useWallet, { WALLET_PROVIDERS } from '../hooks/useWallet'
+import { useMemo } from 'react'
+import useWalletStore from '../stores/useWalletStore'
+import {
+  getWalletProviderByUrl,
+  WALLET_PROVIDERS,
+} from '../utils/wallet-adapters'
 import Button from './Button'
 
 const ChevronDownIcon = (props) => (
@@ -36,7 +41,15 @@ const CheckIcon = (props) => (
 )
 
 const ConnectWalletButton = (props) => {
-  const { connected, provider, setSavedProviderUrl } = useWallet()
+  const {
+    connected,
+    selectedProviderUrl,
+    set: setWalletStore,
+  } = useWalletStore((s) => s)
+
+  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
+    selectedProviderUrl,
+  ])
 
   return (
     <div className="flex">
@@ -65,7 +78,11 @@ const ConnectWalletButton = (props) => {
                   <Menu.Item key={name}>
                     <button
                       className="flex p-2 h-9 hover:bg-bkg-2 hover:cursor-pointer hover:rounded-2xl font-normal focus:outline-none"
-                      onClick={() => setSavedProviderUrl(url)}
+                      onClick={() =>
+                        setWalletStore((s) => {
+                          s.providerUrl = url
+                        })
+                      }
                       style={{ width: '14rem' }}
                     >
                       <img src={icon} className="h-4 w-4 mr-2" />
