@@ -364,7 +364,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       await sendTransaction({ transaction, wallet, connection })
 
-      await actions.fetchPool()
+      await Promise.all([
+        actions.fetchPool(),
+        actions.fetchWalletTokenAccounts(),
+      ])
     },
   },
   set: (fn) => set(produce(fn)),

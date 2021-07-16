@@ -6,23 +6,27 @@ import ConnectWalletButton from './ConnectWalletButton'
 import Loading from './Loading'
 import useLargestAccounts from '../hooks/useLargestAccounts'
 import useVaults from '../hooks/useVaults'
+import { calculateSupply } from '../utils/balance'
 
 const RedeemModal = () => {
   const actions = useWalletStore((s) => s.actions)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
+  const redeemableMint = useWalletStore((s) => s.pool.redeemableMint)
+  const mints = useWalletStore((s) => s.mints)
   const largestAccounts = useLargestAccounts()
   const vaults = useVaults()
 
   const numberFormat = new Intl.NumberFormat('en-US', {
-    maximumSignificantDigits: 6,
+    maximumFractionDigits: 2,
   })
   const totalRaised = vaults.usdc?.balance
-  // const redeemableBalance = 9667.6464734
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
-  const mangoAvailable = vaults.usdc
-    ? (redeemableBalance * vaults.mango.balance) / vaults.usdc.balance
-    : 0
+  const redeemableSupply = calculateSupply(mints, redeemableMint)
+  const mangoAvailable =
+    vaults.mango && redeemableSupply > 0
+      ? (redeemableBalance * vaults.mango.balance) / redeemableSupply
+      : 0
 
   const [submitting, setSubmitting] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -57,7 +61,7 @@ const RedeemModal = () => {
   }, [submitting])
 
   const disableFormInputs = !connected || loading
-  const disableSubmit = disableFormInputs || redeemableBalance <= 0
+  const disableSubmit = disableFormInputs || redeemableBalance < 0
 
   return (
     <>

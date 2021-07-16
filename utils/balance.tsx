@@ -1,3 +1,4 @@
+import { PublicKey } from '@solana/web3.js'
 import BN from 'bn.js'
 import { MintAccount, TokenAccount } from './tokens'
 
@@ -14,4 +15,12 @@ export function calculateBalance(
 ): number {
   const mint = mints[account.mint.toBase58()]
   return mint ? fixedPointToNumber(account.amount, mint.decimals) : 0
+}
+
+export function calculateSupply(
+  mints: { [pk: string]: MintAccount },
+  pk: PublicKey
+): number {
+  const mint = mints[pk.toBase58()]
+  return mint ? fixedPointToNumber(mint.supply, mint.decimals) : 0
 }
