@@ -1,5 +1,6 @@
 import MangoPill from '../components/MangoPill'
 import Button from './Button'
+import GradientText from './GradientText'
 
 const FooterSection = () => {
   return (
@@ -9,9 +10,9 @@ const FooterSection = () => {
           <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
             <h2 className="inline text-3xl font-extrabold sm:block sm:text-4xl">
               Want product news and updates?{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green sm:block sm:text-4xl">
+              <GradientText className="sm:block sm:text-4xl">
                 Sign up for our newsletter.
-              </span>
+              </GradientText>
             </h2>
 
             <form className="mt-8 sm:flex">
@@ -26,7 +27,9 @@ const FooterSection = () => {
                 placeholder="Enter your email"
               />
               <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
-                <Button><span className="">Sign me up!</span></Button>
+                <Button>
+                  <span className="">Sign me up!</span>
+                </Button>
               </div>
             </form>
             <div className="w-full mt-4">
