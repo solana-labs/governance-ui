@@ -12,6 +12,20 @@ module.exports = {
       body: ['Lato, sans-serif'],
     },
     extend: {
+      backgroundImage: (_) => ({
+        'feature-one': "url('../public/img/feature1.png')",
+        'feature-two': "url('../public/img/feature2.png')",
+        'feature-three': "url('../public/img/feature3.png')",
+        'feature-four': "url('../public/img/feature4.png')",
+        'bg-texture': "url('../public/img/bgtexture.png')",
+      }),
+      height: {
+        650: '650px',
+        675: '675px',
+        700: '700px',
+        750: '750px',
+        1750: '1750px',
+      },
       cursor: {
         help: 'help',
       },
@@ -29,6 +43,31 @@ module.exports = {
         'fgd-2': '#FCFCFF',
         'fgd-3': '#B9B5CE',
         'fgd-4': '#706C81',
+        'mango-yellow': '#F2C94C',
+        'mango-red': '#E54033',
+        'mango-green': '#AFD803',
+        'mango-dark': {
+          lighter: '#332F46',
+          light: '#262337',
+          DEFAULT: '#141026',
+        },
+        'mango-med': {
+          light: '#C2BDD9',
+          DEFAULT: '#9490A6',
+          dark: '#706C81',
+        },
+        'mango-light': {
+          light: '#FCFCFF',
+          DEFAULT: '#F0EDFF',
+          dark: '#B9B5CE',
+        },
+        'mango-grey': {
+          lighter: '#f7f7f7',
+          light: '#e6e6e6',
+          dark: '#092e34',
+          darker: '#072428',
+          darkest: '#061f23',
+        },
       },
       animation: {
         'connect-wallet-ping':
