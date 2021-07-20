@@ -39,7 +39,7 @@ const Link: FunctionComponent<LinkProps> = ({
 }) => {
   return (
     <StyledButton
-      className={`${className} pr-5 flex z-10 px-8 py-2 text-fgd-1 relative rounded-full`}
+      className={`${className} pr-5 flex z-10 py-2 text-fgd-1 relative rounded-full`}
       {...props}
     >
       {children}

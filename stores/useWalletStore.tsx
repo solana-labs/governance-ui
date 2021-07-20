@@ -35,7 +35,8 @@ export const ENDPOINTS: EndpointInfo[] = [
     url: 'https://api.devnet.solana.com',
     websocket: 'https://api.devnet.solana.com',
     programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV',
-    poolKey: '82ndgp58GXpwuLrEc9svHFdhiEsPaZoNUEWwgc79WHqk',
+    // poolKey: '82ndgp58GXpwuLrEc9svHFdhiEsPaZoNUEWwgc79WHqk', // already over
+    poolKey: '5heMyYtJK1Us9Hx2w6s5rLDNj8RufeyCR1ZUJAVFLQL7', // long deposits
   },
   {
     name: 'localnet',

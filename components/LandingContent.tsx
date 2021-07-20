@@ -1,13 +1,13 @@
-import Button from "./Button"
-import PoolInfoCards from "./PoolInfoCards"
+import Link from './Link'
+import PoolInfoCards from './PoolInfoCards'
 
 const LandingContent = () => {
   return (
     <div className="bg-bkg-2 transform -skew-y-3 pt-12 lg:pb-48 lg:mb-48  z-0">
       <div className="max-w-7xl mx-auto px-4 py-40 transform skew-y-3">
-      <div>
-        <PoolInfoCards />
-      </div>
+        <div>
+          <PoolInfoCards />
+        </div>
         <div className="max-w-2xl mb-16 mx-auto text-center">
           <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
             It is still the early days.
@@ -64,8 +64,8 @@ const LandingContent = () => {
               Mango Governance tokens ($MNGO) will serve as the incentive for
               those who can proove their work is useful to the DAO.
             </p>
-            <Button>Check out the whitepaper</Button>
-            
+            <Link>Check out the whitepaper</Link>
+
             <p className="text-white leading-relaxed py-4">
               <span className="text-yellow-300">$MNGO</span> were only provided
               to developers who helped to build out the protocol.
@@ -111,8 +111,13 @@ const LandingContent = () => {
                     <p className="text-white text-opacity-50 text-base">
                       The event will span over a 2 day period split into two
                       sections,{' '}
-                      <span className="text-secondary-1-light italic">Unrestricted</span>{' '}
-                      and <span className="text-secondary-2-light italic">Restricted</span>
+                      <span className="text-secondary-1-light italic">
+                        Unrestricted
+                      </span>{' '}
+                      and{' '}
+                      <span className="text-secondary-2-light italic">
+                        Restricted
+                      </span>
                       .
                     </p>
                     <div className="flex flex-wrap overflow-hiddenm mt-8">
@@ -131,7 +136,9 @@ const LandingContent = () => {
 
                       <div className="w-full overflow-hidden lg:w-1/2">
                         <p>
-                          <span className="text-secondary-2-light italic">Restricted</span>
+                          <span className="text-secondary-2-light italic">
+                            Restricted
+                          </span>
                         </p>
                         <p>
                           After 24 hours deposits will be restricted and only
