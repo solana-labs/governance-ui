@@ -1,5 +1,4 @@
 import Link from './Link'
-import PoolInfoCards from './PoolInfoCards'
 
 const LandingContent = () => {
   return (
