@@ -89,7 +89,7 @@ const ConnectWalletButton = (props) => {
                       <span className="text-sm">{name}</span>
 
                       {provider?.url === url ? (
-                        <CheckIcon className="h-4 w-4 text-green-400 stroke-3" />
+                        <CheckIcon className="h-4 w-4 stroke-3" />
                       ) : null}
                     </button>
                   </Menu.Item>

@@ -29,7 +29,7 @@ const NotificationList = () => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6`}
+      className={`z-20 fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6`}
     >
       <div className={`flex flex-col w-full`}>
         {reversedNotifications.map((n, idx) => (
@@ -59,13 +59,11 @@ const Notification = ({ type, message, description, txid }) => {
         <div className={`flex items-center`}>
           <div className={`flex-shrink-0`}>
             {type === 'success' ? (
-              <CheckCircleIcon className={`text-green h-9 w-9 mr-1`} />
+              <CheckCircleIcon className={`h-9 w-9 mr-1`} />
             ) : null}
-            {type === 'info' && (
-              <XCircleIcon className={`text-primary h-9 w-9 mr-1`} />
-            )}
+            {type === 'info' && <XCircleIcon className={`h-9 w-9 mr-1`} />}
             {type === 'error' && (
-              <InformationCircleIcon className={`text-red h-9 w-9 mr-1`} />
+              <InformationCircleIcon className={`h-9 w-9 mr-1`} />
             )}
           </div>
           <div className={`ml-2 w-0 flex-1`}>

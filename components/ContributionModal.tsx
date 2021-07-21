@@ -17,6 +17,7 @@ import useVaults from '../hooks/useVaults'
 import usePool from '../hooks/usePool'
 import styled from '@emotion/styled'
 import 'twin.macro'
+import { notify } from '../utils/notifications'
 
 const SmallButton = styled.button``
 
@@ -126,9 +127,15 @@ const ContributionModal = () => {
   useEffect(() => {
     if (submitting) {
       const handleSubmit = async () => {
-        await actions.submitContribution(contributionAmount)
-        setSubmitted(true)
-        setSubmitting(false)
+        try {
+          await actions.submitContribution(contributionAmount)
+        } catch (e) {
+          notify({ type: 'error', message: e.message })
+          console.error(e.message)
+        } finally {
+          setSubmitted(false)
+          setSubmitting(false)
+        }
       }
       handleSubmit()
     }
