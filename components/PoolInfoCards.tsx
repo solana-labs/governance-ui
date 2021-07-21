@@ -23,7 +23,7 @@ const PoolInfoCards = () => {
   })
 
   return (
-    <div className="flex flex-row justify-center mb-12 z-50">
+    <div className="flex flex-row justify-center mb-16 z-10">
       <Card title="Deposits closing in">
         <PoolCountdown date={endDeposits} />
       </Card>

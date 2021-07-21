@@ -5,9 +5,6 @@ const LandingContent = () => {
   return (
     <div className="bg-bkg-2 transform -skew-y-3 pt-12 lg:pb-48 lg:mb-48  z-0">
       <div className="max-w-7xl mx-auto px-4 py-40 transform skew-y-3">
-        <div>
-          <PoolInfoCards />
-        </div>
         <div className="max-w-2xl mb-16 mx-auto text-center">
           <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
             It is still the early days.

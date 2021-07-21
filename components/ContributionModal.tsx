@@ -129,10 +129,11 @@ const ContributionModal = () => {
       const handleSubmit = async () => {
         try {
           await actions.submitContribution(contributionAmount)
+          setSubmitted(true)
+          setSubmitting(false)
         } catch (e) {
           notify({ type: 'error', message: e.message })
           console.error(e.message)
-        } finally {
           setSubmitted(false)
           setSubmitting(false)
         }
