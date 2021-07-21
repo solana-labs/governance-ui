@@ -32,8 +32,8 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url: 'https://api.devnet.solana.com',
-    websocket: 'https://api.devnet.solana.com',
+    url: 'https://cache.devnet.rpcpool.com',
+    websocket: 'https://cache.devnet.rpcpool.com',
     programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV',
     // poolKey: '82ndgp58GXpwuLrEc9svHFdhiEsPaZoNUEWwgc79WHqk', // already over
     poolKey: '5heMyYtJK1Us9Hx2w6s5rLDNj8RufeyCR1ZUJAVFLQL7', // long deposits
