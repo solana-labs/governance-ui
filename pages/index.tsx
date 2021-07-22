@@ -10,12 +10,14 @@ const Index = () => {
   const { endIdo } = usePool()
 
   return (
-    <div className={`bg-bkg-1 text-fgd-1 transition-all`}>
+    <div className={`bg-bkg-1 text-white transition-all overflow-hidden`}>
+      <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
       <NavBarBeta />
       <Notifications />
       {endIdo?.isAfter() && <ContributionPage />}
       {endIdo?.isBefore() && <RedeemPage />}
       <FooterSection />
+      <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
     </div>
   )
 }

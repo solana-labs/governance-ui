@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import MangoPill from '../components/MangoPill'
-import MangoSale from '../components/MangoSale'
+//import MangoSale from '../components/MangoSale'
 import Button from './Button'
 
 const NavBarBeta = () => {
@@ -43,7 +43,7 @@ const NavBarBeta = () => {
   return (
     <div className="">
       {/* Main Menu */}
-      <div className="px-10 py-8 bg-transparent">
+      <div className="lg:px-10 lg:py-8 xs:px-6 xs:py-1 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
             <div className="flex justify-start lg:w-0 lg:flex-1">
@@ -51,7 +51,7 @@ const NavBarBeta = () => {
                 <span className="sr-only">Mango</span>
                 <img
                   className="h-8"
-                  src="img/logoMango.png"
+                  src="img/logo_mango.svg"
                   alt=""
                   width="auto"
                 />
@@ -60,7 +60,7 @@ const NavBarBeta = () => {
             <div className="-mr-2 -my-2 md:hidden">
               <button
                 type="button"
-                className=" rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-1 focus:ring-inset focus:ring-yellow-300"
+                className=" rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
                 onClick={toggleMobileMenu}
               >
                 <span className="sr-only">Open menu</span>
@@ -85,7 +85,7 @@ const NavBarBeta = () => {
               <div className="relative">
                 <button
                   type="button"
-                  className="text-gray-500 group  rounded-md p-1 px-2 inline-flex items-center text-base font-medium hover:bg-bkg-3 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-yellow-300"
+                  className="text-gray-500 group rounded-md p-1 px-2 inline-flex items-center text-base font-medium hover:bg-bkg-3 hover:text-white focus:outline-none "
                   onClick={toggleProducts}
                 >
                   <span>Products</span>
@@ -205,8 +205,8 @@ const NavBarBeta = () => {
                             Decentralized Lending
                           </p>
                           <p className="mt-1 text-sm text-gray-500">
-                            Earn interest on deposit, a take out collateralized
-                            loans against assets
+                            Earn interest on deposits and take out
+                            collateralized loans against assets
                           </p>
                         </div>
                       </a>
@@ -250,7 +250,7 @@ const NavBarBeta = () => {
 
               <a
                 href="https://docs.mango.markets/"
-                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-bkg-3 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-yellow-300 rounded-md"
+                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-bkg-3 hover:text-white focus:outline-none rounded-md"
               >
                 Docs
               </a>
@@ -258,7 +258,7 @@ const NavBarBeta = () => {
               <div className="relative">
                 <button
                   type="button"
-                  className="text-gray-500 group rounded-md p-1 px-2 inline-flex items-center text-base font-medium hover:bg-bkg-3 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-yellow-300"
+                  className="text-gray-500 group rounded-md p-1 px-2 inline-flex items-center text-base font-medium hover:bg-bkg-3 hover:text-white focus:outline-none"
                   onClick={toggleSupport}
                 >
                   <span>Support</span>
@@ -338,7 +338,7 @@ const NavBarBeta = () => {
                             Twitter
                           </p>
                           <p className="mt-1 text-sm text-gray-500">
-                            See what we&apos;re up to quicky, and meme with us.
+                            Quickly see what we're up to and meme with us.
                           </p>
                         </div>
                       </a>
@@ -382,19 +382,33 @@ const NavBarBeta = () => {
                   </div>
                 </div>
               </div>
-              <a
+
+              {/*
+               <a
                 href="https://mango-token-sale.netlify.app"
-                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-bkg-3 focus:outline-none focus:ring-1 focus:ring-offset-1 focus:ring-yellow-300 rounded-md"
+                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-th-fgd-4 focus:outline-none rounded-md"
+              >             
+              */}
+              <a
+                href="#"
+                onClick={doNothing}
+                className="disabled text-base font-medium text-gray-500 p-1 px-2 opacity-50"
               >
                 <div className="flex flex-row">
                   <p>Mango DAO</p>
-                  <MangoSale />
+                  <MangoPill />
                 </div>
               </a>
             </nav>
             <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               <div>
-                <Button>Start trading</Button>
+                <a
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://trade.mango.markets"
+                >
+                  <Button>Start trading</Button>
+                </a>
               </div>
             </div>
           </div>
@@ -405,15 +419,15 @@ const NavBarBeta = () => {
         <div
           className={`${
             !mobileMenuVisible && 'hidden'
-          } absolute top-0 inset-x-0 p-2 transition transform origin-top-right z-10`}
+          } absolute top-1 inset-x-0 px-4 py-2 transition transform origin-top-right z-50`}
         >
-          <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-bkg-2">
+          <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-th-bkg-3">
             <div className="pt-5 pb-6 px-5">
               <div className="flex items-center justify-between">
                 <div>
                   <img
-                    className="h-8"
-                    src="img/logoMango.png"
+                    className="h-8 ml-1"
+                    src="img/logo_mango.svg"
                     alt=""
                     width="auto"
                   />
@@ -421,7 +435,7 @@ const NavBarBeta = () => {
                 <div className="-mr-2">
                   <button
                     type="button"
-                    className="bg-bkg-2 rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-th-bkg-4 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-300"
+                    className="bg-th-bkg-3 rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-th-bkg-4 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-yellow-300"
                     onClick={closeMenu}
                   >
                     <span className="sr-only">Close menu</span>

@@ -1,8 +1,31 @@
+import { useState } from 'react'
 import MangoPill from '../components/MangoPill'
 import Button from './Button'
-import GradientText from './GradientText'
+
+const doNothing = (e) => {
+  e.stopPropagation()
+}
 
 const FooterSection = () => {
+  const [done, setDone] = useState(false)
+  const [email, setEmail] = useState('')
+
+  const handleChange = (e) => {
+    setEmail(e.target.value)
+  }
+
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+
+    await fetch('/api/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email }),
+    })
+
+    setDone(true)
+  }
+
   return (
     <div className="bg-bg-texture bg-cover bg-bottom bg-no-repeat">
       <div className="max-w-7xl mx-auto ">
@@ -10,44 +33,52 @@ const FooterSection = () => {
           <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8">
             <h2 className="inline text-3xl font-extrabold sm:block sm:text-4xl">
               Want product news and updates?{' '}
-              <GradientText className="sm:block sm:text-4xl">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green sm:block sm:text-4xl">
                 Sign up for our newsletter.
-              </GradientText>
+              </span>
             </h2>
 
-            <form className="mt-8 sm:flex">
+            <form className="mt-8 sm:flex" onSubmit={handleSubmit}>
               <label className="sr-only">Email address</label>
-              <input
-                id="email-address"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                className="w-full px-5 py-2 placeholder-gray-500 sm:max-w-xs border-gray-300 rounded-full"
-                placeholder="Enter your email"
-              />
-              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
-                <Button>
-                  <span className="">Sign me up!</span>
-                </Button>
-              </div>
+              {done ? (
+                <span>Thank you for signing up! 🎉</span>
+              ) : (
+                <>
+                  <input
+                    id="email-address"
+                    name="email"
+                    type="email"
+                    autoComplete="email"
+                    required
+                    className="w-full px-5 py-2 placeholder-gray-400 text-black text-opacity-80 sm:max-w-xs border-gray-300 rounded-full focus:outline-none"
+                    placeholder="Drop us your email..."
+                    value={email}
+                    onChange={handleChange}
+                  />
+                  <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+                    <Button>
+                      <span className="">Sign me up!</span>
+                    </Button>
+                  </div>
+                </>
+              )}
             </form>
             <div className="w-full mt-4">
-              <p className="text-xl text-gray-400">
+              <p className="text-xl text-white text-opacity-50">
                 We promise to never spam and only send alpha.
               </p>
             </div>
           </div>
         </section>
 
-        <footer className="py-20">
-          <div className="container px-4 mx-auto">
+        <footer className="py-20 px-4">
+          <div className="px-4 py-8 mx-auto">
             <div className="flex flex-wrap -mx-4 mb-8 lg:mb-16">
               <div className="w-full lg:w-1/3 px-4 mb-12 lg:mb-0">
                 <a className="text-gray-600 text-2xl leading-none" href="#">
                   <img
                     className="h-8"
-                    src="img/logoMango.png"
+                    src="img/logo_mango.svg"
                     alt=""
                     width="auto"
                   />
@@ -55,21 +86,21 @@ const FooterSection = () => {
                 <p className="mt-5 mb-6 max-w-xs text-gray-500 leading-loose">
                   Mango is a decentralized autonomous organization.{' '}
                 </p>
-                <div>
+                <div className="flex flex-row">
                   <a
-                    className="inline-block h-6 mr-8"
+                    className="flex h-6 w-6 m-2"
                     href="https://github.com/blockworks-foundation"
                   >
                     <img className="mx-auto" src="socials/github.svg" />
                   </a>
                   <a
-                    className="inline-block h-6 mr-8"
+                    className="flex h-6 w-6 m-2"
                     href="https://discord.gg/67jySBhxrg"
                   >
                     <img className="mx-auto" src="socials/discord.svg" />
                   </a>
                   <a
-                    className="inline-block h-6"
+                    className="flex h-6 w-6 m-2"
                     href="https://twitter.com/mangomarkets"
                   >
                     <img className="mx-auto" src="socials/twitter.svg" />
@@ -92,8 +123,15 @@ const FooterSection = () => {
                         </a>
                       </li>
                       <li className="mb-4">
-                        <a
+                        {/* 
+                          <a
                           className="text-gray-500 hover:text-gray-600"
+                          href="#"
+                        >
+                        */}
+                        <a
+                          onClick={doNothing}
+                          className="text-gray-500 hover:text-gray-600 disabled opacity-50"
                           href="#"
                         >
                           Perpetual Futures
@@ -111,7 +149,7 @@ const FooterSection = () => {
                       <li className="mb-4">
                         <a
                           className="text-gray-500 hover:text-gray-600"
-                          href="#"
+                          href="https://gitlab.com/OpinionatedGeek/mango-explorer/-/blob/master/Quickstart.md"
                         >
                           Liquidator Program
                         </a>
@@ -176,7 +214,7 @@ const FooterSection = () => {
               </div>
             </div>
             <div className="pt-8">
-              <p className="lg:text-center text-sm text-gray-400">
+              <p className="lg:text-center text-sm text-white text-opacity-20">
                 All rights reserved &copy; Blockworks Foundation 2021
               </p>
             </div>

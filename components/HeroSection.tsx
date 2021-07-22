@@ -9,7 +9,7 @@ const HeroSection = () => {
               Join the <GradientText>Mango DAO</GradientText> and help build the
               ecosystem.
             </h2>
-            <p className="mb-8 text-2xl text-gray-400">
+            <p className="mb-8 text-2xl text-white text-opacity-50">
               The Mango DAO is an experiment in self governance that aims to
               build a completely decentralzied financial ecosystem.
             </p>
