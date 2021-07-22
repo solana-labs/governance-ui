@@ -91,9 +91,7 @@ export default function useWallet() {
       })
     })
     return () => {
-      if (wallet) {
-        wallet.disconnect()
-      }
+      wallet?.disconnect?.()
       setWalletStore((state) => {
         state.connected = false
       })
