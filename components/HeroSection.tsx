@@ -3,7 +3,7 @@ const HeroSection = () => {
   return (
     <section className="">
       <div className="container px-4 mx-auto">
-        <div className="relative pt-12 md:pt-32 pb-16">
+        <div className="relative pt-16 md:pt-32 pb-2">
           <div className="max-w-2xl mb-16 mx-auto text-center">
             <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
               Join the <GradientText>Mango DAO</GradientText> and help build the

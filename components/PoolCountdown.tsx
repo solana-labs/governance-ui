@@ -12,14 +12,14 @@ const PoolCountdown = (props: { className?: string; date: moment.Moment }) => {
         ? 'Deposits are closed'
         : 'The IDO has ended'
     if (completed) {
-      return <p className="text-secondary-2-light">{message}</p>
+      return <p className="text-mango-red">{message}</p>
     } else {
       return (
         <div
-          className={`${props.className} font-bold text-fgd-1 text-base flex items-center`}
+          className={`${props.className} font-bold text-white flex `}
         >
-          <ClockIcon className="w-5 h-5 mr-1" />
-          <span>
+          <ClockIcon className="w-10 h-10 mr-2" />
+          <span className="text-3xl">
             {/* <span className="bg-bkg-1 border border-bkg-4 mx-0.5 px-1.5 py-1 rounded"> */}
             {hours < 10 ? `0${hours}` : hours}
             {/* </span> */}:

@@ -421,7 +421,7 @@ const NavBarBeta = () => {
             !mobileMenuVisible && 'hidden'
           } absolute top-1 inset-x-0 px-4 py-2 transition transform origin-top-right z-50`}
         >
-          <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-th-bkg-3">
+          <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 bg-bkg-2">
             <div className="pt-5 pb-6 px-5">
               <div className="flex items-center justify-between">
                 <div>

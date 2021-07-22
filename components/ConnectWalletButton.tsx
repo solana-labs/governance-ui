@@ -73,11 +73,11 @@ const ConnectWalletButton = (props) => {
                   <img src={provider?.icon} className="w-4 h-4 m-auto" />
                 )}
               </Menu.Button>
-              <Menu.Items className="z-20 p-1 absolute right-0 top-12 bg-bkg-1 shadow-lg border-2 border-bkg-3 outline-none rounded-2xl">
+              <Menu.Items className="z-20 w-auto p-2 absolute right-0 top-12 bg-bkg-2 border border-bkg-3 shadow-md outline-none rounded-xl">
                 {WALLET_PROVIDERS.map(({ name, url, icon }) => (
                   <Menu.Item key={name}>
                     <button
-                      className="flex p-2 h-9 hover:bg-bkg-2 hover:cursor-pointer hover:rounded-2xl font-normal focus:outline-none"
+                      className="flex p-2 h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded-lg font-normal focus:outline-none"
                       onClick={() =>
                         setWalletStore((s) => {
                           s.providerUrl = url

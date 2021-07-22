@@ -154,8 +154,8 @@ const ContributionModal = () => {
         <div className="pb-4 text-center">
           {!submitted && !submitting && !editContribution ? (
             <>
-              <h2>Plant Your Seed</h2>
-              <p>This is the start of something big.</p>
+              <h2>This time has arrived.</h2>
+              <p>When ready, depost your USDC</p>
             </>
           ) : null}
 
@@ -169,7 +169,7 @@ const ContributionModal = () => {
           {submitted && !submitting ? (
             <>
               <h2>Your contribution amount</h2>
-              <p>A new seed planted...</p>
+              <p>Thanks for contributing...</p>
             </>
           ) : null}
 

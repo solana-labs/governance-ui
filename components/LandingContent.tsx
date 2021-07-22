@@ -3,9 +3,9 @@ import GradientText from './GradientText'
 
 const LandingContent = () => {
   return (
-    <div className="bg-bkg-2 transform -skew-y-3 pt-12 pb-16 mb-16 z-0">
+    <div className="bg-bkg-2 transform -skew-y-3 pt-12 pb-16 mb-16 -mt-32 z-0">
       <div className="max-w-7xl mx-auto px-4 py-40 transform skew-y-3">
-        <div className="max-w-2xl mx-auto text-center">
+        <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
             It is still the early days.
           </h2>
@@ -79,7 +79,7 @@ const LandingContent = () => {
 
 
         {/* Section 2 */}
-        <div className="max-w-2xl mb-12 mx-auto text-center">
+        <div className="max-w-4xl mb-12 mx-auto text-center">
           <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
             How it works.
           </h2>
