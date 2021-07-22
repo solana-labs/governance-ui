@@ -2,8 +2,7 @@ import ContributionModal from "./ContributionModal"
 
 const ModalSection = () => {
   return (
-    <>
-      <div className="w-screen">
+        <>
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
             It is still the early days.
@@ -14,9 +13,8 @@ const ModalSection = () => {
             protocols Insurance Fund.
           </p>
         </div>
-      </div>
-      <ContributionModal />
-      </>
+        <ContributionModal />
+        </>
   )
 }
 

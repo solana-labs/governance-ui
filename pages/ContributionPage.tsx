@@ -10,7 +10,7 @@ const ContributionPage = () => {
       <PoolInfoCards />
       <ContentSection />
       <div className="flex justify-center">
-        <div className="max-w-screen-md grid grid-cols-12 gap-4 w-full">
+        <div className="">
           <ModalSection />
         </div>
       </div>
