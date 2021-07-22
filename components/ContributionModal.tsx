@@ -3,6 +3,7 @@ import {
   ExclamationCircleIcon,
   LockClosedIcon,
   LockOpenIcon,
+  RefreshIcon,
 } from '@heroicons/react/outline'
 import useWalletStore from '../stores/useWalletStore'
 import Input from './Input'
@@ -44,6 +45,7 @@ const ContributionModal = () => {
   const [loading, setLoading] = useState(true)
   const [maxButtonTransition, setMaxButtonTransition] = useState(false)
   const [errorMessage, setErrorMessage] = useState(null)
+  const [refreshing, setRefreshing] = useState(false)
 
   const priceFormat = new Intl.NumberFormat('en-US', {
     maximumSignificantDigits: 4,
@@ -109,6 +111,15 @@ const ContributionModal = () => {
     }
 
     setMaxButtonTransition(true)
+  }
+
+  const handleRefresh = async () => {
+    setRefreshing(true)
+    try {
+      await actions.fetchWalletTokenAccounts()
+    } finally {
+      setTimeout(() => setRefreshing(false), 1000)
+    }
   }
 
   useEffect(() => {
@@ -194,13 +205,22 @@ const ContributionModal = () => {
               >
                 <div className="flex justify-between pb-2">
                   <div className="flex items-center text-xs text-fgd-4">
-                    <WalletIcon className="w-4 h-4 mr-1 text-fgd-3 fill-current" />
+                    <a
+                      onClick={handleRefresh}
+                      className={refreshing && 'animate-spin'}
+                    >
+                      <RefreshIcon
+                        className={`w-4 h-4`}
+                        style={{ transform: 'scaleX(-1)' }}
+                      />
+                    </a>
+                    <WalletIcon className="w-4 h-4 mx-1 text-fgd-3 fill-current" />
                     {connected ? (
                       loading ? (
                         <div className="bg-bkg-4 rounded w-10 h-4 animate-pulse" />
                       ) : (
                         <span className="font-display text-fgd-1 ml-1">
-                          {walletAmount}
+                          {walletAmount.toFixed(2)}
                         </span>
                       )
                     ) : (
