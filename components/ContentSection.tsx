@@ -18,65 +18,62 @@ const ContentSection = () => {
 
         {/* Section 1 */}
 
-    <div className="py-16 xl:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
-      <div className="max-w-max lg:max-w-7xl mx-auto">
-        <div className="relative">
-          <div className="relative md:p-6">
-            <div className="lg:grid lg:grid-cols-2 lg:gap-6">
-              <div className="lg:max-w-none">
-                <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
-                  What is Mango?
-                </h2>
-                <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
-                  Mango is a decentralized autonomous organization. Its purpose is
-                  to contribute maximum value for the defi ecosystem and its
-                  developer community to create commercially viable decentralized
-                  trading and lending products for traders.
-                </p>
+        <div className="py-16 xl:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
+          <div className="max-w-max lg:max-w-7xl mx-auto">
+            <div className="relative">
+              <div className="relative md:p-6">
+                <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+                  <div className="lg:max-w-none">
+                    <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
+                      What is Mango?
+                    </h2>
+                    <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
+                      Mango is a decentralized autonomous organization. Its
+                      purpose is to contribute maximum value for the defi
+                      ecosystem and its developer community to create
+                      commercially viable decentralized trading and lending
+                      products for traders.
+                    </p>
 
-                <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
-                  Why the{' '}
-                  <GradientText>
-                  Insurance fund
-                  </GradientText>
-                  ?
-                </h2>
-                <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
-                  Mango protocol is powered by lenders providing their capital for
-                  the community to use for trading and borrowing purposes. The
-                  insurance fund is the last line of defense for protecting our
-                  mango lenders.
-                </p>
-              </div>
+                    <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
+                      Why the <GradientText>Insurance fund</GradientText>?
+                    </h2>
+                    <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
+                      Mango protocol is powered by lenders providing their
+                      capital for the community to use for trading and borrowing
+                      purposes. The insurance fund is the last line of defense
+                      for protecting our mango lenders.
+                    </p>
+                  </div>
 
-              <div className="mt-6 lg:mt-0">
-              <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
-                What is the{' '}
-                <GradientText>$MNGO</GradientText>{' '}
-                token?
-              </h2>
-                <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
-                  We believe that substantial rewards to a strong developer
-                  community and liquidity incentives are the essential drivers for
-                  growth and therefore the foundation of the Mango DAO.
-                </p>
-                <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
-                  Mango Governance tokens ($MNGO) will serve as the incentive for
-                  those who can proove their work is useful to the DAO.
-                </p>
-                <Button>Check out the whitepaper</Button>
+                  <div className="mt-6 lg:mt-0">
+                    <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
+                      What is the <GradientText>$MNGO</GradientText> token?
+                    </h2>
+                    <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
+                      We believe that substantial rewards to a strong developer
+                      community and liquidity incentives are the essential
+                      drivers for growth and therefore the foundation of the
+                      Mango DAO.
+                    </p>
+                    <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
+                      Mango Governance tokens ($MNGO) will serve as the
+                      incentive for those who can proove their work is useful to
+                      the DAO.
+                    </p>
+                    <Button>Check out the whitepaper</Button>
 
-                <p className="text-white leading-relaxed py-4">
-                  <span className="text-mango-yellow">$MNGO</span> were only provided
-                  to developers who helped to build out the protocol.
-                </p>
+                    <p className="text-white leading-relaxed py-4">
+                      <span className="text-mango-yellow">$MNGO</span> were only
+                      provided to developers who helped to build out the
+                      protocol.
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </div>
-
 
         {/* Section 2 */}
         <div className="max-w-4xl mb-12 mx-auto text-center">
@@ -120,10 +117,7 @@ const ContentSection = () => {
                         Unrestricted
                       </span>{' '}
                       and{' '}
-                      <span className="text-mango-red italic">
-                        Restricted
-                      </span>
-                      .
+                      <span className="text-mango-red italic">Restricted</span>.
                     </p>
                     <div className="flex flex-wrap overflow-hiddenm mt-8">
                       <div className="w-full overflow-hidden lg:w-1/2 pr-4">
