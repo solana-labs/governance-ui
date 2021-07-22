@@ -1,17 +1,17 @@
-import ContributionModal from '../components/ContributionModal'
+import ModalSection from '../components/ModalSection'
 import PoolInfoCards from '../components/PoolInfoCards'
 import HeroSection from '../components/HeroSection'
-import LandingContent from '../components/LandingContent'
+import ContentSection from '../components/ContentSection'
 
 const ContributionPage = () => {
   return (
     <>
       <HeroSection />
       <PoolInfoCards />
-      <LandingContent />
+      <ContentSection />
       <div className="flex justify-center">
         <div className="max-w-screen-md grid grid-cols-12 gap-4 w-full">
-          <ContributionModal />
+          <ModalSection />
         </div>
       </div>
     </>

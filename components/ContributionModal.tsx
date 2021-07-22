@@ -150,7 +150,7 @@ const ContributionModal = () => {
 
   return (
     <>
-      <div className="bg-bkg-2 border border-bkg-3 col-span-7 p-7 rounded-lg shadow-lg">
+      <div className="bg-bkg-2 border border-bkg-3 col-span-6 p-7 rounded-lg shadow-md">
         <div className="pb-4 text-center">
           {!submitted && !submitting && !editContribution ? (
             <>

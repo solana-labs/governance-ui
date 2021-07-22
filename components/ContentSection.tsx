@@ -1,7 +1,7 @@
 import Button from './Button'
 import GradientText from './GradientText'
 
-const LandingContent = () => {
+const ContentSection = () => {
   return (
     <div className="bg-bkg-2 transform -skew-y-3 pt-12 pb-16 mb-16 -mt-32 z-0">
       <div className="max-w-7xl mx-auto px-4 py-40 transform skew-y-3">
@@ -207,4 +207,4 @@ const LandingContent = () => {
   )
 }
 
-export default LandingContent
+export default ContentSection
