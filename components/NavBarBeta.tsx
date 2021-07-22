@@ -338,7 +338,7 @@ const NavBarBeta = () => {
                             Twitter
                           </p>
                           <p className="mt-1 text-sm text-gray-500">
-                            Quickly see what we're up to and meme with us.
+                            Quickly see what we&apos;re up to and meme with us.
                           </p>
                         </div>
                       </a>
