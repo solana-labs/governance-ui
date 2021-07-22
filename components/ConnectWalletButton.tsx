@@ -41,14 +41,12 @@ const CheckIcon = (props) => (
 )
 
 const ConnectWalletButton = (props) => {
-  const {
-    connected,
-    selectedProviderUrl,
-    set: setWalletStore,
-  } = useWalletStore((s) => s)
+  const { connected, providerUrl, set: setWalletStore } = useWalletStore(
+    (s) => s
+  )
 
-  const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
-    selectedProviderUrl,
+  const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
+    providerUrl,
   ])
 
   return (
