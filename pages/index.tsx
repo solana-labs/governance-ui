@@ -15,7 +15,7 @@ const Index = () => {
       <NavBarBeta />
       <Notifications />
       {startIdo?.isAfter() && <ContributionPage />}
-      {startIdo?.isBefore && endIdo?.isAfter() && <ContributionPage />}
+      {startIdo?.isBefore() && endIdo?.isAfter() && <ContributionPage />}
       {endIdo?.isBefore() && <RedeemPage />}
       <FooterSection />
       <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
