@@ -153,7 +153,11 @@ const ContributionModal = () => {
     }
   }, [submitting])
 
-  const disableFormInputs = submitted || !connected || loading
+  const toLateToDeposit =
+    endDeposits.isBefore() && endIdo.isAfter() && !largestAccounts.redeemable
+
+  const disableFormInputs =
+    submitted || !connected || loading || (connected && toLateToDeposit)
 
   const dontAddMore =
     endDeposits?.isBefore() && contributionAmount > redeemableBalance
@@ -164,33 +168,47 @@ const ContributionModal = () => {
       <div className="flex flex-wrap lg:flex-row justify-center">
         <div className="flex flex-col max-w-3xl bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md">
           <div className="pb-4 text-center">
-            {!submitted && !submitting && !editContribution ? (
-              <>
-                <h2>This time has arrived.</h2>
-                <p>When ready, depost your USDC</p>
-              </>
-            ) : null}
+            {!submitted &&
+              !submitting &&
+              !editContribution &&
+              !(connected && toLateToDeposit) && (
+                <>
+                  <h2>This time has arrived.</h2>
+                  <p>When ready, depost your USDC</p>
+                </>
+              )}
 
-            {!submitted && submitting ? (
+            {!submitted &&
+              !submitting &&
+              !editContribution &&
+              connected &&
+              toLateToDeposit && (
+                <>
+                  <h2>We&apos;re sorry, you missed it.</h2>
+                  <p>Deposits are already closed</p>
+                </>
+              )}
+
+            {!submitted && submitting && (
               <>
                 <h2>Approve the transaction</h2>
                 <p>Almost there...</p>
               </>
-            ) : null}
+            )}
 
-            {submitted && !submitting ? (
+            {submitted && !submitting && (
               <>
                 <h2>Your contribution amount</h2>
                 <p>Thanks for contributing...</p>
               </>
-            ) : null}
+            )}
 
-            {editContribution && !submitting ? (
+            {editContribution && !submitting && (
               <>
                 <h2>Funds unlocked</h2>
                 <p>Increase or reduce your contribution...</p>
               </>
-            ) : null}
+            )}
           </div>
           {submitting ? (
             <div className="flex h-64 items-center justify-center">
