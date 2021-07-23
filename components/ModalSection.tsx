@@ -15,7 +15,7 @@ const ModalSection = () => {
             Insurance Fund.
           </p>
         </div>
-        <div className="flex flex-wrap md:flex-row lg:flex-row justify-center">
+        <div className="max-w-3xl flex flex-wrap md:flex-row lg:flex-row mx-auto">
           <ContributionModal />
           <StatsModal />
         </div>

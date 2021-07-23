@@ -10,11 +10,7 @@ const ContributionPage = () => {
       <HeroSection />
       <PoolInfoCards />
       <ContentSection />
-      <div className="flex justify-center">
-        <div className="">
-          <ModalSection />
-        </div>
-      </div>
+      <ModalSection />
       <FooterSection />
     </>
   )
