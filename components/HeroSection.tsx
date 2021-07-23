@@ -17,7 +17,7 @@ const HeroSection = () => {
           </div>
           <div className="mb-16 flex lg:flex-row md:flex-row lg:justify-center md:justify-center sm:justify-center">
                       <a
-                        className="px-1"
+                        className="sm:px-1"
                         rel="noreferrer"
                         target="_blank"
                         href="#"
@@ -25,7 +25,7 @@ const HeroSection = () => {
                         <Button>Contribute now</Button>
                       </a>
                       <a
-                        className="px-2"
+                        className="pl-2 "
                         rel="noreferrer"
                         target="_blank"
                         href="#"
