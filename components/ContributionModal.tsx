@@ -165,7 +165,6 @@ const ContributionModal = () => {
 
   return (
     <>
-      <div className="flex flex-wrap md:flex-row lg:flex-row justify-center">
         <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md">
           <div className="pb-4 text-center">
             {!submitted &&
@@ -330,61 +329,6 @@ const ContributionModal = () => {
             </>
           )}
         </div>
-
-        <div className="w-full flex flex-col m-3 bg-gradient-to-br from-secondary-4-dark to-secondary-4-light border border-bkg-3 p-7 rounded-lg shadow-md">
-          <div className="border-b border-bkg-4 pb-4 text-center">
-            <p className="text-fgd-3">Estimated Token Price</p>
-            <div className="flex items-center justify-center pt-0.5">
-              <img
-                alt=""
-                width="20"
-                height="20"
-                src="/icons/usdc.svg"
-                className={`mr-2`}
-              />
-              <div className="font-bold text-fgd-1 text-xl">
-                {priceFormat.format(vaults.estimatedPrice)}
-              </div>
-            </div>
-          </div>
-          <div className="border-b border-bkg-4 py-4 text-center">
-            <p className="text-fgd-3">Total USDC Deposited</p>
-            <div className="flex items-center justify-center pt-0.5">
-              <div className="font-bold text-fgd-1 text-base">
-                {vaults.usdcBalance}
-              </div>
-            </div>
-          </div>
-          <div className="border-b border-bkg-4 py-4 text-center">
-            <p className="text-fgd-3">Locked MNGO in Pool</p>
-            <div className="flex items-center justify-center pt-0.5">
-              <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="mango" />
-              <div className="font-bold text-fgd-1 text-base">
-                {vaults.mangoBalance}
-              </div>
-            </div>
-          </div>
-          <div className="border-b border-bkg-4 py-4 text-center">
-            <p className="text-fgd-3">Deposits Close</p>
-            <PoolCountdown date={endDeposits} className="justify-center pt-1" />
-          </div>
-          <div className="pt-4 text-center">
-            <p className="text-fgd-3">Withdrawals Close</p>
-            <PoolCountdown date={endIdo} className="justify-center pt-1" />
-          </div>
-          {/* <p>
-          Start: {startIdo?.fromNow()} ({startIdo?.format()})
-        </p>
-        <p>
-          End Deposits: {endDeposits?.fromNow()} ({endDeposits?.format()})
-        </p>
-        <p>
-          End Withdraws: {endIdo?.fromNow()} ({endIdo?.format()})
-        </p>
-        <p>Current USDC in Pool: {vaults.usdc?.balance || 'N/A'}</p>
-        <p>Locked MNGO in Pool: {vaults.mango?.balance || 'N/A'}</p> */}
-        </div>
-      </div>
     </>
   )
 }

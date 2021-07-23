@@ -1,4 +1,5 @@
 import ContributionModal from './ContributionModal'
+import StatsModal from './StatsModal'
 
 const ModalSection = () => {
   return (
@@ -13,7 +14,10 @@ const ModalSection = () => {
           Insurance Fund.
         </p>
       </div>
-      <ContributionModal />
+      <div className="flex flex-wrap md:flex-row lg:flex-row justify-center">
+        <ContributionModal />
+        <StatsModal />
+      </div>
     </>
   )
 }
