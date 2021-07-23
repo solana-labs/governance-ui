@@ -405,9 +405,9 @@ const NavBarBeta = () => {
                 <a
                   rel="noreferrer"
                   target="_blank"
-                  href="https://trade.mango.markets"
+                  href="#"
                 >
-                  <Button>Start trading</Button>
+                  <Button>Contribute now</Button>
                 </a>
               </div>
             </div>
