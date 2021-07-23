@@ -6,10 +6,10 @@ const ContentSection = () => {
     <div className="bg-bkg-2 transform -skew-y-3 pt-12 pb-16 mb-16 -mt-32 z-0">
       <div className="max-w-7xl mx-auto px-4 py-40 transform skew-y-3">
         <div className="max-w-5xl mx-auto text-center">
-          <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
+          <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             It is still the early days.
           </h2>
-          <p className="mb-8 text-2xl text-white text-opacity-50">
+          <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
             This is the first moment for non-developers to participate in
             helping build the Mango protocol by supporting the inception of the
             protocols Insurance Fund.
@@ -24,7 +24,7 @@ const ContentSection = () => {
               <div className="relative md:p-6">
                 <div className="lg:grid lg:grid-cols-2 lg:gap-6">
                   <div className="lg:max-w-none">
-                    <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
+                    <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       What is Mango?
                     </h2>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
@@ -35,7 +35,7 @@ const ContentSection = () => {
                       products for traders.
                     </p>
 
-                    <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
+                    <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       Why the <GradientText>Insurance fund</GradientText>?
                     </h2>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
@@ -47,7 +47,7 @@ const ContentSection = () => {
                   </div>
 
                   <div className="mt-6 lg:mt-0">
-                    <h2 className="text-3xl mb-6 leading-tight font-semibold font-heading">
+                    <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       What is the <GradientText>$MNGO</GradientText> token?
                     </h2>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
@@ -77,10 +77,10 @@ const ContentSection = () => {
 
         {/* Section 2 */}
         <div className="max-w-4xl mb-12 mx-auto text-center">
-          <h2 className="mb-8 text-4xl lg:text-5xl text-white font-bold font-heading">
+          <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             How it works.
           </h2>
-          <p className="mb-8 text-2xl text-white text-opacity-50">
+          <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
             We take the view that token sales should be simple, transparent and
             minimize randomness and luck in the distribution.
           </p>

@@ -165,8 +165,8 @@ const ContributionModal = () => {
 
   return (
     <>
-      <div className="flex flex-wrap lg:flex-row justify-center">
-        <div className="flex flex-col max-w-3xl bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md">
+      <div className="flex flex-wrap md:flex-row lg:flex-row justify-center">
+        <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md">
           <div className="pb-4 text-center">
             {!submitted &&
               !submitting &&
@@ -331,7 +331,7 @@ const ContributionModal = () => {
           )}
         </div>
 
-        <div className="flex flex-col m-3 bg-gradient-to-br from-secondary-4-dark to-secondary-4-light border border-bkg-3 p-7 rounded-lg shadow-md">
+        <div className="w-full flex flex-col m-3 bg-gradient-to-br from-secondary-4-dark to-secondary-4-light border border-bkg-3 p-7 rounded-lg shadow-md">
           <div className="border-b border-bkg-4 pb-4 text-center">
             <p className="text-fgd-3">Estimated Token Price</p>
             <div className="flex items-center justify-center pt-0.5">

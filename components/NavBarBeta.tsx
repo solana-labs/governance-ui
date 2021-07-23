@@ -43,7 +43,7 @@ const NavBarBeta = () => {
   return (
     <div className="">
       {/* Main Menu */}
-      <div className="lg:px-10 lg:py-8 xs:px-6 xs:py-1 bg-transparent">
+      <div className=" px-6 py-1 lg:px-10 lg:py-8 bg-transparent">
         <div className="max-w-7xl mx-auto px-4 sm:px-6">
           <div className="flex justify-between items-center py-6 md:justify-start md:space-x-10">
             <div className="flex justify-start lg:w-0 lg:flex-1">
