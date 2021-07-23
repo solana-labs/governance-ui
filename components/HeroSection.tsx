@@ -22,7 +22,7 @@ const HeroSection = () => {
                         target="_blank"
                         href="#"
                       >
-                        <Button>Take me to contribute</Button>
+                        <Button>Contribute now</Button>
                       </a>
                       <a
                         className="px-2"
@@ -30,7 +30,7 @@ const HeroSection = () => {
                         target="_blank"
                         href="#"
                       >
-                        <Link>Learn before contributing</Link>
+                        <Link>Learn more</Link>
                       </a>
                     </div>
         </div>
