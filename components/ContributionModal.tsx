@@ -9,12 +9,12 @@ import useWalletStore from '../stores/useWalletStore'
 import Input from './Input'
 import Button from './Button'
 import ConnectWalletButton from './ConnectWalletButton'
-import PoolCountdown from './PoolCountdown'
+//import PoolCountdown from './PoolCountdown'
 import Slider from './Slider'
 import Loading from './Loading'
 import WalletIcon from './WalletIcon'
 import useLargestAccounts from '../hooks/useLargestAccounts'
-import useVaults from '../hooks/useVaults'
+//import useVaults from '../hooks/useVaults'
 import usePool from '../hooks/usePool'
 import styled from '@emotion/styled'
 import 'twin.macro'
@@ -27,7 +27,7 @@ const ContributionModal = () => {
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const largestAccounts = useLargestAccounts()
-  const vaults = useVaults()
+  //const vaults = useVaults()
   const { endIdo, endDeposits } = usePool()
 
   const usdcBalance = largestAccounts.usdc?.balance || 0
@@ -47,9 +47,9 @@ const ContributionModal = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
 
-  const priceFormat = new Intl.NumberFormat('en-US', {
-    maximumSignificantDigits: 4,
-  })
+  //onst priceFormat = new Intl.NumberFormat('en-US', {
+  //  maximumSignificantDigits: 4,
+  //})
 
   useEffect(() => {
     console.log('refresh modal on balance change')
@@ -154,7 +154,7 @@ const ContributionModal = () => {
   }, [submitting])
 
   const toLateToDeposit =
-    endDeposits.isBefore() && endIdo.isAfter() && !largestAccounts.redeemable
+    endDeposits?.isBefore() && endIdo.isAfter() && !largestAccounts.redeemable
 
   const disableFormInputs =
     submitted || !connected || loading || (connected && toLateToDeposit)
