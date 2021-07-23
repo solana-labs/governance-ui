@@ -88,7 +88,7 @@ const ContentSection = () => {
         <section className="">
           <div className="grid grid-cols-3 gap-6 mb-6">
             <div className="col-span-3 lg:col-span-1">
-              <div className="bg-bkg-3 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
@@ -104,7 +104,7 @@ const ContentSection = () => {
             </div>
 
             <div className="col-span-3 lg:col-span-2">
-              <div className="bg-bkg-3 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
@@ -154,7 +154,7 @@ const ContentSection = () => {
 
           <div className="grid grid-cols-3 gap-6">
             <div className="col-span-3 lg:col-span-2">
-              <div className="bg-bkg-3 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
