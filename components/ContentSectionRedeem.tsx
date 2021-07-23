@@ -120,7 +120,7 @@ const ContentSection = () => {
                       <span className="text-mango-red italic">Restricted</span>.
                     </p>
                     <div className="flex flex-wrap overflow-hiddenm mt-8">
-                      <div className="w-full overflow-hidden lg:w-1/2 pr-4">
+                      <div className="w-full overflow-hidden lg:w-1/2 pr-4 mt-4">
                         <p>
                           <span className="text-mango-green italic">
                             Unrestricted
@@ -133,7 +133,7 @@ const ContentSection = () => {
                         </p>
                       </div>
 
-                      <div className="w-full overflow-hidden lg:w-1/2">
+                      <div className="w-full mt-4 overflow-hidden lg:w-1/2">
                         <p>
                           <span className="text-mango-red italic">
                             Restricted
