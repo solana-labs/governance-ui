@@ -165,7 +165,7 @@ const ContributionModal = () => {
 
   return (
     <>
-        <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md">
+        <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md z-10">
           <div className="pb-4 text-center">
             {!submitted &&
               !submitting &&
