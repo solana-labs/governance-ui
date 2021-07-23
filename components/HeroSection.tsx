@@ -20,7 +20,7 @@ const HeroSection = () => {
                         className="px-1"
                         rel="noreferrer"
                         target="_blank"
-                        href="https://trade.mango.markets"
+                        href="#"
                       >
                         <Button>Take me to contribute</Button>
                       </a>
@@ -28,7 +28,7 @@ const HeroSection = () => {
                         className="px-2"
                         rel="noreferrer"
                         target="_blank"
-                        href="https://docs.mango.markets/"
+                        href="#"
                       >
                         <Link>Learn before contributing</Link>
                       </a>
