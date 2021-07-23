@@ -3,9 +3,9 @@ import RedeemModal
  from './RedeemModal'
 const HeroSectionLead = () => {
   return (
-    <section className="">
-    <div className="justify-center grid grid-cols:1 lg:grid-cols-12 gap-4 m-10 mx-auto">
-      <div className="lg:col-span-6 lg:col-start-2">
+    <section className="px-4 mx-4">
+    <div className="flex flex-col md:flex-row lg:flex-row m-10 mx-auto">
+      <div className="flex-1">
         <h2 className="my-5 text-3xl lg:text-5xl text-white font-bold font-heading">
           The event has ended. <br />
           It’s time to redeem your&nbsp;
@@ -16,7 +16,7 @@ const HeroSectionLead = () => {
           the future of Mango.
         </p>
       </div>
-      <div className="lg:col-span-4 lg:col-start-8 my-5">
+      <div className="flex-1 my-5 z-10">
         <RedeemModal />
       </div>
     </div>
