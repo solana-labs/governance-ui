@@ -66,7 +66,7 @@ const RedeemModal = () => {
 
   return (
     <>
-      <div className="bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-lg">
+      <div className="flex flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-lg">
         <div className="pb-4 text-center">
           {!submitting ? (
             <>
