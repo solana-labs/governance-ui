@@ -55,7 +55,7 @@ const StatsModal = () => {
               </div>
             </div>
           </div>
-          <div className="py-4 text-center">
+          <div className="pt-4 text-center">
             <p className="text-fgd-3">Locked MNGO in Pool</p>
             <div className="flex items-center justify-center pt-0.5">
               <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="mango" />
