@@ -12,7 +12,7 @@ const ContentSection = () => {
           <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
             This is the first moment for non-developers to participate in
             helping build the Mango protocol by supporting the inception of the
-            protocols Insurance Fund.
+            protocol&apos;s Insurance Fund.
           </p>
         </div>
 
@@ -58,14 +58,14 @@ const ContentSection = () => {
                     </p>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
                       Mango Governance tokens ($MNGO) will serve as the
-                      incentive for those who can proove their work is useful to
+                      incentive for those who can prove their work is useful to
                       the DAO.
                     </p>
                     <Button>Check out the whitepaper</Button>
 
                     <p className="text-white leading-relaxed py-4">
-                      <span className="text-mango-yellow">$MNGO</span> were only
-                      provided to developers who helped to build out the
+                      <span className="text-mango-yellow font-semibold">$MNGO</span> were only
+                      provided to contributors who helped build the
                       protocol.
                     </p>
                   </div>
@@ -142,7 +142,7 @@ const ContentSection = () => {
                         <p className="text-white text-opacity-50">
                           After 24 hours deposits will be restricted and only
                           withdrawals allowed. During the restricted period
-                          price can only goin down.
+                          price can only go down.
                         </p>
                       </div>
                     </div>
@@ -168,7 +168,7 @@ const ContentSection = () => {
                     </p>
                     <p className="text-white text-opacity-50 text-base mb-4">
                       Elements of luck engineered into the mechanism distribute
-                      value randomly to those, who are most willing to do the
+                      value randomly to those who are most willing to do the
                       arbitrary, worthless tasks to get the free value.
                     </p>
                     {/*<p className="text-white font-bold leading-relaxed">

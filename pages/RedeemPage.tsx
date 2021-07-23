@@ -1,8 +1,10 @@
 import RedeemModal from '../components/RedeemModal'
 import GradientText from '../components/GradientText'
+import FooterSection from '../components/FooterSection'
 
 const RedeemPage = () => {
   return (
+    <>
     <div className="justify-center grid grid-cols:1 lg:grid-cols-12 gap-4 m-10">
       <div className="lg:col-span-6 lg:col-start-2">
         <h2 className="my-5 text-3xl lg:text-5xl text-white font-bold font-heading">
@@ -19,6 +21,8 @@ const RedeemPage = () => {
         <RedeemModal />
       </div>
     </div>
+    <FooterSection />
+    </>
   )
 }
 
