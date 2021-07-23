@@ -1,9 +1,9 @@
 import GradientText from './GradientText'
 import RedeemModal
  from './RedeemModal'
-const HeroSectionLead = () => {
+const HeroSectionRedeem = () => {
   return (
-    <section className="px-4 mx-4">
+    <section className="max-w-7xl mx-auto px-10">
     <div className="flex flex-col md:flex-row lg:flex-row m-10 mx-auto">
       <div className="flex-1">
         <h2 className="my-5 text-3xl lg:text-5xl text-white font-bold font-heading">
@@ -24,4 +24,4 @@ const HeroSectionLead = () => {
   )
 }
 
-export default HeroSectionLead
+export default HeroSectionRedeem
