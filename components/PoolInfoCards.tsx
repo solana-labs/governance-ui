@@ -23,8 +23,7 @@ const PoolInfoCards = () => {
   })
 
   return (
-    <div className="max-w-xl flex flex-col mx-auto px-6 mb-16 z-10">
-      <div className="flex flex-col lg:flex-row">
+    <div className="max-w-7xl flex flex-wrap mx-auto px-6 mb-16 z-10">
         <Card title="Deposits closing in">
           <PoolCountdown date={endDeposits} />
         </Card>
@@ -32,26 +31,24 @@ const PoolInfoCards = () => {
         <Card title="Sale event ends in">
           <PoolCountdown date={endIdo} />
         </Card>
-      </div>
       <Card title="Total contributions">
         <div className="flex">
           <img
             alt="USDC"
-            width="40"
-            height="40"
+            width="25"
+            height="25"
             src="/icons/usdc.svg"
             className={`mr-4`}
           />{' '}
-          <div className="font-bold text-fgd-1 text-4xl">
+          <div className="font-bold text-fgd-1 text-xl">
             {vaults.usdcBalance}
           </div>
         </div>
       </Card>
-      <div className="flex flex-wrap">
         <Card title="Total $MNGO for sale">
           <div className="flex">
             <img className="h-7 mr-2 w-auto" src="/logo.svg" alt="MNGO" />
-            <div className="font-bold text-fgd-1 text-2xl">
+            <div className="font-bold text-fgd-1 text-xl">
               {vaults.mangoBalance}
             </div>
           </div>
@@ -65,14 +62,13 @@ const PoolInfoCards = () => {
               src="/icons/usdc.svg"
               className={`mr-2`}
             />{' '}
-            <div className="font-bold text-fgd-1 text-2xl">
+            <div className="font-bold text-fgd-1 text-xl">
               {vaults.estimatedPrice
                 ? numberFormat.format(vaults.estimatedPrice)
                 : 'N/A'}
             </div>
           </div>
         </Card>
-      </div>
     </div>
   )
 }

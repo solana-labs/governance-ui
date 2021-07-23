@@ -1,19 +1,38 @@
 import GradientText from './GradientText'
+import Button from './Button'
+import Link from './Link'
+
 const HeroSection = () => {
   return (
     <section className="">
-      <div className="container px-8 mx-auto">
+      <div className="max-w-6xl px-8 mx-auto">
         <div className="relative pt-16 md:pt-32 pb-2">
-          <div className="max-w-2xl mb-16 mx-auto text-left md:text-center lg:text-center">
-            <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-              Join the <GradientText>Mango DAO</GradientText> and help build the
-              ecosystem.
+          <div className="mb-8 mx-auto text-left md:text-center lg:text-center">
+            <h2 className="mb-8 text-3xl md:text-5xl lg:text-5xl text-white font-bold font-heading">
+            Claim your stake in the <GradientText>Mango Dao</GradientText>.
             </h2>
-            <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
-              The Mango DAO is an experiment in self governance that aims to
-              build a completely decentralzied financial ecosystem.
+            <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
+            The Mango Dao is a self-governance protocol building a decentralized financial ecosystem. By contributing you will have a stake in the future of the ecosystem and its products.
             </p>
           </div>
+          <div className="mb-16 flex lg:flex-row md:flex-row lg:justify-center md:justify-center sm:justify-center">
+                      <a
+                        className="px-1"
+                        rel="noreferrer"
+                        target="_blank"
+                        href="https://trade.mango.markets"
+                      >
+                        <Button>Take me to contribute</Button>
+                      </a>
+                      <a
+                        className="px-2"
+                        rel="noreferrer"
+                        target="_blank"
+                        href="https://docs.mango.markets/"
+                      >
+                        <Link>Learn before contributing</Link>
+                      </a>
+                    </div>
         </div>
       </div>
     </section>

@@ -172,8 +172,8 @@ const ContributionModal = () => {
               !editContribution &&
               !(connected && toLateToDeposit) && (
                 <>
-                  <h2>This time has arrived.</h2>
-                  <p>When ready, depost your USDC</p>
+                  <h2>The journey starts here.</h2>
+                  <p>When your&apos;re ready, deposit your USDC</p>
                 </>
               )}
 

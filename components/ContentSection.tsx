@@ -81,8 +81,7 @@ const ContentSection = () => {
             How it works.
           </h2>
           <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
-            We take the view that token sales should be simple, transparent and
-            minimize randomness and luck in the distribution.
+              We take the view that token sales should be simple, transparent and fairly distributed.
           </p>
         </div>
         <section className="">
@@ -92,7 +91,7 @@ const ContentSection = () => {
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
-                      Deposit your USDC contribution.
+                      Deposit USDC into Vault.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
                       Users deposit USDC into a vault during the event period to
@@ -111,8 +110,7 @@ const ContentSection = () => {
                       48 hour participation period.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
-                      The event will span over a 2 day period split into two
-                      sections,{' '}
+                        The event will span over 2 days split into two periods,{' '}
                       <span className="text-mango-green italic">
                         Unrestricted
                       </span>{' '}
@@ -127,9 +125,7 @@ const ContentSection = () => {
                           </span>
                         </p>
                         <p className="text-white text-opacity-50">
-                          During the unrestricted period users may deposit or
-                          withdraw their USDC from the vault. During the
-                          unrestricted period price can fluctuate.
+                        During the unrestricted period, you may deposit or withdraw USDC from the vault. During the unrestricted period, the $MNGO price can fluctuate.
                         </p>
                       </div>
 
@@ -140,9 +136,7 @@ const ContentSection = () => {
                           </span>
                         </p>
                         <p className="text-white text-opacity-50">
-                          After 24 hours deposits will be restricted and only
-                          withdrawals allowed. During the restricted period
-                          price can only go down.
+                        After 24 hours deposits will be restricted and only withdrawals allowed. During the restricted period price can only go down.
                         </p>
                       </div>
                     </div>
@@ -184,11 +178,10 @@ const ContentSection = () => {
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
-                      MNGO unlocked and distributed.
+                      MNGO unlocked and redeemable.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
-                      At event conclusion $MNGO gets distributed in propotion to
-                      a users USDC contribution.{' '}
+                      On conclusion of the token sale, $MNGO will be distributed in proportion to your USDC contribution.{' '}
                     </p>
                   </div>
                 </div>
