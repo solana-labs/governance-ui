@@ -5,10 +5,10 @@ import PoolCountdown from './PoolCountdown'
 const Card = (props: any) => {
   return (
     <div
-      className="flex-1 m-2 p-5 border border-bkg-3 rounded-xl h-auto w-auto z-10 shadow-md text-center justify-items-center items-center"
+      className="flex-1 m-2 p-5 border border-bkg-3 rounded-xl h-auto w-auto z-10 shadow-md"
       style={{ backgroundColor: 'rgba(44, 41, 66, 1)' }}
     >
-      <p className="pb-2 text-white text-opacity-50 text-xl">{props.title}</p>
+      <p className="pb-2 text-white text-opacity-50 text-md">{props.title}</p>
       {props.children}
     </div>
   )
@@ -23,7 +23,7 @@ const PoolInfoCards = () => {
   })
 
   return (
-    <div className="max-w-3xl flex flex-col mx-auto px-6 mb-16 z-10">
+    <div className="max-w-xl flex flex-col mx-auto px-6 mb-16 z-10">
       <div className="flex flex-col lg:flex-row">
         <Card title="Deposits closing in">
           <PoolCountdown date={endDeposits} />
