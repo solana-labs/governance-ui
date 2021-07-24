@@ -12,7 +12,7 @@ const HeroSectionLead = () => {
             <h2 className="mb-8 text-7xl text-white font-bold font-heading">
               <GradientText>Wen</GradientText> Token?
             </h2>
-            <p className="mb-8 text-7xl">{startIdo.fromNow()}</p>
+            <p className="mb-8 text-7xl">{startIdo?.fromNow()}</p>
           </div>
         </div>
       </div>

@@ -5,9 +5,9 @@ import HeroSectionRedeem from '../components/HeroSectionRedeem'
 const RedeemPage = () => {
   return (
     <>
-    <HeroSectionRedeem />
-    <ContentSectionRedeem />
-    <FooterSection />
+      <HeroSectionRedeem />
+      <ContentSectionRedeem />
+      <FooterSection />
     </>
   )
 }

@@ -4,8 +4,8 @@ import StatsModal from './StatsModal'
 const ModalSection = () => {
   return (
     <>
-    <div className="pt-48 pb-48 px-4">
-      <div className="max-w-5xl mx-auto text-center">
+      <div className="pt-48 pb-48 px-4">
+        <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             Ready to contribute?
           </h2>
@@ -17,8 +17,7 @@ const ModalSection = () => {
           <ContributionModal />
           <StatsModal />
         </div>
-    </div>
-
+      </div>
     </>
   )
 }

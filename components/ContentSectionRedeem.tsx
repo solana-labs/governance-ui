@@ -64,8 +64,10 @@ const ContentSection = () => {
                     <Button>Check out the whitepaper</Button>
 
                     <p className="text-white leading-relaxed py-4">
-                      <span className="text-mango-yellow font-semibold">$MNGO</span> were only
-                      provided to contributors who helped build the
+                      <span className="text-mango-yellow font-semibold">
+                        $MNGO
+                      </span>{' '}
+                      were only provided to contributors who helped build the
                       protocol.
                     </p>
                   </div>
