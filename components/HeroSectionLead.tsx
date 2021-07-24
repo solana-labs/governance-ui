@@ -1,5 +1,9 @@
 import GradientText from './GradientText'
+import usePool from '../hooks/usePool'
+
 const HeroSectionLead = () => {
+  const { startIdo } = usePool()
+
   return (
     <section className="flex">
       <div className="px-8 mx-auto h-screen justify-items-center align-middle">
@@ -8,9 +12,7 @@ const HeroSectionLead = () => {
             <h2 className="mb-8 text-7xl text-white font-bold font-heading">
               <GradientText>Wen</GradientText> Token?
             </h2>
-            <p className="mb-8 text-7xl">
-                6d 23h 35m 12s
-            </p>
+            <p className="mb-8 text-7xl">{startIdo.fromNow()}</p>
           </div>
         </div>
       </div>
