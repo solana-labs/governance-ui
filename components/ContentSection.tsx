@@ -191,7 +191,7 @@ const ContentSection = () => {
 
                     <div className="flex flex-col md:flex-row lg:flex-row">
                       <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
-                        <div className="mt-4">
+                        <div className="py-2">
                         <svg 
                           width="24" 
                           height="20" 
@@ -222,7 +222,7 @@ const ContentSection = () => {
                         </p>
                       </div>
                       <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
-                      <div className="mt-4">
+                      <div className="py-2">
                       <svg 
                           width="21" 
                           height="22" 
@@ -248,7 +248,7 @@ const ContentSection = () => {
                         </p>
                       </div>
                       <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
-                      <div className="mt-4">
+                      <div className="py-2">
                       <svg 
                           width="22" 
                           height="22" 
@@ -267,14 +267,14 @@ const ContentSection = () => {
 
                         </div>
                         <h3 className="my-2">
-                        Not decentralzed; yet. 
+                        Not fully decentralzed; yet. 
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
                           It is very difficult for a DAO to have complete autonomy off inception, Mango plans to fulled decentralize as tools and ecosystem mature. 
                         </p>
                       </div>
                       <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
-                      <div className="mt-4">
+                      <div className="py-2">
                       <svg 
                           width="20" 
                           height="22" 
@@ -293,7 +293,7 @@ const ContentSection = () => {
 
                         </div>
                         <h3 className="my-2">
-                        Contributor tokens are unlocked. 
+                        Tokens are unlocked. 
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
                         Tokens given to early contributors of the protocol are unlocked. 
