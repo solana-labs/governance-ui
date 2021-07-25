@@ -180,7 +180,7 @@ const ContentSection = () => {
                   </div>
                 </div>
 
-                <div className="max-w-5xl mx-auto text-center">
+                <div className="max-w-5xl mx-auto text-center mt-16 pt-12 pb-16">
                       <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
                       Current risks to DAO contributors.
                       </h2>
@@ -189,8 +189,8 @@ const ContentSection = () => {
                       </p>
                     </div>
 
-                    <div className="flex flex-row">
-                      <div className="flex-1 flex-row mt-4">
+                    <div className="flex flex-col md:flex-row lg:flex-row">
+                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                         <div className="mt-4">
                         <svg 
                           width="24" 
@@ -214,14 +214,14 @@ const ContentSection = () => {
                         </svg>
 
                         </div>
-                        <h3>
+                        <h3 className="my-2">
                         Not currently audited.  
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
-                          The protocol and governance are currently unaudited. While we take great caution and forethought in the way we build our smart contracts we cannot offer that gauratee that an audited contract can give.
+                        While we take great caution and forethought in the way we build our smart contracts we cannot offer that gauratee that an audited contract can give.
                         </p>
                       </div>
-                      <div className="flex-1 flex-row mt-4">
+                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="mt-4">
                       <svg 
                           width="21" 
@@ -247,7 +247,7 @@ const ContentSection = () => {
                         While we focused on making our fund raising tool as fair as possible, our mechanism is not free of gaming mechanics.  
                         </p>
                       </div>
-                      <div className="flex-1 flex-row mt-4">
+                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="mt-4">
                       <svg 
                           width="22" 
@@ -273,7 +273,7 @@ const ContentSection = () => {
                           It is very difficult for a DAO to have complete autonomy off inception, Mango plans to fulled decentralize as tools and ecosystem mature. 
                         </p>
                       </div>
-                      <div className="flex-1 flex-row mt-4">
+                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="mt-4">
                       <svg 
                           width="20" 
@@ -293,10 +293,11 @@ const ContentSection = () => {
 
                         </div>
                         <h3 className="my-2">
-                        Initial contributor tokens are unlocked. 
+                        Contributor tokens are unlocked. 
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
-                        Tokens given to early builders and contributors of the protocol are unlocked. We are open source contributors so building and adding to the protocol took presedence over building token mechanism for locking funds. 
+                        Tokens given to early contributors of the protocol are unlocked. 
+                        We were mainly focused on building a great product vs tools token vesting tools.
                         </p>
                       </div>
                     </div>
