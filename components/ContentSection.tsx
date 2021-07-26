@@ -1,4 +1,4 @@
-import Button from './Button'
+import LinkLeft from './LinkLeft'
 import GradientText from './GradientText'
 
 const ContentSection = () => {
@@ -30,16 +30,13 @@ const ContentSection = () => {
                       Mango is a decentralized autonomous organization. Its
                       purpose is to improve the Mango protocol for the greater defi
                       ecosystem. We aim to create commercially viable decentralized trading and lending
-                      products for traders.
+                      products.
                     </p>
-                    <Button>Check out the whitepaper</Button>
-
-
                     <h2 className="mt-8 text-2xl mb-6 leading-tight font-semibold font-heading">
                       Why the <GradientText>Insurance fund</GradientText>?
                     </h2>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
-                      At its core the Mango protocol is powered by lenders providing their
+                      The Mango protocol is powered by lenders providing their
                       capital for the community to use for trading and borrowing
                       purposes. The insurance fund is the last line of defense
                       for protecting our mango lenders in case the system fails.
@@ -47,6 +44,9 @@ const ContentSection = () => {
                     <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       What is the <GradientText>$MNGO</GradientText> token?
                     </h2>
+                    <p className="mb-6 text-lg text-white text-opacity-50 leading-relaxed">
+                    The token is the foundation of the Mango DAO and will be a pivital building block in the future of the protocol. 
+                    </p>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
                       Mango Governance tokens ($MNGO) will serve as the
                       incentive for those who can prove their work is useful to
@@ -60,14 +60,13 @@ const ContentSection = () => {
                     <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       Why the token?
                     </h2>
-                    <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
+                    <p className="mb-2 text-lg text-white text-opacity-50 leading-relaxed">
                       The introduction of the token gives contributing members of the DAO a chance to mold the future of the protocol. The token also helps bootstrap liquidity to the platform buy offering incentives to market makers and participants in the system. 
-                      <br />
-                      <br />
-                      The token is the foundation of the Mango DAO and will be a pivital building block in the future of the protocol. 
                     </p>
-                    <div>
-                  <h3 className="font-bold text-lg my-2">
+                    <LinkLeft>Checkout the whitepaper</LinkLeft>
+
+                    <div className="mt-16 mb-8">
+                    <h3 className="font-bold text-lg my-2">
                         Token distribution: 
                         </h3>
                         
@@ -91,7 +90,7 @@ const ContentSection = () => {
                               Mango DAO  
                             </p>
                               <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              A majority of the tokens will be locked in a smart contract only accessible through DAO governance votes. 
                               </p>
                           </div>
                           <div className="col-span-2 md:col-span-2 lg:col-span-1 m-1 p-1">
@@ -99,7 +98,7 @@ const ContentSection = () => {
                               Liquidity Incentives  
                             </p>
                               <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              Bootstraping liquidity is important, market makers and other participants should be incentivized to be active in the books.
                               </p>
                           </div>
                           <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
@@ -107,7 +106,7 @@ const ContentSection = () => {
                               Insurance Fund  
                             </p>
                               <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
+                              MNGO will be exchange for funds commited to the insurance fund that helps protect Mango lenders.                              
                               </p>
                           </div>
                           <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
@@ -115,25 +114,26 @@ const ContentSection = () => {
                               Contributor Tokens  
                             </p>
                               <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
+                              Tokens distributed to early contributors of the protocol are unlocked and not on a vesting schedule. 
+                              
                               </p>
                           </div>
                         </div>
-                    </div>    
+                    </div>  
                   </div>                  
                 </div>
 
                 <div className="max-w-4xl mx-auto text-center mt-16 pt-12 pb-16">
                       <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-                      We want to be transparent.
+                      We want to be fully transparent.
                       </h2>
                       <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
-                      We feel it important to detail the current risks to the system in order to give full transparency for participants in the insurance funds inception. 
+                      We feel it is important to detail current risks to the system in order to give full transparency for participants in the insurance fund sale. 
                       </p>
                     </div>
 
-                    <div className="grid grid-col-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
-                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                    <div className="flex flex-col md:flex-row lg:flex-row gap-6">
+                      <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                         <div className="py-2">
                         <svg 
                           width="24" 
@@ -157,15 +157,19 @@ const ContentSection = () => {
                         </svg>
 
                         </div>
-                        <h3 className="my-2">
+                        <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                         Unaudited smart contracts.  
                         </h3>
-                        <p className="text-md text-white text-opacity-50"> 
-                        While we take great care and forethought in the way we build our smart contracts, we cannot guarantee they are free of potential exploits.
-                        Users should always take caution when participating and do as much research as possible
+                        <p className="text-white text-opacity-50 text-md"> 
+                        We take great care and forethought in the way we build our smart contracts, we opensource all code once 
+                        ready and work with many industry leading developers during creation.
+                        <br />
+                        <br />
+                        While this is the case we cannot guarantee they are free of potential exploits.
+                        Users should always take caution when participating today and do  on the potential risks.
                         </p>
                       </div>
-                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="21" 
@@ -184,14 +188,22 @@ const ContentSection = () => {
                         </svg>
 
                       </div>
-                        <h3 className="my-2">
+                        <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                         New token sale mechanism 
                         </h3>
-                        <p className="text-md text-white text-opacity-50">
-                        We have focused on fairness for all participants in the sale. However, some players may game the system by inflating the token price during the deposit period (discouraging others to participate) before withdrawing when deposits are closed and lowering the price.
+                        <p className="text-white text-opacity-50 text-md">
+                         We built our own sale and distribution mechanism in order to focus on fairness for all participants during and after the sale. 
+                         <br />
+                         <br />
+                         While fairness is our intention, some participants may still game the system by inflating the token price during the 
+                         deposit period with the intention of discouraging others to participate. 
+                         <br />
+                         <br />
+                         they then could withdraw their deposits during the restricted period
+                        lowering the price for those that remain.
                         </p>
                       </div>
-                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="22" 
@@ -210,41 +222,17 @@ const ContentSection = () => {
                         </svg>
 
                         </div>
-                        <h3 className="my-2">
+                        <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                         Not fully decentralzed; yet. 
                         </h3>
-                        <p className="text-md text-white text-opacity-50"> 
-                        Whilst the path to becoming decentralized is kicking off with the token sale, the team will have control over the direction of the protocol until the governance mechanism is fully established.
-                        Contributers must trust the mango team until full decentralization is reached.
+                        <p className="text-white text-opacity-50 text-md"> 
+                        Whilst the path to becoming decentralized is kicking off with the token sale, at inception the team will have control over the direction of the protocol until the governance mechanism is estabilshed and tools built out.
+                        <br />
+                        <br />
+                        Contributers must trust the mango team until full decentralization is reached. We offer full transparency in during this phase of transition and commit to creating a fair voting system for DAO participants. 
                         </p>
                       </div>
-                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
-                      <div className="py-2">
-                      <svg 
-                          width="20" 
-                          height="22" 
-                          viewBox="0 0 14 16" 
-                          fill="none" 
-                          xmlns="http://www.w3.org/2000/svg"
-                          >
-                          <path d="M7 0C4.23858 0 2 2.23858 2 5V7C0.895431 7 0 7.89543 0 9V14C0 15.1046 0.89543 16 2 16H12C13.1046 16 14 15.1046 14 14V9C14 7.89543 13.1046 7 12 7H4V5C4 3.34315 5.34315 2 7 2C8.39651 2 9.57246 2.95512 9.90555 4.24926C10.0432 4.78411 10.5884 5.1061 11.1232 4.96844C11.6581 4.83078 11.9801 4.28559 11.8424 3.75074C11.2874 1.59442 9.33117 0 7 0Z" fill="url(#paint0_linear)"/>
-                            <defs>
-                              <linearGradient id="paint0_linear" x1="-11.5" y1="-26.1333" x2="44.415" y2="45.6265" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#FECA1A"/>
-                                <stop offset="1" stopColor="#AFD803"/>
-                              </linearGradient>
-                            </defs>
-                        </svg>
 
-                        </div>
-                        <h3 className="my-2">
-                        Contributor tokens fully vested. 
-                        </h3>
-                        <p className="text-md text-white text-opacity-50"> 
-                        Tokens distributed to early contributors of the protocol are unlocked and not on a vesting schedule. This means they are full tradable by contributors at launch. The team fully commits to not dumping on you though. 
-                        </p>
-                       
-                      </div>
                     </div>
 
 
@@ -267,28 +255,13 @@ const ContentSection = () => {
         </div>
         <section className="">
           <div className="grid grid-cols-3 gap-6 mb-6">
-            <div className="col-span-3 lg:col-span-1">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
-                <div className="py-4 px-8 mt-3">
-                  <div className="flex flex-col mb-8">
-                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
-                      Deposit USDC into Vault.
-                    </h2>
-                    <p className="text-white text-opacity-50 text-base">
-                      Users deposit USDC into a vault during the event period to
-                      set their contribution amount.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
 
             <div className="col-span-3 lg:col-span-2">
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
-                      48 hour participation period.
+                      The 48 hour participation period begins.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
                       The event will span over 2 days split into two periods,{' '}
@@ -329,9 +302,40 @@ const ContentSection = () => {
                 </div>
               </div>
             </div>
+            <div className="col-span-3 lg:col-span-1">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+                <div className="py-4 px-8 mt-3">
+                  <div className="flex flex-col mb-8">
+                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
+                      Deposit USDC into Vault.
+                    </h2>
+                    <p className="text-white text-opacity-50 text-base">
+                      Users deposit and lock in their USDC into the contribution vault during the 
+                      <span className="text-mango-green italic"> Unrestricted</span> period locking in their ticket for $MNGO redemptions later on.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-6">
+            
+            <div className="col-span-3 lg:col-span-1">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-four bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+                <div className="py-4 px-8 mt-3">
+                  <div className="flex flex-col mb-8">
+                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
+                      MNGO unlocked and redeemable.
+                    </h2>
+                    <p className="text-white text-opacity-50 text-base">
+                      On conclusion of the even, MNGO will be unlocked for redemption from the distribution vault. Users receive a token amount
+                      in proportion to their USDC contribution.{' '}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
             <div className="col-span-3 lg:col-span-2">
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
@@ -354,21 +358,6 @@ const ContentSection = () => {
                       We believe all &quot;excess&quot; value should be captured
                       by token holders in the DAO.
                     </p>*/}
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div className="col-span-3 lg:col-span-1">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-four bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
-                <div className="py-4 px-8 mt-3">
-                  <div className="flex flex-col mb-8">
-                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
-                      MNGO unlocked and redeemable.
-                    </h2>
-                    <p className="text-white text-opacity-50 text-base">
-                      On conclusion of the token sale, $MNGO will be distributed
-                      in proportion to your USDC contribution.{' '}
-                    </p>
                   </div>
                 </div>
               </div>
