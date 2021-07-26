@@ -165,7 +165,7 @@ const ContentSection = () => {
                         <br />
                         <br />
                         While this is the case we cannot guarantee they are free of potential exploits.
-                        Users should always take caution when participating today and do  on the potential risks.
+                        Users should understand the risks when participating today and know what they are contribtuing too.
                         </p>
                       </div>
                       <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
@@ -191,15 +191,15 @@ const ContentSection = () => {
                         New token sale mechanism 
                         </h3>
                         <p className="text-white text-opacity-50 text-md">
-                         We built our own sale and distribution mechanism in order to focus on fairness for all participants during and after the sale. 
+                         We built our own sale and distribution mechanism in order to focus on fairness for all participants in the sale. 
                          <br />
                          <br />
                          While fairness is our intention, some participants may still game the system by inflating the token price during the 
-                         deposit period with the intention of discouraging others to participate. 
+                         sale period with the intention of discouraging others to participate. 
                          <br />
                          <br />
-                         they then could withdraw their deposits during the grace period
-                        lowering the price for those that remain.
+                         they then could withdrawal their deposits during the grace period
+                        lowering the price.
                         </p>
                       </div>
                       <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
@@ -228,7 +228,11 @@ const ContentSection = () => {
                         Whilst the path to becoming decentralized is kicking off with the token sale, at inception the team will have control over the direction of the protocol until the governance mechanism is estabilshed and tools built out.
                         <br />
                         <br />
-                        Contributers must trust the mango team until full decentralization is reached. We offer full transparency in during this phase of transition and commit to creating a fair voting system for DAO participants. 
+                        Contributers must trust the mango team until full decentralization is reached. 
+                        
+                        <br />
+                        <br />
+                        We offer full transparency in during this phase of transition and will commit to creating a fair voting system for those participating in DAO votes in the future. 
                         </p>
                       </div>
 
