@@ -3,8 +3,8 @@ import GradientText from './GradientText'
 
 const ContentSection = () => {
   return (
-    <div className="bg-bkg-2 transform -skew-y-3 pt-12 pb-16 mb-16 -mt-32 z-0">
-      <div className="max-w-7xl mx-auto px-4 py-40 transform skew-y-3">
+    <div className="bg-bkg-2 transform -skew-y-3 pt-16 pb-16 mb-16 -mt-32 z-0">
+      <div className="max-w-7xl mx-auto px-4 py-48 transform skew-y-3">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             It is still the early days.
@@ -18,10 +18,10 @@ const ContentSection = () => {
 
         {/* Section 1 */}
 
-        <div className="py-16 overflow-hidden">
+        <div className="overflow-hidden">
           <div className="max-w-max lg:max-w-7xl mx-auto">
             <div className="relative">
-                <div className="lg:grid lg:grid-cols-2 lg:gap-6">
+                <div className="lg:grid lg:grid-cols-2 lg:gap-6 py-24 ">
                   <div className="lg:max-w-none">
                     <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       What is Mango?
@@ -32,8 +32,10 @@ const ContentSection = () => {
                       ecosystem. We aim to create commercially viable decentralized trading and lending
                       products for traders.
                     </p>
+                    <Button>Check out the whitepaper</Button>
 
-                    <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
+
+                    <h2 className="mt-8 text-2xl mb-6 leading-tight font-semibold font-heading">
                       Why the <GradientText>Insurance fund</GradientText>?
                     </h2>
                     <p className="mb-8 text-lg text-white text-opacity-50 leading-relaxed">
@@ -42,12 +44,6 @@ const ContentSection = () => {
                       purposes. The insurance fund is the last line of defense
                       for protecting our mango lenders in case the system fails.
                     </p>
-
-                   </div>
-
-
-
-                  <div className="mt-6 lg:mt-0">
                     <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       What is the <GradientText>$MNGO</GradientText> token?
                     </h2>
@@ -56,6 +52,11 @@ const ContentSection = () => {
                       incentive for those who can prove their work is useful to
                       the DAO.
                     </p>
+                   </div>
+
+
+
+                  <div className="mt-6 lg:mt-0">
                     <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
                       Why the token?
                     </h2>
@@ -65,131 +66,74 @@ const ContentSection = () => {
                       <br />
                       The token is the foundation of the Mango DAO and will be a pivital building block in the future of the protocol. 
                     </p>
-                    {/* 
-                    <div className="flex flex-col">
-                      <div className="flex-1 flex-row mt-4">
-                        <div className="mt-4">
-                        <svg 
-                        width="24" 
-                        height="26" 
-                        viewBox="0 0 16 18" 
-                        fill="none" 
-                        xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path fillRule="evenodd" clipRule="evenodd" d="M0.166107 3.99878C3.17437 3.95797 5.91528 2.81021 8 0.944336C10.0847 2.81021 12.8256 3.95797 15.8339 3.99878C15.9431 4.64956 16 5.31809 16 5.99991C16 11.2248 12.6608 15.6697 8 17.317C3.33923 15.6697 0 11.2248 0 5.99991C0 5.31809 0.0568637 4.64956 0.166107 3.99878ZM11.7071 7.70698C12.0976 7.31646 12.0976 6.6833 11.7071 6.29277C11.3166 5.90225 10.6834 5.90225 10.2929 6.29277L7 9.58566L5.70711 8.29277C5.31658 7.90225 4.68342 7.90225 4.29289 8.29277C3.90237 8.6833 3.90237 9.31646 4.29289 9.70698L6.29289 11.707C6.68342 12.0975 7.31658 12.0975 7.70711 11.707L11.7071 7.70698Z" fill="url(#paint0_linear)"/>
-                          <defs>
-                            <linearGradient id="paint0_linear" x1="-28" y1="-6" x2="26" y2="23" gradientUnits="userSpaceOnUse">
-                              <stop stopColor="#E54033"/>
-                              <stop offset="1" stopColor="#FECA1A"/>
-                            </linearGradient>
-                          </defs>
-                        </svg>
+                    <div>
+                  <h3 className="font-bold text-lg my-2">
+                        Token distribution: 
+                        </h3>
+                        
+                        <div className="grid grid-cols-12 mt-4 py-1 px-1 rounded-md shadow-md bg-mango-med-dark">
+                          <div className="col-span-8 bg-mango-green text-center rounded-l-sm py-1">
+                            <span className="text-xs px-1 font-bold text-white">80%</span> 
+                          </div>
+                          <div className="col-span-2 bg-mango-yellow text-center  py-1">
+                            <span className="text-xs px-1 font-bold text-white">10%</span>  
+                          </div>
+                          <div className="col-span-1 bg-mango-red text-center  py-1">
+                            <span className="text-xs px-1 font-bold text-white">5%</span> 
+                          </div>
+                          <div className="col-span-1 bg-blue-400 text-center rounded-r-sm  py-1">
+                            <span className="text-xs px-1 font-bold text-white">5%</span> 
+                          </div>
                         </div>
-                        <h3>
-                        Insurance Fund 
-                        </h3>
-                        <p className="text-md text-white text-opacity-50"> 
-                        The insurance fund protects lenders funds from over zealous traders and borrowers.
-                        </p>
-                      </div>
-                      <div className="flex-1 flex-row mt-4">
-                      <div className="mt-4">
-                      <svg 
-                        width="24" 
-                        height="21" 
-                        viewBox="0 0 18 15" 
-                        fill="none" 
-                        xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 3C12 4.65685 10.6569 6 9 6C7.34315 6 6 4.65685 6 3C6 1.34315 7.34315 0 9 0C10.6569 0 12 1.34315 12 3Z" fill="url(#paint0_linear)"/>
-                          <path d="M17 5C17 6.10457 16.1046 7 15 7C13.8954 7 13 6.10457 13 5C13 3.89543 13.8954 3 15 3C16.1046 3 17 3.89543 17 5Z" fill="url(#paint1_linear)"/>
-                          <path d="M13 12C13 9.79086 11.2091 8 9 8C6.79086 8 5 9.79086 5 12V15H13V12Z" fill="url(#paint2_linear)"/>
-                          <path d="M5 5C5 6.10457 4.10457 7 3 7C1.89543 7 1 6.10457 1 5C1 3.89543 1.89543 3 3 3C4.10457 3 5 3.89543 5 5Z" fill="url(#paint3_linear)"/>
-                          <path d="M15 15V12C15 10.9459 14.7282 9.9552 14.2507 9.09432C14.4902 9.03275 14.7413 9 15 9C16.6569 9 18 10.3431 18 12V15H15Z" fill="url(#paint4_linear)"/>
-                          <path d="M3.74926 9.09432C3.27185 9.9552 3 10.9459 3 12V15H0V12C0 10.3431 1.34315 9 3 9C3.25871 9 3.50977 9.03275 3.74926 9.09432Z" fill="url(#paint5_linear)"/>
-                            <defs>
-                              <linearGradient id="paint0_linear" x1="-14" y1="-3.89417e-07" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                              <linearGradient id="paint1_linear" x1="-14" y1="-3.89417e-07" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                              <linearGradient id="paint2_linear" x1="-14" y1="-3.89417e-07" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                              <linearGradient id="paint3_linear" x1="-14" y1="-3.89417e-07" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                              <linearGradient id="paint4_linear" x1="-14" y1="-3.89417e-07" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                              <linearGradient id="paint5_linear" x1="-14" y1="-3.89417e-07" x2="9" y2="15" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                            </defs>
-                      </svg>
-                      </div>
-                        <h3 className="my-2">
-                        Governance 
-                        </h3>
-                        <p className="text-md text-white text-opacity-50">
-                        The Mango DAO is a decetralized organization, protocol changes are contributor driven and DAO governed.
-                        </p>
-                      </div>
-                      <div className="flex-1 flex-row mt-4">
-                      <div className="mt-4">
-                      <svg 
-                        width="24" 
-                        height="20" 
-                        viewBox="0 0 16 12" 
-                        fill="none" 
-                        xmlns="http://www.w3.org/2000/svg">
-                          <path d="M0 2C0 0.895431 0.895431 0 2 0H14C15.1046 0 16 0.895431 16 2V4C14.8954 4 14 4.89543 14 6C14 7.10457 14.8954 8 16 8V10C16 11.1046 15.1046 12 14 12H2C0.895431 12 0 11.1046 0 10V8C1.10457 8 2 7.10457 2 6C2 4.89543 1.10457 4 0 4V2Z" fill="url(#paint0_linear)"/>
-                            <defs>
-                              <linearGradient id="paint0_linear" x1="-16.5" y1="3.08733e-07" x2="25" y2="10.5" gradientUnits="userSpaceOnUse">
-                                <stop stopColor="#E54033"/>
-                                <stop offset="1" stopColor="#FECA1A"/>
-                              </linearGradient>
-                            </defs>
-                        </svg>
+                        <div className="grid grid-cols-4 mt-4">
+                          <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
+                            <p className="text-mango-green font-bold text-md my-2">
+                              Mango DAO  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              </p>
+                          </div>
+                          <div className="col-span-2 md:col-span-2 lg:col-span-1 m-1 p-1">
+                            <p className="text-mango-yellow font-bold text-md my-2">
+                              Liquidity Incentives  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              </p>
+                          </div>
+                          <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
+                            <p className="text-mango-red font-bold text-md my-2">
+                              Insurance Fund  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
+                              </p>
+                          </div>
+                          <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
+                            <p className="text-blue-400 font-bold text-md my-2">
+                              Contributor Tokens  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
+                              </p>
+                          </div>
                         </div>
-                        <h3 className="my-2">
-                        Liquidity Incentives 
-                        </h3>
-                        <p className="text-md text-white text-opacity-50"> 
-                          In order to bootstrap liquidity for our markets we have designed a system well aligned with liquidity providers needs
-                        </p>
-                      </div>
-                    </div>
-                    */}
-                    <Button>Check out the whitepaper</Button>
-
-                    <p className="text-white leading-relaxed py-4">
-                      <span className="text-mango-yellow font-semibold">
-                        $MNGO
-                      </span>{' '}
-                      were only provided to contributors who helped build the
-                      protocol.
-                    </p>
-                  </div>
+                    </div>    
+                  </div>                  
                 </div>
 
                 <div className="max-w-4xl mx-auto text-center mt-16 pt-12 pb-16">
                       <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-                      Current risks to DAO contributors.
+                      We want to be transparent.
                       </h2>
                       <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
                       We feel it important to detail the current risks to the system in order to give full transparency for participants in the insurance funds inception. 
                       </p>
                     </div>
 
-                    <div className="grid col-span-1 md:grid-cols-8 lg:grid-cols-8 gap-6">
-                      <div className="col-span-1 md:col-span-4 lg:col-span-4 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                    <div className="grid grid-col-1 md:grid-cols-4 lg:grid-cols-4 gap-6">
+                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                         <div className="py-2">
                         <svg 
                           width="24" 
@@ -221,7 +165,7 @@ const ContentSection = () => {
                         Users should always take caution when participating and do as much research as possible
                         </p>
                       </div>
-                      <div className="col-span-1 md:col-span-4 lg:col-span-4 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="21" 
@@ -247,7 +191,7 @@ const ContentSection = () => {
                         We have focused on fairness for all participants in the sale. However, some players may game the system by inflating the token price during the deposit period (discouraging others to participate) before withdrawing when deposits are closed and lowering the price.
                         </p>
                       </div>
-                      <div className="col-span-1 md:col-span-2 lg:col-span-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="22" 
@@ -274,7 +218,7 @@ const ContentSection = () => {
                         Contributers must trust the mango team until full decentralization is reached.
                         </p>
                       </div>
-                      <div className="col-span-1 md:col-span-6 lg:col-span-6 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="col-span-1 md:col-span-2 lg:col-span-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="20" 
@@ -299,57 +243,7 @@ const ContentSection = () => {
                         <p className="text-md text-white text-opacity-50"> 
                         Tokens distributed to early contributors of the protocol are unlocked and not on a vesting schedule. This means they are full tradable by contributors at launch. The team fully commits to not dumping on you though. 
                         </p>
-                        <h3 className="my-2">
-                        Token distribution: 
-                        </h3>
-                        <div className="grid grid-cols-12 mt-4 py-1 px-1 rounded-md shadow-md bg-mango-med-dark">
-                          <div className="col-span-8 bg-mango-green text-center rounded-l-sm py-1">
-                            <span className="text-xs px-1 font-bold text-white">80%</span> 
-                          </div>
-                          <div className="col-span-2 bg-mango-yellow text-center  py-1">
-                            <span className="text-xs px-1 font-bold text-white">10%</span>  
-                          </div>
-                          <div className="col-span-1 bg-mango-red text-center  py-1">
-                            <span className="text-xs px-1 font-bold text-white">5%</span> 
-                          </div>
-                          <div className="col-span-1 bg-blue-400 text-center rounded-r-sm  py-1">
-                            <span className="text-xs px-1 font-bold text-white">5%</span> 
-                          </div>
-                        </div>
-                        <div className="flex mt-4">
-                          <div className="flex-1 m-1 p-1">
-                            <p className="text-mango-green font-bold text-md my-2">
-                              Mango DAO  
-                            </p>
-                              <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                              </p>
-                          </div>
-                          <div className="flex-1 m-1 p-1">
-                            <p className="text-mango-yellow font-bold text-md my-2">
-                              Liquidity Incentives  
-                            </p>
-                              <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-                              </p>
-                          </div>
-                          <div className="flex-1 m-1 p-1">
-                            <p className="text-mango-red font-bold text-md my-2">
-                              Insurance Fund  
-                            </p>
-                              <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
-                              </p>
-                          </div>
-                          <div className="flex-1 m-1 p-1">
-                            <p className="text-blue-400 font-bold text-md my-2">
-                              Contributor Tokens  
-                            </p>
-                              <p className="text-xs text-white text-opacity-50"> 
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
-                              </p>
-                          </div>
-                        </div>
+                       
                       </div>
                     </div>
 
@@ -362,9 +256,9 @@ const ContentSection = () => {
         </div>
 
         {/* Section 2 */}
-        <div className="max-w-4xl mb-12 mx-auto text-center">
+        <div className="max-w-4xl mb-12 mx-auto text-center mt-16 pt-16">
           <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-            How it works.
+            How the sale works.
           </h2>
           <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
             We take the view that token sales should be simple, transparent and
