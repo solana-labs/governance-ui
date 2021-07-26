@@ -46,6 +46,13 @@ const StatsModal = () => {
         <div className="py-4 text-center">
           <p className="text-fgd-3">Total USDC Deposited</p>
           <div className="flex items-center justify-center pt-0.5">
+            <img
+              alt=""
+              width="20"
+              height="20"
+              src="/icons/usdc.svg"
+              className={`mr-2`}
+            />
             <div className="font-bold text-fgd-1 text-xl">
               {vaults.usdcBalance}
             </div>
