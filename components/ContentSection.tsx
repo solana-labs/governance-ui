@@ -4,7 +4,7 @@ import GradientText from './GradientText'
 const ContentSection = () => {
   return (
     <div className="bg-bkg-2 transform -skew-y-3 pt-16 pb-16 mb-16 -mt-32 z-0">
-      <div className="max-w-7xl mx-auto px-4 py-48 transform skew-y-3">
+      <div className="max-w-7xl mx-auto px-8 py-48 transform skew-y-3">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             It is still the early days.
@@ -133,7 +133,7 @@ const ContentSection = () => {
                     </div>
 
                     <div className="flex flex-col md:flex-row lg:flex-row gap-6 mb-16">
-                      <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                         <div className="py-2">
                         <svg 
                           width="28" 
@@ -168,7 +168,7 @@ const ContentSection = () => {
                         Users should always take caution when participating today and do  on the potential risks.
                         </p>
                       </div>
-                      <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="25" 
@@ -202,7 +202,7 @@ const ContentSection = () => {
                         lowering the price for those that remain.
                         </p>
                       </div>
-                      <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="26" 
