@@ -46,7 +46,7 @@ const StatsModal = () => {
         <div className="py-4 text-center">
           <p className="text-fgd-3">Total USDC Deposited</p>
           <div className="flex items-center justify-center pt-0.5">
-            <div className="font-bold text-fgd-1 text-base">
+            <div className="font-bold text-fgd-1 text-xl">
               {vaults.usdcBalance}
             </div>
           </div>
@@ -55,7 +55,7 @@ const StatsModal = () => {
           <p className="text-fgd-3">Locked MNGO in Pool</p>
           <div className="flex items-center justify-center pt-0.5">
             <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="mango" />
-            <div className="font-bold text-fgd-1 text-base">
+            <div className="font-bold text-fgd-1 text-xl">
               {vaults.mangoBalance}
             </div>
         </div>

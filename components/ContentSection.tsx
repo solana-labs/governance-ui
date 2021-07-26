@@ -124,10 +124,10 @@ const ContentSection = () => {
                 </div>
 
                 <div className="max-w-4xl mx-auto text-center mt-16 pt-12 pb-16">
-                      <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
+                      <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
                       We want to be fully transparent.
                       </h2>
-                      <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
+                      <p className="mb-10 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
                       We feel it is important to detail current risks to the system in order to give full transparency for participants in the insurance fund sale. 
                       </p>
                     </div>
@@ -247,11 +247,11 @@ const ContentSection = () => {
         </div>
 
         {/* Section 2 */}
-        <div className="max-w-4xl mb-12 mx-auto text-center mt-16 pt-16">
-          <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
+        <div className="max-w-4xl mb-24 mx-auto text-center mt-16 pt-16">
+          <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             How the sale works.
           </h2>
-          <p className="mb-8 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
+          <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
             We take the view that token sales should be simple, transparent and
             fairly distributed.
           </p>
