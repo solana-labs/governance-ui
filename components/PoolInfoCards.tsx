@@ -53,6 +53,7 @@ const PoolInfoCards = () => {
           </div>
         </div>
       </Card>
+      {/* 
       <Card title="Estimated token price">
         <div className="flex">
           <img
@@ -69,6 +70,7 @@ const PoolInfoCards = () => {
           </div>
         </div>
       </Card>
+      */}
     </div>
   )
 }
