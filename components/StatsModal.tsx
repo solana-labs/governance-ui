@@ -19,32 +19,17 @@ const StatsModal = () => {
     <>
       <div className="flex-1 m-3 sm:-ml-8 bg-secondary-4-dark backdrop-filter backdrop-blur-md bg-opacity-40 border border-bkg-3  py-6 rounded-xl shadow-md divide-y-2 divide-white divide-opacity-5 z-0">
         <div className="pb-4 text-center">
-          <p className="text-fgd-3">Deposits Close</p>
+          <p className="text-fgd-3">Deposits end in:</p>
           <PoolCountdown date={endDeposits} className="justify-center pt-1" />
         </div>
 
         <div className="py-4 text-center">
-          <p className="text-fgd-3">Withdrawals Close</p>
+          <p className="text-fgd-3">Grace Period ends in:</p>
           <PoolCountdown date={endIdo} className="justify-center pt-1" />
         </div>
 
         <div className="py-4 text-center">
-          <p className="text-fgd-3">Estimated Token Price</p>
-          <div className="flex items-center justify-center pt-0.5">
-            <img
-              alt=""
-              width="20"
-              height="20"
-              src="/icons/usdc.svg"
-              className={`mr-2`}
-            />
-            <div className="font-bold text-fgd-1 text-xl">
-              {priceFormat.format(vaults.estimatedPrice)}
-            </div>
-          </div>
-        </div>
-        <div className="py-4 text-center">
-          <p className="text-fgd-3">Total USDC Deposited</p>
+          <p className="text-fgd-3">Total USDC Deposited:</p>
           <div className="flex items-center justify-center pt-0.5">
             <img
               alt=""
@@ -58,8 +43,25 @@ const StatsModal = () => {
             </div>
           </div>
         </div>
+
+        <div className="py-4 text-center">
+          <p className="text-fgd-3">Estimated Token Price:</p>
+          <div className="flex items-center justify-center pt-0.5">
+            <img
+              alt=""
+              width="20"
+              height="20"
+              src="/icons/usdc.svg"
+              className={`mr-2`}
+            />
+            <div className="font-bold text-fgd-1 text-xl">
+              {priceFormat.format(vaults.estimatedPrice)}
+            </div>
+          </div>
+        </div>
+
         <div className="pt-4 text-center">
-          <p className="text-fgd-3">Locked MNGO in Pool</p>
+          <p className="text-fgd-3">MNGO in vault:</p>
           <div className="flex items-center justify-center pt-0.5">
             <img className="h-5 mr-2 w-auto" src="/logo.svg" alt="mango" />
             <div className="font-bold text-fgd-1 text-xl">
