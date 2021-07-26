@@ -66,7 +66,7 @@ const ContentSection = () => {
                     </p>
                     <LinkLeft>Checkout the whitepaper</LinkLeft>
 
-                    <div className="mt-8 mb-8 px-7 py-4 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
+                    <div className="mt-10 mb-8 px-7 py-4 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
                     <h3 className="font-bold text-lg my-2">
                         Token distribution.
                         </h3>
@@ -256,7 +256,7 @@ const ContentSection = () => {
 
 {/* Section 3 */} 
       <div className="bg-bkg-2 transform -skew-y-3">
-        <div className="max-w-7xl mx-auto px-8 pt-16 pb-24 my-16 transform skew-y-3">
+        <div className="max-w-7xl mx-auto px-8 py-48 my-16 transform skew-y-3">
             <div className="max-w-4xl mx-auto text-center pt-12 pb-16">
                     <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
                        We want to be fully transparent.
