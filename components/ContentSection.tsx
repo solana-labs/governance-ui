@@ -18,10 +18,9 @@ const ContentSection = () => {
 
         {/* Section 1 */}
 
-        <div className="py-16 xl:py-36 px-4 sm:px-6 lg:px-8 overflow-hidden">
+        <div className="py-16 overflow-hidden">
           <div className="max-w-max lg:max-w-7xl mx-auto">
             <div className="relative">
-              <div className="relative md:p-6">
                 <div className="lg:grid lg:grid-cols-2 lg:gap-6">
                   <div className="lg:max-w-none">
                     <h2 className="text-2xl mb-6 leading-tight font-semibold font-heading">
@@ -180,7 +179,7 @@ const ContentSection = () => {
                   </div>
                 </div>
 
-                <div className="max-w-5xl mx-auto text-center mt-16 pt-12 pb-16">
+                <div className="max-w-4xl mx-auto text-center mt-16 pt-12 pb-16">
                       <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
                       Current risks to DAO contributors.
                       </h2>
@@ -189,8 +188,8 @@ const ContentSection = () => {
                       </p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row lg:flex-row">
-                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                    <div className="grid col-span-1 md:grid-cols-8 lg:grid-cols-8 gap-6">
+                      <div className="col-span-1 md:col-span-4 lg:col-span-4 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                         <div className="py-2">
                         <svg 
                           width="24" 
@@ -215,13 +214,14 @@ const ContentSection = () => {
 
                         </div>
                         <h3 className="my-2">
-                        Not currently audited.  
+                        Unaudited smart contracts.  
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
-                        While we take great caution and forethought in the way we build our smart contracts we cannot offer that gauratee that an audited contract can give.
+                        While we take great care and forethought in the way we build our smart contracts, we cannot guarantee they are free of potential exploits.
+                        Users should always take caution when participating and do as much research as possible
                         </p>
                       </div>
-                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="col-span-1 md:col-span-4 lg:col-span-4 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="21" 
@@ -241,13 +241,13 @@ const ContentSection = () => {
 
                       </div>
                         <h3 className="my-2">
-                        New fund raise mechanism. 
+                        New token sale mechanism 
                         </h3>
                         <p className="text-md text-white text-opacity-50">
-                        While we focused on making our fund raising tool as fair as possible, our mechanism is not free of gaming mechanics.  
+                        We have focused on fairness for all participants in the sale. However, some players may game the system by inflating the token price during the deposit period (discouraging others to participate) before withdrawing when deposits are closed and lowering the price.
                         </p>
                       </div>
-                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="col-span-1 md:col-span-2 lg:col-span-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="22" 
@@ -270,10 +270,11 @@ const ContentSection = () => {
                         Not fully decentralzed; yet. 
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
-                          It is very difficult for a DAO to have complete autonomy off inception, Mango plans to fulled decentralize as tools and ecosystem mature. 
+                        Whilst the path to becoming decentralized is kicking off with the token sale, the team will have control over the direction of the protocol until the governance mechanism is fully established.
+                        Contributers must trust the mango team until full decentralization is reached.
                         </p>
                       </div>
-                      <div className="flex-1 m-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                      <div className="col-span-1 md:col-span-6 lg:col-span-6 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                           width="20" 
@@ -293,12 +294,62 @@ const ContentSection = () => {
 
                         </div>
                         <h3 className="my-2">
-                        Tokens are unlocked. 
+                        Contributor tokens fully vested. 
                         </h3>
                         <p className="text-md text-white text-opacity-50"> 
-                        Tokens given to early contributors of the protocol are unlocked. 
-                        We were mainly focused on building a great product vs tools token vesting tools.
+                        Tokens distributed to early contributors of the protocol are unlocked and not on a vesting schedule. This means they are full tradable by contributors at launch. The team fully commits to not dumping on you though. 
                         </p>
+                        <h3 className="my-2">
+                        Token distribution: 
+                        </h3>
+                        <div className="grid grid-cols-12 mt-4 py-1 px-1 rounded-md shadow-md bg-mango-med-dark">
+                          <div className="col-span-8 bg-mango-green text-center rounded-l-sm py-1">
+                            <span className="text-xs px-1 font-bold text-white">80%</span> 
+                          </div>
+                          <div className="col-span-2 bg-mango-yellow text-center  py-1">
+                            <span className="text-xs px-1 font-bold text-white">10%</span>  
+                          </div>
+                          <div className="col-span-1 bg-mango-red text-center  py-1">
+                            <span className="text-xs px-1 font-bold text-white">5%</span> 
+                          </div>
+                          <div className="col-span-1 bg-blue-400 text-center rounded-r-sm  py-1">
+                            <span className="text-xs px-1 font-bold text-white">5%</span> 
+                          </div>
+                        </div>
+                        <div className="flex mt-4">
+                          <div className="flex-1 m-1 p-1">
+                            <p className="text-mango-green font-bold text-md my-2">
+                              Mango DAO  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              </p>
+                          </div>
+                          <div className="flex-1 m-1 p-1">
+                            <p className="text-mango-yellow font-bold text-md my-2">
+                              Liquidity Incentives  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                              </p>
+                          </div>
+                          <div className="flex-1 m-1 p-1">
+                            <p className="text-mango-red font-bold text-md my-2">
+                              Insurance Fund  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
+                              </p>
+                          </div>
+                          <div className="flex-1 m-1 p-1">
+                            <p className="text-blue-400 font-bold text-md my-2">
+                              Contributor Tokens  
+                            </p>
+                              <p className="text-xs text-white text-opacity-50"> 
+                              Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.                              
+                              </p>
+                          </div>
+                        </div>
                       </div>
                     </div>
 
@@ -306,7 +357,6 @@ const ContentSection = () => {
 
 
                 
-              </div>
             </div>
           </div>
         </div>
