@@ -18,9 +18,9 @@ const PoolInfoCards = () => {
   const { endIdo, endDeposits } = usePool()
   const vaults = useVaults()
 
-  const numberFormat = new Intl.NumberFormat('en-US', {
-    maximumFractionDigits: 10,
-  })
+  //const numberFormat = new Intl.NumberFormat('en-US', {
+  //  maximumFractionDigits: 10,
+  //})
 
   return (
     <div className="max-w-7xl flex flex-wrap mx-auto px-6 mb-16 z-10">

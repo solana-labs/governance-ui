@@ -13,8 +13,8 @@ const HeroSection = () => {
             </h2>
             <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
               The Mango Dao is a self-governed protocol building a
-              decentralized financial ecosystem; by contributing to the DAO you will receive a
-              stake in the future of the ecosystem and its products.
+              decentralized financial ecosystem; by contributing to the insurance fund you will receive a
+              stake in the DAO therefore having control over future of the ecosystem and its products.
             </p>
           </div>
           <div className="mb-16 flex lg:flex-row md:flex-row lg:justify-center md:justify-center sm:justify-center">
