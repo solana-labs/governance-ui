@@ -313,8 +313,8 @@ const ContentSection = () => {
                       Deposit USDC into Vault.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
-                      Users deposit and lock in their USDC into the contribution vault during the 
-                      <span className="text-mango-green italic"> sale period</span> locking in their ticket for $MNGO redemptions later on.
+                      Users deposit their USDC into the contribution vault during the 
+                      <span className="text-mango-green italic"> sale period</span> locking in their ticket for $MNGO redemptions on sale completion.
                     </p>
                   </div>
                 </div>
@@ -332,7 +332,10 @@ const ContentSection = () => {
                       MNGO unlocked and redeemable.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
-                      Once the <span className="text-blue-400 italic"> grace period</span> ends, MNGO will be unlocked for redemption from the distribution vault. Users receive a token amount
+                      Once the <span className="text-blue-400 italic"> grace period</span> ends, MNGO will be unlocked for redemption from the distribution vault. 
+                      <br />
+                      <br />
+                      Users receive a token amount
                       in proportion to their USDC contribution.{' '}
                     </p>
                   </div>
