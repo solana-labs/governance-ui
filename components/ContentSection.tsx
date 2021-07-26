@@ -5,7 +5,7 @@ const ContentSection = () => {
   return (
     <>
     <div className="bg-bkg-2 transform -skew-y-3 pt-16 pb-16 mb-16 -mt-32 z-0">
-      <div className="max-w-7xl mx-auto px-8 py-48 transform skew-y-3">
+      <div className="max-w-7xl mx-auto px-8 pt-48 pb-16 transform skew-y-3">
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             It is still the early days.
@@ -142,8 +142,8 @@ const ContentSection = () => {
                     </p>
                   </div>
 
-                  <div className="flex flex-col md:flex-row lg:flex-row gap-6 mb-16">
-                    <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                  <div className="grid grid-cols-7 grid-rows-2 gap-6 mb-16 mx-auto">
+                    <div className="col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
                         width="28" 
@@ -178,7 +178,7 @@ const ContentSection = () => {
                       Users should understand the risks when participating today and know what they are contribtuing too.
                       </p>
                     </div>
-                    <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                    <div className="col-span-4 row-span-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                     <div className="py-2">
                     <svg 
                         width="25" 
@@ -201,18 +201,25 @@ const ContentSection = () => {
                       New token sale mechanism 
                       </h3>
                       <p className="text-white text-opacity-50 text-md">
-                       We built our own sale and distribution mechanism in order to focus on fairness for all participants in the sale. 
+                      The Mango token sale was designed with the goal of being as fair as possible to all participants. 
+                      However, there is a mechanism by which one or more participants with large amounts of capital could 
+                      discourage others from participating in the token sale. 
+                      <br />
                        <br />
+                       During the deposit phase, these participants 
+                      could deposit very large amounts of USDC. This would drive up the average price of the token and 
+                      potentially discourage others from participating in the sale. 
+                      <br />
+                       <br />Then, during the last minute 
+                      of the withdrawal phase, these large participants could withdraw much of their USDC, thus 
+                      receiving a much lower average price, depending on how successful they were at discouraging others. 
+                      <br />
                        <br />
-                       While fairness is our intention, some participants may still game the system by inflating the token price during the 
-                       sale period with the intention of discouraging others to participate. 
-                       <br />
-                       <br />
-                       they then could withdrawal their deposits during the grace period
-                      lowering the price.
+                      Therefore, all participants should be aware of this potential behaviour during the sale and 
+                      make their best decisions accordingly.
                       </p>
                     </div>
-                    <div className="flex-1 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                    <div className="col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                     <div className="py-2">
                     <svg 
                         width="26" 
