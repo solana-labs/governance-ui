@@ -17,7 +17,7 @@ const StatsModal = () => {
 
   return (
     <>
-      <div className="flex-1 m-3 sm:-ml-8 bg-secondary-4-dark backdrop-filter backdrop-blur-md bg-opacity-40 border border-bkg-3  py-6 rounded-xl shadow-md divide-y-2 divide-white divide-opacity-5 z-0">
+      <div className="flex-1 m-3 sm:-ml-8 bg-secondary-4-dark border border-bkg-3  py-6 rounded-xl shadow-md divide-y-2 divide-white divide-opacity-5 z-0">
         <div className="pb-4 text-center">
           <p className="text-fgd-3">Deposits end in:</p>
           <PoolCountdown date={endDeposits} className="justify-center pt-1" />
