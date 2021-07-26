@@ -17,7 +17,7 @@ const StatsModal = () => {
 
   return (
     <>
-      <div className="flex-1 m-3 sm:-ml-8 bg-gradient-to-br from-secondary-4-dark to-secondary-4-light border border-bkg-3 p-7 rounded-xl shadow-md divide-y-2 divide-white divide-opacity-10 z-0">
+      <div className="flex-1 m-3 sm:-ml-8 bg-secondary-4-dark backdrop-filter backdrop-blur-md bg-opacity-40 border border-bkg-3  p-7 rounded-xl shadow-md divide-y-2 divide-white divide-opacity-5 z-0">
         <div className="pb-4 text-center">
           <p className="text-fgd-3">Deposits Close</p>
           <PoolCountdown date={endDeposits} className="justify-center pt-1" />
@@ -58,7 +58,6 @@ const StatsModal = () => {
             <div className="font-bold text-fgd-1 text-base">
               {vaults.mangoBalance}
             </div>
-          </div>
         </div>
 
         {/* <p>
@@ -72,6 +71,7 @@ const StatsModal = () => {
             </p>
             <p>Current USDC in Pool: {vaults.usdc?.balance || 'N/A'}</p>
             <p>Locked MNGO in Pool: {vaults.mango?.balance || 'N/A'}</p> */}
+          </div>
       </div>
     </>
   )
