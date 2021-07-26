@@ -350,15 +350,10 @@ const ContentSection = () => {
                       Why does it work this way?
                     </h2>
                     <p className="text-white text-opacity-50 text-base mb-4">
-                      Simple mechanisms are easier to build, explain, understand
-                      and are harder to exploit. A transparent mechanism
-                      increases participation because buyers are more confident
-                      there are no hidden tricks that could harm them.
+                    We wanted to build a mechanism that is fair and transparent for all participants. No private sale, no backroom deals with VCs, all players are on a level playing field.
                     </p>
                     <p className="text-white text-opacity-50 text-base mb-4">
-                      Elements of luck engineered into the mechanism distribute
-                      value randomly to those who are most willing to do the
-                      arbitrary, worthless tasks to get the free value.
+                    The mechanism is simple but robust. This makes it easier to build, use, and more importantly, harder to exploit.
                     </p>
                     {/*<p className="text-white font-bold leading-relaxed">
                       We believe all &quot;excess&quot; value should be captured
