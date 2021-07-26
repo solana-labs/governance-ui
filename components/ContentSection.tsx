@@ -132,12 +132,12 @@ const ContentSection = () => {
                       </p>
                     </div>
 
-                    <div className="flex flex-col md:flex-row lg:flex-row gap-6">
+                    <div className="flex flex-col md:flex-row lg:flex-row gap-6 mb-16">
                       <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                         <div className="py-2">
                         <svg 
-                          width="24" 
-                          height="20" 
+                          width="28" 
+                          height="24" 
                           viewBox="0 0 20 16" 
                           fill="none" 
                           xmlns="http://www.w3.org/2000/svg"
@@ -155,7 +155,6 @@ const ContentSection = () => {
                               </linearGradient>
                             </defs>
                         </svg>
-
                         </div>
                         <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                         Unaudited smart contracts.  
@@ -172,8 +171,8 @@ const ContentSection = () => {
                       <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
-                          width="21" 
-                          height="22" 
+                          width="25" 
+                          height="27" 
                           viewBox="0 0 14 15" 
                           fill="none" 
                           xmlns="http://www.w3.org/2000/svg"
@@ -206,8 +205,8 @@ const ContentSection = () => {
                       <div className="flex-1 py-4 px-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <div className="py-2">
                       <svg 
-                          width="22" 
-                          height="22" 
+                          width="26" 
+                          height="26" 
                           viewBox="0 0 16 16" 
                           fill="none" 
                           xmlns="http://www.w3.org/2000/svg"
