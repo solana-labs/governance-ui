@@ -220,7 +220,7 @@ const ContentSection = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
+                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                       The 48 hour participation period begins.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
@@ -266,7 +266,7 @@ const ContentSection = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
+                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                       Deposit USDC into Vault.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
@@ -285,7 +285,7 @@ const ContentSection = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-four bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
+                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                       MNGO unlocked and redeemable.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
@@ -303,7 +303,7 @@ const ContentSection = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-mango-yellow font-semibold text-xl tracking-wide mb-2">
+                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                       Why does it work this way?
                     </h2>
                     <p className="text-white text-opacity-50 text-base mb-4">
