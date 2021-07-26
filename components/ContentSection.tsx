@@ -198,7 +198,7 @@ const ContentSection = () => {
                          deposit period with the intention of discouraging others to participate. 
                          <br />
                          <br />
-                         they then could withdraw their deposits during the restricted period
+                         they then could withdraw their deposits during the grace period
                         lowering the price for those that remain.
                         </p>
                       </div>
@@ -265,34 +265,34 @@ const ContentSection = () => {
                     <p className="text-white text-opacity-50 text-base">
                       The event will span over 2 days split into two periods,{' '}
                       <span className="text-mango-green italic">
-                        Unrestricted
+                        sale period
                       </span>{' '}
                       and{' '}
-                      <span className="text-mango-red italic">Restricted</span>.
+                      <span className="text-blue-400 italic">grace period</span>.
                     </p>
                     <div className="flex flex-wrap overflow-hiddenm mt-8">
                       <div className="w-full overflow-hidden lg:w-1/2 pr-4">
                         <p>
                           <span className="text-mango-green italic">
-                            Unrestricted
+                            Sale Period
                           </span>
                         </p>
                         <p className="text-white text-opacity-50">
-                          During the unrestricted period, you may deposit or
-                          withdraw USDC from the vault. During the unrestricted
+                          During the sale period, you may deposit or
+                          withdraw USDC from the vault. During the sale
                           period, the $MNGO price can fluctuate.
                         </p>
                       </div>
 
                       <div className="w-full overflow-hidden lg:w-1/2">
                         <p>
-                          <span className="text-mango-red italic">
-                            Restricted
+                          <span className="text-blue-400 italic">
+                            Grace Period
                           </span>
                         </p>
                         <p className="text-white text-opacity-50">
                           After 24 hours deposits will be restricted and only
-                          withdrawals allowed. During the restricted period
+                          withdrawals allowed. During the grace period
                           price can only go down.
                         </p>
                       </div>
@@ -310,7 +310,7 @@ const ContentSection = () => {
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
                       Users deposit and lock in their USDC into the contribution vault during the 
-                      <span className="text-mango-green italic"> unrestricted</span> period locking in their ticket for $MNGO redemptions later on.
+                      <span className="text-mango-green italic"> sale period</span> locking in their ticket for $MNGO redemptions later on.
                     </p>
                   </div>
                 </div>
@@ -328,7 +328,7 @@ const ContentSection = () => {
                       MNGO unlocked and redeemable.
                     </h2>
                     <p className="text-white text-opacity-50 text-base">
-                      Once the <span className="text-mango-red italic"> restricted</span> period ends, MNGO will be unlocked for redemption from the distribution vault. Users receive a token amount
+                      Once the <span className="text-blue-400 italic"> grace period</span> ends, MNGO will be unlocked for redemption from the distribution vault. Users receive a token amount
                       in proportion to their USDC contribution.{' '}
                     </p>
                   </div>
