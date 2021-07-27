@@ -20,6 +20,7 @@ module.exports = {
         'bg-texture': "url('../public/img/bgtexture.png')",
         'risk-one': "url('../public/img/risk1.png')",
         'risk-two': "url('../public/img/risk2.png')",
+        'risk-three': "url('../public/img/risk3.png')",
 
       }),
       height: {

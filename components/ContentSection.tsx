@@ -267,7 +267,7 @@ const ContentSection = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-7 lg:grid-cols-7 grid-rows-2 gap-6 mb-16 mx-auto">
-                    <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md bg-risk-two md:bg-risk-one lg:bg-risk-one bg-contain bg-right-bottom bg-no-repeat">
+                    <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-650 md:h-auto lg:h-auto w-auto z-10 shadow-md bg-risk-two md:bg-risk-one lg:bg-risk-one bg-contain bg-right-bottom bg-no-repeat">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                       Unaudited smart contracts.  
                       </h3>
@@ -282,7 +282,7 @@ const ContentSection = () => {
                       </p>
                       </div>
                   </div>
-                  <div className="col-span-1 md:col-span-4 lg:col-span-4 row-span-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                  <div className="col-span-1 md:col-span-4 lg:col-span-4 row-span-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-650 md:h-auto lg:h-auto w-auto z-10 shadow-md bg-risk-three bg-contain bg-bottom bg-no-repeat">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                       New token sale mechanism 
                       </h3>
