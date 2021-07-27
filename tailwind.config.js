@@ -18,17 +18,13 @@ module.exports = {
         'feature-three': "url('../public/img/feature3.png')",
         'feature-four': "url('../public/img/feature4.png')",
         'bg-texture': "url('../public/img/bgtexture.png')",
-        'bg-wave': "url('../public/img/bg-wave.png')",
         'risk-one': "url('../public/img/risk1.png')",
+        'risk-two': "url('../public/img/risk2.png')",
 
       }),
       height: {
         575: '575px',
         650: '650px',
-        675: '675px',
-        700: '700px',
-        750: '750px',
-        1750: '1750px',
       },
       cursor: {
         help: 'help',
