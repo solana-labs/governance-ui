@@ -125,7 +125,7 @@ const ContentSectionAbout = () => {
               </div>
             </div>
  */}
-      <div className="py-16 px-8">
+      <div className="py-16 ">
         <div className="mb-16 max-w-4xl mx-auto text-center">
           <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             Why release <GradientText>MNGO</GradientText> token?
@@ -173,7 +173,7 @@ const ContentSectionAbout = () => {
                   </p>
                 </div>
               </div>
-              <div className="mt-10 p-8 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
+              <div className="mt-10 py-5 px-5 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
                 <h3 className="font-bold text-xl my-2">Token distribution</h3>
 
                 <div className="grid grid-cols-12 mt-4 py-1 px-1 rounded-md shadow-md bg-mango-med-dark">
