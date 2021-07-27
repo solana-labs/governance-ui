@@ -177,16 +177,18 @@ const ContentSectionAbout = () => {
                 <h3 className="font-bold text-xl my-2">Token distribution</h3>
 
                 <div className="grid grid-cols-12 mt-4 py-1 px-1 rounded-md shadow-md bg-mango-med-dark">
-                  <div className="col-span-8 bg-mango-green text-center rounded-l-sm py-1">
+                  <div className="col-span-10 bg-mango-green text-center rounded-l-sm py-1">
                     <span className="text-xs px-1 font-bold text-white">
-                      80%
+                      90%
                     </span>
                   </div>
+                  {/*
                   <div className="col-span-2 bg-mango-yellow text-center  py-1">
                     <span className="text-xs px-1 font-bold text-white">
                       10%
                     </span>
                   </div>
+                  */}
                   <div className="col-span-1 bg-mango-red text-center  py-1">
                     <span className="text-xs px-1 font-bold text-white">
                       5%
@@ -198,8 +200,8 @@ const ContentSectionAbout = () => {
                     </span>
                   </div>
                 </div>
-                <div className="grid grid-cols-4 mt-4">
-                  <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
+                <div className="grid grid-cols-3 mt-4">
+                  <div className="col-span-1 md:col-span-2 lg:col-span-1  m-1 p-1">
                     <p className="text-mango-green font-bold text-base my-2">
                       Mango DAO
                     </p>
@@ -208,6 +210,7 @@ const ContentSectionAbout = () => {
                       only accessible via DAO governance votes.
                     </p>
                   </div>
+                  {/*
                   <div className="col-span-2 md:col-span-2 lg:col-span-1 m-1 p-1">
                     <p className="text-mango-yellow font-bold text-base my-2">
                       Liquidity incentives
@@ -217,7 +220,8 @@ const ContentSectionAbout = () => {
                       liquidity providers to be active in the system.
                     </p>
                   </div>
-                  <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
+                  */}
+                  <div className="col-span-1 md:col-span-2 lg:col-span-1  m-1 p-1">
                     <p className="text-mango-red font-bold text-base my-2">
                       Insurance Fund
                     </p>
@@ -226,7 +230,7 @@ const ContentSectionAbout = () => {
                       Fund that will protect lenders in the Mango Protocol.
                     </p>
                   </div>
-                  <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
+                  <div className="col-span-1 md:col-span-2 lg:col-span-1  m-1 p-1">
                     <p className="text-blue-400 font-bold text-base my-2">
                       Contributor tokens
                     </p>
