@@ -1,25 +1,23 @@
 const ContentSectionSale = () => {
   return (
     <>
-{/* Section 2 */}                  
-<div className="pb-16 mb-16 z-0">
-      <div className="max-w-7xl mx-auto px-8 py-16">
-        <div className="max-w-4xl mb-24 mx-auto text-center">
-          <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-            How the token sale works.
-          </h2>
-          <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
-            Fairness and transparency for all participants.
-          </p>
-        </div>
-        <section className="">
-          <div className="grid grid-cols-3 gap-6 mb-6">
-
-            <div className="col-span-3 lg:col-span-2">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
-                <div className="py-4 px-8 mt-3">
-                  
-                  <div className="flex flex-col mb-8">
+      {/* Section 2 */}
+      <div className="pb-16 mb-16 z-0">
+        <div className="max-w-7xl mx-auto px-8 py-16">
+          <div className="max-w-4xl mb-24 mx-auto text-center">
+            <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
+              How the token sale works.
+            </h2>
+            <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
+              Fairness and transparency for all participants.
+            </p>
+          </div>
+          <section className="">
+            <div className="grid grid-cols-3 gap-6 mb-6">
+              <div className="col-span-3 lg:col-span-2">
+                <div className="bg-bkg-3 border border-bkg-4 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+                  <div className="py-4 px-8 mt-3">
+                    <div className="flex flex-col mb-8">
                       <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                         The token sale will span 48 hours
                       </h2>
@@ -59,16 +57,16 @@ const ContentSectionSale = () => {
                             MNGO price can only go down.
                           </p>
                         </div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col-span-3 lg:col-span-1">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
-                <div className="py-4 px-8 mt-3">
-                  <div className="flex flex-col mb-8">
-                     <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+              <div className="col-span-3 lg:col-span-1">
+                <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+                  <div className="py-4 px-8 mt-3">
+                    <div className="flex flex-col mb-8">
+                      <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                         Contribute your USDC
                       </h2>
                       <p className="text-white text-opacity-70 text-base">
@@ -81,19 +79,18 @@ const ContentSectionSale = () => {
                         this amount by withdrawing or depositing additional USDC
                         if you choose to.
                       </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
 
-          <div className="grid grid-cols-3 gap-6">
-            
-            <div className="col-span-3 lg:col-span-1">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-four bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
-                <div className="py-4 px-8 mt-3">
-                  <div className="flex flex-col mb-8">
-                  <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+            <div className="grid grid-cols-3 gap-6">
+              <div className="col-span-3 lg:col-span-1">
+                <div className="bg-bkg-3 border border-bkg-4 bg-feature-four bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+                  <div className="py-4 px-8 mt-3">
+                    <div className="flex flex-col mb-8">
+                      <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                         Redeem unlocked MNGO
                       </h2>
                       <p className="text-white text-opacity-70 text-base">
@@ -103,43 +100,40 @@ const ContentSectionSale = () => {
                         number of tokens you&apos;ll receive will be
                         proportional to your USDC contribution.
                       </p>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="col-span-3 lg:col-span-2">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
-                <div className="py-4 px-8 mt-3">
-                  <div className="flex flex-col mb-8">
-                  <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+              <div className="col-span-3 lg:col-span-2">
+                <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+                  <div className="py-4 px-8 mt-3">
+                    <div className="flex flex-col mb-8">
+                      <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
                         Why does it work this way?
                       </h2>
                       <p className="text-white text-opacity-70 text-base mb-4">
                         We wanted to build a mechanism that is fair and
                         transparent for all participants. No private sale, no
                         backroom deals with VCs, all players are on a level
-                        playing field.
+                        playing field. The mechanism is simple but robust. This
+                        makes it easier to build, use, and more importantly,
+                        harder to exploit.
                       </p>
                       <p className="text-white text-opacity-70 text-base">
-                        The mechanism is simple but robust. This makes it easier
-                        to build, use, and more importantly, harder to exploit.
+                        All you need to do, is decide how much you contribute
+                        and how much you value MNGO. If the sale price is too
+                        high for you, you can still withdraw during the{' '}
+                        <span className="text-blue-400">grace period</span>.
                       </p>
-                      <p className="text-white text-opacity-70 text-base">
-                        All you need to do, is decide how much you contribute and how much you value MNGO. 
-                        If the sale price ends up higher, you can still withdraw during the grace period.
-                      </p>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </div>
-    </div>
-
-
-
-  </>
+    </>
   )
 }
 
