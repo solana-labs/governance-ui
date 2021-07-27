@@ -18,16 +18,14 @@ const ContentSectionRisks = () => {
                   <div className="grid grid-cols-1 md:grid-cols-7 lg:grid-cols-7 grid-rows-2 gap-6 mb-16 mx-auto">
                     <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md bg-risk-two md:bg-risk-one lg:bg-risk-one bg-contain bg-right-bottom bg-no-repeat">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
-                      Unaudited smart contracts.  
+                      Unaudited smart contracts  
                       </h3>
                       <div>
                       <p className="text-white text-opacity-70 text-base w-full md:w-1/2 lg:w-1/2"> 
-                      We take great care and forethought in the way we build our smart contracts, we opensource all code once 
-                      ready and work with many industry leading developers during creation.
+                      We take great care and forethought in the way we design our smart contracts. We make their source code publicly accessible in order to get peer reviewed by as many experts possible.
                       <br />
                       <br />
-                      While this is the case we cannot guarantee they are free of potential exploits.
-                      Users should understand the risks when participating today and know what they are contribtuing too.
+                      Still we cannot guarantee that our products are free of exploits, when we launch.
                       </p>
                       </div>
                   </div>
@@ -56,7 +54,7 @@ const ContentSectionRisks = () => {
                 </div>
                 <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
-                      Not fully decentralzed; yet. 
+                      Not fully decentralzed; yet 
                       </h3>
                       <p className="text-white text-opacity-70 text-base"> 
                       Whilst the path to becoming decentralized is kicking off with the token sale, at inception the team will have control over the direction of the protocol until the governance mechanism is estabilshed and tools built out.
