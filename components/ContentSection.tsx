@@ -64,9 +64,9 @@ const ContentSection = () => {
                     </p>
                     <LinkLeft>Checkout the whitepaper</LinkLeft>
 
-                    <div className="mt-10 mb-8 px-4 py-2 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
+                    <div className="mt-10 mb-8 px-5 py-2 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
                     <h3 className="font-bold text-lg my-2">
-                        Token distribution.
+                        Token distribution
                         </h3>
                         
                         <div className="grid grid-cols-12 mt-4 py-1 px-1 rounded-md shadow-md bg-mango-med-dark">
