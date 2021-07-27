@@ -2,9 +2,9 @@ const ContentSectionSale = () => {
   return (
     <>
 {/* Section 2 */}                  
-<div className="pt-16 pb-16 mb-16 -mt-16 z-0">
+<div className="pb-16 mb-16 z-0">
       <div className="max-w-7xl mx-auto px-8 py-16">
-        <div className="max-w-4xl mb-24 mx-auto text-center mt-16 pt-16">
+        <div className="max-w-4xl mb-24 mx-auto text-center">
           <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
             How the token sale works
           </h2>
@@ -108,7 +108,7 @@ const ContentSectionSale = () => {
               </div>
             </div>
             <div className="col-span-3 lg:col-span-2">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-575 md:h-650 lg:h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                   <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
