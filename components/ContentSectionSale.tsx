@@ -6,7 +6,7 @@ const ContentSectionSale = () => {
       <div className="max-w-7xl mx-auto px-8 py-16">
         <div className="max-w-4xl mb-24 mx-auto text-center">
           <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-            How the token sale works
+            How the token sale works.
           </h2>
           <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
             Fairness and transparency for all participants.
@@ -37,7 +37,7 @@ const ContentSectionSale = () => {
                       <div className="flex flex-wrap overflow-hiddenm mt-8">
                         <div className="w-full mb-4 lg:mb-0 overflow-hidden lg:w-1/2 pr-4">
                           <p className="mb-2">
-                            <span className="font-semibold text-mango-green text-xl">
+                            <span className="font-semibold text-mango-green text-lg">
                               Sale period{' '}
                             </span>
                           </p>
@@ -49,7 +49,7 @@ const ContentSectionSale = () => {
                         </div>
                         <div className="w-full overflow-hidden lg:w-1/2 pr-4">
                           <p className="mb-2">
-                            <span className="font-semibold text-blue-400 text-xl">
+                            <span className="font-semibold text-blue-400 text-lg">
                               Grace period{' '}
                             </span>
                           </p>
