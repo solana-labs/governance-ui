@@ -228,7 +228,7 @@ const ContentSectionAbout = () => {
                   </div>
                   <div className="col-span-2 md:col-span-2 lg:col-span-1  m-1 p-1">
                     <p className="text-blue-400 font-bold text-base my-2">
-                      Team/contributor tokens
+                      Contributor tokens
                     </p>
                     <p className="text-white text-opacity-70">
                       5% will be distributed to the team and early contributors.

@@ -5,12 +5,14 @@ const ContentSectionRisks = () => {
       <div className="bg-bkg-2 transform -skew-y-3">
         <div className="max-w-7xl mx-auto px-8 py-48 my-16 transform skew-y-3">
             <div className="max-w-4xl mx-auto text-center pt-12 pb-16">
-                    <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-                       We want to be fully transparent.
-                    </h2>
-                    <p className="mb-10 text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
-                       We feel it is important to detail current risks to the system in order to give full transparency for participants in the insurance fund sale. 
-                    </p>
+                      <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
+                        Transparency builds trust
+                      </h2>
+                      <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
+                        There are risks in participating in the token sale. It&apos;s
+                        important you understand them before deciding to commit your
+                        funds.
+                      </p>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-7 lg:grid-cols-7 grid-rows-2 gap-6 mb-16 mx-auto">
@@ -19,7 +21,7 @@ const ContentSectionRisks = () => {
                       Unaudited smart contracts.  
                       </h3>
                       <div>
-                      <p className="text-white text-opacity-50 text-md w-full md:w-1/2 lg:w-1/2"> 
+                      <p className="text-white text-opacity-70 text-base w-full md:w-1/2 lg:w-1/2"> 
                       We take great care and forethought in the way we build our smart contracts, we opensource all code once 
                       ready and work with many industry leading developers during creation.
                       <br />
@@ -33,7 +35,7 @@ const ContentSectionRisks = () => {
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                       New token sale mechanism 
                       </h3>
-                      <p className="text-white text-opacity-50 text-md">
+                      <p className="text-white text-opacity-70 text-base">
                       The Mango token sale was designed with the goal of being as fair as possible to all participants. 
                       However, there is a mechanism by which one or more participants with large amounts of capital could 
                       discourage others from participating in the token sale. 
@@ -56,7 +58,7 @@ const ContentSectionRisks = () => {
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                       Not fully decentralzed; yet. 
                       </h3>
-                      <p className="text-white text-opacity-50 text-md"> 
+                      <p className="text-white text-opacity-70 text-base"> 
                       Whilst the path to becoming decentralized is kicking off with the token sale, at inception the team will have control over the direction of the protocol until the governance mechanism is estabilshed and tools built out.
                       <br />
                       <br />

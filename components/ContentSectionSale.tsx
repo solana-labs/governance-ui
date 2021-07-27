@@ -6,11 +6,10 @@ const ContentSectionSale = () => {
       <div className="max-w-7xl mx-auto px-8 py-16">
         <div className="max-w-4xl mb-24 mx-auto text-center mt-16 pt-16">
           <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-            How the sale works.
+            How the token sale works
           </h2>
-          <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
-            We take the view that token sales should be simple, transparent and
-            fairly distributed.
+          <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
+            Fairness and transparency for all participants.
           </p>
         </div>
         <section className="">
@@ -19,44 +18,47 @@ const ContentSectionSale = () => {
             <div className="col-span-3 lg:col-span-2">
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-two bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
+                  
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                      The 48 hour participation period begins.
-                    </h2>
-                    <p className="text-white text-opacity-50 text-base">
-                      The event will span over 2 days split into two periods,{' '}
-                      <span className="text-mango-green italic">
-                        sale period
-                      </span>{' '}
-                      and{' '}
-                      <span className="text-blue-400 italic">grace period</span>.
-                    </p>
-                    <div className="flex flex-wrap overflow-hiddenm mt-8">
-                      <div className="w-full overflow-hidden lg:w-1/2 pr-4">
-                        <p>
-                          <span className="text-mango-green italic">
-                            Sale Period
-                          </span>
-                        </p>
-                        <p className="text-white text-opacity-50">
-                          During the sale period, you may deposit or
-                          withdraw USDC from the vault. During the sale
-                          period, the $MNGO price can fluctuate.
-                        </p>
-                      </div>
-
-                      <div className="w-full overflow-hidden lg:w-1/2">
-                        <p>
-                          <span className="text-blue-400 italic">
-                            Grace Period
-                          </span>
-                        </p>
-                        <p className="text-white text-opacity-50">
-                          After 24 hours deposits will be restricted and only
-                          withdrawals allowed. During the grace period
-                          price can only go down.
-                        </p>
-                      </div>
+                      <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+                        The token sale will span 48 hours
+                      </h2>
+                      <p className="text-white text-opacity-70 text-base">
+                        The 48 hours consists of two 24 hour periods, the{' '}
+                        <span className="text-mango-green text-base">
+                          sale period
+                        </span>{' '}
+                        and the{' '}
+                        <span className="text-blue-400 text-base">
+                          grace period
+                        </span>
+                        . Only afterwards you will be able to redeem MNGO.
+                      </p>
+                      <div className="flex flex-wrap overflow-hiddenm mt-8">
+                        <div className="w-full mb-4 lg:mb-0 overflow-hidden lg:w-1/2 pr-4">
+                          <p className="mb-2">
+                            <span className="font-semibold text-mango-green text-xl">
+                              Sale period{' '}
+                            </span>
+                          </p>
+                          <p className="text-base text-white text-opacity-70">
+                            In the first 24 hours, you may deposit or withdraw
+                            your USDC from the vault. During the sale period,
+                            the MNGO price can fluctuate.
+                          </p>
+                        </div>
+                        <div className="w-full overflow-hidden lg:w-1/2 pr-4">
+                          <p className="mb-2">
+                            <span className="font-semibold text-blue-400 text-xl">
+                              Grace period{' '}
+                            </span>
+                          </p>
+                          <p className="text-base text-white text-opacity-70">
+                            After 24 hours, deposits will be restricted and only
+                            withdrawals allowed. During the grace period, the
+                            MNGO price can only go down.
+                          </p>
+                        </div>
                     </div>
                   </div>
                 </div>
@@ -66,13 +68,19 @@ const ContentSectionSale = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-one bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                      Deposit USDC into Vault.
-                    </h2>
-                    <p className="text-white text-opacity-50 text-base">
-                      Users deposit their USDC into the contribution vault during the 
-                      <span className="text-mango-green italic"> sale period</span> locking in their ticket for $MNGO redemptions on sale completion.
-                    </p>
+                     <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+                        Contribute your USDC
+                      </h2>
+                      <p className="text-white text-opacity-70 text-base">
+                        During the
+                        <span className="text-mango-green">
+                          {' '}
+                          sale period
+                        </span>{' '}
+                        you can deposit USDC into the vault. You can also change
+                        this amount by withdrawing or depositing additional USDC
+                        if you choose to.
+                      </p>
                   </div>
                 </div>
               </div>
@@ -85,16 +93,16 @@ const ContentSectionSale = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-four bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                      MNGO unlocked and redeemable.
-                    </h2>
-                    <p className="text-white text-opacity-50 text-base">
-                      Once the <span className="text-blue-400 italic"> grace period</span> ends, MNGO will be unlocked for redemption from the distribution vault. 
-                      <br />
-                      <br />
-                      Users receive a token amount
-                      in proportion to their USDC contribution.{' '}
-                    </p>
+                  <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+                        Redeem unlocked MNGO
+                      </h2>
+                      <p className="text-white text-opacity-70 text-base">
+                        Once the{' '}
+                        <span className="text-blue-400">grace period</span> ends
+                        the MNGO tokens will be unlocked for redemption. The
+                        number of tokens you&apos;ll receive will be
+                        proportional to your USDC contribution.
+                      </p>
                   </div>
                 </div>
               </div>
@@ -103,19 +111,23 @@ const ContentSectionSale = () => {
               <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-575 md:h-650 lg:h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
-                    <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                      Why does it work this way?
-                    </h2>
-                    <p className="text-white text-opacity-50 text-base mb-4">
-                    We wanted to build a mechanism that is fair and transparent for all participants. No private sale, no backroom deals with VCs, all players are on a level playing field.
-                    </p>
-                    <p className="text-white text-opacity-50 text-base mb-4">
-                    The mechanism is simple but robust. This makes it easier to build, use, and more importantly, harder to exploit.
-                    </p>
-                    {/*<p className="text-white font-bold leading-relaxed">
-                      We believe all &quot;excess&quot; value should be captured
-                      by token holders in the DAO.
-                    </p>*/}
+                  <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
+                        Why does it work this way?
+                      </h2>
+                      <p className="text-white text-opacity-70 text-base mb-4">
+                        We wanted to build a mechanism that is fair and
+                        transparent for all participants. No private sale, no
+                        backroom deals with VCs, all players are on a level
+                        playing field.
+                      </p>
+                      <p className="text-white text-opacity-70 text-base">
+                        The mechanism is simple but robust. This makes it easier
+                        to build, use, and more importantly, harder to exploit.
+                      </p>
+                      <p className="text-white text-opacity-70 text-base">
+                        All you need to do, is decide how much you contribute and how much you value MNGO. 
+                        If the sale price ends up higher, you can still withdraw during the grace period.
+                      </p>
                   </div>
                 </div>
               </div>
