@@ -4,6 +4,7 @@ import GradientText from './GradientText'
 const ContentSection = () => {
   return (
     <>
+{/* Section 1 */}
     <div className="bg-bkg-2 transform -skew-y-3 pt-16 pb-16 mb-16 -mt-32 z-0">
       <div className="max-w-7xl mx-auto px-8 pt-48 pb-16 transform skew-y-3">
         <div className="max-w-5xl mx-auto text-center">
@@ -16,9 +17,6 @@ const ContentSection = () => {
             protocol&apos;s Insurance Fund.
           </p>
         </div>
-
-        {/* Section 1 */}
-
         <div className="overflow-hidden">
           <div className="max-w-max lg:max-w-7xl mx-auto">
             <div className="relative">
@@ -66,7 +64,7 @@ const ContentSection = () => {
                     </p>
                     <LinkLeft>Checkout the whitepaper</LinkLeft>
 
-                    <div className="mt-10 mb-8 px-7 py-4 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
+                    <div className="mt-10 mb-8 px-4 py-2 bg-bkg-3 border border-bkg-4 shadow-md rounded-xl">
                     <h3 className="font-bold text-lg my-2">
                         Token distribution.
                         </h3>
