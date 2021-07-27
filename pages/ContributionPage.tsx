@@ -1,7 +1,9 @@
 import ModalSection from '../components/ModalSection'
 import PoolInfoCards from '../components/PoolInfoCards'
 import HeroSection from '../components/HeroSection'
-import ContentSection from '../components/ContentSection'
+import ContentSectionAbout from '../components/ContentSectionAbout'
+import ContentSectionSale from '../components/ContentSectionSale'
+import ContentSectionRisks from '../components/ContentSectionRisks'
 import FooterSection from '../components/FooterSection'
 
 const ContributionPage = () => {
@@ -9,7 +11,9 @@ const ContributionPage = () => {
     <>
       <HeroSection />
       <PoolInfoCards />
-      <ContentSection />
+      <ContentSectionAbout />
+      <ContentSectionSale />
+      <ContentSectionRisks />
       <ModalSection />
       <FooterSection />
     </>
