@@ -166,10 +166,10 @@ const ContentSectionAbout = () => {
                     Incentivize liquidity
                   </h2>
                   <p className="mb-8 text-base text-white text-opacity-70 leading-relaxed">
-                    Bootstraping liquidity is important in a new trading system.
-                    Incentivising market makers and other liquidity providers
-                    with MNGO tokens will benefit the protocol and its
-                    participants.
+                    Bootstrapping liquidity is important in a new trading
+                    system. Incentivizing market makers to provide it on our
+                    order books with MNGO tokens will benefit the protocol
+                    and its participants.
                   </p>
                 </div>
               </div>
@@ -206,7 +206,7 @@ const ContentSectionAbout = () => {
                       Mango DAO
                     </p>
                     <p className="text-white text-opacity-70">
-                      80% of MNGO tokens will be locked in a smart contract,
+                      90% of MNGO tokens will be locked in a smart contract,
                       only accessible via DAO governance votes.
                     </p>
                   </div>
