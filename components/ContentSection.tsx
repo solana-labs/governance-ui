@@ -228,7 +228,7 @@ const ContentSection = () => {
               </div>
             </div>
             <div className="col-span-3 lg:col-span-2">
-              <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
+              <div className="bg-bkg-3 border border-bkg-4 bg-feature-three bg-contain lg:bg-cover bg-bottom bg-no-repeat h-575 md:h-650 lg:h-650 w-full shadow-md rounded-xl overflow-hidden mx-auto">
                 <div className="py-4 px-8 mt-3">
                   <div className="flex flex-col mb-8">
                     <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
@@ -267,11 +267,12 @@ const ContentSection = () => {
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-7 lg:grid-cols-7 grid-rows-2 gap-6 mb-16 mx-auto">
-                    <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
+                    <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md bg-risk-one bg-contain bg-right-bottom bg-no-repeat">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                       Unaudited smart contracts.  
                       </h3>
-                      <p className="text-white text-opacity-50 text-md"> 
+                      <div>
+                      <p className="text-white text-opacity-50 text-md w-full md:w-1/2 lg:w-1/2"> 
                       We take great care and forethought in the way we build our smart contracts, we opensource all code once 
                       ready and work with many industry leading developers during creation.
                       <br />
@@ -279,6 +280,7 @@ const ContentSection = () => {
                       While this is the case we cannot guarantee they are free of potential exploits.
                       Users should understand the risks when participating today and know what they are contribtuing too.
                       </p>
+                      </div>
                   </div>
                   <div className="col-span-1 md:col-span-4 lg:col-span-4 row-span-2 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
