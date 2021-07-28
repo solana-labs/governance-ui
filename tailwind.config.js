@@ -26,6 +26,8 @@ module.exports = {
       height: {
         575: '575px',
         650: '650px',
+        750: '750px',
+
       },
       cursor: {
         help: 'help',
