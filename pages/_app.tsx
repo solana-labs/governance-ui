@@ -11,7 +11,6 @@ function App({ Component, pageProps }) {
     'Claim your stake in the Mango DAO. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
   const keywords =
     'Mango Markets, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens'
-  const image = '/card.jpg'
 
   return (
     <>
@@ -30,10 +29,11 @@ function App({ Component, pageProps }) {
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
 
+        <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={image} />
-        <meta name="twitter:card" content="summary" />
+        <meta property="og:image" content="/card.jpg" />
+        <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@mangomarkets" />
       </Head>
       <ThemeProvider defaultTheme="Mango">
