@@ -1,3 +1,5 @@
+import LinkLeft from "./LinkLeft"
+
 const ContentSectionRisks = () => {
   return (
     <>
@@ -54,17 +56,20 @@ const ContentSectionRisks = () => {
                 </div>
                 <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
-                      Not fully decentralzed; yet 
+                      Inlationary Tokenomics
                       </h3>
                       <p className="text-white text-opacity-70 text-base"> 
-                      Whilst the path to becoming decentralized is kicking off with the token sale, at inception the team will have control over the direction of the protocol until the governance mechanism is estabilshed and tools built out.
+                      Mango will be running its own on-chain order books to allow perpetual swap trading. In order to attract sophisticed traders with the technical expertise to become market makers, the protocol will need to provide very generous liquidity mining rewards.
                       <br />
                       <br />
-                      Contributers must trust the mango team until full decentralization is reached. 
-                      
+                      We were inspired from bitcoins emission schedule in our design, but the mechanism is genuinely unproven in this context and potentially could be exploited. Even if it operates correctly, distributing MNGO from the DAO will be inflationary.                      
                       <br />
                       <br />
-                      We offer full transparency in during this phase of transition and will commit to creating a fair voting system for those participating in DAO votes in the future. 
+                      {/*  
+                      <a rel="noreferrer" target="_blank" href="https://docs.mango.markets/mango-v3/liquidity-incentives">
+                      <LinkLeft>Learn about it in the docs</LinkLeft>
+                      </a>
+                      */}
                       </p>
                 </div>
             </div>
