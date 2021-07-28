@@ -6,7 +6,7 @@ const ContentSectionAbout = () => {
     <>
 
     <div className="bg-bkg-2 transform -skew-y-3 pt-16 pb-16 mb-16 -mt-32 z-0">
-      <div className="max-w-7xl mx-auto px-8 pt-48 pb-16 transform skew-y-3">
+      <div className="max-w-7xl mx-auto px-8 pt-24 pb-16 transform skew-y-3">
         {/* Section 1
         <div className="max-w-5xl mx-auto text-center">
           <h2 className="mb-8 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
