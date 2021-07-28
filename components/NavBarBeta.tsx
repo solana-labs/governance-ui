@@ -383,16 +383,9 @@ const NavBarBeta = () => {
                 </div>
               </div>
 
-              {/*
-               <a
-                href="https://mango-token-sale.netlify.app"
-                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-th-fgd-4 focus:outline-none rounded-md"
-              >             
-              */}
               <a
-                href="#"
-                onClick={doNothing}
-                className="disabled text-base font-medium text-gray-500 p-1 px-2 opacity-50"
+                href="https://token.mango.markets"
+                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-th-fgd-4 focus:outline-none rounded-md"
               >
                 <div className="flex flex-row">
                   <p>Mango DAO</p>
