@@ -1,4 +1,4 @@
-import LinkLeft from "./LinkLeft"
+//import LinkLeft from "./LinkLeft"
 
 const ContentSectionRisks = () => {
   return (

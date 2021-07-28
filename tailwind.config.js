@@ -21,6 +21,7 @@ module.exports = {
         'risk-one': "url('../public/img/risk1.png')",
         'risk-two': "url('../public/img/risk2.png')",
         'risk-three': "url('../public/img/risk3.png')",
+        'risk-four': "url('../public/img/risk4.png')",
 
       }),
       height: {
