@@ -64,7 +64,7 @@ const ContentSectionRisks = () => {
             </div>
             <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md">
               <h3 className="text-white font-semibold text-xl tracking-wide my-2">
-                Inlationary Tokenomics
+                Inflationary Tokenomics
               </h3>
               <p className="text-white text-opacity-70 text-base">
                 Mango will be running its own on-chain order books to allow
