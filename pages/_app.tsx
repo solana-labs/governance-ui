@@ -8,7 +8,7 @@ function App({ Component, pageProps }) {
 
   const title = 'Mango Markets'
   const description =
-    'Mango DAO - Claim your stake in the Mango DAO. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
+    'Claim your stake in the Mango DAO. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
   const keywords =
     'Mango Markets, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens'
 
@@ -28,10 +28,10 @@ function App({ Component, pageProps }) {
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="msapplication-TileColor" content="#da532c" />
         <meta name="theme-color" content="#ffffff" />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@mangomarkets" />
         <meta name="twitter:title" content="Mango Markets" />
         <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="/twitter-image.png" />
 
         {/* <link rel="manifest" href="/manifest.json"></link> */}
       </Head>
