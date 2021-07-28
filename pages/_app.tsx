@@ -32,7 +32,10 @@ function App({ Component, pageProps }) {
         <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content="/card.jpg" />
+        <meta
+          property="twitter:image"
+          content="https://deploy-preview-6--mango-token-sale.netlify.app/card.jpg"
+        />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@mangomarkets" />
       </Head>
