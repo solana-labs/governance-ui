@@ -201,7 +201,7 @@ const ContentSectionAbout = () => {
                   </div>
                 </div>
                 <div className="grid grid-cols-3 mt-4">
-                  <div className="col-span-1 md:col-span-2 lg:col-span-1  m-1 p-1">
+                  <div className="col-span-3 md:col-span-1 lg:col-span-1  m-1 p-1">
                     <p className="text-mango-green font-bold text-base my-2">
                       Mango DAO
                     </p>
@@ -221,7 +221,7 @@ const ContentSectionAbout = () => {
                     </p>
                   </div>
                   */}
-                  <div className="col-span-1 md:col-span-2 lg:col-span-1  m-1 p-1">
+                  <div className="col-span-3 md:col-span-1 lg:col-span-1  m-1 p-1">
                     <p className="text-mango-red font-bold text-base my-2">
                       Insurance Fund
                     </p>
@@ -230,7 +230,7 @@ const ContentSectionAbout = () => {
                       Fund that will protect lenders in the Mango Protocol.
                     </p>
                   </div>
-                  <div className="col-span-1 md:col-span-2 lg:col-span-1  m-1 p-1">
+                  <div className="col-span-3 md:col-span-1 lg:col-span-1  m-1 p-1">
                     <p className="text-blue-400 font-bold text-base my-2">
                       Contributor tokens
                     </p>
