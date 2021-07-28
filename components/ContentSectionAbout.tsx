@@ -237,9 +237,9 @@ const ContentSectionAbout = () => {
                           Contributor tokens
                         </p>
                         <p className="text-white text-opacity-70">
-                          5% will be distributed to early contributors to award
-                          them a large stake in the DAO. These tokens are
-                          unlocked.
+                          5% will be allocated to a distributed group of early
+                          contributors, who worked tirelessly on this project
+                          over the last year. These tokens are unlocked.
                         </p>
                       </div>
                     </div>

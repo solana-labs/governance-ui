@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import MangoPill from '../components/MangoPill'
-//import MangoSale from '../components/MangoSale'
-import Button from './Button'
+// import Button from './Button'
 
 const NavBarBeta = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
