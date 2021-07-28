@@ -67,9 +67,9 @@ const StatsModal = () => {
             <div className="font-bold text-fgd-1 text-xl">
               {vaults.mangoBalance}
             </div>
-        </div>
+          </div>
 
-        {/* <p>
+          {/* <p>
               Start: {startIdo?.fromNow()} ({startIdo?.format()})
               </p>
             <p>
@@ -80,7 +80,7 @@ const StatsModal = () => {
             </p>
             <p>Current USDC in Pool: {vaults.usdc?.balance || 'N/A'}</p>
             <p>Locked MNGO in Pool: {vaults.mango?.balance || 'N/A'}</p> */}
-          </div>
+        </div>
       </div>
     </>
   )

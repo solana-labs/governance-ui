@@ -8,9 +8,10 @@ function App({ Component, pageProps }) {
 
   const title = 'Mango Markets'
   const description =
-    'Mango Markets - Decentralised, cross-margin trading up to 5x leverage with lightning speed and near-zero fees powered by Serum.'
+    'Claim your stake in the Mango DAO. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
   const keywords =
     'Mango Markets, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens'
+  const baseUrl = 'https://mango-token-sale.netlify.app'
 
   return (
     <>
@@ -26,14 +27,15 @@ function App({ Component, pageProps }) {
         <meta name="keywords" content={keywords} />
         <meta name="description" content={description} />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="msapplication-TileColor" content="#da532c" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Mango Markets" />
-        <meta name="twitter:description" content={description} />
-        <meta name="twitter:image" content="/twitter-image.png" />
 
-        {/* <link rel="manifest" href="/manifest.json"></link> */}
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={`${baseUrl}/preview.jpg`} />
+        <meta name="twitter:card" content="summary" />
+        <meta name="twitter:site" content="@mangomarkets" />
       </Head>
       <ThemeProvider defaultTheme="Mango">
         <Component {...pageProps} />
