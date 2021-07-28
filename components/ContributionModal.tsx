@@ -19,6 +19,7 @@ import usePool from '../hooks/usePool'
 import styled from '@emotion/styled'
 import 'twin.macro'
 import { notify } from '../utils/notifications'
+import useIpAddress from '../hooks/useIpAddress'
 
 const SmallButton = styled.button``
 
@@ -29,6 +30,7 @@ const ContributionModal = () => {
   const largestAccounts = useLargestAccounts()
   //const vaults = useVaults()
   const { endIdo, endDeposits } = usePool()
+  const { ipAllowed } = useIpAddress()
 
   const usdcBalance = largestAccounts.usdc?.balance || 0
   const redeemableBalance = largestAccounts.redeemable?.balance || 0
@@ -310,17 +312,25 @@ const ContributionModal = () => {
                     </div>
                   )}
                 </div>
-                <Button
-                  onClick={() => handleSetContribution()}
-                  className="w-full py-2.5"
-                  disabled={disableSubmit}
-                >
-                  <div className={`flex items-center justify-center`}>
-                    {dontAddMore
-                      ? 'Sorry you can’t add anymore 🥲'
-                      : 'Set Contribution'}
-                  </div>
-                </Button>
+                {ipAllowed || !connected ? (
+                  <Button
+                    onClick={() => handleSetContribution()}
+                    className="w-full py-2.5"
+                    disabled={disableSubmit}
+                  >
+                    <div className={`flex items-center justify-center`}>
+                      {dontAddMore
+                        ? 'Sorry you can’t add anymore 🥲'
+                        : 'Set Contribution'}
+                    </div>
+                  </Button>
+                ) : (
+                  <Button className="w-full py-2.5" disabled>
+                    <div className={`flex items-center justify-center`}>
+                      Country Not Allowed
+                    </div>
+                  </Button>
+                )}
               </div>
             </div>
             <div className="flex items-center justify-center">
