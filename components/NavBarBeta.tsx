@@ -389,7 +389,8 @@ const NavBarBeta = () => {
               >
                 <div className="flex flex-row">
                   <p>Mango DAO</p>
-                  <MangoPill />
+                  <span style={{ width: '55px' }}></span>
+                  {/* <MangoPill /> */}{' '}
                 </div>
               </a>
             </nav>
