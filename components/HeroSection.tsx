@@ -12,7 +12,8 @@ const HeroSection = () => {
               Claim your stake in the <GradientText>Mango DAO</GradientText>.
             </h2>
             <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
-              Join us in building Mango, the protocol for permissionless leverage trading &amp; lending.
+              Join us in building Mango, the protocol for permissionless
+              leverage trading &amp; lending.
             </p>
           </div>
           <div className="mb-16 flex lg:flex-row md:flex-row lg:justify-center md:justify-center sm:justify-center">
