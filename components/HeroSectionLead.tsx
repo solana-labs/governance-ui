@@ -10,7 +10,7 @@ const HeroSectionLead = () => {
         <div className="relative pt-16 md:pt-32 pb-2">
           <div className="max-w-2xl mb-16 mx-auto text-left md:text-center lg:text-center">
             <h2 className="mb-8 text-7xl text-white font-bold font-heading">
-              <GradientText>Wen</GradientText> Token?
+              <GradientText>WEN</GradientText> TOKEN?
             </h2>
             <p className="mb-8 text-7xl">{startIdo?.fromNow()}</p>
           </div>
