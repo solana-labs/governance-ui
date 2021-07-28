@@ -35,7 +35,7 @@ const ContentSectionRisks = () => {
                       <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                       New token sale mechanism 
                       </h3>
-                      <p className="text-white text-opacity-70 text-base w-full md:w-1/2 lg:w-1/2">
+                      <p className="text-white text-opacity-70 text-base w-full md:w-3/4 lg:w-3/4">
                       The Mango token sale was designed with the goal of being as fair as possible to all participants. 
                       However, there is a mechanism by which one or more participants with large amounts of capital could 
                       discourage others from participating in the token sale. 
