@@ -11,6 +11,7 @@ function App({ Component, pageProps }) {
     'Claim your stake in the Mango DAO. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
   const keywords =
     'Mango Markets, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens'
+  const baseUrl = 'https://deploy-preview-6--mango-token-sale.netlify.app'
 
   return (
     <>
@@ -32,11 +33,9 @@ function App({ Component, pageProps }) {
         <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta
-          property="twitter:image"
-          content="https://deploy-preview-6--mango-token-sale.netlify.app/card.jpg"
-        />
-        <meta name="twitter:card" content="summary_large_image" />
+        <meta property="og:image" content={`${baseUrl}/banner.jpg`} />
+        <meta property="twitter:image" content={`${baseUrl}/card.jpg`} />
+        <meta name="twitter:card" content="summary" />
         <meta name="twitter:site" content="@mangomarkets" />
       </Head>
       <ThemeProvider defaultTheme="Mango">
