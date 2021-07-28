@@ -6,7 +6,7 @@ const ContentSectionRisks = () => {
       {/* Section 3 */}
       <div className="bg-bkg-2 transform -skew-y-3">
         <div className="max-w-7xl mx-auto px-8 py-32 transform skew-y-3">
-          <div className="max-w-4xl mx-auto text-center pb-16">
+          <div className="max-w-4xl mx-auto -mb-48 md:-mb-0 lg:-mb-0 text-center pb-16">
             <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
               Transparency builds trust.
             </h2>
@@ -18,7 +18,7 @@ const ContentSectionRisks = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-7 lg:grid-cols-7 grid-rows-2 gap-6 mb-16 mx-auto">
-            <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 bg-bkg-3 border border-bkg-4 rounded-xl h-auto w-auto z-10 shadow-md bg-risk-two md:bg-risk-one lg:bg-risk-one bg-contain bg-right-bottom bg-no-repeat">
+            <div className="col-span-1 md:col-span-3 lg:col-span-3 p-5 mt-48 md:mt-0 lg:mt-0 bg-bkg-3 border border-bkg-4 rounded-xl h-550 md:h-auto lg:h-auto w-auto z-10 shadow-md bg-risk-two md:bg-risk-one lg:bg-risk-one bg-contain bg-right-bottom bg-no-repeat">
               <h3 className="text-white font-semibold text-xl tracking-wide my-2">
                 Unaudited smart contracts
               </h3>
