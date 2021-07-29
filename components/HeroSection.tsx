@@ -2,6 +2,15 @@ import GradientText from './GradientText'
 import Button from './Button'
 import Link from './Link'
 
+function scrollToId(id: string) {
+  const element = document.getElementById(id)
+  const y = element.getBoundingClientRect().top + window.scrollY
+  window.scroll({
+    top: y,
+    behavior: 'smooth',
+  })
+}
+
 const HeroSection = () => {
   return (
     <section className="">
@@ -17,7 +26,7 @@ const HeroSection = () => {
             </p>
           </div>
           <div className="mb-16 flex lg:flex-row md:flex-row lg:justify-center md:justify-center sm:justify-center">
-            <a className="sm:px-1" rel="noreferrer" target="_blank" href="#">
+            <a className="sm:px-1" onClick={() => scrollToId('contribute')}>
               <Button>Contribute now</Button>
             </a>
             <a className="pl-2 " rel="noreferrer" target="_blank" href="#">
