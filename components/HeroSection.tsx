@@ -29,7 +29,7 @@ const HeroSection = () => {
             <a className="sm:px-1" onClick={() => scrollToId('contribute')}>
               <Button>Contribute now</Button>
             </a>
-            <a className="pl-2 " rel="noreferrer" target="_blank" href="#">
+            <a className="pl-2 " onClick={() => scrollToId('about')}>
               <Link>Learn more</Link>
             </a>
           </div>
