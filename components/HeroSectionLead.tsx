@@ -13,7 +13,7 @@ const HeroSectionLead = () => {
               <GradientText>WEN</GradientText> TOKEN?
             </h2>
             <p className="mb-8 text-2xl">
-              {startIdo.format('dddd, MMMM Do YYYY, h:mm:ss a')}
+              {startIdo?.format('dddd, MMMM Do YYYY, h:mm:ss a')}
             </p>
           </div>
         </div>
