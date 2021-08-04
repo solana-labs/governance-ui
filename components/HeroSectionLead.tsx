@@ -1,5 +1,6 @@
 import GradientText from './GradientText'
 import usePool from '../hooks/usePool'
+import moment from 'moment-timezone'
 
 const HeroSectionLead = () => {
   const { startIdo } = usePool()
@@ -13,7 +14,9 @@ const HeroSectionLead = () => {
               <GradientText>WEN</GradientText> TOKEN?
             </h2>
             <p className="mb-8 text-2xl">
-              {startIdo?.format('dddd, MMMM Do YYYY, h:mm:ss a')}
+              {startIdo
+                ?.tz(moment.tz.guess())
+                ?.format('dddd, MMMM Do YYYY, h:mm:ss A z')}
             </p>
           </div>
         </div>
