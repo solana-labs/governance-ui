@@ -224,7 +224,7 @@ const ContributionModal = () => {
                 <div className="flex items-center text-xs text-fgd-4">
                   <a
                     onClick={handleRefresh}
-                    className={refreshing && 'animate-spin'}
+                    className={refreshing ? 'animate-spin' : 'hover:cursor-pointer'}
                   >
                     <RefreshIcon
                       className={`w-4 h-4`}
