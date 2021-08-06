@@ -153,6 +153,8 @@ const ContributionModal = () => {
     }
   }, [submitting])
 
+  const hasUSDC = usdcBalance > 0 || redeemableBalance > 0
+
   const toLateToDeposit =
     endDeposits?.isBefore() && endIdo.isAfter() && !largestAccounts.redeemable
 
@@ -224,7 +226,9 @@ const ContributionModal = () => {
                 <div className="flex items-center text-xs text-fgd-4">
                   <a
                     onClick={handleRefresh}
-                    className={refreshing ? 'animate-spin' : 'hover:cursor-pointer'}
+                    className={
+                      refreshing ? 'animate-spin' : 'hover:cursor-pointer'
+                    }
                   >
                     <RefreshIcon
                       className={`w-4 h-4`}
@@ -317,8 +321,10 @@ const ContributionModal = () => {
                 >
                   <div className={`flex items-center justify-center`}>
                     {dontAddMore
-                      ? 'Sorry you can’t add anymore 🥲'
-                      : 'Set Contribution'}
+                      ? "Sorry you can't add anymore 🥲"
+                      : hasUSDC || !connected
+                      ? 'Set Contribution'
+                      : 'Loading USDC balance 💦'}
                   </div>
                 </Button>
               </div>

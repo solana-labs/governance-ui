@@ -31,6 +31,6 @@ export function calculateNativeAmountUnsafe(
   amount: number
 ): BN {
   const mint = mints[pk.toBase58()]
-  const nativeAmount = amount * Math.pow(10, mint.decimals)
+  const nativeAmount = Math.round(amount * Math.pow(10, mint.decimals))
   return new BN(nativeAmount.toString())
 }

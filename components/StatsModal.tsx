@@ -12,6 +12,7 @@ const StatsModal = () => {
   //   : 0
 
   const priceFormat = new Intl.NumberFormat('en-US', {
+    minimumSignificantDigits: 4,
     maximumSignificantDigits: 4,
   })
 
