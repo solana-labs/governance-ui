@@ -10,7 +10,7 @@ const ModalSection = () => {
             Ready to contribute?
           </h2>
           <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-50">
-            Join us and become a valued stakeholder in the Mango Dao.
+            Join us and become a valued stakeholder in the Mango DAO.
           </p>
         </div>
         <div className="max-w-3xl flex flex-wrap md:flex-row lg:flex-row mx-auto">
