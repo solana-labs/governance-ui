@@ -371,7 +371,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
       )
 
-      await sendTransaction({ transaction, wallet, connection })
+      await sendTransaction({
+        transaction,
+        wallet,
+        connection,
+        sendingMessage: 'Sending redeem MNGO transaction...',
+        successMessage: 'MNGO redeemed successfully!',
+      })
 
       await Promise.all([
         actions.fetchPool(),

@@ -84,7 +84,7 @@ const ContributionModal = () => {
     setWalletAmount(totalBalance - amount)
     setContributionAmount(amount)
     if (endDeposits?.isBefore() && amount > redeemableBalance) {
-      setErrorMessage('Deposits ended, contribution can not increase')
+      setErrorMessage('Deposits ended, contribution cannot increase')
       setTimeout(() => setErrorMessage(null), 4000)
     }
   }
@@ -93,7 +93,7 @@ const ContributionModal = () => {
     let newContribution = Math.round(percentage * totalBalance) / 100
     if (endDeposits?.isBefore() && newContribution > redeemableBalance) {
       newContribution = redeemableBalance
-      setErrorMessage('Deposits ended, contribution can not increase')
+      setErrorMessage('Deposits ended, contribution cannot increase')
       setTimeout(() => setErrorMessage(null), 4000)
     }
 
@@ -175,7 +175,7 @@ const ContributionModal = () => {
             !(connected && toLateToDeposit) && (
               <>
                 <h2>The journey starts here.</h2>
-                <p>When your&apos;re ready, deposit your USDC</p>
+                <p>When you&apos;re ready, deposit your USDC</p>
               </>
             )}
 
@@ -207,7 +207,11 @@ const ContributionModal = () => {
           {editContribution && !submitting && (
             <>
               <h2>Funds unlocked</h2>
-              <p>Increase or reduce your contribution...</p>
+              <p>
+                {endDeposits?.isBefore() && endIdo?.isAfter()
+                  ? 'You may reduce your contribution during this phase. Reducing cannot be reversed.'
+                  : 'Increase or reduce your contribution.'}
+              </p>
             </>
           )}
         </div>
@@ -235,12 +239,17 @@ const ContributionModal = () => {
                       style={{ transform: 'scaleX(-1)' }}
                     />
                   </a>
-                  <WalletIcon className="w-4 h-4 mx-1 text-fgd-3 fill-current" />
+                  <div title="Wallet Icon">
+                    <WalletIcon className="w-4 h-4 mx-1 text-fgd-3 fill-current" />
+                  </div>
                   {connected ? (
                     loading ? (
                       <div className="bg-bkg-4 rounded w-10 h-4 animate-pulse" />
                     ) : (
-                      <span className="font-display text-fgd-1 ml-1">
+                      <span
+                        className="font-display text-fgd-3 ml-1"
+                        title="Wallet USDC"
+                      >
                         {walletAmount.toFixed(2)}
                       </span>
                     )
@@ -249,10 +258,11 @@ const ContributionModal = () => {
                   )}
                   <img
                     alt=""
+                    title="Wallet USDC"
                     width="16"
                     height="16"
                     src="/icons/usdc.svg"
-                    className={`ml-1`}
+                    className="ml-1 opacity-75"
                   />
                 </div>
                 <div className="flex">
@@ -314,6 +324,7 @@ const ContributionModal = () => {
                     </div>
                   )}
                 </div>
+
                 <Button
                   onClick={() => handleSetContribution()}
                   className="w-full py-2.5"
@@ -324,7 +335,7 @@ const ContributionModal = () => {
                       ? "Sorry you can't add anymore 🥲"
                       : hasUSDC || !connected
                       ? 'Set Contribution'
-                      : 'Loading USDC balance 💦'}
+                      : 'Your USDC balance is 0'}
                   </div>
                 </Button>
               </div>

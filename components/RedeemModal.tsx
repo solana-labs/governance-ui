@@ -45,6 +45,10 @@ const RedeemModal = () => {
   }
 
   useEffect(() => {
+    actions.fetchMints()
+  }, [])
+
+  useEffect(() => {
     setLoading(true)
     if (largestAccounts.redeemable) {
       setLoading(false)
