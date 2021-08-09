@@ -354,7 +354,7 @@ const ContributionModal = () => {
                 ) : (
                   <Button className="w-full py-2.5" disabled>
                     <div className={`flex items-center justify-center`}>
-                      Country Not Allowed
+                      Country Not Allowed 🇺🇸😭
                     </div>
                   </Button>
                 )}
