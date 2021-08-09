@@ -1,6 +1,6 @@
+import { ChevronDownIcon } from '@heroicons/react/solid'
 import GradientText from './GradientText'
 import Button from './Button'
-import Link from './Link'
 
 function scrollToId(id: string) {
   const element = document.getElementById(id)
@@ -25,12 +25,16 @@ const HeroSection = () => {
               leverage trading &amp; lending.
             </p>
           </div>
-          <div className="mb-16 flex lg:flex-row md:flex-row lg:justify-center md:justify-center sm:justify-center">
-            <a className="sm:px-1" onClick={() => scrollToId('contribute')}>
-              <Button>Contribute now</Button>
+          <div className="mb-16 flex flex-col items-center">
+            <a className="mb-6" onClick={() => scrollToId('contribute')}>
+              <Button>Contribute Now</Button>
             </a>
-            <a className="pl-2 " onClick={() => scrollToId('about')}>
-              <Link>Learn more</Link>
+            <a
+              className="cursor-pointer flex flex-col items-center text-fgd-1 hover:underline"
+              onClick={() => scrollToId('about')}
+            >
+              <div>Learn More</div>
+              <ChevronDownIcon className="h-5 w-5" />
             </a>
           </div>
         </div>

@@ -47,6 +47,8 @@ const ContributionModal = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
 
+  const usdFormat = new Intl.NumberFormat('en-US')
+
   //onst priceFormat = new Intl.NumberFormat('en-US', {
   //  maximumSignificantDigits: 4,
   //})
@@ -154,16 +156,19 @@ const ContributionModal = () => {
   }, [submitting])
 
   const hasUSDC = usdcBalance > 0 || redeemableBalance > 0
+  const difference = contributionAmount - redeemableBalance
 
   const toLateToDeposit =
-    endDeposits?.isBefore() && endIdo.isAfter() && !largestAccounts.redeemable
+    endDeposits?.isBefore() &&
+    endIdo.isAfter() &&
+    !largestAccounts.redeemable?.balance
 
   const disableFormInputs =
     submitted || !connected || loading || (connected && toLateToDeposit)
 
   const dontAddMore =
     endDeposits?.isBefore() && contributionAmount > redeemableBalance
-  const disableSubmit = disableFormInputs || walletAmount < 0 || dontAddMore
+  const disableSubmit = disableFormInputs || walletAmount <= 0 || dontAddMore
 
   return (
     <>
@@ -186,7 +191,7 @@ const ContributionModal = () => {
             toLateToDeposit && (
               <>
                 <h2>We&apos;re sorry, you missed it.</h2>
-                <p>Deposits are already closed</p>
+                <p>The sale period has ended</p>
               </>
             )}
 
@@ -199,18 +204,22 @@ const ContributionModal = () => {
 
           {submitted && !submitting && (
             <>
-              <h2>Your contribution amount</h2>
-              <p>Thanks for contributing...</p>
+              <h2>
+                You&apos;ve contributed ${usdFormat.format(contributionAmount)}
+              </h2>
+              <p>Unlock to edit your contribution amount</p>
             </>
           )}
 
           {editContribution && !submitting && (
             <>
-              <h2>Funds unlocked</h2>
+              <h2>
+                You&apos;ve contributed ${usdFormat.format(redeemableBalance)}
+              </h2>{' '}
               <p>
                 {endDeposits?.isBefore() && endIdo?.isAfter()
-                  ? 'You may reduce your contribution during this phase. Reducing cannot be reversed.'
-                  : 'Increase or reduce your contribution.'}
+                  ? 'You can only reduce your contribution during the grace period. Reducing cannot be reversed.'
+                  : 'Increase or reduce your contribution'}
               </p>
             </>
           )}
@@ -250,7 +259,7 @@ const ContributionModal = () => {
                         className="font-display text-fgd-3 ml-1"
                         title="Wallet USDC"
                       >
-                        {walletAmount.toFixed(2)}
+                        {usdFormat.format(walletAmount)}
                       </span>
                     )
                   ) : (
@@ -333,9 +342,11 @@ const ContributionModal = () => {
                   <div className={`flex items-center justify-center`}>
                     {dontAddMore
                       ? "Sorry you can't add anymore 🥲"
-                      : hasUSDC || !connected
-                      ? 'Set Contribution'
-                      : 'Your USDC balance is 0'}
+                      : !hasUSDC && connected
+                      ? 'Your USDC balance is 0'
+                      : difference >= 0
+                      ? `Deposit $${usdFormat.format(difference)}`
+                      : `Withdraw $${usdFormat.format(-difference)}`}
                   </div>
                 </Button>
               </div>
