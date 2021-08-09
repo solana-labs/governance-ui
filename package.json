@@ -31,6 +31,7 @@
     "@solana/web3.js": "^1.5.0",
     "immer": "^9.0.1",
     "moment": "^2.29.1",
+    "moment-timezone": "^0.5.33",
     "next": "latest",
     "next-themes": "^0.0.14",
     "rc-slider": "^9.7.2",

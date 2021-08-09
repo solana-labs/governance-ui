@@ -44,6 +44,10 @@ const RedeemModal = () => {
     setSubmitting(true)
   }
 
+  // useEffect(() => {
+  //   actions.fetchMints()
+  // }, [])
+
   useEffect(() => {
     setLoading(true)
     if (largestAccounts.redeemable) {
@@ -66,18 +70,18 @@ const RedeemModal = () => {
 
   return (
     <>
-      <div className="flex flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-lg">
+      <div className="flex flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-xl shadow-lg">
         <div className="pb-4 text-center">
           {!submitting ? (
             <>
-              <h2>Redeem your MNGO</h2>
-              {/* <p>Welcome to the DAO, let&apos;s build together.</p> */}
+              <h2>Redeem your MNGO.</h2>
+              <p>Welcome to the DAO, let&apos;s build together.</p>
             </>
           ) : null}
 
           {submitting ? (
             <>
-              <h2>Approve the transaction</h2>
+              <h2>Approve the transaction.</h2>
               <p>Almost there...</p>
             </>
           ) : null}
@@ -154,7 +158,7 @@ const RedeemModal = () => {
                   disabled={disableSubmit}
                 >
                   <div className={`flex items-center justify-center`}>
-                    Redeem 🥭
+                    Redeem {redeemableBalance} MNGO
                   </div>
                 </Button>
               </div>

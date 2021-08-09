@@ -24,3 +24,13 @@ export function calculateSupply(
   const mint = mints[pk.toBase58()]
   return mint && fixedPointToNumber(mint.supply, mint.decimals)
 }
+
+export function calculateNativeAmountUnsafe(
+  mints: { [pk: string]: MintAccount },
+  pk: PublicKey,
+  amount: number
+): BN {
+  const mint = mints[pk.toBase58()]
+  const nativeAmount = Math.round(amount * Math.pow(10, mint.decimals))
+  return new BN(nativeAmount.toString())
+}

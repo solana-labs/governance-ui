@@ -11,7 +11,7 @@ function App({ Component, pageProps }) {
     'Claim your stake in the Mango DAO. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
   const keywords =
     'Mango Markets, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens'
-  const baseUrl = 'https://mango-token-sale.netlify.app'
+  const baseUrl = 'https://token.mango.markets'
 
   return (
     <>

@@ -49,6 +49,8 @@ const ContributionModal = () => {
   const [errorMessage, setErrorMessage] = useState(null)
   const [refreshing, setRefreshing] = useState(false)
 
+  const usdFormat = new Intl.NumberFormat('en-US')
+
   //onst priceFormat = new Intl.NumberFormat('en-US', {
   //  maximumSignificantDigits: 4,
   //})
@@ -86,7 +88,7 @@ const ContributionModal = () => {
     setWalletAmount(totalBalance - amount)
     setContributionAmount(amount)
     if (endDeposits?.isBefore() && amount > redeemableBalance) {
-      setErrorMessage('Deposits ended, contribution can not increase')
+      setErrorMessage('Deposits ended, contribution cannot increase')
       setTimeout(() => setErrorMessage(null), 4000)
     }
   }
@@ -95,7 +97,7 @@ const ContributionModal = () => {
     let newContribution = Math.round(percentage * totalBalance) / 100
     if (endDeposits?.isBefore() && newContribution > redeemableBalance) {
       newContribution = redeemableBalance
-      setErrorMessage('Deposits ended, contribution can not increase')
+      setErrorMessage('Deposits ended, contribution cannot increase')
       setTimeout(() => setErrorMessage(null), 4000)
     }
 
@@ -155,19 +157,24 @@ const ContributionModal = () => {
     }
   }, [submitting])
 
+  const hasUSDC = usdcBalance > 0 || redeemableBalance > 0
+  const difference = contributionAmount - redeemableBalance
+
   const toLateToDeposit =
-    endDeposits?.isBefore() && endIdo.isAfter() && !largestAccounts.redeemable
+    endDeposits?.isBefore() &&
+    endIdo.isAfter() &&
+    !largestAccounts.redeemable?.balance
 
   const disableFormInputs =
     submitted || !connected || loading || (connected && toLateToDeposit)
 
   const dontAddMore =
     endDeposits?.isBefore() && contributionAmount > redeemableBalance
-  const disableSubmit = disableFormInputs || walletAmount < 0 || dontAddMore
+  const disableSubmit = disableFormInputs || walletAmount <= 0 || dontAddMore
 
   return (
     <>
-      <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md z-10">
+      <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-xl shadow-md z-10">
         <div className="pb-4 text-center">
           {!submitted &&
             !submitting &&
@@ -175,7 +182,7 @@ const ContributionModal = () => {
             !(connected && toLateToDeposit) && (
               <>
                 <h2>The journey starts here.</h2>
-                <p>When your&apos;re ready, deposit your USDC</p>
+                <p>When you&apos;re ready, deposit your USDC.</p>
               </>
             )}
 
@@ -186,28 +193,36 @@ const ContributionModal = () => {
             toLateToDeposit && (
               <>
                 <h2>We&apos;re sorry, you missed it.</h2>
-                <p>Deposits are already closed</p>
+                <p>The sale period has ended.</p>
               </>
             )}
 
           {!submitted && submitting && (
             <>
-              <h2>Approve the transaction</h2>
+              <h2>Approve the transaction.</h2>
               <p>Almost there...</p>
             </>
           )}
 
           {submitted && !submitting && (
             <>
-              <h2>Your contribution amount</h2>
-              <p>Thanks for contributing...</p>
+              <h2>
+                You&apos;ve contributed ${usdFormat.format(contributionAmount)}.
+              </h2>
+              <p>Unlock to edit your contribution amount.</p>
             </>
           )}
 
           {editContribution && !submitting && (
             <>
-              <h2>Funds unlocked</h2>
-              <p>Increase or reduce your contribution...</p>
+              <h2>
+                You&apos;ve contributed ${usdFormat.format(redeemableBalance)}.
+              </h2>
+              <p>
+                {endDeposits?.isBefore() && endIdo?.isAfter()
+                  ? 'You can only reduce your contribution during the grace period. Reducing cannot be reversed.'
+                  : 'Increase or reduce your contribution.'}
+              </p>
             </>
           )}
         </div>
@@ -226,20 +241,27 @@ const ContributionModal = () => {
                 <div className="flex items-center text-xs text-fgd-4">
                   <a
                     onClick={handleRefresh}
-                    className={refreshing && 'animate-spin'}
+                    className={
+                      refreshing ? 'animate-spin' : 'hover:cursor-pointer'
+                    }
                   >
                     <RefreshIcon
                       className={`w-4 h-4`}
                       style={{ transform: 'scaleX(-1)' }}
                     />
                   </a>
-                  <WalletIcon className="w-4 h-4 mx-1 text-fgd-3 fill-current" />
+                  <div title="Wallet Icon">
+                    <WalletIcon className="w-4 h-4 mx-1 text-fgd-3 fill-current" />
+                  </div>
                   {connected ? (
                     loading ? (
                       <div className="bg-bkg-4 rounded w-10 h-4 animate-pulse" />
                     ) : (
-                      <span className="font-display text-fgd-1 ml-1">
-                        {walletAmount.toFixed(2)}
+                      <span
+                        className="font-display text-fgd-3 ml-1"
+                        title="Wallet USDC"
+                      >
+                        {usdFormat.format(walletAmount)}
                       </span>
                     )
                   ) : (
@@ -247,10 +269,11 @@ const ContributionModal = () => {
                   )}
                   <img
                     alt=""
+                    title="Wallet USDC"
                     width="16"
                     height="16"
                     src="/icons/usdc.svg"
-                    className={`ml-1`}
+                    className="ml-1 opacity-75"
                   />
                 </div>
                 <div className="flex">
@@ -320,8 +343,12 @@ const ContributionModal = () => {
                   >
                     <div className={`flex items-center justify-center`}>
                       {dontAddMore
-                        ? 'Sorry you can’t add anymore 🥲'
-                        : 'Set Contribution'}
+                        ? "Sorry you can't add anymore 🥲"
+                        : !hasUSDC && connected
+                        ? 'Your USDC balance is 0'
+                        : difference >= 0
+                        ? `Deposit $${usdFormat.format(difference)}`
+                        : `Withdraw $${usdFormat.format(-difference)}`}
                     </div>
                   </Button>
                 ) : (

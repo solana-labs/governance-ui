@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import MangoPill from '../components/MangoPill'
-//import MangoSale from '../components/MangoSale'
-import Button from './Button'
+// import Button from './Button'
 
 const NavBarBeta = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
@@ -111,7 +110,7 @@ const NavBarBeta = () => {
                   } absolute z-50 -ml-4 mt-3 transform px-2 w-screen max-w-md sm:px-0 lg:ml-0 lg:left-1/2 lg:-translate-x-1/2`}
                 >
                   <div className="rounded-lg shadow-lg ring-1 ring-black ring-opacity-5 overflow-hidden">
-                    <div className="relative grid gap-6 bg-bkg-2 px-5 py-6 sm:gap-8 sm:p-8">
+                    <div className="relative grid gap-6 bg-bkg-2  px-5 py-6 sm:gap-8 sm:p-8">
                       <h3 className="text-sm tracking-wide font-medium text-yellow-300 uppercase">
                         Trading
                       </h3>
@@ -171,7 +170,7 @@ const NavBarBeta = () => {
 
                         <div className="ml-4">
                           <div className="text-base font-medium text-white">
-                            Perpetual Futures <MangoPill />
+                            Perpetual Futures <MangoPill>SOON</MangoPill>
                           </div>
                           <p className="mt-1 text-sm text-gray-500">
                             Cross-collateralized decentralized leveraged
@@ -240,6 +239,37 @@ const NavBarBeta = () => {
                           <p className="mt-1 text-sm text-gray-500">
                             Help safegaurd the mango protocol, become a
                             decentralized liquidator.
+                          </p>
+                        </div>
+                      </a>
+
+                      <h3 className="text-sm tracking-wide font-medium text-yellow-300 uppercase">
+                        MERCH
+                      </h3>
+                      <a
+                        href="https://initialcapoffering.com/"
+                        className="-m-3 p-3 flex items-start rounded-lg hover:bg-bkg-3"
+                      >
+                        <svg
+                          width="29"
+                          height="24"
+                          viewBox="0 0 23 18"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            d="M14.5 2.50029C15.8333 3.06167 18 5.91603 16 12.8424M14.5 2.50029C14.141 2.45542 13.7301 2.43894 13.2858 2.46255M14.5 2.50029C15.04 2.60153 15.539 2.72783 16 2.8758M5.5 11.0003C5.83333 10.8336 6.9 10.6002 8.5 11.0003C10.1027 11.401 13.6319 12.4439 16 12.8424M5.5 11.0003L1.5 14.0004C1.16667 14.3337 0.800001 14.9004 2 14.5004C3.5 14.0004 6 14.0004 9 16.0004C12 18.0004 16.5 15.0005 17.5 13.0004M5.5 11.0003C6.19231 4.42331 10.4294 2.61435 13.2858 2.46255M17.5 13.0004C19.1 13.0004 20 13.5004 20 13.5004C20.5 13.6671 21.5 13.7004 21.5 12.5004C21.5 11.1016 22.3696 4.92012 16 2.8758M17.5 13.0004C17.1027 13.0004 16.587 12.9412 16 12.8424M13.2858 2.46255C13.5 1 15 1.49993 15 1.49993C15 1.49993 16 1.49979 16 2.8758"
+                            stroke="#4F4C67"
+                            strokeWidth="2"
+                          />
+                        </svg>
+                        <div className="ml-4">
+                          <p className="text-base font-medium text-white">
+                            Mango Market Caps
+                          </p>
+                          <p className="mt-1 text-sm text-gray-500">
+                            The premier fashion choice for Mango lovers,
+                            traders, and lenders.
                           </p>
                         </div>
                       </a>
@@ -383,30 +413,24 @@ const NavBarBeta = () => {
                 </div>
               </div>
 
-              {/*
-               <a
-                href="https://mango-token-sale.netlify.app"
-                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-th-fgd-4 focus:outline-none rounded-md"
-              >             
-              */}
               <a
-                href="#"
-                onClick={doNothing}
-                className="disabled text-base font-medium text-gray-500 p-1 px-2 opacity-50"
+                href="https://token.mango.markets"
+                className="text-base font-medium text-gray-500 p-1 px-2 hover:bg-bkg-3 focus:outline-none rounded-md"
               >
                 <div className="flex flex-row">
                   <p>Mango DAO</p>
-                  <MangoPill />
+                  <MangoPill>WEN</MangoPill>
                 </div>
               </a>
             </nav>
-            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
+            <div style={{ width: '310px' }} />
+            {/* <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
               <div>
                 <a rel="noreferrer" target="_blank" href="#">
                   <Button>Contribute now</Button>
                 </a>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
 

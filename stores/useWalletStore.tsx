@@ -21,21 +21,22 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { createAssociatedTokenAccount } from '../utils/associated'
 import { sendTransaction } from '../utils/send'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
+import { calculateNativeAmountUnsafe } from '../utils/balance'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet-beta',
-    url: 'https://api.mainnet-beta.solana.com/',
-    websocket: 'https://api.mainnet-beta.solana.com/',
-    programId: '',
-    poolKey: '',
+    url: 'https://mango.rpcpool.com/',
+    websocket: 'https://mango.rpcpool.com/',
+    programId: '6QXNNAPkPsWjd1j3qQJTvRFgSNPARMhF2tE8g1WeGyrM',
+    poolKey: 'AHBj9LAjxStT2YQHN6QdfHKpZLtEVr8ACqeFgYcPsTnr',
   },
   {
     name: 'devnet',
     url: 'https://cache.devnet.rpcpool.com',
     websocket: 'https://cache.devnet.rpcpool.com',
-    // programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV', // owned by devnet key
-    programId: 'CRU6hX2GgtdabESgkoMswMrUdRFxHhCVYmS292VN1Nnn', // owned by governance
+    programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV', // owned by devnet key
+    // programId: 'CRU6hX2GgtdabESgkoMswMrUdRFxHhCVYmS292VN1Nnn', // owned by governance
     //poolKey: 'GvSyVjGwLBeWdURMLDmSffQPqA8g547A6TURbbBnDpa4', // governance test
     // poolKey: '82ndgp58GXpwuLrEc9svHFdhiEsPaZoNUEWwgc79WHqk', // already over
     poolKey: '5heMyYtJK1Us9Hx2w6s5rLDNj8RufeyCR1ZUJAVFLQL7', // long deposits
@@ -51,7 +52,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
 ]
 
-const CLUSTER = 'devnet'
+const CLUSTER = 'mainnet-beta'
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')
@@ -227,7 +228,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         current: wallet,
         connection: { current: connection },
       } = get()
-      const usdcDecimals = mints[usdcVault.mint.toBase58()].decimals
       const redeemable = findLargestBalanceAccountForMint(
         mints,
         tokenAccounts,
@@ -246,8 +246,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       )
 
       if (difference > 0) {
-        const depositAmount = new anchor.BN(
-          difference * Math.pow(10, usdcDecimals)
+        const depositAmount = calculateNativeAmountUnsafe(
+          mints,
+          usdcVault.mint,
+          difference
         )
         console.log(depositAmount.toString(), 'exchangeUsdcForReemable')
 
@@ -279,8 +281,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
         await sendTransaction({ transaction, wallet, connection })
       } else if (difference < 0) {
-        const withdrawAmount = new anchor.BN(
-          difference * -1 * Math.pow(10, usdcDecimals)
+        const withdrawAmount = calculateNativeAmountUnsafe(
+          mints,
+          usdcVault.mint,
+          -1 * difference
         )
         console.log(withdrawAmount.toString(), 'exchangeRedeemableForUsdc')
         await program.rpc.exchangeRedeemableForUsdc(withdrawAmount, {
@@ -367,7 +371,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
       )
 
-      await sendTransaction({ transaction, wallet, connection })
+      await sendTransaction({
+        transaction,
+        wallet,
+        connection,
+        sendingMessage: 'Sending redeem MNGO transaction...',
+        successMessage: 'MNGO redeemed successfully!',
+      })
 
       await Promise.all([
         actions.fetchPool(),

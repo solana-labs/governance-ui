@@ -24,14 +24,14 @@ const PoolInfoCards = () => {
 
   return (
     <div className="max-w-7xl flex flex-wrap mx-auto px-6 mb-16 z-10">
-      <Card title="Deposits closing in">
+      <Card title="Sale Period Ends">
         <PoolCountdown date={endDeposits} />
       </Card>
 
-      <Card title="Sale event ends in">
+      <Card title="Grace Period Ends">
         <PoolCountdown date={endIdo} />
       </Card>
-      <Card title="Total contributions">
+      <Card title="USDC Contributed">
         <div className="flex">
           <img
             alt="USDC"
@@ -45,7 +45,7 @@ const PoolInfoCards = () => {
           </div>
         </div>
       </Card>
-      <Card title="Total $MNGO for sale">
+      <Card title="MNGO For Sale">
         <div className="flex">
           <img className="h-7 mr-2 w-auto" src="/logo.svg" alt="MNGO" />
           <div className="font-bold text-fgd-1 text-xl">

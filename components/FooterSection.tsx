@@ -136,7 +136,7 @@ const FooterSection = () => {
                         >
                           Perpetual Futures
                         </a>{' '}
-                        <MangoPill />
+                        <MangoPill>SOON</MangoPill>
                       </li>
                       <li className="mb-4">
                         <a

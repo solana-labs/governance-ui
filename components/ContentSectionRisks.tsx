@@ -1,4 +1,4 @@
-//import LinkLeft from "./LinkLeft"
+import LinkLeft from './LinkLeft'
 
 const ContentSectionRisks = () => {
   return (
@@ -80,11 +80,13 @@ const ContentSectionRisks = () => {
                 distributing MNGO from the DAO will be inflationary.
                 <br />
                 <br />
-                {/*  
-                      <a rel="noreferrer" target="_blank" href="https://docs.mango.markets/mango-v3/liquidity-incentives">
-                      <LinkLeft>Learn about it in the docs</LinkLeft>
-                      </a>
-                      */}
+                <a
+                  rel="noreferrer"
+                  target="_blank"
+                  href="https://docs.mango.markets/mango-v3/liquidity-incentives"
+                >
+                  <LinkLeft>Learn about it in the docs</LinkLeft>
+                </a>
               </p>
             </div>
           </div>

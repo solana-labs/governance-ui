@@ -5,6 +5,7 @@ import ContentSectionAbout from '../components/ContentSectionAbout'
 import ContentSectionSale from '../components/ContentSectionSale'
 import ContentSectionRisks from '../components/ContentSectionRisks'
 import FooterSection from '../components/FooterSection'
+import ScrollToTop from '../components/ScrollToTop'
 
 const ContributionPage = () => {
   return (
@@ -16,6 +17,7 @@ const ContributionPage = () => {
       <ContentSectionRisks />
       <ModalSection />
       <FooterSection />
+      <ScrollToTop />
     </>
   )
 }
