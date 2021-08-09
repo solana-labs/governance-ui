@@ -26,10 +26,10 @@ import { calculateNativeAmountUnsafe } from '../utils/balance'
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet-beta',
-    url: 'https://api.mainnet-beta.solana.com/',
-    websocket: 'https://api.mainnet-beta.solana.com/',
-    programId: '',
-    poolKey: '',
+    url: 'https://mango.rpcpool.com/',
+    websocket: 'https://mango.rpcpool.com/',
+    programId: '6QXNNAPkPsWjd1j3qQJTvRFgSNPARMhF2tE8g1WeGyrM',
+    poolKey: 'AHBj9LAjxStT2YQHN6QdfHKpZLtEVr8ACqeFgYcPsTnr',
   },
   {
     name: 'devnet',
@@ -52,7 +52,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
 ]
 
-const CLUSTER = 'devnet'
+const CLUSTER = 'mainnet-beta'
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')

@@ -22,8 +22,13 @@ module.exports = {
         'risk-two': "url('../public/img/risk2.png')",
         'risk-three': "url('../public/img/risk3.png')",
         'risk-four': "url('../public/img/risk4.png')",
+        'redeem-one': "url('../public/img/redeem1.png')",
+        'redeem-two': "url('../public/img/redeem2.png')",
+        'redeem-three': "url('../public/img/redeem3.png')",
+        'redeem-four': "url('../public/img/redeem4.png')",
       }),
       height: {
+        350: '350px',
         550: '550px',
         650: '650px',
         750: '750px',

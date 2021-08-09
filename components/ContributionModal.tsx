@@ -172,7 +172,7 @@ const ContributionModal = () => {
 
   return (
     <>
-      <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-lg shadow-md z-10">
+      <div className="flex-1 flex-col bg-bkg-2 border border-bkg-3 p-7 rounded-xl shadow-md z-10">
         <div className="pb-4 text-center">
           {!submitted &&
             !submitting &&
@@ -180,7 +180,7 @@ const ContributionModal = () => {
             !(connected && toLateToDeposit) && (
               <>
                 <h2>The journey starts here.</h2>
-                <p>When you&apos;re ready, deposit your USDC</p>
+                <p>When you&apos;re ready, deposit your USDC.</p>
               </>
             )}
 
@@ -191,13 +191,13 @@ const ContributionModal = () => {
             toLateToDeposit && (
               <>
                 <h2>We&apos;re sorry, you missed it.</h2>
-                <p>The sale period has ended</p>
+                <p>The sale period has ended.</p>
               </>
             )}
 
           {!submitted && submitting && (
             <>
-              <h2>Approve the transaction</h2>
+              <h2>Approve the transaction.</h2>
               <p>Almost there...</p>
             </>
           )}
@@ -205,21 +205,21 @@ const ContributionModal = () => {
           {submitted && !submitting && (
             <>
               <h2>
-                You&apos;ve contributed ${usdFormat.format(contributionAmount)}
+                You&apos;ve contributed ${usdFormat.format(contributionAmount)}.
               </h2>
-              <p>Unlock to edit your contribution amount</p>
+              <p>Unlock to edit your contribution amount.</p>
             </>
           )}
 
           {editContribution && !submitting && (
             <>
               <h2>
-                You&apos;ve contributed ${usdFormat.format(redeemableBalance)}
-              </h2>{' '}
+                You&apos;ve contributed ${usdFormat.format(redeemableBalance)}.
+              </h2>
               <p>
                 {endDeposits?.isBefore() && endIdo?.isAfter()
                   ? 'You can only reduce your contribution during the grace period. Reducing cannot be reversed.'
-                  : 'Increase or reduce your contribution'}
+                  : 'Increase or reduce your contribution.'}
               </p>
             </>
           )}
