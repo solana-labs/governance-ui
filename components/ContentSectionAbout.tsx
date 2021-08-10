@@ -88,7 +88,8 @@ const ContentSectionAbout = () => {
                     </div>
                     <div className="col-span-3 md:col-span-1 lg:col-span-1  m-1 p-1">
                       <p className="text-mango-red font-bold text-base my-2">
-                        Insurance Fund (Token Sale)
+                        Insurance Fund{' '}
+                        <span className="text-gray-500">(Token Sale)</span>
                       </p>
                       <p className="text-white text-opacity-70">
                         5% of MNGO tokens will be used to capitalize the
