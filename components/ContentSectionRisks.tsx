@@ -68,13 +68,13 @@ const ContentSectionRisks = () => {
               </h3>
               <p className="text-white text-opacity-70 text-base">
                 Mango will be running its own on-chain order books to allow
-                perpetual swap trading. In order to attract sophisticed traders
+                perpetual swap trading. In order to attract sophisticated traders
                 with the technical expertise to become market makers, the
                 protocol will need to provide very generous liquidity mining
                 rewards.
                 <br />
                 <br />
-                We were inspired from bitcoins emission schedule in our design,
+                We were inspired by Bitcoin's emission schedule in our design,
                 but the mechanism is genuinely unproven in this context and
                 potentially could be exploited. Even if it operates correctly,
                 distributing MNGO from the DAO will be inflationary.
