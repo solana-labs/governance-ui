@@ -11,10 +11,10 @@ const ContentSectionRedeem = () => {
           <div className="max-w-7xl mx-auto py-16">
             <div className="max-w-4xl mb-24 mx-auto text-center">
               <h2 className="mb-4 text-3xl md:text-4xl lg:text-4xl text-white font-bold font-heading">
-                Now what?
+                A new journey begins...
               </h2>
               <p className="text-xl md:text-2xl lg:text-2xl text-white text-opacity-70">
-                The journey has just begun, here&apos;s what happens next
+                Here&apos;s what happens next.
               </p>
             </div>
             <section className="">
@@ -24,22 +24,19 @@ const ContentSectionRedeem = () => {
                     <div className="py-4 px-8 mt-3">
                       <div className="flex flex-col mb-8">
                         <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                          With power comes great responsibility
+                          With power comes great responsibility.
                         </h2>
+                        <p className="mb-2 text-white text-opacity-70 text-base">
+                          Mango is the first DAO on solana to use on-chain
+                          governance and as MNGO holders we all have a stake in
+                          driving the future of Mango. The governance mechanism
+                          is already functional and MNGO tokens are used to both
+                          bring proposals to the DAO and vote on said proposals.
+                        </p>
                         <p className="text-white text-opacity-70 text-base">
-                          Mango is the first DAO on Solana to use on-chain
-                          governance, this is a big step towrds complete
-                          decentralization. It means that founding members do
-                          not control the DAO, the DAO is actually controlled by
-                          all of us; the MNGO holders.
-                          <br />
-                          <br />
-                          As MNGO holders our highest responsibility is to
-                          command and protect the DAO and it&apos;s value.
-                          Holders have the responsibility to make the rules and
-                          decide on the protocols future. Together we will build
-                          the constitution, together we will push for progress,
-                          together we will grow the protocol.{' '}
+                          There&apos;ll be kinks to iron out as we get up and
+                          running but as DAO members, we are all in this
+                          together. Cementing the Mango Constitution on-chain.
                         </p>
                       </div>
                     </div>
@@ -50,18 +47,18 @@ const ContentSectionRedeem = () => {
                     <div className="py-4 px-8 mt-3">
                       <div className="flex flex-col mb-8">
                         <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                          MNGO in the pool?
+                          Life is cool in the Raydium pool.
                         </h2>
+                        <p className="mb-2 text-white text-opacity-70 text-base">
+                          The plan is to launch Mango v3 with MNGO as one of the
+                          tradable assets. To do this, we need the liquidity for
+                          MNGO to be somewhere close to other assets traded on
+                          Serum DEX.
+                        </p>
                         <p className="text-white text-opacity-70 text-base">
-                          We all want MNGO to be traded on Mango V3 at launch.
-                          This means MNGO needs liquidity on-par with other top
-                          traded tokens on serum. There are no backroom deals,
-                          no one officially to make markets for us.
-                          <br />
-                          <br />
-                          We will be creating a Raydium pool with incentives to
-                          help provide initial liquidity but we also need the
-                          community to add liquidity to the pool and orderbooks.
+                          As no deals were done with market makers to provide
+                          liquidity, it will be up to MNGO holders to jump in
+                          the Raydium pool and create liquidity for MNGO.
                         </p>
                       </div>
                     </div>
@@ -75,14 +72,19 @@ const ContentSectionRedeem = () => {
                     <div className="py-4 px-8 mt-3">
                       <div className="flex flex-col mb-8">
                         <h2 className="text-white font-semibold text-xl tracking-wide mb-2">
-                          MNGO holder &amp; maker of markets
+                          Mango Market Makers United.
                         </h2>
-                        <p className="text-white text-opacity-70 text-base">
-                          Provide liquidity on the upcoming perp markets, the
-                          DAO will vote on liquidity incentives for perp
-                          markets,
+                        <p className="mb-2 text-white text-opacity-70 text-base">
+                          Become a market maker and provide liquidity on the
+                          Mango v3 perp markets (coming soon). Get started with
+                          our example market making bot. Bonus points if you can
+                          deploy it on-chain.
                         </p>
-                        <LinkLeft>link to SDK</LinkLeft>
+                        <p className="mb-4 text-white text-opacity-70 text-base">
+                          There&apos;ll be a DAO proposal to decide on liquidity
+                          incentives for market making on Mango v3.
+                        </p>
+                        <LinkLeft className="mb-2">link to SDK</LinkLeft>
                         <LinkLeft>link to docs with devnet tutorial</LinkLeft>
                       </div>
                     </div>
@@ -117,21 +119,18 @@ const ContentSectionRedeem = () => {
               <div className="pt-10 pb-12 px-6 sm:pt-16 sm:px-16 lg:py-16 lg:pr-0 xl:py-20 xl:px-20 h-350">
                 <div className="lg:self-center">
                   <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
-                    <span className="block">Join the Discord</span>
+                    <span className="block">Join us on Discord.</span>
                   </h2>
                   <p className="mt-4 text-xl leading-6 text-white text-opacity-50">
-                    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                    do eiusmod tempor incididunt ut labore et dolore magna
-                    aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-                    ullamco laboris nisi ut aliquip ex ea commodo consequat.{' '}
+                    The official Mango community lives on Discord.
                   </p>
                   <div className="py-8">
                     <a
                       rel="noreferrer"
                       target="_blank"
-                      href="https://trade.mango.markets"
+                      href="https://discord.gg/67jySBhxrgs"
                     >
-                      <Button>Start trading now</Button>
+                      <Button>Get Involved</Button>
                     </a>
                   </div>
                 </div>
