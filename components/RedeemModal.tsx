@@ -76,8 +76,7 @@ const RedeemModal = () => {
         <div className="pb-4 text-center">
           {!submitting ? (
             <>
-              <h2>Redeem your MNGO.</h2>
-              <p>Welcome to the DAO, let&apos;s build together.</p>
+              <h2>Redeem your MNGO</h2>
             </>
           ) : null}
 
