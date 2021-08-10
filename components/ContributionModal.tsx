@@ -170,7 +170,7 @@ const ContributionModal = () => {
 
   const dontAddMore =
     endDeposits?.isBefore() && contributionAmount > redeemableBalance
-  const disableSubmit = disableFormInputs || walletAmount <= 0 || dontAddMore
+  const disableSubmit = disableFormInputs || difference == 0 || dontAddMore
 
   return (
     <>
