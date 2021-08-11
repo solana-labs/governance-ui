@@ -109,8 +109,10 @@ export default function useWallet() {
 
   // refresh usdc vault regularly
   useInterval(async () => {
-    actions.fetchUsdcVault()
-  }, 20 * SECONDS)
+    await actions.fetchUsdcVault()
+    await actions.fetchMNGOVault()
+    await actions.fetchRedeemableMint()
+  }, 10 * SECONDS)
 
   return { connected, wallet }
 }

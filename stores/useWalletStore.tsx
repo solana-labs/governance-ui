@@ -186,7 +186,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         connection,
         pool.poolUsdc
       )
-      console.log('fetchUsdcVault', vault)
+      // console.log('fetchUsdcVault', vault)
 
       set((state) => {
         state.usdcVault = vault
@@ -200,6 +200,41 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
 
       const mintKeys = [mangoVault.mint, usdcVault.mint, pool.redeemableMint]
+      const mints = await Promise.all(
+        mintKeys.map((pk) => getMint(connection, pk))
+      )
+      // console.log('fetchMints', mints)
+
+      set((state) => {
+        for (const pa of mints) {
+          state.mints[pa.publicKey.toBase58()] = pa.account
+          // console.log('mint', pa.publicKey.toBase58(), pa.account)
+        }
+      })
+    },
+    async fetchMNGOVault() {
+      const connection = get().connection.current
+      const pool = get().pool
+      const set = get().set
+
+      if (!pool) return
+
+      const { account: vault } = await getTokenAccount(
+        connection,
+        pool.poolWatermelon
+      )
+      // console.log('fetchMNGOVault', vault)
+
+      set((state) => {
+        state.mangoVault = vault
+      })
+    },
+    async fetchRedeemableMint() {
+      const connection = get().connection.current
+      const pool = get().pool
+      const set = get().set
+
+      const mintKeys = [pool.redeemableMint]
       const mints = await Promise.all(
         mintKeys.map((pk) => getMint(connection, pk))
       )
