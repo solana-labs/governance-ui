@@ -159,7 +159,7 @@ const RedeemModal = () => {
                   disabled={disableSubmit}
                 >
                   <div className={`flex items-center justify-center`}>
-                    Redeem {redeemableBalance} MNGO
+                    Go MNGO
                   </div>
                 </Button>
               </div>

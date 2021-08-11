@@ -68,9 +68,9 @@ const ContentSectionRisks = () => {
               </h3>
               <p className="text-white text-opacity-70 text-base">
                 Mango will be running its own on-chain order books to allow
-                perpetual swap trading. In order to attract sophisticated traders
-                with the technical expertise to become market makers, the
-                protocol will need to provide very generous liquidity mining
+                perpetual swap trading. In order to attract sophisticated
+                traders with the technical expertise to become market makers,
+                the protocol will need to provide very generous liquidity mining
                 rewards.
                 <br />
                 <br />

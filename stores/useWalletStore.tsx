@@ -27,7 +27,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet-beta',
     url: 'https://cache-mango.rpcpool.com',
-    websocket: 'https://cache-mango.rpcpool.com/cache',
+    websocket: 'https://cache-mango.rpcpool.com',
     programId: '6QXNNAPkPsWjd1j3qQJTvRFgSNPARMhF2tE8g1WeGyrM',
     poolKey: 'AHBj9LAjxStT2YQHN6QdfHKpZLtEVr8ACqeFgYcPsTnr',
   },
