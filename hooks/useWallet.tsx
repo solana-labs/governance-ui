@@ -10,6 +10,7 @@ import {
 
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
+import usePool from './usePool'
 
 const SECONDS = 1000
 
@@ -22,6 +23,8 @@ export default function useWallet() {
     set: setWalletStore,
     actions,
   } = useWalletStore((state) => state)
+
+  const { endIdo } = usePool()
   const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
     'walletProvider',
     DEFAULT_PROVIDER.url
@@ -109,9 +112,12 @@ export default function useWallet() {
 
   // refresh usdc vault regularly
   useInterval(async () => {
-    await actions.fetchUsdcVault()
-    await actions.fetchMNGOVault()
-    await actions.fetchRedeemableMint()
+    if (endIdo.isAfter()) {
+      await actions.fetchUsdcVault()
+    } else {
+      await actions.fetchMNGOVault()
+      await actions.fetchRedeemableMint()
+    }
   }, 10 * SECONDS)
 
   return { connected, wallet }
