@@ -26,7 +26,7 @@ export function getUnixTs() {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 30000
+const DEFAULT_TIMEOUT = 31000
 
 export async function sendTransaction({
   transaction,
@@ -137,7 +137,7 @@ export async function sendSignedTransaction({
       connection.sendRawTransaction(rawTransaction, {
         skipPreflight: true,
       })
-      await sleep(300)
+      await sleep(3000)
     }
   })()
   try {
@@ -251,7 +251,7 @@ async function awaitTransactionSignatureConfirmation(
             }
           }
         })()
-        await sleep(300)
+        await sleep(3000)
       }
     })()
   })
