@@ -26,15 +26,15 @@ import { calculateNativeAmountUnsafe } from '../utils/balance'
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet-beta',
-    url: 'https://cache-mango.rpcpool.com',
-    websocket: 'https://cache-mango.rpcpool.com',
+    url: 'https://mango.rpcpool.com',
+    websocket: 'https://mango.rpcpool.com',
     programId: '6QXNNAPkPsWjd1j3qQJTvRFgSNPARMhF2tE8g1WeGyrM',
     poolKey: 'AHBj9LAjxStT2YQHN6QdfHKpZLtEVr8ACqeFgYcPsTnr',
   },
   {
     name: 'devnet',
-    url: 'https://cache.devnet.rpcpool.com',
-    websocket: 'https://cache.devnet.rpcpool.com',
+    url: 'https://api.devnet.solana.com',
+    websocket: 'https://api.devnet.solana.com',
     programId: '2oBtRS2AAQfsMxXQfg41fKFY9zjvHwSSD7G5idrCFziV', // owned by devnet key
     // programId: 'CRU6hX2GgtdabESgkoMswMrUdRFxHhCVYmS292VN1Nnn', // owned by governance
     //poolKey: 'GvSyVjGwLBeWdURMLDmSffQPqA8g547A6TURbbBnDpa4', // governance test
