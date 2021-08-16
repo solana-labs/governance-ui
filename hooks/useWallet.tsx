@@ -10,7 +10,6 @@ import {
 
 import useInterval from './useInterval'
 import useLocalStorageState from './useLocalStorageState'
-import usePool from './usePool'
 
 const SECONDS = 1000
 
@@ -24,7 +23,6 @@ export default function useWallet() {
     actions,
   } = useWalletStore((state) => state)
 
-  const { endIdo } = usePool()
   const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
     'walletProvider',
     DEFAULT_PROVIDER.url
@@ -42,6 +40,7 @@ export default function useWallet() {
   useEffect(() => {
     if (provider) {
       const updateWallet = () => {
+        console.log('updateWallet', setWalletStore)
         // hack to also update wallet synchronously in case it disconnects
         const wallet = new provider.adapter(
           provider.url,
@@ -80,7 +79,6 @@ export default function useWallet() {
           '...' +
           wallet.publicKey.toString().substr(-5),
       })
-      await actions.fetchPool()
       await actions.fetchWalletTokenAccounts()
     })
     wallet.on('disconnect', () => {
@@ -101,23 +99,18 @@ export default function useWallet() {
     }
   }, [wallet])
 
-  // fetch pool on page load
+  // fetch on page load
   useEffect(() => {
     const pageLoad = async () => {
-      await actions.fetchPool()
-      actions.fetchMints()
+      console.log('pageLoad')
+      await actions.fetchProposals()
     }
     pageLoad()
   }, [])
 
-  // refresh usdc vault regularly
+  // refresh regularly
   useInterval(async () => {
-    if (endIdo.isAfter()) {
-      await actions.fetchUsdcVault()
-    } else {
-      await actions.fetchMNGOVault()
-      await actions.fetchRedeemableMint()
-    }
+    console.log('refresh')
   }, 10 * SECONDS)
 
   return { connected, wallet }
