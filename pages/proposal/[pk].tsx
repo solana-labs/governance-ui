@@ -27,7 +27,7 @@ const Proposal = () => {
       <div className="m-10">
         <h1>{title}</h1>
         <p>{description}</p>
-        <span>{pk.toString()}</span>
+        <span>{pk?.toString()}</span>
       </div>
     </>
   )
