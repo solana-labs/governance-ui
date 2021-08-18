@@ -32,9 +32,14 @@ const DAO = () => {
   const { symbol } = router.query
 
   const { fetchRealm } = useWalletStore((s) => s.actions)
+  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletStore((s) => s.current)
+  const realms = useWalletStore((s) => s.realms)
   const governances = useWalletStore((s) => s.governances)
   const proposals = useWalletStore((s) => s.proposals)
   const votes = useWalletStore((s) => s.votes)
+  const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
+  const tokenRecords = useWalletStore((s) => s.tokenRecords)
 
   const realmInfo = useMemo(() => REALMS.find((r) => r.symbol === symbol), [
     symbol,
@@ -45,6 +50,10 @@ const DAO = () => {
       fetchRealm(realmInfo.programId, realmInfo.realmId)
     }
   }, [realmInfo])
+
+  const realm = useMemo(() => {
+    return realmInfo && realms[realmInfo.realmId.toBase58()]
+  }, [realmInfo, realms])
 
   const realmGovernances = useMemo(() => {
     return realmInfo
@@ -72,10 +81,52 @@ const DAO = () => {
     )
   }, [realmGovernances, proposals])
 
+  const realmTokenAccount = useMemo(
+    () =>
+      realm &&
+      tokenAccounts.find((a) =>
+        a.account.mint.equals(realm.info.communityMint)
+      ),
+    [realm, tokenAccounts]
+  )
+
+  console.log(
+    'governance page tokenAccounts',
+    tokenAccounts,
+    realmTokenAccount && realmTokenAccount.publicKey.toBase58()
+  )
+
+  console.log(
+    'governance page wallet',
+    wallet?.connected && wallet.publicKey.toBase58()
+  )
+
+  const realmTokenRecord = useMemo(
+    () => wallet?.connected && tokenRecords[wallet.publicKey.toBase58()],
+    [tokenRecords, wallet, connected]
+  )
+
+  console.log(
+    'governance page tokenRecord',
+    wallet?.connected && realmTokenRecord
+  )
+
   return (
     <>
       <div className="m-10">
         <h1>{symbol}</h1>
+        <p>
+          in Wallet:{' '}
+          {realmTokenAccount
+            ? realmTokenAccount.account.amount.toString()
+            : 'N/A'}
+        </p>
+        <p>
+          in Governance:{' '}
+          {realmTokenRecord
+            ? realmTokenRecord.info.governingTokenDepositAmount.toNumber()
+            : 'N/A'}
+        </p>
         <p>Proposals:</p>
         {Object.entries(realmProposals).map(([k, v]) => (
           <div className="m-10 p-4 border" key={k}>
@@ -88,6 +139,12 @@ const DAO = () => {
                 </p>
                 <p>{ProposalStateLabels[v.info.state]}</p>
                 <p>Votes {JSON.stringify(votes[k])}</p>
+                <p>
+                  {`Yes Threshold: ${
+                    governances[v.info.governance.toBase58()]?.info.config
+                      .voteThresholdPercentage.value
+                  }%`}
+                </p>
               </a>
             </Link>
           </div>

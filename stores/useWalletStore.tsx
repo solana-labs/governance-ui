@@ -7,6 +7,7 @@ import {
   TokenAccount,
   MintAccount,
   getMint,
+  getOwnedTokenAccounts,
 } from '../utils/tokens'
 import { getGovernanceAccounts, pubkeyFilter } from '../models/api'
 import {
@@ -14,6 +15,7 @@ import {
   Governance,
   Proposal,
   Realm,
+  TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
@@ -42,10 +44,11 @@ interface WalletStore extends State {
     endpoint: string
   }
   current: WalletAdapter | undefined
-  governances: { [pubkey: string]: ParsedAccount<Governance> }
-  proposals: { [pubkey: string]: ParsedAccount<Proposal> }
-  realms: { [pubkey: string]: ParsedAccount<Realm> }
-  votes: { [pubkey: string]: { yes: number; no: number } }
+  governances: { [governance: string]: ParsedAccount<Governance> }
+  proposals: { [proposal: string]: ParsedAccount<Proposal> }
+  realms: { [realm: string]: ParsedAccount<Realm> }
+  tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
+  votes: { [proposal: string]: { yes: number; no: number } }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
   mints: { [pubkey: string]: MintAccount }
@@ -65,11 +68,40 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   governances: {},
   proposals: {},
   realms: {},
+  tokenRecords: {},
   votes: {},
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
   mints: {},
   actions: {
+    async fetchWalletTokenAccounts() {
+      const connection = get().connection.current
+      const connected = get().connected
+      const wallet = get().current
+      const walletOwner = wallet?.publicKey
+      const set = get().set
+
+      if (connected && walletOwner) {
+        const ownedTokenAccounts = await getOwnedTokenAccounts(
+          connection,
+          walletOwner
+        )
+
+        console.log(
+          'fetchWalletTokenAccounts',
+          connected,
+          ownedTokenAccounts.map((t) => t.publicKey.toBase58())
+        )
+
+        set((state) => {
+          state.tokenAccounts = ownedTokenAccounts
+        })
+      } else {
+        set((state) => {
+          state.tokenAccounts = []
+        })
+      }
+    },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
@@ -94,6 +126,36 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       )
 
       console.log('fetchRealm mint', realmMint)
+
+      set(
+        (s) =>
+          (s.mints = Object.assign(
+            {},
+            s.mints,
+            Object.fromEntries([
+              [realmMint.publicKey.toBase58(), realmMint.account],
+            ])
+          ))
+      )
+
+      const tokenRecords = await getGovernanceAccounts<TokenOwnerRecord>(
+        programId,
+        endpoint,
+        TokenOwnerRecord,
+        getAccountTypes(TokenOwnerRecord),
+        [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, realmMint.publicKey)]
+      )
+      const tokenRecordsByOwner = Object.fromEntries(
+        Object.entries(tokenRecords).map(([_k, v]) => [
+          v.info.governingTokenOwner.toBase58(),
+          v,
+        ])
+      )
+      console.log('fetchRealm tokenOwners', tokenRecordsByOwner)
+
+      set((s) => {
+        s.tokenRecords = Object.assign({}, s.tokenRecords, tokenRecordsByOwner)
+      })
 
       const governances = await getGovernanceAccounts<Governance>(
         programId,
@@ -143,23 +205,26 @@ const useWalletStore = create<WalletStore>((set, get) => ({
             [pubkeyFilter(1, proposalId)]
           )
 
+          const precision = Math.pow(10, 6)
           const yes =
             Object.values(voteRecords)
               .map((v) => v.info.voteWeight.yes)
               .filter((v) => !!v)
               .reduce((acc, cur) => acc.add(cur), new BN(0))
-              .mul(new BN(100000))
+              .mul(new BN(precision))
               .div(realmMint.account.supply)
-              .toNumber() / 1000
+              .toNumber() *
+            (100 / precision)
 
           const no =
             Object.values(voteRecords)
               .map((v) => v.info.voteWeight.no)
               .filter((v) => !!v)
               .reduce((acc, cur) => acc.add(cur), new BN(0))
-              .mul(new BN(100000))
+              .mul(new BN(precision))
               .div(realmMint.account.supply)
-              .toNumber() / 1000
+              .toNumber() *
+            (100 / precision)
 
           return [proposalId.toBase58(), { yes, no }]
         })

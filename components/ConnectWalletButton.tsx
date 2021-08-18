@@ -41,19 +41,31 @@ const CheckIcon = (props) => (
 )
 
 const ConnectWalletButton = (props) => {
-  const { connected, providerUrl, set: setWalletStore } = useWalletStore(
-    (s) => s
-  )
+  const {
+    connected,
+    current,
+    providerUrl,
+    set: setWalletStore,
+  } = useWalletStore((s) => s)
 
   const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
     providerUrl,
   ])
+
+  const handleConnectDisconnect = () => {
+    if (connected) {
+      current.disconnect()
+    } else {
+      current.connect()
+    }
+  }
 
   return (
     <div className="flex">
       <Button
         className={`h-9 z-30 px-8 flex items-center`}
         gray={connected}
+        onClick={handleConnectDisconnect}
         {...props}
       >
         <LinkIcon className="h-4 w-4 mr-2" />
