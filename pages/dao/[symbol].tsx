@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useEffect } from 'react'
 import { RealmInfo } from '../../@types/types'
 import useWalletStore from '../../stores/useWalletStore'
+import moment from 'moment'
 
 export const REALMS: RealmInfo[] = [
   {
@@ -14,6 +15,18 @@ export const REALMS: RealmInfo[] = [
   },
 ]
 
+export const ProposalStateLabels = {
+  0: 'Draft',
+  1: 'Draft',
+  2: 'Active',
+  3: 'Approved',
+  4: 'Approved',
+  5: 'Approved',
+  6: 'Cancelled',
+  7: 'Denied',
+  8: 'Error',
+}
+
 const DAO = () => {
   const router = useRouter()
   const { symbol } = router.query
@@ -21,6 +34,7 @@ const DAO = () => {
   const { fetchRealm } = useWalletStore((s) => s.actions)
   const governances = useWalletStore((s) => s.governances)
   const proposals = useWalletStore((s) => s.proposals)
+  const votes = useWalletStore((s) => s.votes)
 
   const realmInfo = useMemo(() => REALMS.find((r) => r.symbol === symbol), [
     symbol,
@@ -43,22 +57,20 @@ const DAO = () => {
   }, [realmInfo, governances])
 
   const realmProposals = useMemo(() => {
-    return realmInfo
-      ? Object.fromEntries(
-          Object.entries(proposals)
-            .filter(
-              ([_k, v]) =>
-                Object.keys(realmGovernances).includes(
-                  v.info.governance.toBase58()
-                ) && v.info.votingAtSlot
-            )
-            .sort(
-              (a, b) =>
-                b[1].info.votingAt.toNumber() - a[1].info.votingAt.toNumber()
-            )
+    return Object.fromEntries(
+      Object.entries(proposals)
+        .filter(
+          ([_k, v]) =>
+            Object.keys(realmGovernances).includes(
+              v.info.governance.toBase58()
+            ) && v.info.votingAtSlot
         )
-      : {}
-  }, [realmInfo, realmGovernances, proposals])
+        .sort(
+          (a, b) =>
+            b[1].info.votingAt.toNumber() - a[1].info.votingAt.toNumber()
+        )
+    )
+  }, [realmGovernances, proposals])
 
   return (
     <>
@@ -71,7 +83,11 @@ const DAO = () => {
               <a>
                 <h3>{v.info.name}</h3>
                 <p>{v.info.descriptionLink}</p>
-                <p>{v.info.state}</p>
+                <p>
+                  {moment.unix(v.info.votingCompletedAt.toNumber()).fromNow()}
+                </p>
+                <p>{ProposalStateLabels[v.info.state]}</p>
+                <p>Votes {JSON.stringify(votes[k])}</p>
               </a>
             </Link>
           </div>
