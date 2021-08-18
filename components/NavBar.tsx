@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
-import MangoPill from '../components/MangoPill'
+import MangoPill from './MangoPill'
 // import Button from './Button'
 
-const NavBarBeta = () => {
+const NavBar = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
   const [productMenuVisible, setProductMenuVisible] = useState(false)
   const [supportMenuVisible, setSupportMenuVisible] = useState(false)
@@ -657,4 +657,4 @@ const NavBarBeta = () => {
   )
 }
 
-export default NavBarBeta
+export default NavBar

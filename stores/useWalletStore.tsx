@@ -3,16 +3,22 @@ import produce from 'immer'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { EndpointInfo, WalletAdapter } from '../@types/types'
 import { ProgramAccount, TokenAccount, MintAccount } from '../utils/tokens'
-import { getGovernanceAccounts } from '../models/api'
-import { getAccountTypes, Proposal } from '../models/accounts'
+import { getGovernanceAccounts, pubkeyFilter } from '../models/api'
+import {
+  getAccountTypes,
+  Governance,
+  Proposal,
+  Realm,
+  VoteRecord,
+} from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
+import { ParsedAccount } from '../models/serialisation'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet-beta',
     url: 'https://mango.rpcpool.com',
     websocket: 'https://mango.rpcpool.com',
-    programId: 'GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J',
   },
 ]
 
@@ -20,7 +26,6 @@ const CLUSTER = 'mainnet-beta'
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')
-const PROGRAM_ID = new PublicKey(ENDPOINT.programId)
 
 interface WalletStore extends State {
   connected: boolean
@@ -29,10 +34,12 @@ interface WalletStore extends State {
     current: Connection
     websocket: Connection
     endpoint: string
-    programId: PublicKey
   }
   current: WalletAdapter | undefined
-  proposals: undefined
+  governances: { [pubkey: string]: ParsedAccount<Governance> }
+  proposals: { [pubkey: string]: ParsedAccount<Proposal> }
+  realms: { [pubkey: string]: ParsedAccount<Realm> }
+  votes: { [pubkey: string]: ParsedAccount<VoteRecord> }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
   mints: { [pubkey: string]: MintAccount }
@@ -47,32 +54,58 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     current: DEFAULT_CONNECTION,
     websocket: WEBSOCKET_CONNECTION,
     endpoint: ENDPOINT.url,
-    programId: PROGRAM_ID,
   },
   current: null,
-  proposals: undefined,
+  governances: {},
+  proposals: {},
+  realms: {},
+  votes: {},
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
   mints: {},
   actions: {
-    async fetchProposals() {
+    async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const endpoint = get().connection.endpoint
-      const programId = get().connection.programId
-      const set = get().set
 
-      console.log('fetchProposals', endpoint)
-
-      const proposals = await getGovernanceAccounts(
+      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
+      const governances = await getGovernanceAccounts<Governance>(
         programId,
         endpoint,
-        Proposal,
-        getAccountTypes(Proposal)
+        Governance,
+        getAccountTypes(Governance),
+        [pubkeyFilter(1, realmId)]
+      )
+      console.log('fetchRealm', governances)
+
+      set((s) => {
+        s.governances = Object.assign({}, s.governances, governances)
+      })
+
+      const governanceIds = Object.keys(governances).map(
+        (k) => new PublicKey(k)
       )
 
-      console.log('fetchProposals', proposals)
+      console.log(
+        'fetchRealm',
+        governanceIds.map((id) => id.toBase58())
+      )
 
-      set((state) => {
-        state.proposals = proposals
+      const proposals = await Promise.all(
+        governanceIds.map(async (governanceId) => {
+          return await getGovernanceAccounts<Proposal>(
+            programId,
+            endpoint,
+            Proposal,
+            getAccountTypes(Proposal),
+            [pubkeyFilter(1, governanceId)]
+          )
+        })
+      )
+
+      console.log('fetchRealm', proposals)
+
+      set((s) => {
+        s.proposals = Object.assign({}, s.proposals, ...proposals)
       })
     },
   },

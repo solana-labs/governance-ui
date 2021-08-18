@@ -4,7 +4,12 @@ export interface EndpointInfo {
   name: string
   url: string
   websocket: string
-  programId: string
+}
+
+export interface RealmInfo {
+  symbol: string
+  programId: PublicKey
+  realmId: PublicKey
 }
 
 export interface TokenAccount {
