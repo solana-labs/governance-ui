@@ -68,7 +68,7 @@ async function runNotifier() {
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
 
-    console.log(`${Date.now()} -- processing ${proposal.info.name}`)
+    console.log(`-- processing ${proposal.info.name}`)
 
     if (
       // voting is closed
@@ -87,7 +87,7 @@ async function runNotifier() {
       nowInSeconds - proposal.info.signingOffAt.toNumber() <=
       fiveMinutesSeconds
     ) {
-      const msg = `${proposal.info.name} proposal just opened for voting`
+      const msg = `--- ${proposal.info.name} proposal just opened for voting`
       console.log(msg)
       axios.post(process.env.WEBHOOK_URL, { msg })
     }
