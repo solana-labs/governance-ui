@@ -65,8 +65,8 @@ async function runNotifier() {
   )
 
   console.log(`- scanning all proposals`)
-  var countJustOpened = 0
-  var countSkipped = 0
+  let countJustOpened = 0
+  let countSkipped = 0
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
 
