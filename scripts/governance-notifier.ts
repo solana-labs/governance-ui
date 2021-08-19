@@ -70,8 +70,6 @@ async function runNotifier() {
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
 
-    console.log(`-- processing ${proposal.info.name}`)
-
     if (
       // voting is closed
       proposal.info.votingCompletedAt
