@@ -64,7 +64,9 @@ async function runNotifier() {
     )
   )
 
-  console.log(`${Date.now()} - scanning all proposals`)
+  console.log(`- scanning all proposals`)
+  var countJustOpened = 0
+  var countSkipped = 0
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
 
@@ -73,25 +75,35 @@ async function runNotifier() {
     if (
       // voting is closed
       proposal.info.votingCompletedAt
-    )
+    ) {
       continue
+      countSkipped++
+    }
 
     if (
       // not yet signed i.e. only in draft
       !proposal.info.signingOffAt
-    )
+    ) {
       continue
+      countSkipped++
+    }
 
     if (
       // proposal opened in last 5 mins
       nowInSeconds - proposal.info.signingOffAt.toNumber() <=
       fiveMinutesSeconds
     ) {
+      countJustOpened++
       const msg = `--- ${proposal.info.name} proposal just opened for voting`
       console.log(msg)
-      axios.post(process.env.WEBHOOK_URL, { msg })
+      if (process.env.WEBHOOK_URL) {
+        axios.post(process.env.WEBHOOK_URL, { msg })
+      }
     }
   }
+  console.log(
+    `-- countJustOpened: ${countJustOpened}, countSkipped: ${countSkipped}`
+  )
 }
 
 setInterval(runNotifier, fiveMinutesSeconds * 1000)
