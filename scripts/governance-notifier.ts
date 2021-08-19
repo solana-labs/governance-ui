@@ -59,31 +59,27 @@ async function runNotifier() {
   )
 
   const realmProposals = Object.fromEntries(
-    Object.entries(proposals)
-      .filter(
-        ([_k, v]) =>
-          Object.keys(realmGovernances).includes(
-            v.info.governance.toBase58()
-          ) && v.info.votingAtSlot
-      )
-      .sort(
-        (a, b) => b[1].info.votingAt.toNumber() - a[1].info.votingAt.toNumber()
-      )
+    Object.entries(proposals).filter(
+      ([_k, v]) =>
+        Object.keys(realmGovernances).includes(v.info.governance.toBase58()) &&
+        v.info.votingAtSlot
+    )
   )
 
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
+
     if (
       // voting is closed
       proposal.info.votingCompletedAt
     )
-      return
+      continue
 
     if (
       // not yet signed i.e. only in draft
-      proposal.info.signingOffAt === null
+      !proposal.info.signingOffAt
     )
-      return
+      continue
 
     const fiveMinutesSeconds = 5 * 60
     if (
