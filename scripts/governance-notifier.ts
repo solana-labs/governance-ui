@@ -2,11 +2,9 @@ import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { RealmInfo } from '../@types/types'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
-import { getGovernanceAccounts, pubkeyFilter } from '../models/api'
 import { ParsedAccount } from '../models/serialisation'
 import { ENDPOINTS } from '../stores/useWalletStore'
-
-global.fetch = require('node-fetch')
+import { getGovernanceAccounts, pubkeyFilter } from './api'
 
 const fiveMinutesSeconds = 5 * 60
 
