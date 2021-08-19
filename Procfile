@@ -1,1 +1,1 @@
-web: npm run notifier
+worker: npm run notifier
