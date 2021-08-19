@@ -5,7 +5,7 @@ const TopBar = () => {
         <div className={`flex justify-between h-16`}>
           <div className={`flex`}>
             <div className={`flex-shrink-0 flex items-center`}>
-              <img className={`h-8 w-auto`} src="/logo.svg" alt="logo" />
+              <img className={`h-6 w-auto`} src="/logo.svg" alt="logo" />
             </div>
           </div>
         </div>

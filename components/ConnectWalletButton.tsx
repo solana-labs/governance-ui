@@ -1,103 +1,119 @@
+// import { useMemo } from 'react'
+import styled from '@emotion/styled'
+// import useMangoStore from '../stores/useMangoStore'
 import { Menu } from '@headlessui/react'
-import { LinkIcon } from '@heroicons/react/solid'
-import { useMemo } from 'react'
+import { DuplicateIcon, LogoutIcon } from '@heroicons/react/outline'
+// import {
+//   WALLET_PROVIDERS,
+//   DEFAULT_PROVIDER,
+//   PROVIDER_LOCAL_STORAGE_KEY,
+// } from '../hooks/useWallet'
 import useWalletStore from '../stores/useWalletStore'
-import {
-  getWalletProviderByUrl,
-  WALLET_PROVIDERS,
-} from '../utils/wallet-adapters'
-import Button from './Button'
+// import {
+//   getWalletProviderByUrl,
+//   WALLET_PROVIDERS,
+// } from '../utils/wallet-adapters'
+// import useLocalStorageState from '../hooks/useLocalStorageState'
+import { copyToClipboard } from '../utils'
+import WalletSelect from './WalletSelect'
+import { WalletIcon, ProfileIcon } from './icons'
 
-const ChevronDownIcon = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    {...props}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M19 9l-7 7-7-7"
-    ></path>
-  </svg>
-)
+const StyledWalletTypeLabel = styled.div`
+  font-size: 0.65rem;
+`
 
-const CheckIcon = (props) => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-    {...props}
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      d="M5 13l4 4L19 7"
-    ></path>
-  </svg>
-)
+const ConnectWalletButton = () => {
+  const {
+    connected,
+    // providerUrl,
+    // set: setWalletStore
+  } = useWalletStore((s) => s)
 
-const ConnectWalletButton = (props) => {
-  const { connected, providerUrl, set: setWalletStore } = useWalletStore(
-    (s) => s
-  )
+  // const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
+  //   providerUrl,
+  // ])
 
-  const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
-    providerUrl,
-  ])
+  // const wallet = useMangoStore((s) => s.wallet.current)
+  // const connected = useMangoStore((s) => s.wallet.connected)
+  // const set = useMangoStore((s) => s.set)
+  // const [selectedWallet, setSelectedWallet] = useState(DEFAULT_PROVIDER.url)
+  // const [savedProviderUrl] = useLocalStorageState(
+  //   PROVIDER_LOCAL_STORAGE_KEY,
+  //   DEFAULT_PROVIDER.url
+  // )
+
+  // update in useEffect to prevent SRR error from next.js
+  // useEffect(() => {
+  //   setSelectedWallet(savedProviderUrl)
+  // }, [savedProviderUrl])
+
+  const handleWalletConect = () => {
+    // wallet.connect()
+    // set((state) => {
+    //   state.selectedMangoAccount.initialLoad = true
+    // })
+  }
 
   return (
-    <div className="flex">
-      <Button
-        className={`h-9 z-30 px-8 flex items-center`}
-        gray={connected}
-        {...props}
-      >
-        <LinkIcon className="h-4 w-4 mr-2" />
-        {connected ? 'Disconnect' : 'Connect Wallet'}
-      </Button>
-
-      <div className="relative pl-2">
+    <>
+      {connected ? (
         <Menu>
-          {({ open }) => (
-            <>
-              <Menu.Button className="cursor-pointer rounded-full h-9 w-9 py-2 px-2 bg-bkg-4 hover:bg-bkg-3 focus:outline-none">
-                {open ? (
-                  <ChevronDownIcon className="w-4 h-4 m-auto stroke-3" />
-                ) : (
-                  <img src={provider?.icon} className="w-4 h-4 m-auto" />
-                )}
-              </Menu.Button>
-              <Menu.Items className="z-20 w-auto p-2 absolute right-0 top-12 bg-bkg-2 border border-bkg-3 shadow-md outline-none rounded-xl">
-                {WALLET_PROVIDERS.map(({ name, url, icon }) => (
-                  <Menu.Item key={name}>
-                    <button
-                      className="flex p-2 h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded-lg font-normal focus:outline-none"
-                      onClick={() =>
-                        setWalletStore((s) => {
-                          s.providerUrl = url
-                        })
-                      }
-                      style={{ width: '14rem' }}
-                    >
-                      <img src={icon} className="h-4 w-4 mr-2" />
-                      <span className="text-sm">{name}</span>
-
-                      {provider?.url === url ? (
-                        <CheckIcon className="h-4 w-4 stroke-3" />
-                      ) : null}
-                    </button>
-                  </Menu.Item>
-                ))}
-              </Menu.Items>
-            </>
-          )}
+          <div className="relative h-full">
+            <Menu.Button className="bg-bkg-4 flex items-center justify-center rounded-full w-10 h-10 text-white focus:outline-none hover:bg-bkg-3 hover:text-fgd-3">
+              <ProfileIcon className="h-6 w-6" />
+            </Menu.Button>
+            <Menu.Items className="bg-bkg-1 mt-2 p-1 absolute right-0 shadow-lg outline-none rounded-md w-48 z-20">
+              <Menu.Item>
+                <button
+                  className="flex flex-row font-normal items-center rounded-none w-full p-2 hover:bg-bkg-2 hover:cursor-pointer focus:outline-none"
+                  onClick={() => copyToClipboard('wallet?.publicKey')}
+                >
+                  <DuplicateIcon className="h-4 w-4" />
+                  <div className="pl-2 text-left">Copy address</div>
+                </button>
+              </Menu.Item>
+              <Menu.Item>
+                <button
+                  className="flex flex-row font-normal items-center rounded-none w-full p-2 hover:bg-bkg-2 hover:cursor-pointer focus:outline-none"
+                  onClick={() => console.log('wallet.disconnect()')}
+                >
+                  <LogoutIcon className="h-4 w-4" />
+                  <div className="pl-2 text-left">
+                    <div className="pb-0.5">Disconnect</div>
+                    <div className="text-fgd-4 text-xs">
+                      {/* {abbreviateAddress(wallet?.publicKey)} */}
+                    </div>
+                  </div>
+                </button>
+              </Menu.Item>
+            </Menu.Items>
+          </div>
         </Menu>
-      </div>
-    </div>
+      ) : (
+        <div className="bg-bkg-1 h-14 flex divide-x divide-bkg-3 justify-between">
+          <button
+            onClick={handleWalletConect}
+            // disabled={!wallet}
+            className="rounded-none text-primary-light hover:bg-bkg-3 focus:outline-none disabled:text-fgd-4 disabled:cursor-wait"
+          >
+            <div className="flex flex-row items-center px-3 justify-center h-full default-transition hover:text-fgd-1">
+              <WalletIcon className="w-4 h-4 mr-2 fill-current" />
+              <div>
+                <div className="mb-0.5 text-sm whitespace-nowrap">
+                  Connect Wallet
+                </div>
+                <StyledWalletTypeLabel className="font-normal text-fgd-3 text-left leading-3 tracking-wider">
+                  {/* {WALLET_PROVIDERS.find((p) => p.url === selectedWallet)?.name} */}
+                </StyledWalletTypeLabel>
+              </div>
+            </div>
+          </button>
+          <div className="relative h-full">
+            <WalletSelect isPrimary />
+          </div>
+        </div>
+      )}
+    </>
   )
 }
 

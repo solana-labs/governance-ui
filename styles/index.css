@@ -20,8 +20,12 @@ h2 {
   @apply text-xl mb-1 font-bold;
 }
 
+h3 {
+  @apply text-lg mb-1 font-bold;
+}
+
 p {
-  @apply text-fgd-3 text-sm;
+  @apply text-fgd-2 text-sm;
 }
 
 button {
