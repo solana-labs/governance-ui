@@ -74,16 +74,16 @@ async function runNotifier() {
       // voting is closed
       proposal.info.votingCompletedAt
     ) {
-      continue
       countSkipped++
+      continue
     }
 
     if (
       // not yet signed i.e. only in draft
       !proposal.info.signingOffAt
     ) {
-      continue
       countSkipped++
+      continue
     }
 
     if (
