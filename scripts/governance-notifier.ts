@@ -8,6 +8,8 @@ import { ENDPOINTS } from '../stores/useWalletStore'
 
 global.fetch = require('node-fetch')
 
+const fiveMinutesSeconds = 5 * 60
+
 // run every 5 mins, checks if a mngo governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
@@ -59,15 +61,16 @@ async function runNotifier() {
   )
 
   const realmProposals = Object.fromEntries(
-    Object.entries(proposals).filter(
-      ([_k, v]) =>
-        Object.keys(realmGovernances).includes(v.info.governance.toBase58()) &&
-        v.info.votingAtSlot
+    Object.entries(proposals).filter(([_k, v]) =>
+      Object.keys(realmGovernances).includes(v.info.governance.toBase58())
     )
   )
 
+  console.log(`${Date.now()} - scanning all proposals`)
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
+
+    console.log(`${Date.now()} -- processing ${proposal.info.name}`)
 
     if (
       // voting is closed
@@ -81,7 +84,6 @@ async function runNotifier() {
     )
       continue
 
-    const fiveMinutesSeconds = 5 * 60
     if (
       // proposal opened in last 5 mins
       nowInSeconds - proposal.info.signingOffAt.toNumber() <=
@@ -94,4 +96,4 @@ async function runNotifier() {
   }
 }
 
-runNotifier()
+setInterval(runNotifier, fiveMinutesSeconds * 1000)
