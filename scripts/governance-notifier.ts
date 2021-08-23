@@ -7,6 +7,7 @@ import { ENDPOINTS } from '../stores/useWalletStore'
 import { getGovernanceAccounts, pubkeyFilter } from './api'
 
 const fiveMinutesSeconds = 5 * 60
+const toleranceSeconds = 30
 
 // run every 5 mins, checks if a mngo governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
@@ -65,8 +66,9 @@ async function runNotifier() {
   )
 
   console.log(`- scanning all proposals`)
-  let countJustOpened = 0
-  let countSkipped = 0
+  let countJustOpenedForVoting = 0
+  let countVotingNotStartedYet = 0
+  let countClosed = 0
   for (const k in realmProposals) {
     const proposal = realmProposals[k]
 
@@ -74,24 +76,24 @@ async function runNotifier() {
       // voting is closed
       proposal.info.votingCompletedAt
     ) {
-      countSkipped++
+      countClosed++
       continue
     }
 
     if (
-      // not yet signed i.e. only in draft
-      !proposal.info.signingOffAt
+      // voting has not started yet
+      !proposal.info.votingAt
     ) {
-      countSkipped++
+      countVotingNotStartedYet++
       continue
     }
 
     if (
       // proposal opened in last 5 mins
-      nowInSeconds - proposal.info.signingOffAt.toNumber() <=
-      fiveMinutesSeconds
+      nowInSeconds - proposal.info.votingAt.toNumber() <=
+      fiveMinutesSeconds + toleranceSeconds
     ) {
-      countJustOpened++
+      countJustOpenedForVoting++
       const msg = `--- ${proposal.info.name} proposal just opened for voting`
       console.log(msg)
       if (process.env.WEBHOOK_URL) {
@@ -100,7 +102,7 @@ async function runNotifier() {
     }
   }
   console.log(
-    `-- countJustOpened: ${countJustOpened}, countSkipped: ${countSkipped}`
+    `-- countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}`
   )
 }
 
