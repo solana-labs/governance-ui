@@ -1,7 +1,11 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import * as bs58 from 'bs58'
 import { deserializeBorsh } from '../utils/borsh'
-import { GOVERNANCE_SCHEMA, ParsedAccount } from './serialisation'
+import {
+  BorshAccountParser,
+  GOVERNANCE_SCHEMA,
+  ParsedAccount,
+} from './serialisation'
 import {
   GovernanceAccount,
   GovernanceAccountClass,
@@ -178,4 +182,15 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
   }
 
   return accounts
+}
+
+export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
+  connection: Connection,
+  accountPubKey: PublicKey,
+  accountClass: GovernanceAccountClass
+) {
+  const accountInfo = await connection.getAccountInfo(accountPubKey)
+  const account = BorshAccountParser(accountClass)(accountPubKey, accountInfo)
+
+  return account as ParsedAccount<TAccount>
 }
