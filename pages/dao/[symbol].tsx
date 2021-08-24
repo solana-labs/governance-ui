@@ -3,6 +3,7 @@ import Link from 'next/link'
 import useWalletStore from '../../stores/useWalletStore'
 import moment from 'moment'
 import useRealm from '../../hooks/useRealm'
+import BN from 'bn.js'
 
 export const ProposalStateLabels = {
   0: 'Draft',
@@ -22,12 +23,19 @@ const DAO = () => {
 
   const wallet = useWalletStore((s) => s.current)
   const {
+    mint,
     governances,
     proposals,
-    votes,
     realmTokenAccount,
     ownTokenRecord,
   } = useRealm(symbol as string)
+
+  const votePrecision = 10000
+  const formatVoteCount = (c: BN) =>
+    `${
+      c.mul(new BN(votePrecision)).div(mint.supply).toNumber() *
+      (100 / votePrecision)
+    }%`
 
   // DEBUG print remove
   console.log(
@@ -89,7 +97,10 @@ const DAO = () => {
                     </p>
                   )}
                   <p>{ProposalStateLabels[v.info.state]}</p>
-                  <p>Votes {JSON.stringify(votes[k])}</p>
+                  <p>
+                    Votes Yes: {formatVoteCount(v.info.yesVotesCount)} No:{' '}
+                    {formatVoteCount(v.info.noVotesCount)}
+                  </p>
                   <p>
                     {`Yes Threshold: ${
                       governances[v.info.governance.toBase58()]?.info.config

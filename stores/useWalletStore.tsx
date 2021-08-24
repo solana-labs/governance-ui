@@ -16,11 +16,9 @@ import {
   Proposal,
   Realm,
   TokenOwnerRecord,
-  VoteRecord,
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/serialisation'
-import { BN } from '@project-serum/anchor'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -52,7 +50,6 @@ interface WalletStore extends State {
     governances: { [governance: string]: ParsedAccount<Governance> }
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
     tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
-    votes: { [proposal: string]: { yes: number; no: number } }
   }
   selectedProposal: any
   providerUrl: string
@@ -90,7 +87,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     governances: {},
     proposals: {},
     tokenRecords: {},
-    votes: {},
   },
   selectedProposal: {},
   providerUrl: DEFAULT_PROVIDER.url,
@@ -217,49 +213,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedRealm.proposals = proposals
-      })
-
-      const votesByProposal = await Promise.all(
-        mapKeys(proposals, async (p) => {
-          const voteRecords = await getGovernanceAccounts<VoteRecord>(
-            programId,
-            endpoint,
-            VoteRecord,
-            getAccountTypes(VoteRecord),
-            [pubkeyFilter(1, new PublicKey(p))]
-          )
-
-          const precision = Math.pow(10, 6)
-          const yes =
-            Object.values(voteRecords)
-              .map((v) => v.info.voteWeight.yes)
-              .filter((v) => !!v)
-              .reduce((acc, cur) => acc.add(cur), new BN(0))
-              .mul(new BN(precision))
-              .div(realmMint.supply)
-              .toNumber() *
-            (100 / precision)
-
-          const no =
-            Object.values(voteRecords)
-              .map((v) => v.info.voteWeight.no)
-              .filter((v) => !!v)
-              .reduce((acc, cur) => acc.add(cur), new BN(0))
-              .mul(new BN(precision))
-              .div(realmMint.supply)
-              .toNumber() *
-            (100 / precision)
-
-          return [p, { yes, no }]
-        })
-      )
-
-      // TODO: cache votes of finished proposals permanently in local storage to avoid recounting
-
-      console.log('fetchRealm votes', votesByProposal)
-
-      set((s) => {
-        s.selectedRealm.votes = Object.fromEntries(votesByProposal)
       })
     },
   },
