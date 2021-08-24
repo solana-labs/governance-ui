@@ -9,7 +9,7 @@ const Proposal = () => {
 
   const { proposal, instructions } = useProposal(pk as string)
 
-  console.log('proposal dat', { proposal, instructions })
+  console.log('proposal data', { proposal, instructions })
 
   return (
     <>

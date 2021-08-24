@@ -9,7 +9,11 @@ import {
   getMint,
   getOwnedTokenAccounts,
 } from '../utils/tokens'
-import { getGovernanceAccounts, pubkeyFilter } from '../models/api'
+import {
+  getGovernanceAccount,
+  getGovernanceAccounts,
+  pubkeyFilter,
+} from '../models/api'
 import {
   getAccountTypes,
   Governance,
@@ -17,9 +21,10 @@ import {
   ProposalInstruction,
   Realm,
   TokenOwnerRecord,
+  VoteRecord,
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
-import { BorshAccountParser, ParsedAccount } from '../models/serialisation'
+import { ParsedAccount } from '../models/serialisation'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -53,8 +58,11 @@ interface WalletStore extends State {
     tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
   }
   selectedProposal: {
-    proposal: ParsedAccount<Proposal> | undefined
+    proposal: ParsedAccount<Proposal>
+    governance: ParsedAccount<Governance>
+    realm: ParsedAccount<Realm>
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
+    voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -94,7 +102,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   },
   selectedProposal: {
     proposal: null,
+    governance: null,
+    realm: null,
     instructions: {},
+    voteRecords: {},
   },
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
@@ -225,22 +236,65 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
     async fetchProposal(proposalPk: string) {
       const connection = get().connection.current
+      const endpoint = get().connection.endpoint
       const set = get().set
 
-      console.log('fetchProposal', proposalPk)
+      console.log('fetchProposal fetching...', proposalPk)
 
-      const proposalInfo = await connection.getAccountInfo(
-        new PublicKey(proposalPk)
-      )
-      const proposal = BorshAccountParser(Proposal)(
-        new PublicKey(proposalPk),
-        proposalInfo
+      const proposalPubKey = new PublicKey(proposalPk)
+
+      // TODO: Should we try to get proposal, governance, and realm from the store or always from the source?
+
+      const proposal = await getGovernanceAccount<Proposal>(
+        connection,
+        proposalPubKey,
+        Proposal
       )
 
-      console.log('fetchProposal proposal', proposal)
+      const governance = await getGovernanceAccount<Governance>(
+        connection,
+        proposal.info.governance,
+        Governance
+      )
+
+      const realm = await getGovernanceAccount<Realm>(
+        connection,
+        governance.info.realm,
+        Realm
+      )
+
+      const programId = proposal.account.owner
+
+      const instructions = await getGovernanceAccounts<ProposalInstruction>(
+        programId,
+        endpoint,
+        ProposalInstruction,
+        getAccountTypes(ProposalInstruction),
+        [pubkeyFilter(1, proposalPubKey)]
+      )
+
+      const voteRecords = await getGovernanceAccounts<VoteRecord>(
+        programId,
+        endpoint,
+        VoteRecord,
+        getAccountTypes(VoteRecord),
+        [pubkeyFilter(1, proposalPubKey)]
+      )
+
+      console.log('fetchProposal fetched', {
+        governance,
+        proposal,
+        realm,
+        instructions,
+        voteRecords,
+      })
 
       set((s) => {
         s.selectedProposal.proposal = proposal
+        s.selectedProposal.governance = governance
+        s.selectedProposal.realm = realm
+        s.selectedProposal.instructions = instructions
+        s.selectedProposal.voteRecords = voteRecords
       })
     },
   },
