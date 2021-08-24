@@ -14,11 +14,12 @@ import {
   getAccountTypes,
   Governance,
   Proposal,
+  ProposalInstruction,
   Realm,
   TokenOwnerRecord,
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
-import { ParsedAccount } from '../models/serialisation'
+import { BorshAccountParser, ParsedAccount } from '../models/serialisation'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -51,7 +52,10 @@ interface WalletStore extends State {
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
     tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
   }
-  selectedProposal: any
+  selectedProposal: {
+    proposal: ParsedAccount<Proposal> | undefined
+    instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
+  }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
   mints: { [pubkey: string]: MintAccount }
@@ -88,7 +92,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     proposals: {},
     tokenRecords: {},
   },
-  selectedProposal: {},
+  selectedProposal: {
+    proposal: null,
+    instructions: {},
+  },
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
   mints: {},
@@ -213,6 +220,27 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedRealm.proposals = proposals
+      })
+    },
+
+    async fetchProposal(proposalPk: string) {
+      const connection = get().connection.current
+      const set = get().set
+
+      console.log('fetchProposal', proposalPk)
+
+      const proposalInfo = await connection.getAccountInfo(
+        new PublicKey(proposalPk)
+      )
+      const proposal = BorshAccountParser(Proposal)(
+        new PublicKey(proposalPk),
+        proposalInfo
+      )
+
+      console.log('fetchProposal proposal', proposal)
+
+      set((s) => {
+        s.selectedProposal.proposal = proposal
       })
     },
   },
