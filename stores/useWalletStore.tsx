@@ -20,6 +20,7 @@ import {
   Proposal,
   ProposalInstruction,
   Realm,
+  SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts'
@@ -63,6 +64,7 @@ interface WalletStore extends State {
     realm: ParsedAccount<Realm>
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
     voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
+    signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -106,6 +108,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     realm: null,
     instructions: {},
     voteRecords: {},
+    signatories: {},
   },
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
@@ -281,12 +284,21 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         [pubkeyFilter(1, proposalPubKey)]
       )
 
+      const signatories = await getGovernanceAccounts<SignatoryRecord>(
+        programId,
+        endpoint,
+        SignatoryRecord,
+        getAccountTypes(SignatoryRecord),
+        [pubkeyFilter(1, proposalPubKey)]
+      )
+
       console.log('fetchProposal fetched', {
         governance,
         proposal,
         realm,
         instructions,
         voteRecords,
+        signatories,
       })
 
       set((s) => {
@@ -295,6 +307,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = instructions
         s.selectedProposal.voteRecords = voteRecords
+        s.selectedProposal.signatories = signatories
       })
     },
   },
