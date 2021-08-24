@@ -44,16 +44,34 @@ interface WalletStore extends State {
     endpoint: string
   }
   current: WalletAdapter | undefined
-  governances: { [governance: string]: ParsedAccount<Governance> }
-  proposals: { [proposal: string]: ParsedAccount<Proposal> }
+
   realms: { [realm: string]: ParsedAccount<Realm> }
-  tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
-  votes: { [proposal: string]: { yes: number; no: number } }
+  selectedRealm: {
+    realm?: ParsedAccount<Realm>
+    mint?: MintAccount
+    governances: { [governance: string]: ParsedAccount<Governance> }
+    proposals: { [proposal: string]: ParsedAccount<Proposal> }
+    tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
+    votes: { [proposal: string]: { yes: number; no: number } }
+  }
+  selectedProposal: any
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
   mints: { [pubkey: string]: MintAccount }
   set: (x: any) => void
   actions: any
+}
+
+function mapKeys(xs: any, mapFn: (k: string) => any) {
+  return Object.keys(xs).map(mapFn)
+}
+
+function mapEntries(xs: any, mapFn: (kv: any[]) => any[]) {
+  return Object.fromEntries(Object.entries(xs).map(mapFn))
+}
+
+function merge(...os) {
+  return Object.assign({}, ...os)
 }
 
 const useWalletStore = create<WalletStore>((set, get) => ({
@@ -65,14 +83,20 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     endpoint: ENDPOINT.url,
   },
   current: null,
-  governances: {},
-  proposals: {},
   realms: {},
-  tokenRecords: {},
-  votes: {},
+  selectedRealm: {
+    realm: null,
+    mint: null,
+    governances: {},
+    proposals: {},
+    tokenRecords: {},
+    votes: {},
+  },
+  selectedProposal: {},
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
   mints: {},
+  set: (fn) => set(produce(fn)),
   actions: {
     async fetchWalletTokenAccounts() {
       const connection = get().connection.current
@@ -90,7 +114,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         console.log(
           'fetchWalletTokenAccounts',
           connected,
-          ownedTokenAccounts.map((t) => t.publicKey.toBase58())
+          ownedTokenAccounts.map((t) => t.account.mint.toBase58())
         )
 
         set((state) => {
@@ -102,11 +126,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         })
       }
     },
-    async fetchRealm(programId: PublicKey, realmId: PublicKey) {
+    async fetchAllRealms(programId: PublicKey) {
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
-
-      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
+      const set = get().set
 
       const realms = await getGovernanceAccounts<Realm>(
         programId,
@@ -114,95 +137,96 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Realm,
         getAccountTypes(Realm)
       )
-      console.log('fetchRealm realms', realms[realmId.toBase58()])
 
       set((s) => {
-        s.realms = Object.assign({}, s.realms, realms)
+        s.realms = realms
       })
 
-      const realmMint = await getMint(
-        connection,
-        realms[realmId.toBase58()].info.communityMint
+      const mints = await Promise.all(
+        Object.values(realms).map((r) =>
+          getMint(connection, r.info.communityMint)
+        )
       )
+
+      set((s) => {
+        s.mints = Object.fromEntries(
+          mints.map((m) => [m.publicKey.toBase58(), m.account])
+        )
+      })
+    },
+    async fetchRealm(programId: PublicKey, realmId: PublicKey) {
+      const endpoint = get().connection.endpoint
+      const realms = get().realms
+      const mints = get().mints
+      const realm = realms[realmId.toBase58()]
+      const realmMintPk = realm.info.communityMint
+      const realmMint = mints[realmMintPk.toBase58()]
+      const set = get().set
+
+      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
+
+      const [governances, tokenRecords] = await Promise.all([
+        getGovernanceAccounts<Governance>(
+          programId,
+          endpoint,
+          Governance,
+          getAccountTypes(Governance),
+          [pubkeyFilter(1, realmId)]
+        ),
+
+        getGovernanceAccounts<TokenOwnerRecord>(
+          programId,
+          endpoint,
+          TokenOwnerRecord,
+          getAccountTypes(TokenOwnerRecord),
+          [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, realmMintPk)]
+        ),
+      ])
+
+      const tokenRecordsByOwner = mapEntries(tokenRecords, ([_k, v]) => [
+        v.info.governingTokenOwner.toBase58(),
+        v,
+      ])
 
       console.log('fetchRealm mint', realmMint)
-
-      set(
-        (s) =>
-          (s.mints = Object.assign(
-            {},
-            s.mints,
-            Object.fromEntries([
-              [realmMint.publicKey.toBase58(), realmMint.account],
-            ])
-          ))
-      )
-
-      const tokenRecords = await getGovernanceAccounts<TokenOwnerRecord>(
-        programId,
-        endpoint,
-        TokenOwnerRecord,
-        getAccountTypes(TokenOwnerRecord),
-        [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, realmMint.publicKey)]
-      )
-      const tokenRecordsByOwner = Object.fromEntries(
-        Object.entries(tokenRecords).map(([_k, v]) => [
-          v.info.governingTokenOwner.toBase58(),
-          v,
-        ])
-      )
-      console.log('fetchRealm tokenOwners', tokenRecordsByOwner)
-
-      set((s) => {
-        s.tokenRecords = Object.assign({}, s.tokenRecords, tokenRecordsByOwner)
-      })
-
-      const governances = await getGovernanceAccounts<Governance>(
-        programId,
-        endpoint,
-        Governance,
-        getAccountTypes(Governance),
-        [pubkeyFilter(1, realmId)]
-      )
       console.log('fetchRealm governances', governances)
+      console.log('fetchRealm tokenRecords', tokenRecordsByOwner)
 
       set((s) => {
-        s.governances = Object.assign({}, s.governances, governances)
+        s.selectedRealm.realm = realm
+        s.selectedRealm.mint = realmMint
+        s.selectedRealm.governances = governances
+        s.selectedRealm.tokenRecords = tokenRecordsByOwner
       })
-
-      const governanceIds = Object.keys(governances).map(
-        (k) => new PublicKey(k)
-      )
 
       const proposalsByGovernance = await Promise.all(
-        governanceIds.map((governanceId) => {
+        mapKeys(governances, (g) => {
           return getGovernanceAccounts<Proposal>(
             programId,
             endpoint,
             Proposal,
             getAccountTypes(Proposal),
-            [pubkeyFilter(1, governanceId)]
+            [pubkeyFilter(1, new PublicKey(g))]
           )
         })
       )
-      const proposals = Object.assign({}, ...proposalsByGovernance)
+
+      const proposals = merge(...proposalsByGovernance)
 
       console.log('fetchRealm proposals', proposals)
 
       set((s) => {
-        s.proposals = Object.assign({}, s.proposals, proposals)
+        s.selectedRealm.proposals = proposals
       })
 
-      const proposalIds = Object.keys(proposals).map((k) => new PublicKey(k))
-
       const votesByProposal = await Promise.all(
-        proposalIds.map(async (proposalId) => {
+        mapKeys(proposals, async (p) => {
           const voteRecords = await getGovernanceAccounts<VoteRecord>(
             programId,
             endpoint,
             VoteRecord,
             getAccountTypes(VoteRecord),
-            [pubkeyFilter(1, proposalId)]
+            [pubkeyFilter(1, new PublicKey(p))]
           )
 
           const precision = Math.pow(10, 6)
@@ -212,7 +236,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
               .filter((v) => !!v)
               .reduce((acc, cur) => acc.add(cur), new BN(0))
               .mul(new BN(precision))
-              .div(realmMint.account.supply)
+              .div(realmMint.supply)
               .toNumber() *
             (100 / precision)
 
@@ -222,26 +246,23 @@ const useWalletStore = create<WalletStore>((set, get) => ({
               .filter((v) => !!v)
               .reduce((acc, cur) => acc.add(cur), new BN(0))
               .mul(new BN(precision))
-              .div(realmMint.account.supply)
+              .div(realmMint.supply)
               .toNumber() *
             (100 / precision)
 
-          return [proposalId.toBase58(), { yes, no }]
+          return [p, { yes, no }]
         })
       )
+
+      // TODO: cache votes of finished proposals permanently in local storage to avoid recounting
 
       console.log('fetchRealm votes', votesByProposal)
 
       set((s) => {
-        s.votes = Object.assign(
-          {},
-          s.votes,
-          Object.fromEntries(votesByProposal)
-        )
+        s.selectedRealm.votes = Object.fromEntries(votesByProposal)
       })
     },
   },
-  set: (fn) => set(produce(fn)),
 }))
 
 export default useWalletStore
