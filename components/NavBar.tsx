@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
-import MangoPill from '../components/MangoPill'
+import ConnectWalletButton from './ConnectWalletButton'
+import MangoPill from './MangoPill'
 // import Button from './Button'
 
-const NavBarBeta = () => {
+const NavBar = () => {
   const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
   const [productMenuVisible, setProductMenuVisible] = useState(false)
   const [supportMenuVisible, setSupportMenuVisible] = useState(false)
@@ -424,13 +425,9 @@ const NavBarBeta = () => {
               </a>
             </nav>
             <div style={{ width: '310px' }} />
-            {/* <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
-              <div>
-                <a rel="noreferrer" target="_blank" href="#">
-                  <Button>Contribute now</Button>
-                </a>
-              </div>
-            </div> */}
+            <div className="hidden md:flex items-center justify-end md:flex-1 lg:w-0">
+              <ConnectWalletButton />
+            </div>
           </div>
         </div>
 
@@ -657,4 +654,4 @@ const NavBarBeta = () => {
   )
 }
 
-export default NavBarBeta
+export default NavBar

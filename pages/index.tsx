@@ -1,17 +1,14 @@
-import ProposalPage from './ProposalPage'
-import Notifications from '../components/Notification'
-import NavBarBeta from '../components/NavBarBeta'
+import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 
 const Index = () => {
-  return (
-    <div className={`bg-bkg-1 text-white transition-all overflow-hidden`}>
-      <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
-      <NavBarBeta />
-      <Notifications />
-      <ProposalPage />
-      <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
-    </div>
-  )
+  const router = useRouter()
+
+  useEffect(() => {
+    router.push('/dao/MNGO')
+  }, [])
+
+  return <></>
 }
 
 export default Index

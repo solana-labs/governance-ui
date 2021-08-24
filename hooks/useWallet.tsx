@@ -40,7 +40,6 @@ export default function useWallet() {
   useEffect(() => {
     if (provider) {
       const updateWallet = () => {
-        console.log('updateWallet', setWalletStore)
         // hack to also update wallet synchronously in case it disconnects
         const wallet = new provider.adapter(
           provider.url,
@@ -103,7 +102,6 @@ export default function useWallet() {
   useEffect(() => {
     const pageLoad = async () => {
       console.log('pageLoad')
-      await actions.fetchProposals()
     }
     pageLoad()
   }, [])
