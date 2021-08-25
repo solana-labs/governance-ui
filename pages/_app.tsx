@@ -4,6 +4,7 @@ import '../styles/index.css'
 import useWallet from '../hooks/useWallet'
 import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
+import PageBodyContainer from '../components/PageBodyContainer'
 
 function App({ Component, pageProps }) {
   useWallet()
@@ -44,7 +45,9 @@ function App({ Component, pageProps }) {
           <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
           <NavBar />
           <Notifications />
-          <Component {...pageProps} />
+          <PageBodyContainer>
+            <Component {...pageProps} />
+          </PageBodyContainer>
           <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
         </div>
       </ThemeProvider>

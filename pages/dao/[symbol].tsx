@@ -1,9 +1,10 @@
 import { useRouter } from 'next/router'
-import Link from 'next/link'
 import useWalletStore from '../../stores/useWalletStore'
-import moment from 'moment'
 import useRealm from '../../hooks/useRealm'
-import BN from 'bn.js'
+import React from 'react'
+import ProposalFilter from '../../components/ProposalFilter'
+import ProposalCard from '../../components/ProposalCard'
+import Button from '../../components/Button'
 
 export const ProposalStateLabels = {
   0: 'Draft',
@@ -22,20 +23,9 @@ const DAO = () => {
   const { symbol } = router.query
 
   const wallet = useWalletStore((s) => s.current)
-  const {
-    mint,
-    governances,
-    proposals,
-    realmTokenAccount,
-    ownTokenRecord,
-  } = useRealm(symbol as string)
-
-  const votePrecision = 10000
-  const formatVoteCount = (c: BN) =>
-    `${
-      c.mul(new BN(votePrecision)).div(mint.supply).toNumber() *
-      (100 / votePrecision)
-    }%`
+  const { mint, proposals, realmTokenAccount, ownTokenRecord } = useRealm(
+    symbol as string
+  )
 
   // DEBUG print remove
   console.log(
@@ -53,64 +43,55 @@ const DAO = () => {
     wallet?.connected && ownTokenRecord
   )
 
+  const displayedProposal = Object.entries(proposals)
+    .filter(([_k, v]) => v.info.votingAt)
+    .sort(
+      (a, b) => b[1].info.votingAt.toNumber() - a[1].info.votingAt.toNumber()
+    )
+
   return (
     <>
-      <div className="m-10">
-        <h1>{symbol}</h1>
-        <p>
-          in Wallet:{' '}
-          {realmTokenAccount
-            ? realmTokenAccount.account.amount.toString()
-            : 'N/A'}
-        </p>
-        <p>
-          in Governance:{' '}
-          {ownTokenRecord
-            ? ownTokenRecord.info.governingTokenDepositAmount.toNumber()
-            : 'N/A'}
-        </p>
-        <p>Proposals:</p>
-        {Object.entries(proposals)
-          .filter(([_k, v]) => v.info.votingAt)
-          .sort(
-            (a, b) =>
-              b[1].info.votingAt.toNumber() - a[1].info.votingAt.toNumber()
-          )
-          .map(([k, v]) => (
-            <div className="m-10 p-4 border" key={k}>
-              <Link href={`/proposal/${k}`}>
-                <a>
-                  <h3>{v.info.name}</h3>
-                  <p>{v.info.descriptionLink}</p>
-
-                  {v.info.votingCompletedAt ? (
-                    <p>
-                      Ended{' '}
-                      {moment
-                        .unix(v.info.votingCompletedAt.toNumber())
-                        .fromNow()}
-                    </p>
-                  ) : (
-                    <p>
-                      Created{' '}
-                      {moment.unix(v.info.votingAt.toNumber()).fromNow()}
-                    </p>
-                  )}
-                  <p>{ProposalStateLabels[v.info.state]}</p>
-                  <p>
-                    Votes Yes: {formatVoteCount(v.info.yesVotesCount)} No:{' '}
-                    {formatVoteCount(v.info.noVotesCount)}
-                  </p>
-                  <p>
-                    {`Yes Threshold: ${
-                      governances[v.info.governance.toBase58()]?.info.config
-                        .voteThresholdPercentage.value
-                    }%`}
-                  </p>
-                </a>
-              </Link>
-            </div>
+      <div className="grid grid-cols-12 gap-4">
+        <div className="col-span-8 space-y-3">
+          <div className="flex items-center justify-between">
+            <h2>{`${displayedProposal.length} proposals`}</h2>
+            <ProposalFilter />
+          </div>
+          {displayedProposal.map(([k, v]) => (
+            <ProposalCard key={k} id={k} mint={mint} proposal={v['info']} />
           ))}
+        </div>
+        <div className="col-span-4">
+          <div className="bg-bkg-2 col-span-4 p-6 rounded-md space-y-6">
+            <h3 className="mb-4">MNGO balance</h3>
+
+            <div className="flex space-x-4 items-center">
+              <div>Deposited</div>
+              <div className="col-span-3 bg-bkg-3 p-4 rounded">
+                <div className="text-xl">
+                  {ownTokenRecord
+                    ? ownTokenRecord.info.governingTokenDepositAmount.toNumber()
+                    : 'N/A'}
+                </div>
+              </div>
+            </div>
+            <div className="flex space-x-4 items-center">
+              <div>In Wallet</div>
+              <div className="col-span-3 bg-bkg-3 p-4 rounded">
+                <div className="text-xl">
+                  {realmTokenAccount
+                    ? realmTokenAccount.account.amount.toString()
+                    : 'N/A'}
+                </div>
+              </div>
+            </div>
+
+            <div className="flex space-x-4">
+              <Button className="w-1/2">Deposit</Button>
+              <Button className="w-1/2">Withdraw</Button>
+            </div>
+          </div>
+        </div>
       </div>
     </>
   )
