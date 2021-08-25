@@ -2,7 +2,7 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ClockIcon } from '@heroicons/react/outline'
 import StatusBadge from './StatusBadge'
 import moment from 'moment'
-import { Proposal } from '../models/accounts'
+import { Proposal, ProposalState } from '../models/accounts'
 import BN from 'bn.js'
 import Link from 'next/link'
 import { MintInfo } from '@solana/spl-token'
@@ -50,10 +50,10 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
             <div className="flex items-center text-fgd-3 text-sm">
               <span className="flex items-center">
                 <ClockIcon className="h-4 mr-1.5 w-4" />
-                {proposal.executingAt
-                  ? `Executed ${fmtUnixTime(proposal.votingCompletedAt)}`
-                  : proposal.votingCompletedAt
-                  ? `Ended ${fmtUnixTime(proposal.votingCompletedAt)}`
+                {proposal.votingCompletedAt
+                  ? `${ProposalState[proposal.state]} ${fmtUnixTime(
+                      proposal.votingCompletedAt
+                    )}`
                   : proposal.votingAt
                   ? `Proposed ${fmtUnixTime(proposal.votingAt)}`
                   : `Drafted ${fmtUnixTime(proposal.draftAt)}`}
