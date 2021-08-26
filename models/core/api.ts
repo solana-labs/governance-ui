@@ -6,6 +6,10 @@ import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
 import { Schema } from 'borsh'
 import { deserializeBorsh } from '../../utils/borsh'
 
+export const SYSTEM_PROGRAM_ID = new PublicKey(
+  '11111111111111111111111111111111'
+)
+
 export interface IWallet {
   publicKey: PublicKey
 }

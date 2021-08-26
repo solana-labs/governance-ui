@@ -1,4 +1,4 @@
-import { AccountInfo, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
 import { deserializeBorsh } from '../utils/borsh'
 
 import { BinaryReader, BinaryWriter } from 'borsh'
