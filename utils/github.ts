@@ -1,5 +1,3 @@
-import { file } from '@babel/types'
-
 const urlRegex =
   // eslint-disable-next-line
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/

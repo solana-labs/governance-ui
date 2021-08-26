@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { EndpointInfo, WalletAdapter } from '../@types/types'
 import {
   ProgramAccount,
