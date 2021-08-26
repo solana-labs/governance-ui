@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { clusterApiUrl, Connection, PublicKey } from '@solana/web3.js'
 import { EndpointInfo, WalletAdapter } from '../@types/types'
 import {
   ProgramAccount,
@@ -30,6 +30,11 @@ export const ENDPOINTS: EndpointInfo[] = [
     name: 'mainnet-beta',
     url: 'https://mango.rpcpool.com',
     websocket: 'https://mango.rpcpool.com',
+  },
+  {
+    name: 'devnet',
+    url: 'https://api.devnet.solana.com',
+    websocket: 'https://api.devnet.solana.com',
   },
 ]
 
