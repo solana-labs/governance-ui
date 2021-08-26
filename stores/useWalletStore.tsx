@@ -38,7 +38,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
 ]
 
-const CLUSTER = 'mainnet-beta'
+const CLUSTER = 'devnet'
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')

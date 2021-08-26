@@ -40,5 +40,5 @@ export async function postChatMessage(
   const transaction = new Transaction()
   instructions.forEach((instruction) => transaction.add(instruction))
 
-  await sendTransaction({ transaction, wallet, connection })
+  await sendTransaction({ transaction, wallet, connection, signers })
 }
