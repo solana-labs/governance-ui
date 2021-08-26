@@ -4,7 +4,7 @@ import useRealm from '../../hooks/useRealm'
 import React from 'react'
 import ProposalFilter from '../../components/ProposalFilter'
 import ProposalCard from '../../components/ProposalCard'
-import Button from '../../components/Button'
+import TokenBalanceCard from '../../components/TokenBalanceCard'
 
 export const ProposalStateLabels = {
   0: 'Draft',
@@ -51,7 +51,7 @@ const DAO = () => {
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-4 pt-16">
         <div className="col-span-8 space-y-3">
           <div className="flex items-center justify-between">
             <h2>{`${displayedProposal.length} proposals`}</h2>
@@ -62,35 +62,7 @@ const DAO = () => {
           ))}
         </div>
         <div className="col-span-4">
-          <div className="bg-bkg-2 col-span-4 p-6 rounded-md space-y-6">
-            <h3 className="mb-4">MNGO balance</h3>
-
-            <div className="flex space-x-4 items-center">
-              <div>Deposited</div>
-              <div className="col-span-3 bg-bkg-3 p-4 rounded">
-                <div className="text-xl">
-                  {ownTokenRecord
-                    ? ownTokenRecord.info.governingTokenDepositAmount.toNumber()
-                    : 'N/A'}
-                </div>
-              </div>
-            </div>
-            <div className="flex space-x-4 items-center">
-              <div>In Wallet</div>
-              <div className="col-span-3 bg-bkg-3 p-4 rounded">
-                <div className="text-xl">
-                  {realmTokenAccount
-                    ? realmTokenAccount.account.amount.toString()
-                    : 'N/A'}
-                </div>
-              </div>
-            </div>
-
-            <div className="flex space-x-4">
-              <Button className="w-1/2">Deposit</Button>
-              <Button className="w-1/2">Withdraw</Button>
-            </div>
-          </div>
+          <TokenBalanceCard />
         </div>
       </div>
     </>

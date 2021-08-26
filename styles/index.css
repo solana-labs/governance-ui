@@ -16,8 +16,16 @@ body {
   @apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
 }
 
+h1 {
+  @apply text-2xl font-bold;
+}
+
 h2 {
   @apply text-xl mb-1 font-bold;
+}
+
+h3 {
+  @apply text-lg mb-1 font-bold;
 }
 
 p {
