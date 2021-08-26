@@ -1,3 +1,5 @@
+import { file } from '@babel/types'
+
 const urlRegex =
   // eslint-disable-next-line
   /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
@@ -14,7 +16,15 @@ export async function fetchGistFile(gistUrl: string) {
       const nextUrlFileName = Object.keys(jsonContent['files'])[0]
       const nextUrl = jsonContent['files'][nextUrlFileName]['raw_url']
       const fileResponse = await fetch(nextUrl)
+
+      console.log('fetchGistFile file', gistUrl, fileResponse)
       return await fileResponse.text()
+    } else {
+      console.error(
+        'could not fetchGistFile',
+        gistUrl,
+        await apiResponse.text()
+      )
     }
   }
 

@@ -261,7 +261,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.proposals = proposals
       })
 
-      const proposalDescriptions = mapFromPromisedEntries(
+      const proposalDescriptions = await mapFromPromisedEntries(
         proposals,
         async ([k, v]: [string, ParsedAccount<Proposal>]) => {
           return [k, await fetchGistFile(v.info.descriptionLink)]
