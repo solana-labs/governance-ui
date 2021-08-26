@@ -24,6 +24,8 @@ import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
 import { pubkeyFilter } from '../scripts/api'
+import { getGovernanceChatMessages } from '../models/chat/api'
+import { ChatMessage } from '../models/chat/accounts'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -69,6 +71,7 @@ interface WalletStore extends State {
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
     voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
+    chatMessages: { [message: string]: ParsedAccount<ChatMessage> }
     description?: string
     loading: boolean
   }
@@ -119,6 +122,7 @@ const INITIAL_PROPOSAL_STATE = {
   instructions: {},
   voteRecords: {},
   signatories: {},
+  chatMessages: {},
   description: null,
   loading: true,
 }
@@ -305,6 +309,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         instructions,
         voteRecords,
         signatories,
+        chatMessages,
       ] = await Promise.all([
         fetchGistFile(proposal.info.descriptionLink),
         getGovernanceAccount<Governance>(
@@ -333,6 +338,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           getAccountTypes(SignatoryRecord),
           [pubkeyFilter(1, proposalPubKey)]
         ),
+        getGovernanceChatMessages(endpoint, proposalPubKey),
       ])
 
       const realm = await getGovernanceAccount<Realm>(
@@ -348,6 +354,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         instructions,
         voteRecords,
         signatories,
+        chatMessages,
       })
 
       set((s) => {
@@ -358,6 +365,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.instructions = instructions
         s.selectedProposal.voteRecords = voteRecords
         s.selectedProposal.signatories = signatories
+        s.selectedProposal.chatMessages = chatMessages
         s.selectedProposal.loading = false
       })
     },
