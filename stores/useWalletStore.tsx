@@ -26,6 +26,7 @@ import {
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/serialisation'
+import { StringifyOptions } from 'node:querystring'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -56,6 +57,7 @@ interface WalletStore extends State {
     mint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
+    proposalDescriptions: { [proposal: string]: string }
     tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
   }
   selectedProposal: {
@@ -77,10 +79,20 @@ function mapKeys(xs: any, mapFn: (k: string) => any) {
   return Object.keys(xs).map(mapFn)
 }
 
-function mapEntries(xs: any, mapFn: (kv: any[]) => any[]) {
-  return Object.fromEntries(Object.entries(xs).map(mapFn))
+function mapEntries(xs: any, mapFn: (kv: [string, any]) => any) {
+  return Object.entries(xs).map(mapFn)
 }
 
+function mapFromEntries(xs: any, mapFn: (kv: [string, any]) => [string, any]) {
+  return Object.fromEntries(mapEntries(xs, mapFn))
+}
+
+async function mapFromPromisedEntries(
+  xs: any,
+  mapFn: (kv: [string, any]) => Promise<[string, any]>
+) {
+  return Object.fromEntries(await Promise.all(mapEntries(xs, mapFn)))
+}
 function merge(...os) {
   return Object.assign({}, ...os)
 }
@@ -100,6 +112,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     mint: null,
     governances: {},
     proposals: {},
+    proposalDescriptions: {},
     tokenRecords: {},
   },
   selectedProposal: {
@@ -200,7 +213,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
       ])
 
-      const tokenRecordsByOwner = mapEntries(tokenRecords, ([_k, v]) => [
+      const tokenRecordsByOwner = mapFromEntries(tokenRecords, ([_k, v]) => [
         v.info.governingTokenOwner.toBase58(),
         v,
       ])
@@ -217,23 +230,59 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
 
       const proposalsByGovernance = await Promise.all(
-        mapKeys(governances, (g) => {
-          return getGovernanceAccounts<Proposal>(
+        mapKeys(governances, (g) =>
+          getGovernanceAccounts<Proposal>(
             programId,
             endpoint,
             Proposal,
             getAccountTypes(Proposal),
             [pubkeyFilter(1, new PublicKey(g))]
           )
-        })
+        )
       )
 
-      const proposals = merge(...proposalsByGovernance)
+      const proposals: Record<string, ParsedAccount<Proposal>> = merge(
+        ...proposalsByGovernance
+      )
 
       console.log('fetchRealm proposals', proposals)
 
       set((s) => {
         s.selectedRealm.proposals = proposals
+      })
+
+      const proposalDescriptions = await mapFromPromisedEntries(
+        proposals,
+        async ([k, v]) => {
+          const proposal: Proposal = v.info
+          const urlRegex =
+            // eslint-disable-next-line
+            /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
+
+          let toFetch = proposal.descriptionLink
+          const pieces = toFetch.match(urlRegex)
+          if (pieces) {
+            const justIdWithoutUser = pieces[1].split('/')[2]
+            toFetch = 'https://api.github.com/gists/' + justIdWithoutUser
+            const apiResponse = await fetch(toFetch)
+
+            if (apiResponse.status === 200) {
+              const jsonContent = await apiResponse.json()
+              const nextUrlFileName = Object.keys(jsonContent['files'])[0]
+              const nextUrl = jsonContent['files'][nextUrlFileName]['raw_url']
+              const fileResponse = await fetch(nextUrl)
+              return [k, await fileResponse.text()]
+            }
+          }
+
+          return [k, '']
+        }
+      )
+
+      console.log('fetchRealm proposalDescriptions', proposalDescriptions)
+
+      set((s) => {
+        s.selectedRealm.proposalDescriptions = proposalDescriptions
       })
     },
 
