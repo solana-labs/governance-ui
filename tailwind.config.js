@@ -50,9 +50,9 @@ module.exports = {
         'fgd-2': '#FCFCFF',
         'fgd-3': '#B9B5CE',
         'fgd-4': '#706C81',
-        'mango-yellow': '#F2C94C',
-        'mango-red': '#E54033',
-        'mango-green': '#AFD803',
+        yellow: '#F2C94C',
+        red: '#E54033',
+        green: '#AFD803',
         'mango-dark': {
           lighter: '#332F46',
           light: '#262337',

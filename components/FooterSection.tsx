@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import MangoPill from '../components/MangoPill'
 import Button from './Button'
 
 const doNothing = (e) => {
@@ -136,7 +135,6 @@ const FooterSection = () => {
                         >
                           Perpetual Futures
                         </a>{' '}
-                        <MangoPill>SOON</MangoPill>
                       </li>
                       <li className="mb-4">
                         <a

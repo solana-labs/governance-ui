@@ -41,15 +41,11 @@ function App({ Component, pageProps }) {
         <meta name="twitter:site" content="@mangomarkets" />
       </Head>
       <ThemeProvider defaultTheme="Mango">
-        <div className={`bg-bkg-1 text-white transition-all overflow-hidden`}>
-          <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
-          <NavBar />
-          <Notifications />
-          <PageBodyContainer>
-            <Component {...pageProps} />
-          </PageBodyContainer>
-          <div className="w-screen h-2 bg-gradient-to-r from-mango-red via-mango-yellow to-mango-green"></div>
-        </div>
+        <NavBar />
+        <Notifications />
+        <PageBodyContainer>
+          <Component {...pageProps} />
+        </PageBodyContainer>
       </ThemeProvider>
     </>
   )
