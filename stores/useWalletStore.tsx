@@ -9,11 +9,7 @@ import {
   getMint,
   getOwnedTokenAccounts,
 } from '../utils/tokens'
-import {
-  getGovernanceAccount,
-  getGovernanceAccounts,
-  pubkeyFilter,
-} from '../models/api'
+import { getGovernanceAccount, getGovernanceAccounts } from '../models/api'
 import {
   getAccountTypes,
   Governance,
@@ -25,8 +21,9 @@ import {
   VoteRecord,
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
-import { ParsedAccount } from '../models/serialisation'
+import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
+import { pubkeyFilter } from '../scripts/api'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
