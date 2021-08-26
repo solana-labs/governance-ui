@@ -1,11 +1,12 @@
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ClockIcon } from '@heroicons/react/outline'
-import StatusBadge from './StatusBadge'
 import moment from 'moment'
-import { Proposal, ProposalState } from '../models/accounts'
+import ReactMarkdown from 'react-markdown/react-markdown.min'
 import BN from 'bn.js'
 import Link from 'next/link'
 import { MintInfo } from '@solana/spl-token'
+import { Proposal, ProposalState } from '../models/accounts'
+import StatusBadge from './StatusBadge'
 
 export const ProposalStateLabels = {
   0: 'Draft',
@@ -22,6 +23,7 @@ export const ProposalStateLabels = {
 type ProposalCardProps = {
   id: string
   proposal: Proposal
+  description?: string
   mint: MintInfo
 }
 
@@ -31,7 +33,12 @@ const calculatePct = (c: BN, total: BN) =>
 
 const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()
 
-const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
+const ProposalCard = ({
+  id,
+  proposal,
+  description,
+  mint,
+}: ProposalCardProps) => {
   const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
   const noVotePct = calculatePct(proposal.noVotesCount, mint.supply)
 
@@ -59,9 +66,7 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
                   : `Drafted ${fmtUnixTime(proposal.draftAt)}`}
               </span>
             </div>
-            {proposal.descriptionLink ? (
-              <p className="mt-3">{proposal.descriptionLink}</p>
-            ) : null}
+            {description && <ReactMarkdown>{description}</ReactMarkdown>}
 
             <div className="flex space-x-4 mt-6">
               <div className="w-1/4">Yes: {yesVotePct}%</div>

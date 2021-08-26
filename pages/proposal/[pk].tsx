@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ChevronLeftIcon } from '@heroicons/react/solid'
 import useProposal from '../../hooks/useProposal'
 
@@ -7,7 +8,7 @@ const Proposal = () => {
   const router = useRouter()
   const { pk } = router.query
 
-  const { proposal, instructions } = useProposal(pk as string)
+  const { proposal, description, instructions } = useProposal(pk as string)
 
   console.log('proposal data', { proposal, instructions })
 
@@ -22,8 +23,7 @@ const Proposal = () => {
 
       <div className="m-10">
         <h1>{proposal?.info.name}</h1>
-        <p>{proposal?.info.descriptionLink}</p>
-        <span>{pk?.toString()}</span>
+        {description && <ReactMarkdown>{description}</ReactMarkdown>}
       </div>
     </>
   )

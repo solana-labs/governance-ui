@@ -26,7 +26,7 @@ import {
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/serialisation'
-import { StringifyOptions } from 'node:querystring'
+import { fetchGistFile } from '../utils/github'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -67,6 +67,7 @@ interface WalletStore extends State {
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
     voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
+    description?: string
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -93,6 +94,7 @@ async function mapFromPromisedEntries(
 ) {
   return Object.fromEntries(await Promise.all(mapEntries(xs, mapFn)))
 }
+
 function merge(...os) {
   return Object.assign({}, ...os)
 }
@@ -122,6 +124,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     instructions: {},
     voteRecords: {},
     signatories: {},
+    description: null,
   },
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
@@ -251,31 +254,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.proposals = proposals
       })
 
-      const proposalDescriptions = await mapFromPromisedEntries(
+      const proposalDescriptions = mapFromPromisedEntries(
         proposals,
-        async ([k, v]) => {
-          const proposal: Proposal = v.info
-          const urlRegex =
-            // eslint-disable-next-line
-            /[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)/
-
-          let toFetch = proposal.descriptionLink
-          const pieces = toFetch.match(urlRegex)
-          if (pieces) {
-            const justIdWithoutUser = pieces[1].split('/')[2]
-            toFetch = 'https://api.github.com/gists/' + justIdWithoutUser
-            const apiResponse = await fetch(toFetch)
-
-            if (apiResponse.status === 200) {
-              const jsonContent = await apiResponse.json()
-              const nextUrlFileName = Object.keys(jsonContent['files'])[0]
-              const nextUrl = jsonContent['files'][nextUrlFileName]['raw_url']
-              const fileResponse = await fetch(nextUrl)
-              return [k, await fileResponse.text()]
-            }
-          }
-
-          return [k, '']
+        async ([k, v]: [string, ParsedAccount<Proposal>]) => {
+          return [k, await fetchGistFile(v.info.descriptionLink)]
         }
       )
 
@@ -302,6 +284,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         proposalPubKey,
         Proposal
       )
+
+      const description = await fetchGistFile(proposal.info.descriptionLink)
 
       const governance = await getGovernanceAccount<Governance>(
         connection,
@@ -352,6 +336,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.proposal = proposal
+        s.selectedProposal.description = description
         s.selectedProposal.governance = governance
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = instructions

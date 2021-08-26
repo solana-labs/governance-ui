@@ -16,9 +16,14 @@ export default function useRealm(symbol: string) {
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
-  const { realm, mint, governances, proposals, tokenRecords } = useWalletStore(
-    (s) => s.selectedRealm
-  )
+  const {
+    realm,
+    mint,
+    governances,
+    proposals,
+    proposalDescriptions,
+    tokenRecords,
+  } = useWalletStore((s) => s.selectedRealm)
 
   const realmInfo = useMemo(() => REALMS.find((r) => r.symbol === symbol), [
     symbol,
@@ -54,6 +59,7 @@ export default function useRealm(symbol: string) {
     mint,
     governances,
     proposals,
+    proposalDescriptions,
     tokenRecords,
     realmTokenAccount,
     ownTokenRecord,

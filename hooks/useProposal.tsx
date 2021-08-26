@@ -3,7 +3,9 @@ import useWalletStore from '../stores/useWalletStore'
 
 export default function useProposal(proposalPk: string) {
   const { fetchProposal } = useWalletStore((s) => s.actions)
-  const { proposal, instructions } = useWalletStore((s) => s.selectedProposal)
+  const { proposal, description, instructions } = useWalletStore(
+    (s) => s.selectedProposal
+  )
 
   useEffect(() => {
     const fetch = async () => {
@@ -16,6 +18,7 @@ export default function useProposal(proposalPk: string) {
 
   return {
     proposal,
+    description,
     instructions,
   }
 }
