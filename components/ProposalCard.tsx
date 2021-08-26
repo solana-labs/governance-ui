@@ -1,19 +1,17 @@
-import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ClockIcon } from '@heroicons/react/outline'
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
+import {
+  CheckCircleIcon,
+  ChevronRightIcon,
+  XCircleIcon,
+} from '@heroicons/react/solid'
+
 import StatusBadge from './StatusBadge'
 import moment from 'moment'
-import { Proposal, ProposalState } from '../models/accounts'
+import ReactMarkdown from 'react-markdown/react-markdown.min'
 import BN from 'bn.js'
 import Link from 'next/link'
 import { MintInfo } from '@solana/spl-token'
-import { ProposalStateLabels } from '../pages/dao/[symbol]'
-
-type ProposalCardProps = {
-  id: string
-  proposal: Proposal
-  mint: MintInfo
-}
+import { Proposal, ProposalState } from '../models/accounts'
 
 const votePrecision = 10000
 const calculatePct = (c: BN, total: BN) =>
@@ -21,7 +19,19 @@ const calculatePct = (c: BN, total: BN) =>
 
 const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()
 
-const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
+type ProposalCardProps = {
+  id: string
+  proposal: Proposal
+  description?: string
+  mint: MintInfo
+}
+
+const ProposalCard = ({
+  id,
+  proposal,
+  description,
+  mint,
+}: ProposalCardProps) => {
   const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
   // const noVotePct = calculatePct(proposal.noVotesCount, mint.supply)
 
@@ -39,7 +49,7 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
               <div className="flex items-center justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
                 <div className="flex items-center">
-                  <StatusBadge status={ProposalStateLabels[proposal.state]} />
+                  <StatusBadge status={ProposalState[proposal.state]} />
                   <ChevronRightIcon className="h-6 ml-2 text-primary-light w-6" />
                 </div>
               </div>
@@ -55,9 +65,7 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
                     : `Drafted ${fmtUnixTime(proposal.draftAt)}`}
                 </span>
               </div>
-              {proposal.descriptionLink ? (
-                <p className="mt-3">{proposal.descriptionLink}</p>
-              ) : null}
+              {description && <ReactMarkdown>{description}</ReactMarkdown>}
             </div>
             <div className="bg-[rgba(255,255,255,0.05)] px-6 py-4 rounded-b-md">
               <div className="flex items-center justify-between">

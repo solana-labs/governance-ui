@@ -26,6 +26,7 @@ import {
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/serialisation'
+import { fetchGistFile } from '../utils/github'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -56,6 +57,7 @@ interface WalletStore extends State {
     mint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
+    proposalDescriptions: { [proposal: string]: string }
     tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
   }
   selectedProposal: {
@@ -65,6 +67,8 @@ interface WalletStore extends State {
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
     voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
+    description?: string
+    loading: boolean
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -77,12 +81,44 @@ function mapKeys(xs: any, mapFn: (k: string) => any) {
   return Object.keys(xs).map(mapFn)
 }
 
-function mapEntries(xs: any, mapFn: (kv: any[]) => any[]) {
-  return Object.fromEntries(Object.entries(xs).map(mapFn))
+function mapEntries(xs: any, mapFn: (kv: [string, any]) => any) {
+  return Object.entries(xs).map(mapFn)
+}
+
+function mapFromEntries(xs: any, mapFn: (kv: [string, any]) => [string, any]) {
+  return Object.fromEntries(mapEntries(xs, mapFn))
+}
+
+async function mapFromPromisedEntries(
+  xs: any,
+  mapFn: (kv: [string, any]) => Promise<[string, any]>
+) {
+  return Object.fromEntries(await Promise.all(mapEntries(xs, mapFn)))
 }
 
 function merge(...os) {
   return Object.assign({}, ...os)
+}
+
+const INITIAL_REALM_STATE = {
+  realm: null,
+  mint: null,
+  governances: {},
+  proposals: {},
+  proposalDescriptions: {},
+  tokenRecords: {},
+  loading: true,
+}
+
+const INITIAL_PROPOSAL_STATE = {
+  proposal: null,
+  governance: null,
+  realm: null,
+  instructions: {},
+  voteRecords: {},
+  signatories: {},
+  description: null,
+  loading: true,
 }
 
 const useWalletStore = create<WalletStore>((set, get) => ({
@@ -95,21 +131,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   },
   current: null,
   realms: {},
-  selectedRealm: {
-    realm: null,
-    mint: null,
-    governances: {},
-    proposals: {},
-    tokenRecords: {},
-  },
-  selectedProposal: {
-    proposal: null,
-    governance: null,
-    realm: null,
-    instructions: {},
-    voteRecords: {},
-    signatories: {},
-  },
+  selectedRealm: INITIAL_REALM_STATE,
+  selectedProposal: INITIAL_PROPOSAL_STATE,
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
   mints: {},
@@ -200,7 +223,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
       ])
 
-      const tokenRecordsByOwner = mapEntries(tokenRecords, ([_k, v]) => [
+      const tokenRecordsByOwner = mapFromEntries(tokenRecords, ([_k, v]) => [
         v.info.governingTokenOwner.toBase58(),
         v,
       ])
@@ -217,23 +240,39 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
 
       const proposalsByGovernance = await Promise.all(
-        mapKeys(governances, (g) => {
-          return getGovernanceAccounts<Proposal>(
+        mapKeys(governances, (g) =>
+          getGovernanceAccounts<Proposal>(
             programId,
             endpoint,
             Proposal,
             getAccountTypes(Proposal),
             [pubkeyFilter(1, new PublicKey(g))]
           )
-        })
+        )
       )
 
-      const proposals = merge(...proposalsByGovernance)
+      const proposals: Record<string, ParsedAccount<Proposal>> = merge(
+        ...proposalsByGovernance
+      )
 
       console.log('fetchRealm proposals', proposals)
 
       set((s) => {
         s.selectedRealm.proposals = proposals
+      })
+
+      const proposalDescriptions = await mapFromPromisedEntries(
+        proposals,
+        async ([k, v]: [string, ParsedAccount<Proposal>]) => {
+          return [k, await fetchGistFile(v.info.descriptionLink)]
+        }
+      )
+
+      console.log('fetchRealm proposalDescriptions', proposalDescriptions)
+
+      set((s) => {
+        s.selectedRealm.proposalDescriptions = proposalDescriptions
+        s.selectedRealm.loading = false
       })
     },
 
@@ -242,11 +281,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const endpoint = get().connection.endpoint
       const set = get().set
 
+      set((s) => {
+        s.selectedProposal = INITIAL_PROPOSAL_STATE
+      })
+
       console.log('fetchProposal fetching...', proposalPk)
 
       const proposalPubKey = new PublicKey(proposalPk)
-
-      // TODO: Should we try to get proposal, governance, and realm from the store or always from the source?
 
       const proposal = await getGovernanceAccount<Proposal>(
         connection,
@@ -254,42 +295,48 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Proposal
       )
 
-      const governance = await getGovernanceAccount<Governance>(
-        connection,
-        proposal.info.governance,
-        Governance
-      )
+      const programId = proposal.account.owner
+
+      const [
+        description,
+        governance,
+        instructions,
+        voteRecords,
+        signatories,
+      ] = await Promise.all([
+        fetchGistFile(proposal.info.descriptionLink),
+        getGovernanceAccount<Governance>(
+          connection,
+          proposal.info.governance,
+          Governance
+        ),
+        getGovernanceAccounts<ProposalInstruction>(
+          programId,
+          endpoint,
+          ProposalInstruction,
+          getAccountTypes(ProposalInstruction),
+          [pubkeyFilter(1, proposalPubKey)]
+        ),
+        getGovernanceAccounts<VoteRecord>(
+          programId,
+          endpoint,
+          VoteRecord,
+          getAccountTypes(VoteRecord),
+          [pubkeyFilter(1, proposalPubKey)]
+        ),
+        getGovernanceAccounts<SignatoryRecord>(
+          programId,
+          endpoint,
+          SignatoryRecord,
+          getAccountTypes(SignatoryRecord),
+          [pubkeyFilter(1, proposalPubKey)]
+        ),
+      ])
 
       const realm = await getGovernanceAccount<Realm>(
         connection,
         governance.info.realm,
         Realm
-      )
-
-      const programId = proposal.account.owner
-
-      const instructions = await getGovernanceAccounts<ProposalInstruction>(
-        programId,
-        endpoint,
-        ProposalInstruction,
-        getAccountTypes(ProposalInstruction),
-        [pubkeyFilter(1, proposalPubKey)]
-      )
-
-      const voteRecords = await getGovernanceAccounts<VoteRecord>(
-        programId,
-        endpoint,
-        VoteRecord,
-        getAccountTypes(VoteRecord),
-        [pubkeyFilter(1, proposalPubKey)]
-      )
-
-      const signatories = await getGovernanceAccounts<SignatoryRecord>(
-        programId,
-        endpoint,
-        SignatoryRecord,
-        getAccountTypes(SignatoryRecord),
-        [pubkeyFilter(1, proposalPubKey)]
       )
 
       console.log('fetchProposal fetched', {
@@ -303,11 +350,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.proposal = proposal
+        s.selectedProposal.description = description
         s.selectedProposal.governance = governance
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = instructions
         s.selectedProposal.voteRecords = voteRecords
         s.selectedProposal.signatories = signatories
+        s.selectedProposal.loading = false
       })
     },
   },

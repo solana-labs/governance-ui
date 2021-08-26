@@ -6,26 +6,18 @@ import ProposalFilter from '../../components/ProposalFilter'
 import ProposalCard from '../../components/ProposalCard'
 import TokenBalanceCard from '../../components/TokenBalanceCard'
 
-export const ProposalStateLabels = {
-  0: 'Draft',
-  1: 'Draft',
-  2: 'Active',
-  3: 'Approved',
-  4: 'Approved',
-  5: 'Approved',
-  6: 'Cancelled',
-  7: 'Denied',
-  8: 'Error',
-}
-
 const DAO = () => {
   const router = useRouter()
   const { symbol } = router.query
 
   const wallet = useWalletStore((s) => s.current)
-  const { mint, proposals, realmTokenAccount, ownTokenRecord } = useRealm(
-    symbol as string
-  )
+  const {
+    mint,
+    proposals,
+    proposalDescriptions,
+    realmTokenAccount,
+    ownTokenRecord,
+  } = useRealm(symbol as string)
 
   // DEBUG print remove
   console.log(
@@ -58,7 +50,13 @@ const DAO = () => {
             <ProposalFilter />
           </div>
           {displayedProposal.map(([k, v]) => (
-            <ProposalCard key={k} id={k} mint={mint} proposal={v['info']} />
+            <ProposalCard
+              key={k}
+              id={k}
+              mint={mint}
+              proposal={v.info}
+              description={proposalDescriptions[k]}
+            />
           ))}
         </div>
         <div className="col-span-4">

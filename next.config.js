@@ -1,4 +1,8 @@
-module.exports = {
+// workaround for ESM module loader errors
+// see https://github.com/vercel/next.js/issues/25454
+const withTM = require('next-transpile-modules')(['react-markdown'])
+
+module.exports = withTM({
   target: 'serverless',
   webpack(config) {
     config.module.rules.push({
@@ -11,4 +15,5 @@ module.exports = {
 
     return config
   },
-}
+  webpack5: false,
+})

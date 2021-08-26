@@ -1,18 +1,19 @@
 import { useRouter } from 'next/router'
 import Link from 'next/link'
+import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
 import useProposal from '../../hooks/useProposal'
 import StatusBadge from '../../components/StatusBadge'
-import { ProposalStateLabels } from '../dao/[symbol]'
 import TokenBalanceCard from '../../components/TokenBalanceCard'
 import DiscussionPanel from '../../components/DiscussionPanel'
 import VotePanel from '../../components/VotePanel'
+import { ProposalState } from '../../models/accounts'
 
 const Proposal = () => {
   const router = useRouter()
   const { pk } = router.query
 
-  const { proposal, instructions } = useProposal(pk as string)
+  const { proposal, description, instructions } = useProposal(pk as string)
 
   console.log('proposal data', { proposal, instructions })
 
@@ -30,12 +31,9 @@ const Proposal = () => {
             <div className="pb-4">
               <div className="pb-4">
                 <h1 className="mb-1">{proposal?.info.name}</h1>
-                <StatusBadge
-                  status={ProposalStateLabels[proposal?.info.state]}
-                />
+                <StatusBadge status={ProposalState[proposal?.info.state]} />
               </div>
-              <p>{proposal?.info.descriptionLink}</p>
-              <span>{pk?.toString()}</span>
+              {description && <ReactMarkdown>{description}</ReactMarkdown>}
             </div>
             <DiscussionPanel />
             <VotePanel />
