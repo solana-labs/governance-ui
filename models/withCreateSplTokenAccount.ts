@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js'
 
 import * as serum from '@project-serum/common'
-import { IWallet } from './api'
+import { IWallet } from './core/api'
 
 export const withCreateSplTokenAccount = async (
   connection: Connection,

@@ -2,7 +2,8 @@ import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { RealmInfo } from '../@types/types'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/serialisation'
+import { ParsedAccount } from '../models/core/accounts'
+
 import { ENDPOINTS } from '../stores/useWalletStore'
 import { getGovernanceAccounts, pubkeyFilter } from './api'
 

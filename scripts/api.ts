@@ -6,8 +6,10 @@ import {
   GovernanceAccount,
   GovernanceAccountClass,
 } from '../models/accounts'
-import { RpcContext } from '../models/api'
-import { ParsedAccount, GOVERNANCE_SCHEMA } from '../models/serialisation'
+import { ParsedAccount } from '../models/core/accounts'
+import { RpcContext } from '../models/core/api'
+import { GOVERNANCE_SCHEMA } from '../models/serialisation'
+
 import { deserializeBorsh } from '../utils/borsh'
 
 const fetch = require('node-fetch')
