@@ -4,12 +4,16 @@ import Input from './Input'
 import CommentCostModal from './CommentCostModal'
 
 const DiscussionForm = () => {
-  const [comment] = useState('')
+  const [comment, setComment] = useState('')
   const [showCostModal, setShowCostModal] = useState(false)
   return (
     <>
       <div className="flex space-x-4">
-        <Input value={comment} type="text" />
+        <Input
+          value={comment}
+          type="text"
+          onChange={(e) => setComment(e.target.value)}
+        />
         <Button
           className="flex-shrink-0"
           onClick={() => setShowCostModal(true)}
@@ -21,6 +25,7 @@ const DiscussionForm = () => {
         <CommentCostModal
           isOpen={showCostModal}
           onClose={() => setShowCostModal(false)}
+          comment={comment}
         />
       ) : null}
     </>

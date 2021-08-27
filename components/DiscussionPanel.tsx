@@ -18,13 +18,17 @@ const DiscussionPanel = () => {
       <div className="pb-4">
         <DiscussionForm />
       </div>
-      {Object.entries(chatMessages).map(([pk, cm]) => (
-        <Comment
-          chatMessage={cm.info}
-          voteRecord={voteRecordsByVoter[cm.info.author.toBase58()]?.info}
-          key={pk}
-        />
-      ))}
+      {Object.values(chatMessages)
+        .sort(
+          (m1, m2) => m2.info.postedAt.toNumber() - m1.info.postedAt.toNumber()
+        )
+        .map((cm) => (
+          <Comment
+            chatMessage={cm.info}
+            voteRecord={voteRecordsByVoter[cm.info.author.toBase58()]?.info}
+            key={cm.pubkey.toBase58()}
+          />
+        ))}
     </div>
   )
 }
