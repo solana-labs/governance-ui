@@ -67,7 +67,7 @@ const Proposal = () => {
                         <div className="font-bold">
                           {formatVotes(
                             proposal?.info.yesVotesCount,
-                            proposalMint.decimals
+                            proposalMint?.decimals
                           ).toLocaleString()}
                         </div>
                       </div>
@@ -76,7 +76,7 @@ const Proposal = () => {
                         <div className="font-bold">
                           {formatVotes(
                             proposal?.info.noVotesCount,
-                            proposalMint.decimals
+                            proposalMint?.decimals
                           ).toLocaleString()}
                         </div>
                       </div>

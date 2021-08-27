@@ -11,11 +11,13 @@ import Modal from './Modal'
 interface MarketCloseModalProps {
   onClose: () => void
   isOpen: boolean
+  comment: string
 }
 
 const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
   onClose,
   isOpen,
+  comment,
 }) => {
   const [submitting, setSubmitting] = useState(false)
 
@@ -40,7 +42,7 @@ const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
     const walletTokenOwnerRecord = proposal.info.tokenOwnerRecord
     const msg = new ChatMessageBody({
       type: ChatMessageBodyType.Text,
-      value: 'I love MNGO!',
+      value: comment,
     })
 
     postChatMessage(rpcContext, proposal, walletTokenOwnerRecord, msg).finally(
