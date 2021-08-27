@@ -29,7 +29,7 @@ import { ChatMessage } from '../models/chat/accounts'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
-    name: 'mainnet-beta',
+    name: 'mainnet',
     url: 'https://mango.rpcpool.com',
     websocket: 'https://mango.rpcpool.com',
   },
@@ -175,6 +175,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
     },
     async fetchAllRealms(programId: PublicKey) {
+      console.log('fetchAllRealms', programId.toBase58())
+
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
       const set = get().set
@@ -201,8 +203,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           mints.map((m) => [m.publicKey.toBase58(), m.account])
         )
       })
+
+      console.log('fetchAllRealms', get().realms, get().mints)
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
+      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
+
       const endpoint = get().connection.endpoint
       const realms = get().realms
       const mints = get().mints
@@ -210,8 +216,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realmMintPk = realm.info.communityMint
       const realmMint = mints[realmMintPk.toBase58()]
       const set = get().set
-
-      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
 
       const [governances, tokenRecords] = await Promise.all([
         getGovernanceAccounts<Governance>(
@@ -285,17 +289,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
 
     async fetchProposal(proposalPk: string) {
+      console.log('fetchProposal', proposalPk)
+
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
-      const set = get().set
-
       const mints = get().mints
+      const set = get().set
 
       set((s) => {
         s.selectedProposal = INITIAL_PROPOSAL_STATE
       })
-
-      console.log('fetchProposal fetching...', proposalPk)
 
       const proposalPubKey = new PublicKey(proposalPk)
 

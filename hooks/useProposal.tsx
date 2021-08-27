@@ -1,22 +1,16 @@
-import { useEffect } from 'react'
+import { useRouter } from 'next/router'
 import useWalletStore from '../stores/useWalletStore'
 
-export default function useProposal(proposalPk: string) {
-  const { fetchProposal } = useWalletStore((s) => s.actions)
+export default function useProposal() {
+  const router = useRouter()
+  const { pk } = router.query
+
   const { proposal, description, instructions, proposalMint } = useWalletStore(
     (s) => s.selectedProposal
   )
 
-  useEffect(() => {
-    const fetch = async () => {
-      if (proposalPk) {
-        await fetchProposal(proposalPk)
-      }
-    }
-    fetch()
-  }, [proposalPk])
-
   return {
+    pk,
     proposal,
     description,
     instructions,
