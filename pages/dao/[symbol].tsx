@@ -5,6 +5,23 @@ import React from 'react'
 import ProposalFilter from '../../components/ProposalFilter'
 import ProposalCard from '../../components/ProposalCard'
 import TokenBalanceCard from '../../components/TokenBalanceCard'
+import { Proposal, ProposalState } from '../../models/accounts'
+
+const compareProposals = (p1: Proposal, p2: Proposal) => {
+  const p1Rank = p1.getStateSortRank()
+  const p2Rank = p2.getStateSortRank()
+
+  if (p1Rank > p2Rank) {
+    return 1
+  } else if (p1Rank < p2Rank) {
+    return -1
+  }
+
+  const tsCompare = p1.getStateTimestamp() - p2.getStateTimestamp()
+
+  // Show the proposals in voting state expiring earlier at the top
+  return p1.state === ProposalState.Voting ? ~tsCompare : tsCompare
+}
 
 const DAO = () => {
   const router = useRouter()
@@ -36,10 +53,8 @@ const DAO = () => {
   )
 
   const displayedProposal = Object.entries(proposals)
-    .filter(([_k, v]) => v.info.votingAt)
-    .sort(
-      (a, b) => b[1].info.votingAt.toNumber() - a[1].info.votingAt.toNumber()
-    )
+    .filter(([_k, v]) => v.info.votingAt || v.info.isPreVotingState())
+    .sort((a, b) => compareProposals(b[1].info, a[1].info))
 
   return (
     <>
