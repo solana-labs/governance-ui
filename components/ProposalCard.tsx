@@ -15,7 +15,7 @@ type ProposalCardProps = {
 }
 
 const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
-  const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
+  const yesVotePct = calculatePct(proposal.yesVotesCount, mint?.supply)
 
   const yesVoteProgress =
     (yesVotePct / proposal.voteThresholdPercentage?.value) * 100

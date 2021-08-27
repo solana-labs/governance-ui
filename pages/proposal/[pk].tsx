@@ -22,7 +22,7 @@ const Proposal = () => {
   )
 
   const yesVotePct = proposal
-    ? calculatePct(proposal.info.yesVotesCount, proposalMint.supply)
+    ? calculatePct(proposal.info.yesVotesCount, proposalMint?.supply)
     : null
 
   const yesVoteProgress =
