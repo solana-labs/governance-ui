@@ -69,7 +69,7 @@ interface WalletStore extends State {
     governance: ParsedAccount<Governance>
     realm: ParsedAccount<Realm>
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
-    voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
+    voteRecordsByVoter: { [voter: string]: ParsedAccount<VoteRecord> }
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
     chatMessages: { [message: string]: ParsedAccount<ChatMessage> }
     description?: string
@@ -120,7 +120,7 @@ const INITIAL_PROPOSAL_STATE = {
   governance: null,
   realm: null,
   instructions: {},
-  voteRecords: {},
+  voteRecordsByVoter: {},
   signatories: {},
   chatMessages: {},
   description: null,
@@ -307,7 +307,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         description,
         governance,
         instructions,
-        voteRecords,
+        voteRecordsByVoter,
         signatories,
         chatMessages,
       ] = await Promise.all([
@@ -330,6 +330,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           VoteRecord,
           getAccountTypes(VoteRecord),
           [pubkeyFilter(1, proposalPubKey)]
+        ).then((vrs) =>
+          mapFromEntries(vrs, ([_, v]) => [
+            v.info.governingTokenOwner.toBase58(),
+            v,
+          ])
         ),
         getGovernanceAccounts<SignatoryRecord>(
           programId,
@@ -352,7 +357,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         proposal,
         realm,
         instructions,
-        voteRecords,
+        voteRecordsByVoter,
         signatories,
         chatMessages,
       })
@@ -363,7 +368,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.governance = governance
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = instructions
-        s.selectedProposal.voteRecords = voteRecords
+        s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
         s.selectedProposal.signatories = signatories
         s.selectedProposal.chatMessages = chatMessages
         s.selectedProposal.loading = false

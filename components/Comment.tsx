@@ -1,8 +1,16 @@
 import moment from 'moment'
-// import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
+import React from 'react'
+import { VoteRecord } from '../models/accounts'
+import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
 import { ChatMessage } from '../models/chat/accounts'
 
-const Comment = ({ chatMessage }: { chatMessage: ChatMessage }) => {
+const Comment = ({
+  chatMessage,
+  voteRecord,
+}: {
+  chatMessage: ChatMessage
+  voteRecord: VoteRecord | undefined
+}) => {
   const { author, postedAt, body } = chatMessage
   return (
     <div className="border-b border-bkg-4 py-6">
@@ -18,18 +26,22 @@ const Comment = ({ chatMessage }: { chatMessage: ChatMessage }) => {
             </div>
           </div>
         </div>
-        {/* <div className="bg-bkg-3 flex items-center px-4 py-2 rounded-full">
-          <div className="flex items-center pr-2 text-fgd-1 text-xs">
-            {vote === 'Approve' ? (
-              <CheckCircleIcon className="h-5 mr-1 text-green w-5" />
-            ) : (
-              <XCircleIcon className="h-5 mr-1 text-red w-5" />
-            )}
-            {vote}
+        {voteRecord && (
+          <div className="bg-bkg-3 flex items-center px-4 py-2 rounded-full">
+            <div className="flex items-center pr-2 text-fgd-1 text-xs">
+              {voteRecord.isYes() ? (
+                <CheckCircleIcon className="h-5 mr-1 text-green w-5" />
+              ) : (
+                <XCircleIcon className="h-5 mr-1 text-red w-5" />
+              )}
+              {voteRecord.isYes() ? 'Approve' : 'Deny'}
+            </div>
+            <span className="text-fgd-4">|</span>
+            <span className="pl-2 text-xs">
+              {voteRecord.getVoteWeight().toLocaleString()} MNGO
+            </span>
           </div>
-          <span className="text-fgd-4">|</span>
-          <span className="pl-2 text-xs">{stake.toLocaleString()} MNGO</span>
-        </div> */}
+        )}
       </div>
       <p>{body.value}</p>
     </div>

@@ -593,6 +593,16 @@ export class VoteRecord {
     this.isRelinquished = !!args.isRelinquished
     this.voteWeight = args.voteWeight
   }
+
+  isYes() {
+    return this.voteWeight.yes && !this.voteWeight.yes.isZero()
+  }
+
+  getVoteWeight() {
+    return this.isYes()
+      ? this.voteWeight.yes.toNumber()
+      : this.voteWeight.no.toNumber()
+  }
 }
 
 export class AccountMetaData {
