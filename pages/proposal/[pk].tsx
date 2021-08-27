@@ -9,24 +9,24 @@ import TokenBalanceCard from '../../components/TokenBalanceCard'
 import DiscussionPanel from '../../components/DiscussionPanel'
 import VotePanel from '../../components/VotePanel'
 import { ProposalState } from '../../models/accounts'
-import useRealm from '../../hooks/useRealm'
+
 import { calculatePct } from '../../utils/formatting'
 import ApprovalProgress from '../../components/ApprovalProgress'
 
 const Proposal = () => {
   const router = useRouter()
   const { pk } = router.query
-  const { mint } = useRealm('MNGO')
 
-  const { proposal, description, instructions } = useProposal(pk as string)
+  const { proposal, description, instructions, proposalMint } = useProposal(
+    pk as string
+  )
 
-  const yesVotePct =
-    proposal && mint
-      ? calculatePct(proposal.info.yesVotesCount, mint.supply)
-      : null
+  const yesVotePct = proposal
+    ? calculatePct(proposal.info.yesVotesCount, proposalMint.supply)
+    : null
 
   const yesVoteProgress =
-    (yesVotePct / proposal?.info.voteThresholdPercentage.value) * 100
+    (yesVotePct / proposal?.info.voteThresholdPercentage?.value) * 100
 
   const formatVotes = (c: BN, decimals: number) =>
     c.div(new BN(10).pow(new BN(decimals))).toNumber()
@@ -67,7 +67,7 @@ const Proposal = () => {
                         <div className="font-bold">
                           {formatVotes(
                             proposal?.info.yesVotesCount,
-                            mint?.decimals
+                            proposalMint.decimals
                           ).toLocaleString()}
                         </div>
                       </div>
@@ -76,7 +76,7 @@ const Proposal = () => {
                         <div className="font-bold">
                           {formatVotes(
                             proposal?.info.noVotesCount,
-                            mint?.decimals
+                            proposalMint.decimals
                           ).toLocaleString()}
                         </div>
                       </div>

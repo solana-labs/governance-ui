@@ -73,6 +73,7 @@ interface WalletStore extends State {
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
     chatMessages: { [message: string]: ParsedAccount<ChatMessage> }
     description?: string
+    proposalMint?: MintAccount
     loading: boolean
   }
   providerUrl: string
@@ -124,6 +125,7 @@ const INITIAL_PROPOSAL_STATE = {
   signatories: {},
   chatMessages: {},
   description: null,
+  proposalMint: null,
   loading: true,
 }
 
@@ -287,6 +289,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const endpoint = get().connection.endpoint
       const set = get().set
 
+      const mints = get().mints
+
       set((s) => {
         s.selectedProposal = INITIAL_PROPOSAL_STATE
       })
@@ -300,6 +304,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         proposalPubKey,
         Proposal
       )
+
+      const proposalMint = mints[proposal.info.governingTokenMint.toBase58()]
 
       const programId = proposal.account.owner
 
@@ -371,6 +377,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
         s.selectedProposal.signatories = signatories
         s.selectedProposal.chatMessages = chatMessages
+        s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
       })
     },

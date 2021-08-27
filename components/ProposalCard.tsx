@@ -46,7 +46,9 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
                 </span>
               </div>
             </div>
-            <ApprovalProgress progress={yesVoteProgress} />
+            {!proposal.isPreVotingState() && (
+              <ApprovalProgress progress={yesVoteProgress} />
+            )}
           </div>
         </a>
       </Link>
