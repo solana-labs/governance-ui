@@ -28,6 +28,7 @@ const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
+  const { fetchChatMessages } = useWalletStore((s) => s.actions)
 
   const gasCost = 0.0016
 
@@ -55,6 +56,8 @@ const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
     } finally {
       setSubmitting(false)
     }
+
+    fetchChatMessages(proposal.pubkey)
   }
 
   return (

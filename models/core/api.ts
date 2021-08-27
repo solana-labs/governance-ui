@@ -97,7 +97,7 @@ export async function getBorshProgramAccounts<
       params: [
         programId.toBase58(),
         {
-          commitment: 'single',
+          commitment: 'recent',
           encoding: 'base64',
           filters: [
             {

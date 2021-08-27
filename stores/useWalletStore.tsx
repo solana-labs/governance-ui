@@ -384,6 +384,19 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.loading = false
       })
     },
+    async fetchChatMessages(proposalPubKey: PublicKey) {
+      const endpoint = get().connection.endpoint
+      const set = get().set
+
+      const chatMessages = await getGovernanceChatMessages(
+        endpoint,
+        proposalPubKey
+      )
+
+      set((s) => {
+        s.selectedProposal.chatMessages = chatMessages
+      })
+    },
   },
 }))
 
