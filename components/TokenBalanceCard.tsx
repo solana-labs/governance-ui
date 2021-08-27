@@ -8,7 +8,7 @@ import BN from 'bn.js'
 import useRealm from '../hooks/useRealm'
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
-import useWalletStore from '../stores/useWalletStore'
+import useWalletStore, { DEFAULT_REALM } from '../stores/useWalletStore'
 import { sendTransaction } from '../utils/send'
 import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
 import Button from './Button'
@@ -20,7 +20,7 @@ const TokenBalanceCard = () => {
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
-  const symbol = 'MNGO'
+  const symbol = DEFAULT_REALM
   const { realm, realmInfo, realmTokenAccount, ownTokenRecord } = useRealm(
     symbol
   )

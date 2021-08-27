@@ -12,6 +12,7 @@ import { ProposalState } from '../../models/accounts'
 
 import { calculatePct } from '../../utils/formatting'
 import ApprovalProgress from '../../components/ApprovalProgress'
+import { DEFAULT_REALM } from '../../stores/useWalletStore'
 
 const Proposal = () => {
   const router = useRouter()
@@ -35,7 +36,7 @@ const Proposal = () => {
 
   return (
     <div className="pb-10 pt-4">
-      <Link href="/dao/MNGO">
+      <Link href={`/dao/${DEFAULT_REALM}`}>
         <a className="flex items-center text-fgd-3">
           <ArrowLeftIcon className="h-5 w-5 mr-1" />
           &nbsp; Back

@@ -41,6 +41,8 @@ export const ENDPOINTS: EndpointInfo[] = [
 ]
 
 const CLUSTER = 'devnet'
+export const DEFAULT_REALM = 'MNGO DEVNET'
+
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')
