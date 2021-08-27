@@ -134,7 +134,7 @@ export async function getBorshProgramAccounts<
 
       accounts[account.pubkey.toBase58()] = account
     } catch (ex) {
-      console.error(`Can't deserialize ${accountFactory}`, ex)
+      console.warn(`Can't deserialize ${accountFactory.name}`, ex)
     }
   }
 

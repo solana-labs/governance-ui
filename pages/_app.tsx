@@ -5,8 +5,10 @@ import useWallet from '../hooks/useWallet'
 import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
 import PageBodyContainer from '../components/PageBodyContainer'
+import useHydrateStore from '../hooks/useHydrateStore'
 
 function App({ Component, pageProps }) {
+  useHydrateStore()
   useWallet()
 
   const title = 'Mango Markets'

@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
-import { useEffect, useMemo } from 'react'
+import { useRouter } from 'next/router'
+import { useMemo } from 'react'
 import { RealmInfo } from '../@types/types'
 import useWalletStore from '../stores/useWalletStore'
 
@@ -10,14 +11,16 @@ export const REALMS: RealmInfo[] = [
     realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
   },
   {
-    symbol: 'MNGO DEVNET',
+    symbol: 'MNGO-DEV',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
   },
 ]
 
-export default function useRealm(symbol?: string) {
-  const { fetchAllRealms, fetchRealm } = useWalletStore((s) => s.actions)
+export default function useRealm() {
+  const router = useRouter()
+  const { symbol } = router.query
+
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
@@ -33,16 +36,6 @@ export default function useRealm(symbol?: string) {
   const realmInfo = useMemo(() => REALMS.find((r) => r.symbol === symbol), [
     symbol,
   ])
-
-  useEffect(() => {
-    const fetch = async () => {
-      if (realmInfo) {
-        await fetchAllRealms(realmInfo.programId)
-        fetchRealm(realmInfo.programId, realmInfo.realmId)
-      }
-    }
-    fetch()
-  }, [realmInfo])
 
   const realmTokenAccount = useMemo(
     () =>
@@ -61,6 +54,7 @@ export default function useRealm(symbol?: string) {
   return {
     realm,
     realmInfo,
+    symbol,
     mint,
     governances,
     proposals,

@@ -7,6 +7,7 @@ import { MintInfo } from '@solana/spl-token'
 import { Proposal, ProposalState } from '../models/accounts'
 import { calculatePct, fmtUnixTime } from '../utils/formatting'
 import ApprovalProgress from './ApprovalProgress'
+import useRealm from '../hooks/useRealm'
 
 type ProposalCardProps = {
   id: string
@@ -15,6 +16,8 @@ type ProposalCardProps = {
 }
 
 const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
+  const { symbol } = useRealm()
+
   const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
 
   const yesVoteProgress =
@@ -22,7 +25,7 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
 
   return (
     <div>
-      <Link href={`/proposal/${id}`}>
+      <Link href={`/dao/${symbol}/proposal/${id}`}>
         <a>
           <div className="bg-bkg-2 rounded-md">
             <div className="px-6 py-4">

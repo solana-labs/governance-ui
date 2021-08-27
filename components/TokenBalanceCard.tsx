@@ -20,10 +20,13 @@ const TokenBalanceCard = () => {
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
-  const symbol = 'MNGO'
-  const { realm, realmInfo, realmTokenAccount, ownTokenRecord } = useRealm(
-    symbol
-  )
+  const {
+    symbol,
+    realm,
+    realmInfo,
+    realmTokenAccount,
+    ownTokenRecord,
+  } = useRealm()
 
   const depositTokens = async function (amount: BN) {
     const instructions: TransactionInstruction[] = []

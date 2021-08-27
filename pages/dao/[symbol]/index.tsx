@@ -1,11 +1,10 @@
-import { useRouter } from 'next/router'
-import useWalletStore from '../../stores/useWalletStore'
-import useRealm from '../../hooks/useRealm'
+import useWalletStore from '../../../stores/useWalletStore'
+import useRealm from '../../../hooks/useRealm'
 import React from 'react'
-import ProposalFilter from '../../components/ProposalFilter'
-import ProposalCard from '../../components/ProposalCard'
-import TokenBalanceCard from '../../components/TokenBalanceCard'
-import { Proposal, ProposalState } from '../../models/accounts'
+import ProposalFilter from '../../../components/ProposalFilter'
+import ProposalCard from '../../../components/ProposalCard'
+import TokenBalanceCard from '../../../components/TokenBalanceCard'
+import { Proposal, ProposalState } from '../../../models/accounts'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -24,13 +23,8 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 }
 
 const DAO = () => {
-  const router = useRouter()
-  const { symbol } = router.query
-
   const wallet = useWalletStore((s) => s.current)
-  const { mint, proposals, realmTokenAccount, ownTokenRecord } = useRealm(
-    symbol as string
-  )
+  const { mint, proposals, realmTokenAccount, ownTokenRecord } = useRealm()
 
   // DEBUG print remove
   console.log(
