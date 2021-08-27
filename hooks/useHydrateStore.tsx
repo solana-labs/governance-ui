@@ -6,6 +6,7 @@ import { REALMS } from './useRealm'
 export default function useHydrateStore() {
   const router = useRouter()
   const { pk, symbol } = router.query
+  const mints = useWalletStore((s) => s.mints)
   const { fetchAllRealms, fetchRealm, fetchProposal } = useWalletStore(
     (s) => s.actions
   )
@@ -23,10 +24,10 @@ export default function useHydrateStore() {
 
   useEffect(() => {
     const fetch = async () => {
-      if (pk) {
+      if (pk && Object.entries(mints).length > 0) {
         await fetchProposal(pk)
       }
     }
     fetch()
-  }, [pk])
+  }, [pk, mints])
 }
