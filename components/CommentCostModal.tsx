@@ -1,6 +1,8 @@
 import { FunctionComponent, useState } from 'react'
 import { postChatMessage } from '../actions/chat/postMessage'
+import { TokenOwnerRecord } from '../models/accounts'
 import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
+import { ParsedAccount } from '../models/core/accounts'
 import { RpcContext } from '../models/core/api'
 import useWalletStore from '../stores/useWalletStore'
 import Button, { LinkButton } from './Button'
@@ -9,15 +11,17 @@ import Loading from './Loading'
 import Modal from './Modal'
 
 interface MarketCloseModalProps {
-  onClose: () => void
+  onClose: (success: boolean) => void
   isOpen: boolean
   comment: string
+  ownTokenRecord: ParsedAccount<TokenOwnerRecord>
 }
 
 const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
   onClose,
   isOpen,
   comment,
+  ownTokenRecord,
 }) => {
   const [submitting, setSubmitting] = useState(false)
 
@@ -25,12 +29,11 @@ const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
 
-  const gasCost = 0.0001
+  const gasCost = 0.0016
 
-  const submitComment = () => {
+  const submitComment = async () => {
     setSubmitting(true)
 
-    console.log('COMMENT', { wallet, connection, proposal })
     const rpcContext = new RpcContext(
       proposal.account.owner,
       wallet,
@@ -38,29 +41,33 @@ const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
       connection.endpoint
     )
 
-    // TODO: Change to current
-    const walletTokenOwnerRecord = proposal.info.tokenOwnerRecord
     const msg = new ChatMessageBody({
       type: ChatMessageBodyType.Text,
       value: comment,
     })
 
-    postChatMessage(rpcContext, proposal, walletTokenOwnerRecord, msg).finally(
-      () => {
-        setSubmitting(false)
-        onClose()
-      }
-    )
+    try {
+      await postChatMessage(rpcContext, proposal, ownTokenRecord.pubkey, msg)
+      onClose(true)
+    } catch {
+      //TODO: How do we present transaction errors to users? Just the notification?
+      onClose(false)
+    } finally {
+      setSubmitting(false)
+    }
   }
 
   return (
-    <Modal onClose={onClose} isOpen={isOpen}>
+    <Modal onClose={() => onClose(false)} isOpen={isOpen}>
       <h2 className="pb-4 text-th-fgd-1">Posting will cost ~{gasCost} SOL</h2>
       <div className="flex items-center">
         <Button onClick={() => submitComment()}>
           {submitting ? <Loading /> : <span>Send It</span>}
         </Button>
-        <LinkButton className="ml-4 text-th-fgd-1" onClick={onClose}>
+        <LinkButton
+          className="ml-4 text-th-fgd-1"
+          onClick={() => onClose(false)}
+        >
           Cancel
         </LinkButton>
       </div>

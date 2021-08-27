@@ -2,10 +2,21 @@ import { useState } from 'react'
 import Button from './Button'
 import Input from './Input'
 import CommentCostModal from './CommentCostModal'
+import useWalletStore from '../stores/useWalletStore'
+import useRealm from '../hooks/useRealm'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const [showCostModal, setShowCostModal] = useState(false)
+  const connected = useWalletStore((s) => s.connected)
+  const { ownTokenRecord } = useRealm()
+
+  const postEnabled =
+    connected &&
+    ownTokenRecord &&
+    !ownTokenRecord.info.governingTokenDepositAmount.isZero() &&
+    comment
+
   return (
     <>
       <div className="flex space-x-4">
@@ -17,6 +28,7 @@ const DiscussionForm = () => {
         <Button
           className="flex-shrink-0"
           onClick={() => setShowCostModal(true)}
+          disabled={!postEnabled}
         >
           Post Comment
         </Button>
@@ -24,8 +36,12 @@ const DiscussionForm = () => {
       {showCostModal ? (
         <CommentCostModal
           isOpen={showCostModal}
-          onClose={() => setShowCostModal(false)}
+          onClose={(success) => {
+            success && setComment('')
+            setShowCostModal(false)
+          }}
           comment={comment}
+          ownTokenRecord={ownTokenRecord}
         />
       ) : null}
     </>
