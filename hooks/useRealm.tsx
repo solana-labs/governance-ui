@@ -11,7 +11,7 @@ export const REALMS: RealmInfo[] = [
   },
 ]
 
-export default function useRealm(symbol: string) {
+export default function useRealm(symbol?: string) {
   const { fetchAllRealms, fetchRealm } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
