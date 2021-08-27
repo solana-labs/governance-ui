@@ -7,6 +7,10 @@ import ProposalCard from '../../components/ProposalCard'
 import TokenBalanceCard from '../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../models/accounts'
 
+// Compares proposals to display actionable proposals first
+// 1) Proposal in Voting state - proposals with less voting time are displayed first
+// 2) Proposals in pending, awaiting actions, states - (Draft, SigningOff, awaiting Execution)
+// 3) Proposals in final states - no actions possible
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
   const p2Rank = p2.getStateSortRank()
@@ -48,9 +52,9 @@ const DAO = () => {
     wallet?.connected && ownTokenRecord
   )
 
-  const displayedProposal = Object.entries(proposals)
-    .filter(([_k, v]) => v.info.votingAt || v.info.isPreVotingState())
-    .sort((a, b) => compareProposals(b[1].info, a[1].info))
+  const displayedProposal = Object.entries(proposals).sort((a, b) =>
+    compareProposals(b[1].info, a[1].info)
+  )
 
   return (
     <>
