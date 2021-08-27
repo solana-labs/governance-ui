@@ -90,7 +90,7 @@ const VotePanel = () => {
     ? 'Cast your vote'
     : isVoting
     ? 'Withdraw your vote'
-    : 'Release yor tokens'
+    : 'Release your tokens'
 
   return (
     <div className="bg-bkg-2 p-6 rounded-md space-y-6">
