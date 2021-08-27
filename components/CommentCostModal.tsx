@@ -1,4 +1,8 @@
 import { FunctionComponent, useState } from 'react'
+import { postChatMessage } from '../actions/chat/postMessage'
+import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
+import { RpcContext } from '../models/core/api'
+import useWalletStore from '../stores/useWalletStore'
 import Button, { LinkButton } from './Button'
 // import { notify } from '../utils/notifications'
 import Loading from './Loading'
@@ -14,13 +18,37 @@ const CommentCostModal: FunctionComponent<MarketCloseModalProps> = ({
   isOpen,
 }) => {
   const [submitting, setSubmitting] = useState(false)
+
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
+  const { proposal } = useWalletStore((s) => s.selectedProposal)
+
   const gasCost = 0.0001
 
   const submitComment = () => {
     setSubmitting(true)
-    //   do stuff...
-    setSubmitting(false)
-    onClose()
+
+    console.log('COMMENT', { wallet, connection, proposal })
+    const rpcContext = new RpcContext(
+      proposal.account.owner,
+      wallet,
+      connection.current,
+      connection.endpoint
+    )
+
+    // TODO: Change to current
+    const walletTokenOwnerRecord = proposal.info.tokenOwnerRecord
+    const msg = new ChatMessageBody({
+      type: ChatMessageBodyType.Text,
+      value: 'I love MNGO!',
+    })
+
+    postChatMessage(rpcContext, proposal, walletTokenOwnerRecord, msg).finally(
+      () => {
+        setSubmitting(false)
+        onClose()
+      }
+    )
   }
 
   return (

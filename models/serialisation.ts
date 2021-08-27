@@ -1,4 +1,4 @@
-import { AccountInfo, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { TransactionInstruction } from '@solana/web3.js'
 import { deserializeBorsh } from '../utils/borsh'
 
 import { BinaryReader, BinaryWriter } from 'borsh'
@@ -485,33 +485,6 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     },
   ],
 ])
-
-export interface ParsedAccountBase {
-  pubkey: PublicKey
-  account: AccountInfo<Buffer>
-  info: unknown
-}
-
-export interface ParsedAccount<T> extends ParsedAccountBase {
-  info: T
-}
-
-export function BorshAccountParser(
-  classType: any
-): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ParsedAccountBase {
-  return (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
-    const buffer = Buffer.from(info.data)
-    const data = deserializeBorsh(GOVERNANCE_SCHEMA, classType, buffer)
-
-    return {
-      pubkey: pubKey,
-      account: {
-        ...info,
-      },
-      info: data,
-    } as ParsedAccountBase
-  }
-}
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {
   const instructionDataBin = Buffer.from(instructionDataBase64, 'base64')

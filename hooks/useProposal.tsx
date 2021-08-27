@@ -3,7 +3,7 @@ import useWalletStore from '../stores/useWalletStore'
 
 export default function useProposal(proposalPk: string) {
   const { fetchProposal } = useWalletStore((s) => s.actions)
-  const { proposal, description, instructions } = useWalletStore(
+  const { proposal, description, instructions, proposalMint } = useWalletStore(
     (s) => s.selectedProposal
   )
 
@@ -20,5 +20,6 @@ export default function useProposal(proposalPk: string) {
     proposal,
     description,
     instructions,
+    proposalMint,
   }
 }

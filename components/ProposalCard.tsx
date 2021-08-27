@@ -18,7 +18,7 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
   const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
 
   const yesVoteProgress =
-    (yesVotePct / proposal.voteThresholdPercentage.value) * 100
+    (yesVotePct / proposal.voteThresholdPercentage?.value) * 100
 
   return (
     <div>
@@ -46,7 +46,9 @@ const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
                 </span>
               </div>
             </div>
-            <ApprovalProgress progress={yesVoteProgress} />
+            {!proposal.isPreVotingState() && (
+              <ApprovalProgress progress={yesVoteProgress} />
+            )}
           </div>
         </a>
       </Link>

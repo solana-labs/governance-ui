@@ -9,11 +9,7 @@ import {
   getMint,
   getOwnedTokenAccounts,
 } from '../utils/tokens'
-import {
-  getGovernanceAccount,
-  getGovernanceAccounts,
-  pubkeyFilter,
-} from '../models/api'
+import { getGovernanceAccount, getGovernanceAccounts } from '../models/api'
 import {
   getAccountTypes,
   Governance,
@@ -25,8 +21,11 @@ import {
   VoteRecord,
 } from '../models/accounts'
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
-import { ParsedAccount } from '../models/serialisation'
+import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
+import { pubkeyFilter } from '../scripts/api'
+import { getGovernanceChatMessages } from '../models/chat/api'
+import { ChatMessage } from '../models/chat/accounts'
 
 export const ENDPOINTS: EndpointInfo[] = [
   {
@@ -34,9 +33,14 @@ export const ENDPOINTS: EndpointInfo[] = [
     url: 'https://mango.rpcpool.com',
     websocket: 'https://mango.rpcpool.com',
   },
+  {
+    name: 'devnet',
+    url: 'https://api.devnet.solana.com',
+    websocket: 'https://api.devnet.solana.com',
+  },
 ]
 
-const CLUSTER = 'mainnet-beta'
+const CLUSTER = 'devnet'
 const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
 const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')
@@ -65,9 +69,11 @@ interface WalletStore extends State {
     governance: ParsedAccount<Governance>
     realm: ParsedAccount<Realm>
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
-    voteRecords: { [voteRecord: string]: ParsedAccount<VoteRecord> }
+    voteRecordsByVoter: { [voter: string]: ParsedAccount<VoteRecord> }
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
+    chatMessages: { [message: string]: ParsedAccount<ChatMessage> }
     description?: string
+    proposalMint?: MintAccount
     loading: boolean
   }
   providerUrl: string
@@ -115,9 +121,11 @@ const INITIAL_PROPOSAL_STATE = {
   governance: null,
   realm: null,
   instructions: {},
-  voteRecords: {},
+  voteRecordsByVoter: {},
   signatories: {},
+  chatMessages: {},
   description: null,
+  proposalMint: null,
   loading: true,
 }
 
@@ -281,6 +289,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const endpoint = get().connection.endpoint
       const set = get().set
 
+      const mints = get().mints
+
       set((s) => {
         s.selectedProposal = INITIAL_PROPOSAL_STATE
       })
@@ -295,14 +305,17 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Proposal
       )
 
+      const proposalMint = mints[proposal.info.governingTokenMint.toBase58()]
+
       const programId = proposal.account.owner
 
       const [
         description,
         governance,
         instructions,
-        voteRecords,
+        voteRecordsByVoter,
         signatories,
+        chatMessages,
       ] = await Promise.all([
         fetchGistFile(proposal.info.descriptionLink),
         getGovernanceAccount<Governance>(
@@ -323,6 +336,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           VoteRecord,
           getAccountTypes(VoteRecord),
           [pubkeyFilter(1, proposalPubKey)]
+        ).then((vrs) =>
+          mapFromEntries(vrs, ([_, v]) => [
+            v.info.governingTokenOwner.toBase58(),
+            v,
+          ])
         ),
         getGovernanceAccounts<SignatoryRecord>(
           programId,
@@ -331,6 +349,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           getAccountTypes(SignatoryRecord),
           [pubkeyFilter(1, proposalPubKey)]
         ),
+        getGovernanceChatMessages(endpoint, proposalPubKey),
       ])
 
       const realm = await getGovernanceAccount<Realm>(
@@ -344,8 +363,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         proposal,
         realm,
         instructions,
-        voteRecords,
+        voteRecordsByVoter,
         signatories,
+        chatMessages,
       })
 
       set((s) => {
@@ -354,8 +374,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.governance = governance
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = instructions
-        s.selectedProposal.voteRecords = voteRecords
+        s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
         s.selectedProposal.signatories = signatories
+        s.selectedProposal.chatMessages = chatMessages
+        s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
       })
     },

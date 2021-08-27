@@ -1,21 +1,49 @@
-import { PublicKey } from '@solana/web3.js'
-import * as bs58 from 'bs58'
-import {
-  Realm,
-  GovernanceAccountType,
-  GovernanceAccount,
-  GovernanceAccountClass,
-} from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
-import { RpcContext } from '../models/core/api'
-import { GOVERNANCE_SCHEMA } from '../models/serialisation'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { WalletNotConnectedError } from './errors'
+import bs58 from 'bs58'
 
-import { deserializeBorsh } from '../utils/borsh'
+import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
+import { Schema } from 'borsh'
+import { deserializeBorsh } from '../../utils/borsh'
 
-const fetch = require('node-fetch')
+export const SYSTEM_PROGRAM_ID = new PublicKey(
+  '11111111111111111111111111111111'
+)
 
 export interface IWallet {
   publicKey: PublicKey
+}
+
+// Context to make RPC calls for given clone programId, current connection, endpoint and wallet
+export class RpcContext {
+  programId: PublicKey
+  wallet: IWallet | undefined
+  connection: Connection
+  endpoint: string
+
+  constructor(
+    programId: PublicKey,
+    wallet: IWallet | undefined,
+    connection: Connection,
+    endpoint: string
+  ) {
+    this.programId = programId
+    this.wallet = wallet
+    this.connection = connection
+    this.endpoint = endpoint
+  }
+
+  get walletPubkey() {
+    if (!this.wallet?.publicKey) {
+      throw new WalletNotConnectedError()
+    }
+
+    return this.wallet.publicKey
+  }
+
+  get programIdBase58() {
+    return this.programId.toBase58()
+  }
 }
 
 export class MemcmpFilter {
@@ -45,57 +73,18 @@ export const pubkeyFilter = (
   pubkey: PublicKey | undefined | null
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()))
 
-export async function getRealms(rpcContext: RpcContext) {
-  return getGovernanceAccountsImpl<Realm>(
-    rpcContext.programId,
-    rpcContext.endpoint,
-    Realm,
-    GovernanceAccountType.Realm
-  )
-}
-
-export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
+export async function getBorshProgramAccounts<
+  TAccount extends ProgramAccountWithType
+>(
   programId: PublicKey,
+  borshSchema: Schema,
   endpoint: string,
-  accountClass: GovernanceAccountClass,
-  accountTypes: GovernanceAccountType[],
-  filters: MemcmpFilter[] = []
+  accountFactory: new (args: any) => TAccount,
+  filters: MemcmpFilter[] = [],
+  accountType?: number
 ) {
-  if (accountTypes.length === 1) {
-    return getGovernanceAccountsImpl<TAccount>(
-      programId,
-      endpoint,
-      accountClass,
-      accountTypes[0],
-      filters
-    )
-  }
+  accountType = accountType ?? new accountFactory({}).accountType
 
-  const all = await Promise.all(
-    accountTypes.map((at) =>
-      getGovernanceAccountsImpl<TAccount>(
-        programId,
-        endpoint,
-        accountClass,
-        at,
-        filters
-      )
-    )
-  )
-
-  return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
-    string,
-    ParsedAccount<TAccount>
-  >
-}
-
-async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
-  programId: PublicKey,
-  endpoint: string,
-  accountClass: GovernanceAccountClass,
-  accountType: GovernanceAccountType,
-  filters: MemcmpFilter[] = []
-) {
   const getProgramAccounts = await fetch(endpoint, {
     method: 'POST',
     headers: {
@@ -126,7 +115,7 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
     }),
   })
   const rawAccounts = (await getProgramAccounts.json())['result']
-  const accounts: Record<string, ParsedAccount<TAccount>> = {}
+  const accounts: { [pubKey: string]: ParsedAccount<TAccount> } = {}
 
   for (const rawAccount of rawAccounts) {
     try {
@@ -137,15 +126,15 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
           data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
         },
         info: deserializeBorsh(
-          GOVERNANCE_SCHEMA,
-          accountClass,
+          borshSchema,
+          accountFactory,
           Buffer.from(rawAccount.account.data[0], 'base64')
         ),
       }
 
       accounts[account.pubkey.toBase58()] = account
     } catch (ex) {
-      console.error(`Can't deserialize ${accountClass}`, ex)
+      console.error(`Can't deserialize ${accountFactory}`, ex)
     }
   }
 
