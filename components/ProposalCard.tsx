@@ -1,44 +1,24 @@
 import { ClockIcon } from '@heroicons/react/outline'
-import {
-  CheckCircleIcon,
-  ChevronRightIcon,
-  XCircleIcon,
-} from '@heroicons/react/solid'
+import { ChevronRightIcon } from '@heroicons/react/solid'
 
 import StatusBadge from './StatusBadge'
-import moment from 'moment'
-import ReactMarkdown from 'react-markdown/react-markdown.min'
-import BN from 'bn.js'
 import Link from 'next/link'
 import { MintInfo } from '@solana/spl-token'
 import { Proposal, ProposalState } from '../models/accounts'
-
-const votePrecision = 10000
-const calculatePct = (c: BN, total: BN) =>
-  c.mul(new BN(votePrecision)).div(total).toNumber() * (100 / votePrecision)
-
-const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()
+import { calculatePct, fmtUnixTime } from '../utils/formatting'
+import ApprovalProgress from './ApprovalProgress'
 
 type ProposalCardProps = {
   id: string
   proposal: Proposal
-  description?: string
   mint: MintInfo
 }
 
-const ProposalCard = ({
-  id,
-  proposal,
-  description,
-  mint,
-}: ProposalCardProps) => {
+const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
   const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
-  // const noVotePct = calculatePct(proposal.noVotesCount, mint.supply)
 
   const yesVoteProgress =
     (yesVotePct / proposal.voteThresholdPercentage.value) * 100
-
-  console.log(proposal.yesVotesCount.toString())
 
   return (
     <div>
@@ -65,31 +45,8 @@ const ProposalCard = ({
                     : `Drafted ${fmtUnixTime(proposal.draftAt)}`}
                 </span>
               </div>
-              {description && <ReactMarkdown>{description}</ReactMarkdown>}
             </div>
-            <div className="bg-[rgba(255,255,255,0.05)] px-6 py-4 rounded-b-md">
-              <div className="flex items-center justify-between">
-                <p className="text-fgd-1">Approval Progress</p>
-                <div className="flex items-center">
-                  {yesVoteProgress > 100 ? (
-                    <CheckCircleIcon className="h-5 text-green w-5" />
-                  ) : (
-                    <XCircleIcon className="h-5 text-red w-5" />
-                  )}
-                  <p className="font-bold ml-1 text-fgd-1">
-                    {yesVoteProgress}%
-                  </p>
-                </div>
-              </div>
-              <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">
-                <div
-                  style={{
-                    width: `${yesVoteProgress}%`,
-                  }}
-                  className="bg-primary-light flex rounded"
-                ></div>
-              </div>
-            </div>
+            <ApprovalProgress progress={yesVoteProgress} />
           </div>
         </a>
       </Link>

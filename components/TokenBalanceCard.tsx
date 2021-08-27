@@ -5,33 +5,23 @@ import Button from './Button'
 const TokenBalanceCard = () => {
   const router = useRouter()
   const { symbol } = router.query
-  const { realmTokenAccount, ownTokenRecord } = useRealm(symbol as string)
+  const { ownTokenRecord } = useRealm(symbol as string)
   return (
-    <div className="bg-bkg-2 p-6 rounded-md space-y-6">
-      <h3 className="mb-4">MNGO balance</h3>
+    <div className="bg-bkg-2 p-6 rounded-md">
+      <h3 className="mb-4">Deposit Tokens</h3>
 
       <div className="flex space-x-4 items-center">
-        <div>Deposited</div>
-        <div className="col-span-3 bg-bkg-3 p-4 rounded">
-          <div className="text-xl">
+        <div className="bg-bkg-1 px-4 py-2 rounded w-full">
+          <p className="text-fgd-3 text-xs">{symbol} Votes</p>
+          <div className="font-bold">
             {ownTokenRecord
               ? ownTokenRecord.info.governingTokenDepositAmount.toNumber()
-              : 'N/A'}
-          </div>
-        </div>
-      </div>
-      <div className="flex space-x-4 items-center">
-        <div>In Wallet</div>
-        <div className="col-span-3 bg-bkg-3 p-4 rounded">
-          <div className="text-xl">
-            {realmTokenAccount
-              ? realmTokenAccount.account.amount.toString()
-              : 'N/A'}
+              : '0'}
           </div>
         </div>
       </div>
 
-      <div className="flex space-x-4">
+      <div className="flex pt-6 space-x-4">
         <Button className="w-1/2">Deposit</Button>
         <Button className="w-1/2">Withdraw</Button>
       </div>

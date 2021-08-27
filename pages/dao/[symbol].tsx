@@ -11,13 +11,9 @@ const DAO = () => {
   const { symbol } = router.query
 
   const wallet = useWalletStore((s) => s.current)
-  const {
-    mint,
-    proposals,
-    proposalDescriptions,
-    realmTokenAccount,
-    ownTokenRecord,
-  } = useRealm(symbol as string)
+  const { mint, proposals, realmTokenAccount, ownTokenRecord } = useRealm(
+    symbol as string
+  )
 
   // DEBUG print remove
   console.log(
@@ -43,20 +39,14 @@ const DAO = () => {
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4 pt-16">
-        <div className="col-span-8 space-y-3">
+      <div className="grid grid-cols-12 gap-4 pb-10 pt-16">
+        <div className="col-span-8 space-y-4">
           <div className="flex items-center justify-between">
             <h2>{`${displayedProposal.length} proposals`}</h2>
             <ProposalFilter />
           </div>
           {displayedProposal.map(([k, v]) => (
-            <ProposalCard
-              key={k}
-              id={k}
-              mint={mint}
-              proposal={v.info}
-              description={proposalDescriptions[k]}
-            />
+            <ProposalCard key={k} id={k} mint={mint} proposal={v.info} />
           ))}
         </div>
         <div className="col-span-4">
