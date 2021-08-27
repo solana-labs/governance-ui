@@ -1,5 +1,6 @@
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
+import useWalletStore from '../stores/useWalletStore'
 
 const comments = [
   {
@@ -23,6 +24,8 @@ const comments = [
 ]
 
 const DiscussionPanel = () => {
+  const { chatMessages } = useWalletStore((s) => s.selectedProposal)
+
   return (
     <div className="bg-bkg-2 p-6 rounded-md">
       <h2 className="mb-4">
@@ -32,8 +35,8 @@ const DiscussionPanel = () => {
       <div className="pb-4">
         <DiscussionForm />
       </div>
-      {comments.map((c) => (
-        <Comment comment={c} key={c.timestamp} />
+      {Object.entries(chatMessages).map(([pk, cm]) => (
+        <Comment chatMessage={cm.info} key={pk} />
       ))}
     </div>
   )
