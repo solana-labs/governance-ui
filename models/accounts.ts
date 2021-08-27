@@ -605,6 +605,23 @@ export class VoteRecord {
   }
 }
 
+export async function getVoteRecordAddress(
+  programId: PublicKey,
+  proposal: PublicKey,
+  tokenOwnerRecord: PublicKey
+) {
+  const [voteRecordAddress] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from(GOVERNANCE_PROGRAM_SEED),
+      proposal.toBuffer(),
+      tokenOwnerRecord.toBuffer(),
+    ],
+    programId
+  )
+
+  return voteRecordAddress
+}
+
 export class AccountMetaData {
   pubkey: PublicKey
   isSigner: boolean
