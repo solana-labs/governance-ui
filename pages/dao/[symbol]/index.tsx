@@ -43,7 +43,7 @@ const DAO = () => {
   )
 
   const displayedProposal = Object.entries(proposals)
-    .filter(([_k, v]) => v.info.votingAt || v.info.isPreVotingState())
+    .filter(([_k, v]) => v.info.votingAt)
     .sort((a, b) => compareProposals(b[1].info, a[1].info))
 
   return (
