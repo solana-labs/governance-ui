@@ -1,9 +1,15 @@
-import { Connection, PublicKey } from '@solana/web3.js'
+import {
+  Account,
+  Connection,
+  PublicKey,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   AccountInfo,
   AccountLayout,
   MintInfo,
   MintLayout,
+  Token,
   u64,
 } from '@solana/spl-token'
 
@@ -56,8 +62,7 @@ export async function getTokenAccount(
 }
 
 // copied from @solana/spl-token
-
-const TOKEN_PROGRAM_ID = new PublicKey(
+export const TOKEN_PROGRAM_ID = new PublicKey(
   'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
 )
 
@@ -114,4 +119,45 @@ function parseMintAccountData(data: Buffer) {
     mintInfo.freezeAuthority = new PublicKey(mintInfo.freezeAuthority)
   }
   return mintInfo
+}
+
+export function approveTokenTransfer(
+  instructions: TransactionInstruction[],
+  cleanupInstructions: TransactionInstruction[],
+  account: PublicKey,
+  owner: PublicKey,
+  amount: number | u64,
+  autoRevoke = true,
+
+  // if delegate is not passed ephemeral transfer authority is used
+  delegate?: PublicKey,
+  existingTransferAuthority?: Account
+): Account {
+  const tokenProgram = TOKEN_PROGRAM_ID
+  const transferAuthority = existingTransferAuthority || new Account()
+
+  // Coerce amount to u64 in case it's deserialized as BN which differs by buffer conversion functions only
+  // Without the coercion createApproveInstruction would fail because it won't be able to serialize it
+  if (typeof amount !== 'number') {
+    amount = new u64(amount.toArray())
+  }
+
+  instructions.push(
+    Token.createApproveInstruction(
+      tokenProgram,
+      account,
+      delegate ?? transferAuthority.publicKey,
+      owner,
+      [],
+      amount
+    )
+  )
+
+  if (autoRevoke) {
+    cleanupInstructions.push(
+      Token.createRevokeInstruction(tokenProgram, account, owner, [])
+    )
+  }
+
+  return transferAuthority
 }
