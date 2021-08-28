@@ -24,7 +24,7 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 
 const DAO = () => {
   const wallet = useWalletStore((s) => s.current)
-  const { mint, proposals, realmTokenAccount, ownTokenRecord } = useRealm()
+  const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
 
   // DEBUG print remove
   console.log(
@@ -55,11 +55,11 @@ const DAO = () => {
             <ProposalFilter />
           </div>
           {displayedProposal.map(([k, v]) => (
-            <ProposalCard key={k} id={k} mint={mint} proposal={v.info} />
+            <ProposalCard key={k} id={k} proposal={v.info} />
           ))}
         </div>
         <div className="col-span-4">
-          <TokenBalanceCard mint={mint} />
+          <TokenBalanceCard />
         </div>
       </div>
     </>

@@ -8,7 +8,7 @@ import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
 
-import { calculatePct, fmtVoteCount } from '../../../../utils/formatting'
+import { calculatePct, fmtTokenAmount } from '../../../../utils/formatting'
 import ApprovalProgress from '../../../../components/ApprovalProgress'
 import useRealm from '../../../../hooks/useRealm'
 
@@ -51,7 +51,7 @@ const Proposal = () => {
             <VotePanel />
           </div>
           <div className="col-span-4 space-y-4">
-            <TokenBalanceCard mint={mint} />
+            <TokenBalanceCard />
             <div className="bg-bkg-2 rounded-md">
               <div className="p-6">
                 <h3 className="mb-4">Results</h3>
@@ -61,19 +61,19 @@ const Proposal = () => {
                       <div className="bg-bkg-1 px-4 py-2 rounded w-full">
                         <p className="text-fgd-3 text-xs">Approve</p>
                         <div className="font-bold">
-                          {fmtVoteCount(
+                          {fmtTokenAmount(
                             proposal?.info.yesVotesCount,
                             mint?.decimals
-                          ).toLocaleString()}
+                          )}
                         </div>
                       </div>
                       <div className="bg-bkg-1 px-4 py-2 rounded w-full">
                         <p className="text-fgd-3 text-xs">Deny</p>
                         <div className="font-bold">
-                          {fmtVoteCount(
+                          {fmtTokenAmount(
                             proposal?.info.noVotesCount,
                             mint?.decimals
-                          ).toLocaleString()}
+                          )}
                         </div>
                       </div>
                     </>
