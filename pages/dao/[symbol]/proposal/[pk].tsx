@@ -8,20 +8,16 @@ import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
 
-import { calculatePct, fmtTokenAmount } from '../../../../utils/formatting'
 import ApprovalProgress from '../../../../components/ApprovalProgress'
 import useRealm from '../../../../hooks/useRealm'
+import useProposalVotes from '../../../../hooks/useProposalVotes'
 
 const Proposal = () => {
-  const { symbol, mint } = useRealm()
+  const { symbol } = useRealm()
   const { proposal, description, instructions } = useProposal()
-
-  const yesVotePct = proposal
-    ? calculatePct(proposal.info.yesVotesCount, mint?.supply)
-    : null
-
-  const yesVoteProgress =
-    (yesVotePct / proposal?.info.voteThresholdPercentage?.value) * 100
+  const { yesVoteProgress, yesVoteCount, noVoteCount } = useProposalVotes(
+    proposal?.info
+  )
 
   console.log('proposal data', { proposal, instructions })
 
@@ -60,21 +56,11 @@ const Proposal = () => {
                     <>
                       <div className="bg-bkg-1 px-4 py-2 rounded w-full">
                         <p className="text-fgd-3 text-xs">Approve</p>
-                        <div className="font-bold">
-                          {fmtTokenAmount(
-                            proposal?.info.yesVotesCount,
-                            mint?.decimals
-                          )}
-                        </div>
+                        <div className="font-bold">{yesVoteCount}</div>
                       </div>
                       <div className="bg-bkg-1 px-4 py-2 rounded w-full">
                         <p className="text-fgd-3 text-xs">Deny</p>
-                        <div className="font-bold">
-                          {fmtTokenAmount(
-                            proposal?.info.noVotesCount,
-                            mint?.decimals
-                          )}
-                        </div>
+                        <div className="font-bold">{noVoteCount}</div>
                       </div>
                     </>
                   ) : (
