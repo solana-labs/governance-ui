@@ -59,7 +59,7 @@ const DAO = () => {
           ))}
         </div>
         <div className="col-span-4">
-          <TokenBalanceCard />
+          <TokenBalanceCard mint={mint} />
         </div>
       </div>
     </>
