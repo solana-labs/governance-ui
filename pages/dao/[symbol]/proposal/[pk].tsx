@@ -1,6 +1,7 @@
+import { Disclosure } from '@headlessui/react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
 import StatusBadge from '../../../../components/StatusBadge'
 import TokenBalanceCard from '../../../../components/TokenBalanceCard'
@@ -36,7 +37,7 @@ const Proposal = () => {
       <div className="pt-6">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8 space-y-3">
-            <div className="pb-4">
+            <div className="pb-1">
               <div className="pb-4">
                 <h1 className="mb-1">{proposal?.info.name}</h1>
                 <StatusBadge status={ProposalState[proposal?.info.state]} />
@@ -46,6 +47,33 @@ const Proposal = () => {
                   {description}
                 </ReactMarkdown>
               )}
+            </div>
+            <div>
+              <Disclosure>
+                {({ open }) => (
+                  <>
+                    <Disclosure.Button
+                      className={`bg-bkg-2 font-bold px-6 py-4 text-fgd-1 rounded-md transition-all w-full hover:bg-bkg-3 focus:outline-none ${
+                        open && 'rounded-b-none'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between">
+                        <h2 className="mb-0">Instructions</h2>
+                        <ChevronDownIcon
+                          className={`h-5 text-primary-light transition-all w-5 ${
+                            open
+                              ? 'transform rotate-180'
+                              : 'transform rotate-360'
+                          }`}
+                        />
+                      </div>
+                    </Disclosure.Button>
+                    <Disclosure.Panel className={`bg-bkg-2 p-6 rounded-b-md`}>
+                      Instructions go here...
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
             </div>
             <DiscussionPanel />
             <VotePanel />
