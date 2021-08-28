@@ -3,25 +3,20 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 
 import StatusBadge from './StatusBadge'
 import Link from 'next/link'
-import { MintInfo } from '@solana/spl-token'
 import { Proposal, ProposalState } from '../models/accounts'
-import { calculatePct, fmtUnixTime } from '../utils/formatting'
+import { fmtUnixTime } from '../utils/formatting'
 import ApprovalProgress from './ApprovalProgress'
 import useRealm from '../hooks/useRealm'
+import useProposalVotes from '../hooks/useProposalVotes'
 
 type ProposalCardProps = {
   id: string
   proposal: Proposal
-  mint: MintInfo
 }
 
-const ProposalCard = ({ id, proposal, mint }: ProposalCardProps) => {
+const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
-
-  const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
-
-  const yesVoteProgress =
-    (yesVotePct / proposal.voteThresholdPercentage?.value) * 100
+  const { yesVoteProgress } = useProposalVotes(proposal)
 
   return (
     <div>
