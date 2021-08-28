@@ -29,6 +29,7 @@ export default function InstructionCard({
       <InstructionProgram
         programId={proposalInstruction.instruction.programId}
       ></InstructionProgram>
+      <div>Accounts:</div>
       {proposalInstruction.instruction.accounts.map((am, idx) => (
         <InstructionAccount
           key={idx}
@@ -37,9 +38,11 @@ export default function InstructionCard({
           descriptor={descriptor}
         />
       ))}
+      <div>Data:</div>
       <InstructionData
         data={proposalInstruction.instruction.data}
         descriptor={descriptor}
+        accounts={proposalInstruction.instruction.accounts}
       ></InstructionData>
     </div>
   )
@@ -82,17 +85,18 @@ export function InstructionAccount({
 export function InstructionData({
   data,
   descriptor,
+  accounts,
 }: {
   data: Uint8Array
   descriptor: InstructionDescriptor | undefined
+  accounts: AccountMetaData[]
 }) {
   const getDataUI =
     descriptor?.getDataUI ?? ((data, _accounts) => <>{JSON.stringify(data)}</>)
 
   return (
     <div>
-      <span>Data:</span>
-      <span> {getDataUI(data, descriptor.accounts)}</span>
+      <span> {getDataUI(data, accounts)}</span>
     </div>
   )
 }
