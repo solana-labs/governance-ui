@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
-import { RealmInfo } from '../@types/types'
+import { REALMS } from '../hooks/useRealm'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 
@@ -14,14 +14,6 @@ const toleranceSeconds = 30
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
-
-  const REALMS: RealmInfo[] = [
-    {
-      symbol: 'MNGO',
-      programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
-      realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
-    },
-  ]
 
   const CLUSTER = 'mainnet-beta'
   const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)

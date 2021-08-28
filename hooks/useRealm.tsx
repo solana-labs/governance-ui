@@ -7,11 +7,13 @@ import useWalletStore from '../stores/useWalletStore'
 export const REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
+    endpoint: 'mainnet',
     programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
     realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
   },
   {
     symbol: 'MNGO-DEV',
+    endpoint: 'devnet',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
   },
