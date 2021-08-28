@@ -5,15 +5,21 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import BN from 'bn.js'
+import { MintInfo } from '@solana/spl-token'
 import useRealm from '../hooks/useRealm'
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
 import useWalletStore from '../stores/useWalletStore'
 import { sendTransaction } from '../utils/send'
 import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
+import { fmtVoteCount } from '../utils/formatting'
 import Button from './Button'
 
-const TokenBalanceCard = () => {
+type TokenBalanceCardProps = {
+  mint: MintInfo
+}
+
+const TokenBalanceCard = ({ mint }: TokenBalanceCardProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
@@ -113,12 +119,15 @@ const TokenBalanceCard = () => {
     <div className="bg-bkg-2 p-6 rounded-md">
       <h3 className="mb-4">Deposit Tokens</h3>
 
-      <div className="flex space-x-4 items-center">
+      <div className="flex space-x-4 items-center pb-6">
         <div className="bg-bkg-1 px-4 py-2 rounded w-full">
           <p className="text-fgd-3 text-xs">{symbol} Votes</p>
           <div className="font-bold">
             {ownTokenRecord
-              ? ownTokenRecord.info.governingTokenDepositAmount.toNumber()
+              ? fmtVoteCount(
+                  ownTokenRecord.info.governingTokenDepositAmount,
+                  mint.decimals
+                )
               : '0'}
           </div>
         </div>

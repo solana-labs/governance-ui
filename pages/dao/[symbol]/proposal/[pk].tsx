@@ -41,13 +41,17 @@ const Proposal = () => {
                 <h1 className="mb-1">{proposal?.info.name}</h1>
                 <StatusBadge status={ProposalState[proposal?.info.state]} />
               </div>
-              {description && <ReactMarkdown>{description}</ReactMarkdown>}
+              {description && (
+                <ReactMarkdown className="markdown">
+                  {description}
+                </ReactMarkdown>
+              )}
             </div>
             <DiscussionPanel />
             <VotePanel />
           </div>
           <div className="col-span-4 space-y-4">
-            <TokenBalanceCard />
+            <TokenBalanceCard mint={mint} />
             <div className="bg-bkg-2 rounded-md">
               <div className="p-6">
                 <h3 className="mb-4">Results</h3>

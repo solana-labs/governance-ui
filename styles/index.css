@@ -39,3 +39,20 @@ button {
 .default-transition {
   @apply transition-all duration-300;
 }
+
+.markdown h1,
+h2 {
+  @apply mb-2 text-lg text-fgd-1;
+}
+
+.markdown ul {
+  @apply mb-4;
+}
+
+.markdown li {
+  @apply mb-2 ml-8 list-disc text-fgd-3;
+}
+
+:placeholder-shown {
+  @apply font-body;
+}
