@@ -37,6 +37,7 @@ const DiscussionForm = () => {
 
     try {
       await postChatMessage(rpcContext, proposal, ownTokenRecord.pubkey, msg)
+      setComment('')
     } catch {
       //TODO: How do we present transaction errors to users? Just the notification?
     } finally {
