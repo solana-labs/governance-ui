@@ -4,9 +4,10 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import StatusBadge from './StatusBadge'
 import Link from 'next/link'
 import { Proposal, ProposalState } from '../models/accounts'
-import { calculatePct, fmtUnixTime } from '../utils/formatting'
+import { fmtUnixTime } from '../utils/formatting'
 import ApprovalProgress from './ApprovalProgress'
 import useRealm from '../hooks/useRealm'
+import useProposalVotes from '../hooks/useProposalVotes'
 
 type ProposalCardProps = {
   id: string
@@ -14,12 +15,8 @@ type ProposalCardProps = {
 }
 
 const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
-  const { symbol, mint } = useRealm()
-
-  const yesVotePct = calculatePct(proposal.yesVotesCount, mint.supply)
-
-  const yesVoteProgress =
-    (yesVotePct / proposal.voteThresholdPercentage?.value) * 100
+  const { symbol } = useRealm()
+  const { yesVoteProgress } = useProposalVotes(proposal)
 
   return (
     <div>
