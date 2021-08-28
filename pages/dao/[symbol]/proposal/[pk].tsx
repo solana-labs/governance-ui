@@ -16,9 +16,13 @@ import useProposalVotes from '../../../../hooks/useProposalVotes'
 const Proposal = () => {
   const { symbol } = useRealm()
   const { proposal, description, instructions } = useProposal()
-  const { yesVoteProgress, yesVoteCount, noVoteCount } = useProposalVotes(
-    proposal?.info
-  )
+  const {
+    yesVoteProgress,
+    yesVoteCount,
+    noVoteCount,
+    relativeNoVotes,
+    relativeYesVotes,
+  } = useProposalVotes(proposal?.info)
 
   console.log('proposal data', { proposal, instructions })
 
@@ -81,22 +85,59 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
                 <div className="flex space-x-4 items-center">
                   {proposal ? (
-                    <>
-                      <div className="bg-bkg-1 px-4 py-2 rounded w-full">
+                    <div className="bg-bkg-1 flex px-4 py-2 rounded w-full">
+                      <div className="border-r border-bkg-4 w-1/2">
                         <p className="text-fgd-3 text-xs">Approve</p>
-                        <div className="font-bold">{yesVoteCount}</div>
+                        <div className="font-bold">
+                          {yesVoteCount.toLocaleString()}
+                        </div>
                       </div>
-                      <div className="bg-bkg-1 px-4 py-2 rounded w-full">
+                      <div className="pl-4 w-1/2">
                         <p className="text-fgd-3 text-xs">Deny</p>
-                        <div className="font-bold">{noVoteCount}</div>
+                        <div className="font-bold">
+                          {noVoteCount.toLocaleString()}
+                        </div>
                       </div>
-                    </>
+                    </div>
                   ) : (
                     <>
-                      <div className="animate-pulse bg-bkg-3 h-10 rounded w-full" />
-                      <div className="animate-pulse bg-bkg-3 h-10 rounded w-full" />
+                      <div className="animate-pulse bg-bkg-3 h-12 rounded w-full" />
                     </>
                   )}
+                </div>
+              </div>
+              <div className="bg-[rgba(255,255,255,0.05)] px-6 py-4 w-full">
+                <div className="flex justify-between">
+                  <div className="flex items-center">
+                    <p className="font-bold ml-1 text-fgd-1">
+                      <span className="mr-1 text-xs text-fgd-3">Approve</span>
+                      {relativeYesVotes ? relativeYesVotes : 0}%
+                    </p>
+                  </div>
+                  <div className="flex items-center">
+                    <p className="font-bold ml-1 text-fgd-1">
+                      <span className="mr-1 text-xs text-fgd-3">Deny</span>
+                      {relativeNoVotes ? relativeNoVotes : 0}%
+                    </p>
+                  </div>
+                </div>
+                <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">
+                  <div
+                    style={{
+                      width: `${relativeYesVotes}%`,
+                    }}
+                    className={`bg-green flex rounded-l ${
+                      relativeYesVotes === 100 && 'rounded'
+                    }`}
+                  ></div>
+                  <div
+                    style={{
+                      width: `${relativeNoVotes}%`,
+                    }}
+                    className={`bg-red flex rounded-r ${
+                      relativeNoVotes === 100 && 'rounded'
+                    }`}
+                  ></div>
                 </div>
               </div>
               <ApprovalProgress progress={yesVoteProgress} />

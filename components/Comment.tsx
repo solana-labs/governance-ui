@@ -2,7 +2,9 @@ import moment from 'moment'
 import React from 'react'
 import { VoteRecord } from '../models/accounts'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { ChatMessage } from '../models/chat/accounts'
+import { abbreviateAddress } from '../utils/formatting'
 
 const Comment = ({
   chatMessage,
@@ -18,9 +20,15 @@ const Comment = ({
         <div className="flex items-center">
           <div className="bg-bkg-3 h-10 rounded-full w-10" />
           <div className="ml-3">
-            <div className="font-bold pb-0.5 text-fgd-1">
-              {author.toBase58()}
-            </div>
+            <a
+              className="flex items-center hover:brightness-[1.15] focus:outline-none"
+              href={`https://explorer.solana.com/address/${author.toString()}`}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <span>{abbreviateAddress(author)}</span>
+              <ExternalLinkIcon className={`h-4 w-4 ml-1.5`} />
+            </a>
             <div className="text-fgd-3 text-xs">
               {moment.unix(postedAt.toNumber()).fromNow()}
             </div>
