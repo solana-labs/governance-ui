@@ -5,6 +5,7 @@ import { ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
 import StatusBadge from '../../../../components/StatusBadge'
 import TokenBalanceCard from '../../../../components/TokenBalanceCard'
+import { InstructionPanel } from '../../../../components/instructions/instructionPanel'
 import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
@@ -65,7 +66,7 @@ const Proposal = () => {
                       </div>
                     </Disclosure.Button>
                     <Disclosure.Panel className={`bg-bkg-2 p-6 rounded-b-md`}>
-                      Instructions go here...
+                      <InstructionPanel></InstructionPanel>
                     </Disclosure.Panel>
                   </>
                 )}
