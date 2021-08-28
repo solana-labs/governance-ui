@@ -5,7 +5,7 @@ const Index = () => {
   const router = useRouter()
 
   useEffect(() => {
-    router.push('/dao/MNGO')
+    router.push('/dao/MNGO-DEV')
   }, [])
 
   return <></>

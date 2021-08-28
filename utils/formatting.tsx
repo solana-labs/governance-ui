@@ -9,7 +9,7 @@ export const calculatePct = (c: BN, total?: BN) =>
     .toNumber() *
   (100 / votePrecision)
 
-export const fmtVoteCount = (c: BN, decimals?: number) =>
+export const nativeToUi = (c: BN, decimals?: number) =>
   c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber()
 
 export const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()

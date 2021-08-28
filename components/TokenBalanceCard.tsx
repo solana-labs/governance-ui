@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Account,
   SystemProgram,
@@ -11,9 +12,12 @@ import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningToke
 import useWalletStore from '../stores/useWalletStore'
 import { sendTransaction } from '../utils/send'
 import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
+import { nativeToUi } from '../utils/formatting'
 import Button from './Button'
+import DepositModal from './DepositModal'
 
 const TokenBalanceCard = () => {
+  const [showDepositModal, setShowDepositModal] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
@@ -26,53 +30,8 @@ const TokenBalanceCard = () => {
     realmInfo,
     realmTokenAccount,
     ownTokenRecord,
+    mint,
   } = useRealm()
-
-  const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Account[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      realmTokenAccount.publicKey,
-      wallet.publicKey,
-      amount
-    )
-
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo.programId,
-      realm.pubkey,
-      realmTokenAccount.publicKey,
-      realm.info.communityMint,
-      wallet.publicKey,
-      transferAuthority.publicKey,
-      wallet.publicKey,
-      TOKEN_PROGRAM_ID,
-      SystemProgram.programId
-    )
-
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
-    })
-
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo.programId, realmInfo.realmId)
-  }
-
-  const depositAllTokens = async () =>
-    await depositTokens(realmTokenAccount.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
@@ -118,7 +77,10 @@ const TokenBalanceCard = () => {
           <p className="text-fgd-3 text-xs">{symbol} Votes</p>
           <div className="font-bold">
             {ownTokenRecord
-              ? ownTokenRecord.info.governingTokenDepositAmount.toNumber()
+              ? nativeToUi(
+                  ownTokenRecord.info.governingTokenDepositAmount,
+                  mint.decimals
+                )
               : '0'}
           </div>
         </div>
@@ -128,7 +90,7 @@ const TokenBalanceCard = () => {
         <Button
           className="w-1/2"
           disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
+          onClick={() => setShowDepositModal(true)}
         >
           Deposit
         </Button>
@@ -140,6 +102,12 @@ const TokenBalanceCard = () => {
           Withdraw
         </Button>
       </div>
+      {showDepositModal ? (
+        <DepositModal
+          isOpen={showDepositModal}
+          onClose={() => setShowDepositModal(false)}
+        />
+      ) : null}
     </div>
   )
 }

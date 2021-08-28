@@ -8,7 +8,7 @@ import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
 
-import { calculatePct, fmtVoteCount } from '../../../../utils/formatting'
+import { calculatePct, nativeToUi } from '../../../../utils/formatting'
 import ApprovalProgress from '../../../../components/ApprovalProgress'
 import useRealm from '../../../../hooks/useRealm'
 
@@ -57,7 +57,7 @@ const Proposal = () => {
                       <div className="bg-bkg-1 px-4 py-2 rounded w-full">
                         <p className="text-fgd-3 text-xs">Approve</p>
                         <div className="font-bold">
-                          {fmtVoteCount(
+                          {nativeToUi(
                             proposal?.info.yesVotesCount,
                             mint?.decimals
                           ).toLocaleString()}
@@ -66,7 +66,7 @@ const Proposal = () => {
                       <div className="bg-bkg-1 px-4 py-2 rounded w-full">
                         <p className="text-fgd-3 text-xs">Deny</p>
                         <div className="font-bold">
-                          {fmtVoteCount(
+                          {nativeToUi(
                             proposal?.info.noVotesCount,
                             mint?.decimals
                           ).toLocaleString()}
