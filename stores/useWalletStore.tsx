@@ -27,30 +27,11 @@ import { pubkeyFilter } from '../scripts/api'
 import { getGovernanceChatMessages } from '../models/chat/api'
 import { ChatMessage } from '../models/chat/accounts'
 
-export const ENDPOINTS: EndpointInfo[] = [
-  {
-    name: 'mainnet',
-    url: 'https://mango.rpcpool.com',
-    websocket: 'https://mango.rpcpool.com',
-  },
-  {
-    name: 'devnet',
-    url: 'https://api.devnet.solana.com',
-    websocket: 'https://api.devnet.solana.com',
-  },
-]
-
-const CLUSTER = 'devnet'
-const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
-const DEFAULT_CONNECTION = new Connection(ENDPOINT.url, 'recent')
-const WEBSOCKET_CONNECTION = new Connection(ENDPOINT.websocket, 'recent')
-
 interface WalletStore extends State {
   connected: boolean
   connection: {
     cluster: string
     current: Connection
-    websocket: Connection
     endpoint: string
   }
   current: WalletAdapter | undefined
@@ -122,6 +103,24 @@ export async function getVoteRecordsByVoter(
   )
 }
 
+export const ENDPOINTS: EndpointInfo[] = [
+  {
+    name: 'mainnet',
+    url: 'https://mango.rpcpool.com',
+  },
+  {
+    name: 'devnet',
+    url: 'https://api.devnet.solana.com',
+  },
+]
+
+const ENDPOINT = ENDPOINTS.find((e) => e.name === 'mainnet')
+const INITIAL_CONNECTION_STATE = {
+  cluster: ENDPOINT.name,
+  current: new Connection(ENDPOINT.url, 'recent'),
+  endpoint: ENDPOINT.url,
+}
+
 const INITIAL_REALM_STATE = {
   realm: null,
   mint: null,
@@ -147,12 +146,7 @@ const INITIAL_PROPOSAL_STATE = {
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
-  connection: {
-    cluster: CLUSTER,
-    current: DEFAULT_CONNECTION,
-    websocket: WEBSOCKET_CONNECTION,
-    endpoint: ENDPOINT.url,
-  },
+  connection: INITIAL_CONNECTION_STATE,
   current: null,
   realms: {},
   selectedRealm: INITIAL_REALM_STATE,

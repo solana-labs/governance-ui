@@ -3,11 +3,11 @@ import { AccountInfo, PublicKey, Transaction } from '@solana/web3.js'
 export interface EndpointInfo {
   name: string
   url: string
-  websocket: string
 }
 
 export interface RealmInfo {
   symbol: string
+  endpoint: string
   programId: PublicKey
   realmId: PublicKey
 }
