@@ -66,7 +66,7 @@ const Proposal = () => {
                       </div>
                     </Disclosure.Button>
                     <Disclosure.Panel className={`bg-bkg-2 p-6 rounded-b-md`}>
-                      Instructions go here...
+                      <InstructionPanel></InstructionPanel>
                     </Disclosure.Panel>
                   </>
                 )}
