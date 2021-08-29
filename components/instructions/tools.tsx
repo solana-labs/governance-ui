@@ -99,5 +99,6 @@ export function getInstructionDescriptor(
   programId: PublicKey,
   instructionId: number
 ): InstructionDescriptor | undefined {
-  return INSTRUCTION_DESCRIPTORS[programId.toBase58()][instructionId]
+  const descriptor = INSTRUCTION_DESCRIPTORS[programId.toBase58()]
+  return descriptor && descriptor[instructionId]
 }
