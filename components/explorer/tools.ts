@@ -9,14 +9,12 @@ export function getExplorerUrl(
   const getClusterUrlParam = () => {
     let cluster: string
 
-    if (endpoint === 'mainnet') {
-      cluster = '' // no custom cluster name for mainnet
-    } else if (endpoint === 'localnet') {
+    if (endpoint === 'localnet') {
       cluster = `custom&customUrl=${encodeURIComponent(
         'http://127.0.0.1:8899'
       )}`
-    } else {
-      cluster = endpoint
+    } else if (endpoint === 'https://api.devnet.solana.com') {
+      cluster = 'devnet'
     }
 
     return cluster ? `?cluster=${cluster}` : ''
@@ -32,7 +30,7 @@ export function getExplorerInspectorUrl(
 ) {
   const SIGNATURE_LENGTH = 64
 
-  const explorerUrl = new URL(getExplorerUrl('inspector', endpoint, 'tx'))
+  const explorerUrl = new URL(getExplorerUrl(endpoint, 'inspector', 'tx'))
 
   const signatures = transaction.signatures.map((s) =>
     base58.encode(s.signature ?? Buffer.alloc(SIGNATURE_LENGTH))
