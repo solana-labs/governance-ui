@@ -8,6 +8,8 @@ import {
   getProgramName,
   InstructionDescriptor,
 } from './tools'
+import React from 'react'
+import InspectorButton from '../explorer/inspectorButton'
 
 export default function InstructionCard({
   index,
@@ -50,6 +52,9 @@ export default function InstructionCard({
         descriptor={descriptor}
         accounts={proposalInstruction.instruction.accounts}
       ></InstructionData>
+      <InspectorButton
+        instructionData={proposalInstruction.instruction}
+      ></InspectorButton>
     </div>
   )
 }

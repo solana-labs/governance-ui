@@ -260,7 +260,7 @@ async function awaitTransactionSignatureConfirmation(
 }
 
 /** Copy of Connection.simulateTransaction that takes a commitment parameter. */
-async function simulateTransaction(
+export async function simulateTransaction(
   connection: Connection,
   transaction: Transaction,
   commitment: Commitment
