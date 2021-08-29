@@ -48,7 +48,6 @@ const Proposal = () => {
               <InstructionPanel />
             </div>
             <DiscussionPanel />
-            <VotePanel />
           </div>
           <div className="col-span-4 space-y-4">
             <TokenBalanceCard />
@@ -77,6 +76,7 @@ const Proposal = () => {
               </div>
               <ApprovalProgress progress={yesVoteProgress} />
             </div>
+            <VotePanel />
           </div>
         </div>
       </div>

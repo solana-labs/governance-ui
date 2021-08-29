@@ -29,10 +29,10 @@ export function InstructionPanel() {
             </div>
           </Disclosure.Button>
           <Disclosure.Panel
-            className={`bg-bkg-2 border-t border-bkg-4 p-6 rounded-b-md`}
+            className={`bg-bkg-2 border-t border-bkg-4 p-6 pt-0 rounded-b-md`}
           >
             {Object.values(instructions).map((pi, idx) => (
-              <div key={pi.pubkey.toBase58()}>
+              <div className="pt-6" key={pi.pubkey.toBase58()}>
                 <InstructionCard
                   index={idx + 1}
                   proposalInstruction={pi.info}
