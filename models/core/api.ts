@@ -73,6 +73,9 @@ export const pubkeyFilter = (
   pubkey: PublicKey | undefined | null
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()))
 
+export const booleanFilter = (offset: number, value: boolean) =>
+  new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]))
+
 export async function getBorshProgramAccounts<
   TAccount extends ProgramAccountWithType
 >(

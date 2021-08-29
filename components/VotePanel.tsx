@@ -92,7 +92,7 @@ const VotePanel = () => {
             onClick={() => submitRelinquishVote()}
             disabled={!isWithdrawEnabled}
           >
-            {isVoting ? 'Withdraw vote' : 'Release tokens'}
+            {isVoting ? 'Withdraw Vote' : 'Release Tokens'}
           </Button>
         ) : (
           <>
