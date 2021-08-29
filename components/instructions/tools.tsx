@@ -20,7 +20,7 @@ export const ACCOUNT_NAMES = {
 }
 
 export function getAccountName(accountPk: PublicKey) {
-  return ACCOUNT_NAMES[accountPk.toBase58()]
+  return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
 
 export interface TokenDescriptor {
