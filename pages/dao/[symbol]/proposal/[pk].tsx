@@ -1,7 +1,6 @@
-import { Disclosure } from '@headlessui/react'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ArrowLeftIcon, ChevronDownIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
 import StatusBadge from '../../../../components/StatusBadge'
 import TokenBalanceCard from '../../../../components/TokenBalanceCard'
@@ -46,33 +45,7 @@ const Proposal = () => {
               )}
             </div>
             <div>
-              <Disclosure>
-                {({ open }) => (
-                  <>
-                    <Disclosure.Button
-                      className={`bg-bkg-2 font-bold px-6 py-4 text-fgd-1 rounded-md transition-all w-full hover:bg-bkg-3 focus:outline-none ${
-                        open && 'rounded-b-none'
-                      }`}
-                    >
-                      <div className="flex items-center justify-between">
-                        <h2 className="mb-0">Instructions</h2>
-                        <ChevronDownIcon
-                          className={`h-5 text-primary-light transition-all w-5 ${
-                            open
-                              ? 'transform rotate-180'
-                              : 'transform rotate-360'
-                          }`}
-                        />
-                      </div>
-                    </Disclosure.Button>
-                    <Disclosure.Panel
-                      className={`bg-bkg-2 border-t border-bkg-4 p-6 rounded-b-md`}
-                    >
-                      <InstructionPanel />
-                    </Disclosure.Panel>
-                  </>
-                )}
-              </Disclosure>
+              <InstructionPanel />
             </div>
             <DiscussionPanel />
             <VotePanel />
