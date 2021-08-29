@@ -4,12 +4,49 @@ import {
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
+  Proposal,
   Realm,
+  VoteRecord,
 } from './accounts'
 
 import { ParsedAccount } from './core/accounts'
-import { getBorshProgramAccounts, MemcmpFilter, RpcContext } from './core/api'
+import {
+  booleanFilter,
+  getBorshProgramAccounts,
+  MemcmpFilter,
+  pubkeyFilter,
+  RpcContext,
+} from './core/api'
 import { BorshAccountParser } from './core/serialisation'
+
+// VoteRecords
+
+export async function getUnrelinquishedVoteRecords(
+  programId: PublicKey,
+  endpoint: string,
+  tokenOwnerRecordPk: PublicKey
+) {
+  return getBorshProgramAccounts<VoteRecord>(
+    programId,
+    GOVERNANCE_SCHEMA,
+    endpoint,
+    VoteRecord,
+    [
+      pubkeyFilter(1 + 32, tokenOwnerRecordPk),
+      booleanFilter(1 + 32 + 32, false),
+    ]
+  )
+}
+
+// Proposal
+export async function getProposal(
+  connection: Connection,
+  proposalPk: PublicKey
+) {
+  return getGovernanceAccount<Proposal>(connection, proposalPk, Proposal)
+}
+
+// Realms
 
 export async function getRealms(rpcContext: RpcContext) {
   return getBorshProgramAccounts<Realm>(
