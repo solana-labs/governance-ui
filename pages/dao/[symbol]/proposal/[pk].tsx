@@ -10,9 +10,10 @@ import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
 
-import ApprovalProgress from '../../../../components/ApprovalProgress'
+import ApprovalQuorum from '../../../../components/ApprovalQuorum'
 import useRealm from '../../../../hooks/useRealm'
 import useProposalVotes from '../../../../hooks/useProposalVotes'
+import VoteResultsBar from '../../../../components/VoteResultsBar'
 
 const Proposal = () => {
   const { symbol } = useRealm()
@@ -109,41 +110,15 @@ const Proposal = () => {
                   )}
                 </div>
               </div>
-              <div className="bg-[rgba(255,255,255,0.05)] px-6 py-4 w-full">
-                <div className="flex justify-between">
-                  <div className="flex items-center">
-                    <p className="font-bold ml-1 text-fgd-1">
-                      <span className="mr-1 text-xs text-fgd-3">Approve</span>
-                      {relativeYesVotes ? relativeYesVotes : 0}%
-                    </p>
-                  </div>
-                  <div className="flex items-center">
-                    <p className="font-bold ml-1 text-fgd-1">
-                      <span className="mr-1 text-xs text-fgd-3">Deny</span>
-                      {relativeNoVotes ? relativeNoVotes : 0}%
-                    </p>
-                  </div>
+              <div className="bg-[rgba(255,255,255,0.05)] p-6 w-full">
+                <div className="pb-4">
+                  <VoteResultsBar
+                    approveVotePercentage={relativeYesVotes}
+                    denyVotePercentage={relativeNoVotes}
+                  />
                 </div>
-                <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">
-                  <div
-                    style={{
-                      width: `${relativeYesVotes}%`,
-                    }}
-                    className={`bg-green flex rounded-l ${
-                      relativeYesVotes === 100 && 'rounded'
-                    }`}
-                  ></div>
-                  <div
-                    style={{
-                      width: `${relativeNoVotes}%`,
-                    }}
-                    className={`bg-red flex rounded-r ${
-                      relativeNoVotes === 100 && 'rounded'
-                    }`}
-                  ></div>
-                </div>
+                <ApprovalQuorum progress={yesVoteProgress} />
               </div>
-              <ApprovalProgress progress={yesVoteProgress} />
             </div>
           </div>
         </div>

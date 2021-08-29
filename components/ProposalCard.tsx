@@ -4,9 +4,10 @@ import StatusBadge from './StatusBadge'
 import Link from 'next/link'
 import { Proposal, ProposalState } from '../models/accounts'
 import { fmtUnixTime } from '../utils/formatting'
-import ApprovalProgress from './ApprovalProgress'
+import ApprovalQuorum from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
+import VoteResultsBar from './VoteResultsBar'
 
 type ProposalCardProps = {
   id: string
@@ -47,44 +48,18 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
                 </span>
               </div>
             </div>
-            {!proposal.isPreVotingState() && (
-              <div className="flex">
-                <div className="bg-[rgba(255,255,255,0.05)] border-r border-bkg-4 px-6 py-4 w-1/2">
-                  <div className="flex justify-between">
-                    <div className="flex items-center">
-                      <p className="font-bold ml-1 text-fgd-1">
-                        <span className="mr-1 text-xs text-fgd-3">Approve</span>
-                        {relativeYesVotes ? relativeYesVotes : 0}%
-                      </p>
-                    </div>
-                    <div className="flex items-center">
-                      <p className="font-bold ml-1 text-fgd-1">
-                        <span className="mr-1 text-xs text-fgd-3">Deny</span>
-                        {relativeNoVotes ? relativeNoVotes : 0}%
-                      </p>
-                    </div>
-                  </div>
-                  <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">
-                    <div
-                      style={{
-                        width: `${relativeYesVotes}%`,
-                      }}
-                      className={`bg-green flex rounded-l ${
-                        relativeYesVotes === 100 && 'rounded'
-                      }`}
-                    ></div>
-                    <div
-                      style={{
-                        width: `${relativeNoVotes}%`,
-                      }}
-                      className={`bg-red flex rounded-r ${
-                        relativeNoVotes === 100 && 'rounded'
-                      }`}
-                    ></div>
-                  </div>
+            {ProposalState[proposal.state] === 'Voting' && (
+              <div className="bg-[rgba(255,255,255,0.05)] flex px-6 py-4">
+                <div className="border-r border-bkg-4 pr-4 w-1/2">
+                  <VoteResultsBar
+                    approveVotePercentage={
+                      relativeYesVotes ? relativeYesVotes : 0
+                    }
+                    denyVotePercentage={relativeNoVotes ? relativeNoVotes : 0}
+                  />
                 </div>
-                <div className="w-1/2">
-                  <ApprovalProgress progress={yesVoteProgress} />
+                <div className="pl-4 w-1/2">
+                  <ApprovalQuorum progress={yesVoteProgress} />
                 </div>
               </div>
             )}

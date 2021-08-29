@@ -4,7 +4,7 @@ type ApprovalProgressProps = {
 
 const ApprovalProgress = ({ progress }: ApprovalProgressProps) => {
   return (
-    <div className="bg-[rgba(255,255,255,0.05)] px-6 py-4 rounded-b-md">
+    <>
       <div className="flex items-center justify-between">
         <p className="font-bold text-fgd-3 text-xs">Approval quorum</p>
         <div className="flex items-center">
@@ -19,7 +19,7 @@ const ApprovalProgress = ({ progress }: ApprovalProgressProps) => {
           className="bg-fgd-3 flex rounded"
         ></div>
       </div>
-    </div>
+    </>
   )
 }
 
