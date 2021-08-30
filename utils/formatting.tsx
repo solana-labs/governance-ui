@@ -11,10 +11,7 @@ export const calculatePct = (c: BN, total?: BN) =>
   (100 / votePrecision)
 
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
-  c
-    .div(new BN(10).pow(new BN(decimals ?? 0)))
-    .toNumber()
-    .toLocaleString()
+  c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber()
 
 export const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()
 

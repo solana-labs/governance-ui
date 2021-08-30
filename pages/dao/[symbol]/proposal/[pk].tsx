@@ -9,16 +9,21 @@ import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
 
-import ApprovalProgress from '../../../../components/ApprovalProgress'
+import ApprovalQuorum from '../../../../components/ApprovalQuorum'
 import useRealm from '../../../../hooks/useRealm'
 import useProposalVotes from '../../../../hooks/useProposalVotes'
+import VoteResultsBar from '../../../../components/VoteResultsBar'
 
 const Proposal = () => {
   const { symbol } = useRealm()
   const { proposal, description, instructions } = useProposal()
-  const { yesVoteProgress, yesVoteCount, noVoteCount } = useProposalVotes(
-    proposal?.info
-  )
+  const {
+    yesVoteProgress,
+    yesVoteCount,
+    noVoteCount,
+    relativeNoVotes,
+    relativeYesVotes,
+  } = useProposalVotes(proposal?.info)
 
   console.log('proposal data', { proposal, instructions })
 
@@ -57,25 +62,36 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
                 <div className="flex space-x-4 items-center">
                   {proposal ? (
-                    <>
-                      <div className="bg-bkg-1 px-4 py-2 rounded w-full">
+                    <div className="bg-bkg-1 flex px-4 py-2 rounded w-full">
+                      <div className="border-r border-bkg-4 w-1/2">
                         <p className="text-fgd-3 text-xs">Approve</p>
-                        <div className="font-bold">{yesVoteCount}</div>
+                        <div className="font-bold">
+                          {yesVoteCount.toLocaleString()}
+                        </div>
                       </div>
-                      <div className="bg-bkg-1 px-4 py-2 rounded w-full">
+                      <div className="pl-4 w-1/2">
                         <p className="text-fgd-3 text-xs">Deny</p>
-                        <div className="font-bold">{noVoteCount}</div>
+                        <div className="font-bold">
+                          {noVoteCount.toLocaleString()}
+                        </div>
                       </div>
-                    </>
+                    </div>
                   ) : (
                     <>
-                      <div className="animate-pulse bg-bkg-3 h-10 rounded w-full" />
-                      <div className="animate-pulse bg-bkg-3 h-10 rounded w-full" />
+                      <div className="animate-pulse bg-bkg-3 h-12 rounded w-full" />
                     </>
                   )}
                 </div>
               </div>
-              <ApprovalProgress progress={yesVoteProgress} />
+              <div className="bg-[rgba(255,255,255,0.05)] p-6 w-full">
+                <div className="pb-4">
+                  <VoteResultsBar
+                    approveVotePercentage={relativeYesVotes}
+                    denyVotePercentage={relativeNoVotes}
+                  />
+                </div>
+                <ApprovalQuorum progress={yesVoteProgress} />
+              </div>
             </div>
           </div>
         </div>

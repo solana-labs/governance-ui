@@ -13,8 +13,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       voteThresholdPct: 100,
       yesVotePct: 0,
       yesVoteProgress: 0,
-      yesVoteCount: 'N/A',
-      noVoteCount: 'N/A',
+      yesVoteCount: 0,
+      noVoteCount: 0,
     }
 
   const voteThresholdPct =
@@ -27,11 +27,16 @@ export default function useProposalVotes(proposal?: Proposal) {
   const yesVoteCount = fmtTokenAmount(proposal.yesVotesCount, mint.decimals)
   const noVoteCount = fmtTokenAmount(proposal.noVotesCount, mint.decimals)
 
+  const relativeYesVotes = (yesVoteCount / (yesVoteCount + noVoteCount)) * 100
+  const relativeNoVotes = (noVoteCount / (yesVoteCount + noVoteCount)) * 100
+
   return {
     voteThresholdPct,
     yesVotePct,
     yesVoteProgress,
     yesVoteCount,
     noVoteCount,
+    relativeYesVotes,
+    relativeNoVotes,
   }
 }
