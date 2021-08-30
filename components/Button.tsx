@@ -68,6 +68,25 @@ const Button: FunctionComponent<ButtonProps> = ({
 
 export default Button
 
+export const SecondaryButton: FunctionComponent<ButtonProps> = ({
+  children,
+  onClick,
+  disabled = false,
+  className,
+  ...props
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${className} border border-primary-light default-transition font-normal rounded-full px-3 py-1 text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-4 disabled:text-fgd-4 disabled:cursor-not-allowed`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
+
 export const LinkButton: FunctionComponent<ButtonProps> = ({
   children,
   onClick,

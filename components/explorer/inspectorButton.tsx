@@ -2,6 +2,7 @@ import { dryRunInstruction } from '../../actions/dryRunInstruction'
 import { InstructionData } from '../../models/accounts'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl } from './tools'
+import { SecondaryButton } from '../Button'
 
 export default function InspectorButton({
   instructionData,
@@ -28,12 +29,8 @@ export default function InspectorButton({
   }
 
   return (
-    <button
-      disabled={!connected}
-      className={`border border-fgd-4 default-transition font-normal pl-3 pr-2 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
-      onClick={() => showInspector()}
-    >
+    <SecondaryButton disabled={!connected} onClick={() => showInspector()}>
       Inspect
-    </button>
+    </SecondaryButton>
   )
 }

@@ -42,15 +42,17 @@ export default function InstructionCard({
           />
         ))}
       </div>
-      <div className="font-bold mb-2 text-sm">Data</div>
+      <div className="flex items-center justify-between mb-2">
+        <div className="font-bold text-sm">Data</div>
+        <InspectorButton
+          instructionData={proposalInstruction.instruction}
+        ></InspectorButton>
+      </div>
       <InstructionData
         data={proposalInstruction.instruction.data}
         descriptor={descriptor}
         accounts={proposalInstruction.instruction.accounts}
       ></InstructionData>
-      <InspectorButton
-        instructionData={proposalInstruction.instruction}
-      ></InspectorButton>
     </div>
   )
 }
