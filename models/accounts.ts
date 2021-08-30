@@ -605,9 +605,7 @@ export class VoteRecord {
   }
 
   getVoteWeight() {
-    return this.isYes()
-      ? this.voteWeight.yes.toNumber()
-      : this.voteWeight.no.toNumber()
+    return this.isYes() ? this.voteWeight.yes : this.voteWeight.no
   }
 }
 

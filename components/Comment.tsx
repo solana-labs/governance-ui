@@ -4,7 +4,8 @@ import { VoteRecord } from '../models/accounts'
 import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { ChatMessage } from '../models/chat/accounts'
-import { abbreviateAddress } from '../utils/formatting'
+import { abbreviateAddress, fmtTokenAmount } from '../utils/formatting'
+import useRealm from '../hooks/useRealm'
 
 const Comment = ({
   chatMessage,
@@ -14,6 +15,8 @@ const Comment = ({
   voteRecord: VoteRecord | undefined
 }) => {
   const { author, postedAt, body } = chatMessage
+  const { mint, symbol } = useRealm()
+
   return (
     <div className="border-b border-bkg-4 py-6">
       <div className="flex items-center justify-between mb-4">
@@ -46,7 +49,10 @@ const Comment = ({
             </div>
             <span className="text-fgd-4">|</span>
             <span className="pl-2 text-xs">
-              {voteRecord.getVoteWeight().toLocaleString()} MNGO
+              {`${fmtTokenAmount(
+                voteRecord.getVoteWeight(),
+                mint.decimals
+              ).toLocaleString()} ${symbol}`}
             </span>
           </div>
         )}
