@@ -1,7 +1,11 @@
 import moment from 'moment'
 import React from 'react'
 import { VoteRecord } from '../models/accounts'
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
+import {
+  CheckCircleIcon,
+  UserCircleIcon,
+  XCircleIcon,
+} from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { ChatMessage } from '../models/chat/accounts'
 import { abbreviateAddress, fmtTokenAmount } from '../utils/formatting'
@@ -21,7 +25,9 @@ const Comment = ({
     <div className="border-b border-bkg-4 py-6">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
-          <div className="bg-bkg-3 h-10 rounded-full w-10" />
+          <div className="bg-bkg-3 flex items-center justify-center h-10 rounded-full w-10">
+            <UserCircleIcon className="h-8 text-fgd-4 w-8" />
+          </div>
           <div className="ml-3">
             <a
               className="flex items-center hover:brightness-[1.15] focus:outline-none"

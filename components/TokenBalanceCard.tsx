@@ -165,7 +165,7 @@ const TokenBalanceCard = () => {
     ownTokenRecord.info.governingTokenDepositAmount.gt(new BN(0))
 
   return (
-    <div className="bg-bkg-2 p-6 rounded-md">
+    <div className="bg-bkg-2 p-6 rounded-lg">
       <h3 className="mb-4">Deposit Tokens</h3>
 
       <div className="flex space-x-4 items-center pb-6">

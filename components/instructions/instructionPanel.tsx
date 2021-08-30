@@ -15,7 +15,7 @@ export function InstructionPanel() {
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`bg-bkg-2 font-bold px-6 py-4 text-fgd-1 rounded-md transition-all w-full hover:bg-bkg-3 focus:outline-none ${
+            className={`bg-bkg-2 font-bold px-6 py-4 text-fgd-1 rounded-lg transition-all w-full hover:bg-bkg-3 focus:outline-none ${
               open && 'rounded-b-none'
             }`}
           >

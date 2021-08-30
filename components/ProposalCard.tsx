@@ -1,13 +1,12 @@
-import { ClockIcon } from '@heroicons/react/outline'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import StatusBadge from './StatusBadge'
 import Link from 'next/link'
 import { Proposal, ProposalState } from '../models/accounts'
-import { fmtUnixTime } from '../utils/formatting'
 import ApprovalQuorum from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
 import VoteResultsBar from './VoteResultsBar'
+import ProposalTimeStatus from './ProposalTimeStatus'
 
 type ProposalCardProps = {
   id: string
@@ -26,7 +25,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
     <div>
       <Link href={`/dao/${symbol}/proposal/${id}`}>
         <a>
-          <div className="bg-bkg-2 rounded-md">
+          <div className="bg-bkg-2 rounded-lg">
             <div className="mb-2 px-6 py-4">
               <div className="flex items-center justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
@@ -35,18 +34,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
                   <ChevronRightIcon className="h-6 ml-2 text-primary-light w-6" />
                 </div>
               </div>
-              <div className="flex items-center text-fgd-3 text-sm">
-                <span className="flex items-center">
-                  <ClockIcon className="h-4 mr-1.5 w-4" />
-                  {proposal.votingCompletedAt
-                    ? `${ProposalState[proposal.state]} ${fmtUnixTime(
-                        proposal.votingCompletedAt
-                      )}`
-                    : proposal.votingAt
-                    ? `Proposed ${fmtUnixTime(proposal.votingAt)}`
-                    : `Drafted ${fmtUnixTime(proposal.draftAt)}`}
-                </span>
-              </div>
+              <ProposalTimeStatus proposal={proposal} />
             </div>
             {ProposalState[proposal.state] === 'Voting' && (
               <div className="bg-[rgba(255,255,255,0.05)] flex px-6 py-4">
