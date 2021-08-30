@@ -2,7 +2,6 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import StatusBadge from './StatusBadge'
 import Link from 'next/link'
 import { Proposal, ProposalState } from '../models/accounts'
-import { fmtUnixTime } from '../utils/formatting'
 import ApprovalQuorum from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
@@ -21,12 +20,6 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal)
-
-  console.log(
-    proposal &&
-      proposal.votingCompletedAt &&
-      fmtUnixTime(proposal.votingCompletedAt)
-  )
 
   return (
     <div>
