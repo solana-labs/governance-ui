@@ -48,7 +48,7 @@ const DAO = () => {
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4 pb-10 pt-16">
+      <div className="grid grid-cols-12 gap-4 pb-10 pt-14">
         <div className="col-span-8 space-y-4">
           <div className="flex items-center justify-between">
             <h2>{`${displayedProposal.length} proposals`}</h2>

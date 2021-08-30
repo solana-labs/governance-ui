@@ -53,6 +53,7 @@ module.exports = {
         yellow: '#F2C94C',
         red: '#E54033',
         green: '#AFD803',
+        blue: '#026DF7',
         'mango-dark': {
           lighter: '#332F46',
           light: '#262337',

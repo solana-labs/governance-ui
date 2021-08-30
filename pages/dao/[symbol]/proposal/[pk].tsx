@@ -13,6 +13,7 @@ import ApprovalQuorum from '../../../../components/ApprovalQuorum'
 import useRealm from '../../../../hooks/useRealm'
 import useProposalVotes from '../../../../hooks/useProposalVotes'
 import VoteResultsBar from '../../../../components/VoteResultsBar'
+import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 
 const Proposal = () => {
   const { symbol } = useRealm()
@@ -28,35 +29,46 @@ const Proposal = () => {
   console.log('proposal data', { proposal, instructions })
 
   return (
-    <div className="pb-10 pt-4">
+    <div className="pb-10 pt-3">
       <Link href={`/dao/${symbol}/`}>
-        <a className="flex items-center text-fgd-3">
-          <ArrowLeftIcon className="h-5 w-5 mr-1" />
-          &nbsp; Back
+        <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
+          <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+          Back
         </a>
       </Link>
       <div className="pt-6">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8 space-y-3">
-            <div className="pb-1">
-              <div className="pb-4">
-                <h1 className="mb-1">{proposal?.info.name}</h1>
-                <StatusBadge status={ProposalState[proposal?.info.state]} />
-              </div>
-              {description && (
-                <ReactMarkdown className="markdown">
-                  {description}
-                </ReactMarkdown>
-              )}
-            </div>
-            <div>
-              <InstructionPanel />
-            </div>
+            {proposal ? (
+              <>
+                <div className="bg-bkg-2 rounded-lg p-6">
+                  <div className="border-b border-bkg-4 mb-6 pb-4">
+                    <div className="flex items-center justify-between mb-1">
+                      <h1>{proposal?.info.name}</h1>
+                      <StatusBadge
+                        status={ProposalState[proposal?.info.state]}
+                      />
+                    </div>
+                    <ProposalTimeStatus proposal={proposal?.info} />
+                  </div>
+                  {description && (
+                    <ReactMarkdown className="markdown">
+                      {description}
+                    </ReactMarkdown>
+                  )}
+                </div>
+                <div>
+                  <InstructionPanel />
+                </div>
+              </>
+            ) : (
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg" />
+            )}
             <DiscussionPanel />
           </div>
           <div className="col-span-4 space-y-4">
             <TokenBalanceCard />
-            <div className="bg-bkg-2 rounded-md">
+            <div className="bg-bkg-2 rounded-lg">
               <div className="p-6">
                 <h3 className="mb-4">Results</h3>
                 <div className="flex space-x-4 items-center">

@@ -50,7 +50,7 @@ h2 {
 }
 
 .markdown li {
-  @apply mb-2 ml-8 list-disc text-fgd-3;
+  @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
 }
 
 :placeholder-shown {
