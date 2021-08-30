@@ -1,7 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { AccountMetaData, ProposalInstruction } from '../../models/accounts'
-import { abbreviateAddress } from '../../utils/formatting'
 import {
   getAccountName,
   getInstructionDescriptor,
@@ -26,16 +25,13 @@ export default function InstructionCard({
 
   return (
     <div>
-      <div className="pb-6">
-        <h3 className="mb-2">
-          <span className="mr-2 text-fgd-3">{`#${index}`}</span>
-          {descriptor && `${descriptor.name}`}
-        </h3>
-        <InstructionProgram
-          programId={proposalInstruction.instruction.programId}
-        ></InstructionProgram>
-      </div>
-      {/* <h3 className="mb-2">Accounts</h3> */}
+      <h3 className="mb-4">
+        {`Instruction ${index} `}
+        {descriptor && `– ${descriptor.name}`}
+      </h3>
+      <InstructionProgram
+        programId={proposalInstruction.instruction.programId}
+      ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
         {proposalInstruction.instruction.accounts.map((am, idx) => (
           <InstructionAccount
@@ -46,7 +42,7 @@ export default function InstructionCard({
           />
         ))}
       </div>
-      <h3 className="mb-2">Data</h3>
+      <div className="font-bold mb-2 text-sm">Data</div>
       <InstructionData
         data={proposalInstruction.instruction.data}
         descriptor={descriptor}
@@ -62,15 +58,23 @@ export default function InstructionCard({
 export function InstructionProgram({ programId }: { programId: PublicKey }) {
   const programLabel = getProgramName(programId)
   return (
-    <div>
-      <div>
-        <span className="bg-bkg-3 rounded-full mr-2 px-2 py-1 text-fgd-1 text-xs">
-          ProgramID
-        </span>
-        <span className="text-sm text-fgd-1">{programId.toBase58()}</span>
-        {programLabel && (
-          <span className="text-fgd-3 text-xs">{` (${programLabel})`}</span>
-        )}
+    <div className="border-t border-bkg-4 flex items-center justify-between py-3">
+      <span className="font-bold text-fgd-1 text-sm">Program</span>
+      <div className="flex items-center">
+        <a
+          className="text-sm hover:brightness-[1.15] focus:outline-none"
+          href={`https://explorer.solana.com/address/${programId.toBase58()}`}
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {programId.toBase58()}
+          {programLabel && (
+            <div className="mt-1 text-fgd-3 text-right text-xs">
+              {programLabel}
+            </div>
+          )}
+        </a>
+        <ExternalLinkIcon className={`h-4 w-4 ml-2 text-primary-light`} />
       </div>
     </div>
   )
@@ -88,26 +92,30 @@ export function InstructionAccount({
   const accountLabel = getAccountName(accountMeta.pubkey)
 
   return (
-    <div className="border-t border-bkg-4 py-3 last-child:border-b last-child:border-bkg-4">
-      <p className="font-bold mb-2 text-fgd-3">{`Account ${index + 1}`}</p>
-      <div className="flex items-center">
+    <div className="border-t border-bkg-4 flex items-center justify-between py-3">
+      <div>
+        <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor && (
-          <div className="bg-bkg-3 rounded-full mr-2 px-2 py-1 text-fgd-1 text-xs">{` ${descriptor.accounts[index].name}`}</div>
+          <div className="mt-1 text-fgd-3 text-xs">
+            {descriptor.accounts[index].name}
+          </div>
         )}
+      </div>
+      <div className="flex items-center">
         <a
-          className="flex items-center text-sm hover:brightness-[1.15] focus:outline-none"
+          className="text-sm hover:brightness-[1.15] focus:outline-none"
           href={`https://explorer.solana.com/address/${accountMeta.pubkey.toString()}`}
           target="_blank"
           rel="noopener noreferrer"
         >
-          <span>
-            {abbreviateAddress(accountMeta.pubkey)}{' '}
-            {accountLabel && (
-              <span className="text-fgd-3 text-xs">{` (${accountLabel})`}</span>
-            )}
-          </span>
-          <ExternalLinkIcon className={`h-4 w-4 ml-1.5 text-primary-light`} />
+          {accountMeta.pubkey.toBase58()}
+          {accountLabel && (
+            <div className="mt-1 text-fgd-3 text-right text-xs">
+              {accountLabel}
+            </div>
+          )}
         </a>
+        <ExternalLinkIcon className={`h-4 w-4 ml-2 text-primary-light`} />
       </div>
     </div>
   )
@@ -129,7 +137,9 @@ export function InstructionData({
 
   return (
     <div>
-      <span className="text-sm text-fgd-1">{getDataUI(data, accounts)}</span>
+      <span className="break-all font-display text-fgd-1 text-xs">
+        {getDataUI(data, accounts)}
+      </span>
     </div>
   )
 }
