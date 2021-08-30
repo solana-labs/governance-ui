@@ -1,4 +1,5 @@
 import { ClockIcon } from '@heroicons/react/outline'
+import useRealm from '../hooks/useRealm'
 import { Proposal, ProposalState } from '../models/accounts'
 import { fmtUnixTime } from '../utils/formatting'
 import { VoteCountdown } from './VoteCountdown'
@@ -8,7 +9,10 @@ type ProposalTimeStatusProps = {
 }
 
 const ProposalTimeStatus = ({ proposal }: ProposalTimeStatusProps) => {
-  return proposal ? (
+  const { governances } = useRealm()
+  const governance = governances[proposal?.governance.toBase58()]?.info
+
+  return proposal && governance ? (
     <div className="flex items-center text-fgd-3 text-sm">
       <span className="flex items-center">
         <ClockIcon className="h-4 mr-1.5 w-4" />
@@ -17,7 +21,7 @@ const ProposalTimeStatus = ({ proposal }: ProposalTimeStatusProps) => {
             proposal.votingCompletedAt
           )}`
         ) : proposal.votingAt ? (
-          <VoteCountdown proposal={proposal} governance={null} />
+          <VoteCountdown proposal={proposal} governance={governance} />
         ) : (
           `Drafted ${fmtUnixTime(proposal.draftAt)}`
         )}

@@ -33,21 +33,17 @@ export function VoteCountdown({
   const [countdown, setCountdown] = useState(ZeroCountdown)
 
   useEffect(() => {
-    //   if (proposal.info.isVoteFinalized()) {
-    //     setCountdown(ZeroCountdown)
-    //     return
-    //   }
+    if (proposal.isVoteFinalized()) {
+      setCountdown(ZeroCountdown)
+      return
+    }
 
     const getTimeToVoteEnd = () => {
       const now = moment().unix()
 
-      // let timeToVoteEnd = proposal.info.isPreVotingState()
-      //   ? governance.info.config.maxVotingTime
-      //   : proposal.info.votingAt?.toNumber()! +
-      //     governance.info.config.maxVotingTime -
-      //     now
-
-      let timeToVoteEnd = 1630444174 - now
+      let timeToVoteEnd = proposal.isPreVotingState()
+        ? governance.config.maxVotingTime
+        : proposal.votingAt?.toNumber() + governance.config.maxVotingTime - now
 
       if (timeToVoteEnd <= 0) {
         return ZeroCountdown
