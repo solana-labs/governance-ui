@@ -165,11 +165,11 @@ const TokenBalanceCard = () => {
     ownTokenRecord.info.governingTokenDepositAmount.gt(new BN(0))
 
   return (
-    <div className="bg-bkg-2 p-6 rounded-lg">
+    <div className="bg-bkg-2 border border-bkg-3 p-6 rounded-lg">
       <h3 className="mb-4">Deposit Tokens</h3>
 
       <div className="flex space-x-4 items-center pb-6">
-        <div className="bg-bkg-1 px-4 py-2 rounded w-full">
+        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{symbol} Votes</p>
           <div className="font-bold">
             {ownTokenRecord && mint
@@ -182,16 +182,16 @@ const TokenBalanceCard = () => {
         </div>
       </div>
 
-      <div className="flex space-x-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <Button
-          className="w-1/2"
+          className="sm:w-1/2"
           disabled={!connected || !hasTokensInWallet}
           onClick={depositAllTokens}
         >
           Deposit
         </Button>
         <Button
-          className="w-1/2"
+          className="sm:w-1/2"
           disabled={!connected || !hasTokensDeposited}
           onClick={withdrawAllTokens}
         >

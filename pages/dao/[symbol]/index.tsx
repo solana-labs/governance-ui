@@ -1,7 +1,7 @@
 import useWalletStore from '../../../stores/useWalletStore'
 import useRealm from '../../../hooks/useRealm'
 import React from 'react'
-import ProposalFilter from '../../../components/ProposalFilter'
+// import ProposalFilter from '../../../components/ProposalFilter'
 import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
@@ -48,17 +48,17 @@ const DAO = () => {
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4 pb-10 pt-14">
-        <div className="col-span-8 space-y-4">
+      <div className="grid grid-cols-12 gap-4 pb-10 pt-9">
+        <div className="col-span-12 md:col-span-7 lg:col-span-8 space-y-4">
           <div className="flex items-center justify-between">
             <h2>{`${displayedProposal.length} proposals`}</h2>
-            <ProposalFilter />
+            {/* <ProposalFilter /> */}
           </div>
           {displayedProposal.map(([k, v]) => (
             <ProposalCard key={k} id={k} proposal={v.info} />
           ))}
         </div>
-        <div className="col-span-4">
+        <div className="col-span-12 md:col-span-5 lg:col-span-4">
           <TokenBalanceCard />
         </div>
       </div>

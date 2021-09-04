@@ -30,19 +30,19 @@ const Proposal = () => {
 
   return (
     <div className="pb-10 pt-3">
-      <Link href={`/dao/${symbol}/`}>
-        <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-          <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-          Back
-        </a>
-      </Link>
       <div className="pt-6">
         <div className="grid grid-cols-12 gap-4">
           <div className="col-span-8 space-y-3">
             {proposal ? (
               <>
-                <div className="bg-bkg-2 rounded-lg p-6">
-                  <div className="border-b border-bkg-4 mb-6 pb-4">
+                <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6">
+                  <Link href={`/dao/${symbol}/`}>
+                    <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
+                      <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+                      Back
+                    </a>
+                  </Link>
+                  <div className="border-b border-bkg-3 mb-6 py-4">
                     <div className="flex items-center justify-between mb-1">
                       <h1>{proposal?.info.name}</h1>
                       <StatusBadge
@@ -68,7 +68,7 @@ const Proposal = () => {
           </div>
           <div className="col-span-4 space-y-4">
             <TokenBalanceCard />
-            <div className="bg-bkg-2 rounded-lg">
+            <div className="bg-bkg-2 border border-bkg-3 rounded-lg">
               <div className="p-6">
                 <h3 className="mb-4">Results</h3>
                 <div className="flex space-x-4 items-center">

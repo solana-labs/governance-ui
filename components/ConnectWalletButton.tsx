@@ -1,12 +1,17 @@
 import { Menu } from '@headlessui/react'
-import { LinkIcon } from '@heroicons/react/solid'
 import { useMemo } from 'react'
+import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
 import {
   getWalletProviderByUrl,
   WALLET_PROVIDERS,
 } from '../utils/wallet-adapters'
 import Button from './Button'
+
+const StyledWalletProviderLabel = styled.p`
+  font-size: 0.65rem;
+  line-height: 1.5;
+`
 
 const ChevronDownIcon = (props) => (
   <svg
@@ -63,31 +68,44 @@ const ConnectWalletButton = (props) => {
   return (
     <div className="flex">
       <Button
-        className={`h-9 z-30 px-8 flex items-center`}
+        className={`default-transition flex items-center h-12 z-30 pl-3 pr-4 rounded-l-full rounded-r-none w-36 hover:bg-bkg-3 focus:outline-none`}
         gray={connected}
         onClick={handleConnectDisconnect}
         {...props}
       >
-        <LinkIcon className="h-4 w-4 mr-2" />
-        {connected ? 'Disconnect' : 'Connect Wallet'}
+        <div className="flex items-center text-left text-sm">
+          <div className="bg-[rgba(0,0,0,0.2)] flex h-7 items-center justify-center rounded-full w-7 mr-2">
+            <img src={provider?.icon} className="h-4 w-4" />
+          </div>
+          <div>
+            {connected ? 'Disconnect' : 'Connect'}
+            <StyledWalletProviderLabel className="font-normal text-fgd-1">
+              {provider?.name}
+            </StyledWalletProviderLabel>
+          </div>
+        </div>
       </Button>
 
-      <div className="relative pl-2">
+      <div className="relative ">
         <Menu>
           {({ open }) => (
             <>
-              <Menu.Button className="cursor-pointer rounded-full h-9 w-9 py-2 px-2 bg-bkg-4 hover:bg-bkg-3 focus:outline-none">
-                {open ? (
-                  <ChevronDownIcon className="w-4 h-4 m-auto stroke-3" />
-                ) : (
-                  <img src={provider?.icon} className="w-4 h-4 m-auto" />
-                )}
+              <Menu.Button
+                className={`border cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none ${
+                  connected ? 'border-bkg-4' : 'border-primary-light'
+                }`}
+              >
+                <ChevronDownIcon
+                  className={`${
+                    open ? 'transform rotate-180' : 'transform rotate-360'
+                  } default-transition h-4 m-auto ml-1 stroke-3 text-primary-light w-4`}
+                />
               </Menu.Button>
-              <Menu.Items className="z-20 w-auto p-2 absolute right-0 top-12 bg-bkg-2 border border-bkg-3 shadow-md outline-none rounded-xl">
+              <Menu.Items className="z-20 w-auto p-2 absolute right-0 top-14 bg-bkg-2 border border-bkg-3 shadow-md outline-none rounded-md">
                 {WALLET_PROVIDERS.map(({ name, url, icon }) => (
                   <Menu.Item key={name}>
                     <button
-                      className="flex p-2 h-9 hover:bg-bkg-3 hover:cursor-pointer hover:rounded-lg font-normal focus:outline-none"
+                      className="flex default-transition h-9 items-center p-2 w-auto hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none"
                       onClick={() =>
                         setWalletStore((s) => {
                           s.providerUrl = url
@@ -99,7 +117,7 @@ const ConnectWalletButton = (props) => {
                       <span className="text-sm">{name}</span>
 
                       {provider?.url === url ? (
-                        <CheckIcon className="h-4 w-4 stroke-3" />
+                        <CheckIcon className="h-5 ml-4 stroke-3 text-green w-5" />
                       ) : null}
                     </button>
                   </Menu.Item>

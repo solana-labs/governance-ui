@@ -83,7 +83,7 @@ const VotePanel = () => {
     : 'Release your tokens'
 
   return (
-    <div className="bg-bkg-2 p-6 rounded-lg space-y-6">
+    <div className="bg-bkg-2 border border-bkg-3 p-6 rounded-lg space-y-6">
       <h2 className="mb-4 text-center">{actionLabel}</h2>
       <div className="flex items-center justify-center">
         {isVoteCast ? (

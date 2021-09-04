@@ -15,7 +15,7 @@ export function InstructionPanel() {
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`bg-bkg-2 font-bold px-6 py-4 text-fgd-1 rounded-lg transition-all w-full hover:bg-bkg-3 focus:outline-none ${
+            className={`bg-bkg-2 border border-bkg-3 font-bold px-6 py-4 text-fgd-1 rounded-lg transition-all w-full hover:bg-bkg-3 focus:outline-none ${
               open && 'rounded-b-none'
             }`}
           >
@@ -29,7 +29,7 @@ export function InstructionPanel() {
             </div>
           </Disclosure.Button>
           <Disclosure.Panel
-            className={`bg-bkg-2 border-t border-bkg-4 p-6 pt-0 rounded-b-md`}
+            className={`bg-bkg-2 border border-bkg-3 border-t-0 p-6 pt-0 rounded-b-md`}
           >
             {Object.values(instructions).map((pi, idx) => (
               <div className="pt-6" key={pi.pubkey.toBase58()}>

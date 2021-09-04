@@ -22,18 +22,8 @@ const StyledButton = styled.button<ButtonProps>`
     }
   }
 
-  :focus {
-    ${tw`ring-2 ring-secondary-2-light ring-opacity-40 outline-none`}
-  }
-
-  :active {
-    :before {
-      ${tw`ring-2 ring-secondary-2-light ring-opacity-40`}
-    }
-  }
-
   :disabled {
-    ${tw`cursor-not-allowed opacity-60`}
+    ${tw`bg-bkg-4 bg-none cursor-not-allowed opacity-60`}
     :before {
       ${tw`hidden`}
     }
@@ -55,7 +45,7 @@ const Button: FunctionComponent<ButtonProps> = ({
 }) => {
   return (
     <StyledButton
-      className={`${className} relative z-10 px-8 py-2 rounded-full text-fgd-1 font-bold  ${
+      className={`${className} relative z-10 px-4 py-2 rounded-full text-fgd-1 font-bold  ${
         gray ? 'bg-bkg-4' : idleGradient
       }`}
       gray={gray}
