@@ -1,3 +1,5 @@
+import Tooltip from './Tooltip'
+
 type ApprovalProgressProps = {
   progress: number
 }
@@ -6,7 +8,11 @@ const ApprovalProgress = ({ progress }: ApprovalProgressProps) => {
   return (
     <>
       <div className="flex items-center justify-between">
-        <p className="font-bold text-fgd-3 text-xs">Approval quorum</p>
+        <Tooltip content="The minimum number of approve votes required. Once approval quorum is >= 100% the proposal is eligible to pass.">
+          <p className="border-b border-dashed border-fgd-3 font-bold text-fgd-3 text-xs hover:cursor-help hover:border-b-0">
+            Approval quorum
+          </p>
+        </Tooltip>
         <div className="flex items-center">
           <p className="font-bold ml-1 text-fgd-1">{progress.toFixed(2)}%</p>
         </div>
@@ -16,7 +22,7 @@ const ApprovalProgress = ({ progress }: ApprovalProgressProps) => {
           style={{
             width: `${progress}%`,
           }}
-          className="bg-fgd-3 flex rounded"
+          className={`${progress > 99 ? 'bg-green' : 'bg-red'} flex rounded`}
         ></div>
       </div>
     </>
