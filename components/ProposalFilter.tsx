@@ -1,4 +1,5 @@
-import { useState, useReducer } from 'react'
+import { useReducer } from 'react'
+import styled from '@emotion/styled'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Disclosure } from '@headlessui/react'
 import Switch from './Switch'
@@ -15,8 +16,11 @@ const initialFilterSettings = {
   Voting: true,
 }
 
-const ProposalFilter = () => {
-  const [filters, setFilters] = useState([])
+const StyledAlertCount = styled.span`
+  font-size: 0.6rem;
+`
+
+const ProposalFilter = ({ filters, setFilters }) => {
   const [filterSettings, setFilterSettings] = useReducer(
     (state, newState) => ({ ...state, ...newState }),
     initialFilterSettings
@@ -25,7 +29,7 @@ const ProposalFilter = () => {
   const handleFilters = (name, checked) => {
     setFilterSettings({ [name]: checked })
     if (!checked) {
-      filters.push(name)
+      setFilters([...filters, name])
     } else {
       setFilters(filters.filter((n) => n !== name))
     }
@@ -38,6 +42,16 @@ const ProposalFilter = () => {
           <Disclosure.Button
             className={`border border-fgd-4 default-transition font-normal pl-3 pr-2 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
           >
+            {filters.length > 0 ? (
+              <div className="absolute -top-3 -right-1.5 z-20">
+                {/* <span className="flex h-4 w-4 relative">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red opacity-75"></span> */}
+                <StyledAlertCount className="w-4 h-4 bg-red relative inline-flex rounded-full flex items-center justify-center">
+                  {filters.length}
+                </StyledAlertCount>
+                {/* </span> */}
+              </div>
+            ) : null}
             <div className="flex items-center justify-between">
               Filter
               <ChevronDownIcon

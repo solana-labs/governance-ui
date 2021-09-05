@@ -1,7 +1,7 @@
 import useWalletStore from '../../../stores/useWalletStore'
 import useRealm from '../../../hooks/useRealm'
-import React from 'react'
-// import ProposalFilter from '../../../components/ProposalFilter'
+import { useEffect, useState } from 'react'
+import ProposalFilter from '../../../components/ProposalFilter'
 import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
@@ -23,8 +23,31 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 }
 
 const DAO = () => {
-  const wallet = useWalletStore((s) => s.current)
   const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
+  const [filters, setFilters] = useState([])
+  const [displayedProposals, setDisplayedProposals] = useState([])
+  const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
+  const wallet = useWalletStore((s) => s.current)
+
+  const allProposals = Object.entries(proposals)
+    .filter(([, v]) => v.info.votingAt)
+    .sort((a, b) => compareProposals(b[1].info, a[1].info))
+
+  useEffect(() => {
+    setDisplayedProposals(allProposals)
+    setFilteredProposals(allProposals)
+  }, [proposals])
+
+  useEffect(() => {
+    if (filters.length > 0) {
+      const proposals = displayedProposals.filter(
+        ([, v]) => !filters.includes(ProposalState[v.info.state])
+      )
+      setFilteredProposals(proposals)
+    } else {
+      setFilteredProposals(allProposals)
+    }
+  }, [filters])
 
   // DEBUG print remove
   console.log(
@@ -42,21 +65,23 @@ const DAO = () => {
     wallet?.connected && ownTokenRecord
   )
 
-  const displayedProposal = Object.entries(proposals)
-    .filter(([_k, v]) => v.info.votingAt)
-    .sort((a, b) => compareProposals(b[1].info, a[1].info))
-
   return (
     <>
       <div className="grid grid-cols-12 gap-4 pb-10 pt-9">
         <div className="col-span-12 md:col-span-7 lg:col-span-8 space-y-4">
           <div className="flex items-center justify-between">
-            <h2>{`${displayedProposal.length} proposals`}</h2>
-            {/* <ProposalFilter /> */}
+            <h2>{`${filteredProposals.length} proposals`}</h2>
+            <ProposalFilter filters={filters} setFilters={setFilters} />
           </div>
-          {displayedProposal.map(([k, v]) => (
-            <ProposalCard key={k} id={k} proposal={v.info} />
-          ))}
+          {filteredProposals.length > 0 ? (
+            filteredProposals.map(([k, v]) => (
+              <ProposalCard key={k} id={k} proposal={v.info} />
+            ))
+          ) : (
+            <div className="bg-bkg-2 border border-bkg-3 px-6 py-4 rounded-lg text-center text-fgd-3">
+              No proposals found
+            </div>
+          )}
         </div>
         <div className="col-span-12 md:col-span-5 lg:col-span-4">
           <TokenBalanceCard />
