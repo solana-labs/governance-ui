@@ -1,3 +1,4 @@
+import styled from '@emotion/styled'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import StatusBadge from './StatusBadge'
 import Link from 'next/link'
@@ -13,6 +14,16 @@ type ProposalCardProps = {
   proposal: Proposal
 }
 
+const StyledSvg = styled(ChevronRightIcon)``
+
+const StyledCardWrapepr = styled.div`
+  :hover {
+    ${StyledSvg} {
+      transform: translateX(4px);
+    }
+  }
+`
+
 const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const {
@@ -25,13 +36,13 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
     <div>
       <Link href={`/dao/${symbol}/proposal/${id}`}>
         <a>
-          <div className="bg-bkg-2 border border-bkg-3 rounded-lg">
+          <StyledCardWrapepr className="bg-bkg-2 border border-bkg-3 default-transition rounded-lg hover:bg-bkg-3">
             <div className="mb-2 px-6 py-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
                 <div className="flex items-center pl-4 pt-1">
                   <StatusBadge status={ProposalState[proposal.state]} />
-                  <ChevronRightIcon className="h-6 ml-2 text-primary-light w-6" />
+                  <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" />
                 </div>
               </div>
               <ProposalTimeStatus proposal={proposal} />
@@ -51,7 +62,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
                 </div>
               </div>
             )}
-          </div>
+          </StyledCardWrapepr>
         </a>
       </Link>
     </div>
