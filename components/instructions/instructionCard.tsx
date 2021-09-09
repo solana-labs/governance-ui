@@ -99,7 +99,7 @@ export function InstructionAccount({
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor && (
           <div className="mt-1 text-fgd-3 text-xs">
-            {descriptor.accounts[index].name}
+            {descriptor.accounts[index]?.name}
           </div>
         )}
       </div>

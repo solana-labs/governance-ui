@@ -1,10 +1,14 @@
 import { PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '../../models/accounts'
 import BN from 'bn.js'
+import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
 
 // Well known program names displayed on the instruction card
 export const PROGRAM_NAMES = {
   TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 'Token Program',
+  mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: 'Mango v3',
+  '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin': 'Serum v3',
+  DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY: 'Serum v3 (devnet)',
 }
 
 export function getProgramName(programId: PublicKey) {
@@ -13,10 +17,12 @@ export function getProgramName(programId: PublicKey) {
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
-  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'MNGO Treasury',
-  CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd: 'BTC-PERP MNGO',
+  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
+    'Mango v3 BTC-PERP Incentive Vault',
+  '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3':
-    'MNGO Treasury Governance Authority',
+    'Mango DAO MNGO Treasury Governance',
 }
 
 export function getAccountName(accountPk: PublicKey) {
@@ -88,6 +94,60 @@ export const INSTRUCTION_DESCRIPTORS = {
             ) : (
               <div>{JSON.stringify(data)}</div>
             )}
+          </>
+        )
+      },
+    },
+  },
+  mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: {
+    4: {
+      name: 'Mango v3: Add Spot Market',
+      accounts: [
+        { name: 'Mango Group' },
+        { name: 'Spot Market' },
+        { name: 'Dex Program' },
+        { name: 'Quote Mint' },
+      ],
+      getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .AddSpotMarket
+        return (
+          <>
+            <p>marketIndex: {args.marketIndex.toNumber()}</p>
+            <p>initLeverage: {args.initLeverage.toNumber()}</p>
+            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
+            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
+            <p>optimalUtil: {args.optimalUtil.toNumber()}</p>
+            <p>optimalRate: {args.optimalRate.toNumber()}</p>
+            <p>maxRate: {args.maxRate.toNumber()}</p>
+          </>
+        )
+      },
+    },
+    10: {
+      name: 'Mango v3: Add Oracle',
+      accounts: [{ name: 'Mango Group' }, { name: 'Oracle' }],
+    },
+    11: {
+      name: 'Mango v3: Add Perp Market',
+      accounts: { 0: { name: 'Mango Group' }, 5: { name: 'Incentive Vault' } },
+      getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .AddPerpMarket
+        return (
+          <>
+            <p>marketIndex: {args.marketIndex.toNumber()}</p>
+            <p>initLeverage: {args.initLeverage.toNumber()}</p>
+            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
+            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
+            <p>makerFee: {args.makerFee.toNumber()}</p>
+            <p>takerFee: {args.takerFee.toNumber()}</p>
+            <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
+            <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
+            <p>rate: {args.rate.toNumber()}</p>
+            <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
+            <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
+            <p>mngoPerPeriod: {args.mngoPerPeriod.toNumber()}</p>
           </>
         )
       },
