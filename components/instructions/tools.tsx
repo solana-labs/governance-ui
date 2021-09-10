@@ -104,6 +104,7 @@ export const INSTRUCTION_DESCRIPTORS = {
       name: 'Mango v3: Add Spot Market',
       accounts: [
         { name: 'Mango Group' },
+        { name: 'Oracle' },
         { name: 'Spot Market' },
         { name: 'Dex Program' },
         { name: 'Quote Mint' },
@@ -113,7 +114,6 @@ export const INSTRUCTION_DESCRIPTORS = {
           .AddSpotMarket
         return (
           <>
-            <p>marketIndex: {args.marketIndex.toNumber()}</p>
             <p>initLeverage: {args.initLeverage.toNumber()}</p>
             <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
             <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
@@ -130,13 +130,16 @@ export const INSTRUCTION_DESCRIPTORS = {
     },
     11: {
       name: 'Mango v3: Add Perp Market',
-      accounts: { 0: { name: 'Mango Group' }, 5: { name: 'Incentive Vault' } },
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Oracle' },
+        5: { name: 'Incentive Vault' },
+      },
       getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddPerpMarket
         return (
           <>
-            <p>marketIndex: {args.marketIndex.toNumber()}</p>
             <p>initLeverage: {args.initLeverage.toNumber()}</p>
             <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
             <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
