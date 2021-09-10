@@ -18,11 +18,17 @@ export function getProgramName(programId: PublicKey) {
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3':
+    'Mango DAO MNGO Treasury Governance',
+  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
+    'Mango DAO Insurance Fund Vault',
+  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
+    'Mango DAO Insurance Fund Governance',
+  '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
+  '6GX2brfV7byA8bCurwgcqiGxNEgzjUmdYgarYZZr2MKe': 'Mango v3 Revenue Governance',
   CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
     'Mango v3 BTC-PERP Incentive Vault',
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
-  '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3':
-    'Mango DAO MNGO Treasury Governance',
 }
 
 export function getAccountName(accountPk: PublicKey) {
