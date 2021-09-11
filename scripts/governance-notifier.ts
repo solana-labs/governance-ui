@@ -15,7 +15,7 @@ const toleranceSeconds = 30
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
-  const CLUSTER = 'mainnet-beta'
+  const CLUSTER = 'mainnet'
   const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 
   const realmInfo = REALMS.find((r) => r.symbol === 'MNGO')
