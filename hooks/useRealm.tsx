@@ -17,6 +17,18 @@ export const REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
   },
+  {
+    symbol: 'SOCEAN',
+    endpoint: 'mainnet',
+    programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
+    realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
+  },
+  {
+    symbol: 'SOCEAN-DEV',
+    endpoint: 'devnet',
+    programId: new PublicKey('GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG'),
+    realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
+  },
 ]
 
 export default function useRealm() {
@@ -29,6 +41,7 @@ export default function useRealm() {
   const {
     realm,
     mint,
+    councilMint,
     governances,
     proposals,
     proposalDescriptions,
@@ -58,6 +71,7 @@ export default function useRealm() {
     realmInfo,
     symbol,
     mint,
+    councilMint,
     governances,
     proposals,
     proposalDescriptions,

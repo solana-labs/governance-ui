@@ -6,7 +6,7 @@ import {
   ProgramAccount,
   TokenAccount,
   MintAccount,
-  getMint,
+  tryGetMint,
   getOwnedTokenAccounts,
 } from '../utils/tokens'
 import { getGovernanceAccount, getGovernanceAccounts } from '../models/api'
@@ -40,6 +40,7 @@ interface WalletStore extends State {
   selectedRealm: {
     realm?: ParsedAccount<Realm>
     mint?: MintAccount
+    councilMint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
     proposalDescriptions: { [proposal: string]: string }
@@ -124,6 +125,7 @@ const INITIAL_CONNECTION_STATE = {
 const INITIAL_REALM_STATE = {
   realm: null,
   mint: null,
+  councilMint: null,
   governances: {},
   proposals: {},
   proposalDescriptions: {},
@@ -202,11 +204,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.realms = realms
       })
 
-      const mints = await Promise.all(
-        Object.values(realms).map((r) =>
-          getMint(connection, r.info.communityMint)
+      const mints = (
+        await Promise.all(
+          Object.values(realms).flatMap((r) => [
+            tryGetMint(connection, r.info.communityMint),
+            r.info.config.councilMint
+              ? tryGetMint(connection, r.info.config.councilMint)
+              : undefined,
+          ])
         )
-      )
+      ).filter(Boolean)
 
       set((s) => {
         s.mints = Object.fromEntries(
@@ -225,6 +232,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realm = realms[realmId.toBase58()]
       const realmMintPk = realm.info.communityMint
       const realmMint = mints[realmMintPk.toBase58()]
+
+      const realmCouncilMint = mints[realm.info.config.councilMint?.toBase58()]
+
       const set = get().set
 
       const [governances, tokenRecords] = await Promise.all([
@@ -251,12 +261,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       ])
 
       console.log('fetchRealm mint', realmMint)
+      console.log('fetchRealm councilMint', realmCouncilMint)
       console.log('fetchRealm governances', governances)
       console.log('fetchRealm tokenRecords', tokenRecordsByOwner)
 
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
+        s.selectedRealm.realmCouncilMint = realmCouncilMint
         s.selectedRealm.governances = governances
         s.selectedRealm.tokenRecords = tokenRecordsByOwner
       })

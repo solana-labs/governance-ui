@@ -35,16 +35,20 @@ export async function getOwnedTokenAccounts(
   })
 }
 
-export async function getMint(
+export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<ProgramAccount<MintAccount>> {
-  const result = await connection.getAccountInfo(publicKey)
-  const data = Buffer.from(result.data)
-  const account = parseMintAccountData(data)
-  return {
-    publicKey,
-    account,
+  try {
+    const result = await connection.getAccountInfo(publicKey)
+    const data = Buffer.from(result.data)
+    const account = parseMintAccountData(data)
+    return {
+      publicKey,
+      account,
+    }
+  } catch (ex) {
+    console.error(`Can't fetch mint ${publicKey.toBase58()}`, ex)
   }
 }
 
