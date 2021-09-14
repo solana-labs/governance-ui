@@ -43,6 +43,7 @@ export interface TokenDescriptor {
 // Well known token account descriptors displayed on the instruction card
 export const TOKEN_DESCRIPTORS = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: { name: 'MNGO', decimals: 6 },
+  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf': { name: 'USDC', decimals: 6 },
 }
 
 export function getTokenDescriptor(tokenAccountPk: PublicKey): TokenDescriptor {
@@ -144,6 +145,7 @@ export const INSTRUCTION_DESCRIPTORS = {
       getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddPerpMarket
+        const mngoMint = { name: 'MNGO', decimals: 6 }
         return (
           <>
             <p>initLeverage: {args.initLeverage.toNumber()}</p>
@@ -153,10 +155,13 @@ export const INSTRUCTION_DESCRIPTORS = {
             <p>takerFee: {args.takerFee.toNumber()}</p>
             <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
             <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
-            <p>rate: {args.rate.toNumber()}</p>
+            <p>rate: {args.rate.toString()}</p>
             <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
             <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            <p>mngoPerPeriod: {args.mngoPerPeriod.toNumber()}</p>
+            <p>
+              mngoPerPeriod:{' '}
+              {args.mngoPerPeriod.toNumber() / Math.pow(10, mngoMint.decimals)}
+            </p>
           </>
         )
       },
