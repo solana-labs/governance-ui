@@ -46,6 +46,7 @@ export default function useRealm() {
     proposals,
     proposalDescriptions,
     tokenRecords,
+    councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
 
   const realmInfo = useMemo(() => REALMS.find((r) => r.symbol === symbol), [
@@ -66,6 +67,24 @@ export default function useRealm() {
     [tokenRecords, wallet, connected]
   )
 
+  const councilTokenAccount = useMemo(
+    () =>
+      realm &&
+      councilMint &&
+      tokenAccounts.find((a) =>
+        a.account.mint.equals(realm.info.config.councilMint)
+      ),
+    [realm, tokenAccounts]
+  )
+
+  const ownCouncilTokenRecord = useMemo(
+    () =>
+      wallet?.connected &&
+      councilMint &&
+      councilTokenOwnerRecords[wallet.publicKey.toBase58()],
+    [tokenRecords, wallet, connected]
+  )
+
   return {
     realm,
     realmInfo,
@@ -78,5 +97,7 @@ export default function useRealm() {
     tokenRecords,
     realmTokenAccount,
     ownTokenRecord,
+    councilTokenAccount,
+    ownCouncilTokenRecord,
   }
 }
