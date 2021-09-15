@@ -52,16 +52,20 @@ export async function tryGetMint(
   }
 }
 
-export async function getTokenAccount(
+export async function tryGetTokenAccount(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<ProgramAccount<TokenAccount>> {
-  const result = await connection.getAccountInfo(publicKey)
-  const data = Buffer.from(result.data)
-  const account = parseTokenAccountData(publicKey, data)
-  return {
-    publicKey,
-    account,
+  try {
+    const result = await connection.getAccountInfo(publicKey)
+    const data = Buffer.from(result.data)
+    const account = parseTokenAccountData(publicKey, data)
+    return {
+      publicKey,
+      account,
+    }
+  } catch (ex) {
+    console.error(`Can't fetch token account ${publicKey.toBase58()}`, ex)
   }
 }
 
