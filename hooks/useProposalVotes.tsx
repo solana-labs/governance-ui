@@ -13,6 +13,8 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
 
+  console.log('Proposal vote data', { councilMint })
+
   // TODO: optimize using memo
   if (!proposal || !governance || !proposalMint)
     return {
@@ -39,8 +41,13 @@ export default function useProposalVotes(proposal?: Proposal) {
     proposalMint.decimals
   )
 
-  const relativeYesVotes = (yesVoteCount / (yesVoteCount + noVoteCount)) * 100
-  const relativeNoVotes = (noVoteCount / (yesVoteCount + noVoteCount)) * 100
+  const totalVoteCount = yesVoteCount + noVoteCount
+
+  const getRelativeVoteCount = (voteCount: number) =>
+    totalVoteCount === 0 ? 0 : (voteCount / totalVoteCount) * 100
+
+  const relativeYesVotes = getRelativeVoteCount(yesVoteCount)
+  const relativeNoVotes = getRelativeVoteCount(noVoteCount)
 
   return {
     voteThresholdPct,

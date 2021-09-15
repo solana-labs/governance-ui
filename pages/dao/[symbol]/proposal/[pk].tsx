@@ -26,7 +26,14 @@ const Proposal = () => {
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
 
-  console.log('proposal data', { proposal, instructions })
+  console.log('proposal data', {
+    proposal,
+    instructions,
+    yesVoteCount,
+    noVoteCount,
+    relativeNoVotes,
+    relativeYesVotes,
+  })
 
   return (
     <div className="pb-10 pt-3">

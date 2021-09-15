@@ -281,7 +281,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
-        s.selectedRealm.realmCouncilMint = realmCouncilMint
+        s.selectedRealm.councilMint = realmCouncilMint
         s.selectedRealm.governances = governances
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
