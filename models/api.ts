@@ -1,11 +1,13 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import { GOVERNANCE_SCHEMA } from './serialisation'
 import {
+  getAccountTypes,
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Proposal,
   Realm,
+  TokenOwnerRecord,
   VoteRecord,
 } from './accounts'
 
@@ -18,6 +20,7 @@ import {
   RpcContext,
 } from './core/api'
 import { BorshAccountParser } from './core/serialisation'
+import { mapFromEntries } from '../tools/core/script'
 
 // VoteRecords
 
@@ -36,6 +39,29 @@ export async function getUnrelinquishedVoteRecords(
       booleanFilter(1 + 32 + 32, false),
     ]
   )
+}
+
+// TokenOwnerRecords
+export async function getTokenOwnerRecordsByTokenOwner(
+  programId: PublicKey,
+  endpoint: string,
+  realmId: PublicKey,
+  governingTokenMintPk: PublicKey | undefined
+) {
+  return governingTokenMintPk
+    ? getGovernanceAccounts<TokenOwnerRecord>(
+        programId,
+        endpoint,
+        TokenOwnerRecord,
+        getAccountTypes(TokenOwnerRecord),
+        [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, governingTokenMintPk)]
+      ).then((tors) =>
+        mapFromEntries(tors, ([_k, v]) => [
+          v.info.governingTokenOwner.toBase58(),
+          v,
+        ])
+      )
+    : undefined
 }
 
 // Proposal

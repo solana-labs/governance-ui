@@ -27,6 +27,7 @@ const TokenBalanceCard = () => {
   )
   const {
     symbol,
+    //councilMint,
     mint,
     realm,
     realmInfo,
@@ -34,6 +35,8 @@ const TokenBalanceCard = () => {
     ownTokenRecord,
     proposals,
   } = useRealm()
+
+  //const mint = councilMint
 
   const depositTokens = async function (amount: BN) {
     const instructions: TransactionInstruction[] = []
