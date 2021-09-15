@@ -33,7 +33,7 @@ export default function InstructionCard({
     <div>
       <h3 className="mb-4">
         {`Instruction ${index} `}
-        {descriptor && `– ${descriptor.name}`}
+        {descriptor?.name && `– ${descriptor.name}`}
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}
