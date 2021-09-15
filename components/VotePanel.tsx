@@ -4,6 +4,7 @@ import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import { ProposalState } from '../models/accounts'
 import { RpcContext } from '../models/core/api'
+import { GoverningTokenType } from '../models/enums'
 
 import { Vote } from '../models/instructions'
 import useWalletStore from '../stores/useWalletStore'
@@ -13,16 +14,24 @@ import VoteCommentModal from './VoteCommentModal'
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState(null)
-  const { governance, proposal, voteRecordsByVoter } = useWalletStore(
-    (s) => s.selectedProposal
-  )
-  const { ownTokenRecord } = useRealm()
+  const {
+    governance,
+    proposal,
+    voteRecordsByVoter,
+    tokenType,
+  } = useWalletStore((s) => s.selectedProposal)
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal)
   const ownVoteRecord = voteRecordsByVoter[wallet?.publicKey?.toBase58()]
+
+  const voterTokenRecord =
+    tokenType === GoverningTokenType.Community
+      ? ownTokenRecord
+      : ownCouncilTokenRecord
 
   const isVoteCast = ownVoteRecord !== undefined
   const isVoting =
@@ -32,8 +41,8 @@ const VotePanel = () => {
     connected &&
     isVoting &&
     !isVoteCast &&
-    ownTokenRecord &&
-    !ownTokenRecord.info.governingTokenDepositAmount.isZero()
+    voterTokenRecord &&
+    !voterTokenRecord.info.governingTokenDepositAmount.isZero()
 
   const isWithdrawEnabled =
     connected &&
@@ -57,7 +66,7 @@ const VotePanel = () => {
       await relinquishVote(
         rpcContext,
         proposal,
-        ownTokenRecord.pubkey,
+        voterTokenRecord.pubkey,
         ownVoteRecord.pubkey
       )
     } catch (ex) {
@@ -118,6 +127,7 @@ const VotePanel = () => {
           isOpen={showVoteModal}
           onClose={handleCloseShowVoteModal}
           vote={vote}
+          voterTokenRecord={voterTokenRecord}
         />
       ) : null}
     </div>

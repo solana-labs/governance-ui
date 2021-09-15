@@ -31,6 +31,7 @@ import { pubkeyFilter } from '../scripts/api'
 import { getGovernanceChatMessages } from '../models/chat/api'
 import { ChatMessage } from '../models/chat/accounts'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
+import { GoverningTokenType } from '../models/enums'
 
 interface WalletStore extends State {
   connected: boolean
@@ -67,6 +68,7 @@ interface WalletStore extends State {
     description?: string
     proposalMint?: MintAccount
     loading: boolean
+    tokenType?: GoverningTokenType
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -386,6 +388,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Realm
       )
 
+      const tokenType = realm.info.communityMint.equals(
+        proposal.info.governingTokenMint
+      )
+        ? GoverningTokenType.Community
+        : GoverningTokenType.Council
+
       console.log('fetchProposal fetched', {
         governance,
         proposal,
@@ -394,6 +402,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         voteRecordsByVoter,
         signatories,
         chatMessages,
+        tokenType,
       })
 
       set((s) => {
@@ -407,6 +416,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = chatMessages
         s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
+        s.selectedProposal.tokenType = tokenType
       })
     },
     async fetchChatMessages(proposalPubKey: PublicKey) {
