@@ -7,7 +7,7 @@ import {
   getProgramName,
   InstructionDescriptor,
 } from './tools'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import InspectorButton from '../explorer/inspectorButton'
 
 export default function InstructionCard({
@@ -17,11 +17,13 @@ export default function InstructionCard({
   index: number
   proposalInstruction: ProposalInstruction
 }) {
-  const instructionId = proposalInstruction.instruction.data[0]
-  const descriptor = getInstructionDescriptor(
-    proposalInstruction.instruction.programId,
-    instructionId
-  )
+  const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
+
+  useEffect(() => {
+    getInstructionDescriptor(proposalInstruction.instruction).then((d) =>
+      setDescriptor(d)
+    )
+  }, [proposalInstruction])
 
   return (
     <div>
@@ -48,11 +50,7 @@ export default function InstructionCard({
           instructionData={proposalInstruction.instruction}
         ></InspectorButton>
       </div>
-      <InstructionData
-        data={proposalInstruction.instruction.data}
-        descriptor={descriptor}
-        accounts={proposalInstruction.instruction.accounts}
-      ></InstructionData>
+      <InstructionData descriptor={descriptor}></InstructionData>
     </div>
   )
 }
@@ -97,7 +95,7 @@ export function InstructionAccount({
     <div className="border-t border-bkg-4 flex items-center justify-between py-3">
       <div>
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
-        {descriptor && (
+        {descriptor?.accounts && (
           <div className="mt-1 text-fgd-3 text-xs">
             {descriptor.accounts[index]?.name}
           </div>
@@ -124,23 +122,14 @@ export function InstructionAccount({
 }
 
 export function InstructionData({
-  data,
   descriptor,
-  accounts,
 }: {
-  data: Uint8Array
   descriptor: InstructionDescriptor | undefined
-  accounts: AccountMetaData[]
 }) {
-  const getDataUI =
-    descriptor?.getDataUI ?? ((data, _accounts) => <>{JSON.stringify(data)}</>)
-
-  console.log(getDataUI(data, accounts))
-
   return (
     <div>
       <span className="break-all font-display text-fgd-1 text-xs">
-        {getDataUI(data, accounts)}
+        {descriptor?.dataUI}
       </span>
     </div>
   )

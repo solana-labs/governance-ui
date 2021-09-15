@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import { AccountMetaData } from '../../models/accounts'
+import { AccountMetaData, InstructionData } from '../../models/accounts'
 import BN from 'bn.js'
 import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
 
@@ -55,10 +55,19 @@ export interface AccountDescriptor {
   important?: boolean
 }
 
+export interface InstructionDescriptorFactory {
+  name: string
+  accounts: AccountDescriptor[]
+  getDataUI: (
+    data: Uint8Array,
+    accounts: AccountMetaData[]
+  ) => Promise<JSX.Element>
+}
+
 export interface InstructionDescriptor {
   name: string
   accounts: AccountDescriptor[]
-  getDataUI: (data: Uint8Array) => JSX.Element
+  dataUI: JSX.Element
 }
 
 // Well known program instructions displayed on the instruction card
@@ -71,7 +80,48 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Destination', important: true },
         { name: 'Authority' },
       ],
-      getDataUI: (data: Uint8Array, accounts: AccountMetaData[]) => {
+      getDataUI: async (data: Uint8Array, accounts: AccountMetaData[]) => {
+        const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
+
+        // TokenTransfer instruction layout
+        // TODO: Use BufferLayout to decode the instruction
+        // const dataLayout = BufferLayout.struct([
+        //     BufferLayout.u8('instruction'),
+        //     Layout.uint64('amount'),
+        //   ]);
+
+        const tokenAmount = tokenDescriptor
+          ? new BN(data.slice(1), 'le').div(
+              new BN(10).pow(new BN(tokenDescriptor.decimals))
+            )
+          : new BN(0)
+
+        return (
+          <>
+            {tokenDescriptor ? (
+              <div>
+                <div>
+                  <span>Amount:</span>
+                  <span>{`${tokenAmount.toNumber().toLocaleString()} ${
+                    tokenDescriptor.name
+                  }`}</span>
+                </div>
+              </div>
+            ) : (
+              <div>{JSON.stringify(data)}</div>
+            )}
+          </>
+        )
+      },
+    },
+    7: {
+      name: 'Token: MintTo',
+      accounts: [
+        { name: 'Mint', important: true },
+        { name: 'Destination', important: true },
+        { name: 'Minting Authority' },
+      ],
+      getDataUI: async (data: Uint8Array, accounts: AccountMetaData[]) => {
         const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
 
         // TokenTransfer instruction layout
@@ -116,7 +166,7 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Dex Program' },
         { name: 'Quote Mint' },
       ],
-      getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
+      getDataUI: async (data: Uint8Array, _accounts: AccountMetaData[]) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddSpotMarket
         return (
@@ -142,7 +192,7 @@ export const INSTRUCTION_DESCRIPTORS = {
         1: { name: 'Oracle' },
         5: { name: 'Incentive Vault' },
       },
-      getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
+      getDataUI: async (data: Uint8Array, _accounts: AccountMetaData[]) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddPerpMarket
         const mngoMint = { name: 'MNGO', decimals: 6 }
@@ -169,10 +219,21 @@ export const INSTRUCTION_DESCRIPTORS = {
   },
 }
 
-export function getInstructionDescriptor(
-  programId: PublicKey,
-  instructionId: number
-): InstructionDescriptor | undefined {
-  const descriptor = INSTRUCTION_DESCRIPTORS[programId.toBase58()]
-  return descriptor && descriptor[instructionId]
+export async function getInstructionDescriptor(instruction: InstructionData) {
+  const descriptors = INSTRUCTION_DESCRIPTORS[
+    instruction.programId.toBase58()
+  ] as InstructionDescriptorFactory[]
+
+  const descriptor = descriptors && descriptors[instruction.data[0]]
+
+  const dataUI = (await descriptor?.getDataUI(
+    instruction.data,
+    instruction.accounts
+  )) ?? <>{JSON.stringify(instruction.data)}</>
+
+  return {
+    name: descriptor?.name,
+    accounts: descriptor?.accounts,
+    dataUI,
+  }
 }
