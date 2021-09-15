@@ -254,11 +254,12 @@ export async function getInstructionDescriptor(
 
   const descriptor = descriptors && descriptors[instruction.data[0]]
 
-  const dataUI = (await descriptor?.getDataUI(
-    connection,
-    instruction.data,
-    instruction.accounts
-  )) ?? <>{JSON.stringify(instruction.data)}</>
+  const dataUI = (descriptor?.getDataUI &&
+    (await descriptor?.getDataUI(
+      connection,
+      instruction.data,
+      instruction.accounts
+    ))) ?? <>{JSON.stringify(instruction.data)}</>
 
   return {
     name: descriptor?.name,
