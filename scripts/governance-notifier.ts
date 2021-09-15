@@ -90,7 +90,7 @@ async function runNotifier() {
       const msg = `--- ${proposal.info.name} proposal just opened for voting`
       console.log(msg)
       if (process.env.WEBHOOK_URL) {
-        axios.post(process.env.WEBHOOK_URL, { msg })
+        axios.post(process.env.WEBHOOK_URL, { content: msg })
       }
     }
   }
