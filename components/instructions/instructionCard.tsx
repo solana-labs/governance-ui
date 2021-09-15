@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { AccountMetaData, ProposalInstruction } from '../../models/accounts'
 import {
@@ -10,6 +10,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import InspectorButton from '../explorer/inspectorButton'
 import useWalletStore from '../../stores/useWalletStore'
+import { getExplorerUrl } from '../explorer/tools'
 
 export default function InstructionCard({
   index,
@@ -35,11 +36,13 @@ export default function InstructionCard({
         {descriptor && `– ${descriptor.name}`}
       </h3>
       <InstructionProgram
+        endpoint={connection.endpoint}
         programId={proposalInstruction.instruction.programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
         {proposalInstruction.instruction.accounts.map((am, idx) => (
           <InstructionAccount
+            endpoint={connection.endpoint}
             key={idx}
             index={idx}
             accountMeta={am}
@@ -58,7 +61,13 @@ export default function InstructionCard({
   )
 }
 
-export function InstructionProgram({ programId }: { programId: PublicKey }) {
+export function InstructionProgram({
+  endpoint,
+  programId,
+}: {
+  endpoint: string
+  programId: PublicKey
+}) {
   const programLabel = getProgramName(programId)
   return (
     <div className="border-t border-bkg-4 flex items-center justify-between py-3">
@@ -66,7 +75,7 @@ export function InstructionProgram({ programId }: { programId: PublicKey }) {
       <div className="flex items-center">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none"
-          href={`https://explorer.solana.com/address/${programId.toBase58()}`}
+          href={getExplorerUrl(endpoint, programId)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -84,10 +93,12 @@ export function InstructionProgram({ programId }: { programId: PublicKey }) {
 }
 
 export function InstructionAccount({
+  endpoint,
   index,
   accountMeta,
   descriptor,
 }: {
+  endpoint: string
   index: number
   accountMeta: AccountMetaData
   descriptor: InstructionDescriptor | undefined
@@ -107,7 +118,7 @@ export function InstructionAccount({
       <div className="flex items-center">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none"
-          href={`https://explorer.solana.com/address/${accountMeta.pubkey.toString()}`}
+          href={getExplorerUrl(endpoint, accountMeta.pubkey)}
           target="_blank"
           rel="noopener noreferrer"
         >
