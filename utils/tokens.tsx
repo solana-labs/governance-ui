@@ -38,7 +38,7 @@ export async function getOwnedTokenAccounts(
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<MintAccount>> {
+): Promise<ProgramAccount<MintAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
     const data = Buffer.from(result.data)

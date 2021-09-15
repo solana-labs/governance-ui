@@ -1,7 +1,8 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData, InstructionData } from '../../models/accounts'
 import BN from 'bn.js'
 import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
+import { tryGetMint } from '../../utils/tokens'
 
 // Well known program names displayed on the instruction card
 export const PROGRAM_NAMES = {
@@ -59,6 +60,7 @@ export interface InstructionDescriptorFactory {
   name: string
   accounts: AccountDescriptor[]
   getDataUI: (
+    connection: Connection,
     data: Uint8Array,
     accounts: AccountMetaData[]
   ) => Promise<JSX.Element>
@@ -80,7 +82,11 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Destination', important: true },
         { name: 'Authority' },
       ],
-      getDataUI: async (data: Uint8Array, accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
         const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
 
         // TokenTransfer instruction layout
@@ -121,30 +127,35 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Destination', important: true },
         { name: 'Minting Authority' },
       ],
-      getDataUI: async (data: Uint8Array, accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
         const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
+        const tokenMint = await tryGetMint(connection, accounts[0].pubkey)
 
-        // TokenTransfer instruction layout
+        // TokenMint instruction layout
         // TODO: Use BufferLayout to decode the instruction
         // const dataLayout = BufferLayout.struct([
         //     BufferLayout.u8('instruction'),
         //     Layout.uint64('amount'),
         //   ]);
 
-        const tokenAmount = tokenDescriptor
+        const tokenAmount = tokenMint
           ? new BN(data.slice(1), 'le').div(
-              new BN(10).pow(new BN(tokenDescriptor.decimals))
+              new BN(10).pow(new BN(tokenMint.account.decimals))
             )
           : new BN(0)
 
         return (
           <>
-            {tokenDescriptor ? (
+            {tokenMint ? (
               <div>
                 <div>
                   <span>Amount:</span>
                   <span>{`${tokenAmount.toNumber().toLocaleString()} ${
-                    tokenDescriptor.name
+                    tokenDescriptor?.name ?? ''
                   }`}</span>
                 </div>
               </div>
@@ -166,7 +177,11 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Dex Program' },
         { name: 'Quote Mint' },
       ],
-      getDataUI: async (data: Uint8Array, _accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddSpotMarket
         return (
@@ -192,7 +207,11 @@ export const INSTRUCTION_DESCRIPTORS = {
         1: { name: 'Oracle' },
         5: { name: 'Incentive Vault' },
       },
-      getDataUI: async (data: Uint8Array, _accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddPerpMarket
         const mngoMint = { name: 'MNGO', decimals: 6 }
@@ -219,7 +238,10 @@ export const INSTRUCTION_DESCRIPTORS = {
   },
 }
 
-export async function getInstructionDescriptor(instruction: InstructionData) {
+export async function getInstructionDescriptor(
+  connection: Connection,
+  instruction: InstructionData
+) {
   const descriptors = INSTRUCTION_DESCRIPTORS[
     instruction.programId.toBase58()
   ] as InstructionDescriptorFactory[]
@@ -227,6 +249,7 @@ export async function getInstructionDescriptor(instruction: InstructionData) {
   const descriptor = descriptors && descriptors[instruction.data[0]]
 
   const dataUI = (await descriptor?.getDataUI(
+    connection,
     instruction.data,
     instruction.accounts
   )) ?? <>{JSON.stringify(instruction.data)}</>

@@ -9,6 +9,7 @@ import {
 } from './tools'
 import React, { useEffect, useState } from 'react'
 import InspectorButton from '../explorer/inspectorButton'
+import useWalletStore from '../../stores/useWalletStore'
 
 export default function InstructionCard({
   index,
@@ -17,12 +18,14 @@ export default function InstructionCard({
   index: number
   proposalInstruction: ProposalInstruction
 }) {
+  const connection = useWalletStore((s) => s.connection)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
 
   useEffect(() => {
-    getInstructionDescriptor(proposalInstruction.instruction).then((d) =>
-      setDescriptor(d)
-    )
+    getInstructionDescriptor(
+      connection.current,
+      proposalInstruction.instruction
+    ).then((d) => setDescriptor(d))
   }, [proposalInstruction])
 
   return (
