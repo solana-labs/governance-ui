@@ -13,6 +13,10 @@ export interface RealmInfo {
   website: string
   // Specifies the realm mainnet name for resource lookups
   mainnetName?: string
+  // Website keywords
+  keywords?: string
+  twitter?: string
+  ogImage?: string
 }
 
 export interface TokenAccount {

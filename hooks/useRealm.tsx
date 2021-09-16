@@ -11,6 +11,10 @@ export const REALMS: RealmInfo[] = [
     programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
     realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
     website: 'https://mango.markets',
+    keywords:
+      'Mango Markets, DAO, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
+    twitter: '@mangomarkets',
+    ogImage: 'https://token.mango.markets/preview.jpg',
   },
   {
     symbol: 'MNGO-DEV',

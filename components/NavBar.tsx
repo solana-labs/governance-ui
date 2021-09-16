@@ -1,5 +1,5 @@
 import useRealm from '../hooks/useRealm'
-import { getResourceName } from '../tools/core/resources'
+import { getResourcePathPart } from '../tools/core/resources'
 import ConnectWalletButton from './ConnectWalletButton'
 
 const NavBar = () => {
@@ -18,7 +18,7 @@ const NavBar = () => {
               <span className="sr-only">{realmName}</span>
               <img
                 className="h-7"
-                src={`/realms/${getResourceName(realmName)}/img/logo.svg`}
+                src={`/realms/${getResourcePathPart(realmName)}/img/logo.svg`}
                 alt={realmName}
                 width="auto"
               />
