@@ -10,6 +10,7 @@ export interface RealmInfo {
   endpoint: string
   programId: PublicKey
   realmId: PublicKey
+  website: string
 }
 
 export interface TokenAccount {

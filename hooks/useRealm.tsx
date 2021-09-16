@@ -10,24 +10,28 @@ export const REALMS: RealmInfo[] = [
     endpoint: 'mainnet',
     programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
     realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
+    website: 'https://mango.markets',
   },
   {
     symbol: 'MNGO-DEV',
     endpoint: 'devnet',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
+    website: 'https://mango.markets',
   },
   {
     symbol: 'SOCEAN',
     endpoint: 'mainnet',
     programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
     realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
+    website: 'https://www.socean.fi',
   },
   {
     symbol: 'SOCEAN-DEV',
     endpoint: 'devnet',
     programId: new PublicKey('GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG'),
     realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
+    website: 'https://www.socean.fi',
   },
 ]
 
