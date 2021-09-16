@@ -14,6 +14,7 @@ import useRealm from '../../../../hooks/useRealm'
 import useProposalVotes from '../../../../hooks/useProposalVotes'
 import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
+import { option } from '../../../../tools/core/option'
 
 const Proposal = () => {
   const { symbol } = useRealm()
@@ -26,7 +27,14 @@ const Proposal = () => {
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
 
-  console.log('proposal data', { proposal, instructions })
+  console.log('proposal data', {
+    proposal,
+    instructions,
+    yesVoteCount,
+    noVoteCount,
+    relativeNoVotes,
+    relativeYesVotes,
+  })
 
   return (
     <div className="pb-10 pt-3">
@@ -67,7 +75,7 @@ const Proposal = () => {
             <DiscussionPanel />
           </div>
           <div className="col-span-4 space-y-4">
-            <TokenBalanceCard />
+            <TokenBalanceCard proposal={option(proposal?.info)} />
             <div className="bg-bkg-2 border border-bkg-3 rounded-lg">
               <div className="p-6">
                 <h3 className="mb-4">Results</h3>
