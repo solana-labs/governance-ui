@@ -15,6 +15,7 @@ export const REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO-DEV',
     endpoint: 'devnet',
+    mainnetName: 'Mango',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
     website: 'https://mango.markets',
@@ -29,6 +30,7 @@ export const REALMS: RealmInfo[] = [
   {
     symbol: 'SOCEAN-DEV',
     endpoint: 'devnet',
+    mainnetName: 'SOCEAN',
     programId: new PublicKey('GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG'),
     realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
     website: 'https://www.socean.fi',

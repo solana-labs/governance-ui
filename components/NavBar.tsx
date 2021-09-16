@@ -7,21 +7,24 @@ const NavBar = () => {
 
   // TODO: Show solana/realms branding when on the home page
 
+  const realmName = realmInfo?.mainnetName ?? realm?.info.name
+
   return (
     <div className="bg-bkg-1 flex h-20 items-center justify-between px-6">
       <div className="flex justify-start lg:w-0 lg:flex-1">
-        {realm && (
-          <a href={`${realmInfo?.website}`}>
-            <span className="sr-only">{realm?.info.name}</span>
-
-            <img
-              className="h-7"
-              src={`/realms/${getResourceName(realm?.info.name)}/img/logo.svg`}
-              alt={realm?.info.name}
-              width="auto"
-            />
-          </a>
-        )}
+        <a href={`${realmInfo?.website}`}>
+          {realmName && (
+            <>
+              <span className="sr-only">{realmName}</span>
+              <img
+                className="h-7"
+                src={`/realms/${getResourceName(realmName)}/img/logo.svg`}
+                alt={realmName}
+                width="auto"
+              />
+            </>
+          )}
+        </a>
       </div>
       <ConnectWalletButton />
     </div>

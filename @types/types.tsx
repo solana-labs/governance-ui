@@ -11,6 +11,8 @@ export interface RealmInfo {
   programId: PublicKey
   realmId: PublicKey
   website: string
+  // Specifies the realm mainnet name for resource lookups
+  mainnetName?: string
 }
 
 export interface TokenAccount {
