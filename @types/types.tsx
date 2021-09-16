@@ -12,10 +12,13 @@ export interface RealmInfo {
   realmId: PublicKey
   website: string
   // Specifies the realm mainnet name for resource lookups
+  // It's required for none mainnet environments when the realm name is different than on mainnet
   mainnetName?: string
   // Website keywords
   keywords?: string
+  // twitter:site meta
   twitter?: string
+  // og:image
   ogImage?: string
 }
 
