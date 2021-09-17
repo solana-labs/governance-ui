@@ -22,7 +22,9 @@ const ApprovalProgress = ({ progress }: ApprovalProgressProps) => {
           style={{
             width: `${progress}%`,
           }}
-          className={`${progress >= 100 ? 'bg-green' : 'bg-red'} flex rounded`}
+          className={`${
+            progress >= 100 ? 'bg-green' : 'bg-fgd-3'
+          } flex rounded`}
         ></div>
       </div>
     </>

@@ -50,7 +50,7 @@ const Proposal = () => {
                       Back
                     </a>
                   </Link>
-                  <div className="border-b border-bkg-3 mb-6 py-4">
+                  <div className="border-b border-bkg-3 py-4">
                     <div className="flex items-center justify-between mb-1">
                       <h1>{proposal?.info.name}</h1>
                       <StatusBadge
@@ -60,9 +60,11 @@ const Proposal = () => {
                     <ProposalTimeStatus proposal={proposal?.info} />
                   </div>
                   {description && (
-                    <ReactMarkdown className="markdown">
-                      {description}
-                    </ReactMarkdown>
+                    <div>
+                      <ReactMarkdown className="markdown">
+                        {description}
+                      </ReactMarkdown>
+                    </div>
                   )}
                 </div>
                 <div>
