@@ -6,17 +6,26 @@ import Notifications from '../components/Notification'
 import NavBar from '../components/NavBar'
 import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
+import useRealm from '../hooks/useRealm'
+import { getResourcePathPart } from '../tools/core/resources'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
 
-  const title = 'Mango DAO'
-  const description =
-    'Discuss and vote on Mango DAO proposals. Join us in building Mango, the protocol for permissionless leverage trading & lending.'
-  const keywords =
-    'Mango Markets, DAO, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens'
-  const baseUrl = 'https://token.mango.markets'
+  const { realm, realmInfo } = useRealm()
+
+  // TODO: Show solana/realms branding when on the home page
+  const realmName = realmInfo?.mainnetName ?? realm?.info.name
+
+  const title = realmName ? `${realmName} DAO` : 'DAO'
+  const description = `Discuss and vote on ${title} proposals.`
+
+  // Note: ?v==${Date.now()} is added to the url to force favicon refresh. Without it browsers would cache the last used and won't change it for different realms
+  // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
+  const faviconUrl = realmName
+    ? `/realms/${getResourcePathPart(realmName)}/favicon.ico?v=${Date.now()}`
+    : undefined
 
   return (
     <>
@@ -27,9 +36,15 @@ function App({ Component, pageProps }) {
           href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=PT+Mono&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/favicon.ico" />
+
+        {faviconUrl && <link rel="icon" href={faviconUrl} />}
+
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="keywords" content={keywords} />
+
+        {realmInfo?.keywords && (
+          <meta name="keywords" content={realmInfo.keywords} />
+        )}
+
         <meta name="description" content={description} />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="msapplication-TileColor" content="#ffffff" />
@@ -38,10 +53,16 @@ function App({ Component, pageProps }) {
         <meta property="og:type" content="website" />
         <meta property="og:title" content={title} />
         <meta property="og:description" content={description} />
-        <meta property="og:image" content={`${baseUrl}/preview.jpg`} />
+        {realmInfo?.ogImage && (
+          <meta property="og:image" content={realmInfo.ogImage} />
+        )}
         <meta name="twitter:card" content="summary" />
-        <meta name="twitter:site" content="@mangomarkets" />
+
+        {realmInfo?.twitter && (
+          <meta name="twitter:site" content={realmInfo.twitter} />
+        )}
       </Head>
+
       <ThemeProvider defaultTheme="Mango">
         <NavBar />
         <Notifications />
