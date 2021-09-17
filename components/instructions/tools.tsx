@@ -243,6 +243,65 @@ export const INSTRUCTION_DESCRIPTORS = {
         )
       },
     },
+    37: {
+      name: 'Mango v3: Change Perp Market',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Perp Market' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .ChangePerpMarketParams
+        const mngoMint = { name: 'MNGO', decimals: 6 }
+        return (
+          <>
+            {args.initLeverageOption && (
+              <p>initLeverage: {args.initLeverage.toNumber()}</p>
+            )}
+            {args.maintLeverageOption && (
+              <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
+            )}
+            {args.liquidationFeeOption && (
+              <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
+            )}
+
+            {args.makerFeeOption && <p>makerFee: {args.makerFee.toNumber()}</p>}
+
+            {args.takerFeeOption && <p>takerFee: {args.takerFee.toNumber()}</p>}
+
+            {args.baseLotSizeOption && (
+              <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
+            )}
+
+            {args.quoteLotSizeOption && (
+              <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
+            )}
+
+            {args.rateOption && <p>rate: {args.rate.toString()}</p>}
+
+            {args.maxDepthBpsOption && (
+              <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
+            )}
+
+            {args.targetPeriodLengthOption && (
+              <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
+            )}
+
+            {args.mngoPerPeriodOption && (
+              <p>
+                mngoPerPeriod:{' '}
+                {args.mngoPerPeriod.toNumber() /
+                  Math.pow(10, mngoMint.decimals)}
+              </p>
+            )}
+          </>
+        )
+      },
+    },
   },
 }
 
