@@ -105,6 +105,11 @@ const TokenDeposit = ({
       ? realmTokenAccount
       : councilTokenAccount
 
+  const depositTokenMint =
+    tokenType === GoverningTokenType.Community
+      ? realm.info.communityMint
+      : realm.info.config.councilMint
+
   const depositTokenName = `${symbol} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
@@ -128,7 +133,7 @@ const TokenDeposit = ({
       realmInfo.programId,
       realm.pubkey,
       depositTokenAccount.publicKey,
-      depositTokenRecord.info.governingTokenMint,
+      depositTokenMint,
       wallet.publicKey,
       transferAuthority.publicKey,
       wallet.publicKey,
