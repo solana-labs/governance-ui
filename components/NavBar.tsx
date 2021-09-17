@@ -1,12 +1,29 @@
+import useRealm from '../hooks/useRealm'
+import { getResourcePathPart } from '../tools/core/resources'
 import ConnectWalletButton from './ConnectWalletButton'
 
 const NavBar = () => {
+  const { realm, realmInfo } = useRealm()
+
+  // TODO: Show solana/realms branding when on the home page
+
+  const realmName = realmInfo?.mainnetName ?? realm?.info.name
+
   return (
     <div className="bg-bkg-1 flex h-20 items-center justify-between px-6">
       <div className="flex justify-start lg:w-0 lg:flex-1">
-        <a href="https://mango.markets">
-          <span className="sr-only">Mango</span>
-          <img className="h-7" src="/img/logo_mango.svg" alt="" width="auto" />
+        <a href={`${realmInfo?.website}`}>
+          {realmName && (
+            <>
+              <span className="sr-only">{realmName}</span>
+              <img
+                className="h-7"
+                src={`/realms/${getResourcePathPart(realmName)}/img/logo.svg`}
+                alt={realmName}
+                width="auto"
+              />
+            </>
+          )}
         </a>
       </div>
       <ConnectWalletButton />

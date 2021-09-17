@@ -12,17 +12,21 @@ import Loading from './Loading'
 import Modal from './Modal'
 import Input from './Input'
 import Tooltip from './Tooltip'
+import { TokenOwnerRecord } from '../models/accounts'
+import { ParsedAccount } from '../models/core/accounts'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
   vote: Vote
+  voterTokenRecord: ParsedAccount<TokenOwnerRecord>
 }
 
 const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   onClose,
   isOpen,
   vote,
+  voterTokenRecord,
 }) => {
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
@@ -31,7 +35,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
-  const { realm, ownTokenRecord } = useRealm()
+  const { realm } = useRealm()
 
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
@@ -52,11 +56,16 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         rpcContext,
         realm.pubkey,
         proposal,
-        ownTokenRecord.pubkey,
+        voterTokenRecord.pubkey,
         vote
       )
       if (comment) {
-        await postChatMessage(rpcContext, proposal, ownTokenRecord.pubkey, msg)
+        await postChatMessage(
+          rpcContext,
+          proposal,
+          voterTokenRecord.pubkey,
+          msg
+        )
       }
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?

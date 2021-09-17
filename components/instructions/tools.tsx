@@ -1,7 +1,8 @@
-import { PublicKey } from '@solana/web3.js'
-import { AccountMetaData } from '../../models/accounts'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { AccountMetaData, InstructionData } from '../../models/accounts'
 import BN from 'bn.js'
 import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
+import { tryGetMint, tryGetTokenAccount } from '../../utils/tokens'
 
 // Well known program names displayed on the instruction card
 export const PROGRAM_NAMES = {
@@ -24,6 +25,8 @@ export const ACCOUNT_NAMES = {
     'Mango DAO Insurance Fund Vault',
   '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
     'Mango DAO Insurance Fund Governance',
+  '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
+    'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
   '6GX2brfV7byA8bCurwgcqiGxNEgzjUmdYgarYZZr2MKe': 'Mango v3 Revenue Governance',
   CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
@@ -42,8 +45,9 @@ export interface TokenDescriptor {
 
 // Well known token account descriptors displayed on the instruction card
 export const TOKEN_DESCRIPTORS = {
-  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: { name: 'MNGO', decimals: 6 },
-  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf': { name: 'USDC', decimals: 6 },
+  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: { name: 'MNGO' },
+  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf': { name: 'USDC' },
+  '4nvTrY3KdYCVEtzfopCDZ2NuL8u6ZaHgL7xcUnQDQpHe': { name: 'SOCN' },
 }
 
 export function getTokenDescriptor(tokenAccountPk: PublicKey): TokenDescriptor {
@@ -55,10 +59,20 @@ export interface AccountDescriptor {
   important?: boolean
 }
 
+export interface InstructionDescriptorFactory {
+  name: string
+  accounts: AccountDescriptor[]
+  getDataUI: (
+    connection: Connection,
+    data: Uint8Array,
+    accounts: AccountMetaData[]
+  ) => Promise<JSX.Element>
+}
+
 export interface InstructionDescriptor {
   name: string
   accounts: AccountDescriptor[]
-  getDataUI: (data: Uint8Array) => JSX.Element
+  dataUI: JSX.Element
 }
 
 // Well known program instructions displayed on the instruction card
@@ -71,8 +85,20 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Destination', important: true },
         { name: 'Authority' },
       ],
-      getDataUI: (data: Uint8Array, accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
         const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
+        const tokenAccount = await tryGetTokenAccount(
+          connection,
+          accounts[0].pubkey
+        )
+        const tokenMint = await tryGetMint(
+          connection,
+          tokenAccount?.account.mint
+        )
 
         // TokenTransfer instruction layout
         // TODO: Use BufferLayout to decode the instruction
@@ -80,21 +106,64 @@ export const INSTRUCTION_DESCRIPTORS = {
         //     BufferLayout.u8('instruction'),
         //     Layout.uint64('amount'),
         //   ]);
-
-        const tokenAmount = tokenDescriptor
-          ? new BN(data.slice(1), 'le').div(
-              new BN(10).pow(new BN(tokenDescriptor.decimals))
-            )
-          : new BN(0)
+        const rawAmount = new BN(data.slice(1), 'le')
+        const tokenAmount = tokenMint
+          ? rawAmount.div(new BN(10).pow(new BN(tokenMint.account.decimals)))
+          : rawAmount
 
         return (
           <>
-            {tokenDescriptor ? (
+            {tokenMint ? (
               <div>
                 <div>
                   <span>Amount:</span>
                   <span>{`${tokenAmount.toNumber().toLocaleString()} ${
-                    tokenDescriptor.name
+                    tokenDescriptor?.name ?? ''
+                  }`}</span>
+                </div>
+              </div>
+            ) : (
+              <div>{JSON.stringify(data)}</div>
+            )}
+          </>
+        )
+      },
+    },
+    7: {
+      name: 'Token: MintTo',
+      accounts: [
+        { name: 'Mint', important: true },
+        { name: 'Destination', important: true },
+        { name: 'Minting Authority' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
+        const tokenMint = await tryGetMint(connection, accounts[0].pubkey)
+
+        // TokenMint instruction layout
+        // TODO: Use BufferLayout to decode the instruction
+        // const dataLayout = BufferLayout.struct([
+        //     BufferLayout.u8('instruction'),
+        //     Layout.uint64('amount'),
+        //   ]);
+
+        const rawAmount = new BN(data.slice(1), 'le')
+        const tokenAmount = tokenMint
+          ? rawAmount.div(new BN(10).pow(new BN(tokenMint.account.decimals)))
+          : rawAmount
+
+        return (
+          <>
+            {tokenMint ? (
+              <div>
+                <div>
+                  <span>Amount:</span>
+                  <span>{`${tokenAmount.toNumber().toLocaleString()} ${
+                    tokenDescriptor?.name ?? ''
                   }`}</span>
                 </div>
               </div>
@@ -116,7 +185,11 @@ export const INSTRUCTION_DESCRIPTORS = {
         { name: 'Dex Program' },
         { name: 'Quote Mint' },
       ],
-      getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddSpotMarket
         return (
@@ -142,7 +215,11 @@ export const INSTRUCTION_DESCRIPTORS = {
         1: { name: 'Oracle' },
         6: { name: 'Incentive Vault' },
       },
-      getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddPerpMarket
         const mngoMint = { name: 'MNGO', decimals: 6 }
@@ -169,10 +246,26 @@ export const INSTRUCTION_DESCRIPTORS = {
   },
 }
 
-export function getInstructionDescriptor(
-  programId: PublicKey,
-  instructionId: number
-): InstructionDescriptor | undefined {
-  const descriptor = INSTRUCTION_DESCRIPTORS[programId.toBase58()]
-  return descriptor && descriptor[instructionId]
+export async function getInstructionDescriptor(
+  connection: Connection,
+  instruction: InstructionData
+) {
+  const descriptors = INSTRUCTION_DESCRIPTORS[
+    instruction.programId.toBase58()
+  ] as InstructionDescriptorFactory[]
+
+  const descriptor = descriptors && descriptors[instruction.data[0]]
+
+  const dataUI = (descriptor?.getDataUI &&
+    (await descriptor?.getDataUI(
+      connection,
+      instruction.data,
+      instruction.accounts
+    ))) ?? <>{JSON.stringify(instruction.data)}</>
+
+  return {
+    name: descriptor?.name,
+    accounts: descriptor?.accounts,
+    dataUI,
+  }
 }

@@ -7,8 +7,10 @@ import {
   getProgramName,
   InstructionDescriptor,
 } from './tools'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import InspectorButton from '../explorer/inspectorButton'
+import useWalletStore from '../../stores/useWalletStore'
+import { getExplorerUrl } from '../explorer/tools'
 
 export default function InstructionCard({
   index,
@@ -17,24 +19,30 @@ export default function InstructionCard({
   index: number
   proposalInstruction: ProposalInstruction
 }) {
-  const instructionId = proposalInstruction.instruction.data[0]
-  const descriptor = getInstructionDescriptor(
-    proposalInstruction.instruction.programId,
-    instructionId
-  )
+  const connection = useWalletStore((s) => s.connection)
+  const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
+
+  useEffect(() => {
+    getInstructionDescriptor(
+      connection.current,
+      proposalInstruction.instruction
+    ).then((d) => setDescriptor(d))
+  }, [proposalInstruction])
 
   return (
     <div>
       <h3 className="mb-4">
         {`Instruction ${index} `}
-        {descriptor && `– ${descriptor.name}`}
+        {descriptor?.name && `– ${descriptor.name}`}
       </h3>
       <InstructionProgram
+        endpoint={connection.endpoint}
         programId={proposalInstruction.instruction.programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
         {proposalInstruction.instruction.accounts.map((am, idx) => (
           <InstructionAccount
+            endpoint={connection.endpoint}
             key={idx}
             index={idx}
             accountMeta={am}
@@ -48,16 +56,18 @@ export default function InstructionCard({
           instructionData={proposalInstruction.instruction}
         ></InspectorButton>
       </div>
-      <InstructionData
-        data={proposalInstruction.instruction.data}
-        descriptor={descriptor}
-        accounts={proposalInstruction.instruction.accounts}
-      ></InstructionData>
+      <InstructionData descriptor={descriptor}></InstructionData>
     </div>
   )
 }
 
-export function InstructionProgram({ programId }: { programId: PublicKey }) {
+export function InstructionProgram({
+  endpoint,
+  programId,
+}: {
+  endpoint: string
+  programId: PublicKey
+}) {
   const programLabel = getProgramName(programId)
   return (
     <div className="border-t border-bkg-4 flex items-center justify-between py-3">
@@ -65,7 +75,7 @@ export function InstructionProgram({ programId }: { programId: PublicKey }) {
       <div className="flex items-center">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none"
-          href={`https://explorer.solana.com/address/${programId.toBase58()}`}
+          href={getExplorerUrl(endpoint, programId)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -83,10 +93,12 @@ export function InstructionProgram({ programId }: { programId: PublicKey }) {
 }
 
 export function InstructionAccount({
+  endpoint,
   index,
   accountMeta,
   descriptor,
 }: {
+  endpoint: string
   index: number
   accountMeta: AccountMetaData
   descriptor: InstructionDescriptor | undefined
@@ -97,7 +109,7 @@ export function InstructionAccount({
     <div className="border-t border-bkg-4 flex items-center justify-between py-3">
       <div>
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
-        {descriptor && (
+        {descriptor?.accounts && (
           <div className="mt-1 text-fgd-3 text-xs">
             {descriptor.accounts[index]?.name}
           </div>
@@ -106,7 +118,7 @@ export function InstructionAccount({
       <div className="flex items-center">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none"
-          href={`https://explorer.solana.com/address/${accountMeta.pubkey.toString()}`}
+          href={getExplorerUrl(endpoint, accountMeta.pubkey)}
           target="_blank"
           rel="noopener noreferrer"
         >
@@ -124,23 +136,14 @@ export function InstructionAccount({
 }
 
 export function InstructionData({
-  data,
   descriptor,
-  accounts,
 }: {
-  data: Uint8Array
   descriptor: InstructionDescriptor | undefined
-  accounts: AccountMetaData[]
 }) {
-  const getDataUI =
-    descriptor?.getDataUI ?? ((data, _accounts) => <>{JSON.stringify(data)}</>)
-
-  console.log(getDataUI(data, accounts))
-
   return (
     <div>
       <span className="break-all font-display text-fgd-1 text-xs">
-        {getDataUI(data, accounts)}
+        {descriptor?.dataUI}
       </span>
     </div>
   )

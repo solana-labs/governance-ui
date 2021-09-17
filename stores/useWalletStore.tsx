@@ -6,10 +6,14 @@ import {
   ProgramAccount,
   TokenAccount,
   MintAccount,
-  getMint,
+  tryGetMint,
   getOwnedTokenAccounts,
 } from '../utils/tokens'
-import { getGovernanceAccount, getGovernanceAccounts } from '../models/api'
+import {
+  getGovernanceAccount,
+  getGovernanceAccounts,
+  getTokenOwnerRecordsByTokenOwner,
+} from '../models/api'
 import {
   getAccountTypes,
   Governance,
@@ -26,6 +30,8 @@ import { fetchGistFile } from '../utils/github'
 import { pubkeyFilter } from '../scripts/api'
 import { getGovernanceChatMessages } from '../models/chat/api'
 import { ChatMessage } from '../models/chat/accounts'
+import { mapFromEntries, mapEntries } from '../tools/core/script'
+import { GoverningTokenType } from '../models/enums'
 
 interface WalletStore extends State {
   connected: boolean
@@ -40,10 +46,16 @@ interface WalletStore extends State {
   selectedRealm: {
     realm?: ParsedAccount<Realm>
     mint?: MintAccount
+    councilMint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
     proposalDescriptions: { [proposal: string]: string }
+    /// Community token records by owner
     tokenRecords: { [owner: string]: ParsedAccount<TokenOwnerRecord> }
+    /// Council token records by owner
+    councilTokenOwnerRecords: {
+      [owner: string]: ParsedAccount<TokenOwnerRecord>
+    }
   }
   selectedProposal: {
     proposal: ParsedAccount<Proposal>
@@ -56,6 +68,7 @@ interface WalletStore extends State {
     description?: string
     proposalMint?: MintAccount
     loading: boolean
+    tokenType?: GoverningTokenType
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -66,14 +79,6 @@ interface WalletStore extends State {
 
 function mapKeys(xs: any, mapFn: (k: string) => any) {
   return Object.keys(xs).map(mapFn)
-}
-
-function mapEntries(xs: any, mapFn: (kv: [string, any]) => any) {
-  return Object.entries(xs).map(mapFn)
-}
-
-function mapFromEntries(xs: any, mapFn: (kv: [string, any]) => [string, any]) {
-  return Object.fromEntries(mapEntries(xs, mapFn))
 }
 
 async function mapFromPromisedEntries(
@@ -124,10 +129,12 @@ const INITIAL_CONNECTION_STATE = {
 const INITIAL_REALM_STATE = {
   realm: null,
   mint: null,
+  councilMint: null,
   governances: {},
   proposals: {},
   proposalDescriptions: {},
   tokenRecords: {},
+  councilTokenOwnerRecords: {},
   loading: true,
 }
 
@@ -202,11 +209,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.realms = realms
       })
 
-      const mints = await Promise.all(
-        Object.values(realms).map((r) =>
-          getMint(connection, r.info.communityMint)
+      const mints = (
+        await Promise.all(
+          Object.values(realms).flatMap((r) => [
+            tryGetMint(connection, r.info.communityMint),
+            r.info.config.councilMint
+              ? tryGetMint(connection, r.info.config.councilMint)
+              : undefined,
+          ])
         )
-      )
+      ).filter(Boolean)
 
       set((s) => {
         s.mints = Object.fromEntries(
@@ -223,11 +235,20 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realms = get().realms
       const mints = get().mints
       const realm = realms[realmId.toBase58()]
+
       const realmMintPk = realm.info.communityMint
       const realmMint = mints[realmMintPk.toBase58()]
+
+      const realmCouncilMintPk = realm.info.config.councilMint
+      const realmCouncilMint = mints[realmCouncilMintPk?.toBase58()]
+
       const set = get().set
 
-      const [governances, tokenRecords] = await Promise.all([
+      const [
+        governances,
+        tokenRecords,
+        councilTokenOwnerRecords,
+      ] = await Promise.all([
         getGovernanceAccounts<Governance>(
           programId,
           endpoint,
@@ -236,29 +257,36 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           [pubkeyFilter(1, realmId)]
         ),
 
-        getGovernanceAccounts<TokenOwnerRecord>(
+        getTokenOwnerRecordsByTokenOwner(
           programId,
           endpoint,
-          TokenOwnerRecord,
-          getAccountTypes(TokenOwnerRecord),
-          [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, realmMintPk)]
+          realmId,
+          realmMintPk
+        ),
+
+        getTokenOwnerRecordsByTokenOwner(
+          programId,
+          endpoint,
+          realmId,
+          realmCouncilMintPk
         ),
       ])
 
-      const tokenRecordsByOwner = mapFromEntries(tokenRecords, ([_k, v]) => [
-        v.info.governingTokenOwner.toBase58(),
-        v,
-      ])
-
       console.log('fetchRealm mint', realmMint)
+      console.log('fetchRealm councilMint', realmCouncilMint)
       console.log('fetchRealm governances', governances)
-      console.log('fetchRealm tokenRecords', tokenRecordsByOwner)
+      console.log('fetchRealm tokenRecords', {
+        tokenRecords,
+        councilTokenOwnerRecords,
+      })
 
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
+        s.selectedRealm.councilMint = realmCouncilMint
         s.selectedRealm.governances = governances
-        s.selectedRealm.tokenRecords = tokenRecordsByOwner
+        s.selectedRealm.tokenRecords = tokenRecords
+        s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
       })
 
       const proposalsByGovernance = await Promise.all(
@@ -360,6 +388,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Realm
       )
 
+      const tokenType = realm.info.communityMint.equals(
+        proposal.info.governingTokenMint
+      )
+        ? GoverningTokenType.Community
+        : GoverningTokenType.Council
+
       console.log('fetchProposal fetched', {
         governance,
         proposal,
@@ -368,6 +402,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         voteRecordsByVoter,
         signatories,
         chatMessages,
+        tokenType,
       })
 
       set((s) => {
@@ -381,6 +416,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = chatMessages
         s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
+        s.selectedProposal.tokenType = tokenType
       })
     },
     async fetchChatMessages(proposalPubKey: PublicKey) {
