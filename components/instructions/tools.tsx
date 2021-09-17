@@ -140,7 +140,7 @@ export const INSTRUCTION_DESCRIPTORS = {
       accounts: {
         0: { name: 'Mango Group' },
         1: { name: 'Oracle' },
-        5: { name: 'Incentive Vault' },
+        6: { name: 'Incentive Vault' },
       },
       getDataUI: (data: Uint8Array, _accounts: AccountMetaData[]) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
