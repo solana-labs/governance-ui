@@ -128,7 +128,7 @@ const TokenDeposit = ({
       realmInfo.programId,
       realm.pubkey,
       depositTokenAccount.publicKey,
-      depositTokenRecord.info.governingTokenMint,
+      depositTokenAccount.account.mint,
       wallet.publicKey,
       transferAuthority.publicKey,
       wallet.publicKey,
