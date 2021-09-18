@@ -42,10 +42,12 @@ interface WalletStore extends State {
   }
   current: WalletAdapter | undefined
 
+  ownVoteRecordsByProposal: { [proposal: string]: ParsedAccount<VoteRecord> }
   realms: { [realm: string]: ParsedAccount<Realm> }
   selectedRealm: {
     realm?: ParsedAccount<Realm>
     mint?: MintAccount
+    programId?: PublicKey
     councilMint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
@@ -92,6 +94,22 @@ function merge(...os) {
   return Object.assign({}, ...os)
 }
 
+export async function getVoteRecordsByProposal(
+  programId: PublicKey,
+  endoint: string,
+  voter: PublicKey
+) {
+  return getGovernanceAccounts<VoteRecord>(
+    programId,
+    endoint,
+    VoteRecord,
+    getAccountTypes(VoteRecord),
+    [pubkeyFilter(33, voter)]
+  ).then((vrs) =>
+    mapFromEntries(vrs, ([_, v]) => [v.info.proposal.toBase58(), v])
+  )
+}
+
 export async function getVoteRecordsByVoter(
   programId: PublicKey,
   endpoint: string,
@@ -129,6 +147,7 @@ const INITIAL_CONNECTION_STATE = {
 const INITIAL_REALM_STATE = {
   realm: null,
   mint: null,
+  programId: null,
   councilMint: null,
   governances: {},
   proposals: {},
@@ -156,6 +175,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   connection: INITIAL_CONNECTION_STATE,
   current: null,
   realms: {},
+  ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
   selectedProposal: INITIAL_PROPOSAL_STATE,
   providerUrl: DEFAULT_PROVIDER.url,
@@ -188,6 +208,32 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       } else {
         set((state) => {
           state.tokenAccounts = []
+        })
+      }
+    },
+    async fetchOwnVoteRecords() {
+      const endpoint = get().connection.endpoint
+      const connected = get().connected
+      const programId = get().selectedRealm.programId
+      const wallet = get().current
+      const walletOwner = wallet?.publicKey
+      const set = get().set
+
+      if (connected && walletOwner && programId) {
+        const ownVoteRecordsByProposal = await getVoteRecordsByProposal(
+          programId,
+          endpoint,
+          walletOwner
+        )
+
+        console.log('fetchOwnVoteRecords', connected, ownVoteRecordsByProposal)
+
+        set((state) => {
+          state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
+        })
+      } else {
+        set((state) => {
+          state.ownVoteRecordsByProposal = []
         })
       }
     },
@@ -283,11 +329,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
+        s.selectedRealm.programId = programId
         s.selectedRealm.councilMint = realmCouncilMint
         s.selectedRealm.governances = governances
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
       })
+
+      get().actions.fetchOwnVoteRecords()
 
       const proposalsByGovernance = await Promise.all(
         mapKeys(governances, (g) =>

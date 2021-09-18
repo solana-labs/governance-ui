@@ -13,8 +13,6 @@ export default function useProposalVotes(proposal?: Proposal) {
       ? mint
       : councilMint
 
-  console.log('Proposal vote data', { councilMint })
-
   // TODO: optimize using memo
   if (!proposal || !governance || !proposalMint)
     return {

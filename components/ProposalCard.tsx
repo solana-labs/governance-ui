@@ -8,6 +8,7 @@ import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
 import VoteResultsBar from './VoteResultsBar'
 import ProposalTimeStatus from './ProposalTimeStatus'
+import useWalletStore from '../stores/useWalletStore'
 
 type ProposalCardProps = {
   id: string
@@ -32,6 +33,12 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
     relativeYesVotes,
   } = useProposalVotes(proposal)
 
+  const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[id]
+
+  let status = ProposalState[proposal.state]
+  if (ownVoteRecord)
+    status = status + ': ' + (ownVoteRecord.info.isYes() ? 'Yes' : 'No')
+
   return (
     <div>
       <Link href={`/dao/${symbol}/proposal/${id}`}>
@@ -41,7 +48,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
               <div className="flex items-start justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
                 <div className="flex items-center pl-4 pt-1">
-                  <StatusBadge status={ProposalState[proposal.state]} />
+                  <StatusBadge status={status} />
                   <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" />
                 </div>
               </div>
