@@ -87,7 +87,7 @@ async function runNotifier() {
       fiveMinutesSeconds + toleranceSeconds
     ) {
       countJustOpenedForVoting++
-      const msg = `--- ${proposal.info.name} proposal just opened for voting`
+      const msg = `“${proposal.info.name}” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/MNGO/proposal/${k}`
       console.log(msg)
       if (process.env.WEBHOOK_URL) {
         axios.post(process.env.WEBHOOK_URL, { content: msg })
