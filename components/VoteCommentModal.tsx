@@ -36,9 +36,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const { realm, realmInfo } = useRealm()
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
-    (s) => s.actions
-  )
+  const { fetchRealm } = useWalletStore((s) => s.actions)
 
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
