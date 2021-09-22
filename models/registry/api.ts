@@ -62,15 +62,15 @@ export function getRealmInfo(symbol: string) {
   if (symbol.endsWith('-DEV')) {
     const mainnetSymbol = symbol.replace('-DEV', '')
 
-    let realmInfo = getAllRealmInfos('devnet').find(
+    let devRealmInfo = getAllRealmInfos('devnet').find(
       (r) => r.symbol === mainnetSymbol
     )
 
-    if (realmInfo) {
-      realmInfo.endpoint = 'devnet'
+    if (devRealmInfo) {
+      devRealmInfo.endpoint = 'devnet'
 
-      if (!realmInfo.programId) {
-        realmInfo.programId = new PublicKey(
+      if (!devRealmInfo.programId) {
+        devRealmInfo.programId = new PublicKey(
           'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
         )
       }
@@ -80,11 +80,11 @@ export function getRealmInfo(symbol: string) {
       )
 
       if (mainnetRealmInfo) {
-        realmInfo = { ...mainnetRealmInfo, ...realmInfo }
+        devRealmInfo = { ...mainnetRealmInfo, ...devRealmInfo }
       }
     }
 
-    return realmInfo
+    return devRealmInfo
   }
 
   const realmInfo = getAllRealmInfos().find((r) => r.symbol === symbol)
