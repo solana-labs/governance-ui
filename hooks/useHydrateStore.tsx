@@ -1,8 +1,8 @@
 import { Connection } from '@solana/web3.js'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
+import { getRealmInfo } from '../models/registry/api'
 import useWalletStore, { ENDPOINTS } from '../stores/useWalletStore'
-import { REALMS } from './useRealm'
 
 export default function useHydrateStore() {
   const router = useRouter()
@@ -14,7 +14,7 @@ export default function useHydrateStore() {
   )
   useEffect(() => {
     const fetch = async () => {
-      const realmInfo = REALMS.find((r) => r.symbol === symbol)
+      const realmInfo = getRealmInfo(symbol as string)
       if (realmInfo) {
         setWalletStore((s) => {
           const ENDPOINT = ENDPOINTS.find((e) => e.name === realmInfo.endpoint)

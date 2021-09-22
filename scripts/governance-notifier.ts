@@ -1,8 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
-import { REALMS } from '../hooks/useRealm'
+
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
+import { getRealmInfo } from '../models/registry/api'
 
 import { ENDPOINTS } from '../stores/useWalletStore'
 import { getGovernanceAccounts, pubkeyFilter } from './api'
@@ -18,7 +19,7 @@ async function runNotifier() {
   const CLUSTER = 'mainnet'
   const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
 
-  const realmInfo = REALMS.find((r) => r.symbol === 'MNGO')
+  const realmInfo = getRealmInfo('MNGO')
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo.programId,
