@@ -35,7 +35,8 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
-  const { realm } = useRealm()
+  const { realm, realmInfo } = useRealm()
+  const { fetchRealm } = useWalletStore((s) => s.actions)
 
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
@@ -78,6 +79,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
     fetchChatMessages(proposal.pubkey)
     fetchVoteRecords(proposal)
+    await fetchRealm(realmInfo.programId, realmInfo.realmId)
   }
 
   const voteString = vote === 0 ? 'Approve' : 'Deny'
