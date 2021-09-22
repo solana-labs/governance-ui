@@ -169,9 +169,7 @@ const TokenDeposit = ({
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.info.proposal.toBase58()]
         if (!proposal) {
-          throw new Error(
-            `Can't find Proposal for VoteRecord[${voteRecord.pubkey.toBase58()}]`
-          )
+          continue
         }
 
         if (proposal.info.state === ProposalState.Voting) {
