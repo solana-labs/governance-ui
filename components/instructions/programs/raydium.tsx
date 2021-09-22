@@ -4,7 +4,7 @@ import { AccountMetaData } from '../../../models/accounts'
 import { fmtMintAmount } from '../../../tools/sdk/units'
 import { tryGetTokenMint } from '../../../utils/tokens'
 
-export const RAYDIUM_INSTRUCTIONS = {
+const RAYDIUM_AMM_INSTRUCTIONS = {
   '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': {
     3: {
       name: 'Raydium: Add Liquidity',
@@ -62,4 +62,49 @@ export const RAYDIUM_INSTRUCTIONS = {
       },
     },
   },
+}
+const RAYDIUM_STAKING_INSTRUCTIONS = {
+  EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q: {
+    1: {
+      name: 'Raydium: Deposit',
+      accounts: [
+        { name: 'poolId' },
+        { name: 'poolAuthority' },
+        { name: 'userInfoAccount' },
+        { name: 'userOwner' },
+        { name: 'userLpTokenAccount' },
+        { name: 'poolLpTokenAccount' },
+        { name: 'userRewardTokenAccount' },
+        { name: 'poolRewardTokenAccount' },
+        { name: 'Sysvar: Clock' },
+        { name: 'Token Program' },
+        { name: 'userRewardTokenAccountB' },
+        { name: 'poolRewardTokenAccountB' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const lpTokenMint = await tryGetTokenMint(
+          connection,
+          accounts[4].pubkey // userLpTokenAccount
+        )
+        const dataLayout = struct([u8('instruction'), nu64('amount')])
+
+        const args = dataLayout.decode(Buffer.from(data)) as any
+
+        return (
+          <>
+            <p>amount: {fmtMintAmount(lpTokenMint.account, args.amount)}</p>
+          </>
+        )
+      },
+    },
+  },
+}
+
+export const RAYDIUM_INSTRUCTIONS = {
+  ...RAYDIUM_STAKING_INSTRUCTIONS,
+  ...RAYDIUM_AMM_INSTRUCTIONS,
 }
