@@ -35,6 +35,11 @@ const MAINNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
     website: 'https://www.socean.fi',
   },
+  {
+    symbol: 'GOV',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
+  },
 ]
 
 const DEVNET_REALMS: RealmInfo[] = [
@@ -47,6 +52,10 @@ const DEVNET_REALMS: RealmInfo[] = [
     symbol: 'SOCEAN',
     programId: new PublicKey('GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG'),
     realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
+  },
+  {
+    symbol: 'GOV',
+    realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
 ]
 
