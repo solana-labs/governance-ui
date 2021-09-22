@@ -1,4 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
+import {
+  endsWithIgnoreCase,
+  equalsIgnoreCase,
+  replaceIgnoreCase,
+} from '../../tools/core/strings'
 
 export interface RealmInfo {
   symbol: string
@@ -17,6 +22,8 @@ export interface RealmInfo {
   ogImage?: string
 }
 
+// Hardcoded list of mainnet realms
+// TODO: Once governance program clones registry program and governance accounts metadata is on-chain the list should be moved there
 const MAINNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
@@ -36,12 +43,13 @@ const MAINNET_REALMS: RealmInfo[] = [
     website: 'https://www.socean.fi',
   },
   {
-    symbol: 'GOV',
+    symbol: 'Governance',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
 ]
 
+// Hardcoded list of devnet realms
 const DEVNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
@@ -54,7 +62,7 @@ const DEVNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
   },
   {
-    symbol: 'GOV',
+    symbol: 'Governance',
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
 ]
@@ -68,11 +76,11 @@ export function getRealmInfo(symbol: string) {
     return undefined
   }
 
-  if (symbol.endsWith('-DEV')) {
-    const mainnetSymbol = symbol.replace('-DEV', '')
+  if (endsWithIgnoreCase(symbol, '-DEV')) {
+    const mainnetSymbol = replaceIgnoreCase(symbol, '-DEV', '')
 
-    let devRealmInfo = getAllRealmInfos('devnet').find(
-      (r) => r.symbol === mainnetSymbol
+    let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
+      equalsIgnoreCase(r.symbol, mainnetSymbol)
     )
 
     if (devRealmInfo) {
@@ -84,8 +92,8 @@ export function getRealmInfo(symbol: string) {
         )
       }
 
-      const mainnetRealmInfo = getAllRealmInfos('mainnet').find(
-        (r) => r.symbol === mainnetSymbol
+      const mainnetRealmInfo = getAllRealmInfos('mainnet').find((r) =>
+        equalsIgnoreCase(r.symbol, mainnetSymbol)
       )
 
       if (mainnetRealmInfo) {
@@ -96,7 +104,9 @@ export function getRealmInfo(symbol: string) {
     return devRealmInfo
   }
 
-  const realmInfo = getAllRealmInfos().find((r) => r.symbol === symbol)
+  const realmInfo = getAllRealmInfos().find((r) =>
+    equalsIgnoreCase(r.symbol, symbol)
+  )
 
   if (realmInfo) {
     realmInfo.endpoint = 'mainnet'
