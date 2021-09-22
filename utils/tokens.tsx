@@ -48,7 +48,7 @@ export async function tryGetMint(
       account,
     }
   } catch (ex) {
-    console.error(`Can't fetch mint ${publicKey.toBase58()}`, ex)
+    console.error(`Can't fetch mint ${publicKey?.toBase58()}`, ex)
   }
 }
 
@@ -65,8 +65,16 @@ export async function tryGetTokenAccount(
       account,
     }
   } catch (ex) {
-    console.error(`Can't fetch token account ${publicKey.toBase58()}`, ex)
+    console.error(`Can't fetch token account ${publicKey?.toBase58()}`, ex)
   }
+}
+
+export async function tryGetTokenMint(
+  connection: Connection,
+  publicKey: PublicKey
+): Promise<ProgramAccount<MintAccount> | undefined> {
+  const tokenAccount = await tryGetTokenAccount(connection, publicKey)
+  return tokenAccount && tryGetMint(connection, tokenAccount.account.mint)
 }
 
 // copied from @solana/spl-token

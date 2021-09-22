@@ -4,13 +4,13 @@ import { AccountMetaData, ProposalInstruction } from '../../models/accounts'
 import {
   getAccountName,
   getInstructionDescriptor,
-  getProgramName,
   InstructionDescriptor,
 } from './tools'
 import React, { useEffect, useState } from 'react'
 import InspectorButton from '../explorer/inspectorButton'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
+import { getProgramName } from './programs/names'
 
 export default function InstructionCard({
   index,

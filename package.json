@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.0.16",
+    "bignumber.js": "^9.0.1",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
     "@headlessui/react": "^1.0.0",
