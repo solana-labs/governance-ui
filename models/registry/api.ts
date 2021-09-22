@@ -8,7 +8,7 @@ import {
 export interface RealmInfo {
   symbol: string
   endpoint?: string
-  programId?: PublicKey
+  programId: PublicKey
   realmId: PublicKey
   website?: string
   // Specifies the realm mainnet name for resource lookups
@@ -54,6 +54,7 @@ const DEVNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
     mainnetName: 'Mango',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
   },
   {
@@ -63,6 +64,7 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
   {
     symbol: 'Governance',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
 ]
@@ -86,12 +88,6 @@ export function getRealmInfo(symbol: string) {
 
     if (devRealmInfo) {
       devRealmInfo.endpoint = 'devnet'
-
-      if (!devRealmInfo.programId) {
-        devRealmInfo.programId = new PublicKey(
-          'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
-        )
-      }
 
       const mainnetRealmInfo = getAllRealmInfos('mainnet').find((r) =>
         equalsIgnoreCase(r.symbol, mainnetSymbol)
