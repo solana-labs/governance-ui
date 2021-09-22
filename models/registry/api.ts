@@ -76,6 +76,7 @@ export function getRealmInfo(symbol: string) {
     return undefined
   }
 
+  // TODO: replace -dev realm symbol suffix with query param
   if (endsWithIgnoreCase(symbol, '-DEV')) {
     const mainnetSymbol = replaceIgnoreCase(symbol, '-DEV', '')
 
