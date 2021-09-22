@@ -4,21 +4,8 @@ import BN from 'bn.js'
 import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
 import { tryGetMint, tryGetTokenAccount } from '../../utils/tokens'
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
-
-// Well known program names displayed on the instruction card
-export const PROGRAM_NAMES = {
-  TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: 'Token Program',
-  mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: 'Mango v3',
-  '9xQeWvG816bUx9EPjHmaT23yvVM2ZWbrrpZb9PusVFin': 'Serum v3',
-  DESVgJVGajEgKGXhb6XmqDHGz3VjdgP7rEVESBgxmroY: 'Serum v3 (devnet)',
-  BPFLoaderUpgradeab1e11111111111111111111111: 'BPF Upgradeable Loader',
-  SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
-  SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
-}
-
-export function getProgramName(programId: PublicKey) {
-  return PROGRAM_NAMES[programId.toBase58()]
-}
+import { getProgramName } from './programs/names'
+import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
@@ -308,6 +295,7 @@ export const INSTRUCTION_DESCRIPTORS = {
     },
   },
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
+  ...RAYDIUM_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
