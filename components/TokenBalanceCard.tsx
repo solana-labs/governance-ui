@@ -80,7 +80,6 @@ const TokenDeposit = ({
     (s) => s.actions
   )
   const {
-    symbol,
     realm,
     realmInfo,
     realmTokenAccount,
