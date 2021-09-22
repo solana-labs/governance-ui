@@ -105,7 +105,7 @@ const TokenDeposit = ({
       ? realmTokenAccount
       : councilTokenAccount
 
-  const depositTokenName = `${symbol} ${
+  const depositTokenName = `${realm?.info.name} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
 
