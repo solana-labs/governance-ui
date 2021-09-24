@@ -33,7 +33,7 @@ const MAINNET_REALMS: RealmInfo[] = [
     keywords:
       'Mango Markets, DAO, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
     twitter: '@mangomarkets',
-    ogImage: 'https://token.mango.markets/preview.jpg',
+    ogImage: 'https://www.phantom.app/img/logo.png',
   },
 
   {
@@ -41,21 +41,25 @@ const MAINNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
     realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
     website: 'https://www.socean.fi',
+    ogImage: 'https://www.phantom.app/img/logo.png',
   },
   {
     symbol: 'Governance',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
+    ogImage: 'https://www.phantom.app/img/logo.png',
   },
   {
     symbol: 'Yield Farming',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('8eUUtRpBCg7sJ5FXfPUMiwSQNqC3FjFLkmS2oFPKoiBi'),
+    ogImage: 'https://www.phantom.app/img/logo.png',
   },
   {
     symbol: 'SCTF1',
     programId: new PublicKey('gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6'),
     realmId: new PublicKey('EtZWAeFFRC5k6uesap1F1gkHFimsL2HqttVTNAeN86o8'),
+    ogImage: 'https://www.phantom.app/img/logo.png',
   },
 ]
 
@@ -107,7 +111,6 @@ export function getRealmInfo(symbol: string) {
         devRealmInfo = { ...mainnetRealmInfo, ...devRealmInfo }
       }
     }
-
     return devRealmInfo
   }
 
