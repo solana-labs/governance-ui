@@ -2,11 +2,14 @@ import { useEffect, useState } from 'react'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
+import { useRouter } from 'next/router'
 
 const COL = 'flex-col'
 const ROW = 'flex-row'
 
 const Realms = () => {
+  const router = useRouter()
+
   const [realms, setRealms] = useState([])
   const [realmsSearchResults, setSearchResult] = useState([])
   const [search, setSerach] = useState('')
@@ -23,6 +26,10 @@ const Realms = () => {
     )
     setSearchResult(results)
   }, [search, realms])
+
+  const goToRealm = ({ name }) => {
+    router.push(`/dao/${name}`)
+  }
 
   return (
     <div className="mt-20">
@@ -43,7 +50,8 @@ const Realms = () => {
       <div className={`flex flex-wrap ${viewType}`}>
         {realmsSearchResults.map((realm: RealmInfo) => (
           <div
-            className="flex flex-col flex-1 p-10 items-center border-gray-500 border"
+            onClick={() => goToRealm({ name: realm.symbol })}
+            className="flex flex-col flex-1 p-10 items-center border-gray-500 border cursor-pointer hover:border-white"
             key={realm.realmId.toString()}
           >
             <div className="pb-5">
