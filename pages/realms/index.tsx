@@ -8,14 +8,22 @@ const ROW = 'flex-row'
 
 const Realms = () => {
   const [realms, setRealms] = useState([])
+  const [realmsSearchResults, setSearchResult] = useState([])
   const [search, setSerach] = useState('')
   const [viewType, setViewType] = useState(ROW)
 
   useEffect(() => {
     const data: RealmInfo[] = getAllRealmInfos()
-    console.log(data)
     setRealms(data)
   }, [])
+
+  useEffect(() => {
+    const results = realms.filter((realm: RealmInfo) =>
+      realm.symbol.toLowerCase().includes(search.toLowerCase())
+    )
+    setSearchResult(results)
+  }, [search])
+
   return (
     <div className="mt-20">
       <div className="mb-10 flex">
@@ -33,23 +41,17 @@ const Realms = () => {
         </div>
       </div>
       <div className={`flex flex-wrap ${viewType}`}>
-        {realms
-          .filter((realm: RealmInfo) =>
-            search
-              ? realm.symbol.toLowerCase().includes(search.toLowerCase())
-              : realm
-          )
-          .map((realm: RealmInfo) => (
-            <div
-              className="flex flex-col flex-1 p-10 items-center border-gray-500 border"
-              key={realm.realmId.toString()}
-            >
-              <div className="pb-5">
-                <img src={realm.ogImage}></img>
-              </div>
-              <div>{realm.symbol}</div>
+        {realmsSearchResults.map((realm: RealmInfo) => (
+          <div
+            className="flex flex-col flex-1 p-10 items-center border-gray-500 border"
+            key={realm.realmId.toString()}
+          >
+            <div className="pb-5">
+              <img src={realm.ogImage}></img>
             </div>
-          ))}
+            <div>{realm.symbol}</div>
+          </div>
+        ))}
       </div>
     </div>
   )
