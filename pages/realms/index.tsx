@@ -22,7 +22,7 @@ const Realms = () => {
       realm.symbol.toLowerCase().includes(search.toLowerCase())
     )
     setSearchResult(results)
-  }, [search])
+  }, [search, realms])
 
   return (
     <div className="mt-20">
