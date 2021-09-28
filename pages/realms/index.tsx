@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
+import Loading from '../../components/Loading'
 
 const COL = 'flex-col'
 const ROW = 'flex-row'
@@ -11,6 +12,8 @@ const ROW = 'flex-row'
 const Realms = () => {
   const router = useRouter()
 
+  //TODO when we fetch realms data from api add loader handling
+  const isLoading = false
   const [realms, setRealms] = useState([])
   const [realmsSearchResults, setSearchResult] = useState([])
   const [search, setSerach] = useState('')
@@ -53,18 +56,22 @@ const Realms = () => {
         </div>
       </div>
       <div className={`flex flex-wrap ${viewType}`}>
-        {realmsSearchResults.map((realm: RealmInfo) => (
-          <div
-            onClick={() => goToRealm({ name: realm.symbol })}
-            className="flex flex-col flex-1 p-10 items-center border-gray-500 border cursor-pointer hover:border-white"
-            key={realm.realmId.toString()}
-          >
-            <div className="pb-5">
-              <img src={realm.ogImage}></img>
+        {isLoading ? (
+          <Loading></Loading>
+        ) : (
+          realmsSearchResults.map((realm: RealmInfo) => (
+            <div
+              onClick={() => goToRealm({ name: realm.symbol })}
+              className="flex flex-col flex-1 p-10 items-center border-gray-500 border cursor-pointer hover:border-white"
+              key={realm.realmId.toString()}
+            >
+              <div className="pb-5">
+                <img src={realm.ogImage}></img>
+              </div>
+              <div>{realm.symbol}</div>
             </div>
-            <div>{realm.symbol}</div>
-          </div>
-        ))}
+          ))
+        )}
       </div>
     </div>
   )
