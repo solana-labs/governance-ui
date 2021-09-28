@@ -13,9 +13,7 @@ const NavBar = () => {
     setShowAltText(true)
   }
 
-  const realmName = realmInfo?.mainnetName ?? realm?.info.name
-
-  // TODO: Show solana/realms branding when on the home page
+  const realmName = realmInfo?.mainnetName ?? realm?.info.name ?? 'solana'
 
   return (
     <div className="bg-bkg-1 flex h-20 items-center justify-between px-6">

@@ -3,6 +3,7 @@ import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 import Input from '../../components/Input'
 import Button from '../../components/Button'
 import { useRouter } from 'next/router'
+import useWalletStore from '../../stores/useWalletStore'
 
 const COL = 'flex-col'
 const ROW = 'flex-row'
@@ -14,10 +15,14 @@ const Realms = () => {
   const [realmsSearchResults, setSearchResult] = useState([])
   const [search, setSerach] = useState('')
   const [viewType, setViewType] = useState(ROW)
+  const { actions, selectedRealm } = useWalletStore((s) => s)
 
   useEffect(() => {
     const data: RealmInfo[] = getAllRealmInfos()
     setRealms(data)
+    if (selectedRealm.realm) {
+      actions.deselectRealm()
+    }
   }, [])
 
   useEffect(() => {

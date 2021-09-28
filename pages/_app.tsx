@@ -8,6 +8,7 @@ import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
+const SOLANA = 'Solana'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -15,10 +16,9 @@ function App({ Component, pageProps }) {
 
   const { realm, realmInfo } = useRealm()
 
-  // TODO: Show solana/realms branding when on the home page
-  const realmName = realmInfo?.mainnetName ?? realm?.info.name
+  const realmName = realmInfo?.mainnetName ?? realm?.info.name ?? SOLANA
 
-  const title = realmName ? `${realmName} DAO` : 'DAO'
+  const title = realmName && realmName !== SOLANA ? `${realmName} DAO` : SOLANA
   const description = `Discuss and vote on ${title} proposals.`
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh. Without it browsers would cache the last used and won't change it for different realms

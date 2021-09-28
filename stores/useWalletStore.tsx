@@ -237,6 +237,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         })
       }
     },
+    deselectRealm() {
+      set((s) => {
+        s.selectedRealm = INITIAL_REALM_STATE
+      })
+    },
     async fetchAllRealms(programId: PublicKey) {
       console.log('fetchAllRealms', programId.toBase58())
 
