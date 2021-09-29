@@ -66,7 +66,13 @@ const Realms = () => {
               key={realm.realmId.toString()}
             >
               <div className="pb-5">
-                <img src={realm.ogImage}></img>
+                {realm.ogImage ? (
+                  <img width="80px" src={realm.ogImage}></img>
+                ) : (
+                  <div className="rounded-full h-20 w-20 flex items-center justify-center border-2 font-bold border-gray-500 text-gray-300">
+                    {realm.symbol?.charAt(0)}
+                  </div>
+                )}
               </div>
               <div>{realm.symbol}</div>
             </div>
