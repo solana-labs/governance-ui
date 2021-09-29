@@ -18,7 +18,7 @@ const NavBar = () => {
             <span className="sr-only">{'Solana'}</span>
             <img
               className="h-7"
-              src="img/solanaLogo.svg"
+              src="/img/solanaLogo.svg"
               alt={'Solana'}
               width="auto"
               onError={onLogoError}
