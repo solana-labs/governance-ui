@@ -26,5 +26,5 @@ export async function fetchGistFile(gistUrl: string) {
     }
   }
 
-  return ''
+  return undefined
 }

@@ -126,6 +126,15 @@ export async function getVoteRecordsByVoter(
   )
 }
 
+async function resolveProposalDescription(description: string) {
+  try {
+    const url = new URL(description)
+    return (await fetchGistFile(url.toString())) ?? description
+  } catch {
+    return description
+  }
+}
+
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
@@ -363,7 +372,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const proposalDescriptions = await mapFromPromisedEntries(
         proposals,
         async ([k, v]: [string, ParsedAccount<Proposal>]) => {
-          return [k, await fetchGistFile(v.info.descriptionLink)]
+          return [k, await resolveProposalDescription(v.info.descriptionLink)]
         }
       )
 
@@ -407,7 +416,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         signatories,
         chatMessages,
       ] = await Promise.all([
-        fetchGistFile(proposal.info.descriptionLink),
+        resolveProposalDescription(proposal.info.descriptionLink),
         getGovernanceAccount<Governance>(
           connection,
           proposal.info.governance,
