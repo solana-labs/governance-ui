@@ -41,6 +41,8 @@ const MAINNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
     realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
     website: 'https://www.socean.fi',
+    ogImage:
+      'https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png',
   },
   {
     symbol: 'Governance',
