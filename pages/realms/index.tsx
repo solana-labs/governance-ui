@@ -40,7 +40,8 @@ const Realms = () => {
   }
 
   return (
-    <div className="mt-20">
+    <div>
+      <div className="mb-10">Organizations</div>
       <div className="mb-10 flex">
         <Input
           value={search}
