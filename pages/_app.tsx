@@ -16,7 +16,7 @@ function App({ Component, pageProps }) {
 
   const { realm, realmInfo } = useRealm()
 
-  const realmName = realmInfo?.mainnetName ?? realm?.info.name ?? SOLANA
+  const realmName = realmInfo?.mainnetName ?? realm?.info?.name ?? SOLANA
 
   const title = realmName && realmName !== SOLANA ? `${realmName} DAO` : SOLANA
   const description = `Discuss and vote on ${title} proposals.`
