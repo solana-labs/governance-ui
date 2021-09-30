@@ -1,29 +1,31 @@
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
-
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 import { getRealmInfo } from '../models/registry/api'
-
-import { ENDPOINTS } from '../stores/useWalletStore'
 import { getGovernanceAccounts, pubkeyFilter } from './api'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
+
+function errorWrapper() {
+  runNotifier().catch((error) => {
+    console.error(error)
+  })
+}
 
 // run every 5 mins, checks if a mngo governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
-  const CLUSTER = 'mainnet'
-  const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
+  const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
 
   const realmInfo = getRealmInfo('MNGO')
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo.programId,
-    ENDPOINT.url,
+    MAINNET_RPC_NODE,
     Governance,
     getAccountTypes(Governance),
     [pubkeyFilter(1, realmInfo.realmId)]
@@ -35,7 +37,7 @@ async function runNotifier() {
     governanceIds.map((governanceId) => {
       return getGovernanceAccounts<Proposal>(
         realmInfo.programId,
-        ENDPOINT.url,
+        MAINNET_RPC_NODE,
         Proposal,
         getAccountTypes(Proposal),
         [pubkeyFilter(1, governanceId)]
@@ -100,4 +102,4 @@ async function runNotifier() {
   )
 }
 
-setInterval(runNotifier, fiveMinutesSeconds * 1000)
+setInterval(errorWrapper, fiveMinutesSeconds * 1000)

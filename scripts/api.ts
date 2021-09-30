@@ -1,15 +1,14 @@
 import { PublicKey } from '@solana/web3.js'
 import * as bs58 from 'bs58'
 import {
-  Realm,
-  GovernanceAccountType,
   GovernanceAccount,
   GovernanceAccountClass,
+  GovernanceAccountType,
+  Realm,
 } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 import { RpcContext } from '../models/core/api'
 import { GOVERNANCE_SCHEMA } from '../models/serialisation'
-
 import { deserializeBorsh } from '../utils/borsh'
 
 const fetch = require('node-fetch')
@@ -125,29 +124,38 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
       ],
     }),
   })
-  const rawAccounts = (await getProgramAccounts.json())['result']
+
   const accounts: Record<string, ParsedAccount<TAccount>> = {}
 
-  for (const rawAccount of rawAccounts) {
-    try {
-      const account = {
-        pubkey: new PublicKey(rawAccount.pubkey),
-        account: {
-          ...rawAccount.account,
-          data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-        },
-        info: deserializeBorsh(
-          GOVERNANCE_SCHEMA,
-          accountClass,
-          Buffer.from(rawAccount.account.data[0], 'base64')
-        ),
+  try {
+    const response = await getProgramAccounts.json()
+    if ('result' in response) {
+      const rawAccounts = response['result']
+      for (const rawAccount of rawAccounts) {
+        try {
+          const account = {
+            pubkey: new PublicKey(rawAccount.pubkey),
+            account: {
+              ...rawAccount.account,
+              data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
+            },
+            info: deserializeBorsh(
+              GOVERNANCE_SCHEMA,
+              accountClass,
+              Buffer.from(rawAccount.account.data[0], 'base64')
+            ),
+          }
+
+          accounts[account.pubkey.toBase58()] = account
+        } catch (ex) {
+          console.error(`Can't deserialize ${accountClass}`, ex)
+        }
       }
-
-      accounts[account.pubkey.toBase58()] = account
-    } catch (ex) {
-      console.error(`Can't deserialize ${accountClass}`, ex)
+    } else {
+      console.error(`Unexpected response ${JSON.stringify(response)}`)
     }
+  } catch (e) {
+    console.error(e)
   }
-
   return accounts
 }
