@@ -5,6 +5,7 @@ import Button from '../../components/Button'
 import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
+import { EndpointTypes } from '../../models/types'
 
 const COL = 'flex-col'
 const ROW = 'flex-row'
@@ -19,14 +20,16 @@ const Realms = () => {
   const [search, setSerach] = useState('')
   const [viewType, setViewType] = useState(ROW)
   const { actions, selectedRealm } = useWalletStore((s) => s)
-
+  const endpoint = router.query.endpoint
+    ? (router.query.endpoint[0] as EndpointTypes)
+    : 'mainnet'
   useEffect(() => {
-    const data: RealmInfo[] = getAllRealmInfos()
+    const data: RealmInfo[] = getAllRealmInfos(endpoint)
     setRealms(data)
     if (selectedRealm.realm) {
       actions.deselectRealm()
     }
-  }, [])
+  }, [endpoint])
 
   useEffect(() => {
     const results = realms.filter((realm: RealmInfo) =>

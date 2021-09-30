@@ -4,6 +4,7 @@ import {
   equalsIgnoreCase,
   replaceIgnoreCase,
 } from '../../tools/core/strings'
+import { EndpointTypes } from '../types'
 
 export interface RealmInfo {
   symbol: string
@@ -81,7 +82,7 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
 ]
 
-export function getAllRealmInfos(endpoint: 'mainnet' | 'devnet' = 'mainnet') {
+export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
   return endpoint === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
@@ -90,7 +91,6 @@ export function getRealmInfo(symbol: string) {
     return undefined
   }
 
-  // TODO: replace -dev realm symbol suffix with query param
   if (endsWithIgnoreCase(symbol, '-DEV')) {
     const mainnetSymbol = replaceIgnoreCase(symbol, '-DEV', '')
 
@@ -119,6 +119,5 @@ export function getRealmInfo(symbol: string) {
   if (realmInfo) {
     realmInfo.endpoint = 'mainnet'
   }
-
   return realmInfo
 }
