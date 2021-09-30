@@ -7,6 +7,7 @@ import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import { getResourcePathPart } from '../../../tools/core/resources'
+import { useRouter } from 'next/router'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -32,6 +33,7 @@ const DAO = () => {
     realm,
     realmInfo,
   } = useRealm()
+  const router = useRouter()
   const [filters, setFilters] = useState([])
   const [displayedProposals, setDisplayedProposals] = useState([])
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
@@ -84,13 +86,13 @@ const DAO = () => {
       <div className="grid grid-cols-12 gap-4 pb-10 pt-9">
         <div className="col-span-12 md:col-span-7 lg:col-span-8 space-y-4">
           <div>
-            <a
+            <div
               className="flex items-center hover:cursor-pointer"
-              href="/realms"
+              onClick={() => router.push('/realms')}
             >
               <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light mr-2" />{' '}
               Organizations
-            </a>
+            </div>
             <div>
               <a href={realmInfo?.website ? `${realmInfo?.website}` : ''}>
                 {realmName &&
