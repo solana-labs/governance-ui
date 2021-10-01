@@ -1,9 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import {
-  endsWithIgnoreCase,
-  equalsIgnoreCase,
-  replaceIgnoreCase,
-} from '../../tools/core/strings'
+import { equalsIgnoreCase } from '../../tools/core/strings'
 import { EndpointTypes } from '../types'
 
 export interface RealmInfo {
@@ -86,23 +82,24 @@ export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
   return endpoint === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export function getRealmInfo(symbol: string) {
+export function getRealmInfo(
+  symbol: string,
+  endpoint: EndpointTypes = 'mainnet'
+) {
   if (!symbol) {
     return undefined
   }
-
-  if (endsWithIgnoreCase(symbol, '-DEV')) {
-    const mainnetSymbol = replaceIgnoreCase(symbol, '-DEV', '')
-
+  console.log(endpoint === 'devnet', '@@@@@@@@')
+  if (endpoint === 'devnet') {
     let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
-      equalsIgnoreCase(r.symbol, mainnetSymbol)
+      equalsIgnoreCase(r.symbol, symbol)
     )
 
     if (devRealmInfo) {
       devRealmInfo.endpoint = 'devnet'
 
       const mainnetRealmInfo = getAllRealmInfos('mainnet').find((r) =>
-        equalsIgnoreCase(r.symbol, mainnetSymbol)
+        equalsIgnoreCase(r.symbol, symbol)
       )
 
       if (mainnetRealmInfo) {

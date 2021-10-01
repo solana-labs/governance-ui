@@ -38,7 +38,6 @@ const DAO = () => {
   const [displayedProposals, setDisplayedProposals] = useState([])
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const wallet = useWalletStore((s) => s.current)
-
   const [showAltImg, setShowAltImg] = useState(false)
 
   const realmName = realmInfo?.mainnetName ?? realm?.info?.name
