@@ -12,9 +12,11 @@ const ROW = 'flex-row'
 
 const Realms = () => {
   const router = useRouter()
+  const { DAO } = process.env
 
   //TODO when we fetch realms data from api add loader handling
-  const isLoading = false
+  const [isLoading] = useState(false)
+  const [isMounting, setIsMouting] = useState(true)
   const [realms, setRealms] = useState([])
   const [realmsSearchResults, setSearchResult] = useState([])
   const [search, setSerach] = useState('')
@@ -23,6 +25,15 @@ const Realms = () => {
   const endpoint = router.query.endpoint
     ? (router.query.endpoint[0] as EndpointTypes)
     : 'mainnet'
+
+  useEffect(() => {
+    if (DAO) {
+      router.push(`/dao/${DAO}`)
+    } else {
+      setIsMouting(false)
+    }
+  }, [])
+
   useEffect(() => {
     const data: RealmInfo[] = getAllRealmInfos(endpoint)
     setRealms(data)
@@ -42,7 +53,7 @@ const Realms = () => {
     router.push(`/dao/${name}`)
   }
 
-  return (
+  return !isMounting ? (
     <div>
       <div className="mb-10">Organizations</div>
       <div className="mb-10 flex">
@@ -84,7 +95,7 @@ const Realms = () => {
         )}
       </div>
     </div>
-  )
+  ) : null
 }
 
 export default Realms
