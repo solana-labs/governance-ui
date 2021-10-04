@@ -13,19 +13,20 @@ function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
 
-  const { realm, realmInfo } = useRealm()
+  const { realm, realmInfo, symbol } = useRealm()
 
-  // TODO: Show solana/realms branding when on the home page
-  const realmName = realmInfo?.mainnetName ?? realm?.info.name
+  const realmName = realmInfo?.displayName ?? realm?.info?.name
 
-  const title = realmName ? `${realmName} DAO` : 'DAO'
+  const title = realmName ? `${realmName}` : 'Solana Governance'
   const description = `Discuss and vote on ${title} proposals.`
 
-  // Note: ?v==${Date.now()} is added to the url to force favicon refresh. Without it browsers would cache the last used and won't change it for different realms
+  // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
+  // Without it browsers would cache the last used and won't change it for different realms
   // https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh
-  const faviconUrl = realmName
-    ? `/realms/${getResourcePathPart(realmName)}/favicon.ico?v=${Date.now()}`
-    : undefined
+  const faviconSelector = symbol ?? 'SOLANA'
+  const faviconUrl = `/realms/${getResourcePathPart(
+    faviconSelector as string
+  )}/favicon.ico?v=${Date.now()}`
 
   return (
     <>

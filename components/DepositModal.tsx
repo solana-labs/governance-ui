@@ -12,7 +12,7 @@ import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens
 import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
 import useRealm from '../hooks/useRealm'
 import { sendTransaction } from '../utils/send'
-import Button, { LinkButton } from './Button'
+import Button from './Button'
 import Modal from './Modal'
 import Input from './Input'
 import ButtonGroup from './ButtonGroup'
@@ -20,7 +20,6 @@ import { fmtTokenAmount } from '../utils/formatting'
 
 type DepositModalProps = {
   depositTokenAccount: any
-  depositTokenName: string
   isOpen: boolean
   mint: MintInfo | undefined
   onClose: () => void
@@ -28,7 +27,6 @@ type DepositModalProps = {
 
 const DepositModal = ({
   depositTokenAccount,
-  depositTokenName,
   isOpen,
   mint,
   onClose,
@@ -143,7 +141,7 @@ const DepositModal = ({
         disabled={!!invalidAmountMessage}
         onClick={() => depositAllTokens(new BN(depositAmount))}
       >
-        {!!invalidAmountMessage
+        {invalidAmountMessage
           ? invalidAmountMessage
           : `Deposit ${depositAmount} ${symbol}`}
       </Button>

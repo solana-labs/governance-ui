@@ -1,42 +1,11 @@
-import { useState } from 'react'
-import useRealm from '../hooks/useRealm'
-import { getResourcePathPart } from '../tools/core/resources'
 import ConnectWalletButton from './ConnectWalletButton'
 
 const NavBar = () => {
-  const { realm, realmInfo } = useRealm()
-  const [showAltText, setShowAltText] = useState(false)
-
-  const onLogoError = (e: any) => {
-    // Hide broken image and show the realm name instead
-    e.target.style.display = 'none'
-    setShowAltText(true)
-  }
-
-  const realmName = realmInfo?.mainnetName ?? realm?.info.name
-
-  // TODO: Show solana/realms branding when on the home page
-
   return (
-    <div className="bg-bkg-1 flex h-20 items-center justify-between px-6">
-      <div className="flex justify-start lg:w-0 lg:flex-1">
-        <a href={realmInfo?.website ? `${realmInfo?.website}` : ''}>
-          {realmName && (
-            <>
-              <span className="sr-only">{realmName}</span>
-              <img
-                className="h-7"
-                src={`/realms/${getResourcePathPart(realmName)}/img/logo.svg`}
-                alt={realmName}
-                width="auto"
-                onError={onLogoError}
-              />
-              {showAltText && <span> {realmName}</span>}
-            </>
-          )}
-        </a>
+    <div className="grid grid-cols-12">
+      <div className="bg-bkg-1 col-span-12 xl:col-start-2 xl:col-span-10 flex h-20 items-center justify-end px-4">
+        <ConnectWalletButton />
       </div>
-      <ConnectWalletButton />
     </div>
   )
 }

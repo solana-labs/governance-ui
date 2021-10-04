@@ -16,4 +16,7 @@ module.exports = withTM({
     return config
   },
   webpack5: false,
+  env: {
+    REALM: process.env.REALM,
+  },
 })

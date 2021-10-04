@@ -1,9 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
-import {
-  endsWithIgnoreCase,
-  equalsIgnoreCase,
-  replaceIgnoreCase,
-} from '../../tools/core/strings'
+import { equalsIgnoreCase } from '../../tools/core/strings'
+import { EndpointTypes } from '../types'
 
 export interface RealmInfo {
   symbol: string
@@ -13,7 +10,7 @@ export interface RealmInfo {
   website?: string
   // Specifies the realm mainnet name for resource lookups
   // It's required for none mainnet environments when the realm name is different than on mainnet
-  mainnetName?: string
+  displayName?: string
   // Website keywords
   keywords?: string
   // twitter:site meta
@@ -27,13 +24,14 @@ export interface RealmInfo {
 const MAINNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
+    displayName: 'Mango DAO',
     programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
     realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
     website: 'https://mango.markets',
     keywords:
-      'Mango Markets, DAO, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
+      'Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
     twitter: '@mangomarkets',
-    ogImage: 'https://token.mango.markets/preview.jpg',
+    ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
   },
 
   {
@@ -41,6 +39,8 @@ const MAINNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
     realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
     website: 'https://www.socean.fi',
+    ogImage:
+      'https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png',
   },
   {
     symbol: 'Governance',
@@ -63,7 +63,7 @@ const MAINNET_REALMS: RealmInfo[] = [
 const DEVNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
-    mainnetName: 'Mango',
+    displayName: 'Mango DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
   },
@@ -79,35 +79,34 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
 ]
 
-export function getAllRealmInfos(endpoint: 'mainnet' | 'devnet' = 'mainnet') {
+export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
   return endpoint === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export function getRealmInfo(symbol: string) {
+export function getRealmInfo(
+  symbol: string,
+  endpoint: EndpointTypes = 'mainnet'
+) {
   if (!symbol) {
     return undefined
   }
-
-  // TODO: replace -dev realm symbol suffix with query param
-  if (endsWithIgnoreCase(symbol, '-DEV')) {
-    const mainnetSymbol = replaceIgnoreCase(symbol, '-DEV', '')
-
+  console.log(endpoint === 'devnet', '@@@@@@@@')
+  if (endpoint === 'devnet') {
     let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
-      equalsIgnoreCase(r.symbol, mainnetSymbol)
+      equalsIgnoreCase(r.symbol, symbol)
     )
 
     if (devRealmInfo) {
       devRealmInfo.endpoint = 'devnet'
 
       const mainnetRealmInfo = getAllRealmInfos('mainnet').find((r) =>
-        equalsIgnoreCase(r.symbol, mainnetSymbol)
+        equalsIgnoreCase(r.symbol, symbol)
       )
 
       if (mainnetRealmInfo) {
         devRealmInfo = { ...mainnetRealmInfo, ...devRealmInfo }
       }
     }
-
     return devRealmInfo
   }
 
@@ -118,6 +117,5 @@ export function getRealmInfo(symbol: string) {
   if (realmInfo) {
     realmInfo.endpoint = 'mainnet'
   }
-
   return realmInfo
 }

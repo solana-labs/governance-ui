@@ -40,12 +40,20 @@ button {
   @apply transition-all duration-300;
 }
 
+.markdown {
+  @apply pt-4;
+}
+
 .markdown > h1 {
-  @apply mb-2 mt-4 text-lg text-fgd-1;
+  @apply mb-2 text-lg text-fgd-1;
 }
 
 .markdown > h2 {
-  @apply mb-2 mt-4 text-lg text-fgd-1;
+  @apply mb-2 text-lg text-fgd-1;
+}
+
+.markdown > p {
+  @apply mb-2;
 }
 
 .markdown ul {
@@ -54,6 +62,14 @@ button {
 
 .markdown li {
   @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
+}
+
+.markdown pre {
+  @apply whitespace-pre-wrap;
+}
+
+.markdown code {
+  @apply block mb-2 text-sm;
 }
 
 :placeholder-shown {
