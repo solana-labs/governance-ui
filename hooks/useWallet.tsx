@@ -79,6 +79,7 @@ export default function useWallet() {
           wallet.publicKey.toString().substr(-5),
       })
       await actions.fetchWalletTokenAccounts()
+      await actions.fetchOwnVoteRecords()
     })
     wallet.on('disconnect', () => {
       setWalletStore((state) => {

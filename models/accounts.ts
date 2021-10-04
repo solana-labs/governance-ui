@@ -379,6 +379,10 @@ export class Proposal {
 
   noVotesCount: BN
 
+  relativeYesVotes: number
+
+  relativeNoVotes: number
+
   instructionsExecutedCount: number
 
   instructionsCount: number
@@ -419,6 +423,8 @@ export class Proposal {
     name: string
     yesVotesCount: BN
     noVotesCount: BN
+    relativeYesVotes: number
+    relativeNoVotes: number
     draftAt: BN
     signingOffAt: BN | null
     votingAt: BN | null
@@ -599,9 +605,7 @@ export class VoteRecord {
   }
 
   getVoteWeight() {
-    return this.isYes()
-      ? this.voteWeight.yes.toNumber()
-      : this.voteWeight.no.toNumber()
+    return this.isYes() ? this.voteWeight.yes : this.voteWeight.no
   }
 }
 

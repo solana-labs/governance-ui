@@ -1,36 +1,31 @@
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
-import { RealmInfo } from '../@types/types'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
-
-import { ENDPOINTS } from '../stores/useWalletStore'
+import { getRealmInfo } from '../models/registry/api'
 import { getGovernanceAccounts, pubkeyFilter } from './api'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
+
+function errorWrapper() {
+  runNotifier().catch((error) => {
+    console.error(error)
+  })
+}
 
 // run every 5 mins, checks if a mngo governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
-  const REALMS: RealmInfo[] = [
-    {
-      symbol: 'MNGO',
-      programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
-      realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
-    },
-  ]
+  const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
 
-  const CLUSTER = 'mainnet-beta'
-  const ENDPOINT = ENDPOINTS.find((e) => e.name === CLUSTER)
-
-  const realmInfo = REALMS.find((r) => r.symbol === 'MNGO')
+  const realmInfo = getRealmInfo('MNGO')
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo.programId,
-    ENDPOINT.url,
+    MAINNET_RPC_NODE,
     Governance,
     getAccountTypes(Governance),
     [pubkeyFilter(1, realmInfo.realmId)]
@@ -42,7 +37,7 @@ async function runNotifier() {
     governanceIds.map((governanceId) => {
       return getGovernanceAccounts<Proposal>(
         realmInfo.programId,
-        ENDPOINT.url,
+        MAINNET_RPC_NODE,
         Proposal,
         getAccountTypes(Proposal),
         [pubkeyFilter(1, governanceId)]
@@ -95,10 +90,10 @@ async function runNotifier() {
       fiveMinutesSeconds + toleranceSeconds
     ) {
       countJustOpenedForVoting++
-      const msg = `--- ${proposal.info.name} proposal just opened for voting`
+      const msg = `“${proposal.info.name}” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/MNGO/proposal/${k}`
       console.log(msg)
       if (process.env.WEBHOOK_URL) {
-        axios.post(process.env.WEBHOOK_URL, { msg })
+        axios.post(process.env.WEBHOOK_URL, { content: msg })
       }
     }
   }
@@ -107,4 +102,4 @@ async function runNotifier() {
   )
 }
 
-setInterval(runNotifier, fiveMinutesSeconds * 1000)
+setInterval(errorWrapper, fiveMinutesSeconds * 1000)

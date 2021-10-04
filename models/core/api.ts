@@ -73,6 +73,9 @@ export const pubkeyFilter = (
   pubkey: PublicKey | undefined | null
 ) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()))
 
+export const booleanFilter = (offset: number, value: boolean) =>
+  new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]))
+
 export async function getBorshProgramAccounts<
   TAccount extends ProgramAccountWithType
 >(
@@ -117,25 +120,29 @@ export async function getBorshProgramAccounts<
   const rawAccounts = (await getProgramAccounts.json())['result']
   const accounts: { [pubKey: string]: ParsedAccount<TAccount> } = {}
 
-  for (const rawAccount of rawAccounts) {
-    try {
-      const account = {
-        pubkey: new PublicKey(rawAccount.pubkey),
-        account: {
-          ...rawAccount.account,
-          data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-        },
-        info: deserializeBorsh(
-          borshSchema,
-          accountFactory,
-          Buffer.from(rawAccount.account.data[0], 'base64')
-        ),
-      }
+  if (rawAccounts) {
+    for (const rawAccount of rawAccounts) {
+      try {
+        const account = {
+          pubkey: new PublicKey(rawAccount.pubkey),
+          account: {
+            ...rawAccount.account,
+            data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
+          },
+          info: deserializeBorsh(
+            borshSchema,
+            accountFactory,
+            Buffer.from(rawAccount.account.data[0], 'base64')
+          ),
+        }
 
-      accounts[account.pubkey.toBase58()] = account
-    } catch (ex) {
-      console.warn(`Can't deserialize ${accountFactory.name}`, ex)
+        accounts[account.pubkey.toBase58()] = account
+      } catch (ex) {
+        console.warn(`Can't deserialize ${accountFactory.name}`, ex)
+      }
     }
+  } else {
+    console.error(`Can't fetch ${accountFactory.name} accounts`)
   }
 
   return accounts

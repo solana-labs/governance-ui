@@ -22,18 +22,8 @@ const StyledButton = styled.button<ButtonProps>`
     }
   }
 
-  :focus {
-    ${tw`ring-2 ring-secondary-2-light ring-opacity-40 outline-none`}
-  }
-
-  :active {
-    :before {
-      ${tw`ring-2 ring-secondary-2-light ring-opacity-40`}
-    }
-  }
-
   :disabled {
-    ${tw`cursor-not-allowed opacity-60`}
+    ${tw`bg-bkg-4 bg-none cursor-not-allowed opacity-60`}
     :before {
       ${tw`hidden`}
     }
@@ -55,7 +45,7 @@ const Button: FunctionComponent<ButtonProps> = ({
 }) => {
   return (
     <StyledButton
-      className={`${className} relative z-10 px-8 py-2 rounded-full text-fgd-1 font-bold  ${
+      className={`${className} relative z-10 px-4 py-2 rounded-full text-fgd-1 font-bold  ${
         gray ? 'bg-bkg-4' : idleGradient
       }`}
       gray={gray}
@@ -67,6 +57,25 @@ const Button: FunctionComponent<ButtonProps> = ({
 }
 
 export default Button
+
+export const SecondaryButton: FunctionComponent<ButtonProps> = ({
+  children,
+  onClick,
+  disabled = false,
+  className,
+  ...props
+}) => {
+  return (
+    <button
+      onClick={onClick}
+      disabled={disabled}
+      className={`${className} border border-primary-light default-transition font-normal rounded-full px-3 py-1 text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-4 disabled:text-fgd-4 disabled:cursor-not-allowed`}
+      {...props}
+    >
+      {children}
+    </button>
+  )
+}
 
 export const LinkButton: FunctionComponent<ButtonProps> = ({
   children,

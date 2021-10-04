@@ -1,58 +1,42 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
+import useRealm from '../hooks/useRealm'
+import { getResourcePathPart } from '../tools/core/resources'
 import ConnectWalletButton from './ConnectWalletButton'
 
 const NavBar = () => {
-  const [mobileMenuVisible, setMobileMenuVisible] = useState(false)
+  const { realm, realmInfo } = useRealm()
+  const [showAltText, setShowAltText] = useState(false)
 
-  const toggleMobileMenu = (e) => {
-    setMobileMenuVisible(!mobileMenuVisible)
-    e.stopPropagation()
+  const onLogoError = (e: any) => {
+    // Hide broken image and show the realm name instead
+    e.target.style.display = 'none'
+    setShowAltText(true)
   }
 
-  const closeMenu = () => {
-    setMobileMenuVisible(false)
-  }
+  const realmName = realmInfo?.mainnetName ?? realm?.info.name
 
-  useEffect(() => {
-    window.addEventListener('click', closeMenu)
-    return () => window.removeEventListener('click', closeMenu)
-  })
+  // TODO: Show solana/realms branding when on the home page
 
   return (
-    <div className="border-b border-bkg-2 px-6 py-4 bg-bkg-2">
-      <div className="flex justify-between items-center md:justify-start md:space-x-10">
-        <div className="flex justify-start lg:w-0 lg:flex-1">
-          <a href="https://mango.markets">
-            <span className="sr-only">Mango</span>
-            <img className="h-7" src="img/logo_mango.svg" alt="" width="auto" />
-          </a>
-        </div>
-        <div className="-mr-2 -my-2 md:hidden">
-          <button
-            type="button"
-            className=" rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
-            onClick={toggleMobileMenu}
-          >
-            <span className="sr-only">Open menu</span>
-            <svg
-              className="h-6 w-6"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              aria-hidden="true"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M4 6h16M4 12h16M4 18h16"
+    <div className="bg-bkg-1 flex h-20 items-center justify-between px-6">
+      <div className="flex justify-start lg:w-0 lg:flex-1">
+        <a href={realmInfo?.website ? `${realmInfo?.website}` : ''}>
+          {realmName && (
+            <>
+              <span className="sr-only">{realmName}</span>
+              <img
+                className="h-7"
+                src={`/realms/${getResourcePathPart(realmName)}/img/logo.svg`}
+                alt={realmName}
+                width="auto"
+                onError={onLogoError}
               />
-            </svg>
-          </button>
-        </div>
-        <ConnectWalletButton />
+              {showAltText && <span> {realmName}</span>}
+            </>
+          )}
+        </a>
       </div>
+      <ConnectWalletButton />
     </div>
   )
 }

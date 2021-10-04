@@ -1,25 +1,37 @@
-import { castVote } from '../actions/castVote'
+import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import { ProposalState } from '../models/accounts'
 import { RpcContext } from '../models/core/api'
+import { GoverningTokenType } from '../models/enums'
 
 import { Vote } from '../models/instructions'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
+import VoteCommentModal from './VoteCommentModal'
 
 const VotePanel = () => {
-  const { governance, proposal, voteRecordsByVoter } = useWalletStore(
-    (s) => s.selectedProposal
-  )
-  const { realm, ownTokenRecord } = useRealm()
+  const [showVoteModal, setShowVoteModal] = useState(false)
+  const [vote, setVote] = useState(null)
+  const {
+    governance,
+    proposal,
+    voteRecordsByVoter,
+    tokenType,
+  } = useWalletStore((s) => s.selectedProposal)
+  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal)
   const ownVoteRecord = voteRecordsByVoter[wallet?.publicKey?.toBase58()]
+
+  const voterTokenRecord =
+    tokenType === GoverningTokenType.Community
+      ? ownTokenRecord
+      : ownCouncilTokenRecord
 
   const isVoteCast = ownVoteRecord !== undefined
   const isVoting =
@@ -29,8 +41,8 @@ const VotePanel = () => {
     connected &&
     isVoting &&
     !isVoteCast &&
-    ownTokenRecord &&
-    !ownTokenRecord.info.governingTokenDepositAmount.isZero()
+    voterTokenRecord &&
+    !voterTokenRecord.info.governingTokenDepositAmount.isZero()
 
   const isWithdrawEnabled =
     connected &&
@@ -43,28 +55,6 @@ const VotePanel = () => {
       proposal.info.state === ProposalState.Executing ||
       proposal.info.state === ProposalState.Defeated)
 
-  const submitVote = async (vote: Vote) => {
-    const rpcContext = new RpcContext(
-      proposal.account.owner,
-      wallet,
-      connection.current,
-      connection.endpoint
-    )
-    try {
-      await castVote(
-        rpcContext,
-        realm.pubkey,
-        proposal,
-        ownTokenRecord.pubkey,
-        vote
-      )
-    } catch (ex) {
-      console.error("Can't cast vote", ex)
-    }
-
-    fetchVoteRecords(proposal)
-  }
-
   const submitRelinquishVote = async () => {
     const rpcContext = new RpcContext(
       proposal.account.owner,
@@ -76,7 +66,7 @@ const VotePanel = () => {
       await relinquishVote(
         rpcContext,
         proposal,
-        ownTokenRecord.pubkey,
+        voterTokenRecord.pubkey,
         ownVoteRecord.pubkey
       )
     } catch (ex) {
@@ -86,6 +76,15 @@ const VotePanel = () => {
     fetchVoteRecords(proposal)
   }
 
+  const handleShowVoteModal = (vote) => {
+    setVote(vote)
+    setShowVoteModal(true)
+  }
+
+  const handleCloseShowVoteModal = useCallback(() => {
+    setShowVoteModal(false)
+  }, [])
+
   const actionLabel = !isVoteCast
     ? 'Cast your vote'
     : isVoting
@@ -93,7 +92,7 @@ const VotePanel = () => {
     : 'Release your tokens'
 
   return (
-    <div className="bg-bkg-2 p-6 rounded-md space-y-6">
+    <div className="bg-bkg-2 border border-bkg-3 p-6 rounded-lg space-y-6">
       <h2 className="mb-4 text-center">{actionLabel}</h2>
       <div className="flex items-center justify-center">
         {isVoteCast ? (
@@ -102,20 +101,20 @@ const VotePanel = () => {
             onClick={() => submitRelinquishVote()}
             disabled={!isWithdrawEnabled}
           >
-            {isVoting ? 'Withdraw vote' : 'Release tokens'}
+            {isVoting ? 'Withdraw Vote' : 'Release Tokens'}
           </Button>
         ) : (
           <>
             <Button
               className="mx-2 w-44"
-              onClick={() => submitVote(Vote.Yes)}
+              onClick={() => handleShowVoteModal(Vote.Yes)}
               disabled={!isVoteEnabled}
             >
               Approve
             </Button>
             <Button
               className="mx-2 w-44"
-              onClick={() => submitVote(Vote.No)}
+              onClick={() => handleShowVoteModal(Vote.No)}
               disabled={!isVoteEnabled}
             >
               Deny
@@ -123,6 +122,14 @@ const VotePanel = () => {
           </>
         )}
       </div>
+      {showVoteModal ? (
+        <VoteCommentModal
+          isOpen={showVoteModal}
+          onClose={handleCloseShowVoteModal}
+          vote={vote}
+          voterTokenRecord={voterTokenRecord}
+        />
+      ) : null}
     </div>
   )
 }

@@ -1,21 +1,8 @@
-import { PublicKey } from '@solana/web3.js'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
-import { RealmInfo } from '../@types/types'
-import useWalletStore from '../stores/useWalletStore'
+import { getRealmInfo } from '../models/registry/api'
 
-export const REALMS: RealmInfo[] = [
-  {
-    symbol: 'MNGO',
-    programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
-    realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
-  },
-  {
-    symbol: 'MNGO-DEV',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
-  },
-]
+import useWalletStore from '../stores/useWalletStore'
 
 export default function useRealm() {
   const router = useRouter()
@@ -27,15 +14,15 @@ export default function useRealm() {
   const {
     realm,
     mint,
+    councilMint,
     governances,
     proposals,
     proposalDescriptions,
     tokenRecords,
+    councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
 
-  const realmInfo = useMemo(() => REALMS.find((r) => r.symbol === symbol), [
-    symbol,
-  ])
+  const realmInfo = useMemo(() => getRealmInfo(symbol as string), [symbol])
 
   const realmTokenAccount = useMemo(
     () =>
@@ -51,16 +38,37 @@ export default function useRealm() {
     [tokenRecords, wallet, connected]
   )
 
+  const councilTokenAccount = useMemo(
+    () =>
+      realm &&
+      councilMint &&
+      tokenAccounts.find((a) =>
+        a.account.mint.equals(realm.info.config.councilMint)
+      ),
+    [realm, tokenAccounts]
+  )
+
+  const ownCouncilTokenRecord = useMemo(
+    () =>
+      wallet?.connected &&
+      councilMint &&
+      councilTokenOwnerRecords[wallet.publicKey.toBase58()],
+    [tokenRecords, wallet, connected]
+  )
+
   return {
     realm,
     realmInfo,
     symbol,
     mint,
+    councilMint,
     governances,
     proposals,
     proposalDescriptions,
     tokenRecords,
     realmTokenAccount,
     ownTokenRecord,
+    councilTokenAccount,
+    ownCouncilTokenRecord,
   }
 }
