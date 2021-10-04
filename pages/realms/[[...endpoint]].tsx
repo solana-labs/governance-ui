@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from 'react'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
-import Input from '../../components/Input'
-import Button from '../../components/Button'
+// import Input from '../../components/Input'
+// import Button from '../../components/Button'
 import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
 import { EndpointTypes } from '../../models/types'
 
-const COL = 'flex-col'
-const ROW = 'flex-row'
+// const COL = 'flex-col'
+// const ROW = 'flex-row'
 
 const Realms = () => {
   const router = useRouter()
@@ -18,9 +18,9 @@ const Realms = () => {
   const [isLoading] = useState(false)
   const [isMounting, setIsMouting] = useState(true)
   const [realms, setRealms] = useState([])
-  const [realmsSearchResults, setSearchResult] = useState([])
-  const [search, setSerach] = useState('')
-  const [viewType, setViewType] = useState(ROW)
+  //   const [realmsSearchResults, setSearchResult] = useState([])
+  //   const [search, setSerach] = useState('')
+  //   const [viewType, setViewType] = useState(ROW)
   const { actions, selectedRealm } = useWalletStore((s) => s)
   const endpoint = router.query.endpoint
     ? (router.query.endpoint[0] as EndpointTypes)
@@ -42,12 +42,12 @@ const Realms = () => {
     }
   }, [endpoint])
 
-  useEffect(() => {
-    const results = realms.filter((realm: RealmInfo) =>
-      realm.symbol.toLowerCase().includes(search.toLowerCase())
-    )
-    setSearchResult(results)
-  }, [search, realms])
+  //   useEffect(() => {
+  //     const results = realms.filter((realm: RealmInfo) =>
+  //       realm.symbol.toLowerCase().includes(search.toLowerCase())
+  //     )
+  //     setSearchResult(results)
+  //   }, [search, realms])
 
   const goToRealm = ({ name }) => {
     router.push(`/dao/${name}`)
@@ -55,8 +55,9 @@ const Realms = () => {
 
   return !isMounting ? (
     <div>
-      <div className="mb-10">Organizations</div>
-      <div className="mb-10 flex">
+      <h1 className="mb-6">Organizations</h1>
+      {/* Re-instate when there are enough DAOs for this to be useful. Maybe > 25 */}
+      {/* <div className="mb-10 flex">
         <Input
           value={search}
           type="text"
@@ -69,27 +70,31 @@ const Realms = () => {
           </Button>
           <Button onClick={() => setViewType(ROW)}>Columns</Button>
         </div>
-      </div>
-      <div className={`flex flex-wrap ${viewType}`}>
+      </div> */}
+      <div
+        className={`grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4`}
+      >
         {isLoading ? (
           <Loading></Loading>
         ) : (
-          realmsSearchResults.map((realm: RealmInfo) => (
+          realms.map((realm: RealmInfo) => (
             <div
               onClick={() => goToRealm({ name: realm.symbol })}
-              className="flex flex-col flex-1 p-10 items-center border-gray-500 border cursor-pointer hover:border-white"
+              className="bg-bkg-2 border border-bkg-3 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
               key={realm.realmId.toString()}
             >
               <div className="pb-5">
                 {realm.ogImage ? (
-                  <img width="80px" src={realm.ogImage}></img>
+                  <div className="bg-[rgba(255,255,255,0.1)] rounded-full h-16 w-16 flex items-center justify-center">
+                    <img className="w-10" src={realm.ogImage}></img>
+                  </div>
                 ) : (
-                  <div className="rounded-full h-20 w-20 flex items-center justify-center border-2 font-bold border-gray-500 text-gray-300">
+                  <div className="bg-[rgba(255,255,255,0.1)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
                     {realm.symbol?.charAt(0)}
                   </div>
                 )}
               </div>
-              <div>{realm.symbol}</div>
+              <h3>{realm.symbol}</h3>
             </div>
           ))
         )}

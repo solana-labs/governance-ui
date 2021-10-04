@@ -44,7 +44,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
       <Link href={`/dao/${symbol}/proposal/${id}`}>
         <a>
           <StyledCardWrapepr className="bg-bkg-2 border border-bkg-3 default-transition rounded-lg hover:bg-bkg-3">
-            <div className="mb-2 px-6 py-4">
+            <div className="px-6 py-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
                 <div className="flex items-center pl-4 pt-1">
@@ -55,7 +55,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
               <ProposalTimeStatus proposal={proposal} />
             </div>
             {ProposalState[proposal.state] === 'Voting' && (
-              <div className="bg-[rgba(255,255,255,0.05)] flex px-6 py-4">
+              <div className="bg-[rgba(255,255,255,0.05)] flex mt-2 px-6 py-4">
                 <div className="border-r border-bkg-4 pr-4 w-1/2">
                   <VoteResultsBar
                     approveVotePercentage={
