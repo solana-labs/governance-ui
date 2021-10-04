@@ -12,11 +12,9 @@ import { EndpointTypes } from '../../models/types'
 
 const Realms = () => {
   const router = useRouter()
-  const { DAO } = process.env
 
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
-  const [isMounting, setIsMouting] = useState(true)
   const [realms, setRealms] = useState([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSerach] = useState('')
@@ -25,14 +23,6 @@ const Realms = () => {
   const endpoint = router.query.endpoint
     ? (router.query.endpoint[0] as EndpointTypes)
     : 'mainnet'
-
-  useEffect(() => {
-    if (DAO) {
-      router.push(`/dao/${DAO}`)
-    } else {
-      setIsMouting(false)
-    }
-  }, [])
 
   useEffect(() => {
     const data: RealmInfo[] = getAllRealmInfos(endpoint)
@@ -49,14 +39,14 @@ const Realms = () => {
   //     setSearchResult(results)
   //   }, [search, realms])
 
-  const goToRealm = ({ name }) => {
-    router.push(`/dao/${name}`)
+  const goToRealm = ({ symbol }) => {
+    router.push(`/dao/${symbol}`)
   }
 
-  return !isMounting ? (
+  return (
     <div>
       <h1 className="mb-6">Organizations</h1>
-      {/* Re-instate when there are enough DAOs for this to be useful. Maybe > 25 */}
+      {/* Re-instate when there are enough REALMs for this to be useful. Maybe > 25 */}
       {/* <div className="mb-10 flex">
         <Input
           value={search}
@@ -79,7 +69,7 @@ const Realms = () => {
         ) : (
           realms.map((realm: RealmInfo) => (
             <div
-              onClick={() => goToRealm({ name: realm.symbol })}
+              onClick={() => goToRealm(realm)}
               className="bg-bkg-2 border border-bkg-3 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
               key={realm.realmId.toString()}
             >
@@ -94,13 +84,13 @@ const Realms = () => {
                   </div>
                 )}
               </div>
-              <h3>{realm.symbol}</h3>
+              <h3>{realm.displayName ?? realm.symbol}</h3>
             </div>
           ))
         )}
       </div>
     </div>
-  ) : null
+  )
 }
 
 export default Realms

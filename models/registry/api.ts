@@ -10,7 +10,7 @@ export interface RealmInfo {
   website?: string
   // Specifies the realm mainnet name for resource lookups
   // It's required for none mainnet environments when the realm name is different than on mainnet
-  mainnetName?: string
+  displayName?: string
   // Website keywords
   keywords?: string
   // twitter:site meta
@@ -24,11 +24,12 @@ export interface RealmInfo {
 const MAINNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
+    displayName: 'Mango DAO',
     programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
     realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
     website: 'https://mango.markets',
     keywords:
-      'Mango Markets, DAO, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
+      'Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
     twitter: '@mangomarkets',
     ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
   },
@@ -62,7 +63,7 @@ const MAINNET_REALMS: RealmInfo[] = [
 const DEVNET_REALMS: RealmInfo[] = [
   {
     symbol: 'MNGO',
-    mainnetName: 'Mango',
+    displayName: 'Mango DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
   },

@@ -17,6 +17,6 @@ module.exports = withTM({
   },
   webpack5: false,
   env: {
-    DAO: process.env.DAO,
+    REALM: process.env.REALM,
   },
 })

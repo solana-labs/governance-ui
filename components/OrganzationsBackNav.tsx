@@ -6,12 +6,14 @@ import Link from 'next/link'
 import { TwitterIcon } from '../components/icons'
 
 const OrganzationsBackNav = () => {
-  const { realm, realmInfo } = useRealm()
-  const { DAO } = process.env
-  const realmName = realmInfo?.mainnetName ?? realm?.info?.name
+  const { symbol, realm, realmInfo } = useRealm()
+  const { REALM } = process.env
+  const realmName = realmInfo?.displayName ?? realm?.info?.name
+
+  const hideBackNav = REALM != symbol // only hide backnav when on default realm
   return (
     <div className="pb-4">
-      {!DAO ? (
+      {hideBackNav ? (
         <Link href={`/realms`}>
           <a className="default-transition flex items-center mb-6 text-fgd-3 text-sm transition-all hover:text-fgd-1">
             <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />

@@ -23,7 +23,7 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
   return p1.state === ProposalState.Voting ? ~tsCompare : tsCompare
 }
 
-const DAO = () => {
+const REALM = () => {
   const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
   const [filters, setFilters] = useState([])
   const [displayedProposals, setDisplayedProposals] = useState([])
@@ -95,4 +95,4 @@ const DAO = () => {
   )
 }
 
-export default DAO
+export default REALM

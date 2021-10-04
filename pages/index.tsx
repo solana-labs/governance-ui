@@ -4,8 +4,8 @@ const Index = () => {
   const router = useRouter()
 
   useEffect(() => {
-    const { DAO } = process.env
-    const mainUrl = DAO ? `/dao/${DAO}` : '/realms'
+    const { REALM } = process.env
+    const mainUrl = REALM ? `/dao/${REALM}` : '/realms'
     router.push(mainUrl)
   }, [])
 
