@@ -1,9 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
-import {
-  endsWithIgnoreCase,
-  equalsIgnoreCase,
-  replaceIgnoreCase,
-} from '../../tools/core/strings'
+import { equalsIgnoreCase } from '../../tools/core/strings'
+import { EndpointTypes } from '../types'
 
 export interface RealmInfo {
   symbol: string
@@ -33,7 +30,7 @@ const MAINNET_REALMS: RealmInfo[] = [
     keywords:
       'Mango Markets, DAO, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
     twitter: '@mangomarkets',
-    ogImage: 'https://token.mango.markets/preview.jpg',
+    ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
   },
 
   {
@@ -41,6 +38,8 @@ const MAINNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
     realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
     website: 'https://www.socean.fi',
+    ogImage:
+      'https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png',
   },
   {
     symbol: 'Governance',
@@ -79,35 +78,34 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
 ]
 
-export function getAllRealmInfos(endpoint: 'mainnet' | 'devnet' = 'mainnet') {
+export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
   return endpoint === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export function getRealmInfo(symbol: string) {
+export function getRealmInfo(
+  symbol: string,
+  endpoint: EndpointTypes = 'mainnet'
+) {
   if (!symbol) {
     return undefined
   }
-
-  // TODO: replace -dev realm symbol suffix with query param
-  if (endsWithIgnoreCase(symbol, '-DEV')) {
-    const mainnetSymbol = replaceIgnoreCase(symbol, '-DEV', '')
-
+  console.log(endpoint === 'devnet', '@@@@@@@@')
+  if (endpoint === 'devnet') {
     let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
-      equalsIgnoreCase(r.symbol, mainnetSymbol)
+      equalsIgnoreCase(r.symbol, symbol)
     )
 
     if (devRealmInfo) {
       devRealmInfo.endpoint = 'devnet'
 
       const mainnetRealmInfo = getAllRealmInfos('mainnet').find((r) =>
-        equalsIgnoreCase(r.symbol, mainnetSymbol)
+        equalsIgnoreCase(r.symbol, symbol)
       )
 
       if (mainnetRealmInfo) {
         devRealmInfo = { ...mainnetRealmInfo, ...devRealmInfo }
       }
     }
-
     return devRealmInfo
   }
 
@@ -118,6 +116,5 @@ export function getRealmInfo(symbol: string) {
   if (realmInfo) {
     realmInfo.endpoint = 'mainnet'
   }
-
   return realmInfo
 }

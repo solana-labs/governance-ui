@@ -32,7 +32,9 @@ const Input = ({
         type={type}
         value={value}
         onChange={onChange}
-        className={`${className} font-display px-2 py-2 w-full bg-bkg-1 rounded text-fgd-1 
+        className={`${
+          className ? className : ''
+        } font-display px-2 py-2 w-full bg-bkg-1 rounded text-fgd-1 
           border border-fgd-4 default-transition hover:border-primary-dark 
           focus:border-primary-light focus:outline-none 
           ${disabled ? 'cursor-not-allowed hover:border-fgd-4 text-fgd-3' : ''}

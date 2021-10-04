@@ -1,13 +1,14 @@
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { getRealmInfo } from '../models/registry/api'
+import { EndpointTypes } from '../models/types'
 
 import useWalletStore from '../stores/useWalletStore'
 
 export default function useRealm() {
   const router = useRouter()
-  const { symbol } = router.query
-
+  const { symbol, endpoint } = router.query
+  const apiEndpoint = endpoint ? (endpoint[0] as EndpointTypes) : 'mainnet'
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
@@ -22,7 +23,9 @@ export default function useRealm() {
     councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
 
-  const realmInfo = useMemo(() => getRealmInfo(symbol as string), [symbol])
+  const realmInfo = useMemo(() => getRealmInfo(symbol as string, apiEndpoint), [
+    symbol,
+  ])
 
   const realmTokenAccount = useMemo(
     () =>

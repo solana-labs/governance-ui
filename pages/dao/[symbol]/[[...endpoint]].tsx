@@ -1,10 +1,11 @@
 import useWalletStore from '../../../stores/useWalletStore'
 import useRealm from '../../../hooks/useRealm'
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import ProposalFilter from '../../../components/ProposalFilter'
 import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
+import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -67,21 +68,24 @@ const DAO = () => {
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4 pb-10 pt-9">
-        <div className="col-span-12 md:col-span-7 lg:col-span-8 space-y-4">
-          <div className="flex items-center justify-between">
-            <h2>{`${filteredProposals.length} proposals`}</h2>
+      <div className="grid grid-cols-12 gap-4">
+        <div className="bg-bkg-2 border border-bkg-3 col-span-12 md:col-span-7 lg:col-span-8 p-6 rounded-lg">
+          <OrganzationsBackNav></OrganzationsBackNav>
+          <div className="flex items-center justify-between pb-2">
+            <h4>{`${filteredProposals.length} proposals`}</h4>
             <ProposalFilter filters={filters} setFilters={setFilters} />
           </div>
-          {filteredProposals.length > 0 ? (
-            filteredProposals.map(([k, v]) => (
-              <ProposalCard key={k} id={k} proposal={v.info} />
-            ))
-          ) : (
-            <div className="bg-bkg-2 border border-bkg-3 px-6 py-4 rounded-lg text-center text-fgd-3">
-              No proposals found
-            </div>
-          )}
+          <div className="space-y-2">
+            {filteredProposals.length > 0 ? (
+              filteredProposals.map(([k, v]) => (
+                <ProposalCard key={k} id={k} proposal={v.info} />
+              ))
+            ) : (
+              <div className="bg-bkg-2 border border-bkg-3 px-6 py-4 rounded-lg text-center text-fgd-3">
+                No proposals found
+              </div>
+            )}
+          </div>
         </div>
         <div className="col-span-12 md:col-span-5 lg:col-span-4">
           <TokenBalanceCard />
