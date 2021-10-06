@@ -20,8 +20,8 @@ const Realms = () => {
   //   const [search, setSerach] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
   const { actions, selectedRealm } = useWalletStore((s) => s)
-  const endpoint = router.query.endpoint
-    ? (router.query.endpoint[0] as EndpointTypes)
+  const endpoint = router.query.cluster
+    ? (router.query.cluster as EndpointTypes)
     : 'mainnet'
 
   useEffect(() => {
@@ -40,7 +40,10 @@ const Realms = () => {
   //   }, [search, realms])
 
   const goToRealm = ({ symbol }) => {
-    router.push(`/dao/${symbol}`)
+    router.push({
+      pathname: `/dao/${symbol}`,
+      query: endpoint !== 'mainnet' ? { cluster: endpoint } : null,
+    })
   }
 
   return (
