@@ -12,7 +12,9 @@ import { EndpointTypes } from '../../models/types'
 
 const Realms = () => {
   const router = useRouter()
+  const { cluster } = router.query
 
+  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
   const [realms, setRealms] = useState([])
@@ -20,9 +22,6 @@ const Realms = () => {
   //   const [search, setSerach] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
   const { actions, selectedRealm } = useWalletStore((s) => s)
-  const endpoint = router.query.cluster
-    ? (router.query.cluster as EndpointTypes)
-    : 'mainnet'
 
   useEffect(() => {
     const data: RealmInfo[] = getAllRealmInfos(endpoint)
@@ -41,7 +40,7 @@ const Realms = () => {
 
   const goToRealm = ({ symbol }) => {
     router.push({
-      pathname: `/dao/${symbol}`,
+      pathname: `/realm/${symbol}`,
       query: endpoint !== 'mainnet' ? { cluster: endpoint } : null,
     })
   }

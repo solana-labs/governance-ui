@@ -1,20 +1,27 @@
 import React from 'react'
 import useRealm from '../hooks/useRealm'
+import { useRouter } from 'next/router'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import { TwitterIcon } from '../components/icons'
+import { EndpointTypes } from '../models/types'
 
 const OrganzationsBackNav = () => {
-  const { symbol, realm, realmInfo } = useRealm()
-  const { REALM } = process.env
-  const realmName = realmInfo?.displayName ?? realm?.info?.name
+  const router = useRouter()
+  const { cluster } = router.query
+  const { realm, realmInfo } = useRealm()
 
-  const hideBackNav = REALM != symbol // only hide backnav when on default realm
+  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
+  const realmName = realmInfo?.displayName ?? realm?.info?.name
+  const hideBackNav = !router.asPath.includes('dao') // only hide backnav when on default realm
+  const backNavLink =
+    endpoint === 'mainnet' ? '/realms' : `/realms?cluster=${endpoint}`
+
   return (
     <div className="pb-4">
       {hideBackNav ? (
-        <Link href={`/realms`}>
+        <Link href={backNavLink}>
           <a className="default-transition flex items-center mb-6 text-fgd-3 text-sm transition-all hover:text-fgd-1">
             <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
             Back
