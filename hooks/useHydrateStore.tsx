@@ -7,8 +7,8 @@ import useWalletStore, { ENDPOINTS } from '../stores/useWalletStore'
 
 export default function useHydrateStore() {
   const router = useRouter()
-  const { symbol, endpoint, pk } = router.query
-  const apiEndpoint = endpoint ? (endpoint[0] as EndpointTypes) : 'mainnet'
+  const { symbol, cluster, pk } = router.query
+  const apiEndpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const mints = useWalletStore((s) => s.mints)
   const setWalletStore = useWalletStore((s) => s.set)
   const { fetchAllRealms, fetchRealm, fetchProposal } = useWalletStore(

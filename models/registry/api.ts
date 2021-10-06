@@ -90,7 +90,6 @@ export function getRealmInfo(
   if (!symbol) {
     return undefined
   }
-  console.log(endpoint === 'devnet', '@@@@@@@@')
   if (endpoint === 'devnet') {
     let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
       equalsIgnoreCase(r.symbol, symbol)

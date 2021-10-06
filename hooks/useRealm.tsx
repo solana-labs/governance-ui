@@ -7,8 +7,8 @@ import useWalletStore from '../stores/useWalletStore'
 
 export default function useRealm() {
   const router = useRouter()
-  const { symbol, endpoint } = router.query
-  const apiEndpoint = endpoint ? (endpoint[0] as EndpointTypes) : 'mainnet'
+  const { symbol, cluster } = router.query
+  const apiEndpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)

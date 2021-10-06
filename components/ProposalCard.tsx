@@ -9,6 +9,7 @@ import useProposalVotes from '../hooks/useProposalVotes'
 import VoteResultsBar from './VoteResultsBar'
 import ProposalTimeStatus from './ProposalTimeStatus'
 import useWalletStore from '../stores/useWalletStore'
+import useRealmContext from '../hooks/useRealmContext'
 
 type ProposalCardProps = {
   id: string
@@ -27,6 +28,7 @@ const StyledCardWrapepr = styled.div`
 
 const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
+  const { urlContext } = useRealmContext()
   const {
     yesVoteProgress,
     relativeNoVotes,
@@ -41,7 +43,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
 
   return (
     <div>
-      <Link href={`/dao/${symbol}/proposal/${id}`}>
+      <Link href={`/${urlContext}/${symbol}/proposal/${id}`}>
         <a>
           <StyledCardWrapepr className="bg-bkg-2 border border-bkg-3 default-transition rounded-lg hover:bg-bkg-3">
             <div className="px-6 py-4">
