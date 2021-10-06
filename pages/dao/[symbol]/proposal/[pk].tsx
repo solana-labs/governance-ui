@@ -15,8 +15,10 @@ import useProposalVotes from '../../../../hooks/useProposalVotes'
 import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
+import useRealmContext from '../../../../hooks/useRealmContext'
 
 const Proposal = () => {
+  const { urlContext } = useRealmContext()
   const { symbol } = useRealm()
   const { proposal, description, instructions } = useProposal()
   const {
@@ -41,7 +43,7 @@ const Proposal = () => {
       <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3">
         {proposal ? (
           <>
-            <Link href={`/dao/${symbol}/`}>
+            <Link href={`/${urlContext}/${symbol}/`}>
               <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
                 <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
                 Back
