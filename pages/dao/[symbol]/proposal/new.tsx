@@ -20,6 +20,11 @@ const New = () => {
               Back
             </a>
           </Link>
+          <div className="border-b border-bkg-3 py-4">
+            <div className="flex items-center justify-between mb-1">
+              <h1>New proposal</h1>
+            </div>
+          </div>
         </>
       </div>
       <div className="col-span-4 space-y-4">
