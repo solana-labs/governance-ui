@@ -6,6 +6,8 @@ import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
 import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
+import Link from 'next/link'
+import useRealmContext from '../../../hooks/useRealmContext'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -24,7 +26,8 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 }
 
 const REALM = () => {
-  const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
+  const { urlContext } = useRealmContext()
+  const { proposals, realmTokenAccount, ownTokenRecord, symbol } = useRealm()
   const [filters, setFilters] = useState([])
   const [displayedProposals, setDisplayedProposals] = useState([])
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
@@ -73,7 +76,14 @@ const REALM = () => {
           <OrganzationsBackNav></OrganzationsBackNav>
           <div className="flex items-center justify-between pb-2">
             <h4>{`${filteredProposals.length} proposals`}</h4>
-            <ProposalFilter filters={filters} setFilters={setFilters} />
+            <div className="flex items-center">
+              <div className="mr-5">
+                <Link href={`/${urlContext}/${symbol}/proposal/new`}>
+                  + New
+                </Link>
+              </div>
+              <ProposalFilter filters={filters} setFilters={setFilters} />
+            </div>
           </div>
           <div className="space-y-2">
             {filteredProposals.length > 0 ? (
