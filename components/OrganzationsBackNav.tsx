@@ -5,18 +5,16 @@ import { GlobeAltIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import { TwitterIcon } from '../components/icons'
-import { EndpointTypes } from '../models/types'
+import useRealmContext from '../hooks/useRealmContext'
 
 const OrganzationsBackNav = () => {
   const router = useRouter()
-  const { cluster } = router.query
+  const { generateUrlWithClusterParam } = useRealmContext()
   const { realm, realmInfo } = useRealm()
 
-  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const realmName = realmInfo?.displayName ?? realm?.info?.name
   const hideBackNav = !router.asPath.includes('dao') // only hide backnav when on default realm
-  const backNavLink =
-    endpoint === 'mainnet' ? '/realms' : `/realms?cluster=${endpoint}`
+  const backNavLink = generateUrlWithClusterParam('/realms')
 
   return (
     <div className="pb-4">
