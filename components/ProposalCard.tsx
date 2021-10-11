@@ -28,7 +28,7 @@ const StyledCardWrapepr = styled.div`
 
 const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
-  const { urlContext } = useRealmContext()
+  const { urlContext, generateUrlWithClusterParam } = useRealmContext()
   const {
     yesVoteProgress,
     relativeNoVotes,
@@ -43,7 +43,11 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
 
   return (
     <div>
-      <Link href={`/${urlContext}/${symbol}/proposal/${id}`}>
+      <Link
+        href={generateUrlWithClusterParam(
+          `/${urlContext}/${symbol}/proposal/${id}`
+        )}
+      >
         <a>
           <StyledCardWrapepr className="bg-bkg-2 border border-bkg-3 default-transition rounded-lg hover:bg-bkg-3">
             <div className="px-6 py-4">
