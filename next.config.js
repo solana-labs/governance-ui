@@ -19,12 +19,4 @@ module.exports = withTM({
   env: {
     REALM: process.env.REALM,
   },
-  async rewrites() {
-    return [
-      {
-        source: '/realm/:symbol*',
-        destination: '/dao/:symbol*',
-      },
-    ]
-  },
 })

@@ -8,11 +8,16 @@ import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
+import useRealmContextStore from '../stores/useRealmContextStore'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
+  const { set: setRealmContext } = useRealmContextStore((s) => s)
 
+  const router = useRouter()
   const { realm, realmInfo, symbol } = useRealm()
 
   const realmName = realmInfo?.displayName ?? realm?.info?.name
@@ -27,6 +32,12 @@ function App({ Component, pageProps }) {
   const faviconUrl = `/realms/${getResourcePathPart(
     faviconSelector as string
   )}/favicon.ico?v=${Date.now()}`
+
+  useEffect(() => {
+    setRealmContext((state) => {
+      state.isRealmContext = router.asPath.includes('realm')
+    })
+  }, [])
 
   return (
     <>
