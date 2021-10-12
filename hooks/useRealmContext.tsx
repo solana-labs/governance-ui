@@ -15,9 +15,7 @@ export default function useRealmContext() {
     return url
   }
 
-  const urlContext = router.asPath.includes('realm') ? 'realm' : 'dao'
   return {
-    urlContext,
     generateUrlWithClusterParam,
   }
 }
