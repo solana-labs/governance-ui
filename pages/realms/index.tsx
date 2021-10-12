@@ -41,7 +41,7 @@ const Realms = () => {
   //   }, [search, realms])
 
   const goToRealm = ({ symbol }) => {
-    const url = generateUrlWithClusterParam(`/realm/${symbol}`)
+    const url = generateUrlWithClusterParam(`/dao/${symbol}`)
     router.push(url)
   }
 
