@@ -7,7 +7,7 @@ import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
 import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
 import Link from 'next/link'
-import useRealmContext from '../../../hooks/useRealmContext'
+import useQueryContext from '../../../hooks/useQueryContext'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -26,7 +26,7 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 }
 
 const REALM = () => {
-  const { urlContext } = useRealmContext()
+  const { generateUrlWithClusterParam } = useQueryContext()
   const { proposals, realmTokenAccount, ownTokenRecord, symbol } = useRealm()
   const [filters, setFilters] = useState([])
   const [displayedProposals, setDisplayedProposals] = useState([])
@@ -78,7 +78,11 @@ const REALM = () => {
             <h4>{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
               <div className="mr-5">
-                <Link href={`/${urlContext}/${symbol}/proposal/new`}>
+                <Link
+                  href={generateUrlWithClusterParam(
+                    `/dao/${symbol}/proposal/new`
+                  )}
+                >
                   + New
                 </Link>
               </div>
