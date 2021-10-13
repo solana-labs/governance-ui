@@ -8,6 +8,7 @@ import { Proposal, ProposalState } from '../../../models/accounts'
 import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
 import Link from 'next/link'
 import useQueryContext from '../../../hooks/useQueryContext'
+import { Disclosure } from '@headlessui/react'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -77,15 +78,19 @@ const REALM = () => {
           <div className="flex items-center justify-between pb-2">
             <h4>{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
-              <div className="mr-5">
-                <Link
-                  href={generateUrlWithClusterParam(
-                    `/dao/${symbol}/proposal/new`
-                  )}
+              <Disclosure as="div" className="mr-5">
+                <Disclosure.Button
+                  className={`border border-fgd-4 default-transition font-normal pl-3 pr-3 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
                 >
-                  + New
-                </Link>
-              </div>
+                  <Link
+                    href={generateUrlWithClusterParam(
+                      `/dao/${symbol}/proposal/new`
+                    )}
+                  >
+                    + New
+                  </Link>
+                </Disclosure.Button>
+              </Disclosure>
               <ProposalFilter filters={filters} setFilters={setFilters} />
             </div>
           </div>
