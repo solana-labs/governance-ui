@@ -8,9 +8,14 @@ import useQueryContext from '../../../../hooks/useQueryContext'
 import Input from '../../../../components/inputs/Input'
 import Textarea from '../../../../components/inputs/Textarea'
 import Select from '../../../../components/inputs/Select'
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
+import SplTokenTransferForm from './instructions/splTokenTransferForm'
+import Button from '../../../../components/Button'
 
-const instructions = [{ id: 'Transfer', name: 'Transfer' }]
+export enum Instructions {
+  Transfer,
+}
+const instructions = [{ id: Instructions.Transfer, name: 'Spl-Token Transfer' }]
 
 const New = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
@@ -22,11 +27,37 @@ const New = () => {
     title: '',
     description: '',
   })
+  const [instructionForm, setInstructionForm] = useState({})
 
   const handleSetForm = ({ propertyName, value }) => {
     setForm({ ...form, [propertyName]: value })
   }
 
+  const onInstructionFormUpdate = ({ form }) => {
+    setInstructionForm(form)
+  }
+
+  const returnInstructionForm = () => {
+    switch (form.instruction?.id) {
+      case Instructions.Transfer:
+        return (
+          <SplTokenTransferForm
+            onChange={onInstructionFormUpdate}
+          ></SplTokenTransferForm>
+        )
+      default:
+        null
+    }
+  }
+
+  const handleCreate = () => {
+    const model = { ...form, ...instructionForm }
+    console.log(model)
+  }
+
+  useEffect(() => {
+    setInstructionForm({})
+  }, [form.instruction?.id])
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3">
@@ -77,6 +108,12 @@ const New = () => {
                 })
               }
             ></Textarea>
+            {returnInstructionForm()}
+            <div>
+              <Button className="mt-5 w-44" onClick={handleCreate}>
+                Create
+              </Button>
+            </div>
           </div>
         </>
       </div>
