@@ -1,25 +1,20 @@
+import { useState } from 'react'
 import { MintInfo } from '@solana/spl-token'
-import {
-  Account,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '../hooks/useRealm'
 import { Proposal, ProposalState } from '../models/accounts'
 import { getProposal, getUnrelinquishedVoteRecords } from '../models/api'
-import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
 import { withRelinquishVote } from '../models/withRelinquishVote'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
 import useWalletStore from '../stores/useWalletStore'
 import { fmtTokenAmount } from '../utils/formatting'
 import { sendTransaction } from '../utils/send'
-import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
+import { TOKEN_PROGRAM_ID } from '../utils/tokens'
 import Button from './Button'
 import { Option } from '../tools/core/option'
 import { GoverningTokenType } from '../models/enums'
+import DepositModal from './DepositModal'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -72,6 +67,7 @@ const TokenDeposit = ({
   mint: MintInfo | undefined
   tokenType: GoverningTokenType
 }) => {
+  const [showDepositModal, setShowDepositModal] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
@@ -107,52 +103,6 @@ const TokenDeposit = ({
   const depositTokenName = `${realm?.info.name} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
-
-  const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Account[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      depositTokenAccount.publicKey,
-      wallet.publicKey,
-      amount
-    )
-
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo.programId,
-      realm.pubkey,
-      depositTokenAccount.publicKey,
-      depositTokenAccount.account.mint,
-      wallet.publicKey,
-      transferAuthority.publicKey,
-      wallet.publicKey,
-      TOKEN_PROGRAM_ID,
-      SystemProgram.programId
-    )
-
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
-    })
-
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo.programId, realmInfo.realmId)
-  }
-
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
@@ -255,7 +205,7 @@ const TokenDeposit = ({
         <Button
           className="sm:w-1/2"
           disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
+          onClick={() => setShowDepositModal(true)}
         >
           Deposit
         </Button>
@@ -267,6 +217,14 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
+      {showDepositModal ? (
+        <DepositModal
+          isOpen={showDepositModal}
+          mint={mint}
+          onClose={() => setShowDepositModal(false)}
+          depositTokenAccount={depositTokenAccount}
+        />
+      ) : null}
     </>
   )
 }

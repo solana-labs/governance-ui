@@ -8,7 +8,6 @@ import { InstructionPanel } from '../../../../components/instructions/instructio
 import DiscussionPanel from '../../../../components/DiscussionPanel'
 import VotePanel from '../../../../components/VotePanel'
 import { ProposalState } from '../../../../models/accounts'
-
 import ApprovalQuorum from '../../../../components/ApprovalQuorum'
 import useRealm from '../../../../hooks/useRealm'
 import useProposalVotes from '../../../../hooks/useProposalVotes'

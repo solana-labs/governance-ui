@@ -33,7 +33,7 @@ p {
 }
 
 button {
-  @apply font-bold;
+  @apply font-bold focus:outline-none;
 }
 
 .default-transition {

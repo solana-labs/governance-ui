@@ -68,7 +68,7 @@ const ConnectWalletButton = (props) => {
   return (
     <div className="flex">
       <Button
-        className={`default-transition flex items-center h-12 z-30 pl-3 pr-4 rounded-l-full rounded-r-none w-36 hover:bg-bkg-3 focus:outline-none`}
+        className={`default-transition flex items-center h-12 pl-3 pr-4 rounded-l-full rounded-r-none w-36 hover:bg-bkg-3 focus:outline-none`}
         gray={connected}
         onClick={handleConnectDisconnect}
         {...props}
