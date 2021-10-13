@@ -6,6 +6,7 @@ import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
 import { EndpointTypes } from '../../models/types'
+import useQueryContext from '../../hooks/useQueryContext'
 
 // const COL = 'flex-col'
 // const ROW = 'flex-row'
@@ -13,6 +14,7 @@ import { EndpointTypes } from '../../models/types'
 const Realms = () => {
   const router = useRouter()
   const { cluster } = router.query
+  const { generateUrlWithClusterParam } = useQueryContext()
 
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   //TODO when we fetch realms data from api add loader handling
@@ -39,10 +41,8 @@ const Realms = () => {
   //   }, [search, realms])
 
   const goToRealm = ({ symbol }) => {
-    router.push({
-      pathname: `/realm/${symbol}`,
-      query: endpoint !== 'mainnet' ? { cluster: endpoint } : null,
-    })
+    const url = generateUrlWithClusterParam(`/dao/${symbol}`)
+    router.push(url)
   }
 
   return (
