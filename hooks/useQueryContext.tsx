@@ -1,12 +1,10 @@
 import { useRouter } from 'next/router'
 import { EndpointTypes } from '../models/types'
 
-export default function useRealmContext() {
+export default function useQueryContext() {
   const router = useRouter()
   const { cluster } = router.query
-  const { REALM } = process.env
 
-  const isOneRealmMode = REALM
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const hasClusterOption = endpoint !== 'mainnet'
   const generateUrlWithClusterParam = (url) => {
@@ -18,7 +16,6 @@ export default function useRealmContext() {
   }
 
   return {
-    isOneRealmMode,
     generateUrlWithClusterParam,
   }
 }

@@ -4,15 +4,15 @@ import { GlobeAltIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import { TwitterIcon } from '../components/icons'
-import useRealmContext from '../hooks/useRealmContext'
+import useQueryContext from '../hooks/useQueryContext'
 
 const OrganzationsBackNav = () => {
-  const { generateUrlWithClusterParam, isOneRealmMode } = useRealmContext()
+  const { generateUrlWithClusterParam } = useQueryContext()
   const { realm, realmInfo } = useRealm()
+  const { REALM } = process.env
 
   const realmName = realmInfo?.displayName ?? realm?.info?.name
-  const isBackNavVisibile = !isOneRealmMode // only hide backnav when on default realm
-
+  const isBackNavVisibile = realmInfo?.symbol !== REALM // only hide backnav when on default realm
   return (
     <div className="pb-4">
       {isBackNavVisibile ? (

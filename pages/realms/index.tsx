@@ -6,7 +6,7 @@ import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
 import { EndpointTypes } from '../../models/types'
-import useRealmContext from '../../hooks/useRealmContext'
+import useQueryContext from '../../hooks/useQueryContext'
 
 // const COL = 'flex-col'
 // const ROW = 'flex-row'
@@ -14,7 +14,7 @@ import useRealmContext from '../../hooks/useRealmContext'
 const Realms = () => {
   const router = useRouter()
   const { cluster } = router.query
-  const { generateUrlWithClusterParam } = useRealmContext()
+  const { generateUrlWithClusterParam } = useQueryContext()
 
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   //TODO when we fetch realms data from api add loader handling

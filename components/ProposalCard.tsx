@@ -9,7 +9,7 @@ import useProposalVotes from '../hooks/useProposalVotes'
 import VoteResultsBar from './VoteResultsBar'
 import ProposalTimeStatus from './ProposalTimeStatus'
 import useWalletStore from '../stores/useWalletStore'
-import useRealmContext from '../hooks/useRealmContext'
+import useQueryContext from '../hooks/useQueryContext'
 
 type ProposalCardProps = {
   id: string
@@ -28,7 +28,7 @@ const StyledCardWrapepr = styled.div`
 
 const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
-  const { generateUrlWithClusterParam } = useRealmContext()
+  const { generateUrlWithClusterParam } = useQueryContext()
   const {
     yesVoteProgress,
     relativeNoVotes,

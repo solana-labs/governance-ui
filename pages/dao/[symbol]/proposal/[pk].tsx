@@ -15,10 +15,10 @@ import useProposalVotes from '../../../../hooks/useProposalVotes'
 import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
-import useRealmContext from '../../../../hooks/useRealmContext'
+import useQueryContext from '../../../../hooks/useQueryContext'
 
 const Proposal = () => {
-  const { generateUrlWithClusterParam } = useRealmContext()
+  const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol } = useRealm()
   const { proposal, description, instructions } = useProposal()
   const {
