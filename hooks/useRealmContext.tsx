@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router'
 import { EndpointTypes } from '../models/types'
 
-export default function useQueryContext() {
+export default function useRealmContext() {
   const router = useRouter()
   const { cluster } = router.query
 
@@ -15,7 +15,9 @@ export default function useQueryContext() {
     return url
   }
 
+  const urlContext = router.asPath.includes('realm') ? 'realm' : 'dao'
   return {
+    urlContext,
     generateUrlWithClusterParam,
   }
 }
