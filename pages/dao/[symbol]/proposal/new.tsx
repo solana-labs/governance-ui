@@ -38,13 +38,12 @@ const New = () => {
   }
 
   const returnInstructionForm = () => {
+    const props = {
+      onChange: onInstructionFormUpdate,
+    }
     switch (form.instruction?.id) {
       case Instructions.Transfer:
-        return (
-          <SplTokenTransferForm
-            onChange={onInstructionFormUpdate}
-          ></SplTokenTransferForm>
-        )
+        return <SplTokenTransferForm {...props}></SplTokenTransferForm>
       default:
         null
     }
@@ -58,6 +57,7 @@ const New = () => {
   useEffect(() => {
     setInstructionForm({})
   }, [form.instruction?.id])
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3">

@@ -2,16 +2,20 @@ import React, { useEffect, useState } from 'react'
 import Input from '../../../../../components/inputs/Input'
 import Select from '../../../../../components/inputs/Select'
 import useRealm from '../../../../../hooks/useRealm'
+import useWalletStore from '../../../../../stores/useWalletStore'
 
 const SplTokenTransferForm = ({ onChange }) => {
   const { realm, realmInfo } = useRealm()
+  const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
+  const programId = realmInfo?.programId?.toString()
+  const accountOwner = realm?.pubkey.toString()
 
   const [form, setForm] = useState({
     destinationAccount: '',
     amount: 1,
     sourceAccount: null,
-    programId: realmInfo?.programId?.toString(),
-    accountOwner: realm?.account?.owner,
+    programId: programId,
+    accountOwner: accountOwner,
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -25,14 +29,14 @@ const SplTokenTransferForm = ({ onChange }) => {
   useEffect(() => {
     handleSetForm({
       propertyName: 'accountOwner',
-      value: realm?.account?.owner,
+      value: accountOwner,
     })
   }, [realm?.account.owner])
 
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
-      value: realmInfo?.programId?.toString(),
+      value: programId,
     })
   }, [realmInfo?.programId])
 
@@ -49,9 +53,9 @@ const SplTokenTransferForm = ({ onChange }) => {
         }
         value={form.sourceAccount?.name}
       >
-        {[].map((acc) => (
-          <Select.Option key={acc.id} value={acc}>
-            <span>{acc.name}</span>
+        {tokenAccounts.map((acc) => (
+          <Select.Option key={acc.publicKey.toString()} value={acc}>
+            <span>{acc.account.address}</span>
           </Select.Option>
         ))}
       </Select>
