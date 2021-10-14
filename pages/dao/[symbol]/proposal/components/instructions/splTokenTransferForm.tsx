@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from 'react'
-import Input from '../../../../../components/inputs/Input'
-import Select from '../../../../../components/inputs/Select'
-import useRealm from '../../../../../hooks/useRealm'
-import useWalletStore from '../../../../../stores/useWalletStore'
+import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
+import useRealm from '@hooks/useRealm'
+import { GovernanceAccountType } from '@models/accounts'
 
 const SplTokenTransferForm = ({ onChange }) => {
-  const { realm, realmInfo } = useRealm()
-  const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
+  const { realm, realmInfo, governances } = useRealm()
+
+  const governancesArray = Object.keys(governances).map(
+    (key) => governances[key]
+  )
+  const sourceAccounts = governancesArray
+    .filter(
+      (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
+    )
+    .map((x) => x.info)
   const programId = realmInfo?.programId?.toString()
-  const accountOwner = realm?.pubkey.toString()
+  const accountOwner = realmInfo?.realmId?.toString()
 
   const [form, setForm] = useState({
     destinationAccount: '',
@@ -23,7 +31,7 @@ const SplTokenTransferForm = ({ onChange }) => {
   }
 
   useEffect(() => {
-    onChange({ form })
+    onChange(form)
   }, [form])
 
   useEffect(() => {
@@ -41,7 +49,7 @@ const SplTokenTransferForm = ({ onChange }) => {
   }, [realmInfo?.programId])
 
   return (
-    <div>
+    <div className="mt-5">
       <div>Program id</div>
       <div>{form.programId}</div>
       <div>Account owner (governance account)</div>
@@ -51,13 +59,16 @@ const SplTokenTransferForm = ({ onChange }) => {
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'sourceAccount' })
         }
-        value={form.sourceAccount?.name}
+        value={form.sourceAccount?.governedAccount?.toString()}
       >
-        {tokenAccounts.map((acc) => (
-          <Select.Option key={acc.publicKey.toString()} value={acc}>
-            <span>{acc.account.address}</span>
-          </Select.Option>
-        ))}
+        {sourceAccounts.map((acc) => {
+          const govAccount = acc.governedAccount?.toString()
+          return (
+            <Select.Option key={govAccount} value={acc}>
+              <span>{govAccount}</span>
+            </Select.Option>
+          )
+        })}
       </Select>
       <Input
         prefix="Destination account"
