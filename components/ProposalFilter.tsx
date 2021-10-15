@@ -40,22 +40,19 @@ const ProposalFilter = ({ filters, setFilters }) => {
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`border border-fgd-4 default-transition font-normal pl-3 pr-2 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
+            className={`bg-bkg-1 border border-fgd-4 default-transition font-normal pl-3 pr-2 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
           >
             {filters.length > 0 ? (
               <div className="absolute -top-3 -right-1.5 z-20">
-                {/* <span className="flex h-4 w-4 relative">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red opacity-75"></span> */}
                 <StyledAlertCount className="w-4 h-4 bg-red relative inline-flex rounded-full flex items-center justify-center">
                   {filters.length}
                 </StyledAlertCount>
-                {/* </span> */}
               </div>
             ) : null}
             <div className="flex items-center justify-between">
               Filter
               <ChevronDownIcon
-                className={`default-transition h-5 w-5 ml-1 ${
+                className={`default-transition h-5 w-5 ml-1 text-primary-light ${
                   open ? 'transform rotate-180' : 'transform rotate-360'
                 }`}
               />

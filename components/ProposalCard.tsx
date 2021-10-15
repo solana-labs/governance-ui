@@ -51,13 +51,13 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
                 <h3 className="text-fgd-1">{proposal.name}</h3>
                 <div className="flex items-center pl-4 pt-1">
                   <StatusBadge status={status} />
-                  <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" />
+                  <StyledSvg className="default-transition h-6 ml-2 text-fgd-3 w-6" />
                 </div>
               </div>
               <ProposalTimeStatus proposal={proposal} />
             </div>
             {ProposalState[proposal.state] === 'Voting' && (
-              <div className="bg-[rgba(255,255,255,0.05)] flex mt-2 px-6 py-4">
+              <div className="border-t border-bkg-3 flex mt-2 px-6 py-4">
                 <div className="border-r border-bkg-4 pr-4 w-1/2">
                   <VoteResultsBar
                     approveVotePercentage={

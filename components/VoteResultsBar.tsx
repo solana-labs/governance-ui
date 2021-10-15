@@ -12,13 +12,13 @@ const VoteResultsBar = ({
       <div className="flex justify-between">
         <div className="flex items-center">
           <p className="font-bold text-fgd-1">
-            <span className="mr-1 text-xs text-fgd-3">Approve</span>
+            <span className="font-normal mr-1 text-xs text-fgd-3">Approve</span>
             {approveVotePercentage.toFixed(2)}%
           </p>
         </div>
         <div className="flex items-center">
           <p className="font-bold text-fgd-1">
-            <span className="mr-1 text-xs text-fgd-3">Deny</span>
+            <span className="font-normal mr-1 text-xs text-fgd-3">Deny</span>
             {denyVotePercentage.toFixed(2)}%
           </p>
         </div>

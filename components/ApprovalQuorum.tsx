@@ -9,7 +9,7 @@ const ApprovalProgress = ({ progress }: ApprovalProgressProps) => {
     <>
       <div className="flex items-center justify-between">
         <Tooltip content="The minimum number of approve votes required. Once approval quorum is >= 100% the proposal is eligible to pass.">
-          <p className="border-b border-dashed border-fgd-3 font-bold text-fgd-3 text-xs hover:cursor-help hover:border-b-0">
+          <p className="border-b border-dashed border-fgd-3 text-fgd-3 text-xs hover:cursor-help hover:border-b-0">
             Approval quorum
           </p>
         </Tooltip>

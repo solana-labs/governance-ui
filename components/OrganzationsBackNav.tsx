@@ -23,11 +23,11 @@ const OrganzationsBackNav = () => {
           </a>
         </Link>
       ) : null}
-      <div className="border-b border-bkg-4 flex items-center justify-between pb-4">
+      <div className="border-b border-bkg-3 flex items-center justify-between pb-4">
         {realmName && (
           <div className="flex items-center">
             {realmInfo?.ogImage ? (
-              <div className="bg-[rgba(255,255,255,0.1)] rounded-full h-14 w-14 flex items-center justify-center">
+              <div className="">
                 <img className="w-8" src={realmInfo?.ogImage}></img>
               </div>
             ) : (
