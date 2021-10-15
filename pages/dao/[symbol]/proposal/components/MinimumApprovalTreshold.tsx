@@ -1,3 +1,4 @@
+import ProgressBar from '@components/ProgressBar'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
 
@@ -13,16 +14,10 @@ const MinimumApprovalTreshold = () => {
   )?.info?.config?.voteThresholdPercentage?.value
 
   return (
-    <>
-      {' '}
-      <div className="mt-5">{`Minimum Approval votes ${voteThresholdPercentage}%`}</div>
-      <div className="bg-black w-full h-2 mt-2">
-        <div
-          className="h-2"
-          style={{ background: 'white', width: `${voteThresholdPercentage}%` }}
-        ></div>
-      </div>
-    </>
+    <ProgressBar
+      progress={voteThresholdPercentage}
+      prefix="Minimum Approval votes"
+    ></ProgressBar>
   )
 }
 

@@ -145,7 +145,7 @@ const New = () => {
                 {returnInstructionForm({ typeId: instruction.type?.id, idx })}
               </div>
             ))}
-            <Button className="mt-5 w-44" onClick={addInstruction}>
+            <Button className="mt-5 w-44 mb-5" onClick={addInstruction}>
               Add new instruction
             </Button>
             <MinimumApprovalTreshold></MinimumApprovalTreshold>
