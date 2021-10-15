@@ -12,7 +12,10 @@ import React, { useState } from 'react'
 import Button from '@components/Button'
 import SplTokenTransferForm from '../proposal/components/instructions/splTokenTransferForm'
 import MinimumApprovalTreshold from './components/MinimumApprovalTreshold'
-
+import { RpcContext } from '@models/core/api'
+import { createProposalDraft } from 'actions/createProposalDraft'
+import useWalletStore from 'stores/useWalletStore'
+import { InstructionData } from '@models/accounts'
 export enum Instructions {
   Transfer,
   GOGO,
@@ -26,8 +29,10 @@ const defaultInstructionModel = { type: null }
 
 const New = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol } = useRealm()
+  const { symbol, realm, realmTokenAccount, realmInfo } = useRealm()
   const { proposal } = useProposal()
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
 
   const [form, setForm] = useState({
     title: '',
@@ -84,8 +89,51 @@ const New = () => {
     console.log(instructions)
   }
 
-  const handleCreateDraft = () => {
-    return null
+  function str2ab(str) {
+    const buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char
+    const bufView = new Uint16Array(buf)
+    for (let i = 0, strLen = str.length; i < strLen; i++) {
+      bufView[i] = str.charCodeAt(i)
+    }
+    return buf
+  }
+
+  const handleCreateDraft = async () => {
+    const instructionsData = new InstructionData({
+      programId: realm.pubkey,
+      accounts: [],
+      data: new Uint8Array(str2ab(instructions.toString())),
+    })
+    const systemId = realm.account.owner
+    const holduptime = 0
+    const proposalIndex = 0
+    const rpcContext = new RpcContext(
+      proposal.account.owner,
+      wallet,
+      connection.current,
+      connection.endpoint
+    )
+
+    try {
+      await createProposalDraft(
+        rpcContext,
+        realm.pubkey,
+        realm.account.owner,
+        realmTokenAccount.account.owner,
+        form.title,
+        form.description,
+        realmTokenAccount.account.mint,
+        holduptime,
+        proposalIndex,
+        systemId,
+        instructionsData
+      )
+    } catch (ex) {
+      //TODO: How do we present transaction errors to users? Just the notification?
+      console.error("Can't create draft", ex)
+    } finally {
+      console.log('done')
+    }
   }
 
   return (
