@@ -7,7 +7,7 @@ import {
 
 import { withCreateProposal } from '../models/withCreateProposal'
 import { withAddSignatory } from '../models/withAddSignatory'
-import { RpcContext } from '../models/core/api'
+import { RpcContext, SYSTEM_PROGRAM_ID } from '../models/core/api'
 import { withInsertInstruction } from '@models/withInsertInstruction'
 import { InstructionData } from '@models/accounts'
 import { sendTransaction } from 'utils/send'
@@ -22,11 +22,11 @@ export const createProposalDraft = async (
   governingTokenMint: PublicKey,
   holdUpTime: number,
   proposalIndex: number,
-  systemId: PublicKey,
-  instructionData: InstructionData
+  instructionsData: InstructionData[]
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Account[] = []
+  const systemId = SYSTEM_PROGRAM_ID
 
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
@@ -58,20 +58,21 @@ export const createProposalDraft = async (
     payer,
     systemId
   )
-
-  await withInsertInstruction(
-    instructions,
-    programId,
-    governance,
-    proposalAddress,
-    tokenOwnerRecord,
-    governanceAuthority,
-    proposalIndex,
-    holdUpTime,
-    instructionData,
-    payer,
-    systemId
-  )
+  for (const instruction of instructionsData) {
+    await withInsertInstruction(
+      instructions,
+      programId,
+      governance,
+      proposalAddress,
+      tokenOwnerRecord,
+      governanceAuthority,
+      proposalIndex,
+      holdUpTime,
+      instruction,
+      payer,
+      systemId
+    )
+  }
 
   const transaction = new Transaction()
   transaction.add(...instructions)

@@ -15,25 +15,22 @@ import MinimumApprovalTreshold from './components/MinimumApprovalTreshold'
 import { RpcContext } from '@models/core/api'
 import { createProposalDraft } from 'actions/createProposalDraft'
 import useWalletStore from 'stores/useWalletStore'
-import { InstructionData } from '@models/accounts'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
 export enum Instructions {
   Transfer,
-  GOGO,
 }
 const availabileInstructions = [
   { id: Instructions.Transfer, name: 'Spl-Token Transfer' },
-  { id: Instructions.GOGO, name: 'GOGO' },
 ]
 
-const defaultInstructionModel = { type: null }
+const defaultInstructionModel = { type: null, serializedInstruction: '' }
 
 const New = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm, realmTokenAccount } = useRealm()
+  const { symbol, realm } = useRealm()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -41,6 +38,7 @@ const New = () => {
   const [instructions, setInstructions] = useState([
     { ...defaultInstructionModel, type: availabileInstructions[0] },
   ])
+  const [sourceAccount, setSourceAccount] = useState(null)
 
   const handleSetForm = ({ propertyName, value }) => {
     setForm({ ...form, [propertyName]: value })
@@ -51,10 +49,10 @@ const New = () => {
     }
     setInstructionChangeAtIndex({ newModel: newInstruction, idx })
   }
-  const handleSetInstructionForm = ({ model, idx }) => {
+  const handleSetInstructionForm = ({ serializedInstruction, idx }) => {
     const newInstruction = {
       ...instructions[idx],
-      ...model,
+      serializedInstruction,
     }
     setInstructionChangeAtIndex({ newModel: newInstruction, idx })
   }
@@ -63,8 +61,8 @@ const New = () => {
     newInstructions[idx] = newModel
     setInstructions(newInstructions)
   }
-  const onInstructionFormUpdate = ({ model, idx }) => {
-    handleSetInstructionForm({ model, idx })
+  const onInstructionFormUpdate = ({ serializedInstruction, idx }) => {
+    handleSetInstructionForm({ serializedInstruction, idx })
   }
   const addInstruction = () => {
     setInstructions([...instructions, defaultInstructionModel])
@@ -75,7 +73,9 @@ const New = () => {
 
   const returnInstructionForm = ({ typeId, idx }) => {
     const props = {
-      onChange: (model) => onInstructionFormUpdate({ model, idx }),
+      onChange: (serializedInstruction) =>
+        onInstructionFormUpdate({ serializedInstruction, idx }),
+      onSourceAccountChange: (sourceAccount) => setSourceAccount(sourceAccount),
     }
     switch (typeId) {
       case Instructions.Transfer:
@@ -89,47 +89,36 @@ const New = () => {
     console.log(instructions)
   }
 
-  function str2ab(str) {
-    const buf = new ArrayBuffer(str.length * 2) // 2 bytes for each char
-    const bufView = new Uint16Array(buf)
-    for (let i = 0, strLen = str.length; i < strLen; i++) {
-      bufView[i] = str.charCodeAt(i)
-    }
-    return buf
-  }
-
   const handleCreateDraft = async () => {
-    const instructionsData = new InstructionData({
-      programId: realm.pubkey,
-      accounts: [],
-      data: new Uint8Array(str2ab(instructions.toString())),
-    })
-    const systemId = realm.account.owner
-    const holduptime = 0
-    const proposalIndex = 0
+    const holduptime = sourceAccount?.info?.minInstructionHoldUpTime || 0
+    const proposalIndex = sourceAccount?.info?.proposalCount
+      ? sourceAccount?.info?.proposalCount + 1
+      : 0
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      realm.account.owner,
       wallet,
       connection.current,
       connection.endpoint
+    )
+    const instructionsData = instructions.map((x) =>
+      getInstructionDataFromBase64(x.serializedInstruction)
     )
 
     try {
       await createProposalDraft(
         rpcContext,
         realm.pubkey,
-        realm.account.owner,
-        realmTokenAccount.account.owner,
+        sourceAccount.pubkey,
+        sourceAccount.info?.governedAccount?.pubkey,
         form.title,
         form.description,
-        realmTokenAccount.account.mint,
+        //brak pewnosci
+        realm.info.communityMint,
         holduptime,
         proposalIndex,
-        systemId,
         instructionsData
       )
     } catch (ex) {
-      //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't create draft", ex)
     } finally {
       console.log('done')

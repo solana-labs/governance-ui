@@ -3,9 +3,13 @@ import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useRealm from '@hooks/useRealm'
 import { GovernanceAccountType } from '@models/accounts'
+import { Token } from '@solana/spl-token'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { PublicKey } from '@solana/web3.js'
+import { serializeInstructionToBase64 } from '@models/serialisation'
 
-const SplTokenTransferForm = ({ onChange }) => {
-  const { realm, realmInfo, governances } = useRealm()
+const SplTokenTransferForm = ({ onChange, onSourceAccountChange }) => {
+  const { realmInfo, governances } = useRealm()
 
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
@@ -14,16 +18,15 @@ const SplTokenTransferForm = ({ onChange }) => {
     .filter(
       (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
     )
-    .map((x) => x.info)
-  const programId = realmInfo?.programId?.toString()
-  const accountOwner = realmInfo?.realmId?.toString()
+    .map((x) => x)
+
+  const programId = realmInfo?.programId
 
   const [form, setForm] = useState({
     destinationAccount: '',
     amount: 1,
     sourceAccount: null,
-    programId: programId,
-    accountOwner: accountOwner,
+    programId: programId?.toString(),
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -31,41 +34,51 @@ const SplTokenTransferForm = ({ onChange }) => {
   }
 
   useEffect(() => {
-    onChange(form)
+    onSourceAccountChange(form.sourceAccount)
+  }, [form.sourceAccount])
+
+  useEffect(() => {
+    try {
+      const mintAmount = parseMintNaturalAmountFromDecimal(form.amount, 1)
+      const transferIx = Token.createTransferInstruction(
+        programId,
+        form.sourceAccount?.pubkey,
+        new PublicKey(form.destinationAccount),
+        form.sourceAccount?.info?.governedAccount,
+        [],
+        mintAmount
+      )
+      const serializedInstruction = serializeInstructionToBase64(transferIx)
+      onChange(serializedInstruction)
+    } catch (e) {
+      console.log(e)
+    }
   }, [form])
 
   useEffect(() => {
     handleSetForm({
-      propertyName: 'accountOwner',
-      value: accountOwner,
-    })
-  }, [realm?.account.owner])
-
-  useEffect(() => {
-    handleSetForm({
       propertyName: 'programId',
-      value: programId,
+      value: programId?.toString(),
     })
   }, [realmInfo?.programId])
-
   return (
     <div className="mt-5">
       <div>Program id</div>
       <div>{form.programId}</div>
       <div>Account owner (governance account)</div>
-      <div>{form.accountOwner}</div>
+      <div>{form.sourceAccount?.pubkey?.toString()}</div>
       <Select
         prefix="Source Account"
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'sourceAccount' })
         }
-        value={form.sourceAccount?.governedAccount?.toString()}
+        value={form.sourceAccount?.info?.governedAccount?.toString()}
       >
         {sourceAccounts.map((acc) => {
-          const govAccount = acc.governedAccount?.toString()
+          const govAccount = acc.pubkey.toString()
           return (
             <Select.Option key={govAccount} value={acc}>
-              <span>{govAccount}</span>
+              <span>{acc.info.governedAccount.toString()}</span>
             </Select.Option>
           )
         })}
