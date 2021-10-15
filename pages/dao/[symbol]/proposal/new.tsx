@@ -29,7 +29,7 @@ const defaultInstructionModel = { type: null }
 
 const New = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm, realmTokenAccount, realmInfo } = useRealm()
+  const { symbol, realm, realmTokenAccount } = useRealm()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
