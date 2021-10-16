@@ -48,7 +48,7 @@ h3 {
 }
 
 p {
-  @apply text-fgd-2 text-sm;
+  @apply leading-6 text-fgd-2 text-sm;
 }
 
 .default-transition {

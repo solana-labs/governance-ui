@@ -1,6 +1,6 @@
 import { Menu } from '@headlessui/react'
 import { useMemo } from 'react'
-import { CheckIcon, ChevronDownIcon } from '@heroicons/react/solid'
+import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
 import {
@@ -66,23 +66,22 @@ const ConnectWalletButton = (props) => {
                   } default-transition h-5 m-auto ml-1 text-primary-light w-5`}
                 />
               </Menu.Button>
-              <Menu.Items className="z-20 w-auto p-2 absolute right-0 top-14 bg-bkg-2 border border-bkg-3 shadow-md outline-none rounded-md">
+              <Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none rounded-md w-48 z-20">
                 {WALLET_PROVIDERS.map(({ name, url, icon }) => (
                   <Menu.Item key={name}>
                     <button
-                      className="flex default-transition h-9 items-center p-2 w-auto hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none"
+                      className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none"
                       onClick={() =>
                         setWalletStore((s) => {
                           s.providerUrl = url
                         })
                       }
-                      style={{ width: '14rem' }}
                     >
                       <img src={icon} className="h-4 w-4 mr-2" />
                       <span className="text-sm">{name}</span>
 
                       {provider?.url === url ? (
-                        <CheckIcon className="h-5 ml-4 text-green w-5" />
+                        <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
                       ) : null}
                     </button>
                   </Menu.Item>

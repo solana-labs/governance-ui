@@ -59,7 +59,7 @@ const ProposalFilter = ({ filters, setFilters }) => {
             </div>
           </Disclosure.Button>
           <Disclosure.Panel
-            className={`bg-bkg-3 mt-2 p-4 absolute right-0 w-56 z-20 rounded-md text-sm`}
+            className={`bg-bkg-1 border border-fgd-4 mt-2 p-4 absolute right-0 w-56 z-20 rounded-md text-xs`}
           >
             <div>
               <div className="flex items-center justify-between pb-2">

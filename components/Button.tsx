@@ -14,12 +14,13 @@ const Button: FunctionComponent<ButtonProps> = ({
 }) => {
   return (
     <button
-      className={`${className} font-bold px-4 py-2.5 rounded-full text-sm ${
+      className={`${className} font-bold px-4 py-2.5 rounded-full text-sm focus:outline-none ${
         disabled
           ? 'bg-bkg-4 cursor-not-allowed text-fgd-2'
           : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'
       }`}
       {...props}
+      disabled={disabled}
     >
       {children}
     </button>
@@ -58,7 +59,7 @@ export const LinkButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border-0 underline hover:no-underline hover:opacity-60 focus:outline-none`}
+      className={`${className} border-0 default-transition underline hover:no-underline hover:opacity-60 focus:outline-none`}
       {...props}
     >
       {children}
