@@ -7,7 +7,6 @@ import {
   getWalletProviderByUrl,
   WALLET_PROVIDERS,
 } from '../utils/wallet-adapters'
-import Button from './Button'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -36,32 +35,30 @@ const ConnectWalletButton = (props) => {
 
   return (
     <div className="flex">
-      <Button
-        className={`bg-transparent border border-fgd-3 border-r-0 default-transition flex items-center h-12 pl-3 pr-4 rounded-l-full rounded-r-none w-36 focus:outline-none`}
+      <button
+        className={`bg-transparent border border-fgd-3 border-r-0 default-transition flex h-12 items-center pl-3 pr-4 rounded-l-full rounded-r-none w-36 hover:bg-bkg-3 focus:outline-none`}
         onClick={handleConnectDisconnect}
         {...props}
       >
-        <div className="flex items-center text-fgd-1 text-left text-sm">
+        <div className="flex font-bold items-center text-fgd-1 text-left text-sm">
           <div className="pr-2">
             <img src={provider?.icon} className="h-5 w-5" />
           </div>
           <div>
             {connected ? 'Disconnect' : 'Connect'}
-            <StyledWalletProviderLabel className="font-normal text-fgd-4">
+            <StyledWalletProviderLabel className="font-normal text-fgd-3">
               {provider?.name}
             </StyledWalletProviderLabel>
           </div>
         </div>
-      </Button>
+      </button>
 
       <div className="relative ">
         <Menu>
           {({ open }) => (
             <>
               <Menu.Button
-                className={`border cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none ${
-                  connected ? 'border-bkg-4' : 'border-fgd-3'
-                }`}
+                className={`border border-fgd-3 cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}
               >
                 <ChevronDownIcon
                   className={`${

@@ -9,11 +9,16 @@ interface ButtonProps {
 const Button: FunctionComponent<ButtonProps> = ({
   children,
   className,
+  disabled,
   ...props
 }) => {
   return (
     <button
-      className={`${className} bg-primary-light font-bold px-4 py-2 rounded-full text-bkg-2 text-sm`}
+      className={`${className} font-bold px-4 py-2.5 rounded-full text-sm ${
+        disabled
+          ? 'bg-bkg-4 cursor-not-allowed text-fgd-2'
+          : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'
+      }`}
       {...props}
     >
       {children}

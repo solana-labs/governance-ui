@@ -44,7 +44,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   )
 
   return (
-    <div className="bg-bkg-2 border border-bkg-3 p-6 rounded-lg">
+    <div className="border border-fgd-4 p-6 rounded-lg">
       <h3 className="mb-4">Deposit Tokens</h3>
       {communityDepositVisible && (
         <TokenDeposit
@@ -238,7 +238,7 @@ const TokenDeposit = ({
   return (
     <>
       <div className="flex space-x-4 items-center pb-6">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
+        <div className="bg-bkg-2 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
           <div className="font-bold">
             {depositTokenRecord && mint

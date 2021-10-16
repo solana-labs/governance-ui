@@ -1,7 +1,7 @@
 import useProposal from '../../hooks/useProposal'
 import InstructionCard from './instructionCard'
 import { Disclosure } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/outline'
+import { ChevronDownIcon } from '@heroicons/react/solid'
 
 export function InstructionPanel() {
   const { instructions } = useProposal()
@@ -15,14 +15,14 @@ export function InstructionPanel() {
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`bg-bkg-2 border border-bkg-3 font-bold px-6 py-4 text-fgd-1 rounded-lg transition-all w-full hover:bg-bkg-3 focus:outline-none ${
+            className={`border border-fgd-4 font-bold px-6 py-4 text-fgd-1 rounded-lg transition-all w-full hover:bg-bkg-3 focus:outline-none ${
               open && 'rounded-b-none'
             }`}
           >
             <div className="flex items-center justify-between">
               <h2 className="mb-0">Instructions</h2>
               <ChevronDownIcon
-                className={`h-5 text-primary-light transition-all w-5 ${
+                className={`h-6 text-primary-light transition-all w-6 ${
                   open ? 'transform rotate-180' : 'transform rotate-360'
                 }`}
               />

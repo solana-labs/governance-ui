@@ -69,13 +69,13 @@ const REALM = () => {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <div className="bg-bkg-2 border border-bkg-3 col-span-12 md:col-span-7 lg:col-span-8 p-6 rounded-lg">
+        <div className="border border-fgd-4 col-span-12 md:col-span-7 lg:col-span-8 p-6 rounded-lg">
           <OrganzationsBackNav></OrganzationsBackNav>
           <div className="flex items-center justify-between pb-2">
-            <h4>{`${filteredProposals.length} proposals`}</h4>
+            <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <ProposalFilter filters={filters} setFilters={setFilters} />
           </div>
-          <div className="space-y-2">
+          <div className="space-y-3">
             {filteredProposals.length > 0 ? (
               filteredProposals.map(([k, v]) => (
                 <ProposalCard key={k} id={k} proposal={v.info} />
