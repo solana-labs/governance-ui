@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
@@ -26,7 +27,8 @@ const VotePanel = () => {
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal)
-  const ownVoteRecord = voteRecordsByVoter[wallet?.publicKey?.toBase58()]
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const ownVoteRecord = voteRecordsByVoter[wallet!.publicKey?.toBase58()]
 
   const voterTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -66,7 +68,8 @@ const VotePanel = () => {
       await relinquishVote(
         rpcContext,
         proposal,
-        voterTokenRecord.pubkey,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        voterTokenRecord!.pubkey,
         ownVoteRecord.pubkey
       )
     } catch (ex) {
@@ -126,8 +129,8 @@ const VotePanel = () => {
         <VoteCommentModal
           isOpen={showVoteModal}
           onClose={handleCloseShowVoteModal}
-          vote={vote}
-          voterTokenRecord={voterTokenRecord}
+          vote={vote!}
+          voterTokenRecord={voterTokenRecord!}
         />
       ) : null}
     </div>

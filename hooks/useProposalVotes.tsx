@@ -5,7 +5,8 @@ import useRealm from './useRealm'
 export default function useProposalVotes(proposal?: Proposal) {
   const { realm, mint, councilMint, governances } = useRealm()
 
-  const governance = governances[proposal?.governance?.toBase58()]?.info
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const governance = governances[proposal!.governance?.toBase58()]?.info
 
   const proposalMint =
     proposal?.governingTokenMint.toBase58() ===

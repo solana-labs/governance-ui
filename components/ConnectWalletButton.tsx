@@ -27,9 +27,9 @@ const ConnectWalletButton = (props) => {
 
   const handleConnectDisconnect = () => {
     if (connected) {
-      current.disconnect()
+      current?.disconnect()
     } else {
-      current.connect()
+      current?.connect()
     }
   }
 

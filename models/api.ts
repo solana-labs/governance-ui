@@ -35,7 +35,7 @@ export async function getUnrelinquishedVoteRecords(
     endpoint,
     VoteRecord,
     [
-      pubkeyFilter(1 + 32, tokenOwnerRecordPk),
+      pubkeyFilter(1 + 32, tokenOwnerRecordPk)!,
       booleanFilter(1 + 32 + 32, false),
     ]
   )

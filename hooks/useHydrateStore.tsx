@@ -20,9 +20,11 @@ export default function useHydrateStore() {
       if (realmInfo) {
         setWalletStore((s) => {
           const ENDPOINT = ENDPOINTS.find((e) => e.name === realmInfo.endpoint)
-          s.connection.cluster = ENDPOINT.name
-          s.connection.current = new Connection(ENDPOINT.url, 'recent')
-          s.connection.endpoint = ENDPOINT.url
+          s.connection.cluster = ENDPOINT?.name
+          s.connection.current = ENDPOINT
+            ? new Connection(ENDPOINT.url, 'recent')
+            : undefined
+          s.connection.endpoint = ENDPOINT?.url
         })
         await fetchAllRealms(realmInfo.programId)
         fetchRealm(realmInfo.programId, realmInfo.realmId)

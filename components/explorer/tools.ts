@@ -7,7 +7,7 @@ export function getExplorerUrl(
   itemType = 'address'
 ) {
   const getClusterUrlParam = () => {
-    let cluster: string
+    let cluster = ''
     if (endpoint === 'localnet') {
       cluster = `custom&customUrl=${encodeURIComponent(
         'http://127.0.0.1:8899'
