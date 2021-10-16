@@ -27,7 +27,6 @@ export const createProposalDraft = async (
   const instructions: TransactionInstruction[] = []
   const signers: Account[] = []
   const systemId = SYSTEM_PROGRAM_ID
-
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
@@ -47,6 +46,21 @@ export const createProposalDraft = async (
     systemId
   )
 
+  console.log({
+    instructions,
+    programId: programId.toString(),
+    realm: realm.toString(),
+    governance: governance.toString(),
+    tokenOwnerRecord: tokenOwnerRecord.toString(),
+    name,
+    descriptionLink,
+    governingTokenMint: governingTokenMint.toString(),
+    governanceAuthority: governanceAuthority.toString(),
+    proposalIndex,
+    payer: payer.toString(),
+    systemId: systemId.toString(),
+  })
+
   // Add the proposal creator as the default signatory
   await withAddSignatory(
     instructions,
@@ -58,7 +72,7 @@ export const createProposalDraft = async (
     payer,
     systemId
   )
-  for (const instruction of instructionsData) {
+  for (const [index, instruction] of instructionsData.entries()) {
     await withInsertInstruction(
       instructions,
       programId,
@@ -66,7 +80,7 @@ export const createProposalDraft = async (
       proposalAddress,
       tokenOwnerRecord,
       governanceAuthority,
-      proposalIndex,
+      index,
       holdUpTime,
       instruction,
       payer,

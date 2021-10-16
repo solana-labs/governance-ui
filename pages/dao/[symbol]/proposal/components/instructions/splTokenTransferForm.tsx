@@ -14,6 +14,7 @@ const SplTokenTransferForm = ({ onChange, onSourceAccountChange }) => {
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
   )
+  console.log(governancesArray)
   const sourceAccounts = governancesArray
     .filter(
       (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance

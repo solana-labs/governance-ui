@@ -42,7 +42,6 @@ export const withCreateProposal = async (
     ],
     programId
   )
-
   const keys = [
     {
       pubkey: realm,
@@ -61,7 +60,7 @@ export const withCreateProposal = async (
     },
     {
       pubkey: tokenOwnerRecord,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {

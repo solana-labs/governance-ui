@@ -16,6 +16,7 @@ import { RpcContext } from '@models/core/api'
 import { createProposalDraft } from 'actions/createProposalDraft'
 import useWalletStore from 'stores/useWalletStore'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { PublicKey } from '@solana/web3.js'
 export enum Instructions {
   Transfer,
 }
@@ -27,7 +28,7 @@ const defaultInstructionModel = { type: null, serializedInstruction: '' }
 
 const New = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm } = useRealm()
+  const { symbol, realm, ownTokenRecord } = useRealm()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -88,14 +89,11 @@ const New = () => {
   const handlePropose = () => {
     console.log(instructions)
   }
-
   const handleCreateDraft = async () => {
     const holduptime = sourceAccount?.info?.minInstructionHoldUpTime || 0
     const proposalIndex = sourceAccount?.info?.proposalCount
-      ? sourceAccount?.info?.proposalCount + 1
-      : 0
     const rpcContext = new RpcContext(
-      realm.account.owner,
+      new PublicKey(realm.account.owner.toString()),
       wallet,
       connection.current,
       connection.endpoint
@@ -103,16 +101,14 @@ const New = () => {
     const instructionsData = instructions.map((x) =>
       getInstructionDataFromBase64(x.serializedInstruction)
     )
-
     try {
       await createProposalDraft(
         rpcContext,
         realm.pubkey,
         sourceAccount.pubkey,
-        sourceAccount.info?.governedAccount?.pubkey,
+        ownTokenRecord?.pubkey,
         form.title,
         form.description,
-        //brak pewnosci
         realm.info.communityMint,
         holduptime,
         proposalIndex,
