@@ -77,6 +77,11 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
+  {
+    symbol: 'Super realm',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('6y4X2QSNX3iSNhQYmgDT6bHLGbDDgCFkfzJbB5RWbpGd'),
+  },
 ]
 
 export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {

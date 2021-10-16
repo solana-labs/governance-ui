@@ -19,7 +19,6 @@ const SplTokenTransferForm = ({ onChange, onSourceAccountChange }) => {
       (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
     )
     .map((x) => x)
-
   const programId = realmInfo?.programId
 
   const [form, setForm] = useState({
@@ -61,6 +60,7 @@ const SplTokenTransferForm = ({ onChange, onSourceAccountChange }) => {
       value: programId?.toString(),
     })
   }, [realmInfo?.programId])
+
   return (
     <div className="mt-5">
       <div>Program id</div>

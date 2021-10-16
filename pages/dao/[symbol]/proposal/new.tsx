@@ -71,7 +71,7 @@ const New = () => {
     setInstructions([...instructions.filter((x, index) => index !== idx)])
   }
 
-  const returnInstructionForm = ({ typeId, idx }) => {
+  const returnCurrentInstruction = ({ typeId, idx }) => {
     const props = {
       onChange: (serializedInstruction) =>
         onInstructionFormUpdate({ serializedInstruction, idx }),
@@ -179,7 +179,10 @@ const New = () => {
                     </Select.Option>
                   ))}
                 </Select>
-                {returnInstructionForm({ typeId: instruction.type?.id, idx })}
+                {returnCurrentInstruction({
+                  typeId: instruction.type?.id,
+                  idx,
+                })}
               </div>
             ))}
             <Button className="mt-5 w-44 mb-5" onClick={addInstruction}>
