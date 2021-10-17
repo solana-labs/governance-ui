@@ -8,7 +8,7 @@ const DiscussionPanel = () => {
   )
 
   return (
-    <div className="border border-fgd-4 p-6 rounded-lg">
+    <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
       <h2 className="mb-4">
         Discussion{' '}
         <span className="text-base text-fgd-3">

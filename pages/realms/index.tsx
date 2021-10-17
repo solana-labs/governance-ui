@@ -86,7 +86,9 @@ const Realms = () => {
                   </div>
                 )}
               </div>
-              <h3>{realm.displayName ?? realm.symbol}</h3>
+              <h3 className="text-center">
+                {realm.displayName ?? realm.symbol}
+              </h3>
             </div>
           ))
         )}

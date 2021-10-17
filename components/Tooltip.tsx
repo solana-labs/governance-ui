@@ -24,7 +24,7 @@ const Tooltip = ({
       interactive
       content={
         <div
-          className={`rounded p-3 text-xs bg-bkg-3 leading-5 shadow-md text-fgd-3 outline-none focus:outline-none ${className}`}
+          className={`rounded p-3 text-xs bg-bkg-2 leading-5 shadow-md text-fgd-3 outline-none focus:outline-none ${className}`}
         >
           {content}
         </div>

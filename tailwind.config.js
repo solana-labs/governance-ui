@@ -17,7 +17,7 @@ module.exports = {
       },
       colors: {
         'sierra-theme': {
-          primary: { light: '#E1CE7A', dark: '#B79D2A' },
+          primary: { light: '#E1CE7A', dark: '#D2B537' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
           'secondary-2': { light: '#E54033', dark: '#C7251A' },
           'bkg-1': '#121417',
@@ -101,6 +101,7 @@ module.exports = {
       opacity: ['disabled'],
       backgroundColor: ['disabled'],
       textColor: ['disabled'],
+      borderWidth: ['last'],
     },
   },
   plugins: [],

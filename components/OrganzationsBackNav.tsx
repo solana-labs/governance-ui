@@ -23,9 +23,9 @@ const OrganzationsBackNav = () => {
           </a>
         </Link>
       ) : null}
-      <div className="border-b border-fgd-4 flex flex-col md:flex-row items-center justify-between pb-4 md:pb-0">
+      <div className="border-b border-fgd-4 flex flex-col md:flex-row items-center justify-between pb-3">
         {realmName && (
-          <div className="flex flex-col md:flex-row items-center pb-3">
+          <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
             {realmInfo?.ogImage ? (
               <img
                 className="flex-shrink-0 mb-2 md:mb-0 w-8"

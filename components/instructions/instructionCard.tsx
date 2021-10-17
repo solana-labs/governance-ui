@@ -30,7 +30,7 @@ export default function InstructionCard({
   }, [proposalInstruction])
 
   return (
-    <div>
+    <div className="break-all">
       <h3 className="mb-4">
         {`Instruction ${index} `}
         {descriptor?.name && `– ${descriptor.name}`}
@@ -70,9 +70,9 @@ export function InstructionProgram({
 }) {
   const programLabel = getProgramName(programId)
   return (
-    <div className="border-t border-bkg-4 flex items-center justify-between py-3">
+    <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
       <span className="font-bold text-fgd-1 text-sm">Program</span>
-      <div className="flex items-center">
+      <div className="flex items-center pt-1 lg:pt-0">
         <a
           className="text-sm hover:brightness-[1.15] focus:outline-none"
           href={getExplorerUrl(endpoint, programId)}
@@ -81,12 +81,14 @@ export function InstructionProgram({
         >
           {programId.toBase58()}
           {programLabel && (
-            <div className="mt-1 text-fgd-3 text-right text-xs">
+            <div className="mt-1 text-fgd-3 lg:text-right text-xs">
               {programLabel}
             </div>
           )}
         </a>
-        <ExternalLinkIcon className={`h-4 w-4 ml-2 text-primary-light`} />
+        <ExternalLinkIcon
+          className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+        />
       </div>
     </div>
   )
@@ -106,11 +108,11 @@ export function InstructionAccount({
   const accountLabel = getAccountName(accountMeta.pubkey)
 
   return (
-    <div className="border-t border-bkg-4 flex items-center justify-between py-3">
-      <div>
+    <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">
+      <div className="pb-1 lg:pb-0">
         <p className="font-bold text-fgd-1">{`Account ${index + 1}`}</p>
         {descriptor?.accounts && (
-          <div className="mt-1 text-fgd-3 text-xs">
+          <div className="mt-0.5 text-fgd-3 text-xs">
             {descriptor.accounts[index]?.name}
           </div>
         )}
@@ -124,12 +126,14 @@ export function InstructionAccount({
         >
           {accountMeta.pubkey.toBase58()}
           {accountLabel && (
-            <div className="mt-1 text-fgd-3 text-right text-xs">
+            <div className="mt-0.5 text-fgd-3 text-right text-xs">
               {accountLabel}
             </div>
           )}
         </a>
-        <ExternalLinkIcon className={`h-4 w-4 ml-2 text-primary-light`} />
+        <ExternalLinkIcon
+          className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+        />
       </div>
     </div>
   )

@@ -57,8 +57,8 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
               <ProposalTimeStatus proposal={proposal} />
             </div>
             {ProposalState[proposal.state] === 'Voting' && (
-              <div className="border-t border-fgd-4 flex flex-col md:flex-row mt-2 p-4">
-                <div className="pb-3 md:pb-0 md:border-r md:border-fgd-3 md:pr-4 w-full md:w-1/2">
+              <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">
+                <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-3 lg:pr-4 w-full lg:w-1/2">
                   <VoteResultsBar
                     approveVotePercentage={
                       relativeYesVotes ? relativeYesVotes : 0
@@ -66,7 +66,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
                     denyVotePercentage={relativeNoVotes ? relativeNoVotes : 0}
                   />
                 </div>
-                <div className="md:pl-4 w-full md:w-1/2">
+                <div className="lg:pl-4 w-full lg:w-1/2">
                   <ApprovalQuorum progress={yesVoteProgress} />
                 </div>
               </div>
