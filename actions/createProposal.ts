@@ -11,8 +11,9 @@ import { RpcContext, SYSTEM_PROGRAM_ID } from '../models/core/api'
 import { withInsertInstruction } from '@models/withInsertInstruction'
 import { InstructionData } from '@models/accounts'
 import { sendTransaction } from 'utils/send'
+import { withSignOffProposal } from '@models/withSignOffProposal'
 
-export const createProposalDraft = async (
+export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
   governance: PublicKey,
@@ -46,8 +47,7 @@ export const createProposalDraft = async (
     systemId
   )
 
-  // Add the proposal creator as the default signatory
-  await withAddSignatory(
+  const signatoryRecordAddress = await withAddSignatory(
     instructions,
     programId,
     proposalAddress,
@@ -73,6 +73,14 @@ export const createProposalDraft = async (
     )
   }
 
+  await withSignOffProposal(
+    instructions,
+    programId,
+    proposalAddress,
+    signatoryRecordAddress,
+    signatory
+  )
+
   const transaction = new Transaction()
   transaction.add(...instructions)
 
@@ -81,8 +89,8 @@ export const createProposalDraft = async (
     wallet,
     connection,
     signers,
-    sendingMessage: 'creating proposal draft',
-    successMessage: 'proposal draft created',
+    sendingMessage: 'creating proposal',
+    successMessage: 'proposal created',
   })
 
   return proposalAddress

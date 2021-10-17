@@ -18,12 +18,16 @@ const Input = ({
   disabled,
   prefix,
   suffix,
+  min,
+  max = Number.MAX_SAFE_INTEGER,
   ...props
 }: InputProps) => {
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {prefix ? <StyledPrefix>{prefix}</StyledPrefix> : null}
       <input
+        max={max}
+        min={min}
         type={type}
         value={value}
         onChange={onChange}

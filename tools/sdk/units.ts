@@ -37,3 +37,8 @@ export function getMintNaturalAmountFromDecimal(
 ) {
   return new BigNumber(decimalAmount).shiftedBy(decimals).toNumber()
 }
+
+// Calculates mint min amount as decimal
+export function getMintMinAmountAsDecimal(mint: MintInfo) {
+  return new BigNumber(1).shiftedBy(-mint.decimals).toNumber()
+}
