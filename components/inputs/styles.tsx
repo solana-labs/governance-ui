@@ -8,12 +8,13 @@ export const StyledPrefix = styled.div`
 export const StyledSuffix = styled.div`
   ${tw`absolute right-0 text-xs flex items-center pr-2 h-full bg-transparent text-fgd-4`}
 `
-export const inputClasses = ({ className, disabled, prefix }) => {
+export const inputClasses = ({ className, disabled, prefix, error }) => {
   return `${
     className ? className : ''
   } font-display px-2 py-2 w-full bg-bkg-1 rounded text-fgd-1 
-		border border-fgd-4 default-transition hover:border-primary-dark 
-		focus:border-primary-light focus:outline-none 
+		border default-transition hover:border-primary-dark 
+		${error ? 'border-red' : 'border-fgd-4'}
+		focus:border-primary-light focus:outline-none
 		${disabled ? 'cursor-not-allowed hover:border-fgd-4 text-fgd-3' : ''}
 		  ${prefix ? 'rounded-l-none' : ''}`
 }

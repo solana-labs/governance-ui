@@ -13,18 +13,19 @@ const Select = ({
   children,
   className = '',
   placeholder = '',
+  error = '',
   disabled = false,
   prefix = '',
 }) => {
   return (
     <>
-      {prefix ? <StyledPrefix>{prefix}</StyledPrefix> : null}
+      {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
       <div className={`relative ${className}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
           {({ open }) => (
             <>
               <Listbox.Button
-                className={inputClasses({ className, disabled, prefix })}
+                className={inputClasses({ className, disabled, prefix, error })}
               >
                 <StyledDiv
                   className={`flex items-center justify-between space-x-4 p-2 text-th-fgd-1`}
@@ -51,6 +52,7 @@ const Select = ({
           )}
         </Listbox>
       </div>
+      {error && <div className="text-red text-xs">{error}</div>}
     </>
   )
 }

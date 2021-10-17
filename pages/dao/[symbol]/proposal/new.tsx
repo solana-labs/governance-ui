@@ -21,6 +21,12 @@ import { PublicKey } from '@solana/web3.js'
 import { XCircleIcon } from '@heroicons/react/solid'
 import { InstructionData } from '@models/accounts'
 import { notify } from 'utils/notifications'
+import * as yup from 'yup'
+import { isFormValid } from 'utils/validation'
+
+const schema = yup.object().shape({
+  title: yup.string().required('Title is required'),
+})
 
 export enum Instructions {
   Transfer,
@@ -44,12 +50,14 @@ const New = () => {
     title: '',
     description: '',
   })
+  const [formErrors, setFormErrors] = useState({})
   const [instructions, setInstructions] = useState([
     { ...defaultInstructionModel, type: availabileInstructions[0] },
   ])
   const [sourceAccount, setSourceAccount] = useState(null)
 
   const handleSetForm = ({ propertyName, value }) => {
+    setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
   const setInstructionType = ({ value, idx }) => {
@@ -95,48 +103,54 @@ const New = () => {
   }
 
   const handleCreate = async (isDraft) => {
-    const holduptime = sourceAccount?.info?.minInstructionHoldUpTime || 0
-    const proposalIndex = sourceAccount?.info?.proposalCount
-    const rpcContext = new RpcContext(
-      new PublicKey(realm.account.owner.toString()),
-      wallet,
-      connection.current,
-      connection.endpoint
-    )
-    const instructionsData = instructions.map((x) =>
-      getInstructionDataFromBase64(x.serializedInstruction)
-    )
-    const params: [
-      rpc: RpcContext,
-      realm: PublicKey,
-      governance: PublicKey,
-      tokenOwnerRecord: PublicKey,
-      name: string,
-      descriptionLink: string,
-      governingTokenMint: PublicKey,
-      holdUpTime: number,
-      proposalIndex: number,
-      instructionsData: InstructionData[]
-    ] = [
-      rpcContext,
-      realm.pubkey,
-      sourceAccount.pubkey,
-      ownTokenRecord?.pubkey,
-      form.title,
-      form.description,
-      realm.info.communityMint,
-      holduptime,
-      proposalIndex,
-      instructionsData,
-    ]
-    try {
-      isDraft
-        ? await createProposalDraft(...params)
-        : await createProposal(...params)
-    } catch (ex) {
-      notify({ message: `${ex}` })
-    } finally {
-      console.log('done')
+    setFormErrors({})
+    const { isValid, validationErrors } = await isFormValid(schema, form)
+    if (isValid) {
+      const holduptime = sourceAccount?.info?.minInstructionHoldUpTime || 0
+      const proposalIndex = sourceAccount?.info?.proposalCount
+      const rpcContext = new RpcContext(
+        new PublicKey(realm.account.owner.toString()),
+        wallet,
+        connection.current,
+        connection.endpoint
+      )
+      const instructionsData = instructions.map((x) =>
+        getInstructionDataFromBase64(x.serializedInstruction)
+      )
+      const params: [
+        rpc: RpcContext,
+        realm: PublicKey,
+        governance: PublicKey,
+        tokenOwnerRecord: PublicKey,
+        name: string,
+        descriptionLink: string,
+        governingTokenMint: PublicKey,
+        holdUpTime: number,
+        proposalIndex: number,
+        instructionsData: InstructionData[]
+      ] = [
+        rpcContext,
+        realm.pubkey,
+        sourceAccount.pubkey,
+        ownTokenRecord?.pubkey,
+        form.title,
+        form.description,
+        realm.info.communityMint,
+        holduptime,
+        proposalIndex,
+        instructionsData,
+      ]
+      try {
+        isDraft
+          ? await createProposalDraft(...params)
+          : await createProposal(...params)
+      } catch (ex) {
+        notify({ message: `${ex}` })
+      } finally {
+        console.log('done')
+      }
+    } else {
+      setFormErrors(validationErrors)
     }
   }
 
@@ -160,6 +174,7 @@ const New = () => {
               prefix="Title"
               value={form.title}
               type="text"
+              error={formErrors['title']}
               onChange={(evt) =>
                 handleSetForm({
                   value: evt.target.value,
@@ -169,7 +184,7 @@ const New = () => {
             />
             <Textarea
               placeholder="Description or github gist link (optional)"
-              className="mb-5"
+              wrapperClassName="mb-5"
               prefix="Description"
               value={form.description}
               onChange={(evt) =>

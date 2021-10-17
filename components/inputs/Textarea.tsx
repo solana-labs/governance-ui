@@ -16,19 +16,21 @@ const TextareaProps = ({
   disabled,
   prefix,
   suffix,
+  error = '',
   ...props
 }: TextareaProps) => {
   return (
     <div className={`flex-col relative ${wrapperClassName}`}>
-      {prefix ? <StyledPrefix>{prefix}</StyledPrefix> : null}
+      {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
       <textarea
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, prefix })}
+        className={inputClasses({ className, disabled, prefix, error })}
         disabled={disabled}
         {...props}
       />
       {suffix ? <StyledSuffix>{suffix}</StyledSuffix> : null}
+      {error && <div className="text-red text-xs">{error}</div>}
     </div>
   )
 }

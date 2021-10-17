@@ -19,23 +19,25 @@ const Input = ({
   prefix,
   suffix,
   min,
+  error = '',
   max = Number.MAX_SAFE_INTEGER,
   ...props
 }: InputProps) => {
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
-      {prefix ? <StyledPrefix>{prefix}</StyledPrefix> : null}
+      {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
       <input
         max={max}
         min={min}
         type={type}
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, prefix })}
+        className={inputClasses({ className, disabled, prefix, error })}
         disabled={disabled}
         {...props}
       />
-      {suffix ? <StyledSuffix>{suffix}</StyledSuffix> : null}
+      {suffix && <StyledSuffix>{suffix}</StyledSuffix>}
+      {error && <div className="text-red text-xs">{error}</div>}
     </div>
   )
 }
