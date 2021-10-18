@@ -19,12 +19,12 @@ import useWalletStore from 'stores/useWalletStore'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { PublicKey } from '@solana/web3.js'
 import { XCircleIcon } from '@heroicons/react/solid'
-import { InstructionData } from '@models/accounts'
 import { notify } from 'utils/notifications'
 import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
 import {
+  createParams,
   Instruction,
   Instructions,
   SplTokenTransferRef,
@@ -39,18 +39,7 @@ const availabileInstructions = [
 const defaultInstructionComponentModel = {
   type: availabileInstructions[0],
 }
-type createParams = [
-  rpc: RpcContext,
-  realm: PublicKey,
-  governance: PublicKey,
-  tokenOwnerRecord: PublicKey,
-  name: string,
-  descriptionLink: string,
-  governingTokenMint: PublicKey,
-  holdUpTime: number,
-  proposalIndex: number,
-  instructionsData: InstructionData[]
-]
+
 const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
