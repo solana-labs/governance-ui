@@ -2,7 +2,6 @@ import { PublicKey } from '@solana/web3.js'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/solid'
 
 function getProposalStateLabel(state: ProposalState, hasVoteEnded: boolean) {
   switch (state) {

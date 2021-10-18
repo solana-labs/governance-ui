@@ -20,7 +20,7 @@ import useQueryContext from '../../../../hooks/useQueryContext'
 const Proposal = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol } = useRealm()
-  const { proposal, description, instructions, governance } = useProposal()
+  const { proposal, description, instructions } = useProposal()
   const {
     yesVoteProgress,
     yesVoteCount,
