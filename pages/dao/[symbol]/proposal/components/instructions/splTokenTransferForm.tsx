@@ -8,7 +8,7 @@ import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useRealm from '@hooks/useRealm'
 import { GovernanceAccountType } from '@models/accounts'
-import { Token } from '@solana/spl-token'
+import { AccountInfo, Token } from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimal,
@@ -21,18 +21,23 @@ import { isFormValid } from '@utils/formValidation'
 import { validateTokenAccountMint } from '@tools/validators/accounts/token'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import { tryGetTokenAccount, tryGetTokenMint } from '@utils/tokens'
+import {
+  ProgramAccount,
+  tryGetTokenAccount,
+  tryGetTokenMint,
+} from '@utils/tokens'
+import { Form, Instruction, SplTokenTransferRef } from '../types/types'
 
-const SplTokenTransferForm = forwardRef((props, ref) => {
+const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo, governances } = useRealm()
-  const programId = realmInfo?.programId
-  const [form, setForm] = useState({
+  const programId: PublicKey | undefined = realmInfo?.programId
+  const [form, setForm] = useState<Form>({
     destinationAccount: '',
     amount: 1,
-    sourceAccount: null,
+    sourceAccount: undefined,
     programId: programId?.toString(),
-    mintInfo: null,
+    mintInfo: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
   const governancesArray = Object.keys(governances).map(
@@ -55,19 +60,27 @@ const SplTokenTransferForm = forwardRef((props, ref) => {
       .test(
         'destinationAccount',
         "Account mint doesn't match source account",
-        async (val) => {
+        async (val: string) => {
           const pubkey = tryParseKey(val)
+          const governedAccount = form.sourceAccount?.info?.governedAccount
           try {
-            if (pubkey) {
-              const [destAccMint, sourceAccMint] = await Promise.all([
+            if (pubkey && governedAccount) {
+              const [destAccMint, sourceAccMint]: [
+                ProgramAccount<AccountInfo> | undefined,
+                ProgramAccount<AccountInfo> | undefined
+              ] = await Promise.all([
                 tryGetTokenAccount(connection.current, pubkey),
-                tryGetTokenAccount(
-                  connection.current,
-                  form.sourceAccount.info.governedAccount
-                ),
+                tryGetTokenAccount(connection.current, governedAccount),
               ])
-              validateTokenAccountMint(destAccMint, sourceAccMint.account.mint)
-              return true
+              if (destAccMint && sourceAccMint) {
+                validateTokenAccountMint(
+                  destAccMint,
+                  sourceAccMint?.account.mint
+                )
+                return true
+              } else {
+                return false
+              }
             }
           } catch (e) {
             return false
@@ -106,10 +119,10 @@ const SplTokenTransferForm = forwardRef((props, ref) => {
     setFormErrors(validationErrors)
     return isValid
   }
-  const getSerializedInstruction = async () => {
+  async function getSerializedInstruction() {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    if (isValid) {
+    if (isValid && programId && form.sourceAccount?.pubkey) {
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount,
         mintMinAmount
@@ -124,11 +137,12 @@ const SplTokenTransferForm = forwardRef((props, ref) => {
       )
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
-    return {
+    const obj: Instruction = {
       serializedInstruction,
       isValid,
       sourceAccount: form.sourceAccount,
     }
+    return obj
   }
 
   useEffect(() => {
@@ -139,11 +153,13 @@ const SplTokenTransferForm = forwardRef((props, ref) => {
   }, [realmInfo?.programId])
   useEffect(() => {
     async function tryGetTooknAccount() {
-      const mintResponse = await tryGetTokenMint(
-        connection.current,
-        form.sourceAccount?.info.governedAccount
-      )
-      setMintInfo(mintResponse.account)
+      if (form.sourceAccount?.info.governedAccount) {
+        const mintResponse = await tryGetTokenMint(
+          connection.current,
+          form.sourceAccount?.info.governedAccount
+        )
+        setMintInfo(mintResponse?.account)
+      }
     }
     if (form.sourceAccount?.info.governedAccount) {
       tryGetTooknAccount()

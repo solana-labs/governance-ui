@@ -10,6 +10,7 @@ const NewBtn = () => {
   const { symbol, ownTokenRecord, realm } = useRealm()
   const canCreateProposal =
     ownTokenRecord &&
+    realm &&
     ownTokenRecord.info.governingTokenDepositAmount.cmp(
       new BN(realm.info.config.minCommunityTokensToCreateGovernance)
     ) >= 0

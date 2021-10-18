@@ -2,8 +2,8 @@ import styled from '@emotion/styled'
 import tw from 'twin.macro'
 
 export const StyledPrefix = styled.div`
-  ${tw`flex items-center justify-end p-2 border border-r-0 
-  border-primary-light bg-bkg-2 h-full text-xs rounded rounded-r-none w-14 text-right`}
+  ${tw`flex items-center justify-start p-2 
+  border-primary-light bg-bkg-2 h-full text-xs rounded rounded-r-none text-right`}
 `
 export const StyledSuffix = styled.div`
   ${tw`absolute right-0 text-xs flex items-center pr-2 h-full bg-transparent text-fgd-4`}

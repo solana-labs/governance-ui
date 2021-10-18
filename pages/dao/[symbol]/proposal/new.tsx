@@ -22,12 +22,14 @@ import { XCircleIcon } from '@heroicons/react/solid'
 import { InstructionData } from '@models/accounts'
 import { notify } from 'utils/notifications'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
+import {
+  Instruction,
+  Instructions,
+  SplTokenTransferRef,
+} from './components/types/types'
 
-export enum Instructions {
-  Transfer,
-}
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -49,9 +51,8 @@ type createParams = [
   proposalIndex: number,
   instructionsData: InstructionData[]
 ]
-
 const New = () => {
-  const refs = useRef([])
+  const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol, realm, ownTokenRecord } = useRealm()
@@ -94,9 +95,10 @@ const New = () => {
     ])
   }
   const getInstructions = async () => {
-    const instructions = []
-    for (const inst of refs.current) {
-      const instruction = await inst?.getSerializedInstruction()
+    const instructions: Instruction[] = []
+    const instRefs: SplTokenTransferRef[] = refs.current
+    for (const inst of instRefs) {
+      const instruction: Instruction = await inst?.getSerializedInstruction()
       instructions.push(instruction)
     }
     return instructions
@@ -104,11 +106,23 @@ const New = () => {
   const handleCreate = async (isDraft) => {
     setFormErrors({})
 
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    const instructions = await getInstructions()
-    let proposalAddress = null
-    if (isValid && instructions.every((x) => x.isValid)) {
+    const { isValid, validationErrors }: formValidation = await isFormValid(
+      schema,
+      form
+    )
+    const instructions: Instruction[] = await getInstructions()
+    let proposalAddress: PublicKey | null = null
+    if (!realm) {
+      throw 'no realm selected'
+    }
+    if (isValid && instructions.every((x: Instruction) => x.isValid)) {
       const sourceAccount = instructions[0].sourceAccount
+      if (!sourceAccount) {
+        throw 'no source account selected'
+      }
+      if (!ownTokenRecord) {
+        throw 'no own token record found'
+      }
       const rpcContext = new RpcContext(
         new PublicKey(realm.account.owner.toString()),
         wallet,

@@ -1,3 +1,8 @@
+export interface formValidation {
+  isValid: boolean
+  validationErrors: any
+}
+
 export const isFormValid = async (schema, formValues) => {
   const values = {
     isValid: false,
