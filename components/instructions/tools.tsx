@@ -88,7 +88,8 @@ export const INSTRUCTION_DESCRIPTORS = {
         )
         const tokenMint = await tryGetMint(
           connection,
-          tokenAccount?.account.mint
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          tokenAccount!.account.mint
         )
 
         // TokenTransfer instruction layout

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FunctionComponent, useState } from 'react'
 import { postChatMessage } from '../actions/chat/postMessage'
 import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
@@ -41,7 +42,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      proposal!.account.owner,
       wallet,
       connection.current,
       connection.endpoint
@@ -55,15 +56,15 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     try {
       await castVote(
         rpcContext,
-        realm.pubkey,
-        proposal,
+        realm!.pubkey,
+        proposal!,
         voterTokenRecord.pubkey,
         vote
       )
       if (comment) {
         await postChatMessage(
           rpcContext,
-          proposal,
+          proposal!,
           voterTokenRecord.pubkey,
           msg
         )
@@ -77,9 +78,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       onClose()
     }
 
-    fetchChatMessages(proposal.pubkey)
+    fetchChatMessages(proposal!.pubkey)
     fetchVoteRecords(proposal)
-    await fetchRealm(realmInfo.programId, realmInfo.realmId)
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const voteString = vote === 0 ? 'Approve' : 'Deny'
@@ -88,8 +89,8 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     <Modal onClose={onClose} isOpen={isOpen}>
       <h2>Confirm your vote</h2>
       <Tooltip content="This will be stored on-chain and displayed publically in the discussion on this proposal">
-        <label className="border-b border-dashed border-fgd-3 inline-block leading-4 text-fgd-1 hover:cursor-help hover:border-b-0">
-          Care to comment on your decision?
+        <label className="border-b border-dashed border-fgd-3 inline-block leading-4 text-fgd-1 text-sm hover:cursor-help hover:border-b-0">
+          Leave a comment
         </label>
         <span className="ml-1 text-xs text-fgd-3">(Optional)</span>
       </Tooltip>

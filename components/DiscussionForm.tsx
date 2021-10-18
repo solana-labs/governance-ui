@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState } from 'react'
 import Button from './Button'
 import Input from './inputs/Input'
@@ -24,7 +25,7 @@ const DiscussionForm = () => {
     setSubmitting(true)
 
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      proposal!.account.owner,
       wallet,
       connection.current,
       connection.endpoint
@@ -36,7 +37,8 @@ const DiscussionForm = () => {
     })
 
     try {
-      await postChatMessage(rpcContext, proposal, ownTokenRecord.pubkey, msg)
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      await postChatMessage(rpcContext, proposal!, ownTokenRecord!.pubkey, msg)
       setComment('')
     } catch {
       //TODO: How do we present transaction errors to users? Just the notification?
@@ -44,7 +46,7 @@ const DiscussionForm = () => {
       setSubmitting(false)
     }
 
-    fetchChatMessages(proposal.pubkey)
+    fetchChatMessages(proposal!.pubkey)
   }
 
   const postEnabled =
@@ -55,16 +57,17 @@ const DiscussionForm = () => {
 
   return (
     <>
-      <div className="flex space-x-4">
+      <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
         <Input
           value={comment}
           type="text"
           onChange={(e) => setComment(e.target.value)}
+          placeholder="Thoughts?..."
         />
         <Button
           className="flex-shrink-0"
           onClick={() => submitComment()}
-          disabled={!postEnabled}
+          disabled={!postEnabled || !comment}
         >
           {submitting ? <Loading /> : <span>Send It</span>}
         </Button>

@@ -14,7 +14,8 @@ class TransactionError extends Error {
   public txid: string
   constructor(message: string, txid?: string) {
     super(message)
-    this.txid = txid
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    this.txid = txid!
   }
 }
 

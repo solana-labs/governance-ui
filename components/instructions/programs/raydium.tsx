@@ -51,10 +51,11 @@ const RAYDIUM_AMM_INSTRUCTIONS = {
           <>
             <p>
               maxCoinAmount:{' '}
-              {fmtMintAmount(poolCoinMint.account, args.maxCoinAmount)}
+              {fmtMintAmount(poolCoinMint?.account, args.maxCoinAmount)}
             </p>
             <p>
-              maxPcAmount: {fmtMintAmount(poolPcMint.account, args.maxPcAmount)}
+              maxPcAmount:{' '}
+              {fmtMintAmount(poolPcMint?.account, args.maxPcAmount)}
             </p>
             <p>fixedFromCoin: {args.fixedFromCoin}</p>
           </>
@@ -96,7 +97,7 @@ const RAYDIUM_STAKING_INSTRUCTIONS = {
 
         return (
           <>
-            <p>amount: {fmtMintAmount(lpTokenMint.account, args.amount)}</p>
+            <p>amount: {fmtMintAmount(lpTokenMint?.account, args.amount)}</p>
           </>
         )
       },

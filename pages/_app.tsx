@@ -34,7 +34,7 @@ function App({ Component, pageProps }) {
         <title>{title}</title>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=PT+Mono&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap"
           rel="stylesheet"
         />
 

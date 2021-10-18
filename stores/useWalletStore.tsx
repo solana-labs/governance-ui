@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import create, { State } from 'zustand'
 import produce from 'immer'
 import { Connection, PublicKey } from '@solana/web3.js'
@@ -60,9 +61,9 @@ interface WalletStore extends State {
     }
   }
   selectedProposal: {
-    proposal: ParsedAccount<Proposal>
-    governance: ParsedAccount<Governance>
-    realm: ParsedAccount<Realm>
+    proposal: ParsedAccount<Proposal> | undefined
+    governance: ParsedAccount<Governance> | undefined
+    realm: ParsedAccount<Realm> | undefined
     instructions: { [instruction: string]: ParsedAccount<ProposalInstruction> }
     voteRecordsByVoter: { [voter: string]: ParsedAccount<VoteRecord> }
     signatories: { [signatory: string]: ParsedAccount<VoteRecord> }
@@ -96,12 +97,12 @@ function merge(...os) {
 
 export async function getVoteRecordsByProposal(
   programId: PublicKey,
-  endoint: string,
+  endpoint: string,
   voter: PublicKey
 ) {
   return getGovernanceAccounts<VoteRecord>(
     programId,
-    endoint,
+    endpoint,
     VoteRecord,
     getAccountTypes(VoteRecord),
     [pubkeyFilter(33, voter)]
@@ -148,16 +149,16 @@ export const ENDPOINTS: EndpointInfo[] = [
 
 const ENDPOINT = ENDPOINTS.find((e) => e.name === 'mainnet')
 const INITIAL_CONNECTION_STATE = {
-  cluster: ENDPOINT.name,
-  current: new Connection(ENDPOINT.url, 'recent'),
-  endpoint: ENDPOINT.url,
+  cluster: ENDPOINT!.name,
+  current: new Connection(ENDPOINT!.url, 'recent'),
+  endpoint: ENDPOINT!.url,
 }
 
 const INITIAL_REALM_STATE = {
-  realm: null,
-  mint: null,
-  programId: null,
-  councilMint: null,
+  realm: undefined,
+  mint: undefined,
+  programId: undefined,
+  councilMint: undefined,
   governances: {},
   proposals: {},
   proposalDescriptions: {},
@@ -167,22 +168,22 @@ const INITIAL_REALM_STATE = {
 }
 
 const INITIAL_PROPOSAL_STATE = {
-  proposal: null,
-  governance: null,
-  realm: null,
+  proposal: undefined,
+  governance: undefined,
+  realm: undefined,
   instructions: {},
   voteRecordsByVoter: {},
   signatories: {},
   chatMessages: {},
-  description: null,
-  proposalMint: null,
+  description: undefined,
+  proposalMint: undefined,
   loading: true,
 }
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
   connection: INITIAL_CONNECTION_STATE,
-  current: null,
+  current: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
@@ -282,7 +283,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.mints = Object.fromEntries(
-          mints.map((m) => [m.publicKey.toBase58(), m.account])
+          mints.map((m) => [m!.publicKey.toBase58(), m!.account])
         )
       })
 
@@ -300,7 +301,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realmMint = mints[realmMintPk.toBase58()]
 
       const realmCouncilMintPk = realm.info.config.councilMint
-      const realmCouncilMint = mints[realmCouncilMintPk?.toBase58()]
+      const realmCouncilMint =
+        realmCouncilMintPk && mints[realmCouncilMintPk.toBase58()]
 
       const set = get().set
 
