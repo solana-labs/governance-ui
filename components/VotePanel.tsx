@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
@@ -25,8 +26,10 @@ const VotePanel = () => {
   const connection = useWalletStore((s) => s.connection)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
-  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal)
-  const ownVoteRecord = voteRecordsByVoter[wallet?.publicKey?.toBase58()]
+  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
+
+  const ownVoteRecord =
+    wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
   const voterTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -48,16 +51,16 @@ const VotePanel = () => {
     connected &&
     ownVoteRecord &&
     !ownVoteRecord?.info.isRelinquished &&
-    (proposal.info.state === ProposalState.Voting ||
-      proposal.info.state === ProposalState.Completed ||
-      proposal.info.state === ProposalState.Cancelled ||
-      proposal.info.state === ProposalState.Succeeded ||
-      proposal.info.state === ProposalState.Executing ||
-      proposal.info.state === ProposalState.Defeated)
+    (proposal!.info.state === ProposalState.Voting ||
+      proposal!.info.state === ProposalState.Completed ||
+      proposal!.info.state === ProposalState.Cancelled ||
+      proposal!.info.state === ProposalState.Succeeded ||
+      proposal!.info.state === ProposalState.Executing ||
+      proposal!.info.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      proposal!.account.owner,
       wallet,
       connection.current,
       connection.endpoint
@@ -65,9 +68,10 @@ const VotePanel = () => {
     try {
       await relinquishVote(
         rpcContext,
-        proposal,
-        voterTokenRecord.pubkey,
-        ownVoteRecord.pubkey
+        proposal!,
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        voterTokenRecord!.pubkey,
+        ownVoteRecord!.pubkey
       )
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
@@ -126,8 +130,8 @@ const VotePanel = () => {
         <VoteCommentModal
           isOpen={showVoteModal}
           onClose={handleCloseShowVoteModal}
-          vote={vote}
-          voterTokenRecord={voterTokenRecord}
+          vote={vote!}
+          voterTokenRecord={voterTokenRecord!}
         />
       ) : null}
     </div>

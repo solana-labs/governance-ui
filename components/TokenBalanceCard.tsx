@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { MintInfo } from '@solana/spl-token'
 import {
   Account,
@@ -125,8 +126,8 @@ const TokenDeposit = ({
     const transferAuthority = approveTokenTransfer(
       instructions,
       [],
-      depositTokenAccount.publicKey,
-      wallet.publicKey,
+      depositTokenAccount!.publicKey,
+      wallet!.publicKey!,
       amount
     )
 
@@ -134,13 +135,13 @@ const TokenDeposit = ({
 
     await withDepositGoverningTokens(
       instructions,
-      realmInfo.programId,
-      realm.pubkey,
-      depositTokenAccount.publicKey,
-      depositTokenAccount.account.mint,
-      wallet.publicKey,
+      realmInfo!.programId,
+      realm!.pubkey,
+      depositTokenAccount!.publicKey,
+      depositTokenAccount!.account.mint,
+      wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet.publicKey,
+      wallet!.publicKey!,
       TOKEN_PROGRAM_ID,
       SystemProgram.programId
     )
@@ -158,21 +159,21 @@ const TokenDeposit = ({
     })
 
     await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo.programId, realmInfo.realmId)
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount.account.amount)
+    await depositTokens(depositTokenAccount!.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
 
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
-    if (depositTokenRecord.info.unrelinquishedVotesCount > 0) {
+    if (depositTokenRecord!.info!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(
-        realmInfo.programId,
+        realmInfo!.programId,
         endpoint,
-        depositTokenRecord.info.governingTokenOwner
+        depositTokenRecord!.info!.governingTokenOwner
       )
 
       for (const voteRecord of Object.values(voteRecords)) {
@@ -197,25 +198,25 @@ const TokenDeposit = ({
         // As a temp. work around I'm leaving the 'Release Tokens' button on finalized Proposal to make it possible to release the tokens from one Proposal at a time
         withRelinquishVote(
           instructions,
-          realmInfo.programId,
+          realmInfo!.programId,
           proposal.info.governance,
           proposal.pubkey,
-          depositTokenRecord.pubkey,
+          depositTokenRecord!.pubkey,
           proposal.info.governingTokenMint,
           voteRecord.pubkey,
-          depositTokenRecord.info.governingTokenOwner,
-          wallet.publicKey
+          depositTokenRecord!.info.governingTokenOwner,
+          wallet!.publicKey
         )
       }
     }
 
     await withWithdrawGoverningTokens(
       instructions,
-      realmInfo.programId,
-      realm.pubkey,
-      depositTokenAccount.publicKey,
-      depositTokenRecord.info.governingTokenMint,
-      wallet.publicKey,
+      realmInfo!.programId,
+      realm!.pubkey,
+      depositTokenAccount!.publicKey,
+      depositTokenRecord!.info.governingTokenMint,
+      wallet!.publicKey!,
       TOKEN_PROGRAM_ID
     )
 
@@ -232,7 +233,7 @@ const TokenDeposit = ({
       })
 
       await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo.programId, realmInfo.realmId)
+      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (ex) {
       console.error("Can't withdraw tokens", ex)
     }

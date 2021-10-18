@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { FunctionComponent, useState } from 'react'
 import { postChatMessage } from '../actions/chat/postMessage'
 import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
@@ -41,7 +42,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      proposal!.account.owner,
       wallet,
       connection.current,
       connection.endpoint
@@ -55,15 +56,15 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     try {
       await castVote(
         rpcContext,
-        realm.pubkey,
-        proposal,
+        realm!.pubkey,
+        proposal!,
         voterTokenRecord.pubkey,
         vote
       )
       if (comment) {
         await postChatMessage(
           rpcContext,
-          proposal,
+          proposal!,
           voterTokenRecord.pubkey,
           msg
         )
@@ -77,9 +78,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       onClose()
     }
 
-    fetchChatMessages(proposal.pubkey)
+    fetchChatMessages(proposal!.pubkey)
     fetchVoteRecords(proposal)
-    await fetchRealm(realmInfo.programId, realmInfo.realmId)
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const voteString = vote === 0 ? 'Approve' : 'Deny'

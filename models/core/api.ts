@@ -11,7 +11,7 @@ export const SYSTEM_PROGRAM_ID = new PublicKey(
 )
 
 export interface IWallet {
-  publicKey: PublicKey
+  publicKey: PublicKey | undefined
 }
 
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
@@ -68,10 +68,8 @@ export class MemcmpFilter {
   }
 }
 
-export const pubkeyFilter = (
-  offset: number,
-  pubkey: PublicKey | undefined | null
-) => (!pubkey ? undefined : new MemcmpFilter(offset, pubkey.toBuffer()))
+export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
+  new MemcmpFilter(offset, pubkey.toBuffer())
 
 export const booleanFilter = (offset: number, value: boolean) =>
   new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]))

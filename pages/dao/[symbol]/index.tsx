@@ -25,8 +25,10 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 
 const REALM = () => {
   const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
-  const [filters, setFilters] = useState([])
-  const [displayedProposals, setDisplayedProposals] = useState([])
+  const [filters, setFilters] = useState<ProposalState[]>([])
+  const [displayedProposals, setDisplayedProposals] = useState(
+    Object.entries(proposals)
+  )
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const wallet = useWalletStore((s) => s.current)
 
@@ -42,7 +44,7 @@ const REALM = () => {
   useEffect(() => {
     if (filters.length > 0) {
       const proposals = displayedProposals.filter(
-        ([, v]) => !filters.includes(ProposalState[v.info.state])
+        ([, v]) => !filters.includes(v.info.state)
       )
       setFilteredProposals(proposals)
     } else {
@@ -58,7 +60,7 @@ const REALM = () => {
 
   console.log(
     'governance page wallet',
-    wallet?.connected && wallet.publicKey.toBase58()
+    wallet?.connected && wallet?.publicKey?.toBase58()
   )
 
   console.log(

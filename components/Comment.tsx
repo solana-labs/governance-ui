@@ -61,7 +61,7 @@ const Comment = ({
             <span className="pl-2 text-xs">
               {`${fmtTokenAmount(
                 voteRecord.getVoteWeight(),
-                mint.decimals
+                mint?.decimals
               ).toLocaleString()} ${symbol}`}
             </span>
           </div>

@@ -42,7 +42,9 @@ export function VoteCountdown({
 
       let timeToVoteEnd = proposal.isPreVotingState()
         ? governance.config.maxVotingTime
-        : proposal.votingAt?.toNumber() + governance.config.maxVotingTime - now
+        : (proposal.votingAt?.toNumber() ?? 0) +
+          governance.config.maxVotingTime -
+          now
 
       if (timeToVoteEnd <= 0) {
         return ZeroCountdown

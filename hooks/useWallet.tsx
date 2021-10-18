@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect, useMemo } from 'react'
 
 import { WalletAdapter } from '../@types/types'
@@ -74,9 +75,9 @@ export default function useWallet() {
         message: 'Wallet connected',
         description:
           'Connected to wallet ' +
-          wallet.publicKey.toString().substr(0, 5) +
+          wallet!.publicKey!.toString().substr(0, 5) +
           '...' +
-          wallet.publicKey.toString().substr(-5),
+          wallet!.publicKey!.toString().substr(-5),
       })
       await actions.fetchWalletTokenAccounts()
       await actions.fetchOwnVoteRecords()

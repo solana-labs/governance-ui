@@ -16,7 +16,8 @@ export default function InspectorButton({
   const showInspector = async () => {
     const result = await dryRunInstruction(
       connection.current,
-      wallet,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      wallet!,
       instructionData
     )
 
