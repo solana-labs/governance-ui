@@ -88,6 +88,10 @@ async function runNotifier() {
       // proposal opened in last 5 mins
       nowInSeconds - proposal.info.votingAt.toNumber() <=
       fiveMinutesSeconds + toleranceSeconds
+      // proposal opened in last 24 hrs - useful to notify when bot recently stopped working
+      // and missed the 5 min window
+      // (nowInSeconds - proposal.info.votingAt.toNumber())/(60 * 60) <=
+      // 24
     ) {
       countJustOpenedForVoting++
       const msg = `“${proposal.info.name}” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/MNGO/proposal/${k}`

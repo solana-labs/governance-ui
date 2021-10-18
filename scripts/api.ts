@@ -70,8 +70,13 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     )
   }
 
-  const all = await Promise.all(
-    accountTypes.map((at) =>
+  const promises = []
+  // workaround for preventing getting rate limited by public node
+  // 1/ for of instead of map +
+  // 2/ sleep a bit
+  for (const at of accountTypes) {
+    await new Promise((r) => setTimeout(r, 3000))
+    promises.push(
       getGovernanceAccountsImpl<TAccount>(
         programId,
         endpoint,
@@ -80,7 +85,9 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
         filters
       )
     )
-  )
+  }
+
+  const all = await Promise.all(promises)
 
   return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
     string,
