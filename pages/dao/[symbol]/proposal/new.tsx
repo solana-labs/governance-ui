@@ -8,7 +8,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Button from '@components/Button'
 import SplTokenTransferForm from '../proposal/components/instructions/splTokenTransferForm'
 import MinimumApprovalTreshold from './components/MinimumApprovalTreshold'
@@ -22,25 +22,35 @@ import { XCircleIcon } from '@heroicons/react/solid'
 import { InstructionData } from '@models/accounts'
 import { notify } from 'utils/notifications'
 import * as yup from 'yup'
-import { isFormValid } from 'utils/validation'
-
-const schema = yup.object().shape({
-  title: yup.string().required('Title is required'),
-})
+import { isFormValid } from '@utils/formValidation'
 
 export enum Instructions {
   Transfer,
 }
+const schema = yup.object().shape({
+  title: yup.string().required('Title is required'),
+})
 const availabileInstructions = [
-  { id: Instructions.Transfer, name: 'Spl-Token Transfer' },
+  { id: Instructions.Transfer, name: 'Token Transfer' },
+]
+const defaultInstructionComponentModel = {
+  type: availabileInstructions[0],
+}
+type createParams = [
+  rpc: RpcContext,
+  realm: PublicKey,
+  governance: PublicKey,
+  tokenOwnerRecord: PublicKey,
+  name: string,
+  descriptionLink: string,
+  governingTokenMint: PublicKey,
+  holdUpTime: number,
+  proposalIndex: number,
+  instructionsData: InstructionData[]
 ]
 
-const defaultInstructionModel = {
-  type: availabileInstructions[0],
-  serializedInstruction: '',
-}
-
 const New = () => {
+  const refs = useRef([])
   const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol, realm, ownTokenRecord } = useRealm()
   const { proposal } = useProposal()
@@ -51,10 +61,9 @@ const New = () => {
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [instructions, setInstructions] = useState([
-    { ...defaultInstructionModel, type: availabileInstructions[0] },
+  const [instructionsComponents, setInstructions] = useState([
+    { ...defaultInstructionComponentModel, type: availabileInstructions[0] },
   ])
-  const [sourceAccount, setSourceAccount] = useState(null)
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -66,48 +75,36 @@ const New = () => {
     }
     setInstructionChangeAtIndex({ newModel: newInstruction, idx })
   }
-  const handleSetInstructionForm = ({ serializedInstruction, idx }) => {
-    const newInstruction = {
-      ...instructions[idx],
-      serializedInstruction,
-    }
-    setInstructionChangeAtIndex({ newModel: newInstruction, idx })
-  }
   const setInstructionChangeAtIndex = ({ newModel, idx }) => {
-    const newInstructions = [...instructions]
+    const newInstructions = [...instructionsComponents]
     newInstructions[idx] = newModel
     setInstructions(newInstructions)
   }
-  const onInstructionFormUpdate = ({ serializedInstruction, idx }) => {
-    handleSetInstructionForm({ serializedInstruction, idx })
-  }
   const addInstruction = () => {
-    setInstructions([...instructions, defaultInstructionModel])
+    setInstructions([
+      ...instructionsComponents,
+      defaultInstructionComponentModel,
+    ])
   }
   const removeInstruction = (idx) => {
-    setInstructions([...instructions.filter((x, index) => index !== idx)])
+    setInstructions([
+      ...instructionsComponents.filter((x, index) => index !== idx),
+    ])
   }
-
-  const returnCurrentInstruction = ({ typeId, idx }) => {
-    const props = {
-      onChange: (serializedInstruction) =>
-        onInstructionFormUpdate({ serializedInstruction, idx }),
-      onSourceAccountChange: (sourceAccount) => setSourceAccount(sourceAccount),
+  const getInstructions = async () => {
+    const instructions = []
+    for (const inst of refs.current) {
+      const instruction = await inst?.getSerializedInstruction()
+      instructions.push(instruction)
     }
-    switch (typeId) {
-      case Instructions.Transfer:
-        return <SplTokenTransferForm {...props}></SplTokenTransferForm>
-      default:
-        null
-    }
+    return instructions
   }
-
   const handleCreate = async (isDraft) => {
     setFormErrors({})
     const { isValid, validationErrors } = await isFormValid(schema, form)
-    if (isValid) {
-      const holduptime = sourceAccount?.info?.minInstructionHoldUpTime || 0
-      const proposalIndex = sourceAccount?.info?.proposalCount
+    const instructions = await getInstructions()
+    if (isValid && instructions.every((x) => x.isValid)) {
+      const sourceAccount = instructions[0].sourceAccount
       const rpcContext = new RpcContext(
         new PublicKey(realm.account.owner.toString()),
         wallet,
@@ -117,18 +114,7 @@ const New = () => {
       const instructionsData = instructions.map((x) =>
         getInstructionDataFromBase64(x.serializedInstruction)
       )
-      const params: [
-        rpc: RpcContext,
-        realm: PublicKey,
-        governance: PublicKey,
-        tokenOwnerRecord: PublicKey,
-        name: string,
-        descriptionLink: string,
-        governingTokenMint: PublicKey,
-        holdUpTime: number,
-        proposalIndex: number,
-        instructionsData: InstructionData[]
-      ] = [
+      const params: createParams = [
         rpcContext,
         realm.pubkey,
         sourceAccount.pubkey,
@@ -136,8 +122,8 @@ const New = () => {
         form.title,
         form.description,
         realm.info.communityMint,
-        holduptime,
-        proposalIndex,
+        sourceAccount?.info?.minInstructionHoldUpTime,
+        sourceAccount?.info?.proposalCount,
         instructionsData,
       ]
       try {
@@ -145,12 +131,30 @@ const New = () => {
           ? await createProposalDraft(...params)
           : await createProposal(...params)
       } catch (ex) {
-        notify({ message: `${ex}` })
+        notify({ type: 'error', message: `${ex}` })
       } finally {
-        console.log('done')
+        notify({
+          message: isDraft
+            ? 'Creating proposal draft success'
+            : 'Creating proposal success',
+        })
       }
     } else {
       setFormErrors(validationErrors)
+    }
+  }
+
+  const returnCurrentInstruction = ({ typeId, idx }) => {
+    const props = {
+      ref: (element) => {
+        refs.current[idx] = element
+      },
+    }
+    switch (typeId) {
+      case Instructions.Transfer:
+        return <SplTokenTransferForm {...props}></SplTokenTransferForm>
+      default:
+        null
     }
   }
 
@@ -194,7 +198,7 @@ const New = () => {
                 })
               }
             ></Textarea>
-            {instructions.map((instruction, idx) => (
+            {instructionsComponents.map((instruction, idx) => (
               <div key={idx} className="mb-5 border border-bkg-3 p-5">
                 {idx !== 0 && (
                   <XCircleIcon

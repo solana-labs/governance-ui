@@ -6,9 +6,7 @@ import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
 import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
-import Link from 'next/link'
-import useQueryContext from '../../../hooks/useQueryContext'
-import { Disclosure } from '@headlessui/react'
+import NewBtn from './proposal/components/NewBtn'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -27,8 +25,7 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 }
 
 const REALM = () => {
-  const { generateUrlWithClusterParam } = useQueryContext()
-  const { proposals, realmTokenAccount, ownTokenRecord, symbol } = useRealm()
+  const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
   const [filters, setFilters] = useState([])
   const [displayedProposals, setDisplayedProposals] = useState([])
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
@@ -78,19 +75,7 @@ const REALM = () => {
           <div className="flex items-center justify-between pb-2">
             <h4>{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
-              <Disclosure as="div" className="mr-5">
-                <Disclosure.Button
-                  className={`border border-fgd-4 default-transition font-normal pl-3 pr-3 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
-                >
-                  <Link
-                    href={generateUrlWithClusterParam(
-                      `/dao/${symbol}/proposal/new`
-                    )}
-                  >
-                    + New
-                  </Link>
-                </Disclosure.Button>
-              </Disclosure>
+              <NewBtn></NewBtn>
               <ProposalFilter filters={filters} setFilters={setFilters} />
             </div>
           </div>

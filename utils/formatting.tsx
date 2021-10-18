@@ -19,3 +19,14 @@ export function abbreviateAddress(address: PublicKey, size = 5) {
   const base58 = address.toBase58()
   return base58.slice(0, size) + '…' + base58.slice(-size)
 }
+
+export function precision(a) {
+  if (!isFinite(a)) return 0
+  let e = 1,
+    p = 0
+  while (Math.round(a * e) / e !== a) {
+    e *= 10
+    p++
+  }
+  return p
+}

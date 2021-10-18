@@ -1,6 +1,7 @@
 // Copied from Explorer code https://github.com/solana-labs/solana/blob/master/explorer/src/validators/accounts/token.ts
 
-import { ParsedAccountData, AccountInfo, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
+import { ProgramAccount, TokenAccount } from '@utils/tokens'
 import {
   Infer,
   number,
@@ -9,7 +10,6 @@ import {
   boolean,
   string,
   type,
-  create,
 } from 'superstruct'
 import { PublicKeyFromString } from '../pubkey'
 
@@ -35,23 +35,11 @@ export const TokenAccountInfo = type({
   closeAuthority: optional(PublicKeyFromString),
 })
 
-export function validateTokenAccount(
-  info: AccountInfo<Buffer | ParsedAccountData>,
+export function validateTokenAccountMint(
+  tokenAccount: ProgramAccount<TokenAccount>,
   mint: PublicKey | undefined
 ) {
-  if (!('parsed' in info.data && info.data.program === 'spl-token')) {
-    throw new Error('Invalid spl token account')
-  }
-
-  let tokenAccount: TokenAccountInfo
-
-  try {
-    tokenAccount = create(info.data.parsed.info, TokenAccountInfo)
-  } catch {
-    throw new Error('Invalid spl token account')
-  }
-
-  if (mint && tokenAccount.mint.toBase58() !== mint.toBase58()) {
+  if (mint && tokenAccount.account.mint.toBase58() !== mint.toBase58()) {
     throw new Error("Account mint doesn't match source account")
   }
 }

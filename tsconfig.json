@@ -18,7 +18,8 @@
       "@components/*": ["components/*"],
       "@hooks/*": ["hooks/*"],
       "@tools/*": ["tools/*"],
-      "@models/*": ["models/*"]
+      "@models/*": ["models/*"],
+      "@utils/*": ["utils/*"]
     }
   },
   "exclude": ["node_modules", ".next", "out"],

@@ -21,6 +21,7 @@ const Input = ({
   min,
   error = '',
   max = Number.MAX_SAFE_INTEGER,
+  step,
   ...props
 }: InputProps) => {
   return (
@@ -34,6 +35,7 @@ const Input = ({
         onChange={onChange}
         className={inputClasses({ className, disabled, prefix, error })}
         disabled={disabled}
+        step={step}
         {...props}
       />
       {suffix && <StyledSuffix>{suffix}</StyledSuffix>}
