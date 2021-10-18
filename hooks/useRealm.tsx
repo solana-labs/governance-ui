@@ -38,7 +38,9 @@ export default function useRealm() {
 
   const ownTokenRecord = useMemo(
     () =>
-      wallet?.connected ? tokenRecords[wallet.publicKey.toBase58()] : undefined,
+      wallet?.connected && wallet.publicKey
+        ? tokenRecords[wallet.publicKey.toBase58()]
+        : undefined,
     [tokenRecords, wallet, connected]
   )
 
@@ -56,7 +58,7 @@ export default function useRealm() {
 
   const ownCouncilTokenRecord = useMemo(
     () =>
-      wallet?.connected && councilMint
+      wallet?.connected && councilMint && wallet.publicKey
         ? councilTokenOwnerRecords[wallet.publicKey.toBase58()]
         : undefined,
     [tokenRecords, wallet, connected]

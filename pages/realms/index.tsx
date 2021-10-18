@@ -19,7 +19,7 @@ const Realms = () => {
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
-  const [realms, setRealms] = useState([])
+  const [realms, setRealms] = useState<RealmInfo[]>([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSerach] = useState('')
   //   const [viewType, setViewType] = useState(ROW)

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
@@ -105,8 +106,8 @@ const Proposal = () => {
           <div className="border-t border-fgd-4 p-4 md:p-6 w-full">
             <div className="pb-4">
               <VoteResultsBar
-                approveVotePercentage={relativeYesVotes}
-                denyVotePercentage={relativeNoVotes}
+                approveVotePercentage={relativeYesVotes!}
+                denyVotePercentage={relativeNoVotes!}
               />
             </div>
             <ApprovalQuorum progress={yesVoteProgress} />

@@ -41,7 +41,8 @@ export async function tryGetMint(
 ): Promise<ProgramAccount<MintAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
-    const data = Buffer.from(result.data)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const data = Buffer.from(result!.data)
     const account = parseMintAccountData(data)
     return {
       publicKey,
@@ -55,10 +56,11 @@ export async function tryGetMint(
 export async function tryGetTokenAccount(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<TokenAccount>> {
+): Promise<ProgramAccount<TokenAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
-    const data = Buffer.from(result.data)
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const data = Buffer.from(result!.data)
     const account = parseTokenAccountData(publicKey, data)
     return {
       publicKey,

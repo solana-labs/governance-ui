@@ -127,7 +127,7 @@ const TokenDeposit = ({
       instructions,
       [],
       depositTokenAccount!.publicKey,
-      wallet!.publicKey,
+      wallet!.publicKey!,
       amount
     )
 
@@ -139,9 +139,9 @@ const TokenDeposit = ({
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenAccount!.account.mint,
-      wallet!.publicKey,
+      wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey,
+      wallet!.publicKey!,
       TOKEN_PROGRAM_ID,
       SystemProgram.programId
     )
@@ -216,7 +216,7 @@ const TokenDeposit = ({
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenRecord!.info.governingTokenMint,
-      wallet!.publicKey,
+      wallet!.publicKey!,
       TOKEN_PROGRAM_ID
     )
 

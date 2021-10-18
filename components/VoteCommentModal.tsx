@@ -42,7 +42,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      proposal!.account.owner,
       wallet,
       connection.current,
       connection.endpoint
@@ -57,14 +57,14 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       await castVote(
         rpcContext,
         realm!.pubkey,
-        proposal,
+        proposal!,
         voterTokenRecord.pubkey,
         vote
       )
       if (comment) {
         await postChatMessage(
           rpcContext,
-          proposal,
+          proposal!,
           voterTokenRecord.pubkey,
           msg
         )
@@ -78,7 +78,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       onClose()
     }
 
-    fetchChatMessages(proposal.pubkey)
+    fetchChatMessages(proposal!.pubkey)
     fetchVoteRecords(proposal)
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }

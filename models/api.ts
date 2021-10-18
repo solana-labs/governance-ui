@@ -35,7 +35,7 @@ export async function getUnrelinquishedVoteRecords(
     endpoint,
     VoteRecord,
     [
-      pubkeyFilter(1 + 32, tokenOwnerRecordPk)!,
+      pubkeyFilter(1 + 32, tokenOwnerRecordPk),
       booleanFilter(1 + 32 + 32, false),
     ]
   )
@@ -126,6 +126,13 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
   accountClass: GovernanceAccountClass
 ) {
   const accountInfo = await connection.getAccountInfo(accountPubKey)
+
+  if (!accountInfo) {
+    throw new Error(
+      `Account ${accountPubKey} of type ${accountClass.name} not found`
+    )
+  }
+
   const account = BorshAccountParser(accountClass, GOVERNANCE_SCHEMA)(
     accountPubKey,
     accountInfo

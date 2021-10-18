@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
@@ -24,11 +25,11 @@ async function runNotifier() {
   const realmInfo = getRealmInfo('MNGO')
 
   const governances = await getGovernanceAccounts<Governance>(
-    realmInfo.programId,
+    realmInfo!.programId,
     MAINNET_RPC_NODE,
     Governance,
     getAccountTypes(Governance),
-    [pubkeyFilter(1, realmInfo.realmId)]
+    [pubkeyFilter(1, realmInfo!.realmId)]
   )
 
   const governanceIds = Object.keys(governances).map((k) => new PublicKey(k))
@@ -36,7 +37,7 @@ async function runNotifier() {
   const proposalsByGovernance = await Promise.all(
     governanceIds.map((governanceId) => {
       return getGovernanceAccounts<Proposal>(
-        realmInfo.programId,
+        realmInfo!.programId,
         MAINNET_RPC_NODE,
         Proposal,
         getAccountTypes(Proposal),
@@ -51,7 +52,7 @@ async function runNotifier() {
 
   const realmGovernances = Object.fromEntries(
     Object.entries(governances).filter(([_k, v]) =>
-      v.info.realm.equals(realmInfo.realmId)
+      v.info.realm.equals(realmInfo!.realmId)
     )
   )
 

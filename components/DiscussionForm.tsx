@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState } from 'react'
 import Button from './Button'
 import Input from './Input'
@@ -24,7 +25,7 @@ const DiscussionForm = () => {
     setSubmitting(true)
 
     const rpcContext = new RpcContext(
-      proposal.account.owner,
+      proposal!.account.owner,
       wallet,
       connection.current,
       connection.endpoint
@@ -37,7 +38,7 @@ const DiscussionForm = () => {
 
     try {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await postChatMessage(rpcContext, proposal, ownTokenRecord!.pubkey, msg)
+      await postChatMessage(rpcContext, proposal!, ownTokenRecord!.pubkey, msg)
       setComment('')
     } catch {
       //TODO: How do we present transaction errors to users? Just the notification?
@@ -45,7 +46,7 @@ const DiscussionForm = () => {
       setSubmitting(false)
     }
 
-    fetchChatMessages(proposal.pubkey)
+    fetchChatMessages(proposal!.pubkey)
   }
 
   const postEnabled =

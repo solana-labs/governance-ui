@@ -12,7 +12,7 @@ export interface TokenAccount {
 }
 
 export interface WalletAdapter {
-  publicKey: PublicKey
+  publicKey: PublicKey | undefined
   autoApprove: boolean
   connected: boolean
   signTransaction: (transaction: Transaction) => Promise<Transaction>
