@@ -6,6 +6,7 @@ import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
 import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
+import { PublicKey } from '@solana/web3.js'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -80,7 +81,11 @@ const REALM = () => {
           <div className="space-y-3">
             {filteredProposals.length > 0 ? (
               filteredProposals.map(([k, v]) => (
-                <ProposalCard key={k} id={k} proposal={v.info} />
+                <ProposalCard
+                  key={k}
+                  proposalPk={new PublicKey(k)}
+                  proposal={v.info}
+                />
               ))
             ) : (
               <div className="bg-bkg-2 border border-bkg-3 px-4 md:px-6 py-4 rounded-lg text-center text-fgd-3">

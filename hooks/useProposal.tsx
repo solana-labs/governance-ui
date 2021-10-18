@@ -5,9 +5,13 @@ export default function useProposal() {
   const router = useRouter()
   const { pk } = router.query
 
-  const { proposal, description, instructions, proposalMint } = useWalletStore(
-    (s) => s.selectedProposal
-  )
+  const {
+    proposal,
+    description,
+    instructions,
+    proposalMint,
+    governance,
+  } = useWalletStore((s) => s.selectedProposal)
 
   return {
     pk,
@@ -15,5 +19,6 @@ export default function useProposal() {
     description,
     instructions,
     proposalMint,
+    governance,
   }
 }
