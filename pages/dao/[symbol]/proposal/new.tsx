@@ -23,6 +23,7 @@ import { InstructionData } from '@models/accounts'
 import { notify } from 'utils/notifications'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
+import { useRouter } from 'next/router'
 
 export enum Instructions {
   Transfer,
@@ -51,6 +52,7 @@ type createParams = [
 
 const New = () => {
   const refs = useRef([])
+  const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol, realm, ownTokenRecord } = useRealm()
   const { proposal } = useProposal()
@@ -101,8 +103,10 @@ const New = () => {
   }
   const handleCreate = async (isDraft) => {
     setFormErrors({})
+
     const { isValid, validationErrors } = await isFormValid(schema, form)
     const instructions = await getInstructions()
+    let proposalAddress = null
     if (isValid && instructions.every((x) => x.isValid)) {
       const sourceAccount = instructions[0].sourceAccount
       const rpcContext = new RpcContext(
@@ -122,22 +126,25 @@ const New = () => {
         form.title,
         form.description,
         realm.info.communityMint,
-        sourceAccount?.info?.minInstructionHoldUpTime,
+        sourceAccount?.info?.config.minInstructionHoldUpTime,
         sourceAccount?.info?.proposalCount,
         instructionsData,
       ]
       try {
-        isDraft
+        proposalAddress = isDraft
           ? await createProposalDraft(...params)
           : await createProposal(...params)
-      } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
-      } finally {
         notify({
           message: isDraft
             ? 'Creating proposal draft success'
             : 'Creating proposal success',
         })
+        const url = generateUrlWithClusterParam(
+          `/dao/${symbol}/proposal/${proposalAddress}`
+        )
+        router.push(url)
+      } catch (ex) {
+        notify({ type: 'error', message: `${ex}` })
       }
     } else {
       setFormErrors(validationErrors)
