@@ -28,7 +28,7 @@ import {
   Instruction,
   Instructions,
   SplTokenTransferRef,
-} from './components/types/types'
+} from '../../../../models/proposalCreationTypes'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),

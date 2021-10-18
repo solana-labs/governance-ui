@@ -26,7 +26,11 @@ import {
   tryGetTokenAccount,
   tryGetTokenMint,
 } from '@utils/tokens'
-import { Form, Instruction, SplTokenTransferRef } from '../types/types'
+import {
+  Form,
+  Instruction,
+  SplTokenTransferRef,
+} from '../../../../../../models/proposalCreationTypes'
 
 const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
   const connection = useWalletStore((s) => s.connection)
