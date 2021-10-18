@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import BN from 'bn.js'
+import moment from 'moment'
 
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance'
@@ -534,6 +535,14 @@ export class Proposal {
   /// Returns true if Proposal has not been voted on yet
   isPreVotingState() {
     return !this.votingAtSlot
+  }
+
+  getTimeToVoteEnd(governance: Governance) {
+    const now = moment().unix()
+
+    return this.isPreVotingState()
+      ? governance.config.maxVotingTime
+      : (this.votingAt?.toNumber() ?? 0) + governance.config.maxVotingTime - now
   }
 }
 
