@@ -72,21 +72,23 @@ const Realms = () => {
           realms.map((realm: RealmInfo) => (
             <div
               onClick={() => goToRealm(realm)}
-              className="bg-bkg-2 border border-bkg-3 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
+              className="border border-fgd-4 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
               key={realm.realmId.toString()}
             >
               <div className="pb-5">
                 {realm.ogImage ? (
-                  <div className="bg-[rgba(255,255,255,0.1)] rounded-full h-16 w-16 flex items-center justify-center">
+                  <div className="bg-bkg-2 rounded-full h-16 w-16 flex items-center justify-center">
                     <img className="w-10" src={realm.ogImage}></img>
                   </div>
                 ) : (
-                  <div className="bg-[rgba(255,255,255,0.1)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                  <div className="bg-bkg-2 h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
                     {realm.symbol?.charAt(0)}
                   </div>
                 )}
               </div>
-              <h3>{realm.displayName ?? realm.symbol}</h3>
+              <h3 className="text-center">
+                {realm.displayName ?? realm.symbol}
+              </h3>
             </div>
           ))
         )}

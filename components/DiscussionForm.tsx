@@ -55,16 +55,17 @@ const DiscussionForm = () => {
 
   return (
     <>
-      <div className="flex space-x-4">
+      <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
         <Input
           value={comment}
           type="text"
           onChange={(e) => setComment(e.target.value)}
+          placeholder="Thoughts?..."
         />
         <Button
           className="flex-shrink-0"
           onClick={() => submitComment()}
-          disabled={!postEnabled}
+          disabled={!postEnabled || !comment}
         >
           {submitting ? <Loading /> : <span>Send It</span>}
         </Button>

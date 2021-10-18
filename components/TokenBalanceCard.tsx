@@ -43,23 +43,33 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
     realm?.info.config.councilMint
   )
 
-  return (
-    <div className="bg-bkg-2 border border-bkg-3 p-6 rounded-lg">
-      <h3 className="mb-4">Deposit Tokens</h3>
-      {communityDepositVisible && (
-        <TokenDeposit
-          mint={mint}
-          tokenType={GoverningTokenType.Community}
-        ></TokenDeposit>
-      )}
+  const hasLoaded = mint || councilMint
 
-      {councilDepositVisible && (
-        <div className="mt-4">
-          <TokenDeposit
-            mint={councilMint}
-            tokenType={GoverningTokenType.Council}
-          ></TokenDeposit>
-        </div>
+  return (
+    <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
+      <h3 className="mb-4">Deposit Tokens</h3>
+      {hasLoaded ? (
+        <>
+          {communityDepositVisible && (
+            <TokenDeposit
+              mint={mint}
+              tokenType={GoverningTokenType.Community}
+            ></TokenDeposit>
+          )}
+          {councilDepositVisible && (
+            <div className="mt-4">
+              <TokenDeposit
+                mint={councilMint}
+                tokenType={GoverningTokenType.Council}
+              ></TokenDeposit>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+        </>
       )}
     </div>
   )
@@ -238,9 +248,9 @@ const TokenDeposit = ({
   return (
     <>
       <div className="flex space-x-4 items-center pb-6">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
+        <div className="bg-bkg-2 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <div className="font-bold">
+          <div className="font-bold text-sm">
             {depositTokenRecord && mint
               ? fmtTokenAmount(
                   depositTokenRecord.info.governingTokenDepositAmount,

@@ -45,8 +45,8 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
     <div>
       <Link href={generateUrlWithClusterParam(`/dao/${symbol}/proposal/${id}`)}>
         <a>
-          <StyledCardWrapepr className="bg-bkg-2 border border-bkg-3 default-transition rounded-lg hover:bg-bkg-3">
-            <div className="px-6 py-4">
+          <StyledCardWrapepr className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3">
+            <div className="p-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
                 <div className="flex items-center pl-4 pt-1">
@@ -57,8 +57,8 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
               <ProposalTimeStatus proposal={proposal} />
             </div>
             {ProposalState[proposal.state] === 'Voting' && (
-              <div className="bg-[rgba(255,255,255,0.05)] flex mt-2 px-6 py-4">
-                <div className="border-r border-bkg-4 pr-4 w-1/2">
+              <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">
+                <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-3 lg:pr-4 w-full lg:w-1/2">
                   <VoteResultsBar
                     approveVotePercentage={
                       relativeYesVotes ? relativeYesVotes : 0
@@ -66,7 +66,7 @@ const ProposalCard = ({ id, proposal }: ProposalCardProps) => {
                     denyVotePercentage={relativeNoVotes ? relativeNoVotes : 0}
                   />
                 </div>
-                <div className="pl-4 w-1/2">
+                <div className="lg:pl-4 w-full lg:w-1/2">
                   <ApprovalQuorum progress={yesVoteProgress} />
                 </div>
               </div>

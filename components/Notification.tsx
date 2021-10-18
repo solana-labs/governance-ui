@@ -4,6 +4,7 @@ import {
   InformationCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/outline'
+import { XIcon } from '@heroicons/react/solid'
 import useNotificationStore from '../stores/useNotificationStore'
 
 const NotificationList = () => {
@@ -53,23 +54,23 @@ const Notification = ({ type, message, description, txid }) => {
 
   return (
     <div
-      className={`max-w-sm w-full bg-bkg-3 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`}
+      className={`max-w-sm w-full bg-bkg-2 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`}
     >
       <div className={`p-4`}>
         <div className={`flex items-center`}>
           <div className={`flex-shrink-0`}>
             {type === 'success' ? (
-              <CheckCircleIcon className={`h-9 w-9 mr-1`} />
+              <CheckCircleIcon className={`h-8 w-8 mr-1 text-green`} />
             ) : null}
-            {type === 'info' && <XCircleIcon className={`h-9 w-9 mr-1`} />}
+            {type === 'info' && <XCircleIcon className={`h-8 w-8 mr-1`} />}
             {type === 'error' && (
-              <InformationCircleIcon className={`h-9 w-9 mr-1`} />
+              <InformationCircleIcon className={`h-8 w-8 mr-1 text-red`} />
             )}
           </div>
           <div className={`ml-2 w-0 flex-1`}>
-            <div className={`text-lg text-fgd-1`}>{message}</div>
+            <div className={`font-bold text-fgd-1`}>{message}</div>
             {description ? (
-              <p className={`mt-0.5 text-base text-fgd-2`}>{description}</p>
+              <p className={`mt-0.5 text-sm text-fgd-2`}>{description}</p>
             ) : null}
             {txid ? (
               <a
@@ -84,22 +85,10 @@ const Notification = ({ type, message, description, txid }) => {
           <div className={`ml-4 flex-shrink-0 self-start flex`}>
             <button
               onClick={() => setShowNotification(false)}
-              className={`bg-bkg-3 rounded-md inline-flex text-fgd-3 hover:text-fgd-4 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary`}
+              className={`bg-bkg-2 default-transition rounded-md inline-flex text-fgd-3 hover:text-fgd-4 focus:outline-none`}
             >
               <span className={`sr-only`}>Close</span>
-              <svg
-                className={`h-5 w-5`}
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 20 20"
-                fill="currentColor"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
-                  clipRule="evenodd"
-                />
-              </svg>
+              <XIcon className="h-5 w-5" />
             </button>
           </div>
         </div>

@@ -17,19 +17,20 @@ const OrganzationsBackNav = () => {
     <div className="pb-4">
       {isBackNavVisibile ? (
         <Link href={generateUrlWithClusterParam('/realms')}>
-          <a className="default-transition flex items-center mb-6 text-fgd-3 text-sm transition-all hover:text-fgd-1">
+          <a className="default-transition flex items-center mb-2 md:mb-6 text-fgd-3 text-sm transition-all hover:text-fgd-1">
             <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
             Back
           </a>
         </Link>
       ) : null}
-      <div className="border-b border-bkg-4 flex items-center justify-between pb-4">
+      <div className="border-b border-fgd-4 flex flex-col md:flex-row items-center justify-between pb-3">
         {realmName && (
-          <div className="flex items-center">
+          <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
             {realmInfo?.ogImage ? (
-              <div className="bg-[rgba(255,255,255,0.1)] rounded-full h-14 w-14 flex items-center justify-center">
-                <img className="w-8" src={realmInfo?.ogImage}></img>
-              </div>
+              <img
+                className="flex-shrink-0 mb-2 md:mb-0 w-8"
+                src={realmInfo?.ogImage}
+              ></img>
             ) : (
               <div className="bg-[rgba(255,255,255,0.1)] h-14 w-14 flex font-bold items-center justify-center rounded-full text-fgd-3">
                 {realmName?.charAt(0)}
@@ -41,23 +42,23 @@ const OrganzationsBackNav = () => {
         <div className="flex items-center space-x-6">
           {realmInfo?.website ? (
             <a
-              className="default-transition flex items-center text-fgd-2 text-sm hover:text-fgd-1"
+              className="default-transition flex items-center text-fgd-1 text-sm hover:text-primary-light"
               href={realmInfo?.website}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <GlobeAltIcon className="mr-1.5 h-4 w-4" />
+              <GlobeAltIcon className="mr-1.5 h-4 text-primary-light w-4" />
               Website
             </a>
           ) : null}
           {realmInfo?.twitter ? (
             <a
-              className="default-transition flex items-center text-fgd-2 text-sm hover:text-fgd-1"
+              className="default-transition flex items-center text-fgd-1 text-sm hover:text-primary-light"
               href={`https://twitter.com/${realmInfo?.twitter}`}
               target="_blank"
               rel="noopener noreferrer"
             >
-              <TwitterIcon className="mr-1.5 h-4 w-4" />
+              <TwitterIcon className="mr-1.5 h-4 text-primary-light w-4" />
               Twitter
             </a>
           ) : null}

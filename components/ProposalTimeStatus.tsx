@@ -15,7 +15,7 @@ const ProposalTimeStatus = ({ proposal }: ProposalTimeStatusProps) => {
   return proposal && governance ? (
     <div className="flex items-center text-fgd-3 text-sm">
       <span className="flex items-center">
-        <ClockIcon className="h-4 mr-1.5 w-4" />
+        <ClockIcon className="h-4 mr-1 w-4" />
         {proposal.votingCompletedAt ? (
           `${ProposalState[proposal.state]} ${fmtUnixTime(
             proposal.votingCompletedAt
