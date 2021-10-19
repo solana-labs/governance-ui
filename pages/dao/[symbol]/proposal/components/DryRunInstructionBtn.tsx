@@ -86,7 +86,7 @@ const DryRunInstructionBtn = ({
         onClick={handleDryRun}
         disabled={isPending}
       >
-        {isPending ? <Loading></Loading> : 'Try instruction'}
+        {isPending ? <Loading></Loading> : 'Run simulation'}
       </Button>
 
       {result?.response && (
