@@ -34,6 +34,7 @@ import {
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import useInstructions from '@hooks/useInstructions'
+import DryRunInstructionBtn from '../DryRunInstructionBtn'
 
 const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
   const connection = useWalletStore((s) => s.connection)
@@ -213,6 +214,13 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
         step={mintMinAmount}
         error={formErrors['amount']}
       />
+      <div className="text-right">
+        <DryRunInstructionBtn
+          btnClassNames="mt-5 "
+          isValid={!Object.keys(formErrors).length}
+          getInstructionDataFcn={getSerializedInstruction}
+        />
+      </div>
     </div>
   )
 })
