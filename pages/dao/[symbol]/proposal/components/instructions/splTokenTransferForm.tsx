@@ -31,6 +31,7 @@ import {
   Instruction,
   SplTokenTransferRef,
 } from '../../../../../../models/proposalCreationTypes'
+import { getAccountName } from '@components/instructions/tools'
 
 const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
   const connection = useWalletStore((s) => s.connection)
@@ -189,9 +190,13 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
       >
         {sourceAccounts.map((acc) => {
           const govAccount = acc.pubkey.toString()
+          const accName = getAccountName(acc.pubkey)
+          const label = accName
+            ? `${accName}: ${acc.info.governedAccount.toString()}`
+            : acc.info.governedAccount.toString()
           return (
             <Select.Option key={govAccount} value={acc}>
-              <span>{acc.info.governedAccount.toString()}</span>
+              <span>{label}</span>
             </Select.Option>
           )
         })}
