@@ -3,13 +3,11 @@ import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
 import useProposal from '@hooks/useProposal'
-import StatusBadge from '@components/StatusBadge'
+import ProposalStateBadge from '@components/ProposalStatusBadge'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import { InstructionPanel } from '@components/instructions/instructionPanel'
 import DiscussionPanel from '@components/DiscussionPanel'
 import VotePanel from '@components/VotePanel'
-import { ProposalState } from '@models/accounts'
-
 import ApprovalQuorum from '@components/ApprovalQuorum'
 import useRealm from '@hooks/useRealm'
 import useProposalVotes from '@hooks/useProposalVotes'
@@ -53,7 +51,10 @@ const Proposal = () => {
             <div className="border-b border-fgd-4 py-4">
               <div className="flex items-center justify-between mb-1">
                 <h1 className="mr-2">{proposal?.info.name}</h1>
-                <StatusBadge status={ProposalState[proposal?.info.state]} />
+                <ProposalStateBadge
+                  proposalPk={proposal.pubkey}
+                  proposal={proposal.info}
+                />
               </div>
               <ProposalTimeStatus proposal={proposal?.info} />
             </div>
