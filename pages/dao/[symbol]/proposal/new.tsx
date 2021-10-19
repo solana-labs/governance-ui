@@ -10,10 +10,9 @@ import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
 import React, { useRef, useState } from 'react'
 import Button from '@components/Button'
-import SplTokenTransferForm from '../proposal/components/instructions/splTokenTransferForm'
+import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import MinimumApprovalTreshold from './components/MinimumApprovalTreshold'
 import { RpcContext } from '@models/core/api'
-import { createProposalDraft } from 'actions/createProposalDraft'
 import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
@@ -28,33 +27,33 @@ import {
   Instruction,
   Instructions,
   SplTokenTransferRef,
-} from '../../../../models/proposalCreationTypes'
+} from '@utils/uiTypes/proposalCreationTypes'
+import useInstructions from '@hooks/useInstructions'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
-const availabileInstructions = [
-  { id: Instructions.Transfer, name: 'Token Transfer' },
-]
-const defaultInstructionComponentModel = {
-  type: availabileInstructions[0],
-}
 
 const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol, realm, ownTokenRecord } = useRealm()
+  const { getAvailableInstructions } = useInstructions()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const availableInstructions = getAvailableInstructions()
+  const defaultInstructionComponentModel = {
+    type: availableInstructions[0],
+  }
   const [form, setForm] = useState({
     title: '',
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const [instructionsComponents, setInstructions] = useState([
-    { ...defaultInstructionComponentModel, type: availabileInstructions[0] },
+    { ...defaultInstructionComponentModel, type: availableInstructions[0] },
   ])
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -105,11 +104,12 @@ const New = () => {
       throw 'no realm selected'
     }
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      const sourceAccount = instructions[0].sourceAccount
-      if (!sourceAccount) {
+      const governance = instructions[0].governance
+      if (!governance) {
         throw 'no source account selected'
       }
       if (!ownTokenRecord) {
+        notify({ type: 'error', message: `no own token record found` })
         throw 'no own token record found'
       }
       const rpcContext = new RpcContext(
@@ -124,24 +124,18 @@ const New = () => {
       const params: createParams = [
         rpcContext,
         realm.pubkey,
-        sourceAccount.pubkey,
+        governance.pubkey,
         ownTokenRecord?.pubkey,
         form.title,
         form.description,
         realm.info.communityMint,
-        sourceAccount?.info?.config.minInstructionHoldUpTime,
-        sourceAccount?.info?.proposalCount,
+        governance?.info?.config.minInstructionHoldUpTime,
+        governance?.info?.proposalCount,
         instructionsData,
+        isDraft,
       ]
       try {
-        proposalAddress = isDraft
-          ? await createProposalDraft(...params)
-          : await createProposal(...params)
-        notify({
-          message: isDraft
-            ? 'Creating proposal draft success'
-            : 'Creating proposal success',
-        })
+        proposalAddress = await createProposal(...params)
         const url = generateUrlWithClusterParam(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
@@ -162,7 +156,7 @@ const New = () => {
     }
     switch (typeId) {
       case Instructions.Transfer:
-        return <SplTokenTransferForm {...props}></SplTokenTransferForm>
+        return <SplTokenTransfer {...props}></SplTokenTransfer>
       default:
         null
     }
@@ -217,11 +211,16 @@ const New = () => {
                   ></XCircleIcon>
                 )}
                 <Select
+                  placeholder={`${
+                    availableInstructions.length
+                      ? 'Instruction'
+                      : 'No available instruction to select'
+                  }`}
                   prefix="Instruction"
                   onChange={(value) => setInstructionType({ value, idx })}
                   value={instruction.type?.name}
                 >
-                  {availabileInstructions.map((inst) => (
+                  {availableInstructions.map((inst) => (
                     <Select.Option key={inst.id} value={inst}>
                       <span>{inst.name}</span>
                     </Select.Option>

@@ -8,6 +8,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { CreateProposalArgs } from './instructions'
 import { GOVERNANCE_PROGRAM_SEED } from './accounts'
+import { SYSTEM_PROGRAM_ID } from './core/api'
 
 export const withCreateProposal = async (
   instructions: TransactionInstruction[],
@@ -20,8 +21,7 @@ export const withCreateProposal = async (
   governingTokenMint: PublicKey,
   governanceAuthority: PublicKey,
   proposalIndex: number,
-  payer: PublicKey,
-  systemId: PublicKey
+  payer: PublicKey
 ) => {
   const args = new CreateProposalArgs({
     name,
@@ -29,7 +29,7 @@ export const withCreateProposal = async (
     governingTokenMint,
   })
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
-
+  const systemId = SYSTEM_PROGRAM_ID
   const proposalIndexBuffer = Buffer.alloc(4)
   proposalIndexBuffer.writeInt32LE(proposalIndex, 0)
 

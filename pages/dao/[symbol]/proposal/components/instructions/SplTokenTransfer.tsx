@@ -27,32 +27,30 @@ import {
   tryGetTokenMint,
 } from '@utils/tokens'
 import {
-  Form,
+  SplTokenTransferForm,
   Instruction,
   SplTokenTransferRef,
-} from '../../../../../../models/proposalCreationTypes'
+} from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
+import { TOKEN_PROGRAM_ID } from '@utils/tokens'
+import useInstructions from '@hooks/useInstructions'
 
-const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
+const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
   const connection = useWalletStore((s) => s.connection)
-  const { realmInfo, governances } = useRealm()
+  const { realmInfo } = useRealm()
+  const { getGovernancesByAccountType } = useInstructions()
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<Form>({
+  const [form, setForm] = useState<SplTokenTransferForm>({
     destinationAccount: '',
     amount: 1,
-    sourceAccount: undefined,
+    governance: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
-  const governancesArray = Object.keys(governances).map(
-    (key) => governances[key]
-  )
-  const sourceAccounts = governancesArray
-    .filter(
-      (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
-    )
-    .map((x) => x)
+  const governancesFiltred = getGovernancesByAccountType(
+    GovernanceAccountType.TokenGovernance
+  ).map((x) => x)
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
@@ -67,7 +65,7 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
         "Account mint doesn't match source account",
         async (val: string) => {
           const pubkey = tryParseKey(val)
-          const governedAccount = form.sourceAccount?.info?.governedAccount
+          const governedAccount = form.governance?.info?.governedAccount
           try {
             if (pubkey && governedAccount) {
               const [destAccMint, sourceAccMint]: [
@@ -94,10 +92,7 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
         }
       ),
     amount: yup.string().required('Amount is required'),
-    sourceAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
+    governance: yup.object().nullable().required('Source account is required'),
   })
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -127,16 +122,16 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
   async function getSerializedInstruction() {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    if (isValid && programId && form.sourceAccount?.pubkey) {
+    if (isValid && programId && form.governance?.pubkey) {
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount,
         mintMinAmount
       )
       const transferIx = Token.createTransferInstruction(
-        programId,
-        form.sourceAccount?.pubkey,
+        TOKEN_PROGRAM_ID,
+        form.governance.info.governedAccount,
         new PublicKey(form.destinationAccount),
-        form.sourceAccount?.info?.governedAccount,
+        form.governance.pubkey,
         [],
         mintAmount
       )
@@ -145,7 +140,7 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
     const obj: Instruction = {
       serializedInstruction,
       isValid,
-      sourceAccount: form.sourceAccount,
+      governance: form.governance,
     }
     return obj
   }
@@ -157,38 +152,34 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
     })
   }, [realmInfo?.programId])
   useEffect(() => {
-    async function tryGetTooknAccount() {
-      if (form.sourceAccount?.info.governedAccount) {
+    async function tryGetTokenAccount() {
+      if (form.governance?.info.governedAccount) {
         const mintResponse = await tryGetTokenMint(
           connection.current,
-          form.sourceAccount?.info.governedAccount
+          form.governance?.info.governedAccount
         )
         setMintInfo(mintResponse?.account)
       }
     }
-    if (form.sourceAccount?.info.governedAccount) {
-      tryGetTooknAccount()
+    if (form.governance?.info.governedAccount) {
+      tryGetTokenAccount()
     }
-  }, [form.sourceAccount?.pubkey])
+  }, [form.governance?.pubkey])
   useImperativeHandle(ref, () => ({
     getSerializedInstruction,
   }))
 
   return (
     <div className="mt-5">
-      <div>Program id</div>
-      <div>{form.programId}</div>
-      <div>Account owner (governance account)</div>
-      <div>{form.sourceAccount?.pubkey?.toString()}</div>
       <Select
         prefix="Source Account"
         onChange={(value) =>
-          handleSetForm({ value, propertyName: 'sourceAccount' })
+          handleSetForm({ value, propertyName: 'governance' })
         }
-        value={form.sourceAccount?.info?.governedAccount?.toString()}
-        error={formErrors['sourceAccount']}
+        value={form.governance?.info?.governedAccount?.toString()}
+        error={formErrors['governance']}
       >
-        {sourceAccounts.map((acc) => {
+        {governancesFiltred.map((acc) => {
           const govAccount = acc.pubkey.toString()
           const accName = getAccountName(acc.pubkey)
           const label = accName
@@ -226,4 +217,4 @@ const SplTokenTransferForm = forwardRef<SplTokenTransferRef>((props, ref) => {
   )
 })
 
-export default SplTokenTransferForm
+export default SplTokenTransfer

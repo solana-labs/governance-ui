@@ -7,12 +7,12 @@ import { PublicKey } from '@solana/web3.js'
 export interface Instruction {
   serializedInstruction: string
   isValid: boolean
-  sourceAccount: ParsedAccount<Governance> | undefined
+  governance: ParsedAccount<Governance> | undefined
 }
-export interface Form {
+export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number
-  sourceAccount: ParsedAccount<Governance> | undefined
+  governance: ParsedAccount<Governance> | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
@@ -38,5 +38,6 @@ export type createParams = [
   governingTokenMint: PublicKey,
   holdUpTime: number,
   proposalIndex: number,
-  instructionsData: InstructionData[]
+  instructionsData: InstructionData[],
+  isDraft: boolean
 ]

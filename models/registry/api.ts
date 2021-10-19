@@ -78,9 +78,9 @@ const DEVNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
   {
-    symbol: 'heheszek',
+    symbol: 'nowyRealm',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('HX55n29RfK5B2BjX5mQxbQotmY9EbQHiWt4uavPeaddA'),
+    realmId: new PublicKey('GE3EYWNPJAesuR2Mry43Mm3Xd12rXKT1YnHBDrXyyg7s'),
   },
 ]
 
