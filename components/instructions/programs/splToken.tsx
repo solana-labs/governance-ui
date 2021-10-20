@@ -3,20 +3,26 @@ import { AccountMetaData } from '../../../models/accounts'
 import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 
-export interface TokenDescriptor {
+export interface TokenMintDescriptor {
   name: string
   decimals: number
 }
 
-// Well known token account descriptors displayed on the instruction card
-export const TOKEN_DESCRIPTORS = {
-  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: { name: 'MNGO' },
-  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf': { name: 'USDC' },
-  '4nvTrY3KdYCVEtzfopCDZ2NuL8u6ZaHgL7xcUnQDQpHe': { name: 'SOCN' },
+// Well known token mint descriptors displayed on the instruction card
+export const TOKEN_MINT_DESCRIPTORS = {
+  MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: { name: 'MNGO' },
+  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { name: 'USDC' },
+  '5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm': { name: 'SOCN' },
+  SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt: { name: 'SRM' },
 }
 
-export function getTokenDescriptor(tokenAccountPk: PublicKey): TokenDescriptor {
-  return TOKEN_DESCRIPTORS[tokenAccountPk.toBase58()]
+export function getTokenMintDescriptor(
+  tokenMintPk: PublicKey | undefined
+): TokenMintDescriptor {
+  // TODO: Fetch token mint metadata from the chain
+  return tokenMintPk
+    ? TOKEN_MINT_DESCRIPTORS[tokenMintPk.toBase58()]
+    : undefined
 }
 
 export const SPL_TOKEN_INSTRUCTIONS = {
@@ -33,7 +39,6 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
         const tokenAccount = await tryGetTokenAccount(
           connection,
           accounts[0].pubkey
@@ -42,6 +47,10 @@ export const SPL_TOKEN_INSTRUCTIONS = {
           connection,
           // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           tokenAccount!.account.mint
+        )
+
+        const tokenMintDescriptor = getTokenMintDescriptor(
+          tokenAccount?.account.mint
         )
 
         // TokenTransfer instruction layout
@@ -62,7 +71,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
                 <div>
                   <span>Amount:</span>
                   <span>{`${tokenAmount.toNumber().toLocaleString()} ${
-                    tokenDescriptor?.name ?? ''
+                    tokenMintDescriptor?.name ?? ''
                   }`}</span>
                 </div>
               </div>
@@ -85,8 +94,9 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
         const tokenMint = await tryGetMint(connection, accounts[0].pubkey)
+
+        const tokenMintDescriptor = getTokenMintDescriptor(accounts[0].pubkey)
 
         // TokenMint instruction layout
         // TODO: Use BufferLayout to decode the instruction
@@ -107,7 +117,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
                 <div>
                   <span>Amount:</span>
                   <span>{`${tokenAmount.toNumber().toLocaleString()} ${
-                    tokenDescriptor?.name ?? ''
+                    tokenMintDescriptor?.name ?? ''
                   }`}</span>
                 </div>
               </div>
