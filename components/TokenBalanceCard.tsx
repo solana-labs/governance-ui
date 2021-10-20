@@ -15,12 +15,13 @@ import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens
 import { withRelinquishVote } from '../models/withRelinquishVote'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
 import useWalletStore from '../stores/useWalletStore'
-import { fmtTokenAmount } from '../utils/formatting'
 import { sendTransaction } from '../utils/send'
 import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
 import Button from './Button'
 import { Option } from '../tools/core/option'
 import { GoverningTokenType } from '../models/enums'
+import { fmtMintAmount } from '../tools/sdk/units'
+import { getTokenMintDescriptor } from './instructions/programs/splToken'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -115,7 +116,15 @@ const TokenDeposit = ({
       ? realmTokenAccount
       : councilTokenAccount
 
-  const depositTokenName = `${realm?.info.name} ${
+  const depositMint =
+    tokenType === GoverningTokenType.Community
+      ? realm?.info.communityMint
+      : realm?.info.config.councilMint
+
+  const tokenName =
+    getTokenMintDescriptor(depositMint)?.name ?? realm?.info.name
+
+  const depositTokenName = `${tokenName} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
 
@@ -253,9 +262,9 @@ const TokenDeposit = ({
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
           <div className="font-bold text-sm">
             {depositTokenRecord && mint
-              ? fmtTokenAmount(
-                  depositTokenRecord.info.governingTokenDepositAmount,
-                  mint.decimals
+              ? fmtMintAmount(
+                  mint,
+                  depositTokenRecord.info.governingTokenDepositAmount
                 )
               : '0'}
           </div>

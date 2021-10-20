@@ -5,7 +5,6 @@ import BN from 'bn.js'
 
 export interface TokenMintDescriptor {
   name: string
-  decimals: number
 }
 
 // Well known token mint descriptors displayed on the instruction card
