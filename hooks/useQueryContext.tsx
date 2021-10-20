@@ -7,7 +7,7 @@ export default function useQueryContext() {
 
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   const hasClusterOption = endpoint !== 'mainnet'
-  const generateUrlWithClusterParam = (url) => {
+  const fmtUrlWithCluster = (url) => {
     if (hasClusterOption) {
       const mark = url.includes('?') ? '&' : '?'
       return decodeURIComponent(`${url}${mark}cluster=${endpoint}`)
@@ -16,6 +16,6 @@ export default function useQueryContext() {
   }
 
   return {
-    generateUrlWithClusterParam,
+    fmtUrlWithCluster,
   }
 }

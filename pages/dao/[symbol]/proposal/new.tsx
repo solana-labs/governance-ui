@@ -38,7 +38,7 @@ const schema = yup.object().shape({
 const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
-  const { generateUrlWithClusterParam } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
     realm,
@@ -165,7 +165,7 @@ const New = () => {
           instructionsData,
           isDraft
         )
-        const url = generateUrlWithClusterParam(
+        const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
         router.push(url)
@@ -195,7 +195,7 @@ const New = () => {
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3">
         <>
-          <Link href={generateUrlWithClusterParam(`/dao/${symbol}/`)}>
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
             <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
               <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
               Back

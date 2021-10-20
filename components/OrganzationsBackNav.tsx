@@ -7,7 +7,7 @@ import { TwitterIcon } from '../components/icons'
 import useQueryContext from '../hooks/useQueryContext'
 
 const OrganzationsBackNav = () => {
-  const { generateUrlWithClusterParam } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext()
   const { realm, realmInfo } = useRealm()
   const { REALM } = process.env
 
@@ -16,7 +16,7 @@ const OrganzationsBackNav = () => {
   return (
     <div className="pb-4">
       {isBackNavVisibile ? (
-        <Link href={generateUrlWithClusterParam('/realms')}>
+        <Link href={fmtUrlWithCluster('/realms')}>
           <a className="default-transition flex items-center mb-2 md:mb-6 text-fgd-3 text-sm transition-all hover:text-fgd-1">
             <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
             Back

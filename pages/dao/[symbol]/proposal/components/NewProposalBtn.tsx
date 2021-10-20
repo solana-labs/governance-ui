@@ -5,7 +5,7 @@ import useRealm from '@hooks/useRealm'
 import React from 'react'
 
 const NewProposalBtn = () => {
-  const { generateUrlWithClusterParam } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
 
@@ -32,7 +32,7 @@ const NewProposalBtn = () => {
       <Disclosure.Button
         className={`border border-fgd-4 default-transition font-normal pl-3 pr-3 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
       >
-        <Link href={generateUrlWithClusterParam(`/dao/${symbol}/proposal/new`)}>
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new`)}>
           + New
         </Link>
       </Disclosure.Button>

@@ -17,7 +17,7 @@ import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
 
 const Proposal = () => {
-  const { generateUrlWithClusterParam } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = useRealm()
   const { proposal, description, instructions } = useProposal()
   const {
@@ -42,7 +42,7 @@ const Proposal = () => {
       <div className="border border-fgd-4 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
-            <Link href={generateUrlWithClusterParam(`/dao/${symbol}/`)}>
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
               <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
                 <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
                 Back
