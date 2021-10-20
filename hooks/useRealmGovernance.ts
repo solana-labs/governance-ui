@@ -6,5 +6,5 @@ import useRealm from './useRealm'
 export default function useRealmGovernance(governance: PublicKey) {
   const realm = useRealm()
 
-  return realm.governances[governance.toBase58()].info
+  return realm.governances[governance.toBase58()]?.info
 }
