@@ -123,10 +123,10 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
   async function getSerializedInstruction() {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    if (isValid && programId && form.governance?.pubkey) {
+    if (isValid && programId && form.governance?.pubkey && form.mintInfo) {
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount,
-        mintMinAmount
+        form.mintInfo?.decimals
       )
       const transferIx = Token.createTransferInstruction(
         TOKEN_PROGRAM_ID,
