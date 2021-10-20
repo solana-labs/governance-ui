@@ -40,7 +40,7 @@ const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm, ownTokenRecord } = useRealm()
+  const { symbol, realm, governances, ownTokenRecord } = useRealm()
   const { getAvailableInstructions } = useInstructions()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
@@ -247,7 +247,10 @@ const New = () => {
                 Add new instruction
               </Button>
             </div>
-            <MinimumApprovalThreshold></MinimumApprovalThreshold>
+            <MinimumApprovalThreshold
+              // TODO: Use governance selected by the first instruction (from context)
+              governance={Object.values(governances)[0]?.info}
+            ></MinimumApprovalThreshold>
             <div className="flex justify-end mt-5">
               <Button className="w-44 mr-5" onClick={() => handleCreate(true)}>
                 Create Draft
