@@ -106,7 +106,7 @@ const DryRunInstructionBtn = ({
           <div className="flex items-center pt-6">
             <Button onClick={onInspect}>Inspect</Button>
             <LinkButton className="ml-4 text-th-fgd-1" onClick={onClose}>
-              Cancel
+              Close
             </LinkButton>
           </div>
         </Modal>

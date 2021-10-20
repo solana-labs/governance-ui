@@ -1,5 +1,4 @@
 import { GovernanceAccountType } from '@models/accounts'
-import { BN } from '@project-serum/anchor'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useRealm from './useRealm'
 
@@ -8,7 +7,7 @@ export default function useInstructions() {
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
   )
-  const { ownTokenRecord, realm } = useRealm()
+  const { ownVoterWeight, realm } = useRealm()
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
@@ -16,16 +15,14 @@ export default function useInstructions() {
     )
     return governancesFiltered
   }
-  const canUseTransferInstruction = getGovernancesByAccountType(
-    GovernanceAccountType.TokenGovernance
-  ).filter(
-    (x) =>
-      ownTokenRecord &&
-      realm &&
-      ownTokenRecord.info.governingTokenDepositAmount.cmp(
-        new BN(x.info.config.minCommunityTokensToCreateProposal)
-      ) >= 0
-  )
+
+  // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
+  const canUseTransferInstruction =
+    realm &&
+    getGovernancesByAccountType(
+      GovernanceAccountType.TokenGovernance
+    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+
   const availableInstructions = [
     {
       id: Instructions.Transfer,
