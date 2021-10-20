@@ -213,13 +213,9 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
       tryGetTokenAccount()
     }
   }, [form.governance?.pubkey])
-  useImperativeHandle(
-    ref,
-    () => ({
-      getSerializedInstruction,
-    }),
-    [form.governance?.pubkey]
-  )
+  useImperativeHandle(ref, () => ({
+    getSerializedInstruction,
+  }))
 
   return (
     <div className="mt-5">
