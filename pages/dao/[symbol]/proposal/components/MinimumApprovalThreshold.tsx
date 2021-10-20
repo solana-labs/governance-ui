@@ -1,22 +1,17 @@
 import ProgressBar from '@components/ProgressBar'
-import useRealm from '@hooks/useRealm'
+
+import { Governance } from '@models/accounts'
 import React from 'react'
 
-const MinimumApprovalThreshold = () => {
-  const { realmInfo, governances } = useRealm()
-  const governancesArray = Object.keys(governances).map(
-    (key) => governances[key]
-  )
-  const programId = realmInfo?.programId?.toString()
-  //todo ask if its good match to take it from here
-  const voteThresholdPercentage = governancesArray.find(
-    (x) => x.account?.owner?.toString() === programId
-  )?.info?.config?.voteThresholdPercentage?.value
-
+const MinimumApprovalThreshold = ({
+  governance,
+}: {
+  governance: Governance | undefined
+}) => {
   return (
     <ProgressBar
-      progress={voteThresholdPercentage}
-      prefix="Minimum Approval votes"
+      progress={governance?.config.voteThresholdPercentage.value}
+      prefix="Approval quorum"
     ></ProgressBar>
   )
 }
