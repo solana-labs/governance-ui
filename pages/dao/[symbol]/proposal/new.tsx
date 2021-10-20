@@ -40,7 +40,7 @@ const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm, governances, ownTokenRecord } = useRealm()
+  const { symbol, realm, governances, ownVoterWeight } = useRealm()
   const { getAvailableInstructions } = useInstructions()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
@@ -107,14 +107,11 @@ const New = () => {
       throw 'no realm selected'
     }
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      const governancePk = instructions[0].governance?.pubkey
-      if (!governancePk) {
-        throw 'no source account selected'
+      let governance = instructions[0].governance
+      if (!governance) {
+        throw Error('no governance selected')
       }
-      if (!ownTokenRecord) {
-        notify({ type: 'error', message: `no own token record found` })
-        throw 'no own token record found'
-      }
+
       const rpcContext = new RpcContext(
         new PublicKey(realm.account.owner.toString()),
         wallet,
@@ -127,15 +124,19 @@ const New = () => {
 
       try {
         // Fetch governance to get up to date proposalCount
-        const governance = (await fetchRealmGovernance(
-          governancePk
+        governance = (await fetchRealmGovernance(
+          governance.pubkey
         )) as ParsedAccount<Governance>
+
+        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+          governance.info.config
+        )
 
         const params: createParams = [
           rpcContext,
           realm.pubkey,
           governance.pubkey,
-          ownTokenRecord?.pubkey,
+          ownTokenRecord.pubkey,
           form.title,
           form.description,
           realm.info.communityMint,

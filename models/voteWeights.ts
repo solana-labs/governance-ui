@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import BN from 'bn.js'
 import { MintInfo } from '@solana/spl-token'
 import BigNumber from 'bignumber.js'
@@ -65,6 +66,18 @@ export class VoterWeight {
       this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal) ||
       this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
     )
+  }
+
+  getTokenRecordToCreateProposal(config: GovernanceConfig) {
+    // Prefer community token owner record as proposal owner
+    if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
+      return this.communityTokenRecord!
+    }
+    if (this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)) {
+      return this.councilTokenRecord!
+    }
+
+    throw new Error('Not enough vote weight to create proposal')
   }
 }
 

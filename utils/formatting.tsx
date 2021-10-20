@@ -3,12 +3,19 @@ import moment from 'moment'
 import { PublicKey } from '@solana/web3.js'
 
 const votePrecision = 10000
-export const calculatePct = (c: BN, total?: BN) =>
-  c
-    .mul(new BN(votePrecision))
-    .div(total ?? new BN(1))
-    .toNumber() *
-  (100 / votePrecision)
+export const calculatePct = (c: BN, total?: BN) => {
+  if (total?.isZero()) {
+    return 0
+  }
+
+  return (
+    c
+      .mul(new BN(votePrecision))
+      .div(total ?? new BN(1))
+      .toNumber() *
+    (100 / votePrecision)
+  )
+}
 
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
   c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber()
