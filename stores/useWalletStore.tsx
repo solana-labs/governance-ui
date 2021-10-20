@@ -402,6 +402,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.selectedRealm.governances[governancePk.toBase58()] = governance
       })
+
+      return governance
     },
 
     async fetchProposal(proposalPk: string) {

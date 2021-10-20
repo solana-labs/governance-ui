@@ -29,6 +29,8 @@ import {
   SplTokenTransferRef,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useInstructions from '@hooks/useInstructions'
+import { ParsedAccount } from '@models/core/accounts'
+import { Governance } from '@models/accounts'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -105,8 +107,8 @@ const New = () => {
       throw 'no realm selected'
     }
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      const governance = instructions[0].governance
-      if (!governance) {
+      const governancePk = instructions[0].governance?.pubkey
+      if (!governancePk) {
         throw 'no source account selected'
       }
       if (!ownTokenRecord) {
@@ -122,28 +124,32 @@ const New = () => {
       const instructionsData = instructions.map((x) =>
         getInstructionDataFromBase64(x.serializedInstruction)
       )
-      const params: createParams = [
-        rpcContext,
-        realm.pubkey,
-        governance.pubkey,
-        ownTokenRecord?.pubkey,
-        form.title,
-        form.description,
-        realm.info.communityMint,
-        governance?.info?.config.minInstructionHoldUpTime,
-        governance?.info?.proposalCount,
-        instructionsData,
-        isDraft,
-      ]
+
       try {
+        // Fetch governance to get up to date proposalCount
+        const governance = (await fetchRealmGovernance(
+          governancePk
+        )) as ParsedAccount<Governance>
+
+        const params: createParams = [
+          rpcContext,
+          realm.pubkey,
+          governance.pubkey,
+          ownTokenRecord?.pubkey,
+          form.title,
+          form.description,
+          realm.info.communityMint,
+          governance?.info?.config.minInstructionHoldUpTime,
+          governance?.info?.proposalCount,
+          instructionsData,
+          isDraft,
+        ]
+
         proposalAddress = await createProposal(...params)
         const url = generateUrlWithClusterParam(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
         router.push(url)
-
-        // Refresh governance to update proposal index
-        fetchRealmGovernance(governance.pubkey)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
       }
