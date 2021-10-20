@@ -48,7 +48,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 
   return (
     <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Deposit Tokens</h3>
+      <h3 className="mb-4">Governance Tokens</h3>
       {hasLoaded ? (
         <>
           {communityDepositVisible && (
