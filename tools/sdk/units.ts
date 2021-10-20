@@ -44,3 +44,17 @@ export function getMintNaturalAmountFromDecimal(
 export function getMintMinAmountAsDecimal(mint: MintInfo) {
   return new BigNumber(1).shiftedBy(-mint.decimals).toNumber()
 }
+
+export function formatMintNaturalAmountAsDecimal(
+  mint: MintInfo,
+  naturalAmount: BN
+) {
+  return getMintDecimalAmountFromNatural(mint, naturalAmount).toFormat()
+}
+
+export function getMintDecimalAmountFromNatural(
+  mint: MintInfo,
+  naturalAmount: BN
+) {
+  return new BigNumber(naturalAmount.toString()).shiftedBy(-mint.decimals)
+}

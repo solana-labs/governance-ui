@@ -18,6 +18,7 @@ export interface SplTokenTransferForm {
 }
 export interface SplTokenTransferRef {
   getSerializedInstruction: GetSerializedInstruction
+  governance: ParsedAccount<Governance> | undefined
 }
 
 interface GetSerializedInstruction {

@@ -10,6 +10,7 @@ import useRealm from '@hooks/useRealm'
 import { GovernanceAccountType } from '@models/accounts'
 import { AccountInfo, Token } from '@solana/spl-token'
 import {
+  formatMintNaturalAmountAsDecimal,
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
@@ -56,8 +57,40 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
-
   const schema = yup.object().shape({
+    amount: yup
+      .number()
+      .required('Amount is required')
+      .min(mintMinAmount, `Minimal value for amount is ${mintMinAmount}`)
+      .test(
+        'amount',
+        'The quantity must be less than the available tokens in the source account',
+        async (val) => {
+          if (form.governance) {
+            const tokenAccount = await tryGetTokenAccount(
+              connection.current,
+              form.governance?.info.governedAccount
+            )
+            const mintInfo = await tryGetTokenMint(
+              connection.current,
+              form.governance?.info.governedAccount
+            )
+            return !!(
+              tokenAccount &&
+              mintInfo &&
+              val &&
+              val <=
+                Number(
+                  formatMintNaturalAmountAsDecimal(
+                    mintInfo.account,
+                    tokenAccount?.account.amount
+                  )
+                )
+            )
+          }
+          return false
+        }
+      ),
     destinationAccount: yup
       .string()
       .required('Destination account is required')
@@ -91,8 +124,15 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
           }
           return false
         }
-      ),
-    amount: yup.string().required('Amount is required'),
+      )
+      .test('tryParse', 'Invalid destination account', (val: string) => {
+        if (val) {
+          const pubKey = tryParseKey(val)
+          console.log(val)
+          return !!pubKey
+        }
+        return false
+      }),
     governance: yup.object().nullable().required('Source account is required'),
   })
   const handleSetForm = ({ propertyName, value }) => {
@@ -102,16 +142,23 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
   const setMintInfo = (value) => {
     setForm({ ...form, mintInfo: value })
   }
-  const setamount = (event) => {
-    const { min, max } = event.target
-    let value = event.target.value
-    value = !value
-      ? ''
-      : Math.max(Number(min), Math.min(Number(max), Number(value))).toFixed(
-          currentPrecision
-        )
+  const setAmount = (event) => {
+    const value = event.target.value
     handleSetForm({
       value: value,
+      propertyName: 'amount',
+    })
+  }
+  const validateAmountOnBlur = () => {
+    const value = form.amount
+
+    handleSetForm({
+      value: parseFloat(
+        Math.max(
+          Number(mintMinAmount),
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+        ).toFixed(currentPrecision)
+      ),
       propertyName: 'amount',
     })
   }
@@ -166,9 +213,13 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
       tryGetTokenAccount()
     }
   }, [form.governance?.pubkey])
-  useImperativeHandle(ref, () => ({
-    getSerializedInstruction,
-  }))
+  useImperativeHandle(
+    ref,
+    () => ({
+      getSerializedInstruction,
+    }),
+    [form.governance?.pubkey]
+  )
 
   return (
     <div className="mt-5">
@@ -210,9 +261,10 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
         prefix="Amount"
         value={form.amount}
         type="number"
-        onChange={setamount}
+        onChange={setAmount}
         step={mintMinAmount}
         error={formErrors['amount']}
+        onBlur={validateAmountOnBlur}
       />
       <div className="text-right">
         <DryRunInstructionBtn
