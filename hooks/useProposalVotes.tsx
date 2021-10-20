@@ -1,4 +1,5 @@
 import { Proposal } from '../models/accounts'
+import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import useRealm from './useRealm'
 
@@ -15,7 +16,7 @@ export default function useProposalVotes(proposal?: Proposal) {
       : councilMint
 
   // TODO: optimize using memo
-  if (!proposal || !governance || !proposalMint)
+  if (!realm || !proposal || !governance || !proposalMint)
     return {
       voteThresholdPct: 100,
       yesVotePct: 0,
@@ -28,7 +29,12 @@ export default function useProposalVotes(proposal?: Proposal) {
     (proposal.isVoteFinalized() && proposal.voteThresholdPercentage?.value) ||
     governance.config.voteThresholdPercentage.value
 
-  const yesVotePct = calculatePct(proposal.yesVotesCount, proposalMint.supply)
+  const maxVoteWeight = getProposalMaxVoteWeight(
+    realm.info,
+    proposal,
+    proposalMint
+  )
+  const yesVotePct = calculatePct(proposal.yesVotesCount, maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
 
   const yesVoteCount = fmtTokenAmount(

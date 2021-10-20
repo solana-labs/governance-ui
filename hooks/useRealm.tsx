@@ -2,7 +2,7 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { getRealmInfo } from '../models/registry/api'
 import { EndpointTypes } from '../models/types'
-import { VoterWeight } from '../models/voterWeight'
+import { VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
 
