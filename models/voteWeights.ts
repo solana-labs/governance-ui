@@ -2,6 +2,8 @@ import BN from 'bn.js'
 import { MintInfo } from '@solana/spl-token'
 import BigNumber from 'bignumber.js'
 import {
+  Governance,
+  GovernanceConfig,
   MintMaxVoteWeightSource,
   Proposal,
   Realm,
@@ -40,6 +42,30 @@ export class VoterWeight {
     }
 
     throw new Error('Current wallet has no Token Owner Records')
+  }
+
+  hasMinCommunityWeight(minCommunityWeight: BN) {
+    return (
+      this.communityTokenRecord &&
+      this.communityTokenRecord.info.governingTokenDepositAmount.cmp(
+        minCommunityWeight
+      ) >= 0
+    )
+  }
+  hasMinCouncilWeight(minCouncilWeight: BN) {
+    return (
+      this.councilTokenRecord &&
+      this.councilTokenRecord.info.governingTokenDepositAmount.cmp(
+        minCouncilWeight
+      ) >= 0
+    )
+  }
+
+  canCreateProposal(config: GovernanceConfig) {
+    return (
+      this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal) ||
+      this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
+    )
   }
 }
 

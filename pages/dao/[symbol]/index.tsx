@@ -6,7 +6,7 @@ import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
 import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
-import NewBtn from './proposal/components/NewBtn'
+import NewProposalBtn from './proposal/components/NewProposalBtn'
 import { PublicKey } from '@solana/web3.js'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
@@ -78,7 +78,7 @@ const REALM = () => {
           <div className="flex items-center justify-between pb-3">
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
-              <NewBtn></NewBtn>
+              <NewProposalBtn></NewProposalBtn>
               <ProposalFilter filters={filters} setFilters={setFilters} />
             </div>
           </div>
