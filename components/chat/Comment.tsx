@@ -1,25 +1,28 @@
 import moment from 'moment'
 import React from 'react'
-import { VoteRecord } from '../models/accounts'
+import { VoteRecord } from '../../models/accounts'
 import {
   CheckCircleIcon,
   UserCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
-import { ChatMessage } from '../models/chat/accounts'
-import { abbreviateAddress, fmtTokenAmount } from '../utils/formatting'
-import useRealm from '../hooks/useRealm'
+import { ChatMessage } from '../../models/chat/accounts'
+import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
+import useRealm from '../../hooks/useRealm'
+import { MintInfo } from '@solana/spl-token'
 
 const Comment = ({
   chatMessage,
   voteRecord,
+  proposalMint,
 }: {
   chatMessage: ChatMessage
   voteRecord: VoteRecord | undefined
+  proposalMint: MintInfo | undefined
 }) => {
   const { author, postedAt, body } = chatMessage
-  const { mint, symbol } = useRealm()
+  const { symbol } = useRealm()
 
   return (
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
@@ -61,7 +64,7 @@ const Comment = ({
             <span className="pl-2 text-xs">
               {`${fmtTokenAmount(
                 voteRecord.getVoteWeight(),
-                mint?.decimals
+                proposalMint?.decimals
               ).toLocaleString()} ${symbol}`}
             </span>
           </div>

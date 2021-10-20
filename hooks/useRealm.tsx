@@ -2,6 +2,7 @@ import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { getRealmInfo } from '../models/registry/api'
 import { EndpointTypes } from '../models/types'
+import { VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
 
@@ -78,5 +79,6 @@ export default function useRealm() {
     ownTokenRecord,
     councilTokenAccount,
     ownCouncilTokenRecord,
+    ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
   }
 }

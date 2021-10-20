@@ -57,6 +57,14 @@ const MAINNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6'),
     realmId: new PublicKey('EtZWAeFFRC5k6uesap1F1gkHFimsL2HqttVTNAeN86o8'),
   },
+  {
+    symbol: 'SERUM',
+    programId: new PublicKey('AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is'),
+    realmId: new PublicKey('3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg'),
+    website: 'https://www.projectserum.com/',
+    ogImage:
+      'https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png',
+  },
 ]
 
 // Hardcoded list of devnet realms

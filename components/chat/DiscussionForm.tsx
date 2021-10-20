@@ -1,18 +1,21 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState } from 'react'
-import Button from './Button'
-import Input from './inputs/Input'
-import useWalletStore from '../stores/useWalletStore'
-import useRealm from '../hooks/useRealm'
-import { RpcContext } from '../models/core/api'
-import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
-import { postChatMessage } from '../actions/chat/postMessage'
-import Loading from './Loading'
+import Button from '../Button'
+import Input from '../inputs/Input'
+import useWalletStore from '../../stores/useWalletStore'
+import useRealm from '../../hooks/useRealm'
+import { RpcContext } from '../../models/core/api'
+import {
+  ChatMessageBody,
+  ChatMessageBodyType,
+} from '../../models/chat/accounts'
+import { postChatMessage } from '../../actions/chat/postMessage'
+import Loading from '../Loading'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const { ownTokenRecord } = useRealm()
+  const { ownVoterWeight } = useRealm()
 
   const [submitting, setSubmitting] = useState(false)
 
@@ -37,10 +40,16 @@ const DiscussionForm = () => {
     })
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      await postChatMessage(rpcContext, proposal!, ownTokenRecord!.pubkey, msg)
+      await postChatMessage(
+        rpcContext,
+        proposal!,
+        ownVoterWeight.getTokenRecord(),
+        msg
+      )
+
       setComment('')
-    } catch {
+    } catch (ex) {
+      console.error("Can't post chat message", ex)
       //TODO: How do we present transaction errors to users? Just the notification?
     } finally {
       setSubmitting(false)
@@ -50,10 +59,7 @@ const DiscussionForm = () => {
   }
 
   const postEnabled =
-    connected &&
-    ownTokenRecord &&
-    !ownTokenRecord.info.governingTokenDepositAmount.isZero() &&
-    comment
+    proposal && connected && ownVoterWeight.hasAnyWeight() && comment
 
   return (
     <>

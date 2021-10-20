@@ -53,7 +53,7 @@ const ProposalStateBadge = ({
 
   let statusLabel = getProposalStateLabel(
     proposal.state,
-    proposal.getTimeToVoteEnd(governance) < 0
+    governance && proposal.getTimeToVoteEnd(governance) < 0
   )
 
   if (ownVoteRecord) {

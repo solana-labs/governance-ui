@@ -1,11 +1,11 @@
 import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData, InstructionData } from '../../models/accounts'
-import BN from 'bn.js'
-import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
-import { tryGetMint, tryGetTokenAccount } from '../../utils/tokens'
+
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
+import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
+import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
@@ -27,22 +27,6 @@ export const ACCOUNT_NAMES = {
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
-}
-
-export interface TokenDescriptor {
-  name: string
-  decimals: number
-}
-
-// Well known token account descriptors displayed on the instruction card
-export const TOKEN_DESCRIPTORS = {
-  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: { name: 'MNGO' },
-  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf': { name: 'USDC' },
-  '4nvTrY3KdYCVEtzfopCDZ2NuL8u6ZaHgL7xcUnQDQpHe': { name: 'SOCN' },
-}
-
-export function getTokenDescriptor(tokenAccountPk: PublicKey): TokenDescriptor {
-  return TOKEN_DESCRIPTORS[tokenAccountPk.toBase58()]
 }
 
 export interface AccountDescriptor {
@@ -68,234 +52,9 @@ export interface InstructionDescriptor {
 
 // Well known program instructions displayed on the instruction card
 export const INSTRUCTION_DESCRIPTORS = {
-  TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA: {
-    3: {
-      name: 'Token: Transfer',
-      accounts: [
-        { name: 'Source', important: true },
-        { name: 'Destination', important: true },
-        { name: 'Authority' },
-      ],
-      getDataUI: async (
-        connection: Connection,
-        data: Uint8Array,
-        accounts: AccountMetaData[]
-      ) => {
-        const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
-        const tokenAccount = await tryGetTokenAccount(
-          connection,
-          accounts[0].pubkey
-        )
-        const tokenMint = await tryGetMint(
-          connection,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          tokenAccount!.account.mint
-        )
-
-        // TokenTransfer instruction layout
-        // TODO: Use BufferLayout to decode the instruction
-        // const dataLayout = BufferLayout.struct([
-        //     BufferLayout.u8('instruction'),
-        //     Layout.uint64('amount'),
-        //   ]);
-        const rawAmount = new BN(data.slice(1), 'le')
-        const tokenAmount = tokenMint
-          ? rawAmount.div(new BN(10).pow(new BN(tokenMint.account.decimals)))
-          : rawAmount
-
-        return (
-          <>
-            {tokenMint ? (
-              <div>
-                <div>
-                  <span>Amount:</span>
-                  <span>{`${tokenAmount.toNumber().toLocaleString()} ${
-                    tokenDescriptor?.name ?? ''
-                  }`}</span>
-                </div>
-              </div>
-            ) : (
-              <div>{JSON.stringify(data)}</div>
-            )}
-          </>
-        )
-      },
-    },
-    7: {
-      name: 'Token: MintTo',
-      accounts: [
-        { name: 'Mint', important: true },
-        { name: 'Destination', important: true },
-        { name: 'Minting Authority' },
-      ],
-      getDataUI: async (
-        connection: Connection,
-        data: Uint8Array,
-        accounts: AccountMetaData[]
-      ) => {
-        const tokenDescriptor = getTokenDescriptor(accounts[0].pubkey)
-        const tokenMint = await tryGetMint(connection, accounts[0].pubkey)
-
-        // TokenMint instruction layout
-        // TODO: Use BufferLayout to decode the instruction
-        // const dataLayout = BufferLayout.struct([
-        //     BufferLayout.u8('instruction'),
-        //     Layout.uint64('amount'),
-        //   ]);
-
-        const rawAmount = new BN(data.slice(1), 'le')
-        const tokenAmount = tokenMint
-          ? rawAmount.div(new BN(10).pow(new BN(tokenMint.account.decimals)))
-          : rawAmount
-
-        return (
-          <>
-            {tokenMint ? (
-              <div>
-                <div>
-                  <span>Amount:</span>
-                  <span>{`${tokenAmount.toNumber().toLocaleString()} ${
-                    tokenDescriptor?.name ?? ''
-                  }`}</span>
-                </div>
-              </div>
-            ) : (
-              <div>{JSON.stringify(data)}</div>
-            )}
-          </>
-        )
-      },
-    },
-  },
-  mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: {
-    4: {
-      name: 'Mango v3: Add Spot Market',
-      accounts: [
-        { name: 'Mango Group' },
-        { name: 'Oracle' },
-        { name: 'Spot Market' },
-        { name: 'Dex Program' },
-        { name: 'Quote Mint' },
-      ],
-      getDataUI: async (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .AddSpotMarket
-        return (
-          <>
-            <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            <p>optimalUtil: {args.optimalUtil.toNumber()}</p>
-            <p>optimalRate: {args.optimalRate.toNumber()}</p>
-            <p>maxRate: {args.maxRate.toNumber()}</p>
-          </>
-        )
-      },
-    },
-    10: {
-      name: 'Mango v3: Add Oracle',
-      accounts: [{ name: 'Mango Group' }, { name: 'Oracle' }],
-    },
-    11: {
-      name: 'Mango v3: Add Perp Market',
-      accounts: {
-        0: { name: 'Mango Group' },
-        1: { name: 'Oracle' },
-        6: { name: 'Incentive Vault' },
-      },
-      getDataUI: async (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .AddPerpMarket
-        const mngoMint = { name: 'MNGO', decimals: 6 }
-        return (
-          <>
-            <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            <p>makerFee: {args.makerFee.toNumber()}</p>
-            <p>takerFee: {args.takerFee.toNumber()}</p>
-            <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
-            <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
-            <p>rate: {args.rate.toString()}</p>
-            <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
-            <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            <p>
-              mngoPerPeriod:{' '}
-              {args.mngoPerPeriod.toNumber() / Math.pow(10, mngoMint.decimals)}
-            </p>
-          </>
-        )
-      },
-    },
-    37: {
-      name: 'Mango v3: Change Perp Market',
-      accounts: {
-        0: { name: 'Mango Group' },
-        1: { name: 'Perp Market' },
-      },
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangePerpMarketParams
-        const mngoMint = { name: 'MNGO', decimals: 6 }
-        return (
-          <>
-            {args.initLeverageOption && (
-              <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            )}
-            {args.maintLeverageOption && (
-              <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            )}
-            {args.liquidationFeeOption && (
-              <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            )}
-
-            {args.makerFeeOption && <p>makerFee: {args.makerFee.toNumber()}</p>}
-
-            {args.takerFeeOption && <p>takerFee: {args.takerFee.toNumber()}</p>}
-
-            {args.baseLotSizeOption && (
-              <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
-            )}
-
-            {args.quoteLotSizeOption && (
-              <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
-            )}
-
-            {args.rateOption && <p>rate: {args.rate.toString()}</p>}
-
-            {args.maxDepthBpsOption && (
-              <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
-            )}
-
-            {args.targetPeriodLengthOption && (
-              <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            )}
-
-            {args.mngoPerPeriodOption && (
-              <p>
-                mngoPerPeriod:{' '}
-                {args.mngoPerPeriod.toNumber() /
-                  Math.pow(10, mngoMint.decimals)}
-              </p>
-            )}
-          </>
-        )
-      },
-    },
-  },
+  ...SPL_TOKEN_INSTRUCTIONS,
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
+  ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
 }
 
