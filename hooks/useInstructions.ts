@@ -11,10 +11,10 @@ export default function useInstructions() {
   const { ownTokenRecord, realm } = useRealm()
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
-    const governancesFiltred = governancesArray.filter(
+    const governancesFiltered = governancesArray.filter(
       (gov) => gov.info?.accountType === type
     )
-    return governancesFiltred
+    return governancesFiltered
   }
   const canUseTransferInstruction = getGovernancesByAccountType(
     GovernanceAccountType.TokenGovernance
@@ -30,11 +30,11 @@ export default function useInstructions() {
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
-      isVisbile: canUseTransferInstruction,
+      isVisible: canUseTransferInstruction,
     },
   ]
   const getAvailableInstructions = () => {
-    return availableInstructions.filter((x) => x.isVisbile)
+    return availableInstructions.filter((x) => x.isVisible)
   }
   return {
     governancesArray,
