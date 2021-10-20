@@ -1,9 +1,9 @@
 import Link from 'next/link'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
-import useProposal from '@hooks/useProposal'
+
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import useRealm from '@hooks/useRealm'
-import { option } from '@tools/core/option'
+
 import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
@@ -39,7 +39,14 @@ const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm, governances, ownVoterWeight, mint } = useRealm()
+  const {
+    symbol,
+    realm,
+    governances,
+    ownVoterWeight,
+    mint,
+    councilMint,
+  } = useRealm()
   const { getAvailableInstructions } = useInstructions()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -135,7 +142,9 @@ const New = () => {
         // TODO: If token holders for both mints can vote the we should add the option in the UI to choose who votes (community or the council)
         const proposalMint = !mint?.supply.isZero()
           ? realm.info.communityMint
-          : realm.info.config.councilMint
+          : !councilMint?.supply.isZero()
+          ? realm.info.config.councilMint
+          : undefined
 
         if (!proposalMint) {
           throw new Error(
