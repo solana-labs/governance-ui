@@ -26,6 +26,7 @@ export const withCreateSplTokenAccount = async (
       provider,
       tokenAccount.publicKey,
       mint,
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       wallet!.publicKey!
     ))
   )

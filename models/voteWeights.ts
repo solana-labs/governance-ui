@@ -2,7 +2,6 @@ import BN from 'bn.js'
 import { MintInfo } from '@solana/spl-token'
 import BigNumber from 'bignumber.js'
 import {
-  Governance,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   Proposal,
