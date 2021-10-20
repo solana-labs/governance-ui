@@ -23,7 +23,6 @@ import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
 import {
-  createParams,
   Instruction,
   Instructions,
   SplTokenTransferRef,
@@ -40,7 +39,7 @@ const New = () => {
   const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, realm, governances, ownVoterWeight } = useRealm()
+  const { symbol, realm, governances, ownVoterWeight, mint } = useRealm()
   const { getAvailableInstructions } = useInstructions()
   const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
@@ -132,21 +131,32 @@ const New = () => {
           governance.info.config
         )
 
-        const params: createParams = [
+        // Select the governing token mint for the proposal
+        // By default we choose the community mint if it has positive supply (otherwise nobody can vote)
+        // TODO: If token holders for both mints can vote the we should add the option in the UI to choose who votes (community or the council)
+        const proposalMint = !mint?.supply.isZero()
+          ? realm.info.communityMint
+          : realm.info.config.councilMint
+
+        if (!proposalMint) {
+          throw new Error(
+            'There is no suitable governing token for the proposal'
+          )
+        }
+
+        proposalAddress = await createProposal(
           rpcContext,
           realm.pubkey,
           governance.pubkey,
           ownTokenRecord.pubkey,
           form.title,
           form.description,
-          realm.info.communityMint,
+          proposalMint,
           governance?.info?.config.minInstructionHoldUpTime,
           governance?.info?.proposalCount,
           instructionsData,
-          isDraft,
-        ]
-
-        proposalAddress = await createProposal(...params)
+          isDraft
+        )
         const url = generateUrlWithClusterParam(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
