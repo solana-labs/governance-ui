@@ -41,7 +41,6 @@ const New = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
   const { symbol, realm, governances, ownVoterWeight, mint } = useRealm()
   const { getAvailableInstructions } = useInstructions()
-  const { proposal } = useProposal()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const availableInstructions = getAvailableInstructions()
@@ -274,7 +273,7 @@ const New = () => {
         </>
       </div>
       <div className="col-span-4 space-y-4">
-        <TokenBalanceCard proposal={option(proposal?.info)} />
+        <TokenBalanceCard />
       </div>
     </div>
   )
