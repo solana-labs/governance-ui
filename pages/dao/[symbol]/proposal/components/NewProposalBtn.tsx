@@ -3,17 +3,23 @@ import { Disclosure } from '@headlessui/react'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
-import { BN } from '@project-serum/anchor'
 
-const NewBtn = () => {
+const NewProposalBtn = () => {
   const { generateUrlWithClusterParam } = useQueryContext()
-  const { symbol, ownTokenRecord, realm } = useRealm()
+  const {
+    symbol,
+
+    realm,
+    governances,
+    ownVoterWeight,
+  } = useRealm()
+
   const canCreateProposal =
-    ownTokenRecord &&
     realm &&
-    ownTokenRecord.info.governingTokenDepositAmount.cmp(
-      new BN(realm.info.config.minCommunityTokensToCreateGovernance)
-    ) >= 0
+    Object.values(governances).some((g) =>
+      ownVoterWeight.canCreateProposal(g.info.config)
+    )
+
   return (
     <Disclosure
       as="div"
@@ -34,4 +40,4 @@ const NewBtn = () => {
   )
 }
 
-export default NewBtn
+export default NewProposalBtn

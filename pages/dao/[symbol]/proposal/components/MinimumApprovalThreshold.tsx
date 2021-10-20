@@ -2,7 +2,7 @@ import ProgressBar from '@components/ProgressBar'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
 
-const MinimumApprovalTreshold = () => {
+const MinimumApprovalThreshold = () => {
   const { realmInfo, governances } = useRealm()
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
@@ -21,4 +21,4 @@ const MinimumApprovalTreshold = () => {
   )
 }
 
-export default MinimumApprovalTreshold
+export default MinimumApprovalThreshold

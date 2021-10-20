@@ -25,7 +25,7 @@ export const useIsBeyondTimestamp = (timestamp: number | undefined) => {
         const now = moment().unix()
         if (now > timestamp) {
           setIsBeyondTimestamp(true)
-          clearInterval(id!)
+          clearInterval(id)
         }
       }, 5000) // TODO: Use actual timestamp to calculate the interval
 
