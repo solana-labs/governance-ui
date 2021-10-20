@@ -3,7 +3,7 @@ import Comment from './Comment'
 import useWalletStore from '../stores/useWalletStore'
 
 const DiscussionPanel = () => {
-  const { chatMessages, voteRecordsByVoter } = useWalletStore(
+  const { chatMessages, voteRecordsByVoter, proposalMint } = useWalletStore(
     (s) => s.selectedProposal
   )
 
@@ -27,6 +27,7 @@ const DiscussionPanel = () => {
             chatMessage={cm.info}
             voteRecord={voteRecordsByVoter[cm.info.author.toBase58()]?.info}
             key={cm.pubkey.toBase58()}
+            proposalMint={proposalMint}
           />
         ))}
     </div>
