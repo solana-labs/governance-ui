@@ -11,6 +11,7 @@ import {
   getOwnedTokenAccounts,
 } from '../utils/tokens'
 import {
+  getGovernance,
   getGovernanceAccount,
   getGovernanceAccounts,
   getTokenOwnerRecordsByTokenOwner,
@@ -388,6 +389,18 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.selectedRealm.proposalDescriptions = proposalDescriptions
         s.selectedRealm.loading = false
+      })
+    },
+
+    // Fetches and updates governance for the selected realm
+    async fetchRealmGovernance(governancePk: PublicKey) {
+      const connection = get().connection.current
+      const set = get().set
+
+      const governance = await getGovernance(connection, governancePk)
+
+      set((s) => {
+        s.selectedRealm.governances[governancePk.toBase58()] = governance
       })
     },
 

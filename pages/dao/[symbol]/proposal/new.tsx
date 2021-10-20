@@ -47,6 +47,7 @@ const New = () => {
   const defaultInstructionComponentModel = {
     type: availableInstructions[0],
   }
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -140,6 +141,9 @@ const New = () => {
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
         router.push(url)
+
+        // Refresh governance to update proposal index
+        fetchRealmGovernance(governance.pubkey)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
       }

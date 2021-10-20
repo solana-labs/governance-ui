@@ -18,11 +18,10 @@ export async function fetchGistFile(gistUrl: string) {
       console.log('fetchGistFile file', gistUrl, fileResponse)
       return await fileResponse.text()
     } else {
-      console.error(
-        'could not fetchGistFile',
+      console.warn('could not fetchGistFile', {
         gistUrl,
-        await apiResponse.text()
-      )
+        apiResponse: await apiResponse.text(),
+      })
     }
   }
 
