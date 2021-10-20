@@ -11,7 +11,7 @@ import Select from '@components/inputs/Select'
 import React, { useRef, useState } from 'react'
 import Button from '@components/Button'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
-import MinimumApprovalTreshold from './components/MinimumApprovalTreshold'
+import MinimumApprovalThreshold from './components/MinimumApprovalThreshold'
 import { RpcContext } from '@models/core/api'
 import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
@@ -247,7 +247,7 @@ const New = () => {
                 Add new instruction
               </Button>
             </div>
-            <MinimumApprovalTreshold></MinimumApprovalTreshold>
+            <MinimumApprovalThreshold></MinimumApprovalThreshold>
             <div className="flex justify-end mt-5">
               <Button className="w-44 mr-5" onClick={() => handleCreate(true)}>
                 Create Draft
