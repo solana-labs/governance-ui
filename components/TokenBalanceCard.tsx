@@ -21,7 +21,7 @@ import Button from './Button'
 import { Option } from '../tools/core/option'
 import { GoverningTokenType } from '../models/enums'
 import { fmtMintAmount } from '../tools/sdk/units'
-import { getTokenMintDescriptor } from './instructions/programs/splToken'
+import { getMintMetadata } from './instructions/programs/splToken'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -121,8 +121,7 @@ const TokenDeposit = ({
       ? realm?.info.communityMint
       : realm?.info.config.councilMint
 
-  const tokenName =
-    getTokenMintDescriptor(depositMint)?.name ?? realm?.info.name
+  const tokenName = getMintMetadata(depositMint)?.name ?? realm?.info.name
 
   const depositTokenName = `${tokenName} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'

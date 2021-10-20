@@ -3,25 +3,23 @@ import { AccountMetaData } from '../../../models/accounts'
 import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 
-export interface TokenMintDescriptor {
+export interface TokenMintMetadata {
   name: string
 }
 
-// Well known token mint descriptors displayed on the instruction card
-export const TOKEN_MINT_DESCRIPTORS = {
+// Mint metadata for Well known tokens displayed on the instruction card
+export const MINT_METADATA = {
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: { name: 'MNGO' },
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: { name: 'USDC' },
   '5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm': { name: 'SOCN' },
   SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt: { name: 'SRM' },
 }
 
-export function getTokenMintDescriptor(
+export function getMintMetadata(
   tokenMintPk: PublicKey | undefined
-): TokenMintDescriptor {
+): TokenMintMetadata {
   // TODO: Fetch token mint metadata from the chain
-  return tokenMintPk
-    ? TOKEN_MINT_DESCRIPTORS[tokenMintPk.toBase58()]
-    : undefined
+  return tokenMintPk ? MINT_METADATA[tokenMintPk.toBase58()] : undefined
 }
 
 export const SPL_TOKEN_INSTRUCTIONS = {
@@ -48,9 +46,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
           tokenAccount!.account.mint
         )
 
-        const tokenMintDescriptor = getTokenMintDescriptor(
-          tokenAccount?.account.mint
-        )
+        const tokenMintDescriptor = getMintMetadata(tokenAccount?.account.mint)
 
         // TokenTransfer instruction layout
         // TODO: Use BufferLayout to decode the instruction
@@ -95,7 +91,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
       ) => {
         const tokenMint = await tryGetMint(connection, accounts[0].pubkey)
 
-        const tokenMintDescriptor = getTokenMintDescriptor(accounts[0].pubkey)
+        const tokenMintDescriptor = getMintMetadata(accounts[0].pubkey)
 
         // TokenMint instruction layout
         // TODO: Use BufferLayout to decode the instruction
