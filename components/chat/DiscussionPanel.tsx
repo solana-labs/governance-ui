@@ -1,6 +1,6 @@
 import DiscussionForm from './DiscussionForm'
 import Comment from './Comment'
-import useWalletStore from '../stores/useWalletStore'
+import useWalletStore from '../../stores/useWalletStore'
 
 const DiscussionPanel = () => {
   const { chatMessages, voteRecordsByVoter, proposalMint } = useWalletStore(

@@ -1,15 +1,15 @@
 import moment from 'moment'
 import React from 'react'
-import { VoteRecord } from '../models/accounts'
+import { VoteRecord } from '../../models/accounts'
 import {
   CheckCircleIcon,
   UserCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
-import { ChatMessage } from '../models/chat/accounts'
-import { abbreviateAddress, fmtTokenAmount } from '../utils/formatting'
-import useRealm from '../hooks/useRealm'
+import { ChatMessage } from '../../models/chat/accounts'
+import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
+import useRealm from '../../hooks/useRealm'
 import { MintInfo } from '@solana/spl-token'
 
 const Comment = ({

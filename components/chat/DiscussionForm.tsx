@@ -1,13 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState } from 'react'
-import Button from './Button'
-import Input from './Input'
-import useWalletStore from '../stores/useWalletStore'
-import useRealm from '../hooks/useRealm'
-import { RpcContext } from '../models/core/api'
-import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
-import { postChatMessage } from '../actions/chat/postMessage'
-import Loading from './Loading'
+import Button from '../Button'
+import Input from '../Input'
+import useWalletStore from '../../stores/useWalletStore'
+import useRealm from '../../hooks/useRealm'
+import { RpcContext } from '../../models/core/api'
+import {
+  ChatMessageBody,
+  ChatMessageBodyType,
+} from '../../models/chat/accounts'
+import { postChatMessage } from '../../actions/chat/postMessage'
+import Loading from '../Loading'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
