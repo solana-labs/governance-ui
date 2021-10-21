@@ -42,7 +42,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     destinationAccount: '',
     // No default transfer amount
     amount: undefined,
-    governance: undefined,
+    governedAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
   })
@@ -94,7 +94,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     if (
       isValid &&
       programId &&
-      form.governance?.token?.publicKey &&
+      form.governedAccount?.token?.publicKey &&
       form.mintInfo
     ) {
       const mintAmount = parseMintNaturalAmountFromDecimal(
@@ -103,10 +103,10 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
       )
       const transferIx = Token.createTransferInstruction(
         TOKEN_PROGRAM_ID,
-        form.governance.token?.account.address,
+        form.governedAccount.token?.account.address,
         new PublicKey(form.destinationAccount),
         // TODO: using owner fixes instruction but GovernedTokenAccount should be GovernedTokenAccount and store the governance
-        form.governance.token?.account.owner,
+        form.governedAccount.token?.account.owner,
         [],
         mintAmount
       )
@@ -115,7 +115,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     const obj: Instruction = {
       serializedInstruction,
       isValid,
-      governance: form.governance,
+      governedAccount: form.governedAccount,
     }
     return obj
   }
@@ -127,8 +127,8 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     })
   }, [realmInfo?.programId])
   useEffect(() => {
-    setMintInfo(form.governance?.mint?.account)
-  }, [form.governance?.token?.publicKey])
+    setMintInfo(form.governedAccount?.mint?.account)
+  }, [form.governedAccount?.token?.publicKey])
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -146,7 +146,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructionData(
-      { governance: form.governance, getSerializedInstruction },
+      { governance: form.governedAccount, getSerializedInstruction },
       index
     )
   }, [form])
@@ -162,14 +162,14 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
         'amount',
         'The quantity must be less than the available tokens in the source account',
         async (val) => {
-          if (val && form.governance && form.governance?.mint) {
+          if (val && form.governedAccount && form.governedAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimal(
               val,
-              form.governance?.mint.account.decimals
+              form.governedAccount?.mint.account.decimals
             )
             return !!(
-              form.governance?.token?.publicKey &&
-              form.governance.token.account.amount.gte(new BN(mintValue))
+              form.governedAccount?.token?.publicKey &&
+              form.governedAccount.token.account.amount.gte(new BN(mintValue))
             )
           }
           return false
@@ -186,7 +186,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
               await validateDestinationAccAdress(
                 connection,
                 val,
-                form.governance?.token?.account.address
+                form.governedAccount?.token?.account.address
               )
               return true
             } catch (e) {
@@ -222,9 +222,9 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     }
   }
   const returnGovernanceTokenAccountLabel = () => {
-    if (form.governance) {
+    if (form.governedAccount) {
       const { label, tokenName, amout } = returnGovernanceTokenAccountLabelInfo(
-        form.governance
+        form.governedAccount
       )
       return (
         <div>
@@ -246,7 +246,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
           handleSetForm({ value, propertyName: 'governance' })
         }
         componentLabelFcn={returnGovernanceTokenAccountLabel}
-        value={form.governance?.token?.account?.address?.toString()}
+        value={form.governedAccount?.token?.account?.address?.toString()}
         error={formErrors['governance']}
       >
         {governedTokenAccounts

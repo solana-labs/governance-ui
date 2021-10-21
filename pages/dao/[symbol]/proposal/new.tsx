@@ -75,7 +75,7 @@ const New = () => {
     .find(
       (x) =>
         x.info.governedAccount ===
-        instructionsData[0]?.governance?.token?.account.address
+        instructionsData[0]?.governedAccount?.token?.account.address
     )
 
   const handleSetInstructionData = (val: any, index) => {
@@ -118,13 +118,15 @@ const New = () => {
       schema,
       form
     )
+
     const instructions: Instruction[] = await getInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
       throw 'no realm selected'
     }
+
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      const governance = instructions[0]?.governance
+      let governance = instructions[0]?.governedAccount?.governance
       if (!governance) {
         throw Error('no governance selected')
       }
@@ -141,12 +143,12 @@ const New = () => {
 
       try {
         // Fetch governance to get up to date proposalCount
-        const governanceAccount = (await fetchRealmGovernance(
-          governance.token?.publicKey
+        governance = (await fetchRealmGovernance(
+          governance.pubkey
         )) as ParsedAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governanceAccount.info.config
+          governance.info.config
         )
 
         // Select the governing token mint for the proposal
@@ -167,13 +169,13 @@ const New = () => {
         proposalAddress = await createProposal(
           rpcContext,
           realm.pubkey,
-          governanceAccount.pubkey,
+          governance.pubkey,
           ownTokenRecord.pubkey,
           form.title,
           form.description,
           proposalMint,
-          governanceAccount?.info?.config.minInstructionHoldUpTime,
-          governanceAccount?.info?.proposalCount,
+          governance?.info?.config.minInstructionHoldUpTime,
+          governance?.info?.proposalCount,
           instructionsData,
           isDraft
         )
@@ -191,7 +193,7 @@ const New = () => {
 
   useEffect(() => {
     setInstructionsData([instructionsData[0]])
-  }, [instructionsData[0].governance?.token?.publicKey])
+  }, [instructionsData[0].governedAccount?.token?.publicKey])
 
   const returnCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
@@ -199,7 +201,7 @@ const New = () => {
         return (
           <SplTokenTransfer
             index={idx}
-            mainGovernance={instructionsData[0].governance}
+            mainGovernance={instructionsData[0].governedAccount}
           ></SplTokenTransfer>
         )
       default:
