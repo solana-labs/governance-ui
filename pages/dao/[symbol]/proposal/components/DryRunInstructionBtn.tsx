@@ -1,4 +1,4 @@
-import Button, { LinkButton } from '@components/Button'
+import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
@@ -81,13 +81,13 @@ const DryRunInstructionBtn = ({
   }
   return (
     <>
-      <Button
+      <SecondaryButton
         className={btnClassNames}
         onClick={handleDryRun}
         disabled={isPending}
       >
         {isPending ? <Loading></Loading> : 'Run simulation'}
-      </Button>
+      </SecondaryButton>
 
       {result?.response && (
         <Modal onClose={onClose} isOpen={isOpen}>

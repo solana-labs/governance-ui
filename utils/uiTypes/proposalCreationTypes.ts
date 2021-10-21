@@ -1,18 +1,18 @@
-import { Governance, InstructionData } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { InstructionData } from '@models/accounts'
 import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
+import { TokenAccountWithMintInfo } from '@utils/tokens'
 
 export interface Instruction {
   serializedInstruction: string
   isValid: boolean
-  governance: ParsedAccount<Governance> | undefined
+  governance: TokenAccountWithMintInfo | undefined
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number
-  governance: ParsedAccount<Governance> | undefined
+  governance: TokenAccountWithMintInfo | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }

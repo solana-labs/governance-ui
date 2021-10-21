@@ -9,6 +9,9 @@ import {
   MintAccount,
   tryGetMint,
   getOwnedTokenAccounts,
+  tryGetTokenAccount,
+  tryGetTokenMint,
+  TokenAccountWithMintInfo,
 } from '../utils/tokens'
 import {
   getGovernance,
@@ -19,6 +22,7 @@ import {
 import {
   getAccountTypes,
   Governance,
+  GovernanceAccountType,
   Proposal,
   ProposalInstruction,
   Realm,
@@ -52,6 +56,7 @@ interface WalletStore extends State {
     programId?: PublicKey
     councilMint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
+    governedTokenAccounts: TokenAccountWithMintInfo[]
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
     proposalDescriptions: { [proposal: string]: string }
     /// Community token records by owner
@@ -161,6 +166,7 @@ const INITIAL_REALM_STATE = {
   programId: undefined,
   councilMint: undefined,
   governances: {},
+  governedTokenAccounts: [],
   proposals: {},
   proposalDescriptions: {},
   tokenRecords: {},
@@ -306,7 +312,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         realmCouncilMintPk && mints[realmCouncilMintPk.toBase58()]
 
       const set = get().set
-
+      //dodac tokenaccounts
       const [
         governances,
         tokenRecords,
@@ -342,9 +348,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenRecords,
         councilTokenOwnerRecords,
       })
-
+      const governedTokenAccounts = await get().actions.getTokenAccountsInfoForGov(
+        governances
+      )
       set((s) => {
         s.selectedRealm.realm = realm
+        s.selectedRealm.governedTokenAccounts = governedTokenAccounts
         s.selectedRealm.mint = realmMint
         s.selectedRealm.programId = programId
         s.selectedRealm.councilMint = realmCouncilMint
@@ -512,7 +521,33 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = chatMessages
       })
     },
-
+    async getTokenAccountsInfoForGov(governances) {
+      const connection = get().connection.current
+      const governedTokenAccounts: TokenAccountWithMintInfo[] = []
+      const governancesArray = Object.keys(governances)
+        .map((key) => governances[key])
+        .filter(
+          (gov) =>
+            gov.info?.accountType === GovernanceAccountType.TokenGovernance
+        )
+      for (const gov of governancesArray) {
+        try {
+          const [tokenAccount, mint] = await Promise.all([
+            tryGetTokenAccount(connection, gov.info.governedAccount),
+            tryGetTokenMint(connection, gov.info.governedAccount),
+          ])
+          if (tokenAccount && mint) {
+            governedTokenAccounts.push({ token: tokenAccount, mintInfo: mint })
+          }
+        } catch (e) {
+          console.log(
+            e,
+            `error fetching token acount ${gov.info.governedAccount}`
+          )
+        }
+      }
+      return governedTokenAccounts
+    },
     async fetchVoteRecords(proposal: ParsedAccount<Proposal>) {
       const endpoint = get().connection.endpoint
       const set = get().set

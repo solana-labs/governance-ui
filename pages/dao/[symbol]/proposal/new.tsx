@@ -30,6 +30,7 @@ import {
 import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
+import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -190,7 +191,18 @@ const New = () => {
         null
     }
   }
-
+  const actions: DropdownBtnOptions[] = [
+    {
+      label: 'Propose',
+      callback: () => handleCreate(false),
+      isDefault: true,
+    },
+    {
+      label: 'Create draft',
+      callback: () => handleCreate(true),
+      isDefault: false,
+    },
+  ]
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3">
@@ -271,12 +283,7 @@ const New = () => {
               governance={Object.values(governances)[0]?.info}
             ></MinimumApprovalThreshold>
             <div className="flex justify-end mt-5">
-              <Button className="w-44 mr-5" onClick={() => handleCreate(true)}>
-                Create Draft
-              </Button>
-              <Button className="w-44" onClick={() => handleCreate(false)}>
-                Propose
-              </Button>
+              <DropdownBtn options={actions}></DropdownBtn>
             </div>
           </div>
         </>

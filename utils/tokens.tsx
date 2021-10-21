@@ -15,6 +15,10 @@ import {
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
+export type TokenAccountWithMintInfo = {
+  token: ProgramAccount<AccountInfo>
+  mintInfo: ProgramAccount<MintInfo>
+}
 export type ProgramAccount<T> = {
   publicKey: PublicKey
   account: T
