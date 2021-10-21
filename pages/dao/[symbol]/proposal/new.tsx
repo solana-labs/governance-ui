@@ -292,9 +292,11 @@ const New = () => {
                 Add new instruction
               </Button>
             </div>
-            <MinimumApprovalThreshold
-              governance={mainGovernanceInfo?.info}
-            ></MinimumApprovalThreshold>
+            {mainGovernanceInfo?.info && (
+              <MinimumApprovalThreshold
+                governance={mainGovernanceInfo?.info}
+              ></MinimumApprovalThreshold>
+            )}
             <div className="flex justify-end mt-5">
               <DropdownBtn options={actions}></DropdownBtn>
             </div>
