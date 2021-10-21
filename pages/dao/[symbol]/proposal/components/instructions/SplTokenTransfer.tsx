@@ -231,7 +231,6 @@ const SplTokenTransfer = ({ index }) => {
                   acc.token?.account.amount
                 )}
               </div>
-              <div>{`mint: ${acc.mintInfo.account.decimals}`}</div>
             </Select.Option>
           )
         })}
