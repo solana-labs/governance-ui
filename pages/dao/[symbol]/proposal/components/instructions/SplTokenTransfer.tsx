@@ -157,6 +157,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
   const schema = yup.object().shape({
     amount: yup
       .number()
+      .nullable()
       .test(
         'amount',
         'The quantity must be less than the available tokens in the source account',
