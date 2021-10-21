@@ -27,10 +27,13 @@ import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { debounce } from '@utils/debounce'
 import { MainGovernanceContext } from '../../new'
 import { validateDestinationAccAdress } from '@utils/validations'
+import useInstructions from '@hooks/useInstructions'
 
 const SplTokenTransfer = ({ index }) => {
   const connection = useWalletStore((s) => s.connection)
-  const { realmInfo, governedTokenAccounts } = useRealm()
+  const { realmInfo } = useRealm()
+  const { governedTokenAccounts } = useInstructions()
+
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
     destinationAccount: '',
@@ -98,7 +101,7 @@ const SplTokenTransfer = ({ index }) => {
         TOKEN_PROGRAM_ID,
         form.governance.token?.account.address,
         new PublicKey(form.destinationAccount),
-        // TODO: using owner fixes instruction but TokenAccountWithMintInfo should be GovernedTokenAccount and store the governance
+        // TODO: using owner fixes instruction but GovernedTokenAccount should be GovernedTokenAccount and store the governance
         form.governance.token?.account.owner,
         [],
         mintAmount
@@ -120,7 +123,7 @@ const SplTokenTransfer = ({ index }) => {
     })
   }, [realmInfo?.programId])
   useEffect(() => {
-    setMintInfo(form.governance?.mintInfo?.account)
+    setMintInfo(form.governance?.mint?.account)
   }, [form.governance?.token?.publicKey])
   useEffect(() => {
     if (form.destinationAccount) {
@@ -150,21 +153,25 @@ const SplTokenTransfer = ({ index }) => {
   const schema = yup.object().shape({
     amount: yup
       .number()
-      .required('Amount is required')
-      .min(mintMinAmount, `Minimal value for amount is ${mintMinAmount}`)
       .test(
         'amount',
         'The quantity must be less than the available tokens in the source account',
-        async (val) => {
-          if (form.governance) {
+        async function (val) {
+          if (!val) {
+            return this.createError({
+              message: `Amount is required`,
+            })
+          }
+          if (form.governance && form.governance?.mint) {
             return !!(
-              form.governance.token.publicKey &&
+              form.governance?.token?.publicKey &&
+              form.governance?.mint.account &&
               val &&
               val <=
                 parseFloat(
                   formatMintNaturalAmountAsDecimal(
-                    form.governance.mintInfo.account,
-                    form.governance.token.account.amount
+                    form.governance?.mint.account,
+                    form.governance?.token?.account.amount
                   )
                 )
             )
@@ -174,7 +181,6 @@ const SplTokenTransfer = ({ index }) => {
       ),
     destinationAccount: yup
       .string()
-      .required('Destination account is required')
       .test(
         'accountTests',
         'Account validation error',
@@ -188,48 +194,77 @@ const SplTokenTransfer = ({ index }) => {
               )
               return true
             } catch (e) {
-              console.log(e)
               return this.createError({
                 message: `${e}`,
               })
             }
           } else {
-            return false
+            return this.createError({
+              message: `Destination account is required`,
+            })
           }
         }
       ),
     governance: yup.object().nullable().required('Source account is required'),
   })
-
+  const returnGovernanceTokenAccountLabelInfo = (acc) => {
+    const govAccount = acc.token.publicKey.toString()
+    const adressAsString = acc.token.account.address.toString()
+    const tokenName = getMintMetadata(acc.token.account.mint)?.name
+    const accName = getAccountName(acc.token.publicKey)
+    const label = accName ? `${accName}: ${adressAsString}` : adressAsString
+    const amout = formatMintNaturalAmountAsDecimal(
+      acc.mintInfo.account,
+      acc.token?.account.amount
+    )
+    return {
+      govAccount,
+      adressAsString,
+      tokenName,
+      label,
+      amout,
+    }
+  }
+  const returnGovernanceTokenAccountLabel = () => {
+    if (form.governance) {
+      const { label, tokenName, amout } = returnGovernanceTokenAccountLabelInfo(
+        form.governance
+      )
+      return (
+        <div>
+          <span>{label}</span>
+          {tokenName && <div>Token Name: {tokenName}</div>}
+          <div>Amount: {amout}</div>
+        </div>
+      )
+    } else {
+      return null
+    }
+  }
   return (
     <div className="mt-5">
       <Select
+        className="h-24"
         prefix="Source Account"
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'governance' })
         }
-        value={form.governance?.token.account?.address?.toString()}
+        componentLabelFcn={returnGovernanceTokenAccountLabel}
+        value={form.governance?.token?.account?.address?.toString()}
         error={formErrors['governance']}
       >
         {governedTokenAccounts.map((acc) => {
-          const govAccount = acc.token.publicKey.toString()
-          const adressAsString = acc.token.account.address.toString()
-          const tokenName = getMintMetadata(acc.token.account.mint)?.name
-          const accName = getAccountName(acc.token.publicKey)
-          const label = accName
-            ? `${accName}: ${adressAsString}`
-            : adressAsString
+          const {
+            govAccount,
+            label,
+            tokenName,
+            amout,
+          } = returnGovernanceTokenAccountLabelInfo(acc)
           return (
             <Select.Option key={govAccount} value={acc}>
               <span>{label}</span>
               {tokenName && <div>Token Name: {tokenName}</div>}
-              <div>
-                Amount:
-                {formatMintNaturalAmountAsDecimal(
-                  acc.mintInfo.account,
-                  acc.token?.account.amount
-                )}
-              </div>
+              <div>Amount: {amout}</div>
             </Select.Option>
           )
         })}

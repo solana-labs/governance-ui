@@ -16,6 +16,7 @@ const Select = ({
   error = '',
   disabled = false,
   prefix = '',
+  componentLabelFcn,
 }) => {
   return (
     <>
@@ -30,7 +31,11 @@ const Select = ({
                 <StyledDiv
                   className={`flex items-center justify-between space-x-4 p-2 text-th-fgd-1`}
                 >
-                  {value ? value : placeholder}
+                  {componentLabelFcn
+                    ? componentLabelFcn()
+                    : value
+                    ? value
+                    : placeholder}
                   {open ? (
                     <ChevronUpIcon className={`h-5 w-5 mr-1 text-th-primary`} />
                   ) : (

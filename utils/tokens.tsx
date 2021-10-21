@@ -12,12 +12,15 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
+import { ParsedAccount } from '@models/core/accounts'
+import { Governance } from '@models/accounts'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
-export type TokenAccountWithMintInfo = {
-  token: ProgramAccount<AccountInfo>
-  mintInfo: ProgramAccount<MintInfo>
+export type GovernedTokenAccount = {
+  token: ProgramAccount<AccountInfo> | undefined
+  mint: ProgramAccount<MintInfo> | undefined
+  governance: ParsedAccount<Governance> | undefined
 }
 export type ProgramAccount<T> = {
   publicKey: PublicKey

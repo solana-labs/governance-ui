@@ -1,9 +1,10 @@
 import { GovernanceAccountType } from '@models/accounts'
+import { GovernedTokenAccount } from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useRealm from './useRealm'
 
 export default function useInstructions() {
-  const { governances } = useRealm()
+  const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
   )
@@ -33,10 +34,33 @@ export default function useInstructions() {
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)
   }
+  function prepareGovernances() {
+    const tokenGovernances = getGovernancesByAccountType(
+      GovernanceAccountType.TokenGovernance
+    )
+    const governanes: GovernedTokenAccount[] = []
+    for (const i of tokenGovernances) {
+      const token = realmTokenAccounts.find(
+        (x) => x.publicKey.toBase58() === i.info.governedAccount.toBase58()
+      )
+      const mint = tokenMints.find(
+        (x) => token?.account.mint.toBase58() === x.publicKey.toBase58()
+      )
+      const obj = {
+        governance: i,
+        token,
+        mint,
+      }
+      governanes.push(obj)
+    }
+    return governanes
+  }
+  const governedTokenAccounts = prepareGovernances()
   return {
     governancesArray,
     getGovernancesByAccountType,
     availableInstructions,
     getAvailableInstructions,
+    governedTokenAccounts,
   }
 }

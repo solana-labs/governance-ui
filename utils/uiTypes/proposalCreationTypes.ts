@@ -2,17 +2,17 @@ import { InstructionData } from '@models/accounts'
 import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import { TokenAccountWithMintInfo } from '@utils/tokens'
+import { GovernedTokenAccount } from '@utils/tokens'
 
 export interface Instruction {
   serializedInstruction: string
   isValid: boolean
-  governance: TokenAccountWithMintInfo | undefined
+  governance: GovernedTokenAccount | undefined
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number
-  governance: TokenAccountWithMintInfo | undefined
+  governance: GovernedTokenAccount | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
@@ -36,7 +36,7 @@ export type createParams = [
 ]
 
 export interface ComponentInstructionData {
-  governance?: TokenAccountWithMintInfo | undefined
+  governance?: GovernedTokenAccount | undefined
   getSerializedInstruction?: () => Promise<Instruction>
   type: any
 }
