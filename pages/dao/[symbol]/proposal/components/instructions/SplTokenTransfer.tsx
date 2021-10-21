@@ -28,7 +28,7 @@ import DryRunInstructionBtn from '../DryRunInstructionBtn'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { debounce } from '@utils/debounce'
 import { MainGovernanceContext } from '../../new'
-import { validateDestinationAccAdress } from '@utils/validations'
+import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
 
@@ -160,8 +160,8 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
       .nullable()
       .test(
         'amount',
-        'The quantity must be less than the available tokens in the source account',
-        async (val) => {
+        'transfer amount must be less than the source account amount',
+        async function (val: number) {
           if (val && form.governedAccount && form.governedAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimal(
               val,
@@ -172,18 +172,20 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
               form.governedAccount.token.account.amount.gte(new BN(mintValue))
             )
           }
-          return false
+          return this.createError({
+            message: `amount is required`,
+          })
         }
       ),
     destinationAccount: yup
       .string()
       .test(
         'accountTests',
-        'Account validation error',
+        'account validation error',
         async function (val: string) {
           if (val) {
             try {
-              await validateDestinationAccAdress(
+              await validateDestinationAccAddress(
                 connection,
                 val,
                 form.governedAccount?.token?.account.address
@@ -196,7 +198,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
             }
           } else {
             return this.createError({
-              message: `Destination account is required`,
+              message: `destination account is required`,
             })
           }
         }
@@ -204,7 +206,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     governedAccount: yup
       .object()
       .nullable()
-      .required('Source account is required'),
+      .required('source account is required'),
   })
   const returnGovernanceTokenAccountLabelInfo = (acc) => {
     const govAccount = acc.token.publicKey.toString()

@@ -4,7 +4,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
 import { tryGetTokenAccount } from './tokens'
 
-export const validateDestinationAccAdress = async (
+export const validateDestinationAccAddress = async (
   connection,
   val: any,
   governedAccount?: PublicKey
@@ -13,7 +13,7 @@ export const validateDestinationAccAdress = async (
   if (pubKey) {
     const account = await connection.current.getParsedAccountInfo(pubKey)
     if (!account || !account.value) {
-      throw 'Account not found'
+      throw 'account not found'
     }
     if (
       !(
@@ -21,31 +21,31 @@ export const validateDestinationAccAdress = async (
         account.value.data.program === 'spl-token'
       )
     ) {
-      throw 'Invalid spl token account'
+      throw 'invalid spl token account'
     }
+
+    let tokenAccount
+
     try {
-      const tokenAccount = create(
-        account.value.data.parsed.info,
-        TokenAccountInfo
-      )
-      if (governedAccount) {
-        const sourceAccMint = await tryGetTokenAccount(
-          connection.current,
-          governedAccount
-        )
-        if (
-          tokenAccount.mint.toBase58() !==
-          sourceAccMint?.account.mint.toBase58()
-        ) {
-          throw "Account mint doesn't match source account"
-        }
-      } else {
-        throw 'Source account not provided'
-      }
+      tokenAccount = create(account.value.data.parsed.info, TokenAccountInfo)
     } catch {
-      throw 'Invalid spl token account'
+      throw 'invalid spl token account'
+    }
+
+    if (governedAccount) {
+      const sourceAccMint = await tryGetTokenAccount(
+        connection.current,
+        governedAccount
+      )
+      if (
+        tokenAccount.mint.toBase58() !== sourceAccMint?.account.mint.toBase58()
+      ) {
+        throw "account mint doesn't match source account"
+      }
+    } else {
+      throw 'source account not provided'
     }
   } else {
-    throw 'Provided value is not a valid account address'
+    throw 'provided value is not a valid account address'
   }
 }
