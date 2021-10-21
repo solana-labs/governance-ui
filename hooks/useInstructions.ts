@@ -28,7 +28,7 @@ export default function useInstructions() {
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
-      isVisible: true,
+      isVisible: canUseTransferInstruction,
     },
   ]
   const getAvailableInstructions = () => {

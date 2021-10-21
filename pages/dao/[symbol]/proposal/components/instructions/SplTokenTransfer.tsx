@@ -252,7 +252,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
           .filter((x) =>
             !shouldBeGoverned
               ? !shouldBeGoverned
-              : x.token?.account?.owner.toBase58() ===
+              : x.governance?.pubkey.toBase58() ===
                 mainGovernance.governance?.pubkey?.toBase58()
           )
           .map((acc) => {
