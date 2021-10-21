@@ -113,7 +113,7 @@ const New = () => {
       throw 'no realm selected'
     }
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      let governance = instructions[0].governance
+      const governance = instructions[0].governance
       if (!governance) {
         throw Error('no governance selected')
       }
@@ -130,12 +130,12 @@ const New = () => {
 
       try {
         // Fetch governance to get up to date proposalCount
-        governance = (await fetchRealmGovernance(
-          governance.pubkey
+        const governanceAccount = (await fetchRealmGovernance(
+          governance.token.publicKey
         )) as ParsedAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance.info.config
+          governanceAccount.info.config
         )
 
         // Select the governing token mint for the proposal
@@ -156,13 +156,13 @@ const New = () => {
         proposalAddress = await createProposal(
           rpcContext,
           realm.pubkey,
-          governance.pubkey,
+          governanceAccount.pubkey,
           ownTokenRecord.pubkey,
           form.title,
           form.description,
           proposalMint,
-          governance?.info?.config.minInstructionHoldUpTime,
-          governance?.info?.proposalCount,
+          governanceAccount?.info?.config.minInstructionHoldUpTime,
+          governanceAccount?.info?.proposalCount,
           instructionsData,
           isDraft
         )
