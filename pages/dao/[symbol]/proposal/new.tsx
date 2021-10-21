@@ -8,7 +8,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
-import React, { useRef, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import Button from '@components/Button'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import MinimumApprovalThreshold from './components/MinimumApprovalThreshold'
@@ -23,9 +23,10 @@ import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
 import {
+  ComponentInstructionData,
   Instruction,
   Instructions,
-  SplTokenTransferRef,
+  InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
@@ -35,9 +36,15 @@ import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
+const defaultGovernanceCtx: InstructionsContext = {
+  instructionsData: [],
+  handleSetInstructionData: () => null,
+}
+export const MainGovernanceContext = createContext<InstructionsContext>(
+  defaultGovernanceCtx
+)
 
 const New = () => {
-  const refs = useRef<SplTokenTransferRef[]>([])
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
@@ -49,22 +56,33 @@ const New = () => {
     councilMint,
   } = useRealm()
   const { getAvailableInstructions } = useInstructions()
+  const availableInstructions = getAvailableInstructions()
+
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const availableInstructions = getAvailableInstructions()
-  const defaultInstructionComponentModel = {
-    type: availableInstructions[0],
-  }
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+
   const [form, setForm] = useState({
     title: '',
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [instructionsComponents, setInstructions] = useState([
-    { ...defaultInstructionComponentModel, type: availableInstructions[0] },
-  ])
+  const [instructionsData, setInstructionsData] = useState<
+    ComponentInstructionData[]
+  >([{ type: availableInstructions[0] }])
+  const mainGovernanceInfo = Object.keys(governances)
+    .map((x) => governances[x])
+    .find(
+      (x) =>
+        x.info.governedAccount ===
+        instructionsData[0]?.governance?.token?.account.address
+    )
 
+  const handleSetInstructionData = (val: any, index) => {
+    const newInstructions = [...instructionsData]
+    newInstructions[index] = { ...instructionsData[index], ...val }
+    setInstructionsData(newInstructions)
+  }
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -73,30 +91,23 @@ const New = () => {
     const newInstruction = {
       type: value,
     }
-    setInstructionChangeAtIndex({ newModel: newInstruction, idx })
-  }
-  const setInstructionChangeAtIndex = ({ newModel, idx }) => {
-    const newInstructions = [...instructionsComponents]
-    newInstructions[idx] = newModel
-    setInstructions(newInstructions)
+    handleSetInstructionData(newInstruction, idx)
   }
   const addInstruction = () => {
-    setInstructions([
-      ...instructionsComponents,
-      defaultInstructionComponentModel,
-    ])
+    setInstructionsData([...instructionsData, { type: undefined }])
   }
   const removeInstruction = (idx) => {
-    setInstructions([
-      ...instructionsComponents.filter((x, index) => index !== idx),
+    setInstructionsData([
+      ...instructionsData.filter((x, index) => index !== idx),
     ])
   }
   const getInstructions = async () => {
     const instructions: Instruction[] = []
-    const instRefs: SplTokenTransferRef[] = refs.current
-    for (const inst of instRefs) {
-      const instruction: Instruction = await inst?.getSerializedInstruction()
-      instructions.push(instruction)
+    for (const inst of instructionsData) {
+      if (inst.getSerializedInstruction) {
+        const instruction: Instruction = await inst?.getSerializedInstruction()
+        instructions.push(instruction)
+      }
     }
     return instructions
   }
@@ -113,7 +124,7 @@ const New = () => {
       throw 'no realm selected'
     }
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      const governance = instructions[0].governance
+      const governance = instructions[0]?.governance
       if (!governance) {
         throw Error('no governance selected')
       }
@@ -178,15 +189,14 @@ const New = () => {
     }
   }
 
+  useEffect(() => {
+    setInstructionsData([instructionsData[0]])
+  }, [instructionsData[0].governance?.token.publicKey])
+
   const returnCurrentInstruction = ({ typeId, idx }) => {
-    const props = {
-      ref: (element) => {
-        refs.current[idx] = element
-      },
-    }
     switch (typeId) {
       case Instructions.Transfer:
-        return <SplTokenTransfer {...props}></SplTokenTransfer>
+        return <SplTokenTransfer index={idx}></SplTokenTransfer>
       default:
         null
     }
@@ -243,7 +253,7 @@ const New = () => {
                 })
               }
             ></Textarea>
-            {instructionsComponents.map((instruction, idx) => (
+            {instructionsData.map((instruction, idx) => (
               <div key={idx} className="mb-5 border border-bkg-3 p-5">
                 {idx !== 0 && (
                   <XCircleIcon
@@ -267,10 +277,14 @@ const New = () => {
                     </Select.Option>
                   ))}
                 </Select>
-                {returnCurrentInstruction({
-                  typeId: instruction.type?.id,
-                  idx,
-                })}
+                <MainGovernanceContext.Provider
+                  value={{ instructionsData, handleSetInstructionData }}
+                >
+                  {returnCurrentInstruction({
+                    typeId: instruction.type?.id,
+                    idx,
+                  })}
+                </MainGovernanceContext.Provider>
               </div>
             ))}
             <div className="flex justify-center mt-5 mb-5">
@@ -279,8 +293,7 @@ const New = () => {
               </Button>
             </div>
             <MinimumApprovalThreshold
-              // TODO: Use governance selected by the first instruction (from context)
-              governance={Object.values(governances)[0]?.info}
+              governance={mainGovernanceInfo?.info}
             ></MinimumApprovalThreshold>
             <div className="flex justify-end mt-5">
               <DropdownBtn options={actions}></DropdownBtn>

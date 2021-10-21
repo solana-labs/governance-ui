@@ -16,13 +16,6 @@ export interface SplTokenTransferForm {
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
-export interface SplTokenTransferRef {
-  getSerializedInstruction: GetSerializedInstruction
-}
-
-interface GetSerializedInstruction {
-  (): Promise<Instruction>
-}
 
 export enum Instructions {
   Transfer,
@@ -41,3 +34,13 @@ export type createParams = [
   instructionsData: InstructionData[],
   isDraft: boolean
 ]
+
+export interface ComponentInstructionData {
+  governance?: TokenAccountWithMintInfo | undefined
+  getSerializedInstruction?: () => Promise<Instruction>
+  type: any
+}
+export interface InstructionsContext {
+  instructionsData: ComponentInstructionData[]
+  handleSetInstructionData: (val, index) => void
+}

@@ -8,7 +8,6 @@ export interface DropdownBtnOptions {
 }
 
 const DropdownBtn = ({ options }: { options: DropdownBtnOptions[] }) => {
-  console.log(options)
   const defaultFunction = options.find((x) => x.isDefault)
   if (!defaultFunction) {
     throw 'DropdownBtn must have at least one default option'
