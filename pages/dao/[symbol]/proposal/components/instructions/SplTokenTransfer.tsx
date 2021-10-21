@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
@@ -6,6 +7,7 @@ import { AccountInfo, Token } from '@solana/spl-token'
 import {
   formatMintNaturalAmountAsDecimal,
   getMintMinAmountAsDecimal,
+  getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
@@ -27,6 +29,7 @@ import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { debounce } from '@utils/debounce'
 import { MainGovernanceContext } from '../../new'
 import { validateDestinationAccAdress } from '@utils/validations'
+import BN from 'bn.js'
 
 const SplTokenTransfer = ({ index }) => {
   const connection = useWalletStore((s) => s.connection)
@@ -34,7 +37,8 @@ const SplTokenTransfer = ({ index }) => {
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
     destinationAccount: '',
-    amount: 1,
+    // No default transfer amount
+    amount: undefined,
     governance: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
@@ -91,7 +95,7 @@ const SplTokenTransfer = ({ index }) => {
       form.mintInfo
     ) {
       const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount,
+        form.amount!,
         form.mintInfo?.decimals
       )
       const transferIx = Token.createTransferInstruction(
@@ -156,17 +160,14 @@ const SplTokenTransfer = ({ index }) => {
         'amount',
         'The quantity must be less than the available tokens in the source account',
         async (val) => {
-          if (form.governance) {
+          if (val && form.governance) {
+            const mintValue = getMintNaturalAmountFromDecimal(
+              val,
+              form.governance.mintInfo.account.decimals
+            )
             return !!(
               form.governance.token.publicKey &&
-              val &&
-              val <=
-                parseFloat(
-                  formatMintNaturalAmountAsDecimal(
-                    form.governance.mintInfo.account,
-                    form.governance.token.account.amount
-                  )
-                )
+              form.governance.token.account.amount.gte(new BN(mintValue))
             )
           }
           return false
@@ -230,6 +231,7 @@ const SplTokenTransfer = ({ index }) => {
                   acc.token?.account.amount
                 )}
               </div>
+              <div>{`mint: ${acc.mintInfo.account.decimals}`}</div>
             </Select.Option>
           )
         })}
@@ -247,7 +249,7 @@ const SplTokenTransfer = ({ index }) => {
         error={formErrors['destinationAccount']}
       />
       {destinationAccount && (
-        <div>Token owner: {destinationAccount.account.owner.toString()}</div>
+        <div>account owner: {destinationAccount.account.owner.toString()}</div>
       )}
       {destinationAccountName && (
         <div>Account name: {destinationAccountName}</div>

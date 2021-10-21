@@ -11,7 +11,7 @@ export interface Instruction {
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
-  amount: number
+  amount: number | undefined
   governance: TokenAccountWithMintInfo | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
