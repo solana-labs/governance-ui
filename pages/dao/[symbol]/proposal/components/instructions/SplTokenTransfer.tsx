@@ -8,7 +8,7 @@ import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useRealm from '@hooks/useRealm'
 import { GovernanceAccountType } from '@models/accounts'
-import { AccountInfo, Token } from '@solana/spl-token'
+import { Token } from '@solana/spl-token'
 import {
   formatMintNaturalAmountAsDecimal,
   getMintMinAmountAsDecimal,
@@ -19,14 +19,10 @@ import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
-import { validateTokenAccountMint } from '@tools/validators/accounts/token'
+import { TokenAccountInfo } from '@tools/validators/accounts/token'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  ProgramAccount,
-  tryGetTokenAccount,
-  tryGetTokenMint,
-} from '@utils/tokens'
+import { tryGetTokenAccount, tryGetTokenMint } from '@utils/tokens'
 import {
   SplTokenTransferForm,
   Instruction,
@@ -36,6 +32,7 @@ import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import useInstructions from '@hooks/useInstructions'
 import DryRunInstructionBtn from '../DryRunInstructionBtn'
+import { create } from 'superstruct'
 
 const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
   const connection = useWalletStore((s) => s.connection)
@@ -95,44 +92,69 @@ const SplTokenTransfer = forwardRef<SplTokenTransferRef>((props, ref) => {
       .string()
       .required('Destination account is required')
       .test(
-        'destinationAccount',
-        "Account mint doesn't match source account",
-        async (val: string) => {
-          const pubkey = tryParseKey(val)
-          const governedAccount = form.governance?.info?.governedAccount
-          try {
-            if (pubkey && governedAccount) {
-              const [destAccMint, sourceAccMint]: [
-                ProgramAccount<AccountInfo> | undefined,
-                ProgramAccount<AccountInfo> | undefined
-              ] = await Promise.all([
-                tryGetTokenAccount(connection.current, pubkey),
-                tryGetTokenAccount(connection.current, governedAccount),
-              ])
-              if (destAccMint && sourceAccMint) {
-                validateTokenAccountMint(
-                  destAccMint,
-                  sourceAccMint?.account.mint
-                )
-                return true
-              } else {
-                return false
+        'accountTests',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            const pubKey = tryParseKey(val)
+            if (pubKey) {
+              const account = await connection.current.getParsedAccountInfo(
+                pubKey
+              )
+              if (!account || !account.value) {
+                return this.createError({
+                  message: 'Account not found',
+                })
               }
+              if (
+                !(
+                  'parsed' in account.value.data &&
+                  account.value.data.program === 'spl-token'
+                )
+              ) {
+                return this.createError({
+                  message: 'Invalid spl token account',
+                })
+              }
+              try {
+                const governedAccount = form.governance?.info?.governedAccount
+                const tokenAccount = create(
+                  account.value.data.parsed.info,
+                  TokenAccountInfo
+                )
+                if (governedAccount) {
+                  const sourceAccMint = await tryGetTokenAccount(
+                    connection.current,
+                    governedAccount
+                  )
+                  if (
+                    tokenAccount.mint.toBase58() !==
+                    sourceAccMint?.account.mint.toBase58()
+                  ) {
+                    return this.createError({
+                      message: "Account mint doesn't match source account",
+                    })
+                  }
+                } else {
+                  return this.createError({
+                    message: 'Source account not provided',
+                  })
+                }
+              } catch {
+                return this.createError({
+                  message: 'Invalid spl token account',
+                })
+              }
+            } else {
+              return this.createError({
+                message: 'Provided value is not a valid account address',
+              })
             }
-          } catch (e) {
-            return false
+            return true
           }
           return false
         }
-      )
-      .test('tryParse', 'Invalid destination account', (val: string) => {
-        if (val) {
-          const pubKey = tryParseKey(val)
-          console.log(val)
-          return !!pubKey
-        }
-        return false
-      }),
+      ),
     governance: yup.object().nullable().required('Source account is required'),
   })
   const handleSetForm = ({ propertyName, value }) => {
