@@ -101,12 +101,12 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
         form.amount!,
         form.mintInfo?.decimals
       )
+
       const transferIx = Token.createTransferInstruction(
         TOKEN_PROGRAM_ID,
         form.governedAccount.token?.account.address,
         new PublicKey(form.destinationAccount),
-        // TODO: using owner fixes instruction but GovernedTokenAccount should be GovernedTokenAccount and store the governance
-        form.governedAccount.token?.account.owner,
+        form.governedAccount.governance!.pubkey,
         [],
         mintAmount
       )
@@ -146,7 +146,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructionData(
-      { governance: form.governedAccount, getSerializedInstruction },
+      { governedAccount: form.governedAccount, getSerializedInstruction },
       index
     )
   }, [form])
@@ -201,7 +201,10 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
           }
         }
       ),
-    governance: yup.object().nullable().required('Source account is required'),
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Source account is required'),
   })
   const returnGovernanceTokenAccountLabelInfo = (acc) => {
     const govAccount = acc.token.publicKey.toString()
@@ -243,11 +246,11 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
         className="h-24"
         prefix="Source Account"
         onChange={(value) =>
-          handleSetForm({ value, propertyName: 'governance' })
+          handleSetForm({ value, propertyName: 'governedAccount' })
         }
         componentLabelFcn={returnGovernanceTokenAccountLabel}
         value={form.governedAccount?.token?.account?.address?.toString()}
-        error={formErrors['governance']}
+        error={formErrors['governedAccount']}
       >
         {governedTokenAccounts
           .filter((x) =>
