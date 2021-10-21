@@ -47,14 +47,7 @@ export const MainGovernanceContext = createContext<InstructionsContext>(
 const New = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    symbol,
-    realm,
-    governances,
-    ownVoterWeight,
-    mint,
-    councilMint,
-  } = useRealm()
+  const { symbol, realm, ownVoterWeight, mint, councilMint } = useRealm()
   const { getAvailableInstructions } = useInstructions()
   const availableInstructions = getAvailableInstructions()
 
@@ -70,13 +63,7 @@ const New = () => {
   const [instructionsData, setInstructionsData] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
-  const mainGovernanceInfo = Object.keys(governances)
-    .map((x) => governances[x])
-    .find(
-      (x) =>
-        x.info.governedAccount ===
-        instructionsData[0]?.governedAccount?.token?.account.address
-    )
+  const selectedGovernance = instructionsData[0]?.governedAccount?.governance
 
   const handleSetInstructionData = (val: any, index) => {
     const newInstructions = [...instructionsData]
@@ -299,9 +286,9 @@ const New = () => {
                 Add new instruction
               </Button>
             </div>
-            {mainGovernanceInfo?.info && (
+            {selectedGovernance?.info && (
               <MinimumApprovalThreshold
-                governance={mainGovernanceInfo?.info}
+                governance={selectedGovernance?.info}
               ></MinimumApprovalThreshold>
             )}
             <div className="flex justify-end mt-5">
