@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import Loading from '@components/Loading'
@@ -35,20 +36,15 @@ const DryRunInstructionBtn = ({
     }
   }
   const handleDryRun = async () => {
-    if (!wallet?.connected) {
-      notify({ type: 'error', message: `no wallet connected` })
-      throw 'please connect your wallet'
-    }
-    if (!isValid) {
-      notify({ type: 'error', message: `invalid instruction configuration` })
-      throw 'invalid instruction configuration'
-    }
-    setIsPending(true)
-    const instructionData = await getInstructionDataFcn()
     try {
+      if (!isValid) {
+        throw new Error('Invalid instruction')
+      }
+      setIsPending(true)
+      const instructionData = await getInstructionDataFcn()
       const result = await dryRunInstruction(
         connection.current,
-        wallet,
+        wallet!,
         getInstructionDataFromBase64(instructionData.serializedInstruction)
       )
       setResult(result)
@@ -56,8 +52,10 @@ const DryRunInstructionBtn = ({
     } catch (ex) {
       notify({
         type: 'error',
-        message: `Can't run simulation. Error: ${ex.message}`,
+        message: `Can't simulate transaction`,
+        description: 'The instruction is invalid',
       })
+      console.error('Simulation error', ex)
     } finally {
       setIsPending(false)
     }
@@ -84,7 +82,7 @@ const DryRunInstructionBtn = ({
       <SecondaryButton
         className={btnClassNames}
         onClick={handleDryRun}
-        disabled={isPending}
+        disabled={isPending || !wallet?.connected}
       >
         {isPending ? <Loading></Loading> : 'Run simulation'}
       </SecondaryButton>
