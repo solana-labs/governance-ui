@@ -225,11 +225,9 @@ const SplTokenTransfer = ({ index }) => {
               {tokenName && <div>Token Name: {tokenName}</div>}
               <div>
                 Amount:
-                {parseFloat(
-                  formatMintNaturalAmountAsDecimal(
-                    acc.mintInfo.account,
-                    acc.token?.account.amount
-                  )
+                {formatMintNaturalAmountAsDecimal(
+                  acc.mintInfo.account,
+                  acc.token?.account.amount
                 )}
               </div>
             </Select.Option>
