@@ -142,7 +142,7 @@ const New = () => {
       try {
         // Fetch governance to get up to date proposalCount
         const governanceAccount = (await fetchRealmGovernance(
-          governance.token.publicKey
+          governance.token?.publicKey
         )) as ParsedAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
@@ -191,12 +191,17 @@ const New = () => {
 
   useEffect(() => {
     setInstructionsData([instructionsData[0]])
-  }, [instructionsData[0].governance?.token.publicKey])
+  }, [instructionsData[0].governance?.token?.publicKey])
 
   const returnCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
-        return <SplTokenTransfer index={idx}></SplTokenTransfer>
+        return (
+          <SplTokenTransfer
+            index={idx}
+            mainGovernance={instructionsData[0].governance}
+          ></SplTokenTransfer>
+        )
       default:
         null
     }

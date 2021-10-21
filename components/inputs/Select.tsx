@@ -17,6 +17,16 @@ const Select = ({
   disabled = false,
   prefix = '',
   componentLabelFcn,
+}: {
+  value: any | undefined
+  onChange: any | undefined
+  children: any | undefined
+  className?: string | undefined
+  placeholder?: string | undefined
+  error?: string | undefined
+  disabled?: boolean | undefined
+  prefix?: string | undefined
+  componentLabelFcn?: any | undefined
 }) => {
   return (
     <>

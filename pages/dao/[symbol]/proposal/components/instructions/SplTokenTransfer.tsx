@@ -32,11 +32,11 @@ import { validateDestinationAccAdress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
 
-const SplTokenTransfer = ({ index }) => {
+const SplTokenTransfer = ({ index, mainGovernance }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
   const { governedTokenAccounts } = useInstructions()
-
+  const shouldBeGoverned = index !== 0 && mainGovernance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
     destinationAccount: '',
@@ -161,14 +161,13 @@ const SplTokenTransfer = ({ index }) => {
         'amount',
         'The quantity must be less than the available tokens in the source account',
         async (val) => {
-          if (val && form.governance) {
+          if (val && form.governance && form.governance?.mint) {
             const mintValue = getMintNaturalAmountFromDecimal(
               val,
-              form.governance.mintInfo.account.decimals
+              form.governance?.mint.account.decimals
             )
             return !!(
               form.governance?.token?.publicKey &&
-              form.governance?.mint.account &&
               form.governance.token.account.amount.gte(new BN(mintValue))
             )
           }
@@ -210,7 +209,7 @@ const SplTokenTransfer = ({ index }) => {
     const accName = getAccountName(acc.token.publicKey)
     const label = accName ? `${accName}: ${adressAsString}` : adressAsString
     const amout = formatMintNaturalAmountAsDecimal(
-      acc.mintInfo.account,
+      acc.mint?.account,
       acc.token?.account.amount
     )
     return {
@@ -249,21 +248,28 @@ const SplTokenTransfer = ({ index }) => {
         value={form.governance?.token?.account?.address?.toString()}
         error={formErrors['governance']}
       >
-        {governedTokenAccounts.map((acc) => {
-          const {
-            govAccount,
-            label,
-            tokenName,
-            amout,
-          } = returnGovernanceTokenAccountLabelInfo(acc)
-          return (
-            <Select.Option key={govAccount} value={acc}>
-              <span>{label}</span>
-              {tokenName && <div>Token Name: {tokenName}</div>}
-              <div>Amount: {amout}</div>
-            </Select.Option>
+        {governedTokenAccounts
+          .filter((x) =>
+            !shouldBeGoverned
+              ? !shouldBeGoverned
+              : x.token?.account?.owner.toBase58() ===
+                mainGovernance.governance?.pubkey?.toBase58()
           )
-        })}
+          .map((acc) => {
+            const {
+              govAccount,
+              label,
+              tokenName,
+              amout,
+            } = returnGovernanceTokenAccountLabelInfo(acc)
+            return (
+              <Select.Option key={govAccount} value={acc}>
+                <span>{label}</span>
+                {tokenName && <div>Token Name: {tokenName}</div>}
+                <div>Amount: {amout}</div>
+              </Select.Option>
+            )
+          })}
       </Select>
       <Input
         prefix="Destination account"
