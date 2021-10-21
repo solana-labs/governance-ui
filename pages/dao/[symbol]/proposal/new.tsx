@@ -208,7 +208,7 @@ const New = () => {
       isDefault: true,
     },
     {
-      label: 'Create draft',
+      label: 'Save Draft',
       callback: () => handleCreate(true),
       isDefault: false,
     },

@@ -98,7 +98,8 @@ const SplTokenTransfer = ({ index }) => {
         TOKEN_PROGRAM_ID,
         form.governance.token?.account.address,
         new PublicKey(form.destinationAccount),
-        form.governance.token?.publicKey,
+        // TODO: using owner fixes instruction but TokenAccountWithMintInfo should be GovernedTokenAccount and store the governance
+        form.governance.token?.account.owner,
         [],
         mintAmount
       )
