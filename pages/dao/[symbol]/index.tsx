@@ -5,7 +5,7 @@ import ProposalFilter from '../../../components/ProposalFilter'
 import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
-import OrganzationsBackNav from '../../../components/OrganzationsBackNav'
+import RealmHeader from '../../../components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
@@ -73,7 +73,7 @@ const REALM = () => {
     <>
       <div className="grid grid-cols-12 gap-4">
         <div className="border border-fgd-4 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg">
-          <OrganzationsBackNav></OrganzationsBackNav>
+          <RealmHeader></RealmHeader>
           <div className="flex items-center justify-between pb-3">
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <ProposalFilter filters={filters} setFilters={setFilters} />
