@@ -9,7 +9,7 @@ import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
 import React, { createContext, useEffect, useState } from 'react'
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import MinimumApprovalThreshold from './components/MinimumApprovalThreshold'
 import { RpcContext } from '@models/core/api'
@@ -34,7 +34,7 @@ import { Governance } from '@models/accounts'
 import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
 
 const schema = yup.object().shape({
-  title: yup.string().required('Title is required'),
+  title: yup.string().required('title is required'),
 })
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
@@ -47,7 +47,14 @@ export const MainGovernanceContext = createContext<InstructionsContext>(
 const New = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realm, ownVoterWeight, mint, councilMint } = useRealm()
+  const {
+    symbol,
+    realm,
+    realmDisplayName,
+    ownVoterWeight,
+    mint,
+    councilMint,
+  } = useRealm()
   const { getAvailableInstructions } = useInstructions()
   const availableInstructions = getAvailableInstructions()
 
@@ -227,12 +234,16 @@ const New = () => {
           </Link>
           <div className="border-b border-bkg-3 py-4">
             <div className="flex items-center justify-between mb-1">
-              <h1>New proposal</h1>
+              <h1>
+                Add a proposal
+                {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
+              </h1>
             </div>
           </div>
           <div>
             <Input
               prefix="Title"
+              placeholder="title of your proposal"
               value={form.title}
               type="text"
               error={formErrors['title']}
@@ -244,7 +255,7 @@ const New = () => {
               }
             />
             <Textarea
-              placeholder="Description or github gist link (optional)"
+              placeholder="write a description of your proposal or use a github gist link (optional)"
               wrapperClassName="mb-5"
               prefix="Description"
               value={form.description}
@@ -266,8 +277,8 @@ const New = () => {
                 <Select
                   placeholder={`${
                     availableInstructions.length
-                      ? 'Instruction'
-                      : 'No available instruction to select'
+                      ? 'select instruction'
+                      : 'there are no available instructions'
                   }`}
                   prefix="Instruction"
                   onChange={(value) => setInstructionType({ value, idx })}
@@ -289,10 +300,10 @@ const New = () => {
                 </MainGovernanceContext.Provider>
               </div>
             ))}
-            <div className="flex justify-center mt-5 mb-5">
-              <Button className="w-44" onClick={addInstruction}>
-                Add new instruction
-              </Button>
+            <div className="flex justify-left mt-5 mb-5">
+              <SecondaryButton className="w-24" onClick={addInstruction}>
+                (+)
+              </SecondaryButton>
             </div>
             {selectedGovernance?.info && (
               <MinimumApprovalThreshold

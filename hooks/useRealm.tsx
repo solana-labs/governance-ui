@@ -84,5 +84,6 @@ export default function useRealm() {
     councilTokenAccount,
     ownCouncilTokenRecord,
     ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
+    realmDisplayName: realmInfo?.displayName ?? realm?.info?.name,
   }
 }
