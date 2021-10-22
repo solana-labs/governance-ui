@@ -349,16 +349,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenRecords,
         councilTokenOwnerRecords,
       })
-      const {
-        tokenMints,
-        tokenAccounts,
-      } = await get().actions.getTokensAndMintsForSelectedRealmGovernances(
-        Object.values(governances)
-      )
       set((s) => {
         s.selectedRealm.realm = realm
-        s.selectedRealm.tokenMints = tokenMints
-        s.selectedRealm.tokenAccounts = tokenAccounts
         s.selectedRealm.mint = realmMint
         s.selectedRealm.programId = programId
         s.selectedRealm.councilMint = realmCouncilMint
@@ -368,7 +360,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
 
       get().actions.fetchOwnVoteRecords()
-
+      get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
       const proposalsByGovernance = await Promise.all(
         mapKeys(governances, (g) =>
           getGovernanceAccounts<Proposal>(
@@ -526,37 +518,72 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = chatMessages
       })
     },
-    async getTokensAndMintsForSelectedRealmGovernances(governances) {
+    async fetchTokenAccountAndMintsForSelectedRealmGovernances() {
+      const {
+        fetchTokenAccountsForSelectedRealmGovernances,
+        fetchMintsForTokenAccounts,
+      } = get().actions
+      const tokenAccounts = await fetchTokenAccountsForSelectedRealmGovernances()
+      fetchMintsForTokenAccounts(tokenAccounts)
+    },
+    async fetchMintsForTokenAccounts(
+      tokenAccounts: ProgramAccount<AccountInfo>[]
+    ) {
+      const set = get().set
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
-      const tokenAccounts: ProgramAccount<AccountInfo>[] = []
-      const tokenGovernances = governances.filter(
-        (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
-      )
-      for (const gov of tokenGovernances) {
+      for (const tokenAccount of tokenAccounts) {
         try {
-          const tokenAccount = await tryGetTokenAccount(
+          const tokenMint = await tryGetMint(
             connection,
-            gov.info.governedAccount
+            tokenAccount.account.mint
           )
-          if (tokenAccount) {
-            tokenAccounts.push(tokenAccount)
-            const tokenMint = await tryGetMint(
-              connection,
-              tokenAccount.account.mint
-            )
-            if (tokenMint) {
-              tokenMints.push(tokenMint)
-            }
+          if (tokenMint) {
+            tokenMints.push(tokenMint)
           }
         } catch (e) {
           console.log(
             e,
-            `error fetching token account ${gov.info.governedAccount}`
+            `error fetching mint for token account ${tokenAccount.publicKey.toBase58()}`
           )
         }
       }
-      return { tokenMints, tokenAccounts }
+
+      set((s) => {
+        s.selectedRealm.tokenMints = tokenMints
+      })
+    },
+    async fetchTokenAccountsForSelectedRealmGovernances() {
+      const set = get().set
+      const selectedRealmGovernances = Object.values(
+        get().selectedRealm.governances
+      )
+      const connection = get().connection.current
+      const tokenAccounts: ProgramAccount<AccountInfo>[] = []
+      const tokenGovernances = selectedRealmGovernances.filter(
+        (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
+      )
+      for (const tokenGov of tokenGovernances) {
+        try {
+          const tokenAccount = await tryGetTokenAccount(
+            connection,
+            tokenGov.info.governedAccount
+          )
+          if (tokenAccount) {
+            tokenAccounts.push(tokenAccount)
+          }
+        } catch (e) {
+          console.log(
+            e,
+            `error fetching token account ${tokenGov.info.governedAccount.toBase58()}`
+          )
+        }
+      }
+
+      set((s) => {
+        s.selectedRealm.tokenAccounts = tokenAccounts
+      })
+      return tokenAccounts
     },
     async fetchVoteRecords(proposal: ParsedAccount<Proposal>) {
       const endpoint = get().connection.endpoint

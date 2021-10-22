@@ -62,7 +62,10 @@ const New = () => {
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+  const {
+    fetchRealmGovernance,
+    fetchTokenAccountsForSelectedRealmGovernances,
+  } = useWalletStore((s) => s.actions)
 
   const [form, setForm] = useState({
     title: '',
@@ -201,6 +204,10 @@ const New = () => {
       setGovernance(firstInstruction.governedAccount.governance)
     }
   }, [instructionsData[0]])
+  useEffect(() => {
+    //fetch to be up to date with amounts
+    fetchTokenAccountsForSelectedRealmGovernances()
+  }, [])
   const returnCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
