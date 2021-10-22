@@ -353,7 +353,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const {
         tokenMints,
         tokenAccounts,
-      } = await get().actions.getTokenAndMintForGovernances(governances)
+      } = await get().actions.getTokensAndMintsForGovernances(
+        Object.values(governances)
+      )
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.tokenMints = tokenMints
@@ -525,32 +527,35 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = chatMessages
       })
     },
-    async getTokenAndMintForGovernances(governances) {
+    async getTokensAndMintsForGovernances(
+      governances: ParsedAccount<Governance>[]
+    ) {
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
       const tokenAccounts: ProgramAccount<AccountInfo>[] = []
-      const governancesArray = Object.keys(governances)
-        .map((key) => governances[key])
-        .filter(
-          (gov) =>
-            gov.info?.accountType === GovernanceAccountType.TokenGovernance
-        )
-      for (const gov of governancesArray) {
+      const tokeGovernances = governances.filter(
+        (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
+      )
+      for (const gov of tokeGovernances) {
         try {
-          const [tokenAccount, tokenMint] = await Promise.all([
-            tryGetTokenAccount(connection, gov.info.governedAccount),
-            tryGetTokenMint(connection, gov.info.governedAccount),
-          ])
-          if (tokenMint) {
-            tokenMints.push(tokenMint)
-          }
+          const tokenAccount = await tryGetTokenAccount(
+            connection,
+            gov.info.governedAccount
+          )
           if (tokenAccount) {
             tokenAccounts.push(tokenAccount)
+            const tokenMint = await tryGetMint(
+              connection,
+              tokenAccount.account.mint
+            )
+            if (tokenMint) {
+              tokenMints.push(tokenMint)
+            }
           }
         } catch (e) {
           console.log(
             e,
-            `error fetching token acount ${gov.info.governedAccount}`
+            `error fetching token account ${gov.info.governedAccount}`
           )
         }
       }

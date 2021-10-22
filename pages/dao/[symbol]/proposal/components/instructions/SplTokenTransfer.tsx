@@ -157,7 +157,6 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
   const schema = yup.object().shape({
     amount: yup
       .number()
-      .nullable()
       .test(
         'amount',
         'transfer amount must be less than the source account amount',
