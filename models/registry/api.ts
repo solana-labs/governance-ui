@@ -86,9 +86,9 @@ const DEVNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
   {
-    symbol: 'nowyRealm',
+    symbol: 'Realm-9wdLW',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('GE3EYWNPJAesuR2Mry43Mm3Xd12rXKT1YnHBDrXyyg7s'),
+    realmId: new PublicKey('6ovvHtT4jUh2bgzZtAmFHBQwpVZ4T5hTaN2rgDbZTz3o'),
   },
   {
     symbol: 'Realm-8TitF',
