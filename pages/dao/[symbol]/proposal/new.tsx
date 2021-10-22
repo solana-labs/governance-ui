@@ -34,7 +34,7 @@ import { Governance } from '@models/accounts'
 import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
 
 const schema = yup.object().shape({
-  title: yup.string().required('title is required'),
+  title: yup.string().required('Title is required'),
 })
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
@@ -118,14 +118,14 @@ const New = () => {
     let proposalAddress: PublicKey | null = null
     if (!realm) {
       setIsLoading(false)
-      throw 'no realm selected'
+      throw 'No realm selected'
     }
 
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
       let governance = instructions[0]?.governedAccount?.governance
       if (!governance) {
         setIsLoading(false)
-        throw Error('no governance selected')
+        throw Error('No governance selected')
       }
 
       const rpcContext = new RpcContext(

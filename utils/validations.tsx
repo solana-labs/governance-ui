@@ -13,7 +13,7 @@ export const validateDestinationAccAddress = async (
   if (pubKey) {
     const account = await connection.current.getParsedAccountInfo(pubKey)
     if (!account || !account.value) {
-      throw 'account not found'
+      throw 'Account not found'
     }
     if (
       !(
@@ -21,7 +21,7 @@ export const validateDestinationAccAddress = async (
         account.value.data.program === 'spl-token'
       )
     ) {
-      throw 'invalid spl token account'
+      throw 'Invalid spl token account'
     }
 
     let tokenAccount
@@ -29,7 +29,7 @@ export const validateDestinationAccAddress = async (
     try {
       tokenAccount = create(account.value.data.parsed.info, TokenAccountInfo)
     } catch {
-      throw 'invalid spl token account'
+      throw 'Invalid spl token account'
     }
 
     if (governedAccount) {
@@ -40,12 +40,12 @@ export const validateDestinationAccAddress = async (
       if (
         tokenAccount.mint.toBase58() !== sourceAccMint?.account.mint.toBase58()
       ) {
-        throw "account mint doesn't match source account"
+        throw "Account mint doesn't match source account"
       }
     } else {
-      throw 'source account not provided'
+      throw 'Source account not provided'
     }
   } else {
-    throw 'provided value is not a valid account address'
+    throw 'Provided value is not a valid account address'
   }
 }

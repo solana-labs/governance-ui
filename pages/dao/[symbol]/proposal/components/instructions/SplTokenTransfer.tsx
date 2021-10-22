@@ -158,7 +158,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
       .typeError('Amount is required')
       .test(
         'amount',
-        'transfer amount must be less than the source account amount',
+        'Transfer amount must be less than the source account amount',
         async function (val: number) {
           if (val && form.governedAccount && form.governedAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimal(
@@ -171,7 +171,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
             )
           }
           return this.createError({
-            message: `amount is required`,
+            message: `Amount is required`,
           })
         }
       ),
@@ -179,7 +179,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
       .string()
       .test(
         'accountTests',
-        'account validation error',
+        'Account validation error',
         async function (val: string) {
           if (val) {
             try {
@@ -196,7 +196,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
             }
           } else {
             return this.createError({
-              message: `destination account is required`,
+              message: `Destination account is required`,
             })
           }
         }
@@ -204,7 +204,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     governedAccount: yup
       .object()
       .nullable()
-      .required('source account is required'),
+      .required('Source account is required'),
   })
 
   return (
