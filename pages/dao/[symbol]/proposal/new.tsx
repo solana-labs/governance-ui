@@ -63,6 +63,7 @@ const New = () => {
   const [instructionsData, setInstructionsData] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
+  const [isLoading, setIsLoading] = useState(false)
   const selectedGovernance = instructionsData[0]?.governedAccount?.governance
 
   const handleSetInstructionData = (val: any, index) => {
@@ -100,7 +101,7 @@ const New = () => {
   }
   const handleCreate = async (isDraft) => {
     setFormErrors({})
-
+    setIsLoading(true)
     const { isValid, validationErrors }: formValidation = await isFormValid(
       schema,
       form
@@ -109,12 +110,14 @@ const New = () => {
     const instructions: Instruction[] = await getInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
+      setIsLoading(false)
       throw 'no realm selected'
     }
 
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
       let governance = instructions[0]?.governedAccount?.governance
       if (!governance) {
+        setIsLoading(false)
         throw Error('no governance selected')
       }
 
@@ -176,6 +179,7 @@ const New = () => {
     } else {
       setFormErrors(validationErrors)
     }
+    setIsLoading(false)
   }
 
   useEffect(() => {
@@ -292,7 +296,10 @@ const New = () => {
               ></MinimumApprovalThreshold>
             )}
             <div className="flex justify-end mt-5">
-              <DropdownBtn options={actions}></DropdownBtn>
+              <DropdownBtn
+                isLoading={isLoading}
+                options={actions}
+              ></DropdownBtn>
             </div>
           </div>
         </>
