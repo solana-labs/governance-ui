@@ -1,4 +1,5 @@
-import { InstructionData } from '@models/accounts'
+import { Governance, InstructionData } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
 import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
@@ -43,6 +44,6 @@ export interface ComponentInstructionData {
 export interface InstructionsContext {
   instructionsData: ComponentInstructionData[]
   setInstructionData: (val, index) => void
-  governance: GovernedTokenAccount | null | undefined
+  governance: ParsedAccount<Governance> | null | undefined
   setGovernance: (val) => void
 }

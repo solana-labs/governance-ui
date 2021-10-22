@@ -32,7 +32,6 @@ import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
-import { GovernedTokenAccount } from '@utils/tokens'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -63,7 +62,6 @@ const New = () => {
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
 
   const [form, setForm] = useState({
     title: '',
@@ -73,11 +71,12 @@ const New = () => {
   const [instructionsData, setInstructionsData] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
-  const [governance, setGovernance] = useState<GovernedTokenAccount | null>(
-    null
-  )
+  const [
+    governance,
+    setGovernance,
+  ] = useState<ParsedAccount<Governance> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const selectedGovernance = governance?.governance
+  const selectedGovernance = governance
 
   const setInstructionData = (val: any, index) => {
     const newInstructions = [...instructionsData]
@@ -128,7 +127,6 @@ const New = () => {
     }
 
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
-      let governance = instructions[0]?.governedAccount?.governance
       if (!governance) {
         setIsLoading(false)
         throw Error('No governance selected')
@@ -145,11 +143,6 @@ const New = () => {
       )
 
       try {
-        // Fetch governance to get up to date proposalCount
-        governance = (await fetchRealmGovernance(
-          governance.pubkey
-        )) as ParsedAccount<Governance>
-
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance.info.config
         )
@@ -200,8 +193,8 @@ const New = () => {
   }, [instructionsData[0].governedAccount?.token?.publicKey])
   useEffect(() => {
     const firstInstruction = instructionsData[0]
-    if (firstInstruction && firstInstruction.governedAccount) {
-      setGovernance(firstInstruction.governedAccount)
+    if (firstInstruction && firstInstruction.governedAccount?.governance) {
+      setGovernance(firstInstruction.governedAccount.governance)
     }
   }, [instructionsData[0]])
 
