@@ -16,7 +16,7 @@ const Select = ({
   error = '',
   disabled = false,
   prefix = '',
-  componentLabelFcn,
+  componentLabel,
 }: {
   value: any | undefined
   onChange: any | undefined
@@ -26,7 +26,7 @@ const Select = ({
   error?: string | undefined
   disabled?: boolean | undefined
   prefix?: string | undefined
-  componentLabelFcn?: any | undefined
+  componentLabel?: any | undefined
 }) => {
   return (
     <>
@@ -41,8 +41,8 @@ const Select = ({
                 <StyledDiv
                   className={`flex items-center justify-between space-x-4 p-2 text-th-fgd-1`}
                 >
-                  {componentLabelFcn
-                    ? componentLabelFcn()
+                  {componentLabel
+                    ? componentLabel
                     : value
                     ? value
                     : placeholder}

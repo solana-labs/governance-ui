@@ -11,7 +11,7 @@ interface InputProps {
 
 const Input = ({
   type,
-  value,
+  value = '',
   onChange,
   className,
   wrapperClassName = 'w-full',

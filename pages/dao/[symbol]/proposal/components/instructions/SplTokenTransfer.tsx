@@ -1,11 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo, Token } from '@solana/spl-token'
 import {
-  formatMintNaturalAmountAsDecimal,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
@@ -25,12 +23,12 @@ import {
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import DryRunInstructionBtn from '../DryRunInstructionBtn'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { debounce } from '@utils/debounce'
 import { MainGovernanceContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
+import SourceAccountSelect from '../SourceAccountSelect'
 
 const SplTokenTransfer = ({ index, mainGovernance }) => {
   const connection = useWalletStore((s) => s.connection)
@@ -207,75 +205,19 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
       .nullable()
       .required('source account is required'),
   })
-  const returnGovernanceTokenAccountLabelInfo = (acc) => {
-    const govAccount = acc.token.publicKey.toString()
-    const adressAsString = acc.token.account.address.toString()
-    const tokenName = getMintMetadata(acc.token.account.mint)?.name
-    const accName = getAccountName(acc.token.publicKey)
-    const label = accName ? `${accName}: ${adressAsString}` : adressAsString
-    const amout = formatMintNaturalAmountAsDecimal(
-      acc.mint?.account,
-      acc.token?.account.amount
-    )
-    return {
-      govAccount,
-      adressAsString,
-      tokenName,
-      label,
-      amout,
-    }
-  }
-  const returnGovernanceTokenAccountLabel = () => {
-    if (form.governedAccount) {
-      const { label, tokenName, amout } = returnGovernanceTokenAccountLabelInfo(
-        form.governedAccount
-      )
-      return (
-        <div>
-          <span>{label}</span>
-          {tokenName && <div>Token Name: {tokenName}</div>}
-          <div>Amount: {amout}</div>
-        </div>
-      )
-    } else {
-      return null
-    }
-  }
+
   return (
     <div className="mt-5">
-      <Select
-        className="h-24"
-        prefix="Source Account"
+      <SourceAccountSelect
+        governedTokenAccounts={governedTokenAccounts}
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'governedAccount' })
         }
-        componentLabelFcn={returnGovernanceTokenAccountLabel}
         value={form.governedAccount?.token?.account?.address?.toString()}
         error={formErrors['governedAccount']}
-      >
-        {governedTokenAccounts
-          .filter((x) =>
-            !shouldBeGoverned
-              ? !shouldBeGoverned
-              : x.governance?.pubkey.toBase58() ===
-                mainGovernance.governance?.pubkey?.toBase58()
-          )
-          .map((acc) => {
-            const {
-              govAccount,
-              label,
-              tokenName,
-              amout,
-            } = returnGovernanceTokenAccountLabelInfo(acc)
-            return (
-              <Select.Option key={govAccount} value={acc}>
-                <span>{label}</span>
-                {tokenName && <div>Token Name: {tokenName}</div>}
-                <div>Amount: {amout}</div>
-              </Select.Option>
-            )
-          })}
-      </Select>
+        shouldBeGoverned={shouldBeGoverned}
+        mainGovernance={mainGovernance}
+      ></SourceAccountSelect>
       <Input
         prefix="Destination account"
         value={form.destinationAccount}
