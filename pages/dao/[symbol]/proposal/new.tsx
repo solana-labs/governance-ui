@@ -213,7 +213,11 @@ const New = () => {
   ]
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3">
+      <div
+        className={`bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3 ${
+          isLoading ? 'pointer-events-none' : ''
+        }`}
+      >
         <>
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
             <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
