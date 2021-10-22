@@ -160,6 +160,11 @@ const SplTokenTransfer = ({ index, governance }) => {
         'amount',
         'Transfer amount must be less than the source account amount',
         async function (val: number) {
+          if (!form.governedAccount) {
+            return this.createError({
+              message: `Please select source account to validate the amount`,
+            })
+          }
           if (val && form.governedAccount && form.governedAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimal(
               val,
@@ -183,6 +188,13 @@ const SplTokenTransfer = ({ index, governance }) => {
         async function (val: string) {
           if (val) {
             try {
+              if (
+                form.governedAccount?.token?.account.address.toBase58() == val
+              ) {
+                return this.createError({
+                  message: `Destination account address can't be same as source account`,
+                })
+              }
               await validateDestinationAccAddress(
                 connection,
                 val,
