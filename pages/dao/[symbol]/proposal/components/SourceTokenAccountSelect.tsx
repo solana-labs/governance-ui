@@ -1,6 +1,8 @@
 import Select from '@components/inputs/Select'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { getAccountName } from '@components/instructions/tools'
+import { Governance } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import { GovernedTokenAccount } from '@utils/tokens'
 import React from 'react'
@@ -19,7 +21,7 @@ const SourceTokenAccountSelect = ({
   error
   governedTokenAccounts: GovernedTokenAccount[]
   shouldBeGoverned
-  mainGovernance
+  mainGovernance: ParsedAccount<Governance> | null | undefined
 }) => {
   const getGovernedTokenAccountLabelInfo = (
     acc: GovernedTokenAccount | undefined
@@ -97,7 +99,7 @@ const SourceTokenAccountSelect = ({
           !shouldBeGoverned
             ? !shouldBeGoverned
             : x.governance?.pubkey.toBase58() ===
-              mainGovernance.governance?.pubkey?.toBase58()
+              mainGovernance?.pubkey?.toBase58()
         )
         .map((acc) => {
           const {
