@@ -60,7 +60,7 @@ const SourceTokenAccountSelect = ({
         amount,
       } = getGovernedTokenAccountLabelInfo(acc)
 
-      return getLabelComponent({
+      return returnLabelComponent({
         tokenAccount,
         tokenAccountName,
         tokenName,
@@ -70,7 +70,7 @@ const SourceTokenAccountSelect = ({
       return null
     }
   }
-  const getLabelComponent = ({
+  const returnLabelComponent = ({
     tokenAccount,
     tokenAccountName,
     tokenName,
@@ -109,7 +109,7 @@ const SourceTokenAccountSelect = ({
           } = getGovernedTokenAccountLabelInfo(acc)
           return (
             <Select.Option key={tokenAccount} value={acc}>
-              {getLabelComponent({
+              {returnLabelComponent({
                 tokenAccount,
                 tokenAccountName,
                 tokenName,

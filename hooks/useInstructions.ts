@@ -2,7 +2,6 @@ import { GovernanceAccountType } from '@models/accounts'
 import { GovernedTokenAccount } from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useRealm from './useRealm'
-
 export default function useInstructions() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const governancesArray = Object.keys(governances).map(
@@ -38,22 +37,23 @@ export default function useInstructions() {
     const tokenGovernances = getGovernancesByAccountType(
       GovernanceAccountType.TokenGovernance
     )
-    const governanes: GovernedTokenAccount[] = []
+    const governedTokenAccounts: GovernedTokenAccount[] = []
     for (const i of tokenGovernances) {
-      const token = realmTokenAccounts.find(
+      const realmTokenAccount = realmTokenAccounts.find(
         (x) => x.publicKey.toBase58() === i.info.governedAccount.toBase58()
       )
       const mint = tokenMints.find(
-        (x) => token?.account.mint.toBase58() === x.publicKey.toBase58()
+        (x) =>
+          realmTokenAccount?.account.mint.toBase58() === x.publicKey.toBase58()
       )
       const obj = {
         governance: i,
-        token,
+        token: realmTokenAccount,
         mint,
       }
-      governanes.push(obj)
+      governedTokenAccounts.push(obj)
     }
-    return governanes
+    return governedTokenAccounts
   }
   const governedTokenAccounts = prepareGovernances()
   return {

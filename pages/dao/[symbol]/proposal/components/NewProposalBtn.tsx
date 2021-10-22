@@ -6,13 +6,7 @@ import React from 'react'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    symbol,
-
-    realm,
-    governances,
-    ownVoterWeight,
-  } = useRealm()
+  const { symbol, realm, governances, ownVoterWeight } = useRealm()
 
   const canCreateProposal =
     realm &&

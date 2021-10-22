@@ -1,19 +1,21 @@
 import ProgressBar from '@components/ProgressBar'
 
 import { Governance } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
 import React from 'react'
 
 const MinimumApprovalThreshold = ({
   governance,
 }: {
-  governance: Governance | undefined
+  governance: ParsedAccount<Governance> | null
 }) => {
-  return (
+  const info = governance?.info
+  return info ? (
     <ProgressBar
-      progress={governance?.config.voteThresholdPercentage.value}
+      progress={info?.config.voteThresholdPercentage.value}
       prefix="Approval quorum"
     ></ProgressBar>
-  )
+  ) : null
 }
 
 export default MinimumApprovalThreshold

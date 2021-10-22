@@ -53,7 +53,7 @@ const SplTokenTransfer = ({ index, governance }) => {
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
-  const { setInstructionData } = useContext(NewProposalContext)
+  const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -86,7 +86,7 @@ const SplTokenTransfer = ({ index, governance }) => {
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getValidatedInstruction() {
+  async function getInstruction() {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (
@@ -143,8 +143,8 @@ const SplTokenTransfer = ({ index, governance }) => {
     }
   }, [form.destinationAccount])
   useEffect(() => {
-    setInstructionData(
-      { governedAccount: form.governedAccount, getValidatedInstruction },
+    handleSetInstructions(
+      { governedAccount: form.governedAccount, getInstruction },
       index
     )
   }, [form])
@@ -160,7 +160,7 @@ const SplTokenTransfer = ({ index, governance }) => {
         'amount',
         'Transfer amount must be less than the source account amount',
         async function (val: number) {
-          if (!form.governedAccount) {
+          if (val && !form.governedAccount) {
             return this.createError({
               message: `Please select source account to validate the amount`,
             })
@@ -264,7 +264,7 @@ const SplTokenTransfer = ({ index, governance }) => {
         <DryRunInstructionBtn
           btnClassNames="mt-5 "
           isValid={!Object.keys(formErrors).length}
-          getInstructionDataFcn={getValidatedInstruction}
+          getInstructionDataFcn={getInstruction}
         />
       </div>
     </div>

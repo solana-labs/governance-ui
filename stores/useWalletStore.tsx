@@ -352,7 +352,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const {
         tokenMints,
         tokenAccounts,
-      } = await get().actions.getTokensAndMintsForGovernances(
+      } = await get().actions.getTokensAndMintsForSelectedRealmGovernances(
         Object.values(governances)
       )
       set((s) => {
@@ -526,16 +526,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.chatMessages = chatMessages
       })
     },
-    async getTokensAndMintsForGovernances(
-      governances: ParsedAccount<Governance>[]
-    ) {
+    async getTokensAndMintsForSelectedRealmGovernances(governances) {
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
       const tokenAccounts: ProgramAccount<AccountInfo>[] = []
-      const tokeGovernances = governances.filter(
+      const tokenGovernances = governances.filter(
         (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
       )
-      for (const gov of tokeGovernances) {
+      for (const gov of tokenGovernances) {
         try {
           const tokenAccount = await tryGetTokenAccount(
             connection,

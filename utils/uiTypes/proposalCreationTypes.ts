@@ -38,12 +38,12 @@ export type createParams = [
 
 export interface ComponentInstructionData {
   governedAccount?: GovernedTokenAccount | undefined
-  getValidatedInstruction?: () => Promise<Instruction>
+  getInstruction?: () => Promise<Instruction>
   type: any
 }
 export interface InstructionsContext {
   instructionsData: ComponentInstructionData[]
-  setInstructionData: (val, index) => void
+  handleSetInstructions: (val, index) => void
   governance: ParsedAccount<Governance> | null | undefined
   setGovernance: (val) => void
 }

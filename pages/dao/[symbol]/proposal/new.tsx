@@ -38,7 +38,7 @@ const schema = yup.object().shape({
 })
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
-  setInstructionData: () => null,
+  handleSetInstructions: () => null,
   governance: null,
   setGovernance: () => null,
 }
@@ -69,7 +69,7 @@ const New = () => {
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [instructionsData, setInstructionsData] = useState<
+  const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
   const [
@@ -78,10 +78,10 @@ const New = () => {
   ] = useState<ParsedAccount<Governance> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const setInstructionData = (val: any, index) => {
+  const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
-    setInstructionsData(newInstructions)
+    setInstructions(newInstructions)
   }
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -91,21 +91,19 @@ const New = () => {
     const newInstruction = {
       type: value,
     }
-    setInstructionData(newInstruction, idx)
+    handleSetInstructions(newInstruction, idx)
   }
   const addInstruction = () => {
-    setInstructionsData([...instructionsData, { type: undefined }])
+    setInstructions([...instructionsData, { type: undefined }])
   }
   const removeInstruction = (idx) => {
-    setInstructionsData([
-      ...instructionsData.filter((x, index) => index !== idx),
-    ])
+    setInstructions([...instructionsData.filter((x, index) => index !== idx)])
   }
-  const getInstructions = async () => {
+  const handleGetInstructions = async () => {
     const instructions: Instruction[] = []
     for (const inst of instructionsData) {
-      if (inst.getValidatedInstruction) {
-        const instruction: Instruction = await inst?.getValidatedInstruction()
+      if (inst.getInstruction) {
+        const instruction: Instruction = await inst?.getInstruction()
         instructions.push(instruction)
       }
     }
@@ -119,7 +117,7 @@ const New = () => {
       form
     )
 
-    const instructions: Instruction[] = await getInstructions()
+    const instructions: Instruction[] = await handleGetInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
       setIsLoading(false)
@@ -195,7 +193,7 @@ const New = () => {
   }
 
   useEffect(() => {
-    setInstructionsData([instructionsData[0]])
+    setInstructions([instructionsData[0]])
   }, [instructionsData[0].governedAccount?.token?.publicKey])
   useEffect(() => {
     const firstInstruction = instructionsData[0]
@@ -203,7 +201,6 @@ const New = () => {
       setGovernance(firstInstruction.governedAccount.governance)
     }
   }, [instructionsData[0]])
-
   const returnCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
@@ -217,7 +214,7 @@ const New = () => {
         null
     }
   }
-  const actions: DropdownBtnOptions[] = [
+  const dropDownBtnFinishActions: DropdownBtnOptions[] = [
     {
       label: 'Propose',
       callback: () => handleCreate(false),
@@ -304,7 +301,7 @@ const New = () => {
                 <NewProposalContext.Provider
                   value={{
                     instructionsData,
-                    setInstructionData,
+                    handleSetInstructions,
                     governance,
                     setGovernance,
                   }}
@@ -321,15 +318,13 @@ const New = () => {
                 (+)
               </SecondaryButton>
             </div>
-            {governance?.info && (
-              <MinimumApprovalThreshold
-                governance={governance.info}
-              ></MinimumApprovalThreshold>
-            )}
+            <MinimumApprovalThreshold
+              governance={governance}
+            ></MinimumApprovalThreshold>
             <div className="flex justify-end mt-5">
               <DropdownBtn
                 isLoading={isLoading}
-                options={actions}
+                options={dropDownBtnFinishActions}
               ></DropdownBtn>
             </div>
           </div>
