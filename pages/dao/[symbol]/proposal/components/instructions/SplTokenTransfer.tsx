@@ -30,11 +30,11 @@ import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
 import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
 
-const SplTokenTransfer = ({ index, mainGovernance }) => {
+const SplTokenTransfer = ({ index, governance }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
   const { governedTokenAccounts } = useInstructions()
-  const shouldBeGoverned = index !== 0 && mainGovernance
+  const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
     destinationAccount: '',
@@ -217,7 +217,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
         value={form.governedAccount?.token?.account?.address?.toString()}
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
-        mainGovernance={mainGovernance}
+        governance={governance}
       ></SourceTokenAccountSelect>
       <Input
         prefix="Destination account"

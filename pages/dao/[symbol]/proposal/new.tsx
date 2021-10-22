@@ -210,7 +210,7 @@ const New = () => {
         return (
           <SplTokenTransfer
             index={idx}
-            mainGovernance={governance}
+            governance={governance}
           ></SplTokenTransfer>
         )
       default:

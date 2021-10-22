@@ -14,14 +14,14 @@ const SourceTokenAccountSelect = ({
   error,
   governedTokenAccounts = [],
   shouldBeGoverned,
-  mainGovernance,
+  governance,
 }: {
   onChange
   value
   error
   governedTokenAccounts: GovernedTokenAccount[]
   shouldBeGoverned
-  mainGovernance: ParsedAccount<Governance> | null | undefined
+  governance: ParsedAccount<Governance> | null | undefined
 }) => {
   const getGovernedTokenAccountLabelInfo = (
     acc: GovernedTokenAccount | undefined
@@ -98,8 +98,7 @@ const SourceTokenAccountSelect = ({
         .filter((x) =>
           !shouldBeGoverned
             ? !shouldBeGoverned
-            : x.governance?.pubkey.toBase58() ===
-              mainGovernance?.pubkey?.toBase58()
+            : x.governance?.pubkey.toBase58() === governance?.pubkey?.toBase58()
         )
         .map((acc) => {
           const {
