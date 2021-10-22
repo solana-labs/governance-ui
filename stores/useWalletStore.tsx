@@ -10,7 +10,6 @@ import {
   tryGetMint,
   getOwnedTokenAccounts,
   tryGetTokenAccount,
-  tryGetTokenMint,
 } from '../utils/tokens'
 import {
   getGovernance,
