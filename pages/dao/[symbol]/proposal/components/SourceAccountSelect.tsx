@@ -2,6 +2,7 @@ import Select from '@components/inputs/Select'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { getAccountName } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { GovernedTokenAccount } from '@utils/tokens'
 import React from 'react'
 
 //TODO more generic with own data fetch
@@ -9,9 +10,16 @@ const SourceAccountSelect = ({
   onChange,
   value,
   error,
-  governedTokenAccounts,
+  governedTokenAccounts = [],
   shouldBeGoverned,
   mainGovernance,
+}: {
+  onChange
+  value
+  error
+  governedTokenAccounts: GovernedTokenAccount[]
+  shouldBeGoverned
+  mainGovernance
 }) => {
   const returnGovernanceTokenAccountLabelInfo = (acc) => {
     let govAccount = ''
