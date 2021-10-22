@@ -62,6 +62,7 @@ const New = () => {
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
 
   const [form, setForm] = useState({
     title: '',
@@ -76,7 +77,6 @@ const New = () => {
     setGovernance,
   ] = useState<ParsedAccount<Governance> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const selectedGovernance = governance
 
   const setInstructionData = (val: any, index) => {
     const newInstructions = [...instructionsData]
@@ -127,6 +127,7 @@ const New = () => {
     }
 
     if (isValid && instructions.every((x: Instruction) => x.isValid)) {
+      let selectedGovernance = governance
       if (!governance) {
         setIsLoading(false)
         throw Error('No governance selected')
@@ -143,6 +144,11 @@ const New = () => {
       )
 
       try {
+        // Fetch governance to get up to date proposalCount
+        selectedGovernance = (await fetchRealmGovernance(
+          governance.pubkey
+        )) as ParsedAccount<Governance>
+
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance.info.config
         )
@@ -165,13 +171,13 @@ const New = () => {
         proposalAddress = await createProposal(
           rpcContext,
           realm.pubkey,
-          governance.pubkey,
+          selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title,
           form.description,
           proposalMint,
-          governance?.info?.config.minInstructionHoldUpTime,
-          governance?.info?.proposalCount,
+          selectedGovernance?.info?.config.minInstructionHoldUpTime,
+          selectedGovernance?.info?.proposalCount,
           instructionsData,
           isDraft
         )
@@ -315,9 +321,9 @@ const New = () => {
                 (+)
               </SecondaryButton>
             </div>
-            {selectedGovernance?.info && (
+            {governance?.info && (
               <MinimumApprovalThreshold
-                governance={selectedGovernance?.info}
+                governance={governance.info}
               ></MinimumApprovalThreshold>
             )}
             <div className="flex justify-end mt-5">
