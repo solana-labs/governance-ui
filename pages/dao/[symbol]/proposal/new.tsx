@@ -32,6 +32,7 @@ import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
+import { GovernedTokenAccount } from '@utils/tokens'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -39,6 +40,8 @@ const schema = yup.object().shape({
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
   setInstructionData: () => null,
+  governance: null,
+  setGovernance: () => null,
 }
 export const NewProposalContext = createContext<InstructionsContext>(
   defaultGovernanceCtx
@@ -70,8 +73,11 @@ const New = () => {
   const [instructionsData, setInstructionsData] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
+  const [governance, setGovernance] = useState<GovernedTokenAccount | null>(
+    null
+  )
   const [isLoading, setIsLoading] = useState(false)
-  const selectedGovernance = instructionsData[0]?.governedAccount?.governance
+  const selectedGovernance = governance?.governance
 
   const setInstructionData = (val: any, index) => {
     const newInstructions = [...instructionsData]
@@ -99,8 +105,8 @@ const New = () => {
   const getInstructions = async () => {
     const instructions: Instruction[] = []
     for (const inst of instructionsData) {
-      if (inst.getSerializedInstruction) {
-        const instruction: Instruction = await inst?.getSerializedInstruction()
+      if (inst.getValidatedInstruction) {
+        const instruction: Instruction = await inst?.getValidatedInstruction()
         instructions.push(instruction)
       }
     }
@@ -192,6 +198,12 @@ const New = () => {
   useEffect(() => {
     setInstructionsData([instructionsData[0]])
   }, [instructionsData[0].governedAccount?.token?.publicKey])
+  useEffect(() => {
+    const firstInstruction = instructionsData[0]
+    if (firstInstruction && firstInstruction.governedAccount) {
+      setGovernance(firstInstruction.governedAccount)
+    }
+  }, [instructionsData[0]])
 
   const returnCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
@@ -199,7 +211,7 @@ const New = () => {
         return (
           <SplTokenTransfer
             index={idx}
-            mainGovernance={instructionsData[0].governedAccount}
+            mainGovernance={governance}
           ></SplTokenTransfer>
         )
       default:
@@ -291,7 +303,12 @@ const New = () => {
                   ))}
                 </Select>
                 <NewProposalContext.Provider
-                  value={{ instructionsData, setInstructionData }}
+                  value={{
+                    instructionsData,
+                    setInstructionData,
+                    governance,
+                    setGovernance,
+                  }}
                 >
                   {returnCurrentInstruction({
                     typeId: instruction.type?.id,

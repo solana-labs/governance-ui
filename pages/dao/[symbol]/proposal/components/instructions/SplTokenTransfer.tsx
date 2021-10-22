@@ -86,7 +86,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getSerializedInstruction() {
+  async function getValidatedInstruction() {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (
@@ -144,7 +144,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
   }, [form.destinationAccount])
   useEffect(() => {
     setInstructionData(
-      { governedAccount: form.governedAccount, getSerializedInstruction },
+      { governedAccount: form.governedAccount, getValidatedInstruction },
       index
     )
   }, [form])
@@ -252,7 +252,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
         <DryRunInstructionBtn
           btnClassNames="mt-5 "
           isValid={!Object.keys(formErrors).length}
-          getInstructionDataFcn={getSerializedInstruction}
+          getInstructionDataFcn={getValidatedInstruction}
         />
       </div>
     </div>
