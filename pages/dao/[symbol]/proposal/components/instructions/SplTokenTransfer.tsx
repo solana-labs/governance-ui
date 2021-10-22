@@ -28,7 +28,7 @@ import { MainGovernanceContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
-import SourceAccountSelect from '../SourceAccountSelect'
+import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
 
 const SplTokenTransfer = ({ index, mainGovernance }) => {
   const connection = useWalletStore((s) => s.connection)
@@ -208,7 +208,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
 
   return (
     <div className="mt-5">
-      <SourceAccountSelect
+      <SourceTokenAccountSelect
         governedTokenAccounts={governedTokenAccounts}
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'governedAccount' })
@@ -217,7 +217,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         mainGovernance={mainGovernance}
-      ></SourceAccountSelect>
+      ></SourceTokenAccountSelect>
       <Input
         prefix="Destination account"
         value={form.destinationAccount}
