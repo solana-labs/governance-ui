@@ -24,7 +24,7 @@ import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import DryRunInstructionBtn from '../DryRunInstructionBtn'
 import { debounce } from '@utils/debounce'
-import { MainGovernanceContext } from '../../new'
+import { NewProposalContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
@@ -53,7 +53,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
-  const { handleSetInstructionData } = useContext(MainGovernanceContext)
+  const { setInstructionData } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -143,7 +143,7 @@ const SplTokenTransfer = ({ index, mainGovernance }) => {
     }
   }, [form.destinationAccount])
   useEffect(() => {
-    handleSetInstructionData(
+    setInstructionData(
       { governedAccount: form.governedAccount, getSerializedInstruction },
       index
     )

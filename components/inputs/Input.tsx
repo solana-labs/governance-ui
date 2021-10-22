@@ -1,4 +1,5 @@
 import { StyledPrefix, StyledSuffix, inputClasses } from './styles'
+import ErrorField from './ErrorField'
 
 interface InputProps {
   type: string
@@ -39,7 +40,7 @@ const Input = ({
         {...props}
       />
       {suffix && <StyledSuffix>{suffix}</StyledSuffix>}
-      {error && <div className="text-red text-xs">{error}</div>}
+      <ErrorField text={error}></ErrorField>
     </div>
   )
 }

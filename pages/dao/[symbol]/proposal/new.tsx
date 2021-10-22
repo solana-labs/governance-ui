@@ -38,9 +38,9 @@ const schema = yup.object().shape({
 })
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],
-  handleSetInstructionData: () => null,
+  setInstructionData: () => null,
 }
-export const MainGovernanceContext = createContext<InstructionsContext>(
+export const NewProposalContext = createContext<InstructionsContext>(
   defaultGovernanceCtx
 )
 
@@ -73,7 +73,7 @@ const New = () => {
   const [isLoading, setIsLoading] = useState(false)
   const selectedGovernance = instructionsData[0]?.governedAccount?.governance
 
-  const handleSetInstructionData = (val: any, index) => {
+  const setInstructionData = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
     setInstructionsData(newInstructions)
@@ -86,7 +86,7 @@ const New = () => {
     const newInstruction = {
       type: value,
     }
-    handleSetInstructionData(newInstruction, idx)
+    setInstructionData(newInstruction, idx)
   }
   const addInstruction = () => {
     setInstructionsData([...instructionsData, { type: undefined }])
@@ -290,14 +290,14 @@ const New = () => {
                     </Select.Option>
                   ))}
                 </Select>
-                <MainGovernanceContext.Provider
-                  value={{ instructionsData, handleSetInstructionData }}
+                <NewProposalContext.Provider
+                  value={{ instructionsData, setInstructionData }}
                 >
                   {returnCurrentInstruction({
                     typeId: instruction.type?.id,
                     idx,
                   })}
-                </MainGovernanceContext.Provider>
+                </NewProposalContext.Provider>
               </div>
             ))}
             <div className="flex justify-left mt-5 mb-5">

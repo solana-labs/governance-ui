@@ -42,5 +42,5 @@ export interface ComponentInstructionData {
 }
 export interface InstructionsContext {
   instructionsData: ComponentInstructionData[]
-  handleSetInstructionData: (val, index) => void
+  setInstructionData: (val, index) => void
 }

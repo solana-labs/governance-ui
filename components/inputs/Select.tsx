@@ -2,6 +2,7 @@ import { Listbox } from '@headlessui/react'
 import styled from '@emotion/styled'
 import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid'
 import { StyledPrefix, inputClasses } from './styles'
+import ErrorField from './ErrorField'
 
 const StyledDiv = styled.div`
   min-height: 2.5rem;
@@ -67,7 +68,7 @@ const Select = ({
           )}
         </Listbox>
       </div>
-      {error && <div className="text-red text-xs">{error}</div>}
+      <ErrorField text={error}></ErrorField>
     </>
   )
 }

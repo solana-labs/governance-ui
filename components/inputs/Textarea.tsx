@@ -1,4 +1,5 @@
 import { StyledPrefix, StyledSuffix, inputClasses } from './styles'
+import ErrorField from './ErrorField'
 
 interface TextareaProps {
   value: any
@@ -30,7 +31,7 @@ const TextareaProps = ({
         {...props}
       />
       {suffix ? <StyledSuffix>{suffix}</StyledSuffix> : null}
-      {error && <div className="text-red text-xs">{error}</div>}
+      <ErrorField text={error}></ErrorField>
     </div>
   )
 }
