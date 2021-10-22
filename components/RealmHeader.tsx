@@ -9,7 +9,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realm, realmInfo, realmDisplayName } = useRealm()
+  const { realmInfo, realmDisplayName } = useRealm()
   const { REALM } = process.env
 
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
