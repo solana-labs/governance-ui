@@ -1,7 +1,7 @@
 import React from 'react'
 import DryRunInstructionBtn from './DryRunInstructionBtn'
 
-const InstructionContainer = ({ children, idx, instructionsData }) => {
+const InstructionContentContainer = ({ children, idx, instructionsData }) => {
   const currentInstruction = instructionsData ? instructionsData[idx] : null
   return (
     <div>
@@ -16,4 +16,4 @@ const InstructionContainer = ({ children, idx, instructionsData }) => {
   )
 }
 
-export default InstructionContainer
+export default InstructionContentContainer

@@ -32,7 +32,7 @@ import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
-import InstructionContainer from './components/InstructionContainer'
+import InstructionContentContainer from './components/InstructionContentContainer'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -213,12 +213,10 @@ const New = () => {
     switch (typeId) {
       case Instructions.Transfer:
         return (
-          <InstructionContainer idx={idx} instructionsData={instructionsData}>
-            <SplTokenTransfer
-              index={idx}
-              governance={governance}
-            ></SplTokenTransfer>
-          </InstructionContainer>
+          <SplTokenTransfer
+            index={idx}
+            governance={governance}
+          ></SplTokenTransfer>
         )
       default:
         null
@@ -284,45 +282,51 @@ const New = () => {
                 })
               }
             ></Textarea>
-            {instructionsData.map((instruction, idx) => (
-              <div key={idx} className="mb-5 border border-bkg-3 p-5">
-                {idx !== 0 && (
-                  <XCircleIcon
-                    className="h-7 cursor-pointer float-right"
-                    onClick={() => removeInstruction(idx)}
-                  ></XCircleIcon>
-                )}
-                <Select
-                  placeholder={`${
-                    availableInstructions.length
-                      ? 'select instruction'
-                      : 'there are no available instructions'
-                  }`}
-                  prefix="Instruction"
-                  onChange={(value) => setInstructionType({ value, idx })}
-                  value={instruction.type?.name}
-                >
-                  {availableInstructions.map((inst) => (
-                    <Select.Option key={inst.id} value={inst}>
-                      <span>{inst.name}</span>
-                    </Select.Option>
-                  ))}
-                </Select>
-                <NewProposalContext.Provider
-                  value={{
-                    instructionsData,
-                    handleSetInstructions,
-                    governance,
-                    setGovernance,
-                  }}
-                >
-                  {returnCurrentInstruction({
-                    typeId: instruction.type?.id,
-                    idx,
-                  })}
-                </NewProposalContext.Provider>
-              </div>
-            ))}
+            <NewProposalContext.Provider
+              value={{
+                instructionsData,
+                handleSetInstructions,
+                governance,
+                setGovernance,
+              }}
+            >
+              {instructionsData.map((instruction, idx) => (
+                <div key={idx} className="mb-5 border border-bkg-3 p-5">
+                  {idx !== 0 && (
+                    <XCircleIcon
+                      className="h-7 cursor-pointer float-right"
+                      onClick={() => removeInstruction(idx)}
+                    ></XCircleIcon>
+                  )}
+                  <Select
+                    placeholder={`${
+                      availableInstructions.length
+                        ? 'select instruction'
+                        : 'there are no available instructions'
+                    }`}
+                    prefix="Instruction"
+                    onChange={(value) => setInstructionType({ value, idx })}
+                    value={instruction.type?.name}
+                  >
+                    {availableInstructions.map((inst) => (
+                      <Select.Option key={inst.id} value={inst}>
+                        <span>{inst.name}</span>
+                      </Select.Option>
+                    ))}
+                  </Select>
+
+                  <InstructionContentContainer
+                    idx={idx}
+                    instructionsData={instructionsData}
+                  >
+                    {returnCurrentInstruction({
+                      typeId: instruction.type?.id,
+                      idx,
+                    })}
+                  </InstructionContentContainer>
+                </div>
+              ))}
+            </NewProposalContext.Provider>
             <div className="flex justify-left mt-5 mb-5">
               <SecondaryButton className="w-24" onClick={addInstruction}>
                 (+)
