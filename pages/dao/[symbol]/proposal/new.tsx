@@ -32,6 +32,7 @@ import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
+import InstructionContainer from './components/InstructionContainer'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -212,10 +213,12 @@ const New = () => {
     switch (typeId) {
       case Instructions.Transfer:
         return (
-          <SplTokenTransfer
-            index={idx}
-            governance={governance}
-          ></SplTokenTransfer>
+          <InstructionContainer idx={idx} instructionsData={instructionsData}>
+            <SplTokenTransfer
+              index={idx}
+              governance={governance}
+            ></SplTokenTransfer>
+          </InstructionContainer>
         )
       default:
         null

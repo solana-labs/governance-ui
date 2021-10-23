@@ -10,11 +10,7 @@ import { dryRunInstruction } from 'actions/dryRunInstruction'
 import React, { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
-const DryRunInstructionBtn = ({
-  isValid,
-  getInstructionDataFcn,
-  btnClassNames,
-}) => {
+const DryRunInstructionBtn = ({ getInstructionDataFcn, btnClassNames }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const [isPending, setIsPending] = useState(false)
@@ -37,11 +33,12 @@ const DryRunInstructionBtn = ({
   }
   const handleDryRun = async () => {
     try {
-      if (!isValid) {
-        throw new Error('Invalid instruction')
-      }
       setIsPending(true)
       const instructionData = await getInstructionDataFcn()
+      if (!instructionData.isValid) {
+        setIsPending(false)
+        throw new Error('Invalid instruction')
+      }
       const result = await dryRunInstruction(
         connection.current,
         wallet!,

@@ -22,7 +22,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
-import DryRunInstructionBtn from '../DryRunInstructionBtn'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
@@ -158,7 +157,7 @@ const SplTokenTransfer = ({ index, governance }) => {
       .typeError('Amount is required')
       .test(
         'amount',
-        'Transfer amount must be less than the source account amount',
+        'Transfer amount must be less than the source account available amount',
         async function (val: number) {
           if (val && !form.governedAccount) {
             return this.createError({
@@ -259,14 +258,6 @@ const SplTokenTransfer = ({ index, governance }) => {
         error={formErrors['amount']}
         onBlur={validateAmountOnBlur}
       />
-      <div className="text-right">
-        {/* TODO move to parent container */}
-        <DryRunInstructionBtn
-          btnClassNames="mt-5 "
-          isValid={!Object.keys(formErrors).length}
-          getInstructionDataFcn={getInstruction}
-        />
-      </div>
     </div>
   )
 }
