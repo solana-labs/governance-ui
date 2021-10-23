@@ -28,8 +28,16 @@ import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
 import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
+import { Governance } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
 
-const SplTokenTransfer = ({ index, governance }) => {
+const SplTokenTransfer = ({
+  index,
+  governance,
+}: {
+  index: number
+  governance: ParsedAccount<Governance> | null
+}) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
   const { governedTokenAccounts } = useInstructions()
@@ -80,12 +88,12 @@ const SplTokenTransfer = ({ index, governance }) => {
       propertyName: 'amount',
     })
   }
-  const validateInstruction = async () => {
+  const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction() {
+  async function getInstruction(): Promise<Instruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (

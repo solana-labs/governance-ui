@@ -6,11 +6,18 @@ import Modal from '@components/Modal'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
+import { Instruction } from '@utils/uiTypes/proposalCreationTypes'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import React, { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
-const DryRunInstructionBtn = ({ getInstructionDataFcn, btnClassNames }) => {
+const DryRunInstructionBtn = ({
+  getInstructionDataFcn,
+  btnClassNames,
+}: {
+  getInstructionDataFcn: (() => Promise<Instruction>) | undefined
+  btnClassNames: string
+}) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const [isPending, setIsPending] = useState(false)
@@ -33,16 +40,19 @@ const DryRunInstructionBtn = ({ getInstructionDataFcn, btnClassNames }) => {
   }
   const handleDryRun = async () => {
     try {
+      if (!getInstructionDataFcn) {
+        throw 'No get instructionDataFcn provided'
+      }
       setIsPending(true)
       const instructionData = await getInstructionDataFcn()
-      if (!instructionData.isValid) {
+      if (!instructionData?.isValid) {
         setIsPending(false)
         throw new Error('Invalid instruction')
       }
       const result = await dryRunInstruction(
         connection.current,
         wallet!,
-        getInstructionDataFromBase64(instructionData.serializedInstruction)
+        getInstructionDataFromBase64(instructionData?.serializedInstruction)
       )
       setResult(result)
       setIsOpen(true)
