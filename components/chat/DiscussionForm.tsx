@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState } from 'react'
 import Button from '../Button'
-import Input from '../Input'
+import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
 import { RpcContext } from '../../models/core/api'
@@ -46,6 +46,7 @@ const DiscussionForm = () => {
         ownVoterWeight.getTokenRecord(),
         msg
       )
+
       setComment('')
     } catch (ex) {
       console.error("Can't post chat message", ex)

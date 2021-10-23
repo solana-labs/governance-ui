@@ -8,11 +8,10 @@ import useQueryContext from '../hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 
 const RealmHeader = () => {
-  const { generateUrlWithClusterParam } = useQueryContext()
-  const { realm, realmInfo } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const { realmInfo, realmDisplayName } = useRealm()
   const { REALM } = process.env
 
-  const realmName = realmInfo?.displayName ?? realm?.info?.name
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
   const mvpUrl = `https://dao.mango.markets/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
@@ -20,7 +19,7 @@ const RealmHeader = () => {
   return (
     <div className="pb-4">
       {isBackNavVisible ? (
-        <Link href={generateUrlWithClusterParam('/realms')}>
+        <Link href={fmtUrlWithCluster('/realms')}>
           <a className="default-transition flex items-center mb-2 md:mb-6 text-fgd-3 text-sm transition-all hover:text-fgd-1">
             <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
             Back
@@ -28,7 +27,7 @@ const RealmHeader = () => {
         </Link>
       ) : null}
       <div className="border-b border-fgd-4 flex flex-col md:flex-row items-center justify-between pb-3">
-        {realmName && (
+        {realmDisplayName && (
           <a href={mvpUrl} target="_blank" rel="noopener noreferrer">
             <div className="flex items-start cursor-pointer">
               <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
@@ -39,10 +38,10 @@ const RealmHeader = () => {
                   ></img>
                 ) : (
                   <div className="bg-[rgba(255,255,255,0.1)] h-14 w-14 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                    {realmName?.charAt(0)}
+                    {realmDisplayName?.charAt(0)}
                   </div>
                 )}
-                <h1 className="ml-3">{realmName}</h1>
+                <h1 className="ml-3">{realmDisplayName}</h1>
               </div>
               <ExternalLinkIcon
                 className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}

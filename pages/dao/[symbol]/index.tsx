@@ -5,6 +5,7 @@ import ProposalFilter from '../../../components/ProposalFilter'
 import ProposalCard from '../../../components/ProposalCard'
 import TokenBalanceCard from '../../../components/TokenBalanceCard'
 import { Proposal, ProposalState } from '../../../models/accounts'
+import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from '../../../components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
 
@@ -76,7 +77,10 @@ const REALM = () => {
           <RealmHeader></RealmHeader>
           <div className="flex items-center justify-between pb-3">
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
-            <ProposalFilter filters={filters} setFilters={setFilters} />
+            <div className="flex items-center">
+              <NewProposalBtn></NewProposalBtn>
+              <ProposalFilter filters={filters} setFilters={setFilters} />
+            </div>
           </div>
           <div className="space-y-3">
             {filteredProposals.length > 0 ? (

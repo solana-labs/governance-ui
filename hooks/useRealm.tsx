@@ -18,6 +18,8 @@ export default function useRealm() {
     mint,
     councilMint,
     governances,
+    tokenMints,
+    tokenAccounts: realmTokenAccounts,
     proposals,
     proposalDescriptions,
     tokenRecords,
@@ -72,6 +74,8 @@ export default function useRealm() {
     mint,
     councilMint,
     governances,
+    realmTokenAccounts,
+    tokenMints,
     proposals,
     proposalDescriptions,
     tokenRecords,
@@ -80,5 +84,6 @@ export default function useRealm() {
     councilTokenAccount,
     ownCouncilTokenRecord,
     ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
+    realmDisplayName: realmInfo?.displayName ?? realm?.info?.name,
   }
 }

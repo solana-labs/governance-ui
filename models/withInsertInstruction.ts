@@ -7,6 +7,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { InsertInstructionArgs } from './instructions'
 import { GOVERNANCE_PROGRAM_SEED, InstructionData } from './accounts'
+import { SYSTEM_PROGRAM_ID } from './core/api'
 
 export const withInsertInstruction = async (
   instructions: TransactionInstruction[],
@@ -18,8 +19,7 @@ export const withInsertInstruction = async (
   index: number,
   holdUpTime: number,
   instructionData: InstructionData,
-  payer: PublicKey,
-  systemId: PublicKey
+  payer: PublicKey
 ) => {
   const args = new InsertInstructionArgs({
     index,
@@ -27,7 +27,7 @@ export const withInsertInstruction = async (
     instructionData: instructionData,
   })
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
-
+  const systemId = SYSTEM_PROGRAM_ID
   const instructionIndexBuffer = Buffer.alloc(2)
   instructionIndexBuffer.writeInt16LE(index, 0)
 

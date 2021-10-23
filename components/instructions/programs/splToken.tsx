@@ -2,6 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '../../../models/accounts'
 import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 
 export interface TokenMintMetadata {
   name: string
@@ -56,7 +57,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         //   ]);
         const rawAmount = new BN(data.slice(1), 'le')
         const tokenAmount = tokenMint
-          ? rawAmount.div(new BN(10).pow(new BN(tokenMint.account.decimals)))
+          ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)
           : rawAmount
 
         return (
@@ -99,10 +100,9 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         //     BufferLayout.u8('instruction'),
         //     Layout.uint64('amount'),
         //   ]);
-
         const rawAmount = new BN(data.slice(1), 'le')
         const tokenAmount = tokenMint
-          ? rawAmount.div(new BN(10).pow(new BN(tokenMint.account.decimals)))
+          ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)
           : rawAmount
 
         return (

@@ -2,6 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { GOVERNANCE_SCHEMA } from './serialisation'
 import {
   getAccountTypes,
+  Governance,
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
@@ -62,6 +63,14 @@ export async function getTokenOwnerRecordsByTokenOwner(
         ])
       )
     : undefined
+}
+
+// Governances
+export async function getGovernance(
+  connection: Connection,
+  governancePk: PublicKey
+) {
+  return getGovernanceAccount<Governance>(connection, governancePk, Governance)
 }
 
 // Proposal

@@ -29,7 +29,7 @@ const StyledCardWrapepr = styled.div`
 
 const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
-  const { generateUrlWithClusterParam } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     yesVoteProgress,
     relativeNoVotes,
@@ -39,7 +39,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   return (
     <div>
       <Link
-        href={generateUrlWithClusterParam(
+        href={fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalPk.toBase58()}`
         )}
       >

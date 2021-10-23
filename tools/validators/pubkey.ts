@@ -6,3 +6,11 @@ export const PublicKeyFromString = coerce(
   string(),
   (value) => new PublicKey(value)
 )
+
+export const tryParseKey = (key: string): PublicKey | null => {
+  try {
+    return new PublicKey(key)
+  } catch (error) {
+    return null
+  }
+}

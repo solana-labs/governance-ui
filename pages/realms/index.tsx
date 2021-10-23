@@ -14,14 +14,14 @@ import useQueryContext from '../../hooks/useQueryContext'
 const Realms = () => {
   const router = useRouter()
   const { cluster } = router.query
-  const { generateUrlWithClusterParam } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext()
 
   const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
   const [realms, setRealms] = useState<RealmInfo[]>([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
-  //   const [search, setSerach] = useState('')
+  //   const [search, setSearch] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
   const { actions, selectedRealm } = useWalletStore((s) => s)
 
@@ -41,7 +41,7 @@ const Realms = () => {
   //   }, [search, realms])
 
   const goToRealm = ({ symbol }) => {
-    const url = generateUrlWithClusterParam(`/dao/${symbol}`)
+    const url = fmtUrlWithCluster(`/dao/${symbol}`)
     router.push(url)
   }
 
@@ -53,7 +53,7 @@ const Realms = () => {
         <Input
           value={search}
           type="text"
-          onChange={(e) => setSerach(e.target.value)}
+          onChange={(e) => setSearch(e.target.value)}
           placeholder={`Search here...`}
         />
         <div className="flex flex-row ml-10">
