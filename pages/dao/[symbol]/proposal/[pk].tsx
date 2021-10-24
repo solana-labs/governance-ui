@@ -39,7 +39,7 @@ const Proposal = () => {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="border border-fgd-4 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
+      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
             <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
@@ -78,12 +78,12 @@ const Proposal = () => {
       </div>
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCard proposal={option(proposal?.info)} />
-        <div className="border border-fgd-4 rounded-lg">
+        <div className="bg-bkg-2 rounded-lg">
           <div className="p-4 md:p-6">
             <h3 className="mb-4">Results</h3>
             <div className="flex space-x-4 items-center">
               {proposal ? (
-                <div className="bg-bkg-2 flex px-4 py-2 rounded w-full">
+                <div className="bg-bkg-1 flex px-4 py-2 rounded w-full">
                   <div className="border-r border-fgd-3 w-1/2">
                     <p className="text-fgd-3 text-xs">Approve</p>
                     <div className="font-bold text-sm">

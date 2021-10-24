@@ -30,7 +30,7 @@ export function InstructionPanel() {
               </div>
             </Disclosure.Button>
             <Disclosure.Panel
-              className={`border border-bkg-3 border-t-0 p-4 md:p-6 pt-0 rounded-b-md`}
+              className={`border border-fgd-4 border-t-0 p-4 md:p-6 pt-0 rounded-b-md`}
             >
               {Object.values(instructions)
                 .sort(

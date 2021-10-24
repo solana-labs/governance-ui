@@ -51,7 +51,7 @@ const Comment = ({
           </div>
         </div>
         {voteRecord && (
-          <div className="bg-bkg-2 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
+          <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
             <div className="flex items-center pr-2 text-fgd-1 text-xs">
               {voteRecord.isYes() ? (
                 <CheckCircleIcon className="h-5 mr-1 text-green w-5" />

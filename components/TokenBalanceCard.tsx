@@ -48,7 +48,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const hasLoaded = mint || councilMint
 
   return (
-    <div className="border border-fgd-4 p-4 md:p-6 rounded-lg">
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Governance Tokens</h3>
       {hasLoaded ? (
         <>
@@ -257,7 +257,7 @@ const TokenDeposit = ({
   return (
     <>
       <div className="flex space-x-4 items-center pb-6">
-        <div className="bg-bkg-2 px-4 py-2 rounded-md w-full">
+        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
           <div className="font-bold text-sm">
             {depositTokenRecord && mint

@@ -26,10 +26,10 @@ const RealmHeader = () => {
           </a>
         </Link>
       ) : null}
-      <div className="border-b border-fgd-4 flex flex-col md:flex-row items-center justify-between pb-3">
-        {realmDisplayName && (
+      <div className="border-b border-fgd-4 flex flex-col md:flex-row md:items-center md:justify-between pb-3">
+        {realmDisplayName ? (
           <a href={mvpUrl} target="_blank" rel="noopener noreferrer">
-            <div className="flex items-start cursor-pointer">
+            <div className="flex items-center cursor-pointer">
               <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
                 {realmInfo?.ogImage ? (
                   <img
@@ -48,6 +48,8 @@ const RealmHeader = () => {
               />
             </div>
           </a>
+        ) : (
+          <div className="animate-pulse bg-bkg-3 h-10 w-40 rounded-md" />
         )}
         <div className="flex items-center space-x-6">
           {realmInfo?.website ? (
