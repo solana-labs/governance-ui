@@ -77,20 +77,31 @@ const SourceTokenAccountSelect = ({
     amount,
   }) => {
     return (
-      <div>
-        <div>{tokenAccount}</div>
-        {tokenAccountName && <div>{tokenAccountName}</div>}
-        {tokenName && <div>token: {tokenName}</div>}
-        <div>amount: {amount}</div>
+      <div className="break-all text-fgd-1">
+        {tokenAccountName && <div className="mb-0.5">{tokenAccountName}</div>}
+        <div className="mb-2">{tokenAccount}</div>
+        <div className="space-y-0.5 text-xs text-fgd-3">
+          {tokenName && (
+            <div className="flex items-center">
+              Token:{' '}
+              <img
+                className="flex-shrink-0 h-4 mx-1 w-4"
+                src={`/icons/${tokenName.toLowerCase()}.svg`}
+              />
+              {tokenName}
+            </div>
+          )}
+          <div>Amount: {amount}</div>
+        </div>
       </div>
     )
   }
   return (
     <Select
-      className="h-24"
       label="Source account"
       onChange={onChange}
       componentLabel={getGovernedTokenAccountLabel()}
+      placeholder="Please select..."
       value={value}
       error={error}
     >

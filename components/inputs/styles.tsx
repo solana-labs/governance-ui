@@ -11,7 +11,7 @@ export const inputClasses = ({ className, disabled, error }) => {
   return `${
     className ? className : ''
   } p-3 w-full bg-bkg-1 rounded-md text-sm text-fgd-1 
-	border border-fgd-3 default-transition hover:border-primary-light 
+	border border-fgd-3 default-transition max-w-lg hover:border-primary-light 
 	focus:border-primary-light focus:outline-none 
 	${error ? 'border-red' : 'border-fgd-4'}
 	${

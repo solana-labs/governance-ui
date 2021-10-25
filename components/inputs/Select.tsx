@@ -25,7 +25,7 @@ const Select = ({
   componentLabel?: any | undefined
 }) => {
   return (
-    <>
+    <div>
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
@@ -34,7 +34,9 @@ const Select = ({
               <Listbox.Button
                 className={inputClasses({ className, disabled, error })}
               >
-                <div className={`flex items-center justify-between text-fgd-1`}>
+                <div
+                  className={`flex items-center justify-between text-fgd-1 text-left`}
+                >
                   {componentLabel
                     ? componentLabel
                     : value
@@ -42,11 +44,11 @@ const Select = ({
                     : placeholder}
                   {open ? (
                     <ChevronUpIcon
-                      className={`h-5 w-5 mr-1 text-primary-light`}
+                      className={`flex-shrink-0 h-5 w-5 mr-1 text-primary-light`}
                     />
                   ) : (
                     <ChevronDownIcon
-                      className={`h-5 w-5 mr-1 text-primary-light`}
+                      className={`flex-shrink-0 h-5 w-5 mr-1 text-primary-light`}
                     />
                   )}
                 </div>
@@ -54,7 +56,7 @@ const Select = ({
               {open ? (
                 <Listbox.Options
                   static
-                  className={`text-fgd-1 max-h-60 overflow-auto z-20 w-full p-1 absolute left-0 mt-1 bg-bkg-1 origin-top-left divide-y divide-th-bkg-3 shadow-lg outline-none rounded-md thin-scroll`}
+                  className={`text-fgd-1 text-sm max-h-64 max-w-lg overflow-auto z-20 w-full p-1 absolute left-0 mt-1 bg-bkg-1 origin-top-left divide-y divide-bkg-3 shadow-lg outline-none rounded-md thin-scroll`}
                 >
                   {children}
                 </Listbox.Options>
@@ -64,7 +66,7 @@ const Select = ({
         </Listbox>
       </div>
       <ErrorField text={error}></ErrorField>
-    </>
+    </div>
   )
 }
 
@@ -73,7 +75,7 @@ const Option = ({ value, children, className = '' }) => {
     <Listbox.Option value={value}>
       {({ selected }) => (
         <div
-          className={`p-2 hover:bg-bkg-3 hover:cursor-pointer tracking-wider ${
+          className={`default-transition px-2 py-3 hover:bg-bkg-2 hover:cursor-pointer tracking-wider ${
             selected && `text-primary-light`
           } ${className}`}
         >

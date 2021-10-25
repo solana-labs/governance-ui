@@ -207,6 +207,7 @@ const New = () => {
     //fetch to be up to date with amounts
     fetchTokenAccountsForSelectedRealmGovernances()
   }, [])
+
   const returnCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
@@ -283,7 +284,7 @@ const New = () => {
               {instructionsData.map((instruction, idx) => (
                 <div
                   key={idx}
-                  className="mb-3 border border-fgd-4 p-4 rounded-lg"
+                  className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                 >
                   <Select
                     className="h-12"
@@ -303,17 +304,7 @@ const New = () => {
                       </Select.Option>
                     ))}
                   </Select>
-                  <div className="flex items-center justify-end pt-4">
-                    {idx !== 0 && (
-                      <LinkButton
-                        className="flex font-bold items-center mr-4 text-fgd-1 text-sm"
-                        onClick={() => removeInstruction(idx)}
-                      >
-                        <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-                        Remove
-                      </LinkButton>
-                    )}
-
+                  <div className="flex items-end pt-4">
                     <InstructionContentContainer
                       idx={idx}
                       instructionsData={instructionsData}
@@ -323,11 +314,20 @@ const New = () => {
                         idx,
                       })}
                     </InstructionContentContainer>
+                    {idx !== 0 && (
+                      <LinkButton
+                        className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
+                        onClick={() => removeInstruction(idx)}
+                      >
+                        <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+                        Remove
+                      </LinkButton>
+                    )}
                   </div>
                 </div>
               ))}
             </NewProposalContext.Provider>
-            <div className="flex justify-end mt-4 mb-8">
+            <div className="flex justify-end mt-4 mb-8 px-6">
               <LinkButton
                 className="flex font-bold items-center text-fgd-1 text-sm"
                 onClick={addInstruction}
