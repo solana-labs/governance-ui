@@ -9,15 +9,14 @@ import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
 import React, { createContext, useEffect, useState } from 'react'
-import { SecondaryButton } from '@components/Button'
+import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
-import MinimumApprovalThreshold from './components/MinimumApprovalThreshold'
 import { RpcContext } from '@models/core/api'
 import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { PublicKey } from '@solana/web3.js'
-import { XCircleIcon } from '@heroicons/react/solid'
+import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { notify } from 'utils/notifications'
 import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
@@ -31,7 +30,6 @@ import {
 import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
-import DropdownBtn, { DropdownBtnOptions } from '@components/DropdownBtn'
 import InstructionContentContainer from './components/InstructionContentContainer'
 
 const schema = yup.object().shape({
@@ -222,22 +220,11 @@ const New = () => {
         null
     }
   }
-  const dropDownBtnFinishActions: DropdownBtnOptions[] = [
-    {
-      label: 'Propose',
-      callback: () => handleCreate(false),
-      isDefault: true,
-    },
-    {
-      label: 'Save Draft',
-      callback: () => handleCreate(true),
-      isDefault: false,
-    },
-  ]
+
   return (
     <div className="grid grid-cols-12 gap-4">
       <div
-        className={`bg-bkg-2 border border-bkg-3 rounded-lg p-6 col-span-8 space-y-3 ${
+        className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${
           isLoading ? 'pointer-events-none' : ''
         }`}
       >
@@ -248,32 +235,34 @@ const New = () => {
               Back
             </a>
           </Link>
-          <div className="border-b border-bkg-3 py-4">
-            <div className="flex items-center justify-between mb-1">
+          <div className="border-b border-fgd-4 pb-4 pt-2">
+            <div className="flex items-center justify-between">
               <h1>
                 Add a proposal
                 {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
               </h1>
             </div>
           </div>
-          <div>
-            <Input
-              prefix="Title"
-              placeholder="title of your proposal"
-              value={form.title}
-              type="text"
-              error={formErrors['title']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'title',
-                })
-              }
-            />
+          <div className="pt-2">
+            <div className="pb-4">
+              <Input
+                label="Title"
+                placeholder="Title of your proposal"
+                value={form.title}
+                type="text"
+                error={formErrors['title']}
+                onChange={(evt) =>
+                  handleSetForm({
+                    value: evt.target.value,
+                    propertyName: 'title',
+                  })
+                }
+              />
+            </div>
             <Textarea
-              placeholder="write a description of your proposal or use a github gist link (optional)"
+              label="Description"
+              placeholder="Description of your proposal or use a github gist link (optional)"
               wrapperClassName="mb-5"
-              prefix="Description"
               value={form.description}
               onChange={(evt) =>
                 handleSetForm({
@@ -290,21 +279,21 @@ const New = () => {
                 setGovernance,
               }}
             >
+              <h2>Instructions</h2>
               {instructionsData.map((instruction, idx) => (
-                <div key={idx} className="mb-5 border border-bkg-3 p-5">
-                  {idx !== 0 && (
-                    <XCircleIcon
-                      className="h-7 cursor-pointer float-right"
-                      onClick={() => removeInstruction(idx)}
-                    ></XCircleIcon>
-                  )}
+                <div
+                  key={idx}
+                  className="mb-3 border border-fgd-4 p-4 rounded-lg"
+                >
                   <Select
+                    className="h-12"
+                    disabled={!availableInstructions.length}
                     placeholder={`${
                       availableInstructions.length
-                        ? 'select instruction'
-                        : 'there are no available instructions'
+                        ? 'Select instruction'
+                        : 'No available instructions'
                     }`}
-                    prefix="Instruction"
+                    label={`Instruction ${idx + 1}`}
                     onChange={(value) => setInstructionType({ value, idx })}
                     value={instruction.type?.name}
                   >
@@ -314,37 +303,54 @@ const New = () => {
                       </Select.Option>
                     ))}
                   </Select>
+                  <div className="flex items-center justify-end pt-4">
+                    {idx !== 0 && (
+                      <LinkButton
+                        className="flex font-bold items-center mr-4 text-fgd-1 text-sm"
+                        onClick={() => removeInstruction(idx)}
+                      >
+                        <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+                        Remove
+                      </LinkButton>
+                    )}
 
-                  <InstructionContentContainer
-                    idx={idx}
-                    instructionsData={instructionsData}
-                  >
-                    {returnCurrentInstruction({
-                      typeId: instruction.type?.id,
-                      idx,
-                    })}
-                  </InstructionContentContainer>
+                    <InstructionContentContainer
+                      idx={idx}
+                      instructionsData={instructionsData}
+                    >
+                      {returnCurrentInstruction({
+                        typeId: instruction.type?.id,
+                        idx,
+                      })}
+                    </InstructionContentContainer>
+                  </div>
                 </div>
               ))}
             </NewProposalContext.Provider>
-            <div className="flex justify-left mt-5 mb-5">
-              <SecondaryButton className="w-24" onClick={addInstruction}>
-                (+)
-              </SecondaryButton>
+            <div className="flex justify-end mt-4 mb-8">
+              <LinkButton
+                className="flex font-bold items-center text-fgd-1 text-sm"
+                onClick={addInstruction}
+              >
+                <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
+                Add instruction
+              </LinkButton>
             </div>
-            <MinimumApprovalThreshold
-              governance={governance}
-            ></MinimumApprovalThreshold>
-            <div className="flex justify-end mt-5">
-              <DropdownBtn
+            <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+              <SecondaryButton
                 isLoading={isLoading}
-                options={dropDownBtnFinishActions}
-              ></DropdownBtn>
+                onClick={() => handleCreate(true)}
+              >
+                Save draft
+              </SecondaryButton>
+              <Button isLoading={isLoading} onClick={() => handleCreate(false)}>
+                Add proposal
+              </Button>
             </div>
           </div>
         </>
       </div>
-      <div className="col-span-4 space-y-4">
+      <div className="col-span-12 md:col-span-5 lg:col-span-4">
         <TokenBalanceCard />
       </div>
     </div>

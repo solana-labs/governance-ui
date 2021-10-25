@@ -88,7 +88,7 @@ const SourceTokenAccountSelect = ({
   return (
     <Select
       className="h-24"
-      prefix="Source Account"
+      label="Source account"
       onChange={onChange}
       componentLabel={getGovernedTokenAccountLabel()}
       value={value}

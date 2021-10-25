@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { Disclosure } from '@headlessui/react'
+import { PlusCircleIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
@@ -15,22 +15,22 @@ const NewProposalBtn = () => {
     )
 
   return (
-    <Disclosure
-      as="div"
-      className={`mr-5 ${
+    <div
+      className={
         !canCreateProposal
           ? 'cursor-not-allowed pointer-events-none opacity-60'
           : ''
-      }`}
+      }
     >
-      <Disclosure.Button
-        className={`border border-fgd-4 default-transition font-normal pl-3 pr-3 py-2.5 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
-      >
-        <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new`)}>
-          + New
-        </Link>
-      </Disclosure.Button>
-    </Disclosure>
+      <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new`)}>
+        <a
+          className={`default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
+        >
+          <PlusCircleIcon className="h-5 mr-1.5 text-primary-light w-5" />
+          New
+        </a>
+      </Link>
+    </div>
   )
 }
 

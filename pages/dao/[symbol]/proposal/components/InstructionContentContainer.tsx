@@ -17,7 +17,7 @@ const InstructionContentContainer = ({
       {children}
       <div className="text-right">
         <DryRunInstructionBtn
-          btnClassNames="mt-5 "
+          btnClassNames=""
           getInstructionDataFcn={currentInstruction?.getInstruction}
         />
       </div>

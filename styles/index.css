@@ -51,6 +51,10 @@ p {
   @apply break-words leading-6 text-fgd-2 text-sm;
 }
 
+button {
+  @apply tracking-wide;
+}
+
 .default-transition {
   @apply transition-all duration-300;
 }

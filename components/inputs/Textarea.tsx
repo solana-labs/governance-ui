@@ -1,4 +1,4 @@
-import { StyledPrefix, StyledSuffix, inputClasses } from './styles'
+import { StyledLabel, StyledSuffix, inputClasses } from './styles'
 import ErrorField from './ErrorField'
 
 interface TextareaProps {
@@ -15,18 +15,18 @@ const TextareaProps = ({
   className,
   wrapperClassName = 'w-full',
   disabled,
-  prefix,
+  label,
   suffix,
   error = '',
   ...props
 }: TextareaProps) => {
   return (
     <div className={`flex-col relative ${wrapperClassName}`}>
-      {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
+      {label && <StyledLabel>{label}</StyledLabel>}
       <textarea
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, prefix, error })}
+        className={inputClasses({ className, disabled, error })}
         disabled={disabled}
         {...props}
       />
