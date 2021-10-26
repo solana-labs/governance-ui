@@ -13,14 +13,12 @@ const InstructionContentContainer = ({
 }) => {
   const currentInstruction = instructionsData ? instructionsData[idx] : null
   return (
-    <div>
+    <div className="space-y-4 w-full">
       {children}
-      <div className="text-right">
-        <DryRunInstructionBtn
-          btnClassNames="mt-5 "
-          getInstructionDataFcn={currentInstruction?.getInstruction}
-        />
-      </div>
+      <DryRunInstructionBtn
+        btnClassNames=""
+        getInstructionDataFcn={currentInstruction?.getInstruction}
+      />
     </div>
   )
 }

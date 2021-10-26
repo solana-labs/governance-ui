@@ -227,7 +227,7 @@ const SplTokenTransfer = ({
   })
 
   return (
-    <div className="mt-5">
+    <>
       <SourceTokenAccountSelect
         governedTokenAccounts={governedTokenAccounts}
         onChange={(value) =>
@@ -239,7 +239,7 @@ const SplTokenTransfer = ({
         governance={governance}
       ></SourceTokenAccountSelect>
       <Input
-        prefix="Destination account"
+        label="Destination account"
         value={form.destinationAccount}
         type="text"
         onChange={(evt) =>
@@ -251,14 +251,22 @@ const SplTokenTransfer = ({
         error={formErrors['destinationAccount']}
       />
       {destinationAccount && (
-        <div>account owner: {destinationAccount.account.owner.toString()}</div>
+        <div>
+          <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>
+          <div className="text-xs">
+            {destinationAccount.account.owner.toString()}
+          </div>
+        </div>
       )}
       {destinationAccountName && (
-        <div>Account name: {destinationAccountName}</div>
+        <div>
+          <div className="pb-0.5 text-fgd-3 text-xs">Account name</div>
+          <div className="text-xs">{destinationAccountName}</div>
+        </div>
       )}
       <Input
         min={mintMinAmount}
-        prefix="Amount"
+        label="Amount"
         value={form.amount}
         type="number"
         onChange={setAmount}
@@ -266,7 +274,7 @@ const SplTokenTransfer = ({
         error={formErrors['amount']}
         onBlur={validateAmountOnBlur}
       />
-    </div>
+    </>
   )
 }
 

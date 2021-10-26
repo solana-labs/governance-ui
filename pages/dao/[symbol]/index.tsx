@@ -74,11 +74,13 @@ const REALM = () => {
     <>
       <div className="grid grid-cols-12 gap-4">
         <div className="bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg">
-          <RealmHeader></RealmHeader>
+          <RealmHeader />
           <div className="flex items-center justify-between pb-3">
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
-              <NewProposalBtn></NewProposalBtn>
+              <div className="mr-4">
+                <NewProposalBtn />
+              </div>
               <ProposalFilter filters={filters} setFilters={setFilters} />
             </div>
           </div>

@@ -90,6 +90,7 @@ const DryRunInstructionBtn = ({
         className={btnClassNames}
         onClick={handleDryRun}
         disabled={isPending || !wallet?.connected}
+        small
       >
         {isPending ? <Loading></Loading> : 'Run simulation'}
       </SecondaryButton>
@@ -98,19 +99,19 @@ const DryRunInstructionBtn = ({
         <Modal onClose={onClose} isOpen={isOpen}>
           <h2>
             {result?.response.err
-              ? 'Simulation returned an error'
-              : 'Simulation ran successfully'}
+              ? 'Simulation error'
+              : 'Simulation successful'}
           </h2>
-          <ul className="instruction-log-list">
+          <ul className="break-all instruction-log-list text-sm">
             {result?.response.logs?.map((log, i) => (
-              <li key={i}>
+              <li className="mb-3" key={i}>
                 <div className={getLogTextType(log)}>{log}</div>
               </li>
             ))}
           </ul>
-          <div className="flex items-center pt-6">
+          <div className="flex items-center pt-3">
             <Button onClick={onInspect}>Inspect</Button>
-            <LinkButton className="ml-4 text-th-fgd-1" onClick={onClose}>
+            <LinkButton className="font-bold ml-4" onClick={onClose}>
               Close
             </LinkButton>
           </div>

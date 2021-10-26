@@ -10,6 +10,7 @@ const MinimumApprovalThreshold = ({
   governance: ParsedAccount<Governance> | null
 }) => {
   const info = governance?.info
+  // const info = { config: { voteThresholdPercentage: { value: 50 } } }
   return info ? (
     <ProgressBar
       progress={info?.config.voteThresholdPercentage.value}

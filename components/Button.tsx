@@ -1,15 +1,19 @@
 import { FunctionComponent } from 'react'
+import Loading from './Loading'
 
 interface ButtonProps {
   className?: string
+  isLoading?: boolean
   onClick?: () => void
   disabled?: boolean
+  small?: boolean
 }
 
 const Button: FunctionComponent<ButtonProps> = ({
   children,
   className,
   disabled,
+  isLoading,
   ...props
 }) => {
   return (
@@ -22,7 +26,7 @@ const Button: FunctionComponent<ButtonProps> = ({
       {...props}
       disabled={disabled}
     >
-      {children}
+      {isLoading ? <Loading /> : children}
     </button>
   )
 }
@@ -34,16 +38,20 @@ export const SecondaryButton: FunctionComponent<ButtonProps> = ({
   onClick,
   disabled = false,
   className,
+  isLoading,
+  small = false,
   ...props
 }) => {
   return (
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border border-primary-light default-transition font-bold rounded-full px-3 py-1 text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
+      className={`${className} border border-primary-light default-transition font-bold rounded-full px-4 ${
+        small ? 'py-1' : 'py-2.5'
+      } text-primary-light text-sm hover:border-primary-dark hover:text-primary-dark focus:outline-none disabled:border-fgd-3 disabled:text-fgd-3 disabled:cursor-not-allowed`}
       {...props}
     >
-      {children}
+      {isLoading ? <Loading /> : children}
     </button>
   )
 }
@@ -59,7 +67,7 @@ export const LinkButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border-0 default-transition underline hover:no-underline hover:opacity-60 focus:outline-none`}
+      className={`${className} border-0 default-transition text-sm underline hover:no-underline hover:opacity-60 focus:outline-none`}
       {...props}
     >
       {children}

@@ -1,4 +1,4 @@
-import { StyledPrefix, StyledSuffix, inputClasses } from './styles'
+import { StyledLabel, StyledSuffix, inputClasses } from './styles'
 import ErrorField from './ErrorField'
 
 interface InputProps {
@@ -17,7 +17,7 @@ const Input = ({
   className,
   wrapperClassName = 'w-full',
   disabled,
-  prefix,
+  label,
   suffix,
   min,
   error = '',
@@ -27,20 +27,22 @@ const Input = ({
 }: InputProps) => {
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
-      {prefix && <StyledPrefix>{prefix}</StyledPrefix>}
+      {label && <StyledLabel>{label}</StyledLabel>}
       <input
         max={max}
         min={min}
         type={type}
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, prefix, error })}
+        className={inputClasses({ className, disabled, error })}
         disabled={disabled}
         step={step}
         {...props}
       />
       {suffix && <StyledSuffix>{suffix}</StyledSuffix>}
-      <ErrorField text={error}></ErrorField>
+      <div className={error && 'pt-1'}>
+        <ErrorField text={error}></ErrorField>
+      </div>
     </div>
   )
 }
