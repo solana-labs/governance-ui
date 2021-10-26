@@ -27,7 +27,7 @@ const Select = ({
   return (
     <div>
       {label && <StyledLabel>{label}</StyledLabel>}
-      <div className={`relative ${className}`}>
+      <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
           {({ open }) => (
             <>

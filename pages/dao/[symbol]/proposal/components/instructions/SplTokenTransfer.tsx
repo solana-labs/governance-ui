@@ -251,10 +251,18 @@ const SplTokenTransfer = ({
         error={formErrors['destinationAccount']}
       />
       {destinationAccount && (
-        <div>Account owner: {destinationAccount.account.owner.toString()}</div>
+        <div>
+          <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>
+          <div className="text-xs">
+            {destinationAccount.account.owner.toString()}
+          </div>
+        </div>
       )}
       {destinationAccountName && (
-        <div>Account name: {destinationAccountName}</div>
+        <div>
+          <div className="pb-0.5 text-fgd-3 text-xs">Account name</div>
+          <div className="text-xs">{destinationAccountName}</div>
+        </div>
       )}
       <Input
         min={mintMinAmount}

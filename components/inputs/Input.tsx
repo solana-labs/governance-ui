@@ -40,7 +40,9 @@ const Input = ({
         {...props}
       />
       {suffix && <StyledSuffix>{suffix}</StyledSuffix>}
-      <ErrorField text={error}></ErrorField>
+      <div className={error && 'pt-1'}>
+        <ErrorField text={error}></ErrorField>
+      </div>
     </div>
   )
 }
