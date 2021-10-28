@@ -9,7 +9,7 @@ export default function useHydrateStore() {
   const router = useRouter()
   const { symbol, cluster, pk } = router.query
   const apiEndpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
-  const mints = useWalletStore((s) => s.mints)
+  const mints = useWalletStore((s) => s.selectedRealm.mints)
   const setWalletStore = useWalletStore((s) => s.set)
   const { fetchAllRealms, fetchRealm, fetchProposal } = useWalletStore(
     (s) => s.actions

@@ -31,7 +31,7 @@ const SourceTokenAccountSelect = ({
     let tokenAccountName = ''
     let amount = ''
 
-    if (acc?.token && acc.mint) {
+    if (acc?.token) {
       tokenAccount = acc.token.publicKey.toBase58()
       tokenName = getMintMetadata(acc.token.account.mint)?.name
       tokenAccountName = getAccountName(acc.token.publicKey)

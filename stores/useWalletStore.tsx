@@ -11,6 +11,7 @@ import {
   getOwnedTokenAccounts,
   getMultipleAccounts,
   parseMintAccountData,
+  parseTokenAccountData,
 } from '../utils/tokens'
 import {
   getGovernance,
@@ -38,7 +39,6 @@ import { ChatMessage } from '../models/chat/accounts'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
-import { parseTokenAccountData } from '@project-serum/common/dist/lib/token'
 interface WalletStore extends State {
   connected: boolean
   connection: {
@@ -287,22 +287,28 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const endpoint = get().connection.endpoint
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
-      const mints = (
-        await Promise.all([
-          tryGetMint(connection, realm.info.communityMint),
-          realm.info.config.councilMint
-            ? tryGetMint(connection, realm.info.config.councilMint)
-            : undefined,
-        ])
+      const mintsArray = (
+        await Promise.all(
+          Object.values(realm).flatMap((r) => [
+            tryGetMint(connection, r.communityMint),
+            r.config?.councilMint
+              ? tryGetMint(connection, r.config.councilMint)
+              : undefined,
+          ])
+        )
       ).filter(Boolean)
 
+      set((s) => {
+        s.selectedRealm.mints = Object.fromEntries(
+          mintsArray.map((m) => [m!.publicKey.toBase58(), m!.account])
+        )
+      })
+      const mints = get().selectedRealm.mints
       const realmMintPk = realm.info.communityMint
       const realmMint = mints[realmMintPk.toBase58()]
-
       const realmCouncilMintPk = realm.info.config.councilMint
       const realmCouncilMint =
         realmCouncilMintPk && mints[realmCouncilMintPk.toBase58()]
-
       const [
         governances,
         tokenRecords,
@@ -347,9 +353,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.governances = governances
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
-        s.selectedRealm.mints = Object.fromEntries(
-          mints.map((m) => [m!.publicKey.toBase58(), m!.account])
-        )
       })
       get().actions.fetchOwnVoteRecords()
       await get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
@@ -556,11 +559,15 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenGovernances.map((x) => x.info.governedAccount.toBase58())
       )
       tokenAccountsInfo.keys.forEach((key, index) => {
+        const publicKey = new PublicKey(tokenAccountsInfo.keys[index])
         const accountInfo = tokenAccountsInfo.array[index]
         const data = Buffer.from(accountInfo!.data)
-        const parsedAccountInfo = parseTokenAccountData(data) as AccountInfo
+        const parsedAccountInfo = parseTokenAccountData(
+          publicKey,
+          data
+        ) as AccountInfo
         tokenAccounts.push({
-          publicKey: new PublicKey(tokenAccountsInfo.keys[index]),
+          publicKey: publicKey,
           account: parsedAccountInfo,
         })
       })
