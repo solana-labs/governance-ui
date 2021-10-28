@@ -263,7 +263,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchAllRealms(programId: PublicKey) {
       console.log('fetchAllRealms', programId.toBase58())
 
-      const connection = get().connection.current
       const endpoint = get().connection.endpoint
       const set = get().set
 
@@ -278,32 +277,23 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.realms = realms
       })
 
-      const mints = (
-        await Promise.all(
-          Object.values(realms).flatMap((r) => [
-            tryGetMint(connection, r.info.communityMint),
-            r.info.config.councilMint
-              ? tryGetMint(connection, r.info.config.councilMint)
-              : undefined,
-          ])
-        )
-      ).filter(Boolean)
-
-      set((s) => {
-        s.mints = Object.fromEntries(
-          mints.map((m) => [m!.publicKey.toBase58(), m!.account])
-        )
-      })
-
       console.log('fetchAllRealms', get().realms, get().mints)
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
-
+      const set = get().set
+      const connection = get().connection.current
       const endpoint = get().connection.endpoint
       const realms = get().realms
-      const mints = get().mints
       const realm = realms[realmId.toBase58()]
+      const mints = (
+        await Promise.all([
+          tryGetMint(connection, realm.info.communityMint),
+          realm.info.config.councilMint
+            ? tryGetMint(connection, realm.info.config.councilMint)
+            : undefined,
+        ])
+      ).filter(Boolean)
 
       const realmMintPk = realm.info.communityMint
       const realmMint = mints[realmMintPk.toBase58()]
@@ -312,8 +302,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realmCouncilMint =
         realmCouncilMintPk && mints[realmCouncilMintPk.toBase58()]
 
-      const set = get().set
-      //dodac tokenaccounts
       const [
         governances,
         tokenRecords,
@@ -349,6 +337,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenRecords,
         councilTokenOwnerRecords,
       })
+
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
@@ -357,6 +346,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.governances = governances
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
+        s.mints = Object.fromEntries(
+          mints.map((m) => [m!.publicKey.toBase58(), m!.account])
+        )
       })
 
       get().actions.fetchOwnVoteRecords()
@@ -529,6 +521,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchMintsForTokenAccounts(
       tokenAccounts: ProgramAccount<AccountInfo>[]
     ) {
+      console.log('fetchTokenAccountAndMintsForSelectedRealmGovernances')
       const set = get().set
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
