@@ -303,12 +303,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           mintsArray.map((m) => [m!.publicKey.toBase58(), m!.account])
         )
       })
-      const mints = get().selectedRealm.mints
+      const realmMints = get().selectedRealm.mints
       const realmMintPk = realm.info.communityMint
-      const realmMint = mints[realmMintPk.toBase58()]
+      const realmMint = realmMints[realmMintPk.toBase58()]
       const realmCouncilMintPk = realm.info.config.councilMint
       const realmCouncilMint =
-        realmCouncilMintPk && mints[realmCouncilMintPk.toBase58()]
+        realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
       const [
         governances,
         tokenRecords,
@@ -412,7 +412,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
-      const mints = get().selectedRealm.mints
+      const realmMints = get().selectedRealm.mints
       const set = get().set
 
       set((s) => {
@@ -427,7 +427,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Proposal
       )
 
-      const proposalMint = mints[proposal.info.governingTokenMint.toBase58()]
+      const proposalMint =
+        realmMints[proposal.info.governingTokenMint.toBase58()]
 
       const programId = proposal.account.owner
 
