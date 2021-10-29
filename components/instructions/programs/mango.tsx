@@ -130,5 +130,46 @@ export const MANGO_INSTRUCTIONS = {
         )
       },
     },
+    46: {
+      name: 'Mango v3: Create Perp Market',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Oracle' },
+        3: { name: 'Event Queue Acct' },
+        4: { name: 'Bids Acct' },
+        5: { name: 'Asks Acct' },
+        7: { name: 'MNGO Vault' },
+      },
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .CreatePerpMarket
+        const mngoMint = { name: 'MNGO', decimals: 6 }
+        return (
+          <>
+            <p>initLeverage: {args.initLeverage.toNumber()}</p>
+            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
+            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
+            <p>makerFee: {args.makerFee.toNumber()}</p>
+            <p>takerFee: {args.takerFee.toNumber()}</p>
+            <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
+            <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
+            <p>rate: {args.rate.toString()}</p>
+            <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
+            <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
+            <p>
+              mngoPerPeriod:{' '}
+              {args.mngoPerPeriod.toNumber() / Math.pow(10, mngoMint.decimals)}
+            </p>
+            <p>exp: {args.exp.toNumber()}</p>
+            <p>version: {args.version.toNumber()}</p>
+            <p>lmSizeShift: {args.lmSizeShift.toNumber()}</p>
+          </>
+        )
+      },
+    },
   },
 }
