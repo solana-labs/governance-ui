@@ -194,14 +194,14 @@ const New = () => {
     }
     setIsLoading(false)
   }
-
   useEffect(() => {
     setInstructions([instructionsData[0]])
-  }, [instructionsData[0].governedAccount?.token?.publicKey])
+  }, [instructionsData[0].governedAccount?.pubkey])
+
   useEffect(() => {
     const firstInstruction = instructionsData[0]
-    if (firstInstruction && firstInstruction.governedAccount?.governance) {
-      setGovernance(firstInstruction.governedAccount.governance)
+    if (firstInstruction && firstInstruction.governedAccount) {
+      setGovernance(firstInstruction.governedAccount)
     }
   }, [instructionsData[0]])
   useEffect(() => {

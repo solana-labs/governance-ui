@@ -10,8 +10,8 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useInstructions from '@hooks/useInstructions'
-import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
-import { Governance } from '@models/accounts'
+import ProgramGovernedAccountSelect from '../ProgramGovernedAccountSelect'
+import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 
 const ProgramUpgrade = ({
@@ -23,7 +23,10 @@ const ProgramUpgrade = ({
 }) => {
   //   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useInstructions()
+  const { getGovernancesByAccountType } = useInstructions()
+  const programGovernances = getGovernancesByAccountType(
+    GovernanceAccountType.ProgramGovernance
+  )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ProgramUpgradeForm>({
@@ -135,16 +138,17 @@ const ProgramUpgrade = ({
 
   return (
     <>
-      <SourceTokenAccountSelect
-        governedTokenAccounts={governedTokenAccounts}
-        onChange={(value) =>
+      <ProgramGovernedAccountSelect
+        programGovernances={programGovernances}
+        onChange={(value) => {
+          console.log(value)
           handleSetForm({ value, propertyName: 'governedAccount' })
-        }
-        value={form.governedAccount?.token?.account?.address?.toString()}
+        }}
+        value={form.governedAccount?.info.governedAccount.toBase58()}
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceTokenAccountSelect>
+      ></ProgramGovernedAccountSelect>
     </>
   )
 }

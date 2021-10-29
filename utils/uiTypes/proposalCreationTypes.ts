@@ -8,18 +8,19 @@ import { GovernedTokenAccount } from '@utils/tokens'
 export interface Instruction {
   serializedInstruction: string
   isValid: boolean
-  governedAccount: GovernedTokenAccount | undefined
+  governedAccount: ParsedAccount<Governance> | undefined
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
-  governedAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: GovernedTokenAccount | undefined
+  governedAccount: ParsedAccount<Governance> | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
 
 export interface ProgramUpgradeForm {
-  governedAccount: GovernedTokenAccount | undefined
+  governedAccount: ParsedAccount<Governance> | undefined
   programId: string | undefined
   bufferAddress: string
 }
@@ -44,7 +45,7 @@ export type createParams = [
 ]
 
 export interface ComponentInstructionData {
-  governedAccount?: GovernedTokenAccount | undefined
+  governedAccount?: ParsedAccount<Governance> | undefined
   getInstruction?: () => Promise<Instruction>
   type: any
 }
