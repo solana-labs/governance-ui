@@ -23,11 +23,22 @@ export default function useInstructions() {
       GovernanceAccountType.TokenGovernance
     ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
 
+  const canUseProgramUpgradeInstruction =
+    realm &&
+    getGovernancesByAccountType(
+      GovernanceAccountType.ProgramGovernance
+    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+
   const availableInstructions = [
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
       isVisible: canUseTransferInstruction,
+    },
+    {
+      id: Instructions.ProgramUpgrade,
+      name: 'Program Upgrade',
+      isVisible: canUseProgramUpgradeInstruction,
     },
   ]
   const getAvailableInstructions = () => {

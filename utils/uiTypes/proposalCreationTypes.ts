@@ -18,8 +18,15 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface ProgramUpgradeForm {
+  governedAccount: GovernedTokenAccount | undefined
+  programId: string | undefined
+  bufferAddress: string
+}
+
 export enum Instructions {
   Transfer,
+  ProgramUpgrade,
 }
 
 export type createParams = [

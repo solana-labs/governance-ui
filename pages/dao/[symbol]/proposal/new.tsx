@@ -31,6 +31,7 @@ import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
+import ProgramUpgrade from './components/instructions/ProgramUpgrade'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -216,6 +217,10 @@ const New = () => {
             index={idx}
             governance={governance}
           ></SplTokenTransfer>
+        )
+      case Instructions.ProgramUpgrade:
+        return (
+          <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
         )
       default:
         null
