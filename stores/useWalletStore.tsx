@@ -9,9 +9,7 @@ import {
   MintAccount,
   tryGetMint,
   getOwnedTokenAccounts,
-  getMultipleAccounts,
-  parseMintAccountData,
-  parseTokenAccountData,
+  tryGetTokenAccount,
 } from '../utils/tokens'
 import {
   getGovernance,
@@ -39,6 +37,7 @@ import { ChatMessage } from '../models/chat/accounts'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
+
 interface WalletStore extends State {
   connected: boolean
   connection: {
@@ -66,7 +65,6 @@ interface WalletStore extends State {
     councilTokenOwnerRecords: {
       [owner: string]: ParsedAccount<TokenOwnerRecord>
     }
-    mints: { [pubkey: string]: MintAccount }
   }
   selectedProposal: {
     proposal: ParsedAccount<Proposal> | undefined
@@ -83,6 +81,7 @@ interface WalletStore extends State {
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
+  mints: { [pubkey: string]: MintAccount }
   set: (x: any) => void
   actions: any
 }
@@ -174,7 +173,6 @@ const INITIAL_REALM_STATE = {
   tokenRecords: {},
   councilTokenOwnerRecords: {},
   loading: true,
-  mints: {},
 }
 
 const INITIAL_PROPOSAL_STATE = {
@@ -200,6 +198,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   selectedProposal: INITIAL_PROPOSAL_STATE,
   providerUrl: DEFAULT_PROVIDER.url,
   tokenAccounts: [],
+  mints: {},
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchWalletTokenAccounts() {
@@ -264,6 +263,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchAllRealms(programId: PublicKey) {
       console.log('fetchAllRealms', programId.toBase58())
 
+      const connection = get().connection.current
       const endpoint = get().connection.endpoint
       const set = get().set
 
@@ -278,37 +278,42 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.realms = realms
       })
 
-      console.log('fetchAllRealms', get().realms)
-    },
-    async fetchRealm(programId: PublicKey, realmId: PublicKey) {
-      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
-      const set = get().set
-      const connection = get().connection.current
-      const endpoint = get().connection.endpoint
-      const realms = get().realms
-      const realm = realms[realmId.toBase58()]
-      const mintsArray = (
+      const mints = (
         await Promise.all(
-          Object.values(realm).flatMap((r) => [
-            tryGetMint(connection, r.communityMint),
-            r.config?.councilMint
-              ? tryGetMint(connection, r.config.councilMint)
+          Object.values(realms).flatMap((r) => [
+            tryGetMint(connection, r.info.communityMint),
+            r.info.config.councilMint
+              ? tryGetMint(connection, r.info.config.councilMint)
               : undefined,
           ])
         )
       ).filter(Boolean)
 
       set((s) => {
-        s.selectedRealm.mints = Object.fromEntries(
-          mintsArray.map((m) => [m!.publicKey.toBase58(), m!.account])
+        s.mints = Object.fromEntries(
+          mints.map((m) => [m!.publicKey.toBase58(), m!.account])
         )
       })
-      const realmMints = get().selectedRealm.mints
+
+      console.log('fetchAllRealms', get().realms, get().mints)
+    },
+    async fetchRealm(programId: PublicKey, realmId: PublicKey) {
+      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
+
+      const endpoint = get().connection.endpoint
+      const realms = get().realms
+      const mints = get().mints
+      const realm = realms[realmId.toBase58()]
+
       const realmMintPk = realm.info.communityMint
-      const realmMint = realmMints[realmMintPk.toBase58()]
+      const realmMint = mints[realmMintPk.toBase58()]
+
       const realmCouncilMintPk = realm.info.config.councilMint
       const realmCouncilMint =
-        realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
+        realmCouncilMintPk && mints[realmCouncilMintPk.toBase58()]
+
+      const set = get().set
+      //dodac tokenaccounts
       const [
         governances,
         tokenRecords,
@@ -344,7 +349,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenRecords,
         councilTokenOwnerRecords,
       })
-
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
@@ -354,6 +358,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
       })
+
       get().actions.fetchOwnVoteRecords()
       get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
       const proposalsByGovernance = await Promise.all(
@@ -412,7 +417,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
-      const realmMints = get().selectedRealm.mints
+      const mints = get().mints
       const set = get().set
 
       set((s) => {
@@ -427,8 +432,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         Proposal
       )
 
-      const proposalMint =
-        realmMints[proposal.info.governingTokenMint.toBase58()]
+      const proposalMint = mints[proposal.info.governingTokenMint.toBase58()]
 
       const programId = proposal.account.owner
 
@@ -528,19 +532,23 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
-      const tokenAccountsMintInfo = await getMultipleAccounts(
-        connection,
-        tokenAccounts.map((x) => x.account.mint.toBase58())
-      )
-      tokenAccountsMintInfo.keys.forEach((key, index) => {
-        const mintAccount = tokenAccountsMintInfo.array[index]
-        const data = Buffer.from(mintAccount!.data)
-        const parsedMintInfo = parseMintAccountData(data) as MintInfo
-        tokenMints.push({
-          publicKey: new PublicKey(tokenAccountsMintInfo.keys[index]),
-          account: parsedMintInfo,
-        })
-      })
+      for (const tokenAccount of tokenAccounts) {
+        try {
+          const tokenMint = await tryGetMint(
+            connection,
+            tokenAccount.account.mint
+          )
+          if (tokenMint) {
+            tokenMints.push(tokenMint)
+          }
+        } catch (e) {
+          console.log(
+            e,
+            `error fetching mint for token account ${tokenAccount.publicKey.toBase58()}`
+          )
+        }
+      }
+
       set((s) => {
         s.selectedRealm.tokenMints = tokenMints
       })
@@ -555,23 +563,23 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenGovernances = selectedRealmGovernances.filter(
         (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
       )
-      const tokenAccountsInfo = await getMultipleAccounts(
-        connection,
-        tokenGovernances.map((x) => x.info.governedAccount.toBase58())
-      )
-      tokenAccountsInfo.keys.forEach((key, index) => {
-        const publicKey = new PublicKey(tokenAccountsInfo.keys[index])
-        const accountInfo = tokenAccountsInfo.array[index]
-        const data = Buffer.from(accountInfo!.data)
-        const parsedAccountInfo = parseTokenAccountData(
-          publicKey,
-          data
-        ) as AccountInfo
-        tokenAccounts.push({
-          publicKey: publicKey,
-          account: parsedAccountInfo,
-        })
-      })
+      for (const tokenGov of tokenGovernances) {
+        try {
+          const tokenAccount = await tryGetTokenAccount(
+            connection,
+            tokenGov.info.governedAccount
+          )
+          if (tokenAccount) {
+            tokenAccounts.push(tokenAccount)
+          }
+        } catch (e) {
+          console.log(
+            e,
+            `error fetching token account ${tokenGov.info.governedAccount.toBase58()}`
+          )
+        }
+      }
+
       set((s) => {
         s.selectedRealm.tokenAccounts = tokenAccounts
       })
