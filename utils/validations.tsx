@@ -1,5 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import { TokenAccountInfo } from '@tools/validators/accounts/token'
+import { ProgramBufferAccount } from '@tools/validators/accounts/upgradeable-program'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
 import { tryGetTokenAccount } from './tokens'
@@ -45,6 +46,49 @@ export const validateDestinationAccAddress = async (
     } else {
       throw 'Source account not provided'
     }
+  } else {
+    throw 'Provided value is not a valid account address'
+  }
+}
+
+export const validateBuffer = async (
+  connection,
+  val: string,
+  governedAccount?: PublicKey
+) => {
+  const pubKey = tryParseKey(val)
+  if (!governedAccount) {
+    throw 'Program governed account not selected'
+  }
+  if (pubKey) {
+    await connection.current.getParsedAccountInfo(pubKey).then((data) => {
+      console.log(data, '@@@')
+      if (!data || !data.value) {
+        throw 'Account not found'
+      }
+      const info = data.value
+      if (
+        !(
+          'parsed' in info.data &&
+          info.data.program === 'bpf-upgradeable-loader'
+        )
+      ) {
+        throw 'Invalid program buffer account'
+      }
+
+      let buffer: ProgramBufferAccount
+
+      try {
+        buffer = create(info.data.parsed, ProgramBufferAccount)
+      } catch {
+        throw 'Invalid program buffer account'
+      }
+
+      if (buffer.info.authority?.toBase58() !== governedAccount.toBase58()) {
+        throw `Buffer authority must be set to governance account 
+              ${governedAccount.toBase58()}`
+      }
+    })
   } else {
     throw 'Provided value is not a valid account address'
   }

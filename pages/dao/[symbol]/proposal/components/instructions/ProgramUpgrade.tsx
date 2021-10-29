@@ -17,6 +17,10 @@ import useWalletStore from 'stores/useWalletStore'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
 import { serializeInstructionToBase64 } from '@models/serialisation'
+import Input from '@components/inputs/Input'
+import { debounce } from '@utils/debounce'
+import { tryParseKey } from '@tools/validators/pubkey'
+import { validateBuffer } from '@utils/validations'
 
 const ProgramUpgrade = ({
   index,
@@ -25,7 +29,7 @@ const ProgramUpgrade = ({
   index: number
   governance: ParsedAccount<Governance> | null
 }) => {
-  //const connection = useWalletStore((s) => s.connection)
+  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useInstructions()
@@ -75,7 +79,6 @@ const ProgramUpgrade = ({
     }
     return obj
   }
-
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -83,21 +86,18 @@ const ProgramUpgrade = ({
     })
   }, [realmInfo?.programId])
 
-  //   useEffect(() => {
-  //     if (form.destinationAccount) {
-  //       debounce.debounceFcn(async () => {
-  //         const pubKey = tryParseKey(form.destinationAccount)
-  //         if (pubKey) {
-  //           const account = await tryGetTokenAccount(connection.current, pubKey)
-  //           setDestinationAccount(account ? account : null)
-  //         } else {
-  //           setDestinationAccount(null)
-  //         }
-  //       })
-  //     } else {
-  //       setDestinationAccount(null)
-  //     }
-  //   }, [form.destinationAccount])
+  useEffect(() => {
+    if (form.bufferAddress) {
+      debounce.debounceFcn(async () => {
+        const pubKey = tryParseKey(form.bufferAddress)
+        if (pubKey) {
+          console.log('buffer ok')
+        } else {
+          console.log('buffer not ok')
+        }
+      })
+    }
+  }, [form.bufferAddress])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount, getInstruction },
@@ -105,47 +105,29 @@ const ProgramUpgrade = ({
     )
   }, [form])
 
-  //   const destinationAccountName =
-  //     destinationAccount?.publicKey &&
-  //     getAccountName(destinationAccount?.account.address)
   const schema = yup.object().shape({
-    // destinationAccount: yup
-    //   .string()
-    //   .test(
-    //     'accountTests',
-    //     'Account validation error',
-    //     async function (val: string) {
-    //       if (val) {
-    //         try {
-    //           if (
-    //             form.governedAccount?.token?.account.address.toBase58() == val
-    //           ) {
-    //             return this.createError({
-    //               message: `Destination account address can't be same as source account`,
-    //             })
-    //           }
-    //           await validateDestinationAccAddress(
-    //             connection,
-    //             val,
-    //             form.governedAccount?.token?.account.address
-    //           )
-    //           return true
-    //         } catch (e) {
-    //           return this.createError({
-    //             message: `${e}`,
-    //           })
-    //         }
-    //       } else {
-    //         return this.createError({
-    //           message: `Destination account is required`,
-    //         })
-    //       }
-    //     }
-    //   ),
+    bufferAddress: yup
+      .string()
+      .test('accountTests', 'Buffer validation', async function (val: string) {
+        if (val) {
+          try {
+            await validateBuffer(connection, val, form.governedAccount?.pubkey)
+            return true
+          } catch (e) {
+            return this.createError({
+              message: `${e}`,
+            })
+          }
+        } else {
+          return this.createError({
+            message: `Buffer address is required`,
+          })
+        }
+      }),
     governedAccount: yup
       .object()
       .nullable()
-      .required('Source account is required'),
+      .required('Program governed account is required'),
   })
 
   return (
@@ -153,7 +135,6 @@ const ProgramUpgrade = ({
       <ProgramGovernedAccountSelect
         programGovernances={programGovernances}
         onChange={(value) => {
-          console.log(value)
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
         value={form.governedAccount?.info.governedAccount.toBase58()}
@@ -161,6 +142,18 @@ const ProgramUpgrade = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></ProgramGovernedAccountSelect>
+      <Input
+        label="Buffer address"
+        value={form.bufferAddress}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'bufferAddress',
+          })
+        }
+        error={formErrors['bufferAddress']}
+      />
     </>
   )
 }
