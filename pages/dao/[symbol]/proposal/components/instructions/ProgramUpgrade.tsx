@@ -15,7 +15,6 @@ import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
-import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
@@ -64,7 +63,6 @@ const ProgramUpgrade = ({
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        BPF_UPGRADE_LOADER_ID,
         form.governedAccount.info.governedAccount,
         new PublicKey(form.bufferAddress),
         form.governedAccount.pubkey,
