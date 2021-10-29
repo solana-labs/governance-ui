@@ -355,7 +355,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
       })
       get().actions.fetchOwnVoteRecords()
-      await get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
+      get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
       const proposalsByGovernance = await Promise.all(
         mapKeys(governances, (g) =>
           getGovernanceAccounts<Proposal>(
@@ -520,7 +520,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         fetchMintsForTokenAccounts,
       } = get().actions
       await fetchTokenAccountsForSelectedRealmGovernances()
-      await fetchMintsForTokenAccounts(get().selectedRealm.tokenAccounts)
+      fetchMintsForTokenAccounts(get().selectedRealm.tokenAccounts)
     },
     async fetchMintsForTokenAccounts(
       tokenAccounts: ProgramAccount<AccountInfo>[]
