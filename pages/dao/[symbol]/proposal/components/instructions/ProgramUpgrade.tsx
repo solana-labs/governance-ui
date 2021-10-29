@@ -13,6 +13,10 @@ import useInstructions from '@hooks/useInstructions'
 import ProgramGovernedAccountSelect from '../ProgramGovernedAccountSelect'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
+import useWalletStore from 'stores/useWalletStore'
+import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
+import { serializeInstructionToBase64 } from '@models/serialisation'
 
 const ProgramUpgrade = ({
   index,
@@ -21,7 +25,8 @@ const ProgramUpgrade = ({
   index: number
   governance: ParsedAccount<Governance> | null
 }) => {
-  //   const connection = useWalletStore((s) => s.connection)
+  //const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useInstructions()
   const programGovernances = getGovernancesByAccountType(
@@ -47,17 +52,24 @@ const ProgramUpgrade = ({
   }
   async function getInstruction(): Promise<Instruction> {
     const isValid = await validateInstruction()
-    // let serializedInstruction = ''
-    // if (
-    //   isValid &&
-    //   programId &&
-    //   form.governedAccount?.token?.publicKey &&
-    // ) {
-    //   const transferIx =
-    //   serializedInstruction = serializeInstructionToBase64(transferIx)
-    // }
+    let serializedInstruction = ''
+    if (
+      isValid &&
+      programId &&
+      form.governedAccount?.info &&
+      wallet?.publicKey
+    ) {
+      const upgradeIx = await createUpgradeInstruction(
+        BPF_UPGRADE_LOADER_ID,
+        form.governedAccount.info.governedAccount,
+        new PublicKey(form.bufferAddress),
+        form.governedAccount.pubkey,
+        wallet!.publicKey
+      )
+      serializedInstruction = serializeInstructionToBase64(upgradeIx)
+    }
     const obj: Instruction = {
-      serializedInstruction: '',
+      serializedInstruction: serializedInstruction,
       isValid,
       governedAccount: form.governedAccount,
     }
