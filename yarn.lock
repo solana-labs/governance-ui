@@ -313,11 +313,12 @@
   version "0.2.3"
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
 
-"@blockworks-foundation/mango-client@^3.0.16":
-  version "3.0.18"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.0.18.tgz#f665406365610fc9bbe3fecdd191fec9bd36df88"
-  integrity sha512-tcKrkp8R8fIpVnrcUWFeQLKQK/bRHDntHOIVwo1R3MbwCWcPrnt2Y68Ev4LEpBzQ1B8WXcHqwOXc2hS2Wx/bnA==
+"@blockworks-foundation/mango-client@^3.2.2":
+  version "3.2.2"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.2.2.tgz#f4681c02e784bea8b32dea0df922c50354b4a2c4"
+  integrity sha512-YQyJD7py1AbwWX/Fb8O980i11XuX098NGlo97Hp3oaZyrqkq3PYvJ3Ei3HR35+RhoSxiHOUda3AnOT/URXIz7Q==
   dependencies:
+    "@project-serum/anchor" "^0.16.2"
     "@project-serum/serum" "0.13.55"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
@@ -325,8 +326,10 @@
     axios "^0.21.1"
     big.js "^6.1.1"
     bigint-buffer "^1.1.5"
-    bn.js "^5.1.0"
+    bn.js "^5.2.0"
     buffer-layout "^1.2.1"
+    dotenv "^10.0.0"
+    dotenv-expand "^5.1.0"
     yargs "^17.0.1"
 
 "@cnakazawa/watch@^1.0.3":
@@ -760,6 +763,26 @@
   version "0.11.1"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.11.1.tgz#155bff2c70652eafdcfd5559c81a83bb19cec9ff"
   integrity sha512-oIdm4vTJkUy6GmE6JgqDAuQPKI7XM4TPJkjtoIzp69RZe0iAD9JP2XHx7lV1jLdYXeYHqDXfBt3zcq7W91K6PA==
+  dependencies:
+    "@project-serum/borsh" "^0.2.2"
+    "@solana/web3.js" "^1.17.0"
+    base64-js "^1.5.1"
+    bn.js "^5.1.2"
+    bs58 "^4.0.1"
+    buffer-layout "^1.2.0"
+    camelcase "^5.3.1"
+    crypto-hash "^1.3.0"
+    eventemitter3 "^4.0.7"
+    find "^0.3.0"
+    js-sha256 "^0.9.0"
+    pako "^2.0.3"
+    snake-case "^3.0.4"
+    toml "^3.0.0"
+
+"@project-serum/anchor@^0.16.2":
+  version "0.16.2"
+  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.16.2.tgz#b8b4ec4c749d59a224108f8d82ab68217ef752ae"
+  integrity sha512-wOJwObd4wOZ5tRRMCKYjeMNsEmf7vuC71KQRnw6wthhErL8c/818n4gYIZCf/1ZPl/8WPruIlmtQHDSEyy2+0Q==
   dependencies:
     "@project-serum/borsh" "^0.2.2"
     "@solana/web3.js" "^1.17.0"
@@ -1671,7 +1694,7 @@ bn.js@^4.0.0, bn.js@^4.1.0, bn.js@^4.11.9:
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-4.12.0.tgz#775b3f278efbb9718eec7361f483fb36fbbfea88"
   integrity sha512-c98Bf3tPniI+scsdk237ku1Dc3ujXQTSgyiPUDEOe7tRkhrqridvh8klBv0HCEso1OLOYcHuCv/cS6DNxKH+ZA==
 
-bn.js@^5.0.0, bn.js@^5.1.0, bn.js@^5.1.1, bn.js@^5.1.2:
+bn.js@^5.0.0, bn.js@^5.1.0, bn.js@^5.1.1, bn.js@^5.1.2, bn.js@^5.2.0:
   version "5.2.0"
   resolved "https://registry.yarnpkg.com/bn.js/-/bn.js-5.2.0.tgz#358860674396c6997771a9d051fcc1b57d4ae002"
   integrity sha512-D7iWRBvnZE8ecXiLj/9wbxH7Tk79fAh8IHaTNq1RWRixsS02W+5qS+iE9yq6RYl0asXx5tw0bLhmT5pIfbSquw==
@@ -2534,7 +2557,12 @@ dot-case@^3.0.4:
     no-case "^3.0.4"
     tslib "^2.0.3"
 
-dotenv@10.0.0:
+dotenv-expand@^5.1.0:
+  version "5.1.0"
+  resolved "https://registry.yarnpkg.com/dotenv-expand/-/dotenv-expand-5.1.0.tgz#3fbaf020bfd794884072ea26b1e9791d45a629f0"
+  integrity sha512-YXQl1DSa4/PQyRfgrv6aoNjhasp/p4qs9FjJ4q4cQk+8m4r6k4ZSiEyytKG8f8W9gi8WsQtIObNmKd+tMzNTmA==
+
+dotenv@10.0.0, dotenv@^10.0.0:
   version "10.0.0"
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-10.0.0.tgz#3d4227b8fb95f81096cdd2b66653fb2c7085ba81"
   integrity sha512-rlBi9d8jpv9Sf1klPjNfFAuWDjKLwTIJJ/VxtoTwIR6hnZxcEOQCZg2oIL3MWBYw5GpUDKOEnND7LXTbIpQ03Q==
