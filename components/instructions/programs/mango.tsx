@@ -147,6 +147,8 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .CreatePerpMarket
+        console.log('args', args)
+
         const mngoMint = { name: 'MNGO', decimals: 6 }
         return (
           <>
@@ -164,9 +166,9 @@ export const MANGO_INSTRUCTIONS = {
               mngoPerPeriod:{' '}
               {args.mngoPerPeriod.toNumber() / Math.pow(10, mngoMint.decimals)}
             </p>
-            <p>exp: {args.exp.toNumber()}</p>
-            <p>version: {args.version.toNumber()}</p>
-            <p>lmSizeShift: {args.lmSizeShift.toNumber()}</p>
+            <p>exp: {args.exp}</p>
+            <p>version: {args.version}</p>
+            <p>lmSizeShift: {args.lmSizeShift}</p>
           </>
         )
       },
