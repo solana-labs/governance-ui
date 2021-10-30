@@ -289,7 +289,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realm = realms[realmId.toBase58()]
       const mintsArray = (
         await Promise.all(
-          Object.values(realm).flatMap((r) => [
+          Object.values(realm || {}).flatMap((r) => [
             r.communityMint
               ? tryGetMint(connection, r.communityMint)
               : undefined,
