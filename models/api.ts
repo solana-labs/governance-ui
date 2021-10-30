@@ -83,6 +83,10 @@ export async function getProposal(
 
 // Realms
 
+export async function getRealm(connection: Connection, realmPk: PublicKey) {
+  return getGovernanceAccount<Realm>(connection, realmPk, Realm)
+}
+
 export async function getRealms(rpcContext: RpcContext) {
   return getBorshProgramAccounts<Realm>(
     rpcContext.programId,

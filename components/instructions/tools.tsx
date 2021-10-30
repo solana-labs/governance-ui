@@ -2,8 +2,9 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData, InstructionData } from '../../models/accounts'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
+import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
 import { MANGO_INSTRUCTIONS } from './programs/mango'
-import { getProgramName } from './programs/names'
+import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 
@@ -62,9 +63,14 @@ export async function getInstructionDescriptor(
   connection: Connection,
   instruction: InstructionData
 ) {
-  const descriptors = INSTRUCTION_DESCRIPTORS[
-    instruction.programId.toBase58()
-  ] as InstructionDescriptorFactory[]
+  let descriptors: any
+
+  if (isGovernanceProgram(instruction.programId)) {
+    descriptors =
+      GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
+  } else {
+    descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
+  }
 
   const descriptor = descriptors && descriptors[instruction.data[0]]
 
