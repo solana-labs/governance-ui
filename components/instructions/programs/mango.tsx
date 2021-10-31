@@ -2,6 +2,53 @@ import { Connection } from '@solana/web3.js'
 import { AccountMetaData } from '../../../models/accounts'
 import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
 
+function displayInstructionArgument(decodedArgs, argName) {
+  return (
+    <p key={argName}>
+      {argName}: {decodedArgs[argName].toString()}
+    </p>
+  )
+}
+
+function displayOptionalInstructionArgument(decodedArgs, argName) {
+  return decodedArgs[argName + 'Option'] ? (
+    displayInstructionArgument(decodedArgs, argName)
+  ) : (
+    <></>
+  )
+}
+
+function displayAllArgs(decodedArgs, exceptions: any[] = []) {
+  const optionalArgs = Object.keys(decodedArgs)
+    .filter((k) => k.endsWith('Option'))
+    .map((k) => k.replace('Option', ''))
+    .filter((k) => !exceptions.includes(k))
+
+  const otherArgs = Object.keys(decodedArgs).filter(
+    (k) =>
+      !k.endsWith('Option') &&
+      !optionalArgs.includes(k) &&
+      !exceptions.includes(k)
+  )
+
+  return (
+    <>
+      {otherArgs.map((a) => displayInstructionArgument(decodedArgs, a))}
+      {optionalArgs.map((a) =>
+        displayOptionalInstructionArgument(decodedArgs, a)
+      )}
+    </>
+  )
+}
+
+function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
+  return (
+    <p key={argName}>
+      {argName}: {decodedArgs[argName].toNumber() / Math.pow(10, decimals)}
+    </p>
+  )
+}
+
 export const MANGO_INSTRUCTIONS = {
   mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: {
     4: {
@@ -20,16 +67,7 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddSpotMarket
-        return (
-          <>
-            <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            <p>optimalUtil: {args.optimalUtil.toNumber()}</p>
-            <p>optimalRate: {args.optimalRate.toNumber()}</p>
-            <p>maxRate: {args.maxRate.toNumber()}</p>
-          </>
-        )
+        return <>{displayAllArgs(args)}</>
       },
     },
     10: {
@@ -50,23 +88,10 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .AddPerpMarket
-        const mngoMint = { name: 'MNGO', decimals: 6 }
         return (
           <>
-            <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            <p>makerFee: {args.makerFee.toNumber()}</p>
-            <p>takerFee: {args.takerFee.toNumber()}</p>
-            <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
-            <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
-            <p>rate: {args.rate.toString()}</p>
-            <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
-            <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            <p>
-              mngoPerPeriod:{' '}
-              {args.mngoPerPeriod.toNumber() / Math.pow(10, mngoMint.decimals)}
-            </p>
+            {displayAllArgs(args, ['mngoPerPeriod'])}
+            {displayDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
       },
@@ -84,48 +109,10 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .ChangePerpMarketParams
-        const mngoMint = { name: 'MNGO', decimals: 6 }
         return (
           <>
-            {args.initLeverageOption && (
-              <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            )}
-            {args.maintLeverageOption && (
-              <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            )}
-            {args.liquidationFeeOption && (
-              <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            )}
-
-            {args.makerFeeOption && <p>makerFee: {args.makerFee.toNumber()}</p>}
-
-            {args.takerFeeOption && <p>takerFee: {args.takerFee.toNumber()}</p>}
-
-            {args.baseLotSizeOption && (
-              <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
-            )}
-
-            {args.quoteLotSizeOption && (
-              <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
-            )}
-
-            {args.rateOption && <p>rate: {args.rate.toString()}</p>}
-
-            {args.maxDepthBpsOption && (
-              <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
-            )}
-
-            {args.targetPeriodLengthOption && (
-              <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            )}
-
-            {args.mngoPerPeriodOption && (
-              <p>
-                mngoPerPeriod:{' '}
-                {args.mngoPerPeriod.toNumber() /
-                  Math.pow(10, mngoMint.decimals)}
-              </p>
-            )}
+            {displayAllArgs(args, ['mngoPerPeriod'])}
+            {displayDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
       },
@@ -147,28 +134,10 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .CreatePerpMarket
-        console.log('args', args)
-
-        const mngoMint = { name: 'MNGO', decimals: 6 }
         return (
           <>
-            <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            <p>makerFee: {args.makerFee.toNumber()}</p>
-            <p>takerFee: {args.takerFee.toNumber()}</p>
-            <p>baseLotSize: {args.baseLotSize.toNumber()}</p>
-            <p>quoteLotSize: {args.quoteLotSize.toNumber()}</p>
-            <p>rate: {args.rate.toString()}</p>
-            <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
-            <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            <p>
-              mngoPerPeriod:{' '}
-              {args.mngoPerPeriod.toNumber() / Math.pow(10, mngoMint.decimals)}
-            </p>
-            <p>exp: {args.exp}</p>
-            <p>version: {args.version}</p>
-            <p>lmSizeShift: {args.lmSizeShift}</p>
+            {displayAllArgs(args, ['mngoPerPeriod'])}
+            {displayDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
       },
@@ -186,48 +155,10 @@ export const MANGO_INSTRUCTIONS = {
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .ChangePerpMarketParams2
-        const mngoMint = { name: 'MNGO', decimals: 6 }
         return (
           <>
-            {args.initLeverageOption && (
-              <p>initLeverage: {args.initLeverage.toNumber()}</p>
-            )}
-            {args.maintLeverageOption && (
-              <p>maintLeverage: {args.maintLeverage.toNumber()}</p>
-            )}
-            {args.liquidationFeeOption && (
-              <p>liquidationFee: {args.liquidationFee.toNumber()}</p>
-            )}
-
-            {args.makerFeeOption && <p>makerFee: {args.makerFee.toNumber()}</p>}
-
-            {args.takerFeeOption && <p>takerFee: {args.takerFee.toNumber()}</p>}
-
-            {args.rateOption && <p>rate: {args.rate.toString()}</p>}
-
-            {args.maxDepthBpsOption && (
-              <p>maxDepthBps: {args.maxDepthBps.toNumber()}</p>
-            )}
-
-            {args.targetPeriodLengthOption && (
-              <p>targetPeriodLength: {args.targetPeriodLength.toNumber()}</p>
-            )}
-
-            {args.mngoPerPeriodOption && (
-              <p>
-                mngoPerPeriod:{' '}
-                {args.mngoPerPeriod.toNumber() /
-                  Math.pow(10, mngoMint.decimals)}
-              </p>
-            )}
-
-            {args.expOption && <p>exp: {args.exp.toString()}</p>}
-
-            {args.versionOption && <p>version: {args.version.toString()}</p>}
-
-            {args.lmSizeShiftOption && (
-              <p>lmSizeShift: {args.lmSizeShift.toString()}</p>
-            )}
+            {displayAllArgs(args, ['mngoPerPeriod'])}
+            {displayDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
       },
