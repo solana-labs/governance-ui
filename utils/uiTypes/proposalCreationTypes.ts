@@ -4,6 +4,7 @@ import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { GovernedTokenAccount } from '@utils/tokens'
+import dayjs from 'dayjs'
 
 export interface Instruction {
   serializedInstruction: string
@@ -18,8 +19,22 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface FundAssemblyBudgetForm {
+  governedAccount: GovernedTokenAccount | undefined
+  rewardMintInfo: MintInfo | undefined
+  distributors: { authority: string; amount: number }[]
+  distEnd: dayjs.Dayjs
+  reviewEnd: dayjs.Dayjs
+  redeemStart: dayjs.Dayjs
+}
+
 export enum Instructions {
+  CreateMint,
+  MintTo,
+  CreateTokenAccount,
+  CreateAssociatedTokenAccount,
   Transfer,
+  FundAssemblyBudget,
 }
 
 export type createParams = [

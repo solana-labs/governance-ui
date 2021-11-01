@@ -29,6 +29,11 @@ export default function useInstructions() {
       name: 'Transfer Tokens',
       isVisible: canUseTransferInstruction,
     },
+    {
+      id: Instructions.FundAssemblyBudget,
+      name: 'Fund Assembly Budget',
+      isVisible: canUseTransferInstruction,
+    },
   ]
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)

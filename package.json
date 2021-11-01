@@ -36,6 +36,7 @@
     "@tippyjs/react": "^4.2.5",
     "axios": "^0.21.1",
     "bignumber.js": "^9.0.1",
+    "dayjs": "^1.10.7",
     "immer": "^9.0.1",
     "moment": "^2.29.1",
     "moment-timezone": "^0.5.33",

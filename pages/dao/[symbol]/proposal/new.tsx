@@ -31,6 +31,7 @@ import useInstructions from '@hooks/useInstructions'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
+import FundAssemblyBudget from './components/instructions/FundAssemblyBudget'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -216,6 +217,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></SplTokenTransfer>
+        )
+      case Instructions.FundAssemblyBudget:
+        return (
+          <FundAssemblyBudget
+            index={idx}
+            governance={governance}
+          ></FundAssemblyBudget>
         )
       default:
         null
