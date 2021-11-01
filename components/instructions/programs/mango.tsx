@@ -42,10 +42,12 @@ function displayAllArgs(decodedArgs, exceptions: any[] = []) {
 }
 
 function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
-  return (
+  return decodedArgs[argName + 'Option'] ? (
     <p key={argName}>
       {argName}: {decodedArgs[argName].toNumber() / Math.pow(10, decimals)}
     </p>
+  ) : (
+    <></>
   )
 }
 
