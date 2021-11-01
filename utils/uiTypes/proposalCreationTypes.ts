@@ -14,7 +14,6 @@ export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
   governedTokenAccount: GovernedTokenAccount | undefined
-  governedAccount: ParsedAccount<Governance> | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }

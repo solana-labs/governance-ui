@@ -62,7 +62,6 @@ export const validateBuffer = async (
   }
   if (pubKey) {
     await connection.current.getParsedAccountInfo(pubKey).then((data) => {
-      console.log(data, '@@@')
       if (!data || !data.value) {
         throw 'Account not found'
       }

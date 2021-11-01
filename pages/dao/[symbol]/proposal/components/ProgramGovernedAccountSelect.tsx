@@ -1,4 +1,5 @@
 import Select from '@components/inputs/Select'
+import { getProgramName } from '@components/instructions/programs/names'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import React from 'react'
@@ -12,19 +13,29 @@ const ProgramGovernedAccountSelect = ({
   governance,
 }: {
   onChange
-  value
+  value: ParsedAccount<Governance> | undefined
   error
   programGovernances: ParsedAccount<Governance>[]
   shouldBeGoverned
   governance: ParsedAccount<Governance> | null | undefined
 }) => {
+  const returnLabel = (val) => {
+    const name = val ? getProgramName(val.info.governedAccount) : ''
+    return (
+      <>
+        {name && <div>{name}</div>}
+        <div>{val?.info?.governedAccount?.toBase58()}</div>
+      </>
+    )
+  }
   return (
     <Select
       label="Program (governed account)"
       onChange={onChange}
       placeholder="Please select..."
-      value={value}
+      value={value?.info?.governedAccount.toBase58()}
       error={error}
+      componentLabel={returnLabel(value)}
     >
       {programGovernances
         .filter((x) =>
@@ -38,7 +49,7 @@ const ProgramGovernedAccountSelect = ({
               key={acc.info.governedAccount.toBase58()}
               value={acc}
             >
-              {acc.info.governedAccount.toBase58()}
+              {returnLabel(acc)}
             </Select.Option>
           )
         })}

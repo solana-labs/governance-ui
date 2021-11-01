@@ -18,7 +18,6 @@ import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/create
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import { tryParseKey } from '@tools/validators/pubkey'
 import { validateBuffer } from '@utils/validations'
 
 const ProgramUpgrade = ({
@@ -87,12 +86,8 @@ const ProgramUpgrade = ({
   useEffect(() => {
     if (form.bufferAddress) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.bufferAddress)
-        if (pubKey) {
-          console.log('buffer ok')
-        } else {
-          console.log('buffer not ok')
-        }
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
       })
     }
   }, [form.bufferAddress])
@@ -106,7 +101,7 @@ const ProgramUpgrade = ({
   const schema = yup.object().shape({
     bufferAddress: yup
       .string()
-      .test('accountTests', 'Buffer validation', async function (val: string) {
+      .test('bufferTest', 'Buffer validation', async function (val: string) {
         if (val) {
           try {
             await validateBuffer(connection, val, form.governedAccount?.pubkey)
@@ -135,7 +130,7 @@ const ProgramUpgrade = ({
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
-        value={form.governedAccount?.info.governedAccount.toBase58()}
+        value={form.governedAccount}
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}

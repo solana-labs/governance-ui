@@ -48,10 +48,12 @@ const SplTokenTransfer = ({
     // No default transfer amount
     amount: undefined,
     governedTokenAccount: undefined,
-    governedAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
   })
+  const [governedAccount, setGovernedAccount] = useState<
+    ParsedAccount<Governance> | undefined
+  >(undefined)
   const [
     destinationAccount,
     setDestinationAccount,
@@ -97,13 +99,6 @@ const SplTokenTransfer = ({
   async function getInstruction(): Promise<Instruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    console.log({
-      isValid,
-      programId,
-      token: form.governedTokenAccount?.token?.publicKey,
-      governedToken: form.governedTokenAccount,
-      mintInfo: form.mintInfo,
-    })
     if (
       isValid &&
       programId &&
@@ -129,7 +124,7 @@ const SplTokenTransfer = ({
     const obj: Instruction = {
       serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount,
+      governedAccount: governedAccount,
     }
     return obj
   }
@@ -157,15 +152,12 @@ const SplTokenTransfer = ({
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form.governedAccount, getInstruction },
+      { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form])
   useEffect(() => {
-    handleSetForm({
-      value: form.governedTokenAccount?.governance,
-      propertyName: 'governedAccount',
-    })
+    setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.mint?.account)
   }, [form.governedTokenAccount])
   const destinationAccountName =
