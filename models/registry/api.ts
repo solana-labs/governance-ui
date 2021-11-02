@@ -65,6 +65,14 @@ const MAINNET_REALMS: RealmInfo[] = [
     ogImage:
       'https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png',
   },
+  {
+    symbol: 'Off My Head',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
+    ogImage: 'https://offmyhead.vercel.app/coin.png',
+    website: 'https://offmyhead.vercel.app',
+    twitter: '@nft_omh',
+  },
 ]
 
 // Hardcoded list of devnet realms
