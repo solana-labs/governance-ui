@@ -66,7 +66,8 @@ const MAINNET_REALMS: RealmInfo[] = [
       'https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png',
   },
   {
-    symbol: 'Off My Head',
+    symbol: 'OMH',
+    displayName: 'Off My Head',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
     ogImage: 'https://offmyhead.vercel.app/coin.png',
@@ -110,7 +111,8 @@ const DEVNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('22XYhMSGmPv2nHC3AwbDAP9akyd3rfVRUZt6HUd3wcY5'),
   },
   {
-    symbol: 'Off My Head',
+    symbol: 'OMH',
+    displayName: 'Off My Head',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
     ogImage: 'https://offmyhead.vercel.app/coin.png',
