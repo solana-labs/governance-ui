@@ -15,13 +15,14 @@ export async function createSetRealmConfig(
   realmAuthority: PublicKey,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
-  minCommunityTokensToCreateGovernance: BN
+  minCommunityTokensToCreateGovernance: BN,
+  communityVoterWeightAddin: PublicKey | undefined
 ) {
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
-
-    communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,
+    communityMintMaxVoteWeightSource,
+    useCommunityVoterWeightAddin: communityVoterWeightAddin !== undefined,
   })
 
   const args = new SetRealmConfigArgs({ configArgs })
