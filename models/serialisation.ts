@@ -89,6 +89,7 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
         ['useCouncilMint', 'u8'],
         ['minCommunityTokensToCreateGovernance', 'u64'],
         ['communityMintMaxVoteWeightSource', MintMaxVoteWeightSource],
+        ['useCommunityVoterWeightAddin', 'u8'],
       ],
     },
   ],

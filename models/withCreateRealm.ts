@@ -1,8 +1,10 @@
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
+  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { CreateRealmArgs } from './instructions'
@@ -11,6 +13,7 @@ import {
   GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
   getTokenHoldingAddress,
+  getRealmConfigAddress,
 } from './accounts'
 import BN from 'bn.js'
 
@@ -24,13 +27,13 @@ export async function withCreateRealm(
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
-  systemId: PublicKey,
-  tokenId: PublicKey
+  communityVoterWeightAddin: PublicKey | undefined
 ) {
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     minCommunityTokensToCreateGovernance,
     communityMintMaxVoteWeightSource,
+    useCommunityVoterWeightAddin: communityVoterWeightAddin !== undefined,
   })
 
   const args = new CreateRealmArgs({
@@ -77,12 +80,12 @@ export async function withCreateRealm(
       isWritable: false,
     },
     {
-      pubkey: systemId,
+      pubkey: SystemProgram.programId,
       isSigner: false,
       isWritable: false,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },
@@ -113,6 +116,25 @@ export async function withCreateRealm(
         isWritable: true,
       },
     ]
+  }
+
+  const realmConfigAddress = await getRealmConfigAddress(
+    programId,
+    realmAddress
+  )
+
+  keys.push({
+    pubkey: realmConfigAddress,
+    isSigner: false,
+    isWritable: true,
+  })
+
+  if (communityVoterWeightAddin) {
+    keys.push({
+      pubkey: communityVoterWeightAddin,
+      isWritable: false,
+      isSigner: false,
+    })
   }
 
   instructions.push(

@@ -130,11 +130,15 @@ export class RealmConfigArgs {
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource
   minCommunityTokensToCreateGovernance: BN
 
+  useCommunityVoterWeightAddin: boolean
+
   constructor(args: {
     useCouncilMint: boolean
 
     communityMintMaxVoteWeightSource: MintMaxVoteWeightSource
     minCommunityTokensToCreateGovernance: BN
+
+    useCommunityVoterWeightAddin: boolean
   }) {
     this.useCouncilMint = !!args.useCouncilMint
 
@@ -143,6 +147,8 @@ export class RealmConfigArgs {
 
     this.minCommunityTokensToCreateGovernance =
       args.minCommunityTokensToCreateGovernance
+
+    this.useCommunityVoterWeightAddin = args.useCommunityVoterWeightAddin
   }
 }
 
@@ -211,6 +217,33 @@ export async function getTokenHoldingAddress(
   )
 
   return tokenHoldingAddress
+}
+
+export class RealmConfigAccount {
+  accountType = GovernanceAccountType.Realm
+
+  realm: PublicKey
+  communityVoterWeightAddin: PublicKey | undefined
+
+  constructor(args: {
+    realm: PublicKey
+    communityVoterWeightAddin: PublicKey | undefined
+  }) {
+    this.realm = args.realm
+    this.communityVoterWeightAddin = args.communityVoterWeightAddin
+  }
+}
+
+export async function getRealmConfigAddress(
+  programId: PublicKey,
+  realm: PublicKey
+) {
+  const [realmConfigAddress] = await PublicKey.findProgramAddress(
+    [Buffer.from('realm-config'), realm.toBuffer()],
+    programId
+  )
+
+  return realmConfigAddress
 }
 
 export class GovernanceConfig {
