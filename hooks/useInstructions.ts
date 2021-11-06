@@ -29,6 +29,12 @@ export default function useInstructions() {
       GovernanceAccountType.ProgramGovernance
     ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
 
+  const canUseMintInstruction =
+    realm &&
+    getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+
   const availableInstructions = [
     {
       id: Instructions.Transfer,
@@ -39,6 +45,11 @@ export default function useInstructions() {
       id: Instructions.ProgramUpgrade,
       name: 'Program Upgrade',
       isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
+      id: Instructions.Mint,
+      name: 'Mint',
+      isVisible: canUseMintInstruction,
     },
   ]
   const getAvailableInstructions = () => {
