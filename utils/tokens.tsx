@@ -24,6 +24,10 @@ export type GovernedTokenAccount = {
   mint: ProgramAccount<MintInfo> | undefined
   governance: ParsedAccount<Governance> | undefined
 }
+export type GovernedMintInfoAccount = {
+  mintInfo: MintInfo
+  governance: ParsedAccount<Governance> | undefined
+}
 export type ProgramAccount<T> = {
   publicKey: PublicKey
   account: T

@@ -27,6 +27,7 @@ import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useInstructions from '@hooks/useInstructions'
+import SourceMintAccountSelect from '../SourceMintAccountSelect'
 
 const Mint = ({
   index,
@@ -37,11 +38,15 @@ const Mint = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountType } = useInstructions()
-  const mintAccounts = getGovernancesByAccountType(
-    GovernanceAccountType.MintGovernance
-  )
-  console.log(mintAccounts)
+  const { getMintWithGovernances } = useInstructions()
+
+  useEffect(() => {
+    async function elo() {
+      const resp = await getMintWithGovernances()
+      console.log(resp)
+    }
+    elo()
+  }, [])
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
@@ -60,7 +65,7 @@ const Mint = ({
   ] = useState<ProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintAccount
-    ? getMintMinAmountAsDecimal(form.mintAccount.account)
+    ? getMintMinAmountAsDecimal(form.mintAccount.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -154,7 +159,7 @@ const Mint = ({
     )
   }, [form])
   useEffect(() => {
-    //setGovernedAccount(form.governedTokenAccount?.governance)
+    setGovernedAccount(form?.mintAccount)
   }, [form.mintAccount])
   const destinationAccountName =
     destinationAccount?.publicKey &&
@@ -227,16 +232,16 @@ const Mint = ({
 
   return (
     <>
-      {/* <SourceTokenAccountSelect
-        governedTokenAccounts={mintAccounts}
+      {/* <SourceMintAccountSelect
+        mintGovernances={mintGovernances}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
-        value={form.governedTokenAccount?.token?.account?.address?.toString()}
+        value={form.mintAccount?.pubkey}
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceTokenAccountSelect> */}
+      ></SourceMintAccountSelect> */}
       <Input
         label="Destination account"
         value={form.destinationAccount}
