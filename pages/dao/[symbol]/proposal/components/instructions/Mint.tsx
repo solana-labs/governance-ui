@@ -5,7 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { AccountInfo, Token } from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
-  //   getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
@@ -25,12 +25,12 @@ import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
-// import { validateDestinationAccAddress } from '@utils/validations'
-// import BN from 'bn.js'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useInstructions from '@hooks/useInstructions'
 import SourceMintAccountSelect from '../SourceMintAccountSelect'
+import { validateDestinationAccAddressWithMint } from '@utils/validations'
+import { BN } from '@project-serum/anchor'
 
 const Mint = ({
   index,
@@ -170,20 +170,22 @@ const Mint = ({
       .typeError('Amount is required')
       .test(
         'amount',
-        'Transfer amount must be less than the source account available amount',
+        'Mint amount must be less than the mint available supply',
         async function (val: number) {
           if (val && !form.mintAccount) {
             return this.createError({
-              message: `Please select source account to validate the amount`,
+              message: `Please select mint to validate the amount`,
             })
           }
           if (val && form.mintAccount && form.mintAccount?.mintInfo) {
-            //   const mintValue = getMintNaturalAmountFromDecimal(
-            //     val,
-            //     form.mintAccount.mintInfo.decimals
-            //   )
-            //supply validation ?
-            return true
+            const mintValue = getMintNaturalAmountFromDecimal(
+              val,
+              form.mintAccount?.mintInfo.decimals
+            )
+            return !!(
+              form.mintAccount.governance?.info.governedAccount &&
+              form.mintAccount.mintInfo.supply.gte(new BN(mintValue))
+            )
           }
           return this.createError({
             message: `Amount is required`,
@@ -198,11 +200,18 @@ const Mint = ({
         async function (val: string) {
           if (val) {
             try {
-              //   await validateDestinationAccAddress(
-              //     connection,
-              //     val,
-              //     form.governedTokenAccount?.token?.account.address
-              //   )
+              if (form.mintAccount?.governance) {
+                await validateDestinationAccAddressWithMint(
+                  connection,
+                  val,
+                  form.mintAccount.governance.info.governedAccount
+                )
+              } else {
+                return this.createError({
+                  message: `Please select mint`,
+                })
+              }
+
               return true
             } catch (e) {
               return this.createError({
@@ -226,7 +235,7 @@ const Mint = ({
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'mintAccount' })
         }}
-        value={form.mintAccount?.governance?.info.governedAccount.toBase58()}
+        value={form.mintAccount}
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
