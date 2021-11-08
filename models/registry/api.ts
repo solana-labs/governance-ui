@@ -2,10 +2,15 @@ import { PublicKey } from '@solana/web3.js'
 import { equalsIgnoreCase } from '../../tools/core/strings'
 import { EndpointTypes } from '../types'
 
+export enum ProgramVersion {
+  V1 = 1,
+  V2,
+}
 export interface RealmInfo {
   symbol: string
   endpoint?: string
   programId: PublicKey
+  programVersion?: ProgramVersion
   realmId: PublicKey
   website?: string
   // Specifies the realm mainnet name for resource lookups
