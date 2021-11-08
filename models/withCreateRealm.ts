@@ -5,7 +5,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { GOVERNANCE_SCHEMA } from './serialisation'
+import { getGovernanceSchema } from './serialisation'
 import { serialize } from 'borsh'
 import { CreateRealmArgs } from './instructions'
 import {
@@ -15,11 +15,13 @@ import {
   getTokenHoldingAddress,
   getRealmConfigAddress,
 } from './accounts'
+import { ProgramVersion } from 'models/registry/api'
 import BN from 'bn.js'
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: ProgramVersion,
   name: string,
   realmAuthority: PublicKey,
   communityMint: PublicKey,
@@ -29,6 +31,12 @@ export async function withCreateRealm(
   minCommunityTokensToCreateGovernance: BN,
   communityVoterWeightAddin: PublicKey | undefined
 ) {
+  if (communityVoterWeightAddin && programVersion < 2) {
+    throw new Error(
+      `Voter weight addin is not supported in version ${programVersion}`
+    )
+  }
+
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     minCommunityTokensToCreateGovernance,
@@ -40,7 +48,7 @@ export async function withCreateRealm(
     configArgs,
     name,
   })
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
+  const data = Buffer.from(serialize(getGovernanceSchema(programVersion), args))
 
   const [realmAddress] = await PublicKey.findProgramAddress(
     [Buffer.from(GOVERNANCE_PROGRAM_SEED), Buffer.from(args.name)],
