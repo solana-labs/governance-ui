@@ -1,6 +1,7 @@
 import Select from '@components/inputs/Select'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
+import { GovernedMintInfoAccount } from '@utils/tokens'
 import React from 'react'
 
 const SourceMintAccountSelect = ({
@@ -14,13 +15,13 @@ const SourceMintAccountSelect = ({
   onChange
   value
   error
-  mintGovernances: ParsedAccount<Governance>[]
+  mintGovernances: GovernedMintInfoAccount[]
   shouldBeGoverned
   governance: ParsedAccount<Governance> | null | undefined
 }) => {
   return (
     <Select
-      label="Source account"
+      label="Mint"
       onChange={onChange}
       placeholder="Please select..."
       value={value}
@@ -30,12 +31,16 @@ const SourceMintAccountSelect = ({
         .filter((x) =>
           !shouldBeGoverned
             ? !shouldBeGoverned
-            : x?.pubkey.toBase58() === governance?.pubkey?.toBase58()
+            : x?.governance?.pubkey.toBase58() ===
+              governance?.pubkey?.toBase58()
         )
         .map((acc) => {
           return (
-            <Select.Option key={acc.pubkey.toBase58()} value={acc}>
-              {acc.info.governedAccount.toBase58()}
+            <Select.Option
+              key={acc.governance?.info.governedAccount.toBase58()}
+              value={acc}
+            >
+              {acc.governance?.info.governedAccount.toBase58()}
             </Select.Option>
           )
         })}

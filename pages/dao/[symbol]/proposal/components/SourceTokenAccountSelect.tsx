@@ -23,6 +23,7 @@ const SourceTokenAccountSelect = ({
   shouldBeGoverned
   governance: ParsedAccount<Governance> | null | undefined
 }) => {
+  console.log(governedTokenAccounts[0].mint?.publicKey.toBase58(), '@@@@@@')
   const getGovernedTokenAccountLabelInfo = (
     acc: GovernedTokenAccount | undefined
   ) => {

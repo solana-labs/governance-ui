@@ -5,7 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { AccountInfo, Token } from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
+  //   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
@@ -15,16 +15,19 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import {
+  GovernedMintInfoAccount,
+  ProgramAccount,
+  tryGetTokenAccount,
+} from '@utils/tokens'
 import { Instruction, MintForm } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
-import { validateDestinationAccAddress } from '@utils/validations'
-import BN from 'bn.js'
-import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
-import { Governance, GovernanceAccountType } from '@models/accounts'
+// import { validateDestinationAccAddress } from '@utils/validations'
+// import BN from 'bn.js'
+import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useInstructions from '@hooks/useInstructions'
 import SourceMintAccountSelect from '../SourceMintAccountSelect'
@@ -39,14 +42,6 @@ const Mint = ({
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
   const { getMintWithGovernances } = useInstructions()
-
-  useEffect(() => {
-    async function elo() {
-      const resp = await getMintWithGovernances()
-      console.log(resp)
-    }
-    elo()
-  }, [])
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
@@ -64,6 +59,10 @@ const Mint = ({
     setDestinationAccount,
   ] = useState<ProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
+  const [
+    mintGovernancesWithMintInfo,
+    setMintGovernancesWithMintInfo,
+  ] = useState<GovernedMintInfoAccount[]>([])
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(form.mintAccount.mintInfo)
     : 1
@@ -101,27 +100,21 @@ const Mint = ({
   async function getInstruction(): Promise<Instruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    // if (
-    //   isValid &&
-    //   programId &&
-    //   form.mint?.token?.publicKey &&
-    //   form.governedTokenAccount?.token &&
-    //   form.mintInfo
-    // ) {
-    //   const mintAmount = parseMintNaturalAmountFromDecimal(
-    //     form.amount!,
-    //     form.mintInfo?.decimals
-    //   )
-    //   const transferIx = Token.createTransferInstruction(
-    //     TOKEN_PROGRAM_ID,
-    //     form.governedTokenAccount.token?.account.address,
-    //     new PublicKey(form.destinationAccount),
-    //     form.governedTokenAccount.governance!.pubkey,
-    //     [],
-    //     mintAmount
-    //   )
-    //   serializedInstruction = serializeInstructionToBase64(transferIx)
-    // }
+    if (isValid && programId && form.mintAccount?.governance?.pubkey) {
+      const mintAmount = parseMintNaturalAmountFromDecimal(
+        form.amount!,
+        form.mintAccount.mintInfo?.decimals
+      )
+      const transferIx = Token.createMintToInstruction(
+        TOKEN_PROGRAM_ID,
+        form.mintAccount.governance.info.governedAccount,
+        new PublicKey(form.destinationAccount),
+        form.mintAccount.governance!.pubkey,
+        [],
+        mintAmount
+      )
+      serializedInstruction = serializeInstructionToBase64(transferIx)
+    }
 
     const obj: Instruction = {
       serializedInstruction,
@@ -159,8 +152,15 @@ const Mint = ({
     )
   }, [form])
   useEffect(() => {
-    setGovernedAccount(form?.mintAccount)
+    setGovernedAccount(form?.mintAccount?.governance)
   }, [form.mintAccount])
+  useEffect(() => {
+    async function getMintWithGovernancesFcn() {
+      const resp = await getMintWithGovernances()
+      setMintGovernancesWithMintInfo(resp)
+    }
+    getMintWithGovernancesFcn()
+  }, [])
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
@@ -177,22 +177,14 @@ const Mint = ({
               message: `Please select source account to validate the amount`,
             })
           }
-          //   if (
-          //     val &&
-          //     form.mintAccount &&
-          //     form.mintAccount?.account
-          //   ) {
-          //     const mintValue = getMintNaturalAmountFromDecimal(
-          //       val,
-          //       form.mintAccount.account.decimals
-          //     )
-          //     return !!(
-          //       form.governedTokenAccount?.token?.publicKey &&
-          //       form.governedTokenAccount.token.account.amount.gte(
-          //         new BN(mintValue)
-          //       )
-          //     )
-          //   }
+          if (val && form.mintAccount && form.mintAccount?.mintInfo) {
+            //   const mintValue = getMintNaturalAmountFromDecimal(
+            //     val,
+            //     form.mintAccount.mintInfo.decimals
+            //   )
+            //supply validation ?
+            return true
+          }
           return this.createError({
             message: `Amount is required`,
           })
@@ -224,24 +216,21 @@ const Mint = ({
           }
         }
       ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
+    mintAccount: yup.object().nullable().required('Mint is required'),
   })
 
   return (
     <>
-      {/* <SourceMintAccountSelect
-        mintGovernances={mintGovernances}
+      <SourceMintAccountSelect
+        mintGovernances={mintGovernancesWithMintInfo}
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedTokenAccount' })
+          handleSetForm({ value, propertyName: 'mintAccount' })
         }}
-        value={form.mintAccount?.pubkey}
-        error={formErrors['governedTokenAccount']}
+        value={form.mintAccount?.governance?.info.governedAccount.toBase58()}
+        error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceMintAccountSelect> */}
+      ></SourceMintAccountSelect>
       <Input
         label="Destination account"
         value={form.destinationAccount}
