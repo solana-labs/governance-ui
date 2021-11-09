@@ -43,6 +43,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     setSubmitting(true)
     const rpcContext = new RpcContext(
       proposal!.account.owner,
+      realmInfo?.programVersion,
       wallet,
       connection.current,
       connection.endpoint

@@ -4,7 +4,7 @@ import BN from 'bn.js'
 
 import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
-import React, { createContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
@@ -15,10 +15,7 @@ import { notify } from 'utils/notifications'
 import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
-import {
-  ComponentInstructionData,
-  InstructionsContext,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes'
 import useInstructions from '@hooks/useInstructions'
 
 const publicKeyValidationTest = (value) => {
@@ -50,16 +47,6 @@ const schema = yup.object().shape({
     ),
 })
 
-const defaultGovernanceCtx: InstructionsContext = {
-  instructionsData: [],
-  handleSetInstructions: () => null,
-  governance: null,
-  setGovernance: () => null,
-}
-export const NewProposalContext = createContext<InstructionsContext>(
-  defaultGovernanceCtx
-)
-
 const New = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -74,6 +61,7 @@ const New = () => {
     name: '',
     communityTokenMint: '',
     councilMint: '',
+    programVersion: 1,
     communityMintMaxVoteWeightSource: 0.5,
     minCommunityTokensToCreateGovernance: 0.001,
   })
@@ -88,8 +76,6 @@ const New = () => {
     setForm({ ...form, [propertyName]: value })
   }
 
-  console.log(connection)
-
   const handleCreate = async () => {
     if (!connection) return
     setFormErrors({})
@@ -102,6 +88,7 @@ const New = () => {
     if (isValid) {
       const rpcContext = new RpcContext(
         new PublicKey(form.governanceProgramId),
+        form.programVersion,
         wallet,
         connection.current,
         connection.endpoint
@@ -130,7 +117,7 @@ const New = () => {
 
   useEffect(() => {
     setInstructions([instructionsData[0]])
-  }, [instructionsData[0].governedAccount?.token?.publicKey])
+  }, [instructionsData[0]])
 
   return (
     <div
@@ -162,6 +149,22 @@ const New = () => {
                 handleSetForm({
                   value: evt.target.value,
                   propertyName: 'governanceProgramId',
+                })
+              }
+            />
+          </div>
+          <div className="pb-4">
+            <Input
+              label="Governance program version"
+              placeholder={1}
+              step="1"
+              value={form.programVersion}
+              type="number"
+              error={formErrors['programVersion']}
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'programVersion',
                 })
               }
             />
