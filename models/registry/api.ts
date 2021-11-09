@@ -74,6 +74,15 @@ const MAINNET_REALMS: RealmInfo[] = [
     website: 'https://offmyhead.vercel.app',
     twitter: '@nft_omh',
   },
+  {
+    symbol: 'FRIES',
+    displayName: 'Soltato',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('7wsrKBeTpqfcribDo34qr8rdSbqXbmQq9Fog2cVirK6C'),
+    ogImage: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FriCEbw1V99GwrJRXPnSQ6su2TabHabNxiZ3VNsVFPPN/logo.png',
+    website: 'https://soltato.io',
+    twitter: '@Soltato_NFT',
+  },
 ]
 
 // Hardcoded list of devnet realms
