@@ -150,7 +150,7 @@ const Mint = ({
       { governedAccount: governedAccount, getInstruction },
       index
     )
-  }, [form])
+  }, [form, governedAccount])
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
   }, [form.mintAccount])
