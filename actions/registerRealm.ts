@@ -6,7 +6,7 @@ import { RpcContext } from '../models/core/api'
 import { sendTransaction } from '../utils/send'
 
 export async function registerRealm(
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   name: string,
   communityMint: PublicKey,
   councilMint: PublicKey | undefined,
@@ -18,6 +18,7 @@ export async function registerRealm(
   await withCreateRealm(
     instructions,
     programId,
+    programVersion,
     name,
     walletPubkey,
     communityMint,

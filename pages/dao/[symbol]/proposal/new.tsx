@@ -53,6 +53,7 @@ const New = () => {
   const {
     symbol,
     realm,
+    realmInfo,
     realmDisplayName,
     ownVoterWeight,
     mint,
@@ -137,6 +138,7 @@ const New = () => {
 
       const rpcContext = new RpcContext(
         new PublicKey(realm.account.owner.toString()),
+        realmInfo?.programVersion,
         wallet,
         connection.current,
         connection.endpoint
