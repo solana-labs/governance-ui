@@ -79,9 +79,28 @@ const MAINNET_REALMS: RealmInfo[] = [
     displayName: 'Soltato',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('7wsrKBeTpqfcribDo34qr8rdSbqXbmQq9Fog2cVirK6C'),
-    ogImage: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FriCEbw1V99GwrJRXPnSQ6su2TabHabNxiZ3VNsVFPPN/logo.png',
+    ogImage:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FriCEbw1V99GwrJRXPnSQ6su2TabHabNxiZ3VNsVFPPN/logo.png',
     website: 'https://soltato.io',
     twitter: '@Soltato_NFT',
+  },
+  {
+    symbol: 'Metaplex Foundation',
+    displayName: 'Metaplex Foundation',
+    programId: new PublicKey('GmtpXy362L8cZfkRmTZMYunWVe8TyRjX5B7sodPZ63LJ'),
+    realmId: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
+    ogImage: 'https://metaplex.com/static/logos/M.svg',
+    website: 'https://metaplex.com',
+    twitter: '@metaplex',
+  },
+  {
+    symbol: 'Metaplex Genesis',
+    displayName: 'Metaplex Genesis',
+    programId: new PublicKey('GMpXgTSJt2nJ7zjD1RwbT2QyPhKqD2MjAZuEaLsfPYLF'),
+    realmId: new PublicKey('Cdui9Va8XnKVng3VGZXcfBFF6XSxbqSi2XruMc7iu817'),
+    ogImage: 'https://metaplex.com/static/logos/M.svg',
+    website: 'https://metaplex.com',
+    twitter: '@metaplex',
   },
 ]
 
