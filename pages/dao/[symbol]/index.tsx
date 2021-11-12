@@ -34,9 +34,9 @@ const REALM = () => {
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const wallet = useWalletStore((s) => s.current)
 
-  const allProposals = Object.entries(proposals)
-    .filter(([, v]) => v.info.votingAt)
-    .sort((a, b) => compareProposals(b[1].info, a[1].info))
+  const allProposals = Object.entries(proposals).sort((a, b) =>
+    compareProposals(b[1].info, a[1].info)
+  )
 
   useEffect(() => {
     setDisplayedProposals(allProposals)
