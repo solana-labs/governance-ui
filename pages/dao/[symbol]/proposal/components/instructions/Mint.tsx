@@ -30,7 +30,6 @@ import { ParsedAccount } from '@models/core/accounts'
 import useInstructions from '@hooks/useInstructions'
 import SourceMintAccountSelect from '../SourceMintAccountSelect'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
-import { BN } from '@project-serum/anchor'
 
 const Mint = ({
   index,
@@ -168,30 +167,26 @@ const Mint = ({
     amount: yup
       .number()
       .typeError('Amount is required')
-      .test(
-        'amount',
-        'Mint amount must be less than the mint available supply',
-        async function (val: number) {
-          if (val && !form.mintAccount) {
-            return this.createError({
-              message: `Please select mint to validate the amount`,
-            })
-          }
-          if (val && form.mintAccount && form.mintAccount?.mintInfo) {
-            const mintValue = getMintNaturalAmountFromDecimal(
-              val,
-              form.mintAccount?.mintInfo.decimals
-            )
-            return !!(
-              form.mintAccount.governance?.info.governedAccount &&
-              form.mintAccount.mintInfo.supply.gte(new BN(mintValue))
-            )
-          }
+      .test('amount', 'Invalid amount', async function (val: number) {
+        if (val && !form.mintAccount) {
           return this.createError({
-            message: `Amount is required`,
+            message: `Please select mint to validate the amount`,
           })
         }
-      ),
+        if (val && form.mintAccount && form.mintAccount?.mintInfo) {
+          const mintValue = getMintNaturalAmountFromDecimal(
+            val,
+            form.mintAccount?.mintInfo.decimals
+          )
+          console.log(mintValue)
+          return !!(
+            form.mintAccount.governance?.info.governedAccount && mintValue
+          )
+        }
+        return this.createError({
+          message: `Amount is required`,
+        })
+      }),
     destinationAccount: yup
       .string()
       .test(
