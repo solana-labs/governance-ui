@@ -51,6 +51,7 @@ const VotePanel = () => {
     connected &&
     ownVoteRecord &&
     !ownVoteRecord?.info.isRelinquished &&
+    proposal &&
     (proposal!.info.state === ProposalState.Voting ||
       proposal!.info.state === ProposalState.Completed ||
       proposal!.info.state === ProposalState.Cancelled ||
