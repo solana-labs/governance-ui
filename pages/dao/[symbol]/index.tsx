@@ -39,11 +39,6 @@ const REALM = () => {
   )
 
   useEffect(() => {
-    setDisplayedProposals(allProposals)
-    setFilteredProposals(allProposals)
-  }, [proposals])
-
-  useEffect(() => {
     if (filters.length > 0) {
       const proposals = displayedProposals.filter(
         ([, v]) => !filters.includes(v.info.state)
@@ -54,6 +49,14 @@ const REALM = () => {
     }
   }, [filters])
 
+  useEffect(() => {
+    const proposals =
+      filters.length > 0
+        ? allProposals.filter(([, v]) => !filters.includes(v.info.state))
+        : allProposals
+    setDisplayedProposals(proposals)
+    setFilteredProposals(proposals)
+  }, [proposals])
   // DEBUG print remove
   console.log(
     'governance page tokenAccount',

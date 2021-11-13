@@ -1,4 +1,4 @@
-import { useReducer } from 'react'
+import { useEffect, useReducer } from 'react'
 import styled from '@emotion/styled'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Disclosure } from '@headlessui/react'
@@ -9,7 +9,7 @@ const initialFilterSettings = {
   [ProposalState.Cancelled]: true,
   [ProposalState.Completed]: true,
   [ProposalState.Defeated]: true,
-  [ProposalState.Draft]: true,
+  [ProposalState.Draft]: false,
   [ProposalState.Executing]: true,
   [ProposalState.ExecutingWithErrors]: true,
   [ProposalState.SigningOff]: true,
@@ -35,6 +35,13 @@ const ProposalFilter = ({ filters, setFilters }) => {
       setFilters(filters.filter((n) => n !== proposalState))
     }
   }
+
+  useEffect(() => {
+    const initialFilters = Object.keys(initialFilterSettings)
+      .filter((x) => !initialFilterSettings[x])
+      .map(Number)
+    setFilters([...initialFilters])
+  }, [])
 
   return (
     <Disclosure as="div" className="relative">
