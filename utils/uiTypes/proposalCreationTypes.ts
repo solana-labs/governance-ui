@@ -3,7 +3,7 @@ import { ParsedAccount } from '@models/core/accounts'
 import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import { GovernedTokenAccount } from '@utils/tokens'
+import { GovernedMintInfoAccount, GovernedTokenAccount } from '@utils/tokens'
 
 export interface Instruction {
   serializedInstruction: string
@@ -18,6 +18,13 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface MintForm {
+  destinationAccount: string
+  amount: number | undefined
+  mintAccount: GovernedMintInfoAccount | undefined
+  programId: string | undefined
+}
+
 export interface ProgramUpgradeForm {
   governedAccount: ParsedAccount<Governance> | undefined
   programId: string | undefined
@@ -27,6 +34,7 @@ export interface ProgramUpgradeForm {
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
+  Mint,
 }
 
 export type createParams = [

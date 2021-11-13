@@ -1,14 +1,21 @@
 import { GovernanceAccountType } from '@models/accounts'
-import { GovernedTokenAccount } from '@utils/tokens'
+import { MintInfo } from '@solana/spl-token'
+import {
+  getMultipleAccounts,
+  GovernedMintInfoAccount,
+  GovernedTokenAccount,
+  parseMintAccountData,
+} from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 export default function useInstructions() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
   )
+  const connection = useWalletStore((s) => s.connection.current)
   const { ownVoterWeight, realm } = useRealm()
-
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
       (gov) => gov.info?.accountType === type
@@ -29,6 +36,12 @@ export default function useInstructions() {
       GovernanceAccountType.ProgramGovernance
     ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
 
+  const canUseMintInstruction =
+    realm &&
+    getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+
   const availableInstructions = [
     {
       id: Instructions.Transfer,
@@ -40,11 +53,16 @@ export default function useInstructions() {
       name: 'Program Upgrade',
       isVisible: canUseProgramUpgradeInstruction,
     },
+    {
+      id: Instructions.Mint,
+      name: 'Mint',
+      isVisible: canUseMintInstruction,
+    },
   ]
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)
   }
-  function prepareGovernances() {
+  function prepareTokenGovernances() {
     const tokenGovernances = getGovernancesByAccountType(
       GovernanceAccountType.TokenGovernance
     )
@@ -66,12 +84,36 @@ export default function useInstructions() {
     }
     return governedTokenAccounts
   }
-  const governedTokenAccounts = prepareGovernances()
+  async function getMintWithGovernances() {
+    const mintGovernances = getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    )
+    const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
+    const mintGovernancesMintInfo = await getMultipleAccounts(
+      connection,
+      mintGovernances.map((x) => x.info.governedAccount.toBase58())
+    )
+    mintGovernancesMintInfo.keys.forEach((key, index) => {
+      const mintAccount = mintGovernancesMintInfo.array[index]
+      const data = Buffer.from(mintAccount!.data)
+      const parsedMintInfo = parseMintAccountData(data) as MintInfo
+      const obj = {
+        governance: mintGovernances.find(
+          (x) => x.info.governedAccount.toBase58() === key
+        ),
+        mintInfo: parsedMintInfo,
+      }
+      governedMintInfoAccounts.push(obj)
+    })
+    return governedMintInfoAccounts
+  }
+  const governedTokenAccounts = prepareTokenGovernances()
   return {
     governancesArray,
     getGovernancesByAccountType,
     availableInstructions,
     getAvailableInstructions,
     governedTokenAccounts,
+    getMintWithGovernances,
   }
 }

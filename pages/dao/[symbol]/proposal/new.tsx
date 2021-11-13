@@ -32,6 +32,7 @@ import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
+import Mint from './components/instructions/Mint'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -222,6 +223,8 @@ const New = () => {
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
         )
+      case Instructions.Mint:
+        return <Mint index={idx} governance={governance}></Mint>
       default:
         null
     }

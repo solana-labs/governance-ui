@@ -25,7 +25,6 @@ export default function useRealm() {
     tokenRecords,
     councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
-
   const realmInfo = useMemo(() => getRealmInfo(symbol as string, apiEndpoint), [
     symbol,
   ])
