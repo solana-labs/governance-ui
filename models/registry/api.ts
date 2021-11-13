@@ -147,6 +147,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     website: 'https://offmyhead.vercel.app',
     twitter: '@nft_omh',
   },
+  {
+    symbol: 'NEWDAO',
+    displayName: 'NEWDAO',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('5eZA8mX9pVXzgbA8oES1ismVSAAgsHkEipJbxvsVYb5d'),
+  },
 ]
 
 export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
