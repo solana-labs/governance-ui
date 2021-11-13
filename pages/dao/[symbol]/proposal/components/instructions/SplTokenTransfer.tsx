@@ -47,10 +47,13 @@ const SplTokenTransfer = ({
     destinationAccount: '',
     // No default transfer amount
     amount: undefined,
-    governedAccount: undefined,
+    governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
   })
+  const [governedAccount, setGovernedAccount] = useState<
+    ParsedAccount<Governance> | undefined
+  >(undefined)
   const [
     destinationAccount,
     setDestinationAccount,
@@ -99,28 +102,29 @@ const SplTokenTransfer = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.token?.publicKey &&
+      form.governedTokenAccount?.token?.publicKey &&
+      form.governedTokenAccount?.token &&
       form.mintInfo
     ) {
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount!,
         form.mintInfo?.decimals
       )
-
       const transferIx = Token.createTransferInstruction(
         TOKEN_PROGRAM_ID,
-        form.governedAccount.token?.account.address,
+        form.governedTokenAccount.token?.account.address,
         new PublicKey(form.destinationAccount),
-        form.governedAccount.governance!.pubkey,
+        form.governedTokenAccount.governance!.pubkey,
         [],
         mintAmount
       )
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
+
     const obj: Instruction = {
       serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount,
+      governedAccount: governedAccount,
     }
     return obj
   }
@@ -131,9 +135,6 @@ const SplTokenTransfer = ({
       value: programId?.toString(),
     })
   }, [realmInfo?.programId])
-  useEffect(() => {
-    setMintInfo(form.governedAccount?.mint?.account)
-  }, [form.governedAccount?.token?.publicKey])
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -151,11 +152,14 @@ const SplTokenTransfer = ({
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form.governedAccount, getInstruction },
+      { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form])
-
+  useEffect(() => {
+    setGovernedAccount(form.governedTokenAccount?.governance)
+    setMintInfo(form.governedTokenAccount?.mint?.account)
+  }, [form.governedTokenAccount])
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
@@ -167,19 +171,25 @@ const SplTokenTransfer = ({
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          if (val && !form.governedAccount) {
+          if (val && !form.governedTokenAccount) {
             return this.createError({
               message: `Please select source account to validate the amount`,
             })
           }
-          if (val && form.governedAccount && form.governedAccount?.mint) {
+          if (
+            val &&
+            form.governedTokenAccount &&
+            form.governedTokenAccount?.mint
+          ) {
             const mintValue = getMintNaturalAmountFromDecimal(
               val,
-              form.governedAccount?.mint.account.decimals
+              form.governedTokenAccount?.mint.account.decimals
             )
             return !!(
-              form.governedAccount?.token?.publicKey &&
-              form.governedAccount.token.account.amount.gte(new BN(mintValue))
+              form.governedTokenAccount?.token?.publicKey &&
+              form.governedTokenAccount.token.account.amount.gte(
+                new BN(mintValue)
+              )
             )
           }
           return this.createError({
@@ -196,7 +206,8 @@ const SplTokenTransfer = ({
           if (val) {
             try {
               if (
-                form.governedAccount?.token?.account.address.toBase58() == val
+                form.governedTokenAccount?.token?.account.address.toBase58() ==
+                val
               ) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
@@ -205,7 +216,7 @@ const SplTokenTransfer = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                form.governedAccount?.token?.account.address
+                form.governedTokenAccount?.token?.account.address
               )
               return true
             } catch (e) {
@@ -220,7 +231,7 @@ const SplTokenTransfer = ({
           }
         }
       ),
-    governedAccount: yup
+    governedTokenAccount: yup
       .object()
       .nullable()
       .required('Source account is required'),
@@ -230,11 +241,11 @@ const SplTokenTransfer = ({
     <>
       <SourceTokenAccountSelect
         governedTokenAccounts={governedTokenAccounts}
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'governedAccount' })
-        }
-        value={form.governedAccount?.token?.account?.address?.toString()}
-        error={formErrors['governedAccount']}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'governedTokenAccount' })
+        }}
+        value={form.governedTokenAccount?.token?.account?.address?.toString()}
+        error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></SourceTokenAccountSelect>

@@ -92,6 +92,9 @@ export async function tryGetTokenMint(
 export const TOKEN_PROGRAM_ID = new PublicKey(
   'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'
 )
+export const BPF_UPGRADE_LOADER_ID = new PublicKey(
+  'BPFLoaderUpgradeab1e11111111111111111111111'
+)
 
 export function parseTokenAccountData(
   account: PublicKey,
