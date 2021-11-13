@@ -2,6 +2,16 @@ import { BN } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { BigNumber } from 'bignumber.js'
 
+const SECONDS_PER_DAY = 86400
+
+export function getDaysFromTimestamp(unixTimestamp: number) {
+  return unixTimestamp / SECONDS_PER_DAY
+}
+
+export function getTimestampFromDays(days: number) {
+  return days * SECONDS_PER_DAY
+}
+
 /// Formats mint amount (natural units) as a decimal string
 export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
   return mint

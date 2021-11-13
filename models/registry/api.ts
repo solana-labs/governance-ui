@@ -65,6 +65,43 @@ const MAINNET_REALMS: RealmInfo[] = [
     ogImage:
       'https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png',
   },
+  {
+    symbol: 'OMH',
+    displayName: 'Off My Head',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
+    ogImage: 'https://offmyhead.vercel.app/coin.png',
+    website: 'https://offmyhead.vercel.app',
+    twitter: '@nft_omh',
+  },
+  {
+    symbol: 'FRIES',
+    displayName: 'Soltato',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('7wsrKBeTpqfcribDo34qr8rdSbqXbmQq9Fog2cVirK6C'),
+    ogImage:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FriCEbw1V99GwrJRXPnSQ6su2TabHabNxiZ3VNsVFPPN/logo.png',
+    website: 'https://soltato.io',
+    twitter: '@Soltato_NFT',
+  },
+  {
+    symbol: 'Metaplex Foundation',
+    displayName: 'Metaplex Foundation',
+    programId: new PublicKey('GmtpXy362L8cZfkRmTZMYunWVe8TyRjX5B7sodPZ63LJ'),
+    realmId: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
+    ogImage: 'https://metaplex.com/static/logos/M.svg',
+    website: 'https://metaplex.com',
+    twitter: '@metaplex',
+  },
+  {
+    symbol: 'Metaplex Genesis',
+    displayName: 'Metaplex Genesis',
+    programId: new PublicKey('GMpXgTSJt2nJ7zjD1RwbT2QyPhKqD2MjAZuEaLsfPYLF'),
+    realmId: new PublicKey('Cdui9Va8XnKVng3VGZXcfBFF6XSxbqSi2XruMc7iu817'),
+    ogImage: 'https://metaplex.com/static/logos/M.svg',
+    website: 'https://metaplex.com',
+    twitter: '@metaplex',
+  },
 ]
 
 // Hardcoded list of devnet realms
@@ -74,11 +111,17 @@ const DEVNET_REALMS: RealmInfo[] = [
     displayName: 'Mango DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
+    website: 'https://mango.markets',
+    twitter: '@mangomarkets',
+    ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
   },
   {
     symbol: 'SOCEAN',
     programId: new PublicKey('GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG'),
     realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
+    website: 'https://www.socean.fi',
+    ogImage:
+      'https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png',
   },
   {
     symbol: 'Governance',
@@ -94,6 +137,15 @@ const DEVNET_REALMS: RealmInfo[] = [
     symbol: 'Realm-8TitF',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('22XYhMSGmPv2nHC3AwbDAP9akyd3rfVRUZt6HUd3wcY5'),
+  },
+  {
+    symbol: 'OMH',
+    displayName: 'Off My Head',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
+    ogImage: 'https://offmyhead.vercel.app/coin.png',
+    website: 'https://offmyhead.vercel.app',
+    twitter: '@nft_omh',
   },
 ]
 

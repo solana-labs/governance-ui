@@ -150,7 +150,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url: 'https://api.devnet.solana.com',
+    url: 'https://mango.devnet.rpcpool.com',
   },
 ]
 
