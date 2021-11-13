@@ -102,6 +102,14 @@ const MAINNET_REALMS: RealmInfo[] = [
     website: 'https://metaplex.com',
     twitter: '@metaplex',
   },
+  {
+    symbol: '21DAO',
+    displayName: '21DAO',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('Dn5yLFi6ZNhkD25CX4c8qq1MV3CC2vcrH2Qujfzy22rT'),
+    ogImage: '/realms/21DAO/img/21dao_icon.png',
+    website: 'https://21dao.xyz',
+  },
 ]
 
 // Hardcoded list of devnet realms
