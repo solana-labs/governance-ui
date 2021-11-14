@@ -179,7 +179,6 @@ const Mint = ({
             val,
             form.mintAccount?.mintInfo.decimals
           )
-          console.log(mintValue)
           return !!(
             form.mintAccount.governance?.info.governedAccount && mintValue
           )
