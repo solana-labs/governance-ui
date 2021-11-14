@@ -17,6 +17,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
+  GovernedMultiTypeAccount,
   ProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
@@ -28,8 +29,8 @@ import { NewProposalContext } from '../../new'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useInstructions from '@hooks/useInstructions'
-import SourceMintAccountSelect from '../SourceMintAccountSelect'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 
 const Mint = ({
   index,
@@ -225,8 +226,11 @@ const Mint = ({
 
   return (
     <>
-      <SourceMintAccountSelect
-        mintGovernances={mintGovernancesWithMintInfo}
+      <GovernedAccountSelect
+        label="Mint"
+        governedAccounts={
+          mintGovernancesWithMintInfo as GovernedMultiTypeAccount[]
+        }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'mintAccount' })
         }}
@@ -234,7 +238,7 @@ const Mint = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceMintAccountSelect>
+      ></GovernedAccountSelect>
       <Input
         label="Destination account"
         value={form.destinationAccount}

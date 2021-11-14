@@ -33,6 +33,7 @@ import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
 import Mint from './components/instructions/Mint'
+import Base64 from './components/instructions/Base64'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -225,6 +226,8 @@ const New = () => {
         )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
+      case Instructions.Base64:
+        return <Base64 index={idx} governance={governance}></Base64>
       default:
         null
     }

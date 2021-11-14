@@ -15,7 +15,11 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import {
+  GovernedMultiTypeAccount,
+  ProgramAccount,
+  tryGetTokenAccount,
+} from '@utils/tokens'
 import {
   SplTokenTransferForm,
   Instruction,
@@ -27,9 +31,9 @@ import { NewProposalContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
-import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
+import SourceGovernedAccountSelect from '../SourceGovernedAccountSelect'
 
 const SplTokenTransfer = ({
   index,
@@ -239,16 +243,17 @@ const SplTokenTransfer = ({
 
   return (
     <>
-      <SourceTokenAccountSelect
-        governedTokenAccounts={governedTokenAccounts}
+      <SourceGovernedAccountSelect
+        label="Source account"
+        governedAccounts={governedTokenAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
-        value={form.governedTokenAccount?.token?.account?.address?.toString()}
+        value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceTokenAccountSelect>
+      ></SourceGovernedAccountSelect>
       <Input
         label="Destination account"
         value={form.destinationAccount}

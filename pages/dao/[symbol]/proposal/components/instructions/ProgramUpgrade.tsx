@@ -10,7 +10,6 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useInstructions from '@hooks/useInstructions'
-import ProgramGovernedAccountSelect from '../ProgramGovernedAccountSelect'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
@@ -19,6 +18,8 @@ import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import { validateBuffer } from '@utils/validations'
+import GovernedAccountSelect from '../GovernedAccountSelect'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
 
 const ProgramUpgrade = ({
   index,
@@ -31,9 +32,13 @@ const ProgramUpgrade = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useInstructions()
-  const programGovernances = getGovernancesByAccountType(
+  const governedProgramAccounts = getGovernancesByAccountType(
     GovernanceAccountType.ProgramGovernance
-  )
+  ).map((x) => {
+    return {
+      governance: x,
+    }
+  })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ProgramUpgradeForm>({
@@ -58,13 +63,13 @@ const ProgramUpgrade = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.info &&
+      form.governedAccount?.governance?.info &&
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.info.governedAccount,
+        form.governedAccount.governance.info.governedAccount,
         new PublicKey(form.bufferAddress),
-        form.governedAccount.pubkey,
+        form.governedAccount.governance.pubkey,
         wallet!.publicKey
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
@@ -72,7 +77,7 @@ const ProgramUpgrade = ({
     const obj: Instruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount,
+      governedAccount: form.governedAccount?.governance,
     }
     return obj
   }
@@ -93,7 +98,7 @@ const ProgramUpgrade = ({
   }, [form.bufferAddress])
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form.governedAccount, getInstruction },
+      { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
@@ -104,7 +109,11 @@ const ProgramUpgrade = ({
       .test('bufferTest', 'Buffer validation', async function (val: string) {
         if (val) {
           try {
-            await validateBuffer(connection, val, form.governedAccount?.pubkey)
+            await validateBuffer(
+              connection,
+              val,
+              form.governedAccount?.governance?.pubkey
+            )
             return true
           } catch (e) {
             return this.createError({
@@ -125,8 +134,9 @@ const ProgramUpgrade = ({
 
   return (
     <>
-      <ProgramGovernedAccountSelect
-        programGovernances={programGovernances}
+      <GovernedAccountSelect
+        label="Governance"
+        governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
@@ -134,7 +144,7 @@ const ProgramUpgrade = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></ProgramGovernedAccountSelect>
+      ></GovernedAccountSelect>
       <Input
         label="Buffer address"
         value={form.bufferAddress}
