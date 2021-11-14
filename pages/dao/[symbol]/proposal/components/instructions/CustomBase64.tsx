@@ -23,7 +23,7 @@ import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
 
-const Base64 = ({
+const CustomBase64 = ({
   index,
   governance,
 }: {
@@ -188,4 +188,4 @@ const Base64 = ({
   )
 }
 
-export default Base64
+export default CustomBase64
