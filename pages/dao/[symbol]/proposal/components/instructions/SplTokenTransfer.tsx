@@ -33,7 +33,7 @@ import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
-import SourceGovernedAccountSelect from '../SourceGovernedAccountSelect'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 
 const SplTokenTransfer = ({
   index,
@@ -243,7 +243,7 @@ const SplTokenTransfer = ({
 
   return (
     <>
-      <SourceGovernedAccountSelect
+      <GovernedAccountSelect
         label="Source account"
         governedAccounts={governedTokenAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
@@ -253,7 +253,7 @@ const SplTokenTransfer = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceGovernedAccountSelect>
+      ></GovernedAccountSelect>
       <Input
         label="Destination account"
         value={form.destinationAccount}
