@@ -106,7 +106,7 @@ const ProgramUpgrade = ({
   const schema = yup.object().shape({
     bufferAddress: yup
       .string()
-      .test('bufferTest', 'Buffer validation', async function (val: string) {
+      .test('bufferTest', 'Invalid buffer', async function (val: string) {
         if (val) {
           try {
             await validateBuffer(

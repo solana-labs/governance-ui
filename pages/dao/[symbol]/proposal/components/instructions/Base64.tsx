@@ -19,6 +19,9 @@ import useWalletStore from 'stores/useWalletStore'
 // import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
+import Input from '@components/inputs/Input'
+import Textarea from '@components/inputs/Textarea'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
 
 const Base64 = ({
   index,
@@ -35,7 +38,7 @@ const Base64 = ({
     getMintWithGovernances,
   } = useInstructions()
   const shouldBeGoverned = index !== 0 && governance
-  const [governedAccounts, setGoverernedAccounts] = useState<
+  const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
   >([])
   const [form, setForm] = useState<Base64InstructionForm>({
@@ -69,8 +72,7 @@ const Base64 = ({
           governance: gov,
         }
       })
-      console.log(matchedGovernances)
-      setGoverernedAccounts(matchedGovernances)
+      setGovernedAccounts(matchedGovernances)
     }
     prepGovernances()
   }, [])
@@ -109,9 +111,38 @@ const Base64 = ({
     governedAccount: yup
       .object()
       .nullable()
-      .required('Program governed account is required'),
+      .required('Governed account is required'),
+    base64: yup
+      .string()
+      .required('Instruction is required')
+      .test('base64Test', 'Invalid base64', function (val: string) {
+        if (val) {
+          try {
+            getInstructionDataFromBase64(val)
+            return true
+          } catch (e) {
+            return false
+          }
+        } else {
+          return this.createError({
+            message: `Buffer address is required`,
+          })
+        }
+      }),
   })
+  const validateAmountOnBlur = () => {
+    const value = form.holdUpTime
 
+    handleSetForm({
+      value: parseFloat(
+        Math.max(
+          Number(0),
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+        ).toFixed()
+      ),
+      propertyName: 'holdUpTime',
+    })
+  }
   return (
     <>
       <GovernedAccountSelect
@@ -125,6 +156,34 @@ const Base64 = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+      <Input
+        min={0}
+        label="Hol up time (days)"
+        value={form.holdUpTime}
+        type="number"
+        onChange={(event) => {
+          handleSetForm({
+            value: event.target.value,
+            propertyName: 'holdUpTime',
+          })
+        }}
+        step={1}
+        error={formErrors['holdUpTime']}
+        onBlur={validateAmountOnBlur}
+      />
+      <Textarea
+        label="Instruction"
+        placeholder="Base64 encoded serialized Solana instruction"
+        wrapperClassName="mb-5"
+        value={form.base64}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'base64',
+          })
+        }
+        error={formErrors['base64']}
+      ></Textarea>
     </>
   )
 }

@@ -68,7 +68,7 @@ export default function useInstructions() {
     },
     {
       id: Instructions.Base64,
-      name: 'Base64',
+      name: 'Custom Instruction (base64)',
       isVisible: canUseAnyInstruction,
     },
   ]
