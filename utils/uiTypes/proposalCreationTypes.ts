@@ -10,10 +10,11 @@ import {
   GovernedTokenAccount,
 } from '@utils/tokens'
 
-export interface Instruction {
+export interface UiInstruction {
   serializedInstruction: string
   isValid: boolean
   governedAccount: ParsedAccount<Governance> | undefined
+  customHoldUpTime?: number
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
@@ -65,7 +66,7 @@ export type createParams = [
 
 export interface ComponentInstructionData {
   governedAccount?: ParsedAccount<Governance> | undefined
-  getInstruction?: () => Promise<Instruction>
+  getInstruction?: () => Promise<UiInstruction>
   type: any
 }
 export interface InstructionsContext {

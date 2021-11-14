@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   Base64InstructionForm,
-  Instruction,
+  UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useInstructions from '@hooks/useInstructions'
@@ -81,7 +81,7 @@ const Base64 = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction(): Promise<Instruction> {
+  async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (
@@ -89,13 +89,13 @@ const Base64 = ({
       form.governedAccount?.governance?.info &&
       wallet?.publicKey
     ) {
-      const customIx = ''
-      serializedInstruction = customIx //serializeInstructionToBase64(customIx)
+      serializedInstruction = form.base64
     }
-    const obj: Instruction = {
+    const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governedAccount: form.governedAccount?.governance,
+      customHoldUpTime: form.holdUpTime,
     }
     return obj
   }

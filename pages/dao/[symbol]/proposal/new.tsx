@@ -23,7 +23,7 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
 import {
   ComponentInstructionData,
-  Instruction,
+  UiInstruction,
   Instructions,
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
@@ -105,10 +105,10 @@ const New = () => {
     setInstructions([...instructionsData.filter((x, index) => index !== idx)])
   }
   const handleGetInstructions = async () => {
-    const instructions: Instruction[] = []
+    const instructions: UiInstruction[] = []
     for (const inst of instructionsData) {
       if (inst.getInstruction) {
-        const instruction: Instruction = await inst?.getInstruction()
+        const instruction: UiInstruction = await inst?.getInstruction()
         instructions.push(instruction)
       }
     }
@@ -122,14 +122,14 @@ const New = () => {
       form
     )
 
-    const instructions: Instruction[] = await handleGetInstructions()
+    const instructions: UiInstruction[] = await handleGetInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
       setIsLoading(false)
       throw 'No realm selected'
     }
 
-    if (isValid && instructions.every((x: Instruction) => x.isValid)) {
+    if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
       let selectedGovernance = governance
       if (!governance) {
         setIsLoading(false)
@@ -142,9 +142,14 @@ const New = () => {
         connection.current,
         connection.endpoint
       )
-      const instructionsData = instructions.map((x) =>
-        getInstructionDataFromBase64(x.serializedInstruction)
-      )
+      const instructionsData = instructions.map((x) => {
+        return {
+          data: getInstructionDataFromBase64(x.serializedInstruction),
+          holdUpTime: x.customHoldUpTime
+            ? x.customHoldUpTime
+            : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+        }
+      })
 
       try {
         // Fetch governance to get up to date proposalCount
@@ -179,7 +184,6 @@ const New = () => {
           form.title,
           form.description,
           proposalMint,
-          selectedGovernance?.info?.config.minInstructionHoldUpTime,
           selectedGovernance?.info?.proposalCount,
           instructionsData,
           isDraft

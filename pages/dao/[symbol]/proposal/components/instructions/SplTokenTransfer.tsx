@@ -22,7 +22,7 @@ import {
 } from '@utils/tokens'
 import {
   SplTokenTransferForm,
-  Instruction,
+  UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
@@ -100,7 +100,7 @@ const SplTokenTransfer = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction(): Promise<Instruction> {
+  async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (
@@ -125,7 +125,7 @@ const SplTokenTransfer = ({
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
 
-    const obj: Instruction = {
+    const obj: UiInstruction = {
       serializedInstruction,
       isValid,
       governedAccount: governedAccount,

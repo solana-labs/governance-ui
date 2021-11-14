@@ -5,7 +5,7 @@ import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
-  Instruction,
+  UiInstruction,
   ProgramUpgradeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
@@ -57,7 +57,7 @@ const ProgramUpgrade = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction(): Promise<Instruction> {
+  async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (
@@ -74,7 +74,7 @@ const ProgramUpgrade = ({
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
-    const obj: Instruction = {
+    const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governedAccount: form.governedAccount?.governance,
