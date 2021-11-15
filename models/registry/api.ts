@@ -56,6 +56,7 @@ const MAINNET_REALMS: RealmInfo[] = [
     symbol: 'SCTF1',
     programId: new PublicKey('gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6'),
     realmId: new PublicKey('EtZWAeFFRC5k6uesap1F1gkHFimsL2HqttVTNAeN86o8'),
+    ogImage: '/realms/SCTF1/img/sctf1.svg',
   },
   {
     symbol: 'SERUM',
