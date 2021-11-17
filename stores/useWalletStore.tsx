@@ -146,11 +146,11 @@ async function resolveProposalDescription(description: string) {
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url: 'https://mango.rpcpool.com',
+    url: process.env.MAINNET_RPC || 'https://mango.rpcpool.com',
   },
   {
     name: 'devnet',
-    url: 'https://mango.devnet.rpcpool.com',
+    url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
   },
 ]
 
