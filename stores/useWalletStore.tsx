@@ -152,13 +152,19 @@ export const ENDPOINTS: EndpointInfo[] = [
     name: 'devnet',
     url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
   },
+  {
+    name: 'localnet',
+    url: 'http://127.0.0.1:8899',
+  },
 ]
 
-const ENDPOINT = ENDPOINTS.find((e) => e.name === 'mainnet')
-const INITIAL_CONNECTION_STATE = {
-  cluster: ENDPOINT!.name,
-  current: new Connection(ENDPOINT!.url, 'recent'),
-  endpoint: ENDPOINT!.url,
+function getConnectionConfig(cluster: string) {
+  const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
+  return {
+    cluster: ENDPOINT!.name,
+    current: new Connection(ENDPOINT!.url, 'recent'),
+    endpoint: ENDPOINT!.url,
+  }
 }
 
 const INITIAL_REALM_STATE = {
@@ -192,7 +198,7 @@ const INITIAL_PROPOSAL_STATE = {
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
-  connection: INITIAL_CONNECTION_STATE,
+  connection: getConnectionConfig('mainnet'),
   current: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
@@ -591,6 +597,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
+      })
+    },
+    async setConnectionConfig(cluster: string) {
+      const set = get().set
+      set((s) => {
+        s.connection = getConnectionConfig(cluster)
       })
     },
   },
