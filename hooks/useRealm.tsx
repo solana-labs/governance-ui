@@ -8,8 +8,8 @@ import useWalletStore from '../stores/useWalletStore'
 
 export default function useRealm() {
   const router = useRouter()
-  const { symbol, cluster } = router.query
-  const apiEndpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
+  const { symbol } = router.query
+  const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
@@ -25,9 +25,11 @@ export default function useRealm() {
     tokenRecords,
     councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
-  const realmInfo = useMemo(() => getRealmInfo(symbol as string, apiEndpoint), [
-    symbol,
-  ])
+
+  const realmInfo = useMemo(
+    () => getRealmInfo(symbol as string, connection.endpoint as EndpointTypes),
+    [symbol]
+  )
 
   const realmTokenAccount = useMemo(
     () =>

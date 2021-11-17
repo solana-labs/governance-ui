@@ -17,7 +17,7 @@ const SECONDS = 1000
 export default function useWallet() {
   const {
     connected,
-    connection: { endpoint },
+    connection,
     current: wallet,
     providerUrl: selectedProviderUrl,
     set: setWalletStore,
@@ -44,7 +44,7 @@ export default function useWallet() {
         // hack to also update wallet synchronously in case it disconnects
         const wallet = new provider.adapter(
           provider.url,
-          endpoint
+          connection.endpoint
         ) as WalletAdapter
         setWalletStore((state) => {
           state.current = wallet
@@ -63,7 +63,7 @@ export default function useWallet() {
         updateWallet()
       }
     }
-  }, [provider, endpoint])
+  }, [provider, connection])
 
   useEffect(() => {
     if (!wallet) return
