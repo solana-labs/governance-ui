@@ -9,9 +9,9 @@ import {
   MintAccount,
   tryGetMint,
   getOwnedTokenAccounts,
-  getMultipleAccounts,
   parseMintAccountData,
   parseTokenAccountData,
+  getMultipleAccountInfoChunked,
 } from '../utils/tokens'
 import {
   getGovernance,
@@ -530,16 +530,21 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
-      const tokenAccountsMintInfo = await getMultipleAccounts(
+      const tokenAccountsMintInfo = await getMultipleAccountInfoChunked(
         connection,
-        tokenAccounts.map((x) => x.account.mint.toBase58())
+        tokenAccounts.map((x) => x.account.mint)
       )
-      tokenAccountsMintInfo.keys.forEach((key, index) => {
-        const mintAccount = tokenAccountsMintInfo.array[index]
-        const data = Buffer.from(mintAccount!.data)
+      tokenAccountsMintInfo.forEach((tokenAccountMintInfo, index) => {
+        const publicKey = tokenAccounts[index].account.mint
+        if (!tokenAccountMintInfo) {
+          throw new Error(
+            `Missing tokenAccountMintInfo: ${publicKey.toBase58()}`
+          )
+        }
+        const data = Buffer.from(tokenAccountMintInfo.data)
         const parsedMintInfo = parseMintAccountData(data) as MintInfo
         tokenMints.push({
-          publicKey: new PublicKey(tokenAccountsMintInfo.keys[index]),
+          publicKey,
           account: parsedMintInfo,
         })
       })
@@ -557,14 +562,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenGovernances = selectedRealmGovernances.filter(
         (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
       )
-      const tokenAccountsInfo = await getMultipleAccounts(
+      const tokenAccountsInfo = await getMultipleAccountInfoChunked(
         connection,
-        tokenGovernances.map((x) => x.info.governedAccount.toBase58())
+        tokenGovernances.map((x) => x.info.governedAccount)
       )
-      tokenAccountsInfo.keys.forEach((key, index) => {
-        const publicKey = new PublicKey(tokenAccountsInfo.keys[index])
-        const accountInfo = tokenAccountsInfo.array[index]
-        const data = Buffer.from(accountInfo!.data)
+      tokenAccountsInfo.forEach((tokenAccountInfo, index) => {
+        const publicKey = tokenGovernances[index].info.governedAccount
+        if (!tokenAccountInfo) {
+          throw new Error(`Missing tokenAccountInfo: ${publicKey.toBase58()}`)
+        }
+        const data = Buffer.from(tokenAccountInfo.data)
         const parsedAccountInfo = parseTokenAccountData(
           publicKey,
           data
