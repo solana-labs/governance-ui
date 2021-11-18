@@ -3,28 +3,23 @@ import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
-  Base64InstructionForm,
+  EmptyInstructionForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useInstructions from '@hooks/useInstructions'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
-import useWalletStore from 'stores/useWalletStore'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
 
-const CustomBase64 = ({
+const Empty = ({
   index,
   governance,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
 }) => {
-  const wallet = useWalletStore((s) => s.current)
   const {
     governancesArray,
     governedTokenAccounts,
@@ -34,10 +29,8 @@ const CustomBase64 = ({
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
   >([])
-  const [form, setForm] = useState<Base64InstructionForm>({
+  const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
-    base64: '',
-    holdUpTime: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -76,19 +69,10 @@ const CustomBase64 = ({
   }
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    if (
-      isValid &&
-      form.governedAccount?.governance?.info &&
-      wallet?.publicKey
-    ) {
-      serializedInstruction = form.base64
-    }
     const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
+      serializedInstruction: '',
       isValid,
       governedAccount: form.governedAccount?.governance,
-      customHoldUpTime: form.holdUpTime,
     }
     return obj
   }
@@ -105,37 +89,7 @@ const CustomBase64 = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    base64: yup
-      .string()
-      .required('Instruction is required')
-      .test('base64Test', 'Invalid base64', function (val: string) {
-        if (val) {
-          try {
-            getInstructionDataFromBase64(val)
-            return true
-          } catch (e) {
-            return false
-          }
-        } else {
-          return this.createError({
-            message: `Buffer address is required`,
-          })
-        }
-      }),
   })
-  const validateAmountOnBlur = () => {
-    const value = form.holdUpTime
-
-    handleSetForm({
-      value: parseFloat(
-        Math.max(
-          Number(0),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed()
-      ),
-      propertyName: 'holdUpTime',
-    })
-  }
   return (
     <>
       <GovernedAccountSelect
@@ -149,36 +103,8 @@ const CustomBase64 = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        min={0}
-        label="Hol up time (days)"
-        value={form.holdUpTime}
-        type="number"
-        onChange={(event) => {
-          handleSetForm({
-            value: event.target.value,
-            propertyName: 'holdUpTime',
-          })
-        }}
-        step={1}
-        error={formErrors['holdUpTime']}
-        onBlur={validateAmountOnBlur}
-      />
-      <Textarea
-        label="Instruction"
-        placeholder="Base64 encoded serialized Solana instruction"
-        wrapperClassName="mb-5"
-        value={form.base64}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'base64',
-          })
-        }
-        error={formErrors['base64']}
-      ></Textarea>
     </>
   )
 }
 
-export default CustomBase64
+export default Empty

@@ -43,11 +43,16 @@ export interface Base64InstructionForm {
   holdUpTime: number
 }
 
+export interface EmptyInstructionForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
   Mint,
   Base64,
+  None,
 }
 
 export type createParams = [

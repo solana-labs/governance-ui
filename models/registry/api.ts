@@ -201,10 +201,11 @@ export function getRealmInfo(
   if (!symbol) {
     return undefined
   }
+
   if (endpoint === 'devnet') {
-    let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
-      equalsIgnoreCase(r.symbol, symbol)
-    )
+    let devRealmInfo = getAllRealmInfos('devnet').find((r) => {
+      return equalsIgnoreCase(r.symbol, symbol)
+    })
 
     if (devRealmInfo) {
       devRealmInfo.endpoint = 'devnet'
@@ -227,5 +228,6 @@ export function getRealmInfo(
   if (realmInfo) {
     realmInfo.endpoint = 'mainnet'
   }
+
   return realmInfo
 }

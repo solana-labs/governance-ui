@@ -71,6 +71,15 @@ export default function useInstructions() {
       name: 'Custom Instruction (base64)',
       isVisible: canUseAnyInstruction,
     },
+    {
+      id: Instructions.None,
+      name: 'None',
+      isVisible:
+        realm &&
+        Object.values(governances).some((g) =>
+          ownVoterWeight.canCreateProposal(g.info.config)
+        ),
+    },
   ]
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)

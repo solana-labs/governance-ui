@@ -32,10 +32,10 @@ import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
+import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
-
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -145,7 +145,9 @@ const New = () => {
       )
       const instructionsData = instructions.map((x) => {
         return {
-          data: getInstructionDataFromBase64(x.serializedInstruction),
+          data: x.serializedInstruction
+            ? getInstructionDataFromBase64(x.serializedInstruction)
+            : null,
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.info?.config.minInstructionHoldUpTime,
@@ -233,6 +235,8 @@ const New = () => {
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.None:
+        return <Empty index={idx} governance={governance}></Empty>
       default:
         null
     }

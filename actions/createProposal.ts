@@ -14,7 +14,7 @@ import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@models/withSignOffProposal'
 
 interface InstructionDataWithHoldUpTime {
-  data: InstructionData
+  data: InstructionData | null
   holdUpTime: number | undefined
 }
 
@@ -61,18 +61,20 @@ export const createProposal = async (
     payer
   )
   for (const [index, instruction] of instructionsData.entries()) {
-    await withInsertInstruction(
-      instructions,
-      programId,
-      governance,
-      proposalAddress,
-      tokenOwnerRecord,
-      governanceAuthority,
-      index,
-      instruction.holdUpTime || 0,
-      instruction.data,
-      payer
-    )
+    if (instruction.data) {
+      await withInsertInstruction(
+        instructions,
+        programId,
+        governance,
+        proposalAddress,
+        tokenOwnerRecord,
+        governanceAuthority,
+        index,
+        instruction.holdUpTime || 0,
+        instruction.data,
+        payer
+      )
+    }
   }
 
   if (!isDraft) {
