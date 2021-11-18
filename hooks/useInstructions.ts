@@ -1,7 +1,7 @@
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
 import {
-  getMultipleAccounts,
+  getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
   GovernedTokenAccount,
   parseMintAccountData,
@@ -102,18 +102,21 @@ export default function useInstructions() {
       GovernanceAccountType.MintGovernance
     )
     const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
-    const mintGovernancesMintInfo = await getMultipleAccounts(
+    const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
       connection,
-      mintGovernances.map((x) => x.info.governedAccount.toBase58())
+      mintGovernances.map((x) => x.info.governedAccount)
     )
-    mintGovernancesMintInfo.keys.forEach((key, index) => {
-      const mintAccount = mintGovernancesMintInfo.array[index]
-      const data = Buffer.from(mintAccount!.data)
+    mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
+      const governance = mintGovernances[index]
+      if (!mintAccountInfo) {
+        throw new Error(
+          `Missing mintAccountInfo for: ${governance.pubkey.toBase58()}`
+        )
+      }
+      const data = Buffer.from(mintAccountInfo.data)
       const parsedMintInfo = parseMintAccountData(data) as MintInfo
       const obj = {
-        governance: mintGovernances.find(
-          (x) => x.info.governedAccount.toBase58() === key
-        ),
+        governance,
         mintInfo: parsedMintInfo,
       }
       governedMintInfoAccounts.push(obj)

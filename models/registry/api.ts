@@ -56,6 +56,7 @@ const MAINNET_REALMS: RealmInfo[] = [
     symbol: 'SCTF1',
     programId: new PublicKey('gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6'),
     realmId: new PublicKey('EtZWAeFFRC5k6uesap1F1gkHFimsL2HqttVTNAeN86o8'),
+    ogImage: '/realms/SCTF1/img/sctf1.svg',
   },
   {
     symbol: 'SERUM',
@@ -117,6 +118,16 @@ const MAINNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg'),
     ogImage: 'https://app.pegasusdao.com/assets/logo.png',
     website: 'https://www.pegasusdao.com/',
+  },
+  {
+    symbol: 'gSAIL',
+    displayName: 'GSAIL GOVERNANCE DAO ',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('36fZRsuM3oXvb5VrEXXVmokbGnjADzVgKpW1pgQq7jXJ'),
+    ogImage:
+      'https://raw.githubusercontent.com/solanasail/token-list/main/assets/mainnet/Gsai2KN28MTGcSZ1gKYFswUpFpS7EM9mvdR9c8f6iVXJ/logo.png',
+    website: 'https://www.solanasail.com/',
+    twitter: '@SolanaSail',
   },
 ]
 

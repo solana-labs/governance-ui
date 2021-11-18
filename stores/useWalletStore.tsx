@@ -9,9 +9,9 @@ import {
   MintAccount,
   tryGetMint,
   getOwnedTokenAccounts,
-  getMultipleAccounts,
   parseMintAccountData,
   parseTokenAccountData,
+  getMultipleAccountInfoChunked,
 } from '../utils/tokens'
 import {
   getGovernance,
@@ -146,19 +146,25 @@ async function resolveProposalDescription(description: string) {
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url: 'https://mango.rpcpool.com',
+    url: process.env.MAINNET_RPC || 'https://mango.rpcpool.com',
   },
   {
     name: 'devnet',
-    url: 'https://mango.devnet.rpcpool.com',
+    url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
+  },
+  {
+    name: 'localnet',
+    url: 'http://127.0.0.1:8899',
   },
 ]
 
-const ENDPOINT = ENDPOINTS.find((e) => e.name === 'mainnet')
-const INITIAL_CONNECTION_STATE = {
-  cluster: ENDPOINT!.name,
-  current: new Connection(ENDPOINT!.url, 'recent'),
-  endpoint: ENDPOINT!.url,
+function getConnectionConfig(cluster: string) {
+  const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
+  return {
+    cluster: ENDPOINT!.name,
+    current: new Connection(ENDPOINT!.url, 'recent'),
+    endpoint: ENDPOINT!.url,
+  }
 }
 
 const INITIAL_REALM_STATE = {
@@ -192,7 +198,7 @@ const INITIAL_PROPOSAL_STATE = {
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
-  connection: INITIAL_CONNECTION_STATE,
+  connection: getConnectionConfig('mainnet'),
   current: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
@@ -530,16 +536,21 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
       const connection = get().connection.current
       const tokenMints: ProgramAccount<MintInfo>[] = []
-      const tokenAccountsMintInfo = await getMultipleAccounts(
+      const tokenAccountsMintInfo = await getMultipleAccountInfoChunked(
         connection,
-        tokenAccounts.map((x) => x.account.mint.toBase58())
+        tokenAccounts.map((x) => x.account.mint)
       )
-      tokenAccountsMintInfo.keys.forEach((key, index) => {
-        const mintAccount = tokenAccountsMintInfo.array[index]
-        const data = Buffer.from(mintAccount!.data)
+      tokenAccountsMintInfo.forEach((tokenAccountMintInfo, index) => {
+        const publicKey = tokenAccounts[index].account.mint
+        if (!tokenAccountMintInfo) {
+          throw new Error(
+            `Missing tokenAccountMintInfo: ${publicKey.toBase58()}`
+          )
+        }
+        const data = Buffer.from(tokenAccountMintInfo.data)
         const parsedMintInfo = parseMintAccountData(data) as MintInfo
         tokenMints.push({
-          publicKey: new PublicKey(tokenAccountsMintInfo.keys[index]),
+          publicKey,
           account: parsedMintInfo,
         })
       })
@@ -557,14 +568,16 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenGovernances = selectedRealmGovernances.filter(
         (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
       )
-      const tokenAccountsInfo = await getMultipleAccounts(
+      const tokenAccountsInfo = await getMultipleAccountInfoChunked(
         connection,
-        tokenGovernances.map((x) => x.info.governedAccount.toBase58())
+        tokenGovernances.map((x) => x.info.governedAccount)
       )
-      tokenAccountsInfo.keys.forEach((key, index) => {
-        const publicKey = new PublicKey(tokenAccountsInfo.keys[index])
-        const accountInfo = tokenAccountsInfo.array[index]
-        const data = Buffer.from(accountInfo!.data)
+      tokenAccountsInfo.forEach((tokenAccountInfo, index) => {
+        const publicKey = tokenGovernances[index].info.governedAccount
+        if (!tokenAccountInfo) {
+          throw new Error(`Missing tokenAccountInfo: ${publicKey.toBase58()}`)
+        }
+        const data = Buffer.from(tokenAccountInfo.data)
         const parsedAccountInfo = parseTokenAccountData(
           publicKey,
           data
@@ -591,6 +604,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
+      })
+    },
+    async setConnectionConfig(cluster: string) {
+      const set = get().set
+      set((s) => {
+        s.connection = getConnectionConfig(cluster)
       })
     },
   },

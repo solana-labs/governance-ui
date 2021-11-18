@@ -3,7 +3,7 @@ import {
   Connection,
   PublicKey,
   TransactionInstruction,
-  AccountInfo as GenericAccountInfo,
+  Commitment,
 } from '@solana/web3.js'
 import {
   AccountInfo,
@@ -209,56 +209,16 @@ export function approveTokenTransfer(
   return transferAuthority
 }
 
-export const getMultipleAccounts = async (
-  connection: any,
-  keys: string[],
-  commitment = 'recent'
-) => {
-  const result = await Promise.all(
-    chunks(keys, 99).map((chunk) =>
-      getMultipleAccountsCore(connection, chunk, commitment)
+export async function getMultipleAccountInfoChunked(
+  connection: Connection,
+  keys: PublicKey[],
+  commitment: Commitment | undefined = 'recent'
+) {
+  return (
+    await Promise.all(
+      chunks(keys, 99).map((chunk) =>
+        connection.getMultipleAccountsInfo(chunk, commitment)
+      )
     )
-  )
-
-  const array = result
-    .map(
-      (a) =>
-        a.array.map((acc) => {
-          if (!acc) {
-            return undefined
-          }
-
-          const { data, ...rest } = acc
-          const obj = {
-            ...rest,
-            data: Buffer.from(data[0], 'base64'),
-          } as GenericAccountInfo<Buffer>
-          return obj
-        }) as GenericAccountInfo<Buffer>[]
-    )
-    .flat()
-  return { keys, array }
-}
-
-const getMultipleAccountsCore = async (
-  connection: any,
-  keys: string[],
-  commitment: string
-) => {
-  const args = connection._buildArgs([keys], commitment, 'base64')
-
-  const unsafeRes = await connection._rpcRequest('getMultipleAccounts', args)
-  if (unsafeRes.error) {
-    throw new Error(
-      'failed to get info about account ' + unsafeRes.error.message
-    )
-  }
-
-  if (unsafeRes.result.value) {
-    const array = unsafeRes.result.value as GenericAccountInfo<string[]>[]
-    return { keys, array }
-  }
-
-  // TODO: fix
-  throw new Error()
+  ).flat()
 }

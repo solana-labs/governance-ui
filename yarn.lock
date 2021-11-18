@@ -935,7 +935,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0":
+"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.30.2":
   version "1.30.2"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.30.2.tgz#e85da75e0825dc64f53eb64a1ff0115b27bec135"
   integrity sha512-hznCj+rkfvM5taRP3Z+l5lumB7IQnDrB4l55Wpsg4kDU9Zds8pE5YOH5Z9bbF/pUzZJKQjyBjnY/6kScBm3Ugg==
@@ -955,7 +955,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.2.2", "@solana/web3.js@^1.5.0":
+"@solana/web3.js@^1.2.2":
   version "1.5.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.5.0.tgz#4819ecad0408ec55f3d47a227627856002a7358b"
   dependencies:

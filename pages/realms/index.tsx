@@ -13,25 +13,27 @@ import useQueryContext from '../../hooks/useQueryContext'
 
 const Realms = () => {
   const router = useRouter()
-  const { cluster } = router.query
   const { fmtUrlWithCluster } = useQueryContext()
 
-  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
   const [realms, setRealms] = useState<RealmInfo[]>([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSearch] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
-  const { actions, selectedRealm } = useWalletStore((s) => s)
+  const { actions, selectedRealm, connection } = useWalletStore((s) => s)
 
   useEffect(() => {
-    const data: RealmInfo[] = getAllRealmInfos(endpoint)
-    setRealms(data)
+    if (connection) {
+      const data: RealmInfo[] = getAllRealmInfos(
+        connection.cluster as EndpointTypes
+      )
+      setRealms(data)
+    }
     if (selectedRealm.realm) {
       actions.deselectRealm()
     }
-  }, [endpoint])
+  }, [connection])
 
   //   useEffect(() => {
   //     const results = realms.filter((realm: RealmInfo) =>
