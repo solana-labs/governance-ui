@@ -4,7 +4,7 @@ import BN from 'bn.js'
 
 import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
@@ -19,6 +19,7 @@ import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes'
 import useInstructions from '@hooks/useInstructions'
 import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
+import { ProgramVersion } from '@models/registry/api'
 
 const DEFAULT_GOVERNANCE_PROGRAM_ID =
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
@@ -43,7 +44,7 @@ const schema = yup.object().shape({
       publicKeyValidationTest
     ),
   name: yup.string().required('Name is required'),
-  communityTokenMint: yup
+  communityMintId: yup
     .string()
     .required('Community token mint is required')
     .test(
@@ -51,6 +52,7 @@ const schema = yup.object().shape({
       'Community token mint id is not a valid public key',
       publicKeyValidationTest
     ),
+  communityMint: yup.object().required('Community token mint is not valid'),
 })
 
 const New = () => {
@@ -62,11 +64,21 @@ const New = () => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    governanceProgramId: string
+    name: string
+    communityMintId: string
+    communityMint: ProgramAccount<MintInfo> | undefined
+    councilMintId: string | undefined
+    programVersion: ProgramVersion
+    communityMintMaxVoteWeightSource: number
+    minCommunityTokensToCreateGovernance: number
+  }>({
     governanceProgramId: DEFAULT_GOVERNANCE_PROGRAM_ID,
     name: '',
-    communityTokenMint: '',
-    councilMint: '',
+    communityMintId: '',
+    communityMint: undefined,
+    councilMintId: '',
     programVersion: 1,
     communityMintMaxVoteWeightSource: 1,
     minCommunityTokensToCreateGovernance: 1000000,
@@ -75,9 +87,6 @@ const New = () => {
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
-  const [communityMint, setCommunityMint] = useState<
-    ProgramAccount<MintInfo> | undefined
-  >(undefined)
   const [isLoading, setIsLoading] = useState(false)
 
   const handleSetForm = (newValues) => {
@@ -106,8 +115,8 @@ const New = () => {
         await registerRealm(
           rpcContext,
           form.name,
-          new PublicKey(form.communityTokenMint),
-          form.councilMint ? new PublicKey(form.councilMint) : undefined,
+          new PublicKey(form.communityMintId),
+          form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
           new BN(form.minCommunityTokensToCreateGovernance)
         )
@@ -129,25 +138,30 @@ const New = () => {
 
   const handleCommunityMint = async (mintId) => {
     handleSetForm({
-      communityTokenMint: mintId,
+      communityMintId: mintId,
+      communityMint: undefined,
     })
-    try {
-      const mintPublicKey = new PublicKey(mintId)
-      const mint = await tryGetMint(connection.current, mintPublicKey)
-      setCommunityMint(mint)
+    const mintPublicKey = new PublicKey(mintId)
+    const mint = await tryGetMint(connection.current, mintPublicKey)
+    if (mint) {
       const supply = mint!.account.supply.toNumber()
       const decimals = mint!.account.decimals
+      // default to 1% of mint supply
       if (supply > 0) {
         handleSetForm({
           minCommunityTokensToCreateGovernance: Math.max(
             1,
             (supply / Math.pow(10, decimals)) * 0.01
           ),
-          communityTokenMint: mintId,
+          communityMintId: mintId,
+          communityMint: mint,
+        })
+      } else {
+        handleSetForm({
+          communityMint: mint,
+          communityMintId: mintId,
         })
       }
-    } catch (e) {
-      console.log('Mint not found', e)
     }
   }
 
@@ -188,22 +202,24 @@ const New = () => {
             <Input
               label="Community Mint Id"
               placeholder="Community mint id of this realm"
-              value={form.communityTokenMint}
+              value={form.communityMintId}
               type="text"
-              error={formErrors['communityTokenMint']}
+              error={
+                formErrors['communityMintId'] || formErrors['communityMint']
+              }
               onChange={(evt) => handleCommunityMint(evt.target.value)}
             />
-            {communityMint && (
+            {form.communityMint && (
               <div className="pt-2">
                 <div className="pb-0.5 text-fgd-3 text-xs">Mint supply</div>
                 <div className="text-xs">
-                  {communityMint.account.supply.toNumber() /
-                    Math.pow(10, communityMint.account.decimals)}
+                  {form.communityMint.account.supply.toNumber() /
+                    Math.pow(10, form.communityMint.account.decimals)}
                 </div>
               </div>
             )}
           </div>
-          {communityMint && (
+          {form.communityMint && (
             <>
               <div className="pb-4">
                 <Input
@@ -240,12 +256,12 @@ const New = () => {
             <Input
               label="Council Mint Id"
               placeholder="(Optional) Council mint"
-              value={form.councilMint}
+              value={form.councilMintId}
               type="text"
-              error={formErrors['councilMint']}
+              error={formErrors['councilMintId']}
               onChange={(evt) =>
                 handleSetForm({
-                  councilMint: evt.target.value,
+                  councilMintId: evt.target.value,
                 })
               }
             />
