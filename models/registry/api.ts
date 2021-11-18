@@ -119,6 +119,16 @@ const MAINNET_REALMS: RealmInfo[] = [
     ogImage: 'https://app.pegasusdao.com/assets/logo.png',
     website: 'https://www.pegasusdao.com/',
   },
+  {
+    symbol: 'gSAIL',
+    displayName: 'GSAIL GOVERNANCE DAO ',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('36fZRsuM3oXvb5VrEXXVmokbGnjADzVgKpW1pgQq7jXJ'),
+    ogImage:
+      'https://raw.githubusercontent.com/solanasail/token-list/main/assets/mainnet/Gsai2KN28MTGcSZ1gKYFswUpFpS7EM9mvdR9c8f6iVXJ/logo.png',
+    website: 'https://www.solanasail.com/',
+    twitter: '@SolanaSail',
+  },
 ]
 
 // Hardcoded list of devnet realms
