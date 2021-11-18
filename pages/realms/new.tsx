@@ -4,7 +4,7 @@ import BN from 'bn.js'
 
 import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
@@ -17,6 +17,11 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
 import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes'
 import useInstructions from '@hooks/useInstructions'
+import { ProgramAccount, tryGetMint } from 'utils/tokens'
+import { MintInfo } from '@solana/spl-token'
+
+const DEFAULT_GOVERNANCE_PROGRAM_ID =
+  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 
 const publicKeyValidationTest = (value) => {
   try {
@@ -27,6 +32,7 @@ const publicKeyValidationTest = (value) => {
     return false
   }
 }
+
 const schema = yup.object().shape({
   governanceProgramId: yup
     .string()
@@ -57,27 +63,29 @@ const New = () => {
   const connection = useWalletStore((s) => s.connection)
 
   const [form, setForm] = useState({
-    governanceProgramId: '',
+    governanceProgramId: DEFAULT_GOVERNANCE_PROGRAM_ID,
     name: '',
     communityTokenMint: '',
     councilMint: '',
     programVersion: 1,
-    communityMintMaxVoteWeightSource: 0.5,
-    minCommunityTokensToCreateGovernance: 0.001,
+    communityMintMaxVoteWeightSource: 1,
+    minCommunityTokensToCreateGovernance: 1000000,
   })
   const [formErrors, setFormErrors] = useState({})
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: availableInstructions[0] }])
+  const [communityMint, setCommunityMint] = useState<
+    ProgramAccount<MintInfo> | undefined
+  >(undefined)
   const [isLoading, setIsLoading] = useState(false)
 
-  const handleSetForm = ({ propertyName, value }) => {
+  const handleSetForm = (newValues) => {
     setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
+    setForm({ ...form, ...newValues })
   }
 
   const handleCreate = async () => {
-    if (!connection) return
     setFormErrors({})
     setIsLoading(true)
     const { isValid, validationErrors }: formValidation = await isFormValid(
@@ -119,6 +127,30 @@ const New = () => {
     setInstructions([instructionsData[0]])
   }, [instructionsData[0]])
 
+  const handleCommunityMint = async (mintId) => {
+    handleSetForm({
+      communityTokenMint: mintId,
+    })
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      setCommunityMint(mint)
+      const supply = mint!.account.supply.toNumber()
+      const decimals = mint!.account.decimals
+      if (supply > 0) {
+        handleSetForm({
+          minCommunityTokensToCreateGovernance: Math.max(
+            1,
+            (supply / Math.pow(10, decimals)) * 0.01
+          ),
+          communityTokenMint: mintId,
+        })
+      }
+    } catch (e) {
+      console.log('Mint not found', e)
+    }
+  }
+
   return (
     <div
       className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${
@@ -140,6 +172,86 @@ const New = () => {
         <div className="pt-2">
           <div className="pb-4">
             <Input
+              label="Name"
+              placeholder="Name of your realm"
+              value={form.name}
+              type="text"
+              error={formErrors['name']}
+              onChange={(evt) =>
+                handleSetForm({
+                  name: evt.target.value,
+                })
+              }
+            />
+          </div>
+          <div className="pb-4">
+            <Input
+              label="Community Mint Id"
+              placeholder="Community mint id of this realm"
+              value={form.communityTokenMint}
+              type="text"
+              error={formErrors['communityTokenMint']}
+              onChange={(evt) => handleCommunityMint(evt.target.value)}
+            />
+            {communityMint && (
+              <div className="pt-2">
+                <div className="pb-0.5 text-fgd-3 text-xs">Mint supply</div>
+                <div className="text-xs">
+                  {communityMint.account.supply.toNumber() /
+                    Math.pow(10, communityMint.account.decimals)}
+                </div>
+              </div>
+            )}
+          </div>
+          {communityMint && (
+            <>
+              <div className="pb-4">
+                <Input
+                  label="Min community tokens to create governance (defaults 1% of community mint)"
+                  placeholder="Min community tokens to create governance"
+                  step="0.01"
+                  value={form.minCommunityTokensToCreateGovernance}
+                  type="number"
+                  error={formErrors['minCommunityTokensToCreateGovernance']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      minCommunityTokensToCreateGovernance: evt.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="pb-4">
+                <Input
+                  label="Community mint supply factor (max vote weight)"
+                  placeholder="Community mint supply factor (max vote weight)"
+                  value={form.communityMintMaxVoteWeightSource}
+                  type="number"
+                  error={formErrors['communityMintMaxVoteWeightSource']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      communityMintMaxVoteWeightSource: evt.target.value,
+                    })
+                  }
+                />
+              </div>
+            </>
+          )}
+          <div className="pb-4">
+            <Input
+              label="Council Mint Id"
+              placeholder="(Optional) Council mint"
+              value={form.councilMint}
+              type="text"
+              error={formErrors['councilMint']}
+              onChange={(evt) =>
+                handleSetForm({
+                  councilMint: evt.target.value,
+                })
+              }
+            />
+          </div>
+          <div className="pb-4">
+            <Input
               label="Governance Program Id"
               placeholder="Id of the governance program this realm will be associated with"
               value={form.governanceProgramId}
@@ -147,8 +259,7 @@ const New = () => {
               error={formErrors['governanceProgramId']}
               onChange={(evt) =>
                 handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'governanceProgramId',
+                  governanceProgramId: evt.target.value,
                 })
               }
             />
@@ -163,84 +274,7 @@ const New = () => {
               error={formErrors['programVersion']}
               onChange={(evt) =>
                 handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'programVersion',
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Name"
-              placeholder="Name of your realm"
-              value={form.name}
-              type="text"
-              error={formErrors['name']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'name',
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Community Mint Id"
-              placeholder="Community mint id of this realm"
-              value={form.communityTokenMint}
-              type="text"
-              error={formErrors['communityTokenMint']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'communityTokenMint',
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Council Mint Id"
-              placeholder="(Optional) Council mint"
-              value={form.councilMint}
-              type="text"
-              error={formErrors['councilMint']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'councilMint',
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Community mint supply factor (max vote weight)"
-              placeholder="Community mint supply factor (max vote weight)"
-              value={form.communityMintMaxVoteWeightSource}
-              type="number"
-              error={formErrors['communityMintMaxVoteWeightSource']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'communityMintMaxVoteWeightSource',
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Min community tokens to create governance"
-              placeholder="Min community tokens to create governance"
-              step="0.01"
-              value={form.minCommunityTokensToCreateGovernance}
-              type="number"
-              error={formErrors['minCommunityTokensToCreateGovernance']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'minCommunityTokensToCreateGovernance',
+                  programVersion: evt.target.value,
                 })
               }
             />
