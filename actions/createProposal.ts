@@ -60,7 +60,9 @@ export const createProposal = async (
     signatory,
     payer
   )
-  for (const [index, instruction] of instructionsData.entries()) {
+  for (const [index, instruction] of instructionsData
+    .filter((x) => x.data)
+    .entries()) {
     if (instruction.data) {
       await withInsertInstruction(
         instructions,
