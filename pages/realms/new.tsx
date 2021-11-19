@@ -4,19 +4,16 @@ import BN from 'bn.js'
 
 import useQueryContext from '@hooks/useQueryContext'
 import Input from '@components/inputs/Input'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
-import { registerRealm } from 'actions/registerRealm'
+import { getRealmIdFromTransaction, registerRealm } from 'actions/registerRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from 'utils/notifications'
 import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
-import { useRouter } from 'next/router'
-import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes'
-import useInstructions from '@hooks/useInstructions'
 import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 import { ProgramVersion } from '@models/registry/api'
@@ -67,11 +64,7 @@ const schema = yup.object().shape({
 })
 
 const New = () => {
-  const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { getAvailableInstructions } = useInstructions()
-  const availableInstructions = getAvailableInstructions()
-
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
@@ -97,10 +90,8 @@ const New = () => {
     minCommunityTokensToCreateGovernance: 1000000,
   })
   const [formErrors, setFormErrors] = useState({})
-  const [instructionsData, setInstructions] = useState<
-    ComponentInstructionData[]
-  >([{ type: availableInstructions[0] }])
   const [isLoading, setIsLoading] = useState(false)
+  const [realmId, setRealmId] = useState<string | undefined>(undefined)
 
   const handleSetForm = (newValues) => {
     setFormErrors({})
@@ -125,7 +116,7 @@ const New = () => {
       )
 
       try {
-        await registerRealm(
+        const txid = await registerRealm(
           rpcContext,
           form.name,
           new PublicKey(form.communityMintId),
@@ -133,8 +124,8 @@ const New = () => {
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
           new BN(form.minCommunityTokensToCreateGovernance)
         )
-        const url = fmtUrlWithCluster(`/realms`)
-        router.push(url)
+        const realmId = await getRealmIdFromTransaction(rpcContext, txid)
+        setRealmId(realmId)
       } catch (ex) {
         console.log(ex)
         notify({ type: 'error', message: `${ex}` })
@@ -144,10 +135,6 @@ const New = () => {
     }
     setIsLoading(false)
   }
-
-  useEffect(() => {
-    setInstructions([instructionsData[0]])
-  }, [instructionsData[0]])
 
   const handleCommunityMint = async (mintId) => {
     handleSetForm({
@@ -201,8 +188,6 @@ const New = () => {
     }
   }
 
-  console.log(form)
-
   return (
     <div
       className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${
@@ -216,125 +201,168 @@ const New = () => {
             Back
           </a>
         </Link>
-        <div className="border-b border-fgd-4 pb-4 pt-2">
-          <div className="flex items-center justify-between">
-            <h1>Create a new realm</h1>
-          </div>
-        </div>
-        <div className="pt-2">
-          <div className="pb-4">
-            <Input
-              label="Name"
-              placeholder="Name of your realm"
-              value={form.name}
-              type="text"
-              error={formErrors['name']}
-              onChange={(evt) =>
-                handleSetForm({
-                  name: evt.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Community Mint Id"
-              placeholder="Community mint id of this realm"
-              value={form.communityMintId}
-              type="text"
-              error={
-                formErrors['communityMintId'] || formErrors['communityMint']
-              }
-              onChange={(evt) => handleCommunityMint(evt.target.value)}
-            />
-            {form.communityMint && (
-              <div className="pt-2">
-                <div className="pb-0.5 text-fgd-3 text-xs">Mint supply</div>
-                <div className="text-xs">
-                  {form.communityMint.account.supply.toNumber() /
-                    Math.pow(10, form.communityMint.account.decimals)}
+        {realmId ? (
+          <>
+            <div className="border-b border-fgd-4 pb-4 pt-2">
+              <div className="flex items-center justify-between">
+                <h1>Realm created succesfully!</h1>
+              </div>
+            </div>
+            <div>
+              <div className="pb-5">
+                Details about your realm here. These can be added manually to
+                your local registry of realms similar to here
+                <div>
+                  <a
+                    target="_blank"
+                    href="https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts"
+                    rel="noreferrer"
+                  >
+                    https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts
+                  </a>
+                </div>
+                <div>This is a temporary solution.</div>
+              </div>
+              <div>
+                <div className="pt-2">
+                  <div className="pb-0.5 text-fgd-3 text-xs">
+                    Governance Program Id
+                  </div>
+                  <div className="text-xs">{form.governanceProgramId}</div>
+                </div>
+                <div className="pt-2">
+                  <div className="pb-0.5 text-fgd-3 text-xs">Realm Id</div>
+                  <div className="text-xs">{realmId}</div>
                 </div>
               </div>
-            )}
-          </div>
-          {form.communityMint && (
-            <>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="border-b border-fgd-4 pb-4 pt-2">
+              <div className="flex items-center justify-between">
+                <h1>Create a new realm</h1>
+              </div>
+            </div>
+            <div className="pt-2">
               <div className="pb-4">
                 <Input
-                  label="Min community tokens to create governance (defaults 1% of community mint)"
-                  placeholder="Min community tokens to create governance"
-                  step="0.01"
-                  value={form.minCommunityTokensToCreateGovernance}
-                  type="number"
-                  error={formErrors['minCommunityTokensToCreateGovernance']}
+                  label="Name"
+                  placeholder="Name of your realm"
+                  value={form.name}
+                  type="text"
+                  error={formErrors['name']}
                   onChange={(evt) =>
                     handleSetForm({
-                      minCommunityTokensToCreateGovernance: evt.target.value,
+                      name: evt.target.value,
                     })
                   }
                 />
               </div>
               <div className="pb-4">
                 <Input
-                  label="Community mint supply factor (max vote weight)"
-                  placeholder="Community mint supply factor (max vote weight)"
-                  value={form.communityMintMaxVoteWeightSource}
-                  type="number"
-                  error={formErrors['communityMintMaxVoteWeightSource']}
+                  label="Community Mint Id"
+                  placeholder="Community mint id of this realm"
+                  value={form.communityMintId}
+                  type="text"
+                  error={
+                    formErrors['communityMintId'] || formErrors['communityMint']
+                  }
+                  onChange={(evt) => handleCommunityMint(evt.target.value)}
+                />
+                {form.communityMint && (
+                  <div className="pt-2">
+                    <div className="pb-0.5 text-fgd-3 text-xs">Mint supply</div>
+                    <div className="text-xs">
+                      {form.communityMint.account.supply.toNumber() /
+                        Math.pow(10, form.communityMint.account.decimals)}
+                    </div>
+                  </div>
+                )}
+              </div>
+              {form.communityMint && (
+                <>
+                  <div className="pb-4">
+                    <Input
+                      label="Min community tokens to create governance (defaults 1% of community mint)"
+                      placeholder="Min community tokens to create governance"
+                      step="0.01"
+                      value={form.minCommunityTokensToCreateGovernance}
+                      type="number"
+                      error={formErrors['minCommunityTokensToCreateGovernance']}
+                      onChange={(evt) =>
+                        handleSetForm({
+                          minCommunityTokensToCreateGovernance:
+                            evt.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                  <div className="pb-4">
+                    <Input
+                      label="Community mint supply factor (max vote weight)"
+                      placeholder="Community mint supply factor (max vote weight)"
+                      value={form.communityMintMaxVoteWeightSource}
+                      type="number"
+                      error={formErrors['communityMintMaxVoteWeightSource']}
+                      onChange={(evt) =>
+                        handleSetForm({
+                          communityMintMaxVoteWeightSource: evt.target.value,
+                        })
+                      }
+                    />
+                  </div>
+                </>
+              )}
+              <div className="pb-4">
+                <Input
+                  label="Council Mint Id"
+                  placeholder="(Optional) Council mint"
+                  value={form.councilMintId}
+                  type="text"
+                  error={
+                    formErrors['councilMintId'] || formErrors['councilMint']
+                  }
+                  onChange={(evt) => handleCouncilMint(evt.target.value)}
+                />
+              </div>
+              <div className="pb-4">
+                <Input
+                  label="Governance Program Id"
+                  placeholder="Id of the governance program this realm will be associated with"
+                  value={form.governanceProgramId}
+                  type="text"
+                  error={formErrors['governanceProgramId']}
                   onChange={(evt) =>
                     handleSetForm({
-                      communityMintMaxVoteWeightSource: evt.target.value,
+                      governanceProgramId: evt.target.value,
                     })
                   }
                 />
               </div>
-            </>
-          )}
-          <div className="pb-4">
-            <Input
-              label="Council Mint Id"
-              placeholder="(Optional) Council mint"
-              value={form.councilMintId}
-              type="text"
-              error={formErrors['councilMintId'] || formErrors['councilMint']}
-              onChange={(evt) => handleCouncilMint(evt.target.value)}
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Governance Program Id"
-              placeholder="Id of the governance program this realm will be associated with"
-              value={form.governanceProgramId}
-              type="text"
-              error={formErrors['governanceProgramId']}
-              onChange={(evt) =>
-                handleSetForm({
-                  governanceProgramId: evt.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="pb-4">
-            <Input
-              label="Governance program version"
-              placeholder={1}
-              step="1"
-              value={form.programVersion}
-              type="number"
-              error={formErrors['programVersion']}
-              onChange={(evt) =>
-                handleSetForm({
-                  programVersion: evt.target.value,
-                })
-              }
-            />
-          </div>
-          <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-            <Button isLoading={isLoading} onClick={() => handleCreate()}>
-              Create Realm
-            </Button>
-          </div>
-        </div>
+              <div className="pb-4">
+                <Input
+                  label="Governance program version"
+                  placeholder={1}
+                  step="1"
+                  value={form.programVersion}
+                  type="number"
+                  error={formErrors['programVersion']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      programVersion: evt.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+                <Button isLoading={isLoading} onClick={() => handleCreate()}>
+                  Create Realm
+                </Button>
+              </div>
+            </div>
+          </>
+        )}
       </>
     </div>
   )
