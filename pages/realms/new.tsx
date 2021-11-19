@@ -53,6 +53,17 @@ const schema = yup.object().shape({
       publicKeyValidationTest
     ),
   communityMint: yup.object().required('Community token mint is not valid'),
+  councilMintId: yup
+    .string()
+    .test(
+      'is-public-key',
+      'Council token mint id is not a valid public key',
+      (value) => (value ? publicKeyValidationTest(value) : true)
+    ),
+  councilMint: yup.object().when('councilMintId', {
+    is: (value) => value,
+    then: yup.object().required('Council token mint is not valid'),
+  }),
 })
 
 const New = () => {
@@ -70,6 +81,7 @@ const New = () => {
     communityMintId: string
     communityMint: ProgramAccount<MintInfo> | undefined
     councilMintId: string | undefined
+    councilMint: ProgramAccount<MintInfo> | undefined
     programVersion: ProgramVersion
     communityMintMaxVoteWeightSource: number
     minCommunityTokensToCreateGovernance: number
@@ -78,7 +90,8 @@ const New = () => {
     name: '',
     communityMintId: '',
     communityMint: undefined,
-    councilMintId: '',
+    councilMintId: undefined,
+    councilMint: undefined,
     programVersion: 1,
     communityMintMaxVoteWeightSource: 1,
     minCommunityTokensToCreateGovernance: 1000000,
@@ -141,29 +154,54 @@ const New = () => {
       communityMintId: mintId,
       communityMint: undefined,
     })
-    const mintPublicKey = new PublicKey(mintId)
-    const mint = await tryGetMint(connection.current, mintPublicKey)
-    if (mint) {
-      const supply = mint!.account.supply.toNumber()
-      const decimals = mint!.account.decimals
-      // default to 1% of mint supply
-      if (supply > 0) {
-        handleSetForm({
-          minCommunityTokensToCreateGovernance: Math.max(
-            1,
-            (supply / Math.pow(10, decimals)) * 0.01
-          ),
-          communityMintId: mintId,
-          communityMint: mint,
-        })
-      } else {
-        handleSetForm({
-          communityMint: mint,
-          communityMintId: mintId,
-        })
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      if (mint) {
+        const supply = mint!.account.supply.toNumber()
+        const decimals = mint!.account.decimals
+        // default to 1% of mint supply
+        if (supply > 0) {
+          handleSetForm({
+            minCommunityTokensToCreateGovernance: Math.max(
+              1,
+              (supply / Math.pow(10, decimals)) * 0.01
+            ),
+            communityMintId: mintId,
+            communityMint: mint,
+          })
+        } else {
+          handleSetForm({
+            communityMint: mint,
+            communityMintId: mintId,
+          })
+        }
       }
+    } catch (e) {
+      console.log('failed to set community mint', e)
     }
   }
+
+  const handleCouncilMint = async (mintId) => {
+    handleSetForm({
+      councilMintId: mintId,
+      councilMint: undefined,
+    })
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      if (mint) {
+        handleSetForm({
+          councilMintId: mintId,
+          councilMint: mint,
+        })
+      }
+    } catch (e) {
+      console.log('failed to set council mint', e)
+    }
+  }
+
+  console.log(form)
 
   return (
     <div
@@ -258,12 +296,8 @@ const New = () => {
               placeholder="(Optional) Council mint"
               value={form.councilMintId}
               type="text"
-              error={formErrors['councilMintId']}
-              onChange={(evt) =>
-                handleSetForm({
-                  councilMintId: evt.target.value,
-                })
-              }
+              error={formErrors['councilMintId'] || formErrors['councilMint']}
+              onChange={(evt) => handleCouncilMint(evt.target.value)}
             />
           </div>
           <div className="pb-4">
