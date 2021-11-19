@@ -130,7 +130,7 @@ const MAINNET_REALMS: RealmInfo[] = [
     twitter: '@SolanaSail',
   },
   {
-    symbol: 'UXP',
+    symbol: 'UXD Council Token',
     displayName: 'UXD Protocol DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k'),
