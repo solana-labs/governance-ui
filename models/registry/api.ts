@@ -135,8 +135,8 @@ const MAINNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k'),
     ogImage: '/realms/UXDProtocol/img/logo.png',
-    website: 'https://www.solanasail.com/',
-    twitter: '@SolanaSail',
+    website: 'https://www.uxd.fi.com/',
+    twitter: '@UXDProtocol',
   },
 ]
 
