@@ -1,5 +1,8 @@
 import { AccountMetaData, VoteWeightSource } from '@models/accounts'
-import { SetGovernanceConfigArgs } from '@models/instructions'
+import {
+  SetGovernanceConfigArgs,
+  SetRealmConfigArgs,
+} from '@models/instructions'
 import { GOVERNANCE_SCHEMA } from '@models/serialisation'
 import { Connection } from '@solana/web3.js'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
@@ -33,12 +36,6 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const councilMint = realm.info.config.councilMint
           ? await tryGetMint(connection, realm.info.config.councilMint)
           : undefined
-
-        console.log('COMMUNITY MINT', {
-          mint: communityMint?.account.decimals,
-          governance,
-          realm,
-        })
 
         return (
           <>
@@ -77,6 +74,47 @@ export const GOVERNANCE_INSTRUCTIONS = {
             <p>
               {`proposalCoolOffTime:
               ${getDaysFromTimestamp(args.config.proposalCoolOffTime)} days(s)`}
+            </p>
+          </>
+        )
+      },
+    },
+    22: {
+      name: 'Set Realm Config',
+      accounts: [{ name: 'Realm' }, { name: 'Realm Authority' }],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const args = deserialize(
+          GOVERNANCE_SCHEMA,
+          SetRealmConfigArgs,
+          Buffer.from(data)
+        ) as SetRealmConfigArgs
+
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const communityMint = await tryGetMint(
+          connection,
+          realm.info.communityMint
+        )
+
+        return (
+          <>
+            <p>
+              {`minCommunityTokensToCreateGovernance:
+               ${fmtMintAmount(
+                 communityMint?.account,
+                 args.configArgs.minCommunityTokensToCreateGovernance
+               )}`}
+            </p>
+            <p>
+              {`useCouncilMint:
+               ${args.configArgs.useCouncilMint}`}
+            </p>
+            <p>
+              {`communityMintMaxVoteWeightSource:
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`}
             </p>
           </>
         )
