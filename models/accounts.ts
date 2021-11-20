@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
+import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import moment from 'moment'
 
@@ -121,6 +122,12 @@ export class MintMaxVoteWeightSource {
     }
 
     return this.value
+  }
+
+  fmtSupplyFractionPercentage() {
+    return new BigNumber(this.getSupplyFraction() as any)
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS + 2)
+      .toFormat()
   }
 }
 
