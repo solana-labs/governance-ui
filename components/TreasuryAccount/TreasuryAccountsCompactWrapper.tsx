@@ -1,4 +1,4 @@
-const TreasuryAccountCompact = () => {
+const TreasuryAccountsCompactWrapper = () => {
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg mt-5">
       <h3 className="mb-4">Tresuary Accounts</h3>
@@ -6,4 +6,4 @@ const TreasuryAccountCompact = () => {
   )
 }
 
-export default TreasuryAccountCompact
+export default TreasuryAccountsCompactWrapper
