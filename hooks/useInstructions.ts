@@ -11,36 +11,44 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 export default function useInstructions() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
+  const connection = useWalletStore((s) => s.connection.current)
+  const { ownVoterWeight, realm } = useRealm()
+
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
   )
-  const connection = useWalletStore((s) => s.connection.current)
-  const { ownVoterWeight, realm } = useRealm()
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
       (gov) => gov.info?.accountType === type
     )
     return governancesFiltered
   }
-
+  function canUseGovernanceForInstruction(type: GovernanceAccountType) {
+    return (
+      realm &&
+      getGovernancesByAccountType(type).some((g) =>
+        ownVoterWeight.canCreateProposal(g.info.config)
+      )
+    )
+  }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
-  const canUseTransferInstruction =
-    realm &&
-    getGovernancesByAccountType(
-      GovernanceAccountType.TokenGovernance
-    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+  const canUseTransferInstruction = canUseGovernanceForInstruction(
+    GovernanceAccountType.TokenGovernance
+  )
 
-  const canUseProgramUpgradeInstruction =
-    realm &&
-    getGovernancesByAccountType(
-      GovernanceAccountType.ProgramGovernance
-    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+  const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction(
+    GovernanceAccountType.ProgramGovernance
+  )
 
-  const canUseMintInstruction =
+  const canUseMintInstruction = canUseGovernanceForInstruction(
+    GovernanceAccountType.MintGovernance
+  )
+
+  const canUseAnyInstruction =
     realm &&
-    getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    ).some((g) => ownVoterWeight.canCreateProposal(g.info.config))
+    governancesArray.some((g) =>
+      ownVoterWeight.canCreateProposal(g.info.config)
+    )
 
   const availableInstructions = [
     {
@@ -50,13 +58,27 @@ export default function useInstructions() {
     },
     {
       id: Instructions.ProgramUpgrade,
-      name: 'Program Upgrade',
+      name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
       id: Instructions.Mint,
-      name: 'Mint',
+      name: 'Mint Tokens',
       isVisible: canUseMintInstruction,
+    },
+    {
+      id: Instructions.Base64,
+      name: 'Execute Custom Instruction',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.None,
+      name: 'None',
+      isVisible:
+        realm &&
+        Object.values(governances).some((g) =>
+          ownVoterWeight.canCreateProposal(g.info.config)
+        ),
     },
   ]
   const getAvailableInstructions = () => {

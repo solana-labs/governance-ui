@@ -15,10 +15,14 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import {
+  GovernedMultiTypeAccount,
+  ProgramAccount,
+  tryGetTokenAccount,
+} from '@utils/tokens'
 import {
   SplTokenTransferForm,
-  Instruction,
+  UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
@@ -27,9 +31,9 @@ import { NewProposalContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
 import useInstructions from '@hooks/useInstructions'
 import BN from 'bn.js'
-import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 
 const SplTokenTransfer = ({
   index,
@@ -96,7 +100,7 @@ const SplTokenTransfer = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction(): Promise<Instruction> {
+  async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (
@@ -121,7 +125,7 @@ const SplTokenTransfer = ({
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
 
-    const obj: Instruction = {
+    const obj: UiInstruction = {
       serializedInstruction,
       isValid,
       governedAccount: governedAccount,
@@ -239,16 +243,17 @@ const SplTokenTransfer = ({
 
   return (
     <>
-      <SourceTokenAccountSelect
-        governedTokenAccounts={governedTokenAccounts}
+      <GovernedAccountSelect
+        label="Source account"
+        governedAccounts={governedTokenAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
-        value={form.governedTokenAccount?.token?.account?.address?.toString()}
+        value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceTokenAccountSelect>
+      ></GovernedAccountSelect>
       <Input
         label="Destination account"
         value={form.destinationAccount}

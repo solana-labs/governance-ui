@@ -84,7 +84,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
       accounts: [
         { name: 'Mint', important: true },
         { name: 'Destination', important: true },
-        { name: 'Minting Authority' },
+        { name: 'Mint Authority' },
       ],
       getDataUI: async (
         connection: Connection,

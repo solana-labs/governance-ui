@@ -26,6 +26,25 @@ export const ACCOUNT_NAMES = {
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
   '2A7UgheVhmoQqXBAQyG1wCoMpooPuiUf2DK6XFiQTtbG': 'OMH Mint Governance',
+
+  // Metaplex Foundation
+  Cmtpx4jmkc9ShvWub4hcAvCqrqvWRpWW9eLUdruyZAN8:
+    'Metaplex Foundation Council Mint',
+  '2yf8YggL4cUhCygoppFMWWeBuJtmLQE9oHkiiUnXP1uM':
+    'Metaplex Foundation Council Mint Governance',
+  mtpXxYKnxwJJReD3PiZ1NLCfbMkHgNcJeGsdXFTfoBk:
+    'Metaplex Foundation Community Mint',
+  '2ZxVbyU35dqtMHgLbZZPoGURf2XuPVmSgmVHY8bTfiMC':
+    'Metaplex Foundation Community Mint Governance',
+
+  // Metaplex Genesis
+  CMPxgYJPXRA8BRfC41uvv6YvpQwtFvLeV9PXjSLpNhYq: 'Metaplex Genesis Council Mint',
+  '68NxN1Vo2TLhA3H33yBjwQE5D5UxqB2iL1HL4dgHyF66':
+    'Metaplex Genesis Council Mint Governance',
+  mpXGnkKdGs1eRZPKkBQ3GW5G4LsVgcX4RzGa5WPo67v:
+    'Metaplex Genesis Community Mint',
+  '4A9WiAZyXpBBEYaBv3UNQCKTqmDth7fukGnBoprLLH2i':
+    'Metaplex Genesis Community Mint Governance',
 }
 
 export function getAccountName(accountPk: PublicKey) {
