@@ -114,7 +114,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
             </p>
             <p>
               {`communityMintMaxVoteWeightSource:
-               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`}
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}
             </p>
           </>
         )
