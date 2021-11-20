@@ -11,6 +11,7 @@ import InspectorButton from '../explorer/inspectorButton'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName } from './programs/names'
+import { tryGetTokenAccount } from '@utils/tokens'
 
 export default function InstructionCard({
   index,
@@ -105,7 +106,20 @@ export function InstructionAccount({
   accountMeta: AccountMetaData
   descriptor: InstructionDescriptor | undefined
 }) {
-  const accountLabel = getAccountName(accountMeta.pubkey)
+  const connection = useWalletStore((s) => s.connection)
+  const [accountLabel, setAccountLabel] = useState(
+    getAccountName(accountMeta.pubkey)
+  )
+
+  if (!accountLabel) {
+    // Check if the account is SPL token account and if yes then display its owner
+    tryGetTokenAccount(connection.current, accountMeta.pubkey).then((ta) => {
+      if (ta) {
+        setAccountLabel(`owner: ${ta?.account.owner.toBase58()}`)
+      }
+    })
+    // TODO: Extend to other well known account types
+  }
 
   return (
     <div className="border-t border-bkg-4 flex flex-col lg:flex-row lg:items-center lg:justify-between py-3">

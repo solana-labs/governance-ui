@@ -58,17 +58,17 @@ export default function useInstructions() {
     },
     {
       id: Instructions.ProgramUpgrade,
-      name: 'Program Upgrade',
+      name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
       id: Instructions.Mint,
-      name: 'Mint',
+      name: 'Mint Tokens',
       isVisible: canUseMintInstruction,
     },
     {
       id: Instructions.Base64,
-      name: 'Custom Instruction (base64)',
+      name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
     },
     {
