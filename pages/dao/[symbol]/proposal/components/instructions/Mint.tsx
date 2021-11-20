@@ -17,10 +17,11 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
+  GovernedMultiTypeAccount,
   ProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
-import { Instruction, MintForm } from '@utils/uiTypes/proposalCreationTypes'
+import { UiInstruction, MintForm } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
@@ -28,8 +29,8 @@ import { NewProposalContext } from '../../new'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useInstructions from '@hooks/useInstructions'
-import SourceMintAccountSelect from '../SourceMintAccountSelect'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 
 const Mint = ({
   index,
@@ -96,7 +97,7 @@ const Mint = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction(): Promise<Instruction> {
+  async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && form.mintAccount?.governance?.pubkey) {
@@ -115,7 +116,7 @@ const Mint = ({
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
 
-    const obj: Instruction = {
+    const obj: UiInstruction = {
       serializedInstruction,
       isValid,
       governedAccount: governedAccount,
@@ -178,7 +179,6 @@ const Mint = ({
             val,
             form.mintAccount?.mintInfo.decimals
           )
-          console.log(mintValue)
           return !!(
             form.mintAccount.governance?.info.governedAccount && mintValue
           )
@@ -225,8 +225,11 @@ const Mint = ({
 
   return (
     <>
-      <SourceMintAccountSelect
-        mintGovernances={mintGovernancesWithMintInfo}
+      <GovernedAccountSelect
+        label="Mint"
+        governedAccounts={
+          mintGovernancesWithMintInfo as GovernedMultiTypeAccount[]
+        }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'mintAccount' })
         }}
@@ -234,7 +237,7 @@ const Mint = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></SourceMintAccountSelect>
+      ></GovernedAccountSelect>
       <Input
         label="Destination account"
         value={form.destinationAccount}
