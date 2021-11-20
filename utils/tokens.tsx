@@ -82,6 +82,11 @@ export async function tryGetTokenAccount(
 ): Promise<ProgramAccount<TokenAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
+
+    if (!result?.owner.equals(TOKEN_PROGRAM_ID)) {
+      return undefined
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = Buffer.from(result!.data)
     const account = parseTokenAccountData(publicKey, data)
@@ -90,7 +95,8 @@ export async function tryGetTokenAccount(
       account,
     }
   } catch (ex) {
-    console.error(`Can't fetch token account ${publicKey?.toBase58()}`, ex)
+    // This is Try method and is expected to fail and hence logging is uneccesery
+    // console.error(`Can't fetch token account ${publicKey?.toBase58()}`, ex)
   }
 }
 
