@@ -609,7 +609,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async setConnectionConfig(cluster: string) {
       const set = get().set
       set((s) => {
-        s.connection = getConnectionConfig(cluster)
+        if (s.connection.cluster !== cluster) {
+          s.connection = getConnectionConfig(cluster)
+        }
       })
     },
   },
