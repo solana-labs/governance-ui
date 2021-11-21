@@ -121,13 +121,22 @@ const MAINNET_REALMS: RealmInfo[] = [
   },
   {
     symbol: 'gSAIL',
-    displayName: 'GSAIL GOVERNANCE DAO ',
+    displayName: 'GSAIL GOVERNANCE DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('36fZRsuM3oXvb5VrEXXVmokbGnjADzVgKpW1pgQq7jXJ'),
     ogImage:
       'https://raw.githubusercontent.com/solanasail/token-list/main/assets/mainnet/Gsai2KN28MTGcSZ1gKYFswUpFpS7EM9mvdR9c8f6iVXJ/logo.png',
     website: 'https://www.solanasail.com/',
     twitter: '@SolanaSail',
+  },
+  {
+    symbol: 'FAFD',
+    displayName: 'Friends and Family DAO',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('371PRJu9vyU2U6WHcqorakWvz3wpfGSVhHr65BBSoaiN'),
+    ogImage: '/realms/fafd/img/fafd.png',
+    website:
+      'https://find-and-update.company-information.service.gov.uk/company/13753949',
   },
 ]
 
