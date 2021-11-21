@@ -45,6 +45,11 @@ export const ACCOUNT_NAMES = {
     'Metaplex Genesis Community Mint',
   '4A9WiAZyXpBBEYaBv3UNQCKTqmDth7fukGnBoprLLH2i':
     'Metaplex Genesis Community Mint Governance',
+
+  Cfafd52FfHRA5FRkTXmMNyHZfhNkbaHpZ12ggmeTVEMw:
+    'Friends and Family Council Mint',
+  FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
+    'Friends and Family Community Mint',
 }
 
 export function getAccountName(accountPk: PublicKey) {
