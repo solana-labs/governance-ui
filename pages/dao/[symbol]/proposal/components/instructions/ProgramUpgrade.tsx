@@ -102,7 +102,14 @@ const ProgramUpgrade = ({
       index
     )
   }, [form])
-
+  useEffect(() => {
+    if (governedProgramAccounts.length === 1) {
+      handleSetForm({
+        value: governedProgramAccounts[0],
+        propertyName: 'governedAccount',
+      })
+    }
+  }, [governedProgramAccounts.length])
   const schema = yup.object().shape({
     bufferAddress: yup
       .string()

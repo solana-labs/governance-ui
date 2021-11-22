@@ -92,14 +92,20 @@ const CustomBase64 = ({
     }
     return obj
   }
-
+  useEffect(() => {
+    if (governedAccounts.length === 1) {
+      handleSetForm({
+        value: governedAccounts[0],
+        propertyName: 'governedAccount',
+      })
+    }
+  }, [governedAccounts.length])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
-
   const schema = yup.object().shape({
     governedAccount: yup
       .object()

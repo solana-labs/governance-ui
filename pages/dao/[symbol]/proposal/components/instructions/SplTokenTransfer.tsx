@@ -164,6 +164,14 @@ const SplTokenTransfer = ({
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.mint?.account)
   }, [form.governedTokenAccount])
+  useEffect(() => {
+    if (governedTokenAccounts.length === 1) {
+      handleSetForm({
+        value: governedTokenAccounts[0],
+        propertyName: 'governedTokenAccount',
+      })
+    }
+  }, [governedTokenAccounts.length])
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
