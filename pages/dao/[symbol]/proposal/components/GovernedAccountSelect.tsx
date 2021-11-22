@@ -5,7 +5,7 @@ import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import React from 'react'
+import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
 
 const GovernedAccountSelect = ({
@@ -151,6 +151,14 @@ const GovernedAccountSelect = ({
       </>
     )
   }
+  useEffect(() => {
+    if (governedAccounts.length == 1) {
+      //wait for microtask queue to be empty
+      setTimeout(() => {
+        onChange(governedAccounts[0])
+      })
+    }
+  }, [JSON.stringify(governedAccounts)])
   return (
     <Select
       label={label}

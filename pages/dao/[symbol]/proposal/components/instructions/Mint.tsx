@@ -161,14 +161,6 @@ const Mint = ({
     }
     getMintWithGovernancesFcn()
   }, [])
-  useEffect(() => {
-    if (mintGovernancesWithMintInfo.length === 1) {
-      handleSetForm({
-        value: mintGovernancesWithMintInfo[0],
-        propertyName: 'mintAccount',
-      })
-    }
-  }, [mintGovernancesWithMintInfo.length])
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)

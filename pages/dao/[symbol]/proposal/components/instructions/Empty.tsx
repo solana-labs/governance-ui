@@ -83,14 +83,6 @@ const Empty = ({
       index
     )
   }, [form])
-  useEffect(() => {
-    if (governedAccounts.length === 1) {
-      handleSetForm({
-        value: governedAccounts[0],
-        propertyName: 'governedAccount',
-      })
-    }
-  }, [governedAccounts.length])
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
