@@ -37,6 +37,8 @@ const GovernedAccountSelect = ({
           )
         case GovernanceAccountType.ProgramGovernance:
           return returnProgramAccountLabel(value.governance)
+        default:
+          return value.governance.info.governedAccount.toBase58()
       }
     } else {
       return null
