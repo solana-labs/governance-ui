@@ -204,8 +204,21 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
 ]
 
+const LOCALNET_REALMS: RealmInfo[] = [
+  {
+    symbol: 'LOCAL',
+    displayName: 'LOCALNET',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey(process.env.LOCALNET_REALM || ''),
+  },
+]
+
 export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
-  return endpoint === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+  return endpoint === 'mainnet'
+    ? MAINNET_REALMS
+    : endpoint == 'devnet'
+    ? DEVNET_REALMS
+    : LOCALNET_REALMS
 }
 
 export function getRealmInfo(
@@ -214,6 +227,18 @@ export function getRealmInfo(
 ) {
   if (!symbol) {
     return undefined
+  }
+
+  if (endpoint === 'localnet') {
+    console.log('localnet')
+    const localRealmInfo = getAllRealmInfos('localnet').find((r) =>
+      equalsIgnoreCase(r.symbol, symbol)
+    )
+
+    if (localRealmInfo) {
+      localRealmInfo.endpoint = 'localnet'
+    }
+    return localRealmInfo
   }
 
   if (endpoint === 'devnet') {
