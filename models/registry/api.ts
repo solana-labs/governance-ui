@@ -205,6 +205,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('5jdLxZkUQLVWwe8mtR9fURFLUFyT6npjiSKzowaqyCj9'),
   },
+  {
+    symbol: 'RealM_Tuto_1',
+    displayName: 'RealM_Tuto_1',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('756iwQL9tAdTr1mDGiu4P9zWW8FzMY1K6MUXHqkwp9Nc'),
+  },
 ]
 
 export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
