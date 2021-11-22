@@ -83,7 +83,6 @@ const Empty = ({
       index
     )
   }, [form])
-
   const schema = yup.object().shape({
     governedAccount: yup
       .object()

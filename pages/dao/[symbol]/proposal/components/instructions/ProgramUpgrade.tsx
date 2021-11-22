@@ -102,7 +102,6 @@ const ProgramUpgrade = ({
       index
     )
   }, [form])
-
   const schema = yup.object().shape({
     bufferAddress: yup
       .string()
