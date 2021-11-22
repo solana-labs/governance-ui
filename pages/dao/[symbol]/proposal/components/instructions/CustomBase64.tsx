@@ -92,14 +92,12 @@ const CustomBase64 = ({
     }
     return obj
   }
-
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
-
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -118,7 +116,7 @@ const CustomBase64 = ({
           }
         } else {
           return this.createError({
-            message: `Buffer address is required`,
+            message: `Instruction is required`,
           })
         }
       }),
