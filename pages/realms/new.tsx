@@ -77,7 +77,7 @@ const New = () => {
     councilMint: ProgramAccount<MintInfo> | undefined
     programVersion: ProgramVersion
     communityMintMaxVoteWeightSource: number
-    minCommunityTokensToCreateGovernance: number
+    minCommunityTokensToCreateGovernance: BN
   }>({
     governanceProgramId: DEFAULT_GOVERNANCE_PROGRAM_ID,
     name: '',
@@ -87,7 +87,7 @@ const New = () => {
     councilMint: undefined,
     programVersion: 1,
     communityMintMaxVoteWeightSource: 1,
-    minCommunityTokensToCreateGovernance: 1000000,
+    minCommunityTokensToCreateGovernance: new BN(1000000),
   })
   const [formErrors, setFormErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
@@ -122,7 +122,7 @@ const New = () => {
           new PublicKey(form.communityMintId),
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
-          new BN(form.minCommunityTokensToCreateGovernance)
+          form.minCommunityTokensToCreateGovernance
         )
         const realmId = await getRealmIdFromTransaction(rpcContext, txid)
         setRealmId(realmId)
@@ -145,14 +145,14 @@ const New = () => {
       const mintPublicKey = new PublicKey(mintId)
       const mint = await tryGetMint(connection.current, mintPublicKey)
       if (mint) {
-        const supply = mint!.account.supply.toNumber()
-        const decimals = mint!.account.decimals
-        // default to 1% of mint supply
-        if (supply > 0) {
+        const supply = mint.account.supply
+        const decimals = mint.account.decimals
+        if (supply.gt(new BN(0))) {
           handleSetForm({
-            minCommunityTokensToCreateGovernance: Math.max(
-              1,
-              (supply / Math.pow(10, decimals)) * 0.01
+            minCommunityTokensToCreateGovernance: BN.max(
+              new BN(1),
+              // divide by 10^(decimal + 2) to get 1% of supply
+              supply.div(new BN(10).pow(new BN(decimals + 2)))
             ),
             communityMintId: mintId,
             communityMint: mint,
@@ -274,8 +274,13 @@ const New = () => {
                   <div className="pt-2">
                     <div className="pb-0.5 text-fgd-3 text-xs">Mint supply</div>
                     <div className="text-xs">
-                      {form.communityMint.account.supply.toNumber() /
-                        Math.pow(10, form.communityMint.account.decimals)}
+                      {form.communityMint.account.supply
+                        .div(
+                          new BN(10).pow(
+                            new BN(form.communityMint.account.decimals)
+                          )
+                        )
+                        .toString()}
                     </div>
                   </div>
                 )}
@@ -292,8 +297,9 @@ const New = () => {
                       error={formErrors['minCommunityTokensToCreateGovernance']}
                       onChange={(evt) =>
                         handleSetForm({
-                          minCommunityTokensToCreateGovernance:
-                            evt.target.value,
+                          minCommunityTokensToCreateGovernance: new BN(
+                            evt.target.value
+                          ),
                         })
                       }
                     />
