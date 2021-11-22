@@ -116,7 +116,7 @@ const CustomBase64 = ({
           }
         } else {
           return this.createError({
-            message: `Buffer address is required`,
+            message: `Instruction is required`,
           })
         }
       }),
