@@ -56,9 +56,13 @@ const TreasuryAccountItem = ({
       )}
       <div className="flex flex-col">
         <div className="font-semibold">
-          {tokenRecordInfo?.name
-            ? tokenRecordInfo?.name
-            : governedAccountTokenAccount.governance?.info.governedAccount.toBase58()}
+          {tokenRecordInfo?.name ? (
+            tokenRecordInfo?.name
+          ) : (
+            <small>
+              {governedAccountTokenAccount.governance?.info.governedAccount.toBase58()}
+            </small>
+          )}
         </div>
         <div className="text-xs font-thin flex flex-col">
           {amount} {tokenRecordInfo?.symbol}
@@ -68,8 +72,8 @@ const TreasuryAccountItem = ({
           </small>
         </div>
       </div>
-      <div className="text-xs flex items-center justify-items-end items-top ml-auto">
-        ${totalPrice}
+      <div className="text-xs flex items-center justify-items-end items-start ml-auto">
+        {totalPrice && totalPrice !== '0' ? `$${totalPrice}` : ''}
       </div>
     </div>
   ) : null
