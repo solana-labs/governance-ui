@@ -1,16 +1,17 @@
 import { GovernanceAccountType } from '@models/accounts'
 import { numberWithCommas } from '@tools/sdk/units'
+import priceService from '@utils/services/price'
 import {
   getMintAccountLabelInfo,
   getTokenAccountLabelInfo,
   GovernedMultiTypeAccount,
 } from '@utils/tokens'
-import { FC, useEffect, useState } from 'react'
-import priceService from 'utils/services/price'
-const TreasuryAccountItem: FC<{
+import { useEffect, useState } from 'react'
+const TreasuryAccountItem = ({
+  governedAccount,
+}: {
   governedAccount: GovernedMultiTypeAccount
-}> = ({ governedAccount }) => {
-  const [price, setPrice] = useState(0)
+}) => {
   const [totalPrice, setTotalPrice] = useState('')
   let account = ''
   let tokenName = ''
@@ -32,6 +33,7 @@ const TreasuryAccountItem: FC<{
     amount = tokenLabelInfo.amount
   }
   function handleSetTotalPrice() {
+    const price = priceService.getTokenPrice(tokenName)
     const amountNumber = parseFloat(amount.split(',').join(''))
     const totalPrice = amountNumber
       ? numberWithCommas((amountNumber * price).toFixed(0))
@@ -39,15 +41,8 @@ const TreasuryAccountItem: FC<{
     setTotalPrice(totalPrice)
   }
   useEffect(() => {
-    async function getTokenPrice() {
-      const price = await priceService.getTokenPriceToUSD(tokenName)
-      setPrice(price)
-    }
-    getTokenPrice()
-  }, [])
-  useEffect(() => {
     handleSetTotalPrice()
-  }, [price, amount])
+  }, [tokenName, amount])
   return account ? (
     <div className="break-all text-fgd-1 bg-bkg-1 px-4 py-2 rounded-md w-full mb-5">
       {accountName && <div className="mb-0.5">{accountName}</div>}
@@ -68,7 +63,7 @@ const TreasuryAccountItem: FC<{
         ) : (
           <div>Supply: {supply}</div>
         )}
-        {totalPrice && `${totalPrice} $`}
+        {totalPrice && `Value: ${totalPrice} $`}
       </div>
     </div>
   ) : null

@@ -1,5 +1,7 @@
+import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
+import priceService from '@utils/services/price'
 import {
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
@@ -7,6 +9,7 @@ import {
   parseMintAccountData,
 } from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 export default function useInstructions() {
@@ -133,6 +136,19 @@ export default function useInstructions() {
     return governedMintInfoAccounts
   }
   const governedTokenAccounts = prepareTokenGovernances()
+  useEffect(() => {
+    async function handleFetchTokensPrices() {
+      const tokenSymbols = [
+        ...new Set(
+          governedTokenAccounts.map((x) => {
+            return getMintMetadata(x.token?.account.mint)?.name
+          })
+        ),
+      ]
+      await priceService.fetchTokenPrices(tokenSymbols)
+    }
+    handleFetchTokensPrices()
+  }, [JSON.stringify(governedTokenAccounts)])
   return {
     governancesArray,
     getGovernancesByAccountType,

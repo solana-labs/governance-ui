@@ -24,26 +24,28 @@ class PriceService {
     )
     this.tokenList = response.data.tokens
   }
-  async getTokenPriceToUSD(symbol: string) {
+  async fetchTokenPrices(symbols: string[]) {
+    const tokenListRecords = this.tokenList.filter((x) =>
+      symbols.includes(x.symbol)
+    )
+    const coingeckoIds = tokenListRecords
+      .map((x) => x.extensions.coingeckoId)
+      .join(',')
+    const priceToUsdResponse = await axios.get(
+      `${coingeckoPriceEndpoint}?ids=${coingeckoIds}&vs_currencies=usd`
+    )
+    const priceToUsd = priceToUsdResponse.data
+    this.tokenPriceToUSDlist = { ...this.tokenPriceToUSDlist, ...priceToUsd }
+    return priceToUsd
+  }
+  getTokenPrice(symbol: string): number {
     const tokenListRecord = this.tokenList.find((x) => x.symbol === symbol)
-    if (typeof tokenListRecord !== 'undefined') {
-      const coingeckoId = tokenListRecord.extensions.coingeckoId
-      if (!this.tokenPriceToUSDlist[coingeckoId]) {
-        const priceToUsdResponse = await axios.get(
-          `${coingeckoPriceEndpoint}?ids=${coingeckoId}&vs_currencies=usd`
-        )
-        const priceToUsd = priceToUsdResponse.data
-        this.tokenPriceToUSDlist = {
-          ...this.tokenPriceToUSDlist,
-          ...priceToUsd,
-        }
-        return priceToUsd[coingeckoId]['usd']
-      } else {
-        return this.tokenPriceToUSDlist[coingeckoId]['usd']
-      }
-    } else {
-      return 0
+    if (tokenListRecord) {
+      return this.tokenPriceToUSDlist[tokenListRecord?.extensions.coingeckoId][
+        'usd'
+      ]
     }
+    return 0
   }
 }
 
