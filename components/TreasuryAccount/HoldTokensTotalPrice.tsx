@@ -7,7 +7,7 @@ import {
 import priceService from '@utils/services/price'
 import { useEffect, useState } from 'react'
 
-const HoldTotalTokenPrice = () => {
+const HoldTokensTotalPrice = () => {
   const { governedTokenAccounts } = useInstructions()
   const [totalPrice, setTotalPrice] = useState('')
   useEffect(() => {
@@ -40,4 +40,4 @@ const HoldTotalTokenPrice = () => {
   return totalPrice ? <div className="mb-5">{totalPrice} $</div> : null
 }
 
-export default HoldTotalTokenPrice
+export default HoldTokensTotalPrice
