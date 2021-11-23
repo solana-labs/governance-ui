@@ -73,3 +73,7 @@ export function getMintDecimalAmountFromNatural(
 ) {
   return new BigNumber(naturalAmount.toString()).shiftedBy(-mint.decimals)
 }
+
+export function numberWithCommas(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+}

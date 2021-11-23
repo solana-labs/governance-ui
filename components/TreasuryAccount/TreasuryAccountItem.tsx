@@ -1,5 +1,5 @@
 import { GovernanceAccountType } from '@models/accounts'
-import { getBigNumberAmount } from '@tools/sdk/units'
+import { getBigNumberAmount, numberWithCommas } from '@tools/sdk/units'
 import {
   getMintAccountLabelInfo,
   getTokenAccountLabelInfo,
@@ -32,7 +32,12 @@ const TreasuryAccountItem: FC<{
       accountName = tokenLabelInfo.tokenAccountName
       amount = tokenLabelInfo.amount
     }
-    function getTotalPrice() {}
+    function getTotalPrice() {
+      const amountNumber = parseFloat(amount.split(',').join(''))
+      return amountNumber
+        ? numberWithCommas((amountNumber * price).toFixed(0))
+        : ''
+    }
     useEffect(() => {
       async function getTokenPrice() {
         const price = await priceService.getTokenPriceToUSD(tokenName)
@@ -40,7 +45,7 @@ const TreasuryAccountItem: FC<{
       }
       getTokenPrice()
     }, [])
-
+    const totalPrice = getTotalPrice()
     return account ? (
       <div className="break-all text-fgd-1 bg-bkg-1 px-4 py-2 rounded-md w-full mb-5">
         {accountName && <div className="mb-0.5">{accountName}</div>}
@@ -61,7 +66,7 @@ const TreasuryAccountItem: FC<{
           ) : (
             <div>Supply: {supply}</div>
           )}
-          {`${getTotalPrice()}`}
+          {totalPrice && `${totalPrice} $`}
         </div>
       </div>
     ) : null
