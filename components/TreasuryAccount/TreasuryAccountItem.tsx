@@ -1,9 +1,10 @@
 import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { getAccountName } from '@components/instructions/tools'
 import {
   formatMintNaturalAmountAsDecimal,
   numberWithCommas,
 } from '@tools/sdk/units'
-import tokenService, { TokenRecord } from '@utils/services/price'
+import tokenService, { TokenRecord } from '@utils/services/token'
 import { GovernedTokenAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 const TreasuryAccountItem = ({
@@ -28,6 +29,7 @@ const TreasuryAccountItem = ({
       : ''
   function handleSetTotalPrice() {
     const price = tokenService.getUSDTokenPrice(tokenName)
+
     const amountNumber = parseFloat(amount.split(',').join(''))
     const totalPrice = amountNumber
       ? numberWithCommas((amountNumber * price).toFixed(0))
@@ -39,23 +41,35 @@ const TreasuryAccountItem = ({
     setTokenRecordInfo(info)
   }
   useEffect(() => {
-    handleSetTotalPrice()
     handleSetTokenInfo()
+    handleSetTotalPrice()
   }, [tokenName, amount])
-  return tokenRecordInfo?.symbol ? (
-    <div className="break-all text-fgd-1 bg-bkg-1 px-4 py-2 rounded-md w-full mb-5">
-      {tokenRecordInfo.name && (
-        <div className="flex">
+  return tokenRecordInfo?.symbol || amount ? (
+    <div className="break-all text-fgd-1 bg-bkg-1 px-3 py-3 rounded-md w-full mb-5 flex">
+      {tokenRecordInfo?.logoURI && (
+        <div className="flex items-center">
           <img
-            className="flex-shrink-0 h-5 mr-2 w-5"
+            className="flex-shrink-0 h-8 w-8 mr-3"
             src={tokenRecordInfo.logoURI}
           />
-          {tokenRecordInfo.name}
         </div>
       )}
-      <div className="space-y-0.5 text-md text-fgd-3">
-        {amount !== '' ? <div>Amount: {amount}</div> : null}
-        {totalPrice && `Value: $${totalPrice}`}
+      <div className="flex flex-col">
+        <div className="font-semibold">
+          {tokenRecordInfo?.name
+            ? tokenRecordInfo?.name
+            : governedAccountTokenAccount.governance?.info.governedAccount.toBase58()}
+        </div>
+        <div className="text-xs font-thin flex flex-col">
+          {amount} {tokenRecordInfo?.symbol}
+          <small>
+            {governedAccountTokenAccount.token?.publicKey &&
+              getAccountName(governedAccountTokenAccount.token?.publicKey)}
+          </small>
+        </div>
+      </div>
+      <div className="text-xs flex items-center justify-items-end items-top ml-auto">
+        ${totalPrice}
       </div>
     </div>
   ) : null

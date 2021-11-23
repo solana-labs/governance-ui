@@ -27,9 +27,12 @@ class TokenService {
     this.tokenList = response.data.tokens
   }
   //best to run as soon as you get all tokens symbols that dao holds.
-  async fetchTokenPrices(symbols: string[]) {
+  async fetchTokenPrices(tokenNames: string[]) {
+    if (!this.tokenList.length) {
+      await this.fetchSolanaTokenList()
+    }
     const tokenListRecords = this.tokenList.filter((x) =>
-      symbols.includes(x.symbol)
+      tokenNames.includes(x.symbol)
     )
     const coingeckoIds = tokenListRecords
       .map((x) => x.extensions.coingeckoId)
@@ -41,14 +44,16 @@ class TokenService {
     this.tokenPriceToUSDlist = { ...this.tokenPriceToUSDlist, ...priceToUsd }
     return priceToUsd
   }
-  //symbol is dao token name
-  getUSDTokenPrice(symbol: string): number {
-    const tokenListRecord = this.tokenList.find((x) => x.symbol === symbol)
-    if (tokenListRecord) {
-      return this.tokenPriceToUSDlist[tokenListRecord?.extensions.coingeckoId][
-        'usd'
-      ]
+  getUSDTokenPrice(tokenName: string): number {
+    if (tokenName) {
+      const tokenListRecord = this.tokenList.find((x) => x.symbol === tokenName)
+      if (tokenListRecord) {
+        return this.tokenPriceToUSDlist[tokenListRecord?.extensions.coingeckoId]
+          ?.usd
+      }
+      return 0
     }
+
     return 0
   }
   getTokenInfo(symbol: string) {

@@ -4,7 +4,7 @@ import {
   formatMintNaturalAmountAsDecimal,
   numberWithCommas,
 } from '@tools/sdk/units'
-import tokenService from '@utils/services/price'
+import tokenService from '@utils/services/token'
 import { useEffect, useState } from 'react'
 
 const HoldTokensTotalPrice = () => {
@@ -13,7 +13,9 @@ const HoldTokensTotalPrice = () => {
   useEffect(() => {
     async function calcTotalTokensPrice() {
       const totalPrice = governedTokenAccounts
-        .filter((x) => typeof x.mint !== 'undefined')
+        .filter(
+          (x) => typeof x.mint !== 'undefined' && typeof x.token !== 'undefined'
+        )
         .map((x) => {
           return (
             parseFloat(
@@ -36,7 +38,10 @@ const HoldTokensTotalPrice = () => {
     if (governedTokenAccounts.length) {
       calcTotalTokensPrice()
     }
-  }, [JSON.stringify(governedTokenAccounts)])
+  }, [
+    JSON.stringify(governedTokenAccounts),
+    JSON.stringify(tokenService.tokenPriceToUSDlist),
+  ])
   return totalPrice ? <h3 className="mb-5 text-center">${totalPrice}</h3> : null
 }
 
