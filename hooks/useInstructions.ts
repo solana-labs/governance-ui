@@ -1,7 +1,7 @@
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
-import priceService from '@utils/services/price'
+import tokenService from '@utils/services/price'
 import {
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
@@ -145,7 +145,7 @@ export default function useInstructions() {
           })
         ),
       ]
-      await priceService.fetchTokenPrices(tokenSymbols)
+      await tokenService.fetchTokenPrices(tokenSymbols)
     }
     handleFetchTokensPrices()
   }, [JSON.stringify(governedTokenAccounts)])

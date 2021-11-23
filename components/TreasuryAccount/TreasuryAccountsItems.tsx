@@ -1,20 +1,16 @@
 import useInstructions from '@hooks/useInstructions'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { GovernedTokenAccount } from '@utils/tokens'
 import React, { useEffect, useState } from 'react'
 import TreasuryAccountItem from './TreasuryAccountItem'
 
 const TreasuryAccountsItems = () => {
-  const { governedTokenAccounts, getMintWithGovernances } = useInstructions()
+  const { governedTokenAccounts } = useInstructions()
   const [treasuryAccounts, setTreasuryAccounts] = useState<
-    GovernedMultiTypeAccount[]
+    GovernedTokenAccount[]
   >([])
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      const mintWithGovernances = await getMintWithGovernances()
-      setTreasuryAccounts([
-        ...(governedTokenAccounts as GovernedMultiTypeAccount[]),
-        ...(mintWithGovernances as GovernedMultiTypeAccount[]),
-      ])
+      setTreasuryAccounts(governedTokenAccounts)
     }
     prepTreasuryAccounts()
   }, [JSON.stringify(governedTokenAccounts)])
@@ -22,8 +18,8 @@ const TreasuryAccountsItems = () => {
     <>
       {treasuryAccounts.map((accountWithGovernance) => (
         <TreasuryAccountItem
-          governedAccount={accountWithGovernance}
-          key={accountWithGovernance.governance.pubkey.toBase58()}
+          governedAccountTokenAccount={accountWithGovernance}
+          key={accountWithGovernance?.governance?.pubkey.toBase58()}
         />
       ))}
     </>

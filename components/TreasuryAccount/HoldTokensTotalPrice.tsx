@@ -4,7 +4,7 @@ import {
   formatMintNaturalAmountAsDecimal,
   numberWithCommas,
 } from '@tools/sdk/units'
-import priceService from '@utils/services/price'
+import tokenService from '@utils/services/price'
 import { useEffect, useState } from 'react'
 
 const HoldTokensTotalPrice = () => {
@@ -24,7 +24,7 @@ const HoldTokensTotalPrice = () => {
                 .split(',')
                 .join('')
             ) *
-            priceService.getTokenPrice(
+            tokenService.getUSDTokenPrice(
               getMintMetadata(x.token!.account.mint)?.name
             )
           )
@@ -37,7 +37,7 @@ const HoldTokensTotalPrice = () => {
       calcTotalTokensPrice()
     }
   }, [JSON.stringify(governedTokenAccounts)])
-  return totalPrice ? <div className="mb-5">{totalPrice} $</div> : null
+  return totalPrice ? <h3 className="mb-5 text-center">${totalPrice}</h3> : null
 }
 
 export default HoldTokensTotalPrice

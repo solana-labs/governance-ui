@@ -5,13 +5,15 @@ interface Extensions {
   coingeckoId: string
 }
 
-interface TokenRerecord {
+export interface TokenRecord {
   extensions: Extensions
   symbol: string
+  logoURI: string
+  name: string
 }
 
-class PriceService {
-  tokenList: TokenRerecord[]
+class TokenService {
+  tokenList: TokenRecord[]
   tokenPriceToUSDlist: any
   constructor() {
     this.tokenList = []
@@ -24,6 +26,7 @@ class PriceService {
     )
     this.tokenList = response.data.tokens
   }
+  //best to run as soon as you get all tokens symbols that dao holds.
   async fetchTokenPrices(symbols: string[]) {
     const tokenListRecords = this.tokenList.filter((x) =>
       symbols.includes(x.symbol)
@@ -38,7 +41,8 @@ class PriceService {
     this.tokenPriceToUSDlist = { ...this.tokenPriceToUSDlist, ...priceToUsd }
     return priceToUsd
   }
-  getTokenPrice(symbol: string): number {
+  //symbol is dao token name
+  getUSDTokenPrice(symbol: string): number {
     const tokenListRecord = this.tokenList.find((x) => x.symbol === symbol)
     if (tokenListRecord) {
       return this.tokenPriceToUSDlist[tokenListRecord?.extensions.coingeckoId][
@@ -47,8 +51,12 @@ class PriceService {
     }
     return 0
   }
+  getTokenInfo(symbol: string) {
+    const tokenListRecord = this.tokenList.find((x) => x.symbol === symbol)
+    return tokenListRecord
+  }
 }
 
-const priceService = new PriceService()
+const tokenService = new TokenService()
 
-export default priceService
+export default tokenService
