@@ -1,14 +1,17 @@
 import { GovernanceAccountType } from '@models/accounts'
+import { getBigNumberAmount } from '@tools/sdk/units'
 import {
   getMintAccountLabelInfo,
   getTokenAccountLabelInfo,
   GovernedMultiTypeAccount,
 } from '@utils/tokens'
-import { FC } from 'react'
-
+import BN from 'bn.js'
+import { FC, useEffect, useState } from 'react'
+import priceService from 'utils/services/price'
 const TreasuryAccountItem: FC<{
   governedAccount: GovernedMultiTypeAccount
 }> = ({ governedAccount }) => {
+  const [price, setPrice] = useState(0)
   function returnItem(governedAccount: GovernedMultiTypeAccount) {
     let account = ''
     let tokenName = ''
@@ -29,6 +32,15 @@ const TreasuryAccountItem: FC<{
       accountName = tokenLabelInfo.tokenAccountName
       amount = tokenLabelInfo.amount
     }
+    function getTotalPrice() {}
+    useEffect(() => {
+      async function getTokenPrice() {
+        const price = await priceService.getTokenPriceToUSD(tokenName)
+        setPrice(price)
+      }
+      getTokenPrice()
+    }, [])
+
     return account ? (
       <div className="break-all text-fgd-1 bg-bkg-1 px-4 py-2 rounded-md w-full mb-5">
         {accountName && <div className="mb-0.5">{accountName}</div>}
@@ -49,6 +61,7 @@ const TreasuryAccountItem: FC<{
           ) : (
             <div>Supply: {supply}</div>
           )}
+          {`${getTotalPrice()}`}
         </div>
       </div>
     ) : null
