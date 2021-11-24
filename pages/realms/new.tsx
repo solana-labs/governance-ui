@@ -210,8 +210,8 @@ const New = () => {
             </div>
             <div>
               <div className="pb-5">
-                Details about your realm here. These can be added manually to
-                your local registry of realms similar to here
+                After creation, the realm can be added manually to your local
+                registry of realms similar to here
                 <div>
                   <a
                     target="_blank"
@@ -243,6 +243,20 @@ const New = () => {
               <div className="flex items-center justify-between">
                 <h1>Create a new realm</h1>
               </div>
+            </div>
+            <div className="pb-5">
+              After creation, the realm can be added manually to your local
+              registry of realms similar to here
+              <div>
+                <a
+                  target="_blank"
+                  href="https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts"
+                  rel="noreferrer"
+                >
+                  https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts
+                </a>
+              </div>
+              <div>This is a temporary solution.</div>
             </div>
             <div className="pt-2">
               <div className="pb-4">
