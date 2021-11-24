@@ -23,6 +23,11 @@ export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
 export function getMintDecimalAmount(mint: MintInfo, mintAmount: BN) {
   return new BigNumber(mintAmount.toString()).shiftedBy(-mint.decimals)
 }
+export function getBigNumberAmount(amount: BN | number) {
+  return typeof amount === 'number'
+    ? new BigNumber(amount)
+    : new BigNumber(amount.toString())
+}
 
 // Parses input string in decimals to mint amount (natural units)
 // If the input is already a number then converts it to mint natural amount
@@ -67,4 +72,8 @@ export function getMintDecimalAmountFromNatural(
   naturalAmount: BN
 ) {
   return new BigNumber(naturalAmount.toString()).shiftedBy(-mint.decimals)
+}
+
+export function numberWithCommas(num) {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }

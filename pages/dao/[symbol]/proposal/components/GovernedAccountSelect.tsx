@@ -1,10 +1,11 @@
 import Select from '@components/inputs/Select'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
-import { getAccountName } from '@components/instructions/tools'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
-import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import {
+  getMintAccountLabelInfo,
+  getTokenAccountLabelInfo,
+  GovernedMultiTypeAccount,
+} from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
 
@@ -44,29 +45,6 @@ const GovernedAccountSelect = ({
       return null
     }
   }
-  function getMintAccountLabelInfo(acc: GovernedMultiTypeAccount | undefined) {
-    let account = ''
-    let tokenName = ''
-    let mintAccountName = ''
-    let amount = ''
-
-    if (acc?.mintInfo && acc.governance) {
-      account = acc.governance?.info.governedAccount.toBase58()
-      tokenName = getMintMetadata(acc.governance?.info.governedAccount)?.name
-      mintAccountName = getAccountName(acc.governance.info.governedAccount)
-      amount = formatMintNaturalAmountAsDecimal(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        acc.mintInfo,
-        acc?.mintInfo.supply
-      )
-    }
-    return {
-      account,
-      tokenName,
-      mintAccountName,
-      amount,
-    }
-  }
   function returnMintAccountLabelComponent({
     account,
     tokenName,
@@ -93,29 +71,6 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function getTokenAccountLabelInfo(acc: GovernedMultiTypeAccount | undefined) {
-    let tokenAccount = ''
-    let tokenName = ''
-    let tokenAccountName = ''
-    let amount = ''
-
-    if (acc?.token && acc.mint) {
-      tokenAccount = acc.token.publicKey.toBase58()
-      tokenName = getMintMetadata(acc.token.account.mint)?.name
-      tokenAccountName = getAccountName(acc.token.publicKey)
-      amount = formatMintNaturalAmountAsDecimal(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        acc.mint!.account,
-        acc.token?.account.amount
-      )
-    }
-    return {
-      tokenAccount,
-      tokenName,
-      tokenAccountName,
-      amount,
-    }
-  }
   function returnTokenAccountLabelComponent({
     tokenAccount,
     tokenAccountName,
@@ -123,7 +78,7 @@ const GovernedAccountSelect = ({
     amount,
   }) {
     return (
-      <div className="break-all text-fgd-1">
+      <div className="break-all text-fgd-1 ">
         {tokenAccountName && <div className="mb-0.5">{tokenAccountName}</div>}
         <div className="mb-2">{tokenAccount}</div>
         <div className="space-y-0.5 text-xs text-fgd-3">
