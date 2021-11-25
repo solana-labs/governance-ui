@@ -1,9 +1,11 @@
 import {
   PublicKey,
   SYSVAR_RENT_PUBKEY,
+  SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { GOVERNANCE_SCHEMA } from './serialisation'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { getGovernanceSchema } from './serialisation'
 import { serialize } from 'borsh'
 import { CreateRealmArgs } from './instructions'
 import {
@@ -11,12 +13,15 @@ import {
   GOVERNANCE_PROGRAM_SEED,
   MintMaxVoteWeightSource,
   getTokenHoldingAddress,
+  getRealmConfigAddress,
 } from './accounts'
+import { ProgramVersion } from 'models/registry/api'
 import BN from 'bn.js'
 
 export async function withCreateRealm(
   instructions: TransactionInstruction[],
   programId: PublicKey,
+  programVersion: ProgramVersion,
   name: string,
   realmAuthority: PublicKey,
   communityMint: PublicKey,
@@ -24,20 +29,26 @@ export async function withCreateRealm(
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
-  systemId: PublicKey,
-  tokenId: PublicKey
+  communityVoterWeightAddin: PublicKey | undefined
 ) {
+  if (communityVoterWeightAddin && programVersion < 2) {
+    throw new Error(
+      `Voter weight addin is not supported in version ${programVersion}`
+    )
+  }
+
   const configArgs = new RealmConfigArgs({
     useCouncilMint: councilMint !== undefined,
     minCommunityTokensToCreateGovernance,
     communityMintMaxVoteWeightSource,
+    useCommunityVoterWeightAddin: communityVoterWeightAddin !== undefined,
   })
 
   const args = new CreateRealmArgs({
     configArgs,
     name,
   })
-  const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
+  const data = Buffer.from(serialize(getGovernanceSchema(programVersion), args))
 
   const [realmAddress] = await PublicKey.findProgramAddress(
     [Buffer.from(GOVERNANCE_PROGRAM_SEED), Buffer.from(args.name)],
@@ -77,12 +88,12 @@ export async function withCreateRealm(
       isWritable: false,
     },
     {
-      pubkey: systemId,
+      pubkey: SystemProgram.programId,
       isSigner: false,
       isWritable: false,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isSigner: false,
       isWritable: false,
     },
@@ -113,6 +124,25 @@ export async function withCreateRealm(
         isWritable: true,
       },
     ]
+  }
+
+  const realmConfigAddress = await getRealmConfigAddress(
+    programId,
+    realmAddress
+  )
+
+  keys.push({
+    pubkey: realmConfigAddress,
+    isSigner: false,
+    isWritable: true,
+  })
+
+  if (communityVoterWeightAddin) {
+    keys.push({
+      pubkey: communityVoterWeightAddin,
+      isWritable: false,
+      isSigner: false,
+    })
   }
 
   instructions.push(

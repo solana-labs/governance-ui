@@ -5,6 +5,7 @@ import bs58 from 'bs58'
 import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
 import { Schema } from 'borsh'
 import { deserializeBorsh } from '../../utils/borsh'
+import { ProgramVersion } from '@models/registry/api'
 
 export const SYSTEM_PROGRAM_ID = new PublicKey(
   '11111111111111111111111111111111'
@@ -17,12 +18,14 @@ export interface IWallet {
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
   programId: PublicKey
+  programVersion: ProgramVersion
   wallet: IWallet | undefined
   connection: Connection
   endpoint: string
 
   constructor(
     programId: PublicKey,
+    programVersion: number | undefined,
     wallet: IWallet | undefined,
     connection: Connection,
     endpoint: string
@@ -31,6 +34,7 @@ export class RpcContext {
     this.wallet = wallet
     this.connection = connection
     this.endpoint = endpoint
+    this.programVersion = programVersion || ProgramVersion.V1
   }
 
   get walletPubkey() {

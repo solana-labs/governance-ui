@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react'
+import Link from 'next/link'
+import { PlusIcon } from '@heroicons/react/outline'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 // import Input from '../../components/Input'
 // import Button from '../../components/Button'
@@ -21,7 +23,9 @@ const Realms = () => {
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSearch] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
-  const { actions, selectedRealm, connection } = useWalletStore((s) => s)
+  const { actions, selectedRealm, connected, connection } = useWalletStore(
+    (s) => s
+  )
 
   useEffect(() => {
     if (connection) {
@@ -71,28 +75,39 @@ const Realms = () => {
         {isLoading ? (
           <Loading></Loading>
         ) : (
-          realms.map((realm: RealmInfo) => (
-            <div
-              onClick={() => goToRealm(realm)}
-              className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
-              key={realm.realmId.toString()}
-            >
-              <div className="pb-5">
-                {realm.ogImage ? (
-                  <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
-                    <img className="w-10" src={realm.ogImage}></img>
-                  </div>
-                ) : (
-                  <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                    {realm.symbol?.charAt(0)}
-                  </div>
-                )}
+          <>
+            {realms.map((realm: RealmInfo) => (
+              <div
+                onClick={() => goToRealm(realm)}
+                className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
+                key={realm.realmId.toString()}
+              >
+                <div className="pb-5">
+                  {realm.ogImage ? (
+                    <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
+                      <img className="w-10" src={realm.ogImage}></img>
+                    </div>
+                  ) : (
+                    <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                      {realm.symbol?.charAt(0)}
+                    </div>
+                  )}
+                </div>
+                <h3 className="text-center">
+                  {realm.displayName ?? realm.symbol}
+                </h3>
               </div>
-              <h3 className="text-center">
-                {realm.displayName ?? realm.symbol}
-              </h3>
-            </div>
-          ))
+            ))}
+            {connected && (
+              <Link href={fmtUrlWithCluster(`/realms/new`)}>
+                <div className="bg-bkg-2 p-14 cursor-pointer default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3">
+                  <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                    <PlusIcon />
+                  </div>
+                </div>
+              </Link>
+            )}
+          </>
         )}
       </div>
     </div>
