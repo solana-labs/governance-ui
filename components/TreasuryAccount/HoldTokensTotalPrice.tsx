@@ -1,5 +1,5 @@
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import useInstructions from '@hooks/useInstructions'
+import useGovernances from '@hooks/useGovernances'
 import {
   formatMintNaturalAmountAsDecimal,
   numberWithCommas,
@@ -8,7 +8,7 @@ import tokenService from '@utils/services/token'
 import { useEffect, useState } from 'react'
 
 const HoldTokensTotalPrice = () => {
-  const { governedTokenAccounts } = useInstructions()
+  const { governedTokenAccounts } = useGovernances()
   const [totalPrice, setTotalPrice] = useState('')
   useEffect(() => {
     async function calcTotalTokensPrice() {

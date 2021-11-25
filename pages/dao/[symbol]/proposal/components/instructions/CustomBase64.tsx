@@ -7,7 +7,7 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useInstructions from '@hooks/useInstructions'
+import useGovernances from '@hooks/useGovernances'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
@@ -29,7 +29,7 @@ const CustomBase64 = ({
     governancesArray,
     governedTokenAccounts,
     getMintWithGovernances,
-  } = useInstructions()
+  } = useGovernances()
   const shouldBeGoverned = index !== 0 && governance
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]

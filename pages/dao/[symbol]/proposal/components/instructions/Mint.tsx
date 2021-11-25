@@ -28,7 +28,7 @@ import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
-import useInstructions from '@hooks/useInstructions'
+import useGovernances from '@hooks/useGovernances'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 
@@ -41,7 +41,7 @@ const Mint = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { getMintWithGovernances } = useInstructions()
+  const { getMintWithGovernances } = useGovernances()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
