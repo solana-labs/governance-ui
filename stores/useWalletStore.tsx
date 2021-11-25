@@ -40,7 +40,6 @@ import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
 interface WalletStore extends State {
   connected: boolean
   connection: {
@@ -588,14 +587,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           account: parsedAccountInfo,
         })
       })
-      const tokenSymbols = [
+      const tokenMintAdresses = [
         ...new Set(
           tokenAccounts.map((x) => {
-            return getMintMetadata(x.account.mint)?.name
+            return x.account.mint.toBase58()
           })
         ),
       ]
-      await tokenService.fetchTokenPrices(tokenSymbols)
+      await tokenService.fetchTokenPrices(tokenMintAdresses)
       set((s) => {
         s.selectedRealm.tokenAccounts = tokenAccounts
       })
