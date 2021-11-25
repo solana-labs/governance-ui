@@ -259,14 +259,14 @@ const TokenDeposit = ({
       <div className="flex space-x-4 items-center pb-6">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <div className="font-bold text-sm">
+          <h3 className="mb-0">
             {depositTokenRecord && mint
               ? fmtMintAmount(
                   mint,
                   depositTokenRecord.info.governingTokenDepositAmount
                 )
               : '0'}
-          </div>
+          </h3>
         </div>
       </div>
 

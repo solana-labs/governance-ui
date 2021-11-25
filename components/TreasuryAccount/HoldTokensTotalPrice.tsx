@@ -42,7 +42,12 @@ const HoldTokensTotalPrice = () => {
     JSON.stringify(governedTokenAccounts),
     JSON.stringify(tokenService.tokenPriceToUSDlist),
   ])
-  return totalPrice ? <h3 className="mb-5 text-center">${totalPrice}</h3> : null
+  return totalPrice ? (
+    <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
+      <p className="text-fgd-3 text-xs">Treasury Balance</p>
+      <h3 className="mb-0">${totalPrice}</h3>
+    </div>
+  ) : null
 }
 
 export default HoldTokensTotalPrice
