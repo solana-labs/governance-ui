@@ -17,6 +17,10 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 import { ProgramVersion } from '@models/registry/api'
+import {
+  getMintDecimalAmount,
+  formatMintNaturalAmountAsDecimal,
+} from '@tools/sdk/units'
 
 const DEFAULT_GOVERNANCE_PROGRAM_ID =
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
@@ -147,13 +151,16 @@ const New = () => {
       const mint = await tryGetMint(connection.current, mintPublicKey)
       if (mint) {
         const supply = mint.account.supply
-        const decimals = mint.account.decimals
         if (supply.gt(new BN(0))) {
           handleSetForm({
             minCommunityTokensToCreateGovernance: BN.max(
               new BN(1),
-              // divide by 10^(decimal + 2) to get 1% of supply
-              supply.div(new BN(10).pow(new BN(decimals + 2)))
+              // divide by 100 for a percentage
+              new BN(
+                getMintDecimalAmount(mint.account, supply)
+                  .dividedBy(100)
+                  .toString()
+              )
             ),
             communityMintId: mintId,
             communityMint: mint,
@@ -275,13 +282,10 @@ const New = () => {
                   <div className="pt-2">
                     <div className="pb-0.5 text-fgd-3 text-xs">Mint supply</div>
                     <div className="text-xs">
-                      {form.communityMint.account.supply
-                        .div(
-                          new BN(10).pow(
-                            new BN(form.communityMint.account.decimals)
-                          )
-                        )
-                        .toString()}
+                      {formatMintNaturalAmountAsDecimal(
+                        form.communityMint.account,
+                        form.communityMint.account.supply
+                      )}
                     </div>
                   </div>
                 )}
