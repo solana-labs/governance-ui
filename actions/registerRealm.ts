@@ -12,10 +12,10 @@ export async function registerRealm(
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN
-): Promise<string> {
+): Promise<PublicKey> {
   const instructions: TransactionInstruction[] = []
 
-  await withCreateRealm(
+  const realmAddress = await withCreateRealm(
     instructions,
     programId,
     programVersion,
@@ -32,13 +32,6 @@ export async function registerRealm(
   const transaction = new Transaction()
   transaction.add(...instructions)
 
-  return sendTransaction({ transaction, wallet, connection })
-}
-
-export async function getRealmIdFromTransaction(
-  { connection }: RpcContext,
-  txid: string
-): Promise<string | undefined> {
-  const tx = await connection.getTransaction(txid, { commitment: 'confirmed' })
-  return tx?.transaction.message.accountKeys[2].toBase58()
+  await sendTransaction({ transaction, wallet, connection })
+  return realmAddress
 }

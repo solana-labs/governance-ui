@@ -8,7 +8,7 @@ import React, { useState } from 'react'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
-import { getRealmIdFromTransaction, registerRealm } from 'actions/registerRealm'
+import { registerRealm } from 'actions/registerRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from 'utils/notifications'
@@ -91,7 +91,9 @@ const New = () => {
   })
   const [formErrors, setFormErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [realmId, setRealmId] = useState<string | undefined>(undefined)
+  const [realmAddress, setRealmAddress] = useState<PublicKey | undefined>(
+    undefined
+  )
 
   const handleSetForm = (newValues) => {
     setFormErrors({})
@@ -116,7 +118,7 @@ const New = () => {
       )
 
       try {
-        const txid = await registerRealm(
+        const realmAddress = await registerRealm(
           rpcContext,
           form.name,
           new PublicKey(form.communityMintId),
@@ -124,8 +126,7 @@ const New = () => {
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
           form.minCommunityTokensToCreateGovernance
         )
-        const realmId = await getRealmIdFromTransaction(rpcContext, txid)
-        setRealmId(realmId)
+        setRealmAddress(realmAddress)
       } catch (ex) {
         console.log(ex)
         notify({ type: 'error', message: `${ex}` })
@@ -201,7 +202,7 @@ const New = () => {
             Back
           </a>
         </Link>
-        {realmId ? (
+        {realmAddress ? (
           <>
             <div className="border-b border-fgd-4 pb-4 pt-2">
               <div className="flex items-center justify-between">
@@ -210,8 +211,8 @@ const New = () => {
             </div>
             <div>
               <div className="pb-5">
-                After creation, the realm can be added manually to your local
-                registry of realms similar to here
+                Details about your realm here. These can be added manually to
+                your local registry of realms similar to here
                 <div>
                   <a
                     target="_blank"
@@ -232,7 +233,7 @@ const New = () => {
                 </div>
                 <div className="pt-2">
                   <div className="pb-0.5 text-fgd-3 text-xs">Realm Id</div>
-                  <div className="text-xs">{realmId}</div>
+                  <div className="text-xs">{realmAddress.toBase58()}</div>
                 </div>
               </div>
             </div>
@@ -243,20 +244,6 @@ const New = () => {
               <div className="flex items-center justify-between">
                 <h1>Create a new realm</h1>
               </div>
-            </div>
-            <div className="pb-5">
-              After creation, the realm can be added manually to your local
-              registry of realms similar to here
-              <div>
-                <a
-                  target="_blank"
-                  href="https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts"
-                  rel="noreferrer"
-                >
-                  https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts
-                </a>
-              </div>
-              <div>This is a temporary solution.</div>
             </div>
             <div className="pt-2">
               <div className="pb-4">
