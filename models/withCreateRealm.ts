@@ -30,7 +30,7 @@ export async function withCreateRealm(
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
   communityVoterWeightAddin: PublicKey | undefined
-) {
+): Promise<PublicKey> {
   if (communityVoterWeightAddin && programVersion < 2) {
     throw new Error(
       `Voter weight addin is not supported in version ${programVersion}`
