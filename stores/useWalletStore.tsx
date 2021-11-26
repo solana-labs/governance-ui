@@ -39,6 +39,8 @@ import { ChatMessage } from '../models/chat/accounts'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
+import tokenService from '@utils/services/token'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
 interface WalletStore extends State {
   connected: boolean
   connection: {
@@ -146,7 +148,9 @@ async function resolveProposalDescription(description: string) {
 export const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://billowing-proud-glitter.solana-mainnet.quiknode.pro/7f49d7f436c2d3af0738270d90dee86962f13a82/',
+    url:
+      process.env.MAINNET_RPC ||
+      'https://billowing-proud-glitter.solana-mainnet.quiknode.pro/7f49d7f436c2d3af0738270d90dee86962f13a82/',
   },
   {
     name: 'devnet',
@@ -220,7 +224,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           connection,
           walletOwner
         )
-
         console.log(
           'fetchWalletTokenAccounts',
           connected,
@@ -587,6 +590,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           account: parsedAccountInfo,
         })
       })
+      const tokenSymbols = [
+        ...new Set(
+          tokenAccounts.map((x) => {
+            return getMintMetadata(x.account.mint)?.name
+          })
+        ),
+      ]
+      await tokenService.fetchTokenPrices(tokenSymbols)
       set((s) => {
         s.selectedRealm.tokenAccounts = tokenAccounts
       })
@@ -609,7 +620,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async setConnectionConfig(cluster: string) {
       const set = get().set
       set((s) => {
-        s.connection = getConnectionConfig(cluster)
+        if (s.connection.cluster !== cluster) {
+          s.connection = getConnectionConfig(cluster)
+        }
       })
     },
   },

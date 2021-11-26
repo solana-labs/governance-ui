@@ -2,10 +2,15 @@ import { PublicKey } from '@solana/web3.js'
 import { equalsIgnoreCase } from '../../tools/core/strings'
 import { EndpointTypes } from '../types'
 
+export enum ProgramVersion {
+  V1 = 1,
+  V2,
+}
 export interface RealmInfo {
   symbol: string
   endpoint?: string
   programId: PublicKey
+  programVersion?: ProgramVersion
   realmId: PublicKey
   website?: string
   // Specifies the realm mainnet name for resource lookups
@@ -112,16 +117,17 @@ const MAINNET_REALMS: RealmInfo[] = [
     website: 'https://21dao.xyz',
   },
   {
-    symbol: 'PART',
-    displayName: 'Pegasus Art',
+    symbol: 'CDNL',
+    displayName: 'Cardinal',
     programId: new PublicKey('bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD'),
     realmId: new PublicKey('8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg'),
-    ogImage: 'https://app.pegasusdao.com/assets/logo.png',
-    website: 'https://www.pegasusdao.com/',
+    ogImage: 'https://app.cardinalconsensus.io/assets/logo-colored.png',
+    website: 'https://www.cardinalconsensus.io',
+    twitter: '@cardinal_dao',
   },
   {
     symbol: 'gSAIL',
-    displayName: 'GSAIL GOVERNANCE DAO ',
+    displayName: 'GSAIL GOVERNANCE DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('36fZRsuM3oXvb5VrEXXVmokbGnjADzVgKpW1pgQq7jXJ'),
     ogImage:
@@ -190,12 +196,25 @@ const DEVNET_REALMS: RealmInfo[] = [
     realmId: new PublicKey('5eZA8mX9pVXzgbA8oES1ismVSAAgsHkEipJbxvsVYb5d'),
   },
   {
-    symbol: 'PART',
-    displayName: 'Pegasus Art',
+    symbol: 'CDNL',
+    displayName: 'Cardinal',
     programId: new PublicKey('bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD'),
     realmId: new PublicKey('8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg'),
-    ogImage: 'https://app.pegasusdao.com/assets/logo.png',
-    website: 'https://www.pegasusdao.com/',
+    ogImage: 'https://app.cardinalconsensus.io/assets/logo-colored.png',
+    website: 'https://www.cardinalconsensus.io',
+    twitter: '@cardinal_dao',
+  },
+  {
+    symbol: 'testgm',
+    displayName: 'testgm',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('5jdLxZkUQLVWwe8mtR9fURFLUFyT6npjiSKzowaqyCj9'),
+  },
+  {
+    symbol: 'RealM_Tuto_1',
+    displayName: 'RealM_Tuto_1',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('756iwQL9tAdTr1mDGiu4P9zWW8FzMY1K6MUXHqkwp9Nc'),
   },
 ]
 
@@ -210,10 +229,11 @@ export function getRealmInfo(
   if (!symbol) {
     return undefined
   }
+
   if (endpoint === 'devnet') {
-    let devRealmInfo = getAllRealmInfos('devnet').find((r) =>
-      equalsIgnoreCase(r.symbol, symbol)
-    )
+    let devRealmInfo = getAllRealmInfos('devnet').find((r) => {
+      return equalsIgnoreCase(r.symbol, symbol)
+    })
 
     if (devRealmInfo) {
       devRealmInfo.endpoint = 'devnet'
@@ -236,5 +256,6 @@ export function getRealmInfo(
   if (realmInfo) {
     realmInfo.endpoint = 'mainnet'
   }
+
   return realmInfo
 }

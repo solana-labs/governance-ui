@@ -17,8 +17,8 @@ export default function useHydrateStore() {
   } = useWalletStore((s) => s.actions)
   useEffect(() => {
     const fetch = async () => {
-      const realmInfo = getRealmInfo(symbol as string, apiEndpoint)
       setConnectionConfig(apiEndpoint)
+      const realmInfo = getRealmInfo(symbol as string, apiEndpoint)
       if (realmInfo) {
         await fetchAllRealms(realmInfo.programId)
         fetchRealm(realmInfo.programId, realmInfo.realmId)

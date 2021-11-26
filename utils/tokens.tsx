@@ -16,6 +16,9 @@ import {
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { chunks } from './helpers'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { getAccountName } from '@components/instructions/tools'
+import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -28,6 +31,16 @@ export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
   governance: ParsedAccount<Governance> | undefined
 }
+export type GovernedProgramAccount = {
+  governance: ParsedAccount<Governance> | undefined
+}
+export type GovernedMultiTypeAccount = {
+  token?: ProgramAccount<AccountInfo> | undefined
+  mint?: ProgramAccount<MintInfo> | undefined
+  governance: ParsedAccount<Governance>
+  mintInfo?: MintInfo | undefined
+}
+
 export type ProgramAccount<T> = {
   publicKey: PublicKey
   account: T
@@ -72,6 +85,11 @@ export async function tryGetTokenAccount(
 ): Promise<ProgramAccount<TokenAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
+
+    if (!result?.owner.equals(TOKEN_PROGRAM_ID)) {
+      return undefined
+    }
+
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = Buffer.from(result!.data)
     const account = parseTokenAccountData(publicKey, data)
@@ -80,7 +98,8 @@ export async function tryGetTokenAccount(
       account,
     }
   } catch (ex) {
-    console.error(`Can't fetch token account ${publicKey?.toBase58()}`, ex)
+    // This is Try method and is expected to fail and hence logging is uneccesery
+    // console.error(`Can't fetch token account ${publicKey?.toBase58()}`, ex)
   }
 }
 
@@ -211,4 +230,56 @@ export async function getMultipleAccountInfoChunked(
       )
     )
   ).flat()
+}
+
+export function getTokenAccountLabelInfo(
+  acc: GovernedMultiTypeAccount | undefined
+) {
+  let tokenAccount = ''
+  let tokenName = ''
+  let tokenAccountName = ''
+  let amount = ''
+
+  if (acc?.token && acc.mint) {
+    tokenAccount = acc.token.publicKey.toBase58()
+    tokenName = getMintMetadata(acc.token.account.mint)?.name
+    tokenAccountName = getAccountName(acc.token.publicKey)
+    amount = formatMintNaturalAmountAsDecimal(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      acc.mint!.account,
+      acc.token?.account.amount
+    )
+  }
+  return {
+    tokenAccount,
+    tokenName,
+    tokenAccountName,
+    amount,
+  }
+}
+
+export function getMintAccountLabelInfo(
+  acc: GovernedMultiTypeAccount | undefined
+) {
+  let account = ''
+  let tokenName = ''
+  let mintAccountName = ''
+  let amount = ''
+
+  if (acc?.mintInfo && acc.governance) {
+    account = acc.governance?.info.governedAccount.toBase58()
+    tokenName = getMintMetadata(acc.governance?.info.governedAccount)?.name
+    mintAccountName = getAccountName(acc.governance.info.governedAccount)
+    amount = formatMintNaturalAmountAsDecimal(
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      acc.mintInfo,
+      acc?.mintInfo.supply
+    )
+  }
+  return {
+    account,
+    tokenName,
+    mintAccountName,
+    amount,
+  }
 }

@@ -15,7 +15,7 @@ import Loading from '../Loading'
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const { ownVoterWeight } = useRealm()
+  const { ownVoterWeight, realmInfo } = useRealm()
 
   const [submitting, setSubmitting] = useState(false)
 
@@ -29,6 +29,7 @@ const DiscussionForm = () => {
 
     const rpcContext = new RpcContext(
       proposal!.account.owner,
+      realmInfo?.programVersion,
       wallet,
       connection.current,
       connection.endpoint

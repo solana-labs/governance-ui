@@ -15,7 +15,7 @@ export async function fetchGistFile(gistUrl: string) {
       const nextUrl = jsonContent['files'][nextUrlFileName]['raw_url']
       const fileResponse = await fetch(nextUrl)
 
-      console.log('fetchGistFile file', gistUrl, fileResponse)
+      //console.log('fetchGistFile file', gistUrl, fileResponse)
       return await fileResponse.text()
     } else {
       console.warn('could not fetchGistFile', {

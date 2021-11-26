@@ -13,6 +13,11 @@ import { InstructionData } from '@models/accounts'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@models/withSignOffProposal'
 
+interface InstructionDataWithHoldUpTime {
+  data: InstructionData | null
+  holdUpTime: number | undefined
+}
+
 export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
@@ -21,9 +26,8 @@ export const createProposal = async (
   name: string,
   descriptionLink: string,
   governingTokenMint: PublicKey,
-  holdUpTime: number,
   proposalIndex: number,
-  instructionsData: InstructionData[],
+  instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
@@ -56,19 +60,23 @@ export const createProposal = async (
     signatory,
     payer
   )
-  for (const [index, instruction] of instructionsData.entries()) {
-    await withInsertInstruction(
-      instructions,
-      programId,
-      governance,
-      proposalAddress,
-      tokenOwnerRecord,
-      governanceAuthority,
-      index,
-      holdUpTime,
-      instruction,
-      payer
-    )
+  for (const [index, instruction] of instructionsData
+    .filter((x) => x.data)
+    .entries()) {
+    if (instruction.data) {
+      await withInsertInstruction(
+        instructions,
+        programId,
+        governance,
+        proposalAddress,
+        tokenOwnerRecord,
+        governanceAuthority,
+        index,
+        instruction.holdUpTime || 0,
+        instruction.data,
+        payer
+      )
+    }
   }
 
   if (!isDraft) {

@@ -21,7 +21,7 @@ const VotePanel = () => {
     voteRecordsByVoter,
     tokenType,
   } = useWalletStore((s) => s.selectedProposal)
-  const { ownTokenRecord, ownCouncilTokenRecord } = useRealm()
+  const { ownTokenRecord, ownCouncilTokenRecord, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
@@ -62,6 +62,7 @@ const VotePanel = () => {
   const submitRelinquishVote = async () => {
     const rpcContext = new RpcContext(
       proposal!.account.owner,
+      realmInfo?.programVersion,
       wallet,
       connection.current,
       connection.endpoint
