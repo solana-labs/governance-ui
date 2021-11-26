@@ -1,16 +1,32 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey, ConfirmOptions } from '@solana/web3.js'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { equalsIgnoreCase } from '../../tools/core/strings'
+import { EndpointTypes } from '../types'
+import * as anchor from '@project-serum/anchor'
+import idl from './registry.json'
+
+// @ts-ignore
+export const PROGRAM_IDL: anchor.Idl = idl
+export const REGISTRY_CONTEXT_SEED = 'registry-context'
+export const ENTRY_SEED = 'governance-program'
+export const REGISTRY_ID = new PublicKey(
+  'govHvVVCZsdJLynaFJdqEWBU9AbJ4aHYdZsWno114V9'
+)
+const CONFIRM_OPTIONS: ConfirmOptions = {
+  preflightCommitment: 'processed',
+}
 
 export enum ProgramVersion {
   V1 = 1,
   V2,
 }
+
 export interface RealmInfo {
   symbol: string
   programId: PublicKey
   programVersion?: ProgramVersion
   realmId: PublicKey
+  creator?: PublicKey
   website?: string
   // Specifies the realm mainnet name for resource lookups
   // It's required for none mainnet environments when the realm name is different than on mainnet
@@ -221,6 +237,48 @@ const DEVNET_REALMS: RealmInfo[] = [
 
 export function getAllRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+}
+
+export async function fetchAllRealms(
+  cluster: EndpointTypes,
+  connection: Connection
+): Promise<RealmInfo[]> {
+  const realms = cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+
+  // @ts-ignore
+  const provider = new anchor.Provider(connection, null, CONFIRM_OPTIONS)
+  const program = new anchor.Program(PROGRAM_IDL, REGISTRY_ID, provider)
+  const accounts = await connection.getProgramAccounts(REGISTRY_ID)
+  console.log('Accounts: ', accounts)
+
+  const resp = await Promise.all(
+    accounts.map(
+      async (account): Promise<RealmInfo | null> => {
+        try {
+          const entry = await program.account.entryData.fetch(account.pubkey)
+          // @ts-ignore
+          // const data = JSON.parse(entry.data)
+          return {
+            ...entry,
+            // symbol: data.symbol,
+            // displayName: data.name,
+            realmId: account.pubkey,
+            programId: account.account.owner,
+            // ...data,
+          }
+        } catch (e) {
+          console.log(`Error mapping account ${account.pubkey}: ${e}`)
+          return null
+        }
+      }
+    )
+  )
+  // @ts-ignore
+  const onChainRealms: RealmInfo[] = resp.filter((i) => i != null)
+  console.log(onChainRealms)
+  // return filteredResp.sort((a, b) => a.acc.name.localeCompare(b.data.name))
+  // return filteredResp
+  return [...realms, ...onChainRealms]
 }
 
 export async function getRealmInfo(

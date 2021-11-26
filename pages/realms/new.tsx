@@ -75,6 +75,8 @@ const New = () => {
   const [form, setForm] = useState<{
     governanceProgramId: string
     name: string
+    description: string
+    imageUrl: string
     communityMintId: string
     communityMint: ProgramAccount<MintInfo> | undefined
     councilMintId: string | undefined
@@ -85,6 +87,8 @@ const New = () => {
   }>({
     governanceProgramId: DEFAULT_GOVERNANCE_PROGRAM_ID,
     name: '',
+    description: '',
+    imageUrl: '',
     communityMintId: '',
     communityMint: undefined,
     councilMintId: undefined,
@@ -103,6 +107,18 @@ const New = () => {
     setFormErrors({})
     setForm({ ...form, ...newValues })
   }
+
+  // const handleInit = async () => {
+  //   await initRegistry(
+  //     new RpcContext(
+  //       new PublicKey(form.governanceProgramId),
+  //       form.programVersion,
+  //       wallet,
+  //       connection.current,
+  //       connection.endpoint
+  //     )
+  //   )
+  // }
 
   const handleCreate = async () => {
     setFormErrors({})
@@ -125,6 +141,8 @@ const New = () => {
         const realmAddress = await registerRealm(
           rpcContext,
           form.name,
+          form.description,
+          form.imageUrl,
           new PublicKey(form.communityMintId),
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
@@ -269,6 +287,34 @@ const New = () => {
               </div>
               <div className="pb-4">
                 <Input
+                  label="Desceription"
+                  placeholder="Descripition of your realm"
+                  value={form.description}
+                  type="text"
+                  error={formErrors['description']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      description: evt.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="pb-4">
+                <Input
+                  label="Image URL"
+                  placeholder="Image for your realm"
+                  value={form.imageUrl}
+                  type="text"
+                  error={formErrors['imageUrl']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      imageUrl: evt.target.value,
+                    })
+                  }
+                />
+              </div>
+              <div className="pb-4">
+                <Input
                   label="Community Mint Id"
                   placeholder="Community mint id of this realm"
                   value={form.communityMintId}
@@ -370,6 +416,9 @@ const New = () => {
                 <Button isLoading={isLoading} onClick={() => handleCreate()}>
                   Create Realm
                 </Button>
+                {/* <Button isLoading={isLoading} onClick={() => handleInit()}>
+                  Init
+                </Button> */}
               </div>
             </div>
           </>

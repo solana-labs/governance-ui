@@ -1,0 +1,244 @@
+{
+  "version": "0.0.0",
+  "name": "permissionless_verifiable_registry",
+  "instructions": [
+    {
+      "name": "init",
+      "accounts": [
+        {
+          "name": "registryContext",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "ix",
+          "type": {
+            "defined": "InitIx"
+          }
+        }
+      ]
+    },
+    {
+      "name": "transferAuthority",
+      "accounts": [
+        {
+          "name": "registryContext",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "newAuthority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "addEntry",
+      "accounts": [
+        {
+          "name": "registryContext",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "entry",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "creator",
+          "isMut": false,
+          "isSigner": true
+        },
+        {
+          "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        }
+      ],
+      "args": [
+        {
+          "name": "ix",
+          "type": {
+            "defined": "AddEntryIx"
+          }
+        }
+      ]
+    },
+    {
+      "name": "verifyEntry",
+      "accounts": [
+        {
+          "name": "registryContext",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "entry",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "removeEntry",
+      "accounts": [
+        {
+          "name": "registryContext",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "entry",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    }
+  ],
+  "accounts": [
+    {
+      "name": "RegistryContext",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "authority",
+            "type": "publicKey"
+          },
+          {
+            "name": "entrySeed",
+            "type": "string"
+          },
+          {
+            "name": "permissionlessAdd",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "EntryData",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "creator",
+            "type": "publicKey"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
+          },
+          {
+            "name": "isVerified",
+            "type": "bool"
+          },
+          {
+            "name": "verifiedAt",
+            "type": "i64"
+          },
+          {
+            "name": "schema",
+            "type": "u8"
+          },
+          {
+            "name": "data",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "types": [
+    {
+      "name": "InitIx",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "entrySeed",
+            "type": "string"
+          },
+          {
+            "name": "permissionlessAdd",
+            "type": "bool"
+          }
+        ]
+      }
+    },
+    {
+      "name": "AddEntryIx",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "address",
+            "type": "publicKey"
+          },
+          {
+            "name": "schema",
+            "type": "u8"
+          },
+          {
+            "name": "data",
+            "type": "string"
+          }
+        ]
+      }
+    }
+  ],
+  "errors": [
+    {
+      "code": 300,
+      "name": "InsufficientAuthority",
+      "msg": "User does not have authority to modify this registry entry"
+    }
+  ],
+  "metadata": {
+    "address": "govHvVVCZsdJLynaFJdqEWBU9AbJ4aHYdZsWno114V9"
+  }
+}

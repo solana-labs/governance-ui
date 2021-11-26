@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
-import { PlusIcon } from '@heroicons/react/outline'
+import { PlusIcon, XIcon } from '@heroicons/react/outline'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 // import Input from '../../components/Input'
 // import Button from '../../components/Button'
@@ -8,6 +8,10 @@ import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
 import useQueryContext from '../../hooks/useQueryContext'
+import { notify } from '@utils/notifications'
+import { removeRealm } from 'actions/removeRealm'
+import { PublicKey } from '@solana/web3.js'
+import { RpcContext } from '@models/core/api'
 
 // const COL = 'flex-col'
 // const ROW = 'flex-row'
@@ -17,11 +21,12 @@ const Realms = () => {
   const { fmtUrlWithCluster } = useQueryContext()
 
   //TODO when we fetch realms data from api add loader handling
-  const [isLoading] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
   const [realms, setRealms] = useState<RealmInfo[]>([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSearch] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
+  const wallet = useWalletStore((s) => s.current)
   const { actions, selectedRealm, connected, connection } = useWalletStore(
     (s) => s
   )
@@ -46,6 +51,31 @@ const Realms = () => {
   const goToRealm = ({ symbol }) => {
     const url = fmtUrlWithCluster(`/dao/${symbol}`)
     router.push(url)
+  }
+
+  const handleDeleteRealm = async (
+    governanceProgramId: PublicKey,
+    programVersion: number | undefined,
+    realmAddress: PublicKey
+  ) => {
+    setIsLoading(true)
+    try {
+      console.log(realmAddress.toBase58())
+      const rpcContext = new RpcContext(
+        governanceProgramId,
+        programVersion,
+        wallet,
+        connection.current,
+        connection.endpoint
+      )
+      await removeRealm(rpcContext, realmAddress)
+      const realms = await getAllRealmInfos(connection)
+      setRealms(realms)
+    } catch (ex) {
+      console.log(ex)
+      notify({ type: 'error', message: `${ex}` })
+    }
+    setIsLoading(false)
   }
 
   return (
@@ -75,24 +105,42 @@ const Realms = () => {
           <>
             {realms.map((realm: RealmInfo) => (
               <div
-                onClick={() => goToRealm(realm)}
-                className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
+                className="bg-bkg-2 rounded-lg relative"
                 key={realm.realmId.toString()}
               >
-                <div className="pb-5">
-                  {realm.ogImage ? (
-                    <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
-                      <img className="w-10" src={realm.ogImage}></img>
-                    </div>
-                  ) : (
-                    <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                      {realm.symbol?.charAt(0)}
-                    </div>
-                  )}
+                {wallet?.publicKey && realm.creator?.equals(wallet?.publicKey) && (
+                  <div
+                    className="h-6 w-6 text-fgd-3 absolute top-2 right-2 hover:bg-bkg-3 cursor-pointer rounded-full default-transition p-1"
+                    onClick={() =>
+                      handleDeleteRealm(
+                        realm.programId,
+                        realm.programVersion,
+                        realm.realmId
+                      )
+                    }
+                  >
+                    <XIcon />
+                  </div>
+                )}
+                <div
+                  onClick={() => goToRealm(realm)}
+                  className="cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3 h-full"
+                >
+                  <div className="pb-5">
+                    {realm.ogImage ? (
+                      <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
+                        <img className="w-10" src={realm.ogImage}></img>
+                      </div>
+                    ) : (
+                      <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                        {realm.symbol?.charAt(0)}
+                      </div>
+                    )}
+                  </div>
+                  <h3 className="text-center">
+                    {realm.displayName ?? realm.symbol}
+                  </h3>
                 </div>
-                <h3 className="text-center">
-                  {realm.displayName ?? realm.symbol}
-                </h3>
               </div>
             ))}
             {connected && (
