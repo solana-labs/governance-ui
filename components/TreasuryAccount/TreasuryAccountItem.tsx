@@ -1,17 +1,15 @@
 import { PublicKey } from '@solana/web3.js'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { getAccountName } from '@components/instructions/tools'
-import {
-  formatMintNaturalAmountAsDecimal,
-  numberWithCommas,
-} from '@tools/sdk/units'
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService, { TokenRecord } from '@utils/services/token'
 import { GovernedTokenAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import { abbreviateAddress } from '@utils/formatting'
 import { getExplorerUrl } from '../explorer/tools'
 import useWalletStore from '../../stores/useWalletStore'
+import BN from 'bn.js'
+import BigNumber from 'bignumber.js'
 
 const TreasuryAccountItem = ({
   governedAccountTokenAccount,
@@ -24,40 +22,41 @@ const TreasuryAccountItem = ({
   >(undefined)
   const connection = useWalletStore((s) => s.connection)
 
-  const tokenName = governedAccountTokenAccount
-    ? getMintMetadata(governedAccountTokenAccount.token?.account.mint)?.name
-    : ''
+  const mintAddress =
+    governedAccountTokenAccount && governedAccountTokenAccount.token
+      ? governedAccountTokenAccount.token.account.mint.toBase58()
+      : ''
 
   const amount =
     governedAccountTokenAccount && governedAccountTokenAccount.mint?.account
-      ? formatMintNaturalAmountAsDecimal(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      ? getMintDecimalAmountFromNatural(
           governedAccountTokenAccount.mint?.account,
-          governedAccountTokenAccount.token!.account.amount
-        )
-      : ''
+          new BN(governedAccountTokenAccount.token!.account.amount)
+        ).toNumber()
+      : 0
 
   const accountPublicKey = governedAccountTokenAccount
     ? governedAccountTokenAccount.governance?.info.governedAccount
     : null
 
   function handleSetTotalPrice() {
-    const price = tokenService.getUSDTokenPrice(tokenName)
-
-    const amountNumber = parseFloat(amount.split(',').join(''))
-    const totalPrice = amountNumber
-      ? numberWithCommas((amountNumber * price).toFixed(0))
+    const price = tokenService.getUSDTokenPrice(mintAddress)
+    console.log(amount, price, '@@@@@@')
+    const totalPrice = amount * price
+    const totalPriceFormatted = amount
+      ? new BigNumber(totalPrice).toFormat(0)
       : ''
-    setTotalPrice(totalPrice)
+    setTotalPrice(totalPriceFormatted)
   }
   async function handleSetTokenInfo() {
-    const info = await tokenService.getTokenInfo(tokenName)
+    const info = await tokenService.getTokenInfo(mintAddress)
     setTokenRecordInfo(info)
   }
   useEffect(() => {
     handleSetTokenInfo()
     handleSetTotalPrice()
-  }, [tokenName, amount])
+  }, [mintAddress, amount])
+  const amountFormatted = new BigNumber(amount).toFormat()
   return tokenRecordInfo?.symbol || amount ? (
     <a
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
@@ -91,7 +90,7 @@ const TreasuryAccountItem = ({
           </div>
         )}
         <div className="text-fgd-3 text-xs flex flex-col">
-          {amount} {tokenRecordInfo?.symbol}
+          {amountFormatted} {tokenRecordInfo?.symbol}
         </div>
         {totalPrice && totalPrice !== '0' ? (
           <div className="mt-0.5 text-fgd-3 text-xs">${totalPrice}</div>

@@ -29,7 +29,7 @@ import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
 import { validateDestinationAccAddress } from '@utils/validations'
-import useInstructions from '@hooks/useInstructions'
+import useGovernances from '@hooks/useGovernances'
 import BN from 'bn.js'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
@@ -44,7 +44,7 @@ const SplTokenTransfer = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useInstructions()
+  const { governedTokenAccounts } = useGovernances()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({

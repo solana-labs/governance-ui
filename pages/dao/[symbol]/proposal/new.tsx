@@ -27,7 +27,7 @@ import {
   Instructions,
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useInstructions from '@hooks/useInstructions'
+import useGovernances from '@hooks/useGovernances'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
@@ -61,7 +61,7 @@ const New = () => {
     mint,
     councilMint,
   } = useRealm()
-  const { getAvailableInstructions } = useInstructions()
+  const { getAvailableInstructions } = useGovernances()
   const availableInstructions = getAvailableInstructions()
 
   const wallet = useWalletStore((s) => s.current)
