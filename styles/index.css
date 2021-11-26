@@ -94,3 +94,9 @@ button {
 :placeholder-shown {
   @apply font-body;
 }
+
+::-webkit-calendar-picker-indicator {
+  /* display: none; */
+  color: white;
+  border: 1px solid white;
+}

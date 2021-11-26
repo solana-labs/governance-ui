@@ -1,9 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import dayjs from 'dayjs'
 import * as yup from 'yup'
+import * as anchor from '@project-serum/anchor'
 
 import useInstructions from '@hooks/useInstructions'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import { Governance } from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
@@ -12,13 +13,15 @@ import {
   FundAssemblyBudgetForm,
   Instruction,
 } from 'utils/uiTypes/proposalCreationTypes'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import { precision } from '@utils/formatting'
 import { NewProposalContext } from '../../new'
 import { isFormValid } from '@utils/formValidation'
 import SourceTokenAccountSelect from '../SourceTokenAccountSelect'
-import { validateDestinationAccAddress } from '@utils/validations'
 import { StyledLabel } from '@components/inputs/styles'
+
+import { serializeInstructionToBase64 } from '@models/serialisation'
+import { AssemblyClient } from '@models/assembly'
+import Input from '@components/inputs/Input'
+import { Wallet } from '@project-serum/anchor'
 
 const AddNewDistributorForm = ({ form, setForm }) => {
   const [authority, setAuthority] = useState('')
@@ -81,7 +84,8 @@ const FundAssemblyBudget = ({
   index: number
   governance: ParsedAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useWalletStore((s) => s.connection.current)
+  const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccounts } = useInstructions()
   const shouldBeGoverned = index !== 0 && governance
@@ -92,14 +96,11 @@ const FundAssemblyBudget = ({
     distributors: [],
     distEnd: dayjs().endOf('month'),
     reviewEnd: dayjs().endOf('month').add(7, 'days'),
-    redeemStart: dayjs().endOf('month').add(7, 'days'),
+    redeemStart: dayjs().endOf('month').add(7, 'days').add(1, 'minute'),
   })
 
   const [formErrors, setFormErrors] = useState({})
-  const mintMinAmount = form.rewardMintInfo
-    ? getMintMinAmountAsDecimal(form.rewardMintInfo)
-    : 1
-  const currentPrecision = precision(mintMinAmount)
+
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -108,6 +109,11 @@ const FundAssemblyBudget = ({
   const setMintInfo = (value) => {
     setForm({ ...form, rewardMintInfo: value })
   }
+  const setFormDate = (propertyName) => (event) =>
+    handleSetForm({
+      propertyName,
+      value: dayjs(event.target.value),
+    })
 
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
@@ -117,42 +123,82 @@ const FundAssemblyBudget = ({
   async function getInstructions(): Promise<Instruction[]> {
     const isValid = await validateInstruction()
     const now = new Date()
-    let serializedInstruction = ''
+    const instructions: TransactionInstruction[] = []
+
+    console.log(
+      'getInstructions',
+      !!isValid,
+      !!programId,
+      !!form.distributors.length,
+      form.distEnd.isAfter(now),
+      form.reviewEnd.isAfter(form.distEnd),
+      form.redeemStart.isAfter(form.reviewEnd)
+    )
 
     if (
       isValid &&
       programId &&
-      form.distributors.length > 0 &&
-      form.rewardMintInfo &&
+      form.distributors.length >= 0 &&
       form.distEnd.isAfter(now) &&
       form.reviewEnd.isAfter(form.distEnd) &&
       form.redeemStart.isAfter(form.reviewEnd)
     ) {
-      /* TODO: create all instructions
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.mintInfo?.decimals
+      const programId = new PublicKey(
+        '7BcUuHjJFLkcY2ahoMqwAjntC8F822fTAs4V2MZSZLw9'
       )
 
-      const transferIx = Token.createTransferInstruction(
-        TOKEN_PROGRAM_ID,
-        form.governedAccount.token?.account.address,
-        new PublicKey(form.destinationAccount),
-        form.governedAccount.governance!.pubkey,
-        [],
-        mintAmount
+      console.log({ connection, wallet })
+      const provider = new anchor.Provider(
+        connection,
+        (wallet as unknown) as Wallet,
+        anchor.Provider.defaultOptions()
       )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-      */
-      serializedInstruction = ''
+
+      console.log({ provider })
+
+      const client = await AssemblyClient.connect(programId, provider)
+
+      const rewardMintPk = form.governedAccount?.mint?.publicKey
+      const governancePk = form.governedAccount?.governance?.pubkey
+      const distributors = form.distributors.map((v) => ({
+        ...v,
+        authority: new PublicKey(v.authority),
+      }))
+
+      const distMintPk = await client.prepareDistMint(
+        rewardMintPk!,
+        distributors,
+        governancePk
+      )
+
+      console.log('distMintPk', distMintPk.toString())
+
+      const { ix } = await client.createDistributorInstruction(
+        distMintPk,
+        rewardMintPk!,
+        governancePk!,
+        form.distEnd.unix(),
+        form.redeemStart.unix()
+      )
+      instructions.push(ix)
+
+      const ixs = await client.mintBudgetInstructions(
+        distMintPk,
+        rewardMintPk!,
+        distributors,
+        governancePk
+      )
+
+      console.log('ixs', ixs)
+
+      instructions.push(...ixs)
     }
-    const ixs: Instruction[] = [
-      {
-        serializedInstruction,
-        isValid,
-        governedAccount: form.governedAccount,
-      },
-    ]
+
+    const ixs: Instruction[] = instructions.map((ix) => ({
+      serializedInstruction: serializeInstructionToBase64(ix),
+      isValid,
+      governedAccount: form.governedAccount,
+    }))
     return ixs
   }
 
@@ -182,6 +228,27 @@ const FundAssemblyBudget = ({
 
   return (
     <>
+      <Input
+        label="Distribution End"
+        value={form.distEnd.format('YYYY-MM-DDThh:mm')}
+        type="datetime-local"
+        onChange={setFormDate('distEnd')}
+        error={formErrors['distEnd']}
+      />
+      <Input
+        label="Review End"
+        value={form.reviewEnd.format('YYYY-MM-DDThh:mm')}
+        type="datetime-local"
+        onChange={setFormDate('reviewEnd')}
+        error={formErrors['reviewEnd']}
+      />
+      <Input
+        label="Redemption Start"
+        value={form.redeemStart.format('YYYY-MM-DDThh:mm')}
+        type="datetime-local"
+        onChange={setFormDate('redeemStart')}
+        error={formErrors['redeemStart']}
+      />
       <SourceTokenAccountSelect
         governedTokenAccounts={governedTokenAccounts}
         onChange={(value) =>
@@ -192,7 +259,6 @@ const FundAssemblyBudget = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></SourceTokenAccountSelect>
-
       <table className="table-auto gap-1 space-1 text-left">
         {form.distributors.length > 0 ? (
           <thead>

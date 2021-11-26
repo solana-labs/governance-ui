@@ -74,6 +74,7 @@ const DEVNET_REALMS: RealmInfo[] = [
     displayName: 'Mango DAO',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
+    ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
   },
   {
     symbol: 'SOCEAN',

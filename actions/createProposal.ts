@@ -12,6 +12,7 @@ import { withInsertInstruction } from '@models/withInsertInstruction'
 import { InstructionData } from '@models/accounts'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@models/withSignOffProposal'
+import { chunk } from '@models/assembly/chunk'
 
 export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -81,17 +82,23 @@ export const createProposal = async (
     )
   }
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+  const chunks = chunk(instructions, 4)
+  for (const chunk of chunks) {
+    const transaction = new Transaction()
 
-  await sendTransaction({
-    transaction,
-    wallet,
-    connection,
-    signers,
-    sendingMessage: `creating ${notificationTitle}`,
-    successMessage: `${notificationTitle} created`,
-  })
+    transaction.add(...chunk)
+
+    const signature = await sendTransaction({
+      transaction,
+      wallet,
+      connection,
+      signers,
+      sendingMessage: `creating ${notificationTitle}`,
+      successMessage: `${notificationTitle} created`,
+    })
+
+    console.log(signature)
+  }
 
   return proposalAddress
 }

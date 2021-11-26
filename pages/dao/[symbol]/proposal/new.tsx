@@ -109,6 +109,10 @@ const New = () => {
         const instruction: Instruction = await inst?.getInstruction()
         instructions.push(instruction)
       }
+      if (inst.getInstructions) {
+        const ixs: Instruction[] = await inst?.getInstructions()
+        instructions.push(...ixs)
+      }
     }
     return instructions
   }

@@ -1,6 +1,7 @@
 import { PublicKey, Transaction } from '@solana/web3.js'
 import base58 from 'bs58'
 
+// TODO change this to accept cluster not endpoint as argument
 export function getExplorerUrl(
   endpoint: string,
   viewTypeOrItemAddress: 'inspector' | PublicKey,
@@ -12,7 +13,7 @@ export function getExplorerUrl(
       cluster = `custom&customUrl=${encodeURIComponent(
         'http://127.0.0.1:8899'
       )}`
-    } else if (endpoint === 'https://api.devnet.solana.com') {
+    } else if (endpoint === 'https://mango.devnet.rpcpool.com') {
       cluster = 'devnet'
     }
 
