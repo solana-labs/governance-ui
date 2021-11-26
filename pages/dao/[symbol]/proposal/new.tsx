@@ -23,7 +23,7 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
 import {
   ComponentInstructionData,
-  Instruction,
+  UiInstruction,
   Instructions,
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
@@ -32,8 +32,10 @@ import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
+import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
-
+import CustomBase64 from './components/instructions/CustomBase64'
+import { getTimestampFromDays } from '@tools/sdk/units'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -53,6 +55,7 @@ const New = () => {
   const {
     symbol,
     realm,
+    realmInfo,
     realmDisplayName,
     ownVoterWeight,
     mint,
@@ -104,10 +107,10 @@ const New = () => {
     setInstructions([...instructionsData.filter((x, index) => index !== idx)])
   }
   const handleGetInstructions = async () => {
-    const instructions: Instruction[] = []
+    const instructions: UiInstruction[] = []
     for (const inst of instructionsData) {
       if (inst.getInstruction) {
-        const instruction: Instruction = await inst?.getInstruction()
+        const instruction: UiInstruction = await inst?.getInstruction()
         instructions.push(instruction)
       }
     }
@@ -121,14 +124,14 @@ const New = () => {
       form
     )
 
-    const instructions: Instruction[] = await handleGetInstructions()
+    const instructions: UiInstruction[] = await handleGetInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
       setIsLoading(false)
       throw 'No realm selected'
     }
 
-    if (isValid && instructions.every((x: Instruction) => x.isValid)) {
+    if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
       let selectedGovernance = governance
       if (!governance) {
         setIsLoading(false)
@@ -137,13 +140,21 @@ const New = () => {
 
       const rpcContext = new RpcContext(
         new PublicKey(realm.account.owner.toString()),
+        realmInfo?.programVersion,
         wallet,
         connection.current,
         connection.endpoint
       )
-      const instructionsData = instructions.map((x) =>
-        getInstructionDataFromBase64(x.serializedInstruction)
-      )
+      const instructionsData = instructions.map((x) => {
+        return {
+          data: x.serializedInstruction
+            ? getInstructionDataFromBase64(x.serializedInstruction)
+            : null,
+          holdUpTime: x.customHoldUpTime
+            ? getTimestampFromDays(x.customHoldUpTime)
+            : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+        }
+      })
 
       try {
         // Fetch governance to get up to date proposalCount
@@ -178,7 +189,6 @@ const New = () => {
           form.title,
           form.description,
           proposalMint,
-          selectedGovernance?.info?.config.minInstructionHoldUpTime,
           selectedGovernance?.info?.proposalCount,
           instructionsData,
           isDraft
@@ -225,6 +235,10 @@ const New = () => {
         )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
+      case Instructions.Base64:
+        return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.None:
+        return <Empty index={idx} governance={governance}></Empty>
       default:
         null
     }

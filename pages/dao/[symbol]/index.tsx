@@ -8,6 +8,7 @@ import { Proposal, ProposalState } from '../../../models/accounts'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from '../../../components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
+import TreasuryAccountsCompactWrapper from '@components/TreasuryAccount/TreasuryAccountsCompactWrapper'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -105,6 +106,7 @@ const REALM = () => {
         </div>
         <div className="col-span-12 md:col-span-5 lg:col-span-4">
           <TokenBalanceCard />
+          <TreasuryAccountsCompactWrapper />
         </div>
       </div>
     </>

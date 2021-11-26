@@ -3,12 +3,18 @@ import { ParsedAccount } from '@models/core/accounts'
 import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import { GovernedMintInfoAccount, GovernedTokenAccount } from '@utils/tokens'
+import {
+  GovernedMintInfoAccount,
+  GovernedMultiTypeAccount,
+  GovernedProgramAccount,
+  GovernedTokenAccount,
+} from '@utils/tokens'
 
-export interface Instruction {
+export interface UiInstruction {
   serializedInstruction: string
   isValid: boolean
   governedAccount: ParsedAccount<Governance> | undefined
+  customHoldUpTime?: number
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
@@ -26,15 +32,27 @@ export interface MintForm {
 }
 
 export interface ProgramUpgradeForm {
-  governedAccount: ParsedAccount<Governance> | undefined
+  governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
   bufferAddress: string
+}
+
+export interface Base64InstructionForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
+  base64: string
+  holdUpTime: number
+}
+
+export interface EmptyInstructionForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
 }
 
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
   Mint,
+  Base64,
+  None,
 }
 
 export type createParams = [
@@ -53,7 +71,7 @@ export type createParams = [
 
 export interface ComponentInstructionData {
   governedAccount?: ParsedAccount<Governance> | undefined
-  getInstruction?: () => Promise<Instruction>
+  getInstruction?: () => Promise<UiInstruction>
   type: any
 }
 export interface InstructionsContext {
