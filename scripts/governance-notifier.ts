@@ -107,4 +107,7 @@ async function runNotifier() {
   )
 }
 
+// start notifier immediately
+errorWrapper()
+
 setInterval(errorWrapper, fiveMinutesSeconds * 1000)
