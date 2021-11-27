@@ -10,8 +10,10 @@ import { getExplorerUrl } from '../explorer/tools'
 import useWalletStore from '../../stores/useWalletStore'
 import BN from 'bn.js'
 import BigNumber from 'bignumber.js'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { ViewState } from './Types'
 
-const TreasuryAccountItem = ({
+const AccountItem = ({
   governedAccountTokenAccount,
 }: {
   governedAccountTokenAccount: GovernedTokenAccount
@@ -21,6 +23,10 @@ const TreasuryAccountItem = ({
     TokenRecord | undefined
   >(undefined)
   const connection = useWalletStore((s) => s.connection)
+  const {
+    setCurrentCompactView,
+    setCurrentCompactAccount,
+  } = useTreasuryAccountStore()
 
   const mintAddress =
     governedAccountTokenAccount && governedAccountTokenAccount.token
@@ -41,7 +47,6 @@ const TreasuryAccountItem = ({
 
   function handleSetTotalPrice() {
     const price = tokenService.getUSDTokenPrice(mintAddress)
-    console.log(amount, price, '@@@@@@')
     const totalPrice = amount * price
     const totalPriceFormatted = amount
       ? new BigNumber(totalPrice).toFormat(0)
@@ -49,16 +54,24 @@ const TreasuryAccountItem = ({
     setTotalPrice(totalPriceFormatted)
   }
   async function handleSetTokenInfo() {
-    const info = await tokenService.getTokenInfo(mintAddress)
+    const info = tokenService.getTokenInfo(mintAddress)
     setTokenRecordInfo(info)
   }
+  async function handleGoToAccountOverview() {
+    setCurrentCompactView(ViewState.AccountView)
+    setCurrentCompactAccount(governedAccountTokenAccount)
+  }
+
   useEffect(() => {
     handleSetTokenInfo()
     handleSetTotalPrice()
   }, [mintAddress, amount])
   const amountFormatted = new BigNumber(amount).toFormat()
   return tokenRecordInfo?.symbol || amount ? (
-    <div className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3">
+    <div
+      onClick={handleGoToAccountOverview}
+      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
+    >
       {tokenRecordInfo?.logoURI && (
         <img
           className="flex-shrink-0 h-6 w-6 mr-2.5 mt-1"
@@ -103,4 +116,4 @@ const TreasuryAccountItem = ({
   ) : null
 }
 
-export default TreasuryAccountItem
+export default AccountItem
