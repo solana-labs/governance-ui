@@ -1,20 +1,23 @@
 import Button from '@components/Button'
+import { getExplorerUrlForTxSign } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
-import { PublicKey } from '@solana/web3.js'
+import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import { abbreviateAddress } from '@utils/formatting'
+import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import useWalletStore from 'stores/useWalletStore'
 import { ViewState } from './Types'
 
 const AccountOverview = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const connection = useWalletStore((s) => s.connection)
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const mintAddress = useTreasuryAccountStore((s) => s.compact.mintAddress)
 
@@ -23,6 +26,9 @@ const AccountOverview = () => {
     resetCompactViewState,
   } = useTreasuryAccountStore()
   const [totalPrice, setTotalPrice] = useState('')
+  const [recentActivity, setRecentActivity] = useState<
+    ConfirmedSignatureInfo[]
+  >([])
   const accountPublicKey = currentAccount
     ? currentAccount.governance?.info.governedAccount
     : null
@@ -43,13 +49,26 @@ const AccountOverview = () => {
       : ''
     setTotalPrice(totalPriceFormatted)
   }
-  function handleGoBackToMainView() {
+  const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
-
+  const handleGetAccountHistory = async () => {
+    const resp = await connection.current.getConfirmedSignaturesForAddress2(
+      currentAccount!.governance!.info.governedAccount,
+      {
+        limit: 6,
+      },
+      //TODO confirmed ?
+      'confirmed'
+    )
+    setRecentActivity(resp)
+  }
   useEffect(() => {
     handleSetTotalPrice()
+    if (currentAccount) {
+      handleGetAccountHistory()
+    }
   }, [currentAccount])
   return (
     <>
@@ -87,10 +106,41 @@ const AccountOverview = () => {
           </h3>
         </div>
       </div>
-      <div className="flex justify-center">
-        <Button onClick={() => setCurrentCompactView(ViewState.Send)}>
+      <div className="flex justify-center mb-4">
+        <Button
+          className="lg:w-1/2"
+          onClick={() => setCurrentCompactView(ViewState.Send)}
+        >
           Send
         </Button>
+      </div>
+      <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
+        Recent activity
+      </div>
+      <div>
+        {recentActivity.map((activity) => (
+          <a
+            href={
+              activity.signature
+                ? getExplorerUrlForTxSign(
+                    connection.endpoint,
+                    activity.signature
+                  )
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
+            key={activity.signature}
+          >
+            <div>{activity.signature.substring(0, 12)}...</div>
+            <div className="ml-auto text-fgd-3 text-xs flex flex-col">
+              {activity.blockTime
+                ? fmtUnixTime(new BN(activity.blockTime))
+                : null}
+            </div>
+          </a>
+        ))}
       </div>
     </>
   )

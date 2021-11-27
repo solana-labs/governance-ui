@@ -98,6 +98,7 @@ const AccountItem = ({
               }
               target="_blank"
               rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
             >
               <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
             </a>

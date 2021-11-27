@@ -22,6 +22,27 @@ export function getExplorerUrl(
   return `https://explorer.solana.com/${itemType}/${viewTypeOrItemAddress}${getClusterUrlParam()}`
 }
 
+export function getExplorerUrlForTxSign(
+  endpoint: string,
+  viewTypeOrItemAddress: 'inspector' | string,
+  itemType = 'tx'
+) {
+  const getClusterUrlParam = () => {
+    let cluster = ''
+    if (endpoint === 'localnet') {
+      cluster = `custom&customUrl=${encodeURIComponent(
+        'http://127.0.0.1:8899'
+      )}`
+    } else if (endpoint === 'https://api.devnet.solana.com') {
+      cluster = 'devnet'
+    }
+
+    return cluster ? `?cluster=${cluster}` : ''
+  }
+
+  return `https://explorer.solana.com/${itemType}/${viewTypeOrItemAddress}${getClusterUrlParam()}`
+}
+
 /// Returns explorer inspector URL for the given transaction
 export function getExplorerInspectorUrl(
   endpoint: string,
