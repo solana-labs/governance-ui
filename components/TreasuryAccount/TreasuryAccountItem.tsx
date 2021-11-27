@@ -58,16 +58,7 @@ const TreasuryAccountItem = ({
   }, [mintAddress, amount])
   const amountFormatted = new BigNumber(amount).toFormat()
   return tokenRecordInfo?.symbol || amount ? (
-    <a
-      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
-      href={
-        accountPublicKey
-          ? getExplorerUrl(connection.endpoint, accountPublicKey)
-          : ''
-      }
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <div className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3">
       {tokenRecordInfo?.logoURI && (
         <img
           className="flex-shrink-0 h-6 w-6 mr-2.5 mt-1"
@@ -86,7 +77,17 @@ const TreasuryAccountItem = ({
                 {abbreviateAddress(accountPublicKey as PublicKey)}
               </div>
             )}
-            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+            <a
+              href={
+                accountPublicKey
+                  ? getExplorerUrl(connection.endpoint, accountPublicKey)
+                  : ''
+              }
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+            </a>
           </div>
         )}
         <div className="text-fgd-3 text-xs flex flex-col">
@@ -98,7 +99,7 @@ const TreasuryAccountItem = ({
           ''
         )}
       </div>
-    </a>
+    </div>
   ) : null
 }
 
