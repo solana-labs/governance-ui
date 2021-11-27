@@ -33,8 +33,10 @@ const Realms = () => {
 
   useMemo(async () => {
     if (connection) {
+      setIsLoading(true)
       const data: RealmInfo[] = await getAllRealmInfos(connection)
       setRealms(data)
+      setIsLoading(false)
     }
     if (selectedRealm.realm) {
       actions.deselectRealm()
@@ -56,11 +58,10 @@ const Realms = () => {
   const handleDeleteRealm = async (
     governanceProgramId: PublicKey,
     programVersion: number | undefined,
-    realmAddress: PublicKey
+    realmId: string
   ) => {
     setIsLoading(true)
     try {
-      console.log(realmAddress.toBase58())
       const rpcContext = new RpcContext(
         governanceProgramId,
         programVersion,
@@ -68,7 +69,7 @@ const Realms = () => {
         connection.current,
         connection.endpoint
       )
-      await removeRealm(rpcContext, realmAddress)
+      await removeRealm(rpcContext, new PublicKey(realmId))
       const realms = await getAllRealmInfos(connection)
       setRealms(realms)
     } catch (ex) {
@@ -115,7 +116,7 @@ const Realms = () => {
                       handleDeleteRealm(
                         realm.programId,
                         realm.programVersion,
-                        realm.realmId
+                        realm.realmId.toString()
                       )
                     }
                   >

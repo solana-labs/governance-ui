@@ -36,9 +36,14 @@ export async function registerRealm(
   await withAddEntry(
     instructions,
     realmAddress,
-    name,
-    description,
-    imageUrl,
+    0,
+    JSON.stringify({
+      programId: programId.toBase58(),
+      ogImage: imageUrl,
+      displayName: name,
+      description,
+      realmId: realmAddress.toBase58(),
+    }),
     walletPubkey
   )
 

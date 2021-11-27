@@ -14,9 +14,8 @@ import {
 export async function withAddEntry(
   instructions: TransactionInstruction[],
   address: PublicKey,
-  name: string,
-  subname: string | undefined,
-  imageUrl: string | undefined,
+  schema: number,
+  data: string,
   creator: PublicKey
 ) {
   const [registryContext] = await PublicKey.findProgramAddress(
@@ -32,12 +31,8 @@ export async function withAddEntry(
     ix: {
       bump,
       address,
-      schema: 0,
-      data: JSON.stringify({
-        name,
-        subname,
-        imageUrl,
-      }),
+      schema,
+      data,
     },
   })
   instructions.push(

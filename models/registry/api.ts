@@ -239,6 +239,13 @@ export function getAllRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
+const kebabCase = (str) =>
+  str &&
+  str
+    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+    .map((x) => x.toLowerCase())
+    .join('-')
+
 export async function fetchAllRealms(
   cluster: EndpointTypes,
   connection: Connection
@@ -257,14 +264,13 @@ export async function fetchAllRealms(
         try {
           const entry = await program.account.entryData.fetch(account.pubkey)
           // @ts-ignore
-          // const data = JSON.parse(entry.data)
+          const data = JSON.parse(entry.data)
           return {
             ...entry,
-            // symbol: data.symbol,
-            // displayName: data.name,
+            symbol: kebabCase(data.displayName),
             realmId: account.pubkey,
             programId: account.account.owner,
-            // ...data,
+            ...data,
           }
         } catch (e) {
           console.log(`Error mapping account ${account.pubkey}: ${e}`)

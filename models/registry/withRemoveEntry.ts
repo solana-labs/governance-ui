@@ -1,6 +1,11 @@
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import * as anchor from '@project-serum/anchor'
-import { REGISTRY_CONTEXT_SEED, REGISTRY_ID, PROGRAM_IDL } from './api'
+import {
+  ENTRY_SEED,
+  REGISTRY_CONTEXT_SEED,
+  REGISTRY_ID,
+  PROGRAM_IDL,
+} from './api'
 
 export async function withRemoveEntry(
   instructions: TransactionInstruction[],
@@ -9,6 +14,10 @@ export async function withRemoveEntry(
 ) {
   const [registryContext] = await PublicKey.findProgramAddress(
     [anchor.utils.bytes.utf8.encode(REGISTRY_CONTEXT_SEED)],
+    REGISTRY_ID
+  )
+  const [seededPubkey] = await PublicKey.findProgramAddress(
+    [anchor.utils.bytes.utf8.encode(ENTRY_SEED), address.toBuffer()],
     REGISTRY_ID
   )
   const coder = new anchor.Coder(PROGRAM_IDL)
@@ -26,7 +35,7 @@ export async function withRemoveEntry(
           isWritable: true,
         },
         {
-          pubkey: address,
+          pubkey: seededPubkey,
           isSigner: false,
           isWritable: true,
         },
