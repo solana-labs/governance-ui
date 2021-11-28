@@ -190,9 +190,6 @@ const SendTokens = () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
-      const proposalTitle = `Pay ${form.amount} ${
-        tokenInfo ? tokenInfo?.symbol : ''
-      } to ${form.destinationAccount}`
       const governance = currentAccount?.governance
       let proposalAddress: PublicKey | null = null
       if (!realm) {
