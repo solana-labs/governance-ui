@@ -84,7 +84,7 @@ const SendTokens = () => {
     title: '',
     description: '',
   })
-  const [showOptionalInputs, setShowOptionalInputs] = useState(false)
+  const [showReferenceFields, setShowReferenceFields] = useState(false)
   const [
     destinationAccount,
     setDestinationAccount,
@@ -302,6 +302,9 @@ const SendTokens = () => {
 
   const schema = returnTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
+  const proposalTitle = `Pay ${form.amount}${
+    tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
+  }to ${form.destinationAccount}`
   return (
     <>
       <h3 className="mb-4 flex items-center">
@@ -365,18 +368,18 @@ const SendTokens = () => {
             : null}
         </small>
         <div className={'flex items-center'}>
-          {showOptionalInputs ? (
+          {showReferenceFields ? (
             <ArrowCircleUpIcon
-              onClick={() => setShowOptionalInputs(false)}
+              onClick={() => setShowReferenceFields(false)}
               className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer"
             />
           ) : (
             <ArrowCircleDownIcon
-              onClick={() => setShowOptionalInputs(true)}
+              onClick={() => setShowReferenceFields(true)}
               className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer"
             />
           )}
-          <small className="text-fgd-3">Options</small>
+          <small className="text-fgd-3">Reference</small>
           {/* popover with description maybe will be needed later */}
           {/* <Popover className="relative ml-auto border-none flex">
             <Popover.Button className="focus:outline-none">
@@ -392,12 +395,16 @@ const SendTokens = () => {
             </Popover.Panel>
           </Popover> */}
         </div>
-        {showOptionalInputs && (
+        {showReferenceFields && (
           <>
             <Input
               noMaxWidth={true}
               label="Title"
-              placeholder="Title of your proposal"
+              placeholder={
+                form.amount && form.destinationAccount
+                  ? proposalTitle
+                  : 'Title of your proposal'
+              }
               value={form.title}
               type="text"
               onChange={(evt) =>
@@ -410,7 +417,11 @@ const SendTokens = () => {
             <Textarea
               noMaxWidth={true}
               label="Description"
-              placeholder="Description of your proposal or use a github gist link (optional)"
+              placeholder={
+                form.amount && form.destinationAccount
+                  ? proposalTitle
+                  : 'Description of your proposal or use a github gist link (optional)'
+              }
               wrapperClassName="mb-5"
               value={form.description}
               onChange={(evt) =>
