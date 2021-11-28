@@ -1,5 +1,5 @@
 import Button from '@components/Button'
-import { getExplorerUrlForTxSign } from '@components/explorer/tools'
+import { getExplorerUrl } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -83,10 +83,7 @@ const AccountOverview = () => {
           <a
             href={
               activity.signature
-                ? getExplorerUrlForTxSign(
-                    connection.endpoint,
-                    activity.signature
-                  )
+                ? getExplorerUrl(connection.endpoint, activity.signature, 'tx')
                 : ''
             }
             target="_blank"

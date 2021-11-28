@@ -32,7 +32,9 @@ export default function useGovernanceAssets() {
     )
   }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
-  const canUseTransferInstruction = true
+  const canUseTransferInstruction = canUseGovernanceForInstruction(
+    GovernanceAccountType.TokenGovernance
+  )
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction(
     GovernanceAccountType.ProgramGovernance
