@@ -5,7 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { AccountInfo, Token } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import {
-  getMintDecimalAmountFromNatural,
+  //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
@@ -19,7 +19,7 @@ import {
   tryGetTokenAccount,
 } from '@utils/tokens'
 import {
-  SplTokenTransferForm,
+  SendTokenCompactViewForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import React, { useEffect, useState } from 'react'
@@ -28,7 +28,12 @@ import useWalletStore from 'stores/useWalletStore'
 import { ViewState } from './Types'
 import { BN } from '@project-serum/anchor'
 import { returnTokenTransferSchema } from '@utils/validations'
-import { ArrowLeftIcon } from '@heroicons/react/solid'
+import {
+  ArrowCircleDownIcon,
+  ArrowCircleUpIcon,
+  ArrowLeftIcon,
+  //   InformationCircleIcon,
+} from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
 import { isFormValid } from '@utils/formValidation'
@@ -43,6 +48,8 @@ import { ParsedAccount } from '@models/core/accounts'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
+import Textarea from '@components/inputs/Textarea'
+// import { Popover } from '@headlessui/react'
 
 const SendTokens = () => {
   const {
@@ -67,14 +74,17 @@ const SendTokens = () => {
   const router = useRouter()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<SplTokenTransferForm>({
+  const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
     // No default transfer amount
     amount: undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
+    title: '',
+    description: '',
   })
+  const [showOptionalInputs, setShowOptionalInputs] = useState(false)
   const [
     destinationAccount,
     setDestinationAccount,
@@ -117,19 +127,19 @@ const SendTokens = () => {
       propertyName: 'amount',
     })
   }
-  const setMaxAmount = () => {
-    const amount =
-      currentAccount && currentAccount.mint?.account
-        ? getMintDecimalAmountFromNatural(
-            currentAccount.mint?.account,
-            new BN(currentAccount.token!.account.amount)
-          ).toNumber()
-        : 0
-    handleSetForm({
-      value: amount,
-      propertyName: 'amount',
-    })
-  }
+  //   const setMaxAmount = () => {
+  //     const amount =
+  //       currentAccount && currentAccount.mint?.account
+  //         ? getMintDecimalAmountFromNatural(
+  //             currentAccount.mint?.account,
+  //             new BN(currentAccount.token!.account.amount)
+  //           ).toNumber()
+  //         : 0
+  //     handleSetForm({
+  //       value: amount,
+  //       propertyName: 'amount',
+  //     })
+  //   }
   const calcTransactionDolarAmount = (amount) => {
     const price = tokenService.getUSDTokenPrice(
       currentAccount!.mint!.publicKey.toBase58()
@@ -180,6 +190,9 @@ const SendTokens = () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
+      const proposalTitle = `Pay ${form.amount} ${
+        tokenInfo ? tokenInfo?.symbol : ''
+      } to ${form.destinationAccount}`
       const governance = currentAccount?.governance
       let proposalAddress: PublicKey | null = null
       if (!realm) {
@@ -224,14 +237,14 @@ const SendTokens = () => {
             'There is no suitable governing token for the proposal'
           )
         }
-        //TODO description ?
+        //Description same as title
         proposalAddress = await createProposal(
           rpcContext,
           realm.pubkey,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
-          'test proposal',
-          'test description',
+          form.title ? form.title : proposalTitle,
+          form.description ? form.description : proposalTitle,
           proposalMint,
           selectedGovernance?.info?.proposalCount,
           [instructionData],
@@ -247,6 +260,22 @@ const SendTokens = () => {
     }
     setIsLoading(false)
   }
+  const returnIfAmountIsNotHigherBalance = () => {
+    const mintValue = getMintNaturalAmountFromDecimal(
+      form.amount!,
+      form.governedTokenAccount!.mint!.account.decimals
+    )
+    let gte: boolean | undefined = false
+    try {
+      gte = form.governedTokenAccount?.token?.account?.amount?.gte(
+        new BN(mintValue)
+      )
+    } catch (e) {
+      //silent fail
+    }
+    return form.governedTokenAccount?.token?.publicKey && gte
+  }
+
   useEffect(() => {
     if (currentAccount) {
       handleSetForm({
@@ -270,17 +299,7 @@ const SendTokens = () => {
       setDestinationAccount(null)
     }
   }, [form.destinationAccount])
-  const returnIfAmountIsNotHigherBalance = () => {
-    const mintValue = getMintNaturalAmountFromDecimal(
-      form.amount!,
-      form.governedTokenAccount!.mint!.account.decimals
-    )
 
-    return (
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount.token.account.amount.gte(new BN(mintValue))
-    )
-  }
   const schema = returnTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   return (
@@ -299,7 +318,7 @@ const SendTokens = () => {
           <img className="flex-shrink-0 h-14 w-14" src={tokenInfo.logoURI} />
         </div>
       )}
-      <div className="space-y-4 w-full">
+      <div className="space-y-4 w-full pb-4">
         <Input
           label="Destination account"
           value={form.destinationAccount}
@@ -310,6 +329,7 @@ const SendTokens = () => {
               propertyName: 'destinationAccount',
             })
           }
+          noMaxWidth={true}
           error={formErrors['destinationAccount']}
         />
         {destinationAccount && (
@@ -326,21 +346,17 @@ const SendTokens = () => {
             <div className="text-xs break-all">{destinationAccountName}</div>
           </div>
         )}
-        <div className="flex">
-          <Input
-            min={mintMinAmount}
-            label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
-            value={form.amount}
-            type="number"
-            onChange={setAmount}
-            step={mintMinAmount}
-            error={formErrors['amount']}
-            onBlur={validateAmountOnBlur}
-          />
-          <Button className="self-end mb-1 ml-2 text-xs" onClick={setMaxAmount}>
-            Max
-          </Button>
-        </div>
+        <Input
+          min={mintMinAmount}
+          label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
+          value={form.amount}
+          type="number"
+          onChange={setAmount}
+          step={mintMinAmount}
+          error={formErrors['amount']}
+          onBlur={validateAmountOnBlur}
+          noMaxWidth={true}
+        />
         <small className="text-red">
           {transactionDolarAmount
             ? returnIfAmountIsNotHigherBalance()
@@ -348,6 +364,64 @@ const SendTokens = () => {
               : 'Insufficient balance'
             : null}
         </small>
+        <div className={'flex items-center'}>
+          {showOptionalInputs ? (
+            <ArrowCircleUpIcon
+              onClick={() => setShowOptionalInputs(false)}
+              className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer"
+            />
+          ) : (
+            <ArrowCircleDownIcon
+              onClick={() => setShowOptionalInputs(true)}
+              className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer"
+            />
+          )}
+          <small className="text-fgd-3">Options</small>
+          {/* popover with description maybe will be needed later */}
+          {/* <Popover className="relative ml-auto border-none flex">
+            <Popover.Button className="focus:outline-none">
+              <InformationCircleIcon className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer" />
+            </Popover.Button>
+
+            <Popover.Panel className="absolute z-10 right-4 top-4 w-80">
+              <div className="bg-bkg-1 px-4 py-2 rounded-md text-xs">
+                {`In case of empty fields of advanced options, title and description will be
+                combination of amount token symbol and destination account e.g
+                "Pay 10 sol to PF295R1YJ8n1..."`}
+              </div>
+            </Popover.Panel>
+          </Popover> */}
+        </div>
+        {showOptionalInputs && (
+          <>
+            <Input
+              noMaxWidth={true}
+              label="Title"
+              placeholder="Title of your proposal"
+              value={form.title}
+              type="text"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'title',
+                })
+              }
+            />
+            <Textarea
+              noMaxWidth={true}
+              label="Description"
+              placeholder="Description of your proposal or use a github gist link (optional)"
+              wrapperClassName="mb-5"
+              value={form.description}
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'description',
+                })
+              }
+            ></Textarea>
+          </>
+        )}
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <SecondaryButton

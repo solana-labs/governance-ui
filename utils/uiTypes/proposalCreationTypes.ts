@@ -24,6 +24,11 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+  description: string
+  title: string
+}
+
 export interface MintForm {
   destinationAccount: string
   amount: number | undefined
