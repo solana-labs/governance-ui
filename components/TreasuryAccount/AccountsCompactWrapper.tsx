@@ -7,6 +7,7 @@ import useRealm from '@hooks/useRealm'
 import { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
 import SendTokens from './SendTokens'
+import DepositTokens from './DepositTokens'
 
 const AccountsCompactWrapper = () => {
   const { governedTokenAccounts } = useGovernances()
@@ -29,6 +30,8 @@ const AccountsCompactWrapper = () => {
         return <AccountOverview></AccountOverview>
       case ViewState.Send:
         return <SendTokens></SendTokens>
+      case ViewState.Deposit:
+        return <DepositTokens></DepositTokens>
     }
   }
   useEffect(() => {

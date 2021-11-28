@@ -59,7 +59,7 @@ const AccountItem = ({
   }
   async function handleGoToAccountOverview() {
     setCurrentCompactView(ViewState.AccountView)
-    setCurrentCompactAccount(governedAccountTokenAccount)
+    setCurrentCompactAccount(governedAccountTokenAccount, connection)
   }
 
   useEffect(() => {

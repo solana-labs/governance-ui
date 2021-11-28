@@ -2,7 +2,7 @@ import Button from '@components/Button'
 import { getExplorerUrlForTxSign } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
-import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import tokenService from '@utils/services/token'
@@ -20,15 +20,15 @@ const AccountOverview = () => {
   const connection = useWalletStore((s) => s.connection)
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const mintAddress = useTreasuryAccountStore((s) => s.compact.mintAddress)
+  const recentActivity = useTreasuryAccountStore(
+    (s) => s.compact.recentActivity
+  )
 
   const {
     setCurrentCompactView,
     resetCompactViewState,
   } = useTreasuryAccountStore()
   const [totalPrice, setTotalPrice] = useState('')
-  const [recentActivity, setRecentActivity] = useState<
-    ConfirmedSignatureInfo[]
-  >([])
   const accountPublicKey = currentAccount
     ? currentAccount.governance?.info.governedAccount
     : null
@@ -53,22 +53,8 @@ const AccountOverview = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
-  const handleGetAccountHistory = async () => {
-    const resp = await connection.current.getConfirmedSignaturesForAddress2(
-      currentAccount!.governance!.info.governedAccount,
-      {
-        limit: 6,
-      },
-      //TODO confirmed ?
-      'confirmed'
-    )
-    setRecentActivity(resp)
-  }
   useEffect(() => {
     handleSetTotalPrice()
-    if (currentAccount) {
-      handleGetAccountHistory()
-    }
   }, [currentAccount])
   return (
     <>
@@ -106,9 +92,15 @@ const AccountOverview = () => {
           </h3>
         </div>
       </div>
-      <div className="flex justify-center mb-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4">
         <Button
-          className="lg:w-1/2"
+          className="sm:w-1/2 text-sm"
+          onClick={() => setCurrentCompactView(ViewState.Deposit)}
+        >
+          Deposit
+        </Button>
+        <Button
+          className="sm:w-1/2 text-sm py-2.5"
           onClick={() => setCurrentCompactView(ViewState.Send)}
         >
           Send

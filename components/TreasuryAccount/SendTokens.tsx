@@ -26,9 +26,8 @@ import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import { ViewState } from './Types'
-import * as yup from 'yup'
 import { BN } from '@project-serum/anchor'
-import { validateDestinationAccAddress } from '@utils/validations'
+import { returnTokenTransferSchema } from '@utils/validations'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
@@ -88,8 +87,9 @@ const SendTokens = () => {
   const mintMinAmount = form.governedTokenAccount?.mint
     ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
     : 1
+  const currentPrecision = precision(mintMinAmount)
 
-  function handleGoBackToMainView() {
+  const handleGoBackToMainView = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
@@ -117,30 +117,6 @@ const SendTokens = () => {
       propertyName: 'amount',
     })
   }
-  const currentPrecision = precision(mintMinAmount)
-  useEffect(() => {
-    if (currentAccount) {
-      handleSetForm({
-        value: currentAccount,
-        propertyName: 'governedTokenAccount',
-      })
-    }
-  }, [currentAccount])
-  useEffect(() => {
-    if (form.destinationAccount) {
-      debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.destinationAccount)
-        if (pubKey) {
-          const account = await tryGetTokenAccount(connection.current, pubKey)
-          setDestinationAccount(account ? account : null)
-        } else {
-          setDestinationAccount(null)
-        }
-      })
-    } else {
-      setDestinationAccount(null)
-    }
-  }, [form.destinationAccount])
   const setMaxAmount = () => {
     const amount =
       currentAccount && currentAccount.mint?.account
@@ -271,80 +247,41 @@ const SendTokens = () => {
     }
     setIsLoading(false)
   }
-  //TODO make more common to use with SplTokenTransfer component
-  const schema = yup.object().shape({
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test(
-        'amount',
-        'Transfer amount must be less than the source account available amount',
-        async function (val: number) {
-          if (val && !form.governedTokenAccount) {
-            return this.createError({
-              message: `Please select source account to validate the amount`,
-            })
-          }
-          if (
-            val &&
-            form.governedTokenAccount &&
-            form.governedTokenAccount?.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimal(
-              val,
-              form.governedTokenAccount?.mint.account.decimals
-            )
-            return !!(
-              form.governedTokenAccount?.token?.publicKey &&
-              form.governedTokenAccount.token.account.amount.gte(
-                new BN(mintValue)
-              )
-            )
-          }
-          return this.createError({
-            message: `Amount is required`,
-          })
+  useEffect(() => {
+    if (currentAccount) {
+      handleSetForm({
+        value: currentAccount,
+        propertyName: 'governedTokenAccount',
+      })
+    }
+  }, [currentAccount])
+  useEffect(() => {
+    if (form.destinationAccount) {
+      debounce.debounceFcn(async () => {
+        const pubKey = tryParseKey(form.destinationAccount)
+        if (pubKey) {
+          const account = await tryGetTokenAccount(connection.current, pubKey)
+          setDestinationAccount(account ? account : null)
+        } else {
+          setDestinationAccount(null)
         }
-      ),
-    destinationAccount: yup
-      .string()
-      .test(
-        'accountTests',
-        'Account validation error',
-        async function (val: string) {
-          if (val) {
-            try {
-              if (
-                form.governedTokenAccount?.token?.account.address.toBase58() ==
-                val
-              ) {
-                return this.createError({
-                  message: `Destination account address can't be same as source account`,
-                })
-              }
-              await validateDestinationAccAddress(
-                connection,
-                val,
-                form.governedTokenAccount?.token?.account.address
-              )
-              return true
-            } catch (e) {
-              return this.createError({
-                message: `${e}`,
-              })
-            }
-          } else {
-            return this.createError({
-              message: `Destination account is required`,
-            })
-          }
-        }
-      ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
-  })
+      })
+    } else {
+      setDestinationAccount(null)
+    }
+  }, [form.destinationAccount])
+  const returnIfAmountIsNotHigherBalance = () => {
+    const mintValue = getMintNaturalAmountFromDecimal(
+      form.amount!,
+      form.governedTokenAccount!.mint!.account.decimals
+    )
+
+    return (
+      form.governedTokenAccount?.token?.publicKey &&
+      form.governedTokenAccount.token.account.amount.gte(new BN(mintValue))
+    )
+  }
+  const schema = returnTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   return (
     <>
@@ -405,7 +342,11 @@ const SendTokens = () => {
           </Button>
         </div>
         <small className="text-red">
-          {transactionDolarAmount ? `- $${transactionDolarAmount}` : null}
+          {transactionDolarAmount
+            ? returnIfAmountIsNotHigherBalance()
+              ? `~$${transactionDolarAmount}`
+              : 'Insufficient balance'
+            : null}
         </small>
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
@@ -416,7 +357,6 @@ const SendTokens = () => {
         >
           Cancel
         </SecondaryButton>
-        {/* TODO block send here or you can't even go here without connection ? */}
         <Button className="sm:w-1/2" onClick={handleSend} isLoading={isLoading}>
           Send
         </Button>
