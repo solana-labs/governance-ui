@@ -425,7 +425,7 @@ const SendTokens = () => {
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <SecondaryButton
-          isLoading={isLoading}
+          disabled={isLoading}
           className="sm:w-1/2 text-th-fgd-1"
           onClick={handleGoBackToMainView}
         >
