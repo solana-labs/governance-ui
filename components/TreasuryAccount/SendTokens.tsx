@@ -187,7 +187,7 @@ const SendTokens = () => {
     }
     return obj
   }
-  const handleSend = async () => {
+  const handlePropose = async () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
@@ -431,8 +431,12 @@ const SendTokens = () => {
         >
           Cancel
         </SecondaryButton>
-        <Button className="sm:w-1/2" onClick={handleSend} isLoading={isLoading}>
-          Send
+        <Button
+          className="sm:w-1/2"
+          onClick={handlePropose}
+          isLoading={isLoading}
+        >
+          Propose
         </Button>
       </div>
     </>
