@@ -6,6 +6,7 @@ import { LinkButton } from '@components/Button'
 import { abbreviateAddress } from '@utils/formatting'
 import { PublicKey } from '@solana/web3.js'
 import { getAccountName } from '@components/instructions/tools'
+import AccountLabel from './AccountHeader'
 
 const SendTokens = () => {
   const { setCurrentCompactView } = useTreasuryAccountStore()
@@ -13,7 +14,6 @@ const SendTokens = () => {
     (s) => s.compact.currentAccount
   )
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
-
   return (
     <>
       <h3 className="mb-4 flex items-center">
@@ -25,11 +25,7 @@ const SendTokens = () => {
           Deposit {tokenInfo && tokenInfo?.symbol}
         </>
       </h3>
-      {tokenInfo?.logoURI && (
-        <div className="flex justify-center mb-4">
-          <img className="flex-shrink-0 h-14 w-14" src={tokenInfo.logoURI} />
-        </div>
-      )}
+      <AccountLabel></AccountLabel>
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
         <div>
           <div className="text-fgd-3 text-xs">

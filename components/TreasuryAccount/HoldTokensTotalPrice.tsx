@@ -1,4 +1,4 @@
-import useGovernances from '@hooks/useGovernances'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
@@ -6,7 +6,7 @@ import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 
 const HoldTokensTotalPrice = () => {
-  const { governedTokenAccounts } = useGovernances()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const [totalPriceFormatted, setTotalPriceFormatted] = useState('')
   useEffect(() => {
     async function calcTotalTokensPrice() {

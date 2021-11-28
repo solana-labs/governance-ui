@@ -136,7 +136,7 @@ export const validateBuffer = async (
   }
 }
 
-export const returnTokenTransferSchema = ({ form, connection }) => {
+export const getTokenTransferSchema = ({ form, connection }) => {
   return yup.object().shape({
     amount: yup
       .number()

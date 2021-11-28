@@ -1,10 +1,10 @@
-import useGovernances from '@hooks/useGovernances'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { GovernedTokenAccount } from '@utils/tokens'
 import React, { useEffect, useState } from 'react'
 import AccountItem from './AccountItem'
 
 const AccountsItems = () => {
-  const { governedTokenAccounts } = useGovernances()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])

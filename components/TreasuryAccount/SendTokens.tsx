@@ -27,7 +27,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import { ViewState } from './Types'
 import { BN } from '@project-serum/anchor'
-import { returnTokenTransferSchema } from '@utils/validations'
+import { getTokenTransferSchema } from '@utils/validations'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
@@ -50,6 +50,7 @@ import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import Textarea from '@components/inputs/Textarea'
 // import { Popover } from '@headlessui/react'
+import AccountLabel from './AccountHeader'
 
 const SendTokens = () => {
   const {
@@ -241,7 +242,7 @@ const SendTokens = () => {
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title ? form.title : proposalTitle,
-          form.description ? form.description : proposalTitle,
+          form.description ? form.description : '',
           proposalMint,
           selectedGovernance?.info?.proposalCount,
           [instructionData],
@@ -257,7 +258,7 @@ const SendTokens = () => {
     }
     setIsLoading(false)
   }
-  const returnIfAmountIsNotHigherBalance = () => {
+  const IsAmountNotHigherThenBalance = () => {
     const mintValue = getMintNaturalAmountFromDecimal(
       form.amount!,
       form.governedTokenAccount!.mint!.account.decimals
@@ -297,7 +298,7 @@ const SendTokens = () => {
     }
   }, [form.destinationAccount])
 
-  const schema = returnTokenTransferSchema({ form, connection })
+  const schema = getTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   const proposalTitle = `Pay ${form.amount}${
     tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
@@ -313,11 +314,7 @@ const SendTokens = () => {
           Send {tokenInfo && tokenInfo?.symbol}
         </>
       </h3>
-      {tokenInfo?.logoURI && (
-        <div className="flex justify-center mb-4">
-          <img className="flex-shrink-0 h-14 w-14" src={tokenInfo.logoURI} />
-        </div>
-      )}
+      <AccountLabel></AccountLabel>
       <div className="space-y-4 w-full pb-4">
         <Input
           label="Destination account"
@@ -359,22 +356,19 @@ const SendTokens = () => {
         />
         <small className="text-red">
           {transactionDolarAmount
-            ? returnIfAmountIsNotHigherBalance()
+            ? IsAmountNotHigherThenBalance()
               ? `~$${transactionDolarAmount}`
               : 'Insufficient balance'
             : null}
         </small>
-        <div className={'flex items-center'}>
+        <div
+          className={'flex items-center hover:cursor-pointer w-24'}
+          onClick={() => setShowReferenceFields(!showReferenceFields)}
+        >
           {showReferenceFields ? (
-            <ArrowCircleUpIcon
-              onClick={() => setShowReferenceFields(false)}
-              className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer"
-            />
+            <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
           ) : (
-            <ArrowCircleDownIcon
-              onClick={() => setShowReferenceFields(true)}
-              className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer"
-            />
+            <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
           )}
           <small className="text-fgd-3">Reference</small>
           {/* popover with description maybe will be needed later */}
@@ -415,9 +409,7 @@ const SendTokens = () => {
               noMaxWidth={true}
               label="Description"
               placeholder={
-                form.amount && form.destinationAccount
-                  ? proposalTitle
-                  : 'Description of your proposal or use a github gist link (optional)'
+                'Description of your proposal or use a github gist link (optional)'
               }
               wrapperClassName="mb-5"
               value={form.description}

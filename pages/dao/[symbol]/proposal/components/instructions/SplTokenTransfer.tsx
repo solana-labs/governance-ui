@@ -26,8 +26,8 @@ import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
-import { returnTokenTransferSchema } from '@utils/validations'
-import useGovernances from '@hooks/useGovernances'
+import { getTokenTransferSchema } from '@utils/validations'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import GovernedAccountSelect from '../GovernedAccountSelect'
@@ -41,7 +41,7 @@ const SplTokenTransfer = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useGovernances()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
@@ -164,7 +164,7 @@ const SplTokenTransfer = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = returnTokenTransferSchema({ form, connection })
+  const schema = getTokenTransferSchema({ form, connection })
 
   return (
     <>

@@ -1,6 +1,6 @@
 import AccountsItems from './AccountsItems'
 import HoldTokensTotalPrice from './HoldTokensTotalPrice'
-import useGovernances from '@hooks/useGovernances'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ViewState } from './Types'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useRealm from '@hooks/useRealm'
@@ -10,11 +10,11 @@ import SendTokens from './SendTokens'
 import DepositTokens from './DepositTokens'
 
 const AccountsCompactWrapper = () => {
-  const { governedTokenAccounts } = useGovernances()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const currentView = useTreasuryAccountStore((s) => s.compact.currentView)
   const { resetCompactViewState } = useTreasuryAccountStore()
   const { symbol } = useRealm()
-  const returnCurrentView = () => {
+  const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
         return (
@@ -39,7 +39,7 @@ const AccountsCompactWrapper = () => {
   }, [symbol])
   return governedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg mt-5">
-      {returnCurrentView()}
+      {getCurrentView()}
     </div>
   ) : null
 }
