@@ -50,6 +50,10 @@ export const ACCOUNT_NAMES = {
     'Friends and Family Council Mint',
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
+
+  // GM DAO
+  '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
+  DWhnQm42vCBLkA9RsrBB2spyR3uAJq1BGeroyNMKgnEh: 'Marketing funds',
 }
 
 export function getAccountName(accountPk: PublicKey) {
