@@ -2,6 +2,7 @@ import Button from '@components/Button'
 import { getExplorerUrlForTxSign } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
+import useGovernances from '@hooks/useGovernances'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
@@ -17,6 +18,7 @@ const AccountOverview = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const { canUseTransferInstruction } = useGovernances()
   const connection = useWalletStore((s) => s.connection)
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const mintAddress = useTreasuryAccountStore((s) => s.compact.mintAddress)
@@ -92,19 +94,25 @@ const AccountOverview = () => {
           </h3>
         </div>
       </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4">
+      <div
+        className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 ${
+          !canUseTransferInstruction ? 'justify-center' : ''
+        }`}
+      >
         <Button
           className="sm:w-1/2 text-sm"
           onClick={() => setCurrentCompactView(ViewState.Deposit)}
         >
           Deposit
         </Button>
-        <Button
-          className="sm:w-1/2 text-sm py-2.5"
-          onClick={() => setCurrentCompactView(ViewState.Send)}
-        >
-          Send
-        </Button>
+        {canUseTransferInstruction && (
+          <Button
+            className="sm:w-1/2 text-sm py-2.5"
+            onClick={() => setCurrentCompactView(ViewState.Send)}
+          >
+            Send
+          </Button>
+        )}
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
         Recent activity

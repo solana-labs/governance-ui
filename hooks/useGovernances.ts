@@ -140,5 +140,6 @@ export default function useGovernances() {
     getAvailableInstructions,
     governedTokenAccounts,
     getMintWithGovernances,
+    canUseTransferInstruction,
   }
 }
