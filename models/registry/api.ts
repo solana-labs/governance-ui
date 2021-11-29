@@ -217,6 +217,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('756iwQL9tAdTr1mDGiu4P9zWW8FzMY1K6MUXHqkwp9Nc'),
   },
+  {
+    symbol: 'SAIA',
+    displayName: 'SAIAdao Devnet',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
+  },
 ]
 
 export function getAllRealmInfos({ cluster }: ConnectionContext) {
