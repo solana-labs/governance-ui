@@ -149,7 +149,7 @@ const CustomBase64 = ({
       ></GovernedAccountSelect>
       <Input
         min={0}
-        label="Hol up time (days)"
+        label="Hold up time (days)"
         value={form.holdUpTime}
         type="number"
         onChange={(event) => {
