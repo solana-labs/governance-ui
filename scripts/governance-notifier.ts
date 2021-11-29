@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
+import { getConnectionContext } from 'stores/useWalletStore'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 import { getRealmInfo } from '../models/registry/api'
@@ -21,8 +22,9 @@ async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
   const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
+  const connectionContext = getConnectionContext('mainnet')
 
-  const realmInfo = getRealmInfo('MNGO')
+  const realmInfo = await getRealmInfo('MNGO', connectionContext)
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo!.programId,

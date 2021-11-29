@@ -1,7 +1,6 @@
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
-import { getRealmInfo } from '../models/registry/api'
-import { EndpointTypes } from '../models/types'
+import { useMemo, useState } from 'react'
+import { getRealmInfo, RealmInfo } from '../models/registry/api'
 import { VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -25,10 +24,12 @@ export default function useRealm() {
     tokenRecords,
     councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
-  const realmInfo = useMemo(
-    () => getRealmInfo(symbol as string, connection.cluster as EndpointTypes),
-    [symbol]
-  )
+  const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
+
+  useMemo(async () => {
+    const realm = await getRealmInfo(symbol as string, connection)
+    setRealmInfo(realm)
+  }, [symbol])
 
   const realmTokenAccount = useMemo(
     () =>
