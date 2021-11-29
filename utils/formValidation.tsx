@@ -1,3 +1,5 @@
+import { SanitizedObject } from './helpers'
+
 export interface formValidation {
   isValid: boolean
   validationErrors: any
@@ -7,19 +9,10 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
   if (!schema) {
     throw 'pleas provide schema'
   }
-  const values = Object.create(null)
-  Object.defineProperty(values, 'isValid', {
-    value: false,
-    writable: true,
-    enumerable: true,
-    configurable: false,
-  })
-  Object.defineProperty(values, 'validationErrors', {
-    value: Object.create(null),
-    writable: false,
-    enumerable: true,
-    configurable: false,
-  })
+  const values = new SanitizedObject({
+    isValid: false,
+    validationErrors: new SanitizedObject({}),
+  }) as formValidation
 
   try {
     await schema.validate(formValues, { abortEarly })

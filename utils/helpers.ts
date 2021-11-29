@@ -9,3 +9,9 @@ export function chunks<T>(array: T[], size: number): T[][] {
     new Array(Math.ceil(array.length / size))
   ).map((_, index) => array.slice(index * size, (index + 1) * size))
 }
+
+export class SanitizedObject {
+  constructor(obj) {
+    return Object.assign(Object.create(null), obj)
+  }
+}
