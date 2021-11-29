@@ -4,18 +4,10 @@ const withTM = require('next-transpile-modules')(['react-markdown'])
 
 module.exports = withTM({
   target: 'serverless',
-  webpack(config) {
-    config.module.rules.push({
-      test: /\.svg$/,
-      use: ['@svgr/webpack'],
-    })
-    config.node = {
-      fs: 'empty',
-    }
-
+  webpack: (config, { isServer }) => {
+    if (!isServer) config.resolve.fallback.fs = false
     return config
   },
-  webpack5: false,
   env: {
     REALM: process.env.REALM,
   },
