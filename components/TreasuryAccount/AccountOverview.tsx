@@ -1,6 +1,7 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
+import Tooltip from '@components/Tooltip'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
@@ -66,14 +67,15 @@ const AccountOverview = () => {
         >
           Deposit
         </Button>
-        {canUseTransferInstruction && (
-          <Button
-            className="sm:w-1/2 text-sm py-2.5"
-            onClick={() => setCurrentCompactView(ViewState.Send)}
-          >
+        <Button
+          className="sm:w-1/2 text-sm py-2.5"
+          onClick={() => setCurrentCompactView(ViewState.Send)}
+          disabled={!canUseTransferInstruction}
+        >
+          <Tooltip content="You need to have connected wallet with ability to create token transfer proposals">
             Send
-          </Button>
-        )}
+          </Tooltip>
+        </Button>
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
         Recent activity
