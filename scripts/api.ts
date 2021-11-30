@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
+import { SanitizedObject } from '@utils/helpers'
 import * as bs58 from 'bs58'
 import {
   GovernanceAccount,
@@ -127,26 +128,27 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
     }),
   })
 
-  const accounts: Record<string, ParsedAccount<TAccount>> = {}
-
+  const accounts: Record<string, ParsedAccount<TAccount>> = new SanitizedObject(
+    {}
+  ) as Record<string, ParsedAccount<TAccount>>
   try {
     const response = await getProgramAccounts.json()
     if ('result' in response) {
       const rawAccounts = response['result']
       for (const rawAccount of rawAccounts) {
         try {
-          const account = {
+          const account = new SanitizedObject({
             pubkey: new PublicKey(rawAccount.pubkey),
-            account: {
+            account: new SanitizedObject({
               ...rawAccount.account,
               data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-            },
+            }),
             info: deserializeBorsh(
               GOVERNANCE_SCHEMA,
               accountClass,
               Buffer.from(rawAccount.account.data[0], 'base64')
             ),
-          }
+          }) as ParsedAccount<TAccount>
 
           accounts[account.pubkey.toBase58()] = account
         } catch (ex) {

@@ -5,13 +5,11 @@ import useRealm from '@hooks/useRealm'
 import { AccountInfo, Token } from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
-import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
@@ -28,9 +26,8 @@ import { getAccountName } from '@components/instructions/tools'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
-import { validateDestinationAccAddress } from '@utils/validations'
-import useInstructions from '@hooks/useInstructions'
-import BN from 'bn.js'
+import { getTokenTransferSchema } from '@utils/validations'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import GovernedAccountSelect from '../GovernedAccountSelect'
@@ -44,7 +41,7 @@ const SplTokenTransfer = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useInstructions()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
@@ -167,79 +164,7 @@ const SplTokenTransfer = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = yup.object().shape({
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test(
-        'amount',
-        'Transfer amount must be less than the source account available amount',
-        async function (val: number) {
-          if (val && !form.governedTokenAccount) {
-            return this.createError({
-              message: `Please select source account to validate the amount`,
-            })
-          }
-          if (
-            val &&
-            form.governedTokenAccount &&
-            form.governedTokenAccount?.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimal(
-              val,
-              form.governedTokenAccount?.mint.account.decimals
-            )
-            return !!(
-              form.governedTokenAccount?.token?.publicKey &&
-              form.governedTokenAccount.token.account.amount.gte(
-                new BN(mintValue)
-              )
-            )
-          }
-          return this.createError({
-            message: `Amount is required`,
-          })
-        }
-      ),
-    destinationAccount: yup
-      .string()
-      .test(
-        'accountTests',
-        'Account validation error',
-        async function (val: string) {
-          if (val) {
-            try {
-              if (
-                form.governedTokenAccount?.token?.account.address.toBase58() ==
-                val
-              ) {
-                return this.createError({
-                  message: `Destination account address can't be same as source account`,
-                })
-              }
-              await validateDestinationAccAddress(
-                connection,
-                val,
-                form.governedTokenAccount?.token?.account.address
-              )
-              return true
-            } catch (e) {
-              return this.createError({
-                message: `${e}`,
-              })
-            }
-          } else {
-            return this.createError({
-              message: `Destination account is required`,
-            })
-          }
-        }
-      ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
-  })
+  const schema = getTokenTransferSchema({ form, connection })
 
   return (
     <>

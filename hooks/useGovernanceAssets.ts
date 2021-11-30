@@ -9,7 +9,7 @@ import {
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
-export default function useInstructions() {
+export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const { ownVoterWeight, realm } = useRealm()
@@ -140,5 +140,6 @@ export default function useInstructions() {
     getAvailableInstructions,
     governedTokenAccounts,
     getMintWithGovernances,
+    canUseTransferInstruction,
   }
 }

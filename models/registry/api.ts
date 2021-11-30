@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
+import { ConnectionContext } from 'stores/useWalletStore'
 import { equalsIgnoreCase } from '../../tools/core/strings'
-import { EndpointTypes } from '../types'
 
 export enum ProgramVersion {
   V1 = 1,
@@ -8,7 +8,6 @@ export enum ProgramVersion {
 }
 export interface RealmInfo {
   symbol: string
-  endpoint?: string
   programId: PublicKey
   programVersion?: ProgramVersion
   realmId: PublicKey
@@ -144,6 +143,15 @@ const MAINNET_REALMS: RealmInfo[] = [
     website: 'https://www.uxd.fi.com/',
     twitter: '@UXDProtocol',
   },
+  {
+    symbol: 'FAFD',
+    displayName: 'Friends and Family DAO',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('371PRJu9vyU2U6WHcqorakWvz3wpfGSVhHr65BBSoaiN'),
+    ogImage: '/realms/fafd/img/fafd.png',
+    website:
+      'https://find-and-update.company-information.service.gov.uk/company/13753949',
+  },
 ]
 
 // Hardcoded list of devnet realms
@@ -154,6 +162,8 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
     website: 'https://mango.markets',
+    keywords:
+      'Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
     twitter: '@mangomarkets',
     ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
   },
@@ -216,46 +226,31 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('756iwQL9tAdTr1mDGiu4P9zWW8FzMY1K6MUXHqkwp9Nc'),
   },
+  {
+    symbol: 'SAIA',
+    displayName: 'SAIAdao Devnet',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
+  },
 ]
 
-export function getAllRealmInfos(endpoint: EndpointTypes = 'mainnet') {
-  return endpoint === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+export function getAllRealmInfos({ cluster }: ConnectionContext) {
+  return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export function getRealmInfo(
-  symbol: string,
-  endpoint: EndpointTypes = 'mainnet'
+export async function getRealmInfo(
+  realmId: string,
+  connection: ConnectionContext
 ) {
-  if (!symbol) {
+  if (!realmId) {
     return undefined
   }
 
-  if (endpoint === 'devnet') {
-    let devRealmInfo = getAllRealmInfos('devnet').find((r) => {
-      return equalsIgnoreCase(r.symbol, symbol)
-    })
-
-    if (devRealmInfo) {
-      devRealmInfo.endpoint = 'devnet'
-
-      const mainnetRealmInfo = getAllRealmInfos('mainnet').find((r) =>
-        equalsIgnoreCase(r.symbol, symbol)
-      )
-
-      if (mainnetRealmInfo) {
-        devRealmInfo = { ...mainnetRealmInfo, ...devRealmInfo }
-      }
-    }
-    return devRealmInfo
-  }
-
-  const realmInfo = getAllRealmInfos().find((r) =>
-    equalsIgnoreCase(r.symbol, symbol)
+  const realmInfo = getAllRealmInfos(connection).find(
+    (r) =>
+      equalsIgnoreCase(r.realmId.toBase58(), realmId) ||
+      equalsIgnoreCase(r.symbol, realmId)
   )
-
-  if (realmInfo) {
-    realmInfo.endpoint = 'mainnet'
-  }
 
   return realmInfo
 }

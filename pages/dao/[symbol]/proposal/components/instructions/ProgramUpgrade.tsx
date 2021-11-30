@@ -9,7 +9,7 @@ import {
   ProgramUpgradeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useInstructions from '@hooks/useInstructions'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
@@ -31,7 +31,7 @@ const ProgramUpgrade = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountType } = useInstructions()
+  const { getGovernancesByAccountType } = useGovernanceAssets()
   const governedProgramAccounts = getGovernancesByAccountType(
     GovernanceAccountType.ProgramGovernance
   ).map((x) => {

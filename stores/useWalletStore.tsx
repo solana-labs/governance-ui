@@ -40,14 +40,16 @@ import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
+import { EndpointTypes } from '@models/types'
+
+export interface ConnectionContext {
+  cluster: EndpointTypes
+  current: Connection
+  endpoint: string
+}
 interface WalletStore extends State {
   connected: boolean
-  connection: {
-    cluster: string
-    current: Connection
-    endpoint: string
-  }
+  connection: ConnectionContext
   current: WalletAdapter | undefined
 
   ownVoteRecordsByProposal: { [proposal: string]: ParsedAccount<VoteRecord> }
@@ -162,10 +164,10 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
 ]
 
-function getConnectionConfig(cluster: string) {
+export function getConnectionContext(cluster: string): ConnectionContext {
   const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
   return {
-    cluster: ENDPOINT!.name,
+    cluster: ENDPOINT!.name as EndpointTypes,
     current: new Connection(ENDPOINT!.url, 'recent'),
     endpoint: ENDPOINT!.url,
   }
@@ -202,7 +204,7 @@ const INITIAL_PROPOSAL_STATE = {
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
-  connection: getConnectionConfig('mainnet'),
+  connection: getConnectionContext('mainnet'),
   current: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
@@ -590,14 +592,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           account: parsedAccountInfo,
         })
       })
-      const tokenSymbols = [
+      const tokenMintAdresses = [
         ...new Set(
           tokenAccounts.map((x) => {
-            return getMintMetadata(x.account.mint)?.name
+            return x.account.mint.toBase58()
           })
         ),
       ]
-      await tokenService.fetchTokenPrices(tokenSymbols)
+      await tokenService.fetchTokenPrices(tokenMintAdresses)
       set((s) => {
         s.selectedRealm.tokenAccounts = tokenAccounts
       })
@@ -617,11 +619,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
       })
     },
-    async setConnectionConfig(cluster: string) {
+    async setConnectionContext(cluster: string) {
       const set = get().set
       set((s) => {
         if (s.connection.cluster !== cluster) {
-          s.connection = getConnectionConfig(cluster)
+          s.connection = getConnectionContext(cluster)
         }
       })
     },
