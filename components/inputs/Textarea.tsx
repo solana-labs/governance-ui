@@ -18,6 +18,7 @@ const TextareaProps = ({
   label,
   suffix,
   error = '',
+  noMaxWidth = false,
   ...props
 }: TextareaProps) => {
   return (
@@ -26,7 +27,7 @@ const TextareaProps = ({
       <textarea
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, error })}
+        className={inputClasses({ className, disabled, error, noMaxWidth })}
         disabled={disabled}
         {...props}
       />

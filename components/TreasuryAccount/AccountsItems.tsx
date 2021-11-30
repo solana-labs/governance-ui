@@ -1,10 +1,10 @@
-import useInstructions from '@hooks/useInstructions'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { GovernedTokenAccount } from '@utils/tokens'
 import React, { useEffect, useState } from 'react'
-import TreasuryAccountItem from './TreasuryAccountItem'
+import AccountItem from './AccountItem'
 
-const TreasuryAccountsItems = () => {
-  const { governedTokenAccounts } = useInstructions()
+const AccountsItems = () => {
+  const { governedTokenAccounts } = useGovernanceAssets()
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
@@ -17,7 +17,7 @@ const TreasuryAccountsItems = () => {
   return (
     <div className="space-y-3">
       {treasuryAccounts.map((accountWithGovernance) => (
-        <TreasuryAccountItem
+        <AccountItem
           governedAccountTokenAccount={accountWithGovernance}
           key={accountWithGovernance?.governance?.pubkey.toBase58()}
         />
@@ -26,4 +26,4 @@ const TreasuryAccountsItems = () => {
   )
 }
 
-export default TreasuryAccountsItems
+export default AccountsItems

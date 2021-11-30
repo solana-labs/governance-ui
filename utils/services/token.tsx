@@ -10,6 +10,7 @@ export interface TokenRecord {
   symbol: string
   logoURI: string
   name: string
+  address: string
 }
 
 class TokenService {
@@ -26,13 +27,12 @@ class TokenService {
     )
     this.tokenList = response.data.tokens
   }
-  //best to run as soon as you get all tokens symbols that dao holds.
-  async fetchTokenPrices(tokenNames: string[]) {
+  async fetchTokenPrices(mintAddresses: string[]) {
     if (!this.tokenList.length) {
       await this.fetchSolanaTokenList()
     }
     const tokenListRecords = this.tokenList.filter((x) =>
-      tokenNames.includes(x.symbol)
+      mintAddresses.includes(x.address)
     )
     const coingeckoIds = tokenListRecords
       .map((x) => x.extensions.coingeckoId)
@@ -44,20 +44,24 @@ class TokenService {
     this.tokenPriceToUSDlist = { ...this.tokenPriceToUSDlist, ...priceToUsd }
     return priceToUsd
   }
-  getUSDTokenPrice(tokenName: string): number {
-    if (tokenName) {
-      const tokenListRecord = this.tokenList.find((x) => x.symbol === tokenName)
-      if (tokenListRecord) {
-        return this.tokenPriceToUSDlist[tokenListRecord?.extensions.coingeckoId]
-          ?.usd
+  getUSDTokenPrice(mintAddress: string): number {
+    if (mintAddress) {
+      const tokenListRecord = this.tokenList.find(
+        (x) => x.address === mintAddress
+      )
+      const coingeckoId = tokenListRecord?.extensions.coingeckoId
+      if (tokenListRecord && coingeckoId) {
+        return this.tokenPriceToUSDlist[coingeckoId]?.usd
       }
       return 0
     }
 
     return 0
   }
-  getTokenInfo(symbol: string) {
-    const tokenListRecord = this.tokenList.find((x) => x.symbol === symbol)
+  getTokenInfo(mintAddress: string) {
+    const tokenListRecord = this.tokenList.find(
+      (x) => x.address === mintAddress
+    )
     return tokenListRecord
   }
 }

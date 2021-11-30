@@ -26,18 +26,16 @@ const GovernedAccountSelect = ({
   governance: ParsedAccount<Governance> | null | undefined
   label
 }) => {
-  function returnLabel(value: GovernedMultiTypeAccount) {
+  function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
       const accountType = value.governance.info.accountType
       switch (accountType) {
         case GovernanceAccountType.MintGovernance:
-          return returnMintAccountLabelComponent(getMintAccountLabelInfo(value))
+          return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
         case GovernanceAccountType.TokenGovernance:
-          return returnTokenAccountLabelComponent(
-            getTokenAccountLabelInfo(value)
-          )
+          return getTokenAccountLabelComponent(getTokenAccountLabelInfo(value))
         case GovernanceAccountType.ProgramGovernance:
-          return returnProgramAccountLabel(value.governance)
+          return getProgramAccountLabel(value.governance)
         default:
           return value.governance.info.governedAccount.toBase58()
       }
@@ -45,7 +43,7 @@ const GovernedAccountSelect = ({
       return null
     }
   }
-  function returnMintAccountLabelComponent({
+  function getMintAccountLabelComponent({
     account,
     tokenName,
     mintAccountName,
@@ -71,7 +69,7 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function returnTokenAccountLabelComponent({
+  function getTokenAccountLabelComponent({
     tokenAccount,
     tokenAccountName,
     tokenName,
@@ -97,7 +95,7 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function returnProgramAccountLabel(val: ParsedAccount<Governance>) {
+  function getProgramAccountLabel(val: ParsedAccount<Governance>) {
     const name = val ? getProgramName(val.info.governedAccount) : ''
     return (
       <>
@@ -118,7 +116,7 @@ const GovernedAccountSelect = ({
     <Select
       label={label}
       onChange={onChange}
-      componentLabel={returnLabel(value)}
+      componentLabel={getLabel(value)}
       placeholder="Please select..."
       value={value?.governance?.info.governedAccount.toBase58()}
       error={error}
@@ -136,7 +134,7 @@ const GovernedAccountSelect = ({
               key={acc.governance?.info.governedAccount.toBase58()}
               value={acc}
             >
-              {returnLabel(acc)}
+              {getLabel(acc)}
             </Select.Option>
           )
         })}

@@ -27,7 +27,7 @@ import {
   Instructions,
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useInstructions from '@hooks/useInstructions'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
@@ -61,7 +61,7 @@ const New = () => {
     mint,
     councilMint,
   } = useRealm()
-  const { getAvailableInstructions } = useInstructions()
+  const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
 
   const wallet = useWalletStore((s) => s.current)
@@ -220,7 +220,7 @@ const New = () => {
     fetchTokenAccountsForSelectedRealmGovernances()
   }, [])
 
-  const returnCurrentInstruction = ({ typeId, idx }) => {
+  const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -331,7 +331,7 @@ const New = () => {
                       idx={idx}
                       instructionsData={instructionsData}
                     >
-                      {returnCurrentInstruction({
+                      {getCurrentInstruction({
                         typeId: instruction.type?.id,
                         idx,
                       })}

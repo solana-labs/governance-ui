@@ -1,15 +1,13 @@
-import { getMintMetadata } from '@components/instructions/programs/splToken'
-import useInstructions from '@hooks/useInstructions'
-import {
-  formatMintNaturalAmountAsDecimal,
-  numberWithCommas,
-} from '@tools/sdk/units'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { BN } from '@project-serum/anchor'
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
+import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 
 const HoldTokensTotalPrice = () => {
-  const { governedTokenAccounts } = useInstructions()
-  const [totalPrice, setTotalPrice] = useState('')
+  const { governedTokenAccounts } = useGovernanceAssets()
+  const [totalPriceFormatted, setTotalPriceFormatted] = useState('')
   useEffect(() => {
     async function calcTotalTokensPrice() {
       const totalPrice = governedTokenAccounts
@@ -18,22 +16,18 @@ const HoldTokensTotalPrice = () => {
         )
         .map((x) => {
           return (
-            parseFloat(
-              formatMintNaturalAmountAsDecimal(
-                x.mint!.account,
-                x.token!.account.amount
-              )
-                .split(',')
-                .join('')
-            ) *
-            tokenService.getUSDTokenPrice(
-              getMintMetadata(x.token!.account.mint)?.name
-            )
+            getMintDecimalAmountFromNatural(
+              x.mint!.account,
+              new BN(x.token!.account.amount)
+            ).toNumber() *
+            tokenService.getUSDTokenPrice(x.token!.account.mint.toBase58())
           )
         })
         .reduce((acc, val) => acc + val, 0)
-        .toFixed(0)
-      setTotalPrice(totalPrice !== '0' ? numberWithCommas(totalPrice) : '')
+
+      setTotalPriceFormatted(
+        totalPrice ? new BigNumber(totalPrice).toFormat(0) : ''
+      )
     }
     if (governedTokenAccounts.length) {
       calcTotalTokensPrice()
@@ -42,10 +36,10 @@ const HoldTokensTotalPrice = () => {
     JSON.stringify(governedTokenAccounts),
     JSON.stringify(tokenService.tokenPriceToUSDlist),
   ])
-  return totalPrice ? (
+  return totalPriceFormatted ? (
     <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
       <p className="text-fgd-3 text-xs">Treasury Balance</p>
-      <h3 className="mb-0">${totalPrice}</h3>
+      <h3 className="mb-0">${totalPriceFormatted}</h3>
     </div>
   ) : null
 }

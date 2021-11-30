@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { PlusIcon } from '@heroicons/react/outline'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
@@ -7,7 +7,6 @@ import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
-import { EndpointTypes } from '../../models/types'
 import useQueryContext from '../../hooks/useQueryContext'
 
 // const COL = 'flex-col'
@@ -27,11 +26,9 @@ const Realms = () => {
     (s) => s
   )
 
-  useEffect(() => {
+  useMemo(async () => {
     if (connection) {
-      const data: RealmInfo[] = getAllRealmInfos(
-        connection.cluster as EndpointTypes
-      )
+      const data: RealmInfo[] = await getAllRealmInfos(connection)
       setRealms(data)
     }
     if (selectedRealm.realm) {

@@ -13,10 +13,13 @@ export async function fetchGistFile(gistUrl: string) {
       const jsonContent = await apiResponse.json()
       const nextUrlFileName = Object.keys(jsonContent['files'])[0]
       const nextUrl = jsonContent['files'][nextUrlFileName]['raw_url']
-      const fileResponse = await fetch(nextUrl)
+      if (nextUrl.startsWith('https://gist.githubusercontent.com')) {
+        const fileResponse = await fetch(nextUrl)
 
-      //console.log('fetchGistFile file', gistUrl, fileResponse)
-      return await fileResponse.text()
+        //console.log('fetchGistFile file', gistUrl, fileResponse)
+        return await fileResponse.text()
+      }
+      return undefined
     } else {
       console.warn('could not fetchGistFile', {
         gistUrl,
