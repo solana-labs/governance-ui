@@ -1,6 +1,6 @@
 import Input from '@components/inputs/Input'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { precision } from '@utils/formatting'
+// import { precision } from '@utils/formatting'
 import React, { useState } from 'react'
 
 interface NewTreasuryAccountForm {
