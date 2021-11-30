@@ -12,6 +12,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
+const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const AccountsCompactWrapper = () => {
   const router = useRouter()
@@ -21,8 +22,9 @@ const AccountsCompactWrapper = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const goToNewAccountForm = () => {
-    router.push(fmtUrlWithCluster(`/treasury/new`))
+    router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
   }
+  const isNewAccountRoute = router.route.includes(NEW_TREASURY_ROUTE)
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -32,24 +34,26 @@ const AccountsCompactWrapper = () => {
             <HoldTokensTotalPrice />
             <div className="max-h-full overflow-y-auto">
               <AccountsItems />
-              <Tooltip
-                content={
-                  !connected && 'Connect your wallet to create new account'
-                }
-              >
-                <div
-                  onClick={goToNewAccountForm}
-                  className={`bg-bkg-2 p-3 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 mt-3 ${
-                    !connected
-                      ? 'cursor-not-allowed pointer-events-none opacity-60'
-                      : 'cursor-pointer'
-                  }`}
+              {!isNewAccountRoute && (
+                <Tooltip
+                  content={
+                    !connected && 'Connect your wallet to create new account'
+                  }
                 >
-                  <div className="bg-[rgba(255,255,255,0.06)] h-8 w-8 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                    <PlusIcon />
+                  <div
+                    onClick={goToNewAccountForm}
+                    className={`bg-bkg-2 p-3 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 mt-3 ${
+                      !connected
+                        ? 'cursor-not-allowed pointer-events-none opacity-60'
+                        : 'cursor-pointer'
+                    }`}
+                  >
+                    <div className="bg-[rgba(255,255,255,0.06)] h-8 w-8 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                      <PlusIcon />
+                    </div>
                   </div>
-                </div>
-              </Tooltip>
+                </Tooltip>
+              )}
             </div>
           </>
         )
@@ -66,9 +70,7 @@ const AccountsCompactWrapper = () => {
     resetCompactViewState()
   }, [symbol])
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg mt-5">
-      {getCurrentView()}
-    </div>
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
   )
 }
 
