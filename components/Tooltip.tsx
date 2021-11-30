@@ -15,7 +15,7 @@ const Tooltip = ({
   className,
   placement = 'top',
 }: TooltipProps) => {
-  return (
+  return content ? (
     <Tippy
       animation="scale"
       placement={placement}
@@ -32,6 +32,8 @@ const Tooltip = ({
     >
       <div className="outline-none focus:outline-none">{children}</div>
     </Tippy>
+  ) : (
+    <>{children}</>
   )
 }
 
