@@ -156,7 +156,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
+    url: process.env.DEVNET_RPC || 'https://api.devnet.solana.com',
   },
   {
     name: 'localnet',
@@ -166,6 +166,7 @@ export const ENDPOINTS: EndpointInfo[] = [
 
 export function getConnectionContext(cluster: string): ConnectionContext {
   const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
+  console.log({ ENDPOINT })
   return {
     cluster: ENDPOINT!.name as EndpointTypes,
     current: new Connection(ENDPOINT!.url, 'recent'),
@@ -220,7 +221,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const wallet = get().current
       const walletOwner = wallet?.publicKey
       const set = get().set
-
       if (connected && walletOwner) {
         const ownedTokenAccounts = await getOwnedTokenAccounts(
           connection,
