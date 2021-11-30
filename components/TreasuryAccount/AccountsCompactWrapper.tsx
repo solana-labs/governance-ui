@@ -7,19 +7,22 @@ import React, { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
 import SendTokens from './SendTokens'
 import DepositTokens from './DepositTokens'
-import Link from 'next/link'
 import { PlusIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
-import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
+import { useRouter } from 'next/router'
+import Tooltip from '@components/Tooltip'
 
 const AccountsCompactWrapper = () => {
+  const router = useRouter()
   const currentView = useTreasuryAccountStore((s) => s.compact.currentView)
   const { resetCompactViewState } = useTreasuryAccountStore()
   const connected = useWalletStore((s) => s.connected)
-  console.log(connected)
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
+  const goToNewAccountForm = () => {
+    router.push(fmtUrlWithCluster(`/treasury/new`))
+  }
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -29,20 +32,24 @@ const AccountsCompactWrapper = () => {
             <HoldTokensTotalPrice />
             <div className="max-h-full overflow-y-auto">
               <AccountsItems />
-              <Link href={fmtUrlWithCluster(`/treasury/new`)}>
-                <Tooltip
-                  content={
-                    !connected &&
-                    'Please connect your wallet to create new account'
-                  }
+              <Tooltip
+                content={
+                  !connected && 'Connect your wallet to create new account'
+                }
+              >
+                <div
+                  onClick={goToNewAccountForm}
+                  className={`bg-bkg-2 p-3 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 mt-3 ${
+                    !connected
+                      ? 'cursor-not-allowed pointer-events-none opacity-60'
+                      : 'cursor-pointer'
+                  }`}
                 >
-                  <div className="bg-bkg-2 p-3 cursor-pointer default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 mt-3">
-                    <div className="bg-[rgba(255,255,255,0.06)] h-8 w-8 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                      <PlusIcon />
-                    </div>
+                  <div className="bg-[rgba(255,255,255,0.06)] h-8 w-8 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                    <PlusIcon />
                   </div>
-                </Tooltip>
-              </Link>
+                </div>
+              </Tooltip>
             </div>
           </>
         )
@@ -54,6 +61,7 @@ const AccountsCompactWrapper = () => {
         return <DepositTokens></DepositTokens>
     }
   }
+
   useEffect(() => {
     resetCompactViewState()
   }, [symbol])
