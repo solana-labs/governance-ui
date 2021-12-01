@@ -1,8 +1,15 @@
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-// import { precision } from '@utils/formatting'
+import useRealm from '@hooks/useRealm'
+import { RpcContext } from '@models/core/api'
+import { PublicKey } from '@solana/web3.js'
+import { getGovernanceConfig } from '@utils/GovernanceTools'
+import { tryGetMint } from '@utils/tokens'
+import { createTreasuryAccount } from 'actions/createTreasuryAccount'
+import BigNumber from 'bignumber.js'
 import React, { useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 
 interface NewTreasuryAccountForm {
   mintAddress: string
@@ -13,6 +20,9 @@ interface NewTreasuryAccountForm {
 }
 
 const NewAccountForm = () => {
+  const { realmInfo, realm, ownCouncilTokenRecord } = useRealm()
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
   const [form, setForm] = useState<NewTreasuryAccountForm>({
     mintAddress: '',
     minCommunityTokensToCreateProposal: 100,
@@ -32,8 +42,7 @@ const NewAccountForm = () => {
     const min = e.target.min || 0
     const max = e.target.max || Number.MAX_SAFE_INTEGER
     const value = form[fieldName]
-    //todo
-    const currentPrecision = 0 //precision(min)
+    const currentPrecision = new BigNumber(min).decimalPlaces()
 
     handleSetForm({
       value: parseFloat(
@@ -44,8 +53,56 @@ const NewAccountForm = () => {
       propertyName: fieldName,
     })
   }
-  const handleCreate = () => {
+
+  if (!realm) {
+    return null
+  }
+  //TODO
+  const communityTokenOwnerRecord = null
+
+  const canCreateGovernanceUsingCommunityTokens = communityTokenOwnerRecord
+
+  const canCreateGovernanceUsingCouncilTokens =
+    ownCouncilTokenRecord &&
+    !ownCouncilTokenRecord.info.governingTokenDepositAmount.isZero()
+
+  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
+    ? ownCouncilTokenRecord
+    : canCreateGovernanceUsingCommunityTokens
+    ? communityTokenOwnerRecord
+    : undefined
+
+  const handleCreate = async () => {
     setIsLoading(true)
+    if (!realm) {
+      throw 'No realm selected'
+    }
+    const rpcContext = new RpcContext(
+      new PublicKey(realm.account.owner.toString()),
+      realmInfo?.programVersion,
+      wallet,
+      connection.current,
+      connection.endpoint
+    )
+    const mintDecimals = await tryGetMint(
+      connection.current,
+      new PublicKey(form.mintAddress)
+    )
+    const governanceConfigValues = {
+      minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
+      minInstructionHoldUpTime: form.minInstructionHoldUpTime,
+      maxVotingTime: form.maxVotingTime,
+      voteThresholdPercentage: form.voteThreshold,
+      mintDecimals: mintDecimals!.account.decimals,
+    }
+    const governanceConfig = getGovernanceConfig(governanceConfigValues)
+    await createTreasuryAccount(
+      rpcContext,
+      realm.pubkey,
+      new PublicKey(form.mintAddress),
+      governanceConfig,
+      tokenOwnerRecord!.pubkey
+    )
     setIsLoading(false)
   }
   return (
