@@ -1,16 +1,26 @@
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
 import { RpcContext } from '@models/core/api'
+import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
+import {
+  getMintMinAmountAsDecimal,
+  getMintSupplyAsDecimal,
+  getMintSupplyPercentageAsDecimal,
+} from '@tools/sdk/units'
+import { tryParseKey } from '@tools/validators/pubkey'
+import { debounce } from '@utils/debounce'
+import { isFormValid } from '@utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
-import { tryGetMint } from '@utils/tokens'
+import { ProgramAccount, tryGetMint } from '@utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import BigNumber from 'bignumber.js'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-
+import * as yup from 'yup'
 interface NewTreasuryAccountForm {
   mintAddress: string
   minCommunityTokensToCreateProposal: number
@@ -18,18 +28,29 @@ interface NewTreasuryAccountForm {
   maxVotingTime: number
   voteThreshold: number
 }
-
+const defaultFormValues = {
+  mintAddress: '',
+  minCommunityTokensToCreateProposal: 100,
+  minInstructionHoldUpTime: 0,
+  maxVotingTime: 3,
+  voteThreshold: 60,
+}
 const NewAccountForm = () => {
-  const { realmInfo, realm, ownCouncilTokenRecord, ownTokenRecord } = useRealm()
+  const {
+    realmInfo,
+    realm,
+    ownCouncilTokenRecord,
+    ownTokenRecord,
+    mint: realmMint,
+  } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const connected = useWalletStore((s) => s.connected)
+  const { fetchRealm } = useWalletStore((s) => s.actions)
   const [form, setForm] = useState<NewTreasuryAccountForm>({
-    mintAddress: '',
-    minCommunityTokensToCreateProposal: 100,
-    minInstructionHoldUpTime: 0,
-    maxVotingTime: 3,
-    voteThreshold: 60,
+    ...defaultFormValues,
   })
+  const [mint, setMint] = useState<ProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
 
@@ -53,11 +74,7 @@ const NewAccountForm = () => {
       propertyName: fieldName,
     })
   }
-
-  if (!realm) {
-    return null
-  }
-
+  //TODO ownTokenRecord === communityTokenMint ?
   const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
 
   const canCreateGovernanceUsingCouncilTokens =
@@ -71,38 +88,111 @@ const NewAccountForm = () => {
     : undefined
 
   const handleCreate = async () => {
-    setIsLoading(true)
-    if (!realm) {
-      throw 'No realm selected'
+    try {
+      if (!realm) {
+        throw 'No realm selected'
+      }
+      if (!connected) {
+        throw 'Please connect your wallet'
+      }
+      const { isValid, validationErrors } = await isFormValid(schema, form)
+      setFormErrors(validationErrors)
+      if (isValid) {
+        setIsLoading(true)
+        const rpcContext = new RpcContext(
+          new PublicKey(realm.account.owner.toString()),
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
+
+        const governanceConfigValues = {
+          minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
+          minInstructionHoldUpTime: form.minInstructionHoldUpTime,
+          maxVotingTime: form.maxVotingTime,
+          voteThresholdPercentage: form.voteThreshold,
+          mintDecimals: mint!.account.decimals,
+        }
+        const governanceConfig = getGovernanceConfig(governanceConfigValues)
+        await createTreasuryAccount(
+          rpcContext,
+          realm.pubkey,
+          new PublicKey(form.mintAddress),
+          governanceConfig,
+          tokenOwnerRecord!.pubkey
+        )
+        setIsLoading(false)
+        setForm({ ...defaultFormValues })
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      }
+    } catch (e) {
+      console.log(e)
+      setIsLoading(false)
     }
-    const rpcContext = new RpcContext(
-      new PublicKey(realm.account.owner.toString()),
-      realmInfo?.programVersion,
-      wallet,
-      connection.current,
-      connection.endpoint
-    )
-    const mintDecimals = await tryGetMint(
-      connection.current,
-      new PublicKey(form.mintAddress)
-    )
-    const governanceConfigValues = {
-      minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
-      minInstructionHoldUpTime: form.minInstructionHoldUpTime,
-      maxVotingTime: form.maxVotingTime,
-      voteThresholdPercentage: form.voteThreshold,
-      mintDecimals: mintDecimals!.account.decimals,
-    }
-    const governanceConfig = getGovernanceConfig(governanceConfigValues)
-    await createTreasuryAccount(
-      rpcContext,
-      realm.pubkey,
-      new PublicKey(form.mintAddress),
-      governanceConfig,
-      tokenOwnerRecord!.pubkey
-    )
-    setIsLoading(false)
   }
+  const schema = yup.object().shape({
+    mintAddress: yup
+      .string()
+      .test(
+        'mintAddressTest',
+        'Mint address validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              const mint = new PublicKey(val)
+              await tryGetMint(connection.current, mint)
+              return true
+            } catch (e) {
+              return this.createError({
+                message: `Invalid mint address`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Mint address is required`,
+            })
+          }
+        }
+      ),
+  })
+  // Use 1% of mint supply as the default value for minTokensToCreateProposal and the default increment step in the input editor
+  const mintSupply1Percent = realmMint
+    ? getMintSupplyPercentageAsDecimal(realmMint, 1)
+    : 100
+  const minTokenAmount = realmMint
+    ? getMintMinAmountAsDecimal(realmMint)
+    : 0.0001
+  // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
+  const minTokenStep = Math.max(mintSupply1Percent, minTokenAmount)
+
+  const maxTokenAmount = realmMint?.supply.isZero()
+    ? getMintSupplyAsDecimal(realmMint)
+    : undefined
+  useEffect(() => {
+    handleSetForm({
+      value: minTokenStep,
+      propertyName: 'minCommunityTokensToCreateProposal',
+    })
+  }, [minTokenStep])
+  useEffect(() => {
+    const mintError = { mintAddress: 'Invalid mint address' }
+    if (form.mintAddress) {
+      debounce.debounceFcn(async () => {
+        const pubKey = tryParseKey(form.mintAddress)
+
+        if (pubKey) {
+          const account = await tryGetMint(connection.current, pubKey)
+          setMint(account ? account : null)
+        } else {
+          setFormErrors(mintError)
+          setMint(null)
+        }
+      })
+    } else {
+      setMint(null)
+    }
+  }, [form.mintAddress])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
@@ -123,13 +213,20 @@ const NewAccountForm = () => {
         }
         error={formErrors['mintAddress']}
       />
+      {/* TODO ask */}
+      {mint && (
+        <div>
+          Mint found with authority: {mint?.account.mintAuthority?.toBase58()}
+        </div>
+      )}
       <Input
         label="Min community tokens to create proposal"
         value={form.minCommunityTokensToCreateProposal}
         type="number"
         name="minCommunityTokensToCreateProposal"
-        min={0.001}
-        max={10000}
+        min={minTokenAmount}
+        max={maxTokenAmount}
+        step={minTokenStep}
         onBlur={validateMinMax}
         onChange={(evt) =>
           handleSetForm({
@@ -186,9 +283,15 @@ const NewAccountForm = () => {
         error={formErrors['voteThreshold']}
       />
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-        <Button isLoading={isLoading} onClick={handleCreate}>
-          Save
-        </Button>
+        <Tooltip content={!connected && 'Please connect your wallet'}>
+          <Button
+            disabled={!connected}
+            isLoading={isLoading}
+            onClick={handleCreate}
+          >
+            Save
+          </Button>
+        </Tooltip>
       </div>
     </div>
   )

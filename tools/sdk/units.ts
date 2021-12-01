@@ -73,3 +73,20 @@ export function getMintDecimalAmountFromNatural(
 ) {
   return new BigNumber(naturalAmount.toString()).shiftedBy(-mint.decimals)
 }
+
+// Returns mint supply amount as decimal
+export function getMintSupplyAsDecimal(mint: MintInfo) {
+  return new BigNumber(mint.supply.toString())
+    .shiftedBy(-mint.decimals)
+    .toNumber()
+}
+
+// Calculates percentage (provided as 0-100) of mint supply as decimal amount
+export function getMintSupplyPercentageAsDecimal(
+  mint: MintInfo,
+  percentage: number
+) {
+  return new BigNumber(mint.supply.mul(new BN(percentage)).toString())
+    .shiftedBy(-(mint.decimals + 2))
+    .toNumber()
+}
