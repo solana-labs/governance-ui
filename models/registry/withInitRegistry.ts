@@ -6,7 +6,7 @@ import {
 import * as anchor from '@project-serum/anchor'
 import {
   ENTRY_SEED,
-  REGISTRY_CONTEXT_SEED,
+  REGISTRY_CONFIG_SEED,
   REGISTRY_ID,
   PROGRAM_IDL,
 } from './api'
@@ -15,8 +15,8 @@ export async function withInit(
   instructions: TransactionInstruction[],
   authority: PublicKey
 ) {
-  const [registryContext, bump] = await PublicKey.findProgramAddress(
-    [anchor.utils.bytes.utf8.encode(REGISTRY_CONTEXT_SEED)],
+  const [registryConfig, bump] = await PublicKey.findProgramAddress(
+    [anchor.utils.bytes.utf8.encode(REGISTRY_CONFIG_SEED)],
     REGISTRY_ID
   )
   const coder = new anchor.Coder(PROGRAM_IDL)
@@ -33,7 +33,7 @@ export async function withInit(
       data: ix,
       keys: [
         {
-          pubkey: registryContext,
+          pubkey: registryConfig,
           isSigner: false,
           isWritable: true,
         },

@@ -1,13 +1,12 @@
-import { Connection, PublicKey, ConfirmOptions } from '@solana/web3.js'
+import { PublicKey, ConfirmOptions } from '@solana/web3.js'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { equalsIgnoreCase } from '../../tools/core/strings'
-import { EndpointTypes } from '../types'
 import * as anchor from '@project-serum/anchor'
 import idl from './registry.json'
 
 // @ts-ignore
 export const PROGRAM_IDL: anchor.Idl = idl
-export const REGISTRY_CONTEXT_SEED = 'registry-context'
+export const REGISTRY_CONFIG_SEED = 'registry-config'
 export const ENTRY_SEED = 'governance-program'
 export const REGISTRY_ID = new PublicKey(
   'govHvVVCZsdJLynaFJdqEWBU9AbJ4aHYdZsWno114V9'
@@ -235,8 +234,45 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
 ]
 
-export function getAllRealmInfos({ cluster }: ConnectionContext) {
-  return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+export async function getAllRealmInfos({
+  cluster,
+  current,
+}: ConnectionContext) {
+  const realms = cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+  let onChainRealms: RealmInfo[] = []
+
+  if (cluster === 'devnet') {
+    // @ts-ignore
+    const provider = new anchor.Provider(current, null, CONFIRM_OPTIONS)
+    const program = new anchor.Program(PROGRAM_IDL, REGISTRY_ID, provider)
+    const accounts = await current.getProgramAccounts(REGISTRY_ID)
+    console.log('Accounts: ', accounts)
+
+    const resp = await Promise.all(
+      accounts.map(
+        async (account): Promise<RealmInfo | null> => {
+          try {
+            const entry = await program.account.entryData.fetch(account.pubkey)
+            // @ts-ignore
+            const data = JSON.parse(entry.data)
+            return {
+              ...entry,
+              symbol: kebabCase(data.displayName),
+              ...data,
+              realmId: new PublicKey(data.realmId),
+              programId: new PublicKey(data.programId),
+            }
+          } catch (e) {
+            console.log(`Error mapping account ${account.pubkey}: ${e}`)
+            return null
+          }
+        }
+      )
+    )
+    // @ts-ignore
+    onChainRealms = resp.filter((i) => i != null)
+  }
+  return [...realms, ...onChainRealms]
 }
 
 const kebabCase = (str) =>
@@ -246,47 +282,6 @@ const kebabCase = (str) =>
     .map((x) => x.toLowerCase())
     .join('-')
 
-export async function fetchAllRealms(
-  cluster: EndpointTypes,
-  connection: Connection
-): Promise<RealmInfo[]> {
-  const realms = cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
-
-  // @ts-ignore
-  const provider = new anchor.Provider(connection, null, CONFIRM_OPTIONS)
-  const program = new anchor.Program(PROGRAM_IDL, REGISTRY_ID, provider)
-  const accounts = await connection.getProgramAccounts(REGISTRY_ID)
-  console.log('Accounts: ', accounts)
-
-  const resp = await Promise.all(
-    accounts.map(
-      async (account): Promise<RealmInfo | null> => {
-        try {
-          const entry = await program.account.entryData.fetch(account.pubkey)
-          // @ts-ignore
-          const data = JSON.parse(entry.data)
-          return {
-            ...entry,
-            symbol: kebabCase(data.displayName),
-            realmId: account.pubkey,
-            programId: account.account.owner,
-            ...data,
-          }
-        } catch (e) {
-          console.log(`Error mapping account ${account.pubkey}: ${e}`)
-          return null
-        }
-      }
-    )
-  )
-  // @ts-ignore
-  const onChainRealms: RealmInfo[] = resp.filter((i) => i != null)
-  console.log(onChainRealms)
-  // return filteredResp.sort((a, b) => a.acc.name.localeCompare(b.data.name))
-  // return filteredResp
-  return [...realms, ...onChainRealms]
-}
-
 export async function getRealmInfo(
   realmId: string,
   connection: ConnectionContext
@@ -295,11 +290,11 @@ export async function getRealmInfo(
     return undefined
   }
 
-  const realmInfo = getAllRealmInfos(connection).find(
+  const realmInfos = await getAllRealmInfos(connection)
+  const realmInfo = realmInfos.find(
     (r) =>
       equalsIgnoreCase(r.realmId.toBase58(), realmId) ||
       equalsIgnoreCase(r.symbol, realmId)
   )
-
   return realmInfo
 }

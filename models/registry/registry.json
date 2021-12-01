@@ -6,7 +6,7 @@
       "name": "init",
       "accounts": [
         {
-          "name": "registryContext",
+          "name": "registryConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -34,7 +34,7 @@
       "name": "transferAuthority",
       "accounts": [
         {
-          "name": "registryContext",
+          "name": "registryConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -55,7 +55,7 @@
       "name": "addEntry",
       "accounts": [
         {
-          "name": "registryContext",
+          "name": "registryConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -88,7 +88,28 @@
       "name": "verifyEntry",
       "accounts": [
         {
-          "name": "registryContext",
+          "name": "registryConfig",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "entry",
+          "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "authority",
+          "isMut": false,
+          "isSigner": true
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "unverifyEntry",
+      "accounts": [
+        {
+          "name": "registryConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -109,7 +130,7 @@
       "name": "removeEntry",
       "accounts": [
         {
-          "name": "registryContext",
+          "name": "registryConfig",
           "isMut": true,
           "isSigner": false
         },
@@ -129,7 +150,7 @@
   ],
   "accounts": [
     {
-      "name": "RegistryContext",
+      "name": "RegistryConfig",
       "type": {
         "kind": "struct",
         "fields": [
@@ -174,7 +195,7 @@
             "type": "i64"
           },
           {
-            "name": "schema",
+            "name": "schemaVersion",
             "type": "u8"
           },
           {
@@ -220,7 +241,7 @@
             "type": "publicKey"
           },
           {
-            "name": "schema",
+            "name": "schemaVersion",
             "type": "u8"
           },
           {
@@ -237,8 +258,5 @@
       "name": "InsufficientAuthority",
       "msg": "User does not have authority to modify this registry entry"
     }
-  ],
-  "metadata": {
-    "address": "govHvVVCZsdJLynaFJdqEWBU9AbJ4aHYdZsWno114V9"
-  }
+  ]
 }

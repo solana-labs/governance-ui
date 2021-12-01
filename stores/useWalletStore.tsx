@@ -41,6 +41,7 @@ import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
 import { EndpointTypes } from '@models/types'
+import { getRealmInfo, RealmInfo } from '@models/registry/api'
 
 export interface ConnectionContext {
   cluster: EndpointTypes
@@ -56,6 +57,7 @@ interface WalletStore extends State {
   realms: { [realm: string]: ParsedAccount<Realm> }
   selectedRealm: {
     realm?: ParsedAccount<Realm>
+    realmInfo?: RealmInfo
     mint?: MintAccount
     programId?: PublicKey
     councilMint?: MintAccount
@@ -321,10 +323,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realmCouncilMint =
         realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
       const [
+        realmInfo,
         governances,
         tokenRecords,
         councilTokenOwnerRecords,
       ] = await Promise.all([
+        getRealmInfo(realmId.toBase58(), get().connection),
         getGovernanceAccounts<Governance>(
           programId,
           endpoint,
@@ -358,6 +362,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedRealm.realm = realm
+        s.selectedRealm.realmInfo = realmInfo
         s.selectedRealm.mint = realmMint
         s.selectedRealm.programId = programId
         s.selectedRealm.councilMint = realmCouncilMint
@@ -480,6 +485,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         governance.info.realm,
         Realm
       )
+
+      console.log('REALM', realm)
 
       const tokenType = realm.info.communityMint.equals(
         proposal.info.governingTokenMint
