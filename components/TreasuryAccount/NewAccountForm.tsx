@@ -74,7 +74,6 @@ const NewAccountForm = () => {
       propertyName: fieldName,
     })
   }
-  //TODO ownTokenRecord === communityTokenMint ?
   const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
 
   const canCreateGovernanceUsingCouncilTokens =
