@@ -1,3 +1,4 @@
+import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 // import { precision } from '@utils/formatting'
@@ -19,6 +20,7 @@ const NewAccountForm = () => {
     maxVotingTime: 3,
     voteThreshold: 60,
   })
+  const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -41,6 +43,10 @@ const NewAccountForm = () => {
       ),
       propertyName: fieldName,
     })
+  }
+  const handleCreate = () => {
+    setIsLoading(true)
+    setIsLoading(false)
   }
   return (
     <div className="space-y-3">
@@ -124,6 +130,11 @@ const NewAccountForm = () => {
         }
         error={formErrors['voteThreshold']}
       />
+      <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+        <Button isLoading={isLoading} onClick={handleCreate}>
+          Save
+        </Button>
+      </div>
     </div>
   )
 }
