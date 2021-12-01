@@ -133,7 +133,6 @@ export default function useGovernanceAssets() {
     return governedMintInfoAccounts
   }
   const governedTokenAccounts = prepareTokenGovernances()
-
   return {
     governancesArray,
     getGovernancesByAccountType,

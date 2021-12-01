@@ -20,7 +20,7 @@ interface NewTreasuryAccountForm {
 }
 
 const NewAccountForm = () => {
-  const { realmInfo, realm, ownCouncilTokenRecord } = useRealm()
+  const { realmInfo, realm, ownCouncilTokenRecord, ownTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const [form, setForm] = useState<NewTreasuryAccountForm>({
@@ -57,10 +57,8 @@ const NewAccountForm = () => {
   if (!realm) {
     return null
   }
-  //TODO
-  const communityTokenOwnerRecord = null
 
-  const canCreateGovernanceUsingCommunityTokens = communityTokenOwnerRecord
+  const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
 
   const canCreateGovernanceUsingCouncilTokens =
     ownCouncilTokenRecord &&
@@ -69,7 +67,7 @@ const NewAccountForm = () => {
   const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
     ? ownCouncilTokenRecord
     : canCreateGovernanceUsingCommunityTokens
-    ? communityTokenOwnerRecord
+    ? ownTokenRecord
     : undefined
 
   const handleCreate = async () => {
