@@ -54,7 +54,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       recentActivity = await connection.current.getConfirmedSignaturesForAddress2(
         account!.governance!.info.governedAccount,
         {
-          limit: 6,
+          limit: 5,
         },
         'confirmed'
       )

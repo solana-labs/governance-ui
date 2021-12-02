@@ -21,39 +21,57 @@ const AccountsCompactWrapper = () => {
   const connected = useWalletStore((s) => s.connected)
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
+  const { ownCouncilTokenRecord, ownTokenRecord } = useRealm()
   const goToNewAccountForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
   }
   const isNewAccountRoute = router.route.includes(NEW_TREASURY_ROUTE)
+
+  const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
+
+  const canCreateGovernanceUsingCouncilTokens =
+    ownCouncilTokenRecord &&
+    !ownCouncilTokenRecord.info.governingTokenDepositAmount.isZero()
+
+  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
+    ? ownCouncilTokenRecord
+    : canCreateGovernanceUsingCommunityTokens
+    ? ownTokenRecord
+    : undefined
+  const canCreateGovernance = connected && tokenOwnerRecord
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
         return (
           <>
-            <h3 className="mb-4">Treasury</h3>
-            <HoldTokensTotalPrice />
-            <div className="max-h-full overflow-y-auto">
-              <AccountsItems />
+            <h3 className="mb-4 flex items-center">
+              Treasury
               {!isNewAccountRoute && (
                 <Tooltip
+                  contentClassName="ml-auto"
                   content={
-                    !connected && 'Connect your wallet to create new account'
+                    !canCreateGovernance &&
+                    'Connect your wallet to create new account'
                   }
                 >
                   <div
                     onClick={goToNewAccountForm}
-                    className={`bg-bkg-2 p-3 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 mt-3 ${
-                      !connected
+                    className={`bg-bkg-2 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 ml-auto ${
+                      !canCreateGovernance
                         ? 'cursor-not-allowed pointer-events-none opacity-60'
                         : 'cursor-pointer'
                     }`}
                   >
-                    <div className="bg-[rgba(255,255,255,0.06)] h-8 w-8 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                    <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3">
                       <PlusIcon />
                     </div>
                   </div>
                 </Tooltip>
               )}
+            </h3>
+            <HoldTokensTotalPrice />
+            <div style={{ maxHeight: '505px' }} className="overflow-y-auto">
+              <AccountsItems />
             </div>
           </>
         )

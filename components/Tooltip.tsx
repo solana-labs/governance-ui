@@ -7,12 +7,14 @@ type TooltipProps = {
   placement?: any
   className?: string
   children?: ReactNode
+  contentClassName?: string
 }
 
 const Tooltip = ({
   children,
   content,
   className,
+  contentClassName,
   placement = 'top',
 }: TooltipProps) => {
   return content ? (
@@ -30,7 +32,9 @@ const Tooltip = ({
         </div>
       }
     >
-      <div className="outline-none focus:outline-none">{children}</div>
+      <div className={`outline-none focus:outline-none ${contentClassName}`}>
+        {children}
+      </div>
     </Tippy>
   ) : (
     <>{children}</>

@@ -90,3 +90,27 @@ export function getMintSupplyPercentageAsDecimal(
     .shiftedBy(-(mint.decimals + 2))
     .toNumber()
 }
+
+// Formats percentage value showing it in human readable form
+export function formatPercentage(percentage: number) {
+  if (percentage === 0 || percentage === Infinity) {
+    return '0%'
+  }
+
+  if (percentage < 0.01) {
+    return '<0.01%'
+  }
+
+  return `${+percentage.toFixed(2)}%`
+}
+
+// Calculates mint supply fraction for the given natural amount as decimal amount
+export function getMintSupplyFractionAsDecimalPercentage(
+  mint: MintInfo,
+  naturalAmount: BN | number
+) {
+  return getBigNumberAmount(naturalAmount)
+    .multipliedBy(100)
+    .dividedBy(new BigNumber(mint.supply.toString()))
+    .toNumber()
+}
