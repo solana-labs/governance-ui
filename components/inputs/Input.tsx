@@ -7,6 +7,7 @@ interface InputProps {
   onChange?: (e) => void
   className?: string
   disabled?: boolean
+  placeholder?: any
   [x: string]: any
 }
 
@@ -24,12 +25,14 @@ const Input = ({
   max = Number.MAX_SAFE_INTEGER,
   step,
   noMaxWidth,
+  placeholder,
   ...props
 }: InputProps) => {
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
       <input
+        placeholder={placeholder}
         max={max}
         min={min}
         type={type}

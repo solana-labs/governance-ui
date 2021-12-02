@@ -5,16 +5,16 @@
 /* Theme */
 
 :root {
-  --primary-light: theme('colors.sierra-theme.primary.light');
-  --primary-dark: theme('colors.sierra-theme.primary.dark');
+  --primary-light: theme("colors.sierra-theme.primary.light");
+  --primary-dark: theme("colors.sierra-theme.primary.dark");
   --secondary-1: theme('colors.sierra-theme["secondary-1"].light');
   --secondary-1-dark: theme('colors.sierra-theme["secondary-1"].dark');
   --secondary-2: theme('colors.sierra-theme["secondary-2"].light');
   --secondary-2-dark: theme('colors.sierra-theme["secondary-2"].dark');
-  --red: theme('colors.sierra-theme.red');
-  --green: theme('colors.sierra-theme.green');
-  --orange: theme('colors.sierra-theme.orange');
-  --blue: theme('colors.sierra-theme.blue');
+  --red: theme("colors.sierra-theme.red");
+  --green: theme("colors.sierra-theme.green");
+  --orange: theme("colors.sierra-theme.orange");
+  --blue: theme("colors.sierra-theme.blue");
   --bkg-1: theme('colors.sierra-theme["bkg-1"]');
   --bkg-2: theme('colors.sierra-theme["bkg-2"]');
   --bkg-3: theme('colors.sierra-theme["bkg-3"]');
@@ -26,7 +26,6 @@
 }
 
 /* base */
-
 * {
   @apply m-0 p-0;
 }
@@ -93,4 +92,27 @@ button {
 
 :placeholder-shown {
   @apply font-body;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.notification.notification-leave {
+  animation: notification-enter 200ms reverse;
+}
+.notification.notification-enter {
+  animation: notification-enter 200ms forwards;
+}
+
+@keyframes notification-enter {
+  0% {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  50%,
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
