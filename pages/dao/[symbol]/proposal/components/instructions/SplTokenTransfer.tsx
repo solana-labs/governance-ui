@@ -125,6 +125,11 @@ const SplTokenTransfer = ({
     return obj
   }
 
+  async function getInstructions(): Promise<Instruction[]> {
+    const ix = await this.getInstruction()
+    return [ix, ix, ix, ix, ix, ix, ix]
+  }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -151,7 +156,11 @@ const SplTokenTransfer = ({
   }, [form.destinationAccount])
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form.governedAccount, getInstruction },
+      {
+        governedAccount: form.governedAccount,
+        getInstruction,
+        getInstructions,
+      },
       index
     )
   }, [form])

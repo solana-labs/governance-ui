@@ -6,7 +6,7 @@ export enum GovernanceInstruction {
   CreateRealm = 0,
   DepositGoverningTokens = 1,
   WithdrawGoverningTokens = 2,
-  SetGovernanceDelegate = 3, // --
+  SetGovernanceDelegate = 3,
   CreateAccountGovernance = 4,
   CreateProgramGovernance = 5,
 
@@ -197,6 +197,16 @@ export class ExecuteInstructionArgs {
 export class FlagInstructionErrorArgs {
   instruction: GovernanceInstruction =
     GovernanceInstruction.FlagInstructionError
+}
+
+export class SetGovernanceDelegateArgs {
+  instruction: GovernanceInstruction =
+    GovernanceInstruction.SetGovernanceDelegate
+  newGovernanceDelegate?: PublicKey
+
+  constructor(args: { newGovernanceDelegate?: PublicKey }) {
+    this.newGovernanceDelegate = args.newGovernanceDelegate
+  }
 }
 
 export class SetRealmAuthorityArgs {

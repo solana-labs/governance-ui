@@ -12,7 +12,7 @@ import React, { createContext, useEffect, useState } from 'react'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import { RpcContext } from '@models/core/api'
-import { createProposal } from 'actions/createProposal'
+import { createProposal2 } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { PublicKey } from '@solana/web3.js'
@@ -106,10 +106,12 @@ const New = () => {
     const instructions: Instruction[] = []
     for (const inst of instructionsData) {
       if (inst.getInstruction) {
+        console.log('get ix')
         const instruction: Instruction = await inst?.getInstruction()
         instructions.push(instruction)
       }
       if (inst.getInstructions) {
+        console.log('get ixs')
         const ixs: Instruction[] = await inst?.getInstructions()
         instructions.push(...ixs)
       }
@@ -173,7 +175,7 @@ const New = () => {
           )
         }
 
-        proposalAddress = await createProposal(
+        proposalAddress = await createProposal2(
           rpcContext,
           realm.pubkey,
           selectedGovernance.pubkey,
@@ -192,6 +194,7 @@ const New = () => {
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
+        console.error(ex)
       }
     } else {
       setFormErrors(validationErrors)

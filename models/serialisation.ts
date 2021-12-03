@@ -24,6 +24,7 @@ import {
   SetRealmConfigArgs,
   SignOffProposalArgs,
   WithdrawGoverningTokensArgs,
+  SetGovernanceDelegateArgs,
 } from './instructions'
 import {
   AccountMetaData,
@@ -261,6 +262,16 @@ export const GOVERNANCE_SCHEMA = new Map<any, any>([
     {
       kind: 'struct',
       fields: [['instruction', 'u8']],
+    },
+  ],
+  [
+    SetGovernanceDelegateArgs,
+    {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['newGovernanceDelegate', { kind: 'option', type: 'pubkey' }],
+      ],
     },
   ],
   [
