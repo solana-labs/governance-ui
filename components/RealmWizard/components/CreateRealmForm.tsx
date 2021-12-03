@@ -71,6 +71,9 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
     if (form) {
       setFormErrors({})
       setIsLoading(true)
+      await handleCouncilMint(form.councilMintId)
+      await handleCommunityMint(form.communityMintId)
+      setIsLoading(true)
       const { isValid, validationErrors }: formValidation = await isFormValid(
         CreateFormSchema,
         form
@@ -107,10 +110,6 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
   }
 
   const handleCommunityMint = async (mintId: string) => {
-    handleSetForm({
-      communityMintId: mintId,
-      communityMint: undefined,
-    })
     try {
       const mintPublicKey = new PublicKey(mintId)
       const mint = await tryGetMint(connection.current, mintPublicKey)
@@ -127,13 +126,11 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
                   .toString()
               )
             ),
-            communityMintId: mintId,
             communityMint: mint,
           })
         } else {
           handleSetForm({
             communityMint: mint,
-            communityMintId: mintId,
           })
         }
       }
@@ -143,16 +140,11 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
   }
 
   const handleCouncilMint = async (mintId: string) => {
-    handleSetForm({
-      councilMintId: mintId,
-      councilMint: undefined,
-    })
     try {
       const mintPublicKey = new PublicKey(mintId)
       const mint = await tryGetMint(connection.current, mintPublicKey)
       if (mint) {
         handleSetForm({
-          councilMintId: mintId,
           councilMint: mint,
         })
       }
@@ -190,7 +182,9 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
             value={form?.communityMintId}
             type="text"
             error={formErrors['communityMintId'] || formErrors['communityMint']}
-            onChange={(evt) => handleCommunityMint(evt.target.value)}
+            onChange={(evt) =>
+              handleSetForm({ communityMintId: evt.target.value })
+            }
           />
           {form?.communityMint && (
             <div className="pt-2">
@@ -246,7 +240,9 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
             value={form?.councilMintId}
             type="text"
             error={formErrors['councilMintId'] || formErrors['councilMint']}
-            onChange={(evt) => handleCouncilMint(evt.target.value)}
+            onChange={(evt) =>
+              handleSetForm({ councilMintId: evt.target.value })
+            }
           />
         </div>
         <div className="pb-4">
@@ -287,7 +283,11 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
           />
         </div>
         <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-          <Button isLoading={isLoading} onClick={handleCreate}>
+          <Button
+            isLoading={isLoading}
+            onClick={handleCreate}
+            disabled={!form?.teamWallets?.length}
+          >
             Create Realm
           </Button>
         </div>

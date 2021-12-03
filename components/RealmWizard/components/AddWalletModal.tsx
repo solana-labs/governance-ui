@@ -2,7 +2,6 @@ import React, { useState } from 'react'
 import Input from '@components/inputs/Input'
 import Modal from '@components/Modal'
 import Button from '@components/Button'
-import { PublicKey } from '@solana/web3.js'
 import { publicKeyValidationTest } from '../validators/create-realm-validator'
 
 const AddWalletModal: React.FC<{

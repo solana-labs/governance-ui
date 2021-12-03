@@ -49,7 +49,7 @@ const NotificationList = () => {
 
 const Notification = ({ type, message, description, txid }) => {
   const [showNotification, setShowNotification] = useState(true)
-  const [animateState, setAnimateState] = useState('notification-enter')
+  const [animateState, setAnimateState] = useState('animation-enter')
   if (!showNotification) return null
 
   return (
@@ -85,7 +85,6 @@ const Notification = ({ type, message, description, txid }) => {
           <div className={`ml-4 flex-shrink-0 self-start flex`}>
             <button
               onClick={() => {
-                setAnimateState('notification-leave')
                 setTimeout(() => {
                   setShowNotification(false)
                 }, 300)

@@ -2,7 +2,6 @@ import React from 'react'
 import BN from 'bn.js'
 import { ProgramAccount } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
-import { PublicKey } from '@solana/web3.js'
 import { ProgramVersion } from '@models/registry/api'
 import { useState } from 'react'
 import CreateRealmForm from './components/CreateRealmForm'
@@ -36,11 +35,11 @@ const RealmWizard: React.FC = () => {
       setIsLoading(false)
       setShowForm(true)
       const artifacts: CreateRealmProps = {
-        name: 'Realm-TYqAX',
+        name: 'Realm-EZUBS',
         programVersion: 1,
         governanceProgramId: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
-        communityMintId: 'TYqAXESFc7i4KNtKujkUuB985vThkYJybuRx59tDBaK',
-        councilMintId: 'DsB4RCfTjiwRXFe7zpnDnLxF7V5ex4cuhyLPagEEdaEW',
+        communityMintId: 'EZUBSaFK4jVPxk5ChMmbNGtiXkRsuf1E2soDi5GmcdCN',
+        councilMintId: '9DPEfrW5y1AoB1B2NU77BQmEDJvrtkxJTQE2pr729DAm',
         minCommunityTokensToCreateGovernance: new BN(1000000),
         teamWallets: [],
       }
@@ -51,7 +50,10 @@ const RealmWizard: React.FC = () => {
   return (
     <div className="relative">
       {isLoading ? (
-        <Loading />
+        <div className="text-center">
+          <Loading />
+          <span>Creating Realm..</span>
+        </div>
       ) : (
         <>
           {showForm ? (

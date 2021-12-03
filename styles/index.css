@@ -98,14 +98,11 @@ button {
   cursor: pointer;
 }
 
-.notification.notification-leave {
-  animation: notification-enter 200ms reverse;
-}
-.notification.notification-enter {
-  animation: notification-enter 200ms forwards;
+.animation-enter {
+  animation: animation-enter 200ms forwards;
 }
 
-@keyframes notification-enter {
+@keyframes animation-enter {
   0% {
     opacity: 0;
     transform: translateX(-20px);
