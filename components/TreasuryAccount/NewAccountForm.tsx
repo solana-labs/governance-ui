@@ -22,7 +22,7 @@ import { isFormValid } from '@utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import { notify } from '@utils/notifications'
 import tokenService, { TokenRecord } from '@utils/services/token'
-import { ProgramAccount, tryGetMint } from '@utils/tokens'
+import { MintParser, ProgramAccount, tryGetMint } from '@utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
@@ -68,6 +68,17 @@ const NewAccountForm = () => {
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()
+  const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
+
+  const canCreateGovernanceUsingCouncilTokens =
+    ownCouncilTokenRecord &&
+    !ownCouncilTokenRecord.info.governingTokenDepositAmount.isZero()
+
+  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
+    ? ownCouncilTokenRecord
+    : canCreateGovernanceUsingCommunityTokens
+    ? ownTokenRecord
+    : undefined
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -89,18 +100,6 @@ const NewAccountForm = () => {
       propertyName: fieldName,
     })
   }
-  const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
-
-  const canCreateGovernanceUsingCouncilTokens =
-    ownCouncilTokenRecord &&
-    !ownCouncilTokenRecord.info.governingTokenDepositAmount.isZero()
-
-  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
-    ? ownCouncilTokenRecord
-    : canCreateGovernanceUsingCommunityTokens
-    ? ownTokenRecord
-    : undefined
-
   const handleCreate = async () => {
     try {
       if (!realm) {
@@ -111,7 +110,7 @@ const NewAccountForm = () => {
       }
       const { isValid, validationErrors } = await isFormValid(schema, form)
       setFormErrors(validationErrors)
-      if (isValid) {
+      if (isValid && realmMint) {
         setIsLoading(true)
         const rpcContext = new RpcContext(
           new PublicKey(realm.account.owner.toString()),
@@ -126,7 +125,7 @@ const NewAccountForm = () => {
           minInstructionHoldUpTime: form.minInstructionHoldUpTime,
           maxVotingTime: form.maxVotingTime,
           voteThresholdPercentage: form.voteThreshold,
-          mintDecimals: realmMint!.decimals,
+          mintDecimals: realmMint.decimals,
         }
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
         await createTreasuryAccount(
@@ -141,15 +140,40 @@ const NewAccountForm = () => {
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {
-      //TODO maybe some generic inside sendTransaction?
       notify({
         type: 'error',
         message: `Can't create governance`,
-        description: 'Unauthorized to create governance',
+        description: 'Transaction error',
       })
       setIsLoading(false)
     }
   }
+  function parseMinTokensToCreateProposal(
+    value: string | number,
+    mintDecimals: number
+  ) {
+    return typeof value === 'string'
+      ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
+      : getMintNaturalAmountFromDecimal(value, mintDecimals)
+  }
+  const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
+    const minTokens = realmMint
+      ? parseMinTokensToCreateProposal(
+          minTokensToCreateProposal,
+          realmMint.decimals
+        )
+      : 0
+    setMinTokensPercentage(getMinTokensPercentage(minTokens))
+  }
+  const handleSetDefaultMintError = () => {
+    const mintError = { mintAddress: 'Invalid mint address' }
+    setFormErrors(mintError)
+    setMint(null)
+    setTokenInfo(undefined)
+  }
+  const getMinTokensPercentage = (amount: number) =>
+    realmMint ? getMintSupplyFractionAsDecimalPercentage(realmMint, amount) : 0
+
   const schema = yup.object().shape({
     mintAddress: yup
       .string()
@@ -159,15 +183,30 @@ const NewAccountForm = () => {
         async function (val: string) {
           if (val) {
             try {
-              const mint = new PublicKey(val)
-              const mintAccount = await tryGetMint(connection.current, mint)
-              if (!mintAccount) {
+              const mint = tryParseKey(val)
+              if (!mint) {
                 return this.createError({
                   message: `Invalid mint address`,
                 })
               }
+              await connection.current.getAccountInfo(mint).then((data) => {
+                if (!data) {
+                  return this.createError({
+                    message: `Account not found`,
+                  })
+                }
+
+                try {
+                  MintParser(mint, data)
+                } catch {
+                  return this.createError({
+                    message: `Account is not a valid mint`,
+                  })
+                }
+              })
               return true
             } catch (e) {
+              console.log(e, '@@@@')
               return this.createError({
                 message: `Invalid mint address`,
               })
@@ -180,14 +219,6 @@ const NewAccountForm = () => {
         }
       ),
   })
-  function parseMinTokensToCreateProposal(
-    value: string | number,
-    mintDecimals: number
-  ) {
-    return typeof value === 'string'
-      ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
-      : getMintNaturalAmountFromDecimal(value, mintDecimals)
-  }
   // Use 1% of mint supply as the default value for minTokensToCreateProposal and the default increment step in the input editor
   const mintSupply1Percent = realmMint
     ? getMintSupplyPercentageAsDecimal(realmMint, 1)
@@ -198,29 +229,14 @@ const NewAccountForm = () => {
   // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
   const minTokenStep = Math.max(mintSupply1Percent, minTokenAmount)
 
-  const maxTokenAmount = !realmMint?.supply.isZero()
-    ? getMintSupplyAsDecimal(realmMint!)
-    : undefined
+  const maxTokenAmount =
+    !realmMint?.supply?.isZero() && realmMint
+      ? getMintSupplyAsDecimal(realmMint)
+      : undefined
 
-  const getMinTokensPercentage = (amount: number) =>
-    getMintSupplyFractionAsDecimalPercentage(realmMint!, amount)
-
-  const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
-    const minTokens = parseMinTokensToCreateProposal(
-      minTokensToCreateProposal,
-      realmMint!.decimals
-    )
-    setMinTokensPercentage(getMinTokensPercentage(minTokens))
-  }
   useEffect(() => {
     onMinTokensChange(form.minCommunityTokensToCreateProposal)
-  }, [form.minCommunityTokensToCreateProposal])
-  const handleSetDefaultMintError = () => {
-    const mintError = { mintAddress: 'Invalid mint address' }
-    setFormErrors(mintError)
-    setMint(null)
-    setTokenInfo(undefined)
-  }
+  }, [form.minCommunityTokensToCreateProposal, realmInfo?.symbol])
   useEffect(() => {
     if (form.mintAddress) {
       debounce.debounceFcn(async () => {
@@ -297,9 +313,13 @@ const NewAccountForm = () => {
         }
         error={formErrors['minCommunityTokensToCreateProposal']}
       />
-      {maxTokenAmount && minTokensPercentage && (
-        <div>{`${formatPercentage(minTokensPercentage)} of token supply`}</div>
-      )}
+      {maxTokenAmount &&
+        !!minTokensPercentage &&
+        !isNaN(minTokensPercentage) && (
+          <div>{`${formatPercentage(
+            minTokensPercentage
+          )} of token supply`}</div>
+        )}
       <Input
         label="min instruction hold up time (days)"
         value={form.minInstructionHoldUpTime}

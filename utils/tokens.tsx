@@ -13,7 +13,7 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ParsedAccount } from '@models/core/accounts'
+import { ParsedAccount, ParsedAccountBase } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { chunks } from './helpers'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
@@ -282,4 +282,53 @@ export function getMintAccountLabelInfo(
     mintAccountName,
     amount,
   }
+}
+
+export type AccountInfoGen<T> = {
+  executable: boolean
+  owner: PublicKey
+  lamports: number
+  data: T
+  rentEpoch?: number
+}
+
+export const MintParser = (pubKey: PublicKey, info: AccountInfoGen<Buffer>) => {
+  const buffer = Buffer.from(info.data)
+
+  const data = deserializeMint(buffer)
+
+  const details = {
+    pubkey: pubKey,
+    account: {
+      ...info,
+    },
+    info: data,
+  } as ParsedAccountBase
+
+  return details
+}
+
+export const deserializeMint = (data: Buffer) => {
+  if (data.length !== MintLayout.span) {
+    throw new Error('Not a valid Mint')
+  }
+
+  const mintInfo = MintLayout.decode(data)
+
+  if (mintInfo.mintAuthorityOption === 0) {
+    mintInfo.mintAuthority = null
+  } else {
+    mintInfo.mintAuthority = new PublicKey(mintInfo.mintAuthority)
+  }
+
+  mintInfo.supply = u64.fromBuffer(mintInfo.supply)
+  mintInfo.isInitialized = mintInfo.isInitialized !== 0
+
+  if (mintInfo.freezeAuthorityOption === 0) {
+    mintInfo.freezeAuthority = null
+  } else {
+    mintInfo.freezeAuthority = new PublicKey(mintInfo.freezeAuthority)
+  }
+
+  return mintInfo as MintInfo
 }
