@@ -7,6 +7,7 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+import { UXD_INSTRUCTIONS } from './programs/uxdProtocol'
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
@@ -96,6 +97,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...UXD_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(

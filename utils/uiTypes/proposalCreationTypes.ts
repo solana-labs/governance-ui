@@ -58,6 +58,23 @@ export enum Instructions {
   Mint,
   Base64,
   None,
+  InitializeController,
+}
+
+export interface InitializeControllerForm {
+  governedAccount: GovernedProgramAccount | undefined
+  mintSymbol: string | undefined
+  mintDecimals: number | undefined
+  programId: string | undefined
+}
+
+export enum UXDIntructions {
+  InitializeController,
+  SetRedeemableGlobalSupplyCap,
+  SetMangoDepositoriesRedeemableSoftCap,
+  RegisterMangoDepository,
+  DepositInsuranceToMangoDepository,
+  WithdrawInsuranceFromMangoDepository,
 }
 
 export type createParams = [

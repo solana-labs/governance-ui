@@ -36,6 +36,7 @@ import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
+import InitializeController from './components/instructions/InitializeController'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -258,6 +259,8 @@ const New = () => {
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
         )
+      case Instructions.InitializeController:
+        return <InitializeController index={idx} governance={governance} />
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:

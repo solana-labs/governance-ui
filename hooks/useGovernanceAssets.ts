@@ -12,7 +12,7 @@ import useRealm from './useRealm'
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
-  const { ownVoterWeight, realm } = useRealm()
+  const { ownVoterWeight, realm, symbol } = useRealm()
 
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
@@ -44,6 +44,10 @@ export default function useGovernanceAssets() {
     GovernanceAccountType.MintGovernance
   )
 
+  const canUseUxdInstructions =
+    symbol === 'UXD Protocol' &&
+    canUseGovernanceForInstruction(GovernanceAccountType.ProgramGovernance)
+
   const canUseAnyInstruction =
     realm &&
     governancesArray.some((g) =>
@@ -51,6 +55,11 @@ export default function useGovernanceAssets() {
     )
 
   const availableInstructions = [
+    {
+      id: Instructions.InitializeController,
+      name: 'Initialize Controller',
+      isVisible: canUseUxdInstructions,
+    },
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
