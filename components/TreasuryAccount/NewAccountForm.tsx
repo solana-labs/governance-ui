@@ -140,6 +140,7 @@ const NewAccountForm = () => {
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {
+      console.log(e)
       notify({
         type: 'error',
         message: `Can't create governance`,
