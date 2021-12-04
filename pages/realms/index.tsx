@@ -86,7 +86,7 @@ const Realms = () => {
                     </div>
                   ) : (
                     <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                      {realm.symbol?.charAt(0)}
+                      {realm.displayName?.charAt(0)}
                     </div>
                   )}
                 </div>
