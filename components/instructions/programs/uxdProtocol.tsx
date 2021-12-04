@@ -1,5 +1,5 @@
 import { Connection } from '@solana/web3.js'
-import { struct, u8 } from 'buffer-layout'
+import { struct, u8, u48 } from 'buffer-layout'
 import { AccountMetaData } from '../../../models/accounts'
 
 const UXD_INIT_CONTROLLER_INSTRUCTION = {
@@ -37,6 +37,29 @@ const UXD_INIT_CONTROLLER_INSTRUCTION = {
   },
 }
 
+const UXD_SET_REDEEMABLE_GLOBAL_SUPPLY_CAP_INSTRUCTION = {
+  1: {
+    name: 'UXD - Set Redeemable Global Supply Cap',
+    accounts: ['authority', 'controller'],
+    getDataUI: (
+      _connection: Connection,
+      data: Uint8Array,
+      _accounts: AccountMetaData[]
+    ) => {
+      const dataLayout = struct([u48('redeemable_global_supply_cap')])
+
+      const args = dataLayout.decode(Buffer.from(data)) as any
+      console.log('args', args)
+      return (
+        <>
+          <p>{args}</p>
+        </>
+      )
+    },
+  },
+}
+
 export const UXD_INSTRUCTIONS = {
   ...UXD_INIT_CONTROLLER_INSTRUCTION,
+  ...UXD_SET_REDEEMABLE_GLOBAL_SUPPLY_CAP_INSTRUCTION,
 }

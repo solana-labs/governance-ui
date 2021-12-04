@@ -61,6 +61,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseUxdInstructions,
     },
     {
+      id: Instructions.SetRedeemableGlobalSupplyCap,
+      name: 'Set Redeemable Global Supply Cap',
+      isVisible: canUseUxdInstructions,
+    },
+    {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
       isVisible: canUseTransferInstruction,

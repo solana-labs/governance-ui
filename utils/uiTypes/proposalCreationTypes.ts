@@ -59,12 +59,19 @@ export enum Instructions {
   Base64,
   None,
   InitializeController,
+  SetRedeemableGlobalSupplyCap,
 }
 
 export interface InitializeControllerForm {
   governedAccount: GovernedProgramAccount | undefined
   mintSymbol: string | undefined
   mintDecimals: number | undefined
+  programId: string | undefined
+}
+
+export interface SetRedeemableGlobalSupplyCapForm {
+  governedAccount: GovernedProgramAccount | undefined
+  supplyCap: number | undefined
   programId: string | undefined
 }
 
