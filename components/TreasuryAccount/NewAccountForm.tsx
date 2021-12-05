@@ -140,11 +140,11 @@ const NewAccountForm = () => {
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {
-      console.log(e)
+      //TODO how do we present errors maybe something more generic ?
       notify({
         type: 'error',
         message: `Can't create governance`,
-        description: 'Transaction error',
+        description: `Transaction error ${e}`,
       })
       setIsLoading(false)
     }
