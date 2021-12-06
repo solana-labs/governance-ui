@@ -13,7 +13,7 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ParsedAccount, ParsedAccountBase } from '@models/core/accounts'
+import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { chunks } from './helpers'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
