@@ -22,7 +22,7 @@ import { isFormValid } from '@utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import { notify } from '@utils/notifications'
 import tokenService, { TokenRecord } from '@utils/services/token'
-import { MintParser, ProgramAccount, tryGetMint } from '@utils/tokens'
+import { ProgramAccount, tryGetMint } from '@utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
@@ -184,30 +184,29 @@ const NewAccountForm = () => {
         async function (val: string) {
           if (val) {
             try {
-              const mint = tryParseKey(val)
-              if (!mint) {
+              const pubKey = tryParseKey(val)
+              if (!pubKey) {
                 return this.createError({
                   message: `Invalid mint address`,
                 })
               }
-              await connection.current.getAccountInfo(mint).then((data) => {
-                if (!data) {
-                  return this.createError({
-                    message: `Account not found`,
-                  })
-                }
 
-                try {
-                  MintParser(mint, data)
-                } catch {
-                  return this.createError({
-                    message: `Account is not a valid mint`,
-                  })
-                }
-              })
+              const accountData = await connection.current.getAccountInfo(
+                pubKey
+              )
+              if (!accountData) {
+                return this.createError({
+                  message: `Account not found`,
+                })
+              }
+              const mint = tryGetMint(connection.current, pubKey)
+              if (!mint) {
+                return this.createError({
+                  message: `Account is not a valid mint`,
+                })
+              }
               return true
             } catch (e) {
-              console.log(e, '@@@@')
               return this.createError({
                 message: `Invalid mint address`,
               })

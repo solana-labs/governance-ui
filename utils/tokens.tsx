@@ -292,22 +292,6 @@ export type AccountInfoGen<T> = {
   rentEpoch?: number
 }
 
-export const MintParser = (pubKey: PublicKey, info: AccountInfoGen<Buffer>) => {
-  const buffer = Buffer.from(info.data)
-
-  const data = deserializeMint(buffer)
-
-  const details = {
-    pubkey: pubKey,
-    account: {
-      ...info,
-    },
-    info: data,
-  } as ParsedAccountBase
-
-  return details
-}
-
 export const deserializeMint = (data: Buffer) => {
   if (data.length !== MintLayout.span) {
     throw new Error('Not a valid Mint')
