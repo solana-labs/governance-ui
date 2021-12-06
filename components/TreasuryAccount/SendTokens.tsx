@@ -51,6 +51,8 @@ import { notify } from '@utils/notifications'
 import Textarea from '@components/inputs/Textarea'
 // import { Popover } from '@headlessui/react'
 import AccountLabel from './AccountHeader'
+import Tooltip from '@components/Tooltip'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const SendTokens = () => {
   const {
@@ -69,6 +71,7 @@ const SendTokens = () => {
     mint,
     councilMint,
   } = useRealm()
+  const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
@@ -432,11 +435,19 @@ const SendTokens = () => {
           Cancel
         </SecondaryButton>
         <Button
+          disabled={!canUseTransferInstruction}
           className="sm:w-1/2"
           onClick={handlePropose}
           isLoading={isLoading}
         >
-          Propose
+          <Tooltip
+            content={
+              !canUseTransferInstruction &&
+              'You need to have connected wallet with ability to create token transfer proposals'
+            }
+          >
+            <div>Propose</div>
+          </Tooltip>
         </Button>
       </div>
     </>
