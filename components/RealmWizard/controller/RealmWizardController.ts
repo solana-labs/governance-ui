@@ -67,8 +67,18 @@ class RealmWizardController {
     throw new Error('The chosen step is not available.')
   }
 
+  /**
+   * Checks if the state is equal to the last step
+   */
   isLastStep(): boolean {
     return this.currentStep === this.steps[this.steps.length - 1]
+  }
+
+  /**
+   * Checks if the state is equal to the first step
+   */
+  isFirstStep(): boolean {
+    return this.currentStep === this.steps[0]
   }
   /**
    * Return the current step

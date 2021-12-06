@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import RealmWizardController from './controller/RealmWizardController'
 import BN from 'bn.js'
 // import CreateRealmForm from './components/CreateRealmForm'
@@ -14,8 +14,17 @@ import {
   RealmWizardStep,
   StepDirection,
 } from './interfaces/Realm'
+import { formValidation, isFormValid } from '@utils/formValidation'
+import { CreateFormSchema } from './validators/create-realm-validator'
+import { tryGetMint } from '@utils/tokens'
+import { PublicKey } from '@solana/web3.js'
+import { getMintDecimalAmount } from '@tools/sdk/units'
+import useWalletStore from 'stores/useWalletStore'
+import _ from 'lodash'
 
 const RealmWizard: React.FC = () => {
+  // const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
   /**
    * The wizard controller instance
    */
@@ -41,20 +50,71 @@ const RealmWizard: React.FC = () => {
   /**
    * Generate program artifacts
    */
-  const generateProgramArtifacts = () => {
+  const generateProgramArtifacts = async () => {
     setIsLoading(true)
-    setTimeout(() => {
-      setIsLoading(false)
-      const artifacts: RealmArtifacts = {
-        name: 'Realm-EZUBS',
-        programVersion: 1,
-        governanceProgramId: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
-        communityMintId: 'EZUBSaFK4jVPxk5ChMmbNGtiXkRsuf1E2soDi5GmcdCN',
-        councilMintId: '9DPEfrW5y1AoB1B2NU77BQmEDJvrtkxJTQE2pr729DAm',
-        minCommunityTokensToCreateGovernance: new BN(1000000),
+    const artifacts: RealmArtifacts = {
+      // name: 'Realm-EZUBS',
+      programVersion: 1,
+      governanceProgramId: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
+      communityMintId: 'EZUBSaFK4jVPxk5ChMmbNGtiXkRsuf1E2soDi5GmcdCN',
+      councilMintId: '9DPEfrW5y1AoB1B2NU77BQmEDJvrtkxJTQE2pr729DAm',
+      minCommunityTokensToCreateGovernance: new BN(1000000),
+    }
+
+    if (artifacts?.councilMintId) {
+      await handleCouncilMint(artifacts.councilMintId)
+    }
+    if (artifacts?.communityMintId) {
+      await handleCommunityMint(artifacts.communityMintId)
+    }
+
+    setIsLoading(false)
+
+    return artifacts
+  }
+
+  const handleCommunityMint = async (mintId: string) => {
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      if (mint) {
+        const supply = mint.account.supply
+        if (supply.gt(new BN(0))) {
+          handleSetForm({
+            minCommunityTokensToCreateGovernance: BN.max(
+              new BN(1),
+              // divide by 100 for a percentage
+              new BN(
+                getMintDecimalAmount(mint.account, supply)
+                  .dividedBy(100)
+                  .toString()
+              )
+            ),
+            communityMint: mint,
+          })
+        } else {
+          handleSetForm({
+            communityMint: mint,
+          })
+        }
       }
-      setForm(artifacts)
-    }, 1000)
+    } catch (e) {
+      console.log('failed to set community mint', e)
+    }
+  }
+
+  const handleCouncilMint = async (mintId: string) => {
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      if (mint) {
+        handleSetForm({
+          councilMint: mint,
+        })
+      }
+    } catch (e) {
+      console.log('failed to set council mint', e)
+    }
   }
 
   /**
@@ -89,8 +149,27 @@ const RealmWizard: React.FC = () => {
     }
   }
 
-  const handleCreateRealm = () => {
-    console.log('Creating realm')
+  const handleCreateRealm = async () => {
+    const artifacts = await generateProgramArtifacts()
+    const generatedForm = {
+      ...form,
+      ...artifacts,
+    }
+    setForm(form)
+
+    const { isValid, validationErrors }: formValidation = await isFormValid(
+      CreateFormSchema,
+      generatedForm
+    )
+    if (isValid) {
+      console.log({ generatedForm }, 'is valid')
+    } else {
+      console.log({ generatedForm, validationErrors })
+      notify({
+        type: 'error',
+        message: 'The form is invalid.',
+      })
+    }
   }
 
   /**
@@ -123,7 +202,7 @@ const RealmWizard: React.FC = () => {
       ) : (
         BoundStepComponent
       )}
-      {currentStep !== RealmWizardStep.SELECT_MODE && ctl && (
+      {ctl && !ctl.isFirstStep() && (
         <>
           <Button
             onClick={() => handleStepSelection(StepDirection.PREV)}
