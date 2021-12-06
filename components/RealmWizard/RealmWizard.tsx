@@ -202,7 +202,7 @@ const RealmWizard: React.FC = () => {
       ) : (
         BoundStepComponent
       )}
-      {ctl && !ctl.isFirstStep() && (
+      {ctl && !(ctl.isFirstStep() || isLoading) && (
         <>
           <Button
             onClick={() => handleStepSelection(StepDirection.PREV)}
@@ -215,6 +215,7 @@ const RealmWizard: React.FC = () => {
               if (ctl.isLastStep()) handleCreateRealm()
               else handleStepSelection(StepDirection.NEXT)
             }}
+            disabled={!form.teamWallets?.length}
           >
             {ctl.isLastStep() ? 'Create' : 'Next'}
           </Button>
