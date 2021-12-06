@@ -1,16 +1,11 @@
 import React from 'react'
-import {
-  RealmWizardStep,
-  RealmWizardStepComponentProps,
-} from '../../interfaces/Realm'
+import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import TeamWalletField from '../TeamWalletField'
 import { notify } from '@utils/notifications'
 import Input from '@components/inputs/Input'
-import Button from '@components/Button'
 
 const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
-  onConfirm,
   form,
 }) => {
   const handleInsertTeamWallet = (wallet: string) => {
@@ -63,15 +58,6 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
           wallets={form?.teamWallets ?? []}
         />
       </div>
-      <Button
-        onClick={() => onConfirm(RealmWizardStep.SELECT_MODE)}
-        className="mr-3"
-      >
-        Previous
-      </Button>
-      <Button onClick={() => onConfirm(RealmWizardStep.TOKENS_CONFIG)}>
-        Next
-      </Button>
     </>
   )
 }

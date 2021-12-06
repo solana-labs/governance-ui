@@ -62,8 +62,12 @@ export enum RealmWizardStep {
   STEP_4,
 }
 
+export enum StepDirection {
+  PREV = -1,
+  NEXT = 1,
+}
+
 export interface RealmWizardStepComponentProps {
   form: RealmArtifacts
   setForm: (data: RealmArtifacts) => void
-  onConfirm: (nextStep: RealmWizardStep) => void
 }

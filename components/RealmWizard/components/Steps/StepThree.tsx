@@ -3,7 +3,6 @@ import { RealmWizardStepComponentProps } from '@components/RealmWizard/interface
 
 const StepThree: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
-  onConfirm,
   form,
 }) => {
   return <></>

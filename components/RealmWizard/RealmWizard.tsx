@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import RealmWizardController from './controller/RealmWizardController'
 import BN from 'bn.js'
 // import CreateRealmForm from './components/CreateRealmForm'
 import Loading from '@components/Loading'
@@ -6,17 +7,25 @@ import WizardModeSelect from './components/Steps/WizardModeSelect'
 import { notify } from '@utils/notifications'
 import { StepOne, StepTwo, StepThree, StepFour } from './components/Steps'
 import { useMemo } from 'react'
+import Button from '@components/Button'
 import {
   RealmArtifacts,
   RealmWizardMode,
   RealmWizardStep,
+  StepDirection,
 } from './interfaces/Realm'
 
 const RealmWizard: React.FC = () => {
+  /**
+   * The wizard controller instance
+   */
+  const [ctl, setController] = useState<RealmWizardController>()
+
   const [form, setForm] = useState<RealmArtifacts>({})
   const [isLoading, setIsLoading] = useState(false)
-  const [step, setStep] = useState<RealmWizardStep>(RealmWizardStep.SELECT_MODE)
-  const [mode, setMode] = useState<RealmWizardMode>(RealmWizardMode.BASIC)
+  const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
+    RealmWizardStep.SELECT_MODE
+  )
 
   /**
    * Handles and set the form data
@@ -53,72 +62,56 @@ const RealmWizard: React.FC = () => {
    * @param option the selected mode
    */
   const handleModeSelection = (option: RealmWizardMode) => {
-    console.log(option === RealmWizardMode.BASIC, option)
-    switch (option) {
-      // The most basic scenario where the platform will take care of everything.
-      case RealmWizardMode.BASIC:
-        setStep(RealmWizardStep.BASIC_CONFIG)
-        setMode(option)
-        break
-      // Scenario: the user already have the mints
-      case RealmWizardMode.ADVANCED:
-        setMode(option)
-        break
-      default:
-        notify({
-          type: 'error',
-          message: 'Seems like you have made an invalid choice :/',
-        })
+    try {
+      const ctl = new RealmWizardController(option)
+      const nextStep = ctl.getNextStep(currentStep, StepDirection.NEXT)
+      setController(ctl)
+      setCurrentStep(nextStep)
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: error.message,
+      })
     }
   }
 
-  const handleStepSelection = (nextStep: RealmWizardStep) => {
-    setStep(nextStep)
+  const handleStepSelection = (direction: StepDirection) => {
+    if (ctl) {
+      try {
+        const nextStep = ctl.getNextStep(currentStep, direction)
+        setCurrentStep(nextStep)
+      } catch (error) {
+        notify({
+          type: 'error',
+          message: error.message,
+        })
+      }
+    }
+  }
+
+  const handleCreateRealm = () => {
+    console.log('Creating realm')
   }
 
   /**
    * Binds the current step to the matching component
    */
   const BoundStepComponent = useMemo(() => {
-    switch (step) {
+    switch (currentStep) {
       case RealmWizardStep.SELECT_MODE:
         return <WizardModeSelect onSelect={handleModeSelection} />
       case RealmWizardStep.BASIC_CONFIG:
-        return (
-          <StepOne
-            form={form}
-            setForm={handleSetForm}
-            onConfirm={handleStepSelection}
-          />
-        )
+        return <StepOne form={form} setForm={handleSetForm} />
       case RealmWizardStep.TOKENS_CONFIG:
-        return (
-          <StepTwo
-            form={form}
-            setForm={handleSetForm}
-            onConfirm={handleStepSelection}
-          />
-        )
+        return <StepTwo form={form} setForm={handleSetForm} />
       case RealmWizardStep.STEP_3:
-        return (
-          <StepThree
-            form={form}
-            setForm={handleSetForm}
-            onConfirm={handleStepSelection}
-          />
-        )
+        return <StepThree form={form} setForm={handleSetForm} />
       case RealmWizardStep.STEP_4:
-        return (
-          <StepFour
-            form={form}
-            setForm={handleSetForm}
-            onConfirm={handleStepSelection}
-          />
-        )
+        return <StepFour form={form} setForm={handleSetForm} />
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [step, form.teamWallets?.length])
+  }, [currentStep, form.teamWallets?.length])
 
   return (
     <div className="relative">
@@ -129,6 +122,24 @@ const RealmWizard: React.FC = () => {
         </div>
       ) : (
         BoundStepComponent
+      )}
+      {currentStep !== RealmWizardStep.SELECT_MODE && ctl && (
+        <>
+          <Button
+            onClick={() => handleStepSelection(StepDirection.PREV)}
+            className="mr-3"
+          >
+            Previous
+          </Button>
+          <Button
+            onClick={() => {
+              if (ctl.isLastStep()) handleCreateRealm()
+              else handleStepSelection(StepDirection.NEXT)
+            }}
+          >
+            {ctl.isLastStep() ? 'Create' : 'Next'}
+          </Button>
+        </>
       )}
     </div>
   )
