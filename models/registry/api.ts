@@ -150,6 +150,8 @@ const MAINNET_REALMS: RealmInfo[] = [
     displayName: 'The Sanctuary',
     programId: new PublicKey('Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS'),
     realmId: new PublicKey('CS3HBXBdZ44g7FdZfgPAz6nSBe4FSThg6ANuVdowTT6G'),
+    ogImage: '/realms/hope/img/hope_logo.svg',
+    website: 'https://www.solsanctuary.io',
   },
 ]
 
