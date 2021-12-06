@@ -6,7 +6,7 @@ import {
 } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
-import { RealmArtifacts } from '../RealmWizard'
+import { RealmArtifacts } from '../interfaces/Realm'
 import Input from '@components/inputs/Input'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
@@ -48,7 +48,7 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
         form
       )
 
-      if (isValid) {
+      if (isValid && form.governanceProgramId) {
         const rpcContext = new RpcContext(
           new PublicKey(form.governanceProgramId),
           form.programVersion,
@@ -58,15 +58,23 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
         )
 
         try {
-          const realmAddress = await registerRealm(
-            rpcContext,
-            form.name,
-            new PublicKey(form.communityMintId),
-            form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
-            MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+          if (
+            form.name &&
+            form.communityMintId &&
             form.minCommunityTokensToCreateGovernance
-          )
-          setRealmAddress(realmAddress)
+          ) {
+            const realmAddress = await registerRealm(
+              rpcContext,
+              form.name,
+              new PublicKey(form?.communityMintId),
+              form.councilMintId
+                ? new PublicKey(form.councilMintId)
+                : undefined,
+              MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+              form.minCommunityTokensToCreateGovernance
+            )
+            setRealmAddress(realmAddress)
+          }
         } catch (ex) {
           console.log(ex)
           notify({ type: 'error', message: `${ex}` })
@@ -257,13 +265,7 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
             }
           />
         </div>
-        <div className="pb-4">
-          <TeamWalletField
-            onInsert={handleInsertTeamWallet}
-            onRemove={handleRemoveTeamWallet}
-            wallets={form?.teamWallets ?? []}
-          />
-        </div>
+
         <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
           <Button
             isLoading={isLoading}
