@@ -154,7 +154,7 @@ export const ENDPOINTS: EndpointInfo[] = [
   },
   {
     name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
+    url: process.env.DEVNET_RPC || 'https://api.testnet.solana.com',
   },
   {
     name: 'localnet',

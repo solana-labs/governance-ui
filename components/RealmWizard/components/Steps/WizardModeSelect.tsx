@@ -1,7 +1,8 @@
 import React from 'react'
+import { RealmWizardMode } from '@components/RealmWizard/interfaces/Realm'
 
-const CreateRealmOptions: React.FC<{
-  onSelect: () => void
+const WizardModeSelect: React.FC<{
+  onSelect: (option: number) => void
 }> = ({ onSelect }) => {
   return (
     <>
@@ -13,7 +14,7 @@ const CreateRealmOptions: React.FC<{
           <div
             className="border rounded px-5 py-3 w-6/12"
             onClick={() => {
-              onSelect()
+              onSelect(RealmWizardMode.BASIC)
             }}
           >
             <h2 className="mb-0">
@@ -23,7 +24,12 @@ const CreateRealmOptions: React.FC<{
           </div>
         </div>
         <div className="flex justify-center pointer">
-          <div className="border rounded px-5 py-3 w-6/12">
+          <div
+            className="border rounded px-5 py-3 w-6/12"
+            onClick={() => {
+              onSelect(RealmWizardMode.ADVANCED)
+            }}
+          >
             <h2 className="mb-0">
               <b>I already have a Realm</b>
             </h2>
@@ -35,4 +41,4 @@ const CreateRealmOptions: React.FC<{
   )
 }
 
-export default CreateRealmOptions
+export default WizardModeSelect

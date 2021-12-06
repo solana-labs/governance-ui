@@ -3,7 +3,7 @@ import ErrorField from './ErrorField'
 
 interface InputProps {
   type: string
-  value: any
+  value?: any
   onChange?: (e) => void
   className?: string
   disabled?: boolean
@@ -13,7 +13,7 @@ interface InputProps {
 
 const Input = ({
   type,
-  value = '',
+  value,
   onChange,
   className,
   wrapperClassName = 'w-full',

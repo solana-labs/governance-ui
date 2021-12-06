@@ -6,7 +6,7 @@ import {
 } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
-import { CreateRealmProps } from '../RealmWizard'
+import { RealmArtifacts } from '../RealmWizard'
 import Input from '@components/inputs/Input'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
@@ -16,15 +16,15 @@ import { notify } from 'utils/notifications'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { PublicKey } from '@solana/web3.js'
 import { CreateFormSchema } from '../validators/create-realm-validator'
-import TeamWalletField from './TeamWalletField'
+import _ from 'lodash'
 
-const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
+const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
   artifacts,
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
-  const [form, setForm] = useState<CreateRealmProps>()
+  const [form, setForm] = useState<RealmArtifacts>()
 
   useEffect(() => {
     if (artifacts) setForm(artifacts)
@@ -39,40 +39,9 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
     setForm({ ...form, ...newValues })
   }
 
-  const handleInsertTeamWallet = (wallet: string) => {
-    let teamWallets: string[] = []
-    if (form?.teamWallets) {
-      teamWallets = form.teamWallets
-    }
-    if (!teamWallets.find((addr) => addr === wallet)) {
-      teamWallets.push(wallet)
-      handleSetForm({ teamWallets })
-    } else {
-      notify({
-        type: 'error',
-        message: 'This wallet already exists.',
-      })
-    }
-  }
-
-  const handleRemoveTeamWallet = (index: number) => {
-    if (form?.teamWallets[index]) {
-      const teamWallets = form.teamWallets
-      const removedWallet = teamWallets.splice(index, 1)
-      handleSetForm({ teamWallets })
-      notify({
-        type: 'success',
-        message: `Wallet ${removedWallet} removed.`,
-      })
-    }
-  }
-
   const handleCreate = async () => {
     if (form) {
       setFormErrors({})
-      setIsLoading(true)
-      await handleCouncilMint(form.councilMintId)
-      await handleCommunityMint(form.communityMintId)
       setIsLoading(true)
       const { isValid, validationErrors }: formValidation = await isFormValid(
         CreateFormSchema,
@@ -152,6 +121,19 @@ const CreateRealmForm: React.FC<{ artifacts?: CreateRealmProps }> = ({
       console.log('failed to set council mint', e)
     }
   }
+
+  useEffect(() => {
+    _.debounce(async () => {
+      setIsLoading(true)
+      if (form?.councilMintId) {
+        await handleCouncilMint(form.councilMintId)
+      }
+      if (form?.communityMintId) {
+        await handleCommunityMint(form.communityMintId)
+      }
+      setIsLoading(false)
+    }, 250)()
+  }, [form?.communityMintId, form?.councilMintId])
 
   return (
     <>
