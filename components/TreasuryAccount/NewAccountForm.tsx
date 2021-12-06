@@ -49,10 +49,9 @@ const NewAccountForm = () => {
   const {
     realmInfo,
     realm,
-    ownCouncilTokenRecord,
-    ownTokenRecord,
     mint: realmMint,
     symbol,
+    ownVoterWeight,
   } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -70,19 +69,19 @@ const NewAccountForm = () => {
   >()
   const canCreateGovernanceUsingCommunityTokens =
     realm &&
-    ownTokenRecord &&
-    ownTokenRecord.info.governingTokenDepositAmount.cmp(
+    ownVoterWeight.communityTokenRecord &&
+    ownVoterWeight.communityTokenRecord.info.governingTokenDepositAmount.cmp(
       realm.info.config.minCommunityTokensToCreateGovernance
     ) >= 0
 
   const canCreateGovernanceUsingCouncilTokens =
-    ownCouncilTokenRecord &&
-    !ownCouncilTokenRecord.info.governingTokenDepositAmount.isZero()
+    ownVoterWeight.councilTokenRecord &&
+    !ownVoterWeight.councilTokenRecord.info.governingTokenDepositAmount.isZero()
 
   const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
-    ? ownCouncilTokenRecord
+    ? ownVoterWeight.councilTokenRecord
     : canCreateGovernanceUsingCommunityTokens
-    ? ownTokenRecord
+    ? ownVoterWeight.communityTokenRecord
     : undefined
 
   const handleSetForm = ({ propertyName, value }) => {
