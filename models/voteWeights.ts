@@ -67,18 +67,21 @@ export class VoterWeight {
       this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
     )
   }
-
-  canCreateGovernance(realm: ParsedAccount<Realm>) {
-    const canCreateGovernanceUsingCommunityTokens = this.hasMinCommunityWeight(
+  canCreateGovernanceUsingCommunityTokens(realm: ParsedAccount<Realm>) {
+    return this.hasMinCommunityWeight(
       realm.info.config.minCommunityTokensToCreateGovernance
     )
-    const canCreateGovernanceUsingCouncilTokens =
+  }
+  canCreateGovernanceUsingCouncilTokens() {
+    return (
       this.councilTokenRecord &&
       !this.councilTokenRecord.info.governingTokenDepositAmount.isZero()
-
+    )
+  }
+  canCreateGovernance(realm: ParsedAccount<Realm>) {
     return (
-      canCreateGovernanceUsingCommunityTokens ||
-      canCreateGovernanceUsingCouncilTokens
+      this.canCreateGovernanceUsingCommunityTokens(realm) ||
+      this.canCreateGovernanceUsingCouncilTokens()
     )
   }
 

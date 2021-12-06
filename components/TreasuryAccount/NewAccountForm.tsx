@@ -67,20 +67,10 @@ const NewAccountForm = () => {
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()
-  const canCreateGovernanceUsingCommunityTokens =
-    realm &&
-    ownVoterWeight.communityTokenRecord &&
-    ownVoterWeight.communityTokenRecord.info.governingTokenDepositAmount.cmp(
-      realm.info.config.minCommunityTokensToCreateGovernance
-    ) >= 0
 
-  const canCreateGovernanceUsingCouncilTokens =
-    ownVoterWeight.councilTokenRecord &&
-    !ownVoterWeight.councilTokenRecord.info.governingTokenDepositAmount.isZero()
-
-  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
+  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
-    : canCreateGovernanceUsingCommunityTokens
+    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
     : undefined
 
