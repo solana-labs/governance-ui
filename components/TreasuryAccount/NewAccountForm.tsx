@@ -8,7 +8,7 @@ import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import {
-  formatPercentage,
+  fmtPercentage,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
   getMintSupplyAsDecimal,
@@ -68,7 +68,12 @@ const NewAccountForm = () => {
   const [minTokensPercentage, setMinTokensPercentage] = useState<
     number | undefined
   >()
-  const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
+  const canCreateGovernanceUsingCommunityTokens =
+    realm &&
+    ownTokenRecord &&
+    ownTokenRecord.info.governingTokenDepositAmount.cmp(
+      realm.info.config.minCommunityTokensToCreateGovernance
+    ) >= 0
 
   const canCreateGovernanceUsingCouncilTokens =
     ownCouncilTokenRecord &&
@@ -107,6 +112,9 @@ const NewAccountForm = () => {
       }
       if (!connected) {
         throw 'Please connect your wallet'
+      }
+      if (!tokenOwnerRecord) {
+        throw "You don't have enough governance power to create a new treasury account"
       }
       const { isValid, validationErrors } = await isFormValid(schema, form)
       setFormErrors(validationErrors)
@@ -316,9 +324,7 @@ const NewAccountForm = () => {
       {maxTokenAmount &&
         !!minTokensPercentage &&
         !isNaN(minTokensPercentage) && (
-          <div>{`${formatPercentage(
-            minTokensPercentage
-          )} of token supply`}</div>
+          <div>{`${fmtPercentage(minTokensPercentage)} of token supply`}</div>
         )}
       <Input
         label="min instruction hold up time (days)"
@@ -369,7 +375,7 @@ const NewAccountForm = () => {
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
         <Tooltip content={!connected && 'Please connect your wallet'}>
           <Button
-            disabled={!connected}
+            disabled={!connected || isLoading}
             isLoading={isLoading}
             onClick={handleCreate}
           >

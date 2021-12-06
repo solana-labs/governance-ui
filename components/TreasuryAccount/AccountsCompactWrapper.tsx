@@ -19,26 +19,17 @@ const AccountsCompactWrapper = () => {
   const currentView = useTreasuryAccountStore((s) => s.compact.currentView)
   const { resetCompactViewState } = useTreasuryAccountStore()
   const connected = useWalletStore((s) => s.connected)
-  const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { ownCouncilTokenRecord, ownTokenRecord } = useRealm()
+  const { ownVoterWeight, symbol, realm } = useRealm()
   const goToNewAccountForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
   }
   const isNewAccountRoute = router.route.includes(NEW_TREASURY_ROUTE)
-
-  const canCreateGovernanceUsingCommunityTokens = ownTokenRecord
-
-  const canCreateGovernanceUsingCouncilTokens =
-    ownCouncilTokenRecord &&
-    !ownCouncilTokenRecord.info.governingTokenDepositAmount.isZero()
-
-  const tokenOwnerRecord = canCreateGovernanceUsingCouncilTokens
-    ? ownCouncilTokenRecord
-    : canCreateGovernanceUsingCommunityTokens
-    ? ownTokenRecord
-    : undefined
-  const canCreateGovernance = connected && tokenOwnerRecord
+  const canCreateGovernance = realm
+    ? ownVoterWeight.canCreateGovernance(realm)
+    : null
+  const isConnectedWithGovernanceCreationPermission =
+    connected && canCreateGovernance
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -50,14 +41,17 @@ const AccountsCompactWrapper = () => {
                 <Tooltip
                   contentClassName="ml-auto"
                   content={
-                    !canCreateGovernance &&
-                    'Connect your wallet to create new account'
+                    !connected
+                      ? 'Connect your wallet to create new account'
+                      : !canCreateGovernance
+                      ? "You don't have enough governance power to create a new treasury account"
+                      : ''
                   }
                 >
                   <div
                     onClick={goToNewAccountForm}
                     className={`bg-bkg-2 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 ml-auto ${
-                      !canCreateGovernance
+                      !isConnectedWithGovernanceCreationPermission
                         ? 'cursor-not-allowed pointer-events-none opacity-60'
                         : 'cursor-pointer'
                     }`}
