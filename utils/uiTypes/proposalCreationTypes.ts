@@ -60,6 +60,7 @@ export enum Instructions {
   None,
   InitializeController,
   SetRedeemableGlobalSupplyCap,
+  RegisterMangoDepository,
 }
 
 export interface InitializeControllerForm {
@@ -72,6 +73,13 @@ export interface InitializeControllerForm {
 export interface SetRedeemableGlobalSupplyCapForm {
   governedAccount: GovernedProgramAccount | undefined
   supplyCap: number | undefined
+  programId: string | undefined
+}
+
+export interface RegisterMangoDepositoryForm {
+  governedAccount: GovernedProgramAccount | undefined
+  collateralMint: string
+  insuranceMint: string
   programId: string | undefined
 }
 

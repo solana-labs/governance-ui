@@ -28,9 +28,6 @@ const createSetRedeemableGlobalSupplyCapInstruction = (
     uxdProgramId
   )
 
-  console.log('uxdProgramId', uxdProgramId.toBase58())
-  console.log('authority', authority.toBase58())
-  console.log('pda', pda.toBase58())
   const decimals = new BN(10 ** redeemableDecimals)
   const supplyCapNativeAmount = new BN(supplyCapUiAmount).mul(decimals)
   return program.instruction.setRedeemableGlobalSupplyCap(

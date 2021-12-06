@@ -59,7 +59,44 @@ const UXD_SET_REDEEMABLE_GLOBAL_SUPPLY_CAP_INSTRUCTION = {
   },
 }
 
+const UXD_REGISTER_MANGO_DEPOSITORY_INSTRUCTION = {
+  1: {
+    name: 'UXD - Register Mango Depository',
+    accounts: [
+      'authority',
+      'controller',
+      'depository',
+      'collateralMint', // BTC/ WSOL.....
+      'insuranceMint', // USDC
+      'depositoryCollateralPassthroughAccount',
+      'depositoryInsurancePassthroughAccount',
+      'depositoryMangoAccount',
+      'mangoGroup',
+      'rent',
+      'systemProgram',
+      'tokenProgram',
+      'mangoProgram',
+    ],
+    getDataUI: (
+      _connection: Connection,
+      data: Uint8Array,
+      _accounts: AccountMetaData[]
+    ) => {
+      const dataLayout = struct([u48('redeemable_global_supply_cap')])
+
+      const args = dataLayout.decode(Buffer.from(data)) as any
+      console.log('args', args)
+      return (
+        <>
+          <p>{args}</p>
+        </>
+      )
+    },
+  },
+}
+
 export const UXD_INSTRUCTIONS = {
   ...UXD_INIT_CONTROLLER_INSTRUCTION,
   ...UXD_SET_REDEEMABLE_GLOBAL_SUPPLY_CAP_INSTRUCTION,
+  ...UXD_REGISTER_MANGO_DEPOSITORY_INSTRUCTION,
 }
