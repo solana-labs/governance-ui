@@ -165,7 +165,8 @@ export const createProposal2 = async (
   const accountRent = (await Promise.all(rentExemptions)).reduce(
     (a, b) => a + b
   )
-  const signatureFees = instructionsData.length * 5_000
+  // sign for each AddInstruction + finalize (5_046 on devnet)
+  const signatureFees = instructionsData.length * 5_000 + 5_046
   const estimatedLamports = accountRent + signatureFees
   console.log('total', accountRent, signatureFees, estimatedLamports)
 
@@ -263,13 +264,14 @@ export const createProposal2 = async (
         confirmationStatus === 'finalized'
       )
         confirmed = true
-
-      await sleep(1000)
+      else {
+        await sleep(1000)
+      }
     }
     console.log('add ix', index, sig)
   }
 
-  const finalizeSig = await (async () => {
+  await (async () => {
     const instructions: TransactionInstruction[] = []
 
     if (!isDraft) {
@@ -290,17 +292,31 @@ export const createProposal2 = async (
       previousDelegate
     )
 
-    // TODO: reclaim unused lamports
-
     const tx = new Transaction()
     tx.add(...instructions)
 
-    return await connection.sendTransaction(tx, [temporaryKeypair], {
+    const sig = await connection.sendTransaction(tx, [temporaryKeypair], {
       skipPreflight: true,
     })
+
+    let confirmed = false
+    while (!confirmed) {
+      const sigStatus = await connection.getSignatureStatus(sig)
+      const confirmationStatus = sigStatus.value?.confirmationStatus
+      if (
+        confirmationStatus === 'confirmed' ||
+        confirmationStatus === 'finalized'
+      )
+        confirmed = true
+      else {
+        await sleep(1000)
+      }
+    }
+
+    console.log('finalize', sig)
   })()
 
-  console.log('finalize', finalizeSig)
+  console.log('end createProposal', proposalAddress.toString())
 
   return proposalAddress
 }
