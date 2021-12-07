@@ -10,11 +10,7 @@ import {
 import BN from 'bn.js'
 import useRealm from '../hooks/useRealm'
 import { Proposal, ProposalState } from '../models/accounts'
-import {
-  getGovernance,
-  getProposal,
-  getUnrelinquishedVoteRecords,
-} from '../models/api'
+import { getProposal, getUnrelinquishedVoteRecords } from '../models/api'
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
 import { withRelinquishVote } from '../models/withRelinquishVote'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
@@ -104,6 +100,7 @@ const TokenDeposit = ({
     ownCouncilTokenRecord,
     councilTokenAccount,
     proposals,
+    governances,
   } = useRealm()
 
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
@@ -199,10 +196,7 @@ const TokenDeposit = ({
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
           proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.info.state === ProposalState.Voting) {
-            const governance = await getGovernance(
-              connection,
-              proposal.info.governance
-            )
+            const governance = governances[proposal.info.governance.toBase58()]
             if (proposal.info.getTimeToVoteEnd(governance.info) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               throw new Error(
