@@ -2,7 +2,7 @@ import { MintMaxVoteWeightSource } from '@models/accounts'
 import { RpcContext } from '@models/core/api'
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
-import { WalletAdapter } from '@types/types'
+import { WalletAdapter } from '../../../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
 import {
   RealmArtifacts,
