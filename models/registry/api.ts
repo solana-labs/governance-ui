@@ -1,4 +1,4 @@
-import { PublicKey, ConfirmOptions } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { equalsIgnoreCase } from '../../tools/core/strings'
 import * as anchor from '@project-serum/anchor'
@@ -11,9 +11,6 @@ export const ENTRY_SEED = 'governance-program'
 export const REGISTRY_ID = new PublicKey(
   'govHvVVCZsdJLynaFJdqEWBU9AbJ4aHYdZsWno114V9'
 )
-const CONFIRM_OPTIONS: ConfirmOptions = {
-  preflightCommitment: 'processed',
-}
 
 export enum ProgramVersion {
   V1 = 1,
@@ -243,8 +240,7 @@ export async function getAllRealmInfos({
 
   if (cluster === 'devnet') {
     // @ts-ignore
-    const provider = new anchor.Provider(current, null, CONFIRM_OPTIONS)
-    const program = new anchor.Program(PROGRAM_IDL, REGISTRY_ID, provider)
+    const coder = new anchor.Coder(PROGRAM_IDL)
     const accounts = await current.getProgramAccounts(REGISTRY_ID)
     console.log('Accounts: ', accounts)
 
@@ -252,7 +248,10 @@ export async function getAllRealmInfos({
       accounts.map(
         async (account): Promise<RealmInfo | null> => {
           try {
-            const entry = await program.account.entryData.fetch(account.pubkey)
+            const entry = await coder.accounts.decode(
+              'entryData',
+              account.account.data
+            )
             // @ts-ignore
             const data = JSON.parse(entry.data)
             return {

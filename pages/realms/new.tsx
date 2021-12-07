@@ -8,7 +8,7 @@ import React, { useState } from 'react'
 import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
-import { initRegistry, registerRealm } from 'actions/registerRealm'
+import { registerRealm } from 'actions/registerRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { PublicKey } from '@solana/web3.js'
 import { notify } from 'utils/notifications'
@@ -108,17 +108,17 @@ const New = () => {
     setForm({ ...form, ...newValues })
   }
 
-  const handleInit = async () => {
-    await initRegistry(
-      new RpcContext(
-        new PublicKey(form.governanceProgramId),
-        form.programVersion,
-        wallet,
-        connection.current,
-        connection.endpoint
-      )
-    )
-  }
+  // const handleInit = async () => {
+  //   await initRegistry(
+  //     new RpcContext(
+  //       new PublicKey(form.governanceProgramId),
+  //       form.programVersion,
+  //       wallet,
+  //       connection.current,
+  //       connection.endpoint
+  //     )
+  //   )
+  // }
 
   const handleCreate = async () => {
     setFormErrors({})
@@ -287,7 +287,7 @@ const New = () => {
               </div>
               <div className="pb-4">
                 <Input
-                  label="Desceription"
+                  label="Description"
                   placeholder="Descripition of your realm"
                   value={form.description}
                   type="text"
@@ -416,9 +416,9 @@ const New = () => {
                 <Button isLoading={isLoading} onClick={() => handleCreate()}>
                   Create Realm
                 </Button>
-                <Button isLoading={isLoading} onClick={() => handleInit()}>
+                {/* <Button isLoading={isLoading} onClick={() => handleInit()}>
                   Init
-                </Button>
+                </Button> */}
               </div>
             </div>
           </>
