@@ -6,17 +6,23 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-
-import { withCreateProposal } from '../models/withCreateProposal'
-import { withAddSignatory } from '../models/withAddSignatory'
-import { RpcContext } from '../models/core/api'
+import { serialize } from 'borsh'
+import {
+  InstructionData,
+  InstructionExecutionStatus,
+  ProposalInstruction,
+  TokenOwnerRecord,
+} from '@models/accounts'
+import { RpcContext } from '@models/core/api'
+import { withCreateProposal } from '@models/withCreateProposal'
+import { withAddSignatory } from '@models/withAddSignatory'
 import { withInsertInstruction } from '@models/withInsertInstruction'
-import { InstructionData, TokenOwnerRecord } from '@models/accounts'
-import { sendTransaction, sleep } from 'utils/send'
 import { withSignOffProposal } from '@models/withSignOffProposal'
 import { chunk } from '@models/assembly/chunk'
 import { withSetGovernanceDelegate } from '@models/withSetGovernanceDelegate'
 import { getGovernanceAccount } from '@models/api'
+import { GOVERNANCE_SCHEMA } from '@models/serialisation'
+import { sendTransaction, sleep } from '@utils/send'
 
 export const createProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -136,8 +142,32 @@ export const createProposal2 = async (
   const temporaryKeypair = new Keypair()
   console.log('temporaryKey', Array.from(temporaryKeypair.secretKey.values()))
 
-  // TODO calculate rent for instructions + signature fees
-  const estimatedLamports = 5000 * 100_000
+  const rentExemptions = instructionsData.map(async (i) => {
+    const instructionAccount = new ProposalInstruction({
+      proposal: PublicKey.default,
+      instructionIndex: 0,
+      holdUpTime: 0,
+      instruction: i,
+      executedAt: null,
+      executionStatus: InstructionExecutionStatus.None,
+    })
+
+    const serializedAccount = Buffer.from(
+      serialize(GOVERNANCE_SCHEMA, instructionAccount)
+    )
+
+    // each account has a 8 byte header
+    const accountSize = serializedAccount.length + 8
+
+    return await connection.getMinimumBalanceForRentExemption(accountSize)
+  })
+
+  const accountRent = (await Promise.all(rentExemptions)).reduce(
+    (a, b) => a + b
+  )
+  const signatureFees = instructionsData.length * 5_000
+  const estimatedLamports = accountRent + signatureFees
+  console.log('total', accountRent, signatureFees, estimatedLamports)
 
   // allocated temporary wallet for background signing
   instructions.push(
