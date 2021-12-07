@@ -10,7 +10,11 @@ import {
 import BN from 'bn.js'
 import useRealm from '../hooks/useRealm'
 import { Proposal, ProposalState } from '../models/accounts'
-import { getProposal, getUnrelinquishedVoteRecords } from '../models/api'
+import {
+  getGovernance,
+  getProposal,
+  getUnrelinquishedVoteRecords,
+} from '../models/api'
 import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
 import { withRelinquishVote } from '../models/withRelinquishVote'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
@@ -22,6 +26,7 @@ import { Option } from '../tools/core/option'
 import { GoverningTokenType } from '../models/enums'
 import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
+import { withFinalizeVote } from '@models/withFinalizeVote'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -194,10 +199,26 @@ const TokenDeposit = ({
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
           proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.info.state === ProposalState.Voting) {
-            // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
-            throw new Error(
-              `Can't withdraw tokens while Proposal ${proposal.info.name} is being voted on. Please withdraw your vote first`
+            const governance = await getGovernance(
+              connection,
+              proposal.info.governance
             )
+            if (proposal.info.getTimeToVoteEnd(governance.info) > 0) {
+              // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
+              throw new Error(
+                `Can't withdraw tokens while Proposal ${proposal.info.name} is being voted on. Please withdraw your vote first`
+              )
+            } else {
+              // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
+              await withFinalizeVote(
+                instructions,
+                realmInfo!.programId,
+                realm!.pubkey,
+                proposal.info.governance,
+                proposal.pubkey,
+                proposal.info.governingTokenMint
+              )
+            }
           }
         }
 
