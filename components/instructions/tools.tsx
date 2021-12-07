@@ -58,6 +58,7 @@ export const ACCOUNT_NAMES = {
   // GSAIL
   '39J1sWHCJgWab8pn6zpTqFCYRXTYVqbEkpLimrq8kTYJ':
     'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
+  GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
 }
 
 export function getAccountName(accountPk: PublicKey) {
