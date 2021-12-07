@@ -216,6 +216,7 @@ const TokenDeposit = ({
                 realm!.pubkey,
                 proposal.info.governance,
                 proposal.pubkey,
+                proposal.info.tokenOwnerRecord,
                 proposal.info.governingTokenMint
               )
             }
