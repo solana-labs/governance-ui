@@ -23,6 +23,7 @@ import { GoverningTokenType } from '../models/enums'
 import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
+import { chunks } from '@utils/helpers'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -244,18 +245,18 @@ const TokenDeposit = ({
       TOKEN_PROGRAM_ID
     )
 
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
     try {
-      await sendTransaction({
-        connection,
-        wallet,
-        transaction,
-        sendingMessage: 'Withdrawing tokens',
-        successMessage: 'Tokens have been withdrawn',
-      })
-
+      const ixChunks = chunks(instructions, 8)
+      for (const chunk of ixChunks) {
+        const transaction = new Transaction().add(...chunk)
+        await sendTransaction({
+          connection,
+          wallet,
+          transaction,
+          sendingMessage: 'Withdrawing tokens',
+          successMessage: 'Tokens have been withdrawn',
+        })
+      }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (ex) {
