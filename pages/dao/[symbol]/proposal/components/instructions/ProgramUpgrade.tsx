@@ -134,7 +134,7 @@ const ProgramUpgrade = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
+        label="Program"
         governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })

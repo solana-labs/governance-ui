@@ -48,11 +48,13 @@ const MAINNET_REALMS: RealmInfo[] = [
   },
   {
     symbol: 'Governance',
+    displayName: 'Governance',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
   {
     symbol: 'Yield Farming',
+    displayName: 'Yield Farming',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('8eUUtRpBCg7sJ5FXfPUMiwSQNqC3FjFLkmS2oFPKoiBi'),
   },
@@ -143,6 +145,14 @@ const MAINNET_REALMS: RealmInfo[] = [
     website:
       'https://find-and-update.company-information.service.gov.uk/company/13753949',
   },
+  {
+    symbol: '$HOPE',
+    displayName: 'The Sanctuary',
+    programId: new PublicKey('Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS'),
+    realmId: new PublicKey('CS3HBXBdZ44g7FdZfgPAz6nSBe4FSThg6ANuVdowTT6G'),
+    ogImage: '/realms/hope/img/hope_logo.svg',
+    website: 'https://www.solsanctuary.io',
+  },
 ]
 
 // Hardcoded list of devnet realms
@@ -168,16 +178,19 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
   {
     symbol: 'Governance',
+    displayName: 'Governance',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
   {
     symbol: 'Hype-realm',
+    displayName: 'Hype-realm',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('Ap2qT88wk4CPENAcdZN6Q356mauZym4yrQptGXD2AqVF'),
   },
   {
     symbol: 'Realm-8TitF',
+    displayName: 'Realm-8TitF',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('22XYhMSGmPv2nHC3AwbDAP9akyd3rfVRUZt6HUd3wcY5'),
   },

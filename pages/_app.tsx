@@ -8,11 +8,12 @@ import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
+import useRouterHistory from '@hooks/useRouterHistory'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
-
+  useRouterHistory()
   const { realm, realmInfo, symbol } = useRealm()
 
   const realmName = realmInfo?.displayName ?? realm?.info?.name
