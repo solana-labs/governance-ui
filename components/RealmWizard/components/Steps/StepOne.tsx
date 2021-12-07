@@ -4,6 +4,14 @@ import TeamWalletField from '../TeamWalletField'
 import { notify } from '@utils/notifications'
 import Input from '@components/inputs/Input'
 
+/**
+ * This is the Step One for the Realm Wizard.
+ *
+ * This step will set up the Realm name and the team member wallets.
+ * Then the parent should trigger the contracts creation.
+ *
+ * @param param0 the form data and form handler.
+ */
 const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
@@ -35,11 +43,13 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
       })
     }
   }
+
   return (
     <>
       <h2>Name your realm</h2>
       <div className="pb-4">
         <Input
+          required
           type="text"
           value={form.name}
           placeholder="My Realm"
@@ -48,7 +58,6 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
               name: $e.target.value,
             })
           }}
-          required
         />
       </div>
       <div className="pb-4">

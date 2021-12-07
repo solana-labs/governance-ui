@@ -5,7 +5,13 @@ import BN from 'bn.js'
 import Loading from '@components/Loading'
 import WizardModeSelect from './components/Steps/WizardModeSelect'
 import { notify } from '@utils/notifications'
-import { StepOne, StepTwo, StepThree, StepFour } from './components/Steps'
+import {
+  StepOne,
+  StepTwo,
+  StepThree,
+  StepFour,
+  RealmCreated,
+} from './components/Steps'
 import { useMemo } from 'react'
 import Button from '@components/Button'
 import {
@@ -21,10 +27,21 @@ import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import _ from 'lodash'
+import { registerRealm } from 'actions/registerRealm'
+
+const LOADER_MESSAGES = {
+  CREATING_ARTIFACTS: 'Creating the Realm Artifacts..',
+  MINTING_COUNCIL_TOKENS: 'Minting the council tokens..',
+  MINTING_COMMUNITY_TOKENS: 'Minting the community tokens..',
+  DEPLOYING_REALM: 'Deploying the Realm..',
+  COMPLETING_REALM: 'Finishing the Realm buildings..',
+  FINISHED: 'Realm successfully created.',
+  ERROR: 'We found an error while creating your Realm :/',
+}
 
 const RealmWizard: React.FC = () => {
   // const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
+  const { connection, current: wallet } = useWalletStore((s) => s)
   /**
    * The wizard controller instance
    */
@@ -35,6 +52,8 @@ const RealmWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
   )
+  const [realmAddress, setRealmAddress] = useState('')
+  const [loaderMessage, setLoaderMessage] = useState('')
 
   /**
    * Handles and set the form data
@@ -51,25 +70,41 @@ const RealmWizard: React.FC = () => {
    * Generate program artifacts
    */
   const generateProgramArtifacts = async () => {
+    if (!ctl) return
+    if (!wallet || !connection) {
+      notify({ type: 'error', message: 'Wallet not connected!' })
+      return
+    }
+
     setIsLoading(true)
-    const artifacts: RealmArtifacts = {
+    setLoaderMessage(LOADER_MESSAGES.CREATING_ARTIFACTS)
+    let artifacts: RealmArtifacts = {
       // name: 'Realm-EZUBS',
       programVersion: 1,
       governanceProgramId: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
-      communityMintId: 'EZUBSaFK4jVPxk5ChMmbNGtiXkRsuf1E2soDi5GmcdCN',
-      councilMintId: '9DPEfrW5y1AoB1B2NU77BQmEDJvrtkxJTQE2pr729DAm',
+      communityMintId: '8sJ4PFZWaoLtSrQEz5CCSFdnQn1ysRXptSqo4Mm5th3Z',
+      councilMintId: 'ANp8emegzk4uhYQynsyDeC2KjYXbn4Jc3h3bV71PHnRE',
       minCommunityTokensToCreateGovernance: new BN(1000000),
     }
 
     if (artifacts?.councilMintId) {
-      await handleCouncilMint(artifacts.councilMintId)
+      setLoaderMessage(LOADER_MESSAGES.MINTING_COUNCIL_TOKENS)
+      const councilMintInfo = await handleCouncilMint(artifacts.councilMintId)
+      artifacts = {
+        ...artifacts,
+        ...councilMintInfo,
+      }
     }
     if (artifacts?.communityMintId) {
-      await handleCommunityMint(artifacts.communityMintId)
+      setLoaderMessage(LOADER_MESSAGES.MINTING_COMMUNITY_TOKENS)
+      const communityMintInfo = await handleCommunityMint(
+        artifacts.communityMintId
+      )
+      artifacts = {
+        ...artifacts,
+        ...communityMintInfo,
+      }
     }
-
-    setIsLoading(false)
-
     return artifacts
   }
 
@@ -78,9 +113,10 @@ const RealmWizard: React.FC = () => {
       const mintPublicKey = new PublicKey(mintId)
       const mint = await tryGetMint(connection.current, mintPublicKey)
       if (mint) {
+        let mintInfo
         const supply = mint.account.supply
         if (supply.gt(new BN(0))) {
-          handleSetForm({
+          mintInfo = {
             minCommunityTokensToCreateGovernance: BN.max(
               new BN(1),
               // divide by 100 for a percentage
@@ -91,16 +127,20 @@ const RealmWizard: React.FC = () => {
               )
             ),
             communityMint: mint,
-          })
+          }
+          handleSetForm({ ...mintInfo })
         } else {
-          handleSetForm({
+          mintInfo = {
             communityMint: mint,
-          })
+          }
+          handleSetForm({ ...mintInfo })
         }
+        return mintInfo
       }
     } catch (e) {
       console.log('failed to set community mint', e)
     }
+    return undefined
   }
 
   const handleCouncilMint = async (mintId: string) => {
@@ -111,10 +151,12 @@ const RealmWizard: React.FC = () => {
         handleSetForm({
           councilMint: mint,
         })
+        return { councilMint: mint }
       }
     } catch (e) {
       console.log('failed to set council mint', e)
     }
+    return undefined
   }
 
   /**
@@ -161,13 +203,37 @@ const RealmWizard: React.FC = () => {
       CreateFormSchema,
       generatedForm
     )
-    if (isValid) {
-      console.log({ generatedForm }, 'is valid')
+
+    if (isValid && ctl && wallet) {
+      setLoaderMessage(LOADER_MESSAGES.DEPLOYING_REALM)
+      try {
+        const calldata = ctl.prepareData(wallet, connection, generatedForm)
+        const realmAddress = await registerRealm(
+          calldata.rpc,
+          calldata.name,
+          calldata.communityMintId,
+          calldata.councilMintId,
+          calldata.voteWeight,
+          calldata.minCommunityTokens
+        )
+        setLoaderMessage(LOADER_MESSAGES.COMPLETING_REALM)
+        setRealmAddress(realmAddress.toBase58())
+        console.log(realmAddress)
+        setLoaderMessage(LOADER_MESSAGES.FINISHED)
+        handleStepSelection(StepDirection.NEXT)
+      } catch (error) {
+        notify({
+          type: 'error',
+          message: error.message,
+        })
+        setLoaderMessage(LOADER_MESSAGES.ERROR)
+      } finally {
+        setIsLoading(false)
+      }
     } else {
-      console.log({ generatedForm, validationErrors })
       notify({
         type: 'error',
-        message: 'The form is invalid.',
+        message: 'Something happened during the validation of your Realm.',
       })
     }
   }
@@ -187,17 +253,19 @@ const RealmWizard: React.FC = () => {
         return <StepThree form={form} setForm={handleSetForm} />
       case RealmWizardStep.STEP_4:
         return <StepFour form={form} setForm={handleSetForm} />
+      case RealmWizardStep.REALM_CREATED:
+        return <RealmCreated realmAddress={realmAddress} />
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [currentStep, form.teamWallets?.length])
+  }, [currentStep, form])
 
   return (
     <div className="relative">
       {isLoading ? (
         <div className="text-center">
           <Loading />
-          <span>Creating Realm artifacts for you...</span>
+          <span>{loaderMessage}</span>
         </div>
       ) : (
         BoundStepComponent

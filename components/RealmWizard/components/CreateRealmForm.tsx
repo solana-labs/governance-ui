@@ -18,6 +18,11 @@ import { PublicKey } from '@solana/web3.js'
 import { CreateFormSchema } from '../validators/create-realm-validator'
 import _ from 'lodash'
 
+/**
+ *
+ * @param param0
+ * @deprecated
+ */
 const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
   artifacts,
 }) => {

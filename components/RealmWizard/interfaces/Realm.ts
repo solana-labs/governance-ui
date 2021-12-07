@@ -60,6 +60,10 @@ export enum RealmWizardStep {
    * Not defined yet
    */
   STEP_4,
+  /**
+   * Represents the Realm Created state
+   */
+  REALM_CREATED,
 }
 
 export enum StepDirection {

@@ -1,4 +1,11 @@
+import { MintMaxVoteWeightSource } from '@models/accounts'
+import { RpcContext } from '@models/core/api'
+import { BN } from '@project-serum/anchor'
+import { PublicKey } from '@solana/web3.js'
+import { WalletAdapter } from '@types/types'
+import { ConnectionContext } from 'stores/useWalletStore'
 import {
+  RealmArtifacts,
   RealmWizardMode,
   RealmWizardStep,
   StepDirection,
@@ -47,6 +54,7 @@ class RealmWizardController {
       default:
         throw new Error('The selected mode is not available')
     }
+    this.steps.push(RealmWizardStep.REALM_CREATED)
   }
 
   /**
@@ -71,20 +79,73 @@ class RealmWizardController {
    * Checks if the state is equal to the last step
    */
   isLastStep(): boolean {
-    return this.currentStep === this.steps[this.steps.length - 1]
+    return this.currentStep === this.steps[this.steps.length - 2]
   }
 
   /**
    * Checks if the state is equal to the first step
    */
   isFirstStep(): boolean {
-    return this.currentStep === this.steps[0]
+    return (
+      this.currentStep === this.steps[0] ||
+      this.currentStep === RealmWizardStep.REALM_CREATED
+    )
   }
   /**
    * Return the current step
    */
   getCurrentStep(): RealmWizardStep {
     return this.currentStep
+  }
+
+  /**
+   * Prepares the necessary data to request the realm creation
+   */
+  prepareData(
+    wallet: WalletAdapter,
+    conn: ConnectionContext,
+    artifacts: RealmArtifacts
+  ): {
+    rpc: RpcContext
+    name: string
+    communityMintId: PublicKey
+    councilMintId?: PublicKey
+    voteWeight: MintMaxVoteWeightSource
+    minCommunityTokens: BN
+  } {
+    console.log({ ...artifacts })
+    if (artifacts.governanceProgramId) {
+      const rpc = new RpcContext(
+        new PublicKey(artifacts.governanceProgramId),
+        artifacts.programVersion,
+        wallet,
+        conn.current,
+        conn.endpoint
+      )
+      try {
+        if (
+          artifacts.name &&
+          artifacts.communityMintId &&
+          artifacts.minCommunityTokensToCreateGovernance
+        ) {
+          return {
+            rpc,
+            name: artifacts.name,
+            communityMintId: new PublicKey(artifacts.communityMintId),
+            councilMintId: artifacts.councilMintId
+              ? new PublicKey(artifacts.councilMintId)
+              : undefined,
+            voteWeight: MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+            minCommunityTokens: artifacts.minCommunityTokensToCreateGovernance,
+          }
+        } else {
+          throw new Error('Invalid realm data.')
+        }
+      } catch (error) {
+        return error.message
+      }
+    }
+    throw new Error('Invalid Governance Program ID.')
   }
 }
 export default RealmWizardController
