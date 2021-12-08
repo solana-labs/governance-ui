@@ -620,7 +620,7 @@ async function awaitTransactionSignatureConfirmation(
   }
   let subId = 0
   await new Promise((resolve, reject) => {
-    ;(async () => {
+    const fn = async () => {
       setTimeout(() => {
         if (done) {
           return
@@ -654,7 +654,7 @@ async function awaitTransactionSignatureConfirmation(
       }
       while (!done && queryStatus) {
         // eslint-disable-next-line no-loop-func
-        ;(async () => {
+        const fn = async () => {
           try {
             const signatureStatuses = await connection.getSignatureStatuses([
               txid,
@@ -680,10 +680,12 @@ async function awaitTransactionSignatureConfirmation(
               console.log('REST connection error: txid', txid, e)
             }
           }
-        })()
+        }
+        fn();
         await sleep(2000)
       }
-    })()
+    }
+    fn();
   })
     .catch((err) => {
       if (err.timeout && status) {

@@ -72,7 +72,7 @@ const RealmWizard: React.FC = () => {
    */
   const generateProgramArtifacts = async () => {
     if (!ctl) return
-    if (!wallet || !connection) {
+    if (!wallet?.publicKey || !connection.current) {
       notify({ type: 'error', message: 'Wallet not connected!' })
       return
     }
@@ -225,7 +225,7 @@ const RealmWizard: React.FC = () => {
       generatedForm
     )
 
-    if (isValid && ctl && wallet) {
+    if (isValid && ctl && wallet?.publicKey) {
       setLoaderMessage(LOADER_MESSAGES.DEPLOYING_REALM)
       try {
         const calldata = ctl.prepareData(wallet, connection, generatedForm)
@@ -251,11 +251,6 @@ const RealmWizard: React.FC = () => {
       } finally {
         setIsLoading(false)
       }
-    } else {
-      notify({
-        type: 'error',
-        message: 'Something happened during the validation of your Realm.',
-      })
     }
   }
 
