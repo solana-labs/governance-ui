@@ -249,14 +249,20 @@ const TokenDeposit = ({
       // use chunks of 8 here since we added finalize,
       // because previously 9 withdraws used to fit into one tx
       const ixChunks = chunks(instructions, 8)
-      for (const chunk of ixChunks) {
+      for (const [index, chunk] of ixChunks.entries()) {
         const transaction = new Transaction().add(...chunk)
         await sendTransaction({
           connection,
           wallet,
           transaction,
-          sendingMessage: 'Withdrawing tokens',
-          successMessage: 'Tokens have been withdrawn',
+          sendingMessage:
+            index == ixChunks.length - 1
+              ? 'Withdrawing tokens'
+              : `Releasing tokens (${index}/${ixChunks.length - 2})`,
+          successMessage:
+            index == ixChunks.length - 1
+              ? 'Tokens have been withdrawn'
+              : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
       await fetchWalletTokenAccounts()
