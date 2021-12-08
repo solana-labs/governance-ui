@@ -104,6 +104,8 @@ const MakeChangeMaxAccounts = ({
 
   return (
     <>
+      {/* if you need more fields add theme to interface MangoMakeChangeMaxAccountsForm
+        then you can add inputs in here */}
       <GovernedAccountSelect
         label="Program"
         governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
