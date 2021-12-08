@@ -49,7 +49,7 @@ export default function useGovernanceAssets() {
     governancesArray.some((g) =>
       ownVoterWeight.canCreateProposal(g.info.config)
     )
-  console.log(symbol, ' @@@@@@@@@')
+
   const availableInstructions = [
     {
       id: Instructions.Transfer,
