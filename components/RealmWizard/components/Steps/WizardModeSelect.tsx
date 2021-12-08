@@ -1,5 +1,6 @@
 import React from 'react'
 import { RealmWizardMode } from '@components/RealmWizard/interfaces/Realm'
+import Tooltip from '@components/Tooltip'
 
 const WizardModeSelect: React.FC<{
   onSelect: (option: number) => void
@@ -23,17 +24,19 @@ const WizardModeSelect: React.FC<{
             <p>We&apos;ll generate governance artifacts for you</p>
           </div>
         </div>
-        <div className="flex justify-center pointer">
+        <div className="flex justify-center">
           <div
             className="border rounded px-5 py-3 w-6/12"
-            onClick={() => {
-              onSelect(RealmWizardMode.ADVANCED)
-            }}
+            // onClick={() => {
+            //   onSelect(RealmWizardMode.ADVANCED)
+            // }}
           >
-            <h2 className="mb-0">
-              <b>I already have a Realm</b>
-            </h2>
-            <p>You have your token details ready</p>
+            <Tooltip content="This mode is not available yet.">
+              <h2 className="mb-0">
+                <b>I already have a Realm</b>
+              </h2>
+              <p>You have your token details ready</p>
+            </Tooltip>
           </div>
         </div>
       </div>

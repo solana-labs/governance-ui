@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import RealmWizardController from './controller/RealmWizardController'
 import BN from 'bn.js'
 // import CreateRealmForm from './components/CreateRealmForm'
@@ -28,6 +28,7 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import _ from 'lodash'
 import { registerRealm } from 'actions/registerRealm'
+import { generateGovernanceArtifacts } from '@utils/governance/generate-governance-artifacts'
 
 const LOADER_MESSAGES = {
   CREATING_ARTIFACTS: 'Creating the Realm Artifacts..',
@@ -75,15 +76,34 @@ const RealmWizard: React.FC = () => {
       notify({ type: 'error', message: 'Wallet not connected!' })
       return
     }
+    if (!form.name)
+      return notify({
+        type: 'error',
+        message: 'You must set a name for the realm!',
+      })
 
-    setIsLoading(true)
+    if (!form.teamWallets?.length)
+      return notify({
+        type: 'error',
+        message: 'Team member wallets are required.',
+      })
+
     setLoaderMessage(LOADER_MESSAGES.CREATING_ARTIFACTS)
+    setIsLoading(true)
+
+    const generatedArtifacts = await generateGovernanceArtifacts(
+      connection.current,
+      wallet,
+      form.name,
+      form.teamWallets
+    )
+
     let artifacts: RealmArtifacts = {
-      // name: 'Realm-EZUBS',
+      name: generatedArtifacts.realmName,
       programVersion: 1,
       governanceProgramId: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
-      communityMintId: '8sJ4PFZWaoLtSrQEz5CCSFdnQn1ysRXptSqo4Mm5th3Z',
-      councilMintId: 'ANp8emegzk4uhYQynsyDeC2KjYXbn4Jc3h3bV71PHnRE',
+      communityMintId: generatedArtifacts.communityMintAddress.toBase58(),
+      councilMintId: generatedArtifacts.councilMintAddress.toBase58(),
       minCommunityTokensToCreateGovernance: new BN(1000000),
     }
 
@@ -105,6 +125,7 @@ const RealmWizard: React.FC = () => {
         ...communityMintInfo,
       }
     }
+    setForm(artifacts)
     return artifacts
   }
 

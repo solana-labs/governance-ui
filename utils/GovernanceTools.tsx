@@ -1,10 +1,12 @@
 import { GovernanceConfig, VoteThresholdPercentage } from '@models/accounts'
 import { BN } from '@project-serum/anchor'
+import { Keypair } from '@solana/web3.js'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
+import { ConnectionContext } from 'stores/useWalletStore'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
