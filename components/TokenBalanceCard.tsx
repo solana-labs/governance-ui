@@ -246,6 +246,8 @@ const TokenDeposit = ({
     )
 
     try {
+      // use chunks of 8 here since we added finalize,
+      // because previously 9 withdraws used to fit into one tx
       const ixChunks = chunks(instructions, 8)
       for (const chunk of ixChunks) {
         const transaction = new Transaction().add(...chunk)
