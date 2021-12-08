@@ -6,7 +6,7 @@ import base58 from 'bs58'
 export function getExplorerUrl(
   viewTypeOrItemAddress: string | PublicKey,
   endpoint: string,
-  itemType: string = 'address',
+  itemType = 'address',
   connection?: Connection
 ) {
   const getClusterUrlParam = () => {
