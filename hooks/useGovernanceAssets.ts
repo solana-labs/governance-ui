@@ -1,3 +1,4 @@
+import { Cluster } from '@blockworks-foundation/mango-client/lib/src/config'
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
 import {
@@ -9,11 +10,11 @@ import {
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
+
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
-  const { ownVoterWeight, realm } = useRealm()
-
+  const { ownVoterWeight, realm, symbol } = useRealm()
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
   )
@@ -49,7 +50,7 @@ export default function useGovernanceAssets() {
     governancesArray.some((g) =>
       ownVoterWeight.canCreateProposal(g.info.config)
     )
-
+  console.log(symbol, ' @@@@@@@@@')
   const availableInstructions = [
     {
       id: Instructions.Transfer,
@@ -70,6 +71,11 @@ export default function useGovernanceAssets() {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MangoMakeChangeMaxAccounts,
+      name: 'Mango - change max accounts',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.None,

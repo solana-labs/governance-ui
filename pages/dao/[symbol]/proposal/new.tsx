@@ -36,6 +36,7 @@ import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
+import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -264,6 +265,13 @@ const New = () => {
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
+      case Instructions.MangoMakeChangeMaxAccounts:
+        return (
+          <MakeChangeMaxAccounts
+            index={idx}
+            governance={governance}
+          ></MakeChangeMaxAccounts>
+        )
       default:
         null
     }

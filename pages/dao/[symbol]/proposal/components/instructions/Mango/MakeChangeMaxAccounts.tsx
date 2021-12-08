@@ -6,28 +6,25 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ProgramUpgradeForm,
+  MangoMakeChangeMaxAccountsForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
-import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
-import { serializeInstructionToBase64 } from '@models/serialisation'
+//import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
-import { debounce } from '@utils/debounce'
-import { validateBuffer } from '@utils/validations'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-const ProgramUpgrade = ({
+
+const MakeChangeMaxAccounts = ({
   index,
   governance,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useGovernanceAssets()
@@ -40,10 +37,10 @@ const ProgramUpgrade = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<ProgramUpgradeForm>({
+  const [form, setForm] = useState<MangoMakeChangeMaxAccountsForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    bufferAddress: '',
+    maxMangoAccounts: 1,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -65,13 +62,10 @@ const ProgramUpgrade = ({
       form.governedAccount?.governance?.info &&
       wallet?.publicKey
     ) {
-      const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.info.governedAccount,
-        new PublicKey(form.bufferAddress),
-        form.governedAccount.governance.pubkey,
-        wallet!.publicKey
-      )
-      serializedInstruction = serializeInstructionToBase64(upgradeIx)
+      //const makeChangeMaxMangoAccountsInstructionIx = ''
+      //Mango instruction call and serialize
+      //   serializedInstruction = serializeInstructionToBase64(makeChangeMaxMangoAccountsInstructionIx)
+      serializedInstruction = ''
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -88,42 +82,13 @@ const ProgramUpgrade = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.bufferAddress) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.bufferAddress])
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
   const schema = yup.object().shape({
-    bufferAddress: yup
-      .string()
-      .test('bufferTest', 'Invalid buffer', async function (val: string) {
-        if (val) {
-          try {
-            await validateBuffer(
-              connection,
-              val,
-              form.governedAccount?.governance?.pubkey
-            )
-            return true
-          } catch (e) {
-            return this.createError({
-              message: `${e}`,
-            })
-          }
-        } else {
-          return this.createError({
-            message: `Buffer address is required`,
-          })
-        }
-      }),
+    bufferAddress: yup.number(),
     governedAccount: yup
       .object()
       .nullable()
@@ -144,19 +109,20 @@ const ProgramUpgrade = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Buffer address"
-        value={form.bufferAddress}
-        type="text"
+        label="Max accounts"
+        value={form.maxMangoAccounts}
+        type="number"
+        min={1}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'bufferAddress',
+            propertyName: 'maxMangoAccounts',
           })
         }
-        error={formErrors['bufferAddress']}
+        error={formErrors['maxMangoAccounts']}
       />
     </>
   )
 }
 
-export default ProgramUpgrade
+export default MakeChangeMaxAccounts

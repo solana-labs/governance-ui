@@ -42,6 +42,12 @@ export interface ProgramUpgradeForm {
   bufferAddress: string
 }
 
+export interface MangoMakeChangeMaxAccountsForm {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  maxMangoAccounts: number
+}
+
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string
@@ -58,6 +64,7 @@ export enum Instructions {
   Mint,
   Base64,
   None,
+  MangoMakeChangeMaxAccounts,
 }
 
 export type createParams = [
