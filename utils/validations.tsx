@@ -8,6 +8,11 @@ import * as yup from 'yup'
 import { getMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { BN } from '@project-serum/anchor'
 import { ConnectionContext } from 'stores/useWalletStore'
+import {
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
 
 const getValidateAccount = async (connection, pubKey: PublicKey) => {
   const account = await connection.current.getParsedAccountInfo(pubKey)
@@ -26,14 +31,17 @@ const getValidatePublicKey = (val: string) => {
   }
 }
 
-const isValidSplTokenAccount = (account) => {
+const isValidSplTokenAccount = (account, exceptionMode = false) => {
   if (
     !(
       'parsed' in account.value.data &&
       account.value.data.program === 'spl-token'
     )
   ) {
-    throw 'Invalid spl token account'
+    if (exceptionMode) {
+      throw 'Invalid spl token account'
+    }
+    return false
   }
   return true
 }
@@ -78,6 +86,29 @@ const validateDoseTokenAccountMatchMint = (
   }
 }
 
+export const isATAExisit = async (
+  connection: ConnectionContext,
+  governedAccount: PublicKey,
+  owner: PublicKey
+) => {
+  //we do ATA validation
+  const sourceAccMint = await tryGetTokenAccount(
+    connection.current,
+    governedAccount
+  )
+  if (!sourceAccMint) {
+    throw 'Source account not found'
+  }
+  const ata = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+    sourceAccMint.account.mint, // mint
+    owner // owner
+  )
+  const tokenAccount = await tryGetTokenAccount(connection.current, ata)
+  return tokenAccount
+}
+
 export const validateDestinationAccAddress = async (
   connection: ConnectionContext,
   val: any,
@@ -85,17 +116,20 @@ export const validateDestinationAccAddress = async (
 ) => {
   const pubKey = getValidatePublicKey(val)
   const account = await getValidateAccount(connection, pubKey)
-  isValidSplTokenAccount(account)
-  const tokenAccount = getValidateTokenAccount(account)
-  if (governedAccount) {
+  const isExistingTokenAccount = isValidSplTokenAccount(account)
+  if (!governedAccount) {
+    throw 'Source account not provided'
+  }
+  if (isExistingTokenAccount) {
+    const tokenAccount = getValidateTokenAccount(account)
+
     validateIsTokenAccSameMintAsGovernedAcc(
       connection,
       tokenAccount,
       governedAccount
     )
-  } else {
-    throw 'Source account not provided'
   }
+
   return true
 }
 
