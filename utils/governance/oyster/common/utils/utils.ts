@@ -117,7 +117,7 @@ export function isKnownMint(map: KnownTokenMap, mintAddress: string) {
 export const STABLE_COINS = new Set(['USDC', 'wUSDC', 'USDT'])
 
 export function chunks<T>(array: T[], size: number): T[][] {
-  return Array.apply<number, T[], T[][]>(
+  return Array.apply(
     0,
     new Array(Math.ceil(array.length / size))
   ).map((_, index) => array.slice(index * size, (index + 1) * size))
@@ -145,7 +145,7 @@ export function wadToLamports(amount?: BN): BN {
 export function fromLamports(
   account?: TokenAccount | number | BN,
   mint?: MintInfo,
-  rate: number = 1.0
+  rate = 1.0
 ): number {
   if (!account) {
     return 0
@@ -171,14 +171,14 @@ export const tryParseKey = (key: string): PublicKey | null => {
   }
 }
 
-var SI_SYMBOL = ['', 'k', 'M', 'G', 'T', 'P', 'E']
+const SI_SYMBOL = ['', 'k', 'M', 'G', 'T', 'P', 'E']
 
 const abbreviateNumber = (number: number, precision: number) => {
-  let tier = (Math.log10(number) / 3) | 0
+  const tier = (Math.log10(number) / 3) | 0
   let scaled = number
-  let suffix = SI_SYMBOL[tier]
+  const suffix = SI_SYMBOL[tier]
   if (tier !== 0) {
-    let scale = Math.pow(10, tier * 3)
+    const scale = Math.pow(10, tier * 3)
     scaled = number / scale
   }
 
@@ -187,14 +187,14 @@ const abbreviateNumber = (number: number, precision: number) => {
 
 export const formatAmount = (
   val: number,
-  precision: number = 6,
-  abbr: boolean = true
+  precision = 6,
+  abbr = true
 ) => (abbr ? abbreviateNumber(val, precision) : val.toFixed(precision))
 
 export function formatTokenAmount(
   account?: TokenAccount,
   mint?: MintInfo,
-  rate: number = 1.0,
+  rate = 1.0,
   prefix = '',
   suffix = '',
   precision = 6,
@@ -241,7 +241,7 @@ export const formatPct = new Intl.NumberFormat('en-US', {
 export function convert(
   account?: TokenAccount | number,
   mint?: MintInfo,
-  rate: number = 1.0
+  rate = 1.0
 ): number {
   if (!account) {
     return 0
@@ -251,7 +251,7 @@ export function convert(
     typeof account === 'number' ? account : account.info.amount?.toNumber()
 
   const precision = Math.pow(10, mint?.decimals || 0)
-  let result = (amount / precision) * rate
+  const result = (amount / precision) * rate
 
   return result
 }
