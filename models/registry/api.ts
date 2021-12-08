@@ -236,6 +236,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
   },
+  {
+    symbol: 'Realm-4LbqG',
+    displayName: 'Dev Maximilian',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('G25whFStzVjoahyiXiy7rx2G266ePaMpN4yCtMuMKDhJ'),
+  },
 ]
 
 export function getAllRealmInfos({ cluster }: ConnectionContext) {
