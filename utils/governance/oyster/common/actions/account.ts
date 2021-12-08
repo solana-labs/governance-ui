@@ -5,8 +5,7 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { TOKEN_PROGRAM_ID, WRAPPED_SOL_MINT } from '../utils/ids'
-import { cache, TokenAccountParser } from '../contexts/accounts'
+import { TOKEN_PROGRAM_ID } from '../utils/ids'
 
 ////////////////////////////////////////////////
 export function createUninitializedMint(

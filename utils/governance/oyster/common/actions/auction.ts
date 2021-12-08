@@ -10,7 +10,6 @@ import { programIds } from '../utils/ids'
 import { deserializeBorsh } from './../utils/borsh'
 import { serialize } from 'borsh'
 import BN from 'bn.js'
-import { AccountParser, cache } from '../contexts'
 
 export const AUCTION_PREFIX = 'auction'
 export const METADATA = 'metadata'

@@ -8,8 +8,6 @@ import { programIds } from '../utils/ids'
 import { deserializeBorsh } from './../utils/borsh'
 import { serialize } from 'borsh'
 import BN from 'bn.js'
-import { PublicKeyInput } from 'node:crypto'
-import { ParsedAccount } from '..'
 
 export const METADATA_PREFIX = 'metadata'
 export const EDITION = 'edition'
