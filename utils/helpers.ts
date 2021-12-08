@@ -4,10 +4,12 @@ export function capitalize(str?: string) {
 }
 
 export function chunks<T>(array: T[], size: number): T[][] {
-  return Array.apply(
-    0,
-    new Array(Math.ceil(array.length / size))
-  ).map((_, index) => array.slice(index * size, (index + 1) * size))
+  const result: Array<T[]> = []
+  let i, j
+  for (i = 0, j = array.length; i < j; i += size) {
+    result.push(array.slice(i, i + size))
+  }
+  return result
 }
 
 //SanitizedObject class helps prevent prototype pollution with creating obj without prototype
