@@ -81,6 +81,7 @@ const DepositModal = ({
       depositTokenAccount.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
+      amount,
       wallet!.publicKey!,
       TOKEN_PROGRAM_ID,
       SystemProgram.programId
