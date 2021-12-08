@@ -1,27 +1,22 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { MintInfo } from '@solana/spl-token'
-import {
-  Account,
-  PublicKey,
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '../hooks/useRealm'
 import { Proposal, ProposalState } from '../models/accounts'
 import { getProposal, getUnrelinquishedVoteRecords } from '../models/api'
-import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
 import { withRelinquishVote } from '../models/withRelinquishVote'
 import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
 import useWalletStore from '../stores/useWalletStore'
 import { sendTransaction } from '../utils/send'
-import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
+import { TOKEN_PROGRAM_ID } from '../utils/tokens'
 import Button from './Button'
 import { Option } from '../tools/core/option'
 import { GoverningTokenType } from '../models/enums'
 import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
+import { useState } from 'react'
+import DepositModal from './DepositModal'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -91,6 +86,7 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
+  const [showDepositModal, setShowDepositModal] = useState(false)
   const {
     realm,
     realmInfo,
@@ -126,52 +122,6 @@ const TokenDeposit = ({
   const depositTokenName = `${tokenName} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
-
-  const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Account[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      depositTokenAccount!.publicKey,
-      wallet!.publicKey!,
-      amount
-    )
-
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo!.programId,
-      realm!.pubkey,
-      depositTokenAccount!.publicKey,
-      depositTokenAccount!.account.mint,
-      wallet!.publicKey!,
-      transferAuthority.publicKey,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID,
-      SystemProgram.programId
-    )
-
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
-    })
-
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-  }
-
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount!.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
@@ -274,7 +224,7 @@ const TokenDeposit = ({
         <Button
           className="sm:w-1/2"
           disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
+          onClick={() => setShowDepositModal(true)}
         >
           Deposit
         </Button>
@@ -285,6 +235,14 @@ const TokenDeposit = ({
         >
           Withdraw
         </Button>
+        {showDepositModal ? (
+          <DepositModal
+            isOpen={showDepositModal}
+            mint={mint}
+            onClose={() => setShowDepositModal(false)}
+            depositTokenAccount={depositTokenAccount}
+          />
+        ) : null}
       </div>
     </>
   )
