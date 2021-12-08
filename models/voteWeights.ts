@@ -67,6 +67,23 @@ export class VoterWeight {
       this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
     )
   }
+  canCreateGovernanceUsingCommunityTokens(realm: ParsedAccount<Realm>) {
+    return this.hasMinCommunityWeight(
+      realm.info.config.minCommunityTokensToCreateGovernance
+    )
+  }
+  canCreateGovernanceUsingCouncilTokens() {
+    return (
+      this.councilTokenRecord &&
+      !this.councilTokenRecord.info.governingTokenDepositAmount.isZero()
+    )
+  }
+  canCreateGovernance(realm: ParsedAccount<Realm>) {
+    return (
+      this.canCreateGovernanceUsingCommunityTokens(realm) ||
+      this.canCreateGovernanceUsingCouncilTokens()
+    )
+  }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
     // Prefer community token owner record as proposal owner

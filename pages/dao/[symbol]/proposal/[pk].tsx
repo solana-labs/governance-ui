@@ -19,7 +19,7 @@ import useQueryContext from '../../../../hooks/useQueryContext'
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = useRealm()
-  const { proposal, description, instructions } = useProposal()
+  const { proposal, description } = useProposal()
   const {
     yesVoteProgress,
     yesVoteCount,
@@ -27,15 +27,6 @@ const Proposal = () => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
-
-  console.log('proposal data', {
-    proposal,
-    instructions,
-    yesVoteCount,
-    noVoteCount,
-    relativeNoVotes,
-    relativeYesVotes,
-  })
 
   return (
     <div className="grid grid-cols-12 gap-4">

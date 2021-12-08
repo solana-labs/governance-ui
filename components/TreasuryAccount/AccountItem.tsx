@@ -67,7 +67,7 @@ const AccountItem = ({
     handleSetTotalPrice()
   }, [mintAddress, amount])
   const amountFormatted = new BigNumber(amount).toFormat()
-  return tokenRecordInfo?.symbol || amount ? (
+  return tokenRecordInfo?.symbol || accountPublicKey ? (
     <div
       onClick={handleGoToAccountOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"

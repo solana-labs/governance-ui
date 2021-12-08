@@ -8,6 +8,7 @@ const AccountsItems = () => {
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
+
   useEffect(() => {
     async function prepTreasuryAccounts() {
       setTreasuryAccounts(governedTokenAccounts)

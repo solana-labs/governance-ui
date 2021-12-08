@@ -13,6 +13,7 @@ export const withFinalizeVote = async (
   realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
+  proposalOwnerRecord: PublicKey,
   governingTokenMint: PublicKey
 ) => {
   const args = new FinalizeVoteArgs()
@@ -31,6 +32,11 @@ export const withFinalizeVote = async (
     },
     {
       pubkey: proposal,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
+      pubkey: proposalOwnerRecord,
       isWritable: true,
       isSigner: false,
     },

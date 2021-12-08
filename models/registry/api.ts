@@ -48,11 +48,13 @@ const MAINNET_REALMS: RealmInfo[] = [
   },
   {
     symbol: 'Governance',
+    displayName: 'Governance',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
   {
     symbol: 'Yield Farming',
+    displayName: 'Yield Farming',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('8eUUtRpBCg7sJ5FXfPUMiwSQNqC3FjFLkmS2oFPKoiBi'),
   },
@@ -144,6 +146,14 @@ const MAINNET_REALMS: RealmInfo[] = [
       'https://find-and-update.company-information.service.gov.uk/company/13753949',
   },
   {
+    symbol: '$HOPE',
+    displayName: 'The Sanctuary',
+    programId: new PublicKey('Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS'),
+    realmId: new PublicKey('CS3HBXBdZ44g7FdZfgPAz6nSBe4FSThg6ANuVdowTT6G'),
+    ogImage: '/realms/hope/img/hope_logo.svg',
+    website: 'https://www.solsanctuary.io',
+  },
+  {
     symbol: 'FANT',
     displayName: 'Phantasia',
     programId: new PublicKey('5sGZEdn32y8nHax7TxEyoHuPS3UXfPWtisgm8kqxat8H'),
@@ -152,7 +162,7 @@ const MAINNET_REALMS: RealmInfo[] = [
         'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FANTafPFBAt93BNJVpdu25pGPmca3RfwdsDsRrT3LX1r/logo.png',
     website: 'https://phantasia.app',
     twitter: '@PhantasiaSports',
-  },
+  }
 ]
 
 // Hardcoded list of devnet realms
@@ -178,16 +188,19 @@ const DEVNET_REALMS: RealmInfo[] = [
   },
   {
     symbol: 'Governance',
+    displayName: 'Governance',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
   },
   {
     symbol: 'Hype-realm',
+    displayName: 'Hype-realm',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('Ap2qT88wk4CPENAcdZN6Q356mauZym4yrQptGXD2AqVF'),
   },
   {
     symbol: 'Realm-8TitF',
+    displayName: 'Realm-8TitF',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('22XYhMSGmPv2nHC3AwbDAP9akyd3rfVRUZt6HUd3wcY5'),
   },
@@ -232,6 +245,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     displayName: 'SAIAdao Devnet',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
+  },
+  {
+    symbol: 'Realm-4LbqG',
+    displayName: 'Dev Maximilian',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('G25whFStzVjoahyiXiy7rx2G266ePaMpN4yCtMuMKDhJ'),
   },
 ]
 
