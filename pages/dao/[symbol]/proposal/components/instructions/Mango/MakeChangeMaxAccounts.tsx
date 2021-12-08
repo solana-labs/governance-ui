@@ -62,9 +62,16 @@ const MakeChangeMaxAccounts = ({
       form.governedAccount?.governance?.info &&
       wallet?.publicKey
     ) {
-      //const makeChangeMaxMangoAccountsInstructionIx = ''
       //Mango instruction call and serialize
-      //   serializedInstruction = serializeInstructionToBase64(makeChangeMaxMangoAccountsInstructionIx)
+      //example
+
+      //   const upgradeIx = await createUpgradeInstruction(
+      //     form.governedAccount.governance.info.governedAccount,
+      //     new PublicKey(form.bufferAddress),
+      //     form.governedAccount.governance.pubkey,
+      //     wallet!.publicKey
+      //   )
+      //   serializedInstruction = serializeInstructionToBase64(upgradeIx)
       serializedInstruction = ''
     }
     const obj: UiInstruction = {
