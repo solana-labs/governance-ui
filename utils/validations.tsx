@@ -67,13 +67,11 @@ const validateIsTokenAccSameMintAsGovernedAcc = async (
     connection.current,
     governedAccount
   )
-  if (
-    sourceAccMint &&
-    tokenAccount.mint.toBase58() !== sourceAccMint.account.mint.toBase58()
-  ) {
-    throw "Account mint doesn't match source account"
-  } else {
+  if (!sourceAccMint) {
     throw 'Invalid source account'
+  }
+  if (tokenAccount.mint.toBase58() !== sourceAccMint.account.mint.toBase58()) {
+    throw "Account mint doesn't match source account"
   }
 }
 
@@ -86,7 +84,7 @@ const validateDoseTokenAccountMatchMint = (
   }
 }
 
-export const isATAExisit = async (
+export const doseATAExists = async (
   connection: ConnectionContext,
   governedAccount: PublicKey,
   owner: PublicKey
@@ -123,7 +121,7 @@ export const validateDestinationAccAddress = async (
   if (isExistingTokenAccount) {
     const tokenAccount = getValidateTokenAccount(account)
 
-    validateIsTokenAccSameMintAsGovernedAcc(
+    await validateIsTokenAccSameMintAsGovernedAcc(
       connection,
       tokenAccount,
       governedAccount
@@ -250,6 +248,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               )
               return true
             } catch (e) {
+              console.log(e)
               return this.createError({
                 message: `${e}`,
               })
