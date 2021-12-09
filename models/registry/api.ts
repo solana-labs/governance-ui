@@ -154,6 +154,14 @@ const MAINNET_REALMS: RealmInfo[] = [
     website: 'https://www.solsanctuary.io',
   },
   {
+    symbol: 'MOOD',
+    displayName: 'Strangemood Foundation',
+    programId: new PublicKey('smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui'),
+    realmId: new PublicKey('FvzZFjf3NPTZbKAmQA4Gf1v7uTW7HFcP5Pcr2oVm49t3'),
+    ogImage: '/realms/strangemood/img/logo.svg',
+    website: 'https://strangemood.org',
+  },
+  {
     symbol: 'FANT',
     displayName: 'Phantasia',
     programId: new PublicKey('5sGZEdn32y8nHax7TxEyoHuPS3UXfPWtisgm8kqxat8H'),
