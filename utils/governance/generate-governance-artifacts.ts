@@ -44,8 +44,8 @@ export const generateGovernanceArtifacts = async (
     connection,
     wallet,
     3,
-    new u64('7000000'),
-    new u64('10000000'),
+    new u64('0'),
+    new u64('0'),
     otherOwnerWallet
   )
 
@@ -59,8 +59,8 @@ export const generateGovernanceArtifacts = async (
     connection,
     wallet,
     0,
-    new u64(20),
-    new u64(55),
+    new u64(teamWallets.length),
+    new u64(teamWallets.length),
     otherOwnerWallet
   )
 

@@ -1,6 +1,7 @@
 import { ProgramVersion } from '@models/registry/api'
 import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
 
 /**
  * Default realm artifact interface
@@ -74,4 +75,16 @@ export enum StepDirection {
 export interface RealmWizardStepComponentProps {
   form: RealmArtifacts
   setForm: (data: RealmArtifacts) => void
+}
+
+export interface RealmProps {
+  address?: string
+  tx: number
+  realmName: string
+  communityMintAddress: PublicKey
+  councilMintAddress: PublicKey
+  tokenGovernance: {
+    tokenAccountAddress: string
+    beneficiaryTokenAccountAddress: string
+  }
 }
