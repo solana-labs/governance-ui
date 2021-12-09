@@ -30,20 +30,21 @@ import _ from 'lodash'
 import { registerRealm } from 'actions/registerRealm'
 import { generateGovernanceArtifacts } from '@utils/governance/generate-governance-artifacts'
 
-const LOADER_MESSAGES = {
-  CREATING_ARTIFACTS: 'Creating the Realm Artifacts..',
-  MINTING_COUNCIL_TOKENS: 'Minting the council tokens..',
-  MINTING_COMMUNITY_TOKENS: 'Minting the community tokens..',
-  DEPLOYING_REALM: 'Deploying the Realm..',
-  COMPLETING_REALM: 'Finishing the Realm buildings..',
-  FINISHED: 'Realm successfully created.',
-  ERROR: 'We found an error while creating your Realm :/',
+enum LoaderMessage {
+  CREATING_ARTIFACTS = 'Creating the Realm Artifacts..',
+  MINTING_COUNCIL_TOKENS = 'Minting the council tokens..',
+  MINTING_COMMUNITY_TOKENS = 'Minting the community tokens..',
+  DEPLOYING_REALM = 'Deploying the Realm..',
+  COMPLETING_REALM = 'Finishing the Realm buildings..',
+  FINISHED = 'Realm successfully created.',
+  ERROR = 'We found an error while creating your Realm :/',
 }
 
 const RealmWizard: React.FC = () => {
   // const wallet = useWalletStore((s) => s.current)
   const { connection, current: wallet } = useWalletStore((s) => s)
   /**
+   * @var {RealmWizardController} ctl
    * The wizard controller instance
    */
   const [ctl, setController] = useState<RealmWizardController>()
@@ -54,8 +55,8 @@ const RealmWizard: React.FC = () => {
     RealmWizardStep.SELECT_MODE
   )
   const [realmAddress, setRealmAddress] = useState('')
-  const [loaderMessage, setLoaderMessage] = useState('')
-
+  const [loaderMessage, setLoaderMessage] = useState<LoaderMessage>()
+  const [hasGeneratedArtifacts, setHasGeneratedArtifacts] = useState(false)
   /**
    * Handles and set the form data
    * @param data the form data
@@ -88,7 +89,7 @@ const RealmWizard: React.FC = () => {
         message: 'Team member wallets are required.',
       })
 
-    setLoaderMessage(LOADER_MESSAGES.CREATING_ARTIFACTS)
+    setLoaderMessage(LoaderMessage.CREATING_ARTIFACTS)
     setIsLoading(true)
 
     const generatedArtifacts = await generateGovernanceArtifacts(
@@ -108,7 +109,7 @@ const RealmWizard: React.FC = () => {
     }
 
     if (artifacts?.councilMintId) {
-      setLoaderMessage(LOADER_MESSAGES.MINTING_COUNCIL_TOKENS)
+      setLoaderMessage(LoaderMessage.MINTING_COUNCIL_TOKENS)
       const councilMintInfo = await handleCouncilMint(artifacts.councilMintId)
       artifacts = {
         ...artifacts,
@@ -116,7 +117,7 @@ const RealmWizard: React.FC = () => {
       }
     }
     if (artifacts?.communityMintId) {
-      setLoaderMessage(LOADER_MESSAGES.MINTING_COMMUNITY_TOKENS)
+      setLoaderMessage(LoaderMessage.MINTING_COMMUNITY_TOKENS)
       const communityMintInfo = await handleCommunityMint(
         artifacts.communityMintId
       )
@@ -126,6 +127,7 @@ const RealmWizard: React.FC = () => {
       }
     }
     setForm(artifacts)
+    setHasGeneratedArtifacts(true)
     return artifacts
   }
 
@@ -213,12 +215,24 @@ const RealmWizard: React.FC = () => {
   }
 
   const handleCreateRealm = async () => {
-    const artifacts = await generateProgramArtifacts()
-    const generatedForm = {
-      ...form,
-      ...artifacts,
+    let generatedForm = { ...form }
+    setIsLoading(true)
+    if (!hasGeneratedArtifacts) {
+      try {
+        const artifacts = await generateProgramArtifacts()
+        generatedForm = {
+          ...generatedForm,
+          ...artifacts,
+        }
+        setForm(generatedForm)
+      } catch (error) {
+        notify({
+          type: 'error',
+          message: error.message,
+        })
+        return
+      }
     }
-    setForm(form)
 
     const { isValid, validationErrors }: formValidation = await isFormValid(
       CreateFormSchema,
@@ -226,7 +240,7 @@ const RealmWizard: React.FC = () => {
     )
 
     if (isValid && ctl && wallet?.publicKey) {
-      setLoaderMessage(LOADER_MESSAGES.DEPLOYING_REALM)
+      setLoaderMessage(LoaderMessage.DEPLOYING_REALM)
       try {
         const calldata = ctl.prepareData(wallet, connection, generatedForm)
         const realmAddress = await registerRealm(
@@ -237,17 +251,17 @@ const RealmWizard: React.FC = () => {
           calldata.voteWeight,
           calldata.minCommunityTokens
         )
-        setLoaderMessage(LOADER_MESSAGES.COMPLETING_REALM)
+        setLoaderMessage(LoaderMessage.COMPLETING_REALM)
         setRealmAddress(realmAddress.toBase58())
-        console.log(realmAddress)
-        setLoaderMessage(LOADER_MESSAGES.FINISHED)
+        setLoaderMessage(LoaderMessage.FINISHED)
         handleStepSelection(StepDirection.NEXT)
+        setHasGeneratedArtifacts(false)
       } catch (error) {
         notify({
           type: 'error',
           message: error.message,
         })
-        setLoaderMessage(LOADER_MESSAGES.ERROR)
+        setLoaderMessage(LoaderMessage.ERROR)
       } finally {
         setIsLoading(false)
       }
