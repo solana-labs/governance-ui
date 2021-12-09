@@ -37,14 +37,11 @@ const MAINNET_REALMS = parseRealms(mainnetBetaRealms)
 const DEVNET_REALMS = parseRealms(devnetRealms)
 
 function parseRealms(realms: RealmInfoAsJSON[]) {
-  return realms.map(
-    (realm) =>
-      ({
-        ...realm,
-        programId: new PublicKey(realm.programId),
-        realmId: new PublicKey(realm.realmId),
-      } as RealmInfo)
-  )
+  return realms.map((realm) => ({
+    ...realm,
+    programId: new PublicKey(realm.programId),
+    realmId: new PublicKey(realm.realmId),
+  })) as ReadonlyArray<RealmInfo>
 }
 
 export function getAllRealmInfos({ cluster }: ConnectionContext) {
