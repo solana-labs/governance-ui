@@ -153,6 +153,25 @@ const MAINNET_REALMS: RealmInfo[] = [
     ogImage: '/realms/hope/img/hope_logo.svg',
     website: 'https://www.solsanctuary.io',
   },
+
+  {
+    symbol: 'FANT',
+    displayName: 'Phantasia',
+    programId: new PublicKey('5sGZEdn32y8nHax7TxEyoHuPS3UXfPWtisgm8kqxat8H'),
+    realmId: new PublicKey('4BNkheiMATVVcyJnGpjPbbPvFuKMx3cCDmkEbtnTz2iV'),
+    ogImage:
+      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FANTafPFBAt93BNJVpdu25pGPmca3RfwdsDsRrT3LX1r/logo.png',
+    website: 'https://phantasia.app',
+    twitter: '@PhantasiaSports',
+  },
+  {
+    symbol: 'MOOD',
+    displayName: 'Strangemood Foundation',
+    programId: new PublicKey('smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui'),
+    realmId: new PublicKey('FvzZFjf3NPTZbKAmQA4Gf1v7uTW7HFcP5Pcr2oVm49t3'),
+    ogImage: '/realms/strangemood/img/logo.svg',
+    website: 'https://strangemood.org',
+  },
 ]
 
 // Hardcoded list of devnet realms
@@ -235,6 +254,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     displayName: 'SAIAdao Devnet',
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
+  },
+  {
+    symbol: 'Realm-4LbqG',
+    displayName: 'Dev Maximilian',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('G25whFStzVjoahyiXiy7rx2G266ePaMpN4yCtMuMKDhJ'),
   },
 ]
 
