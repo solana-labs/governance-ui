@@ -14,9 +14,10 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 
+//TODO refactor account.value
 const getValidateAccount = async (connection, pubKey: PublicKey) => {
   const account = await connection.current.getParsedAccountInfo(pubKey)
-  if (!account || !account.value) {
+  if (!account) {
     throw 'Account not found'
   }
   return account
@@ -84,27 +85,30 @@ const validateDoseTokenAccountMatchMint = (
   }
 }
 
-export const doseATAExists = async (
+export const getDoseAtaExists = async (
   connection: ConnectionContext,
-  governedAccount: PublicKey,
+  mint: PublicKey,
   owner: PublicKey
 ) => {
   //we do ATA validation
-  const sourceAccMint = await tryGetTokenAccount(
-    connection.current,
-    governedAccount
-  )
-  if (!sourceAccMint) {
-    throw 'Source account not found'
-  }
   const ata = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    sourceAccMint.account.mint, // mint
+    mint, // mint
     owner // owner
   )
   const tokenAccount = await tryGetTokenAccount(connection.current, ata)
   return tokenAccount
+}
+
+export const isExistingTokenAccount = async (
+  connection: ConnectionContext,
+  val: PublicKey
+) => {
+  const account = await getValidateAccount(connection, val)
+  const isExistingTokenAccount =
+    account.value !== null && isValidSplTokenAccount(account)
+  return isExistingTokenAccount
 }
 
 export const validateDestinationAccAddress = async (
@@ -114,11 +118,11 @@ export const validateDestinationAccAddress = async (
 ) => {
   const pubKey = getValidatePublicKey(val)
   const account = await getValidateAccount(connection, pubKey)
-  const isExistingTokenAccount = isValidSplTokenAccount(account)
-  if (!governedAccount) {
-    throw 'Source account not provided'
-  }
-  if (isExistingTokenAccount) {
+  if (account?.value !== null) {
+    isValidSplTokenAccount(account)
+    if (!governedAccount) {
+      throw 'Source account not provided'
+    }
     const tokenAccount = getValidateTokenAccount(account)
 
     await validateIsTokenAccSameMintAsGovernedAcc(

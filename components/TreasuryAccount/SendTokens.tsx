@@ -53,6 +53,7 @@ import Textarea from '@components/inputs/Textarea'
 import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { findReceiverAddress } from '@utils/ataHelpers'
 
 const SendTokens = () => {
   const {
@@ -168,14 +169,24 @@ const SendTokens = () => {
       form.governedTokenAccount?.token &&
       form.governedTokenAccount?.mint?.account
     ) {
+      const sourceAccount = form.governedTokenAccount.token?.account.address
+      let receiverAddress = new PublicKey(form.destinationAccount)
+      const mintPK = form.governedTokenAccount.mint.publicKey
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount!,
         form.governedTokenAccount.mint.account.decimals
       )
+      receiverAddress = await findReceiverAddress(
+        connection,
+        receiverAddress,
+        mintPK,
+        wallet!
+      )
+      console.log(receiverAddress.toBase58(), '@@@@@@@@@@')
       const transferIx = Token.createTransferInstruction(
         TOKEN_PROGRAM_ID,
-        form.governedTokenAccount.token?.account.address,
-        new PublicKey(form.destinationAccount),
+        sourceAccount,
+        receiverAddress,
         form.governedTokenAccount.governance!.pubkey,
         [],
         mintAmount
