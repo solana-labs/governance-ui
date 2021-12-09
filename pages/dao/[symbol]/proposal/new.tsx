@@ -39,6 +39,7 @@ import { getTimestampFromDays } from '@tools/sdk/units'
 import InitializeController from './components/instructions/InitializeController'
 import SetRedeemGlobalSupplyCap from './components/instructions/SetRedeemGlobalSupplyCap'
 import RegisterMangoDepository from './components/instructions/RegisterMangoDepository'
+import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/SetMangoDepositoriesRedeemableSoftCap'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -265,6 +266,13 @@ const New = () => {
         return <InitializeController index={idx} governance={governance} />
       case Instructions.SetRedeemableGlobalSupplyCap:
         return <SetRedeemGlobalSupplyCap index={idx} governance={governance} />
+      case Instructions.SetMangoDepositoriesRedeemableSoftCap:
+        return (
+          <SetMangoDepositoriesRedeemableSoftCap
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.RegisterMangoDepository:
         return <RegisterMangoDepository index={idx} governance={governance} />
       case Instructions.Mint:

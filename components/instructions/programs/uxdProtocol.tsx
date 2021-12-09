@@ -55,6 +55,25 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       },
     },
     3: {
+      name: 'UXD - Set Mango Depositories Redeemable Supply Soft Cap',
+      accounts: ['authority', 'controller'],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const dataLayout = struct([u48('redeemable_global_supply_cap')])
+
+        const args = dataLayout.decode(Buffer.from(data)) as any
+        console.log('args', args)
+        return (
+          <>
+            <p>{args}</p>
+          </>
+        )
+      },
+    },
+    4: {
       name: 'UXD - Register Mango Depository',
       accounts: [
         'authority',

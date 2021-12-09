@@ -66,6 +66,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseUxdInstructions,
     },
     {
+      id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
+      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
+      isVisible: canUseUxdInstructions,
+    },
+    {
       id: Instructions.RegisterMangoDepository,
       name: 'Register Mango Depository',
       isVisible: canUseUxdInstructions,
