@@ -8,10 +8,11 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { associatedTokenAccount, mint } from 'easy-spl'
 import * as bs58 from 'bs58'
 import { chunk } from './chunk'
+import { untilConfirmed } from './sleep'
 
 const MEMO_ID = new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr')
 
@@ -98,6 +99,125 @@ export class AssemblyClient {
     console.log('prepareDistMint', distMint.publicKey.toString(), ...sigs)
 
     return distMint.publicKey
+  }
+
+  public async prepareDistMint2(
+    rewardMint: PublicKey,
+    distributors: { authority: PublicKey }[],
+    governingAuthority?: PublicKey
+  ): Promise<PublicKey> {
+    if (!governingAuthority) {
+      governingAuthority = this.program.provider.wallet.publicKey
+    }
+    const connection = this.program.provider.connection
+    const distMintKeypair = anchor.web3.Keypair.generate()
+    const distMint = distMintKeypair.publicKey
+    const feePayerKeypair = anchor.web3.Keypair.generate()
+    const feePayer = feePayerKeypair.publicKey
+    const wallet = this.program.provider.wallet.publicKey
+
+    const recentBlockhash = (
+      await this.program.provider.connection.getRecentBlockhash()
+    ).blockhash
+    const rewardMintInfo = await mint.get.info(
+      this.program.provider.connection,
+      rewardMint
+    )
+
+    // create distributor mint
+    const mintIxs = await mint.create.instructions(
+      connection,
+      rewardMintInfo.decimals,
+      distMint,
+      governingAuthority,
+      wallet
+    )
+
+    // create all associated token accounts for the distributors
+    const createTokenIxs = (
+      await Promise.all(
+        distributors.map(
+          async (d) =>
+            associatedTokenAccount.create.maybeInstructions(
+              connection,
+              distMint,
+              d.authority,
+              feePayer
+            ),
+          this
+        )
+      )
+    ).flat()
+
+    // calculate total cost of creating all token accounts
+    const [
+      rentPerTokenAccount,
+      rentForFeePayer,
+      feeCalculator,
+    ] = await Promise.all([
+      Token.getMinBalanceRentForExemptAccount(this.program.provider.connection),
+      connection.getMinimumBalanceForRentExemption(0),
+      connection.getFeeCalculatorForBlockhash(recentBlockhash),
+    ])
+    const rentTotal =
+      rentPerTokenAccount * createTokenIxs.length + rentForFeePayer
+    const chunkSize = 5 // maximum number of assoc token accounts that can be created per TX
+    const numInstructions = createTokenIxs.length + 1 // add one instruction to return rentForfeePayer
+    const signatureFee =
+      feeCalculator.value!.lamportsPerSignature *
+      Math.ceil(numInstructions / chunkSize)
+
+    console.log(
+      'num accounts',
+      distributors.length,
+      'num ixs',
+      numInstructions,
+      'rent tokenAccount',
+      rentPerTokenAccount,
+      'rent feePayer',
+      rentForFeePayer,
+      'sig fee',
+      signatureFee
+    )
+
+    // fund the feePayer with enough lamports to execute all transactions
+    const allocFeePayerIx = SystemProgram.transfer({
+      fromPubkey: wallet,
+      toPubkey: feePayer,
+      lamports: rentTotal + signatureFee,
+    })
+
+    // return rentForFeePayer to user wallet
+    const freeFeePayerIx = SystemProgram.transfer({
+      fromPubkey: feePayer,
+      toPubkey: wallet,
+      lamports: rentForFeePayer,
+    })
+
+    // execute first tx signed by user:
+    // create mint & alloc feePayer
+    const setupTx = new Transaction({ feePayer: wallet, recentBlockhash }).add(
+      ...mintIxs, // create mint
+      allocFeePayerIx
+    )
+    const setupSig = await this.program.provider.send(setupTx, [
+      distMintKeypair,
+    ])
+    await untilConfirmed(connection, setupSig)
+    console.log('prepareDistMint setup', setupSig)
+
+    // execute all create token instructions in batches signed by the feePayerKeypair
+    const backgroundIxs = createTokenIxs.concat([freeFeePayerIx])
+    const backgroundTxs = chunk(backgroundIxs, chunkSize).map((ixsChunk) =>
+      new Transaction({ feePayer, recentBlockhash }).add(...ixsChunk.flat())
+    )
+    for (const [index, tx] of backgroundTxs.entries()) {
+      const sig = await connection.sendTransaction(tx, [feePayerKeypair])
+      await untilConfirmed(connection, sig)
+      console.log('prepareDistMint background', index, sig)
+    }
+
+    return distMint
   }
 
   public async mintBudgetInstructions(
