@@ -104,7 +104,7 @@ const REALM = () => {
             )}
           </div>
         </div>
-        <div className="col-span-12 md:col-span-5 lg:col-span-4">
+        <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
           <TokenBalanceCard />
           <AccountsCompactWrapper />
         </div>
