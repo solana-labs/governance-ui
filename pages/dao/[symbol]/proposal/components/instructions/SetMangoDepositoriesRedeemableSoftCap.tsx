@@ -18,7 +18,7 @@ import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCap'
+import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction'
 
 const SetRedeemGlobalSupplyCap = ({
   index,
