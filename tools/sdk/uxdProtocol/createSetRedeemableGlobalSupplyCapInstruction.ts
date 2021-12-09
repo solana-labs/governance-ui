@@ -1,10 +1,11 @@
-import { Program, BN, utils, Provider, Wallet } from '@project-serum/anchor'
+import { Program, BN, Provider, Wallet } from '@project-serum/anchor'
 import {
   TransactionInstruction,
   PublicKey,
   Connection,
   Keypair,
 } from '@solana/web3.js'
+import { Controller } from '@uxdprotocol/uxd-client'
 import uxdIdl from './uxdIdl'
 
 const redeemableDecimals = 6
@@ -23,19 +24,17 @@ const createSetRedeemableGlobalSupplyCapInstruction = (
   )
 
   const program = new Program(uxdIdl, uxdProgramId, provider)
-  const [pda] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('CONTROLLER')],
-    uxdProgramId
-  )
+  const controller = new Controller('UXD', redeemableDecimals, uxdProgramId)
 
   const decimals = new BN(10 ** redeemableDecimals)
   const supplyCapNativeAmount = new BN(supplyCapUiAmount).mul(decimals)
+
   return program.instruction.setRedeemableGlobalSupplyCap(
     supplyCapNativeAmount,
     {
       accounts: {
         authority: authority,
-        controller: pda,
+        controller: controller.pda,
       },
       options: Provider.defaultOptions(),
     }

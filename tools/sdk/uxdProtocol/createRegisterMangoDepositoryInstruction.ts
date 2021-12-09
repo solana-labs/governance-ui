@@ -1,4 +1,4 @@
-import { Program, utils, Provider, Wallet } from '@project-serum/anchor'
+import { Program, Provider, Wallet } from '@project-serum/anchor'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   SystemProgram,
@@ -8,13 +8,18 @@ import {
   Connection,
   Keypair,
 } from '@solana/web3.js'
-import { createAndInitializeMango } from '@uxdprotocol/uxd-client'
+import {
+  Controller,
+  createAndInitializeMango,
+  MangoDepository,
+} from '@uxdprotocol/uxd-client'
 import uxdIdl from './uxdIdl'
 
 const createRegisterMangoDepositoryInstruction = async (
   connection: Connection,
   uxdProgramId: PublicKey,
   authority: PublicKey,
+  payer: PublicKey,
   collateralMint: PublicKey,
   insuranceMint: PublicKey
 ): Promise<TransactionInstruction> => {
@@ -26,65 +31,36 @@ const createRegisterMangoDepositoryInstruction = async (
   )
   const mango = await createAndInitializeMango(provider, 'devnet')
   const program = new Program(uxdIdl, uxdProgramId, provider)
-  const [controllerPda] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('CONTROLLER')],
-    uxdProgramId
-  )
 
-  console.log('uxdProgramId', uxdProgramId)
-  console.log('authority', authority)
-  console.log('collateralMint', collateralMint)
-  console.log('insuranceMint', insuranceMint)
-
-  const [
-    depositoryPda,
-    depositoryBump,
-  ] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('MANGODEPOSITORY'), collateralMint.toBuffer()],
-    uxdProgramId
-  )
-
-  const [
-    collateralPassthroughPda,
-    collateralPassthroughBump,
-  ] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('COLLATERALPASSTHROUGH'), collateralMint.toBuffer()],
-    uxdProgramId
-  )
-  const [
-    insurancePassthroughPda,
-    insurancePassthroughBump,
-  ] = utils.publicKey.findProgramAddressSync(
-    [
-      Buffer.from('INSURANCEPASSTHROUGH'),
-      collateralMint.toBuffer(),
-      insuranceMint.toBuffer(),
-    ],
-    uxdProgramId
-  )
-  const [
-    mangoAccountPda,
-    mangoAccountBump,
-  ] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('MANGOACCOUNT'), collateralMint.toBuffer()],
+  const controller = new Controller('UXD', 6, uxdProgramId)
+  const depository = new MangoDepository(
+    collateralMint,
+    'collateralName',
+    6,
+    insuranceMint,
+    'USDC',
+    6,
     uxdProgramId
   )
 
   return program.instruction.registerMangoDepository(
-    depositoryBump,
-    collateralPassthroughBump,
-    insurancePassthroughBump,
-    mangoAccountBump,
+    depository.bump,
+    depository.collateralPassthroughBump,
+    depository.insurancePassthroughBump,
+    depository.mangoAccountBump,
     {
       accounts: {
-        authority: authority,
-        controller: controllerPda,
-        depository: depositoryPda,
-        collateralMint, // BTC/ WSOL.....
-        insuranceMint, // USDC
-        depositoryCollateralPassthroughAccount: collateralPassthroughPda,
-        depositoryInsurancePassthroughAccount: insurancePassthroughPda,
-        depositoryMangoAccount: mangoAccountPda,
+        authority,
+        payer,
+        controller: controller.pda,
+        depository: depository.pda,
+        collateralMint: depository.collateralMint, // BTC/ WSOL.....
+        insuranceMint: depository.insuranceMint, // USDC
+        depositoryCollateralPassthroughAccount:
+          depository.collateralPassthroughPda,
+        depositoryInsurancePassthroughAccount:
+          depository.insurancePassthroughPda,
+        depositoryMangoAccount: depository.mangoAccountPda,
         mangoGroup: mango.group.publicKey,
         rent: SYSVAR_RENT_PUBKEY,
         systemProgram: SystemProgram.programId,

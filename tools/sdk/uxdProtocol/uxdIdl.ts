@@ -9,6 +9,11 @@ const uxdIdl: Idl = {
       accounts: [
         {
           name: 'authority',
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: 'payer',
           isMut: true,
           isSigner: true,
         },
@@ -100,6 +105,11 @@ const uxdIdl: Idl = {
       accounts: [
         {
           name: 'authority',
+          isMut: false,
+          isSigner: true,
+        },
+        {
+          name: 'payer',
           isMut: true,
           isSigner: true,
         },
@@ -914,6 +924,46 @@ const uxdIdl: Idl = {
       code: 337,
       name: 'InsuficientAuthorityInsuranceAmount',
       msg: "The Insurance ATA from authority doesn't have enough balance.",
+    },
+    {
+      code: 338,
+      name: 'InsuficentOrderBookDepth',
+      msg: 'Insuficcent order book depth for order.',
+    },
+    {
+      code: 339,
+      name: 'InvalidExecutedOrderSize',
+      msg: 'The executed order size does not match the expected one.',
+    },
+    {
+      code: 380,
+      name: 'MangoOrderBookLoading',
+      msg: 'Could not load Mango Order book.',
+    },
+    {
+      code: 381,
+      name: 'MangoGroupLoading',
+      msg: 'Could not load Mango Group.',
+    },
+    {
+      code: 382,
+      name: 'MangoCacheLoading',
+      msg: 'Could not load Mango Cache.',
+    },
+    {
+      code: 383,
+      name: 'MangoLoadPerpMarket',
+      msg: 'Could not load Mango PerpMarket.',
+    },
+    {
+      code: 384,
+      name: 'MangoAccountLoading',
+      msg: 'Could not load Mango Account.',
+    },
+    {
+      code: 385,
+      name: 'MangoPerpMarketIndexNotFound',
+      msg: 'Could not find the perp market index for the given collateral.',
     },
   ],
 }

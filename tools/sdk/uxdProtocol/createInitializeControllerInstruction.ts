@@ -1,4 +1,4 @@
-import { Program, BN, utils, Provider, Wallet } from '@project-serum/anchor'
+import { Program, BN, Provider, Wallet } from '@project-serum/anchor'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   SystemProgram,
@@ -8,12 +8,15 @@ import {
   Connection,
   Keypair,
 } from '@solana/web3.js'
+import { Controller } from '@uxdprotocol/uxd-client'
 import uxdIdl from './uxdIdl'
 
 const createInitializeControllerInstruction = (
   uxdProgramId: PublicKey,
+  mintSymbol: string,
   mintDecimals: number,
   authority: PublicKey,
+  payer: PublicKey,
   connection: Connection
 ): TransactionInstruction => {
   // generating a random wallet to be able to instantiate a dummy provider
@@ -23,28 +26,18 @@ const createInitializeControllerInstruction = (
     Provider.defaultOptions()
   )
   const program = new Program(uxdIdl, uxdProgramId, provider)
-
-  const [pda, bump] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('CONTROLLER')],
-    uxdProgramId
-  )
-  const [
-    redeemableMintPda,
-    redeemableMintBump,
-  ] = utils.publicKey.findProgramAddressSync(
-    [Buffer.from('REDEEMABLE')],
-    uxdProgramId
-  )
+  const controller = new Controller(mintSymbol, mintDecimals, uxdProgramId)
 
   return program.instruction.initializeController(
-    bump,
-    redeemableMintBump,
+    controller.bump,
+    controller.redeemableMintBump,
     new BN(mintDecimals),
     {
       accounts: {
-        authority: authority,
-        controller: pda,
-        redeemableMint: redeemableMintPda,
+        authority,
+        payer,
+        controller: controller.pda,
+        redeemableMint: controller.redeemableMintPda,
         rent: SYSVAR_RENT_PUBKEY,
         systemProgram: SystemProgram.programId,
         tokenProgram: TOKEN_PROGRAM_ID,
