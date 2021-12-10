@@ -19,6 +19,7 @@ function displayOptionalInstructionArgument(decodedArgs, argName) {
 }
 
 function displayAllArgs(decodedArgs, exceptions: any[] = []) {
+  console.log('wtf', decodedArgs)
   const optionalArgs = Object.keys(decodedArgs)
     .filter((k) => k.endsWith('Option'))
     .map((k) => k.replace('Option', ''))
@@ -41,8 +42,18 @@ function displayAllArgs(decodedArgs, exceptions: any[] = []) {
   )
 }
 
-function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
+function displayOptionalDecimalArgument(decodedArgs, argName, decimals = 6) {
   return decodedArgs[argName + 'Option'] ? (
+    <p key={argName}>
+      {argName}: {decodedArgs[argName].toNumber() / Math.pow(10, decimals)}
+    </p>
+  ) : (
+    <></>
+  )
+}
+
+function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
+  return decodedArgs[argName] ? (
     <p key={argName}>
       {argName}: {decodedArgs[argName].toNumber() / Math.pow(10, decimals)}
     </p>
@@ -114,7 +125,7 @@ export const MANGO_INSTRUCTIONS = {
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
-            {displayDecimalArgument(args, 'mngoPerPeriod')}
+            {displayOptionalDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
       },
@@ -160,7 +171,7 @@ export const MANGO_INSTRUCTIONS = {
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
-            {displayDecimalArgument(args, 'mngoPerPeriod')}
+            {displayOptionalDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
       },
