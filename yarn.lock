@@ -950,6 +950,14 @@
     bs58 "^4.0.1"
     eventemitter3 "^4.0.4"
 
+"@project-serum/sol-wallet-adapter@^0.2.5":
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/@project-serum/sol-wallet-adapter/-/sol-wallet-adapter-0.2.6.tgz#b4cd25a566294354427c97c26d716112b91a0107"
+  integrity sha512-cpIb13aWPW8y4KzkZAPDgw+Kb+DXjCC6rZoH74MGm3I/6e/zKyGnfAuW5olb2zxonFqsYgnv7ev8MQnvSgJ3/g==
+  dependencies:
+    bs58 "^4.0.1"
+    eventemitter3 "^4.0.7"
+
 "@sinonjs/commons@^1.7.0":
   version "1.8.3"
   resolved "https://registry.yarnpkg.com/@sinonjs/commons/-/commons-1.8.3.tgz#3802ddd21a50a949b6721ddd72da36e67e7f1b2d"
@@ -991,6 +999,25 @@
     buffer "6.0.3"
     buffer-layout "^1.2.0"
     dotenv "10.0.0"
+
+"@solana/wallet-adapter-base@^0.7.1":
+  version "0.7.1"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-base/-/wallet-adapter-base-0.7.1.tgz#9d352e946f406b5d5342515f2e14c82f11425c1c"
+  integrity sha512-NgdLrsOouBP6Cr563PjxW+4viBo1yx6q2N86LJQzwlrk8Aug48p0AgBPX+F1t9WyulDwRWVTPEALBhmggMpZIg==
+  dependencies:
+    eventemitter3 "^4.0.7"
+
+"@solana/wallet-adapter-phantom@^0.7.0":
+  version "0.7.0"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-phantom/-/wallet-adapter-phantom-0.7.0.tgz#fc71557a3d61b20c45e53c99e24f0f03f3a5a199"
+  integrity sha512-u2SkJ6LO+A2MKTgN9bsG5Ro0Vn9KL7NKsGPT0JrYI2rvXm3yZnhlAE0i0oq+/nFAjkL/+Onm9boOaYF0/Z7vBQ==
+
+"@solana/wallet-adapter-sollet@^0.8.0":
+  version "0.8.0"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-sollet/-/wallet-adapter-sollet-0.8.0.tgz#d2e24a6b1430c40b974b239b8b7442886d57f5fe"
+  integrity sha512-9Bxj2IFT9XPh7Nl9IQaTyNwS3uoowQahqE43Ei2DbFJCrlN8qC6wSnJwHGAUPMKnL85Gg0IEZmtZfmuVmyTGQg==
+  dependencies:
+    "@project-serum/sol-wallet-adapter" "^0.2.5"
 
 "@solana/web3.js@1.21.0":
   version "1.21.0"

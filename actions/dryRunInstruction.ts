@@ -2,7 +2,7 @@ import { InstructionData } from '../models/accounts'
 
 import { Connection, Transaction } from '@solana/web3.js'
 import { simulateTransaction } from '../utils/send'
-import { WalletAdapter } from '../@types/types'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 
 export async function dryRunInstruction(
   connection: Connection,
