@@ -19,7 +19,6 @@ function displayOptionalInstructionArgument(decodedArgs, argName) {
 }
 
 function displayAllArgs(decodedArgs, exceptions: any[] = []) {
-  console.log('wtf', decodedArgs)
   const optionalArgs = Object.keys(decodedArgs)
     .filter((k) => k.endsWith('Option'))
     .map((k) => k.replace('Option', ''))
