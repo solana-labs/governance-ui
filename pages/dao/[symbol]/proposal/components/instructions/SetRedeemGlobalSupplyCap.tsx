@@ -68,7 +68,7 @@ const SetRedeemGlobalSupplyCap = ({
       const createIx = createSetRedeemableGlobalSupplyCapInstruction(
         connection.current,
         form.governedAccount.governance?.info.governedAccount,
-        form.supplyCap || 9,
+        form.supplyCap || 0,
         form.governedAccount?.governance.pubkey
       )
       serializedInstruction = serializeInstructionToBase64(createIx)

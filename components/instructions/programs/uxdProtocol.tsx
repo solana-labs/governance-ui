@@ -107,5 +107,41 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         )
       },
     },
+    5: {
+      name: 'UXD - Deposit Insurance To Mango Depository',
+      accounts: [
+        'authority',
+        'controller',
+        'depository',
+        'insuranceMint',
+        'authorityInsurance',
+        'depositoryInsurancePassthroughAccount',
+        'depositoryMangoAccount',
+        // mango accounts for CPI
+        'mangoGroup',
+        'mangoCache',
+        'mangoRootBank',
+        'mangoNodeBank',
+        'mangoVault',
+        //
+        'tokenProgram',
+        'mangoProgram',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const dataLayout = struct([u48('redeemable_global_supply_cap')])
+
+        const args = dataLayout.decode(Buffer.from(data)) as any
+        console.log('args', args)
+        return (
+          <>
+            <p>{args}</p>
+          </>
+        )
+      },
+    },
   },
 }

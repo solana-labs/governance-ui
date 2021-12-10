@@ -76,6 +76,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseUxdInstructions,
     },
     {
+      id: Instructions.DepositInsuranceToMangoDepository,
+      name: 'Deposit Insurance To Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
+    {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
       isVisible: canUseTransferInstruction,

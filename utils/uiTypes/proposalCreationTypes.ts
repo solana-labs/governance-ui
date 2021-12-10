@@ -62,6 +62,7 @@ export enum Instructions {
   SetRedeemableGlobalSupplyCap,
   SetMangoDepositoriesRedeemableSoftCap,
   RegisterMangoDepository,
+  DepositInsuranceToMangoDepository,
 }
 
 export interface InitializeControllerForm {
@@ -87,6 +88,14 @@ export interface RegisterMangoDepositoryForm {
   governedAccount: GovernedProgramAccount | undefined
   collateralMint: string
   insuranceMint: string
+  programId: string | undefined
+}
+
+export interface DepositInsuranceToMangoDepositoryForm {
+  governedAccount: GovernedProgramAccount | undefined
+  collateralMint: string
+  insuranceMint: string
+  insuranceDepositedAmount: number | undefined
   programId: string | undefined
 }
 

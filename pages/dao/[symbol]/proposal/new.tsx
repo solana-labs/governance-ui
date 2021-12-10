@@ -40,6 +40,7 @@ import InitializeController from './components/instructions/InitializeController
 import SetRedeemGlobalSupplyCap from './components/instructions/SetRedeemGlobalSupplyCap'
 import RegisterMangoDepository from './components/instructions/RegisterMangoDepository'
 import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/SetMangoDepositoriesRedeemableSoftCap'
+import DepositInsuranceToMangoDepository from './components/instructions/DepositInsuranceToMangoDepository'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -275,6 +276,13 @@ const New = () => {
         )
       case Instructions.RegisterMangoDepository:
         return <RegisterMangoDepository index={idx} governance={governance} />
+      case Instructions.DepositInsuranceToMangoDepository:
+        return (
+          <DepositInsuranceToMangoDepository
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:

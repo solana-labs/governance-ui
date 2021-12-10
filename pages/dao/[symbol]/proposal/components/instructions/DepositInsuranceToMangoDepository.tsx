@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  SetMangoDepositoriesRedeemableSoftCapForm,
+  DepositInsuranceToMangoDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -18,9 +18,9 @@ import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction'
+import createDepositInsuranceToMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createDepositInsuranceToMangoDepositoryInstruction'
 
-const SetMangoDepositoriesRedeemableSoftCap = ({
+const DepositInsuranceToMangoDepository = ({
   index,
   governance,
 }: {
@@ -40,10 +40,12 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<SetMangoDepositoriesRedeemableSoftCapForm>({
+  const [form, setForm] = useState<DepositInsuranceToMangoDepositoryForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    supplyCap: 0,
+    collateralMint: '',
+    insuranceMint: '',
+    insuranceDepositedAmount: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -65,11 +67,13 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       form.governedAccount?.governance?.info &&
       wallet?.publicKey
     ) {
-      const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
+      const createIx = await createDepositInsuranceToMangoDepositoryInstruction(
         connection.current,
-        form.governedAccount.governance?.info.governedAccount,
-        form.supplyCap || 9,
-        form.governedAccount?.governance.pubkey
+        form.governedAccount?.governance.info.governedAccount,
+        form.governedAccount?.governance.pubkey,
+        new PublicKey(form.collateralMint),
+        new PublicKey(form.insuranceMint),
+        form.insuranceDepositedAmount || 0
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -88,13 +92,21 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.supplyCap) {
+    if (form.collateralMint) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.supplyCap])
+  }, [form.collateralMint])
+  useEffect(() => {
+    if (form.insuranceMint) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceMint])
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -102,7 +114,10 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     )
   }, [form])
   const schema = yup.object().shape({
-    supplyCap: yup.number().required('Redeemable supply cap is required'),
+    collateralMint: yup
+      .string()
+      .required('Collateral Mint address is required'),
+    insuranceMint: yup.string().required('Insurance Mint address is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -122,17 +137,40 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-
       <Input
-        label="Redeem Global Supply Cap"
-        value={form.supplyCap}
+        label="Collateral Mint"
+        value={form.collateralMint}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'collateralMint',
+          })
+        }
+        error={formErrors['collateralMint']}
+      />
+      <Input
+        label="Insurance Mint"
+        value={form.insuranceMint}
+        type="test"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'insuranceMint',
+          })
+        }
+        error={formErrors['insuranceMint']}
+      />
+      <Input
+        label="Insurance Deposited Amount"
+        value={form.insuranceDepositedAmount}
         type="number"
         min={0}
         max={10 ** 12}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'supplyCap',
+            propertyName: 'insuranceDepositedAmount',
           })
         }
         error={formErrors['global']}
@@ -141,4 +179,4 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   )
 }
 
-export default SetMangoDepositoriesRedeemableSoftCap
+export default DepositInsuranceToMangoDepository
