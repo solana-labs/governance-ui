@@ -163,6 +163,7 @@ const SendTokens = () => {
     setFormErrors(validationErrors)
     return isValid
   }
+  //TODO make one common get instruction for simple send and transfer
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''

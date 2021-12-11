@@ -2,13 +2,17 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
-import { AccountInfo, Token } from '@solana/spl-token'
+import {
+  AccountInfo,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
 import * as yup from 'yup'
@@ -31,6 +35,7 @@ import { ParsedAccount } from '@models/core/accounts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
+import { findTrueReceiver } from '@utils/ataHelpers'
 
 const Mint = ({
   index,
@@ -51,6 +56,7 @@ const Mint = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
+  const wallet = useWalletStore((s) => s.current)
   const [governedAccount, setGovernedAccount] = useState<
     ParsedAccount<Governance> | undefined
   >(undefined)
@@ -100,7 +106,35 @@ const Mint = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+    const additionalTransactions: TransactionInstruction[] = []
     if (isValid && programId && form.mintAccount?.governance?.pubkey) {
+      //this is the original owner
+      const destinationAccount = new PublicKey(form.destinationAccount)
+      const mintPK = form.mintAccount.governance.info.governedAccount
+      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+      const {
+        currentAddress: receiverAddress,
+        needToCreateAta,
+      } = await findTrueReceiver(
+        connection,
+        destinationAccount,
+        mintPK,
+        wallet!
+      )
+      //we push this createATA instruction to transactions to create right before creating proposal
+      //we don't want to create ata only when instruction is serialized
+      if (needToCreateAta) {
+        additionalTransactions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            mintPK, // mint
+            receiverAddress, // ata
+            destinationAccount, // owner of token account
+            wallet!.publicKey! // fee payer
+          )
+        )
+      }
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount!,
         form.mintAccount.mintInfo?.decimals
@@ -108,7 +142,7 @@ const Mint = ({
       const transferIx = Token.createMintToInstruction(
         TOKEN_PROGRAM_ID,
         form.mintAccount.governance.info.governedAccount,
-        new PublicKey(form.destinationAccount),
+        receiverAddress,
         form.mintAccount.governance!.pubkey,
         [],
         mintAmount
@@ -120,6 +154,7 @@ const Mint = ({
       serializedInstruction,
       isValid,
       governedAccount: governedAccount,
+      additionalTransactions: additionalTransactions,
     }
     return obj
   }
