@@ -81,5 +81,14 @@
     "displayName": "Dev Maximilian",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "G25whFStzVjoahyiXiy7rx2G266ePaMpN4yCtMuMKDhJ"
+  },
+  {
+    "symbol": "MNDE",
+    "displayName": "Marinade DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Bdow7yGwdvsAjbTFHk5h8jXd7AW3bbMxwxkawNuoVqE3",
+    "ogImage": "https://marinade.finance/static/8665458407ac84338260b729267d0c53/ce52d/marinade-logo.avif",
+    "website": "https://marinade.finance/",
+    "twitter": "@marinadefinance"
   }
 ]
