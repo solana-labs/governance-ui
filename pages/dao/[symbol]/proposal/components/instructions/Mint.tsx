@@ -111,6 +111,10 @@ const Mint = ({
       //this is the original owner
       const destinationAccount = new PublicKey(form.destinationAccount)
       const mintPK = form.mintAccount.governance.info.governedAccount
+      const mintAmount = parseMintNaturalAmountFromDecimal(
+        form.amount!,
+        form.mintAccount.mintInfo?.decimals
+      )
       //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
       const {
         currentAddress: receiverAddress,
@@ -135,10 +139,6 @@ const Mint = ({
           )
         )
       }
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.mintAccount.mintInfo?.decimals
-      )
       const transferIx = Token.createMintToInstruction(
         TOKEN_PROGRAM_ID,
         form.mintAccount.governance.info.governedAccount,
@@ -149,7 +149,6 @@ const Mint = ({
       )
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
-
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,

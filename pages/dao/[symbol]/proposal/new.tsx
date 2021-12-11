@@ -178,6 +178,7 @@ const New = () => {
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+          additionalTransactions: x.additionalTransactions,
         }
       })
 
