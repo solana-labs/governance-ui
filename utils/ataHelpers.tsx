@@ -43,7 +43,7 @@ export async function createATA(
   return ata
 }
 
-export async function findReceiverAddress(
+export async function findTrueReceiver(
   connection: ConnectionContext,
   receiverAddress: PublicKey,
   mintPK: PublicKey,
@@ -53,6 +53,7 @@ export async function findReceiverAddress(
     throw 'please connect your wallet'
   }
   let currentAddress = receiverAddress
+  let needToCreateAta = false
   const existingAta = await getDoseAtaExists(connection, mintPK, currentAddress)
   const isExistingAccount = await isExistingTokenAccount(
     connection,
@@ -60,18 +61,20 @@ export async function findReceiverAddress(
   )
   if (!isExistingAccount) {
     if (!existingAta) {
-      const createdAta = await createATA(
-        connection.current,
-        wallet,
-        mintPK,
-        currentAddress,
-        wallet.publicKey
+      const ata = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        mintPK, // mint
+        receiverAddress // owner
       )
-      currentAddress = createdAta
+      needToCreateAta = true
+      currentAddress = ata
     } else {
       currentAddress = existingAta.publicKey
     }
   }
-
-  return currentAddress
+  return {
+    currentAddress,
+    needToCreateAta,
+  }
 }

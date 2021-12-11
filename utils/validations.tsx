@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import { TokenAccountInfo } from '@tools/validators/accounts/token'
 import { ProgramBufferAccount } from '@tools/validators/accounts/upgradeable-program'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
@@ -9,15 +8,19 @@ import { getMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { BN } from '@project-serum/anchor'
 import { ConnectionContext } from 'stores/useWalletStore'
 import {
+  AccountInfo,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import { Connection } from '@solana/web3.js'
 
-//TODO refactor account.value
-const getValidateAccount = async (connection, pubKey: PublicKey) => {
-  const account = await connection.current.getParsedAccountInfo(pubKey)
-  if (!account) {
+const getValidateAccount = async (
+  connection: Connection,
+  pubKey: PublicKey
+) => {
+  const account = await connection.getParsedAccountInfo(pubKey)
+  if (!account || !account.value) {
     throw 'Account not found'
   }
   return account
@@ -47,37 +50,8 @@ const isValidSplTokenAccount = (account, exceptionMode = false) => {
   return true
 }
 
-const getValidateTokenAccount = (account) => {
-  try {
-    const tokenAccount = create(
-      account.value.data.parsed.info,
-      TokenAccountInfo
-    )
-    return tokenAccount
-  } catch {
-    throw 'Invalid spl token account'
-  }
-}
-
-const validateIsTokenAccSameMintAsGovernedAcc = async (
-  connection,
-  tokenAccount: TokenAccountInfo,
-  governedAccount: PublicKey
-) => {
-  const sourceAccMint = await tryGetTokenAccount(
-    connection.current,
-    governedAccount
-  )
-  if (!sourceAccMint) {
-    throw 'Invalid source account'
-  }
-  if (tokenAccount.mint.toBase58() !== sourceAccMint.account.mint.toBase58()) {
-    throw "Account mint doesn't match source account"
-  }
-}
-
 const validateDoseTokenAccountMatchMint = (
-  tokenAccount: TokenAccountInfo,
+  tokenAccount: AccountInfo,
   mint: PublicKey
 ) => {
   if (tokenAccount.mint.toBase58() !== mint.toBase58()) {
@@ -105,7 +79,7 @@ export const isExistingTokenAccount = async (
   connection: ConnectionContext,
   val: PublicKey
 ) => {
-  const account = await getValidateAccount(connection, val)
+  const account = await getValidateAccount(connection.current, val)
   const isExistingTokenAccount =
     account.value !== null && isValidSplTokenAccount(account)
   return isExistingTokenAccount
@@ -116,20 +90,24 @@ export const validateDestinationAccAddress = async (
   val: any,
   governedAccount?: PublicKey
 ) => {
+  const currentConnection = connection.current
   const pubKey = getValidatePublicKey(val)
-  const account = await getValidateAccount(connection, pubKey)
+  const account = await getValidateAccount(currentConnection, pubKey)
   if (account?.value !== null) {
-    isValidSplTokenAccount(account)
     if (!governedAccount) {
       throw 'Source account not provided'
     }
-    const tokenAccount = getValidateTokenAccount(account)
-
-    await validateIsTokenAccSameMintAsGovernedAcc(
-      connection,
-      tokenAccount,
+    const tokenAccount = await tryGetTokenAccount(currentConnection, pubKey)
+    const governedTokenAccount = await tryGetTokenAccount(
+      currentConnection,
       governedAccount
     )
+    if (tokenAccount && governedTokenAccount) {
+      await validateDoseTokenAccountMatchMint(
+        tokenAccount.account,
+        governedTokenAccount?.account.mint
+      )
+    }
   }
 
   return true
@@ -140,14 +118,17 @@ export const validateDestinationAccAddressWithMint = async (
   val: any,
   mintPubKey: PublicKey
 ) => {
+  const currentConnection = connection.current
   const pubKey = getValidatePublicKey(val)
-  const account = await getValidateAccount(connection, pubKey)
-  isValidSplTokenAccount(account)
-  const tokenAccount = getValidateTokenAccount(account)
-  if (mintPubKey) {
-    validateDoseTokenAccountMatchMint(tokenAccount, mintPubKey)
-  } else {
-    throw 'Source account not provided'
+  const account = await getValidateAccount(currentConnection, pubKey)
+  if (account?.value !== null) {
+    if (!mintPubKey) {
+      throw 'Source account not provided'
+    }
+    const tokenAccount = await tryGetTokenAccount(currentConnection, pubKey)
+    if (tokenAccount && mintPubKey) {
+      await validateDoseTokenAccountMatchMint(tokenAccount.account, mintPubKey)
+    }
   }
   return true
 }
