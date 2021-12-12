@@ -26,7 +26,7 @@ const createRegisterMangoDepositoryInstruction = async (
   )
 
   const { client, controller } = uxdClient(connection, uxdProgramId)
-  const [authorityInsuranceATA] = findATAAddrSync(authority, insuranceMint)[0]
+  const [authorityInsuranceATA] = findATAAddrSync(authority, insuranceMint)
   const createAuthorityInsuranceItx = Token.createAssociatedTokenAccountInstruction(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
