@@ -2,26 +2,17 @@ import Button, { SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getAccountName } from '@components/instructions/tools'
 import useRealm from '@hooks/useRealm'
-import {
-  AccountInfo,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-} from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { AccountInfo } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
 import {
   //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
-  parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
-import {
-  ProgramAccount,
-  TOKEN_PROGRAM_ID,
-  tryGetTokenAccount,
-} from '@utils/tokens'
+import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
   UiInstruction,
@@ -40,11 +31,7 @@ import {
 } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
-import { isFormValid } from '@utils/formValidation'
-import {
-  getInstructionDataFromBase64,
-  serializeInstructionToBase64,
-} from '@models/serialisation'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
 import useQueryContext from '@hooks/useQueryContext'
 import { RpcContext } from '@models/core/api'
 import { Governance } from '@models/accounts'
@@ -57,7 +44,7 @@ import Textarea from '@components/inputs/Textarea'
 import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { findTrueReceiver } from '@utils/ataHelpers'
+import { getTransferInstruction } from '@utils/instructionTools'
 
 const SendTokens = () => {
   const {
@@ -158,73 +145,17 @@ const SendTokens = () => {
       amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
     return totalPriceFormatted
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-  //TODO make one common get instruction for simple send and transfer
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    const additionalTransactions: TransactionInstruction[] = []
-    if (
-      isValid &&
-      programId &&
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount?.token &&
-      form.governedTokenAccount?.mint?.account
-    ) {
-      const sourceAccount = form.governedTokenAccount.token?.account.address
-      //this is the original owner
-      const destinationAccount = new PublicKey(form.destinationAccount)
-      const mintPK = form.governedTokenAccount.mint.publicKey
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.governedTokenAccount.mint.account.decimals
-      )
-      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-      const {
-        currentAddress: receiverAddress,
-        needToCreateAta,
-      } = await findTrueReceiver(
-        connection,
-        destinationAccount,
-        mintPK,
-        wallet!
-      )
-      //we push this createATA instruction to transactions to create right before creating proposal
-      //we don't want to create ata only when instruction is serialized
-      if (needToCreateAta) {
-        additionalTransactions.push(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            mintPK, // mint
-            receiverAddress, // ata
-            destinationAccount, // owner of token account
-            wallet!.publicKey! // fee payer
-          )
-        )
-      }
-      const transferIx = Token.createTransferInstruction(
-        TOKEN_PROGRAM_ID,
-        sourceAccount,
-        receiverAddress,
-        form.governedTokenAccount.governance!.pubkey,
-        [],
-        mintAmount
-      )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-    }
 
-    const obj: UiInstruction = {
-      serializedInstruction,
-      isValid,
-      governedAccount: currentAccount?.governance,
-      additionalTransactions: additionalTransactions,
-    }
-    return obj
+  async function getInstruction(): Promise<UiInstruction> {
+    return getTransferInstruction({
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount,
+      setFormErrors,
+    })
   }
   const handlePropose = async () => {
     setIsLoading(true)

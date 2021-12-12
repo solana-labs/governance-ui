@@ -16,7 +16,6 @@ import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
 import React from 'react'
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()

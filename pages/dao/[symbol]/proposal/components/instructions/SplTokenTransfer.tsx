@@ -2,19 +2,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
-import {
-  AccountInfo,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-} from '@solana/spl-token'
-import {
-  getMintMinAmountAsDecimal,
-  parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { serializeInstructionToBase64 } from '@models/serialisation'
+import { AccountInfo } from '@solana/spl-token'
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
+import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
@@ -27,7 +18,6 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
-import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
 import { getTokenTransferSchema } from '@utils/validations'
@@ -35,7 +25,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { findTrueReceiver } from '@utils/ataHelpers'
+import { getTransferInstruction } from '@utils/instructionTools'
 
 const SplTokenTransfer = ({
   index,
@@ -98,71 +88,16 @@ const SplTokenTransfer = ({
       propertyName: 'amount',
     })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    const additionalTransactions: TransactionInstruction[] = []
-    if (
-      isValid &&
-      programId &&
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount?.token &&
-      form.mintInfo
-    ) {
-      //this is the original owner
-      const destinationAccount = new PublicKey(form.destinationAccount)
-      const mintPk = form.governedTokenAccount.mint!.publicKey
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.mintInfo?.decimals
-      )
-      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-      const {
-        currentAddress: receiverAddress,
-        needToCreateAta,
-      } = await findTrueReceiver(
-        connection,
-        destinationAccount,
-        mintPk,
-        wallet!
-      )
-      //we push this createATA instruction to transactions to create right before creating proposal
-      //we don't want to create ata only when instruction is serialized
-      if (needToCreateAta) {
-        additionalTransactions.push(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            mintPk!, // mint
-            receiverAddress, // ata
-            destinationAccount, // owner of token account
-            wallet!.publicKey! // fee payer
-          )
-        )
-      }
-      const transferIx = Token.createTransferInstruction(
-        TOKEN_PROGRAM_ID,
-        form.governedTokenAccount.token?.account.address,
-        receiverAddress,
-        form.governedTokenAccount.governance!.pubkey,
-        [],
-        mintAmount
-      )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-    }
-
-    const obj: UiInstruction = {
-      serializedInstruction,
-      isValid,
-      governedAccount: governedAccount,
-      additionalTransactions: additionalTransactions,
-    }
-    return obj
+    return getTransferInstruction({
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount: form.governedTokenAccount || null,
+      setFormErrors,
+    })
   }
 
   useEffect(() => {
