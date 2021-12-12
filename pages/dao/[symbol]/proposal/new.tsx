@@ -41,6 +41,7 @@ import SetRedeemGlobalSupplyCap from './components/instructions/SetRedeemGlobalS
 import RegisterMangoDepository from './components/instructions/RegisterMangoDepository'
 import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/SetMangoDepositoriesRedeemableSoftCap'
 import DepositInsuranceToMangoDepository from './components/instructions/DepositInsuranceToMangoDepository'
+import WithdrawInsuranceFromMangoDepository from './components/instructions/WithdrawInsuranceFromMangoDepository'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -279,6 +280,13 @@ const New = () => {
       case Instructions.DepositInsuranceToMangoDepository:
         return (
           <DepositInsuranceToMangoDepository
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.WithdrawInsuranceFromMangoDepository:
+        return (
+          <WithdrawInsuranceFromMangoDepository
             index={idx}
             governance={governance}
           />
