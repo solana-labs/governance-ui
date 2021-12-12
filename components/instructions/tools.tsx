@@ -59,6 +59,10 @@ export const ACCOUNT_NAMES = {
   '39J1sWHCJgWab8pn6zpTqFCYRXTYVqbEkpLimrq8kTYJ':
     'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
   GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
+
+  // Marinade DAO
+  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
+  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
 }
 
 export function getAccountName(accountPk: PublicKey) {
