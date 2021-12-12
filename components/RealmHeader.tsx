@@ -15,9 +15,10 @@ const RealmHeader = () => {
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
   const mvpHost =
-    realmInfo?.symbol === 'MNGO'
-      ? 'dao.mango.markets'
+    realmInfo?.symbol === 'UXD'
+      ? 'governance.uxd.fi'
       : 'solana-labs.github.io/oyster-gov'
+
   const mvpUrl = `https://${mvpHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
   return (
