@@ -53,7 +53,7 @@ const Proposal = () => {
               </Link>
               <a
                 className="ml-auto"
-                href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${DEFAULT_GOVERNANCE_PROGRAM_ID}`}
+                href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}

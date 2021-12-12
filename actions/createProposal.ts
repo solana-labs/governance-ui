@@ -16,7 +16,7 @@ import { withSignOffProposal } from '@models/withSignOffProposal'
 interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
-  additionalTransactions?: TransactionInstruction[]
+  additionalTransactions: TransactionInstruction[]
 }
 
 export const createProposal = async (

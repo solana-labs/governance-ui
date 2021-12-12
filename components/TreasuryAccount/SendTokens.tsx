@@ -249,7 +249,7 @@ const SendTokens = () => {
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
         holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
-        additionalTransactions: instruction.additionalTransactions,
+        additionalTransactions: instruction.additionalTransactions || [],
       }
       try {
         // Fetch governance to get up to date proposalCount
