@@ -7,6 +7,8 @@ import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { GovernanceConfig } from './accounts'
 import { CreateTokenGovernanceArgs } from './instructions'
+import { SYSTEM_PROGRAM_ID } from './core/api'
+import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 
 export const withCreateTokenGovernance = async (
   instructions: TransactionInstruction[],
@@ -18,15 +20,14 @@ export const withCreateTokenGovernance = async (
   tokenOwner: PublicKey,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
-  tokenId: PublicKey,
-  systemId: PublicKey
+  governanceAuthority: PublicKey
 ): Promise<{ governanceAddress: PublicKey }> => {
   const args = new CreateTokenGovernanceArgs({
     config,
     transferTokenOwner,
   })
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
-
+  const systemId = SYSTEM_PROGRAM_ID
   const [tokenGovernanceAddress] = await PublicKey.findProgramAddress(
     [
       Buffer.from('token-governance'),
@@ -35,6 +36,7 @@ export const withCreateTokenGovernance = async (
     ],
     programId
   )
+  const tokenId = TOKEN_PROGRAM_ID
 
   const keys = [
     {
@@ -81,6 +83,11 @@ export const withCreateTokenGovernance = async (
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
+    },
+    {
+      pubkey: governanceAuthority,
+      isWritable: false,
+      isSigner: true,
     },
   ]
 

@@ -19,7 +19,7 @@ type ProposalCardProps = {
 
 const StyledSvg = styled(ChevronRightIcon)``
 
-const StyledCardWrapepr = styled.div`
+const StyledCardWrapper = styled.div`
   :hover {
     ${StyledSvg} {
       transform: translateX(4px);
@@ -44,7 +44,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
         )}
       >
         <a>
-          <StyledCardWrapepr className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3">
+          <StyledCardWrapper className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3">
             <div className="p-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>
@@ -73,7 +73,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                 </div>
               </div>
             )}
-          </StyledCardWrapepr>
+          </StyledCardWrapper>
         </a>
       </Link>
     </div>

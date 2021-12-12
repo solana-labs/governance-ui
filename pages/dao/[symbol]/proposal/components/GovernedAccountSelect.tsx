@@ -98,10 +98,10 @@ const GovernedAccountSelect = ({
   function getProgramAccountLabel(val: ParsedAccount<Governance>) {
     const name = val ? getProgramName(val.info.governedAccount) : ''
     return (
-      <>
+      <div className="flex flex-col">
         {name && <div>{name}</div>}
         <div>{val?.info?.governedAccount?.toBase58()}</div>
-      </>
+      </div>
     )
   }
   useEffect(() => {

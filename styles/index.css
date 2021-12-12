@@ -94,3 +94,28 @@ button {
 :placeholder-shown {
   @apply font-body;
 }
+
+/* width */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: var(--bkg-2);
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: var(--bkg-1);
+  border-radius: 100vh;
+  border: 3px solid var(--bkg-2);
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: var(--bkg-3);
+  cursor: pointer;
+}
