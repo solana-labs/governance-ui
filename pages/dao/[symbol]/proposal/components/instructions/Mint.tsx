@@ -16,7 +16,6 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
@@ -36,6 +35,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { findTrueReceiver } from '@utils/ataHelpers'
+import { validateInstruction } from '@utils/instructionTools'
 
 const Mint = ({
   index,
@@ -98,13 +98,8 @@ const Mint = ({
       propertyName: 'amount',
     })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const additionalTransactions: TransactionInstruction[] = []
     if (isValid && programId && form.mintAccount?.governance?.pubkey) {

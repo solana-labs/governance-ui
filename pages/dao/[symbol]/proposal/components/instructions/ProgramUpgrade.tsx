@@ -20,6 +20,7 @@ import { debounce } from '@utils/debounce'
 import { validateBuffer } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { validateInstruction } from '@utils/instructionTools'
 
 const ProgramUpgrade = ({
   index,
@@ -52,13 +53,8 @@ const ProgramUpgrade = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
       isValid &&
