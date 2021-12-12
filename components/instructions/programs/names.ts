@@ -4,6 +4,9 @@ export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance',
   AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is: 'Serum Governance',
   GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw: 'Governance',
+  '5sGZEdn32y8nHax7TxEyoHuPS3UXfPWtisgm8kqxat8H': 'Phantasia Governance',
+  smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui:
+    'Strangemood Foundation Governance',
 }
 
 // Well known program names displayed on the instruction card

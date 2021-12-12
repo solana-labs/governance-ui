@@ -23,6 +23,7 @@ const Input = ({
   error = '',
   max = Number.MAX_SAFE_INTEGER,
   step,
+  noMaxWidth,
   ...props
 }: InputProps) => {
   return (
@@ -34,7 +35,7 @@ const Input = ({
         type={type}
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, error })}
+        className={inputClasses({ className, disabled, error, noMaxWidth })}
         disabled={disabled}
         step={step}
         {...props}

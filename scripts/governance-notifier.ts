@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
+import { getConnectionContext } from 'stores/useWalletStore'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 import { getRealmInfo } from '../models/registry/api'
@@ -21,10 +22,10 @@ async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
   const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
+  const connectionContext = getConnectionContext('mainnet')
 
   const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
-
-  const realmInfo = getRealmInfo(REALM_SYMBOL)
+  const realmInfo = await getRealmInfo(REALM_SYMBOL, connectionContext)
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo!.programId,
@@ -114,5 +115,8 @@ async function runNotifier() {
     `-- countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}`
   )
 }
+
+// start notifier immediately
+errorWrapper()
 
 setInterval(errorWrapper, fiveMinutesSeconds * 1000)

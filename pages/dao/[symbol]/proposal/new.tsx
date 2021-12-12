@@ -27,9 +27,9 @@ import {
   Instructions,
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useGovernances from '@hooks/useGovernances'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ParsedAccount } from '@models/core/accounts'
-import { Governance } from '@models/accounts'
+import { Governance, GovernanceAccountType } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
 import Empty from './components/instructions/Empty'
@@ -61,9 +61,8 @@ const New = () => {
     mint,
     councilMint,
   } = useRealm()
-  const { getAvailableInstructions } = useGovernances()
+  const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
-
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -76,15 +75,41 @@ const New = () => {
     description: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [instructionsData, setInstructions] = useState<
-    ComponentInstructionData[]
-  >([{ type: availableInstructions[0] }])
   const [
     governance,
     setGovernance,
   ] = useState<ParsedAccount<Governance> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-
+  const customInstructionFilterForSelectedGovernance = (
+    instructionType: Instructions
+  ) => {
+    if (!governance) {
+      return true
+    } else {
+      const governanceType = governance.info.accountType
+      const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
+      switch (governanceType) {
+        case GovernanceAccountType.ProgramGovernance:
+          return instructionsAvailiableAfterProgramGovernance.includes(
+            instructionType
+          )
+        default:
+          return true
+      }
+    }
+  }
+  const getAvailableInstructionsForIndex = (index) => {
+    if (index === 0) {
+      return availableInstructions
+    } else {
+      return availableInstructions.filter((x) =>
+        customInstructionFilterForSelectedGovernance(x.id)
+      )
+    }
+  }
+  const [instructionsData, setInstructions] = useState<
+    ComponentInstructionData[]
+  >([{ type: availableInstructions[0] }])
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
@@ -220,7 +245,7 @@ const New = () => {
     fetchTokenAccountsForSelectedRealmGovernances()
   }, [])
 
-  const returnCurrentInstruction = ({ typeId, idx }) => {
+  const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
         return (
@@ -303,51 +328,56 @@ const New = () => {
               }}
             >
               <h2>Instructions</h2>
-              {instructionsData.map((instruction, idx) => (
-                <div
-                  key={idx}
-                  className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
-                >
-                  <Select
-                    className="h-12"
-                    disabled={!availableInstructions.length}
-                    placeholder={`${
-                      availableInstructions.length
-                        ? 'Select instruction'
-                        : 'No available instructions'
-                    }`}
-                    label={`Instruction ${idx + 1}`}
-                    onChange={(value) => setInstructionType({ value, idx })}
-                    value={instruction.type?.name}
+              {instructionsData.map((instruction, idx) => {
+                const availableInstructionsForIdx = getAvailableInstructionsForIndex(
+                  idx
+                )
+                return (
+                  <div
+                    key={idx}
+                    className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
                   >
-                    {availableInstructions.map((inst) => (
-                      <Select.Option key={inst.id} value={inst}>
-                        <span>{inst.name}</span>
-                      </Select.Option>
-                    ))}
-                  </Select>
-                  <div className="flex items-end pt-4">
-                    <InstructionContentContainer
-                      idx={idx}
-                      instructionsData={instructionsData}
+                    <Select
+                      className="h-12"
+                      disabled={!getAvailableInstructionsForIndex.length}
+                      placeholder={`${
+                        availableInstructionsForIdx.length
+                          ? 'Select instruction'
+                          : 'No available instructions'
+                      }`}
+                      label={`Instruction ${idx + 1}`}
+                      onChange={(value) => setInstructionType({ value, idx })}
+                      value={instruction.type?.name}
                     >
-                      {returnCurrentInstruction({
-                        typeId: instruction.type?.id,
-                        idx,
-                      })}
-                    </InstructionContentContainer>
-                    {idx !== 0 && (
-                      <LinkButton
-                        className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
-                        onClick={() => removeInstruction(idx)}
+                      {availableInstructionsForIdx.map((inst) => (
+                        <Select.Option key={inst.id} value={inst}>
+                          <span>{inst.name}</span>
+                        </Select.Option>
+                      ))}
+                    </Select>
+                    <div className="flex items-end pt-4">
+                      <InstructionContentContainer
+                        idx={idx}
+                        instructionsData={instructionsData}
                       >
-                        <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-                        Remove
-                      </LinkButton>
-                    )}
+                        {getCurrentInstruction({
+                          typeId: instruction.type?.id,
+                          idx,
+                        })}
+                      </InstructionContentContainer>
+                      {idx !== 0 && (
+                        <LinkButton
+                          className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
+                          onClick={() => removeInstruction(idx)}
+                        >
+                          <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+                          Remove
+                        </LinkButton>
+                      )}
+                    </div>
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </NewProposalContext.Provider>
             <div className="flex justify-end mt-4 mb-8 px-6">
               <LinkButton

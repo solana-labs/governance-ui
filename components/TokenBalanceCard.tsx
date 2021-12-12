@@ -22,6 +22,8 @@ import { Option } from '../tools/core/option'
 import { GoverningTokenType } from '../models/enums'
 import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
+import { withFinalizeVote } from '@models/withFinalizeVote'
+import { chunks } from '@utils/helpers'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -99,6 +101,7 @@ const TokenDeposit = ({
     ownCouncilTokenRecord,
     councilTokenAccount,
     proposals,
+    governances,
   } = useRealm()
 
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
@@ -194,10 +197,24 @@ const TokenDeposit = ({
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
           proposal = await getProposal(connection, proposal.pubkey)
           if (proposal.info.state === ProposalState.Voting) {
-            // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
-            throw new Error(
-              `Can't withdraw tokens while Proposal ${proposal.info.name} is being voted on. Please withdraw your vote first`
-            )
+            const governance = governances[proposal.info.governance.toBase58()]
+            if (proposal.info.getTimeToVoteEnd(governance.info) > 0) {
+              // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
+              throw new Error(
+                `Can't withdraw tokens while Proposal ${proposal.info.name} is being voted on. Please withdraw your vote first`
+              )
+            } else {
+              // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
+              await withFinalizeVote(
+                instructions,
+                realmInfo!.programId,
+                realm!.pubkey,
+                proposal.info.governance,
+                proposal.pubkey,
+                proposal.info.tokenOwnerRecord,
+                proposal.info.governingTokenMint
+              )
+            }
           }
         }
 
@@ -228,18 +245,26 @@ const TokenDeposit = ({
       TOKEN_PROGRAM_ID
     )
 
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
     try {
-      await sendTransaction({
-        connection,
-        wallet,
-        transaction,
-        sendingMessage: 'Withdrawing tokens',
-        successMessage: 'Tokens have been withdrawn',
-      })
-
+      // use chunks of 8 here since we added finalize,
+      // because previously 9 withdraws used to fit into one tx
+      const ixChunks = chunks(instructions, 8)
+      for (const [index, chunk] of ixChunks.entries()) {
+        const transaction = new Transaction().add(...chunk)
+        await sendTransaction({
+          connection,
+          wallet,
+          transaction,
+          sendingMessage:
+            index == ixChunks.length - 1
+              ? 'Withdrawing tokens'
+              : `Releasing tokens (${index}/${ixChunks.length - 2})`,
+          successMessage:
+            index == ixChunks.length - 1
+              ? 'Tokens have been withdrawn'
+              : `Released tokens (${index}/${ixChunks.length - 2})`,
+        })
+      }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (ex) {

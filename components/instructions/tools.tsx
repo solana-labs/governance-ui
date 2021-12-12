@@ -50,6 +50,19 @@ export const ACCOUNT_NAMES = {
     'Friends and Family Council Mint',
   FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
     'Friends and Family Community Mint',
+
+  // GM DAO
+  '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
+  DWhnQm42vCBLkA9RsrBB2spyR3uAJq1BGeroyNMKgnEh: 'Marketing funds',
+
+  // GSAIL
+  '39J1sWHCJgWab8pn6zpTqFCYRXTYVqbEkpLimrq8kTYJ':
+    'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
+  GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
+
+  // Marinade DAO
+  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
+  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
 }
 
 export function getAccountName(accountPk: PublicKey) {

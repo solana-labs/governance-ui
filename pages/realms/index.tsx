@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { PlusIcon } from '@heroicons/react/outline'
 import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
@@ -7,7 +7,6 @@ import { getAllRealmInfos, RealmInfo } from '../../models/registry/api'
 import { useRouter } from 'next/router'
 import useWalletStore from '../../stores/useWalletStore'
 import Loading from '../../components/Loading'
-import { EndpointTypes } from '../../models/types'
 import useQueryContext from '../../hooks/useQueryContext'
 
 // const COL = 'flex-col'
@@ -19,7 +18,7 @@ const Realms = () => {
 
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
-  const [realms, setRealms] = useState<RealmInfo[]>([])
+  const [realms, setRealms] = useState<ReadonlyArray<RealmInfo>>([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSearch] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
@@ -27,11 +26,9 @@ const Realms = () => {
     (s) => s
   )
 
-  useEffect(() => {
+  useMemo(async () => {
     if (connection) {
-      const data: RealmInfo[] = getAllRealmInfos(
-        connection.cluster as EndpointTypes
-      )
+      const data = await getAllRealmInfos(connection)
       setRealms(data)
     }
     if (selectedRealm.realm) {
@@ -89,7 +86,7 @@ const Realms = () => {
                     </div>
                   ) : (
                     <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                      {realm.symbol?.charAt(0)}
+                      {realm.displayName?.charAt(0)}
                     </div>
                   )}
                 </div>

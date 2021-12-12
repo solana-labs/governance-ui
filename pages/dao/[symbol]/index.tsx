@@ -1,14 +1,14 @@
-import useWalletStore from '../../../stores/useWalletStore'
-import useRealm from '../../../hooks/useRealm'
+import useWalletStore from 'stores/useWalletStore'
+import useRealm from 'hooks/useRealm'
 import React, { useEffect, useState } from 'react'
-import ProposalFilter from '../../../components/ProposalFilter'
-import ProposalCard from '../../../components/ProposalCard'
-import TokenBalanceCard from '../../../components/TokenBalanceCard'
-import { Proposal, ProposalState } from '../../../models/accounts'
+import ProposalFilter from 'components/ProposalFilter'
+import ProposalCard from 'components/ProposalCard'
+import TokenBalanceCard from 'components/TokenBalanceCard'
+import { Proposal, ProposalState } from 'models/accounts'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
-import RealmHeader from '../../../components/RealmHeader'
+import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
-import TreasuryAccountsCompactWrapper from '@components/TreasuryAccount/TreasuryAccountsCompactWrapper'
+import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactWrapper'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -104,9 +104,9 @@ const REALM = () => {
             )}
           </div>
         </div>
-        <div className="col-span-12 md:col-span-5 lg:col-span-4">
+        <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
           <TokenBalanceCard />
-          <TreasuryAccountsCompactWrapper />
+          <AccountsCompactWrapper />
         </div>
       </div>
     </>

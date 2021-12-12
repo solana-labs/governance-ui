@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
+import { SanitizedObject } from '@utils/helpers'
 import * as bs58 from 'bs58'
 import {
   GovernanceAccount,
@@ -68,26 +69,24 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     )
   }
 
-  const promises: Promise<Record<string, ParsedAccount<TAccount>>>[] = []
-  // workaround for preventing getting rate limited by public node
-  // 1/ for of instead of map +
-  // 2/ sleep a bit
+  let accounts: Record<string, ParsedAccount<TAccount>> = {}
+
   for (const at of accountTypes) {
-    await new Promise((r) => setTimeout(r, 3000))
-    promises.push(
-      getGovernanceAccountsImpl<TAccount>(
+    accounts = {
+      ...accounts,
+      ...(await getGovernanceAccountsImpl(
         programId,
         endpoint,
         accountClass,
         at,
         filters
-      )
-    )
+      )),
+    }
+    // XXX: sleep to prevent public RPC rate limits
+    await new Promise((r) => setTimeout(r, 3_000))
   }
 
-  const all = await Promise.all(promises)
-
-  return all.reduce((res, r) => ({ ...res, ...r }), {})
+  return accounts
 }
 
 async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
@@ -127,26 +126,27 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
     }),
   })
 
-  const accounts: Record<string, ParsedAccount<TAccount>> = {}
-
+  const accounts: Record<string, ParsedAccount<TAccount>> = new SanitizedObject(
+    {}
+  ) as Record<string, ParsedAccount<TAccount>>
   try {
     const response = await getProgramAccounts.json()
     if ('result' in response) {
       const rawAccounts = response['result']
       for (const rawAccount of rawAccounts) {
         try {
-          const account = {
+          const account = new SanitizedObject({
             pubkey: new PublicKey(rawAccount.pubkey),
-            account: {
+            account: new SanitizedObject({
               ...rawAccount.account,
               data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-            },
+            }),
             info: deserializeBorsh(
               GOVERNANCE_SCHEMA,
               accountClass,
               Buffer.from(rawAccount.account.data[0], 'base64')
             ),
-          }
+          }) as ParsedAccount<TAccount>
 
           accounts[account.pubkey.toBase58()] = account
         } catch (ex) {

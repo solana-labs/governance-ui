@@ -7,7 +7,7 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useGovernances from '@hooks/useGovernances'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
@@ -29,7 +29,7 @@ const CustomBase64 = ({
     governancesArray,
     governedTokenAccounts,
     getMintWithGovernances,
-  } = useGovernances()
+  } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
@@ -149,7 +149,7 @@ const CustomBase64 = ({
       ></GovernedAccountSelect>
       <Input
         min={0}
-        label="Hol up time (days)"
+        label="Hold up time (days)"
         value={form.holdUpTime}
         type="number"
         onChange={(event) => {
