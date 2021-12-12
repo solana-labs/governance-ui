@@ -12,7 +12,7 @@ import useRealm from './useRealm'
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
-  const { ownVoterWeight, realm } = useRealm()
+  const { ownVoterWeight, realm, symbol } = useRealm()
 
   const governancesArray = Object.keys(governances).map(
     (key) => governances[key]
@@ -44,6 +44,10 @@ export default function useGovernanceAssets() {
     GovernanceAccountType.MintGovernance
   )
 
+  const canUseUxdInstructions =
+    symbol === 'UXD' &&
+    canUseGovernanceForInstruction(GovernanceAccountType.ProgramGovernance)
+
   const canUseAnyInstruction =
     realm &&
     governancesArray.some((g) =>
@@ -51,6 +55,36 @@ export default function useGovernanceAssets() {
     )
 
   const availableInstructions = [
+    {
+      id: Instructions.InitializeController,
+      name: 'Initialize Controller',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.SetRedeemableGlobalSupplyCap,
+      name: 'Set Redeemable Global Supply Cap',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
+      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.RegisterMangoDepository,
+      name: 'Register Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.DepositInsuranceToMangoDepository,
+      name: 'Deposit Insurance To Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.WithdrawInsuranceFromMangoDepository,
+      name: 'Withdraw Insurance From Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',

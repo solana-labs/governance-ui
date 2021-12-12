@@ -90,5 +90,14 @@
     "ogImage": "https://marinade.finance/static/8665458407ac84338260b729267d0c53/ce52d/marinade-logo.avif",
     "website": "https://marinade.finance/",
     "twitter": "@marinadefinance"
+  },
+  {
+    "symbol": "UXD",
+    "displayName": "UXD Protocol DAO - devnet",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3eZ6p8VxnmncMgVYK1oMGb7rSiZPxoi6vtpDr3qKMEG3",
+    "ogImage": "/realms/UXD/img/logo.png",
+    "website": "https://www.uxd.fi.com/",
+    "twitter": "@UXDProtocol"
   }
 ]

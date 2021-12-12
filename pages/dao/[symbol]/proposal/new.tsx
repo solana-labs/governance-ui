@@ -36,6 +36,12 @@ import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
+import InitializeController from './components/instructions/InitializeController'
+import SetRedeemGlobalSupplyCap from './components/instructions/SetRedeemGlobalSupplyCap'
+import RegisterMangoDepository from './components/instructions/RegisterMangoDepository'
+import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/SetMangoDepositoriesRedeemableSoftCap'
+import DepositInsuranceToMangoDepository from './components/instructions/DepositInsuranceToMangoDepository'
+import WithdrawInsuranceFromMangoDepository from './components/instructions/WithdrawInsuranceFromMangoDepository'
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -257,6 +263,33 @@ const New = () => {
       case Instructions.ProgramUpgrade:
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+        )
+      case Instructions.InitializeController:
+        return <InitializeController index={idx} governance={governance} />
+      case Instructions.SetRedeemableGlobalSupplyCap:
+        return <SetRedeemGlobalSupplyCap index={idx} governance={governance} />
+      case Instructions.SetMangoDepositoriesRedeemableSoftCap:
+        return (
+          <SetMangoDepositoriesRedeemableSoftCap
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.RegisterMangoDepository:
+        return <RegisterMangoDepository index={idx} governance={governance} />
+      case Instructions.DepositInsuranceToMangoDepository:
+        return (
+          <DepositInsuranceToMangoDepository
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.WithdrawInsuranceFromMangoDepository:
+        return (
+          <WithdrawInsuranceFromMangoDepository
+            index={idx}
+            governance={governance}
+          />
         )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>

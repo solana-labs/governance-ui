@@ -58,6 +58,63 @@ export enum Instructions {
   Mint,
   Base64,
   None,
+  InitializeController,
+  SetRedeemableGlobalSupplyCap,
+  SetMangoDepositoriesRedeemableSoftCap,
+  RegisterMangoDepository,
+  DepositInsuranceToMangoDepository,
+  WithdrawInsuranceFromMangoDepository,
+}
+
+export interface InitializeControllerForm {
+  governedAccount: GovernedProgramAccount | undefined
+  mintSymbol: string | undefined
+  mintDecimals: number | undefined
+  programId: string | undefined
+}
+
+export interface SetRedeemableGlobalSupplyCapForm {
+  governedAccount: GovernedProgramAccount | undefined
+  supplyCap: number | undefined
+  programId: string | undefined
+}
+
+export interface SetMangoDepositoriesRedeemableSoftCapForm {
+  governedAccount: GovernedProgramAccount | undefined
+  supplyCap: number | undefined
+  programId: string | undefined
+}
+
+export interface RegisterMangoDepositoryForm {
+  governedAccount: GovernedProgramAccount | undefined
+  collateralMint: string
+  insuranceMint: string
+  programId: string | undefined
+}
+
+export interface DepositInsuranceToMangoDepositoryForm {
+  governedAccount: GovernedProgramAccount | undefined
+  collateralMint: string
+  insuranceMint: string
+  insuranceDepositedAmount: number | undefined
+  programId: string | undefined
+}
+
+export interface WithdrawInsuranceFromMangoDepositoryForm {
+  governedAccount: GovernedProgramAccount | undefined
+  collateralMint: string
+  insuranceMint: string
+  insuranceWithdrawnAmount: number | undefined
+  programId: string | undefined
+}
+
+export enum UXDIntructions {
+  InitializeController,
+  SetRedeemableGlobalSupplyCap,
+  SetMangoDepositoriesRedeemableSoftCap,
+  RegisterMangoDepository,
+  DepositInsuranceToMangoDepository,
+  WithdrawInsuranceFromMangoDepository,
 }
 
 export type createParams = [
