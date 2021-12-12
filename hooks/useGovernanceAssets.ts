@@ -45,7 +45,7 @@ export default function useGovernanceAssets() {
   )
 
   const canUseUxdInstructions =
-    symbol === 'UXD Protocol' &&
+    symbol === 'UXD' &&
     canUseGovernanceForInstruction(GovernanceAccountType.ProgramGovernance)
 
   const canUseAnyInstruction =

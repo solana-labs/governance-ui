@@ -16,7 +16,7 @@ const RealmHeader = () => {
 
   const mvpHost =
     realmInfo?.symbol === 'UXD'
-      ? 'governance.uxd.fi'
+      ? 'oyster.uxd.fi'
       : 'solana-labs.github.io/oyster-gov'
 
   const mvpUrl = `https://${mvpHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`

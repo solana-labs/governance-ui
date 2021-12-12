@@ -317,9 +317,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
       })
       const realmMints = get().selectedRealm.mints
-      const realmMintPk = realm.info.communityMint
-      const realmMint = realmMints[realmMintPk.toBase58()]
-      const realmCouncilMintPk = realm.info.config.councilMint
+      const realmMintPk = realm?.info.communityMint
+      const realmMint = realmMints[realmMintPk?.toBase58()]
+      const realmCouncilMintPk = realm?.info.config.councilMint
       const realmCouncilMint =
         realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
       const [
