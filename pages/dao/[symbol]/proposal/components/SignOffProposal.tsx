@@ -5,7 +5,9 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import Button from '@components/Button'
 import Modal from '@components/Modal'
-import { getSignatoryRecordAddress, SignatoryRecord } from 'models/accounts'
+import {
+  /* getSignatoryRecordAddress, */ SignatoryRecord,
+} from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { signOffProposal } from 'actions/signOffProposal'
 import { notify } from '@utils/notifications'
@@ -24,7 +26,6 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const proposalAccount = useWalletStore((s) => s.selectedProposal)
   const { realmInfo } = useRealm()
   const { proposal } = useProposal()
 

@@ -9,7 +9,7 @@ import { RpcContext } from '../models/core/api'
 import {
   getSignatoryRecordAddress,
   Proposal,
-  SignatoryRecord,
+  // SignatoryRecord,
   // Proposal,
   // SignatoryRecord,
 } from '@models/accounts'
