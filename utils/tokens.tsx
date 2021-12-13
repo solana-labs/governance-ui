@@ -272,7 +272,9 @@ export function getMintAccountLabelInfo(
   let amount = ''
   let imgUrl = ''
   if (acc?.mintInfo && acc.governance) {
-    const info = tokenService.getTokenInfo(acc!.mint!.publicKey.toBase58())
+    const info = tokenService.getTokenInfo(
+      acc.governance.info.governedAccount.toBase58()
+    )
     imgUrl = info?.logoURI ? info.logoURI : ''
     account = acc.governance?.info.governedAccount.toBase58()
     tokenName = info?.name ? info.name : ''
