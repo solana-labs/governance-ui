@@ -13,12 +13,13 @@ export const withFinalizeVote = async (
   realm: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
+  proposalOwnerRecord: PublicKey,
   governingTokenMint: PublicKey
 ) => {
   const args = new FinalizeVoteArgs()
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
 
-  const keys = [
+  let keys = [
     {
       pubkey: realm,
       isWritable: false,
@@ -26,7 +27,7 @@ export const withFinalizeVote = async (
     },
     {
       pubkey: governance,
-      isWritable: true,
+      isWritable: false,
       isSigner: false,
     },
     {
@@ -35,9 +36,14 @@ export const withFinalizeVote = async (
       isSigner: false,
     },
     {
+      pubkey: proposalOwnerRecord,
+      isWritable: true,
+      isSigner: false,
+    },
+    {
       pubkey: governingTokenMint,
       isWritable: false,
-      isSigner: true,
+      isSigner: false,
     },
     {
       pubkey: SYSVAR_CLOCK_PUBKEY,
