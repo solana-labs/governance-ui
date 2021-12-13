@@ -42,6 +42,7 @@ import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
 import { EndpointTypes } from '@models/types'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { getRealmInfo } from '@models/registry/api'
 
 export interface ConnectionContext {
   cluster: EndpointTypes
@@ -213,6 +214,26 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   tokenAccounts: [],
   set: (fn) => set(produce(fn)),
   actions: {
+    async fetchRealmBySymbol(cluster: string, symbol: string) {
+      console.log('fetchRealmBySymbol', cluster, symbol)
+
+      const actions = get().actions
+      const connection = get().connection
+      const set = get().set
+      const newConnection = getConnectionContext(cluster)
+
+      if (connection.cluster == cluster) {
+        return
+      }
+      set((s) => {
+        s.connection = newConnection
+      })
+      const realmInfo = await getRealmInfo(symbol, newConnection)
+      if (realmInfo) {
+        await actions.fetchAllRealms(realmInfo.programId)
+        actions.fetchRealm(realmInfo.programId, realmInfo.realmId)
+      }
+    },
     async fetchWalletTokenAccounts() {
       const connection = get().connection.current
       const connected = get().connected
@@ -616,14 +637,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
-      })
-    },
-    async setConnectionContext(cluster: string) {
-      const set = get().set
-      set((s) => {
-        if (s.connection.cluster !== cluster) {
-          s.connection = getConnectionContext(cluster)
-        }
       })
     },
   },
