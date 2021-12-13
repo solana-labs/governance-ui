@@ -6,7 +6,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { simulateTransaction } from '../utils/send'
-import { WalletAdapter } from '../@types/types'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 
 export async function dryRunInstruction(
   connection: Connection,
