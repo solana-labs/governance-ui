@@ -226,6 +226,8 @@ const RealmWizard: React.FC = () => {
         }
         setForm(generatedForm)
       } catch (error) {
+        console.error(error)
+        setIsLoading(false)
         notify({
           type: 'error',
           message: error.message,

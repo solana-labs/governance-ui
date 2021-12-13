@@ -37,8 +37,14 @@ export const generateGovernanceArtifacts = async (
     'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
   )
 
+  const otherOwnersWallets = teamWallets
+    .filter((_wallet) => _wallet !== wallet.publicKey.toBase58())
+    .map((_wallet) => new PublicKey(_wallet))
+
   // Setup community mint
-  const { mintAddress: communityMintAddress } = await withMint(
+  const {
+    mintAddress: communityMintAddress,
+  } = await withMint(
     communityMintInstruction,
     communityMintSigners,
     connection,
@@ -46,7 +52,7 @@ export const generateGovernanceArtifacts = async (
     3,
     new u64('0'),
     new u64('0'),
-    otherOwnerWallet
+    [otherOwnerWallet]
   )
 
   const councilMinSigners: Keypair[] = []
@@ -59,9 +65,9 @@ export const generateGovernanceArtifacts = async (
     connection,
     wallet,
     0,
-    new u64(teamWallets.length),
-    new u64(teamWallets.length),
-    otherOwnerWallet
+    new u64('1'),
+    new u64(otherOwnersWallets.length),
+    otherOwnersWallets
   )
 
   // Setup Realm, Governance and Proposal instruction
@@ -191,7 +197,7 @@ export const withMint = async (
   decimals: number,
   amount: u64,
   supply: u64,
-  otherOwnerWallet: PublicKey
+  otherOwnersWallets: PublicKey[]
 ) => {
   const { publicKey } = wallet
   if (!publicKey) throw new Error('Wallet not connected!')
@@ -253,25 +259,28 @@ export const withMint = async (
 
   signers.push(otherOwner)
 
-  const otherOwnerTokenAccount = createTokenAccount(
-    instructions,
-    publicKey,
-    tokenAccountRentExempt,
-    mintAddress,
-    otherOwnerWallet,
-    signers
-  )
-
-  instructions.push(
-    Token.createMintToInstruction(
-      tokenId,
-      mintAddress,
-      otherOwnerTokenAccount,
+  const otherOwnersTokenAccounts = otherOwnersWallets.map((wallet) => {
+    const otherOwnerTokenAccount = createTokenAccount(
+      instructions,
       publicKey,
-      [],
-      new u64(supply.sub(amount).toArray())
+      tokenAccountRentExempt,
+      mintAddress,
+      wallet,
+      signers
     )
-  )
 
-  return { mintAddress, otherOwnerTokenAccount }
+    instructions.push(
+      Token.createMintToInstruction(
+        tokenId,
+        mintAddress,
+        otherOwnerTokenAccount,
+        publicKey,
+        [],
+        new u64(supply.sub(amount).toArray())
+      )
+    )
+    return otherOwnerTokenAccount
+  })
+
+  return { mintAddress, otherOwnersTokenAccounts }
 }
