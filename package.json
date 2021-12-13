@@ -14,7 +14,8 @@
     "lint": "eslint . --ext ts --ext tsx --ext js --ext jsx",
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
-    "notifier": "TS_NODE_PROJECT=./tsconfig.commonjs.json ts-node scripts/governance-notifier.ts"
+    "notifier": "TS_NODE_PROJECT=./tsconfig.commonjs.json ts-node scripts/governance-notifier.ts",
+    "postinstall": "patch-package"
   },
   "lint-staged": {
     "*.@(ts|tsx|js|jsx)": [
@@ -23,16 +24,16 @@
   },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.2.15",
-    "@project-serum/anchor": "^0.19.0",
-    "@solana/spl-token": "^0.1.8",
-    "@solana/web3.js": "1.31.0",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
     "@headlessui/react": "^1.0.0",
     "@heroicons/react": "^1.0.1",
+    "@project-serum/anchor": "^0.19.0",
     "@project-serum/borsh": "^0.2.2",
     "@project-serum/common": "^0.0.1-beta.3",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
+    "@solana/spl-token": "^0.1.8",
+    "@solana/web3.js": "1.31.0",
     "@tippyjs/react": "^4.2.5",
     "@uxdprotocol/uxd-client": "^2.56.0",
     "axios": "^0.21.1",
@@ -71,8 +72,10 @@
     "jest": "^26.6.3",
     "jest-watch-typeahead": "^0.6.1",
     "lint-staged": "^10.0.10",
+    "patch-package": "^6.4.7",
     "postcss": "^8.2.12",
     "postcss-preset-env": "^6.7.0",
+    "postinstall-postinstall": "^2.1.0",
     "prettier": "^2.0.2",
     "tailwindcss": "^2.1.2",
     "twin.macro": "^2.4.0",
