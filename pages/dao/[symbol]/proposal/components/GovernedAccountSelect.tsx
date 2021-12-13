@@ -43,11 +43,13 @@ const GovernedAccountSelect = ({
       return null
     }
   }
+  //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
   function getMintAccountLabelComponent({
     account,
     tokenName,
     mintAccountName,
     amount,
+    imgUrl,
   }) {
     return (
       <div className="break-all text-fgd-1">
@@ -56,11 +58,7 @@ const GovernedAccountSelect = ({
         <div className="space-y-0.5 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token:{' '}
-              <img
-                className="flex-shrink-0 h-4 mx-1 w-4"
-                src={`/icons/${tokenName.toLowerCase()}.svg`}
-              />
+              Token: <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
               {tokenName}
             </div>
           )}
@@ -74,6 +72,7 @@ const GovernedAccountSelect = ({
     tokenAccountName,
     tokenName,
     amount,
+    imgUrl,
   }) {
     return (
       <div className="break-all text-fgd-1 ">
@@ -82,11 +81,7 @@ const GovernedAccountSelect = ({
         <div className="space-y-0.5 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token:{' '}
-              <img
-                className="flex-shrink-0 h-4 mx-1 w-4"
-                src={`/icons/${tokenName.toLowerCase()}.svg`}
-              />
+              Token: <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
               {tokenName}
             </div>
           )}
