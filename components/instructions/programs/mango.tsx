@@ -177,3 +177,7 @@ export const MANGO_INSTRUCTIONS = {
     },
   },
 }
+
+// also allow decoding of instructions for devnet versions of mango
+MANGO_INSTRUCTIONS['4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA'] =
+  MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']
