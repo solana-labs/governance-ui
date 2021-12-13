@@ -61,7 +61,7 @@ const CancelProposalModal: FunctionComponent<CancelProposalModalProps> = ({
     console.log('proposal and rpc context', proposal)
 
     try {
-      await cancelProposal(rpcContext, proposal, instructions)
+      await cancelProposal(rpcContext, proposal)
     } catch (error) {
       notify({
         type: 'error',
