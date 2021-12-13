@@ -19,7 +19,7 @@ export const withFinalizeVote = async (
   const args = new FinalizeVoteArgs()
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
 
-  let keys = [
+  const keys = [
     {
       pubkey: realm,
       isWritable: false,
