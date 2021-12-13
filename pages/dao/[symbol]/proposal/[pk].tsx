@@ -18,13 +18,13 @@ import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
 import SignOffProposal from './components/SignOffProposal'
 import CancelProposal from './components/CancelProposal'
-import { ProposalState, SignatoryRecord } from '@models/accounts'
+// import { ProposalState, SignatoryRecord } from '@models/accounts'
 import FinalizeVotes from './components/FinalizeVotes'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = useRealm()
-  const { proposal, description, instructions } = useProposal()
+  const { proposal, description } = useProposal()
   const {
     yesVoteProgress,
     yesVoteCount,

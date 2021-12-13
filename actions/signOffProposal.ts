@@ -1,6 +1,6 @@
 import {
   Account,
-  PublicKey,
+  // PublicKey,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -8,8 +8,8 @@ import {
 import { RpcContext } from '../models/core/api'
 import {
   getSignatoryRecordAddress,
-  Proposal,
-  SignatoryRecord,
+  // Proposal,
+  // SignatoryRecord,
 } from '@models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { sendTransaction } from 'utils/send'
@@ -27,7 +27,7 @@ export const signOffProposal = async (
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     programId,
     //@ts-ignore
-    signatoryRecord!.pubkey,
+    signatoryRecord.pubkey,
     walletPubkey
   )
 

@@ -6,7 +6,7 @@ import {
 import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { CancelProposalArgs } from './instructions'
-import { InstructionData } from './accounts'
+// import { InstructionData } from './accounts'
 
 export const withCancelProposal = (
   instructions: TransactionInstruction[],

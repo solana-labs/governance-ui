@@ -17,8 +17,8 @@ export const finalizeVote = async (
   realm: PublicKey,
   proposal: ParsedAccount<Proposal>
 ) => {
-  let signers: Account[] = []
-  let instructions: TransactionInstruction[] = []
+  const signers: Account[] = []
+  const instructions: TransactionInstruction[] = []
 
   console.log('proposal finalize vote', proposal, realm)
 

@@ -1,23 +1,11 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent, useState } from 'react'
-import { postChatMessage } from 'actions/chat/postMessage'
-import { ChatMessageBody, ChatMessageBodyType } from 'models/chat/accounts'
+import React, { FunctionComponent } from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
-import { castVote } from 'actions/castVote'
-import { Vote } from 'models/instructions'
-import Button, { LinkButton } from '@components/Button'
-// import { notify } from 'utils/notifications'
-import Loading from '@components/Loading'
+import Button from '@components/Button'
 import Modal from '@components/Modal'
-import Input from '@components/inputs/Input'
-import Tooltip from '@components/Tooltip'
-import {
-  getSignatoryRecordAddress,
-  SignatoryRecord,
-  TokenOwnerRecord,
-} from 'models/accounts'
+import { SignatoryRecord } from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { signOffProposal } from 'actions/signOffProposal'
 import { notify } from '@utils/notifications'
@@ -33,15 +21,10 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
   onClose,
   isOpen,
 }) => {
-  const [submitting, setSubmitting] = useState(false)
-  const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { fetchVoteRecords } = useWalletStore((s) => s.actions)
-  const { realm, realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { realmInfo } = useRealm()
 
   const rpcContext = new RpcContext(
     proposal!.account.owner,

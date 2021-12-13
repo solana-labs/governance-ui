@@ -1,19 +1,11 @@
-import {
-  Account,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Account, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import { RpcContext } from '../models/core/api'
 import { Proposal } from '@models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
-import { sendTransaction, simulateTransaction } from 'utils/send'
+import { sendTransaction /* simulateTransaction */ } from 'utils/send'
 import { withCancelProposal } from '@models/withCancelProposal'
 // import { sendTransactionWithNotifications } from '@components/instructions/tools';
-import { dryRunInstruction } from './dryRunInstruction'
-import useProposal from '@hooks/useProposal'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
 
 export const cancelProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -29,13 +21,6 @@ export const cancelProposal = async (
     proposal!.pubkey,
     proposal!.info.tokenOwnerRecord,
     governanceAuthority
-  )
-
-  console.log(
-    'signers after cancel proposal',
-    signers,
-    walletPubkey === wallet?.publicKey,
-    walletPubkey === proposal?.pubkey
   )
 
   const transaction = new Transaction({ feePayer: walletPubkey })
