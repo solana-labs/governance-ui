@@ -7,9 +7,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-
 import { Proposal } from '../models/accounts'
-
 import { withFinalizeVote } from '../models/withFinalizeVote'
 
 export const finalizeVote = async (
@@ -29,14 +27,6 @@ export const finalizeVote = async (
     proposal.info.tokenOwnerRecord,
     proposal.info.governingTokenMint
   )
-
-  // instructions,
-  // programId,
-  // realm,
-  // proposal.info.governance,
-  // proposal.pubkey,
-  // proposal.info.tokenOwnerRecord,
-  // proposal.info.governingTokenMint,
 
   const transaction = new Transaction()
 

@@ -1,54 +1,25 @@
-import {
-  Account,
-  // PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { Account, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import { RpcContext } from '../models/core/api'
-import {
-  getSignatoryRecordAddress,
-  Proposal,
-  // SignatoryRecord,
-  // Proposal,
-  // SignatoryRecord,
-} from '@models/accounts'
+import { SignatoryRecord } from '@models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@models/withSignOffProposal'
 
 export const signOffProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal> | undefined
+  signatoryRecord: ParsedAccount<SignatoryRecord> | undefined
 ) => {
   const instructions: TransactionInstruction[] = []
   const signers: Account[] = []
 
-  console.log('before sign off ptoposal', instructions)
-
-  const signatoryRecordAddress = await getSignatoryRecordAddress(
-    programId,
-    //@ts-ignore
-    walletPubkey,
-    walletPubkey
-  )
-
   withSignOffProposal(
     instructions,
     programId,
-    proposal!.pubkey,
-    signatoryRecordAddress,
+    signatoryRecord!.info.proposal,
+    signatoryRecord!.pubkey,
     walletPubkey
   )
-
-  // withSignOffProposal(
-  //   instructions,
-  //   programId,
-  //   signatoryRecord!.info.proposal,
-  //   signatoryRecord!.pubkey,
-  //   //@ts-ignore
-  //   signatoryRecordAddress
-  // )
 
   const transaction = new Transaction()
 

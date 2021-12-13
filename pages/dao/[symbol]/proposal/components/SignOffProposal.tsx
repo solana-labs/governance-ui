@@ -1,18 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent } from 'react'
+import React, { FunctionComponent, useEffect } from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import Button from '@components/Button'
 import Modal from '@components/Modal'
-import {
-  /* getSignatoryRecordAddress, */ SignatoryRecord,
-} from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { signOffProposal } from 'actions/signOffProposal'
 import { notify } from '@utils/notifications'
 import useProposal from '@hooks/useProposal'
-// import { useWalletSignatoryRecord } from '@hooks/useProposal'
+import { SignatoryRecord } from '@models/accounts'
 
 interface SignOffProposalModalProps {
   onClose: () => void
@@ -23,6 +20,7 @@ interface SignOffProposalModalProps {
 const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
   onClose,
   isOpen,
+  signatoryRecord,
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -37,19 +35,9 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
     connection.endpoint
   )
 
-  // const signatoryRecord = getSignatoryRecordAddress(
-  //   rpcContext.programId,
-  //   proposal,
-  //   rpcContext.walletPubkey
-  // );
-
   const handleSignOffProposal = async () => {
-    console.log('sign off proposal', proposal)
-
     try {
-      await signOffProposal(rpcContext, proposal)
-
-      console.log('action sign off', proposal!.info.state)
+      await signOffProposal(rpcContext, signatoryRecord)
     } catch (error) {
       notify({
         type: 'error',
@@ -59,24 +47,30 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
 
       onClose()
 
-      console.log('error cancel', error)
+      console.log('error sign off', error)
     }
   }
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
-      <h2>Sign off proposal</h2>
+      {signatoryRecord!.info.signedOff && <h2>Signed</h2>}
 
-      <p className="text-left mt-5 mb-8">
-        Do you want to sign off this proposal?
-      </p>
+      {!signatoryRecord!.info.signedOff && (
+        <>
+          <h2>Sign off proposal</h2>
 
-      <Button className="mx-2 w-44" onClick={onClose}>
-        Cancel
-      </Button>
-      <Button className="mx-2 w-44" onClick={handleSignOffProposal}>
-        Sign off
-      </Button>
+          <p className="text-left mt-5 mb-8">
+            Do you want to sign off this proposal?
+          </p>
+
+          <Button className="mx-2 w-44" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button className="mx-2 w-44" onClick={handleSignOffProposal}>
+            Sign off
+          </Button>
+        </>
+      )}
     </Modal>
   )
 }
