@@ -5,6 +5,13 @@ const withTM = require('next-transpile-modules')(['react-markdown'])
 module.exports = withTM({
   target: 'serverless',
   webpack: (config, { isServer }) => {
+    config.resolve = {
+      ...config.resolve,
+      alias: {
+        ...config.resolve.alias,
+        '@project-serum/anchor$': '@project-serum/anchor/dist/esm',
+      },
+    }
     config.module.rules.push({
       test: /\.svg$/,
       use: ['@svgr/webpack'],
