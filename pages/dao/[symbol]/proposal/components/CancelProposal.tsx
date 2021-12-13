@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent, useState } from 'react'
+import React, { FunctionComponent } from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
