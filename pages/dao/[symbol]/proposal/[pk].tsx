@@ -22,7 +22,6 @@ import FinalizeVotes from './components/FinalizeVotes'
 import { getSignatoryRecordAddress, ProposalState } from '@models/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@models/core/api'
-import Execute from './components/instructions/Execute'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()

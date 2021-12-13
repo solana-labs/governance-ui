@@ -31,7 +31,7 @@ export function InstructionPanel() {
     connection.endpoint
   )
 
-  let canExecuteAt = proposal!.info.votingCompletedAt
+  const canExecuteAt = proposal!.info.votingCompletedAt
     ? proposal!.info.votingCompletedAt.toNumber() + 1
     : 0
 
