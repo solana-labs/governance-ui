@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
+import { useCallback, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
@@ -15,6 +16,10 @@ import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
+import SignOffProposal from './components/SignOffProposal'
+import CancelProposal from './components/CancelProposal'
+import { ProposalState, SignatoryRecord } from '@models/accounts'
+import FinalizeVotes from './components/FinalizeVotes'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -27,27 +32,61 @@ const Proposal = () => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
+  const [showSignOffModal, setShowSignOffModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
 
-  console.log('proposal data', {
-    proposal,
-    instructions,
-    yesVoteCount,
-    noVoteCount,
-    relativeNoVotes,
-    relativeYesVotes,
-  })
+  console.log('proposal data', proposal?.info.state)
+
+  const handleCloseShowSignOffModal = useCallback(() => {
+    setShowSignOffModal(false)
+  }, [])
+
+  const handleCloseShowCancelModal = useCallback(() => {
+    setShowCancelModal(false)
+  }, [])
+
+  const handleCloseShowFinalizeVoteModal = useCallback(() => {
+    setShowFinalizeVoteModal(false)
+  }, [])
 
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-              <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-                <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-                Back
-              </a>
-            </Link>
+            <div className="flex w-full items-center justify-between">
+              <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+                <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
+                  <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+                  Back
+                </a>
+              </Link>
+
+              <div className="flex items-center justify-center gap-x-5">
+                <p
+                  onClick={() => setShowSignOffModal(true)}
+                  className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+                >
+                  Sign Off
+                </p>
+
+                <p
+                  onClick={() => setShowCancelModal(true)}
+                  className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+                >
+                  Cancel
+                </p>
+
+                <p
+                  onClick={() => setShowFinalizeVoteModal(true)}
+                  className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+                >
+                  Finalize vote
+                </p>
+              </div>
+            </div>
+
             <div className="border-b border-fgd-4 py-4">
               <div className="flex items-center justify-between mb-1">
                 <h1 className="mr-2">{proposal?.info.name}</h1>
@@ -76,6 +115,28 @@ const Proposal = () => {
           </>
         )}
       </div>
+
+      {showSignOffModal ? (
+        <SignOffProposal
+          isOpen={showSignOffModal}
+          onClose={handleCloseShowSignOffModal}
+        />
+      ) : null}
+
+      {showCancelModal ? (
+        <CancelProposal
+          isOpen={showCancelModal}
+          onClose={handleCloseShowCancelModal}
+        />
+      ) : null}
+
+      {showFinalizeVoteModal ? (
+        <FinalizeVotes
+          isOpen={showFinalizeVoteModal}
+          onClose={handleCloseShowFinalizeVoteModal}
+        />
+      ) : null}
+
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCard proposal={option(proposal?.info)} />
         <div className="bg-bkg-2 rounded-lg">

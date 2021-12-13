@@ -236,6 +236,12 @@ const DEVNET_REALMS: RealmInfo[] = [
     programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
     realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
   },
+  {
+    symbol: 'REALM99',
+    displayName: 'REALM99',
+    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
+    realmId: new PublicKey('62yTu6Pv172sKcrsa9sRoPfXiNsD648ZK6wGaWP8ak5j'),
+  },
 ]
 
 export function getAllRealmInfos({ cluster }: ConnectionContext) {

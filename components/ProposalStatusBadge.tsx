@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
+import { useEffect } from 'react'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
@@ -45,6 +46,10 @@ const ProposalStateBadge = ({
   proposalPk: PublicKey
   proposal: Proposal
 }) => {
+  useEffect(() => {
+    console.log('status badge proposal', proposal, proposal.state)
+  }, [])
+
   const governance = useRealmGovernance(proposal.governance)
 
   const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[

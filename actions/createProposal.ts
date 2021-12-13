@@ -60,6 +60,7 @@ export const createProposal = async (
     signatory,
     payer
   )
+
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
@@ -80,7 +81,7 @@ export const createProposal = async (
   }
 
   if (!isDraft) {
-    await withSignOffProposal(
+    withSignOffProposal(
       instructions,
       programId,
       proposalAddress,
