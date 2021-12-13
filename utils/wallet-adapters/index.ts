@@ -15,7 +15,7 @@ export const WALLET_PROVIDERS = [
     name: 'Sollet.io',
     url: 'https://www.sollet.io',
     icon: `${ASSET_URL}/sollet.svg`,
-    adapter: new SolletWalletAdapter({ provider: 'https://sollet.io' }),
+    adapter: new SolletWalletAdapter({ provider: 'https://www.sollet.io' }),
   },
 ]
 
