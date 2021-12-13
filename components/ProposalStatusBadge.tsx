@@ -47,7 +47,7 @@ const ProposalStateBadge = ({
   proposal: Proposal
 }) => {
   useEffect(() => {
-    console.log('status badge proposal', proposal, proposal.state)
+    console.log('STATUS PROPOSAL', proposal.state)
   }, [])
 
   const governance = useRealmGovernance(proposal.governance)

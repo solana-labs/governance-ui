@@ -23,7 +23,6 @@ export const withSignOffProposal = (
       isWritable: true,
       isSigner: false,
     },
-
     {
       pubkey: signatoryRecord,
       isWritable: true,

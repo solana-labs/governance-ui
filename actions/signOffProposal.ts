@@ -8,6 +8,8 @@ import {
 import { RpcContext } from '../models/core/api'
 import {
   getSignatoryRecordAddress,
+  Proposal,
+  SignatoryRecord,
   // Proposal,
   // SignatoryRecord,
 } from '@models/accounts'
@@ -17,28 +19,36 @@ import { withSignOffProposal } from '@models/withSignOffProposal'
 
 export const signOffProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  signatoryRecord: ParsedAccount<any> | undefined
+  proposal: ParsedAccount<Proposal> | undefined
 ) => {
   const instructions: TransactionInstruction[] = []
   const signers: Account[] = []
 
-  console.log('before cancel ptoposal', instructions)
+  console.log('before sign off ptoposal', instructions)
 
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     programId,
     //@ts-ignore
-    signatoryRecord.pubkey,
+    walletPubkey,
     walletPubkey
   )
 
   withSignOffProposal(
     instructions,
     programId,
-    signatoryRecord!.info.proposal,
-    signatoryRecord!.pubkey,
-    //@ts-ignore
-    signatoryRecordAddress
+    proposal!.pubkey,
+    signatoryRecordAddress,
+    walletPubkey
   )
+
+  // withSignOffProposal(
+  //   instructions,
+  //   programId,
+  //   signatoryRecord!.info.proposal,
+  //   signatoryRecord!.pubkey,
+  //   //@ts-ignore
+  //   signatoryRecordAddress
+  // )
 
   const transaction = new Transaction()
 

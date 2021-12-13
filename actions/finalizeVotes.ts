@@ -20,8 +20,6 @@ export const finalizeVote = async (
   const signers: Account[] = []
   const instructions: TransactionInstruction[] = []
 
-  console.log('proposal finalize vote', proposal, realm)
-
   withFinalizeVote(
     instructions,
     programId,

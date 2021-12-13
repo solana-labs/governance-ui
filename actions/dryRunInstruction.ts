@@ -10,13 +10,12 @@ export async function dryRunInstruction(
   instructionData: InstructionData
 ) {
   const transaction = new Transaction({ feePayer: wallet.publicKey })
+
   transaction.add({
     keys: instructionData.accounts,
     programId: instructionData.programId,
     data: Buffer.from(instructionData.data),
   })
-
-  console.log('transaction dry run', transaction)
 
   const result = await simulateTransaction(connection, transaction, 'single')
 

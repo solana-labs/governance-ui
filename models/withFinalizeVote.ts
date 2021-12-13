@@ -26,7 +26,7 @@ export const withFinalizeVote = async (
     },
     {
       pubkey: governance,
-      isWritable: false,
+      isWritable: true,
       isSigner: false,
     },
     {
@@ -37,7 +37,7 @@ export const withFinalizeVote = async (
     {
       pubkey: governingTokenMint,
       isWritable: false,
-      isSigner: false,
+      isSigner: true,
     },
     {
       pubkey: SYSVAR_CLOCK_PUBKEY,
