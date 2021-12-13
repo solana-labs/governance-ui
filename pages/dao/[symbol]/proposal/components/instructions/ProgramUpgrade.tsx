@@ -73,7 +73,7 @@ const ProgramUpgrade = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount?.governance,
+      governance: form.governedAccount?.governance,
     }
     return obj
   }

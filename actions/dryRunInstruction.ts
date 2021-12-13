@@ -12,11 +12,11 @@ export async function dryRunInstruction(
   connection: Connection,
   wallet: WalletAdapter,
   instructionData: InstructionData,
-  additionalInstructionsToRun?: TransactionInstruction[] | undefined
+  prerequisiteInstructionsToRun?: TransactionInstruction[] | undefined
 ) {
   const transaction = new Transaction({ feePayer: wallet.publicKey })
-  if (additionalInstructionsToRun) {
-    additionalInstructionsToRun.map((x) => transaction.add(x))
+  if (prerequisiteInstructionsToRun) {
+    prerequisiteInstructionsToRun.map((x) => transaction.add(x))
   }
   transaction.add({
     keys: instructionData.accounts,

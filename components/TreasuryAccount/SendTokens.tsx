@@ -180,7 +180,7 @@ const SendTokens = () => {
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
         holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
-        additionalTransactions: instruction.additionalTransactions || [],
+        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
         // Fetch governance to get up to date proposalCount
@@ -403,7 +403,7 @@ const SendTokens = () => {
           Cancel
         </SecondaryButton>
         <Button
-          disabled={!canUseTransferInstruction}
+          disabled={!canUseTransferInstruction || isLoading}
           className="sm:w-1/2"
           onClick={handlePropose}
           isLoading={isLoading}

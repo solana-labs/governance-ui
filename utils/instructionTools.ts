@@ -8,7 +8,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { WalletAdapter } from '../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
-import { findTrueReceiver } from './ataHelpers'
+import { findTrueReceiver } from './ataTools'
 import { isFormValid } from './formValidation'
 import { GovernedTokenAccount } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
@@ -41,7 +41,7 @@ export async function getTransferInstruction({
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
-  const additionalTransactions: TransactionInstruction[] = []
+  const prerequisiteInstructions: TransactionInstruction[] = []
   if (
     isValid &&
     programId &&
@@ -65,7 +65,7 @@ export async function getTransferInstruction({
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
-      additionalTransactions.push(
+      prerequisiteInstructions.push(
         Token.createAssociatedTokenAccountInstruction(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
@@ -90,8 +90,8 @@ export async function getTransferInstruction({
   const obj: UiInstruction = {
     serializedInstruction,
     isValid,
-    governedAccount: currentAccount?.governance,
-    additionalTransactions: additionalTransactions,
+    governance: currentAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
   }
   return obj
 }

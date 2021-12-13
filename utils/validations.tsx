@@ -21,33 +21,18 @@ const getValidateAccount = async (
 ) => {
   const account = await connection.getParsedAccountInfo(pubKey)
   if (!account || !account.value) {
-    throw 'Account not found'
+    throw "Account doesn't exist or has no SOLs"
   }
   return account
 }
 
-const getValidatePublicKey = (val: string) => {
+const getValidatedPublickKey = (val: string) => {
   const pubKey = tryParseKey(val)
   if (pubKey) {
     return pubKey
   } else {
     throw 'Provided value is not a public key'
   }
-}
-
-const isValidSplTokenAccount = (account, exceptionMode = false) => {
-  if (
-    !(
-      'parsed' in account.value.data &&
-      account.value.data.program === 'spl-token'
-    )
-  ) {
-    if (exceptionMode) {
-      throw 'Invalid spl token account'
-    }
-    return false
-  }
-  return true
 }
 
 const validateDoseTokenAccountMatchMint = (
@@ -59,7 +44,7 @@ const validateDoseTokenAccountMatchMint = (
   }
 }
 
-export const getDoseAtaExists = async (
+export const tryGetAta = async (
   connection: ConnectionContext,
   mint: PublicKey,
   owner: PublicKey
@@ -81,7 +66,8 @@ export const isExistingTokenAccount = async (
 ) => {
   const account = await getValidateAccount(connection.current, val)
   const isExistingTokenAccount =
-    account.value !== null && isValidSplTokenAccount(account)
+    account.value !== null &&
+    (await tryGetTokenAccount(connection.current, val))
   return isExistingTokenAccount
 }
 
@@ -91,7 +77,7 @@ export const validateDestinationAccAddress = async (
   governedAccount?: PublicKey
 ) => {
   const currentConnection = connection.current
-  const pubKey = getValidatePublicKey(val)
+  const pubKey = getValidatedPublickKey(val)
   const account = await getValidateAccount(currentConnection, pubKey)
   if (account?.value !== null) {
     if (!governedAccount) {
@@ -119,7 +105,7 @@ export const validateDestinationAccAddressWithMint = async (
   mintPubKey: PublicKey
 ) => {
   const currentConnection = connection.current
-  const pubKey = getValidatePublicKey(val)
+  const pubKey = getValidatedPublickKey(val)
   const account = await getValidateAccount(currentConnection, pubKey)
   if (account?.value !== null) {
     if (!mintPubKey) {
@@ -145,7 +131,7 @@ export const validateBuffer = async (
   if (pubKey) {
     await connection.current.getParsedAccountInfo(pubKey).then((data) => {
       if (!data || !data.value) {
-        throw 'Account not found'
+        throw "account doesn't exist or has no SOLs"
       }
       const info = data.value
       if (

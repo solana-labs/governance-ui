@@ -67,7 +67,7 @@ const Empty = ({
     const obj: UiInstruction = {
       serializedInstruction: '',
       isValid,
-      governedAccount: form.governedAccount?.governance,
+      governance: form.governedAccount?.governance,
     }
     return obj
   }

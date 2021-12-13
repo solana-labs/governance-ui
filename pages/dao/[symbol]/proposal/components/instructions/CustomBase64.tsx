@@ -82,7 +82,7 @@ const CustomBase64 = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount?.governance,
+      governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdUpTime,
     }
     return obj

@@ -178,7 +178,7 @@ const New = () => {
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.info?.config.minInstructionHoldUpTime,
-          additionalTransactions: x.additionalTransactions || [],
+          prerequisiteInstructions: x.prerequisiteInstructions || [],
         }
       })
 
@@ -391,12 +391,17 @@ const New = () => {
             </div>
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
+                disabled={isLoading}
                 isLoading={isLoading}
                 onClick={() => handleCreate(true)}
               >
                 Save draft
               </SecondaryButton>
-              <Button isLoading={isLoading} onClick={() => handleCreate(false)}>
+              <Button
+                isLoading={isLoading}
+                disabled={isLoading}
+                onClick={() => handleCreate(false)}
+              >
                 Add proposal
               </Button>
             </div>

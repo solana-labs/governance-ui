@@ -7,7 +7,7 @@ import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import { WalletAdapter } from '../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { sendTransaction } from './send'
-import { getDoseAtaExists, isExistingTokenAccount } from './validations'
+import { tryGetAta, isExistingTokenAccount } from './validations'
 
 // calculate ATA
 export async function createATA(
@@ -54,12 +54,12 @@ export async function findTrueReceiver(
   }
   let currentAddress = receiverAddress
   let needToCreateAta = false
-  const existingAta = await getDoseAtaExists(connection, mintPK, currentAddress)
   const isExistingAccount = await isExistingTokenAccount(
     connection,
     receiverAddress
   )
   if (!isExistingAccount) {
+    const existingAta = await tryGetAta(connection, mintPK, currentAddress)
     if (!existingAta) {
       const ata = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID

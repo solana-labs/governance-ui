@@ -45,7 +45,8 @@ const DryRunInstructionBtn = ({
       }
       setIsPending(true)
       const instructionData = await getInstructionDataFcn()
-      const additionalInstructionsToRun = instructionData.additionalTransactions
+      const prerequisiteInstructionsToRun =
+        instructionData.prerequisiteInstructions
       if (!instructionData?.isValid) {
         setIsPending(false)
         throw new Error('Invalid instruction')
@@ -54,7 +55,7 @@ const DryRunInstructionBtn = ({
         connection.current,
         wallet!,
         getInstructionDataFromBase64(instructionData?.serializedInstruction),
-        additionalInstructionsToRun
+        prerequisiteInstructionsToRun
       )
       setResult(result)
       setIsOpen(true)

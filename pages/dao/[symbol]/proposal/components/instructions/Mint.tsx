@@ -34,7 +34,7 @@ import { ParsedAccount } from '@models/core/accounts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { findTrueReceiver } from '@utils/ataHelpers'
+import { findTrueReceiver } from '@utils/ataTools'
 import { validateInstruction } from '@utils/instructionTools'
 
 const Mint = ({
@@ -101,7 +101,7 @@ const Mint = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
-    const additionalTransactions: TransactionInstruction[] = []
+    const prerequisiteInstructions: TransactionInstruction[] = []
     if (isValid && programId && form.mintAccount?.governance?.pubkey) {
       //this is the original owner
       const destinationAccount = new PublicKey(form.destinationAccount)
@@ -123,7 +123,7 @@ const Mint = ({
       //we push this createATA instruction to transactions to create right before creating proposal
       //we don't want to create ata only when instruction is serialized
       if (needToCreateAta) {
-        additionalTransactions.push(
+        prerequisiteInstructions.push(
           Token.createAssociatedTokenAccountInstruction(
             ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
             TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
@@ -147,8 +147,8 @@ const Mint = ({
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governedAccount: governedAccount,
-      additionalTransactions: additionalTransactions,
+      governance: governedAccount,
+      prerequisiteInstructions: prerequisiteInstructions,
     }
     return obj
   }

@@ -13,9 +13,9 @@ import {
 export interface UiInstruction {
   serializedInstruction: string
   isValid: boolean
-  governedAccount: ParsedAccount<Governance> | undefined
+  governance: ParsedAccount<Governance> | undefined
   customHoldUpTime?: number
-  additionalTransactions?: TransactionInstruction[]
+  prerequisiteInstructions?: TransactionInstruction[]
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
