@@ -8,7 +8,7 @@ import {
 
 import useWalletStore from '../../stores/useWalletStore'
 
-import { RealmsDashboard } from './components/RealmsDashboard'
+import RealmsDashboard from './components/RealmsDashboard'
 
 // const COL = 'flex-col'
 // const ROW = 'flex-row'
