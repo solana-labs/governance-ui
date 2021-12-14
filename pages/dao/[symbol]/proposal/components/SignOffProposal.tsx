@@ -63,12 +63,15 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
             Do you want to sign off this proposal?
           </p>
 
-          <Button className="mx-2 w-44" onClick={onClose}>
-            Cancel
-          </Button>
-          <Button className="mx-2 w-44" onClick={handleSignOffProposal}>
-            Sign off
-          </Button>
+          <div className="flex items-center justify-center">
+            <Button className="mx-2 w-44" onClick={onClose}>
+              Cancel
+            </Button>
+
+            <Button className="mx-2 w-44" onClick={handleSignOffProposal}>
+              Sign off
+            </Button>
+          </div>
         </>
       )}
     </Modal>

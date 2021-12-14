@@ -23,7 +23,7 @@ const ExecuteInstruction: FunctionComponent<ExecuteInstructionProps> = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { proposal, instructions } = useWalletStore((s) => s.selectedProposal)
+  const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { realmInfo } = useRealm()
 
   const rpcContext = new RpcContext(
@@ -36,18 +36,18 @@ const ExecuteInstruction: FunctionComponent<ExecuteInstructionProps> = ({
 
   const handleExecuteInstruction = async () => {
     try {
-      console.log('instructins account', instructions)
       await executeInstruction(rpcContext, proposal!, instruction)
+
+      onClose()
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not execute instruction.`,
-        description: `Error: ${error}`,
       })
 
-      onClose()
+      console.log('error executing instruction', error)
 
-      console.log('error executing', error)
+      onClose()
     }
   }
 
@@ -57,13 +57,15 @@ const ExecuteInstruction: FunctionComponent<ExecuteInstructionProps> = ({
 
       <p className="text-left mt-5 mb-8">Do you want to execute instruction?</p>
 
-      <Button className="mx-2 w-44" onClick={onClose}>
-        No
-      </Button>
+      <div className="flex items-center justify-center">
+        <Button className="mx-2 w-44" onClick={onClose}>
+          No
+        </Button>
 
-      <Button className="mx-2 w-44" onClick={handleExecuteInstruction}>
-        Execute
-      </Button>
+        <Button className="mx-2 w-44" onClick={handleExecuteInstruction}>
+          Execute
+        </Button>
+      </div>
     </Modal>
   )
 }

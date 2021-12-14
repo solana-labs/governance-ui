@@ -37,20 +37,19 @@ const CancelProposalModal: FunctionComponent<CancelProposalModalProps> = ({
   const handleCancelProposal = async (
     proposal: ParsedAccount<Proposal> | undefined
   ) => {
-    console.log('proposal and rpc context', proposal)
-
     try {
       await cancelProposal(rpcContext, proposal)
+
+      onClose()
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not cancel proposal.`,
-        description: `${error}`,
       })
 
       onClose()
 
-      console.log('error cancel', error)
+      console.log('error cancelling proposal', error)
     }
   }
 
@@ -62,16 +61,15 @@ const CancelProposalModal: FunctionComponent<CancelProposalModalProps> = ({
         Do you want to cancel this proposal?
       </p>
 
-      <Button className="mx-2 w-44" onClick={onClose}>
-        No
-      </Button>
+      <div className="flex items-center justify-center">
+        <Button className="w-44 mr-4" onClick={onClose}>
+          No
+        </Button>
 
-      <Button
-        className="mx-2 w-44"
-        onClick={() => handleCancelProposal(proposal)}
-      >
-        Yes, cancel
-      </Button>
+        <Button className="w-44" onClick={() => handleCancelProposal(proposal)}>
+          Yes, cancel
+        </Button>
+      </div>
     </Modal>
   )
 }

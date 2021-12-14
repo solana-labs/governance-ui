@@ -18,7 +18,6 @@ import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
 import SignOffProposal from './components/SignOffProposal'
 import CancelProposal from './components/CancelProposal'
-import FinalizeVotes from './components/FinalizeVotes'
 import { getSignatoryRecordAddress, ProposalState } from '@models/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@models/core/api'
@@ -34,26 +33,14 @@ const Proposal = () => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
-  const [showSignOffModal, setShowSignOffModal] = useState(false)
-  const [showCancelModal, setShowCancelModal] = useState(false)
-  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const connection = useWalletStore((s) => s.connection)
+
+  const [showSignOffModal, setShowSignOffModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-
-  const handleCloseShowSignOffModal = useCallback(() => {
-    setShowSignOffModal(false)
-  }, [])
-
-  const handleCloseShowCancelModal = useCallback(() => {
-    setShowCancelModal(false)
-  }, [])
-
-  const handleCloseShowFinalizeVoteModal = useCallback(() => {
-    setShowFinalizeVoteModal(false)
-  }, [])
 
   useEffect(() => {
     const setup = async () => {
@@ -108,19 +95,19 @@ const Proposal = () => {
                     </p>
                   )}
 
-                <p
-                  onClick={() => setShowCancelModal(true)}
-                  className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
-                >
-                  Cancel
-                </p>
-
-                <p
-                  onClick={() => setShowFinalizeVoteModal(true)}
-                  className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
-                >
-                  Finalize vote
-                </p>
+                {ProposalState.Cancelled === proposal?.info.state ||
+                !(
+                  proposal.info.state === ProposalState.Draft ||
+                  proposal.info.state === ProposalState.SigningOff ||
+                  proposal.info.state === ProposalState.Voting
+                ) ? null : (
+                  <p
+                    onClick={() => setShowCancelModal(true)}
+                    className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+                  >
+                    Cancel
+                  </p>
+                )}
               </div>
             </div>
 
@@ -130,6 +117,7 @@ const Proposal = () => {
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.info}
+                  open={true}
                 />
               </div>
               <ProposalTimeStatus proposal={proposal?.info} />
@@ -156,7 +144,7 @@ const Proposal = () => {
       {signatoryRecord && showSignOffModal && (
         <SignOffProposal
           isOpen={showSignOffModal}
-          onClose={handleCloseShowSignOffModal}
+          onClose={() => setShowSignOffModal(false)}
           signatoryRecord={signatoryRecord}
         />
       )}
@@ -164,14 +152,7 @@ const Proposal = () => {
       {showCancelModal && (
         <CancelProposal
           isOpen={showCancelModal}
-          onClose={handleCloseShowCancelModal}
-        />
-      )}
-
-      {showFinalizeVoteModal && (
-        <FinalizeVotes
-          isOpen={showFinalizeVoteModal}
-          onClose={handleCloseShowFinalizeVoteModal}
+          onClose={() => setShowCancelModal(false)}
         />
       )}
 

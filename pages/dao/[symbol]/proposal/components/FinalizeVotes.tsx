@@ -31,23 +31,19 @@ const FinalizeVotesModal: FunctionComponent<FinalizeVotesModalProps> = ({
   )
 
   const handleFinalizeVote = async () => {
-    console.log('proposal and rpc context', proposal, rpcContext)
-
-    // Error: Error: Transaction failed: Error: NotEnoughAccountKeys
-    //4: "Program GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw failed: insufficient account keys for instruction"
-
     try {
       await finalizeVote(rpcContext, realmInfo!.realmId, proposal!)
+
+      onClose()
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not finalize vote.`,
-        description: `Error: ${error}`,
       })
 
       onClose()
 
-      console.log('error cancel', error)
+      console.log('error finalizing vote', error)
     }
   }
 
@@ -57,13 +53,15 @@ const FinalizeVotesModal: FunctionComponent<FinalizeVotesModalProps> = ({
 
       <p className="text-left mt-5 mb-8">Do you want to finalize vote?</p>
 
-      <Button className="mx-2 w-44" onClick={onClose}>
-        No
-      </Button>
+      <div className="flex items-center justify-center">
+        <Button className="w-44 mr-4" onClick={onClose}>
+          No
+        </Button>
 
-      <Button className="mx-2 w-44" onClick={handleFinalizeVote}>
-        Finalize
-      </Button>
+        <Button className="w-44" onClick={handleFinalizeVote}>
+          Finalize
+        </Button>
+      </div>
     </Modal>
   )
 }
