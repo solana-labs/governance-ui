@@ -16,7 +16,7 @@ function errorWrapper() {
   })
 }
 
-// run every 5 mins, checks if a mngo governance proposal just opened in the last 5 mins
+// run every 5 mins, checks if a governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
@@ -24,7 +24,8 @@ async function runNotifier() {
   const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
   const connectionContext = getConnectionContext('mainnet')
 
-  const realmInfo = await getRealmInfo('MNGO', connectionContext)
+  const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
+  const realmInfo = await getRealmInfo(REALM_SYMBOL, connectionContext)
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo!.programId,
@@ -64,7 +65,7 @@ async function runNotifier() {
     )
   )
 
-  console.log(`- scanning all proposals`)
+  console.log(`- scanning all '${REALM_SYMBOL}' proposals`)
   let countJustOpenedForVoting = 0
   let countVotingNotStartedYet = 0
   let countClosed = 0
@@ -97,7 +98,13 @@ async function runNotifier() {
       // 24
     ) {
       countJustOpenedForVoting++
-      const msg = `“${proposal.info.name}” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/MNGO/proposal/${k}`
+
+      const msg = `“${
+        proposal.info.name
+      }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
+        REALM_SYMBOL
+      )}/proposal/${k}`
+
       console.log(msg)
       if (process.env.WEBHOOK_URL) {
         axios.post(process.env.WEBHOOK_URL, { content: msg })
