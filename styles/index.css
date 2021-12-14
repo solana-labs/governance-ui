@@ -122,19 +122,3 @@ button {
 .pointer {
   cursor: pointer;
 }
-
-.animation-enter {
-  animation: animation-enter 200ms forwards;
-}
-
-@keyframes animation-enter {
-  0% {
-    opacity: 0;
-    transform: translateX(-20px);
-  }
-  50%,
-  100% {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}

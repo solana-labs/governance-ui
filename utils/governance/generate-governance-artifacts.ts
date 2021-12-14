@@ -25,6 +25,7 @@ export interface SourceEntryInterface {
   sourceAccount: PublicKey | undefined
   tokenAmount: number
 }
+
 export const generateGovernanceArtifacts = async (
   connection: Connection,
   wallet: WalletSigner,

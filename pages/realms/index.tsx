@@ -44,7 +44,7 @@ const Realms = () => {
   //   }, [search, realms])
 
   const goToRealm = ({ symbol }) => {
-    const url = fmtUrlWithCluster(`/realms/${symbol}`)
+    const url = fmtUrlWithCluster(`/dao/${symbol}`)
     router.push(url)
   }
 

@@ -4,4 +4,3 @@ yarn.lock
 package-lock.json
 public
 components/charting_library
-**/utils/governance
