@@ -52,7 +52,7 @@ export default function RealmsDashboard({
           <Loading></Loading>
         ) : (
           <>
-            {realms.map((realm: RealmInfo) => (
+            {realms?.map((realm: RealmInfo) => (
               <div
                 onClick={() => goToRealm(realm)}
                 className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
