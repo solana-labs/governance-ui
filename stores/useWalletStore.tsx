@@ -288,6 +288,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
     },
     deselectRealm() {
+      const set = get().set
       set((s) => {
         s.selectedRealm = INITIAL_REALM_STATE
       })
