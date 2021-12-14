@@ -10,8 +10,6 @@ import {
   StepDirection,
 } from '../interfaces/Realm'
 
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
-
 /**
  * This class provides methods to control the Realm Creator Wizard.
  *
@@ -103,7 +101,7 @@ class RealmWizardController {
    * Prepares the necessary data to request the realm creation
    */
   prepareData(
-    wallet: PhantomWalletAdapter,
+    wallet: any,
     conn: ConnectionContext,
     artifacts: RealmArtifacts
   ): {

@@ -236,7 +236,7 @@ const RealmWizard: React.FC = () => {
       }
     }
 
-    const { isValid, validationErrors }: formValidation = await isFormValid(
+    const { isValid }: formValidation = await isFormValid(
       CreateFormSchema,
       generatedForm
     )
