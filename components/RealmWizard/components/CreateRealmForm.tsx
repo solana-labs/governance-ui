@@ -37,7 +37,7 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
 
   const [formErrors, setFormErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
-  const [realmAddress, setRealmAddress] = useState<PublicKey>()
+  const [, setRealmAddress] = useState<PublicKey>()
 
   const handleSetForm = (newValues) => {
     setFormErrors({})

@@ -26,7 +26,6 @@ import { tryGetMint } from '@utils/tokens'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
-import _ from 'lodash'
 import { registerRealm } from 'actions/registerRealm'
 import { generateGovernanceArtifacts } from '@utils/governance/generate-governance-artifacts'
 

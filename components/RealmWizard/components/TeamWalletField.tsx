@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { inputClasses, StyledLabel } from '@components/inputs/styles'
-import Modal from '@components/Modal'
-import Input from '@components/inputs/Input'
+import { StyledLabel } from '@components/inputs/styles'
 import AddWalletModal from './AddWalletModal'
 import { TrashIcon } from '@heroicons/react/solid'
 import { PlusCircleIcon } from '@heroicons/react/outline'
