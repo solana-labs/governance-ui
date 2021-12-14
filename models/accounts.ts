@@ -2,7 +2,6 @@ import { PublicKey } from '@solana/web3.js'
 import BigNumber from 'bignumber.js'
 import BN from 'bn.js'
 import moment from 'moment'
-
 /// Seed  prefix for Governance Program PDAs
 export const GOVERNANCE_PROGRAM_SEED = 'governance'
 

@@ -1,4 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
+import CancelProposal from 'pages/dao/[symbol]/proposal/components/CancelProposal'
+import FinalizeVotes from 'pages/dao/[symbol]/proposal/components/FinalizeVotes'
+import { useEffect, useState } from 'react'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
@@ -41,10 +44,19 @@ function getProposalStateStyle(state: ProposalState) {
 const ProposalStateBadge = ({
   proposalPk,
   proposal,
+  open,
 }: {
   proposalPk: PublicKey
   proposal: Proposal
+  open: boolean
 }) => {
+  useEffect(() => {
+    console.log('STATUS PROPOSAL', proposal.state)
+  }, [])
+
+  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+
   const governance = useRealmGovernance(proposal.governance)
 
   const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[
@@ -62,13 +74,66 @@ const ProposalStateBadge = ({
   }
 
   return (
-    <div
-      className={`${getProposalStateStyle(
-        proposal.state
-      )} inline-block px-2 py-1 rounded-full text-xs`}
-    >
-      {statusLabel}
-    </div>
+    <>
+      {open ? (
+        <>
+          <div className="flex items-center justify-end gap-4">
+            {governance && proposal.getTimeToVoteEnd(governance) < 0 && (
+              <p
+                onClick={() => setShowFinalizeVoteModal(true)}
+                className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
+              >
+                Finalize vote
+              </p>
+            )}
+
+            {ProposalState.Cancelled === proposal?.state ||
+            !(
+              proposal.state === ProposalState.Draft ||
+              proposal.state === ProposalState.SigningOff ||
+              proposal.state === ProposalState.Voting
+            ) ? null : (
+              <p
+                onClick={() => setShowCancelModal(true)}
+                className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
+              >
+                Cancel
+              </p>
+            )}
+
+            <div
+              className={`${getProposalStateStyle(
+                proposal.state
+              )} inline-block px-2 py-1 rounded-full text-xs`}
+            >
+              {statusLabel}
+            </div>
+          </div>
+
+          {showFinalizeVoteModal && (
+            <FinalizeVotes
+              isOpen={showFinalizeVoteModal}
+              onClose={() => setShowFinalizeVoteModal(false)}
+            />
+          )}
+
+          {showCancelModal && (
+            <CancelProposal
+              isOpen={showCancelModal}
+              onClose={() => setShowCancelModal(false)}
+            />
+          )}
+        </>
+      ) : (
+        <div
+          className={`${getProposalStateStyle(
+            proposal.state
+          )} inline-block px-2 py-1 rounded-full text-xs`}
+        >
+          {statusLabel}
+        </div>
+      )}
+    </>
   )
 }
 

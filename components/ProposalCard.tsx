@@ -52,6 +52,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                   <ProposalStateBadge
                     proposalPk={proposalPk}
                     proposal={proposal}
+                    open={false}
                   />
                   <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" />
                 </div>

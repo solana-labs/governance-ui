@@ -1,5 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
@@ -15,6 +16,10 @@ import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
+import SignOffProposal from './components/SignOffProposal'
+import { getSignatoryRecordAddress, ProposalState } from '@models/accounts'
+import useWalletStore from 'stores/useWalletStore'
+import { RpcContext } from '@models/core/api'
 import React from 'react'
 
 const Proposal = () => {
@@ -28,28 +33,76 @@ const Proposal = () => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
+  const { realmInfo } = useRealm()
+  const wallet = useWalletStore((s) => s.current)
+  const signatories = useWalletStore((s) => s.selectedProposal.signatories)
+  const connection = useWalletStore((s) => s.connection)
+
+  const [showSignOffModal, setShowSignOffModal] = useState(false)
+  const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
+
+  useEffect(() => {
+    const setup = async () => {
+      if (proposal) {
+        const rpcContext = new RpcContext(
+          proposal!.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
+
+        const response = await getSignatoryRecordAddress(
+          rpcContext.programId,
+          proposal!.pubkey,
+          rpcContext.walletPubkey
+        )
+
+        setSignatoryRecord(signatories[response.toBase58()].info)
+      }
+    }
+
+    setup()
+  }, [proposal])
+
+  useEffect(() => {
+    console.log('signatory record', signatoryRecord)
+  }, [signatoryRecord])
 
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
-            <div className="flex flex-items">
+            <div className="flex flex-items justify-between">
               <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
                 <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
                   <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
                   Back
                 </a>
               </Link>
-              <a
-                className="ml-auto"
-                href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-              </a>
+
+              <div className="flex items-center">
+                {signatoryRecord &&
+                  (proposal.info.state === ProposalState.Draft ||
+                    proposal.info.state === ProposalState.SigningOff) && (
+                    <p
+                      onClick={() => setShowSignOffModal(true)}
+                      className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
+                    >
+                      Sign Off
+                    </p>
+                  )}
+
+                <a
+                  href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+                </a>
+              </div>
             </div>
 
             <div className="border-b border-fgd-4 py-4">
@@ -58,10 +111,12 @@ const Proposal = () => {
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.info}
+                  open={true}
                 />
               </div>
               <ProposalTimeStatus proposal={proposal?.info} />
             </div>
+
             {description && (
               <div className="pb-2">
                 <ReactMarkdown className="markdown">
@@ -69,6 +124,18 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
+
+            {signatoryRecord &&
+              showSignOffModal &&
+              (proposal.info.state === ProposalState.Draft ||
+                proposal.info.state === ProposalState.SigningOff) && (
+                <SignOffProposal
+                  isOpen={showSignOffModal}
+                  onClose={() => setShowSignOffModal(false)}
+                  signatoryRecord={signatoryRecord}
+                />
+              )}
+
             <InstructionPanel />
             <DiscussionPanel />
           </>
@@ -80,6 +147,7 @@ const Proposal = () => {
           </>
         )}
       </div>
+
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCard proposal={option(proposal?.info)} />
         <div className="bg-bkg-2 rounded-lg">

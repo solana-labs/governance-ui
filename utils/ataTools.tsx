@@ -3,8 +3,8 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
-import { WalletAdapter } from '../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { sendTransaction } from './send'
 import { tryGetAta, isExistingTokenAccount } from './validations'

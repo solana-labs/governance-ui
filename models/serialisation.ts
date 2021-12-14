@@ -42,11 +42,13 @@ import {
   RealmConfigAccount,
   VoteThresholdPercentage,
   VoteWeight,
+  GovernanceAccountClass,
 } from './accounts'
 import { serialize } from 'borsh'
 import { ProgramVersion } from './registry/api'
 
 // Temp. workaround to support u16.
+import { BorshAccountParser } from './core/serialisation'
 ;(BinaryReader.prototype as any).readU16 = function () {
   const reader = (this as unknown) as BinaryReader
   const value = reader.buf.readUInt16LE(reader.offset)
@@ -533,3 +535,6 @@ export function getInstructionDataFromBase64(instructionDataBase64: string) {
 
   return instructionData
 }
+
+export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
+  BorshAccountParser(classType, GOVERNANCE_SCHEMA)
