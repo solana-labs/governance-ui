@@ -2,7 +2,6 @@ import { MintMaxVoteWeightSource } from '@models/accounts'
 import { RpcContext } from '@models/core/api'
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
-import { WalletAdapter } from '../../../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
 import {
   RealmArtifacts,
@@ -10,6 +9,8 @@ import {
   RealmWizardStep,
   StepDirection,
 } from '../interfaces/Realm'
+
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
 
 /**
  * This class provides methods to control the Realm Creator Wizard.
@@ -102,7 +103,7 @@ class RealmWizardController {
    * Prepares the necessary data to request the realm creation
    */
   prepareData(
-    wallet: WalletAdapter,
+    wallet: PhantomWalletAdapter,
     conn: ConnectionContext,
     artifacts: RealmArtifacts
   ): {
