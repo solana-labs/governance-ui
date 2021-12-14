@@ -1,4 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { withFinalizeVote } from '@models/withFinalizeVote'
+import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
@@ -21,11 +23,11 @@ const VotePanel = () => {
     voteRecordsByVoter,
     tokenType,
   } = useWalletStore((s) => s.selectedProposal)
-  const { ownTokenRecord, ownCouncilTokenRecord, realmInfo } = useRealm()
+  const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   const ownVoteRecord =
@@ -68,18 +70,33 @@ const VotePanel = () => {
       connection.endpoint
     )
     try {
+      const instructions: TransactionInstruction[] = []
+
+      if (proposal?.info.state === ProposalState.Voting && hasVoteTimeExpired) {
+        await withFinalizeVote(
+          instructions,
+          realmInfo!.programId,
+          realm!.pubkey,
+          proposal.info.governance,
+          proposal.pubkey,
+          proposal.info.tokenOwnerRecord,
+          proposal.info.governingTokenMint
+        )
+      }
+
       await relinquishVote(
         rpcContext,
         proposal!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
-        ownVoteRecord!.pubkey
+        ownVoteRecord!.pubkey,
+        instructions
       )
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }
 
-    fetchVoteRecords(proposal)
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const handleShowVoteModal = (vote) => {

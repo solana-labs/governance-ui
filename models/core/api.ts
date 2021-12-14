@@ -6,27 +6,24 @@ import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
 import { Schema } from 'borsh'
 import { deserializeBorsh } from '../../utils/borsh'
 import { ProgramVersion } from '@models/registry/api'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
 export const SYSTEM_PROGRAM_ID = new PublicKey(
   '11111111111111111111111111111111'
 )
 
-export interface IWallet {
-  publicKey: PublicKey | undefined
-}
-
 // Context to make RPC calls for given clone programId, current connection, endpoint and wallet
 export class RpcContext {
   programId: PublicKey
   programVersion: ProgramVersion
-  wallet: IWallet | undefined
+  wallet: SignerWalletAdapter | undefined
   connection: Connection
   endpoint: string
 
   constructor(
     programId: PublicKey,
     programVersion: number | undefined,
-    wallet: IWallet | undefined,
+    wallet: SignerWalletAdapter | undefined,
     connection: Connection,
     endpoint: string
   ) {

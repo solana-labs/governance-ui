@@ -1,6 +1,5 @@
-import Wallet from '@project-serum/sol-wallet-adapter'
-import { PhantomWalletAdapter } from './phantom'
-import { SolletExtensionAdapter } from './sollet-extension'
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
+import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
 
 const ASSET_URL =
   'https://cdn.jsdelivr.net/gh/solana-labs/oyster@main/assets/wallets'
@@ -10,19 +9,13 @@ export const WALLET_PROVIDERS = [
     name: 'Phantom',
     url: 'https://www.phantom.app',
     icon: `https://www.phantom.app/img/logo.png`,
-    adapter: PhantomWalletAdapter,
+    adapter: new PhantomWalletAdapter(),
   },
   {
     name: 'Sollet.io',
     url: 'https://www.sollet.io',
     icon: `${ASSET_URL}/sollet.svg`,
-    adapter: Wallet,
-  },
-  {
-    name: 'Sollet Extension',
-    url: 'https://www.sollet.io/extension',
-    icon: `${ASSET_URL}/sollet.svg`,
-    adapter: SolletExtensionAdapter as any,
+    adapter: new SolletWalletAdapter({ provider: 'https://www.sollet.io' }),
   },
 ]
 

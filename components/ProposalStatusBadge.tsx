@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
+import CancelProposal from 'pages/dao/[symbol]/proposal/components/CancelProposal'
 import FinalizeVotes from 'pages/dao/[symbol]/proposal/components/FinalizeVotes'
 import { useEffect, useState } from 'react'
 import useRealmGovernance from '../hooks/useRealmGovernance'
@@ -54,6 +55,7 @@ const ProposalStateBadge = ({
   }, [])
 
   const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
 
   const governance = useRealmGovernance(proposal.governance)
 
@@ -85,6 +87,20 @@ const ProposalStateBadge = ({
               </p>
             )}
 
+            {ProposalState.Cancelled === proposal?.state ||
+            !(
+              proposal.state === ProposalState.Draft ||
+              proposal.state === ProposalState.SigningOff ||
+              proposal.state === ProposalState.Voting
+            ) ? null : (
+              <p
+                onClick={() => setShowCancelModal(true)}
+                className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
+              >
+                Cancel
+              </p>
+            )}
+
             <div
               className={`${getProposalStateStyle(
                 proposal.state
@@ -98,6 +114,13 @@ const ProposalStateBadge = ({
             <FinalizeVotes
               isOpen={showFinalizeVoteModal}
               onClose={() => setShowFinalizeVoteModal(false)}
+            />
+          )}
+
+          {showCancelModal && (
+            <CancelProposal
+              isOpen={showCancelModal}
+              onClose={() => setShowCancelModal(false)}
             />
           )}
         </>

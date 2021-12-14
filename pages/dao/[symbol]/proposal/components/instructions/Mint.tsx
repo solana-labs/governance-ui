@@ -2,17 +2,20 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
-import { AccountInfo, Token } from '@solana/spl-token'
+import {
+  AccountInfo,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+} from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
@@ -31,6 +34,8 @@ import { ParsedAccount } from '@models/core/accounts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { validateDestinationAccAddressWithMint } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
+import { findTrueReceiver } from '@utils/ataTools'
+import { validateInstruction } from '@utils/instructionTools'
 
 const Mint = ({
   index,
@@ -51,6 +56,7 @@ const Mint = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
+  const wallet = useWalletStore((s) => s.current)
   const [governedAccount, setGovernedAccount] = useState<
     ParsedAccount<Governance> | undefined
   >(undefined)
@@ -92,34 +98,57 @@ const Mint = ({
       propertyName: 'amount',
     })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
     if (isValid && programId && form.mintAccount?.governance?.pubkey) {
+      //this is the original owner
+      const destinationAccount = new PublicKey(form.destinationAccount)
+      const mintPK = form.mintAccount.governance.info.governedAccount
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount!,
         form.mintAccount.mintInfo?.decimals
       )
+      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+      const {
+        currentAddress: receiverAddress,
+        needToCreateAta,
+      } = await findTrueReceiver(
+        connection,
+        destinationAccount,
+        mintPK,
+        wallet!
+      )
+      //we push this createATA instruction to transactions to create right before creating proposal
+      //we don't want to create ata only when instruction is serialized
+      if (needToCreateAta) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            mintPK, // mint
+            receiverAddress, // ata
+            destinationAccount, // owner of token account
+            wallet!.publicKey! // fee payer
+          )
+        )
+      }
       const transferIx = Token.createMintToInstruction(
         TOKEN_PROGRAM_ID,
         form.mintAccount.governance.info.governedAccount,
-        new PublicKey(form.destinationAccount),
+        receiverAddress,
         form.mintAccount.governance!.pubkey,
         [],
         mintAmount
       )
       serializedInstruction = serializeInstructionToBase64(transferIx)
     }
-
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governedAccount: governedAccount,
+      governance: governedAccount,
+      prerequisiteInstructions: prerequisiteInstructions,
     }
     return obj
   }

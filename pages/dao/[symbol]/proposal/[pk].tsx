@@ -2,7 +2,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
 import ProposalStateBadge from '../../../../components/ProposalStatusBadge'
 import TokenBalanceCard from '../../../../components/TokenBalanceCard'
@@ -17,10 +17,10 @@ import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
 import SignOffProposal from './components/SignOffProposal'
-import CancelProposal from './components/CancelProposal'
 import { getSignatoryRecordAddress, ProposalState } from '@models/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@models/core/api'
+import React from 'react'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -39,7 +39,6 @@ const Proposal = () => {
   const connection = useWalletStore((s) => s.connection)
 
   const [showSignOffModal, setShowSignOffModal] = useState(false)
-  const [showCancelModal, setShowCancelModal] = useState(false)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   useEffect(() => {
@@ -75,7 +74,7 @@ const Proposal = () => {
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
-            <div className="flex w-full items-center justify-between">
+            <div className="flex flex-items justify-between">
               <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
                 <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
                   <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
@@ -83,31 +82,26 @@ const Proposal = () => {
                 </a>
               </Link>
 
-              <div className="flex items-center justify-center gap-x-5">
+              <div className="flex items-center">
                 {signatoryRecord &&
                   (proposal.info.state === ProposalState.Draft ||
                     proposal.info.state === ProposalState.SigningOff) && (
                     <p
                       onClick={() => setShowSignOffModal(true)}
-                      className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+                      className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
                     >
                       Sign Off
                     </p>
                   )}
 
-                {ProposalState.Cancelled === proposal?.info.state ||
-                !(
-                  proposal.info.state === ProposalState.Draft ||
-                  proposal.info.state === ProposalState.SigningOff ||
-                  proposal.info.state === ProposalState.Voting
-                ) ? null : (
-                  <p
-                    onClick={() => setShowCancelModal(true)}
-                    className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
-                  >
-                    Cancel
-                  </p>
-                )}
+                <a
+                  href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+                </a>
               </div>
             </div>
 
@@ -122,6 +116,7 @@ const Proposal = () => {
               </div>
               <ProposalTimeStatus proposal={proposal?.info} />
             </div>
+
             {description && (
               <div className="pb-2">
                 <ReactMarkdown className="markdown">
@@ -129,6 +124,18 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
+
+            {signatoryRecord &&
+              showSignOffModal &&
+              (proposal.info.state === ProposalState.Draft ||
+                proposal.info.state === ProposalState.SigningOff) && (
+                <SignOffProposal
+                  isOpen={showSignOffModal}
+                  onClose={() => setShowSignOffModal(false)}
+                  signatoryRecord={signatoryRecord}
+                />
+              )}
+
             <InstructionPanel />
             <DiscussionPanel />
           </>
@@ -140,21 +147,6 @@ const Proposal = () => {
           </>
         )}
       </div>
-
-      {signatoryRecord && showSignOffModal && (
-        <SignOffProposal
-          isOpen={showSignOffModal}
-          onClose={() => setShowSignOffModal(false)}
-          signatoryRecord={signatoryRecord}
-        />
-      )}
-
-      {showCancelModal && (
-        <CancelProposal
-          isOpen={showCancelModal}
-          onClose={() => setShowCancelModal(false)}
-        />
-      )}
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCard proposal={option(proposal?.info)} />

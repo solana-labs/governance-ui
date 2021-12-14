@@ -14,7 +14,7 @@ import { SignatoryRecord } from '@models/accounts'
 interface SignOffProposalModalProps {
   onClose: () => void
   isOpen: boolean
-  signatoryRecord?: ParsedAccount<SignatoryRecord>
+  signatoryRecord: ParsedAccount<SignatoryRecord>
 }
 
 const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({

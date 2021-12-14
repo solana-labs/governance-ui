@@ -16,9 +16,9 @@ import {
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { chunks } from './helpers'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { getAccountName } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import tokenService from './services/token'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -232,6 +232,7 @@ export async function getMultipleAccountInfoChunked(
   ).flat()
 }
 
+//TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
 export function getTokenAccountLabelInfo(
   acc: GovernedMultiTypeAccount | undefined
 ) {
@@ -239,10 +240,13 @@ export function getTokenAccountLabelInfo(
   let tokenName = ''
   let tokenAccountName = ''
   let amount = ''
+  let imgUrl = ''
 
   if (acc?.token && acc.mint) {
+    const info = tokenService.getTokenInfo(acc!.mint!.publicKey.toBase58())
+    imgUrl = info?.logoURI ? info.logoURI : ''
     tokenAccount = acc.token.publicKey.toBase58()
-    tokenName = getMintMetadata(acc.token.account.mint)?.name
+    tokenName = info?.name ? info.name : ''
     tokenAccountName = getAccountName(acc.token.publicKey)
     amount = formatMintNaturalAmountAsDecimal(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -255,6 +259,7 @@ export function getTokenAccountLabelInfo(
     tokenName,
     tokenAccountName,
     amount,
+    imgUrl,
   }
 }
 
@@ -265,10 +270,14 @@ export function getMintAccountLabelInfo(
   let tokenName = ''
   let mintAccountName = ''
   let amount = ''
-
+  let imgUrl = ''
   if (acc?.mintInfo && acc.governance) {
+    const info = tokenService.getTokenInfo(
+      acc.governance.info.governedAccount.toBase58()
+    )
+    imgUrl = info?.logoURI ? info.logoURI : ''
     account = acc.governance?.info.governedAccount.toBase58()
-    tokenName = getMintMetadata(acc.governance?.info.governedAccount)?.name
+    tokenName = info?.name ? info.name : ''
     mintAccountName = getAccountName(acc.governance.info.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -281,6 +290,7 @@ export function getMintAccountLabelInfo(
     tokenName,
     mintAccountName,
     amount,
+    imgUrl,
   }
 }
 

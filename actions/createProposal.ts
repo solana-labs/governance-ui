@@ -16,6 +16,7 @@ import { withSignOffProposal } from '@models/withSignOffProposal'
 interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
+  prerequisiteInstructions: TransactionInstruction[]
 }
 
 export const createProposal = async (
@@ -36,7 +37,7 @@ export const createProposal = async (
   const signatory = walletPubkey
   const payer = walletPubkey
   const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
-
+  const prerequisiteInstructions: TransactionInstruction[] = []
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
@@ -65,6 +66,9 @@ export const createProposal = async (
     .filter((x) => x.data)
     .entries()) {
     if (instruction.data) {
+      if (instruction.prerequisiteInstructions) {
+        prerequisiteInstructions.push(...instruction.prerequisiteInstructions)
+      }
       await withInsertInstruction(
         instructions,
         programId,
@@ -91,7 +95,10 @@ export const createProposal = async (
   }
 
   const transaction = new Transaction()
-  transaction.add(...instructions)
+  //we merge instructions with additionalInstructionTransaction
+  //additional transaction instructions can came from instruction as something we need to do before instruction run.
+  //e.g ATA creation
+  transaction.add(...prerequisiteInstructions, ...instructions)
 
   await sendTransaction({
     transaction,

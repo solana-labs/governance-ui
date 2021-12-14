@@ -21,9 +21,7 @@ import {
   getMintDecimalAmount,
   formatMintNaturalAmountAsDecimal,
 } from '@tools/sdk/units'
-
-const DEFAULT_GOVERNANCE_PROGRAM_ID =
-  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
 
 const publicKeyValidationTest = (value) => {
   try {

@@ -409,6 +409,7 @@ export class Proposal {
 
   state: ProposalState
 
+  // Proposal owner record
   tokenOwnerRecord: PublicKey
 
   signatoriesCount: number

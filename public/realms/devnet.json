@@ -1,0 +1,100 @@
+[
+  {
+    "symbol": "MNGO",
+    "displayName": "Mango DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+  },
+  {
+    "symbol": "SOCEAN",
+    "programId": "GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG",
+    "realmId": "4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus",
+    "website": "https://www.socean.fi",
+    "ogImage": "https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png"
+  },
+  {
+    "symbol": "Governance",
+    "displayName": "Governance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck"
+  },
+  {
+    "symbol": "Hype-realm",
+    "displayName": "Hype-realm",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Ap2qT88wk4CPENAcdZN6Q356mauZym4yrQptGXD2AqVF"
+  },
+  {
+    "symbol": "Realm-8TitF",
+    "displayName": "Realm-8TitF",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "22XYhMSGmPv2nHC3AwbDAP9akyd3rfVRUZt6HUd3wcY5"
+  },
+  {
+    "symbol": "OMH",
+    "displayName": "Off My Head",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX",
+    "ogImage": "https://offmyhead.vercel.app/coin.png",
+    "website": "https://offmyhead.vercel.app",
+    "twitter": "@nft_omh"
+  },
+  {
+    "symbol": "NEWDAO",
+    "displayName": "NEWDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5eZA8mX9pVXzgbA8oES1ismVSAAgsHkEipJbxvsVYb5d"
+  },
+  {
+    "symbol": "CDNL",
+    "displayName": "Cardinal",
+    "programId": "bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD",
+    "realmId": "8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg",
+    "ogImage": "https://app.cardinalconsensus.io/assets/logo-colored.png",
+    "website": "https://www.cardinalconsensus.io",
+    "twitter": "@cardinal_dao"
+  },
+  {
+    "symbol": "testgm",
+    "displayName": "testgm",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5jdLxZkUQLVWwe8mtR9fURFLUFyT6npjiSKzowaqyCj9"
+  },
+  {
+    "symbol": "RealM_Tuto_1",
+    "displayName": "RealM_Tuto_1",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "756iwQL9tAdTr1mDGiu4P9zWW8FzMY1K6MUXHqkwp9Nc"
+  },
+  {
+    "symbol": "SAIA",
+    "displayName": "SAIAdao Devnet",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o"
+  },
+  {
+    "symbol": "Realm-4LbqG",
+    "displayName": "Dev Maximilian",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "G25whFStzVjoahyiXiy7rx2G266ePaMpN4yCtMuMKDhJ"
+  },
+  {
+    "symbol": "MNDE",
+    "displayName": "Marinade DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Bdow7yGwdvsAjbTFHk5h8jXd7AW3bbMxwxkawNuoVqE3",
+    "ogImage": "https://marinade.finance/static/8665458407ac84338260b729267d0c53/ce52d/marinade-logo.avif",
+    "website": "https://marinade.finance/",
+    "twitter": "@marinadefinance"
+  },
+  {
+    "symbol": "REALM99",
+    "displayName": "REALM99",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "62yTu6Pv172sKcrsa9sRoPfXiNsD648ZK6wGaWP8ak5j"
+  }
+]
