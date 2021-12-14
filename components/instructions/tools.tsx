@@ -7,7 +7,8 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
-
+export const DEFAULT_GOVERNANCE_PROGRAM_ID =
+  'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
@@ -59,6 +60,10 @@ export const ACCOUNT_NAMES = {
   '39J1sWHCJgWab8pn6zpTqFCYRXTYVqbEkpLimrq8kTYJ':
     'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
   GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
+
+  // Marinade DAO
+  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
+  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
 }
 
 export function getAccountName(accountPk: PublicKey) {

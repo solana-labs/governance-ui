@@ -2,7 +2,7 @@ import { Governance, InstructionData } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import { RpcContext } from '@models/core/api'
 import { MintInfo } from '@solana/spl-token'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
@@ -13,8 +13,9 @@ import {
 export interface UiInstruction {
   serializedInstruction: string
   isValid: boolean
-  governedAccount: ParsedAccount<Governance> | undefined
+  governance: ParsedAccount<Governance> | undefined
   customHoldUpTime?: number
+  prerequisiteInstructions?: TransactionInstruction[]
 }
 export interface SplTokenTransferForm {
   destinationAccount: string

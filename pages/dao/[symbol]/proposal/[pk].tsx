@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
 import ProposalStateBadge from '../../../../components/ProposalStatusBadge'
 import TokenBalanceCard from '../../../../components/TokenBalanceCard'
@@ -15,11 +15,12 @@ import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
+import React from 'react'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = useRealm()
-  const { proposal, description, instructions } = useProposal()
+  const { proposal, description } = useProposal()
   const {
     yesVoteProgress,
     yesVoteCount,
@@ -28,26 +29,29 @@ const Proposal = () => {
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
 
-  console.log('proposal data', {
-    proposal,
-    instructions,
-    yesVoteCount,
-    noVoteCount,
-    relativeNoVotes,
-    relativeYesVotes,
-  })
-
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-              <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-                <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-                Back
+            <div className="flex flex-items">
+              <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+                <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
+                  <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+                  Back
+                </a>
+              </Link>
+              <a
+                className="ml-auto"
+                href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
               </a>
-            </Link>
+            </div>
+
             <div className="border-b border-fgd-4 py-4">
               <div className="flex items-center justify-between mb-1">
                 <h1 className="mr-2">{proposal?.info.name}</h1>

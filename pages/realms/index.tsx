@@ -18,7 +18,7 @@ const Realms = () => {
 
   //TODO when we fetch realms data from api add loader handling
   const [isLoading] = useState(false)
-  const [realms, setRealms] = useState<RealmInfo[]>([])
+  const [realms, setRealms] = useState<ReadonlyArray<RealmInfo>>([])
   //   const [realmsSearchResults, setSearchResult] = useState([])
   //   const [search, setSearch] = useState('')
   //   const [viewType, setViewType] = useState(ROW)
@@ -28,7 +28,7 @@ const Realms = () => {
 
   useMemo(async () => {
     if (connection) {
-      const data: RealmInfo[] = await getAllRealmInfos(connection)
+      const data = await getAllRealmInfos(connection)
       setRealms(data)
     }
     if (selectedRealm.realm) {

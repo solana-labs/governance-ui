@@ -79,7 +79,9 @@ const New = () => {
     governance,
     setGovernance,
   ] = useState<ParsedAccount<Governance> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
+  const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+  const isLoading = isLoadingSignedProposal || isLoadingDraft
   const customInstructionFilterForSelectedGovernance = (
     instructionType: Instructions
   ) => {
@@ -141,9 +143,18 @@ const New = () => {
     }
     return instructions
   }
+  const handleTurnOffLoaders = () => {
+    setIsLoadingSignedProposal(false)
+    setIsLoadingDraft(false)
+  }
   const handleCreate = async (isDraft) => {
     setFormErrors({})
-    setIsLoading(true)
+    if (isDraft) {
+      setIsLoadingDraft(true)
+    } else {
+      setIsLoadingSignedProposal(true)
+    }
+
     const { isValid, validationErrors }: formValidation = await isFormValid(
       schema,
       form
@@ -152,14 +163,14 @@ const New = () => {
     const instructions: UiInstruction[] = await handleGetInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
-      setIsLoading(false)
+      handleTurnOffLoaders()
       throw 'No realm selected'
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
       let selectedGovernance = governance
       if (!governance) {
-        setIsLoading(false)
+        handleTurnOffLoaders()
         throw Error('No governance selected')
       }
 
@@ -178,6 +189,7 @@ const New = () => {
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: x.prerequisiteInstructions || [],
         }
       })
 
@@ -228,7 +240,7 @@ const New = () => {
     } else {
       setFormErrors(validationErrors)
     }
-    setIsLoading(false)
+    handleTurnOffLoaders()
   }
   useEffect(() => {
     setInstructions([instructionsData[0]])
@@ -390,12 +402,17 @@ const New = () => {
             </div>
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
-                isLoading={isLoading}
+                disabled={isLoading}
+                isLoading={isLoadingDraft}
                 onClick={() => handleCreate(true)}
               >
                 Save draft
               </SecondaryButton>
-              <Button isLoading={isLoading} onClick={() => handleCreate(false)}>
+              <Button
+                isLoading={isLoadingSignedProposal}
+                disabled={isLoading}
+                onClick={() => handleCreate(false)}
+              >
                 Add proposal
               </Button>
             </div>
