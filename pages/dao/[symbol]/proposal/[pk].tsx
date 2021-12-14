@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
