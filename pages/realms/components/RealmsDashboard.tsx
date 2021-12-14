@@ -7,7 +7,7 @@ import React from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
 
-export function RealmsDashboard({
+export default function RealmsDashboard({
   realms,
   isLoading,
   showNewButton,
