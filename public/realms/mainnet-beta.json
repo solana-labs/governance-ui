@@ -135,5 +135,16 @@
     "realmId": "FvzZFjf3NPTZbKAmQA4Gf1v7uTW7HFcP5Pcr2oVm49t3",
     "ogImage": "/realms/strangemood/img/logo.svg",
     "website": "https://strangemood.org"
+  },
+  {
+    "symbol": "GRAPE",
+    "displayName": "GRAPE",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
+    "ogImage": "/realms/Grape/img/grape.png",
+    "website": "https://grapes.network/",
+    "twitter": "@grapeprotocol"
   }
+
+  
 ]
