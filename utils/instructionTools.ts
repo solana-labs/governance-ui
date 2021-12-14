@@ -6,7 +6,7 @@ import {
 } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { WalletAdapter } from '../@types/types'
+// import { WalletAdapter } from '../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { findTrueReceiver } from './ataTools'
 import { isFormValid } from './formValidation'
@@ -35,7 +35,7 @@ export async function getTransferInstruction({
   form: any
   programId: PublicKey | undefined
   connection: ConnectionContext
-  wallet: WalletAdapter | undefined
+  wallet: any | undefined
   currentAccount: GovernedTokenAccount | null
   setFormErrors: any
 }): Promise<UiInstruction> {

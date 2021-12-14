@@ -4,7 +4,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
-import { WalletAdapter } from '../@types/types'
+// import { WalletAdapter } from '../@types/types'
 import { ConnectionContext } from 'stores/useWalletStore'
 import { sendTransaction } from './send'
 import { tryGetAta, isExistingTokenAccount } from './validations'
@@ -47,7 +47,7 @@ export async function findTrueReceiver(
   connection: ConnectionContext,
   receiverAddress: PublicKey,
   mintPK: PublicKey,
-  wallet: WalletAdapter
+  wallet: any
 ) {
   if (!wallet?.publicKey) {
     throw 'please connect your wallet'
