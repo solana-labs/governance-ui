@@ -75,22 +75,15 @@ const ProposalStateBadge = ({
     <>
       {open ? (
         <>
-          {/* {governance && proposal.getTimeToVoteEnd(governance) < 0 && (
-            <p
-              onClick={() => setShowFinalizeVoteModal(true)}
-              className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
-            >
-              Finalize vote
-            </p>
-          )} */}
-
           <div className="flex items-center justify-end gap-4">
-            <p
-              onClick={() => setShowFinalizeVoteModal(true)}
-              className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
-            >
-              Finalize vote
-            </p>
+            {governance && proposal.getTimeToVoteEnd(governance) < 0 && (
+              <p
+                onClick={() => setShowFinalizeVoteModal(true)}
+                className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
+              >
+                Finalize vote
+              </p>
+            )}
 
             <div
               className={`${getProposalStateStyle(
