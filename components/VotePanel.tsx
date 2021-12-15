@@ -172,13 +172,12 @@ const VotePanel = () => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
       <h2 className="mb-4 text-center">{actionLabel}</h2>
       <div
-        className={`grid ${
-          isVoting ? 'grid-cols-1 sm:grid-cols-2 gap-3' : 'grid-cols-1 gap-y-3'
-        }`}
+        className={`${
+          isVoting && 'flex-col'
+        } flex justify-center items-center gap-5`}
       >
         {isVoteCast ? (
           <Button
-            className="w-full"
             onClick={() => submitRelinquishVote()}
             disabled={!isWithdrawEnabled}
           >
@@ -186,18 +185,22 @@ const VotePanel = () => {
           </Button>
         ) : (
           <>
-            <Button
-              onClick={() => handleShowVoteModal(Vote.Yes)}
-              disabled={!isVoteEnabled}
-            >
-              Approve
-            </Button>
-            <Button
-              onClick={() => handleShowVoteModal(Vote.No)}
-              disabled={!isVoteEnabled}
-            >
-              Deny
-            </Button>
+            {isVoting && (
+              <div className="border-b border-gray-600 flex gap-x-5 pb-6 w-full justify-center items-center">
+                <Button
+                  onClick={() => handleShowVoteModal(Vote.Yes)}
+                  disabled={!isVoteEnabled}
+                >
+                  Approve
+                </Button>
+                <Button
+                  onClick={() => handleShowVoteModal(Vote.No)}
+                  disabled={!isVoteEnabled}
+                >
+                  Deny
+                </Button>
+              </div>
+            )}
           </>
         )}
 
