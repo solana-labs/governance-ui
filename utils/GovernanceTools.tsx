@@ -51,14 +51,3 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     minCouncilTokensToCreateProposal: new BN(1),
   })
 }
-
-export interface GovernanceContextState {
-  realms: Record<string, ParsedAccount<Realm>>
-  changeTracker: any
-  programId: string
-  programVersion: number
-}
-
-export const GovernanceContext = React.createContext<GovernanceContextState | null>(
-  null
-)

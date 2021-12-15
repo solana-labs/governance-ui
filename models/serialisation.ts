@@ -535,6 +535,3 @@ export function getInstructionDataFromBase64(instructionDataBase64: string) {
 
   return instructionData
 }
-
-export const GovernanceAccountParser = (classType: GovernanceAccountClass) =>
-  BorshAccountParser(classType, GOVERNANCE_SCHEMA)

@@ -53,8 +53,6 @@ export async function sendTransaction({
     connection,
   })
 
-  console.log('signed tx cancelproposal', signedTransaction, signers)
-
   return await sendSignedTransaction({
     signedTransaction,
     connection,

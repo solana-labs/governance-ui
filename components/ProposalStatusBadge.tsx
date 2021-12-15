@@ -50,10 +50,6 @@ const ProposalStateBadge = ({
   proposal: Proposal
   open: boolean
 }) => {
-  useEffect(() => {
-    console.log('STATUS PROPOSAL', proposal.state)
-  }, [])
-
   const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
 
