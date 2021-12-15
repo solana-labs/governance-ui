@@ -1,4 +1,6 @@
+import { Realm } from '@models/accounts'
 import { getRealms } from '@models/api'
+import { ParsedAccount } from '@models/core/accounts'
 import { PublicKey } from '@solana/web3.js'
 import { arrayToMap, arrayToUnique } from '@tools/core/script'
 
@@ -142,8 +144,6 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     .flatMap((r) => Object.values(r))
     .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
 
-  const programVersion = 1
-
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
   )
@@ -154,15 +154,18 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
         excludedRealms.has(r.pubkey.toBase58()) ||
         EXCLUDED_REALMS.has(r.pubkey.toBase58())
       )
-        ? ({
-            symbol: r.info.name,
-            programId: r.account.owner,
-            programVersion,
-            realmId: r.pubkey,
-            displayName: r.info.name,
-            isCertified: false,
-          } as RealmInfo)
+        ? createUnchartedRealmInfo(r)
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]
+}
+
+export function createUnchartedRealmInfo(realm: ParsedAccount<Realm>) {
+  return {
+    symbol: realm.info.name,
+    programId: new PublicKey(realm.account.owner),
+    realmId: realm.pubkey,
+    displayName: realm.info.name,
+    isCertified: false,
+  } as RealmInfo
 }
