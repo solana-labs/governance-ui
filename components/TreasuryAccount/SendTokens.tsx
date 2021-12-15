@@ -64,7 +64,8 @@ const SendTokens = () => {
     mint,
     councilMint,
   } = useRealm()
-  const canChooseWhoVote = mint?.supply.isZero() && councilMint?.supply.isZero()
+  const canChooseWhoVote =
+    !mint?.supply.isZero() && !councilMint?.supply.isZero()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const { fmtUrlWithCluster } = useQueryContext()
