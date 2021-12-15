@@ -22,7 +22,11 @@ export default function RealmsDashboard({
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected } = useWalletStore((s) => s)
 
-  const goToRealm = ({ symbol }) => {
+  const goToRealm = (realmInfo: RealmInfo) => {
+    const symbol =
+      realmInfo.isCertified && realmInfo.symbol
+        ? realmInfo.symbol
+        : realmInfo.realmId.toBase58()
     const url = fmtUrlWithCluster(`/dao/${symbol}`)
     router.push(url)
   }
@@ -69,7 +73,7 @@ export default function RealmsDashboard({
                     </div>
                   )}
                 </div>
-                <h3 className="text-center">
+                <h3 className="text-center break-all">
                   {realm.displayName ?? realm.symbol}
                 </h3>
               </div>
