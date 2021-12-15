@@ -104,6 +104,7 @@ const New = () => {
       }
     }
   }
+
   const getAvailableInstructionsForIndex = (index) => {
     if (index === 0) {
       return availableInstructions
@@ -235,9 +236,11 @@ const New = () => {
           instructionsData,
           isDraft
         )
+
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
