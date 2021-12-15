@@ -188,12 +188,14 @@ const VotePanel = () => {
             {isVoting && (
               <div className="border-b border-gray-600 flex gap-x-5 pb-6 w-full justify-center items-center">
                 <Button
+                  className="w-full"
                   onClick={() => handleShowVoteModal(Vote.Yes)}
                   disabled={!isVoteEnabled}
                 >
                   Approve
                 </Button>
                 <Button
+                  className="w-full"
                   onClick={() => handleShowVoteModal(Vote.No)}
                   disabled={!isVoteEnabled}
                 >
@@ -206,6 +208,7 @@ const VotePanel = () => {
 
         {canSignOff && (
           <Button
+            className={isVoteCast && isVoting ? 'w-full' : ''}
             onClick={() => setShowSignOffModal(true)}
             disabled={!connected || !canSignOff}
           >
@@ -215,6 +218,7 @@ const VotePanel = () => {
 
         {canCancelProposal && (
           <Button
+            className={isVoteCast && isVoting ? 'w-full' : ''}
             onClick={() => setShowCancelModal(true)}
             disabled={!connected || !canCancelProposal}
           >
@@ -224,6 +228,7 @@ const VotePanel = () => {
 
         {canFinalizeVote && (
           <Button
+            className={isVoting ? 'w-full' : ''}
             onClick={() => setShowFinalizeVoteModal(true)}
             disabled={!connected || !canFinalizeVote}
           >
