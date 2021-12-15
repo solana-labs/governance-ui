@@ -42,7 +42,8 @@ import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
 import { EndpointTypes } from '@models/types'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
-import { getRealmInfo } from '@models/registry/api'
+import { getCertifiedRealmInfo } from '@models/registry/api'
+import { tryParsePublicKey } from '@tools/core/pubkey'
 
 export interface ConnectionContext {
   cluster: EndpointTypes
@@ -223,17 +224,32 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection
       const set = get().set
       const newConnection = getConnectionContext(cluster)
-
-      if (connection.cluster == cluster) {
-        return
+      if (
+        connection.cluster !== newConnection.cluster ||
+        connection.endpoint !== newConnection.endpoint
+      ) {
+        set((s) => {
+          s.connection = newConnection
+        })
       }
-      set((s) => {
-        s.connection = newConnection
-      })
-      const realmInfo = await getRealmInfo(symbol, newConnection)
-      if (realmInfo) {
-        await actions.fetchAllRealms(realmInfo.programId)
-        actions.fetchRealm(realmInfo.programId, realmInfo.realmId)
+
+      let programId: PublicKey | undefined
+      let realmId = tryParsePublicKey(symbol)
+
+      if (!realmId) {
+        const realmInfo = await getCertifiedRealmInfo(symbol, newConnection)
+        realmId = realmInfo?.realmId
+        programId = realmInfo?.programId
+      } else {
+        const realmAccountInfo = await connection.current.getAccountInfo(
+          realmId
+        )
+        programId = realmAccountInfo?.owner
+      }
+
+      if (realmId && programId) {
+        await actions.fetchAllRealms(programId)
+        actions.fetchRealm(programId, realmId)
       }
     },
     async fetchWalletTokenAccounts() {

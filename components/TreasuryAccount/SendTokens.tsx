@@ -45,6 +45,7 @@ import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getTransferInstruction } from '@utils/instructionTools'
+import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 
 const SendTokens = () => {
   const {
@@ -62,7 +63,9 @@ const SendTokens = () => {
     ownVoterWeight,
     mint,
     councilMint,
+    canChooseWhoVote,
   } = useRealm()
+
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const { fmtUrlWithCluster } = useQueryContext()
@@ -80,7 +83,8 @@ const SendTokens = () => {
     title: '',
     description: '',
   })
-  const [showReferenceFields, setShowReferenceFields] = useState(false)
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
   const [
     destinationAccount,
     setDestinationAccount,
@@ -192,14 +196,16 @@ const SendTokens = () => {
           governance!.info.config
         )
 
-        // Select the governing token mint for the proposal
-        // By default we choose the community mint if it has positive supply (otherwise nobody can vote)
-        // TODO: If token holders for both mints can vote the we should add the option in the UI to choose who votes (community or the council)
-        const proposalMint = !mint?.supply.isZero()
+        const defaultProposalMint = !mint?.supply.isZero()
           ? realm.info.communityMint
           : !councilMint?.supply.isZero()
           ? realm.info.config.councilMint
           : undefined
+
+        const proposalMint =
+          canChooseWhoVote && voteByCouncil
+            ? realm.info.config.councilMint
+            : defaultProposalMint
 
         if (!proposalMint) {
           throw new Error(
@@ -334,14 +340,14 @@ const SendTokens = () => {
         </small>
         <div
           className={'flex items-center hover:cursor-pointer w-24'}
-          onClick={() => setShowReferenceFields(!showReferenceFields)}
+          onClick={() => setShowOptions(!showOptions)}
         >
-          {showReferenceFields ? (
+          {showOptions ? (
             <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
           ) : (
             <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
           )}
-          <small className="text-fgd-3">Reference</small>
+          <small className="text-fgd-3">Options</small>
           {/* popover with description maybe will be needed later */}
           {/* <Popover className="relative ml-auto border-none flex">
             <Popover.Button className="focus:outline-none">
@@ -357,7 +363,7 @@ const SendTokens = () => {
             </Popover.Panel>
           </Popover> */}
         </div>
-        {showReferenceFields && (
+        {showOptions && (
           <>
             <Input
               noMaxWidth={true}
@@ -391,6 +397,14 @@ const SendTokens = () => {
                 })
               }
             ></Textarea>
+            {canChooseWhoVote && (
+              <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+              ></VoteBySwitch>
+            )}
           </>
         )}
       </div>
