@@ -1,15 +1,23 @@
 import { InstructionData } from '../models/accounts'
 
-import { Connection, Transaction } from '@solana/web3.js'
+import {
+  Connection,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { simulateTransaction } from '../utils/send'
-import { WalletAdapter } from '../@types/types'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 
 export async function dryRunInstruction(
   connection: Connection,
   wallet: WalletAdapter,
-  instructionData: InstructionData
+  instructionData: InstructionData,
+  prerequisiteInstructionsToRun?: TransactionInstruction[] | undefined
 ) {
   const transaction = new Transaction({ feePayer: wallet.publicKey })
+  if (prerequisiteInstructionsToRun) {
+    prerequisiteInstructionsToRun.map((x) => transaction.add(x))
+  }
   transaction.add({
     keys: instructionData.accounts,
     programId: instructionData.programId,

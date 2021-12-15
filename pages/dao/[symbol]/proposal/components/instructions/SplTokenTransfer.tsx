@@ -2,15 +2,10 @@
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
-import { AccountInfo, Token } from '@solana/spl-token'
-import {
-  getMintMinAmountAsDecimal,
-  parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
+import { AccountInfo } from '@solana/spl-token'
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
-import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
-import { isFormValid } from '@utils/formValidation'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
@@ -23,7 +18,6 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
-import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
 import { getTokenTransferSchema } from '@utils/validations'
@@ -31,6 +25,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import GovernedAccountSelect from '../GovernedAccountSelect'
+import { getTransferInstruction } from '@utils/instructionTools'
 
 const SplTokenTransfer = ({
   index,
@@ -40,6 +35,7 @@ const SplTokenTransfer = ({
   governance: ParsedAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
@@ -92,42 +88,16 @@ const SplTokenTransfer = ({
       propertyName: 'amount',
     })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    if (
-      isValid &&
-      programId &&
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount?.token &&
-      form.mintInfo
-    ) {
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.mintInfo?.decimals
-      )
-      const transferIx = Token.createTransferInstruction(
-        TOKEN_PROGRAM_ID,
-        form.governedTokenAccount.token?.account.address,
-        new PublicKey(form.destinationAccount),
-        form.governedTokenAccount.governance!.pubkey,
-        [],
-        mintAmount
-      )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-    }
-
-    const obj: UiInstruction = {
-      serializedInstruction,
-      isValid,
-      governedAccount: governedAccount,
-    }
-    return obj
+    return getTransferInstruction({
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount: form.governedTokenAccount || null,
+      setFormErrors,
+    })
   }
 
   useEffect(() => {

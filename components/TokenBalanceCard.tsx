@@ -230,7 +230,7 @@ const TokenDeposit = ({
           proposal.info.governingTokenMint,
           voteRecord.pubkey,
           depositTokenRecord!.info.governingTokenOwner,
-          wallet!.publicKey
+          wallet!.publicKey!
         )
       }
     }

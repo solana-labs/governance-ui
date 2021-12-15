@@ -2,22 +2,17 @@ import Button, { SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getAccountName } from '@components/instructions/tools'
 import useRealm from '@hooks/useRealm'
-import { AccountInfo, Token } from '@solana/spl-token'
+import { AccountInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import {
   //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
-  parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
-import {
-  ProgramAccount,
-  TOKEN_PROGRAM_ID,
-  tryGetTokenAccount,
-} from '@utils/tokens'
+import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
   UiInstruction,
@@ -36,11 +31,7 @@ import {
 } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
-import { isFormValid } from '@utils/formValidation'
-import {
-  getInstructionDataFromBase64,
-  serializeInstructionToBase64,
-} from '@models/serialisation'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
 import useQueryContext from '@hooks/useQueryContext'
 import { RpcContext } from '@models/core/api'
 import { Governance } from '@models/accounts'
@@ -53,6 +44,7 @@ import Textarea from '@components/inputs/Textarea'
 import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { getTransferInstruction } from '@utils/instructionTools'
 
 const SendTokens = () => {
   const {
@@ -153,42 +145,17 @@ const SendTokens = () => {
       amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
     return totalPriceFormatted
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    if (
-      isValid &&
-      programId &&
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount?.token &&
-      form.governedTokenAccount?.mint?.account
-    ) {
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.governedTokenAccount.mint.account.decimals
-      )
-      const transferIx = Token.createTransferInstruction(
-        TOKEN_PROGRAM_ID,
-        form.governedTokenAccount.token?.account.address,
-        new PublicKey(form.destinationAccount),
-        form.governedTokenAccount.governance!.pubkey,
-        [],
-        mintAmount
-      )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-    }
 
-    const obj: UiInstruction = {
-      serializedInstruction,
-      isValid,
-      governedAccount: currentAccount?.governance,
-    }
-    return obj
+  async function getInstruction(): Promise<UiInstruction> {
+    return getTransferInstruction({
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      currentAccount,
+      setFormErrors,
+    })
   }
   const handlePropose = async () => {
     setIsLoading(true)
@@ -213,6 +180,7 @@ const SendTokens = () => {
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
         holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
         // Fetch governance to get up to date proposalCount
@@ -435,7 +403,7 @@ const SendTokens = () => {
           Cancel
         </SecondaryButton>
         <Button
-          disabled={!canUseTransferInstruction}
+          disabled={!canUseTransferInstruction || isLoading}
           className="sm:w-1/2"
           onClick={handlePropose}
           isLoading={isLoading}

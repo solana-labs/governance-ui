@@ -18,7 +18,6 @@ import {
   getBorshProgramAccounts,
   MemcmpFilter,
   pubkeyFilter,
-  RpcContext,
 } from './core/api'
 import { BorshAccountParser } from './core/serialisation'
 import { mapFromEntries } from '../tools/core/script'
@@ -87,11 +86,11 @@ export async function getRealm(connection: Connection, realmPk: PublicKey) {
   return getGovernanceAccount<Realm>(connection, realmPk, Realm)
 }
 
-export async function getRealms(rpcContext: RpcContext) {
+export async function getRealms(programId: PublicKey, endpoint: string) {
   return getBorshProgramAccounts<Realm>(
-    rpcContext.programId,
+    programId,
     GOVERNANCE_SCHEMA,
-    rpcContext.endpoint,
+    endpoint,
     Realm
   )
 }

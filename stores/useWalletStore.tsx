@@ -2,7 +2,7 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { EndpointInfo, WalletAdapter } from '../@types/types'
+import { EndpointInfo } from '../@types/types'
 import {
   ProgramAccount,
   TokenAccount,
@@ -41,6 +41,8 @@ import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
 import { EndpointTypes } from '@models/types'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { getRealmInfo } from '@models/registry/api'
 
 export interface ConnectionContext {
   cluster: EndpointTypes
@@ -50,7 +52,7 @@ export interface ConnectionContext {
 interface WalletStore extends State {
   connected: boolean
   connection: ConnectionContext
-  current: WalletAdapter | undefined
+  current: SignerWalletAdapter | undefined
 
   ownVoteRecordsByProposal: { [proposal: string]: ParsedAccount<VoteRecord> }
   realms: { [realm: string]: ParsedAccount<Realm> }
@@ -215,6 +217,26 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   tokenAccounts: [],
   set: (fn) => set(produce(fn)),
   actions: {
+    async fetchRealmBySymbol(cluster: string, symbol: string) {
+      console.log('fetchRealmBySymbol', cluster, symbol)
+
+      const actions = get().actions
+      const connection = get().connection
+      const set = get().set
+      const newConnection = getConnectionContext(cluster)
+
+      if (connection.cluster == cluster) {
+        return
+      }
+      set((s) => {
+        s.connection = newConnection
+      })
+      const realmInfo = await getRealmInfo(symbol, newConnection)
+      if (realmInfo) {
+        await actions.fetchAllRealms(realmInfo.programId)
+        actions.fetchRealm(realmInfo.programId, realmInfo.realmId)
+      }
+    },
     async fetchWalletTokenAccounts() {
       const connection = get().connection.current
       const connected = get().connected
@@ -268,6 +290,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
     },
     deselectRealm() {
+      const set = get().set
       set((s) => {
         s.selectedRealm = INITIAL_REALM_STATE
       })
@@ -617,14 +640,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
-      })
-    },
-    async setConnectionContext(cluster: string) {
-      const set = get().set
-      set((s) => {
-        if (s.connection.cluster !== cluster) {
-          s.connection = getConnectionContext(cluster)
-        }
       })
     },
   },

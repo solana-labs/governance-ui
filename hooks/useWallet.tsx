@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect, useMemo } from 'react'
 
-import { WalletAdapter } from '../@types/types'
 import useWalletStore from '../stores/useWalletStore'
 import { notify } from '../utils/notifications'
 import {
@@ -42,10 +41,7 @@ export default function useWallet() {
     if (provider) {
       const updateWallet = () => {
         // hack to also update wallet synchronously in case it disconnects
-        const wallet = new provider.adapter(
-          provider.url,
-          connection.endpoint
-        ) as WalletAdapter
+        const wallet = provider.adapter
         setWalletStore((state) => {
           state.current = wallet
         })
