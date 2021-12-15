@@ -4,8 +4,7 @@ import { uxdClient } from './uxdClient'
 
 const createInitializeControllerInstruction = (
   uxdProgramId: PublicKey,
-  mintSymbol: string,
-  mintDecimals: number,
+  _mintDecimals: number,
   authority: PublicKey,
   payer: PublicKey,
   connection: Connection

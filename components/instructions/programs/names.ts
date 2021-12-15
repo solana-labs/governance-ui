@@ -21,7 +21,7 @@ export const PROGRAM_NAMES = {
   '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium AMM Program',
   EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q: 'Raydium Staking Program',
 
-  CBSkoqgGtB4772H7FqeE6wz56rLbsxxbVjxEG6JmHzwG: 'UXD Protocol Devnet Program',
+  UXGA4U6nmCkdpVnhrhRzgFWYtmY4uHpNzLn3h9nVXNa: 'UXD Protocol Program',
 
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',

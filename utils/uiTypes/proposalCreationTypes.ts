@@ -69,7 +69,6 @@ export enum Instructions {
 
 export interface InitializeControllerForm {
   governedAccount: GovernedProgramAccount | undefined
-  mintSymbol: string | undefined
   mintDecimals: number | undefined
   programId: string | undefined
 }

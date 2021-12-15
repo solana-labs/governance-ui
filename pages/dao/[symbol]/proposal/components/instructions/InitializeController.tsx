@@ -43,7 +43,6 @@ const InitializeController = ({
   const [form, setForm] = useState<InitializeControllerForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    mintSymbol: '',
     mintDecimals: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -64,12 +63,12 @@ const InitializeController = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.info &&
+      form.mintDecimals &&
       wallet?.publicKey
     ) {
       const createIx = createInitializeControllerInstruction(
         form.governedAccount?.governance.info.governedAccount,
-        form.mintSymbol || '',
-        form.mintDecimals || 9,
+        form.mintDecimals,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
         connection.current
@@ -90,22 +89,7 @@ const InitializeController = ({
     })
   }, [realmInfo?.programId])
 
-  useEffect(() => {
-    if (form.mintSymbol) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.mintSymbol])
-  useEffect(() => {
-    handleSetInstructions(
-      { governedAccount: form.governedAccount?.governance, getInstruction },
-      index
-    )
-  }, [form])
   const schema = yup.object().shape({
-    mintSymbol: yup.string().required('Mint Symbol is required'),
     mintDecimals: yup.number().required('Mint Decimals is required'),
     governedAccount: yup
       .object()
@@ -126,18 +110,6 @@ const InitializeController = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        label="Mint Symbol"
-        value={form.mintSymbol}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'mintSymbol',
-          })
-        }
-        error={formErrors['mintSymbol']}
-      />
       <Input
         label="Mint Decimals"
         value={form.mintDecimals}
