@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
+import React, { useEffect } from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import Modal from '@components/Modal'
 import { ParsedAccount } from 'models/core/accounts'
 import { signOffProposal } from 'actions/signOffProposal'
@@ -57,27 +57,31 @@ const SignOffProposalModal = ({
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
-      {signatoryRecord?.info.signedOff && <h2>Signed</h2>}
-
-      {!signatoryRecord?.info.signedOff && (
+      {signatoryRecord ? (
         <>
-          <h2>Sign off proposal</h2>
+          {signatoryRecord.info.signedOff && <h2>Signed</h2>}
 
-          <p className="text-left mt-5 mb-8">
-            Do you want to sign off this proposal?
-          </p>
+          {!signatoryRecord.info.signedOff && (
+            <>
+              <h2>Sign off proposal</h2>
 
-          <div className="flex items-center justify-center">
-            <Button className="mx-2 w-44" onClick={onClose}>
-              Cancel
-            </Button>
+              <p className="text-left mt-5 mb-8">
+                Do you want to sign off this proposal?
+              </p>
 
-            <Button className="mx-2 w-44" onClick={handleSignOffProposal}>
-              Sign off
-            </Button>
-          </div>
+              <div className="flex items-center justify-center">
+                <SecondaryButton className="w-44 mr-4" onClick={onClose}>
+                  No
+                </SecondaryButton>
+
+                <Button className="mx-2 w-44" onClick={handleSignOffProposal}>
+                  Sign off
+                </Button>
+              </div>
+            </>
+          )}
         </>
-      )}
+      ) : null}
     </Modal>
   )
 }

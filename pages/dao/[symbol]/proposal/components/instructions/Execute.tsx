@@ -3,7 +3,7 @@ import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
 import { executeInstruction } from 'actions/executeInstruction'
@@ -60,9 +60,9 @@ const ExecuteInstruction = ({
       <p className="text-left mt-5 mb-8">Do you want to execute instruction?</p>
 
       <div className="flex items-center justify-center">
-        <Button className="mx-2 w-44" onClick={onClose}>
+        <SecondaryButton className="w-44 mr-4" onClick={onClose}>
           No
-        </Button>
+        </SecondaryButton>
 
         <Button className="mx-2 w-44" onClick={handleExecuteInstruction}>
           Execute

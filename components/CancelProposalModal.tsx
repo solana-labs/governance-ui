@@ -3,7 +3,7 @@ import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
 import { Proposal } from 'models/accounts'
@@ -60,9 +60,9 @@ const CancelProposalModal = ({ onClose, isOpen }: CancelProposalModalProps) => {
       </p>
 
       <div className="flex items-center justify-center">
-        <Button className="w-44 mr-4" onClick={onClose}>
+        <SecondaryButton className="w-44 mr-4" onClick={onClose}>
           No
-        </Button>
+        </SecondaryButton>
 
         <Button className="w-44" onClick={() => handleCancelProposal(proposal)}>
           Yes, cancel

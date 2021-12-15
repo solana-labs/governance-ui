@@ -1,17 +1,20 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { TransactionInstruction } from '@solana/web3.js'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { ProposalState } from '../models/accounts'
+import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
 import { RpcContext } from '../models/core/api'
 import { GoverningTokenType } from '../models/enums'
 
 import { Vote } from '../models/instructions'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
+import CancelProposalModal from './CancelProposalModal'
+import FinalizeVotesModal from './FinalizeVotesModal'
+import SignOffProposalModal from './SignOffProposalModal'
 import VoteCommentModal from './VoteCommentModal'
 
 const VotePanel = () => {
@@ -29,6 +32,43 @@ const VotePanel = () => {
   const connected = useWalletStore((s) => s.connected)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
+  const signatories = useWalletStore((s) => s.selectedProposal.signatories)
+
+  const [showSignOffModal, setShowSignOffModal] = useState(false)
+  const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
+  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
+  const [showCancelModal, setShowCancelModal] = useState(false)
+
+  const canFinalizeVote =
+    hasVoteTimeExpired === true &&
+    connected &&
+    proposal?.info.state === ProposalState.Voting
+
+  useEffect(() => {
+    const setup = async () => {
+      if (connected && proposal && realmInfo && wallet) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
+
+        const response = await getSignatoryRecordAddress(
+          rpcContext.programId,
+          proposal.pubkey,
+          rpcContext.walletPubkey
+        )
+
+        if (response && signatories) {
+          setSignatoryRecord(signatories[response.toBase58()])
+        }
+      }
+    }
+
+    setup()
+  }, [proposal])
 
   const ownVoteRecord =
     wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
@@ -114,29 +154,47 @@ const VotePanel = () => {
     ? 'Withdraw your vote'
     : 'Release your tokens'
 
+  const canSignOff =
+    signatoryRecord &&
+    (proposal?.info.state === ProposalState.Draft ||
+      proposal?.info.state === ProposalState.SigningOff)
+
+  const canCancelProposal = !(
+    ProposalState.Cancelled === proposal?.info.state ||
+    !(
+      proposal?.info.state === ProposalState.Draft ||
+      proposal?.info.state === ProposalState.SigningOff ||
+      proposal?.info.state === ProposalState.Voting
+    )
+  )
+
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
       <h2 className="mb-4 text-center">{actionLabel}</h2>
-      <div className="flex items-center justify-center">
+      <div
+        className={`grid ${
+          isVoting || !isWithdrawEnabled || !connected
+            ? 'grid-cols-1 gap-y-3'
+            : 'grid-cols-2 gap-3'
+        }`}
+      >
         {isVoteCast ? (
           <Button
-            className="mx-2 w-44"
+            className="w-full"
             onClick={() => submitRelinquishVote()}
             disabled={!isWithdrawEnabled}
           >
-            {isVoting ? 'Withdraw Vote' : 'Release Tokens'}
+            {isVoting ? 'Withdraw' : 'Release Tokens'}
           </Button>
         ) : (
           <>
             <Button
-              className="mx-2 w-44"
               onClick={() => handleShowVoteModal(Vote.Yes)}
               disabled={!isVoteEnabled}
             >
               Approve
             </Button>
             <Button
-              className="mx-2 w-44"
               onClick={() => handleShowVoteModal(Vote.No)}
               disabled={!isVoteEnabled}
             >
@@ -144,7 +202,35 @@ const VotePanel = () => {
             </Button>
           </>
         )}
+
+        {canSignOff && (
+          <Button
+            onClick={() => setShowSignOffModal(true)}
+            disabled={!connected || !canSignOff}
+          >
+            Sign Off
+          </Button>
+        )}
+
+        {canCancelProposal && (
+          <Button
+            onClick={() => setShowCancelModal(true)}
+            disabled={!connected || !canCancelProposal}
+          >
+            Cancel
+          </Button>
+        )}
+
+        {canFinalizeVote && (
+          <Button
+            onClick={() => setShowFinalizeVoteModal(true)}
+            disabled={!connected || !canFinalizeVote}
+          >
+            Finalize
+          </Button>
+        )}
       </div>
+
       {showVoteModal ? (
         <VoteCommentModal
           isOpen={showVoteModal}
@@ -153,6 +239,30 @@ const VotePanel = () => {
           voterTokenRecord={voterTokenRecord!}
         />
       ) : null}
+
+      {showSignOffModal && (
+        <SignOffProposalModal
+          isOpen={showSignOffModal && canSignOff}
+          onClose={() => setShowSignOffModal(false)}
+          signatoryRecord={signatoryRecord}
+        />
+      )}
+
+      {showFinalizeVoteModal && (
+        <FinalizeVotesModal
+          isOpen={showFinalizeVoteModal && canFinalizeVote}
+          onClose={() => setShowFinalizeVoteModal(false)}
+          proposal={proposal}
+          governance={governance}
+        />
+      )}
+
+      {showCancelModal && (
+        <CancelProposalModal
+          isOpen={showCancelModal && canCancelProposal}
+          onClose={() => setShowCancelModal(false)}
+        />
+      )}
     </div>
   )
 }
