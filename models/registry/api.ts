@@ -27,23 +27,27 @@ export interface RealmInfo {
   twitter?: string
   // og:image
   ogImage?: string
+
+  isCertified: boolean
 }
 
-interface RealmInfoAsJSON extends Omit<RealmInfo, 'programId' | 'realmId'> {
+interface RealmInfoAsJSON
+  extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
   programId: string
   realmId: string
 }
 
 // TODO: Once governance program clones registry program and governance
 //       accounts metadata is on-chain the list should be moved there
-const MAINNET_REALMS = parseRealms(mainnetBetaRealms)
-const DEVNET_REALMS = parseRealms(devnetRealms)
+const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
+const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
 
-function parseRealms(realms: RealmInfoAsJSON[]) {
+function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
   return realms.map((realm) => ({
     ...realm,
     programId: new PublicKey(realm.programId),
     realmId: new PublicKey(realm.realmId),
+    isCertified: true,
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -156,6 +160,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
             programVersion,
             realmId: r.pubkey,
             displayName: r.info.name,
+            isCertified: false,
           } as RealmInfo)
         : undefined
     })
