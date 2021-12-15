@@ -4,7 +4,7 @@ import axios from 'axios'
 import { getConnectionContext } from 'stores/useWalletStore'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
-import { getRealmInfo } from '../models/registry/api'
+import { getCertifiedRealmInfo } from '../models/registry/api'
 import { getGovernanceAccounts, pubkeyFilter } from './api'
 
 const fiveMinutesSeconds = 5 * 60
@@ -25,7 +25,7 @@ async function runNotifier() {
   const connectionContext = getConnectionContext('mainnet')
 
   const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
-  const realmInfo = await getRealmInfo(REALM_SYMBOL, connectionContext)
+  const realmInfo = await getCertifiedRealmInfo(REALM_SYMBOL, connectionContext)
 
   const governances = await getGovernanceAccounts<Governance>(
     realmInfo!.programId,

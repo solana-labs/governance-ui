@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { getRealmInfo, RealmInfo } from '../models/registry/api'
+import { getCertifiedRealmInfo, RealmInfo } from '../models/registry/api'
 import { VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -27,7 +27,7 @@ export default function useRealm() {
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
 
   useMemo(async () => {
-    const realm = await getRealmInfo(symbol as string, connection)
+    const realm = await getCertifiedRealmInfo(symbol as string, connection)
     setRealmInfo(realm)
   }, [symbol])
 
