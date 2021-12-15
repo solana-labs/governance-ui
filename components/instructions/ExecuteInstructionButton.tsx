@@ -41,7 +41,7 @@ export function ExecuteInstructionButton({
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  let canExecuteAt = proposal?.info.votingCompletedAt
+  const canExecuteAt = proposal?.info.votingCompletedAt
     ? proposal.info.votingCompletedAt.toNumber() + 1
     : 0
 
