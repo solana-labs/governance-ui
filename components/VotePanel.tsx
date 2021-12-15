@@ -208,7 +208,7 @@ const VotePanel = () => {
 
         {canSignOff && (
           <Button
-            className={isVoting ? 'w-full' : 'w-1/2'}
+            className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowSignOffModal(true)}
             disabled={!connected || !canSignOff}
           >
@@ -218,7 +218,7 @@ const VotePanel = () => {
 
         {canCancelProposal && (
           <Button
-            className={isVoting ? 'w-full' : 'w-1/2'}
+            className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowCancelModal(true)}
             disabled={!connected || !canCancelProposal}
           >

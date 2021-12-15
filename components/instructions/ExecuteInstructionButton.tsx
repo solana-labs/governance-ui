@@ -37,6 +37,7 @@ export function ExecuteInstructionButton({
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const connected = useWalletStore((s) => s.connected)
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -72,6 +73,7 @@ export function ExecuteInstructionButton({
 
     try {
       await executeInstruction(rpcContext, proposal, proposalInstruction)
+      await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
     } catch (error) {
       console.log('error executing instruction', error)
 
@@ -129,11 +131,10 @@ export function ExecuteInstructionButton({
   ) {
     return (
       <Tooltip content="retry to execute instruction">
-        <p className="border-dashed border-fgd-3 text-fgd-3 text-xs hover:cursor-help border-b-0">
-          <Button disabled={!connected} onClick={onExecuteInstruction}>
-            <RefreshIcon className="h-5 ml-2 text-orange w-5" />
-          </Button>
-        </p>
+        <RefreshIcon
+          onClick={onExecuteInstruction}
+          className="h-5 ml-2 text-orange w-5"
+        />
       </Tooltip>
     )
   }
