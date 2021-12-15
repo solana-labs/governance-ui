@@ -29,3 +29,34 @@ export const initializeMango = async (connection: Connection) => {
   const provider = new Provider(connection, wallet, Provider.defaultOptions())
   return createAndInitializeMango(provider, CLUSTER)
 }
+
+// import { Program, Provider } from '@project-serum/anchor'
+// import Wallet from '@project-serum/sol-wallet-adapter'
+// import { Connection } from '@solana/web3.js'
+// import {
+//   createAndInitializeMango,
+//   UXD,
+//   UXDHelpers,
+// } from '@uxdprotocol/uxd-client'
+// import useWalletStore from 'stores/useWalletStore'
+// import uxdIdl, { UXD_PROGRAM_ID } from './uxdIdl'
+
+// export const uxdHelpers = new UXDHelpers();
+
+// export const uxdClient = (): UXD => {
+//   const connection = useWalletStore((s) => s.connection)
+//   const wallet = useWalletStore((s) => s.current)
+
+//   // PROBABLY NOT OK to fix
+//   const provider = new Provider(connection.current, wallet, Provider.defaultOptions());
+
+//   const uxdProgram = new Program(uxdIdl, UXD_PROGRAM_ID, provider);
+//   return new UXD(new Program(uxdIdl, UXD_PROGRAM_ID, provider));
+// }
+
+// export const initializeMango = async () => {
+//   const connection = useWalletStore((s) => s.connection)
+//   const wallet = useWalletStore((s) => s.current)
+//   const provider = new Provider(connection.current, wallet, Provider.defaultOptions())
+//   return createAndInitializeMango(provider, `mainnet`);
+// }
