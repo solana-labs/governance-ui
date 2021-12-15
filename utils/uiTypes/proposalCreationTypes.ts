@@ -77,12 +77,14 @@ export interface SetRedeemableGlobalSupplyCapForm {
   governedAccount: GovernedProgramAccount | undefined
   supplyCap: number | undefined
   programId: string | undefined
+  controllerPda: string
 }
 
 export interface SetMangoDepositoriesRedeemableSoftCapForm {
   governedAccount: GovernedProgramAccount | undefined
   supplyCap: number | undefined
   programId: string | undefined
+  controllerPda: string
 }
 
 export interface RegisterMangoDepositoryForm {
@@ -90,6 +92,7 @@ export interface RegisterMangoDepositoryForm {
   collateralMint: string
   insuranceMint: string
   programId: string | undefined
+  controllerPda: string
 }
 
 export interface DepositInsuranceToMangoDepositoryForm {
@@ -98,6 +101,7 @@ export interface DepositInsuranceToMangoDepositoryForm {
   insuranceMint: string
   insuranceDepositedAmount: number | undefined
   programId: string | undefined
+  controllerPda: string
 }
 
 export interface WithdrawInsuranceFromMangoDepositoryForm {
@@ -106,6 +110,7 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
   insuranceMint: string
   insuranceWithdrawnAmount: number | undefined
   programId: string | undefined
+  controllerPda: string
 }
 
 export enum UXDIntructions {

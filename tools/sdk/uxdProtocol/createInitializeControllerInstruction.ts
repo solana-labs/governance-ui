@@ -1,5 +1,6 @@
 import { Provider } from '@project-serum/anchor'
 import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
+import { Controller } from '@uxdprotocol/uxd-client'
 import { uxdClient } from './uxdClient'
 
 const createInitializeControllerInstruction = (
@@ -9,9 +10,11 @@ const createInitializeControllerInstruction = (
   payer: PublicKey,
   connection: Connection
 ): TransactionInstruction => {
-  const { client, controller } = uxdClient(
+  const client = uxdClient(connection, uxdProgramId)
+
+  const controller = new Controller(
+    'redeemableTicker',
     mintDecimals,
-    connection,
     uxdProgramId
   )
 

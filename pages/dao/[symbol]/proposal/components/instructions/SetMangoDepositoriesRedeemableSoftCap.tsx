@@ -44,6 +44,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     governedAccount: undefined,
     programId: programId?.toString(),
     supplyCap: 0,
+    controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -69,7 +70,8 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
         connection.current,
         form.governedAccount.governance?.info.governedAccount,
         form.supplyCap || 9,
-        form.governedAccount?.governance.pubkey
+        form.governedAccount?.governance.pubkey,
+        new PublicKey(form.controllerPda)
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -103,6 +105,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [form])
   const schema = yup.object().shape({
     supplyCap: yup.number().required('Redeemable supply cap is required'),
+    controllerAddress: yup.string().required('Controller address is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -136,6 +139,18 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
           })
         }
         error={formErrors['global']}
+      />
+      <Input
+        label="Controller Address"
+        value={form.controllerPda}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'controllerPda',
+          })
+        }
+        error={formErrors['controllerPda']}
       />
     </>
   )

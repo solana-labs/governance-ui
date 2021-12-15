@@ -46,6 +46,7 @@ const DepositInsuranceToMangoDepository = ({
     collateralMint: '',
     insuranceMint: '',
     insuranceDepositedAmount: 0,
+    controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -68,12 +69,13 @@ const DepositInsuranceToMangoDepository = ({
       wallet?.publicKey
     ) {
       const createIx = await createDepositInsuranceToMangoDepositoryInstruction(
-        connection.current,
+        connection,
         form.governedAccount?.governance.info.governedAccount,
         form.governedAccount?.governance.pubkey,
         new PublicKey(form.collateralMint),
         new PublicKey(form.insuranceMint),
-        form.insuranceDepositedAmount || 0
+        form.insuranceDepositedAmount || 0,
+        new PublicKey(form.controllerPda)
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -174,6 +176,18 @@ const DepositInsuranceToMangoDepository = ({
           })
         }
         error={formErrors['global']}
+      />
+      <Input
+        label="Controller Address"
+        value={form.controllerPda}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'controllerPda',
+          })
+        }
+        error={formErrors['controllerPda']}
       />
     </>
   )

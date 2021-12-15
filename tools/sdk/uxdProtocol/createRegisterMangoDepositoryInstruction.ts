@@ -1,20 +1,26 @@
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { Provider } from '@project-serum/anchor'
 import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
+import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
-import { findATAAddrSync, MangoDepository } from '@uxdprotocol/uxd-client'
+import {
+  Controller,
+  findATAAddrSync,
+  MangoDepository,
+} from '@uxdprotocol/uxd-client'
+import { ConnectionContext } from 'stores/useWalletStore'
 import { initializeMango, uxdClient } from './uxdClient'
 
 const createRegisterMangoDepositoryInstruction = async (
-  connection: Connection,
+  connection: ConnectionContext,
   uxdProgramId: PublicKey,
   authority: PublicKey,
   payer: PublicKey,
   collateralMint: PublicKey,
-  insuranceMint: PublicKey
+  insuranceMint: PublicKey,
+  controllerPda: PublicKey
 ): Promise<TransactionInstruction> => {
-  const mango = await initializeMango(connection)
+  const mango = await initializeMango(connection.current, connection.cluster)
   const depository = new MangoDepository(
     collateralMint,
     'collateralName',
@@ -25,7 +31,7 @@ const createRegisterMangoDepositoryInstruction = async (
     uxdProgramId
   )
 
-  const { client, controller } = uxdClient(connection, uxdProgramId)
+  const client = uxdClient(connection.current, uxdProgramId)
   const [authorityInsuranceATA] = findATAAddrSync(authority, insuranceMint)
   const createAuthorityInsuranceItx = Token.createAssociatedTokenAccountInstruction(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -42,7 +48,7 @@ const createRegisterMangoDepositoryInstruction = async (
   )
 
   return client.createRegisterMangoDepositoryInstruction(
-    controller,
+    { pda: controllerPda } as Controller,
     depository,
     mango,
     authority,

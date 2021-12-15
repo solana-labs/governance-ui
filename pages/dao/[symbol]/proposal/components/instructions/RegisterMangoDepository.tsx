@@ -45,6 +45,7 @@ const RegisterMangoDepository = ({
     programId: programId?.toString(),
     collateralMint: '',
     insuranceMint: '',
+    controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -67,12 +68,13 @@ const RegisterMangoDepository = ({
       wallet?.publicKey
     ) {
       const createIx = await createRegisterMangoDepositoryInstruction(
-        connection.current,
+        connection,
         form.governedAccount?.governance.info.governedAccount,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
         new PublicKey(form.collateralMint),
-        new PublicKey(form.insuranceMint)
+        new PublicKey(form.insuranceMint),
+        new PublicKey(form.controllerPda)
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -83,6 +85,7 @@ const RegisterMangoDepository = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -98,6 +101,16 @@ const RegisterMangoDepository = ({
       })
     }
   }, [form.collateralMint])
+
+  useEffect(() => {
+    if (form.controllerPda) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.controllerPda])
+
   useEffect(() => {
     if (form.insuranceMint) {
       debounce.debounceFcn(async () => {
@@ -106,17 +119,20 @@ const RegisterMangoDepository = ({
       })
     }
   }, [form.insuranceMint])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
     collateralMint: yup
       .string()
       .required('Collateral Mint address is required'),
     insuranceMint: yup.string().required('Insurance Mint address is required'),
+    controllerPda: yup.string().required('Insurance Mint address is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -151,7 +167,7 @@ const RegisterMangoDepository = ({
       <Input
         label="Insurance Mint"
         value={form.insuranceMint}
-        type="test"
+        type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
@@ -159,6 +175,18 @@ const RegisterMangoDepository = ({
           })
         }
         error={formErrors['insuranceMint']}
+      />
+      <Input
+        label="Controller Address"
+        value={form.controllerPda}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'controllerPda',
+          })
+        }
+        error={formErrors['controllerPda']}
       />
     </>
   )
