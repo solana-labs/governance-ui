@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import { TokenAccountInfo } from '@tools/validators/accounts/token'
 import { ProgramBufferAccount } from '@tools/validators/accounts/upgradeable-program'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
@@ -7,51 +6,97 @@ import { tryGetTokenAccount } from './tokens'
 import * as yup from 'yup'
 import { getMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { BN } from '@project-serum/anchor'
+import { ConnectionContext } from 'stores/useWalletStore'
+import {
+  AccountInfo,
+  ASSOCIATED_TOKEN_PROGRAM_ID,
+  Token,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token'
+import { Connection } from '@solana/web3.js'
+
+const getValidateAccount = async (
+  connection: Connection,
+  pubKey: PublicKey
+) => {
+  const account = await connection.getParsedAccountInfo(pubKey)
+  if (!account || !account.value) {
+    throw "Account doesn't exist or has no SOLs"
+  }
+  return account
+}
+
+const getValidatedPublickKey = (val: string) => {
+  const pubKey = tryParseKey(val)
+  if (pubKey) {
+    return pubKey
+  } else {
+    throw 'Provided value is not a public key'
+  }
+}
+
+const validateDoseTokenAccountMatchMint = (
+  tokenAccount: AccountInfo,
+  mint: PublicKey
+) => {
+  if (tokenAccount.mint.toBase58() !== mint.toBase58()) {
+    throw "Account mint doesn't match source account"
+  }
+}
+
+export const tryGetAta = async (
+  connection: ConnectionContext,
+  mint: PublicKey,
+  owner: PublicKey
+) => {
+  //we do ATA validation
+  const ata = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+    mint, // mint
+    owner // owner
+  )
+  const tokenAccount = await tryGetTokenAccount(connection.current, ata)
+  return tokenAccount
+}
+
+export const isExistingTokenAccount = async (
+  connection: ConnectionContext,
+  val: PublicKey
+) => {
+  const account = await getValidateAccount(connection.current, val)
+  const isExistingTokenAccount =
+    account.value !== null &&
+    (await tryGetTokenAccount(connection.current, val))
+  return isExistingTokenAccount
+}
 
 export const validateDestinationAccAddress = async (
-  connection,
+  connection: ConnectionContext,
   val: any,
   governedAccount?: PublicKey
 ) => {
-  const pubKey = tryParseKey(val)
-  if (pubKey) {
-    const account = await connection.current.getParsedAccountInfo(pubKey)
-    if (!account || !account.value) {
-      throw 'Account not found'
-    }
-    if (
-      !(
-        'parsed' in account.value.data &&
-        account.value.data.program === 'spl-token'
-      )
-    ) {
-      throw 'Invalid spl token account'
-    }
-
-    let tokenAccount
-
-    try {
-      tokenAccount = create(account.value.data.parsed.info, TokenAccountInfo)
-    } catch {
-      throw 'Invalid spl token account'
-    }
-
-    if (governedAccount) {
-      const sourceAccMint = await tryGetTokenAccount(
-        connection.current,
-        governedAccount
-      )
-      if (
-        tokenAccount.mint.toBase58() !== sourceAccMint?.account.mint.toBase58()
-      ) {
-        throw "Account mint doesn't match source account"
-      }
-    } else {
+  const currentConnection = connection.current
+  const pubKey = getValidatedPublickKey(val)
+  const account = await getValidateAccount(currentConnection, pubKey)
+  if (account?.value !== null) {
+    if (!governedAccount) {
       throw 'Source account not provided'
     }
-  } else {
-    throw 'Provided value is not a valid account address'
+    const tokenAccount = await tryGetTokenAccount(currentConnection, pubKey)
+    const governedTokenAccount = await tryGetTokenAccount(
+      currentConnection,
+      governedAccount
+    )
+    if (tokenAccount && governedTokenAccount) {
+      await validateDoseTokenAccountMatchMint(
+        tokenAccount.account,
+        governedTokenAccount?.account.mint
+      )
+    }
   }
+
+  return true
 }
 
 export const validateDestinationAccAddressWithMint = async (
@@ -59,39 +104,19 @@ export const validateDestinationAccAddressWithMint = async (
   val: any,
   mintPubKey: PublicKey
 ) => {
-  const pubKey = tryParseKey(val)
-  if (pubKey) {
-    const account = await connection.current.getParsedAccountInfo(pubKey)
-    if (!account || !account.value) {
-      throw 'Account not found'
-    }
-    if (
-      !(
-        'parsed' in account.value.data &&
-        account.value.data.program === 'spl-token'
-      )
-    ) {
-      throw 'Invalid spl token account'
-    }
-
-    let tokenAccount
-
-    try {
-      tokenAccount = create(account.value.data.parsed.info, TokenAccountInfo)
-    } catch {
-      throw 'Invalid spl token account'
-    }
-
-    if (mintPubKey) {
-      if (tokenAccount.mint.toBase58() !== mintPubKey.toBase58()) {
-        throw "Account mint doesn't match source account"
-      }
-    } else {
+  const currentConnection = connection.current
+  const pubKey = getValidatedPublickKey(val)
+  const account = await getValidateAccount(currentConnection, pubKey)
+  if (account?.value !== null) {
+    if (!mintPubKey) {
       throw 'Source account not provided'
     }
-  } else {
-    throw 'Provided value is not a valid account address'
+    const tokenAccount = await tryGetTokenAccount(currentConnection, pubKey)
+    if (tokenAccount && mintPubKey) {
+      await validateDoseTokenAccountMatchMint(tokenAccount.account, mintPubKey)
+    }
   }
+  return true
 }
 
 export const validateBuffer = async (
@@ -106,7 +131,7 @@ export const validateBuffer = async (
   if (pubKey) {
     await connection.current.getParsedAccountInfo(pubKey).then((data) => {
       if (!data || !data.value) {
-        throw 'Account not found'
+        throw "account doesn't exist or has no SOLs"
       }
       const info = data.value
       if (
@@ -194,6 +219,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               )
               return true
             } catch (e) {
+              console.log(e)
               return this.createError({
                 message: `${e}`,
               })

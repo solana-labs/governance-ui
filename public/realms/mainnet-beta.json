@@ -137,12 +137,21 @@
     "website": "https://strangemood.org"
   },
   {
-    "symbol": "UXD Council Token",
+    "symbol": "UXD",
     "displayName": "UXD Protocol DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k",
+    "programId": "UXGA4U6nmCkdpVnhrhRzgFWYtmY4uHpNzLn3h9nVXNa",
+    "realmId": "GGt3TagE3111gd7ChWMczWDsCnkEriXyjRPzQDejJbNK",
     "ogImage": "/realms/UXDProtocol/img/logo.png",
     "website": "https://www.uxd.fi.com/",
     "twitter": "@UXDProtocol"
+  },
+  {
+    "symbol": "GRAPE",
+    "displayName": "GRAPE",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "By2sVGZXwfQq6rAiAM3rNPJ9iQfb5e2QhnF4YjJ4Bip",
+    "ogImage": "/realms/Grape/img/grape.png",
+    "website": "https://grapes.network/",
+    "twitter": "@grapeprotocol"
   }
 ]
