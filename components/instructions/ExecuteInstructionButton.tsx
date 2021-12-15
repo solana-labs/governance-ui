@@ -89,11 +89,7 @@ export function ExecuteInstructionButton({
   ) {
     return (
       <Tooltip content="instruction executed successfully">
-        <p className="border-dashed border-fgd-3 text-fgd-3 text-xs hover:cursor-help border-b-0">
-          <Button>
-            <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
-          </Button>
-        </p>
+        <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
       </Tooltip>
     )
   }
