@@ -5,7 +5,6 @@ import {
   getTimestampFromDays,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import React from 'react'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
