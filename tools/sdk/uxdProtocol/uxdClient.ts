@@ -12,6 +12,7 @@ const DEFAULT_WALLET_PROVIDER = 'https://sollet.io'
 const CLUSTER = 'devnet'
 
 export const uxdClient = (
+  mintDecimals: number,
   connection: Connection,
   programId: PublicKey
 ): { client: UXD; controller: Controller } => {
@@ -19,7 +20,7 @@ export const uxdClient = (
   const provider = new Provider(connection, wallet, Provider.defaultOptions())
   return {
     client: new UXD(new Program(uxdIdl, programId, provider)),
-    controller: new Controller('UXD', 6, programId),
+    controller: new Controller('redeemable_ticker', mintDecimals, programId), // The redeemable ticker is just local, doesn't matter.
   }
 }
 

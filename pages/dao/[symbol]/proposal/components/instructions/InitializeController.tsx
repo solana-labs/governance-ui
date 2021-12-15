@@ -65,14 +65,16 @@ const InitializeController = ({
       form.mintDecimals &&
       wallet?.publicKey
     ) {
-      const createIx = createInitializeControllerInstruction(
+      const initializeControllerIx = createInitializeControllerInstruction(
         form.governedAccount?.governance.info.governedAccount,
         form.mintDecimals,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
         connection.current
       )
-      serializedInstruction = serializeInstructionToBase64(createIx)
+      serializedInstruction = serializeInstructionToBase64(
+        initializeControllerIx
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction,

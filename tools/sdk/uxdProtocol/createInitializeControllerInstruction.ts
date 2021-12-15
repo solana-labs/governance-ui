@@ -4,12 +4,16 @@ import { uxdClient } from './uxdClient'
 
 const createInitializeControllerInstruction = (
   uxdProgramId: PublicKey,
-  _mintDecimals: number,
+  mintDecimals: number,
   authority: PublicKey,
   payer: PublicKey,
   connection: Connection
 ): TransactionInstruction => {
-  const { client, controller } = uxdClient(connection, uxdProgramId)
+  const { client, controller } = uxdClient(
+    mintDecimals,
+    connection,
+    uxdProgramId
+  )
 
   return client.createInitializeControllerInstruction(
     controller,
