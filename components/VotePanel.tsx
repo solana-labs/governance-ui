@@ -173,9 +173,7 @@ const VotePanel = () => {
       <h2 className="mb-4 text-center">{actionLabel}</h2>
       <div
         className={`grid ${
-          isVoting || !isWithdrawEnabled || !connected
-            ? 'grid-cols-1 gap-y-3'
-            : 'grid-cols-2 gap-3'
+          isVoting ? 'grid-cols-1 sm:grid-cols-2 gap-3' : 'grid-cols-1 gap-y-3'
         }`}
       >
         {isVoteCast ? (
