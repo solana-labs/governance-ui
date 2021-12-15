@@ -88,6 +88,12 @@ const InitializeController = ({
     })
   }, [realmInfo?.programId])
 
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: form.governedAccount?.governance, getInstruction },
+      index
+    )
+  }, [form])
   const schema = yup.object().shape({
     mintDecimals: yup.number().required('Mint Decimals is required'),
     governedAccount: yup
