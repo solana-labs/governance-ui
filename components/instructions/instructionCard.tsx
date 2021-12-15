@@ -1,34 +1,49 @@
 import { PublicKey } from '@solana/web3.js'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { AccountMetaData, ProposalInstruction } from '../../models/accounts'
+import {
+  AccountMetaData,
+  Proposal,
+  ProposalInstruction,
+} from '../../models/accounts'
 import {
   getAccountName,
   getInstructionDescriptor,
   InstructionDescriptor,
 } from './tools'
 import React, { useEffect, useState } from 'react'
-import InspectorButton from '../explorer/inspectorButton'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'
+import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
+import { ParsedAccount } from '@models/core/accounts'
+import InspectorButton from '@components/explorer/inspectorButton'
+import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
 
 export default function InstructionCard({
   index,
+  proposal,
   proposalInstruction,
 }: {
   index: number
-  proposalInstruction: ProposalInstruction
+  proposal: ParsedAccount<Proposal>
+  proposalInstruction: ParsedAccount<ProposalInstruction>
 }) {
   const connection = useWalletStore((s) => s.connection)
+  const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
+  const [playing, setPlaying] = useState(
+    proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed
+  )
 
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
-      proposalInstruction.instruction
+      proposalInstruction.info.instruction
     ).then((d) => setDescriptor(d))
   }, [proposalInstruction])
+
+  const proposalAuthority = tokenRecords[proposal.account.owner.toBase58()]
 
   return (
     <div className="break-all">
@@ -38,10 +53,10 @@ export default function InstructionCard({
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}
-        programId={proposalInstruction.instruction.programId}
+        programId={proposalInstruction.info.instruction.programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
-        {proposalInstruction.instruction.accounts.map((am, idx) => (
+        {proposalInstruction.info.instruction.accounts.map((am, idx) => (
           <InstructionAccount
             endpoint={connection.endpoint}
             key={idx}
@@ -53,11 +68,30 @@ export default function InstructionCard({
       </div>
       <div className="flex items-center justify-between mb-2">
         <div className="font-bold text-sm">Data</div>
-        <InspectorButton
-          instructionData={proposalInstruction.instruction}
-        ></InspectorButton>
       </div>
       <InstructionData descriptor={descriptor}></InstructionData>
+
+      <div className="flex justify-start items-center gap-x-4 mt-6">
+        <InspectorButton
+          instructionData={proposalInstruction.info.instruction}
+        />
+
+        <FlagInstructionErrorButton
+          playState={playing}
+          proposal={proposal}
+          proposalAuthority={proposalAuthority}
+          proposalInstruction={proposalInstruction}
+        />
+
+        {proposal && (
+          <ExecuteInstructionButton
+            proposal={proposal}
+            proposalInstruction={proposalInstruction}
+            playing={playing}
+            setPlaying={setPlaying}
+          />
+        )}
+      </div>
     </div>
   )
 }
