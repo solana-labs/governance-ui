@@ -7,6 +7,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
   '5sGZEdn32y8nHax7TxEyoHuPS3UXfPWtisgm8kqxat8H': 'Phantasia Governance',
   smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui:
     'Strangemood Foundation Governance',
+  UXGA4U6nmCkdpVnhrhRzgFWYtmY4uHpNzLn3h9nVXNa: 'UXD Protocol Governance',
 }
 
 // Well known program names displayed on the instruction card
@@ -21,7 +22,7 @@ export const PROGRAM_NAMES = {
   '675kPX9MHTjS2zt1qfr1NYHuzeLXfQM9H24wFSUt1Mp8': 'Raydium AMM Program',
   EhhTKczWMGQt46ynNeRX1WfeagwwJd7ufHvCDjRxjo5Q: 'Raydium Staking Program',
 
-  UXGA4U6nmCkdpVnhrhRzgFWYtmY4uHpNzLn3h9nVXNa: 'UXD Protocol Program',
+  UXDQDbkAeGMPR7gqDykDNu22D9DnYrKdvZhvNmMu6QX: 'UXDProtocol Program',
 
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
