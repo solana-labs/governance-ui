@@ -221,13 +221,15 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection
       const set = get().set
       const newConnection = getConnectionContext(cluster)
-
-      if (connection.cluster == cluster) {
-        return
+      if (
+        connection.cluster !== newConnection.cluster ||
+        connection.endpoint !== newConnection.endpoint
+      ) {
+        set((s) => {
+          s.connection = newConnection
+        })
       }
-      set((s) => {
-        s.connection = newConnection
-      })
+
       const realmInfo = await getRealmInfo(symbol, newConnection)
       if (realmInfo) {
         await actions.fetchAllRealms(realmInfo.programId)
