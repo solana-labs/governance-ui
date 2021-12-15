@@ -62,9 +62,8 @@ const New = () => {
     ownVoterWeight,
     mint,
     councilMint,
+    canChooseWhoVote,
   } = useRealm()
-  const canChooseWhoVote =
-    !mint?.supply.isZero() && !councilMint?.supply.isZero()
 
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()

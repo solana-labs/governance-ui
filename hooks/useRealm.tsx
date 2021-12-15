@@ -68,6 +68,12 @@ export default function useRealm() {
     [tokenRecords, wallet, connected]
   )
 
+  const canChooseWhoVote =
+    realm?.info.communityMint &&
+    !mint?.supply.isZero() &&
+    realm.info.config.councilMint &&
+    !councilMint?.supply.isZero()
+
   return {
     realm,
     realmInfo,
@@ -86,5 +92,6 @@ export default function useRealm() {
     ownCouncilTokenRecord,
     ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
     realmDisplayName: realmInfo?.displayName ?? realm?.info?.name,
+    canChooseWhoVote,
   }
 }
