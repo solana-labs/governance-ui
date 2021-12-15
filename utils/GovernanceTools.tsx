@@ -1,9 +1,4 @@
-import {
-  GovernanceConfig,
-  Realm,
-  VoteThresholdPercentage,
-} from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { GovernanceConfig, VoteThresholdPercentage } from '@models/accounts'
 import { BN } from '@project-serum/anchor'
 import {
   getMintNaturalAmountFromDecimal,

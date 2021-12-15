@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import CancelProposal from 'pages/dao/[symbol]/proposal/components/CancelProposal'
 import FinalizeVotes from 'pages/dao/[symbol]/proposal/components/FinalizeVotes'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
