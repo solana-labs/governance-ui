@@ -9,6 +9,7 @@ export async function registerRealm(
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   name: string,
   communityMint: PublicKey,
+  communityVoterWeightAddin: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN
@@ -26,7 +27,7 @@ export async function registerRealm(
     councilMint,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateGovernance,
-    undefined
+    communityVoterWeightAddin
   )
 
   const transaction = new Transaction()

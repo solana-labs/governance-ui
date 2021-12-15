@@ -52,6 +52,13 @@ const schema = yup.object().shape({
       publicKeyValidationTest
     ),
   communityMint: yup.object().required('Community token mint is not valid'),
+  communityVoterWeightAddinId: yup
+    .string()
+    .test(
+      'is-public-key',
+      'Community voter weight addin id is not a valid public key',
+      (value) => (value ? publicKeyValidationTest(value) : true)
+    ),
   councilMintId: yup
     .string()
     .test(
@@ -75,6 +82,7 @@ const New = () => {
     name: string
     communityMintId: string
     communityMint: ProgramAccount<MintInfo> | undefined
+    communityVoterWeightAddinId: string
     councilMintId: string | undefined
     councilMint: ProgramAccount<MintInfo> | undefined
     programVersion: ProgramVersion
@@ -85,6 +93,7 @@ const New = () => {
     name: '',
     communityMintId: '',
     communityMint: undefined,
+    communityVoterWeightAddinId: '',
     councilMintId: undefined,
     councilMint: undefined,
     programVersion: 1,
@@ -124,6 +133,9 @@ const New = () => {
           rpcContext,
           form.name,
           new PublicKey(form.communityMintId),
+          form.communityVoterWeightAddinId
+            ? new PublicKey(form.communityVoterWeightAddinId)
+            : undefined,
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
           form.minCommunityTokensToCreateGovernance
@@ -323,6 +335,20 @@ const New = () => {
                   </div>
                 </>
               )}
+              <div className="pb-4">
+                <Input
+                  label="Community Voter Weight Addin Id"
+                  placeholder="(Optional) Voter weight addin"
+                  value={form.communityVoterWeightAddinId}
+                  type="text"
+                  error={formErrors['communityVoterWeightAddinId']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      communityVoterWeightAddinId: evt.target.value,
+                    })
+                  }
+                />
+              </div>
               <div className="pb-4">
                 <Input
                   label="Council Mint Id"
