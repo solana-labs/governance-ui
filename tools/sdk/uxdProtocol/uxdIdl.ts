@@ -1,9 +1,9 @@
 import { Idl } from '@project-serum/anchor'
 
-export const UXD_PROGRAM_ID = 'UXDQDbkAeGMPR7gqDykDNu22D9DnYrKdvZhvNmMu6QX'
+export const UXD_PROGRAM_ID = 'DdJ9BKWG8XqQaj5BMjYks6Y8Amcv1onoo7cvVipp9jKC' //'UXDQDbkAeGMPR7gqDykDNu22D9DnYrKdvZhvNmMu6QX'
 
 const uxdIdl: Idl = {
-  version: '1.2.0',
+  version: '0.0.0',
   name: 'uxd',
   instructions: [
     {
@@ -779,219 +779,219 @@ const uxdIdl: Idl = {
   ],
   errors: [
     {
-      code: 6000,
+      code: 300,
       name: 'InvalidRedeemableMintDecimals',
       msg: 'The redeemable mint decimals must be between 0 and 9 (inclusive).',
     },
     {
-      code: 6001,
+      code: 301,
       name: 'InvalidRedeemableGlobalSupplyCap',
       msg:
         'The redeemable global supply cap must be below MAX_REDEEMABLE_GLOBAL_SUPPLY_CAP.',
     },
     {
-      code: 6002,
+      code: 302,
       name: 'RootBankIndexNotFound',
       msg:
         'The associated mango root bank index cannot be found for the deposited coin..',
     },
     {
-      code: 6003,
+      code: 303,
       name: 'InvalidSlippage',
       msg:
         'The slippage value is invalid. Must be in the [0...1000] range points.',
     },
     {
-      code: 6004,
+      code: 304,
       name: 'InvalidCollateralMint',
       msg:
         "The provided collateral mint does not match the depository's collateral mint.",
     },
     {
-      code: 6005,
+      code: 305,
       name: 'InvalidInsuranceMint',
       msg:
         "The provided insurance mint does not match the depository's insurance mint.",
     },
     {
-      code: 6006,
+      code: 306,
       name: 'InvalidCollateralAmount',
       msg: 'Collateral amount must be > 0 in order to mint.',
     },
     {
-      code: 6007,
+      code: 307,
       name: 'InsuficientCollateralAmount',
       msg:
         'The balance of the collateral ATA is not enough to fulfill the mint operation.',
     },
     {
-      code: 6008,
+      code: 308,
       name: 'InvalidRedeemableAmount',
       msg: 'The redeemable amount for redeem must be superior to 0.',
     },
     {
-      code: 6009,
+      code: 309,
       name: 'InsuficientRedeemableAmount',
       msg:
         'The balance of the redeemable ATA is not enough to fulfill the redeem operation.',
     },
     {
-      code: 6010,
+      code: 310,
       name: 'InvalidAuthority',
       msg:
         'Only the Program initializer authority can access this instructions.',
     },
     {
-      code: 6011,
+      code: 311,
       name: 'InvalidRedeemableMint',
       msg: "The Redeemable Mint provided does not match the Controller's one.",
     },
     {
-      code: 6012,
+      code: 312,
       name: 'InvalidUserRedeemableATAMint',
       msg:
         "The user's Redeemable ATA's mint does not match the Controller's one.",
     },
     {
-      code: 6013,
+      code: 313,
       name: 'InvalidUserCollateralATAMint',
       msg:
         "The user's Collateral ATA's mint does not match the Depository's one.",
     },
     {
-      code: 6014,
+      code: 314,
       name: 'InvalidAuthorityInsuranceATAMint',
       msg:
         "The authority's Insurance ATA's mint does not match the Depository's one.",
     },
     {
-      code: 6015,
+      code: 315,
       name: 'InvalidCollateralPassthroughATAMint',
       msg:
         "The Depository Collateral Passthrough ATA's mint does not match the Depository's one.",
     },
     {
-      code: 6016,
+      code: 316,
       name: 'InvalidInsurancePassthroughATAMint',
       msg:
         "The Depository Insurance Passthrough ATA's mint does not match the Depository's one.",
     },
     {
-      code: 6017,
+      code: 317,
       name: 'PerpOrderPartiallyFilled',
       msg:
         'The perp position could not be fully filled with the provided slippage.',
     },
     {
-      code: 6018,
+      code: 318,
       name: 'PositionAmountCalculation',
       msg:
         'Error while getting the redeemable value of the deposited coin amount.',
     },
     {
-      code: 6019,
+      code: 319,
       name: 'RedeemableGlobalSupplyCapReached',
       msg: 'Minting amount would go past the Redeemable Global Supply Cap.',
     },
     {
-      code: 6020,
+      code: 320,
       name: 'MangoDepositoriesSoftCapOverflow',
       msg: 'Operation not allowed due to being over the Redeemable soft Cap.',
     },
     {
-      code: 6030,
+      code: 330,
       name: 'MaxNumberOfMangoDepositoriesRegisteredReached',
       msg:
         'Cannot register more mango depositories, the limit has been reached.',
     },
     {
-      code: 6031,
+      code: 331,
       name: 'InvalidController',
       msg: "The Depository's controller doesn't match the provided Controller.",
     },
     {
-      code: 6032,
+      code: 332,
       name: 'InvalidDepository',
       msg: 'The Depository provided is not registered with the Controller.',
     },
     {
-      code: 6033,
+      code: 333,
       name: 'InvalidCollateralPassthroughAccount',
       msg: "The Collateral Passthrough Account isn't the Deposiroty one.",
     },
     {
-      code: 6034,
+      code: 334,
       name: 'InvalidInsurancePassthroughAccount',
       msg: "The Insurance Passthrough Account isn't the Deposiroty one.",
     },
     {
-      code: 6035,
+      code: 335,
       name: 'InvalidMangoAccount',
       msg: "The Mango Account isn't the Deposiroty one.",
     },
     {
-      code: 6036,
+      code: 336,
       name: 'InvalidInsuranceAmount',
       msg:
         'The amount to withdraw from the Insurance Fund must be superior to zero..',
     },
     {
-      code: 6037,
+      code: 337,
       name: 'InsuficientAuthorityInsuranceAmount',
       msg: "The Insurance ATA from authority doesn't have enough balance.",
     },
     {
-      code: 6038,
+      code: 338,
       name: 'InvalidRebalancingAmount',
       msg: 'The max amount to rebalance must be superior to zero..',
     },
     {
-      code: 6039,
+      code: 339,
       name: 'InsuficentOrderBookDepth',
       msg: 'Insuficcent order book depth for order.',
     },
     {
-      code: 6040,
+      code: 340,
       name: 'InvalidExecutedOrderSize',
       msg: 'The executed order size does not match the expected one.',
     },
     {
-      code: 6080,
+      code: 380,
       name: 'MangoOrderBookLoading',
       msg: 'Could not load Mango Order book.',
     },
     {
-      code: 6081,
+      code: 381,
       name: 'MangoGroupLoading',
       msg: 'Could not load Mango Group.',
     },
     {
-      code: 6082,
+      code: 382,
       name: 'MangoCacheLoading',
       msg: 'Could not load Mango Cache.',
     },
     {
-      code: 6083,
+      code: 383,
       name: 'MangoLoadPerpMarket',
       msg: 'Could not load Mango PerpMarket.',
     },
     {
-      code: 6084,
+      code: 384,
       name: 'MangoAccountLoading',
       msg: 'Could not load Mango Account.',
     },
     {
-      code: 6085,
+      code: 385,
       name: 'MangoPerpMarketIndexNotFound',
       msg: 'Could not find the perp market index for the given collateral.',
     },
     {
-      code: 6086,
+      code: 386,
       name: 'InvalidPerpAccountState',
       msg: 'The Mango PerpAccount has uncommitted changes.',
     },
     {
-      code: 6087,
+      code: 387,
       name: 'InvalidDepositoryAccounting',
       msg: 'The Depository accounting is in an invalid state.',
     },
