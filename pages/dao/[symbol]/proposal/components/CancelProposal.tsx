@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent } from 'react'
+import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
@@ -11,36 +11,34 @@ import { ParsedAccount } from 'models/core/accounts'
 import { cancelProposal } from 'actions/cancelProposal'
 import useProposal from '@hooks/useProposal'
 
-interface CancelProposalModalProps {
+type CancelProposalModalProps = {
   onClose: () => void
   isOpen: boolean
 }
 
-const CancelProposalModal: FunctionComponent<CancelProposalModalProps> = ({
-  onClose,
-  isOpen,
-}) => {
+const CancelProposalModal = ({ onClose, isOpen }: CancelProposalModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-
   const { proposal } = useProposal()
-
-  const rpcContext = new RpcContext(
-    proposal!.account.owner,
-    realmInfo?.programVersion,
-    wallet,
-    connection.current,
-    connection.endpoint
-  )
 
   const handleCancelProposal = async (
     proposal: ParsedAccount<Proposal> | undefined
   ) => {
     try {
-      await cancelProposal(rpcContext, proposal)
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
 
-      onClose()
+        await cancelProposal(rpcContext, proposal)
+
+        onClose()
+      }
     } catch (error) {
       notify({
         type: 'error',
@@ -74,4 +72,4 @@ const CancelProposalModal: FunctionComponent<CancelProposalModalProps> = ({
   )
 }
 
-export default React.memo(CancelProposalModal)
+export default CancelProposalModal

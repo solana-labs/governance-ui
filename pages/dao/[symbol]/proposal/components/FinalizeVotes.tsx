@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent } from 'react'
+import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
@@ -8,33 +8,32 @@ import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
 import { finalizeVote } from 'actions/finalizeVotes'
 
-interface FinalizeVotesModalProps {
+type FinalizeVotesModalProps = {
   onClose: () => void
   isOpen: boolean
 }
 
-const FinalizeVotesModal: FunctionComponent<FinalizeVotesModalProps> = ({
-  onClose,
-  isOpen,
-}) => {
+const FinalizeVotesModal = ({ onClose, isOpen }: FinalizeVotesModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { realmInfo } = useRealm()
 
-  const rpcContext = new RpcContext(
-    proposal!.account.owner,
-    realmInfo?.programVersion,
-    wallet,
-    connection.current,
-    connection.endpoint
-  )
-
   const handleFinalizeVote = async () => {
     try {
-      await finalizeVote(rpcContext, realmInfo!.realmId, proposal!)
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
 
-      onClose()
+        await finalizeVote(rpcContext, realmInfo.realmId, proposal!)
+
+        onClose()
+      }
     } catch (error) {
       notify({
         type: 'error',
@@ -66,4 +65,4 @@ const FinalizeVotesModal: FunctionComponent<FinalizeVotesModalProps> = ({
   )
 }
 
-export default React.memo(FinalizeVotesModal)
+export default FinalizeVotesModal

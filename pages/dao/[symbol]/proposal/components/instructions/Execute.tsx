@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent } from 'react'
+import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
@@ -10,35 +10,37 @@ import { executeInstruction } from 'actions/executeInstruction'
 import { ProposalInstruction } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 
-interface ExecuteInstructionProps {
+type ExecuteInstructionProps = {
   onClose: () => void
   isOpen: boolean
   instruction: ParsedAccount<ProposalInstruction> | any
 }
 
-const ExecuteInstruction: FunctionComponent<ExecuteInstructionProps> = ({
+const ExecuteInstruction = ({
   onClose,
   isOpen,
   instruction,
-}) => {
+}: ExecuteInstructionProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { realmInfo } = useRealm()
 
-  const rpcContext = new RpcContext(
-    proposal!.account.owner,
-    realmInfo?.programVersion,
-    wallet,
-    connection.current,
-    connection.endpoint
-  )
-
   const handleExecuteInstruction = async () => {
     try {
-      await executeInstruction(rpcContext, proposal!, instruction)
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
 
-      onClose()
+        await executeInstruction(rpcContext, proposal, instruction)
+
+        onClose()
+      }
     } catch (error) {
       notify({
         type: 'error',
@@ -70,4 +72,4 @@ const ExecuteInstruction: FunctionComponent<ExecuteInstructionProps> = ({
   )
 }
 
-export default React.memo(ExecuteInstruction)
+export default ExecuteInstruction

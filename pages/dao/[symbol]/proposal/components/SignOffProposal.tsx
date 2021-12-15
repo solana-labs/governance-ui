@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { FunctionComponent } from 'react'
+import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
@@ -11,33 +11,37 @@ import { notify } from '@utils/notifications'
 import useProposal from '@hooks/useProposal'
 import { SignatoryRecord } from '@models/accounts'
 
-interface SignOffProposalModalProps {
+type SignOffProposalModalProps = {
   onClose: () => void
   isOpen: boolean
   signatoryRecord: ParsedAccount<SignatoryRecord>
 }
 
-const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
+const SignOffProposalModal = ({
   onClose,
   isOpen,
   signatoryRecord,
-}) => {
+}: SignOffProposalModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
   const { proposal } = useProposal()
 
-  const rpcContext = new RpcContext(
-    proposal!.account.owner,
-    realmInfo?.programVersion,
-    wallet,
-    connection.current,
-    connection.endpoint
-  )
-
   const handleSignOffProposal = async () => {
     try {
-      await signOffProposal(rpcContext, signatoryRecord)
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
+
+        await signOffProposal(rpcContext, signatoryRecord)
+
+        onClose()
+      }
     } catch (error) {
       notify({
         type: 'error',
@@ -53,9 +57,9 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
-      {signatoryRecord!.info.signedOff && <h2>Signed</h2>}
+      {signatoryRecord?.info.signedOff && <h2>Signed</h2>}
 
-      {!signatoryRecord!.info.signedOff && (
+      {!signatoryRecord?.info.signedOff && (
         <>
           <h2>Sign off proposal</h2>
 
@@ -78,4 +82,4 @@ const SignOffProposalModal: FunctionComponent<SignOffProposalModalProps> = ({
   )
 }
 
-export default React.memo(SignOffProposalModal)
+export default SignOffProposalModal
