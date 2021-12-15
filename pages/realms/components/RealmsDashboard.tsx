@@ -69,7 +69,7 @@ export default function RealmsDashboard({
                     </div>
                   )}
                 </div>
-                <h3 className="text-center">
+                <h3 className="text-center break-all">
                   {realm.displayName ?? realm.symbol}
                 </h3>
               </div>
