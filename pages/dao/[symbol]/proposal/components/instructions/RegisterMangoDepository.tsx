@@ -74,7 +74,8 @@ const RegisterMangoDepository = ({
         new PublicKey(wallet.publicKey.toBase58()),
         new PublicKey(form.collateralMint),
         new PublicKey(form.insuranceMint),
-        new PublicKey(form.controllerPda)
+        new PublicKey(form.controllerPda),
+        wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -132,7 +133,7 @@ const RegisterMangoDepository = ({
       .string()
       .required('Collateral Mint address is required'),
     insuranceMint: yup.string().required('Insurance Mint address is required'),
-    controllerPda: yup.string().required('Insurance Mint address is required'),
+    controllerPda: yup.string().required('Controller address is required'),
     governedAccount: yup
       .object()
       .nullable()

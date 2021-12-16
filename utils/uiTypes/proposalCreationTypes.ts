@@ -69,20 +69,20 @@ export enum Instructions {
 
 export interface InitializeControllerForm {
   governedAccount: GovernedProgramAccount | undefined
-  mintDecimals: number | undefined
+  mintDecimals: number
   programId: string | undefined
 }
 
 export interface SetRedeemableGlobalSupplyCapForm {
   governedAccount: GovernedProgramAccount | undefined
-  supplyCap: number | undefined
+  supplyCap: number
   programId: string | undefined
   controllerPda: string
 }
 
 export interface SetMangoDepositoriesRedeemableSoftCapForm {
   governedAccount: GovernedProgramAccount | undefined
-  supplyCap: number | undefined
+  supplyCap: number
   programId: string | undefined
   controllerPda: string
 }
@@ -99,7 +99,7 @@ export interface DepositInsuranceToMangoDepositoryForm {
   governedAccount: GovernedProgramAccount | undefined
   collateralMint: string
   insuranceMint: string
-  insuranceDepositedAmount: number | undefined
+  insuranceDepositedAmount: number
   programId: string | undefined
   controllerPda: string
 }
@@ -108,7 +108,7 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
   governedAccount: GovernedProgramAccount | undefined
   collateralMint: string
   insuranceMint: string
-  insuranceWithdrawnAmount: number | undefined
+  insuranceWithdrawnAmount: number
   programId: string | undefined
   controllerPda: string
 }

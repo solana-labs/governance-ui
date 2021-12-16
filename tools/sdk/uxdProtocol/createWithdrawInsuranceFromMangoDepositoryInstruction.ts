@@ -1,8 +1,13 @@
 import { Provider } from '@project-serum/anchor'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { Controller, MangoDepository } from '@uxdprotocol/uxd-client'
+import { Controller } from '@uxdprotocol/uxd-client'
 import { ConnectionContext } from 'stores/useWalletStore'
-import { uxdClient, initializeMango } from './uxdClient'
+import {
+  uxdClient,
+  initializeMango,
+  instantiateMangoDepository,
+} from './uxdClient'
 
 const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
   connection: ConnectionContext,
@@ -11,19 +16,20 @@ const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
   depositoryMint: PublicKey,
   insuranceMint: PublicKey,
   insuranceWithdrawnAmount: number,
-  controllerPda: PublicKey
+  controllerPda: PublicKey,
+  wallet: SignerWalletAdapter
 ): Promise<TransactionInstruction> => {
-  const client = uxdClient(connection.current, uxdProgramId)
+  const client = uxdClient(connection.current, uxdProgramId, wallet)
 
-  const mango = await initializeMango(connection.current, connection.cluster)
-  const depository = new MangoDepository(
+  const mango = await initializeMango(
+    connection.current,
+    connection.cluster,
+    wallet
+  )
+  const depository = instantiateMangoDepository(
+    uxdProgramId,
     depositoryMint,
-    'collateralName',
-    6,
-    insuranceMint,
-    'USDC',
-    6,
-    uxdProgramId
+    insuranceMint
   )
 
   return client.createWithdrawInsuranceFromMangoDepositoryInstruction(

@@ -74,8 +74,9 @@ const DepositInsuranceToMangoDepository = ({
         form.governedAccount?.governance.pubkey,
         new PublicKey(form.collateralMint),
         new PublicKey(form.insuranceMint),
-        form.insuranceDepositedAmount || 0,
-        new PublicKey(form.controllerPda)
+        form.insuranceDepositedAmount,
+        new PublicKey(form.controllerPda),
+        wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -101,6 +102,7 @@ const DepositInsuranceToMangoDepository = ({
       })
     }
   }, [form.collateralMint])
+
   useEffect(() => {
     if (form.insuranceMint) {
       debounce.debounceFcn(async () => {
@@ -109,6 +111,25 @@ const DepositInsuranceToMangoDepository = ({
       })
     }
   }, [form.insuranceMint])
+
+  useEffect(() => {
+    if (form.insuranceDepositedAmount) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceDepositedAmount])
+
+  useEffect(() => {
+    if (form.controllerPda) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.controllerPda])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -120,6 +141,11 @@ const DepositInsuranceToMangoDepository = ({
       .string()
       .required('Collateral Mint address is required'),
     insuranceMint: yup.string().required('Insurance Mint address is required'),
+    controllerPda: yup.string().required('Controller address is required'),
+    insuranceDepositedAmount: yup
+      .number()
+      .moreThan(0, 'Insurance Deposited amount should be more than 0')
+      .required('Insurance Deposited amount is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -175,7 +201,7 @@ const DepositInsuranceToMangoDepository = ({
             propertyName: 'insuranceDepositedAmount',
           })
         }
-        error={formErrors['global']}
+        error={formErrors['insuranceDepositedAmount']}
       />
       <Input
         label="Controller Address"

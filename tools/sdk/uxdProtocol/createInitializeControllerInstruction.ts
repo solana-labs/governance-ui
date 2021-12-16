@@ -1,25 +1,20 @@
 import { Provider } from '@project-serum/anchor'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
-import { Controller } from '@uxdprotocol/uxd-client'
-import { uxdClient } from './uxdClient'
+import { instantiateController, uxdClient } from './uxdClient'
 
 const createInitializeControllerInstruction = (
   uxdProgramId: PublicKey,
   mintDecimals: number,
   authority: PublicKey,
   payer: PublicKey,
-  connection: Connection
+  connection: Connection,
+  wallet: SignerWalletAdapter
 ): TransactionInstruction => {
-  const client = uxdClient(connection, uxdProgramId)
-
-  const controller = new Controller(
-    'redeemableTicker',
-    mintDecimals,
-    uxdProgramId
-  )
+  const client = uxdClient(connection, uxdProgramId, wallet)
 
   return client.createInitializeControllerInstruction(
-    controller,
+    instantiateController(uxdProgramId, mintDecimals),
     authority,
     Provider.defaultOptions(),
     payer

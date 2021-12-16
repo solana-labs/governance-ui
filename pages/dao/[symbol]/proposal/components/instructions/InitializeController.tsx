@@ -70,7 +70,8 @@ const InitializeController = ({
         form.mintDecimals,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
-        connection.current
+        connection.current,
+        wallet
       )
       serializedInstruction = serializeInstructionToBase64(
         initializeControllerIx
@@ -97,7 +98,11 @@ const InitializeController = ({
     )
   }, [form])
   const schema = yup.object().shape({
-    mintDecimals: yup.number().required('Mint Decimals is required'),
+    mintDecimals: yup
+      .number()
+      .min(0, 'Mint decimals cannot be less than 0')
+      .max(9, 'Mint decimals cannot be more than 9')
+      .required('Mint Decimals is required'),
     governedAccount: yup
       .object()
       .nullable()

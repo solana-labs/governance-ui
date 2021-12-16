@@ -74,8 +74,9 @@ const WithdrawInsuranceFromMangoDepository = ({
         form.governedAccount?.governance.pubkey,
         new PublicKey(form.collateralMint),
         new PublicKey(form.insuranceMint),
-        form.insuranceWithdrawnAmount || 0,
-        new PublicKey(form.controllerPda)
+        form.insuranceWithdrawnAmount,
+        new PublicKey(form.controllerPda),
+        wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -101,6 +102,7 @@ const WithdrawInsuranceFromMangoDepository = ({
       })
     }
   }, [form.collateralMint])
+
   useEffect(() => {
     if (form.insuranceMint) {
       debounce.debounceFcn(async () => {
@@ -109,17 +111,42 @@ const WithdrawInsuranceFromMangoDepository = ({
       })
     }
   }, [form.insuranceMint])
+
+  useEffect(() => {
+    if (form.insuranceWithdrawnAmount) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceWithdrawnAmount])
+
+  useEffect(() => {
+    if (form.controllerPda) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.controllerPda])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
     collateralMint: yup
       .string()
       .required('Collateral Mint address is required'),
     insuranceMint: yup.string().required('Insurance Mint address is required'),
+    controllerPda: yup.string().required('Controller address is required'),
+    insuranceWithdrawnAmount: yup
+      .number()
+      .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
+      .required('Insurance Withdrawn amount is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -168,14 +195,13 @@ const WithdrawInsuranceFromMangoDepository = ({
         value={form.insuranceWithdrawnAmount}
         type="number"
         min={0}
-        max={10 ** 12}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
             propertyName: 'insuranceWithdrawnAmount',
           })
         }
-        error={formErrors['global']}
+        error={formErrors['insuranceWithdrawnAmount']}
       />
       <Input
         label="Controller Address"
