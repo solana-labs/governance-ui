@@ -64,7 +64,7 @@ const AccountsCompactWrapper = () => {
               )}
             </h3>
             <HoldTokensTotalPrice />
-            <div style={{ maxHeight: '505px' }} className="overflow-y-auto">
+            <div style={{ maxHeight: '400px' }} className="overflow-y-auto">
               <AccountsItems />
             </div>
           </>
