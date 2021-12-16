@@ -7,7 +7,7 @@ import { uxdClient } from './uxdClient'
 const createSetMangoDepositoriesRedeemableSoftCapInstruction = (
   connection: Connection,
   uxdProgramId: PublicKey,
-  supplyCapUiAmount: number,
+  softCapUiAmount: number,
   authority: PublicKey,
   controllerPda: PublicKey,
   wallet: SignerWalletAdapter
@@ -17,7 +17,7 @@ const createSetMangoDepositoriesRedeemableSoftCapInstruction = (
   return client.createSetMangoDepositoriesRedeemableSoftCapInstruction(
     { pda: controllerPda } as Controller,
     authority,
-    supplyCapUiAmount,
+    softCapUiAmount,
     Provider.defaultOptions()
   )
 }

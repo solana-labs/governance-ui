@@ -43,7 +43,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   const [form, setForm] = useState<SetMangoDepositoriesRedeemableSoftCapForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    supplyCap: 0,
+    softCap: 0,
     controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -70,7 +70,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
         connection.current,
         form.governedAccount.governance?.info.governedAccount,
-        form.supplyCap,
+        form.softCap,
         form.governedAccount?.governance.pubkey,
         new PublicKey(form.controllerPda),
         wallet
@@ -93,13 +93,13 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.supplyCap) {
+    if (form.softCap) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.supplyCap])
+  }, [form.softCap])
 
   useEffect(() => {
     if (form.controllerPda) {
@@ -118,11 +118,11 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [form])
 
   const schema = yup.object().shape({
-    supplyCap: yup
+    softCap: yup
       .number()
-      .moreThan(0, 'Redeemable supply cap should be more than 0')
-      .required('Redeemable supply cap is required'),
-    controllerAddress: yup.string().required('Controller address is required'),
+      .moreThan(0, 'Redeemable soft cap should be more than 0')
+      .required('Redeemable soft cap is required'),
+    controllerPda: yup.string().required('Controller address is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -145,16 +145,16 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
 
       <Input
         label="Redeem Global Supply Cap"
-        value={form.supplyCap}
+        value={form.softCap}
         type="number"
         min={0}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'supplyCap',
+            propertyName: 'softCap',
           })
         }
-        error={formErrors['supplyCap']}
+        error={formErrors['softCap']}
       />
       <Input
         label="Controller Address"

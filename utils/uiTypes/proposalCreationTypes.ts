@@ -82,7 +82,7 @@ export interface SetRedeemableGlobalSupplyCapForm {
 
 export interface SetMangoDepositoriesRedeemableSoftCapForm {
   governedAccount: GovernedProgramAccount | undefined
-  supplyCap: number
+  softCap: number
   programId: string | undefined
   controllerPda: string
 }
