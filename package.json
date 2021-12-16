@@ -73,6 +73,7 @@
     "jest": "^26.6.3",
     "jest-watch-typeahead": "^0.6.1",
     "lint-staged": "^10.0.10",
+    "next-router-mock": "^0.6.3",
     "postcss": "^8.2.12",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.0.2",

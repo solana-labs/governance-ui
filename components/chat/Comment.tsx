@@ -11,6 +11,7 @@ import { ChatMessage } from '../../models/chat/accounts'
 import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
 import useRealm from '../../hooks/useRealm'
 import { MintInfo } from '@solana/spl-token'
+import { isPublicKey } from '@tools/core/pubkey'
 
 const Comment = ({
   chatMessage,
@@ -22,7 +23,13 @@ const Comment = ({
   proposalMint: MintInfo | undefined
 }) => {
   const { author, postedAt, body } = chatMessage
-  const { symbol } = useRealm()
+  const { realmInfo } = useRealm()
+
+  const voteSymbol = !realmInfo
+    ? ''
+    : isPublicKey(realmInfo.symbol)
+    ? realmInfo.displayName
+    : realmInfo.symbol
 
   return (
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
@@ -65,7 +72,7 @@ const Comment = ({
               {`${fmtTokenAmount(
                 voteRecord.getVoteWeight(),
                 proposalMint?.decimals
-              ).toLocaleString()} ${symbol}`}
+              ).toLocaleString()} ${voteSymbol}`}
             </span>
           </div>
         )}

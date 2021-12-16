@@ -1,4 +1,6 @@
+import { Realm } from '@models/accounts'
 import { getRealms } from '@models/api'
+import { ParsedAccount } from '@models/core/accounts'
 import { PublicKey } from '@solana/web3.js'
 import { arrayToMap, arrayToUnique } from '@tools/core/script'
 
@@ -27,23 +29,27 @@ export interface RealmInfo {
   twitter?: string
   // og:image
   ogImage?: string
+
+  isCertified: boolean
 }
 
-interface RealmInfoAsJSON extends Omit<RealmInfo, 'programId' | 'realmId'> {
+interface RealmInfoAsJSON
+  extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
   programId: string
   realmId: string
 }
 
 // TODO: Once governance program clones registry program and governance
 //       accounts metadata is on-chain the list should be moved there
-const MAINNET_REALMS = parseRealms(mainnetBetaRealms)
-const DEVNET_REALMS = parseRealms(devnetRealms)
+const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
+const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
 
-function parseRealms(realms: RealmInfoAsJSON[]) {
+function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
   return realms.map((realm) => ({
     ...realm,
     programId: new PublicKey(realm.programId),
     realmId: new PublicKey(realm.realmId),
+    isCertified: true,
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -54,7 +60,7 @@ export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export async function getRealmInfo(
+export async function getCertifiedRealmInfo(
   realmId: string,
   connection: ConnectionContext
 ) {
@@ -138,8 +144,6 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     .flatMap((r) => Object.values(r))
     .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
 
-  const programVersion = 1
-
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
   )
@@ -150,14 +154,18 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
         excludedRealms.has(r.pubkey.toBase58()) ||
         EXCLUDED_REALMS.has(r.pubkey.toBase58())
       )
-        ? ({
-            symbol: r.info.name,
-            programId: r.account.owner,
-            programVersion,
-            realmId: r.pubkey,
-            displayName: r.info.name,
-          } as RealmInfo)
+        ? createUnchartedRealmInfo(r)
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]
+}
+
+export function createUnchartedRealmInfo(realm: ParsedAccount<Realm>) {
+  return {
+    symbol: realm.info.name,
+    programId: new PublicKey(realm.account.owner),
+    realmId: realm.pubkey,
+    displayName: realm.info.name,
+    isCertified: false,
+  } as RealmInfo
 }
