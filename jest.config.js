@@ -22,7 +22,7 @@ module.exports = {
   testPathIgnorePatterns: ['<rootDir>/(node_modules|.next)/'],
   transformIgnorePatterns: ['/node_modules/.+\\.(ts|tsx)$'],
   transform: {
-    '^.+\\.(ts|tsx)$': 'babel-jest',
+    '^.+\\.([jt]sx?)$': 'babel-jest',
   },
   watchPlugins: [
     'jest-watch-typeahead/filename',
