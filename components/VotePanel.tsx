@@ -39,6 +39,8 @@ const VotePanel = () => {
   const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
   const [showCancelModal, setShowCancelModal] = useState(false)
 
+  const tokenRecords = useWalletStore((s) => s.selectedRealm)
+
   const canFinalizeVote =
     hasVoteTimeExpired === true &&
     connected &&
@@ -159,14 +161,15 @@ const VotePanel = () => {
     (proposal?.info.state === ProposalState.Draft ||
       proposal?.info.state === ProposalState.SigningOff)
 
-  const canCancelProposal = !(
-    ProposalState.Cancelled === proposal?.info.state ||
+  const canCancelProposal =
     !(
       proposal?.info.state === ProposalState.Draft ||
       proposal?.info.state === ProposalState.SigningOff ||
-      proposal?.info.state === ProposalState.Voting
-    )
-  )
+      proposal?.info.state === ProposalState.Cancelled
+    ) &&
+    proposal &&
+    wallet?.publicKey &&
+    tokenRecords.tokenRecords[wallet.publicKey.toBase58()]
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
@@ -216,11 +219,11 @@ const VotePanel = () => {
           </Button>
         )}
 
-        {canCancelProposal && proposal.account.owner === wallet?.publicKey && (
+        {canCancelProposal && (
           <Button
             className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowCancelModal(true)}
-            disabled={!connected || !canCancelProposal}
+            disabled={!connected}
           >
             Cancel
           </Button>
@@ -265,6 +268,7 @@ const VotePanel = () => {
 
       {showCancelModal && (
         <CancelProposalModal
+          // @ts-ignore
           isOpen={showCancelModal && canCancelProposal}
           onClose={() => setShowCancelModal(false)}
         />
