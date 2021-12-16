@@ -1,10 +1,12 @@
 import React from 'react'
-import { render } from '../testUtils'
 import Home from '../../pages/index'
+import { render } from '@testing-library/react'
+
+jest.mock('next/router', () => require('next-router-mock'))
 
 describe('Home page', () => {
   it('renders', () => {
-    render(<Home />, {})
+    render(<Home />)
     expect(true).toBe(true)
   })
 })
