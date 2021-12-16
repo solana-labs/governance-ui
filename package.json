@@ -58,9 +58,10 @@
     "zustand": "^3.4.1"
   },
   "devDependencies": {
+    "@babel/preset-env": "^7.16.5",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@testing-library/react": "^11.2.5",
-    "@types/jest": "^26.0.20",
+    "@types/jest": "^27.0.3",
     "@types/node": "^14.14.25",
     "@types/react": "^17.0.1",
     "@typescript-eslint/eslint-plugin": "^5.7.0",
@@ -72,7 +73,7 @@
     "eslint-plugin-react-hooks": "^4.3.0",
     "husky": "^6.0.0",
     "identity-obj-proxy": "^3.0.0",
-    "jest": "^26.6.3",
+    "jest": "^27.4.5",
     "jest-watch-typeahead": "^0.6.1",
     "lint-staged": "^10.0.10",
     "next-router-mock": "^0.6.3",
