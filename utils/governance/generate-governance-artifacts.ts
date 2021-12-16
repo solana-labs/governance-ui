@@ -26,6 +26,7 @@ export interface SourceEntryInterface {
   tokenAmount: number
 }
 
+// TODO: Remove all of this, it's not needed
 export const generateGovernanceArtifacts = async (
   connection: Connection,
   wallet: WalletSigner,
@@ -45,7 +46,7 @@ export const generateGovernanceArtifacts = async (
   // Setup community mint
   const {
     mintAddress: communityMintAddress,
-  } = await withMint(
+  } = await withMintAndTokenAccounts(
     communityMintInstruction,
     communityMintSigners,
     connection,
@@ -60,7 +61,7 @@ export const generateGovernanceArtifacts = async (
   const councilMintInstructions: TransactionInstruction[] = []
 
   // Setup council mint
-  const { mintAddress: councilMintAddress } = await withMint(
+  const { mintAddress: councilMintAddress } = await withMintAndTokenAccounts(
     councilMintInstructions,
     councilMinSigners,
     connection,
@@ -190,7 +191,7 @@ const withTokenGovernance = async (
 }
 
 //////////////////////////////////////////
-export const withMint = async (
+export const withMintAndTokenAccounts = async (
   instructions: TransactionInstruction[],
   signers: Keypair[],
   connection: Connection,

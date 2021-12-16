@@ -152,9 +152,7 @@ const TokenDeposit = ({
       depositTokenAccount!.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID,
-      SystemProgram.programId
+      wallet!.publicKey!
     )
 
     const transaction = new Transaction()

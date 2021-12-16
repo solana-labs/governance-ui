@@ -106,8 +106,7 @@ export async function getInstructionDescriptor(
   let descriptors: any
 
   if (isGovernanceProgram(instruction.programId)) {
-    descriptors =
-      GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
+    descriptors = GOVERNANCE_INSTRUCTIONS[DEFAULT_GOVERNANCE_PROGRAM_ID]
   } else {
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }

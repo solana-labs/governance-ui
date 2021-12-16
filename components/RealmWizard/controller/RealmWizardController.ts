@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { MintMaxVoteWeightSource } from '@models/accounts'
 import { RpcContext } from '@models/core/api'
+import { ProgramVersion } from '@models/registry/api'
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from 'stores/useWalletStore'
@@ -111,8 +113,9 @@ class RealmWizardController {
     councilMintId?: PublicKey
     voteWeight: MintMaxVoteWeightSource
     minCommunityTokens: BN
+    programId: PublicKey
+    programVersion: ProgramVersion
   } {
-    console.log({ ...artifacts })
     if (artifacts.governanceProgramId) {
       const rpc = new RpcContext(
         new PublicKey(artifacts.governanceProgramId),
@@ -136,6 +139,8 @@ class RealmWizardController {
               : undefined,
             voteWeight: MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
             minCommunityTokens: artifacts.minCommunityTokensToCreateGovernance,
+            programId: new PublicKey(artifacts.governanceProgramId),
+            programVersion: artifacts.programVersion!,
           }
         } else {
           throw new Error('Invalid realm data.')

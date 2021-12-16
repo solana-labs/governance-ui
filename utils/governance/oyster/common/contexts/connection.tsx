@@ -20,6 +20,14 @@ export type WalletSigner = Pick<
   'publicKey' | 'signTransaction' | 'signAllTransactions'
 >
 
+export function getWalletPublicKey(wallet: WalletSigner) {
+  if (!wallet.publicKey) {
+    throw new Error('Wallet not connected!')
+  }
+
+  return wallet.publicKey
+}
+
 async function awaitTransactionSignatureConfirmation(
   txid: TransactionSignature,
   timeout: number,

@@ -70,6 +70,9 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
           ) {
             const realmAddress = await registerRealm(
               rpcContext,
+              // TODO: programId and programVersion should be taken from the form inputs
+              rpcContext.programId,
+              rpcContext.programVersion,
               form.name,
               new PublicKey(form?.communityMintId),
               form.councilMintId

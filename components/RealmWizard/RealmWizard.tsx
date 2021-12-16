@@ -28,6 +28,10 @@ import { getMintDecimalAmount } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { registerRealm } from 'actions/registerRealm'
 import { generateGovernanceArtifacts } from '@utils/governance/generate-governance-artifacts'
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { ProgramVersion } from '@models/registry/api'
+
+import { createMultisigRealm } from 'actions/createMultisigRealm'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the Realm Artifacts..',
@@ -91,6 +95,28 @@ const RealmWizard: React.FC = () => {
     setLoaderMessage(LoaderMessage.CREATING_ARTIFACTS)
     setIsLoading(true)
 
+    let programId = DEFAULT_GOVERNANCE_PROGRAM_ID
+
+    // temp. set to other instance to prevent spamming the default one
+    // TODO: make it possible to set the default one via environment variable
+    programId = '4T4jPyMxM4fMn71pJQpU3iuQZrf5FnE2MmP71T7PGosm'
+
+    const results = await createMultisigRealm(
+      connection.current,
+      new PublicKey(programId),
+      ProgramVersion.V1,
+      form.name,
+      60,
+      form.teamWallets.map((w) => new PublicKey(w)),
+      wallet
+    )
+
+    if (results) {
+      throw new Error(
+        'TODO: Remove everything after this line because realm is already created at this point and redirect to the realm page  dao/${realmPk}'
+      )
+    }
+
     const generatedArtifacts = await generateGovernanceArtifacts(
       connection.current,
       wallet,
@@ -100,8 +126,8 @@ const RealmWizard: React.FC = () => {
 
     let artifacts: RealmArtifacts = {
       name: generatedArtifacts.realmName,
-      programVersion: 1,
-      governanceProgramId: 'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw',
+      programVersion: ProgramVersion.V1,
+      governanceProgramId: DEFAULT_GOVERNANCE_PROGRAM_ID,
       communityMintId: generatedArtifacts.communityMintAddress.toBase58(),
       councilMintId: generatedArtifacts.councilMintAddress.toBase58(),
       minCommunityTokensToCreateGovernance: new BN(1000000),
@@ -244,8 +270,11 @@ const RealmWizard: React.FC = () => {
       setLoaderMessage(LoaderMessage.DEPLOYING_REALM)
       try {
         const calldata = ctl.prepareData(wallet, connection, generatedForm)
+
         const realmAddress = await registerRealm(
           calldata.rpc,
+          calldata.programId,
+          calldata.programVersion,
           calldata.name,
           calldata.communityMintId,
           calldata.councilMintId,
