@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'

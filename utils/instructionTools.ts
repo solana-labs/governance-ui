@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,

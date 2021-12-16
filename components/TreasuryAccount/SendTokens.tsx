@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Button, { SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getAccountName } from '@components/instructions/tools'

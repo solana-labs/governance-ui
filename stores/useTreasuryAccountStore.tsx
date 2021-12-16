@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import create, { State } from 'zustand'
 import { ViewState } from '@components/TreasuryAccount/Types'
 import { GovernedTokenAccount } from '@utils/tokens'

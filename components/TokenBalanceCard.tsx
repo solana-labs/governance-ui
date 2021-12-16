@@ -3,7 +3,6 @@ import { MintInfo } from '@solana/spl-token'
 import {
   Account,
   PublicKey,
-  SystemProgram,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
