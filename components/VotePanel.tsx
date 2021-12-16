@@ -216,7 +216,7 @@ const VotePanel = () => {
           </Button>
         )}
 
-        {canCancelProposal && (
+        {canCancelProposal && proposal.account.owner === wallet?.publicKey && (
           <Button
             className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowCancelModal(true)}
