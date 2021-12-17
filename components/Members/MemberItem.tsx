@@ -4,13 +4,13 @@ import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
-import { TokenRecordWithWallet } from './types'
+import { TokenRecordsWithWalletAddress } from './types'
 import tokenService from '@utils/services/token'
 import useMembersListStore from 'stores/useMembersListStore'
 import { ViewState } from './types'
 import { useMemo } from 'react'
 
-const MemberItem = ({ item }: { item: TokenRecordWithWallet }) => {
+const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
   const { mint, councilMint, realm } = useRealm()
   const {
     setCurrentCompactView,

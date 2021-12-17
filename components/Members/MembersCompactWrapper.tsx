@@ -12,11 +12,13 @@ const MembersCompactWrapper = () => {
   const membersCount = members.length
   const { resetCompactViewState } = useMembersListStore()
   const currentView = useMembersListStore((s) => s.compact.currentView)
-  const totalVotesCast = members
-    .map((x) => x.info.totalVotesCount)
-    .reduce((prev, current) => {
-      return current + prev
-    }, 0)
+  const totalVotesCast = members.reduce((prev, current) => {
+    return (
+      (current.council?.info.totalVotesCount || 0) +
+      (current.community?.info.totalVotesCount || 0) +
+      prev
+    )
+  }, 0)
 
   const getCurrentView = () => {
     switch (currentView) {
@@ -29,7 +31,7 @@ const MembersCompactWrapper = () => {
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
             <div style={{ maxHeight: '350px' }}>
-              <MembersItems></MembersItems>
+              {/* <MembersItems></MembersItems> */}
             </div>
           </>
         )

@@ -6,6 +6,8 @@ export enum ViewState {
   MemberOverview,
 }
 
-export interface TokenRecordWithWallet extends ParsedAccount<TokenOwnerRecord> {
+export interface TokenRecordsWithWalletAddress {
   walletAddress: string
+  council?: ParsedAccount<TokenOwnerRecord> | undefined
+  community?: ParsedAccount<TokenOwnerRecord> | undefined
 }
