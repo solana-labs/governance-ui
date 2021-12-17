@@ -16,30 +16,33 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
     setCurrentCompactView,
     setCurrentCompactViewMember,
   } = useMembersListStore()
-  const { walletAddress, info } = item
+  const { walletAddress, council, community } = item
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === realm?.info.communityMint.toBase58()
   )?.symbol
   const walletPublicKey = tryParsePublicKey(walletAddress)
-  const currentMint =
-    realm?.info.communityMint?.toBase58() === info.governingTokenMint.toBase58()
-      ? mint
-      : councilMint
-  const isCouncilMint =
-    realm?.info.communityMint?.toBase58() !== info.governingTokenMint.toBase58()
 
   async function handleGoToMemberOverview() {
     setCurrentCompactView(ViewState.MemberOverview)
     setCurrentCompactViewMember(item)
   }
-  const amount = useMemo(
-    () => fmtMintAmount(currentMint, info.governingTokenDepositAmount),
-    [info.governingTokenDepositAmount]
-  )
-  const walletAddressFormated = useMemo(
-    () => abbreviateAddress(walletPublicKey as PublicKey),
-    [walletAddress]
-  )
+  const totalCommunityVotes = community?.info.totalVotesCount || 0
+  const totalCouncilVotes = council?.info.totalVotesCount || 0
+  const totalVotes = totalCommunityVotes + totalCouncilVotes
+  const communityAmount = community
+    ? useMemo(
+        () => fmtMintAmount(mint, community.info.governingTokenDepositAmount),
+        [community.info.governingTokenDepositAmount]
+      )
+    : null
+  const councilAmount = council
+    ? useMemo(
+        () =>
+          fmtMintAmount(councilMint, council.info.governingTokenDepositAmount),
+        [council.info.governingTokenDepositAmount]
+      )
+    : null
+  const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
   return (
     <div
       onClick={handleGoToMemberOverview}
@@ -49,12 +52,18 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
         <UserCircleIcon className="h-6 text-fgd-3 w-6" />
       </div>
       <div>
-        <div className="text-xs text-th-fgd-1">{walletAddressFormated}</div>
+        <div className="text-xs text-th-fgd-1">{walletAddressFormatted}</div>
         <div className="text-fgd-3 text-xs flex flex-col">
-          Total Votes: {info.totalVotesCount}
+          Total Votes: {totalVotes}
         </div>
-        <div className="text-fgd-3 text-xs flex flex-col">
-          {isCouncilMint ? 'Council' : tokenName} Votes {amount}
+        <div className="text-fgd-3 text-xs flex flex-row">
+          {communityAmount && (
+            <span>
+              {tokenName} Votes {communityAmount}
+            </span>
+          )}
+          {communityAmount && council && <span className="ml-1 mr-1">|</span>}
+          {council && <span>Council Votes {councilAmount}</span>}
         </div>
       </div>
     </div>

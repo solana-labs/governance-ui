@@ -14,7 +14,7 @@ export default function useMembers() {
             }
           })
         : [],
-    [tokenRecords]
+    [JSON.stringify(tokenRecords)]
   )
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
@@ -26,13 +26,15 @@ export default function useMembers() {
             }
           })
         : [],
-    [councilTokenOwnerRecords]
+    [JSON.stringify(councilTokenOwnerRecords)]
   )
   const communityAndCouncilTokenRecords = [
     ...tokenRecordArray,
     ...councilRecordArray,
   ]
 
+  //We merge community and council vote records to one big array of members
+  //we sort them by totalVotes sum of community and council votes
   const members = useMemo(
     () =>
       Array.from(
@@ -58,22 +60,20 @@ export default function useMembers() {
               ),
           }
         })
-        .filter(
-          (x) =>
-            x.council?.info.totalVotesCount !== 0 ||
-            x.community?.info.totalVotesCount !== 0
-        )
         .sort((a, b) => {
-          return (
-            (b.community?.info.totalVotesCount || 0) +
-            (b.council?.info.totalVotesCount || 0) -
-            ((a.community?.info.totalVotesCount || 0) +
-              (a.council?.info.totalVotesCount || 0))
-          )
-        }),
-    [tokenRecordArray, councilRecordArray]
+          const prevCommunityVotes = a.community?.info.totalVotesCount || 0
+          const prevCouncilVotes = a.council?.info.totalVotesCount || 0
+          const nextCommunityVotes = b.community?.info.totalVotesCount || 0
+          const nextCouncilVotes = b.council?.info.totalVotesCount || 0
+          const prevTotalVotes = prevCommunityVotes + prevCouncilVotes
+          const nextTotalVotes = nextCommunityVotes + nextCouncilVotes
+          console.log(prevTotalVotes, nextTotalVotes, '@@@@@@')
+          return prevTotalVotes - nextTotalVotes
+        })
+        .reverse(),
+    [JSON.stringify(tokenRecordArray), JSON.stringify(councilRecordArray)]
   )
-  console.log(members)
+
   return {
     tokenRecordArray,
     councilRecordArray,

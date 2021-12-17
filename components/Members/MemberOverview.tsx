@@ -5,28 +5,38 @@ import { PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import tokenService from '@utils/services/token'
-import React from 'react'
+import React, { useMemo } from 'react'
 import useMembersListStore from 'stores/useMembersListStore'
 import { ViewState } from './types'
 
 const MemberOverview = () => {
   const member = useMembersListStore((s) => s.compact.currentMember)
-  const { walletAddress, info } = member!
+  const { walletAddress, community, council } = member!
   const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
   const tokenName = tokenService.tokenList.find(
-    (x) => x.address === info.governingTokenMint.toBase58()
+    (x) => x.address === community?.info.governingTokenMint.toBase58()
   )?.symbol
-  const { mint, councilMint, realm } = useRealm()
-  const currentMint =
-    realm?.info.communityMint?.toBase58() === info.governingTokenMint.toBase58()
-      ? mint
-      : councilMint
-  const isCouncilMint =
-    realm?.info.communityMint?.toBase58() !== info.governingTokenMint.toBase58()
+  const { mint, councilMint } = useRealm()
+  const totalCommunityVotes = community?.info.totalVotesCount || 0
+  const totalCouncilVotes = council?.info.totalVotesCount || 0
+  const totalVotes = totalCommunityVotes + totalCouncilVotes
+  const communityAmount = community
+    ? useMemo(
+        () => fmtMintAmount(mint, community.info.governingTokenDepositAmount),
+        [community.info.governingTokenDepositAmount]
+      )
+    : null
+  const councilAmount = council
+    ? useMemo(
+        () =>
+          fmtMintAmount(councilMint, council.info.governingTokenDepositAmount),
+        [council.info.governingTokenDepositAmount]
+      )
+    : null
   return (
     <>
       <h3 className="mb-4 flex items-center">
@@ -42,11 +52,16 @@ const MemberOverview = () => {
         <div>
           {abbreviateAddress(new PublicKey(walletAddress))}
           <div className="text-fgd-3 text-xs flex flex-col">
-            Total Votes: {info.totalVotesCount}
+            Total Votes: {totalVotes}
           </div>
           <div className="text-fgd-3 text-xs flex flex-col">
-            {isCouncilMint ? 'Council' : tokenName} Votes{' '}
-            {fmtMintAmount(currentMint, info.governingTokenDepositAmount)}
+            {communityAmount && (
+              <span>
+                {tokenName} Votes {communityAmount}
+              </span>
+            )}
+            {communityAmount && council && <span className="ml-1 mr-1">|</span>}
+            {council && <span>Council Votes {councilAmount}</span>}
           </div>
         </div>
         <div className="ml-auto">
@@ -56,7 +71,7 @@ const MemberOverview = () => {
               navigator.clipboard.writeText(walletAddress)
             }}
           >
-            Copy address
+            Copy
           </LinkButton>
         </div>
       </div>
