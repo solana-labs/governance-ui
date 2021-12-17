@@ -6,7 +6,7 @@ import { arrayToMap, arrayToUnique } from '@tools/core/script'
 
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
 import { ProgramVersion } from './constants'
 
