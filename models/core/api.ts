@@ -5,7 +5,7 @@ import bs58 from 'bs58'
 import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
 import { Schema } from 'borsh'
 import { deserializeBorsh } from '../../utils/borsh'
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from 'models/registry/constants'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
 export const SYSTEM_PROGRAM_ID = new PublicKey(
