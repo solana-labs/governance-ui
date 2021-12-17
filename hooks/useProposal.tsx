@@ -11,6 +11,7 @@ export default function useProposal() {
     instructions,
     proposalMint,
     governance,
+    proposalOwner,
   } = useWalletStore((s) => s.selectedProposal)
 
   return {
@@ -20,5 +21,6 @@ export default function useProposal() {
     instructions,
     proposalMint,
     governance,
+    proposalOwner,
   }
 }

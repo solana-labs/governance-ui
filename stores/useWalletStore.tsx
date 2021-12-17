@@ -87,6 +87,7 @@ interface WalletStore extends State {
     proposalMint?: MintAccount
     loading: boolean
     tokenType?: GoverningTokenType
+    proposalOwner: ParsedAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -201,6 +202,7 @@ const INITIAL_PROPOSAL_STATE = {
   description: undefined,
   proposalMint: undefined,
   loading: true,
+  proposalOwner: undefined,
 }
 
 const useWalletStore = create<WalletStore>((set, get) => ({
@@ -489,6 +491,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         voteRecordsByVoter,
         signatories,
         chatMessages,
+        proposalOwner,
       ] = await Promise.all([
         resolveProposalDescription(proposal.info.descriptionLink),
         getGovernanceAccount<Governance>(
@@ -512,6 +515,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           [pubkeyFilter(1, proposalPubKey)]
         ),
         getGovernanceChatMessages(endpoint, proposalPubKey),
+        getGovernanceAccount<TokenOwnerRecord>(
+          connection,
+          proposal.info.tokenOwnerRecord,
+          TokenOwnerRecord
+        ),
       ])
 
       const realm = await getGovernanceAccount<Realm>(
@@ -535,6 +543,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         signatories,
         chatMessages,
         tokenType,
+        proposalOwner,
       })
 
       set((s) => {
@@ -549,6 +558,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
         s.selectedProposal.tokenType = tokenType
+        s.selectedProposal.proposalOwner = proposalOwner
       })
     },
     async fetchChatMessages(proposalPubKey: PublicKey) {
