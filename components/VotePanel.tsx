@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useEffect, useState } from 'react'
@@ -123,7 +121,6 @@ const VotePanel = () => {
       await relinquishVote(
         rpcContext,
         proposal!,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
         ownVoteRecord!.pubkey,
         instructions

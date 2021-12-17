@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { getConnectionContext } from 'stores/useWalletStore'
