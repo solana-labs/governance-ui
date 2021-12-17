@@ -3,18 +3,21 @@ import React, { useEffect } from 'react'
 import useMembersListStore from 'stores/useMembersListStore'
 import { ViewState } from './types'
 import MembersItems from './MembersItems'
+import useMembers from './useMembers'
+import MemberOverview from './MemberOverview'
 
 const MembersCompactWrapper = () => {
-  //TODO do we want to fetch only when realm change?
-  const { symbol, tokenRecords } = useRealm()
-  const membersCount = Object.keys(tokenRecords).length
-  const totalVotesCast = Object.keys(tokenRecords)
-    .map((x) => tokenRecords[x].info.totalVotesCount)
+  const { symbol } = useRealm()
+  const { members } = useMembers()
+  const membersCount = members.length
+  const { resetCompactViewState } = useMembersListStore()
+  const currentView = useMembersListStore((s) => s.compact.currentView)
+  const totalVotesCast = members
+    .map((x) => x.info.totalVotesCount)
     .reduce((prev, current) => {
       return current + prev
     }, 0)
-  const { resetCompactViewState } = useMembersListStore()
-  const currentView = useMembersListStore((s) => s.compact.currentView)
+
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -25,11 +28,13 @@ const MembersCompactWrapper = () => {
               <p className="text-fgd-3 text-xs">Total votes cast</p>
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
-            <div style={{ maxHeight: '400px' }} className="overflow-y-auto">
+            <div style={{ maxHeight: '350px' }}>
               <MembersItems></MembersItems>
             </div>
           </>
         )
+      case ViewState.MemberOverview:
+        return <MemberOverview></MemberOverview>
     }
   }
   useEffect(() => {

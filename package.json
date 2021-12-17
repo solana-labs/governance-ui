@@ -50,6 +50,7 @@
     "react-dom": "^17.0.1",
     "react-markdown": "^7.0.0",
     "react-portal": "^4.2.1",
+    "react-virtualized": "^9.22.3",
     "superstruct": "^0.15.3",
     "ts-node": "^10.2.1",
     "yup": "^0.32.11",
