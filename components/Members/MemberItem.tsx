@@ -17,7 +17,7 @@ const MemberItem = ({ item }: { item: TokenRecordWithWallet }) => {
     setCurrentCompactViewMember,
   } = useMembersListStore()
   const { walletAddress, info } = item
-  const tokeName = tokenService.tokenList.find(
+  const tokenName = tokenService.tokenList.find(
     (x) => x.address === realm?.info.communityMint.toBase58()
   )?.symbol
   const walletPublicKey = tryParsePublicKey(walletAddress)
@@ -54,7 +54,7 @@ const MemberItem = ({ item }: { item: TokenRecordWithWallet }) => {
           Total Votes: {info.totalVotesCount}
         </div>
         <div className="text-fgd-3 text-xs flex flex-col">
-          {isCouncilMint ? 'Council' : tokeName} Votes {amount}
+          {isCouncilMint ? 'Council' : tokenName} Votes {amount}
         </div>
       </div>
     </div>

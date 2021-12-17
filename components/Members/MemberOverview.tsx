@@ -17,8 +17,8 @@ const MemberOverview = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
-  const tokeName = tokenService.tokenList.find(
-    (x) => x.address === realm?.info.communityMint.toBase58()
+  const tokenName = tokenService.tokenList.find(
+    (x) => x.address === info.governingTokenMint.toBase58()
   )?.symbol
   const { mint, councilMint, realm } = useRealm()
   const currentMint =
@@ -40,13 +40,12 @@ const MemberOverview = () => {
       </h3>
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
         <div>
-          <div className="text-fgd-3 text-xs">Wallet</div>
           {abbreviateAddress(new PublicKey(walletAddress))}
           <div className="text-fgd-3 text-xs flex flex-col">
             Total Votes: {info.totalVotesCount}
           </div>
           <div className="text-fgd-3 text-xs flex flex-col">
-            {isCouncilMint ? 'Council' : tokeName} Votes{' '}
+            {isCouncilMint ? 'Council' : tokenName} Votes{' '}
             {fmtMintAmount(currentMint, info.governingTokenDepositAmount)}
           </div>
         </div>
