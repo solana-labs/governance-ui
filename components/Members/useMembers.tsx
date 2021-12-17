@@ -14,6 +14,7 @@ export default function useMembers() {
             }
           })
         : [],
+    //JSON stringify for performance
     [JSON.stringify(tokenRecords)]
   )
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
@@ -33,13 +34,15 @@ export default function useMembers() {
     ...councilRecordArray,
   ]
 
-  //We merge community and council vote records to one big array of members
-  //we sort them by totalVotes sum of community and council votes
+  //merge community and council vote records to one big array of members
+  //sort them by totalVotes sum of community and council votes
   const members = useMemo(
     () =>
+      //remove duplicated walletAddresses
       Array.from(
         new Set(communityAndCouncilTokenRecords.map((s) => s.walletAddress))
       )
+        //deduplication
         .map((walletAddress) => {
           return {
             ...communityAndCouncilTokenRecords
@@ -61,13 +64,19 @@ export default function useMembers() {
           }
         })
         .sort((a, b) => {
-          const prevCommunityVotes = a.community?.info.totalVotesCount || 0
-          const prevCouncilVotes = a.council?.info.totalVotesCount || 0
-          const nextCommunityVotes = b.community?.info.totalVotesCount || 0
-          const nextCouncilVotes = b.council?.info.totalVotesCount || 0
+          const prevCommunityInfo = a.community?.info
+          const prevCouncilInfo = a.council?.info
+          const nextCouncilInfo = b.council?.info
+          const nextCommunityInfo = b.community?.info
+
+          const prevCommunityVotes = prevCommunityInfo?.totalVotesCount || 0
+          const prevCouncilVotes = prevCouncilInfo?.totalVotesCount || 0
+          const nextCommunityVotes = nextCommunityInfo?.totalVotesCount || 0
+          const nextCouncilVotes = nextCouncilInfo?.totalVotesCount || 0
+
           const prevTotalVotes = prevCommunityVotes + prevCouncilVotes
           const nextTotalVotes = nextCommunityVotes + nextCouncilVotes
-          console.log(prevTotalVotes, nextTotalVotes, '@@@@@@')
+
           return prevTotalVotes - nextTotalVotes
         })
         .reverse(),

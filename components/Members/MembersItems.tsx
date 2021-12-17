@@ -10,7 +10,6 @@ const MembersItems = () => {
   function rowRenderer({
     key, // Unique key within array of rows
     index, // Index of row within collection
-
     style, // Style object to be applied to row (to position it)
   }) {
     return (
@@ -19,6 +18,7 @@ const MembersItems = () => {
       </div>
     )
   }
+  //TODO implement CellMeasurer for now every row has to be same height
   return (
     <div className="space-y-3">
       <AutoSizer disableHeight>

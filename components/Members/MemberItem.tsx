@@ -44,6 +44,8 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
     : null
   const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
   return (
+    //TODO: implement dynamic height with CellMeasurer
+    //for now every member item element has to be same height
     <div
       onClick={handleGoToMemberOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
