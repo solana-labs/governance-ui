@@ -165,7 +165,8 @@ const VotePanel = () => {
     !(
       proposal?.info.state === ProposalState.Draft ||
       proposal?.info.state === ProposalState.SigningOff ||
-      proposal?.info.state === ProposalState.Cancelled
+      proposal?.info.state === ProposalState.Cancelled ||
+      proposal?.info.state === ProposalState.Succeeded
     ) &&
     proposal &&
     wallet?.publicKey &&
