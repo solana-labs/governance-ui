@@ -21,7 +21,8 @@
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],
       "@utils/*": ["utils/*"]
-    }
+    },
+    "incremental": true
   },
   "exclude": ["node_modules", ".next", "out"],
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
