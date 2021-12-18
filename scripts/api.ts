@@ -11,6 +11,7 @@ import { ParsedAccount } from 'models/core/accounts'
 import { MemcmpFilter, RpcContext } from 'models/core/api'
 import { GOVERNANCE_SCHEMA } from 'models/serialisation'
 import { deserializeBorsh } from 'utils/borsh'
+import { sleep } from '@project-serum/common'
 
 const fetch = require('node-fetch')
 
@@ -54,7 +55,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
       )),
     }
     // XXX: sleep to prevent public RPC rate limits
-    await new Promise((r) => setTimeout(r, 3_000))
+    await sleep(3_000)
   }
 
   return accounts
