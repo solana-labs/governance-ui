@@ -2,11 +2,15 @@ import Link from 'next/link'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realm, governances, ownVoterWeight } = useRealm()
+
+  useEffect(() => {
+    console.log('governance realm 8099', governances)
+  }, [])
 
   const canCreateProposal =
     realm &&

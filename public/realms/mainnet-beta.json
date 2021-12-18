@@ -108,7 +108,7 @@
     "displayName": "Friends and Family DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "371PRJu9vyU2U6WHcqorakWvz3wpfGSVhHr65BBSoaiN",
-    "ogImage": "/realms/fafd/img/fafd.png",
+    "ogImage": "/realms/FAFD/img/fafd_logo.png",
     "website": "https://find-and-update.company-information.service.gov.uk/company/13753949"
   },
   {
@@ -153,5 +153,14 @@
     "ogImage": "/realms/Grape/img/grape.png",
     "website": "https://grapes.network/",
     "twitter": "@grapeprotocol"
+  },
+  {
+    "symbol": "MonkeDAO",
+    "displayName": "MonkeDAO",
+    "programId": "GMnke6kxYvqoAXgbFGnu84QzvNHoqqTnijWSXYYTFQbB",
+    "realmId": "B1CxhV1khhj7n5mi5hebbivesqH9mvXr5Hfh2nD2UCh6",
+    "ogImage": "/realms/MonkeDAO/img/MonkeDAO_logo.png",
+    "website": "https://monkedao.io/",
+    "twitter": "@MonkeDAO"
   }
 ]

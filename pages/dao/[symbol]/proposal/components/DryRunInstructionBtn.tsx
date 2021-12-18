@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import Loading from '@components/Loading'

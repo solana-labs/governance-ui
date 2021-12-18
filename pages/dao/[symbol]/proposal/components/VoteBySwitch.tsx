@@ -4,11 +4,9 @@ import React from 'react'
 const VoteBySwitch = ({ checked, onChange }) => {
   return (
     <div className="text-sm mb-3">
-      <div className="mb-2">Vote by</div>
+      <div className="mb-2">Vote by council</div>
       <div className="flex flex-row text-xs items-center">
-        Community
-        <Switch className="ml-2 mr-2" checked={checked} onChange={onChange} />
-        Council
+        <Switch checked={checked} onChange={onChange} />
       </div>
     </div>
   )

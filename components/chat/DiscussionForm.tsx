@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useState } from 'react'
 import Button from '../Button'
 import Input from '../inputs/Input'

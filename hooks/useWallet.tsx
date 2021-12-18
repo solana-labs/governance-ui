@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect, useMemo } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'

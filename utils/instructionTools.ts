@@ -7,7 +7,7 @@ import {
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import { findTrueReceiver } from './ataTools'
 import { isFormValid } from './formValidation'
 import { GovernedTokenAccount } from './tokens'

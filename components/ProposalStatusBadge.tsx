@@ -41,9 +41,11 @@ function getProposalStateStyle(state: ProposalState) {
 const ProposalStateBadge = ({
   proposalPk,
   proposal,
+  open,
 }: {
   proposalPk: PublicKey
   proposal: Proposal
+  open: boolean
 }) => {
   const governance = useRealmGovernance(proposal.governance)
 
@@ -62,13 +64,29 @@ const ProposalStateBadge = ({
   }
 
   return (
-    <div
-      className={`${getProposalStateStyle(
-        proposal.state
-      )} inline-block px-2 py-1 rounded-full text-xs`}
-    >
-      {statusLabel}
-    </div>
+    <>
+      {open ? (
+        <>
+          <div className="flex items-center justify-end gap-4">
+            <div
+              className={`${getProposalStateStyle(
+                proposal.state
+              )} inline-block px-2 py-1 rounded-full text-xs`}
+            >
+              {statusLabel}
+            </div>
+          </div>
+        </>
+      ) : (
+        <div
+          className={`${getProposalStateStyle(
+            proposal.state
+          )} inline-block px-2 py-1 rounded-full text-xs`}
+        >
+          {statusLabel}
+        </div>
+      )}
+    </>
   )
 }
 
