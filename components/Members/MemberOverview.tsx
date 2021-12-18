@@ -170,7 +170,7 @@ const MemberOverview = () => {
             key={x.proposalPublicKey}
           >
             <div>
-              <div>{x.proposalName}</div>
+              <div className="break-all">{x.proposalName}</div>
               {x.chatMessages.length !== 0 && (
                 <div className="mt-2 mb-2 text-fgd-3 text-xs">Comments:</div>
               )}

@@ -7,13 +7,14 @@ import useMembers from './useMembers'
 import MemberOverview from './MemberOverview'
 import { PlusIcon } from '@heroicons/react/outline'
 import AddMember from './AddMember'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const MembersCompactWrapper = () => {
-  const { symbol } = useRealm()
+  const { symbol, mint, councilMint } = useRealm()
   const { members } = useMembers()
   const membersCount = members.length
-  const { setCurrentCompactView } = useMembersListStore()
-  const { resetCompactViewState } = useMembersListStore()
+  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
+  const { canUseMintInstruction } = useGovernanceAssets()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
     const councilTotalVotes = current.council?.info.totalVotesCount || 0
@@ -30,21 +31,23 @@ const MembersCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Members ({membersCount})
-              <div
-                onClick={goToAddMemberView}
-                className={`bg-bkg-2 default-transition 
+              {(mint || councilMint) && (
+                <div
+                  onClick={goToAddMemberView}
+                  className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
                 rounded-lg hover:bg-bkg-3 ml-auto 
                 hover:cursor-pointer`}
-              >
-                <div
-                  className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
+                >
+                  <div
+                    className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
                 font-bold items-center justify-center 
                 rounded-full text-fgd-3"
-                >
-                  <PlusIcon />
+                  >
+                    <PlusIcon />
+                  </div>
                 </div>
-              </div>
+              )}
             </h3>
             <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
               <p className="text-fgd-3 text-xs">Total votes cast</p>
