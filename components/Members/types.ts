@@ -16,5 +16,5 @@ export interface WalletTokenRecordWithProposal
   extends ParsedAccount<VoteRecord> {
   proposalPublicKey: string
   proposalName: string
-  chatMessage: string
+  chatMessages: string[]
 }

@@ -51,53 +51,68 @@ const MemberOverview = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
-
+  //TODO comments
+  const getVoteRecordsAndChatMsgs = async () => {
+    let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
+    let chat: { [pubKey: string]: ParsedAccount<ChatMessage> } = {}
+    try {
+      const responsnes = await Promise.all([
+        getVoteRecordsByProposal(
+          selectedRealm!.programId!,
+          connection.endpoint,
+          new PublicKey(member!.walletAddress)
+        ),
+        getGovernanceChatMessagesByVoter(
+          connection!.endpoint,
+          new PublicKey(member!.walletAddress)
+        ),
+      ])
+      voteRecords = responsnes[0]
+      chat = responsnes[1]
+    } catch (e) {
+      notify({
+        message: 'Unable to fetch vote records for selected wallet address',
+        type: 'error',
+      })
+    }
+    return { voteRecords, chat }
+  }
   useEffect(() => {
     const handleSetVoteRecords = async () => {
       const take = 8
-      let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
-      let chat: { [pubKey: string]: ParsedAccount<ChatMessage> } = {}
-      try {
-        const responsnes = await Promise.all([
-          getVoteRecordsByProposal(
-            selectedRealm!.programId!,
-            connection.endpoint,
-            new PublicKey(member!.walletAddress)
-          ),
-          getGovernanceChatMessagesByVoter(
-            connection!.endpoint,
-            new PublicKey(member!.walletAddress)
-          ),
-        ])
-        voteRecords = responsnes[0]
-        chat = responsnes[1]
-      } catch (e) {
-        notify({
-          message: 'Unable to fetch vote records for selected wallet address',
-          type: 'error',
-        })
-      }
+      const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
       const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
         voteRecords
       )
+        .sort((a, b) => {
+          const prevProposal = proposals[a]
+          const nextProposal = proposals[b]
+          return (
+            prevProposal?.info.getStateTimestamp() -
+            nextProposal?.info.getStateTimestamp()
+          )
+        })
+        .reverse()
+        .filter((x) => proposals[x])
         .slice(0, take)
         .flatMap((x) => {
           const currentProposal = proposals[x]
-          const currentChatMsgPk = Object.keys(chat).find(
+          const currentChatsMsgPk = Object.keys(chat).filter(
             (c) =>
               chat[c]?.info.proposal.toBase58() ===
               currentProposal?.pubkey.toBase58()
           )
-          const currentChatMsg = currentChatMsgPk
-            ? chat[currentChatMsgPk].info.body.value
-            : ''
+          const currentChatMsgs = currentChatsMsgPk.map(
+            (c) => chat[c].info.body.value
+          )
           return {
             proposalPublicKey: x,
             proposalName: currentProposal?.info.name,
-            chatMessage: currentChatMsg,
+            chatMessages: currentChatMsgs,
             ...voteRecords[x],
           }
         })
+
       setOwnVoteRecords(voteRecordsArray)
     }
     handleSetVoteRecords()
@@ -105,7 +120,7 @@ const MemberOverview = () => {
 
   return (
     <>
-      <h3 className="mb-4 flex items-center">
+      <h3 className="mb-4 flex items-center hover:cursor-pointer">
         <>
           <ArrowLeftIcon
             onClick={handleGoBackToMainView}
@@ -156,7 +171,11 @@ const MemberOverview = () => {
           >
             <div>
               <div>{x.proposalName}</div>
-              <div className="text-fgd-3 text-xs">{x.chatMessage}</div>
+              {x.chatMessages.map((x) => (
+                <div key={x} className="text-fgd-3 text-xs">
+                  {x}
+                </div>
+              ))}
             </div>
             <div className="ml-auto text-fgd-3 text-xs flex flex-col">
               {x.info.isYes() ? (
