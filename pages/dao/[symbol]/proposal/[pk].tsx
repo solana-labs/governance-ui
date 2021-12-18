@@ -123,6 +123,7 @@ const Proposal = () => {
             <ApprovalQuorum progress={yesVoteProgress} />
           </div>
         </div>
+
         <VotePanel />
       </div>
     </div>

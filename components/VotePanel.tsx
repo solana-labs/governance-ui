@@ -172,108 +172,129 @@ const VotePanel = () => {
     wallet?.publicKey
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
-      <h2 className="mb-4 text-center">{actionLabel}</h2>
-      <div
-        className={`${
-          isVoting && 'flex-col'
-        } flex justify-center items-center gap-5`}
-      >
-        {isVoteCast ? (
-          <Button
-            onClick={() => submitRelinquishVote()}
-            disabled={!isWithdrawEnabled}
+    <>
+      {ProposalState.Cancelled === proposal?.info.state ||
+      ProposalState.Succeeded === proposal?.info.state ? null : (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
+          <h2 className="mb-4 text-center">{actionLabel}</h2>
+          <div
+            className={`${
+              ProposalState.Draft === proposal?.info.state ||
+              !canCancelProposal ||
+              isVoteCast
+                ? 'items-center justify-center'
+                : 'items-start justify-start'
+            } flex flex-wrap w-full gap-5`}
           >
-            {isVoting ? 'Withdraw' : 'Release Tokens'}
-          </Button>
-        ) : (
-          <>
-            {isVoting && (
-              <div className="border-b border-gray-600 flex gap-x-5 pb-6 w-full justify-center items-center">
-                <Button
-                  className="w-full"
-                  onClick={() => handleShowVoteModal(Vote.Yes)}
-                  disabled={!isVoteEnabled}
-                >
-                  Approve
-                </Button>
-                <Button
-                  className="w-full"
-                  onClick={() => handleShowVoteModal(Vote.No)}
-                  disabled={!isVoteEnabled}
-                >
-                  Deny
-                </Button>
-              </div>
+            {isVoteCast ? (
+              <Button
+                onClick={() => submitRelinquishVote()}
+                disabled={!isWithdrawEnabled}
+              >
+                {isVoting ? 'Withdraw' : 'Release Tokens'}
+              </Button>
+            ) : (
+              <>
+                {isVoting && (
+                  <div
+                    className={`${
+                      canSignOff || canCancelProposal || canFinalizeVote
+                        ? 'border-b border-gray-600 pb-5'
+                        : ''
+                    } w-full flex justify-between items-center gap-x-5`}
+                  >
+                    <Button
+                      className="w-1/2"
+                      onClick={() => handleShowVoteModal(Vote.Yes)}
+                      disabled={!isVoteEnabled}
+                    >
+                      Approve
+                    </Button>
+                    <Button
+                      className="w-1/2"
+                      onClick={() => handleShowVoteModal(Vote.No)}
+                      disabled={!isVoteEnabled}
+                    >
+                      Deny
+                    </Button>
+                  </div>
+                )}
+              </>
             )}
-          </>
-        )}
 
-        {canSignOff && (
-          <Button
-            className={isVoting ? 'w-1/2' : 'w-full'}
-            onClick={() => setShowSignOffModal(true)}
-            disabled={!connected || !canSignOff}
-          >
-            Sign Off
-          </Button>
-        )}
+            {canSignOff && (
+              <Button
+                className="w-1/2"
+                onClick={() => setShowSignOffModal(true)}
+                disabled={!connected || !canSignOff}
+              >
+                Sign Off
+              </Button>
+            )}
 
-        {canCancelProposal && (
-          <Button
-            className={isVoting ? 'w-1/2' : 'w-full'}
-            onClick={() => setShowCancelModal(true)}
-            disabled={!connected}
-          >
-            Cancel
-          </Button>
-        )}
+            {canCancelProposal && (
+              <Button
+                className={
+                  ProposalState.Completed === proposal?.info.state ||
+                  ProposalState.Voting === proposal?.info.state ||
+                  ProposalState.ExecutingWithErrors === proposal?.info.state
+                    ? 'w-1/2'
+                    : 'w-full'
+                }
+                onClick={() => setShowCancelModal(true)}
+                disabled={!connected}
+              >
+                Cancel
+              </Button>
+            )}
 
-        {canFinalizeVote && (
-          <Button
-            className={isVoting ? 'w-full' : ''}
-            onClick={() => setShowFinalizeVoteModal(true)}
-            disabled={!connected || !canFinalizeVote}
-          >
-            Finalize
-          </Button>
-        )}
-      </div>
+            {canFinalizeVote && (
+              <Button
+                className={isVoting ? 'w-full' : ''}
+                onClick={() => setShowFinalizeVoteModal(true)}
+                disabled={!connected || !canFinalizeVote}
+              >
+                Finalize
+              </Button>
+            )}
+          </div>
 
-      {showVoteModal ? (
-        <VoteCommentModal
-          isOpen={showVoteModal}
-          onClose={handleCloseShowVoteModal}
-          vote={vote!}
-          voterTokenRecord={voterTokenRecord!}
-        />
-      ) : null}
+          {showVoteModal ? (
+            <VoteCommentModal
+              isOpen={showVoteModal}
+              onClose={handleCloseShowVoteModal}
+              vote={vote!}
+              voterTokenRecord={voterTokenRecord!}
+            />
+          ) : null}
 
-      {showSignOffModal && (
-        <SignOffProposalModal
-          isOpen={showSignOffModal && canSignOff}
-          onClose={() => setShowSignOffModal(false)}
-          signatoryRecord={signatoryRecord}
-        />
+          {showSignOffModal && (
+            <SignOffProposalModal
+              isOpen={showSignOffModal && canSignOff}
+              onClose={() => setShowSignOffModal(false)}
+              signatoryRecord={signatoryRecord}
+            />
+          )}
+
+          {showFinalizeVoteModal && (
+            <FinalizeVotesModal
+              isOpen={showFinalizeVoteModal && canFinalizeVote}
+              onClose={() => setShowFinalizeVoteModal(false)}
+              proposal={proposal}
+              governance={governance}
+            />
+          )}
+
+          {showCancelModal && (
+            <CancelProposalModal
+              // @ts-ignore
+              isOpen={showCancelModal && canCancelProposal}
+              onClose={() => setShowCancelModal(false)}
+            />
+          )}
+        </div>
       )}
-
-      {showFinalizeVoteModal && (
-        <FinalizeVotesModal
-          isOpen={showFinalizeVoteModal && canFinalizeVote}
-          onClose={() => setShowFinalizeVoteModal(false)}
-          proposal={proposal}
-          governance={governance}
-        />
-      )}
-
-      {showCancelModal && (
-        <CancelProposalModal
-          // @ts-ignore
-          isOpen={showCancelModal && canCancelProposal}
-          onClose={() => setShowCancelModal(false)}
-        />
-      )}
-    </div>
+    </>
   )
 }
 
