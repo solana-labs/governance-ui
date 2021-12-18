@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import create, { State } from 'zustand'
 import produce from 'immer'
 import { Connection, PublicKey } from '@solana/web3.js'
