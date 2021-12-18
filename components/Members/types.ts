@@ -4,6 +4,7 @@ import { ParsedAccount } from '@models/core/accounts'
 export enum ViewState {
   MainView,
   MemberOverview,
+  AddMember,
 }
 
 export interface TokenRecordsWithWalletAddress {
