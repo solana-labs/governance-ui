@@ -17,15 +17,10 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
     setCurrentCompactViewMember,
   } = useMembersListStore()
   const { walletAddress, council, community } = item
+  const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === realm?.info.communityMint.toBase58()
   )?.symbol
-  const walletPublicKey = tryParsePublicKey(walletAddress)
-
-  async function handleGoToMemberOverview() {
-    setCurrentCompactView(ViewState.MemberOverview)
-    setCurrentCompactViewMember(item)
-  }
   const totalCommunityVotes = community?.info.totalVotesCount || 0
   const totalCouncilVotes = council?.info.totalVotesCount || 0
   const totalVotes = totalCommunityVotes + totalCouncilVotes
@@ -43,6 +38,11 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
       )
     : null
   const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
+
+  async function handleGoToMemberOverview() {
+    setCurrentCompactView(ViewState.MemberOverview)
+    setCurrentCompactViewMember(item)
+  }
   return (
     //TODO: implement dynamic height with CellMeasurer
     //for now every member item element has to be same height

@@ -7,11 +7,7 @@ const MembersItems = () => {
   //TODO implement auto height if needed;
   const minRowHeight = 84
   const rowHeight = members.length > 4 ? 350 : members.length * minRowHeight
-  function rowRenderer({
-    key, // Unique key within array of rows
-    index, // Index of row within collection
-    style, // Style object to be applied to row (to position it)
-  }) {
+  function rowRenderer({ key, index, style }) {
     return (
       <div key={key} style={style}>
         <MemberItem item={members[index]}></MemberItem>

@@ -13,11 +13,9 @@ const MembersCompactWrapper = () => {
   const { resetCompactViewState } = useMembersListStore()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
-    return (
-      (current.council?.info.totalVotesCount || 0) +
-      (current.community?.info.totalVotesCount || 0) +
-      prev
-    )
+    const councilTotalVotes = current.council?.info.totalVotesCount || 0
+    const communityTotalVotes = current.community?.info.totalVotesCount || 0
+    return councilTotalVotes + communityTotalVotes + prev
   }, 0)
 
   const getCurrentView = () => {
