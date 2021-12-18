@@ -6,13 +6,9 @@ import { arrayToMap, arrayToUnique } from '@tools/core/script'
 
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
-
-export enum ProgramVersion {
-  V1 = 1,
-  V2,
-}
+import { ProgramVersion } from './constants'
 
 export interface RealmInfo {
   symbol: string

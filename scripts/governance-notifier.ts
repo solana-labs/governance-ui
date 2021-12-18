@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
-import { getConnectionContext } from 'stores/useWalletStore'
+import { getConnectionContext } from 'utils/connection'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 import { getCertifiedRealmInfo } from '../models/registry/api'

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'
@@ -19,6 +18,7 @@ type CancelProposalModalProps = {
 const CancelProposalModal = ({ onClose, isOpen }: CancelProposalModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const { realmInfo } = useRealm()
   const { proposal } = useProposal()
 
@@ -38,6 +38,8 @@ const CancelProposalModal = ({ onClose, isOpen }: CancelProposalModalProps) => {
         await cancelProposal(rpcContext, proposal)
 
         onClose()
+
+        await fetchRealm(realmInfo.programId, realmInfo.realmId)
       }
     } catch (error) {
       notify({

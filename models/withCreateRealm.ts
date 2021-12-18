@@ -15,7 +15,7 @@ import {
   getTokenHoldingAddress,
   getRealmConfigAddress,
 } from './accounts'
-import { ProgramVersion } from 'models/registry/api'
+import { ProgramVersion } from 'models/registry/constants'
 import BN from 'bn.js'
 
 export async function withCreateRealm(
