@@ -63,7 +63,6 @@ const AddMember = () => {
     ownVoterWeight,
     mint,
   } = useRealm()
-  console.log(realm?.info.config.councilMint?.toBase58())
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AddMemberForm>({
     destinationAccount: '',
@@ -82,6 +81,8 @@ const AddMember = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const proposalTitle = `Add council member ${form.destinationAccount}`
+  const schema = getMintSchema({ form, connection })
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -109,7 +110,6 @@ const AddMember = () => {
       propertyName: 'amount',
     })
   }
-  const schema = getMintSchema({ form, connection })
   //TODO common getMintInstruction
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
