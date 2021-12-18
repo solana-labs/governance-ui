@@ -1,6 +1,10 @@
-import { LinkButton } from '@components/Button'
-import { ArrowLeftIcon } from '@heroicons/react/solid'
+import { getExplorerUrl } from '@components/explorer/tools'
+import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
+import { VoteRecord } from '@models/accounts'
+import { ChatMessage } from '@models/chat/accounts'
+import { getGovernanceChatMessagesByVoter } from '@models/chat/api'
+import { ParsedAccount } from '@models/core/accounts'
 import { PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
@@ -13,15 +17,12 @@ import { ViewState, WalletTokenRecordWithProposal } from './types'
 
 const MemberOverview = () => {
   const member = useMembersListStore((s) => s.compact.currentMember)
-  const { walletAddress, community, council } = member!
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals } = useRealm()
   const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
-  const handleGoBackToMainView = async () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
+  const { walletAddress, community, council } = member!
+
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === community?.info.governingTokenMint.toBase58()
   )?.symbol
@@ -46,29 +47,54 @@ const MemberOverview = () => {
       )
     : null
 
+  const handleGoBackToMainView = async () => {
+    setCurrentCompactView(ViewState.MainView)
+    resetCompactViewState()
+  }
+
   useEffect(() => {
     const handleSetVoteRecords = async () => {
       const take = 8
-      let voteRecords: WalletTokenRecordWithProposal = {}
+      let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
+      let chat: { [pubKey: string]: ParsedAccount<ChatMessage> } = {}
       try {
-        voteRecords = await getVoteRecordsByProposal(
-          selectedRealm!.programId!,
-          connection.endpoint,
-          new PublicKey(member!.walletAddress)
-        )
+        const responsnes = await Promise.all([
+          getVoteRecordsByProposal(
+            selectedRealm!.programId!,
+            connection.endpoint,
+            new PublicKey(member!.walletAddress)
+          ),
+          getGovernanceChatMessagesByVoter(
+            connection!.endpoint,
+            new PublicKey(member!.walletAddress)
+          ),
+        ])
+        voteRecords = responsnes[0]
+        chat = responsnes[1]
       } catch (e) {
         notify({
-          message: 'Unable to fetch vote records for wallet address',
+          message: 'Unable to fetch vote records for selected wallet address',
           type: 'error',
         })
       }
-
-      const voteRecordsArray = Object.keys(voteRecords)
+      const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
+        voteRecords
+      )
         .slice(0, take)
         .flatMap((x) => {
+          const currentProposal = proposals[x]
+          const currentChatMsgPk = Object.keys(chat).find(
+            (c) =>
+              chat[c]?.info.proposal.toBase58() ===
+              currentProposal?.pubkey.toBase58()
+          )
+          const currentChatMsg = currentChatMsgPk
+            ? chat[currentChatMsgPk].info.body.value
+            : ''
           return {
             proposalPublicKey: x,
-            proposalName: proposals[x].info.name,
+            proposalName: currentProposal?.info.name,
+            chatMessage: currentChatMsg,
             ...voteRecords[x],
           }
         })
@@ -83,7 +109,7 @@ const MemberOverview = () => {
         <>
           <ArrowLeftIcon
             onClick={handleGoBackToMainView}
-            className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
+            className="h-4 w-4 mr-1 text-primary-light mr-2"
           />
           {abbreviateAddress(new PublicKey(walletAddress))}
         </>
@@ -105,14 +131,18 @@ const MemberOverview = () => {
           </div>
         </div>
         <div className="ml-auto">
-          <LinkButton
-            className="ml-4 text-th-fgd-1"
-            onClick={() => {
-              navigator.clipboard.writeText(walletAddress)
-            }}
+          <a
+            href={
+              walletAddress
+                ? getExplorerUrl(connection.endpoint, walletAddress)
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
           >
-            Copy
-          </LinkButton>
+            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+          </a>
         </div>
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">
@@ -121,10 +151,13 @@ const MemberOverview = () => {
       <div>
         {ownVoteRecords.map((x) => (
           <div
-            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
+            className="border border-fgd-4 default-transition rounded-lg css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
             key={x.proposalPublicKey}
           >
-            <div>{x.proposalName}</div>
+            <div>
+              <div>{x.proposalName}</div>
+              <div className="text-fgd-3 text-xs">{x.chatMessage}</div>
+            </div>
             <div className="ml-auto text-fgd-3 text-xs flex flex-col">
               {x.info.isYes() ? (
                 <span className="text-green">Yes</span>
