@@ -1,16 +1,29 @@
 import MemberItem from './MemberItem'
 import useMembers from './useMembers'
 import { List, AutoSizer } from 'react-virtualized'
+import useRealm from '@hooks/useRealm'
+import { fmtMintAmount } from '@tools/sdk/units'
 
 const MembersItems = () => {
   const { members } = useMembers()
+  const { councilMint } = useRealm()
+  //if member is council type but he don't have tokens kept in realm we filter him out to not show him inside component
+  //but his previous votes are used for statistic.
+  const membersFiltred = members.filter((x) =>
+    x.council
+      ? Number(
+          fmtMintAmount(councilMint, x.council.info.governingTokenDepositAmount)
+        ) > 0
+      : true
+  )
   //TODO implement auto height if needed;
   const minRowHeight = 84
-  const rowHeight = members.length > 4 ? 350 : members.length * minRowHeight
+  const rowHeight =
+    membersFiltred.length > 4 ? 350 : membersFiltred.length * minRowHeight
   function rowRenderer({ key, index, style }) {
     return (
       <div key={key} style={style}>
-        <MemberItem item={members[index]}></MemberItem>
+        <MemberItem item={membersFiltred[index]}></MemberItem>
       </div>
     )
   }
@@ -22,7 +35,7 @@ const MembersItems = () => {
           <List
             width={width}
             height={rowHeight}
-            rowCount={members.length}
+            rowCount={membersFiltred.length}
             rowHeight={minRowHeight}
             rowRenderer={rowRenderer}
           />

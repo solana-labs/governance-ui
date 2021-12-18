@@ -85,7 +85,6 @@ const MemberOverview = () => {
   useEffect(() => {
     //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
     const handleSetVoteRecords = async () => {
-      const take = 8
       const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
       const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
         voteRecords
@@ -100,7 +99,6 @@ const MemberOverview = () => {
         })
         .reverse()
         .filter((x) => proposals[x])
-        .slice(0, take)
         .flatMap((x) => {
           const currentProposal = proposals[x]
           const currentChatsMsgPk = Object.keys(chat).filter(
@@ -169,7 +167,7 @@ const MemberOverview = () => {
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">
         Recent votes
       </div>
-      <div>
+      <div style={{ maxHeight: '350px' }} className="overflow-auto">
         {ownVoteRecords.map((x) => (
           <a
             href={fmtUrlWithCluster(
