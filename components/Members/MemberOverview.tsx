@@ -137,7 +137,7 @@ const MemberOverview = () => {
         <div>
           {abbreviateAddress(new PublicKey(walletAddress))}
           <div className="text-fgd-3 text-xs flex flex-col">
-            Cast Votes: {totalVotes}
+            Votes cast: {totalVotes}
           </div>
           <div className="text-fgd-3 text-xs flex flex-row">
             {communityAmount && (
@@ -174,7 +174,6 @@ const MemberOverview = () => {
             href={fmtUrlWithCluster(
               `/dao/${symbol}/proposal/${x.proposalPublicKey}`
             )}
-            target="_blank"
             rel="noopener noreferrer"
             className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
             key={x.proposalPublicKey}
