@@ -265,7 +265,7 @@ const AddMember = () => {
       </h3>
       <div className="space-y-4">
         <Input
-          label="Destination wallet"
+          label="Member's wallet"
           value={form.destinationAccount}
           type="text"
           onChange={(evt) =>
@@ -292,7 +292,7 @@ const AddMember = () => {
           <>
             <Input
               noMaxWidth={true}
-              label="Title"
+              label="Proposal Title"
               placeholder={
                 form.amount && form.destinationAccount
                   ? proposalTitle
@@ -309,7 +309,7 @@ const AddMember = () => {
             />
             <Textarea
               noMaxWidth={true}
-              label="Description"
+              label="Proposal Description"
               placeholder={
                 'Description of your proposal or use a github gist link (optional)'
               }
@@ -324,7 +324,7 @@ const AddMember = () => {
             ></Textarea>
             <Input
               min={mintMinAmount}
-              label="Amount"
+              label="Voter weight"
               value={form.amount}
               type="number"
               onChange={setAmount}

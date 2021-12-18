@@ -1,5 +1,11 @@
 import { getExplorerUrl } from '@components/explorer/tools'
-import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
+import {
+  ArrowLeftIcon,
+  CheckCircleIcon,
+  ExternalLinkIcon,
+  XCircleIcon,
+} from '@heroicons/react/solid'
+import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { VoteRecord } from '@models/accounts'
 import { ChatMessage } from '@models/chat/accounts'
@@ -19,10 +25,10 @@ const MemberOverview = () => {
   const member = useMembersListStore((s) => s.compact.currentMember)
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
-  const { mint, councilMint, proposals } = useRealm()
+  const { mint, councilMint, proposals, symbol } = useRealm()
   const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
   const { walletAddress, community, council } = member!
-
+  const { fmtUrlWithCluster } = useQueryContext()
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === community?.info.governingTokenMint.toBase58()
   )?.symbol
@@ -129,11 +135,11 @@ const MemberOverview = () => {
           {abbreviateAddress(new PublicKey(walletAddress))}
         </>
       </h3>
-      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
+      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex">
         <div>
           {abbreviateAddress(new PublicKey(walletAddress))}
           <div className="text-fgd-3 text-xs flex flex-col">
-            Total Votes: {totalVotes}
+            Cast Votes: {totalVotes}
           </div>
           <div className="text-fgd-3 text-xs flex flex-row">
             {communityAmount && (
@@ -165,23 +171,24 @@ const MemberOverview = () => {
       </div>
       <div>
         {ownVoteRecords.map((x) => (
-          <div
-            className="border border-fgd-4 default-transition rounded-lg css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
+          <a
+            href={fmtUrlWithCluster(
+              `/dao/${symbol}/proposal/${x.proposalPublicKey}`
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
             key={x.proposalPublicKey}
           >
-            <div>
-              <div className="break-all">{x.proposalName}</div>
-              {x.chatMessages.length !== 0 && (
-                <div className="mt-2 mb-2 text-fgd-3 text-xs">Comments:</div>
-              )}
+            <div className="w-full pr-6">
+              <div className="break-all mb-2">
+                {x.proposalName.slice(0, 30)}
+                {x.proposalName.length > 30 ? '...' : ''}
+              </div>
               {x.chatMessages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`text-xs p-1 ${
-                    index !== x.chatMessages.length - 1
-                      ? 'border-b border-fgd-4 mb-2'
-                      : ''
-                  }`}
+                  className={`text-xs text-fgd-3 text-xs p-2 border-t border-fgd-4`}
                 >
                   {msg}
                 </div>
@@ -189,12 +196,12 @@ const MemberOverview = () => {
             </div>
             <div className="ml-auto text-fgd-3 text-xs flex flex-col">
               {x.info.isYes() ? (
-                <span className="text-green">Yes</span>
+                <CheckCircleIcon className="h-4 mr-1 text-green w-4" />
               ) : (
-                <span className="text-red">No</span>
+                <XCircleIcon className="h-4 mr-1 text-red w-4" />
               )}
             </div>
-          </div>
+          </a>
         ))}
       </div>
     </>
