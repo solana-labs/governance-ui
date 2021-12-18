@@ -171,9 +171,19 @@ const MemberOverview = () => {
           >
             <div>
               <div>{x.proposalName}</div>
-              {x.chatMessages.map((x) => (
-                <div key={x} className="text-fgd-3 text-xs">
-                  {x}
+              {x.chatMessages.length !== 0 && (
+                <div className="mt-2 mb-2 text-fgd-3 text-xs">Comments:</div>
+              )}
+              {x.chatMessages.map((msg, index) => (
+                <div
+                  key={index}
+                  className={`text-xs p-1 ${
+                    index !== x.chatMessages.length - 1
+                      ? 'border-b border-fgd-4 mb-2'
+                      : ''
+                  }`}
+                >
+                  {msg}
                 </div>
               ))}
             </div>
