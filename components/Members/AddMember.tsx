@@ -236,6 +236,7 @@ const AddMember = () => {
     }
     setIsLoading(false)
   }
+
   useEffect(() => {
     async function getMintWithGovernancesFcn() {
       const resp = await getMintWithGovernances()
@@ -250,7 +251,6 @@ const AddMember = () => {
     }
     getMintWithGovernancesFcn()
   }, [])
-  console.log(form)
   return (
     <>
       <h3 className="mb-4 flex items-center hover:cursor-pointer">
