@@ -51,7 +51,6 @@ const MemberOverview = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
-  //TODO comments
   const getVoteRecordsAndChatMsgs = async () => {
     let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
     let chat: { [pubKey: string]: ParsedAccount<ChatMessage> } = {}
@@ -78,6 +77,7 @@ const MemberOverview = () => {
     return { voteRecords, chat }
   }
   useEffect(() => {
+    //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
     const handleSetVoteRecords = async () => {
       const take = 8
       const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
