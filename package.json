@@ -58,7 +58,6 @@
     "zustand": "^3.4.1"
   },
   "devDependencies": {
-    "@babel/preset-env": "^7.16.5",
     "@emotion/babel-preset-css-prop": "^11.2.0",
     "@testing-library/react": "^11.2.5",
     "@types/jest": "^27.0.3",
