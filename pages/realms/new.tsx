@@ -16,7 +16,7 @@ import * as yup from 'yup'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from 'models/registry/constants'
 import {
   getMintDecimalAmount,
   formatMintNaturalAmountAsDecimal,

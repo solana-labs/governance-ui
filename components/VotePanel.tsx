@@ -5,11 +5,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import {
-  getSignatoryRecordAddress,
-  getTokenOwnerAddress,
-  ProposalState,
-} from '../models/accounts'
+import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
 import { RpcContext } from '../models/core/api'
 import { GoverningTokenType } from '../models/enums'
 
@@ -173,8 +169,7 @@ const VotePanel = () => {
       proposal?.info.state === ProposalState.Succeeded
     ) &&
     proposal &&
-    wallet?.publicKey &&
-    connected
+    wallet?.publicKey
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
