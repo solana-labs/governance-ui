@@ -7,6 +7,7 @@ import {
   uxdClient,
   initializeMango,
   instantiateMangoDepository,
+  getControllerPda,
 } from './uxdClient'
 
 const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
@@ -16,7 +17,6 @@ const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
   depositoryMint: PublicKey,
   insuranceMint: PublicKey,
   insuranceWithdrawnAmount: number,
-  controllerPda: PublicKey,
   wallet: SignerWalletAdapter
 ): Promise<TransactionInstruction> => {
   const client = uxdClient(connection.current, uxdProgramId, wallet)
@@ -34,7 +34,7 @@ const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
 
   return client.createWithdrawInsuranceFromMangoDepositoryInstruction(
     insuranceWithdrawnAmount,
-    { pda: controllerPda } as Controller,
+    { pda: getControllerPda(uxdProgramId) } as Controller,
     depository,
     mango,
     authority,

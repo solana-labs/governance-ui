@@ -5,6 +5,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import {
   Controller,
   createAndInitializeMango,
+  findAddrSync,
   MangoDepository,
   UXD,
 } from '@uxdprotocol/uxd-client'
@@ -26,6 +27,10 @@ export const initializeMango = async (
 ) => {
   const provider = new Provider(connection, wallet, Provider.defaultOptions())
   return createAndInitializeMango(provider, cluster)
+}
+
+export const getControllerPda = (uxdProgramId: PublicKey): PublicKey => {
+  return findAddrSync([Buffer.from('CONTROLLER')], uxdProgramId)[0]
 }
 
 // We do not need the mint symbol so it is just set with a placeholder value

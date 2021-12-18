@@ -44,7 +44,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     governedAccount: undefined,
     programId: programId?.toString(),
     softCap: 0,
-    controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -72,7 +71,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
         form.governedAccount.governance?.info.governedAccount,
         form.softCap,
         form.governedAccount?.governance.pubkey,
-        new PublicKey(form.controllerPda),
         wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
@@ -102,15 +100,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [form.softCap])
 
   useEffect(() => {
-    if (form.controllerPda) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.controllerPda])
-
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
@@ -122,7 +111,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       .number()
       .moreThan(0, 'Redeemable soft cap should be more than 0')
       .required('Redeemable soft cap is required'),
-    controllerPda: yup.string().required('Controller address is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -155,18 +143,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
           })
         }
         error={formErrors['softCap']}
-      />
-      <Input
-        label="Controller Address"
-        value={form.controllerPda}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'controllerPda',
-          })
-        }
-        error={formErrors['controllerPda']}
       />
     </>
   )

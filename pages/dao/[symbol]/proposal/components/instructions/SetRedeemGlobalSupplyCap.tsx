@@ -44,7 +44,6 @@ const SetRedeemGlobalSupplyCap = ({
     governedAccount: undefined,
     programId: programId?.toString(),
     supplyCap: 0,
-    controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -71,7 +70,6 @@ const SetRedeemGlobalSupplyCap = ({
         form.governedAccount.governance?.info.governedAccount,
         form.supplyCap,
         form.governedAccount?.governance.pubkey,
-        new PublicKey(form.controllerPda),
         wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
@@ -101,15 +99,6 @@ const SetRedeemGlobalSupplyCap = ({
   }, [form.supplyCap])
 
   useEffect(() => {
-    if (form.controllerPda) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.controllerPda])
-
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
@@ -121,7 +110,6 @@ const SetRedeemGlobalSupplyCap = ({
       .number()
       .moreThan(0, 'Redeemable global supply cap should be more than 0')
       .required('Redeemable global supply cap is required'),
-    controllerPda: yup.string().required('Controller address is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -154,19 +142,6 @@ const SetRedeemGlobalSupplyCap = ({
           })
         }
         error={formErrors['supplyCap']}
-      />
-
-      <Input
-        label="Controller Address"
-        value={form.controllerPda}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'controllerPda',
-          })
-        }
-        error={formErrors['controllerPda']}
       />
     </>
   )

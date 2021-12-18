@@ -46,7 +46,6 @@ const WithdrawInsuranceFromMangoDepository = ({
     collateralMint: '',
     insuranceMint: '',
     insuranceWithdrawnAmount: 0,
-    controllerPda: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -75,7 +74,6 @@ const WithdrawInsuranceFromMangoDepository = ({
         new PublicKey(form.collateralMint),
         new PublicKey(form.insuranceMint),
         form.insuranceWithdrawnAmount,
-        new PublicKey(form.controllerPda),
         wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
@@ -122,15 +120,6 @@ const WithdrawInsuranceFromMangoDepository = ({
   }, [form.insuranceWithdrawnAmount])
 
   useEffect(() => {
-    if (form.controllerPda) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.controllerPda])
-
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
@@ -142,7 +131,6 @@ const WithdrawInsuranceFromMangoDepository = ({
       .string()
       .required('Collateral Mint address is required'),
     insuranceMint: yup.string().required('Insurance Mint address is required'),
-    controllerPda: yup.string().required('Controller address is required'),
     insuranceWithdrawnAmount: yup
       .number()
       .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
@@ -202,18 +190,6 @@ const WithdrawInsuranceFromMangoDepository = ({
           })
         }
         error={formErrors['insuranceWithdrawnAmount']}
-      />
-      <Input
-        label="Controller Address"
-        value={form.controllerPda}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'controllerPda',
-          })
-        }
-        error={formErrors['controllerPda']}
       />
     </>
   )
