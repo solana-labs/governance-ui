@@ -105,5 +105,11 @@
     "ogImage": "/realms/UXD/img/logo.png",
     "website": "https://www.uxd.fi.com/",
     "twitter": "@UXDProtocol"
+  },
+  {
+    "symbol": "REALM99",
+    "displayName": "REALM99",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "62yTu6Pv172sKcrsa9sRoPfXiNsD648ZK6wGaWP8ak5j"
   }
 ]

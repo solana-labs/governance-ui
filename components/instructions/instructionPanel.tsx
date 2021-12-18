@@ -2,9 +2,45 @@ import useProposal from '../../hooks/useProposal'
 import InstructionCard from './instructionCard'
 import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
+import { useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
+import { RpcContext } from '@models/core/api'
+import useRealm from '@hooks/useRealm'
 
 export function InstructionPanel() {
-  const { instructions } = useProposal()
+  const { instructions, proposal } = useProposal()
+  const { realmInfo } = useRealm()
+
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
+
+  const [currentSlot, setCurrentSlot] = useState(0)
+
+  const canExecuteAt = proposal!.info.votingCompletedAt
+    ? proposal!.info.votingCompletedAt.toNumber() + 1
+    : 0
+
+  const ineligibleToSee = currentSlot - canExecuteAt >= 0
+
+  useEffect(() => {
+    if (ineligibleToSee && proposal) {
+      const rpcContext = new RpcContext(
+        proposal?.account.owner,
+        realmInfo?.programVersion,
+        wallet,
+        connection.current,
+        connection.endpoint
+      )
+
+      const timer = setTimeout(() => {
+        rpcContext.connection.getSlot().then(setCurrentSlot)
+      }, 5000)
+
+      return () => {
+        clearTimeout(timer)
+      }
+    }
+  }, [ineligibleToSee, connection, currentSlot])
 
   if (Object.values(instructions).length === 0) {
     return null
@@ -39,10 +75,13 @@ export function InstructionPanel() {
                 )
                 .map((pi, idx) => (
                   <div key={pi.pubkey.toBase58()}>
-                    <InstructionCard
-                      index={idx + 1}
-                      proposalInstruction={pi.info}
-                    ></InstructionCard>
+                    {proposal && (
+                      <InstructionCard
+                        proposal={proposal}
+                        index={idx + 1}
+                        proposalInstruction={pi}
+                      ></InstructionCard>
+                    )}
                   </div>
                 ))}
             </Disclosure.Panel>

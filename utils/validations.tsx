@@ -6,7 +6,7 @@ import { tryGetTokenAccount } from './tokens'
 import * as yup from 'yup'
 import { getMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import { BN } from '@project-serum/anchor'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import {
   AccountInfo,
   ASSOCIATED_TOKEN_PROGRAM_ID,

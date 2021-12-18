@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
@@ -34,22 +33,24 @@ const Proposal = () => {
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
         {proposal ? (
           <>
-            <div className="flex flex-items">
+            <div className="flex flex-items justify-between">
               <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
                 <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
                   <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
                   Back
                 </a>
               </Link>
-              <a
-                className="ml-auto"
-                href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={(e) => e.stopPropagation()}
-              >
-                <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-              </a>
+
+              <div className="flex items-center">
+                <a
+                  href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+                </a>
+              </div>
             </div>
 
             <div className="border-b border-fgd-4 py-4">
@@ -58,10 +59,12 @@ const Proposal = () => {
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.info}
+                  open={true}
                 />
               </div>
               <ProposalTimeStatus proposal={proposal?.info} />
             </div>
+
             {description && (
               <div className="pb-2">
                 <ReactMarkdown className="markdown">
@@ -69,6 +72,7 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
+
             <InstructionPanel />
             <DiscussionPanel />
           </>
@@ -80,6 +84,7 @@ const Proposal = () => {
           </>
         )}
       </div>
+
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCard proposal={option(proposal?.info)} />
         <div className="bg-bkg-2 rounded-lg">

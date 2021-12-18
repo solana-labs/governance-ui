@@ -44,7 +44,6 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         )
         const tokenMint = await tryGetMint(
           connection,
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           tokenAccount!.account.mint
         )
 
