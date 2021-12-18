@@ -167,6 +167,7 @@ const MemberOverview = () => {
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">
         Recent votes
       </div>
+      {/* TODO virtual scroll */}
       <div style={{ maxHeight: '350px' }} className="overflow-auto">
         {ownVoteRecords.map((x) => (
           <a
