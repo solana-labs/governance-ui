@@ -10,7 +10,7 @@ import AddMember from './AddMember'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const MembersCompactWrapper = () => {
-  const { symbol, mint, councilMint } = useRealm()
+  const { symbol, councilMint } = useRealm()
   const { members } = useMembers()
   const membersCount = members.length
   const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
@@ -31,7 +31,7 @@ const MembersCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Members ({membersCount})
-              {(mint || councilMint) && (
+              {councilMint && canUseMintInstruction && (
                 <div
                   onClick={goToAddMemberView}
                   className={`bg-bkg-2 default-transition 
