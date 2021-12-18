@@ -63,6 +63,7 @@ const AddMember = () => {
     ownVoterWeight,
     mint,
   } = useRealm()
+  console.log(realm?.info.config.councilMint?.toBase58())
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AddMemberForm>({
     destinationAccount: '',
@@ -243,10 +244,10 @@ const AddMember = () => {
       handleSetForm({
         value: resp.find(
           (x) =>
-            x.governance?.pubkey.toBase58() ===
+            x.governance?.info.governedAccount.toBase58() ===
             realm?.info.config.councilMint?.toBase58()
         ),
-        propertyName: 'destinationAccount',
+        propertyName: 'mintAccount',
       })
     }
     getMintWithGovernancesFcn()

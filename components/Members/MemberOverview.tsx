@@ -135,7 +135,7 @@ const MemberOverview = () => {
           <div className="text-fgd-3 text-xs flex flex-col">
             Total Votes: {totalVotes}
           </div>
-          <div className="text-fgd-3 text-xs flex flex-col">
+          <div className="text-fgd-3 text-xs flex flex-row">
             {communityAmount && (
               <span>
                 {tokenName} Votes {communityAmount}
