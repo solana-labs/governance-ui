@@ -5,7 +5,7 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { Controller, findATAAddrSync } from '@uxdprotocol/uxd-client'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import {
   getControllerPda,
   getDepositoryMintKey,

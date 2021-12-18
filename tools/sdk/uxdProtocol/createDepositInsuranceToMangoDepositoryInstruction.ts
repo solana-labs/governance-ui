@@ -2,7 +2,7 @@ import { Provider } from '@project-serum/anchor'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { Controller } from '@uxdprotocol/uxd-client'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import {
   uxdClient,
   initializeMango,
