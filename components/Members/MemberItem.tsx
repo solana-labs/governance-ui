@@ -56,7 +56,7 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
       <div>
         <div className="text-xs text-th-fgd-1">{walletAddressFormatted}</div>
         <div className="text-fgd-3 text-xs flex flex-col">
-          Total Votes: {totalVotes}
+          Votes cast: {totalVotes}
         </div>
         <div className="text-fgd-3 text-xs flex flex-row">
           {communityAmount && (

@@ -1,9 +1,10 @@
 import { TokenRecordsWithWalletAddress } from './types'
 import useRealm from '@hooks/useRealm'
 import { useMemo } from 'react'
+import { fmtMintAmount } from '@tools/sdk/units'
 
 export default function useMembers() {
-  const { tokenRecords, councilTokenOwnerRecords } = useRealm()
+  const { tokenRecords, councilTokenOwnerRecords, councilMint } = useRealm()
 
   const tokenRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
@@ -17,15 +18,27 @@ export default function useMembers() {
         : [],
     [JSON.stringify(tokenRecords)]
   )
+  //we take only records who have stored tokens inside realm
+  //TODO check ATA wallet
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
       councilTokenOwnerRecords
-        ? Object.keys(councilTokenOwnerRecords).flatMap((x) => {
-            return {
-              walletAddress: x,
-              council: { ...councilTokenOwnerRecords[x] },
-            }
-          })
+        ? Object.keys(councilTokenOwnerRecords)
+            .flatMap((x) => {
+              return {
+                walletAddress: x,
+                council: { ...councilTokenOwnerRecords[x] },
+              }
+            })
+            .filter(
+              (x) =>
+                Number(
+                  fmtMintAmount(
+                    councilMint,
+                    x.council.info.governingTokenDepositAmount
+                  )
+                ) > 0
+            )
         : [],
     [JSON.stringify(councilTokenOwnerRecords)]
   )
