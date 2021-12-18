@@ -31,7 +31,6 @@ import {
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
-import { pubkeyFilter } from '../scripts/api'
 import { getGovernanceChatMessages } from '../models/chat/api'
 import { ChatMessage } from '../models/chat/accounts'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
@@ -43,6 +42,7 @@ import { getCertifiedRealmInfo } from '@models/registry/api'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
+import { pubkeyFilter } from 'models/core/api'
 
 interface WalletStore extends State {
   connected: boolean

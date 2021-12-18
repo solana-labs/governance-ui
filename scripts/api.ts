@@ -14,9 +14,6 @@ import { deserializeBorsh } from 'utils/borsh'
 
 const fetch = require('node-fetch')
 
-export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
-  new MemcmpFilter(offset, pubkey.toBuffer())
-
 export async function getRealms(rpcContext: RpcContext) {
   return getGovernanceAccountsImpl<Realm>(
     rpcContext.programId,
