@@ -24,7 +24,7 @@ const FinalizeVotesModal = ({
 }: FinalizeVotesModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const { realmInfo } = useRealm()
 
   const handleFinalizeVote = async () => {
@@ -42,7 +42,7 @@ const FinalizeVotesModal = ({
 
         onClose()
 
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await fetchProposal(proposal.pubkey)
       }
     } catch (error) {
       notify({
