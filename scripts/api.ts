@@ -1,15 +1,16 @@
 import { PublicKey } from '@solana/web3.js'
-import { SanitizedObject } from '@utils/helpers'
+import { SanitizedObject } from 'utils/helpers'
 import * as bs58 from 'bs58'
 import {
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
-} from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
-import { GOVERNANCE_SCHEMA } from '../models/serialisation'
-import { deserializeBorsh } from '../utils/borsh'
+} from 'models/accounts'
+import { ParsedAccount } from 'models/core/accounts'
+import { MemcmpFilter, RpcContext } from 'models/core/api'
+import { GOVERNANCE_SCHEMA } from 'models/serialisation'
+import { deserializeBorsh } from 'utils/borsh'
 
 const fetch = require('node-fetch')
 
