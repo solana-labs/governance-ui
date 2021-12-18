@@ -8,6 +8,8 @@ import { Controller, findATAAddrSync } from '@uxdprotocol/uxd-client'
 import { ConnectionContext } from 'stores/useWalletStore'
 import {
   getControllerPda,
+  getDepositoryMintKey,
+  getInsuranceMintKey,
   initializeMango,
   instantiateMangoDepository,
   uxdClient,
@@ -18,8 +20,8 @@ const createRegisterMangoDepositoryInstruction = async (
   uxdProgramId: PublicKey,
   authority: PublicKey,
   payer: PublicKey,
-  depositoryMint: PublicKey,
-  insuranceMint: PublicKey,
+  depositoryMintName: string,
+  insuranceMintName: string,
   wallet: SignerWalletAdapter
 ): Promise<TransactionInstruction> => {
   const mango = await initializeMango(
@@ -27,6 +29,16 @@ const createRegisterMangoDepositoryInstruction = async (
     connection.cluster,
     wallet
   )
+
+  const depositoryMint = getDepositoryMintKey(
+    connection.cluster,
+    depositoryMintName
+  )
+  const insuranceMint = getInsuranceMintKey(
+    connection.cluster,
+    insuranceMintName
+  )
+
   const depository = instantiateMangoDepository(
     uxdProgramId,
     depositoryMint,

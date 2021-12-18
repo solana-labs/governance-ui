@@ -19,6 +19,11 @@ import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction'
+import Select from '@components/inputs/Select'
+import {
+  getDepositoryMintSymbols,
+  getInsuranceMintSymbols,
+} from '@tools/sdk/uxdProtocol/uxdClient'
 
 const WithdrawInsuranceFromMangoDepository = ({
   index,
@@ -43,8 +48,8 @@ const WithdrawInsuranceFromMangoDepository = ({
   const [form, setForm] = useState<WithdrawInsuranceFromMangoDepositoryForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    collateralMint: '',
-    insuranceMint: '',
+    collateralName: '',
+    insuranceName: '',
     insuranceWithdrawnAmount: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -71,8 +76,8 @@ const WithdrawInsuranceFromMangoDepository = ({
         connection,
         form.governedAccount?.governance.info.governedAccount,
         form.governedAccount?.governance.pubkey,
-        new PublicKey(form.collateralMint),
-        new PublicKey(form.insuranceMint),
+        form.collateralName,
+        form.insuranceName,
         form.insuranceWithdrawnAmount,
         wallet
       )
@@ -93,22 +98,22 @@ const WithdrawInsuranceFromMangoDepository = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.collateralMint) {
+    if (form.collateralName) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.collateralMint])
+  }, [form.collateralName])
 
   useEffect(() => {
-    if (form.insuranceMint) {
+    if (form.insuranceName) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.insuranceMint])
+  }, [form.insuranceName])
 
   useEffect(() => {
     if (form.insuranceWithdrawnAmount) {
@@ -127,10 +132,8 @@ const WithdrawInsuranceFromMangoDepository = ({
   }, [form])
 
   const schema = yup.object().shape({
-    collateralMint: yup
-      .string()
-      .required('Collateral Mint address is required'),
-    insuranceMint: yup.string().required('Insurance Mint address is required'),
+    collateralName: yup.string().required('Collateral Name is required'),
+    insuranceName: yup.string().required('Insurance Name is required'),
     insuranceWithdrawnAmount: yup
       .number()
       .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
@@ -154,30 +157,39 @@ const WithdrawInsuranceFromMangoDepository = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        label="Collateral Mint"
-        value={form.collateralMint}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'collateralMint',
-          })
+
+      <Select
+        label="Collateral Name"
+        value={form.collateralName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'collateralName' })
         }
-        error={formErrors['collateralMint']}
-      />
-      <Input
-        label="Insurance Mint"
-        value={form.insuranceMint}
-        type="test"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'insuranceMint',
-          })
+        error={formErrors['collateralName']}
+      >
+        {getDepositoryMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
+
+      <Select
+        label="Insurance Name"
+        value={form.insuranceName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'insuranceName' })
         }
-        error={formErrors['insuranceMint']}
-      />
+        error={formErrors['insuranceName']}
+      >
+        {getInsuranceMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
+
       <Input
         label="Insurance Withdrawn Amount"
         value={form.insuranceWithdrawnAmount}

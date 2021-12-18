@@ -87,23 +87,23 @@ export interface SetMangoDepositoriesRedeemableSoftCapForm {
 
 export interface RegisterMangoDepositoryForm {
   governedAccount: GovernedProgramAccount | undefined
-  collateralMint: string
-  insuranceMint: string
+  collateralName: string
+  insuranceName: string
   programId: string | undefined
 }
 
 export interface DepositInsuranceToMangoDepositoryForm {
   governedAccount: GovernedProgramAccount | undefined
-  collateralMint: string
-  insuranceMint: string
+  collateralName: string
+  insuranceName: string
   insuranceDepositedAmount: number
   programId: string | undefined
 }
 
 export interface WithdrawInsuranceFromMangoDepositoryForm {
   governedAccount: GovernedProgramAccount | undefined
-  collateralMint: string
-  insuranceMint: string
+  collateralName: string
+  insuranceName: string
   insuranceWithdrawnAmount: number
   programId: string | undefined
 }
