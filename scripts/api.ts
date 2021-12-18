@@ -8,7 +8,6 @@ import {
   Realm,
 } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
-import { RpcContext } from '../models/core/api'
 import { GOVERNANCE_SCHEMA } from '../models/serialisation'
 import { deserializeBorsh } from '../utils/borsh'
 
@@ -16,28 +15,6 @@ const fetch = require('node-fetch')
 
 export interface IWallet {
   publicKey: PublicKey
-}
-
-export class MemcmpFilter {
-  offset: number
-  bytes: Buffer
-
-  constructor(offset: number, bytes: Buffer) {
-    this.offset = offset
-    this.bytes = bytes
-  }
-
-  isMatch(buffer: Buffer) {
-    if (this.offset + this.bytes.length > buffer.length) {
-      return false
-    }
-
-    for (let i = 0; i < this.bytes.length; i++) {
-      if (this.bytes[i] !== buffer[this.offset + i]) return false
-    }
-
-    return true
-  }
 }
 
 export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
