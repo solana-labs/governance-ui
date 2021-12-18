@@ -1,7 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { EndpointInfo } from '../@types/types'
+import { PublicKey } from '@solana/web3.js'
 import {
   ProgramAccount,
   TokenAccount,
@@ -39,16 +38,12 @@ import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
-import { EndpointTypes } from '@models/types'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { getCertifiedRealmInfo } from '@models/registry/api'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import type { ConnectionContext } from 'utils/connection'
+import { getConnectionContext } from 'utils/connection'
 
-export interface ConnectionContext {
-  cluster: EndpointTypes
-  current: Connection
-  endpoint: string
-}
 interface WalletStore extends State {
   connected: boolean
   connection: ConnectionContext
@@ -147,30 +142,6 @@ async function resolveProposalDescription(description: string) {
     return (await fetchGistFile(url.toString())) ?? description
   } catch {
     return description
-  }
-}
-
-export const ENDPOINTS: EndpointInfo[] = [
-  {
-    name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://mango.rpcpool.com',
-  },
-  {
-    name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
-  },
-  {
-    name: 'localnet',
-    url: 'http://127.0.0.1:8899',
-  },
-]
-
-export function getConnectionContext(cluster: string): ConnectionContext {
-  const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
-  return {
-    cluster: ENDPOINT!.name as EndpointTypes,
-    current: new Connection(ENDPOINT!.url, 'recent'),
-    endpoint: ENDPOINT!.url,
   }
 }
 
