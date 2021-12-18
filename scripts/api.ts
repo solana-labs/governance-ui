@@ -14,10 +14,6 @@ import { deserializeBorsh } from 'utils/borsh'
 
 const fetch = require('node-fetch')
 
-export interface IWallet {
-  publicKey: PublicKey
-}
-
 export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
   new MemcmpFilter(offset, pubkey.toBuffer())
 
