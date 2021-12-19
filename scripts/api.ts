@@ -1,5 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import { SanitizedObject } from 'utils/helpers'
 import * as bs58 from 'bs58'
 import {
   GovernanceAccount,
@@ -11,16 +10,16 @@ import { ParsedAccount } from 'models/core/accounts'
 import { MemcmpFilter, RpcContext } from 'models/core/api'
 import { GOVERNANCE_SCHEMA } from 'models/serialisation'
 import { deserializeBorsh } from 'utils/borsh'
-import { sleep } from '@project-serum/common'
+import { SanitizedObject } from 'utils/helpers'
 
 const fetch = require('node-fetch')
 
 export async function getRealms(rpcContext: RpcContext) {
-  return getGovernanceAccountsImpl<Realm>(
+  return getGovernanceAccounts<Realm>(
     rpcContext.programId,
     rpcContext.endpoint,
     Realm,
-    GovernanceAccountType.Realm
+    [GovernanceAccountType.Realm]
   )
 }
 
@@ -31,81 +30,48 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   accountTypes: GovernanceAccountType[],
   filters: MemcmpFilter[] = []
 ) {
-  if (accountTypes.length === 1) {
-    return getGovernanceAccountsImpl<TAccount>(
-      programId,
-      endpoint,
-      accountClass,
-      accountTypes[0],
-      filters
-    )
-  }
-
-  let accounts: Record<string, ParsedAccount<TAccount>> = {}
-
-  for (const at of accountTypes) {
-    accounts = {
-      ...accounts,
-      ...(await getGovernanceAccountsImpl(
-        programId,
-        endpoint,
-        accountClass,
-        at,
-        filters
-      )),
-    }
-    // XXX: sleep to prevent public RPC rate limits
-    await sleep(3_000)
-  }
-
-  return accounts
-}
-
-async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
-  programId: PublicKey,
-  endpoint: string,
-  accountClass: GovernanceAccountClass,
-  accountType: GovernanceAccountType,
-  filters: MemcmpFilter[] = []
-) {
   const getProgramAccounts = await fetch(endpoint, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({
-      jsonrpc: '2.0',
-      id: 1,
-      method: 'getProgramAccounts',
-      params: [
-        programId.toBase58(),
-        {
-          commitment: 'single',
-          encoding: 'base64',
-          filters: [
-            {
-              memcmp: {
-                offset: 0,
-                bytes: bs58.encode([accountType]),
+    body: JSON.stringify(
+      // send multiple requests in a single batched RPC request
+      accountTypes.map((accountType, i) => ({
+        jsonrpc: '2.0',
+        id: i + 1,
+        method: 'getProgramAccounts',
+        params: [
+          programId.toBase58(),
+          {
+            commitment: 'single',
+            encoding: 'base64',
+            filters: [
+              {
+                memcmp: {
+                  offset: 0,
+                  bytes: bs58.encode([accountType]),
+                },
               },
-            },
-            ...filters.map((f) => ({
-              memcmp: { offset: f.offset, bytes: bs58.encode(f.bytes) },
-            })),
-          ],
-        },
-      ],
-    }),
+              ...filters.map(({ offset, bytes }) => ({
+                memcmp: { offset, bytes: bs58.encode(bytes) },
+              })),
+            ],
+          },
+        ],
+      }))
+    ),
   })
 
-  const accounts: Record<string, ParsedAccount<TAccount>> = new SanitizedObject(
-    {}
-  ) as Record<string, ParsedAccount<TAccount>>
+  const accounts = new SanitizedObject({}) as Record<
+    string,
+    ParsedAccount<TAccount>
+  >
+
   try {
-    const response = await getProgramAccounts.json()
-    if ('result' in response) {
-      const rawAccounts = response['result']
-      for (const rawAccount of rawAccounts) {
+    const responses = await getProgramAccounts.json()
+    responses.forEach(({ result }) => {
+      result.forEach((rawAccount) => {
         try {
           const account = new SanitizedObject({
             pubkey: new PublicKey(rawAccount.pubkey),
@@ -121,15 +87,14 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
           }) as ParsedAccount<TAccount>
 
           accounts[account.pubkey.toBase58()] = account
-        } catch (ex) {
-          console.error(`Can't deserialize ${accountClass}`, ex)
+        } catch (err) {
+          console.error(`Can't deserialize ${accountClass}`, err)
         }
-      }
-    } else {
-      console.error(`Unexpected response ${JSON.stringify(response)}`)
-    }
-  } catch (e) {
-    console.error(e)
+      })
+    })
+  } catch (err) {
+    console.error('Unexpected response', err)
   }
+
   return accounts
 }
