@@ -8,7 +8,6 @@ const withTM = require('next-transpile-modules')([
 ])
 
 module.exports = withTM({
-  target: 'serverless',
   webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.svg$/,

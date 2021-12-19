@@ -1,3 +1,4 @@
+const nextJest = require('next/jest')
 const { resolve } = require('path')
 const { readdirSync } = require('fs')
 
@@ -15,21 +16,10 @@ const directories = readdirSync(__dirname, { withFileTypes: true })
     {}
   )
 
-module.exports = {
-  roots: ['<rootDir>'],
-  moduleFileExtensions: ['ts', 'tsx', 'js', 'json', 'jsx'],
-  testPathIgnorePatterns: ['<rootDir>/(node_modules|.next)/'],
-  transformIgnorePatterns: ['/node_modules/.+\\.(ts|tsx)$'],
-  transform: {
-    '^.+\\.(t|j)sx?$': '@swc/jest',
-  },
-  watchPlugins: [
-    'jest-watch-typeahead/filename',
-    'jest-watch-typeahead/testname',
-  ],
-  moduleNameMapper: {
-    '\\.(css|less|sass|scss)$': 'identity-obj-proxy',
-    '\\.(gif|ttf|eot|svg|png)$': '<rootDir>/test/__mocks__/fileMock.js',
-    ...directories,
-  },
+const customConfig = {
+  moduleNameMapper: directories,
+  setupFilesAfterEnv: ['<rootDir>/test/setup.js'],
+  moduleDirectories: ['node_modules', '<rootDir>/'],
 }
+
+module.exports = nextJest({ dir: './' })(customConfig)
