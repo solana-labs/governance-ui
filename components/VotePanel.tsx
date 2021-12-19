@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
@@ -22,6 +23,7 @@ const VotePanel = () => {
     proposal,
     voteRecordsByVoter,
     tokenType,
+    proposalOwner,
   } = useWalletStore((s) => s.selectedProposal)
   const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
