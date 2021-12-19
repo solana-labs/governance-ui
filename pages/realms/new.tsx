@@ -18,7 +18,6 @@ import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 import { ProgramVersion } from 'models/registry/constants'
 import {
-  getMintDecimalAmount,
   formatMintNaturalAmountAsDecimal,
   getMintSupplyPercentageAsBN,
 } from '@tools/sdk/units'
