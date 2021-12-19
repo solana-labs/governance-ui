@@ -153,6 +153,14 @@
     "ogImage": "/realms/MonkeDAO/img/MonkeDAO_logo.png",
     "website": "https://monkedao.io/",
     "twitter": "@MonkeDAO"
+  },
+  {
+    "symbol": "MonkOG",
+    "displayName": "MonkOG DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "39aX7mDZ1VLpZcPWstBhQBoqwNkhf5f1KDACguvrryi6",
+    "ogImage": "/realms/MonkOG/img/ogemoji.png",
+    "twitter": "@MonkOG_DAO"
   }
 
   
