@@ -15,6 +15,7 @@ import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
 import React from 'react'
+import ProposalActionsPanel from '@components/ProposalActions'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -125,6 +126,7 @@ const Proposal = () => {
         </div>
 
         <VotePanel />
+        <ProposalActionsPanel />
       </div>
     </div>
   )
