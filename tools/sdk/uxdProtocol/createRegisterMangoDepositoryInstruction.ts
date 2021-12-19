@@ -1,31 +1,51 @@
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { Provider } from '@project-serum/anchor'
 import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
-import { findATAAddrSync, MangoDepository } from '@uxdprotocol/uxd-client'
-import { initializeMango, uxdClient } from './uxdClient'
+import { Controller, findATAAddrSync } from '@uxdprotocol/uxd-client'
+import type { ConnectionContext } from 'utils/connection'
+import {
+  getControllerPda,
+  getDepositoryMintKey,
+  getInsuranceMintKey,
+  initializeMango,
+  instantiateMangoDepository,
+  uxdClient,
+} from './uxdClient'
 
 const createRegisterMangoDepositoryInstruction = async (
-  connection: Connection,
+  connection: ConnectionContext,
   uxdProgramId: PublicKey,
   authority: PublicKey,
   payer: PublicKey,
-  collateralMint: PublicKey,
-  insuranceMint: PublicKey
+  depositoryMintName: string,
+  insuranceMintName: string,
+  wallet: SignerWalletAdapter
 ): Promise<TransactionInstruction> => {
-  const mango = await initializeMango(connection)
-  const depository = new MangoDepository(
-    collateralMint,
-    'collateralName',
-    6,
-    insuranceMint,
-    'USDC',
-    6,
-    uxdProgramId
+  const mango = await initializeMango(
+    connection.current,
+    connection.cluster,
+    wallet
   )
 
-  const { client, controller } = uxdClient(connection, uxdProgramId)
+  const depositoryMint = getDepositoryMintKey(
+    connection.cluster,
+    depositoryMintName
+  )
+  const insuranceMint = getInsuranceMintKey(
+    connection.cluster,
+    insuranceMintName
+  )
+
+  const depository = instantiateMangoDepository(
+    uxdProgramId,
+    depositoryMint,
+    insuranceMint
+  )
+
+  const client = uxdClient(connection.current, uxdProgramId, wallet)
   const [authorityInsuranceATA] = findATAAddrSync(authority, insuranceMint)
   const createAuthorityInsuranceItx = Token.createAssociatedTokenAccountInstruction(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -42,7 +62,7 @@ const createRegisterMangoDepositoryInstruction = async (
   )
 
   return client.createRegisterMangoDepositoryInstruction(
-    controller,
+    { pda: getControllerPda(uxdProgramId) } as Controller,
     depository,
     mango,
     authority,

@@ -1,19 +1,20 @@
 import { Provider } from '@project-serum/anchor'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
-import { uxdClient } from './uxdClient'
+import { instantiateController, uxdClient } from './uxdClient'
 
 const createInitializeControllerInstruction = (
   uxdProgramId: PublicKey,
-  mintSymbol: string,
   mintDecimals: number,
   authority: PublicKey,
   payer: PublicKey,
-  connection: Connection
+  connection: Connection,
+  wallet: SignerWalletAdapter
 ): TransactionInstruction => {
-  const { client, controller } = uxdClient(connection, uxdProgramId)
+  const client = uxdClient(connection, uxdProgramId, wallet)
 
   return client.createInitializeControllerInstruction(
-    controller,
+    instantiateController(uxdProgramId, mintDecimals),
     authority,
     Provider.defaultOptions(),
     payer

@@ -1,32 +1,43 @@
 import { Provider } from '@project-serum/anchor'
-import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
-import { MangoDepository } from '@uxdprotocol/uxd-client'
-import { uxdClient, initializeMango } from './uxdClient'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { TransactionInstruction, PublicKey } from '@solana/web3.js'
+import { Controller } from '@uxdprotocol/uxd-client'
+import type { ConnectionContext } from 'utils/connection'
+import {
+  uxdClient,
+  initializeMango,
+  instantiateMangoDepository,
+  getControllerPda,
+  getDepositoryMintKey,
+  getInsuranceMintKey,
+} from './uxdClient'
 
 const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
-  connection: Connection,
+  connection: ConnectionContext,
   uxdProgramId: PublicKey,
   authority: PublicKey,
-  depositoryMint: PublicKey,
-  insuranceMint: PublicKey,
-  insuranceWithdrawnAmount: number
+  depositoryMintName: string,
+  insuranceMintName: string,
+  insuranceWithdrawnAmount: number,
+  wallet: SignerWalletAdapter
 ): Promise<TransactionInstruction> => {
-  const { client, controller } = uxdClient(connection, uxdProgramId)
+  const client = uxdClient(connection.current, uxdProgramId, wallet)
+  console.log(depositoryMintName, insuranceMintName)
+  const mango = await initializeMango(
+    connection.current,
+    connection.cluster,
+    wallet
+  )
 
-  const mango = await initializeMango(connection)
-  const depository = new MangoDepository(
-    depositoryMint,
-    'collateralName',
-    6,
-    insuranceMint,
-    'USDC',
-    6,
-    uxdProgramId
+  const depository = instantiateMangoDepository(
+    uxdProgramId,
+    getDepositoryMintKey(connection.cluster, depositoryMintName),
+    getInsuranceMintKey(connection.cluster, insuranceMintName)
   )
 
   return client.createWithdrawInsuranceFromMangoDepositoryInstruction(
     insuranceWithdrawnAmount,
-    controller,
+    { pda: getControllerPda(uxdProgramId) } as Controller,
     depository,
     mango,
     authority,

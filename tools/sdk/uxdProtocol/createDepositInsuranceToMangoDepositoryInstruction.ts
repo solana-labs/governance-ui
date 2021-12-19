@@ -1,32 +1,43 @@
 import { Provider } from '@project-serum/anchor'
-import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
-import { MangoDepository } from '@uxdprotocol/uxd-client'
-import { uxdClient, initializeMango } from './uxdClient'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { TransactionInstruction, PublicKey } from '@solana/web3.js'
+import { Controller } from '@uxdprotocol/uxd-client'
+import type { ConnectionContext } from 'utils/connection'
+import {
+  uxdClient,
+  initializeMango,
+  instantiateMangoDepository,
+  getControllerPda,
+  getDepositoryMintKey,
+  getInsuranceMintKey,
+} from './uxdClient'
 
 const createDepositInsuranceToMangoDepositoryInstruction = async (
-  connection: Connection,
+  connection: ConnectionContext,
   uxdProgramId: PublicKey,
   authority: PublicKey,
-  depositoryMint: PublicKey,
-  insuranceMint: PublicKey,
-  insuranceDepositedAmount: number
+  depositoryMintName: string,
+  insuranceMintName: string,
+  insuranceDepositedAmount: number,
+  wallet: SignerWalletAdapter
 ): Promise<TransactionInstruction> => {
-  const { client, controller } = uxdClient(connection, uxdProgramId)
+  const client = uxdClient(connection.current, uxdProgramId, wallet)
 
-  const mango = await initializeMango(connection)
-  const depository = new MangoDepository(
-    depositoryMint,
-    'collateralName',
-    6,
-    insuranceMint,
-    'USDC',
-    6,
-    uxdProgramId
+  const mango = await initializeMango(
+    connection.current,
+    connection.cluster,
+    wallet
+  )
+
+  const depository = instantiateMangoDepository(
+    uxdProgramId,
+    getDepositoryMintKey(connection.cluster, depositoryMintName),
+    getInsuranceMintKey(connection.cluster, insuranceMintName)
   )
 
   return client.createDepositInsuranceToMangoDepositoryInstruction(
     insuranceDepositedAmount,
-    controller,
+    { pda: getControllerPda(uxdProgramId) } as Controller,
     depository,
     mango,
     authority,

@@ -15,7 +15,6 @@ import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
-import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction'
@@ -43,7 +42,6 @@ const InitializeController = ({
   const [form, setForm] = useState<InitializeControllerForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    mintSymbol: '',
     mintDecimals: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -64,17 +62,20 @@ const InitializeController = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.info &&
+      form.mintDecimals &&
       wallet?.publicKey
     ) {
-      const createIx = createInitializeControllerInstruction(
+      const initializeControllerIx = createInitializeControllerInstruction(
         form.governedAccount?.governance.info.governedAccount,
-        form.mintSymbol || '',
-        form.mintDecimals || 9,
+        form.mintDecimals,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
-        connection.current
+        connection.current,
+        wallet
       )
-      serializedInstruction = serializeInstructionToBase64(createIx)
+      serializedInstruction = serializeInstructionToBase64(
+        initializeControllerIx
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction,
@@ -91,22 +92,17 @@ const InitializeController = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.mintSymbol) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.mintSymbol])
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
   const schema = yup.object().shape({
-    mintSymbol: yup.string().required('Mint Symbol is required'),
-    mintDecimals: yup.number().required('Mint Decimals is required'),
+    mintDecimals: yup
+      .number()
+      .min(0, 'Mint decimals cannot be less than 0')
+      .max(9, 'Mint decimals cannot be more than 9')
+      .required('Mint Decimals is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -126,18 +122,6 @@ const InitializeController = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        label="Mint Symbol"
-        value={form.mintSymbol}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'mintSymbol',
-          })
-        }
-        error={formErrors['mintSymbol']}
-      />
       <Input
         label="Mint Decimals"
         value={form.mintDecimals}

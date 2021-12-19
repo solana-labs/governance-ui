@@ -1,5 +1,7 @@
 import { Idl } from '@project-serum/anchor'
 
+export const UXD_PROGRAM_ID = 'DdJ9BKWG8XqQaj5BMjYks6Y8Amcv1onoo7cvVipp9jKC' //'UXDQDbkAeGMPR7gqDykDNu22D9DnYrKdvZhvNmMu6QX'
+
 const uxdIdl: Idl = {
   version: '0.0.0',
   name: 'uxd',
@@ -353,6 +355,11 @@ const uxdIdl: Idl = {
           isSigner: false,
         },
         {
+          name: 'systemProgram',
+          isMut: false,
+          isSigner: false,
+        },
+        {
           name: 'tokenProgram',
           isMut: false,
           isSigner: false,
@@ -375,7 +382,7 @@ const uxdIdl: Idl = {
       accounts: [
         {
           name: 'user',
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -500,7 +507,7 @@ const uxdIdl: Idl = {
       accounts: [
         {
           name: 'user',
-          isMut: false,
+          isMut: true,
           isSigner: true,
         },
         {
@@ -742,6 +749,14 @@ const uxdIdl: Idl = {
             name: 'redeemableAmountUnderManagement',
             type: 'u128',
           },
+          {
+            name: 'deltaNeutralQuoteFeeOffset',
+            type: 'u128',
+          },
+          {
+            name: 'deltaNeutralQuotePosition',
+            type: 'u128',
+          },
         ],
       },
     },
@@ -927,11 +942,16 @@ const uxdIdl: Idl = {
     },
     {
       code: 338,
+      name: 'InvalidRebalancingAmount',
+      msg: 'The max amount to rebalance must be superior to zero..',
+    },
+    {
+      code: 339,
       name: 'InsuficentOrderBookDepth',
       msg: 'Insuficcent order book depth for order.',
     },
     {
-      code: 339,
+      code: 340,
       name: 'InvalidExecutedOrderSize',
       msg: 'The executed order size does not match the expected one.',
     },
@@ -964,6 +984,16 @@ const uxdIdl: Idl = {
       code: 385,
       name: 'MangoPerpMarketIndexNotFound',
       msg: 'Could not find the perp market index for the given collateral.',
+    },
+    {
+      code: 386,
+      name: 'InvalidPerpAccountState',
+      msg: 'The Mango PerpAccount has uncommitted changes.',
+    },
+    {
+      code: 387,
+      name: 'InvalidDepositoryAccounting',
+      msg: 'The Depository accounting is in an invalid state.',
     },
   ],
 }

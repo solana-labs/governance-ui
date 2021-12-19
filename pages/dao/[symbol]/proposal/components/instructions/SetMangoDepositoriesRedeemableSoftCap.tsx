@@ -43,7 +43,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   const [form, setForm] = useState<SetMangoDepositoriesRedeemableSoftCapForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    supplyCap: 0,
+    softCap: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -59,6 +59,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+
     if (
       isValid &&
       programId &&
@@ -68,8 +69,9 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
         connection.current,
         form.governedAccount.governance?.info.governedAccount,
-        form.supplyCap || 9,
-        form.governedAccount?.governance.pubkey
+        form.softCap,
+        form.governedAccount?.governance.pubkey,
+        wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -80,6 +82,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -88,21 +91,26 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.supplyCap) {
+    if (form.softCap) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.supplyCap])
+  }, [form.softCap])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
-    supplyCap: yup.number().required('Redeemable supply cap is required'),
+    softCap: yup
+      .number()
+      .moreThan(0, 'Redeemable soft cap should be more than 0')
+      .required('Redeemable soft cap is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -125,17 +133,16 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
 
       <Input
         label="Redeem Global Supply Cap"
-        value={form.supplyCap}
+        value={form.softCap}
         type="number"
         min={0}
-        max={10 ** 12}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'supplyCap',
+            propertyName: 'softCap',
           })
         }
-        error={formErrors['global']}
+        error={formErrors['softCap']}
       />
     </>
   )

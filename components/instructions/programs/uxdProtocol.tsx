@@ -3,7 +3,7 @@ import { struct, u8, u48 } from 'buffer-layout'
 import { AccountMetaData } from '../../../models/accounts'
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
-  '73yvDSPxhtXmi8Gaheobm32n3jMdbvQzCahXgqqE12My': {
+  UXGA4U6nmCkdpVnhrhRzgFWYtmY4uHpNzLn3h9nVXNa: {
     1: {
       name: 'UXD - Initialize Controller',
       accounts: [

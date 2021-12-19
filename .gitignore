@@ -34,5 +34,5 @@ yarn-error.log*
 .vercel
 
 
-/.github/
 .npmrc
+.env

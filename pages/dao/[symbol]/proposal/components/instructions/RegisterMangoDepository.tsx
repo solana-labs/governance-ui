@@ -14,11 +14,15 @@ import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@models/serialisation'
-import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction'
+import Select from '@components/inputs/Select'
+import {
+  getDepositoryMintSymbols,
+  getInsuranceMintSymbols,
+} from '@tools/sdk/uxdProtocol/uxdClient'
 
 const RegisterMangoDepository = ({
   index,
@@ -43,8 +47,8 @@ const RegisterMangoDepository = ({
   const [form, setForm] = useState<RegisterMangoDepositoryForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    collateralMint: '',
-    insuranceMint: '',
+    collateralName: '',
+    insuranceName: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -64,15 +68,17 @@ const RegisterMangoDepository = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.info &&
+      form.insuranceName &&
       wallet?.publicKey
     ) {
       const createIx = await createRegisterMangoDepositoryInstruction(
-        connection.current,
+        connection,
         form.governedAccount?.governance.info.governedAccount,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
-        new PublicKey(form.collateralMint),
-        new PublicKey(form.insuranceMint)
+        form.collateralName,
+        form.insuranceName,
+        wallet
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -83,6 +89,7 @@ const RegisterMangoDepository = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -91,32 +98,33 @@ const RegisterMangoDepository = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.collateralMint) {
+    if (form.collateralName) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.collateralMint])
+  }, [form.collateralName])
+
   useEffect(() => {
-    if (form.insuranceMint) {
+    if (form.insuranceName) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.insuranceMint])
+  }, [form.insuranceName])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
-    collateralMint: yup
-      .string()
-      .required('Collateral Mint address is required'),
-    insuranceMint: yup.string().required('Insurance Mint address is required'),
+    collateralName: yup.string().required('Valid Collateral name is required'),
+    insuranceName: yup.string().required('Valid Insurance name is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -136,30 +144,38 @@ const RegisterMangoDepository = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        label="Collateral Mint"
-        value={form.collateralMint}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'collateralMint',
-          })
+
+      <Select
+        label="Collateral Name"
+        value={form.collateralName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'collateralName' })
         }
-        error={formErrors['collateralMint']}
-      />
-      <Input
-        label="Insurance Mint"
-        value={form.insuranceMint}
-        type="test"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'insuranceMint',
-          })
+        error={formErrors['collateralName']}
+      >
+        {getDepositoryMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
+
+      <Select
+        label="Insurance Name"
+        value={form.insuranceName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'insuranceName' })
         }
-        error={formErrors['insuranceMint']}
-      />
+        error={formErrors['insuranceName']}
+      >
+        {getInsuranceMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
     </>
   )
 }
