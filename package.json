@@ -59,6 +59,8 @@
   },
   "devDependencies": {
     "@emotion/babel-preset-css-prop": "^11.2.0",
+    "@swc/core": "^1.2.120",
+    "@swc/jest": "^0.2.15",
     "@testing-library/react": "^11.2.5",
     "@types/jest": "^27.0.3",
     "@types/node": "^14.14.25",

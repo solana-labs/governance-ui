@@ -9,7 +9,7 @@ const Index = () => {
     router.push(mainUrl)
   }, [])
 
-  return <></>
+  return null
 }
 
 export default Index
