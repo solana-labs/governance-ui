@@ -172,15 +172,12 @@ const VotePanel = () => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
       <h2 className="mb-4 text-center">{actionLabel}</h2>
       <div
-        className={`grid ${
-          isVoting || !isWithdrawEnabled || !connected
-            ? 'grid-cols-1 gap-y-3'
-            : 'grid-cols-2 gap-3'
-        }`}
+        className={`${
+          isVoting && 'flex-col'
+        } flex justify-center items-center gap-5`}
       >
         {isVoteCast ? (
           <Button
-            className="w-full"
             onClick={() => submitRelinquishVote()}
             disabled={!isWithdrawEnabled}
           >
@@ -188,23 +185,30 @@ const VotePanel = () => {
           </Button>
         ) : (
           <>
-            <Button
-              onClick={() => handleShowVoteModal(Vote.Yes)}
-              disabled={!isVoteEnabled}
-            >
-              Approve
-            </Button>
-            <Button
-              onClick={() => handleShowVoteModal(Vote.No)}
-              disabled={!isVoteEnabled}
-            >
-              Deny
-            </Button>
+            {isVoting && (
+              <div className="border-b border-gray-600 flex gap-x-5 pb-6 w-full justify-center items-center">
+                <Button
+                  className="w-full"
+                  onClick={() => handleShowVoteModal(Vote.Yes)}
+                  disabled={!isVoteEnabled}
+                >
+                  Approve
+                </Button>
+                <Button
+                  className="w-full"
+                  onClick={() => handleShowVoteModal(Vote.No)}
+                  disabled={!isVoteEnabled}
+                >
+                  Deny
+                </Button>
+              </div>
+            )}
           </>
         )}
 
         {canSignOff && (
           <Button
+            className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowSignOffModal(true)}
             disabled={!connected || !canSignOff}
           >
@@ -214,6 +218,7 @@ const VotePanel = () => {
 
         {canCancelProposal && (
           <Button
+            className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowCancelModal(true)}
             disabled={!connected || !canCancelProposal}
           >
@@ -223,6 +228,7 @@ const VotePanel = () => {
 
         {canFinalizeVote && (
           <Button
+            className={isVoting ? 'w-full' : ''}
             onClick={() => setShowFinalizeVoteModal(true)}
             disabled={!connected || !canFinalizeVote}
           >

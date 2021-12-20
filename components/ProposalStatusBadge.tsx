@@ -1,7 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import CancelProposal from 'pages/dao/[symbol]/proposal/components/CancelProposal'
-import FinalizeVotes from 'pages/dao/[symbol]/proposal/components/FinalizeVotes'
-import { useEffect, useState } from 'react'
 import useRealmGovernance from '../hooks/useRealmGovernance'
 import { Proposal, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
@@ -50,13 +47,6 @@ const ProposalStateBadge = ({
   proposal: Proposal
   open: boolean
 }) => {
-  useEffect(() => {
-    console.log('STATUS PROPOSAL', proposal.state)
-  }, [])
-
-  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
-  const [showCancelModal, setShowCancelModal] = useState(false)
-
   const governance = useRealmGovernance(proposal.governance)
 
   const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[

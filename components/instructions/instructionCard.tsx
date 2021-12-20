@@ -71,7 +71,7 @@ export default function InstructionCard({
       </div>
       <InstructionData descriptor={descriptor}></InstructionData>
 
-      <div className="flex justify-start items-center gap-x-4 mt-6">
+      <div className="flex justify-start items-center gap-x-4 mt-6 mb-8">
         <InspectorButton
           instructionData={proposalInstruction.info.instruction}
         />

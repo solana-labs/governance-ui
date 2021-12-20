@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from '../../../../hooks/useProposal'
@@ -16,9 +15,6 @@ import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
-import { getSignatoryRecordAddress } from '@models/accounts'
-import useWalletStore from 'stores/useWalletStore'
-import { RpcContext } from '@models/core/api'
 import React from 'react'
 
 const Proposal = () => {
@@ -32,40 +28,6 @@ const Proposal = () => {
     relativeNoVotes,
     relativeYesVotes,
   } = useProposalVotes(proposal?.info)
-  const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const signatories = useWalletStore((s) => s.selectedProposal.signatories)
-  const connection = useWalletStore((s) => s.connection)
-
-  const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-
-  useEffect(() => {
-    const setup = async () => {
-      if (proposal) {
-        const rpcContext = new RpcContext(
-          proposal!.account.owner,
-          realmInfo?.programVersion,
-          wallet,
-          connection.current,
-          connection.endpoint
-        )
-
-        const response = await getSignatoryRecordAddress(
-          rpcContext.programId,
-          proposal!.pubkey,
-          rpcContext.walletPubkey
-        )
-
-        setSignatoryRecord(signatories[response.toBase58()].info)
-      }
-    }
-
-    setup()
-  }, [proposal])
-
-  useEffect(() => {
-    console.log('signatory record', signatoryRecord)
-  }, [signatoryRecord])
 
   return (
     <div className="grid grid-cols-12 gap-4">

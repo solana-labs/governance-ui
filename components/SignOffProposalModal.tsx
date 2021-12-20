@@ -24,6 +24,7 @@ const SignOffProposalModal = ({
 }: SignOffProposalModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const { realmInfo } = useRealm()
   const { proposal } = useProposal()
 
@@ -41,6 +42,8 @@ const SignOffProposalModal = ({
         await signOffProposal(rpcContext, signatoryRecord)
 
         onClose()
+
+        await fetchRealm(realmInfo.programId, realmInfo.realmId)
       }
     } catch (error) {
       notify({

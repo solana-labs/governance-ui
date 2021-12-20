@@ -1,16 +1,10 @@
-import {
-  GovernanceConfig,
-  Realm,
-  VoteThresholdPercentage,
-} from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { GovernanceConfig, VoteThresholdPercentage } from '@models/accounts'
 import { BN } from '@project-serum/anchor'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import React from 'react'
 
 export interface GovernanceConfigValues {
   minTokensToCreateProposal: number | string
@@ -51,14 +45,3 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     minCouncilTokensToCreateProposal: new BN(1),
   })
 }
-
-export interface GovernanceContextState {
-  realms: Record<string, ParsedAccount<Realm>>
-  changeTracker: any
-  programId: string
-  programVersion: number
-}
-
-export const GovernanceContext = React.createContext<GovernanceContextState | null>(
-  null
-)
