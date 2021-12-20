@@ -16,8 +16,7 @@ import VoteResultsBar from '../../../../components/VoteResultsBar'
 import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
 import { option } from '../../../../tools/core/option'
 import useQueryContext from '../../../../hooks/useQueryContext'
-import SignOffProposal from './components/SignOffProposal'
-import { getSignatoryRecordAddress, ProposalState } from '@models/accounts'
+import { getSignatoryRecordAddress } from '@models/accounts'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@models/core/api'
 import React from 'react'
@@ -38,7 +37,6 @@ const Proposal = () => {
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const connection = useWalletStore((s) => s.connection)
 
-  const [showSignOffModal, setShowSignOffModal] = useState(false)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   useEffect(() => {
@@ -83,17 +81,6 @@ const Proposal = () => {
               </Link>
 
               <div className="flex items-center">
-                {signatoryRecord &&
-                  (proposal.info.state === ProposalState.Draft ||
-                    proposal.info.state === ProposalState.SigningOff) && (
-                    <p
-                      onClick={() => setShowSignOffModal(true)}
-                      className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1 mr-4"
-                    >
-                      Sign Off
-                    </p>
-                  )}
-
                 <a
                   href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
                   target="_blank"
@@ -124,17 +111,6 @@ const Proposal = () => {
                 </ReactMarkdown>
               </div>
             )}
-
-            {signatoryRecord &&
-              showSignOffModal &&
-              (proposal.info.state === ProposalState.Draft ||
-                proposal.info.state === ProposalState.SigningOff) && (
-                <SignOffProposal
-                  isOpen={showSignOffModal}
-                  onClose={() => setShowSignOffModal(false)}
-                  signatoryRecord={signatoryRecord}
-                />
-              )}
 
             <InstructionPanel />
             <DiscussionPanel />

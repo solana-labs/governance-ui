@@ -8,7 +8,7 @@ import { withSignOffProposal } from '@models/withSignOffProposal'
 
 export const signOffProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  signatoryRecord: ParsedAccount<SignatoryRecord> | undefined
+  signatoryRecord: ParsedAccount<SignatoryRecord>
 ) => {
   const instructions: TransactionInstruction[] = []
   const signers: Account[] = []
@@ -16,8 +16,8 @@ export const signOffProposal = async (
   withSignOffProposal(
     instructions,
     programId,
-    signatoryRecord!.info.proposal,
-    signatoryRecord!.pubkey,
+    signatoryRecord?.info.proposal,
+    signatoryRecord?.pubkey,
     walletPubkey
   )
 
