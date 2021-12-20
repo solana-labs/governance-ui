@@ -19,5 +19,6 @@ module.exports = withTM({
   },
   env: {
     REALM: process.env.REALM,
+    DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
 })
