@@ -48,13 +48,7 @@ export class RpcContext {
 }
 
 export class MemcmpFilter {
-  offset: number
-  bytes: Buffer
-
-  constructor(offset: number, bytes: Buffer) {
-    this.offset = offset
-    this.bytes = bytes
-  }
+  constructor(public offset: number, public bytes: Buffer) {}
 
   isMatch(buffer: Buffer) {
     if (this.offset + this.bytes.length > buffer.length) {

@@ -11,7 +11,9 @@ import FinalizeVotesModal from './FinalizeVotesModal'
 import SignOffProposalModal from './SignOffProposalModal'
 
 const ProposalActionsPanel = () => {
-  const { governance, proposal } = useWalletStore((s) => s.selectedProposal)
+  const { governance, proposal, proposalOwner } = useWalletStore(
+    (s) => s.selectedProposal
+  )
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -61,14 +63,15 @@ const ProposalActionsPanel = () => {
       proposal?.info.state === ProposalState.SigningOff)
 
   const canCancelProposal =
-    !(
-      proposal?.info.state === ProposalState.Draft ||
-      proposal?.info.state === ProposalState.SigningOff ||
-      proposal?.info.state === ProposalState.Cancelled ||
-      proposal?.info.state === ProposalState.Succeeded
-    ) &&
     proposal &&
-    wallet?.publicKey
+    governance &&
+    proposalOwner &&
+    wallet?.publicKey &&
+    proposal.info.canWalletCancel(
+      governance.info,
+      proposalOwner.info,
+      wallet.publicKey
+    )
 
   return (
     <>

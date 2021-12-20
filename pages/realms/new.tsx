@@ -18,10 +18,11 @@ import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { MintInfo } from '@solana/spl-token'
 import { ProgramVersion } from 'models/registry/constants'
 import {
-  getMintDecimalAmount,
   formatMintNaturalAmountAsDecimal,
+  getMintSupplyPercentageAsBN,
 } from '@tools/sdk/units'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import { useRouter } from 'next/router'
 
 const publicKeyValidationTest = (value) => {
   try {
@@ -96,6 +97,7 @@ const New = () => {
   const [realmAddress, setRealmAddress] = useState<PublicKey | undefined>(
     undefined
   )
+  const router = useRouter()
 
   const handleSetForm = (newValues) => {
     setFormErrors({})
@@ -128,7 +130,19 @@ const New = () => {
           MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
           form.minCommunityTokensToCreateGovernance
         )
-        setRealmAddress(realmAddress)
+
+        // When the default governance program is used then navigate to the uncharted realm
+        if (
+          rpcContext.programId.equals(
+            new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID)
+          )
+        ) {
+          const url = fmtUrlWithCluster(`/dao/${realmAddress}/`)
+          router.push(url)
+        } else {
+          // If custom programId then show the configuration message
+          setRealmAddress(realmAddress)
+        }
       } catch (ex) {
         console.log(ex)
         notify({ type: 'error', message: `${ex}` })
@@ -147,18 +161,14 @@ const New = () => {
     try {
       const mintPublicKey = new PublicKey(mintId)
       const mint = await tryGetMint(connection.current, mintPublicKey)
+
       if (mint) {
         const supply = mint.account.supply
         if (supply.gt(new BN(0))) {
           handleSetForm({
             minCommunityTokensToCreateGovernance: BN.max(
               new BN(1),
-              // divide by 100 for a percentage
-              new BN(
-                getMintDecimalAmount(mint.account, supply)
-                  .dividedBy(100)
-                  .toString()
-              )
+              getMintSupplyPercentageAsBN(mint.account, 1)
             ),
             communityMintId: mintId,
             communityMint: mint,
@@ -221,10 +231,10 @@ const New = () => {
                 <div>
                   <a
                     target="_blank"
-                    href="https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts"
+                    href="https://github.com/solana-labs/governance-ui/blob/main/public/realms/mainnet-beta.json"
                     rel="noreferrer"
                   >
-                    https://github.com/blockworks-foundation/governance-ui/blob/main/models/registry/api.ts
+                    https://github.com/solana-labs/governance-ui/blob/main/public/realms/mainnet-beta.json
                   </a>
                 </div>
                 <div>This is a temporary solution.</div>

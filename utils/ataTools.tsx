@@ -43,7 +43,7 @@ export async function createATA(
   return ata
 }
 
-export async function findTrueReceiver(
+export async function getATA(
   connection: ConnectionContext,
   receiverAddress: PublicKey,
   mintPK: PublicKey,

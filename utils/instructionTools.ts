@@ -8,7 +8,7 @@ import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import type { ConnectionContext } from 'utils/connection'
-import { findTrueReceiver } from './ataTools'
+import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
 import { GovernedTokenAccount } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
@@ -58,10 +58,12 @@ export async function getTransferInstruction({
       form.governedTokenAccount.mint.account.decimals
     )
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const {
-      currentAddress: receiverAddress,
-      needToCreateAta,
-    } = await findTrueReceiver(connection, destinationAccount, mintPK, wallet!)
+    const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
+      connection,
+      destinationAccount,
+      mintPK,
+      wallet!
+    )
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
