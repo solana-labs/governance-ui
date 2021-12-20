@@ -81,14 +81,34 @@ export function getMintSupplyAsDecimal(mint: MintInfo) {
     .toNumber()
 }
 
+// Calculates percentage (provided as 0-100) of mint supply as BigNumber amount
+export function getMintSupplyPercentageAsBigNumber(
+  mint: MintInfo,
+  percentage: number
+) {
+  return new BigNumber(
+    mint.supply.mul(new BN(percentage)).toString()
+  ).shiftedBy(-(mint.decimals + 2))
+}
+
 // Calculates percentage (provided as 0-100) of mint supply as decimal amount
 export function getMintSupplyPercentageAsDecimal(
   mint: MintInfo,
   percentage: number
 ) {
-  return new BigNumber(mint.supply.mul(new BN(percentage)).toString())
-    .shiftedBy(-(mint.decimals + 2))
-    .toNumber()
+  return getMintSupplyPercentageAsBigNumber(mint, percentage).toNumber()
+}
+
+// Calculates percentage (provided as 0-100) of mint supply as rounded BN amount
+export function getMintSupplyPercentageAsBN(
+  mint: MintInfo,
+  percentage: number
+) {
+  return new BN(
+    getMintSupplyPercentageAsBigNumber(mint, percentage)
+      .dp(0, BigNumber.ROUND_DOWN) // BN doesn't support floating point and we have to round it
+      .toString()
+  )
 }
 
 // Formats percentage value showing it in human readable form

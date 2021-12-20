@@ -237,3 +237,64 @@ export const getTokenTransferSchema = ({ form, connection }) => {
       .required('Source account is required'),
   })
 }
+
+export const getMintSchema = ({ form, connection }) => {
+  return yup.object().shape({
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test('amount', 'Invalid amount', async function (val: number) {
+        if (val && !form.mintAccount) {
+          return this.createError({
+            message: `Please select mint to validate the amount`,
+          })
+        }
+        if (val && form.mintAccount && form.mintAccount?.mintInfo) {
+          const mintValue = getMintNaturalAmountFromDecimal(
+            val,
+            form.mintAccount?.mintInfo.decimals
+          )
+          return !!(
+            form.mintAccount.governance?.info.governedAccount && mintValue
+          )
+        }
+        return this.createError({
+          message: `Amount is required`,
+        })
+      }),
+    destinationAccount: yup
+      .string()
+      .test(
+        'accountTests',
+        'Account validation error',
+        async function (val: string) {
+          if (val) {
+            try {
+              if (form.mintAccount?.governance) {
+                await validateDestinationAccAddressWithMint(
+                  connection,
+                  val,
+                  form.mintAccount.governance.info.governedAccount
+                )
+              } else {
+                return this.createError({
+                  message: `Please select mint`,
+                })
+              }
+
+              return true
+            } catch (e) {
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Destination account is required`,
+            })
+          }
+        }
+      ),
+    mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}

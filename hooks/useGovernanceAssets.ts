@@ -175,5 +175,6 @@ export default function useGovernanceAssets() {
     governedTokenAccounts,
     getMintWithGovernances,
     canUseTransferInstruction,
+    canUseMintInstruction,
   }
 }
