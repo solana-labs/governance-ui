@@ -14,11 +14,14 @@ const Button: FunctionComponent<ButtonProps> = ({
   className,
   disabled,
   isLoading,
+  small,
   ...props
 }) => {
   return (
     <button
-      className={`${className} default-transition font-bold px-4 py-2.5 rounded-full text-sm focus:outline-none ${
+      className={`${className} default-transition font-bold px-4 rounded-full ${
+        small ? 'py-1' : 'py-2.5'
+      } text-sm focus:outline-none ${
         disabled
           ? 'bg-bkg-4 cursor-not-allowed text-fgd-2'
           : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'

@@ -4,7 +4,7 @@ import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
-import Button from './Button'
+import Button, { SecondaryButton } from './Button'
 import CancelProposalModal from './CancelProposalModal'
 import FinalizeVotesModal from './FinalizeVotesModal'
 import SignOffProposalModal from './SignOffProposalModal'
@@ -84,13 +84,13 @@ const ProposalActionsPanel = () => {
             )}
 
             {canCancelProposal && (
-              <Button
+              <SecondaryButton
                 className="w-1/2"
                 onClick={() => setShowCancelModal(true)}
                 disabled={!connected}
               >
                 Cancel
-              </Button>
+              </SecondaryButton>
             )}
 
             {canFinalizeVote && (
