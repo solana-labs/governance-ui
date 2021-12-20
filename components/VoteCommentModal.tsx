@@ -109,7 +109,10 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           Cancel
         </SecondaryButton>
 
-        <Button className="w-44" onClick={() => submitVote(vote)}>
+        <Button
+          className="w-44 flex items-center justify-center"
+          onClick={() => submitVote(vote)}
+        >
           {submitting ? <Loading /> : <span>{voteString} Proposal</span>}
         </Button>
       </div>
