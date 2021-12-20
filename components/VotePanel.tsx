@@ -123,7 +123,7 @@ const VotePanel = () => {
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
-          <div className="items-start justify-start flex w-full gap-5">
+          <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast ? (
               <Button
                 onClick={() => submitRelinquishVote()}

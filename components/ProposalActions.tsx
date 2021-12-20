@@ -68,7 +68,9 @@ const ProposalActionsPanel = () => {
   return (
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
-      ProposalState.Succeeded === proposal?.info.state ? null : (
+      ProposalState.Succeeded === proposal?.info.state ||
+      ProposalState.Defeated === proposal?.info.state ||
+      (!canCancelProposal && !canSignOff && canFinalizeVote) ? null : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
             {canSignOff && (
