@@ -4,7 +4,7 @@ import {
   VoteThresholdPercentage,
   VoteWeightSource,
 } from '@models/accounts'
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from '@models/registry/constants'
 import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
 import { withCreateRealm } from '@models/withCreateRealm'
 import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'

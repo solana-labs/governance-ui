@@ -29,7 +29,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { registerRealm } from 'actions/registerRealm'
 import { generateGovernanceArtifacts } from '@utils/governance/generate-governance-artifacts'
 import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from '@models/registry/constants'
 
 import { createMultisigRealm } from 'actions/createMultisigRealm'
 

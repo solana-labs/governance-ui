@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { MintMaxVoteWeightSource } from '@models/accounts'
 import { RpcContext } from '@models/core/api'
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from '@models/registry/constants'
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
-import { ConnectionContext } from 'stores/useWalletStore'
+import { ConnectionContext } from '@utils/connection'
 import {
   RealmArtifacts,
   RealmWizardMode,

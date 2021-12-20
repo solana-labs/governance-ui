@@ -1,4 +1,4 @@
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from '@models/registry/constants'
 import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
