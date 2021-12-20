@@ -15,6 +15,7 @@ const MembersCompactWrapper = () => {
     symbol,
     councilMint,
     toManyCouncilOutstandingProposalsForUse,
+    toManyCommunityOutstandingProposalsForUser,
   } = useRealm()
   const { members } = useMembers()
   const membersCount = members.length
@@ -45,7 +46,8 @@ const MembersCompactWrapper = () => {
                   <Tooltip
                     contentClassName="ml-auto"
                     content={
-                      toManyCouncilOutstandingProposalsForUse
+                      toManyCouncilOutstandingProposalsForUse &&
+                      toManyCommunityOutstandingProposalsForUser
                         ? 'You have to many outstanding proposals'
                         : ''
                     }
@@ -56,7 +58,8 @@ const MembersCompactWrapper = () => {
                 flex flex-col items-center justify-center
                 rounded-lg hover:bg-bkg-3 ml-auto 
                 hover:cursor-pointer ${
-                  toManyCouncilOutstandingProposalsForUse
+                  toManyCouncilOutstandingProposalsForUse &&
+                  toManyCommunityOutstandingProposalsForUser
                     ? 'opacity-60 pointer-events-none'
                     : ''
                 }`}

@@ -25,6 +25,7 @@ const AccountsCompactWrapper = () => {
     symbol,
     realm,
     toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const goToNewAccountForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
@@ -36,7 +37,8 @@ const AccountsCompactWrapper = () => {
   const isConnectedWithGovernanceCreationPermission =
     connected &&
     canCreateGovernance &&
-    !toManyCommunityOutstandingProposalsForUser
+    !toManyCommunityOutstandingProposalsForUser &&
+    !toManyCouncilOutstandingProposalsForUse
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -52,7 +54,8 @@ const AccountsCompactWrapper = () => {
                       ? 'Connect your wallet to create new account'
                       : !canCreateGovernance
                       ? "You don't have enough governance power to create a new treasury account"
-                      : toManyCommunityOutstandingProposalsForUser
+                      : toManyCommunityOutstandingProposalsForUser &&
+                        toManyCouncilOutstandingProposalsForUse
                       ? 'You have to many outstanding proposals'
                       : ''
                   }
