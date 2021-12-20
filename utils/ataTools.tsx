@@ -78,4 +78,3 @@ export async function getATA(
     needToCreateAta,
   }
 }
-console.log(getATA)

@@ -8,13 +8,21 @@ import MemberOverview from './MemberOverview'
 import { PlusIcon } from '@heroicons/react/outline'
 import AddMember from './AddMember'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import Tooltip from '@components/Tooltip'
 
 const MembersCompactWrapper = () => {
-  const { symbol, councilMint } = useRealm()
+  const {
+    symbol,
+    councilMint,
+    toManyCouncilOutstandingProposalsForUse,
+  } = useRealm()
   const { members } = useMembers()
   const membersCount = members.length
   const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
-  const { canUseMintInstruction } = useGovernanceAssets()
+  const {
+    canUseMintInstruction,
+    canMintRealmCouncilToken,
+  } = useGovernanceAssets()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
     const councilTotalVotes = current.council?.info.totalVotesCount || 0
@@ -31,23 +39,38 @@ const MembersCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Members ({membersCount})
-              {councilMint && canUseMintInstruction && (
-                <div
-                  onClick={goToAddMemberView}
-                  className={`bg-bkg-2 default-transition 
+              {councilMint &&
+                canUseMintInstruction &&
+                canMintRealmCouncilToken() && (
+                  <Tooltip
+                    contentClassName="ml-auto"
+                    content={
+                      toManyCouncilOutstandingProposalsForUse
+                        ? 'You have to many outstanding proposals'
+                        : ''
+                    }
+                  >
+                    <div
+                      onClick={goToAddMemberView}
+                      className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
                 rounded-lg hover:bg-bkg-3 ml-auto 
-                hover:cursor-pointer`}
-                >
-                  <div
-                    className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
+                hover:cursor-pointer ${
+                  toManyCouncilOutstandingProposalsForUse
+                    ? 'opacity-60 pointer-events-none'
+                    : ''
+                }`}
+                    >
+                      <div
+                        className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
                 font-bold items-center justify-center 
                 rounded-full text-fgd-3"
-                  >
-                    <PlusIcon />
-                  </div>
-                </div>
-              )}
+                      >
+                        <PlusIcon />
+                      </div>
+                    </div>
+                  </Tooltip>
+                )}
             </h3>
             <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
               <p className="text-fgd-3 text-xs">Total votes cast</p>

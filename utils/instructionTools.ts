@@ -127,7 +127,7 @@ export async function getMintInstruction({
       form.amount!,
       form.mintAccount.mintInfo?.decimals
     )
-    console.log(getATA)
+
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
     const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
       connection,

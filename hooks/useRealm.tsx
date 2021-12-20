@@ -83,6 +83,16 @@ export default function useRealm() {
     realm.info.config.councilMint &&
     !councilMint?.supply.isZero()
 
+  const realmCfgMaxOutstandingProposalCount = 10
+  const toManyCommunityOutstandingProposalsForUser =
+    ownTokenRecord &&
+    ownTokenRecord?.info.outstandingProposalCount >=
+      realmCfgMaxOutstandingProposalCount
+  const toManyCouncilOutstandingProposalsForUse =
+    ownCouncilTokenRecord &&
+    ownCouncilTokenRecord?.info.outstandingProposalCount >=
+      realmCfgMaxOutstandingProposalCount
+
   return {
     realm,
     realmInfo,
@@ -103,5 +113,7 @@ export default function useRealm() {
     realmDisplayName: realmInfo?.displayName ?? realm?.info?.name,
     canChooseWhoVote,
     councilTokenOwnerRecords,
+    toManyCouncilOutstandingProposalsForUse,
+    toManyCommunityOutstandingProposalsForUser,
   }
 }

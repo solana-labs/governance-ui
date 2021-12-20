@@ -6,12 +6,12 @@ import React, { useEffect } from 'react'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
+
   const { symbol, realm, governances, ownVoterWeight } = useRealm()
 
   useEffect(() => {
     console.log('governance realm 8099', governances)
   }, [])
-
   const canCreateProposal =
     realm &&
     Object.values(governances).some((g) =>
