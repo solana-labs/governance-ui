@@ -45,6 +45,7 @@ export interface ProgramUpgradeForm {
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
+  mangoGroupKey: string | undefined
   maxMangoAccounts: number
 }
 

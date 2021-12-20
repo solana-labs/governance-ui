@@ -13,10 +13,12 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
-//import { serializeInstructionToBase64 } from '@models/serialisation'
+import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { makeChangeMaxMangoAccountsInstruction } from '@blockworks-foundation/mango-client'
+import { BN } from '@project-serum/anchor'
 
 const MakeChangeMaxAccounts = ({
   index,
@@ -40,6 +42,7 @@ const MakeChangeMaxAccounts = ({
   const [form, setForm] = useState<MangoMakeChangeMaxAccountsForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
+    mangoGroupKey: undefined,
     maxMangoAccounts: 1,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -63,16 +66,16 @@ const MakeChangeMaxAccounts = ({
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
-      //example
+      const setMaxMangoAccountsInstr = makeChangeMaxMangoAccountsInstruction(
+        form.governedAccount.governance.info.governedAccount,
+        new PublicKey(form.mangoGroupKey!),
+        form.governedAccount.governance.pubkey,
+        new BN(form.maxMangoAccounts)
+      )
 
-      //   const upgradeIx = await createUpgradeInstruction(
-      //     form.governedAccount.governance.info.governedAccount,
-      //     new PublicKey(form.bufferAddress),
-      //     form.governedAccount.governance.pubkey,
-      //     wallet!.publicKey
-      //   )
-      //   serializedInstruction = serializeInstructionToBase64(upgradeIx)
-      serializedInstruction = ''
+      serializedInstruction = serializeInstructionToBase64(
+        setMaxMangoAccountsInstr
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -117,6 +120,18 @@ const MakeChangeMaxAccounts = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+      <Input
+        label="Mango group key"
+        value={form.mangoGroupKey}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'mangoGroupKey',
+          })
+        }
+        error={formErrors['mangoGroupKey']}
+      />
       <Input
         label="Max accounts"
         value={form.maxMangoAccounts}
