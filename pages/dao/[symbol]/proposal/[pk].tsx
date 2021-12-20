@@ -15,6 +15,7 @@ import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import { option } from 'tools/core/option'
 import useQueryContext from 'hooks/useQueryContext'
 import React from 'react'
+import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
 
 const Proposal = () => {
@@ -126,7 +127,9 @@ const Proposal = () => {
             <ApprovalQuorum progress={yesVoteProgress} />
           </div>
         </div>
+
         <VotePanel />
+        <ProposalActionsPanel />
       </div>
     </div>
   )
