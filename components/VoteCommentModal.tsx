@@ -6,7 +6,7 @@ import useWalletStore from '../stores/useWalletStore'
 import useRealm from '../hooks/useRealm'
 import { castVote } from '../actions/castVote'
 import { Vote } from '../models/instructions'
-import Button, { LinkButton } from './Button'
+import Button, { LinkButton, SecondaryButton } from './Button'
 // import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
@@ -88,12 +88,14 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <h2>Confirm your vote</h2>
+
       <Tooltip content="This will be stored on-chain and displayed publically in the discussion on this proposal">
-        <label className="border-b border-dashed border-fgd-3 inline-block leading-4 text-fgd-1 text-sm hover:cursor-help hover:border-b-0">
+        <label className="border- mt-4 border-dashed border-fgd-3 inline-block leading-4 text-fgd-1 text-sm hover:cursor-help hover:border-b-0">
           Leave a comment
         </label>
         <span className="ml-1 text-xs text-fgd-3">(Optional)</span>
       </Tooltip>
+
       <Input
         className="mt-1.5"
         value={comment}
@@ -101,13 +103,15 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         onChange={(e) => setComment(e.target.value)}
         // placeholder={`Let the DAO know why you vote '${voteString}'`}
       />
-      <div className="flex items-center pt-6">
-        <Button onClick={() => submitVote(vote)}>
+
+      <div className="flex items-center justify-center mt-8">
+        <SecondaryButton className="w-44 mr-4" onClick={onClose}>
+          Cancel
+        </SecondaryButton>
+
+        <Button className="w-44" onClick={() => submitVote(vote)}>
           {submitting ? <Loading /> : <span>{voteString} Proposal</span>}
         </Button>
-        <LinkButton className="ml-4 text-th-fgd-1" onClick={onClose}>
-          Cancel
-        </LinkButton>
       </div>
     </Modal>
   )
