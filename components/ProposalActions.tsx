@@ -31,31 +31,25 @@ const ProposalActionsPanel = () => {
     connected &&
     proposal?.info.state === ProposalState.Voting
 
+  const walletPk = wallet?.publicKey
+
   useEffect(() => {
     const setup = async () => {
-      if (connected && proposal && realmInfo && wallet) {
-        const rpcContext = new RpcContext(
-          proposal.account.owner,
-          realmInfo.programVersion,
-          wallet,
-          connection.current,
-          connection.endpoint
-        )
-
-        const response = await getSignatoryRecordAddress(
-          rpcContext.programId,
+      if (proposal && realmInfo && walletPk) {
+        const signatoryRecordPk = await getSignatoryRecordAddress(
+          realmInfo.programId,
           proposal.pubkey,
-          rpcContext.walletPubkey
+          walletPk
         )
 
-        if (response && signatories) {
-          setSignatoryRecord(signatories[response.toBase58()])
+        if (signatoryRecordPk && signatories) {
+          setSignatoryRecord(signatories[signatoryRecordPk.toBase58()])
         }
       }
     }
 
     setup()
-  }, [proposal])
+  }, [proposal, realmInfo, walletPk])
 
   const canSignOff =
     signatoryRecord &&
