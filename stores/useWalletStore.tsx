@@ -1,8 +1,6 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { EndpointInfo } from '../@types/types'
+import { PublicKey } from '@solana/web3.js'
 import {
   ProgramAccount,
   TokenAccount,
@@ -33,22 +31,19 @@ import {
 import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
-import { pubkeyFilter } from '../scripts/api'
 import { getGovernanceChatMessages } from '../models/chat/api'
 import { ChatMessage } from '../models/chat/accounts'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '../models/enums'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
-import { EndpointTypes } from '@models/types'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
-import { getRealmInfo } from '@models/registry/api'
+import { getCertifiedRealmInfo } from '@models/registry/api'
+import { tryParsePublicKey } from '@tools/core/pubkey'
+import type { ConnectionContext } from 'utils/connection'
+import { getConnectionContext } from 'utils/connection'
+import { pubkeyFilter } from 'models/core/api'
 
-export interface ConnectionContext {
-  cluster: EndpointTypes
-  current: Connection
-  endpoint: string
-}
 interface WalletStore extends State {
   connected: boolean
   connection: ConnectionContext
@@ -86,6 +81,7 @@ interface WalletStore extends State {
     proposalMint?: MintAccount
     loading: boolean
     tokenType?: GoverningTokenType
+    proposalOwner: ParsedAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string
   tokenAccounts: ProgramAccount<TokenAccount>[]
@@ -149,30 +145,6 @@ async function resolveProposalDescription(description: string) {
   }
 }
 
-export const ENDPOINTS: EndpointInfo[] = [
-  {
-    name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://mango.rpcpool.com',
-  },
-  {
-    name: 'devnet',
-    url: process.env.DEVNET_RPC || 'https://mango.devnet.rpcpool.com',
-  },
-  {
-    name: 'localnet',
-    url: 'http://127.0.0.1:8899',
-  },
-]
-
-export function getConnectionContext(cluster: string): ConnectionContext {
-  const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
-  return {
-    cluster: ENDPOINT!.name as EndpointTypes,
-    current: new Connection(ENDPOINT!.url, 'recent'),
-    endpoint: ENDPOINT!.url,
-  }
-}
-
 const INITIAL_REALM_STATE = {
   realm: undefined,
   mint: undefined,
@@ -200,6 +172,7 @@ const INITIAL_PROPOSAL_STATE = {
   description: undefined,
   proposalMint: undefined,
   loading: true,
+  proposalOwner: undefined,
 }
 
 const useWalletStore = create<WalletStore>((set, get) => ({
@@ -221,17 +194,32 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection
       const set = get().set
       const newConnection = getConnectionContext(cluster)
-
-      if (connection.cluster == cluster) {
-        return
+      if (
+        connection.cluster !== newConnection.cluster ||
+        connection.endpoint !== newConnection.endpoint
+      ) {
+        set((s) => {
+          s.connection = newConnection
+        })
       }
-      set((s) => {
-        s.connection = newConnection
-      })
-      const realmInfo = await getRealmInfo(symbol, newConnection)
-      if (realmInfo) {
-        await actions.fetchAllRealms(realmInfo.programId)
-        actions.fetchRealm(realmInfo.programId, realmInfo.realmId)
+
+      let programId: PublicKey | undefined
+      let realmId = tryParsePublicKey(symbol)
+
+      if (!realmId) {
+        const realmInfo = await getCertifiedRealmInfo(symbol, newConnection)
+        realmId = realmInfo?.realmId
+        programId = realmInfo?.programId
+      } else {
+        const realmAccountInfo = await connection.current.getAccountInfo(
+          realmId
+        )
+        programId = realmAccountInfo?.owner
+      }
+
+      if (realmId && programId) {
+        await actions.fetchAllRealms(programId)
+        actions.fetchRealm(programId, realmId)
       }
     },
     async fetchWalletTokenAccounts() {
@@ -473,6 +461,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         voteRecordsByVoter,
         signatories,
         chatMessages,
+        proposalOwner,
       ] = await Promise.all([
         resolveProposalDescription(proposal.info.descriptionLink),
         getGovernanceAccount<Governance>(
@@ -496,6 +485,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           [pubkeyFilter(1, proposalPubKey)]
         ),
         getGovernanceChatMessages(endpoint, proposalPubKey),
+        getGovernanceAccount<TokenOwnerRecord>(
+          connection,
+          proposal.info.tokenOwnerRecord,
+          TokenOwnerRecord
+        ),
       ])
 
       const realm = await getGovernanceAccount<Realm>(
@@ -519,6 +513,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         signatories,
         chatMessages,
         tokenType,
+        proposalOwner,
       })
 
       set((s) => {
@@ -533,6 +528,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
         s.selectedProposal.tokenType = tokenType
+        s.selectedProposal.proposalOwner = proposalOwner
       })
     },
     async fetchChatMessages(proposalPubKey: PublicKey) {

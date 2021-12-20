@@ -68,7 +68,6 @@ export async function tryGetMint(
 ): Promise<ProgramAccount<MintAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = Buffer.from(result!.data)
     const account = parseMintAccountData(data)
     return {
@@ -91,7 +90,6 @@ export async function tryGetTokenAccount(
       return undefined
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = Buffer.from(result!.data)
     const account = parseTokenAccountData(publicKey, data)
     return {
@@ -250,7 +248,6 @@ export function getTokenAccountLabelInfo(
     tokenName = info?.name ? info.name : ''
     tokenAccountName = getAccountName(acc.token.publicKey)
     amount = formatMintNaturalAmountAsDecimal(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       acc.mint!.account,
       acc.token?.account.amount
     )
@@ -281,7 +278,6 @@ export function getMintAccountLabelInfo(
     tokenName = info?.name ? info.name : ''
     mintAccountName = getAccountName(acc.governance.info.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       acc.mintInfo,
       acc?.mintInfo.supply
     )

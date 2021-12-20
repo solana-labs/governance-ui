@@ -15,6 +15,7 @@ const InstructionContentContainer = ({
   instructionsData: ComponentInstructionData[]
 }) => {
   const currentInstruction = instructionsData ? instructionsData[idx] : null
+
   return (
     <div className="space-y-4 w-full">
       {children}

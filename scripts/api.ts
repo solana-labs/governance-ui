@@ -1,47 +1,19 @@
 import { PublicKey } from '@solana/web3.js'
-import { SanitizedObject } from '@utils/helpers'
+import { SanitizedObject } from 'utils/helpers'
 import * as bs58 from 'bs58'
 import {
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
-} from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
-import { RpcContext } from '../models/core/api'
-import { GOVERNANCE_SCHEMA } from '../models/serialisation'
-import { deserializeBorsh } from '../utils/borsh'
+} from 'models/accounts'
+import { ParsedAccount } from 'models/core/accounts'
+import { MemcmpFilter, RpcContext } from 'models/core/api'
+import { GOVERNANCE_SCHEMA } from 'models/serialisation'
+import { deserializeBorsh } from 'utils/borsh'
+import { sleep } from '@project-serum/common'
 
 const fetch = require('node-fetch')
-
-export interface IWallet {
-  publicKey: PublicKey
-}
-
-export class MemcmpFilter {
-  offset: number
-  bytes: Buffer
-
-  constructor(offset: number, bytes: Buffer) {
-    this.offset = offset
-    this.bytes = bytes
-  }
-
-  isMatch(buffer: Buffer) {
-    if (this.offset + this.bytes.length > buffer.length) {
-      return false
-    }
-
-    for (let i = 0; i < this.bytes.length; i++) {
-      if (this.bytes[i] !== buffer[this.offset + i]) return false
-    }
-
-    return true
-  }
-}
-
-export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
-  new MemcmpFilter(offset, pubkey.toBuffer())
 
 export async function getRealms(rpcContext: RpcContext) {
   return getGovernanceAccountsImpl<Realm>(
@@ -83,7 +55,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
       )),
     }
     // XXX: sleep to prevent public RPC rate limits
-    await new Promise((r) => setTimeout(r, 3_000))
+    await sleep(3_000)
   }
 
   return accounts
