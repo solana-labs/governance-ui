@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
 import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
-import { RpcContext } from '../models/core/api'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import CancelProposalModal from './CancelProposalModal'
@@ -16,7 +15,6 @@ const ProposalActionsPanel = () => {
   )
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
