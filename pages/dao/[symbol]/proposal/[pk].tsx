@@ -1,24 +1,25 @@
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
-import useProposal from '../../../../hooks/useProposal'
-import ProposalStateBadge from '../../../../components/ProposalStatusBadge'
-import TokenBalanceCard from '../../../../components/TokenBalanceCard'
-import { InstructionPanel } from '../../../../components/instructions/instructionPanel'
-import DiscussionPanel from '../../../../components/chat/DiscussionPanel'
-import VotePanel from '../../../../components/VotePanel'
-import ApprovalQuorum from '../../../../components/ApprovalQuorum'
-import useRealm from '../../../../hooks/useRealm'
-import useProposalVotes from '../../../../hooks/useProposalVotes'
-import VoteResultsBar from '../../../../components/VoteResultsBar'
-import ProposalTimeStatus from '../../../../components/ProposalTimeStatus'
-import { option } from '../../../../tools/core/option'
-import useQueryContext from '../../../../hooks/useQueryContext'
+import useProposal from 'hooks/useProposal'
+import ProposalStateBadge from 'components/ProposalStatusBadge'
+import TokenBalanceCard from 'components/TokenBalanceCard'
+import { InstructionPanel } from 'components/instructions/instructionPanel'
+import DiscussionPanel from 'components/chat/DiscussionPanel'
+import VotePanel from 'components/VotePanel'
+import ApprovalQuorum from 'components/ApprovalQuorum'
+import useRealm from 'hooks/useRealm'
+import useProposalVotes from 'hooks/useProposalVotes'
+import VoteResultsBar from 'components/VoteResultsBar'
+import ProposalTimeStatus from 'components/ProposalTimeStatus'
+import { option } from 'tools/core/option'
+import useQueryContext from 'hooks/useQueryContext'
 import React from 'react'
+import { getRealmExplorerHost } from 'tools/routing'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol } = useRealm()
+  const { symbol, realmInfo } = useRealm()
   const { proposal, description } = useProposal()
   const {
     yesVoteProgress,
@@ -43,7 +44,9 @@ const Proposal = () => {
 
               <div className="flex items-center">
                 <a
-                  href={`https://solana-labs.github.io/oyster-gov/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
+                  href={`https://${getRealmExplorerHost(
+                    realmInfo
+                  )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

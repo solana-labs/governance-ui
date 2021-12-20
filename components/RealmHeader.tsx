@@ -1,11 +1,12 @@
 import React from 'react'
-import useRealm from '../hooks/useRealm'
+import useRealm from 'hooks/useRealm'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import { TwitterIcon } from './icons'
-import useQueryContext from '../hooks/useQueryContext'
+import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
+import { getRealmExplorerHost } from 'tools/routing'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -14,12 +15,8 @@ const RealmHeader = () => {
 
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
-  const mvpHost =
-    realmInfo?.symbol === 'UXD'
-      ? 'oyster.uxd.fi'
-      : 'solana-labs.github.io/oyster-gov'
-
-  const mvpUrl = `https://${mvpHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  const explorerHost = getRealmExplorerHost(realmInfo)
+  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
 
   return (
     <div className="pb-4">
@@ -33,7 +30,7 @@ const RealmHeader = () => {
       ) : null}
       <div className="border-b border-fgd-4 flex flex-col md:flex-row md:items-center md:justify-between pb-3">
         {realmDisplayName ? (
-          <a href={mvpUrl} target="_blank" rel="noopener noreferrer">
+          <a href={realmUrl} target="_blank" rel="noopener noreferrer">
             <div className="flex items-center cursor-pointer">
               <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
                 {realmInfo?.ogImage ? (
