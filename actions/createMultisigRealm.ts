@@ -86,8 +86,6 @@ export const createMultisigRealm = async (
 
   let walletAtaPk: PublicKey | undefined
 
-  // Create ATAs for member and mint them council tokens
-  // TODO: check the max allowable tx size and chunk the instructions accordingly
   for (const teamWalletPk of councilWalletPks) {
     const ataPk = await withCreateAssociatedTokenAccount(
       councilMintInstructions,
