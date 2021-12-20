@@ -1,11 +1,11 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
-import { getConnectionContext } from 'stores/useWalletStore'
+import { getConnectionContext } from 'utils/connection'
+import { pubkeyFilter } from 'models/core/api'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
 import { ParsedAccount } from '../models/core/accounts'
 import { getCertifiedRealmInfo } from '../models/registry/api'
-import { getGovernanceAccounts, pubkeyFilter } from './api'
+import { getGovernanceAccounts } from './api'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30

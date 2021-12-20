@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
@@ -9,13 +8,11 @@ import {
 } from '@solana/spl-token'
 import {
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import { precision } from '@utils/formatting'
-import * as yup from 'yup'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
@@ -32,9 +29,9 @@ import { NewProposalContext } from '../../new'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { validateDestinationAccAddressWithMint } from '@utils/validations'
+import { getMintSchema } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { findTrueReceiver } from '@utils/ataTools'
+import { getATA } from '@utils/ataTools'
 import { validateInstruction } from '@utils/instructionTools'
 
 const Mint = ({
@@ -111,10 +108,7 @@ const Mint = ({
         form.mintAccount.mintInfo?.decimals
       )
       //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-      const {
-        currentAddress: receiverAddress,
-        needToCreateAta,
-      } = await findTrueReceiver(
+      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
         connection,
         destinationAccount,
         mintPK,
@@ -193,64 +187,7 @@ const Mint = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = yup.object().shape({
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test('amount', 'Invalid amount', async function (val: number) {
-        if (val && !form.mintAccount) {
-          return this.createError({
-            message: `Please select mint to validate the amount`,
-          })
-        }
-        if (val && form.mintAccount && form.mintAccount?.mintInfo) {
-          const mintValue = getMintNaturalAmountFromDecimal(
-            val,
-            form.mintAccount?.mintInfo.decimals
-          )
-          return !!(
-            form.mintAccount.governance?.info.governedAccount && mintValue
-          )
-        }
-        return this.createError({
-          message: `Amount is required`,
-        })
-      }),
-    destinationAccount: yup
-      .string()
-      .test(
-        'accountTests',
-        'Account validation error',
-        async function (val: string) {
-          if (val) {
-            try {
-              if (form.mintAccount?.governance) {
-                await validateDestinationAccAddressWithMint(
-                  connection,
-                  val,
-                  form.mintAccount.governance.info.governedAccount
-                )
-              } else {
-                return this.createError({
-                  message: `Please select mint`,
-                })
-              }
-
-              return true
-            } catch (e) {
-              return this.createError({
-                message: `${e}`,
-              })
-            }
-          } else {
-            return this.createError({
-              message: `Destination account is required`,
-            })
-          }
-        }
-      ),
-    mintAccount: yup.object().nullable().required('Mint is required'),
-  })
+  const schema = getMintSchema({ form, connection })
 
   return (
     <>

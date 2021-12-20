@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useEffect, useState } from 'react'
@@ -25,6 +24,7 @@ const VotePanel = () => {
     proposal,
     voteRecordsByVoter,
     tokenType,
+    proposalOwner,
   } = useWalletStore((s) => s.selectedProposal)
   const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
@@ -44,31 +44,25 @@ const VotePanel = () => {
     connected &&
     proposal?.info.state === ProposalState.Voting
 
+  const walletPk = wallet?.publicKey
+
   useEffect(() => {
     const setup = async () => {
-      if (connected && proposal && realmInfo && wallet) {
-        const rpcContext = new RpcContext(
-          proposal.account.owner,
-          realmInfo.programVersion,
-          wallet,
-          connection.current,
-          connection.endpoint
-        )
-
-        const response = await getSignatoryRecordAddress(
-          rpcContext.programId,
+      if (proposal && realmInfo && walletPk) {
+        const signatoryRecordPk = await getSignatoryRecordAddress(
+          realmInfo.programId,
           proposal.pubkey,
-          rpcContext.walletPubkey
+          walletPk
         )
 
-        if (response && signatories) {
-          setSignatoryRecord(signatories[response.toBase58()])
+        if (signatoryRecordPk && signatories) {
+          setSignatoryRecord(signatories[signatoryRecordPk.toBase58()])
         }
       }
     }
 
     setup()
-  }, [proposal])
+  }, [proposal, realmInfo, walletPk])
 
   const ownVoteRecord =
     wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
@@ -127,7 +121,6 @@ const VotePanel = () => {
       await relinquishVote(
         rpcContext,
         proposal!,
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
         ownVoteRecord!.pubkey,
         instructions
@@ -159,14 +152,16 @@ const VotePanel = () => {
     (proposal?.info.state === ProposalState.Draft ||
       proposal?.info.state === ProposalState.SigningOff)
 
-  const canCancelProposal = !(
-    ProposalState.Cancelled === proposal?.info.state ||
-    !(
-      proposal?.info.state === ProposalState.Draft ||
-      proposal?.info.state === ProposalState.SigningOff ||
-      proposal?.info.state === ProposalState.Voting
+  const canCancelProposal =
+    proposal &&
+    governance &&
+    proposalOwner &&
+    wallet?.publicKey &&
+    proposal.info.canWalletCancel(
+      governance.info,
+      proposalOwner.info,
+      wallet.publicKey
     )
-  )
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
@@ -220,7 +215,7 @@ const VotePanel = () => {
           <Button
             className={isVoting ? 'w-1/2' : 'w-full'}
             onClick={() => setShowCancelModal(true)}
-            disabled={!connected || !canCancelProposal}
+            disabled={!connected}
           >
             Cancel
           </Button>
@@ -265,6 +260,7 @@ const VotePanel = () => {
 
       {showCancelModal && (
         <CancelProposalModal
+          // @ts-ignore
           isOpen={showCancelModal && canCancelProposal}
           onClose={() => setShowCancelModal(false)}
         />

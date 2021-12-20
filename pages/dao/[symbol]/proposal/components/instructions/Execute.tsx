@@ -5,26 +5,27 @@ import useRealm from 'hooks/useRealm'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
-import { Proposal } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
-import { cancelProposal } from 'actions/cancelProposal'
-import useProposal from '@hooks/useProposal'
+import { executeInstruction } from 'actions/executeInstruction'
+import { ProposalInstruction } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
 
-type CancelProposalModalProps = {
+type ExecuteInstructionProps = {
   onClose: () => void
   isOpen: boolean
+  instruction: ParsedAccount<ProposalInstruction> | any
 }
 
-const CancelProposalModal = ({ onClose, isOpen }: CancelProposalModalProps) => {
+const ExecuteInstruction = ({
+  onClose,
+  isOpen,
+  instruction,
+}: ExecuteInstructionProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { realmInfo } = useRealm()
-  const { proposal } = useProposal()
 
-  const handleCancelProposal = async (
-    proposal: ParsedAccount<Proposal> | undefined
-  ) => {
+  const handleExecuteInstruction = async () => {
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
@@ -35,43 +36,39 @@ const CancelProposalModal = ({ onClose, isOpen }: CancelProposalModalProps) => {
           connection.endpoint
         )
 
-        await cancelProposal(rpcContext, proposal)
+        await executeInstruction(rpcContext, proposal, instruction)
 
         onClose()
-
-        await fetchRealm(realmInfo.programId, realmInfo.realmId)
       }
     } catch (error) {
       notify({
         type: 'error',
-        message: `Error: Could not cancel proposal.`,
+        message: `Error: Could not execute instruction.`,
       })
 
-      onClose()
+      console.log('error executing instruction', error)
 
-      console.log('error cancelling proposal', error)
+      onClose()
     }
   }
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
-      <h2>Cancel proposal</h2>
+      <h2>Execute instruction</h2>
 
-      <p className="text-left mt-5 mb-8">
-        Do you want to cancel this proposal?
-      </p>
+      <p className="text-left mt-5 mb-8">Do you want to execute instruction?</p>
 
       <div className="flex items-center justify-center">
         <SecondaryButton className="w-44 mr-4" onClick={onClose}>
           No
         </SecondaryButton>
 
-        <Button className="w-44" onClick={() => handleCancelProposal(proposal)}>
-          Yes, cancel
+        <Button className="mx-2 w-44" onClick={handleExecuteInstruction}>
+          Execute
         </Button>
       </div>
     </Modal>
   )
 }
 
-export default CancelProposalModal
+export default ExecuteInstruction

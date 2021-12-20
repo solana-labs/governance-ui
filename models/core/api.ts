@@ -5,7 +5,7 @@ import bs58 from 'bs58'
 import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
 import { Schema } from 'borsh'
 import { deserializeBorsh } from '../../utils/borsh'
-import { ProgramVersion } from '@models/registry/api'
+import { ProgramVersion } from 'models/registry/constants'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
 export const SYSTEM_PROGRAM_ID = new PublicKey(
@@ -48,13 +48,7 @@ export class RpcContext {
 }
 
 export class MemcmpFilter {
-  offset: number
-  bytes: Buffer
-
-  constructor(offset: number, bytes: Buffer) {
-    this.offset = offset
-    this.bytes = bytes
-  }
+  constructor(public offset: number, public bytes: Buffer) {}
 
   isMatch(buffer: Buffer) {
     if (this.offset + this.bytes.length > buffer.length) {

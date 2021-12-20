@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
 import { RpcContext } from 'models/core/api'
 import useWalletStore from 'stores/useWalletStore'

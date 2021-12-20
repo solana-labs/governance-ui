@@ -5,7 +5,7 @@ import {
 } from '@solana/spl-token'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
-import { ConnectionContext } from 'stores/useWalletStore'
+import type { ConnectionContext } from 'utils/connection'
 import { sendTransaction } from './send'
 import { tryGetAta, isExistingTokenAccount } from './validations'
 
@@ -43,7 +43,7 @@ export async function createATA(
   return ata
 }
 
-export async function findTrueReceiver(
+export async function getATA(
   connection: ConnectionContext,
   receiverAddress: PublicKey,
   mintPK: PublicKey,

@@ -9,18 +9,14 @@ import {
   TransactionSignature,
 } from '@solana/web3.js'
 import Wallet from '@project-serum/sol-wallet-adapter'
+import { sleep } from '@project-serum/common'
 
 class TransactionError extends Error {
   public txid: string
   constructor(message: string, txid?: string) {
     super(message)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     this.txid = txid!
   }
-}
-
-export async function sleep(ms) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
 export function getUnixTs() {

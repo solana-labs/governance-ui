@@ -21,8 +21,15 @@
       "@tools/*": ["tools/*"],
       "@models/*": ["models/*"],
       "@utils/*": ["utils/*"]
-    }
+    },
+    "incremental": true
   },
   "exclude": ["node_modules", ".next", "out"],
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"]
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", "**/*.js"],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"],
+    "compilerOptions": {
+      "module": "commonjs"
+    }
+  }
 }

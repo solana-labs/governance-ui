@@ -361,7 +361,7 @@ export class TokenOwnerRecord {
   }
 }
 
-export async function getTokenOwnerAddress(
+export async function getTokenOwnerRecordAddress(
   programId: PublicKey,
   realm: PublicKey,
   governingTokenMint: PublicKey,
@@ -583,6 +583,42 @@ export class Proposal {
     return this.isPreVotingState()
       ? governance.config.maxVotingTime
       : (this.votingAt?.toNumber() ?? 0) + governance.config.maxVotingTime - now
+  }
+
+  hasVoteTimeEnded(governance: Governance) {
+    return this.getTimeToVoteEnd(governance) <= 0
+  }
+
+  canCancel(governance: Governance) {
+    if (
+      this.state === ProposalState.Draft ||
+      this.state === ProposalState.SigningOff
+    ) {
+      return true
+    }
+    if (
+      this.state === ProposalState.Voting &&
+      !this.hasVoteTimeEnded(governance)
+    ) {
+      return true
+    }
+
+    return false
+  }
+
+  canWalletCancel(
+    governance: Governance,
+    proposalOwner: TokenOwnerRecord,
+    walletPk: PublicKey
+  ) {
+    if (!this.canCancel(governance)) {
+      return false
+    }
+
+    return (
+      proposalOwner.governingTokenOwner.equals(walletPk) ||
+      proposalOwner.governanceDelegate?.equals(walletPk)
+    )
   }
 }
 
