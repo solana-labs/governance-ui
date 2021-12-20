@@ -23,7 +23,6 @@ const VotePanel = () => {
     proposal,
     voteRecordsByVoter,
     tokenType,
-    proposalOwner,
   } = useWalletStore((s) => s.selectedProposal)
   const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
