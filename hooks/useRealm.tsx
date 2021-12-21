@@ -83,6 +83,7 @@ export default function useRealm() {
     realm.info.config.councilMint &&
     !councilMint?.supply.isZero()
 
+  //TODO take from realm config when available
   const realmCfgMaxOutstandingProposalCount = 10
   const toManyCommunityOutstandingProposalsForUser =
     ownTokenRecord &&
