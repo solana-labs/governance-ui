@@ -342,6 +342,8 @@ export class TokenOwnerRecord {
 
   governanceDelegate?: PublicKey
 
+  outstandingProposalCount: number
+
   constructor(args: {
     realm: PublicKey
     governingTokenMint: PublicKey
@@ -349,6 +351,7 @@ export class TokenOwnerRecord {
     governingTokenDepositAmount: BN
     unrelinquishedVotesCount: number
     totalVotesCount: number
+    outstandingProposalCount: number
     reserved: Uint8Array
   }) {
     this.realm = args.realm
@@ -358,6 +361,7 @@ export class TokenOwnerRecord {
     this.unrelinquishedVotesCount = args.unrelinquishedVotesCount
     this.totalVotesCount = args.totalVotesCount
     this.reserved = args.reserved
+    this.outstandingProposalCount = args.outstandingProposalCount
   }
 }
 

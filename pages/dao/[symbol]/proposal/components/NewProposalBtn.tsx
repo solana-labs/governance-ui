@@ -6,17 +6,26 @@ import React, { useEffect } from 'react'
 
 const NewProposalBtn = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realm, governances, ownVoterWeight } = useRealm()
+
+  const {
+    symbol,
+    realm,
+    governances,
+    ownVoterWeight,
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
+  } = useRealm()
 
   useEffect(() => {
     console.log('governance realm 8099', governances)
   }, [])
-
   const canCreateProposal =
     realm &&
     Object.values(governances).some((g) =>
       ownVoterWeight.canCreateProposal(g.info.config)
-    )
+    ) &&
+    !toManyCommunityOutstandingProposalsForUser &&
+    !toManyCouncilOutstandingProposalsForUse
 
   return (
     <div
