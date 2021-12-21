@@ -23,7 +23,7 @@ const SignOffProposalModal = ({
 }: SignOffProposalModalProps) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const { realmInfo } = useRealm()
   const { proposal } = useProposal()
 
@@ -42,7 +42,7 @@ const SignOffProposalModal = ({
 
         onClose()
 
-        await fetchRealm(realmInfo.programId, realmInfo.realmId)
+        await fetchProposal(proposal.pubkey)
       }
     } catch (error) {
       notify({

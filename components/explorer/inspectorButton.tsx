@@ -29,7 +29,11 @@ export default function InspectorButton({
   }
 
   return (
-    <SecondaryButton disabled={!connected} onClick={() => showInspector()}>
+    <SecondaryButton
+      small
+      disabled={!connected}
+      onClick={() => showInspector()}
+    >
       Inspect
     </SecondaryButton>
   )
