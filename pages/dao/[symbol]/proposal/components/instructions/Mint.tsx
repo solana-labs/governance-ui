@@ -1,19 +1,11 @@
 import React, { useContext, useEffect, useState } from 'react'
-import Input from '@components/inputs/Input'
-import useRealm from '@hooks/useRealm'
-import {
-  AccountInfo,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-} from '@solana/spl-token'
-import {
-  getMintMinAmountAsDecimal,
-  parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { serializeInstructionToBase64 } from '@models/serialisation'
-import { precision } from '@utils/formatting'
-import { tryParseKey } from '@tools/validators/pubkey'
+import Input from 'components/inputs/Input'
+import useRealm from 'hooks/useRealm'
+import { AccountInfo } from '@solana/spl-token'
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
+import { PublicKey } from '@solana/web3.js'
+import { precision } from 'utils/formatting'
+import { tryParseKey } from 'tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
@@ -21,19 +13,16 @@ import {
   ProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
-import { UiInstruction, MintForm } from '@utils/uiTypes/proposalCreationTypes'
-import { getAccountName } from '@components/instructions/tools'
-import { TOKEN_PROGRAM_ID } from '@utils/tokens'
-import { debounce } from '@utils/debounce'
+import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
+import { getAccountName } from 'components/instructions/tools'
+import { debounce } from 'utils/debounce'
 import { NewProposalContext } from '../../new'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getMintSchema } from '@utils/validations'
+import { Governance } from 'models/accounts'
+import { ParsedAccount } from 'models/core/accounts'
+import useGovernanceAssets from 'hooks/useGovernanceAssets'
+import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { getATA } from '@utils/ataTools'
-import { validateInstruction } from '@utils/instructionTools'
-
+import { getMintInstruction } from 'utils/instructionTools'
 const Mint = ({
   index,
   governance,
@@ -96,55 +85,15 @@ const Mint = ({
     })
   }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstruction = ''
-    const prerequisiteInstructions: TransactionInstruction[] = []
-    if (isValid && programId && form.mintAccount?.governance?.pubkey) {
-      //this is the original owner
-      const destinationAccount = new PublicKey(form.destinationAccount)
-      const mintPK = form.mintAccount.governance.info.governedAccount
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.mintAccount.mintInfo?.decimals
-      )
-      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
-        connection,
-        destinationAccount,
-        mintPK,
-        wallet!
-      )
-      //we push this createATA instruction to transactions to create right before creating proposal
-      //we don't want to create ata only when instruction is serialized
-      if (needToCreateAta) {
-        prerequisiteInstructions.push(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            mintPK, // mint
-            receiverAddress, // ata
-            destinationAccount, // owner of token account
-            wallet!.publicKey! // fee payer
-          )
-        )
-      }
-      const transferIx = Token.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        form.mintAccount.governance.info.governedAccount,
-        receiverAddress,
-        form.mintAccount.governance!.pubkey,
-        [],
-        mintAmount
-      )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-    }
-    const obj: UiInstruction = {
-      serializedInstruction,
-      isValid,
-      governance: governedAccount,
-      prerequisiteInstructions: prerequisiteInstructions,
-    }
-    return obj
+    return getMintInstruction({
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      governedMintInfoAccount: form.mintAccount,
+      setFormErrors,
+    })
   }
 
   useEffect(() => {

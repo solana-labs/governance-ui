@@ -114,7 +114,7 @@ export function ExecuteInstructionButton({
       InstructionExecutionStatus.Error
   ) {
     return (
-      <Button disabled={!connected} onClick={onExecuteInstruction}>
+      <Button small disabled={!connected} onClick={onExecuteInstruction}>
         Execute
       </Button>
     )
