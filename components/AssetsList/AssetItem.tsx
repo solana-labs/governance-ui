@@ -29,6 +29,9 @@ const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
         <div className="text-xs text-th-fgd-1">
           {name ? name : governedAccount}
         </div>
+        <div className="text-fgd-3 text-xs flex flex-row">
+          {item?.info.governedAccount.toBase58()}
+        </div>
       </div>
     </div>
   )
