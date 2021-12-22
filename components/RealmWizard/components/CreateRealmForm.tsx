@@ -15,7 +15,7 @@ import { registerRealm } from 'actions/registerRealm'
 import { notify } from 'utils/notifications'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { PublicKey } from '@solana/web3.js'
-import { CreateFormSchema } from '../validators/create-realm-validator'
+import { CreateFormSchema } from '../validators/createRealmValidator'
 import _ from 'lodash'
 
 /**

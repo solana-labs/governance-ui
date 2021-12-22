@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import Textarea from '@components/inputs/Textarea'
 import Modal from '@components/Modal'
 import Button from '@components/Button'
-import { publicKeyValidationTest } from '../validators/create-realm-validator'
+import { publicKeyValidationTest } from '../validators/createRealmValidator'
 
 const AddWalletModal: React.FC<{
   onOk: (wallets: string[]) => void

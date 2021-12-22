@@ -12,6 +12,10 @@ import {
 } from '@solana/web3.js'
 import { SignerWalletAdapter } from '@project-serum/sol-wallet-adapter'
 
+// TODO: sendTransactions() was imported from Oyster as is and needs to be reviewed and updated
+// In particular common primitives should be unified with send.tsx and also ensure the same resiliency mechanism
+// is used for monitoring transactions status and timeouts
+
 const sleep = (ttl: number) =>
   new Promise((resolve) => setTimeout(() => resolve(true), ttl))
 
