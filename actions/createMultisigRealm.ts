@@ -47,10 +47,10 @@ export const createMultisigRealm = async (
 ) => {
   const walletPk = getWalletPublicKey(wallet)
 
-  const mintSetupInstructions: TransactionInstruction[] = []
+  const mintsSetupInstructions: TransactionInstruction[] = []
   const councilMembersInstructions: TransactionInstruction[] = []
 
-  const mintSetupSigners: Keypair[] = []
+  const mintsSetupSigners: Keypair[] = []
   const councilMembersSigners: Keypair[] = []
   // Default to 100% supply
   const communityMintMaxVoteWeightSource =
@@ -65,8 +65,8 @@ export const createMultisigRealm = async (
   // Create community mint
   const communityMintPk = await withCreateMint(
     connection,
-    mintSetupInstructions,
-    mintSetupSigners,
+    mintsSetupInstructions,
+    mintsSetupSigners,
     walletPk,
     null,
     communityMintDecimals,
@@ -76,8 +76,8 @@ export const createMultisigRealm = async (
   // Create council mint
   const councilMintPk = await withCreateMint(
     connection,
-    mintSetupInstructions,
-    mintSetupSigners,
+    mintsSetupInstructions,
+    mintsSetupSigners,
     walletPk,
     null,
     0,
@@ -204,18 +204,17 @@ export const createMultisigRealm = async (
   )
 
   try {
-    const councilMintChunks = chunks(councilMembersInstructions, 10)
-    const councilMintSignersChunks = Array(
-      councilMembersInstructions.length
-    ).fill(councilMembersSigners)
-
-    console.log('SETS', { councilMintChunks, councilMintSignersChunks })
+    const councilMembersChunks = chunks(councilMembersInstructions, 10)
+    // only walletPk needs to sign the minting instructions and it's a signer by default and we don't have to include any more signers
+    const councilMembersSignersChunks = Array(councilMembersChunks.length).fill(
+      []
+    )
 
     const tx = await sendTransactions(
       connection,
       wallet,
-      [mintSetupInstructions, ...councilMintChunks, realmInstructions],
-      [mintSetupSigners, ...councilMintSignersChunks, realmSigners],
+      [mintsSetupInstructions, ...councilMembersChunks, realmInstructions],
+      [mintsSetupSigners, ...councilMembersSignersChunks, realmSigners],
       SequenceType.Sequential
     )
 
