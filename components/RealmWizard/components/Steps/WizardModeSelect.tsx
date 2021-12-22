@@ -8,7 +8,7 @@ const WizardModeSelect: React.FC<{
   return (
     <>
       <h2 className="text-center">
-        Create a decentralized organization (Realm)
+        Create a decentralized organization (realm)
       </h2>
       <div className="grid grid-cols-1 gap-2 text-center ">
         <div className="flex justify-center pointer ">
@@ -19,9 +19,13 @@ const WizardModeSelect: React.FC<{
             }}
           >
             <h2 className="mb-0">
-              <b>I wanna create a new Realm</b>
+              <b>I want to create a multisig realm</b>
             </h2>
-            <p>We&apos;ll generate governance artifacts for you</p>
+            <p>
+              Multisig Realm allows you to create an organization for your team
+              members and jointly own and control shared assets like treasury
+              accounts, programs or mints.
+            </p>
           </div>
         </div>
         <div className="flex justify-center ">
@@ -33,9 +37,13 @@ const WizardModeSelect: React.FC<{
           >
             <Tooltip content="This mode is not available yet.">
               <h2 className="mb-0">
-                <b>I already have a Realm</b>
+                <b>I want to create a bespoke realm</b>
               </h2>
-              <p>You have your token details ready</p>
+              <p>
+                Bespoke realm is an advanced option and allows you to create a
+                realm customized for your community, governance structure and
+                individual requirements.
+              </p>
             </Tooltip>
           </div>
         </div>
