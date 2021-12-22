@@ -30,7 +30,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import router from 'next/router'
 
 enum LoaderMessage {
-  CREATING_ARTIFACTS = 'Creating the Realm Artifacts..',
+  CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
   MINTING_COUNCIL_TOKENS = 'Minting the council tokens..',
   MINTING_COMMUNITY_TOKENS = 'Minting the community tokens..',
   DEPLOYING_REALM = 'Deploying the Realm..',
@@ -71,9 +71,9 @@ const RealmWizard: React.FC = () => {
   }
 
   /**
-   * Generate program artifacts
+   * Generate realm artifacts
    */
-  const generateProgramArtifacts = async () => {
+  const generateRealmArtifacts = async () => {
     if (!ctl) return
     if (!wallet?.publicKey || !connection.current) {
       notify({ type: 'error', message: 'Wallet not connected!' })
@@ -152,7 +152,7 @@ const RealmWizard: React.FC = () => {
   const handleCreateRealm = async () => {
     setIsLoading(true)
     try {
-      const realm = await generateProgramArtifacts()
+      const realm = await generateRealmArtifacts()
       setIsLoading(false)
       if (realm) {
         setLoaderMessage(LoaderMessage.FINISHED)
