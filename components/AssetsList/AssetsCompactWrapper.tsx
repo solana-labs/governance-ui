@@ -6,13 +6,18 @@ import { PlusIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
 import AssetOverview from './AssetOverview'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
+const NEW_PROGRAM_VIEW = `/program/new`
 
 const AssetsCompactWrapper = () => {
+  const router = useRouter()
   const { symbol } = useRealm()
-  const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
+  const { resetCompactViewState } = useAssetsStore()
   const currentView = useAssetsStore((s) => s.compact.currentView)
-  const goToAddAssetView = () => {
-    setCurrentCompactView(ViewState.AddAsset)
+  const { fmtUrlWithCluster } = useQueryContext()
+  const goToNewAssetForm = () => {
+    router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
   }
   useEffect(() => {
     resetCompactViewState()
@@ -26,7 +31,7 @@ const AssetsCompactWrapper = () => {
               Assets
               <Tooltip contentClassName="ml-auto" content={''}>
                 <div
-                  onClick={goToAddAssetView}
+                  onClick={goToNewAssetForm}
                   className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
                 rounded-lg hover:bg-bkg-3 ml-auto 
