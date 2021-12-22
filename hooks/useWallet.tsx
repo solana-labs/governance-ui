@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 import useWalletStore from '../stores/useWalletStore'
 import { notify } from '../utils/notifications'
@@ -21,7 +21,9 @@ export default function useWallet() {
     set: setWalletStore,
     actions,
   } = useWalletStore((state) => state)
+  console.debug(connection)
 
+  const [timeInterval, setTimeInterval] = useState<number | null>(null)
   const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
     'walletProvider',
     DEFAULT_PROVIDER.url
@@ -60,6 +62,23 @@ export default function useWallet() {
     }
   }, [provider, connection])
 
+  useInterval(async () => {
+    wallet?.connect()
+    // when user is disconnected by window.solana.connect()
+    // we should connect him again
+    // but know with the right wallet
+    try {
+      await window.solana.connect()
+      // the only purpose is to disconnect the user when he changes the wallet.
+    } catch (error) {
+      setTimeInterval(SECONDS)
+      // So when the window.solana.connect() gives an error
+      // we know that he changed the wallet
+      // so we start the interval
+      console.log(error)
+    }
+  }, timeInterval)
+
   useEffect(() => {
     if (!wallet) return
     wallet.on('connect', async () => {
@@ -76,8 +95,13 @@ export default function useWallet() {
       })
       await actions.fetchWalletTokenAccounts()
       await actions.fetchOwnVoteRecords()
+
+      setTimeInterval(SECONDS)
+      // start verifying if user changed account
     })
     wallet.on('disconnect', () => {
+      setTimeInterval(null)
+      // Stop verifying because user disconnected
       setWalletStore((state) => {
         state.connected = false
         state.tokenAccounts = []
