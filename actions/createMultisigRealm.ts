@@ -51,7 +51,7 @@ export const createMultisigRealm = async (
   const councilMembersInstructions: TransactionInstruction[] = []
 
   const mintsSetupSigners: Keypair[] = []
-  const councilMembersSigners: Keypair[] = []
+
   // Default to 100% supply
   const communityMintMaxVoteWeightSource =
     MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
