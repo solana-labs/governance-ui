@@ -23,7 +23,7 @@ const WizardModeSelect: React.FC<{
             </h2>
             <p>
               Multisig Realm allows you to create an organization for your team
-              members and jointly own and control shared assets like treasury
+              members and jointly own and manage shared assets like treasury
               accounts, programs or mints.
             </p>
           </div>
@@ -41,8 +41,8 @@ const WizardModeSelect: React.FC<{
               </h2>
               <p>
                 Bespoke realm is an advanced option and allows you to create a
-                realm customized for your community, governance structure and
-                individual requirements.
+                realm customized for your individual requirements, community
+                structure and governance token setup.
               </p>
             </Tooltip>
           </div>
