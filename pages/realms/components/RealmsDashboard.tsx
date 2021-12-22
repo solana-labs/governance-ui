@@ -6,6 +6,8 @@ import { PlusIcon } from '@heroicons/react/outline'
 import React from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
+import Button from '@components/Button'
+import { notify } from '@utils/notifications'
 
 export default function RealmsDashboard({
   realms,
@@ -31,9 +33,18 @@ export default function RealmsDashboard({
     router.push(url)
   }
 
+  const handleCreateRealmButtonClick = () => {
+    if (!connected) {
+      return notify({
+        type: 'info',
+        message: 'You must connect your wallet first.',
+      })
+    }
+    router.push(fmtUrlWithCluster(`/realms/new`))
+  }
+
   return (
     <div>
-      <h1 className="mb-6">{header}</h1>
       {/* Re-instate when there are enough REALMs for this to be useful. Maybe > 25 */}
       {/* <div className="mb-10 flex">
             <Input
@@ -49,6 +60,11 @@ export default function RealmsDashboard({
               <Button onClick={() => setViewType(ROW)}>Columns</Button>
             </div>
           </div> */}
+      <div className="flex w-full justify-between mb-6">
+        <h1>{header}</h1>
+
+        <Button onClick={handleCreateRealmButtonClick}>Create Realm</Button>
+      </div>
       <div
         className={`grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4`}
       >
@@ -78,15 +94,6 @@ export default function RealmsDashboard({
                 </h3>
               </div>
             ))}
-            {showNewButton && connected && (
-              <Link href={fmtUrlWithCluster(`/realms/new`)}>
-                <div className="bg-bkg-2 p-14 cursor-pointer default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3">
-                  <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                    <PlusIcon />
-                  </div>
-                </div>
-              </Link>
-            )}
           </>
         )}
       </div>
