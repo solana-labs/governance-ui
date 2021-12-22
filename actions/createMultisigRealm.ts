@@ -47,11 +47,11 @@ export const createMultisigRealm = async (
 ) => {
   const walletPk = getWalletPublicKey(wallet)
 
-  const communityMintInstructions: TransactionInstruction[] = []
-  const councilMintInstructions: TransactionInstruction[] = []
+  const mintSetupInstructions: TransactionInstruction[] = []
+  const councilMembersInstructions: TransactionInstruction[] = []
 
-  const communityMintSigners: Keypair[] = []
-  const councilMintSigners: Keypair[] = []
+  const mintSetupSigners: Keypair[] = []
+  const councilMembersSigners: Keypair[] = []
   // Default to 100% supply
   const communityMintMaxVoteWeightSource =
     MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
@@ -65,8 +65,8 @@ export const createMultisigRealm = async (
   // Create community mint
   const communityMintPk = await withCreateMint(
     connection,
-    communityMintInstructions,
-    communityMintSigners,
+    mintSetupInstructions,
+    mintSetupSigners,
     walletPk,
     null,
     communityMintDecimals,
@@ -76,8 +76,8 @@ export const createMultisigRealm = async (
   // Create council mint
   const councilMintPk = await withCreateMint(
     connection,
-    councilMintInstructions,
-    councilMintSigners,
+    mintSetupInstructions,
+    mintSetupSigners,
     walletPk,
     null,
     0,
@@ -88,13 +88,19 @@ export const createMultisigRealm = async (
 
   for (const teamWalletPk of councilWalletPks) {
     const ataPk = await withCreateAssociatedTokenAccount(
-      councilMintInstructions,
+      councilMembersInstructions,
       councilMintPk,
       teamWalletPk,
       walletPk
     )
     // Mint 1 council token to each team member
-    await withMintTo(councilMintInstructions, councilMintPk, ataPk, walletPk, 1)
+    await withMintTo(
+      councilMembersInstructions,
+      councilMintPk,
+      ataPk,
+      walletPk,
+      1
+    )
 
     if (teamWalletPk.equals(walletPk)) {
       walletAtaPk = ataPk
@@ -198,15 +204,18 @@ export const createMultisigRealm = async (
   )
 
   try {
-    const councilMintChunks = chunks(councilMintInstructions, 10)
-    const councilMintSignersChunks = Array(councilMintInstructions.length).fill(
-      councilMintSigners
-    )
+    const councilMintChunks = chunks(councilMembersInstructions, 10)
+    const councilMintSignersChunks = Array(
+      councilMembersInstructions.length
+    ).fill(councilMembersSigners)
+
+    console.log('SETS', { councilMintChunks, councilMintSignersChunks })
+
     const tx = await sendTransactions(
       connection,
       wallet,
-      [communityMintInstructions, ...councilMintChunks, realmInstructions],
-      [communityMintSigners, ...councilMintSignersChunks, realmSigners],
+      [mintSetupInstructions, ...councilMintChunks, realmInstructions],
+      [mintSetupSigners, ...councilMintSignersChunks, realmSigners],
       SequenceType.Sequential
     )
 
