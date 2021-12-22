@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
-import { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import { notify } from '@utils/notifications'
 
 export default function RealmsDashboard({
@@ -32,18 +32,18 @@ export default function RealmsDashboard({
   }
 
   const handleCreateRealmButtonClick = async () => {
-    if (!connected && wallet) {
+    if (!connected) {
       try {
-        await wallet.connect()
-        router.push(fmtUrlWithCluster(`/realms/new`))
+        if (wallet) await wallet.connect()
       } catch (error) {
         const err = error as Error
-        notify({
+        return notify({
           type: 'error',
           message: err.message,
         })
       }
     }
+    router.push(fmtUrlWithCluster(`/realms/new`))
   }
 
   return (
@@ -66,12 +66,9 @@ export default function RealmsDashboard({
       <div className="flex w-full justify-between mb-6">
         <h1>{header}</h1>
         {showNewButton && (
-          <SecondaryButton
-            className="px-10 "
-            onClick={handleCreateRealmButtonClick}
-          >
+          <Button className="px-10 " onClick={handleCreateRealmButtonClick}>
             Create Realm
-          </SecondaryButton>
+          </Button>
         )}
       </div>
       <div
