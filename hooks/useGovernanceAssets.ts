@@ -31,6 +31,27 @@ export default function useGovernanceAssets() {
       )
     )
   }
+  const canMintRealmCommunityToken = () => {
+    const governances = getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    )
+    return !!governances.find(
+      (x) =>
+        x.info.governedAccount.toBase58() ==
+        realm?.info.communityMint.toBase58()
+    )
+  }
+  const canMintRealmCouncilToken = () => {
+    const governances = getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    )
+
+    return !!governances.find(
+      (x) =>
+        x.info.governedAccount.toBase58() ==
+        realm?.info.config.councilMint?.toBase58()
+    )
+  }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
   const canUseTransferInstruction = canUseGovernanceForInstruction(
     GovernanceAccountType.TokenGovernance
@@ -176,5 +197,7 @@ export default function useGovernanceAssets() {
     getMintWithGovernances,
     canUseTransferInstruction,
     canUseMintInstruction,
+    canMintRealmCommunityToken,
+    canMintRealmCouncilToken,
   }
 }

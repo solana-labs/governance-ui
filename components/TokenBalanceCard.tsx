@@ -102,7 +102,6 @@ const TokenDeposit = ({
     proposals,
     governances,
   } = useRealm()
-
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
