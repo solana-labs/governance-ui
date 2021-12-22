@@ -21,9 +21,10 @@ export default function useWallet() {
     set: setWalletStore,
     actions,
   } = useWalletStore((state) => state)
-  console.debug(connection)
 
-  const [timeInterval, setTimeInterval] = useState<number | null>(null)
+  const [walletTimePolling, setWalletTimePolling] = useState<number | null>(
+    null
+  )
   const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
     'walletProvider',
     DEFAULT_PROVIDER.url
@@ -71,13 +72,13 @@ export default function useWallet() {
       await window.solana.connect()
       // the only purpose is to disconnect the user when he changes the wallet.
     } catch (error) {
-      setTimeInterval(SECONDS)
+      setWalletTimePolling(SECONDS)
       // So when the window.solana.connect() gives an error
       // we know that he changed the wallet
       // so we start the interval
       console.log(error)
     }
-  }, timeInterval)
+  }, walletTimePolling)
 
   useEffect(() => {
     if (!wallet) return
@@ -96,11 +97,11 @@ export default function useWallet() {
       await actions.fetchWalletTokenAccounts()
       await actions.fetchOwnVoteRecords()
 
-      setTimeInterval(SECONDS)
+      setWalletTimePolling(SECONDS)
       // start verifying if user changed account
     })
     wallet.on('disconnect', () => {
-      setTimeInterval(null)
+      setWalletTimePolling(null)
       // Stop verifying because user disconnected
       setWalletStore((state) => {
         state.connected = false
