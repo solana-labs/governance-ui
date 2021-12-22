@@ -1,8 +1,6 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import Link from 'next/link'
-import { PlusIcon } from '@heroicons/react/outline'
 import React from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
