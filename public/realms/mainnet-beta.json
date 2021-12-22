@@ -170,5 +170,14 @@
     "realmId": "39aX7mDZ1VLpZcPWstBhQBoqwNkhf5f1KDACguvrryi6",
     "ogImage": "/realms/MonkOG/img/ogemoji.png",
     "twitter": "@MonkOG_DAO"
+  },
+  {
+    "symbol": "NoGoal",
+    "displayName": "NoGoalDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3YdSnGzJbgyq5mGoFxu4RqmrUetUCEvyDkXEFy4oi6zd",
+    "ogImage": "/realms/NoGoal/img/ino-128.png",
+    "website": "https://nogoal.click/",
+    "twitter": "@NoGoalFacesNFT"
   }
 ]
