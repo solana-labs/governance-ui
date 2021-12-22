@@ -1435,10 +1435,10 @@
     "@typescript-eslint/types" "5.7.0"
     eslint-visitor-keys "^3.0.0"
 
-"@uxdprotocol/uxd-client@^3.1.0":
-  version "3.2.0"
-  resolved "https://npm.pkg.github.com/download/@uxdprotocol/uxd-client/3.2.0/8588d6be3ef0a2e17f2b740dfcf31e6e0a0628da6af067d1c63d75cc19c51c2f#2199bf5eb4f7f0c1f93f772b392465c5d8bf5c92"
-  integrity sha512-I/iVOKhp1BXOvIyal4XHiJBE5klLtIDPj56N0pHd2RJ7RB6jZnkTLqvfBEpUdIePsIzlhyJ+lPRShytXhGoxjg==
+"@uxdprotocol/uxd-client@^3.6.0":
+  version "3.6.0"
+  resolved "https://npm.pkg.github.com/download/@uxdprotocol/uxd-client/3.6.0/84a0d5e222396364604ba7b2b99ba2ccd94acef316885c0738eeafcc11eed0bf#932810a3a2e20eb0e819de0f11a268696e98a650"
+  integrity sha512-2/1qeDNX9ZwbZ7QN10+UhXnH2xWEtHyx+UqmB/DzbcR3UMWZoiY6n2NN+wg1L7BURGfDlXalamaYAswJR7ShYw==
   dependencies:
     "@blockworks-foundation/mango-client" "3.2.15"
 

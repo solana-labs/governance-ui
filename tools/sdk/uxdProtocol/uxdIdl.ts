@@ -1,6 +1,6 @@
 import { Idl } from '@project-serum/anchor'
 
-export const UXD_PROGRAM_ID = 'DdJ9BKWG8XqQaj5BMjYks6Y8Amcv1onoo7cvVipp9jKC' //'UXDQDbkAeGMPR7gqDykDNu22D9DnYrKdvZhvNmMu6QX'
+export const UXD_PROGRAM_ID = '3Kk1FnBEFt58yenonsXg7wQ7kJBtqDA7f83pDcsKxrZz' //'UXDQDbkAeGMPR7gqDykDNu22D9DnYrKdvZhvNmMu6QX'
 
 const uxdIdl: Idl = {
   version: '0.0.0',
