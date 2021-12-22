@@ -4,7 +4,7 @@ import {
   ArrowLeftIcon,
 } from '@heroicons/react/outline'
 import { ViewState } from './types'
-import useMembersListStore from 'stores/useMembersListStore'
+import useMembersListStore from 'stores/useMembersStore'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
