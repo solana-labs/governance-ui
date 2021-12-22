@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 import React from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
-import Button from '@components/Button'
+import { SecondaryButton } from '@components/Button'
 import { notify } from '@utils/notifications'
 
 export default function RealmsDashboard({
@@ -20,7 +20,7 @@ export default function RealmsDashboard({
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { connected } = useWalletStore((s) => s)
+  const { connected, current: wallet } = useWalletStore((s) => s)
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
@@ -31,14 +31,19 @@ export default function RealmsDashboard({
     router.push(url)
   }
 
-  const handleCreateRealmButtonClick = () => {
-    if (!connected) {
-      return notify({
-        type: 'info',
-        message: 'You must connect your wallet first.',
-      })
+  const handleCreateRealmButtonClick = async () => {
+    if (!connected && wallet) {
+      try {
+        await wallet.connect()
+        router.push(fmtUrlWithCluster(`/realms/new`))
+      } catch (error) {
+        const err = error as Error
+        notify({
+          type: 'error',
+          message: err.message,
+        })
+      }
     }
-    router.push(fmtUrlWithCluster(`/realms/new`))
   }
 
   return (
@@ -61,9 +66,12 @@ export default function RealmsDashboard({
       <div className="flex w-full justify-between mb-6">
         <h1>{header}</h1>
         {showNewButton && (
-          <Button className="px-10" onClick={handleCreateRealmButtonClick}>
+          <SecondaryButton
+            className="px-10 "
+            onClick={handleCreateRealmButtonClick}
+          >
             Create Realm
-          </Button>
+          </SecondaryButton>
         )}
       </div>
       <div
