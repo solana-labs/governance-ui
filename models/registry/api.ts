@@ -1,9 +1,11 @@
 import { Realm } from '@models/accounts'
 import { getRealms } from '@models/api'
 import { ParsedAccount } from '@models/core/accounts'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { arrayToMap, arrayToUnique } from '@tools/core/script'
-
+import { ProgramDataAccountInfo } from '@tools/validators/accounts/upgradeable-program'
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
+import { create } from 'superstruct'
 import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 import type { ConnectionContext } from 'utils/connection'
@@ -125,6 +127,12 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['AeUazJsjGVrxKWkTi5PQ4S4JxWXQ3mYHNS1mURD9GeNg', ''],
 ])
 
+export const PROGRAM_VERSION_V1 = 1
+export const PROGRAM_VERSION_V2 = 2
+
+// The most up to date program version
+export const PROGRAM_VERSION = PROGRAM_VERSION_V2
+
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
@@ -164,4 +172,94 @@ export function createUnchartedRealmInfo(realm: ParsedAccount<Realm>) {
     displayName: realm.info.name,
     isCertified: false,
   } as RealmInfo
+}
+
+export async function getProgramVersion(
+  connection: Connection,
+  programId: string,
+  env: string
+) {
+  // For localnet always use the latest version
+  if (env === 'localnet') {
+    return PROGRAM_VERSION
+  }
+
+  const programData = await getProgramDataAccount(
+    connection,
+    new PublicKey(programId)
+  )
+
+  const slot = getLatestVersionCutOffSlot(env)
+  return programData.slot > slot ? PROGRAM_VERSION : PROGRAM_VERSION_V1
+}
+
+export async function getProgramSlot(
+  connection: Connection,
+  programId: string,
+  env: string
+) {
+  // For localnet always use the latest version
+  if (env === 'localnet') {
+    return PROGRAM_VERSION
+  }
+
+  const programData = await getProgramDataAccount(
+    connection,
+    new PublicKey(programId)
+  )
+
+  return programData.slot
+}
+
+// Returns the min deployment slot from which onwards the program should be on the latest version
+function getLatestVersionCutOffSlot(env: string) {
+  switch (env) {
+    case 'devnet':
+      return 87097690
+    default:
+      // Default to mainnet slot
+      return 111991240
+  }
+}
+
+export async function getProgramDataAddress(programId: PublicKey) {
+  const [programDataAddress] = await PublicKey.findProgramAddress(
+    [programId.toBuffer()],
+    BPF_UPGRADE_LOADER_ID
+  )
+
+  return programDataAddress
+}
+
+export async function getProgramDataAccount(
+  connection: Connection,
+  programId: PublicKey
+) {
+  const programDataAddress = await getProgramDataAddress(programId)
+  const account = await connection.getParsedAccountInfo(programDataAddress)
+
+  if (!account || !account.value) {
+    throw new Error(
+      `Program data account ${programDataAddress.toBase58()} for program ${programId.toBase58()} not found`
+    )
+  }
+
+  const accountInfo = account.value
+
+  if (
+    !(
+      'parsed' in accountInfo.data &&
+      accountInfo.data.program === 'bpf-upgradeable-loader'
+    )
+  ) {
+    throw new Error(
+      `Invalid program data account ${programDataAddress.toBase58()} for program ${programId.toBase58()}`
+    )
+  }
+
+  const programData = create(
+    accountInfo.data.parsed.info,
+    ProgramDataAccountInfo
+  )
+  return programData
 }

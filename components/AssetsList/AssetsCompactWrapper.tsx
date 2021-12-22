@@ -5,6 +5,7 @@ import MembersItems from './AssetsList'
 import { PlusIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
+import AssetOverview from './AssetOverview'
 
 const AssetsCompactWrapper = () => {
   const { symbol } = useRealm()
@@ -41,17 +42,13 @@ const AssetsCompactWrapper = () => {
                 </div>
               </Tooltip>
             </h3>
-            <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
-              <p className="text-fgd-3 text-xs">placeholder</p>
-              <h3 className="mb-0">placeholder</h3>
-            </div>
             <div style={{ maxHeight: '350px' }}>
               <MembersItems></MembersItems>
             </div>
           </>
         )
       case ViewState.AssetOverview:
-        return null
+        return <AssetOverview></AssetOverview>
       case ViewState.AddAsset:
         return null
     }
