@@ -62,8 +62,11 @@ export default function RealmsDashboard({
           </div> */}
       <div className="flex w-full justify-between mb-6">
         <h1>{header}</h1>
-
-        <Button onClick={handleCreateRealmButtonClick}>Create Realm</Button>
+        {showNewButton && (
+          <Button className="px-10" onClick={handleCreateRealmButtonClick}>
+            Create Realm
+          </Button>
+        )}
       </div>
       <div
         className={`grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4`}
