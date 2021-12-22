@@ -29,7 +29,7 @@ import {
   sendTransactions,
   SequenceType,
   WalletSigner,
-} from '@utils/governance/oyster/common'
+} from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
 /// Creates multisig realm with community mint with 0 supply
