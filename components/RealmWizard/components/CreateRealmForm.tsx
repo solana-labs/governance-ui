@@ -6,9 +6,8 @@ import {
 } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
-import { RealmArtifacts } from '../interfaces/Realm'
+import { RealmWizardStepComponentProps } from '../interfaces/Realm'
 import Input from '@components/inputs/Input'
-import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import { MintMaxVoteWeightSource } from 'models/accounts'
 import { registerRealm } from 'actions/registerRealm'
@@ -17,26 +16,22 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { PublicKey } from '@solana/web3.js'
 import { CreateFormSchema } from '../validators/createRealmValidator'
 import _ from 'lodash'
+import router from 'next/router'
+import useQueryContext from '@hooks/useQueryContext'
+import { ProgramVersion } from '@models/registry/constants'
 
-/**
- *
- * @param param0
- * @deprecated
- */
-const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
-  artifacts,
+const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
+  form,
+  setForm,
+  shouldFireCreate = false,
+  setIsLoading = (state) => {},
 }) => {
+  const { fmtUrlWithCluster } = useQueryContext()
+
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
-  const [form, setForm] = useState<RealmArtifacts>()
-
-  useEffect(() => {
-    if (artifacts) setForm(artifacts)
-  }, [artifacts])
-
   const [formErrors, setFormErrors] = useState({})
-  const [isLoading, setIsLoading] = useState(false)
   const [, setRealmAddress] = useState<PublicKey>()
 
   const handleSetForm = (newValues) => {
@@ -44,54 +39,47 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
     setForm({ ...form, ...newValues })
   }
 
+  // TODO: in the complete version of the realm wizard,
+  // all the methods inside this component will be moved to
+  // a separate controller and handled by the main component
+  // to fit the `step-by-step` model.
   const handleCreate = async () => {
-    if (form) {
-      setFormErrors({})
-      setIsLoading(true)
-      const { isValid, validationErrors }: formValidation = await isFormValid(
-        CreateFormSchema,
-        form
+    setFormErrors({})
+    setIsLoading(true)
+    const { isValid, validationErrors }: formValidation = await isFormValid(
+      CreateFormSchema,
+      form
+    )
+
+    if (isValid) {
+      const rpcContext = new RpcContext(
+        new PublicKey(form.governanceProgramId!),
+        form.programVersion,
+        wallet,
+        connection.current,
+        connection.endpoint
       )
 
-      if (isValid && form.governanceProgramId) {
-        const rpcContext = new RpcContext(
-          new PublicKey(form.governanceProgramId),
-          form.programVersion,
-          wallet,
-          connection.current,
-          connection.endpoint
+      try {
+        const realmAddress = await registerRealm(
+          rpcContext,
+          rpcContext.programId,
+          form.programVersion ?? ProgramVersion.V1,
+          form.name!,
+          new PublicKey(form.communityMintId!),
+          form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
+          MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+          form.minCommunityTokensToCreateGovernance!
         )
-
-        try {
-          if (
-            form.name &&
-            form.communityMintId &&
-            form.minCommunityTokensToCreateGovernance
-          ) {
-            const realmAddress = await registerRealm(
-              rpcContext,
-              // TODO: programId and programVersion should be taken from the form inputs
-              rpcContext.programId,
-              rpcContext.programVersion,
-              form.name,
-              new PublicKey(form?.communityMintId),
-              form.councilMintId
-                ? new PublicKey(form.councilMintId)
-                : undefined,
-              MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
-              form.minCommunityTokensToCreateGovernance
-            )
-            setRealmAddress(realmAddress)
-          }
-        } catch (ex) {
-          console.log(ex)
-          notify({ type: 'error', message: `${ex}` })
-        }
-      } else {
-        setFormErrors(validationErrors)
+        setRealmAddress(realmAddress)
+      } catch (ex) {
+        console.log(ex)
+        notify({ type: 'error', message: `${ex}` })
       }
-      setIsLoading(false)
+    } else {
+      setFormErrors(validationErrors)
     }
+    setIsLoading(false)
   }
 
   const handleCommunityMint = async (mintId: string) => {
@@ -140,16 +128,19 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
 
   useEffect(() => {
     _.debounce(async () => {
-      setIsLoading(true)
       if (form?.councilMintId) {
         await handleCouncilMint(form.councilMintId)
       }
       if (form?.communityMintId) {
         await handleCommunityMint(form.communityMintId)
       }
-      setIsLoading(false)
     }, 250)()
   }, [form?.communityMintId, form?.councilMintId])
+
+  // TODO: This hook will be removed in future versions of the wizard
+  useEffect(() => {
+    if (shouldFireCreate) handleCreate()
+  }, [shouldFireCreate])
 
   return (
     <>
@@ -163,7 +154,7 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
           <Input
             label="Name"
             placeholder="Name of your realm"
-            value={form?.name}
+            value={form.name}
             type="text"
             error={formErrors['name']}
             onChange={(evt) =>
@@ -273,16 +264,15 @@ const CreateRealmForm: React.FC<{ artifacts?: RealmArtifacts }> = ({
             }
           />
         </div>
-
-        <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+        {/* <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
           <Button
-            isLoading={isLoading}
-            onClick={handleCreate}
-            disabled={!form?.teamWallets?.length}
+          isLoading={isLoading}
+          onClick={handleCreate}
+          disabled={!form?.teamWallets?.length}
           >
-            Create Realm
+          Create Realm
           </Button>
-        </div>
+        </div> */}
       </div>
     </>
   )

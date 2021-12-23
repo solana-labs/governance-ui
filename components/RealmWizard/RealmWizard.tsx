@@ -28,6 +28,8 @@ import { createMultisigRealm } from 'actions/createMultisigRealm'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import router from 'next/router'
+import CreateRealmForm from './components/CreateRealmForm'
+import { useEffect } from 'react'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
@@ -57,7 +59,12 @@ const RealmWizard: React.FC = () => {
     RealmWizardStep.SELECT_MODE
   )
   const [realmAddress] = useState('')
-  const [loaderMessage, setLoaderMessage] = useState<LoaderMessage>()
+  const [loaderMessage, setLoaderMessage] = useState<LoaderMessage>(
+    LoaderMessage.DEPLOYING_REALM
+  )
+
+  // TODO: This state will be removed in future versions
+  const [shouldFireCreate, setShouldFireCreate] = useState(false)
 
   /**
    * Handles and set the form data
@@ -91,9 +98,9 @@ const RealmWizard: React.FC = () => {
         message: 'Team member wallets are required.',
       })
 
-    setLoaderMessage(LoaderMessage.CREATING_ARTIFACTS)
     setIsLoading(true)
 
+    // TODO: make it part of the form
     const programId =
       process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ?? DEFAULT_GOVERNANCE_PROGRAM_ID
 
@@ -125,6 +132,7 @@ const RealmWizard: React.FC = () => {
     try {
       const ctl = new RealmWizardController(option)
       const nextStep = ctl.getNextStep(currentStep, StepDirection.NEXT)
+      console.log(ctl)
       setController(ctl)
       setCurrentStep(nextStep)
     } catch (error) {
@@ -150,6 +158,11 @@ const RealmWizard: React.FC = () => {
   }
 
   const handleCreateRealm = async () => {
+    // Handles the current misuse of the CreateRealmForm
+    if (ctl && ctl.getMode() === RealmWizardMode.ADVANCED) {
+      setShouldFireCreate(true)
+      return
+    }
     setIsLoading(true)
     try {
       const realm = await generateRealmArtifacts()
@@ -176,6 +189,11 @@ const RealmWizard: React.FC = () => {
     }
   }
 
+  const isCreateButtonDisabled = () =>
+    ctl && ctl.getMode() === RealmWizardMode.ADVANCED
+      ? false
+      : !form.teamWallets?.length || !form.name
+
   /**
    * Binds the current step to the matching component
    */
@@ -186,7 +204,14 @@ const RealmWizard: React.FC = () => {
       case RealmWizardStep.BASIC_CONFIG:
         return <StepOne form={form} setForm={handleSetForm} />
       case RealmWizardStep.TOKENS_CONFIG:
-        return <StepTwo form={form} setForm={handleSetForm} />
+        return (
+          <CreateRealmForm
+            form={form}
+            setForm={handleSetForm}
+            shouldFireCreate={shouldFireCreate}
+            setIsLoading={setIsLoading}
+          />
+        )
       case RealmWizardStep.STEP_3:
         return <StepThree form={form} setForm={handleSetForm} />
       case RealmWizardStep.STEP_4:
@@ -196,7 +221,16 @@ const RealmWizard: React.FC = () => {
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [currentStep, form])
+  }, [currentStep, form, shouldFireCreate])
+
+  useEffect(() => {
+    // Return shouldFireCreate to the base state
+    if (shouldFireCreate) {
+      setTimeout(() => {
+        setShouldFireCreate(false)
+      }, 1000)
+    }
+  }, [shouldFireCreate])
 
   return (
     <div className="relative">
@@ -224,7 +258,7 @@ const RealmWizard: React.FC = () => {
               if (ctl.isLastStep()) handleCreateRealm()
               else handleStepSelection(StepDirection.NEXT)
             }}
-            disabled={!form.teamWallets?.length || !form.name}
+            disabled={isCreateButtonDisabled()}
           >
             {ctl.isLastStep() ? 'Create' : 'Next'}
           </Button>

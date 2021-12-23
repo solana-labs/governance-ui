@@ -30,10 +30,10 @@ const WizardModeSelect: React.FC<{
         </div>
         <div className="flex justify-center ">
           <div
-            className="border rounded px-5 py-3 w-6/12 hover:bg-bkg-3 opacity-50"
-            // onClick={() => {
-            //   onSelect(RealmWizardMode.ADVANCED)
-            // }}
+            className="border rounded px-5 py-3 w-6/12 hover:bg-bkg-3 pointer"
+            onClick={() => {
+              onSelect(RealmWizardMode.ADVANCED)
+            }}
           >
             <Tooltip content="This mode is not available yet.">
               <h2 className="mb-0">

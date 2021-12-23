@@ -76,6 +76,7 @@ export enum StepDirection {
 export interface RealmWizardStepComponentProps {
   form: RealmArtifacts
   setForm: (data: RealmArtifacts) => void
+  [key: string]: any
 }
 
 export interface RealmProps {
