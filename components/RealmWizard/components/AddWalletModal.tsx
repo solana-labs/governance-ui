@@ -13,7 +13,7 @@ const AddWalletModal: React.FC<{
   const [hasErrors, setErrors] = useState<string[]>()
 
   const handleAddWallet = () => {
-    const wallets = walletAddr.replace(' ', '').split(/,|\n/gim)
+    const wallets = walletAddr.replace(/ /gim, '').split(/,|\n/gim)
     const errors: string[] = []
     wallets.forEach((wallet, index) => {
       if (!publicKeyValidationTest(wallet)) {
@@ -37,6 +37,7 @@ const AddWalletModal: React.FC<{
     <>
       {isOpen && (
         <Modal
+          sizeClassName="sm:max-w-lg"
           isOpen={isOpen}
           onClose={() => {
             setWalletAddr('')
@@ -45,6 +46,7 @@ const AddWalletModal: React.FC<{
         >
           <h2>Add a teammate wallet</h2>
           <Textarea
+            rows={10}
             placeholder="Public keys separated by coma or line break"
             value={walletAddr}
             onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
