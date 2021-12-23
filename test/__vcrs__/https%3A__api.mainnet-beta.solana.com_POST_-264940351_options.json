@@ -1,0 +1,14 @@
+{
+  "url": "https://api.mainnet-beta.solana.com/",
+  "status": 200,
+  "statusText": "OK",
+  "ok": true,
+  "headers": {
+    "content-type": ["application/json; charset=utf-8"],
+    "date": ["Wed, 22 Dec 2021 17:32:10 GMT"],
+    "content-encoding": ["gzip"],
+    "transfer-encoding": ["chunked"],
+    "vary": ["Accept-Encoding"],
+    "connection": ["close"]
+  }
+}

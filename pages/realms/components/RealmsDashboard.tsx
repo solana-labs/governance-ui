@@ -1,11 +1,12 @@
+import Loading from '@components/Loading'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React from 'react'
-import Loading from '@components/Loading'
+import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
+import getProposalCounts from 'scripts/getProposalCounts'
 
 export default function RealmsDashboard({
   realms,
@@ -20,7 +21,16 @@ export default function RealmsDashboard({
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+
   const { connected, current: wallet } = useWalletStore((s) => s)
+  const [counts, setCounts] = useState({})
+
+  useEffect(() => {
+    const fetchBadgeCounts = async () => {
+      setCounts(await getProposalCounts(realms))
+    }
+    fetchBadgeCounts()
+  }, [realms])
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
@@ -84,7 +94,7 @@ export default function RealmsDashboard({
                 className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
                 key={realm.realmId.toString()}
               >
-                <div className="pb-5">
+                <div className="pb-5 relative">
                   {realm.ogImage ? (
                     <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
                       <img className="w-10" src={realm.ogImage}></img>
@@ -94,6 +104,7 @@ export default function RealmsDashboard({
                       {realm.displayName?.charAt(0)}
                     </div>
                   )}
+                  <Badge count={counts[realm.realmId.toString()]} />
                 </div>
                 <h3 className="text-center break-all">
                   {realm.displayName ?? realm.symbol}
@@ -106,3 +117,10 @@ export default function RealmsDashboard({
     </div>
   )
 }
+
+const Badge = ({ count }: { count: number }) =>
+  count > 0 ? (
+    <span className="inline-flex items-center justify-center px-2 py-1 mr-2 text-s font-bold leading-none text-primary bg-red rounded-full absolute -top-1 -right-3">
+      {count}
+    </span>
+  ) : null
