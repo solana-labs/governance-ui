@@ -10,9 +10,8 @@ import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
-import { tryGetMint } from 'utils/tokens'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
@@ -21,6 +20,7 @@ import BaseGovernanceForm, {
 import { registerGovernance } from 'actions/registerGovernance'
 import { GovernanceType } from 'models/enums'
 import Switch from 'components/Switch'
+import { debounce } from '@utils/debounce'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -117,7 +117,7 @@ const NewProgramForm = () => {
       setIsLoading(false)
     }
   }
-
+  //if you altering this look at useEffect for form.programId
   const schema = yup.object().shape({
     programId: yup
       .string()
@@ -156,7 +156,15 @@ const NewProgramForm = () => {
         }
       ),
   })
-
+  useEffect(() => {
+    if (form.programId) {
+      //now validation contains only programId if more fields come it would be good to reconsider this method.
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.programId])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
