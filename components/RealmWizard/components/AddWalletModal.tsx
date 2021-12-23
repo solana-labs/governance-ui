@@ -33,6 +33,13 @@ const AddWalletModal: React.FC<{
     }
   }
 
+  const getAddMembersText = () => {
+    let message = 'Add Member'
+    const wallets = walletAddr.split(/\n/)
+    if (wallets.length > 1 && wallets[1].length > 1) message += 's'
+    return message
+  }
+
   return (
     <>
       {isOpen && (
@@ -78,7 +85,7 @@ const AddWalletModal: React.FC<{
               className="ml-4"
               onClick={handleAddWallet}
             >
-              Ok
+              {getAddMembersText()}
             </Button>
           </div>
         </Modal>
