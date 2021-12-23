@@ -200,17 +200,15 @@ const RealmWizard: React.FC = () => {
 
   return (
     <div className="relative">
-      <>
-        <div className="pointer">
-          <a
-            className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
-            onClick={handleBackButtonClick}
-          >
-            <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-            Back
-          </a>
-        </div>
-      </>
+      <div className="pointer">
+        <a
+          className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+          onClick={handleBackButtonClick}
+        >
+          <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+          Back
+        </a>
+      </div>
       {isLoading ? (
         <div className="text-center">
           <Loading />
@@ -221,12 +219,6 @@ const RealmWizard: React.FC = () => {
       )}
       {ctl && !(ctl.isFirstStep() || isLoading) && (
         <>
-          <Button
-            onClick={() => handleStepSelection(StepDirection.PREV)}
-            className="mr-3"
-          >
-            Previous
-          </Button>
           <Button
             onClick={() => {
               if (ctl.isLastStep()) handleCreateRealm()

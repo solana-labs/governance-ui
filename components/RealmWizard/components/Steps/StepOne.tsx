@@ -3,6 +3,7 @@ import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import TeamWalletField from '../TeamWalletField'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
+import AmountSlider from '@components/Slider'
 
 /**
  * This is the Step One for the Realm Wizard.
@@ -38,14 +39,14 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   }
 
   return (
-    <>
-      <h2>Name your realm</h2>
-      <div className="pb-4">
+    <div>
+      <div className="pb-4 my-5">
+        <StyledLabel>Name your realm</StyledLabel>
         <Input
           required
           type="text"
           value={form.name}
-          placeholder="My Realm"
+          placeholder="The name of your realm"
           onChange={($e) => {
             setForm({
               name: $e.target.value,
@@ -53,9 +54,17 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
           }}
         />
       </div>
-      <div className="pb-4">
-        <StyledLabel>Vote Threshold (%)</StyledLabel>
-        <Input
+      <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
+        <StyledLabel>Approval quorum (%)</StyledLabel>
+        <AmountSlider
+          step={1}
+          value={form.yesThreshold ?? 0}
+          disabled={false}
+          onChange={($e) => {
+            setForm({ yesThreshold: $e })
+          }}
+        />
+        {/* <Input
           required
           type="number"
           value={form.yesThreshold}
@@ -66,7 +75,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
                 yesThreshold: $e.target.value,
               })
           }}
-        />
+        /> */}
       </div>
       <div className="pb-4">
         <TeamWalletField
@@ -75,7 +84,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
           wallets={form?.teamWallets ?? []}
         />
       </div>
-    </>
+    </div>
   )
 }
 
