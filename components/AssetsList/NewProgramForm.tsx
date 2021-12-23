@@ -5,25 +5,25 @@ import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
 import { RpcContext } from 'models/core/api'
-import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
-import { debounce } from 'utils/debounce'
 import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from 'utils/GovernanceTools'
 import { notify } from 'utils/notifications'
-import tokenService, { TokenRecord } from 'utils/services/token'
-import { ProgramAccount, tryGetMint } from 'utils/tokens'
-import { createTreasuryAccount } from 'actions/createTreasuryAccount'
+import { tryGetMint } from 'utils/tokens'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
 } from './BaseGovernanceForm'
+import { registerGovernance } from 'actions/registerGovernance'
+import { GovernanceType } from 'models/enums'
+import Switch from 'components/Switch'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
+  transferAuthority: boolean
 }
 
 const defaultFormValues = {
@@ -32,6 +32,7 @@ const defaultFormValues = {
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
+  transferAuthority: true,
 }
 const NewProgramForm = () => {
   const router = useRouter()
@@ -93,11 +94,13 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
         }
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
-        await createTreasuryAccount(
+        await registerGovernance(
           rpcContext,
+          GovernanceType.Program,
           realm.pubkey,
           new PublicKey(form.programId),
           governanceConfig,
+          form.transferAuthority,
           tokenOwnerRecord!.pubkey
         )
         setIsLoading(false)
@@ -116,44 +119,38 @@ const NewProgramForm = () => {
   }
 
   const schema = yup.object().shape({
-    mintAddress: yup
+    programId: yup
       .string()
       .test(
-        'mintAddressTest',
-        'Mint address validation error',
+        'programIdTest',
+        'program id validation error',
         async function (val: string) {
           if (val) {
             try {
               const pubKey = tryParseKey(val)
               if (!pubKey) {
                 return this.createError({
-                  message: `Invalid mint address`,
+                  message: `Invalid account address`,
                 })
               }
 
-              const accountData = await connection.current.getAccountInfo(
+              const accountData = await connection.current.getParsedAccountInfo(
                 pubKey
               )
-              if (!accountData) {
+              if (!accountData || !accountData.value) {
                 return this.createError({
                   message: `Account not found`,
-                })
-              }
-              const mint = tryGetMint(connection.current, pubKey)
-              if (!mint) {
-                return this.createError({
-                  message: `Account is not a valid mint`,
                 })
               }
               return true
             } catch (e) {
               return this.createError({
-                message: `Invalid mint address`,
+                message: `Invalid account address`,
               })
             }
           } else {
             return this.createError({
-              message: `Mint address is required`,
+              message: `Program id is required`,
             })
           }
         }
@@ -180,6 +177,20 @@ const NewProgramForm = () => {
         }
         error={formErrors['programId']}
       />
+      <div className="text-sm mb-3">
+        <div className="mb-2">Transfer upgrade authority to governance</div>
+        <div className="flex flex-row text-xs items-center">
+          <Switch
+            checked={form.transferAuthority}
+            onChange={(checked) =>
+              handleSetForm({
+                value: checked,
+                propertyName: 'transferAuthority',
+              })
+            }
+          />
+        </div>
+      </div>
       <BaseGovernanceForm
         formErrors={formErrors}
         form={form}
