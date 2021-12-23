@@ -5,6 +5,7 @@ import { TrashIcon } from '@heroicons/react/solid'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
+import Tooltip from '@components/Tooltip'
 
 const TeamWalletField: React.FC<{
   onInsert: (wallets: string[]) => void
@@ -25,13 +26,27 @@ const TeamWalletField: React.FC<{
     </div>
   )
 
+  const isCurrentWallet = (index: number) =>
+    wallets[index] === wallet?.publicKey?.toBase58()
+
   const handleRemoveWallet = (index: number) => {
-    if (wallets[index] === wallet?.publicKey?.toBase58())
-      notify({
-        type: 'info',
-        message: 'Current wallet is required.',
-      })
-    else onRemove(index)
+    if (!isCurrentWallet(index)) onRemove(index)
+  }
+
+  const trashIcon = (
+    type: 'disabled' | 'enabled' = 'enabled',
+    index: number
+  ) => {
+    return (
+      <TrashIcon
+        className={`mt-3 ml-3 h-5 ${
+          type === 'disabled' ? 'opacity-30' : 'text-red pointer'
+        }`}
+        onClick={() => {
+          handleRemoveWallet(index)
+        }}
+      />
+    )
   }
 
   useEffect(() => {
@@ -51,12 +66,13 @@ const TeamWalletField: React.FC<{
           <StyledLabel>Member {index + 1}:</StyledLabel>
           <div className="flex align-center">
             <div className="bg-gray-700 px-3 py-2 rounded">{wallet}</div>
-            <TrashIcon
-              className="mt-3 ml-3 h-5 text-red pointer"
-              onClick={() => {
-                handleRemoveWallet(index)
-              }}
-            />
+            {isCurrentWallet(index) ? (
+              <Tooltip content="The current wallet is required">
+                {trashIcon('disabled', index)}
+              </Tooltip>
+            ) : (
+              trashIcon('enabled', index)
+            )}
           </div>
         </div>
       ))}
