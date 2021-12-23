@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import Textarea from '@components/inputs/Textarea'
 import Modal from '@components/Modal'
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import { publicKeyValidationTest } from '../validators/createRealmValidator'
 
 const AddWalletModal: React.FC<{
@@ -66,13 +66,13 @@ const AddWalletModal: React.FC<{
           )}
           <br />
           <div className="text-right mt-3">
-            <Button
+            <SecondaryButton
               onClick={() => {
                 onClose()
               }}
             >
               Cancel
-            </Button>
+            </SecondaryButton>
             <Button
               disabled={!walletAddr.length}
               className="ml-4"
