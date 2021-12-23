@@ -82,10 +82,7 @@ const RealmWizard: React.FC = () => {
    */
   const generateRealmArtifacts = async () => {
     if (!ctl) return
-    if (!wallet?.publicKey || !connection.current) {
-      notify({ type: 'error', message: 'Wallet not connected!' })
-      return
-    }
+    if (!wallet?.publicKey || !connection.current) return
     if (!form.name)
       return notify({
         type: 'error',
@@ -158,6 +155,11 @@ const RealmWizard: React.FC = () => {
   }
 
   const handleCreateRealm = async () => {
+    if (!wallet?.publicKey || !connection.current)
+      return notify({
+        type: 'error',
+        message: 'Wallet not connected',
+      })
     // Handles the current misuse of the CreateRealmForm
     if (ctl && ctl.getMode() === RealmWizardMode.ADVANCED) {
       setShouldFireCreate(true)

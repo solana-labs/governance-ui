@@ -35,16 +35,14 @@ const WizardModeSelect: React.FC<{
               onSelect(RealmWizardMode.ADVANCED)
             }}
           >
-            <Tooltip content="This mode is not available yet.">
-              <h2 className="mb-0">
-                <b>I want to create a bespoke realm</b>
-              </h2>
-              <p>
-                Bespoke realm is an advanced option and allows you to create a
-                realm customized for your individual requirements, community
-                structure and governance token setup.
-              </p>
-            </Tooltip>
+            <h2 className="mb-0">
+              <b>I want to create a bespoke realm</b>
+            </h2>
+            <p>
+              Bespoke realm is an advanced option and allows you to create a
+              realm customized for your individual requirements, community
+              structure and governance token setup.
+            </p>
           </div>
         </div>
       </div>
