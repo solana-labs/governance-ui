@@ -54,7 +54,7 @@ const AssetOverview = () => {
       </h3>
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex mb-4">
         <div>
-          Program id
+          Program
           <div className="text-fgd-3 text-xs flex flex-col">
             {currentAsset?.info.governedAccount.toBase58()}
           </div>

@@ -2,6 +2,7 @@ import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
   ArrowLeftIcon,
+  DuplicateIcon,
 } from '@heroicons/react/outline'
 import { ViewState } from './types'
 import { PublicKey } from '@solana/web3.js'
@@ -51,7 +52,7 @@ const UpgradeProgram = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { setCurrentCompactView } = useAssetsStore()
+  const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const {
     realmInfo,
     canChooseWhoVote,
@@ -72,7 +73,7 @@ const UpgradeProgram = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Upgrade program ${form.governedAccount?.governance?.info.governedAccount.toBase58()}`
+  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.info.governedAccount.toBase58()}`
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -80,6 +81,7 @@ const UpgradeProgram = () => {
   }
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
+    resetCompactViewState()
   }
   const schema = yup.object().shape({
     bufferAddress: yup
@@ -228,10 +230,10 @@ const UpgradeProgram = () => {
       <h3 className="mb-4 flex items-center hover:cursor-pointer">
         <>
           <ArrowLeftIcon
-            onClick={handleGoBackToMainView}
+            onClick={() => setCurrentCompactView(ViewState.AssetOverview)}
             className="h-4 w-4 mr-1 text-primary-light mr-2"
           />
-          Add new member
+          Upgrade
         </>
       </h3>
       <div className="space-y-4">
@@ -248,6 +250,22 @@ const UpgradeProgram = () => {
           noMaxWidth={true}
           error={formErrors['bufferAddress']}
         />
+        <div className="text-sm mb-3">
+          <div className="mb-2">Upgrade authority</div>
+          <div className="flex flex-row text-xs items-center break-all">
+            <span className="text-fgd-3">
+              {form.governedAccount?.governance?.pubkey.toBase58()}
+            </span>
+            <DuplicateIcon
+              className="ml-4 text-th-fgd-1 w-5 h-5 hover:cursor-pointer text-primary-light"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  form.governedAccount!.governance!.pubkey.toBase58()
+                )
+              }}
+            ></DuplicateIcon>
+          </div>
+        </div>
         <div
           className={'flex items-center hover:cursor-pointer w-24 mt-3'}
           onClick={() => setShowOptions(!showOptions)}

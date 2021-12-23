@@ -4,15 +4,10 @@ import useAssetsStore from 'stores/useAssetsStore'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { getProgramName } from '@components/instructions/programs/names'
-import { PublicKey } from '@solana/web3.js'
-import { abbreviateAddress } from '@utils/formatting'
 
 const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
   const { setCurrentCompactView, setCurrentCompactViewAsset } = useAssetsStore()
   const name = item ? getProgramName(item.info.governedAccount) : ''
-  const governedAccount = item
-    ? abbreviateAddress(item?.info.governedAccount as PublicKey)
-    : ''
   async function handleGoToMemberOverview() {
     setCurrentCompactView(ViewState.AssetOverview)
     setCurrentCompactViewAsset(item)
@@ -27,7 +22,7 @@ const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
       </div>
       <div className="flex flex-col">
         <div className="text-xs text-th-fgd-1">
-          {name ? name : governedAccount}
+          Program{name && `: ${name}`}
         </div>
         <div className="text-fgd-3 text-xs flex flex-row break-all">
           {item?.info.governedAccount.toBase58()}
