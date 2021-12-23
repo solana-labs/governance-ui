@@ -220,12 +220,6 @@ const RealmWizard: React.FC = () => {
       {ctl && !(ctl.isFirstStep() || isLoading) && (
         <>
           <Button
-            onClick={() => handleStepSelection(StepDirection.PREV)}
-            className="mr-3"
-          >
-            Previous
-          </Button>
-          <Button
             onClick={() => {
               if (ctl.isLastStep()) handleCreateRealm()
               else handleStepSelection(StepDirection.NEXT)
