@@ -2,7 +2,6 @@ import { MintInfo } from '@solana/spl-token'
 import {
   Account,
   PublicKey,
-  SystemProgram,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -102,7 +101,6 @@ const TokenDeposit = ({
     proposals,
     governances,
   } = useRealm()
-
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
@@ -151,9 +149,7 @@ const TokenDeposit = ({
       depositTokenAccount!.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID,
-      SystemProgram.programId
+      wallet!.publicKey!
     )
 
     const transaction = new Transaction()

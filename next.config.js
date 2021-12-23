@@ -8,7 +8,6 @@ const withTM = require('next-transpile-modules')([
 ])
 
 module.exports = withTM({
-  target: 'serverless',
   webpack: (config, { isServer }) => {
     config.resolve = {
       ...config.resolve,
@@ -26,5 +25,6 @@ module.exports = withTM({
   },
   env: {
     REALM: process.env.REALM,
+    DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
 })
