@@ -64,7 +64,12 @@ const TeamWalletField: React.FC<{
         <div className="flex flex-col relative w-full pb-5" key={index}>
           <StyledLabel>Member {index + 1}:</StyledLabel>
           <div className="flex align-center">
-            <div className="bg-gray-700 px-3 py-2 rounded w-6/12">{wallet}</div>
+            <div
+              className="bg-gray-700 px-3 py-2 rounded"
+              style={{ fontFamily: 'monospace' }}
+            >
+              {wallet}
+            </div>
             {isCurrentWallet(index) ? (
               <Tooltip content="The current wallet is required">
                 {trashIcon('disabled', index)}
