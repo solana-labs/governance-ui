@@ -1,6 +1,5 @@
 import React from 'react'
 import { RealmWizardMode } from '@components/RealmWizard/interfaces/Realm'
-import Tooltip from '@components/Tooltip'
 
 const WizardModeSelect: React.FC<{
   onSelect: (option: number) => void

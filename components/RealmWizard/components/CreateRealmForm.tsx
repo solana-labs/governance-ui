@@ -16,15 +16,15 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { PublicKey } from '@solana/web3.js'
 import { CreateFormSchema } from '../validators/createRealmValidator'
 import _ from 'lodash'
-import router from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import { ProgramVersion } from '@models/registry/constants'
+import router from 'next/router'
 
 const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
   form,
   setForm,
   shouldFireCreate = false,
-  setIsLoading = (state) => {},
+  setIsLoading = () => undefined,
 }) => {
   const { fmtUrlWithCluster } = useQueryContext()
 
@@ -72,6 +72,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
           form.minCommunityTokensToCreateGovernance!
         )
         setRealmAddress(realmAddress)
+        router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
       } catch (ex) {
         console.log(ex)
         notify({ type: 'error', message: `${ex}` })

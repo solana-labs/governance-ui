@@ -4,13 +4,7 @@ import RealmWizardController from './controller/RealmWizardController'
 import Loading from '@components/Loading'
 import WizardModeSelect from './components/Steps/WizardModeSelect'
 import { notify } from '@utils/notifications'
-import {
-  StepOne,
-  StepTwo,
-  StepThree,
-  StepFour,
-  RealmCreated,
-} from './components/Steps'
+import { StepOne, StepThree, StepFour, RealmCreated } from './components/Steps'
 import { useMemo } from 'react'
 import Button from '@components/Button'
 import {
