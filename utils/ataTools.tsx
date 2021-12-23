@@ -3,7 +3,6 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { Connection, PublicKey, Transaction } from '@solana/web3.js'
 import type { ConnectionContext } from 'utils/connection'
 import { sendTransaction } from './send'
@@ -47,7 +46,7 @@ export async function getATA(
   connection: ConnectionContext,
   receiverAddress: PublicKey,
   mintPK: PublicKey,
-  wallet: WalletAdapter
+  wallet: any
 ) {
   if (!wallet?.publicKey) {
     throw 'please connect your wallet'
