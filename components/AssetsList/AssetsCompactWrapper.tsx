@@ -8,6 +8,7 @@ import useRealm from '@hooks/useRealm'
 import AssetOverview from './AssetOverview'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
+import UpgradeProgram from './UpgradeProgram'
 const NEW_PROGRAM_VIEW = `/program/new`
 
 const AssetsCompactWrapper = () => {
@@ -54,8 +55,8 @@ const AssetsCompactWrapper = () => {
         )
       case ViewState.AssetOverview:
         return <AssetOverview></AssetOverview>
-      case ViewState.AddAsset:
-        return null
+      case ViewState.Upgrade:
+        return <UpgradeProgram></UpgradeProgram>
     }
   }
   useEffect(() => {

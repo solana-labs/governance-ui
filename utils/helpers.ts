@@ -1,6 +1,5 @@
 export function capitalize(str?: string) {
-  const lower = str?.toLowerCase()
-  return lower ? str?.charAt(0).toUpperCase() + lower?.slice(1) : lower
+  return str ? str?.charAt(0).toUpperCase() + str?.slice(1) : str
 }
 
 export function chunks<T>(array: T[], size: number): T[][] {
