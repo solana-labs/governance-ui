@@ -55,7 +55,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
         />
       </div>
       <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
-        <StyledLabel>Vote Threshold (%)</StyledLabel>
+        <StyledLabel>Approval quorum (%)</StyledLabel>
         <AmountSlider
           step={1}
           value={form.yesThreshold ?? 0}

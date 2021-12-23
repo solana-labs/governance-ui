@@ -51,7 +51,7 @@ const AddWalletModal: React.FC<{
             onClose()
           }}
         >
-          <h2>Add a teammate wallet</h2>
+          <h2>Team member wallets</h2>
           <Textarea
             rows={10}
             placeholder="Public keys separated by coma or line break"
