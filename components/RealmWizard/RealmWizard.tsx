@@ -228,6 +228,14 @@ const RealmWizard: React.FC = () => {
     }
   }, [shouldFireCreate])
 
+  useEffect(() => {
+    setForm({
+      governanceProgramId:
+        process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
+        DEFAULT_GOVERNANCE_PROGRAM_ID,
+    })
+  }, [])
+
   return (
     <div
       className="relative w-full"

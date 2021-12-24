@@ -151,7 +151,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
         </div>
       </div>
       <div className="pt-2">
-        <div className="pb-4">
+        <div className="pb-4 pr-10 mr-2">
           <Input
             label="Name"
             placeholder="Name of your realm"
@@ -165,7 +165,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4">
+        <div className="pb-4 pr-10 mr-2">
           <Input
             label="Community Mint Id"
             placeholder="Community mint id of this realm"
@@ -190,7 +190,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
         </div>
         {form?.communityMint && (
           <>
-            <div className="pb-4">
+            <div className="pb-4 pr-10 mr-2">
               <Input
                 label="Min community tokens to create governance (defaults 1% of community mint)"
                 placeholder="Min community tokens to create governance"
@@ -207,7 +207,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
                 }
               />
             </div>
-            <div className="pb-4">
+            <div className="pb-4 pr-10 mr-2">
               <Input
                 label="Community mint supply factor (max vote weight)"
                 placeholder="Community mint supply factor (max vote weight)"
@@ -223,7 +223,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
             </div>
           </>
         )}
-        <div className="pb-4">
+        <div className="pb-4 pr-10 mr-2">
           <Input
             label="Council Mint Id"
             placeholder="(Optional) Council mint"
@@ -235,7 +235,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4">
+        <div className="pb-4 pr-10 mr-2">
           <Input
             label="Governance Program Id"
             placeholder="Id of the governance program this realm will be associated with"
@@ -249,7 +249,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4">
+        <div className="pb-4 pr-10 mr-2">
           <Input
             label="Governance program version"
             placeholder={1}
