@@ -72,7 +72,7 @@ const NewProgramForm = () => {
         throw 'Please connect your wallet'
       }
       if (!tokenOwnerRecord) {
-        throw "You don't have enough governance power to create a new treasury account"
+        throw "You don't have enough governance power to create a new program governance"
       }
       const { isValid, validationErrors } = await isFormValid(schema, form)
       setFormErrors(validationErrors)
