@@ -4,7 +4,7 @@ import {
   ViewState,
 } from '@components/Members/types'
 
-interface MembersListStore extends State {
+interface MembersStore extends State {
   compact: {
     currentView: ViewState
     currentMember: TokenRecordsWithWalletAddress | null
@@ -19,7 +19,7 @@ const compactDefaultState = {
   currentMember: null,
 }
 
-const useTreasuryAccountStore = create<MembersListStore>((set, _get) => ({
+const useMembersStore = create<MembersStore>((set, _get) => ({
   compact: {
     ...compactDefaultState,
   },
@@ -40,4 +40,4 @@ const useTreasuryAccountStore = create<MembersListStore>((set, _get) => ({
   },
 }))
 
-export default useTreasuryAccountStore
+export default useMembersStore

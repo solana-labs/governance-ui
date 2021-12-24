@@ -165,5 +165,6 @@ export default function useGovernanceAssets() {
     canUseMintInstruction,
     canMintRealmCommunityToken,
     canMintRealmCouncilToken,
+    canUseProgramUpgradeInstruction,
   }
 }

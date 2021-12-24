@@ -30,7 +30,6 @@ const AccountsCompactWrapper = () => {
   const goToNewAccountForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
   }
-  const isNewAccountRoute = router.route.includes(NEW_TREASURY_ROUTE)
   const canCreateGovernance = realm
     ? ownVoterWeight.canCreateGovernance(realm)
     : null
@@ -46,34 +45,32 @@ const AccountsCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Treasury
-              {!isNewAccountRoute && (
-                <Tooltip
-                  contentClassName="ml-auto"
-                  content={
-                    !connected
-                      ? 'Connect your wallet to create new account'
-                      : !canCreateGovernance
-                      ? "You don't have enough governance power to create a new treasury account"
-                      : toManyCommunityOutstandingProposalsForUser &&
-                        toManyCouncilOutstandingProposalsForUse
-                      ? 'You have to many outstanding proposals'
-                      : ''
-                  }
+              <Tooltip
+                contentClassName="ml-auto"
+                content={
+                  !connected
+                    ? 'Connect your wallet to create new account'
+                    : !canCreateGovernance
+                    ? "You don't have enough governance power to create a new treasury account"
+                    : toManyCommunityOutstandingProposalsForUser &&
+                      toManyCouncilOutstandingProposalsForUse
+                    ? 'You have to many outstanding proposals'
+                    : ''
+                }
+              >
+                <div
+                  onClick={goToNewAccountForm}
+                  className={`bg-bkg-2 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 ml-auto ${
+                    !isConnectedWithGovernanceCreationPermission
+                      ? 'cursor-not-allowed pointer-events-none opacity-60'
+                      : 'cursor-pointer'
+                  }`}
                 >
-                  <div
-                    onClick={goToNewAccountForm}
-                    className={`bg-bkg-2 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 ml-auto ${
-                      !isConnectedWithGovernanceCreationPermission
-                        ? 'cursor-not-allowed pointer-events-none opacity-60'
-                        : 'cursor-pointer'
-                    }`}
-                  >
-                    <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                      <PlusIcon />
-                    </div>
+                  <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                    <PlusIcon />
                   </div>
-                </Tooltip>
-              )}
+                </div>
+              </Tooltip>
             </h3>
             <HoldTokensTotalPrice />
             <div style={{ maxHeight: '350px' }} className="overflow-y-auto">

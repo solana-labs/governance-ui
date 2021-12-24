@@ -1,6 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
-import useMembersListStore from 'stores/useMembersListStore'
+import useMembersListStore from 'stores/useMembersStore'
 import { ViewState } from './types'
 import MembersItems from './MembersItems'
 import useMembers from './useMembers'
