@@ -40,7 +40,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
 
   return (
     <div>
-      <div className="pb-4 my-5">
+      <div className="pb-4 my-5 pr-10 w-full" style={{ maxWidth: 512 }}>
         <StyledLabel>Name your realm</StyledLabel>
         <Input
           required
@@ -56,6 +56,19 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
       </div>
       <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
         <StyledLabel>Approval quorum (%)</StyledLabel>
+        <Input
+          required
+          type="number"
+          value={form.yesThreshold}
+          min={1}
+          max={100}
+          onChange={($e) => {
+            setForm({
+              yesThreshold: $e.target.value,
+            })
+          }}
+        />
+        <div className="pb-5" />
         <AmountSlider
           step={1}
           value={form.yesThreshold ?? 0}

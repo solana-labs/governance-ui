@@ -16,7 +16,7 @@ const TeamWalletField: React.FC<{
 
   const newWalletButton = (
     <div
-      className="add-wallet-btn pointer pt-1.5 w-10 h-10 mt-4 flex justify-center align-center"
+      className="add-wallet-btn pointer w-10 h-10"
       onClick={() => {
         setShowWalletModal(true)
       }}
@@ -88,7 +88,7 @@ const TeamWalletField: React.FC<{
           setShowWalletModal(false)
         }}
       />
-      {newWalletButton}
+      <div className="flex justify-center pr-10 mr-7">{newWalletButton}</div>
     </div>
   )
 }
