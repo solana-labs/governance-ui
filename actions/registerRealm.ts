@@ -4,9 +4,12 @@ import { MintMaxVoteWeightSource } from '../models/accounts'
 import { withCreateRealm } from '../models/withCreateRealm'
 import { RpcContext } from '../models/core/api'
 import { sendTransaction } from '../utils/send'
+import { ProgramVersion } from '@models/registry/constants'
 
 export async function registerRealm(
-  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  { connection, wallet, walletPubkey }: RpcContext,
+  programId: PublicKey,
+  programVersion: ProgramVersion,
   name: string,
   communityMint: PublicKey,
   councilMint: PublicKey | undefined,
