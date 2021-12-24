@@ -62,9 +62,24 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
           value={form.yesThreshold}
           min={1}
           max={100}
+          onBlur={() => {
+            if (
+              !form.yesThreshold ||
+              form.yesThreshold.toString().match(/\D+/gim)
+            ) {
+              setForm({
+                yesThreshold: 60,
+              })
+            }
+          }}
           onChange={($e) => {
+            let yesThreshold = $e.target.value
+            if (yesThreshold.length) {
+              yesThreshold =
+                +yesThreshold < 1 ? 1 : +yesThreshold > 100 ? 100 : yesThreshold
+            }
             setForm({
-              yesThreshold: $e.target.value,
+              yesThreshold,
             })
           }}
         />
