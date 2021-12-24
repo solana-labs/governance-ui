@@ -33,21 +33,13 @@ class RealmWizardController {
    */
   private mountSteps(mode: RealmWizardMode) {
     this.mode = mode
+    this.steps.push(RealmWizardStep.SELECT_MODE)
     switch (this.mode) {
       case RealmWizardMode.BASIC:
-        this.steps.push(
-          RealmWizardStep.SELECT_MODE,
-          RealmWizardStep.BASIC_CONFIG
-        )
+        this.steps.push(RealmWizardStep.BASIC_CONFIG)
         break
       case RealmWizardMode.ADVANCED:
-        this.steps.push(
-          RealmWizardStep.SELECT_MODE,
-          RealmWizardStep.BASIC_CONFIG,
-          RealmWizardStep.TOKENS_CONFIG,
-          RealmWizardStep.STEP_3,
-          RealmWizardStep.STEP_4
-        )
+        this.steps.push(RealmWizardStep.TOKENS_CONFIG)
         break
       default:
         throw new Error('The selected mode is not available')
@@ -65,7 +57,8 @@ class RealmWizardController {
     currentStep: RealmWizardStep,
     direction: StepDirection
   ): RealmWizardStep {
-    const nextStep = this.steps[currentStep + direction]
+    const stepIndex = this.steps.indexOf(currentStep)
+    const nextStep = this.steps[stepIndex + direction]
     if (nextStep !== undefined) {
       this.currentStep = nextStep
       return nextStep
@@ -95,6 +88,13 @@ class RealmWizardController {
    */
   getCurrentStep(): RealmWizardStep {
     return this.currentStep
+  }
+
+  /**
+   * Return the current wizard mode
+   */
+  getMode(): RealmWizardMode {
+    return this.mode
   }
 }
 export default RealmWizardController
