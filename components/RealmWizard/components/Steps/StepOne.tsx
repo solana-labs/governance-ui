@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import TeamWalletField from '../TeamWalletField'
 import Input from '@components/inputs/Input'
@@ -17,6 +17,12 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
 }) => {
+  const DEFAULT_APPROVAL_QUORUM = 60
+
+  useEffect(() => {
+    setForm({ yesThreshold: DEFAULT_APPROVAL_QUORUM })
+  }, [])
+
   const handleInsertTeamWallet = (wallets: string[]) => {
     let teamWallets: string[] = []
     if (form?.teamWallets) {
@@ -86,7 +92,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
         <div className="pb-5" />
         <AmountSlider
           step={1}
-          value={form.yesThreshold ?? 0}
+          value={form.yesThreshold ?? DEFAULT_APPROVAL_QUORUM}
           disabled={false}
           onChange={($e) => {
             setForm({ yesThreshold: $e })

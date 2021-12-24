@@ -89,6 +89,13 @@ const RealmWizard: React.FC = () => {
         message: 'Team member wallets are required.',
       })
 
+    if (!form.yesThreshold) {
+      return notify({
+        type: 'error',
+        message: 'Approval quorum required.',
+      })
+    }
+
     setIsLoading(true)
 
     // TODO: make it part of the form
@@ -100,7 +107,7 @@ const RealmWizard: React.FC = () => {
       new PublicKey(programId),
       ProgramVersion.V1,
       form.name,
-      60,
+      form.yesThreshold,
       form.teamWallets.map((w) => new PublicKey(w)),
       wallet
     )
