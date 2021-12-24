@@ -170,7 +170,7 @@ const NewProgramForm = () => {
       <PreviousRouteBtn />
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Create new program </h1>
+          <h1>Create new program governance </h1>
         </div>
       </div>
       <Input

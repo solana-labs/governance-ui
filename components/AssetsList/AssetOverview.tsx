@@ -1,6 +1,7 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getProgramName } from '@components/instructions/programs/names'
+import Tooltip from '@components/Tooltip'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getProgramSlot } from '@models/registry/api'
@@ -14,6 +15,7 @@ import { ViewState } from './types'
 const AssetOverview = () => {
   const currentAsset = useAssetsStore((s) => s.compact.currentAsset)
   const { canUseProgramUpgradeInstruction } = useGovernanceAssets()
+  const connected = useWalletStore((s) => s.connected)
   const [slot, setSlot] = useState(0)
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
@@ -80,14 +82,20 @@ const AssetOverview = () => {
       <div
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 justify-center`}
       >
-        {canUseProgramUpgradeInstruction && (
-          <Button
-            className="sm:w-1/2 text-sm"
-            onClick={() => setCurrentCompactView(ViewState.Upgrade)}
+        <Button
+          disabled={!canUseProgramUpgradeInstruction}
+          className="sm:w-1/2 text-sm"
+          onClick={() => setCurrentCompactView(ViewState.Upgrade)}
+        >
+          <Tooltip
+            content={
+              !canUseProgramUpgradeInstruction &&
+              'You need to have connected wallet with ability to create upgrade proposals'
+            }
           >
-            Upgrade
-          </Button>
-        )}
+            <div>Upgrade</div>
+          </Tooltip>
+        </Button>
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
         Last deployed slot: <span className="text-fgd-1">{slot}</span>
