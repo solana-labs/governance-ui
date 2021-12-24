@@ -4,6 +4,7 @@ import useAssetsStore from 'stores/useAssetsStore'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { getProgramName } from '@components/instructions/programs/names'
+import { abbreviateAddress } from '@utils/formatting'
 
 const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
   const { setCurrentCompactView, setCurrentCompactViewAsset } = useAssetsStore()
@@ -12,6 +13,9 @@ const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
     setCurrentCompactView(ViewState.AssetOverview)
     setCurrentCompactViewAsset(item)
   }
+  const governedAccount = item
+    ? abbreviateAddress(item?.info.governedAccount as PublicKey)
+    : ''
   return (
     <div
       onClick={handleGoToMemberOverview}
@@ -25,7 +29,7 @@ const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
           Program{name && `: ${name}`}
         </div>
         <div className="text-fgd-3 text-xs flex flex-row break-all">
-          {item?.info.governedAccount.toBase58()}
+          {governedAccount}
         </div>
       </div>
     </div>
