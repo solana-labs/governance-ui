@@ -15,7 +15,6 @@ import { ViewState } from './types'
 const AssetOverview = () => {
   const currentAsset = useAssetsStore((s) => s.compact.currentAsset)
   const { canUseProgramUpgradeInstruction } = useGovernanceAssets()
-  const connected = useWalletStore((s) => s.connected)
   const [slot, setSlot] = useState(0)
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
