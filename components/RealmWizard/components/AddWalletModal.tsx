@@ -3,7 +3,6 @@ import Textarea from '@components/inputs/Textarea'
 import Modal from '@components/Modal'
 import Button, { SecondaryButton } from '@components/Button'
 import { publicKeyValidationTest } from '../validators/createRealmValidator'
-import { Wallet } from '@project-serum/anchor'
 
 const AddWalletModal: React.FC<{
   onOk: (wallets: string[]) => void
