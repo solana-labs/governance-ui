@@ -13,23 +13,27 @@ const AddWalletModal: React.FC<{
   const [hasErrors, setErrors] = useState<string[]>()
 
   const handleAddWallet = () => {
-    const wallets = walletAddr.replace(/ /gim, '').split(/,|\n/gim)
+    const wallets = walletAddr.replace(/ +/gim, '').split(/,|\n/gim)
     const errors: string[] = []
+    const parsedWallets: string[] = []
     wallets.forEach((wallet, index) => {
-      if (!publicKeyValidationTest(wallet)) {
-        errors.push(
-          `Entry ${index + 1} (${wallet.substr(
-            0,
-            8
-          )}...)  is not a valid public key.`
-        )
+      if (wallet.length) {
+        parsedWallets.push(wallet)
+        if (!publicKeyValidationTest(wallet)) {
+          errors.push(
+            `Entry ${index + 1} (${wallet.substr(
+              0,
+              8
+            )}...)  is not a valid public key.`
+          )
+        }
       }
     })
     if (errors.length) setErrors(errors)
     else {
       onClose()
       setWalletAddr('')
-      onOk(wallets)
+      onOk(parsedWallets)
     }
   }
 

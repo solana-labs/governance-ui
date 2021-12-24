@@ -199,7 +199,14 @@ const RealmWizard: React.FC = () => {
   }, [currentStep, form])
 
   return (
-    <div className="relative">
+    <div
+      className="relative w-full"
+      style={
+        ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE
+          ? { maxWidth: 512 }
+          : undefined
+      }
+    >
       <div className="pointer">
         <a
           className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
@@ -218,7 +225,7 @@ const RealmWizard: React.FC = () => {
         BoundStepComponent
       )}
       {ctl && !(ctl.isFirstStep() || isLoading) && (
-        <>
+        <div className="flex justify-end pr-10 mr-3">
           <Button
             onClick={() => {
               if (ctl.isLastStep()) handleCreateRealm()
@@ -228,7 +235,7 @@ const RealmWizard: React.FC = () => {
           >
             {ctl.isLastStep() ? 'Create' : 'Next'}
           </Button>
-        </>
+        </div>
       )}
     </div>
   )
