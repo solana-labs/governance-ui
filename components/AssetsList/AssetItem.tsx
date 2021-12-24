@@ -5,6 +5,7 @@ import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { getProgramName } from '@components/instructions/programs/names'
 import { abbreviateAddress } from '@utils/formatting'
+import { PublicKey } from '@solana/web3.js'
 
 const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
   const { setCurrentCompactView, setCurrentCompactViewAsset } = useAssetsStore()
