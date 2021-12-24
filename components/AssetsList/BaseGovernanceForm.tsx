@@ -1,4 +1,5 @@
 import Input from '@components/inputs/Input'
+import AmountSlider from '@components/Slider'
 import useRealm from '@hooks/useRealm'
 import {
   fmtPercentage,
@@ -154,6 +155,19 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         }
         error={formErrors['voteThreshold']}
       />
+      <div className="pb-5 max-w-lg">
+        <AmountSlider
+          step={1}
+          value={form.voteThreshold}
+          disabled={false}
+          onChange={($e) => {
+            handleSetForm({
+              value: $e,
+              propertyName: 'voteThreshold',
+            })
+          }}
+        />
+      </div>
     </>
   )
 }
