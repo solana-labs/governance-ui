@@ -88,7 +88,7 @@ const TeamWalletField: React.FC<{
           setShowWalletModal(false)
         }}
       />
-      <div className="flex justify-center pr-10 mr-5">{newWalletButton}</div>
+      <div className="flex justify-start">{newWalletButton}</div>
     </div>
   )
 }
