@@ -1,3 +1,4 @@
+import { HIDDEN_GOVERNANCES } from '@components/instructions/tools'
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
 import {
@@ -14,9 +15,10 @@ export default function useGovernanceAssets() {
   const connection = useWalletStore((s) => s.connection.current)
   const { ownVoterWeight, realm } = useRealm()
 
-  const governancesArray = Object.keys(governances).map(
-    (key) => governances[key]
-  )
+  const governancesArray = Object.keys(governances)
+    .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
+    .map((key) => governances[key])
+
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
       (gov) => gov.info?.accountType === type
