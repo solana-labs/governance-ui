@@ -17,7 +17,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
-import useMembersListStore from 'stores/useMembersListStore'
+import useMembersListStore from 'stores/useMembersStore'
 import useWalletStore, { getVoteRecordsByProposal } from 'stores/useWalletStore'
 import { ViewState, WalletTokenRecordWithProposal } from './types'
 

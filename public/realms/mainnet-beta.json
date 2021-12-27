@@ -179,5 +179,14 @@
     "ogImage": "/realms/NoGoal/img/ino-128.png",
     "website": "https://nogoal.click/",
     "twitter": "@NoGoalFacesNFT"
+  },
+  {
+    "symbol": "MNDE",
+    "displayName": "Marinade.Finance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3gmcbygQUUDgmtDtx41R7xSf3K4oFXrH9icPNijyq9pS",
+    "ogImage": "/realms/MNDE/img/mnde_logo.png",
+    "website": "https://marinade.finance/",
+    "twitter": "@marinadefinance"
   }
 ]

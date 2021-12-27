@@ -2,23 +2,26 @@ import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
   ArrowLeftIcon,
+  DuplicateIcon,
 } from '@heroicons/react/outline'
 import { ViewState } from './types'
-import useMembersListStore from 'stores/useMembersStore'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import { precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
-import { getMintSchema } from 'utils/validations'
+import { validateBuffer } from 'utils/validations'
 import { useEffect, useState } from 'react'
-import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
-import useGovernanceAssets from 'hooks/useGovernanceAssets'
-import { getInstructionDataFromBase64 } from 'models/serialisation'
+import {
+  ProgramUpgradeForm,
+  UiInstruction,
+} from 'utils/uiTypes/proposalCreationTypes'
+import {
+  getInstructionDataFromBase64,
+  serializeInstructionToBase64,
+} from 'models/serialisation'
 import { RpcContext } from 'models/core/api'
 import { Governance } from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
@@ -26,23 +29,30 @@ import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
-import { getMintInstruction } from 'utils/instructionTools'
+import { validateInstruction } from 'utils/instructionTools'
+import useAssetsStore from 'stores/useAssetsStore'
+import * as yup from 'yup'
+import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
+import { debounce } from '@utils/debounce'
+import { isFormValid } from '@utils/formValidation'
 
-interface AddMemberForm extends MintForm {
+interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
   title: string
 }
 
-//Can add only council members for now
-const AddMember = () => {
+const UpgradeProgram = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
+  const program = useAssetsStore((s) => s.compact.currentAsset)
+  const governedAccount = {
+    governance: program!,
+  }
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
-  const { getMintWithGovernances } = useGovernanceAssets()
+  const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const {
     realmInfo,
     canChooseWhoVote,
@@ -52,32 +62,19 @@ const AddMember = () => {
     mint,
   } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<AddMemberForm>({
-    destinationAccount: '',
-    amount: 1,
-    mintAccount: undefined,
+  const [form, setForm] = useState<UpgradeProgramCompactForm>({
+    governedAccount: governedAccount,
     programId: programId?.toString(),
+    bufferAddress: '',
     description: '',
     title: '',
   })
-  const mintMinAmount = form.mintAccount
-    ? getMintMinAmountAsDecimal(councilMint!)
-    : 1
-  const currentPrecision = precision(mintMinAmount)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Add council member ${form.destinationAccount}`
-  const schema = getMintSchema({ form, connection })
+  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.info.governedAccount.toBase58()}`
 
-  const setAmount = (event) => {
-    const value = event.target.value
-    handleSetForm({
-      value: value,
-      propertyName: 'amount',
-    })
-  }
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -86,36 +83,63 @@ const AddMember = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
-  const validateAmountOnBlur = () => {
-    const value = form.amount
-
-    handleSetForm({
-      value: parseFloat(
-        Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed(currentPrecision)
-      ),
-      propertyName: 'amount',
-    })
-  }
+  const schema = yup.object().shape({
+    bufferAddress: yup
+      .string()
+      .test('bufferTest', 'Invalid buffer', async function (val: string) {
+        if (val) {
+          try {
+            await validateBuffer(
+              connection,
+              val,
+              form.governedAccount?.governance?.pubkey
+            )
+            return true
+          } catch (e) {
+            return this.createError({
+              message: `${e}`,
+            })
+          }
+        } else {
+          return this.createError({
+            message: `Buffer address is required`,
+          })
+        }
+      }),
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
+  })
   async function getInstruction(): Promise<UiInstruction> {
-    return getMintInstruction({
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      governedMintInfoAccount: form.mintAccount,
-      setFormErrors,
-    })
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    let serializedInstruction = ''
+    if (
+      isValid &&
+      programId &&
+      form.governedAccount?.governance?.info &&
+      wallet?.publicKey
+    ) {
+      const upgradeIx = await createUpgradeInstruction(
+        form.governedAccount.governance.info.governedAccount,
+        new PublicKey(form.bufferAddress),
+        form.governedAccount.governance.pubkey,
+        wallet!.publicKey
+      )
+      serializedInstruction = serializeInstructionToBase64(upgradeIx)
+    }
+    const obj: UiInstruction = {
+      serializedInstruction: serializedInstruction,
+      isValid,
+      governance: form.governedAccount?.governance,
+    }
+    return obj
   }
-  //TODO common handle propose
   const handlePropose = async () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
-      const governance = form.mintAccount?.governance
+      const governance = form.governedAccount?.governance
       let proposalAddress: PublicKey | null = null
       if (!realm) {
         setIsLoading(false)
@@ -187,44 +211,61 @@ const AddMember = () => {
   }
 
   useEffect(() => {
-    async function getMintWithGovernancesFcn() {
-      const resp = await getMintWithGovernances()
-      handleSetForm({
-        value: resp.find(
-          (x) =>
-            x.governance?.info.governedAccount.toBase58() ===
-            realm?.info.config.councilMint?.toBase58()
-        ),
-        propertyName: 'mintAccount',
+    handleSetForm({
+      propertyName: 'programId',
+      value: programId?.toString(),
+    })
+  }, [realmInfo?.programId])
+
+  useEffect(() => {
+    if (form.bufferAddress) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
       })
     }
-    getMintWithGovernancesFcn()
-  }, [])
+  }, [form.bufferAddress])
   return (
     <>
       <h3 className="mb-4 flex items-center hover:cursor-pointer">
         <>
           <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.MemberOverview)}
+            onClick={() => setCurrentCompactView(ViewState.AssetOverview)}
             className="h-4 w-4 mr-1 text-primary-light mr-2"
           />
-          Add new member
+          Upgrade
         </>
       </h3>
       <div className="space-y-4">
         <Input
-          label="Member's wallet"
-          value={form.destinationAccount}
+          label="Buffer address"
+          value={form.bufferAddress}
           type="text"
           onChange={(evt) =>
             handleSetForm({
               value: evt.target.value,
-              propertyName: 'destinationAccount',
+              propertyName: 'bufferAddress',
             })
           }
           noMaxWidth={true}
-          error={formErrors['destinationAccount']}
+          error={formErrors['bufferAddress']}
         />
+        <div className="text-sm mb-3">
+          <div className="mb-2">Upgrade authority</div>
+          <div className="flex flex-row text-xs items-center break-all">
+            <span className="text-fgd-3">
+              {form.governedAccount?.governance?.pubkey.toBase58()}
+            </span>
+            <DuplicateIcon
+              className="ml-4 text-th-fgd-1 w-5 h-5 hover:cursor-pointer text-primary-light"
+              onClick={() => {
+                navigator.clipboard.writeText(
+                  form.governedAccount!.governance!.pubkey.toBase58()
+                )
+              }}
+            ></DuplicateIcon>
+          </div>
+        </div>
         <div
           className={'flex items-center hover:cursor-pointer w-24 mt-3'}
           onClick={() => setShowOptions(!showOptions)}
@@ -241,11 +282,7 @@ const AddMember = () => {
             <Input
               noMaxWidth={true}
               label="Proposal Title"
-              placeholder={
-                form.amount && form.destinationAccount
-                  ? proposalTitle
-                  : 'Title of your proposal'
-              }
+              placeholder={proposalTitle}
               value={form.title}
               type="text"
               onChange={(evt) =>
@@ -270,16 +307,6 @@ const AddMember = () => {
                 })
               }
             ></Textarea>
-            <Input
-              min={mintMinAmount}
-              label="Voter weight"
-              value={form.amount}
-              type="number"
-              onChange={setAmount}
-              step={mintMinAmount}
-              error={formErrors['amount']}
-              onBlur={validateAmountOnBlur}
-            />
             {canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
@@ -311,4 +338,4 @@ const AddMember = () => {
   )
 }
 
-export default AddMember
+export default UpgradeProgram

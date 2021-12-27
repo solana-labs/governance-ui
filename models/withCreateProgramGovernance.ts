@@ -7,6 +7,8 @@ import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { GovernanceConfig } from './accounts'
 import { CreateProgramGovernanceArgs } from './instructions'
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
+import { SYSTEM_PROGRAM_ID } from './core/api'
 
 export const withCreateProgramGovernance = async (
   instructions: TransactionInstruction[],
@@ -18,9 +20,9 @@ export const withCreateProgramGovernance = async (
   programUpgradeAuthority: PublicKey,
   tokenOwnerRecord: PublicKey,
   payer: PublicKey,
-  systemId: PublicKey,
-  bpfUpgradableLoaderId: PublicKey
+  governanceAuthority: PublicKey
 ): Promise<{ governanceAddress: PublicKey }> => {
+  const systemId = SYSTEM_PROGRAM_ID
   const args = new CreateProgramGovernanceArgs({
     config,
     transferUpgradeAuthority,
@@ -38,7 +40,7 @@ export const withCreateProgramGovernance = async (
 
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [governedProgram.toBuffer()],
-    bpfUpgradableLoaderId
+    BPF_UPGRADE_LOADER_ID
   )
 
   const keys = [
@@ -78,7 +80,7 @@ export const withCreateProgramGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: bpfUpgradableLoaderId,
+      pubkey: BPF_UPGRADE_LOADER_ID,
       isWritable: false,
       isSigner: false,
     },
@@ -91,6 +93,11 @@ export const withCreateProgramGovernance = async (
       pubkey: SYSVAR_RENT_PUBKEY,
       isWritable: false,
       isSigner: false,
+    },
+    {
+      pubkey: governanceAuthority,
+      isWritable: false,
+      isSigner: true,
     },
   ]
 

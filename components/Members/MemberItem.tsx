@@ -6,7 +6,7 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import { TokenRecordsWithWalletAddress } from './types'
 import tokenService from '@utils/services/token'
-import useMembersListStore from 'stores/useMembersListStore'
+import useMembersListStore from 'stores/useMembersStore'
 import { ViewState } from './types'
 import { useMemo } from 'react'
 
