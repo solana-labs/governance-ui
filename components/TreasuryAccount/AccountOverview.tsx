@@ -69,18 +69,16 @@ const AccountOverview = () => {
         </Button>
 
         <Button
+          tooltipMessage={
+            !canUseTransferInstruction
+              ? 'You need to have connected wallet with ability to create token transfer proposals'
+              : ''
+          }
           className="sm:w-1/2 text-sm py-2.5"
           onClick={() => setCurrentCompactView(ViewState.Send)}
           disabled={!canUseTransferInstruction}
         >
-          <Tooltip
-            content={
-              !canUseTransferInstruction &&
-              'You need to have connected wallet with ability to create token transfer proposals'
-            }
-          >
-            <div>Send</div>
-          </Tooltip>
+          Send
         </Button>
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">

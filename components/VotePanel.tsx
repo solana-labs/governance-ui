@@ -145,45 +145,35 @@ const VotePanel = () => {
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
-            {isVoteCast ? (
-              <Tooltip content={withdrawTooltipContent}>
-                <Button
-                  className="w-full"
-                  onClick={() => submitRelinquishVote()}
-                  disabled={!isWithdrawEnabled}
-                >
-                  {isVoting ? 'Withdraw' : 'Release Tokens'}
-                </Button>
-              </Tooltip>
+            {!isVoteCast ? (
+              <Button
+                tooltipMessage={withdrawTooltipContent}
+                onClick={() => submitRelinquishVote()}
+                disabled={!isWithdrawEnabled}
+              >
+                {isVoting ? 'Withdraw' : 'Release Tokens'}
+              </Button>
             ) : (
               <>
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
-                    <Tooltip
-                      contentClassName={`${voteTooltipContent && 'w-1/2'}`}
-                      content={voteTooltipContent}
+                    <Button
+                      tooltipMessage={voteTooltipContent}
+                      className="w-1/2"
+                      onClick={() => handleShowVoteModal(Vote.Yes)}
+                      disabled={!isVoteEnabled}
                     >
-                      <Button
-                        className={`${voteTooltipContent ? 'w-full' : 'w-1/2'}`}
-                        onClick={() => handleShowVoteModal(Vote.Yes)}
-                        disabled={!isVoteEnabled}
-                      >
-                        Approve
-                      </Button>
-                    </Tooltip>
+                      Approve
+                    </Button>
 
-                    <Tooltip
-                      contentClassName={`${voteTooltipContent && 'w-1/2'}`}
-                      content={voteTooltipContent}
+                    <Button
+                      tooltipMessage={voteTooltipContent}
+                      className="w-1/2"
+                      onClick={() => handleShowVoteModal(Vote.No)}
+                      disabled={!isVoteEnabled}
                     >
-                      <Button
-                        className={`${voteTooltipContent ? 'w-full' : 'w-1/2'}`}
-                        onClick={() => handleShowVoteModal(Vote.No)}
-                        disabled={!isVoteEnabled}
-                      >
-                        Deny
-                      </Button>
-                    </Tooltip>
+                      Deny
+                    </Button>
                   </div>
                 )}
               </>

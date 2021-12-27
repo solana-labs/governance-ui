@@ -233,15 +233,14 @@ const NewAccountForm = () => {
         setFormErrors={setFormErrors}
       ></BaseGovernanceForm>
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-        <Tooltip content={!connected && 'Please connect your wallet'}>
-          <Button
-            disabled={!connected || isLoading}
-            isLoading={isLoading}
-            onClick={handleCreate}
-          >
-            Create
-          </Button>
-        </Tooltip>
+        <Button
+          tooltipMessage={!connected ? 'Please connect your wallet' : ''}
+          disabled={!connected || isLoading}
+          isLoading={isLoading}
+          onClick={handleCreate}
+        >
+          Create
+        </Button>
       </div>
     </div>
   )

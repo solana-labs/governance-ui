@@ -306,25 +306,23 @@ const TokenDeposit = ({
       </p>
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-        <Tooltip contentClassName="sm:w-1/2" content={depositTooltipContent}>
-          <Button
-            className={`${depositTooltipContent ? 'w-full' : 'w-1/2'}`}
-            disabled={!connected || !hasTokensInWallet}
-            onClick={depositAllTokens}
-          >
-            Deposit
-          </Button>
-        </Tooltip>
+        <Button
+          tooltipMessage={depositTooltipContent}
+          className="sm:w-1/2"
+          disabled={!connected || !hasTokensInWallet}
+          onClick={depositAllTokens}
+        >
+          Deposit
+        </Button>
 
-        <Tooltip contentClassName="sm:w-1/2" content={withdrawTooltipContent}>
-          <Button
-            className={`${withdrawTooltipContent ? 'w-full' : 'w-1/2'}`}
-            disabled={!connected || !hasTokensDeposited}
-            onClick={withdrawAllTokens}
-          >
-            Withdraw
-          </Button>
-        </Tooltip>
+        <Button
+          tooltipMessage={withdrawTooltipContent}
+          className="sm:w-1/2"
+          disabled={!connected || !hasTokensDeposited}
+          onClick={withdrawAllTokens}
+        >
+          Withdraw
+        </Button>
       </div>
     </>
   )

@@ -91,6 +91,14 @@ const ProposalActionsPanel = () => {
     ? 'Only the owner of the proposal can execute this action'
     : ''
 
+  const finalizeVoteTooltipContent = !connected
+    ? 'Connect your wallet to finalize this proposal'
+    : !hasVoteTimeExpired
+    ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
+    : proposal?.info.state === ProposalState.Voting
+    ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
+    : ''
+
   return (
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
@@ -100,31 +108,30 @@ const ProposalActionsPanel = () => {
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
             {canSignOff && (
-              <Tooltip contentClassName="w-1/2" content={signOffTooltipContent}>
-                <Button
-                  className={`${signOffTooltipContent ? 'w-full' : 'w-1/2'}`}
-                  onClick={() => setShowSignOffModal(true)}
-                  disabled={!connected || !canSignOff}
-                >
-                  Sign Off
-                </Button>
-              </Tooltip>
+              <Button
+                tooltipMessage={signOffTooltipContent}
+                className="w-1/2"
+                onClick={() => setShowSignOffModal(true)}
+                disabled={!connected || !canSignOff}
+              >
+                Sign Off
+              </Button>
             )}
 
             {canCancelProposal && (
-              <Tooltip contentClassName="w-1/2" content={cancelTooltipContent}>
-                <SecondaryButton
-                  className={`${cancelTooltipContent ? 'w-full' : 'w-1/2'}`}
-                  onClick={() => setShowCancelModal(true)}
-                  disabled={!connected}
-                >
-                  Cancel
-                </SecondaryButton>
-              </Tooltip>
+              <SecondaryButton
+                tooltipMessage={cancelTooltipContent}
+                className="w-1/2"
+                onClick={() => setShowCancelModal(true)}
+                disabled={!connected}
+              >
+                Cancel
+              </SecondaryButton>
             )}
 
             {canFinalizeVote && (
               <Button
+                tooltipMessage={finalizeVoteTooltipContent}
                 className="w-1/2"
                 onClick={() => setShowFinalizeVoteModal(true)}
                 disabled={!connected || !canFinalizeVote}

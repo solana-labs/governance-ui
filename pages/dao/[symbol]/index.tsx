@@ -96,7 +96,7 @@ const REALM = () => {
                   content={
                     toManyCommunityOutstandingProposalsForUser &&
                     toManyCouncilOutstandingProposalsForUse
-                      ? 'You have to many outstanding proposals'
+                      ? 'You have too many outstanding proposals'
                       : ''
                   }
                 >
