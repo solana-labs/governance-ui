@@ -8,6 +8,7 @@ import Button, { SecondaryButton } from './Button'
 import CancelProposalModal from './CancelProposalModal'
 import FinalizeVotesModal from './FinalizeVotesModal'
 import SignOffProposalModal from './SignOffProposalModal'
+import Tooltip from './Tooltip'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -65,6 +66,31 @@ const ProposalActionsPanel = () => {
       wallet.publicKey
     )
 
+  const signOffTooltipContent = !connected
+    ? 'Connect your wallet to sign off this proposal'
+    : !signatoryRecord
+    ? 'No signatory record'
+    : !(
+        proposal?.info.state === ProposalState.Draft ||
+        proposal?.info.state === ProposalState.SigningOff
+      )
+    ? 'Invalid proposal state. To sign off a proposal, it must be a draft or be in signing off state after creation.'
+    : ''
+
+  const cancelTooltipContent = !connected
+    ? 'Connect your wallet to cancel this proposal'
+    : proposal &&
+      governance &&
+      proposalOwner &&
+      wallet?.publicKey &&
+      !proposal?.info.canWalletCancel(
+        governance.info,
+        proposalOwner.info,
+        wallet.publicKey
+      )
+    ? 'Only the owner of the proposal can execute this action'
+    : ''
+
   return (
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
@@ -74,23 +100,27 @@ const ProposalActionsPanel = () => {
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
             {canSignOff && (
-              <Button
-                className="w-1/2"
-                onClick={() => setShowSignOffModal(true)}
-                disabled={!connected || !canSignOff}
-              >
-                Sign Off
-              </Button>
+              <Tooltip contentClassName="w-1/2" content={signOffTooltipContent}>
+                <Button
+                  className={`${signOffTooltipContent ? 'w-full' : 'w-1/2'}`}
+                  onClick={() => setShowSignOffModal(true)}
+                  disabled={!connected || !canSignOff}
+                >
+                  Sign Off
+                </Button>
+              </Tooltip>
             )}
 
             {canCancelProposal && (
-              <SecondaryButton
-                className="w-1/2"
-                onClick={() => setShowCancelModal(true)}
-                disabled={!connected}
-              >
-                Cancel
-              </SecondaryButton>
+              <Tooltip contentClassName="w-1/2" content={cancelTooltipContent}>
+                <SecondaryButton
+                  className={`${cancelTooltipContent ? 'w-full' : 'w-1/2'}`}
+                  onClick={() => setShowCancelModal(true)}
+                  disabled={!connected}
+                >
+                  Cancel
+                </SecondaryButton>
+              </Tooltip>
             )}
 
             {canFinalizeVote && (

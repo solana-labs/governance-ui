@@ -22,6 +22,7 @@ import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { chunks } from '@utils/helpers'
+import Tooltip from './Tooltip'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -56,14 +57,14 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             <TokenDeposit
               mint={mint}
               tokenType={GoverningTokenType.Community}
-            ></TokenDeposit>
+            />
           )}
           {councilDepositVisible && (
             <div className="mt-4">
               <TokenDeposit
                 mint={councilMint}
                 tokenType={GoverningTokenType.Council}
-              ></TokenDeposit>
+              />
             </div>
           )}
         </>
@@ -274,37 +275,56 @@ const TokenDeposit = ({
     depositTokenRecord &&
     depositTokenRecord.info.governingTokenDepositAmount.gt(new BN(0))
 
+  const depositTooltipContent = !connected
+    ? 'Connect your wallet to deposit'
+    : !hasTokensInWallet
+    ? "You don't have enough tokens in your wallet. Withdraw some tokens to be able to deposit."
+    : ''
+
+  const withdrawTooltipContent = !connected
+    ? 'Connect your wallet to withdraw'
+    : !hasTokensDeposited
+    ? "You don't have any tokens deposited. Deposit some tokens to be able to withdraw."
+    : ''
+
+  const availableTokens =
+    depositTokenRecord && mint
+      ? fmtMintAmount(mint, depositTokenRecord.info.governingTokenDepositAmount)
+      : '0'
+
   return (
     <>
-      <div className="flex space-x-4 items-center pb-6">
+      <div className="flex space-x-4 items-center mt-8">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <h3 className="mb-0">
-            {depositTokenRecord && mint
-              ? fmtMintAmount(
-                  mint,
-                  depositTokenRecord.info.governingTokenDepositAmount
-                )
-              : '0'}
-          </h3>
+          <h3 className="mb-0">{availableTokens}</h3>
         </div>
       </div>
 
+      <p className="mt-2 opacity-70 mb-4 ml-1 text-xs">
+        You have {availableTokens} tokens available.
+      </p>
+
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-        <Button
-          className="sm:w-1/2"
-          disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
-        >
-          Deposit
-        </Button>
-        <Button
-          className="sm:w-1/2"
-          disabled={!connected || !hasTokensDeposited}
-          onClick={withdrawAllTokens}
-        >
-          Withdraw
-        </Button>
+        <Tooltip contentClassName="sm:w-1/2" content={depositTooltipContent}>
+          <Button
+            className={`${depositTooltipContent ? 'w-full' : 'w-1/2'}`}
+            disabled={!connected || !hasTokensInWallet}
+            onClick={depositAllTokens}
+          >
+            Deposit
+          </Button>
+        </Tooltip>
+
+        <Tooltip contentClassName="sm:w-1/2" content={withdrawTooltipContent}>
+          <Button
+            className={`${withdrawTooltipContent ? 'w-full' : 'w-1/2'}`}
+            disabled={!connected || !hasTokensDeposited}
+            onClick={withdrawAllTokens}
+          >
+            Withdraw
+          </Button>
+        </Tooltip>
       </div>
     </>
   )
