@@ -4,7 +4,6 @@ import BaseGovernanceForm, {
 import Button from 'components/Button'
 import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
-import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
 import { RpcContext } from 'models/core/api'

@@ -8,7 +8,6 @@ import Button, { SecondaryButton } from './Button'
 import CancelProposalModal from './CancelProposalModal'
 import FinalizeVotesModal from './FinalizeVotesModal'
 import SignOffProposalModal from './SignOffProposalModal'
-import Tooltip from './Tooltip'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(

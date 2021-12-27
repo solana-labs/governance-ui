@@ -22,7 +22,6 @@ import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { chunks } from '@utils/helpers'
-import Tooltip from './Tooltip'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()

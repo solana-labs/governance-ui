@@ -1,7 +1,6 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
-import Tooltip from '@components/Tooltip'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'

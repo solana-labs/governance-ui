@@ -13,7 +13,6 @@ import { GoverningTokenType } from '../models/enums'
 import { Vote } from '../models/instructions'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
-import Tooltip from './Tooltip'
 import VoteCommentModal from './VoteCommentModal'
 
 const VotePanel = () => {
