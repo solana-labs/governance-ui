@@ -13,6 +13,7 @@ import { GoverningTokenType } from '../models/enums'
 import { Vote } from '../models/instructions'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
+import Tooltip from './Tooltip'
 import VoteCommentModal from './VoteCommentModal'
 
 const VotePanel = () => {
@@ -115,6 +116,26 @@ const VotePanel = () => {
     ? 'Withdraw your vote'
     : 'Release your tokens'
 
+  const withdrawTooltipContent = !connected
+    ? 'You need to connect your wallet'
+    : !isWithdrawEnabled
+    ? !ownVoteRecord?.info.isRelinquished
+      ? 'Owner vote record is not relinquished'
+      : 'The proposal is not in a valid state to execute this action.'
+    : ''
+
+  const voteTooltipContent = !connected
+    ? 'You need to connect your wallet to be able to vote'
+    : !isVoteEnabled
+    ? !isVoting && isVoteCast
+      ? 'Proposal is not in a voting state anymore.'
+      : !voterTokenRecord
+      ? 'No voter token record found.'
+      : voterTokenRecord.info.governingTokenDepositAmount.isZero()
+      ? 'No governing token deposit amount found. You need to deposit some tokens first.'
+      : ''
+    : ''
+
   return (
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
@@ -125,30 +146,44 @@ const VotePanel = () => {
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast ? (
-              <Button
-                onClick={() => submitRelinquishVote()}
-                disabled={!isWithdrawEnabled}
-              >
-                {isVoting ? 'Withdraw' : 'Release Tokens'}
-              </Button>
+              <Tooltip content={withdrawTooltipContent}>
+                <Button
+                  className="w-full"
+                  onClick={() => submitRelinquishVote()}
+                  disabled={!isWithdrawEnabled}
+                >
+                  {isVoting ? 'Withdraw' : 'Release Tokens'}
+                </Button>
+              </Tooltip>
             ) : (
               <>
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
-                    <Button
-                      className="w-1/2"
-                      onClick={() => handleShowVoteModal(Vote.Yes)}
-                      disabled={!isVoteEnabled}
+                    <Tooltip
+                      contentClassName={`${voteTooltipContent && 'w-1/2'}`}
+                      content={voteTooltipContent}
                     >
-                      Approve
-                    </Button>
-                    <Button
-                      className="w-1/2"
-                      onClick={() => handleShowVoteModal(Vote.No)}
-                      disabled={!isVoteEnabled}
+                      <Button
+                        className={`${voteTooltipContent ? 'w-full' : 'w-1/2'}`}
+                        onClick={() => handleShowVoteModal(Vote.Yes)}
+                        disabled={!isVoteEnabled}
+                      >
+                        Approve
+                      </Button>
+                    </Tooltip>
+
+                    <Tooltip
+                      contentClassName={`${voteTooltipContent && 'w-1/2'}`}
+                      content={voteTooltipContent}
                     >
-                      Deny
-                    </Button>
+                      <Button
+                        className={`${voteTooltipContent ? 'w-full' : 'w-1/2'}`}
+                        onClick={() => handleShowVoteModal(Vote.No)}
+                        disabled={!isVoteEnabled}
+                      >
+                        Deny
+                      </Button>
+                    </Tooltip>
                   </div>
                 )}
               </>
