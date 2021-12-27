@@ -1,7 +1,13 @@
 import { Portal } from 'react-portal'
 import { XIcon } from '@heroicons/react/outline'
 
-const Modal = ({ isOpen, onClose, children, hideClose = false }) => {
+const Modal = ({
+  isOpen,
+  onClose,
+  children,
+  hideClose = false,
+  sizeClassName = 'sm:max-w-md',
+}) => {
   return (
     <Portal>
       <div
@@ -28,9 +34,9 @@ const Modal = ({ isOpen, onClose, children, hideClose = false }) => {
 
           {isOpen ? (
             <div
-              className="inline-block bg-bkg-2 
+              className={`inline-block bg-bkg-2 
               rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all 
-              sm:my-8 align-middle sm:max-w-md w-full"
+              sm:my-8 align-middle ${sizeClassName} w-full`}
             >
               {!hideClose ? (
                 <div className="">

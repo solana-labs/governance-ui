@@ -70,7 +70,16 @@ export const ACCOUNT_NAMES = {
   // Marinade DAO
   B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
   GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
+
+  // MonkOG DAO
+  CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
 }
+
+// Blacklisted governances which should not be displayed in the UI
+// TODO: Add this to on-chain metadata to Governance account
+export const HIDDEN_GOVERNANCES = new Map<string, string>([
+  ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
+])
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
