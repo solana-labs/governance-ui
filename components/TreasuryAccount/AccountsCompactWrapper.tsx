@@ -53,9 +53,9 @@ const AccountsCompactWrapper = () => {
                     : !canCreateGovernance
                     ? "You don't have enough governance power to create a new treasury account"
                     : toManyCommunityOutstandingProposalsForUser
-                    ? 'You have too many community outstanding proposals. You need to finalize them before a new treasury account.'
+                    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new treasury account.'
                     : toManyCouncilOutstandingProposalsForUse
-                    ? 'You have too many council outstanding proposals. You need to finalize them before a new treasury account.'
+                    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new treasury account.'
                     : ''
                 }
               >

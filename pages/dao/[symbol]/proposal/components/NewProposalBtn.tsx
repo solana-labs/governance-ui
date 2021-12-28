@@ -35,9 +35,9 @@ const NewProposalBtn = () => {
       )
     ? "You don't have enough governance power to create a new proposal"
     : toManyCommunityOutstandingProposalsForUser
-    ? 'Too many community outstanding proposals. You need to finalize them before create a new one.'
+    ? 'Too many community outstanding proposals. You need to finalize them before creating a new one.'
     : toManyCouncilOutstandingProposalsForUse
-    ? 'Too many council outstanding proposals. You need to finalize them before create a new one.'
+    ? 'Too many council outstanding proposals. You need to finalize them before creating a new one.'
     : ''
 
   return (
