@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -20,7 +20,7 @@ export const registerGovernance = async (
   tokenOwnerRecord: PublicKey
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   let governanceAddress
   const governanceAuthority = walletPubkey
 

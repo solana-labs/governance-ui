@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -19,7 +19,7 @@ export const flagInstructionError = async (
 ) => {
   const governanceAuthority = walletPubkey
 
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   withFlagInstructionError(

@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   Connection,
   PublicKey,
   TransactionInstruction,
@@ -185,10 +185,10 @@ export function approveTokenTransfer(
 
   // if delegate is not passed ephemeral transfer authority is used
   delegate?: PublicKey,
-  existingTransferAuthority?: Account
-): Account {
+  existingTransferAuthority?: Keypair
+): Keypair {
   const tokenProgram = TOKEN_PROGRAM_ID
-  const transferAuthority = existingTransferAuthority || new Account()
+  const transferAuthority = existingTransferAuthority || new Keypair()
 
   // Coerce amount to u64 in case it's deserialized as BN which differs by buffer conversion functions only
   // Without the coercion createApproveInstruction would fail because it won't be able to serialize it

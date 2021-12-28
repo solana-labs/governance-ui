@@ -1,4 +1,4 @@
-import { Account, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import { RpcContext } from '../models/core/api'
 import { Proposal } from '@models/accounts'
@@ -11,7 +11,7 @@ export const cancelProposal = async (
   proposal: ParsedAccount<Proposal> | undefined
 ) => {
   const instructions: TransactionInstruction[] = []
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const governanceAuthority = walletPubkey
 
   withCancelProposal(
