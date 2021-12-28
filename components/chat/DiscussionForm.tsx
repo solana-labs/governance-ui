@@ -10,6 +10,7 @@ import {
 } from '../../models/chat/accounts'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
+import Tooltip from '@components/Tooltip'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -61,6 +62,14 @@ const DiscussionForm = () => {
   const postEnabled =
     proposal && connected && ownVoterWeight.hasAnyWeight() && comment
 
+  const tooltipContent = !connected
+    ? 'Connect your wallet to send a comment'
+    : !ownVoterWeight.hasAnyWeight()
+    ? 'You need to have deposited some tokens to submit your comment.'
+    : !comment
+    ? 'Write a comment to submit'
+    : ''
+
   return (
     <>
       <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
@@ -70,13 +79,16 @@ const DiscussionForm = () => {
           onChange={(e) => setComment(e.target.value)}
           placeholder="Thoughts?..."
         />
-        <Button
-          className="flex-shrink-0"
-          onClick={() => submitComment()}
-          disabled={!postEnabled || !comment}
-        >
-          {submitting ? <Loading /> : <span>Send It</span>}
-        </Button>
+
+        <Tooltip contentClassName="flex-shrink-0" content={tooltipContent}>
+          <Button
+            className="flex-shrink-0"
+            onClick={() => submitComment()}
+            disabled={!postEnabled || !comment}
+          >
+            {submitting ? <Loading /> : <span>Send It</span>}
+          </Button>
+        </Tooltip>
       </div>
     </>
   )
