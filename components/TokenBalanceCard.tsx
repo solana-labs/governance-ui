@@ -23,7 +23,13 @@ import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { chunks } from '@utils/helpers'
 
-const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
+const TokenBalanceCard = ({
+  proposal,
+  councilVotes,
+}: {
+  proposal?: Option<Proposal>
+  councilVotes?: boolean
+}) => {
   const { councilMint, mint, realm } = useRealm()
 
   const isDepositVisible = (
@@ -56,6 +62,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             <TokenDeposit
               mint={mint}
               tokenType={GoverningTokenType.Community}
+              councilVote={false}
             />
           )}
           {councilDepositVisible && (
@@ -63,6 +70,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
               <TokenDeposit
                 mint={councilMint}
                 tokenType={GoverningTokenType.Council}
+                councilVote={true}
               />
             </div>
           )}
@@ -80,9 +88,11 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 const TokenDeposit = ({
   mint,
   tokenType,
+  councilVote,
 }: {
   mint: MintInfo | undefined
   tokenType: GoverningTokenType
+  councilVote?: boolean
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -100,6 +110,8 @@ const TokenDeposit = ({
     councilTokenAccount,
     proposals,
     governances,
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
@@ -277,19 +289,34 @@ const TokenDeposit = ({
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'
     : !hasTokensInWallet
-    ? "You don't have enough tokens in your wallet. Withdraw some tokens to be able to deposit."
+    ? "You don't have any governance tokens in your wallet to deposit."
     : ''
 
   const withdrawTooltipContent = !connected
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited
-    ? "You don't have any tokens deposited. Deposit some tokens to be able to withdraw."
+    ? "You don't have any tokens deposited to withdraw."
+    : !councilVote &&
+      (toManyCouncilOutstandingProposalsForUse ||
+        toManyCommunityOutstandingProposalsForUser)
+    ? "You don't have any governance tokens to withdraw."
     : ''
 
   const availableTokens =
     depositTokenRecord && mint
       ? fmtMintAmount(mint, depositTokenRecord.info.governingTokenDepositAmount)
       : '0'
+
+  const canShowAvailableTokensMessage =
+    !hasTokensDeposited && hasTokensInWallet && connected
+  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
+  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  const tokensToShow =
+    canDepositToken && depositTokenAccount
+      ? fmtMintAmount(mint, depositTokenAccount.account.amount)
+      : canDepositToken
+      ? availableTokens
+      : 0
 
   return (
     <>
@@ -300,11 +327,15 @@ const TokenDeposit = ({
         </div>
       </div>
 
-      <p className="mt-2 opacity-70 mb-4 ml-1 text-xs">
-        You have {availableTokens} tokens available.
+      <p
+        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+          canShowAvailableTokensMessage ? 'block' : 'hidden'
+        }`}
+      >
+        You have {tokensToShow} tokens available to {canExecuteAction}.
       </p>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
           tooltipMessage={depositTooltipContent}
           className="sm:w-1/2"
@@ -317,7 +348,12 @@ const TokenDeposit = ({
         <Button
           tooltipMessage={withdrawTooltipContent}
           className="sm:w-1/2"
-          disabled={!connected || !hasTokensDeposited}
+          disabled={
+            !connected ||
+            !hasTokensDeposited ||
+            (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
+            toManyCouncilOutstandingProposalsForUse
+          }
           onClick={withdrawAllTokens}
         >
           Withdraw

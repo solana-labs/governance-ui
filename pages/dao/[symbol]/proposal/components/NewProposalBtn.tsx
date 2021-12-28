@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { PlusCircleIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import React, { useEffect } from 'react'
+import React from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import Tooltip from '@components/Tooltip'
 
@@ -20,10 +20,6 @@ const NewProposalBtn = () => {
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
 
-  useEffect(() => {
-    console.log('governance realm 8099', governances)
-  }, [])
-
   const canCreateProposal =
     realm &&
     Object.values(governances).some((g) =>
@@ -38,9 +34,10 @@ const NewProposalBtn = () => {
         ownVoterWeight.canCreateProposal(g.info.config)
       )
     ? "You don't have enough governance power to create a new proposal"
-    : toManyCommunityOutstandingProposalsForUser &&
-      toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many outstanding proposals'
+    : toManyCommunityOutstandingProposalsForUser
+    ? 'Too many community outstanding proposals. You need to finalize them before create a new one.'
+    : toManyCouncilOutstandingProposalsForUse
+    ? 'Too many council outstanding proposals. You need to finalize them before create a new one.'
     : ''
 
   return (

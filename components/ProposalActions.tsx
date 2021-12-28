@@ -68,7 +68,7 @@ const ProposalActionsPanel = () => {
   const signOffTooltipContent = !connected
     ? 'Connect your wallet to sign off this proposal'
     : !signatoryRecord
-    ? 'No signatory record'
+    ? 'Only a  signatory of the proposal can sign it off'
     : !(
         proposal?.info.state === ProposalState.Draft ||
         proposal?.info.state === ProposalState.SigningOff
