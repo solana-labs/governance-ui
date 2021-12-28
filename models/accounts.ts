@@ -624,6 +624,32 @@ export class Proposal {
       proposalOwner.governanceDelegate?.equals(walletPk)
     )
   }
+
+  canFinalize(governance: Governance) {
+    if (
+      this.state === ProposalState.Voting ||
+      this.hasVoteTimeEnded(governance)
+    ) {
+      return true
+    }
+
+    return false
+  }
+
+  canWalletFinalize(
+    governance: Governance,
+    proposalOwner: TokenOwnerRecord,
+    walletPk: PublicKey
+  ) {
+    if (!this.canFinalize(governance)) {
+      return false
+    }
+
+    return (
+      proposalOwner.governingTokenOwner.equals(walletPk) ||
+      proposalOwner.governanceDelegate?.equals(walletPk)
+    )
+  }
 }
 
 export class SignatoryRecord {
