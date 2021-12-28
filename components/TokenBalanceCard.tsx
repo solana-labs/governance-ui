@@ -1,6 +1,6 @@
 import { MintInfo } from '@solana/spl-token'
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -56,14 +56,16 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             <TokenDeposit
               mint={mint}
               tokenType={GoverningTokenType.Community}
-            ></TokenDeposit>
+              councilVote={false}
+            />
           )}
           {councilDepositVisible && (
             <div className="mt-4">
               <TokenDeposit
                 mint={councilMint}
                 tokenType={GoverningTokenType.Council}
-              ></TokenDeposit>
+                councilVote={true}
+              />
             </div>
           )}
         </>
@@ -80,9 +82,11 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 const TokenDeposit = ({
   mint,
   tokenType,
+  councilVote,
 }: {
   mint: MintInfo | undefined
   tokenType: GoverningTokenType
+  councilVote?: boolean
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -100,6 +104,8 @@ const TokenDeposit = ({
     councilTokenAccount,
     proposals,
     governances,
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
@@ -129,7 +135,7 @@ const TokenDeposit = ({
 
   const depositTokens = async function (amount: BN) {
     const instructions: TransactionInstruction[] = []
-    const signers: Account[] = []
+    const signers: Keypair[] = []
 
     const transferAuthority = approveTokenTransfer(
       instructions,
@@ -274,33 +280,74 @@ const TokenDeposit = ({
     depositTokenRecord &&
     depositTokenRecord.info.governingTokenDepositAmount.gt(new BN(0))
 
+  const depositTooltipContent = !connected
+    ? 'Connect your wallet to deposit'
+    : !hasTokensInWallet
+    ? "You don't have any governance tokens in your wallet to deposit."
+    : ''
+
+  const withdrawTooltipContent = !connected
+    ? 'Connect your wallet to withdraw'
+    : !hasTokensDeposited
+    ? "You don't have any tokens deposited to withdraw."
+    : !councilVote &&
+      (toManyCouncilOutstandingProposalsForUse ||
+        toManyCommunityOutstandingProposalsForUser)
+    ? "You don't have any governance tokens to withdraw."
+    : ''
+
+  const availableTokens =
+    depositTokenRecord && mint
+      ? fmtMintAmount(mint, depositTokenRecord.info.governingTokenDepositAmount)
+      : '0'
+
+  const canShowAvailableTokensMessage =
+    !hasTokensDeposited && hasTokensInWallet && connected
+  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
+  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  const tokensToShow =
+    canDepositToken && depositTokenAccount
+      ? fmtMintAmount(mint, depositTokenAccount.account.amount)
+      : canDepositToken
+      ? availableTokens
+      : 0
+
   return (
     <>
-      <div className="flex space-x-4 items-center pb-6">
+      <div className="flex space-x-4 items-center mt-8">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <h3 className="mb-0">
-            {depositTokenRecord && mint
-              ? fmtMintAmount(
-                  mint,
-                  depositTokenRecord.info.governingTokenDepositAmount
-                )
-              : '0'}
-          </h3>
+          <h3 className="mb-0">{availableTokens}</h3>
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+      <p
+        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+          canShowAvailableTokensMessage ? 'block' : 'hidden'
+        }`}
+      >
+        You have {tokensToShow} tokens available to {canExecuteAction}.
+      </p>
+
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
+          tooltipMessage={depositTooltipContent}
           className="sm:w-1/2"
           disabled={!connected || !hasTokensInWallet}
           onClick={depositAllTokens}
         >
           Deposit
         </Button>
+
         <Button
+          tooltipMessage={withdrawTooltipContent}
           className="sm:w-1/2"
-          disabled={!connected || !hasTokensDeposited}
+          disabled={
+            !connected ||
+            !hasTokensDeposited ||
+            (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
+            toManyCouncilOutstandingProposalsForUse
+          }
           onClick={withdrawAllTokens}
         >
           Withdraw

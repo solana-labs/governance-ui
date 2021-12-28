@@ -115,17 +115,41 @@ const VotePanel = () => {
     ? 'Withdraw your vote'
     : 'Release your tokens'
 
+  const withdrawTooltipContent = !connected
+    ? 'You need to connect your wallet'
+    : !isWithdrawEnabled
+    ? !ownVoteRecord?.info.isRelinquished
+      ? 'Owner vote record is not relinquished'
+      : 'The proposal is not in a valid state to execute this action.'
+    : ''
+
+  const voteTooltipContent = !connected
+    ? 'You need to connect your wallet to be able to vote'
+    : !isVoteEnabled
+    ? !isVoting && isVoteCast
+      ? 'Proposal is not in a voting state anymore.'
+      : !voterTokenRecord
+      ? 'No voter token record found.'
+      : voterTokenRecord.info.governingTokenDepositAmount.isZero()
+      ? 'No governing token deposit amount found. You need to deposit some tokens first.'
+      : ''
+    : ''
+
   return (
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
       ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Draft === proposal?.info.state ? null : (
+      ProposalState.Draft === proposal?.info.state ||
+      (!isVoting && !isVoteCast) ||
+      (connected && isVoteCast && !isWithdrawEnabled) ||
+      !connected ? null : (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast ? (
               <Button
+                tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
                 disabled={!isWithdrawEnabled}
               >
@@ -136,13 +160,16 @@ const VotePanel = () => {
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
                     <Button
+                      tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(Vote.Yes)}
                       disabled={!isVoteEnabled}
                     >
                       Approve
                     </Button>
+
                     <Button
+                      tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(Vote.No)}
                       disabled={!isVoteEnabled}

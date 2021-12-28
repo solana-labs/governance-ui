@@ -5,7 +5,6 @@ import {
   fmtPercentage,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
-  getMintSupplyAsDecimal,
   getMintSupplyFractionAsDecimalPercentage,
   getMintSupplyPercentageAsDecimal,
   parseMintNaturalAmountFromDecimal,
@@ -76,10 +75,14 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
   // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
   const minTokenStep = Math.max(mintSupply1Percent, minTokenAmount)
 
-  const maxTokenAmount =
-    !realmMint?.supply?.isZero() && realmMint
-      ? getMintSupplyAsDecimal(realmMint)
-      : undefined
+  const getSupplyPercent = () => {
+    const hasMinTokensPercentage =
+      !!minTokensPercentage && !isNaN(minTokensPercentage)
+    const percent = hasMinTokensPercentage
+      ? fmtPercentage(minTokensPercentage)
+      : ''
+    return hasMinTokensPercentage && <div>{`${percent} of token supply`}</div>
+  }
 
   useEffect(() => {
     onMinTokensChange(form.minCommunityTokensToCreateProposal)
@@ -93,7 +96,6 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         type="number"
         name="minCommunityTokensToCreateProposal"
         min={minTokenAmount}
-        max={maxTokenAmount}
         step={minTokenStep}
         onBlur={validateMinMax}
         onChange={(evt) =>
@@ -104,11 +106,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         }
         error={formErrors['minCommunityTokensToCreateProposal']}
       />
-      {maxTokenAmount &&
-        !!minTokensPercentage &&
-        !isNaN(minTokensPercentage) && (
-          <div>{`${fmtPercentage(minTokensPercentage)} of token supply`}</div>
-        )}
+      {getSupplyPercent()}
       <Input
         label="min instruction hold up time (days)"
         value={form.minInstructionHoldUpTime}

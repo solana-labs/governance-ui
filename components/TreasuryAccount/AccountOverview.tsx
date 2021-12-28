@@ -1,7 +1,6 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
-import Tooltip from '@components/Tooltip'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
@@ -41,7 +40,7 @@ const AccountOverview = () => {
         <>
           <ArrowLeftIcon
             onClick={handleGoBackToMainView}
-            className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
+            className="h-4 w-4 text-primary-light mr-2 hover:cursor-pointer"
           />
           {currentAccount?.token?.publicKey &&
           getAccountName(currentAccount?.token?.publicKey) ? (
@@ -69,18 +68,16 @@ const AccountOverview = () => {
         </Button>
 
         <Button
+          tooltipMessage={
+            !canUseTransferInstruction
+              ? 'You need to have connected wallet with ability to create token transfer proposals'
+              : ''
+          }
           className="sm:w-1/2 text-sm py-2.5"
           onClick={() => setCurrentCompactView(ViewState.Send)}
           disabled={!canUseTransferInstruction}
         >
-          <Tooltip
-            content={
-              !canUseTransferInstruction &&
-              'You need to have connected wallet with ability to create token transfer proposals'
-            }
-          >
-            <div>Send</div>
-          </Tooltip>
+          Send
         </Button>
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">

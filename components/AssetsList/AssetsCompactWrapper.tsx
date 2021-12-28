@@ -9,17 +9,39 @@ import AssetOverview from './AssetOverview'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import UpgradeProgram from './UpgradeProgram'
+import useWalletStore from 'stores/useWalletStore'
 const NEW_PROGRAM_VIEW = `/program/new`
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
-  const { symbol } = useRealm()
+  const {
+    symbol,
+    realm,
+    ownVoterWeight,
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
+  } = useRealm()
+  const connected = useWalletStore((s) => s.connected)
   const { resetCompactViewState } = useAssetsStore()
   const currentView = useAssetsStore((s) => s.compact.currentView)
   const { fmtUrlWithCluster } = useQueryContext()
   const goToNewAssetForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
   }
+  const canCreateGovernance = realm
+    ? ownVoterWeight.canCreateGovernance(realm)
+    : null
+
+  const addNewAssetTooltip = !connected
+    ? 'Connect your wallet to create new asset'
+    : !canCreateGovernance
+    ? "You don't have enough governance power to create a new asset"
+    : toManyCommunityOutstandingProposalsForUser
+    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new asset.'
+    : toManyCouncilOutstandingProposalsForUse
+    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new asset.'
+    : ''
+
   useEffect(() => {
     resetCompactViewState()
   }, [symbol])
@@ -30,13 +52,16 @@ const AssetsCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Assets
-              <Tooltip contentClassName="ml-auto" content={''}>
+              <Tooltip contentClassName="ml-auto" content={addNewAssetTooltip}>
                 <div
                   onClick={goToNewAssetForm}
                   className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
-                rounded-lg hover:bg-bkg-3 ml-auto 
-                hover:cursor-pointer`}
+                rounded-lg hover:bg-bkg-3 ml-auto ${
+                  addNewAssetTooltip
+                    ? 'cursor-not-allowed pointer-events-none opacity-60'
+                    : 'cursor-pointer'
+                }`}
                 >
                   <div
                     className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 

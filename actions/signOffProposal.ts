@@ -1,4 +1,4 @@
-import { Account, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import { RpcContext } from '../models/core/api'
 import { SignatoryRecord } from '@models/accounts'
@@ -11,7 +11,7 @@ export const signOffProposal = async (
   signatoryRecord: ParsedAccount<SignatoryRecord>
 ) => {
   const instructions: TransactionInstruction[] = []
-  const signers: Account[] = []
+  const signers: Keypair[] = []
 
   withSignOffProposal(
     instructions,
