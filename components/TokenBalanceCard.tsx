@@ -23,7 +23,13 @@ import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { chunks } from '@utils/helpers'
 
-const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
+const TokenBalanceCard = ({
+  proposal,
+  councilVotes,
+}: {
+  proposal?: Option<Proposal>
+  councilVotes?: boolean
+}) => {
   const { councilMint, mint, realm } = useRealm()
 
   const isDepositVisible = (
