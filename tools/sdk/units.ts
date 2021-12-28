@@ -121,6 +121,10 @@ export function fmtPercentage(percentage: number) {
     return '<0.01%'
   }
 
+  if (percentage > 100) {
+    return '>100%'
+  }
+
   return `${+percentage.toFixed(2)}%`
 }
 
