@@ -25,9 +25,7 @@ const ProposalActionsPanel = () => {
   const [showCancelModal, setShowCancelModal] = useState(false)
 
   const canFinalizeVote =
-    hasVoteTimeExpired &&
-    connected &&
-    proposal?.info.state === ProposalState.Voting
+    hasVoteTimeExpired && proposal?.info.state === ProposalState.Voting
 
   const walletPk = wallet?.publicKey
 
