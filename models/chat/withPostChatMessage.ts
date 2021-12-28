@@ -1,4 +1,4 @@
-import { Account, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { GOVERNANCE_CHAT_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { PostChatMessageArgs } from './instructions'
@@ -7,7 +7,7 @@ import { SYSTEM_PROGRAM_ID } from '../core/api'
 
 export async function withPostChatMessage(
   instructions: TransactionInstruction[],
-  signers: Account[],
+  signers: Keypair[],
   governanceProgramId: PublicKey,
   governance: PublicKey,
   proposal: PublicKey,
@@ -23,7 +23,7 @@ export async function withPostChatMessage(
 
   const data = Buffer.from(serialize(GOVERNANCE_CHAT_SCHEMA, args))
 
-  const chatMessage = new Account()
+  const chatMessage = new Keypair()
   signers.push(chatMessage)
 
   const keys = [

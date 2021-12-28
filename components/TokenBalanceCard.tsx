@@ -1,6 +1,6 @@
 import { MintInfo } from '@solana/spl-token'
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -129,7 +129,7 @@ const TokenDeposit = ({
 
   const depositTokens = async function (amount: BN) {
     const instructions: TransactionInstruction[] = []
-    const signers: Account[] = []
+    const signers: Keypair[] = []
 
     const transferAuthority = approveTokenTransfer(
       instructions,
