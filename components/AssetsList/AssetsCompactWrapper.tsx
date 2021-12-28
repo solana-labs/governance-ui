@@ -33,7 +33,7 @@ const AssetsCompactWrapper = () => {
     : null
 
   const addNewAssetTooltip = !connected
-    ? 'Connect your wallet to create new account'
+    ? 'Connect your wallet to create new asset'
     : !canCreateGovernance
     ? "You don't have enough governance power to create a new asset"
     : toManyCommunityOutstandingProposalsForUser
