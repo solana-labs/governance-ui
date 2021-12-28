@@ -7,8 +7,9 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula')
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'SPL Governance UI',
-  url: 'https://solana-labs.github.io/governance-ui',
-  baseUrl: '/',
+  url: 'https://solana-labs.github.io',
+  baseUrl: '/governance-ui/',
+  trailingSlash: false,
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
