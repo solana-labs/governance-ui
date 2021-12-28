@@ -139,12 +139,13 @@ const VotePanel = () => {
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
       ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Draft === proposal?.info.state ? null : (
+      ProposalState.Draft === proposal?.info.state ||
+      !isVoting ? null : (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
-            {!isVoteCast ? (
+            {isVoteCast ? (
               <Button
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
