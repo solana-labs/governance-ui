@@ -57,8 +57,7 @@ const AssetsCompactWrapper = () => {
                   onClick={goToNewAssetForm}
                   className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
-                rounded-lg hover:bg-bkg-3 ml-auto 
-                hover:cursor-pointer ${
+                rounded-lg hover:bg-bkg-3 ml-auto ${
                   addNewAssetTooltip
                     ? 'cursor-not-allowed pointer-events-none opacity-60'
                     : 'cursor-pointer'
