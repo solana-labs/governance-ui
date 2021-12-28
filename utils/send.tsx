@@ -1,8 +1,8 @@
 import { notify } from './notifications'
 import {
-  Account,
   Commitment,
   Connection,
+  Keypair,
   RpcResponseAndContext,
   SimulatedTransactionResponse,
   Transaction,
@@ -36,7 +36,7 @@ export async function sendTransaction({
 }: {
   transaction: Transaction
   wallet: Wallet
-  signers?: Array<Account>
+  signers?: Array<Keypair>
   connection: Connection
   sendingMessage?: string
   successMessage?: string
@@ -66,7 +66,7 @@ export async function signTransaction({
 }: {
   transaction: Transaction
   wallet: Wallet
-  signers?: Array<Account>
+  signers?: Array<Keypair>
   connection: Connection
 }) {
   transaction.recentBlockhash = (
@@ -86,7 +86,7 @@ export async function signTransactions({
 }: {
   transactionsAndSigners: {
     transaction: Transaction
-    signers?: Array<Account>
+    signers?: Array<Keypair>
   }[]
   wallet: Wallet
   connection: Connection

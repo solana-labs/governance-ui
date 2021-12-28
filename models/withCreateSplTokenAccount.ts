@@ -1,6 +1,6 @@
 import {
-  Account,
   Connection,
+  Keypair,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -12,10 +12,10 @@ export const withCreateSplTokenAccount = async (
   connection: Connection,
   wallet: SignerWalletAdapter | undefined,
   instructions: TransactionInstruction[],
-  signers: Account[],
+  signers: Keypair[],
   mint: PublicKey
 ): Promise<{ tokenAccountAddress: PublicKey }> => {
-  const tokenAccount = new Account()
+  const tokenAccount = new Keypair()
   const provider = new serum.Provider(
     connection,
     wallet as serum.Wallet,
