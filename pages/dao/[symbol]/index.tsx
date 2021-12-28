@@ -11,6 +11,7 @@ import { PublicKey } from '@solana/web3.js'
 import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactWrapper'
 import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
 import Tooltip from '@components/Tooltip'
+import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -125,6 +126,7 @@ const REALM = () => {
           <TokenBalanceCard />
           <AccountsCompactWrapper />
           <MembersCompactWrapper></MembersCompactWrapper>
+          <AssetsCompactWrapper></AssetsCompactWrapper>
         </div>
       </div>
     </>

@@ -2,7 +2,6 @@ import { MintInfo } from '@solana/spl-token'
 import {
   Account,
   PublicKey,
-  SystemProgram,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -150,9 +149,7 @@ const TokenDeposit = ({
       depositTokenAccount!.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID,
-      SystemProgram.programId
+      wallet!.publicKey!
     )
 
     const transaction = new Transaction()

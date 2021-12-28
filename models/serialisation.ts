@@ -93,7 +93,7 @@ export function getGovernanceSchema(programVersion: ProgramVersion) {
 }
 
 function createGovernanceSchema(programVersion: ProgramVersion) {
-  return new Map<any, any>([
+  const schemaData = [
     [
       RealmConfigArgs,
       {
@@ -518,7 +518,10 @@ function createGovernanceSchema(programVersion: ProgramVersion) {
         ],
       },
     ],
-  ])
+  ] as const
+
+  // only allow valid class keys to be used when accessing Map
+  return new Map<typeof schemaData[number][0], any>(schemaData)
 }
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {

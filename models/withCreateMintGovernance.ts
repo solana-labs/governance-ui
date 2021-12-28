@@ -1,5 +1,6 @@
 import {
   PublicKey,
+  SystemProgram,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -7,6 +8,7 @@ import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { GovernanceConfig } from './accounts'
 import { CreateMintGovernanceArgs } from './instructions'
+import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 
 export const withCreateMintGovernance = async (
   instructions: TransactionInstruction[],
@@ -17,9 +19,7 @@ export const withCreateMintGovernance = async (
   transferMintAuthority: boolean,
   mintAuthority: PublicKey,
   tokenOwnerRecord: PublicKey,
-  payer: PublicKey,
-  tokenId: PublicKey,
-  systemId: PublicKey
+  payer: PublicKey
 ): Promise<{ governanceAddress: PublicKey }> => {
   const args = new CreateMintGovernanceArgs({
     config,
@@ -64,12 +64,12 @@ export const withCreateMintGovernance = async (
       isSigner: true,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: systemId,
+      pubkey: SystemProgram.programId,
       isWritable: false,
       isSigner: false,
     },
