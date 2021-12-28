@@ -25,7 +25,7 @@ const ProposalActionsPanel = () => {
   const [showCancelModal, setShowCancelModal] = useState(false)
 
   const canFinalizeVote =
-    hasVoteTimeExpired === true &&
+    hasVoteTimeExpired &&
     connected &&
     proposal?.info.state === ProposalState.Voting
 
@@ -103,7 +103,7 @@ const ProposalActionsPanel = () => {
       {ProposalState.Cancelled === proposal?.info.state ||
       ProposalState.Succeeded === proposal?.info.state ||
       ProposalState.Defeated === proposal?.info.state ||
-      (!canCancelProposal && !canSignOff && canFinalizeVote) ? null : (
+      (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
             {canSignOff && (
@@ -150,7 +150,7 @@ const ProposalActionsPanel = () => {
 
           {showFinalizeVoteModal && (
             <FinalizeVotesModal
-              isOpen={showFinalizeVoteModal && canFinalizeVote}
+              isOpen={showFinalizeVoteModal && canFinalizeVote ? true : false}
               onClose={() => setShowFinalizeVoteModal(false)}
               proposal={proposal}
               governance={governance}
