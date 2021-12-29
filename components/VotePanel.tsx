@@ -139,11 +139,12 @@ const VotePanel = () => {
     ProposalState.Succeeded,
     ProposalState.Draft,
   ]
+
   const isVisibleToWallet = !connected
     ? !hasVoteTimeExpired &&
-      !notVisibleStatesForNotConnectedWallet.find(
+      typeof notVisibleStatesForNotConnectedWallet.find(
         (x) => x === proposal?.info.state
-      )
+      ) === 'undefined'
     : !ownVoteRecord?.info.isRelinquished
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
