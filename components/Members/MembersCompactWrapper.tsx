@@ -39,14 +39,14 @@ const MembersCompactWrapper = () => {
     ? 'Connect your wallet to add new council member'
     : !canUseMintInstruction
     ? "You don't have enough governance power to add new council member"
-    : canMintRealmCouncilToken()
+    : !canMintRealmCouncilToken()
     ? 'Your realm need mint governance for council token to add new member'
     : toManyCommunityOutstandingProposalsForUser
     ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
     : toManyCouncilOutstandingProposalsForUse
     ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
     : ''
-
+  console.log(addNewMemberTooltip)
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
