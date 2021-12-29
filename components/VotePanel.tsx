@@ -109,11 +109,12 @@ const VotePanel = () => {
     setShowVoteModal(false)
   }, [])
 
-  const actionLabel = !isVoteCast
-    ? 'Cast your vote'
-    : isVoting
-    ? 'Withdraw your vote'
-    : 'Release your tokens'
+  const actionLabel =
+    !isVoteCast || !connected
+      ? 'Cast your vote'
+      : isVoting
+      ? 'Withdraw your vote'
+      : 'Release your tokens'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -135,14 +136,26 @@ const VotePanel = () => {
       : ''
     : ''
 
+  const notVisibleStatesForNotConnectedWallet = [
+    ProposalState.Cancelled,
+    ProposalState.Succeeded,
+    ProposalState.Draft,
+  ]
+  const isVisibleToWallet = !connected
+    ? !notVisibleStatesForNotConnectedWallet.find(
+        (x) => x === proposal?.info.state
+      )
+    : !ownVoteRecord?.info.isRelinquished
+
+  const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
   return (
     <>
-      {connected && (isVoting || isVoteCast) && (
+      {isPanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
-            {isVoteCast ? (
+            {isVoteCast && connected ? (
               <Button
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
