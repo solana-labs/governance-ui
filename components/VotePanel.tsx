@@ -137,12 +137,7 @@ const VotePanel = () => {
 
   return (
     <>
-      {ProposalState.Cancelled === proposal?.info.state ||
-      ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Draft === proposal?.info.state ||
-      (!isVoting && !isVoteCast) ||
-      (connected && isVoteCast && !isWithdrawEnabled) ||
-      !connected ? null : (
+      {(isVoting || isVoteCast) && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
