@@ -46,7 +46,7 @@ const MembersCompactWrapper = () => {
     : toManyCouncilOutstandingProposalsForUse
     ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
     : ''
-  console.log(addNewMemberTooltip)
+
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
