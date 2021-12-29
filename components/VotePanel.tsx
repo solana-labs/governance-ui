@@ -129,10 +129,10 @@ const VotePanel = () => {
     : !isVoteEnabled
     ? !isVoting && isVoteCast
       ? 'Proposal is not in a voting state anymore.'
+      : voterTokenRecord?.info.governingTokenDepositAmount.isZero()
+      ? 'You don’t have governance power to vote in this realm'
       : !voterTokenRecord
       ? 'No voter token record found.'
-      : voterTokenRecord.info.governingTokenDepositAmount.isZero()
-      ? 'No governing token deposit amount found. You need to deposit some tokens first.'
       : ''
     : ''
 
@@ -142,7 +142,8 @@ const VotePanel = () => {
     ProposalState.Draft,
   ]
   const isVisibleToWallet = !connected
-    ? !notVisibleStatesForNotConnectedWallet.find(
+    ? !hasVoteTimeExpired &&
+      !notVisibleStatesForNotConnectedWallet.find(
         (x) => x === proposal?.info.state
       )
     : !ownVoteRecord?.info.isRelinquished
