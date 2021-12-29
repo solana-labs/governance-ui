@@ -3,8 +3,8 @@ import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import TeamWalletField from '../TeamWalletField'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
-import AmountSlider from '@components/Slider'
 import useWalletStore from 'stores/useWalletStore'
+import ApprovalQuorumInput from '../ApprovalQuorumInput'
 
 /**
  * This is the Step One for the Realm Wizard.
@@ -14,7 +14,7 @@ import useWalletStore from 'stores/useWalletStore'
  *
  * @param param0 the form data and form handler.
  */
-const StepOne: React.FC<RealmWizardStepComponentProps> = ({
+const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
 }) => {
@@ -71,13 +71,11 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
         />
       </div>
       <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
-        <StyledLabel>Approval quorum (%)</StyledLabel>
-        <Input
-          required
-          type="number"
+        <ApprovalQuorumInput
           value={form.yesThreshold}
-          min={1}
-          max={100}
+          onChange={($e) => {
+            setForm({ yesThreshold: $e })
+          }}
           onBlur={() => {
             if (
               !form.yesThreshold ||
@@ -88,38 +86,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
               })
             }
           }}
-          onChange={($e) => {
-            let yesThreshold = $e.target.value
-            if (yesThreshold.length) {
-              yesThreshold =
-                +yesThreshold < 1 ? 1 : +yesThreshold > 100 ? 100 : yesThreshold
-            }
-            setForm({
-              yesThreshold,
-            })
-          }}
         />
-        <div className="pb-5" />
-        <AmountSlider
-          step={1}
-          value={form.yesThreshold ?? DEFAULT_APPROVAL_QUORUM}
-          disabled={false}
-          onChange={($e) => {
-            setForm({ yesThreshold: $e })
-          }}
-        />
-        {/* <Input
-          required
-          type="number"
-          value={form.yesThreshold}
-          placeholder="Vote threshold"
-          onChange={($e) => {
-            if (+$e.target.value > 0 && +$e.target.value <= 100)
-              setForm({
-                yesThreshold: $e.target.value,
-              })
-          }}
-        /> */}
       </div>
       <div className="pb-4">
         <TeamWalletField
@@ -132,4 +99,4 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   )
 }
 
-export default StepOne
+export default MultisigOptions

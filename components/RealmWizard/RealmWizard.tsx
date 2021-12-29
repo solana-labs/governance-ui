@@ -4,7 +4,13 @@ import RealmWizardController from './controller/RealmWizardController'
 import Loading from '@components/Loading'
 import WizardModeSelect from './components/Steps/WizardModeSelect'
 import { notify } from '@utils/notifications'
-import { StepOne, StepThree, StepFour, RealmCreated } from './components/Steps'
+import {
+  MultisigOptions,
+  BespokeConfig,
+  BespokeCouncil,
+  StepFour,
+  RealmCreated,
+} from './components/Steps'
 import { useMemo } from 'react'
 import Button from '@components/Button'
 import {
@@ -22,8 +28,12 @@ import { createMultisigRealm } from 'actions/createMultisigRealm'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import router from 'next/router'
-import CreateRealmForm from './components/CreateRealmForm'
 import { useEffect } from 'react'
+import { CreateFormSchema } from './validators/createRealmValidator'
+import { formValidation, isFormValid } from '@utils/formValidation'
+import { RpcContext } from '@models/core/api'
+import { registerRealm } from 'actions/registerRealm'
+import { MintMaxVoteWeightSource } from '@models/accounts'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
@@ -34,6 +44,8 @@ enum LoaderMessage {
   FINISHED = "Realm successfully created. Redirecting to the realm's page",
   ERROR = 'We found an error while creating your Realm :/',
 }
+
+// TODO: split this component
 
 const RealmWizard: React.FC = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -46,17 +58,14 @@ const RealmWizard: React.FC = () => {
   const [ctl, setController] = useState<RealmWizardController>()
 
   const [form, setForm] = useState<RealmArtifacts>({})
+  const [formErrors, setFormErrors] = useState({})
+
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
   )
   const [realmAddress] = useState('')
-  const [loaderMessage, setLoaderMessage] = useState<LoaderMessage>(
-    LoaderMessage.DEPLOYING_REALM
-  )
-
-  // TODO: This state will be removed in future versions
-  const [shouldFireCreate, setShouldFireCreate] = useState(false)
+  const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
 
   /**
    * Handles and set the form data
@@ -72,7 +81,7 @@ const RealmWizard: React.FC = () => {
   /**
    * Generate realm artifacts
    */
-  const generateRealmArtifacts = async () => {
+  const handleCreateMultisigRealm = async () => {
     if (!ctl) return
     if (!wallet?.publicKey || !connection.current) return
     if (!form.name)
@@ -111,13 +120,49 @@ const RealmWizard: React.FC = () => {
     )
 
     if (results) {
-      return results
+      router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
+      return
     }
 
     notify({
       type: 'error',
       message: 'Something bad happened during this request.',
     })
+  }
+
+  const handleCreateBespokeRealm = async () => {
+    setFormErrors({})
+
+    const { isValid, validationErrors }: formValidation = await isFormValid(
+      CreateFormSchema,
+      form
+    )
+    if (isValid) {
+      const rpcContext = new RpcContext(
+        new PublicKey(form.governanceProgramId!),
+        form.programVersion,
+        wallet,
+        connection.current,
+        connection.endpoint
+      )
+
+      const realmAddress = await registerRealm(
+        rpcContext,
+        rpcContext.programId,
+        form.programVersion ?? ProgramVersion.V1,
+        form.name!,
+        new PublicKey(form.communityMintId!),
+        form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
+        MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+        form.minCommunityTokensToCreateGovernance!,
+        form.teamWallets
+          ? form.teamWallets.map((w) => new PublicKey(w))
+          : undefined
+      )
+      router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+    } else {
+      setFormErrors(validationErrors)
+    }
   }
 
   /**
@@ -128,7 +173,12 @@ const RealmWizard: React.FC = () => {
     try {
       const ctl = new RealmWizardController(option)
       const nextStep = ctl.getNextStep(currentStep, StepDirection.NEXT)
-      console.log(ctl)
+      setForm({
+        governanceProgramId:
+          process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
+          DEFAULT_GOVERNANCE_PROGRAM_ID,
+        yesThreshold: 60,
+      })
       setController(ctl)
       setCurrentStep(nextStep)
     } catch (error) {
@@ -160,25 +210,29 @@ const RealmWizard: React.FC = () => {
         message: 'Wallet not connected',
       })
     // Handles the current misuse of the CreateRealmForm
-    if (ctl && ctl.getMode() === RealmWizardMode.ADVANCED) {
-      setShouldFireCreate(true)
-      return
-    }
-    setIsLoading(true)
-    try {
-      const realm = await generateRealmArtifacts()
-      setIsLoading(false)
-      if (realm) {
-        setLoaderMessage(LoaderMessage.FINISHED)
-        router.push(fmtUrlWithCluster(`/dao/${realm.realmPk.toBase58()}`))
+    if (ctl) {
+      try {
+        setIsLoading(true)
+        switch (ctl.getMode()) {
+          case RealmWizardMode.BASIC:
+            await handleCreateMultisigRealm()
+            break
+          case RealmWizardMode.ADVANCED:
+            handleCreateBespokeRealm()
+            break
+          default:
+            throw new Error('Mode not available.')
+        }
+      } catch (error) {
+        const err = error as Error
+        setIsLoading(false)
+        notify({
+          type: 'error',
+          message: err.message,
+        })
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      const err = error as Error
-      setIsLoading(false)
-      notify({
-        type: 'error',
-        message: err.message,
-      })
     }
   }
 
@@ -195,6 +249,39 @@ const RealmWizard: React.FC = () => {
       ? false
       : !form.teamWallets?.length || !form.name
 
+  const checkStepCondition = (step: RealmWizardStep): boolean => {
+    if (step === RealmWizardStep.BESPOKE_CONFIG) {
+      const errors: any = {}
+      !form.name ? (errors.name = 'Name is required') : null
+      !form.communityMint
+        ? (errors.communityMint = 'Community mint is required')
+        : null
+      !form.governanceProgramId
+        ? (errors.governanceProgramId = 'Governance Program ID is required')
+        : null
+      !form.communityMintMaxVoteWeightSource
+        ? (errors.communityMintMaxVoteWeightSource =
+            'Mint supply factor is required')
+        : null
+
+      setFormErrors(errors)
+      console.debug(!!Object.values(errors).length)
+      return !Object.values(errors).length
+    }
+    return false
+  }
+
+  const onClickNext = (): boolean => {
+    if (ctl)
+      switch (ctl.getMode()) {
+        case RealmWizardMode.ADVANCED:
+          return checkStepCondition(ctl.getCurrentStep())
+        default:
+          return false
+      }
+    return false
+  }
+
   /**
    * Binds the current step to the matching component
    */
@@ -202,19 +289,25 @@ const RealmWizard: React.FC = () => {
     switch (currentStep) {
       case RealmWizardStep.SELECT_MODE:
         return <WizardModeSelect onSelect={handleModeSelection} />
-      case RealmWizardStep.BASIC_CONFIG:
-        return <StepOne form={form} setForm={handleSetForm} />
-      case RealmWizardStep.TOKENS_CONFIG:
+      case RealmWizardStep.MULTISIG_CONFIG:
+        return <MultisigOptions form={form} setForm={handleSetForm} />
+      case RealmWizardStep.BESPOKE_CONFIG:
         return (
-          <CreateRealmForm
+          <BespokeConfig
             form={form}
             setForm={handleSetForm}
-            shouldFireCreate={shouldFireCreate}
-            setIsLoading={setIsLoading}
+            formErrors={formErrors}
           />
         )
-      case RealmWizardStep.STEP_3:
-        return <StepThree form={form} setForm={handleSetForm} />
+      case RealmWizardStep.BESPOKE_COUNCIL:
+        return (
+          <BespokeCouncil
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
+          />
+        )
       case RealmWizardStep.STEP_4:
         return <StepFour form={form} setForm={handleSetForm} />
       case RealmWizardStep.REALM_CREATED:
@@ -222,25 +315,12 @@ const RealmWizard: React.FC = () => {
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [currentStep, form, shouldFireCreate])
+  }, [currentStep, form, formErrors])
 
   useEffect(() => {
     // Return shouldFireCreate to the base state
-    if (shouldFireCreate) {
-      setTimeout(() => {
-        setShouldFireCreate(false)
-      }, 1000)
-    }
-  }, [shouldFireCreate])
-
-  useEffect(() => {
-    setForm({
-      governanceProgramId:
-        process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
-        DEFAULT_GOVERNANCE_PROGRAM_ID,
-      yesThreshold: 60,
-    })
-  }, [])
+    if (Object.values(formErrors).length) setFormErrors({})
+  }, [form])
 
   return (
     <div
@@ -273,7 +353,7 @@ const RealmWizard: React.FC = () => {
           <Button
             onClick={() => {
               if (ctl.isLastStep()) handleCreateRealm()
-              else handleStepSelection(StepDirection.NEXT)
+              else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
             }}
             disabled={isCreateButtonDisabled()}
           >
