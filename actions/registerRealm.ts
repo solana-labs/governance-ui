@@ -103,7 +103,6 @@ export async function registerRealm(
   councilWalletPks?: PublicKey[]
 ): Promise<PublicKey> {
   const realmInstructions: TransactionInstruction[] = []
-  let tokenOwnerRecordPk: PublicKey | undefined = undefined
 
   const {
     councilMintPk,
