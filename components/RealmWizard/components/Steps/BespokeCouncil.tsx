@@ -33,13 +33,24 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
       setForm({ teamWallets })
     }
   }
-  useEffect(() => {
+
+  const handleWallets = () => {
     if (councilMintSwitch && wallet?.publicKey) {
+      // Forces to add the current wallet
       handleInsertTeamWallet([wallet.publicKey.toBase58()])
     } else {
       setForm({ teamWallets: [] })
     }
+  }
+
+  useEffect(() => {
+    handleWallets()
   }, [councilMintSwitch])
+
+  useEffect(() => {
+    handleWallets()
+  }, [])
+
   return (
     <>
       <div className="border-b border-fgd-4 pb-4 pt-2">
@@ -56,25 +67,25 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
           />
           <StyledLabel className="mt-1.5 ml-3">Use Council</StyledLabel>
         </div>
-        {councilMintSwitch && (
-          <>
-            <Input
-              label="Council Mint Id"
-              placeholder="(Optional) Council mint"
-              value={form?.councilMintId}
-              type="text"
-              error={formErrors['councilMintId'] || formErrors['councilMint']}
-              onChange={(evt) => setForm({ councilMintId: evt.target.value })}
-            />
-
-            <TeamWalletField
-              onInsert={handleInsertTeamWallet}
-              onRemove={handleRemoveTeamWallet}
-              wallets={form.teamWallets}
-            />
-          </>
-        )}
       </div>
+      {councilMintSwitch && (
+        <div className="w-full">
+          <Input
+            label="Council Mint Id"
+            placeholder="(Optional) Council mint"
+            value={form?.councilMintId}
+            type="text"
+            error={formErrors['councilMintId'] || formErrors['councilMint']}
+            onChange={(evt) => setForm({ councilMintId: evt.target.value })}
+          />
+
+          <TeamWalletField
+            onInsert={handleInsertTeamWallet}
+            onRemove={handleRemoveTeamWallet}
+            wallets={form.teamWallets}
+          />
+        </div>
+      )}
     </>
   )
 }

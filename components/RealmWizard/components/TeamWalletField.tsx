@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyledLabel } from '@components/inputs/styles'
 import AddWalletModal from './AddWalletModal'
 import { TrashIcon } from '@heroicons/react/solid'
@@ -47,6 +47,15 @@ const TeamWalletField: React.FC<{
       />
     )
   }
+
+  useEffect(() => {
+    if (
+      wallet?.publicKey &&
+      !wallets.find((addr) => addr === wallet.publicKey?.toBase58())
+    ) {
+      onInsert([wallet.publicKey?.toBase58()])
+    }
+  }, [wallets.length, wallet?.publicKey])
 
   return (
     <div className="team-wallets-wrapper">

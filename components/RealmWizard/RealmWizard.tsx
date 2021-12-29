@@ -133,6 +133,7 @@ const RealmWizard: React.FC = () => {
 
   const handleCreateBespokeRealm = async () => {
     setFormErrors({})
+
     const { isValid, validationErrors }: formValidation = await isFormValid(
       CreateFormSchema,
       form
@@ -154,7 +155,10 @@ const RealmWizard: React.FC = () => {
         new PublicKey(form.communityMintId!),
         form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
         MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
-        form.minCommunityTokensToCreateGovernance!
+        form.minCommunityTokensToCreateGovernance!,
+        form.teamWallets
+          ? form.teamWallets.map((w) => new PublicKey(w))
+          : undefined
       )
       router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
     } else {
@@ -170,7 +174,12 @@ const RealmWizard: React.FC = () => {
     try {
       const ctl = new RealmWizardController(option)
       const nextStep = ctl.getNextStep(currentStep, StepDirection.NEXT)
-      console.log(ctl)
+      setForm({
+        governanceProgramId:
+          process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
+          DEFAULT_GOVERNANCE_PROGRAM_ID,
+        yesThreshold: 60,
+      })
       setController(ctl)
       setCurrentStep(nextStep)
     } catch (error) {
@@ -313,15 +322,6 @@ const RealmWizard: React.FC = () => {
     // Return shouldFireCreate to the base state
     if (Object.values(formErrors).length) setFormErrors({})
   }, [form])
-
-  useEffect(() => {
-    setForm({
-      governanceProgramId:
-        process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
-        DEFAULT_GOVERNANCE_PROGRAM_ID,
-      yesThreshold: 60,
-    })
-  }, [])
 
   return (
     <div
