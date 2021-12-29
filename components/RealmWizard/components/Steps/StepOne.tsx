@@ -51,7 +51,6 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   }, [wallet?.publicKey])
 
   useEffect(() => {
-    setForm({ yesThreshold: DEFAULT_APPROVAL_QUORUM })
     addCurrentWallet()
   }, [])
 
