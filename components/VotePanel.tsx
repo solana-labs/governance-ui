@@ -128,7 +128,8 @@ const VotePanel = () => {
     ? 'You need to connect your wallet to be able to vote'
     : !isVoting && isVoteCast
     ? 'Proposal is not in a voting state anymore.'
-    : voterTokenRecord?.info.governingTokenDepositAmount.isZero()
+    : !voterTokenRecord ||
+      voterTokenRecord.info.governingTokenDepositAmount.isZero()
     ? 'You don’t have governance power to vote in this realm'
     : ''
 
