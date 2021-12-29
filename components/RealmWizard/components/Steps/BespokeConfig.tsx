@@ -2,11 +2,11 @@
 import React from 'react'
 import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm'
 
-const StepTwo: React.FC<RealmWizardStepComponentProps> = ({
+const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
 }) => {
   return <></>
 }
 
-export default StepTwo
+export default BespokeConfig

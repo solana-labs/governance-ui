@@ -4,7 +4,13 @@ import RealmWizardController from './controller/RealmWizardController'
 import Loading from '@components/Loading'
 import WizardModeSelect from './components/Steps/WizardModeSelect'
 import { notify } from '@utils/notifications'
-import { StepOne, StepThree, StepFour, RealmCreated } from './components/Steps'
+import {
+  MultisigOptions,
+  BespokeConfig,
+  BespokeCouncil,
+  StepFour,
+  RealmCreated,
+} from './components/Steps'
 import { useMemo } from 'react'
 import Button from '@components/Button'
 import {
@@ -24,6 +30,11 @@ import useQueryContext from '@hooks/useQueryContext'
 import router from 'next/router'
 import CreateRealmForm from './components/CreateRealmForm'
 import { useEffect } from 'react'
+import { CreateFormSchema } from './validators/createRealmValidator'
+import { formValidation, isFormValid } from '@utils/formValidation'
+import { RpcContext } from '@models/core/api'
+import { registerRealm } from 'actions/registerRealm'
+import { MintMaxVoteWeightSource } from '@models/accounts'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
@@ -48,6 +59,7 @@ const RealmWizard: React.FC = () => {
   const [form, setForm] = useState<RealmArtifacts>({
     yesThreshold: 60,
   })
+  const [formErrors, setFormErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
@@ -74,7 +86,7 @@ const RealmWizard: React.FC = () => {
   /**
    * Generate realm artifacts
    */
-  const generateRealmArtifacts = async () => {
+  const handleCreateMultisigRealm = async () => {
     if (!ctl) return
     if (!wallet?.publicKey || !connection.current) return
     if (!form.name)
@@ -113,13 +125,45 @@ const RealmWizard: React.FC = () => {
     )
 
     if (results) {
-      return results
+      router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
+      return
     }
 
     notify({
       type: 'error',
       message: 'Something bad happened during this request.',
     })
+  }
+
+  const handleCreateBespokeRealm = async () => {
+    setFormErrors({})
+    const { isValid, validationErrors }: formValidation = await isFormValid(
+      CreateFormSchema,
+      form
+    )
+    if (isValid) {
+      const rpcContext = new RpcContext(
+        new PublicKey(form.governanceProgramId!),
+        form.programVersion,
+        wallet,
+        connection.current,
+        connection.endpoint
+      )
+
+      const realmAddress = await registerRealm(
+        rpcContext,
+        rpcContext.programId,
+        form.programVersion ?? ProgramVersion.V1,
+        form.name!,
+        new PublicKey(form.communityMintId!),
+        form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
+        MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+        form.minCommunityTokensToCreateGovernance!
+      )
+      router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+    } else {
+      setFormErrors(validationErrors)
+    }
   }
 
   /**
@@ -162,25 +206,29 @@ const RealmWizard: React.FC = () => {
         message: 'Wallet not connected',
       })
     // Handles the current misuse of the CreateRealmForm
-    if (ctl && ctl.getMode() === RealmWizardMode.ADVANCED) {
-      setShouldFireCreate(true)
-      return
-    }
-    setIsLoading(true)
-    try {
-      const realm = await generateRealmArtifacts()
-      setIsLoading(false)
-      if (realm) {
-        setLoaderMessage(LoaderMessage.FINISHED)
-        router.push(fmtUrlWithCluster(`/dao/${realm.realmPk.toBase58()}`))
+    if (ctl) {
+      try {
+        setIsLoading(true)
+        switch (ctl.getMode()) {
+          case RealmWizardMode.BASIC:
+            await handleCreateMultisigRealm()
+            break
+          case RealmWizardMode.ADVANCED:
+            handleCreateBespokeRealm()
+            break
+          default:
+            throw new Error('Mode not available.')
+        }
+      } catch (error) {
+        const err = error as Error
+        setIsLoading(false)
+        notify({
+          type: 'error',
+          message: err.message,
+        })
+      } finally {
+        setIsLoading(false)
       }
-    } catch (error) {
-      const err = error as Error
-      setIsLoading(false)
-      notify({
-        type: 'error',
-        message: err.message,
-      })
     }
   }
 
@@ -204,19 +252,12 @@ const RealmWizard: React.FC = () => {
     switch (currentStep) {
       case RealmWizardStep.SELECT_MODE:
         return <WizardModeSelect onSelect={handleModeSelection} />
-      case RealmWizardStep.BASIC_CONFIG:
-        return <StepOne form={form} setForm={handleSetForm} />
-      case RealmWizardStep.TOKENS_CONFIG:
-        return (
-          <CreateRealmForm
-            form={form}
-            setForm={handleSetForm}
-            shouldFireCreate={shouldFireCreate}
-            setIsLoading={setIsLoading}
-          />
-        )
-      case RealmWizardStep.STEP_3:
-        return <StepThree form={form} setForm={handleSetForm} />
+      case RealmWizardStep.MULTISIG_CONFIG:
+        return <MultisigOptions form={form} setForm={handleSetForm} />
+      case RealmWizardStep.BESPOKE_CONFIG:
+        return <BespokeConfig form={form} setForm={handleSetForm} />
+      case RealmWizardStep.BESPOKE_COUNCIL:
+        return <BespokeCouncil form={form} setForm={handleSetForm} />
       case RealmWizardStep.STEP_4:
         return <StepFour form={form} setForm={handleSetForm} />
       case RealmWizardStep.REALM_CREATED:

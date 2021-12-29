@@ -13,7 +13,7 @@ import AmountSlider from '@components/Slider'
  *
  * @param param0 the form data and form handler.
  */
-const StepOne: React.FC<RealmWizardStepComponentProps> = ({
+const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
 }) => {
@@ -122,4 +122,4 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   )
 }
 
-export default StepOne
+export default MultisigOptions
