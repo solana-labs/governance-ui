@@ -19,6 +19,11 @@ jobs:
           yarn install --frozen-lockfile
           yarn build
 
+      # temporary hack so that root postcss config doesn't
+      # interfere with the build process for the docs
+      - name: Remove root postcss config
+        run: rm postcss.config.js
+
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
         with:
