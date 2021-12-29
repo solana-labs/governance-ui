@@ -4,38 +4,31 @@ import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
-import { TokenRecordsWithWalletAddress } from './types'
 import tokenService from '@utils/services/token'
 import useMembersListStore from 'stores/useMembersStore'
 import { ViewState } from './types'
 import { useMemo } from 'react'
+import { Member } from '@utils/uiTypes/members'
 
-const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
+const MemberItem = ({ item }: { item: Member }) => {
   const { mint, councilMint, realm } = useRealm()
   const {
     setCurrentCompactView,
     setCurrentCompactViewMember,
   } = useMembersListStore()
-  const { walletAddress, council, community } = item
+  const { walletAddress, councilVotes, communityVotes, votesCasted } = item
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === realm?.info.communityMint.toBase58()
   )?.symbol
-  const totalCommunityVotes = community?.info.totalVotesCount || 0
-  const totalCouncilVotes = council?.info.totalVotesCount || 0
-  const totalVotes = totalCommunityVotes + totalCouncilVotes
-  const communityAmount = community
-    ? useMemo(
-        () => fmtMintAmount(mint, community.info.governingTokenDepositAmount),
-        [community.info.governingTokenDepositAmount]
-      )
+  const totalVotes = votesCasted
+  const communityAmount = communityVotes
+    ? useMemo(() => fmtMintAmount(mint, communityVotes), [item.walletAddress])
     : null
-  const councilAmount = council
-    ? useMemo(
-        () =>
-          fmtMintAmount(councilMint, council.info.governingTokenDepositAmount),
-        [council.info.governingTokenDepositAmount]
-      )
+  const councilAmount = councilVotes
+    ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
+        item.walletAddress,
+      ])
     : null
   const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
 
@@ -64,8 +57,10 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
               {tokenName} Votes {communityAmount}
             </span>
           )}
-          {communityAmount && council && <span className="ml-1 mr-1">|</span>}
-          {council && <span>Council Votes {councilAmount}</span>}
+          {communityAmount && !councilVotes.isZero() && (
+            <span className="ml-1 mr-1">|</span>
+          )}
+          {!councilVotes.isZero() && <span>Council Votes {councilAmount}</span>}
         </div>
       </div>
     </div>

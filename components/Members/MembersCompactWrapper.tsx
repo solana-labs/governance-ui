@@ -26,9 +26,7 @@ const MembersCompactWrapper = () => {
   } = useGovernanceAssets()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
-    const councilTotalVotes = current.council?.info.totalVotesCount || 0
-    const communityTotalVotes = current.community?.info.totalVotesCount || 0
-    return councilTotalVotes + communityTotalVotes + prev
+    return prev + current.votesCasted
   }, 0)
   const goToAddMemberView = () => {
     setCurrentCompactView(ViewState.AddMember)

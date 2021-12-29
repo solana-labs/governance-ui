@@ -5,7 +5,8 @@ import useWalletStore from 'stores/useWalletStore'
 import { getTokenAccountsByMint } from 'scripts/api'
 import { parseTokenAccountData } from '@utils/tokens'
 import { AccountInfo } from '@solana/spl-token'
-
+import { Member } from 'utils/uiTypes/members'
+import { BN } from '@project-serum/anchor'
 export default function useMembers() {
   const { tokenRecords, councilTokenOwnerRecords, realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
@@ -49,7 +50,11 @@ export default function useMembers() {
   )
 
   const communityAndCouncilTokenRecords = [
-    ...tokenRecordArray,
+    ...tokenRecordArray.filter(
+      (x) =>
+        x.community?.info.totalVotesCount &&
+        x.community?.info.totalVotesCount > 0
+    ),
     ...councilRecordArray,
   ]
 
@@ -66,33 +71,32 @@ export default function useMembers() {
           return {
             ...communityAndCouncilTokenRecords
               .filter((x) => x.walletAddress === walletAddress)
-              .reduce<TokenRecordsWithWalletAddress>(
+              .reduce<Member>(
                 (acc, curr) => {
                   acc['walletAddress'] = curr.walletAddress
                   if (curr.community) {
-                    acc['community'] = curr.community
+                    acc['communityVotes'] =
+                      curr.community.info.governingTokenDepositAmount
+                    acc['votesCasted'] += curr.community.info.totalVotesCount
                   }
                   if (curr.council) {
-                    acc['council'] = curr.council
+                    acc['councilVotes'] =
+                      curr.council.info.governingTokenDepositAmount
+                    acc['votesCasted'] += curr.council.info.totalVotesCount
                   }
                   return acc
                 },
-                { walletAddress: '' }
+                {
+                  walletAddress: '',
+                  votesCasted: 0,
+                  councilVotes: new BN(0),
+                  communityVotes: new BN(0),
+                }
               ),
           }
         })
         .sort((a, b) => {
-          const { community: prevCommunity, council: prevCouncil } = a
-          const { community: nextCommunity, council: nextCouncil } = b
-          const prevCommunityVotes = prevCommunity?.info?.totalVotesCount || 0
-          const prevCouncilVotes = prevCouncil?.info?.totalVotesCount || 0
-          const nextCommunityVotes = nextCommunity?.info?.totalVotesCount || 0
-          const nextCouncilVotes = nextCouncil?.info?.totalVotesCount || 0
-
-          const prevTotalVotes = prevCommunityVotes + prevCouncilVotes
-          const nextTotalVotes = nextCommunityVotes + nextCouncilVotes
-
-          return prevTotalVotes - nextTotalVotes
+          return a.votesCasted - b.votesCasted
         })
         .reverse(),
 
@@ -101,19 +105,21 @@ export default function useMembers() {
 
   useEffect(() => {
     const fetchOutsideRealmMembers = async () => {
-      let communityMembers: AccountInfo[] = []
       let councilMembers: AccountInfo[] = []
-      if (realm?.info.communityMint) {
-        communityMembers = await fetchMembersWithTokensOutsideRealm(
-          realm.info.communityMint.toBase58()
-        )
-      }
       if (realm?.info.config.councilMint) {
         councilMembers = await fetchMembersWithTokensOutsideRealm(
           realm.info.config.councilMint.toBase58()
         )
       }
-      console.log(communityMembers, councilMembers, '@@@@@')
+      councilMembers = councilMembers.filter((x) => x.amount.toNumber() !== 0)
+      for (const councilMember of councilMembers) {
+        const member = members.find(
+          (x) => x.walletAddress === councilMember.owner.toBase58()
+        )
+        if (member) {
+          member.councilVotes.add(councilMember.amount)
+        }
+      }
     }
 
     fetchOutsideRealmMembers()
