@@ -45,6 +45,8 @@ enum LoaderMessage {
   ERROR = 'We found an error while creating your Realm :/',
 }
 
+// TODO: split this component
+
 const RealmWizard: React.FC = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   // const wallet = useWalletStore((s) => s.current)
@@ -64,9 +66,6 @@ const RealmWizard: React.FC = () => {
   )
   const [realmAddress] = useState('')
   const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
-
-  // TODO: This state will be removed in future versions
-  const [shouldFireCreate, setShouldFireCreate] = useState(false)
 
   /**
    * Handles and set the form data

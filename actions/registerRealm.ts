@@ -11,12 +11,7 @@ import { withCreateRealm } from '../models/withCreateRealm'
 import { RpcContext } from '../models/core/api'
 import { sendTransaction } from '../utils/send'
 import { ProgramVersion } from '@models/registry/constants'
-import {
-  getWalletPublicKey,
-  sendTransactions,
-  SequenceType,
-  WalletSigner,
-} from 'utils/sendTransactions'
+import { sendTransactions, SequenceType } from 'utils/sendTransactions'
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
