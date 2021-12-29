@@ -214,7 +214,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         const realmAccountInfo = await connection.current.getAccountInfo(
           realmId
         )
-        console.log(realmAccountInfo, realmId, 'accountINFO')
         programId = realmAccountInfo?.owner
       }
       if (realmId && programId) {
@@ -301,12 +300,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       console.log('fetchAllRealms', get().realms)
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
-      console.log(
-        'fetchRealm',
-        programId.toBase58(),
-        realmId.toBase58(),
-        '@@@@@'
-      )
       const set = get().set
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
