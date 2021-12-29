@@ -58,7 +58,7 @@ const RealmWizard: React.FC = () => {
   const [form, setForm] = useState<RealmArtifacts>({
     yesThreshold: 60,
   })
-  const [, setFormErrors] = useState({})
+  const [formErrors, setFormErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
@@ -242,6 +242,39 @@ const RealmWizard: React.FC = () => {
       ? false
       : !form.teamWallets?.length || !form.name
 
+  const checkStepCondition = (step: RealmWizardStep): boolean => {
+    if (step === RealmWizardStep.BESPOKE_CONFIG) {
+      const errors: any = {}
+      !form.name ? (errors.name = 'Name is required') : null
+      !form.communityMint
+        ? (errors.communityMint = 'Community mint is required')
+        : null
+      !form.governanceProgramId
+        ? (errors.governanceProgramId = 'Governance Program ID is required')
+        : null
+      !form.communityMintMaxVoteWeightSource
+        ? (errors.communityMintMaxVoteWeightSource =
+            'Mint supply factor is required')
+        : null
+
+      setFormErrors(errors)
+      console.debug(!!Object.values(errors).length)
+      return !Object.values(errors).length
+    }
+    return false
+  }
+
+  const onClickNext = (): boolean => {
+    if (ctl)
+      switch (ctl.getMode()) {
+        case RealmWizardMode.ADVANCED:
+          return checkStepCondition(ctl.getCurrentStep())
+        default:
+          return false
+      }
+    return false
+  }
+
   /**
    * Binds the current step to the matching component
    */
@@ -252,9 +285,22 @@ const RealmWizard: React.FC = () => {
       case RealmWizardStep.MULTISIG_CONFIG:
         return <MultisigOptions form={form} setForm={handleSetForm} />
       case RealmWizardStep.BESPOKE_CONFIG:
-        return <BespokeConfig form={form} setForm={handleSetForm} />
+        return (
+          <BespokeConfig
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+          />
+        )
       case RealmWizardStep.BESPOKE_COUNCIL:
-        return <BespokeCouncil form={form} setForm={handleSetForm} />
+        return (
+          <BespokeCouncil
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
+          />
+        )
       case RealmWizardStep.STEP_4:
         return <StepFour form={form} setForm={handleSetForm} />
       case RealmWizardStep.REALM_CREATED:
@@ -262,16 +308,12 @@ const RealmWizard: React.FC = () => {
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [currentStep, form, shouldFireCreate])
+  }, [currentStep, form, formErrors])
 
   useEffect(() => {
     // Return shouldFireCreate to the base state
-    if (shouldFireCreate) {
-      setTimeout(() => {
-        setShouldFireCreate(false)
-      }, 1000)
-    }
-  }, [shouldFireCreate])
+    if (Object.values(formErrors).length) setFormErrors({})
+  }, [form])
 
   useEffect(() => {
     setForm({
@@ -312,7 +354,7 @@ const RealmWizard: React.FC = () => {
           <Button
             onClick={() => {
               if (ctl.isLastStep()) handleCreateRealm()
-              else handleStepSelection(StepDirection.NEXT)
+              else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
             }}
             disabled={isCreateButtonDisabled()}
           >

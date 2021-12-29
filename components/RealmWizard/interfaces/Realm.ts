@@ -2,6 +2,7 @@ import { ProgramVersion } from '@models/registry/constants'
 import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
+import React from 'react'
 
 /**
  * Default realm artifact interface
@@ -76,6 +77,7 @@ export enum StepDirection {
 export interface RealmWizardStepComponentProps {
   form: RealmArtifacts
   setForm: (data: RealmArtifacts) => void
+  beforeClickNext?: React.Dispatch<(...args) => boolean>
   [key: string]: any
 }
 

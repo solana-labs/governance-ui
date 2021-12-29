@@ -7,7 +7,7 @@ export interface formValidation {
 
 export const isFormValid = async (schema, formValues, abortEarly = false) => {
   if (!schema) {
-    throw 'pleas provide schema'
+    throw 'please provide schema'
   }
   const values = new SanitizedObject({
     isValid: false,
