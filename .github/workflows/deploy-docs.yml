@@ -18,7 +18,7 @@ jobs:
       # interfere with the build process for the docs
       - name: Remove root postcss config
         run: rm postcss.config.js
-        
+
       - name: Build docs
         working-directory: docs
         run: |

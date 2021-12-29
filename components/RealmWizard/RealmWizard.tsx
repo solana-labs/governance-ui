@@ -28,7 +28,6 @@ import { createMultisigRealm } from 'actions/createMultisigRealm'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import router from 'next/router'
-import CreateRealmForm from './components/CreateRealmForm'
 import { useEffect } from 'react'
 import { CreateFormSchema } from './validators/createRealmValidator'
 import { formValidation, isFormValid } from '@utils/formValidation'
@@ -59,15 +58,13 @@ const RealmWizard: React.FC = () => {
   const [form, setForm] = useState<RealmArtifacts>({
     yesThreshold: 60,
   })
-  const [formErrors, setFormErrors] = useState({})
+  const [, setFormErrors] = useState({})
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
   )
   const [realmAddress] = useState('')
-  const [loaderMessage, setLoaderMessage] = useState<LoaderMessage>(
-    LoaderMessage.DEPLOYING_REALM
-  )
+  const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
 
   // TODO: This state will be removed in future versions
   const [shouldFireCreate, setShouldFireCreate] = useState(false)
