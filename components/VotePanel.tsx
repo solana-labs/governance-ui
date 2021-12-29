@@ -131,8 +131,6 @@ const VotePanel = () => {
       ? 'Proposal is not in a voting state anymore.'
       : voterTokenRecord?.info.governingTokenDepositAmount.isZero()
       ? 'You don’t have governance power to vote in this realm'
-      : !voterTokenRecord
-      ? 'No voter token record found.'
       : ''
     : ''
 
