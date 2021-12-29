@@ -4,6 +4,7 @@ import TeamWalletField from '../TeamWalletField'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
 import AmountSlider from '@components/Slider'
+import useWalletStore from 'stores/useWalletStore'
 
 /**
  * This is the Step One for the Realm Wizard.
@@ -18,22 +19,17 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
   form,
 }) => {
   const DEFAULT_APPROVAL_QUORUM = 60
-
-  useEffect(() => {
-    setForm({ yesThreshold: DEFAULT_APPROVAL_QUORUM })
-  }, [])
+  const { current: wallet } = useWalletStore((s) => s)
 
   const handleInsertTeamWallet = (wallets: string[]) => {
-    let teamWallets: string[] = []
-    if (form?.teamWallets) {
-      teamWallets = form.teamWallets
-    }
+    const teamWallets: string[] = form?.teamWallets ?? []
+
     wallets.forEach((wallet) => {
       if (!teamWallets.find((addr) => addr === wallet)) {
         teamWallets.push(wallet)
-        setForm({ teamWallets })
       }
     })
+    setForm({ teamWallets })
   }
 
   const handleRemoveTeamWallet = (index: number) => {
@@ -43,6 +39,21 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
       setForm({ teamWallets })
     }
   }
+
+  const addCurrentWallet = () => {
+    if (wallet?.publicKey) {
+      handleInsertTeamWallet([wallet.publicKey?.toBase58()])
+    }
+  }
+
+  useEffect(() => {
+    addCurrentWallet()
+  }, [wallet?.publicKey])
+
+  useEffect(() => {
+    setForm({ yesThreshold: DEFAULT_APPROVAL_QUORUM })
+    addCurrentWallet()
+  }, [])
 
   return (
     <div>
@@ -74,7 +85,7 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
               form.yesThreshold.toString().match(/\D+/gim)
             ) {
               setForm({
-                yesThreshold: 60,
+                yesThreshold: DEFAULT_APPROVAL_QUORUM,
               })
             }
           }}

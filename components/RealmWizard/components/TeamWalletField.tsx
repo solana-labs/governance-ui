@@ -48,15 +48,6 @@ const TeamWalletField: React.FC<{
     )
   }
 
-  useEffect(() => {
-    if (
-      wallet?.publicKey &&
-      !wallets.find((addr) => addr === wallet.publicKey?.toBase58())
-    ) {
-      onInsert([wallet.publicKey?.toBase58()])
-    }
-  }, [wallets.length, wallet?.publicKey])
-
   return (
     <div className="team-wallets-wrapper">
       <StyledLabel className="py-5">Team wallets</StyledLabel>
