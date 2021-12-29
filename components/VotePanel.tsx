@@ -126,18 +126,17 @@ const VotePanel = () => {
 
   const voteTooltipContent = !connected
     ? 'You need to connect your wallet to be able to vote'
-    : !isVoteEnabled
-    ? !isVoting && isVoteCast
-      ? 'Proposal is not in a voting state anymore.'
-      : voterTokenRecord?.info.governingTokenDepositAmount.isZero()
-      ? 'You don’t have governance power to vote in this realm'
-      : ''
+    : !isVoting && isVoteCast
+    ? 'Proposal is not in a voting state anymore.'
+    : voterTokenRecord?.info.governingTokenDepositAmount.isZero()
+    ? 'You don’t have governance power to vote in this realm'
     : ''
 
   const notVisibleStatesForNotConnectedWallet = [
     ProposalState.Cancelled,
     ProposalState.Succeeded,
     ProposalState.Draft,
+    ProposalState.Completed,
   ]
 
   const isVisibleToWallet = !connected
