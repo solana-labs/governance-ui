@@ -134,7 +134,7 @@ export async function registerRealm(
   // If the current wallet is in the team then deposit the council token
   if (councilMintPk)
     if (walletAtaPk) {
-      tokenOwnerRecordPk = await withDepositGoverningTokens(
+      await withDepositGoverningTokens(
         realmInstructions,
         programId,
         realmAddress,
