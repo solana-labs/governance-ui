@@ -12,6 +12,8 @@ import { MemcmpFilter, RpcContext } from 'models/core/api'
 import { GOVERNANCE_SCHEMA } from 'models/serialisation'
 import { deserializeBorsh } from 'utils/borsh'
 import { sleep } from '@project-serum/common'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { ConnectionContext } from '@utils/connection'
 
 const fetch = require('node-fetch')
 
@@ -132,4 +134,23 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
     console.error(e)
   }
   return accounts
+}
+
+export const getTokenAccountsByMint = async (
+  connection: ConnectionContext,
+  mint: string
+) => {
+  return await connection.current.getProgramAccounts(TOKEN_PROGRAM_ID, {
+    filters: [
+      {
+        dataSize: 165,
+      },
+      {
+        memcmp: {
+          offset: 0,
+          bytes: mint,
+        },
+      },
+    ],
+  })
 }

@@ -1,10 +1,25 @@
 import { TokenRecordsWithWalletAddress } from './types'
 import useRealm from '@hooks/useRealm'
-import { useMemo } from 'react'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { useEffect, useMemo } from 'react'
+import useWalletStore from 'stores/useWalletStore'
+import { getTokenAccountsByMint } from 'scripts/api'
+import { parseTokenAccountData } from '@utils/tokens'
+import { AccountInfo } from '@solana/spl-token'
 
 export default function useMembers() {
-  const { tokenRecords, councilTokenOwnerRecords, councilMint } = useRealm()
+  const { tokenRecords, councilTokenOwnerRecords, realm } = useRealm()
+  const connection = useWalletStore((s) => s.connection)
+
+  const fetchMembersWithTokensOutsideRealm = async (mint: string) => {
+    const tokenAccounts = await getTokenAccountsByMint(connection, mint)
+
+    const tokenAccountsInfo: AccountInfo[] = []
+    for (const acc of tokenAccounts) {
+      const parsed = parseTokenAccountData(acc.pubkey, acc.account.data)
+      tokenAccountsInfo.push(parsed)
+    }
+    return tokenAccountsInfo
+  }
 
   const tokenRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
@@ -23,22 +38,12 @@ export default function useMembers() {
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
       councilTokenOwnerRecords
-        ? Object.keys(councilTokenOwnerRecords)
-            .flatMap((x) => {
-              return {
-                walletAddress: x,
-                council: { ...councilTokenOwnerRecords[x] },
-              }
-            })
-            .filter(
-              (x) =>
-                Number(
-                  fmtMintAmount(
-                    councilMint,
-                    x.council.info.governingTokenDepositAmount
-                  )
-                ) > 0
-            )
+        ? Object.keys(councilTokenOwnerRecords).flatMap((x) => {
+            return {
+              walletAddress: x,
+              council: { ...councilTokenOwnerRecords[x] },
+            }
+          })
         : [],
     [JSON.stringify(councilTokenOwnerRecords)]
   )
@@ -94,6 +99,25 @@ export default function useMembers() {
     [JSON.stringify(tokenRecordArray), JSON.stringify(councilRecordArray)]
   )
 
+  useEffect(() => {
+    const fetchOutsideRealmMembers = async () => {
+      let communityMembers: AccountInfo[] = []
+      let councilMembers: AccountInfo[] = []
+      if (realm?.info.communityMint) {
+        communityMembers = await fetchMembersWithTokensOutsideRealm(
+          realm.info.communityMint.toBase58()
+        )
+      }
+      if (realm?.info.config.councilMint) {
+        councilMembers = await fetchMembersWithTokensOutsideRealm(
+          realm.info.config.councilMint.toBase58()
+        )
+      }
+      console.log(communityMembers, councilMembers, '@@@@@')
+    }
+
+    fetchOutsideRealmMembers()
+  }, [realm?.pubkey.toBase58()])
   return {
     tokenRecordArray,
     councilRecordArray,
