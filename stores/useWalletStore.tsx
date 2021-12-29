@@ -191,7 +191,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       console.log('fetchRealmBySymbol', cluster, symbol)
 
       const actions = get().actions
-      const connection = get().connection
+      let connection = get().connection
       const set = get().set
       const newConnection = getConnectionContext(cluster)
       if (
@@ -201,11 +201,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         set((s) => {
           s.connection = newConnection
         })
+        connection = get().connection
       }
 
       let programId: PublicKey | undefined
       let realmId = tryParsePublicKey(symbol)
-
       if (!realmId) {
         const realmInfo = await getCertifiedRealmInfo(symbol, newConnection)
         realmId = realmInfo?.realmId
@@ -216,7 +216,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
         programId = realmAccountInfo?.owner
       }
-
       if (realmId && programId) {
         await actions.fetchAllRealms(programId)
         actions.fetchRealm(programId, realmId)
@@ -301,7 +300,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       console.log('fetchAllRealms', get().realms)
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
-      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
       const set = get().set
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
