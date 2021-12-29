@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { StyledLabel } from '@components/inputs/styles'
 import AddWalletModal from './AddWalletModal'
 import { TrashIcon } from '@heroicons/react/solid'
