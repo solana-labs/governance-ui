@@ -1,6 +1,6 @@
 import { TokenRecordsWithWalletAddress } from './types'
 import useRealm from '@hooks/useRealm'
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { getTokenAccountsByMint } from 'scripts/api'
 import { parseTokenAccountData } from '@utils/tokens'
@@ -34,6 +34,7 @@ export default function useMembers() {
         : [],
     [JSON.stringify(tokenRecords)]
   )
+  const [members, setMembers] = useState<Member[]>([])
   //we take only records who have stored tokens inside realm
   //TODO check ATA wallet
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
@@ -60,7 +61,7 @@ export default function useMembers() {
 
   //merge community and council vote records to one big array of members
   //sort them by totalVotes sum of community and council votes
-  const members = useMemo(
+  const membersWithTokensDeposited = useMemo(
     () =>
       //remove duplicated walletAddresses
       Array.from(
@@ -113,13 +114,21 @@ export default function useMembers() {
       }
       councilMembers = councilMembers.filter((x) => x.amount.toNumber() !== 0)
       for (const councilMember of councilMembers) {
-        const member = members.find(
+        const member = membersWithTokensDeposited.find(
           (x) => x.walletAddress === councilMember.owner.toBase58()
         )
         if (member) {
-          member.councilVotes.add(councilMember.amount)
+          member.councilVotes = member.councilVotes.add(councilMember.amount)
+        } else {
+          membersWithTokensDeposited.push({
+            walletAddress: councilMember.owner.toBase58(),
+            votesCasted: 0,
+            councilVotes: councilMember.amount,
+            communityVotes: new BN(0),
+          })
         }
       }
+      setMembers(membersWithTokensDeposited)
     }
 
     fetchOutsideRealmMembers()
