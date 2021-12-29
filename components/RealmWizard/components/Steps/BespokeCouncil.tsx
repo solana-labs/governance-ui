@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm'
 import Input from '@components/inputs/Input'
 import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import TeamWalletField from '../TeamWalletField'
+import useWalletStore from 'stores/useWalletStore'
 const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
 }) => {
+  const { current: wallet } = useWalletStore((s) => s)
   const [councilMintSwitch, setCouncilMintSwitch] = useState(false)
   const handleInsertTeamWallet = (wallets: string[]) => {
     let teamWallets: string[] = []
@@ -31,6 +33,13 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
       setForm({ teamWallets })
     }
   }
+  useEffect(() => {
+    if (councilMintSwitch && wallet?.publicKey) {
+      handleInsertTeamWallet([wallet.publicKey.toBase58()])
+    } else {
+      setForm({ teamWallets: [] })
+    }
+  }, [councilMintSwitch])
   return (
     <>
       <div className="border-b border-fgd-4 pb-4 pt-2">

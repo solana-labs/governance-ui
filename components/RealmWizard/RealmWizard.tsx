@@ -55,10 +55,9 @@ const RealmWizard: React.FC = () => {
    */
   const [ctl, setController] = useState<RealmWizardController>()
 
-  const [form, setForm] = useState<RealmArtifacts>({
-    yesThreshold: 60,
-  })
+  const [form, setForm] = useState<RealmArtifacts>({})
   const [formErrors, setFormErrors] = useState({})
+
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
@@ -320,6 +319,7 @@ const RealmWizard: React.FC = () => {
       governanceProgramId:
         process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
         DEFAULT_GOVERNANCE_PROGRAM_ID,
+      yesThreshold: 60,
     })
   }, [])
 
