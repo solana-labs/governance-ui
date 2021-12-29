@@ -6,6 +6,8 @@ import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import TeamWalletField from '../TeamWalletField'
 import useWalletStore from 'stores/useWalletStore'
+import ApprovalQuorumInput from '../ApprovalQuorumInput'
+
 const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
@@ -69,22 +71,42 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
         </div>
       </div>
       {councilMintSwitch && (
-        <div className="w-full">
-          <Input
-            label="Council Mint Id"
-            placeholder="(Optional) Council mint"
-            value={form?.councilMintId}
-            type="text"
-            error={formErrors['councilMintId'] || formErrors['councilMint']}
-            onChange={(evt) => setForm({ councilMintId: evt.target.value })}
-          />
+        <>
+          <div className="pb-7 pr-10 w-full">
+            <Input
+              label="Council Mint Id"
+              placeholder="(Optional) Council mint"
+              value={form?.councilMintId}
+              type="text"
+              error={formErrors['councilMintId'] || formErrors['councilMint']}
+              onChange={(evt) => setForm({ councilMintId: evt.target.value })}
+            />
+          </div>
+          <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
+            <ApprovalQuorumInput
+              value={form.yesThreshold}
+              onChange={($e) => {
+                setForm({ yesThreshold: $e })
+              }}
+              onBlur={() => {
+                if (
+                  !form.yesThreshold ||
+                  form.yesThreshold.toString().match(/\D+/gim)
+                ) {
+                  setForm({
+                    yesThreshold: 60,
+                  })
+                }
+              }}
+            />
+          </div>
 
           <TeamWalletField
             onInsert={handleInsertTeamWallet}
             onRemove={handleRemoveTeamWallet}
             wallets={form.teamWallets}
           />
-        </div>
+        </>
       )}
     </>
   )
