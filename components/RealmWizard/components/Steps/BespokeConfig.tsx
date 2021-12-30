@@ -38,6 +38,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                   .toString()
               )
             ),
+            communityMintMaxVoteWeightSource: 1,
             communityMint: mint,
           })
         } else {
@@ -100,7 +101,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         </div>
         <div className="pb-4 pr-10 mr-2">
           <Input
-            label="Community Mint Id"
+            label="Community Token Mint"
             placeholder="Community mint id of this realm"
             value={form?.communityMintId}
             type="text"

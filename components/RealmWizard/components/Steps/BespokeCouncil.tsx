@@ -14,7 +14,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   formErrors,
 }) => {
   const { current: wallet } = useWalletStore((s) => s)
-  const [councilMintSwitch, setCouncilMintSwitch] = useState(false)
+  const [councilMintSwitch, setCouncilMintSwitch] = useState(true)
   const handleInsertTeamWallet = (wallets: string[]) => {
     let teamWallets: string[] = []
     if (form?.teamWallets) {
@@ -74,7 +74,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
         <>
           <div className="pb-7 pr-10 w-full">
             <Input
-              label="Council Mint Id"
+              label="Council token mint"
               placeholder="(Optional) Council mint"
               value={form?.councilMintId}
               type="text"
