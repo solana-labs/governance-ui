@@ -1,5 +1,4 @@
-import { LogoutIcon } from '@heroicons/react/solid'
-import { UserCircleIcon } from '@heroicons/react/outline'
+import { UserCircleIcon, LogoutIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
