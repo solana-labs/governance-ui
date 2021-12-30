@@ -46,6 +46,7 @@ export default function useMembers() {
     [JSON.stringify(councilTokenOwnerRecords)]
   )
 
+  //for community we exclude people who never vote
   const communityAndCouncilTokenRecords = [
     ...tokenRecordArray.filter(
       (x) =>
@@ -125,6 +126,7 @@ export default function useMembers() {
             member.councilVotes = member.councilVotes.add(
               councilMember.account.amount
             )
+            member.hasCouncilTokenOutsideRealm = true
           } else {
             //we add members who never deposited tokens inside realm
             members.push({
@@ -132,6 +134,7 @@ export default function useMembers() {
               votesCasted: 0,
               councilVotes: councilMember.account.amount,
               communityVotes: new BN(0),
+              hasCouncilTokenOutsideRealm: true,
             })
           }
         }
