@@ -22,14 +22,16 @@ const MemberItem = ({ item }: { item: Member }) => {
     (x) => x.address === realm?.info.communityMint.toBase58()
   )?.symbol
   const totalVotes = votesCasted
-  const communityAmount = communityVotes
-    ? useMemo(() => fmtMintAmount(mint, communityVotes), [item.walletAddress])
-    : null
-  const councilAmount = councilVotes
-    ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
-        item.walletAddress,
-      ])
-    : null
+  const communityAmount =
+    communityVotes && !communityVotes.isZero()
+      ? useMemo(() => fmtMintAmount(mint, communityVotes), [item.walletAddress])
+      : null
+  const councilAmount =
+    councilVotes && !councilVotes.isZero()
+      ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
+          item.walletAddress,
+        ])
+      : null
   const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
 
   async function handleGoToMemberOverview() {
@@ -52,15 +54,16 @@ const MemberItem = ({ item }: { item: Member }) => {
           Votes cast: {totalVotes}
         </div>
         <div className="text-fgd-3 text-xs flex flex-row">
-          {communityAmount && (
+          {/* until we have community tokens match from wallets we show 0 if someone withdrawn tokens */}
+          {(communityAmount || !councilAmount) && (
             <span>
-              {tokenName} Votes {communityAmount}
+              {tokenName} Votes {communityAmount || 0}
             </span>
           )}
-          {communityAmount && !councilVotes.isZero() && (
+          {communityAmount && councilAmount && (
             <span className="ml-1 mr-1">|</span>
           )}
-          {!councilVotes.isZero() && <span>Council Votes {councilAmount}</span>}
+          {councilAmount && <span>Council Votes {councilAmount}</span>}
         </div>
       </div>
     </div>
