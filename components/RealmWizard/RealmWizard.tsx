@@ -155,6 +155,7 @@ const RealmWizard: React.FC = () => {
         form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
         MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
         form.minCommunityTokensToCreateGovernance!,
+        form.yesThreshold,
         form.teamWallets
           ? form.teamWallets.map((w) => new PublicKey(w))
           : undefined
