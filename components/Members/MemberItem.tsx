@@ -1,4 +1,4 @@
-import { UserCircleIcon } from '@heroicons/react/outline'
+import { UserCircleIcon, LogoutIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
@@ -16,7 +16,13 @@ const MemberItem = ({ item }: { item: Member }) => {
     setCurrentCompactView,
     setCurrentCompactViewMember,
   } = useMembersListStore()
-  const { walletAddress, councilVotes, communityVotes, votesCasted } = item
+  const {
+    walletAddress,
+    councilVotes,
+    communityVotes,
+    votesCasted,
+    hasCouncilTokenOutsideRealm,
+  } = item
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === realm?.info.communityMint.toBase58()
@@ -63,7 +69,14 @@ const MemberItem = ({ item }: { item: Member }) => {
           {communityAmount && councilAmount && (
             <span className="ml-1 mr-1">|</span>
           )}
-          {councilAmount && <span>Council Votes {councilAmount}</span>}
+          {councilAmount && (
+            <span className="flex items-center">
+              Council Votes {councilAmount}{' '}
+              {hasCouncilTokenOutsideRealm && (
+                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
+              )}
+            </span>
+          )}
         </div>
       </div>
     </div>

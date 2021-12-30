@@ -5,4 +5,5 @@ export interface Member {
   votesCasted: number
   councilVotes: BN
   communityVotes: BN
+  hasCouncilTokenOutsideRealm?: boolean
 }
