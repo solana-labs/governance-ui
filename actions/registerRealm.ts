@@ -33,6 +33,12 @@ import {
 } from '@tools/sdk/units'
 import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
 import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
+
+/* 
+  TODO: Check if the abstractions present here can be moved to a 
+  separate util and replace some of the repeating code over the project
+*/
+
 /**
  * The default minimum amount of community tokens to create governance
  */
@@ -56,6 +62,8 @@ async function prepareCouncilInstructions(
   councilMint?: PublicKey,
   councilWalletPks?: PublicKey[]
 ) {
+  console.debug('preparing council instructions')
+
   let councilMintPk: PublicKey | undefined = undefined
   let walletAtaPk: PublicKey | undefined
   const councilMintInstructions: TransactionInstruction[] = []
@@ -127,6 +135,8 @@ async function prepareCommunityInstructions(
   connection: Connection,
   walletPubkey: PublicKey
 ) {
+  console.debug('preparing community instructions')
+
   const communityMintInstructions: TransactionInstruction[] = []
   const communityMintSigners: Keypair[] = []
   // Create community mint
@@ -153,6 +163,8 @@ async function prepareCommunityInstructions(
  * @returns
  */
 function mountGovernanceConfig(yesVoteThreshold = 60): GovernanceConfig {
+  console.debug('mounting governance config')
+
   const minCommunityTokensToCreateAsMintValue = new BN(
     getMintNaturalAmountFromDecimal(
       MIN_COMM_TOKENS_TO_CREATE_GOV,
@@ -197,6 +209,7 @@ async function prepareGovernanceInstructions(
   tokenOwnerRecordPk: PublicKey,
   realmInstructions: TransactionInstruction[]
 ) {
+  console.debug('Preparing governance instructions')
   const config = mountGovernanceConfig(yesVoteThreshold)
 
   const {
@@ -255,6 +268,8 @@ function sendTransactionFactory(
   communityMintInstructions?: TransactionInstruction[],
   communityMintSigners?: Keypair[]
 ) {
+  console.debug('factoring sendtransaction')
+
   const instructions: TransactionInstruction[][] = [realmInstructions]
   const signerSets: Keypair[][] = [[]]
 
@@ -296,6 +311,7 @@ export async function registerRealm(
   councilWalletPks?: PublicKey[]
 ): Promise<PublicKey> {
   if (!wallet) throw WalletConnectionError
+  console.debug('starting register realm')
 
   const realmInstructions: TransactionInstruction[] = []
 
@@ -390,8 +406,9 @@ export async function registerRealm(
     communityMintInstructions,
     communityMintSigners
   )
-
+  console.debug('sending transaction')
   await txnToSend
+  console.debug('transaction sent')
 
   return realmAddress
 }
