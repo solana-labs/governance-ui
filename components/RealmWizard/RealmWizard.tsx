@@ -307,7 +307,13 @@ const RealmWizard: React.FC = () => {
           />
         )
       case RealmWizardStep.BESPOKE_INFO:
-        return <BespokeInfo form={form} setForm={handleSetForm} />
+        return (
+          <BespokeInfo
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+          />
+        )
       case RealmWizardStep.REALM_CREATED:
         return <RealmCreated realmAddress={realmAddress} />
       default:
@@ -322,11 +328,9 @@ const RealmWizard: React.FC = () => {
 
   return (
     <div
-      className="relative w-full min-h-[60vh]"
+      className="relative w-auto min-h-[60vh]"
       style={
-        ctl &&
-        ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE &&
-        ctl.getCurrentStep() !== RealmWizardStep.BESPOKE_INFO
+        ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE
           ? { maxWidth: 512 }
           : undefined
       }

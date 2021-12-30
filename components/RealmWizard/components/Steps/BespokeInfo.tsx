@@ -5,21 +5,20 @@ import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import ApprovalQuorumInput from '../ApprovalQuorumInput'
-import TeamWalletField from '../TeamWalletField'
 
 const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
+  formErrors,
 }) => {
-  console.log(form)
   return (
     <>
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Create a new realm</h1>
+          <h1>Realm summary</h1>
         </div>
       </div>
-      <div className="grid grid-cols-2">
+      <div className="flex justify-between">
         <div>
           <div className="pt-2">
             <div className="pb-4 pr-10 mr-2">
@@ -28,6 +27,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 label="Name"
                 placeholder="Name of your realm"
                 value={form.name}
+                error={formErrors['name']}
                 type="text"
               />
             </div>
@@ -39,6 +39,9 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                   !form?.communityMintId ? " (We'll generate for you)" : ''
                 } `}
                 placeholder="Community mint id of this realm"
+                error={
+                  formErrors['communityMintId'] || formErrors['communityMint']
+                }
                 value={form?.communityMintId}
                 type="text"
               />
@@ -63,6 +66,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     placeholder="Min community tokens to create governance"
                     step="0.01"
                     value={form.minCommunityTokensToCreateGovernance}
+                    error={formErrors['minCommunityTokensToCreateGovernance']}
                     type="number"
                   />
                 </div>
@@ -72,6 +76,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     label="Community mint supply factor (max vote weight)"
                     placeholder="Community mint supply factor (max vote weight)"
                     value={form.communityMintMaxVoteWeightSource}
+                    error={formErrors['communityMintMaxVoteWeightSource']}
                     type="number"
                   />
                 </div>
@@ -83,6 +88,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 label="Governance Program Id"
                 placeholder="Id of the governance program this realm will be associated with"
                 value={form?.governanceProgramId}
+                error={formErrors['governanceProgramId']}
                 type="text"
               />
             </div>
@@ -95,12 +101,13 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 step="1"
                 min={1}
                 value={form?.programVersion}
+                error={formErrors['programVersion']}
                 type="number"
               />
             </div>
           </div>
         </div>
-        <div className="pt-2">
+        <div className="pt-5 pr-2">
           {form.teamWallets?.length ? (
             <>
               <div className="pb-7 pr-10 w-full">
@@ -110,11 +117,14 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     !form?.councilMintId ? " (We'll generate for you)" : ''
                   } `}
                   placeholder="(Optional) Council mint"
+                  error={
+                    formErrors['councilMintId'] || formErrors['councilMintId']
+                  }
                   value={form?.councilMintId}
                   type="text"
                 />
               </div>
-              <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
+              <div className="pb-7 pr-10 w-full">
                 <ApprovalQuorumInput
                   value={form.yesThreshold}
                   onChange={($e) => null}
@@ -122,9 +132,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 />
               </div>
             </>
-          ) : (
-            <></>
-          )}
+          ) : null}
           {form.teamWallets?.length ? (
             <div className="team-wallets-wrapper">
               <StyledLabel className="py-5">Team wallets</StyledLabel>
@@ -142,9 +150,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 </div>
               ))}
             </div>
-          ) : (
-            <></>
-          )}
+          ) : null}
         </div>
       </div>
     </>
