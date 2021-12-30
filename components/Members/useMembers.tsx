@@ -13,7 +13,6 @@ export default function useMembers() {
 
   const fetchMembersWithTokensOutsideRealm = async (mint: string) => {
     const tokenAccounts = await getTokenAccountsByMint(connection, mint)
-
     const tokenAccountsInfo: AccountInfo[] = []
     for (const acc of tokenAccounts) {
       const parsed = parseTokenAccountData(acc.pubkey, acc.account.data)
@@ -35,8 +34,7 @@ export default function useMembers() {
     [JSON.stringify(tokenRecords)]
   )
   const [members, setMembers] = useState<Member[]>([])
-  //we take only records who have stored tokens inside realm
-  //TODO check ATA wallet
+
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
       councilTokenOwnerRecords
@@ -105,34 +103,47 @@ export default function useMembers() {
   )
 
   useEffect(() => {
-    const fetchOutsideRealmMembers = async () => {
+    const handleSetMembers = async () => {
       let councilMembers: AccountInfo[] = []
+      //if realm has council mint we fetch token accounts with tokens inside wallet
       if (realm?.info.config.councilMint) {
+        const members = [...membersWithTokensDeposited]
         councilMembers = await fetchMembersWithTokensOutsideRealm(
           realm.info.config.councilMint.toBase58()
         )
-      }
-      councilMembers = councilMembers.filter((x) => x.amount.toNumber() !== 0)
-      for (const councilMember of councilMembers) {
-        const member = membersWithTokensDeposited.find(
-          (x) => x.walletAddress === councilMember.owner.toBase58()
+        //we filter out people who dont have any tokens and we filter out accounts owned by realm e.g.
+        //accounts that holds deposited tokens inside realm.
+        councilMembers = councilMembers.filter(
+          (x) =>
+            x.amount.toNumber() !== 0 &&
+            x.owner.toBase58() !== realm?.pubkey.toBase58()
         )
-        if (member) {
-          member.councilVotes = member.councilVotes.add(councilMember.amount)
-        } else {
-          membersWithTokensDeposited.push({
-            walletAddress: councilMember.owner.toBase58(),
-            votesCasted: 0,
-            councilVotes: councilMember.amount,
-            communityVotes: new BN(0),
-          })
+        for (const councilMember of councilMembers) {
+          //We match members that had deposited tokens at least once
+          const member = members.find(
+            (x) => x.walletAddress === councilMember.owner.toBase58()
+          )
+          if (member) {
+            member.councilVotes = member.councilVotes.add(councilMember.amount)
+          } else {
+            //we add members who never deposited tokens inside realm
+            members.push({
+              walletAddress: councilMember.owner.toBase58(),
+              votesCasted: 0,
+              councilVotes: councilMember.amount,
+              communityVotes: new BN(0),
+            })
+          }
         }
+        setMembers(members)
+      } else {
+        setMembers(membersWithTokensDeposited)
       }
-      setMembers(membersWithTokensDeposited)
     }
 
-    fetchOutsideRealmMembers()
+    handleSetMembers()
   }, [realm?.pubkey.toBase58()])
+
   return {
     tokenRecordArray,
     councilRecordArray,
