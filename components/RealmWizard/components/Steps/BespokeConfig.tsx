@@ -75,6 +75,9 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         await handleCommunityMint(form.communityMintId)
       }
     }, 250)()
+    if (!form?.communityMintId?.length) {
+      setForm({ communityMint: undefined })
+    }
   }, [form?.communityMintId, form?.councilMintId])
 
   return (

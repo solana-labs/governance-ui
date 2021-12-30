@@ -151,7 +151,8 @@ const RealmWizard: React.FC = () => {
         rpcContext.programId,
         form.programVersion ?? ProgramVersion.V1,
         form.name!,
-        new PublicKey(form.communityMintId!),
+
+        form.communityMintId ? new PublicKey(form.communityMintId) : undefined,
         form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
         MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
         form.minCommunityTokensToCreateGovernance!,
@@ -162,6 +163,7 @@ const RealmWizard: React.FC = () => {
       )
       router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
     } else {
+      console.debug(validationErrors)
       setFormErrors(validationErrors)
     }
   }
@@ -214,12 +216,13 @@ const RealmWizard: React.FC = () => {
     if (ctl) {
       try {
         setIsLoading(true)
+
         switch (ctl.getMode()) {
           case RealmWizardMode.BASIC:
             await handleCreateMultisigRealm()
             break
           case RealmWizardMode.ADVANCED:
-            handleCreateBespokeRealm()
+            await handleCreateBespokeRealm()
             break
           default:
             throw new Error('Mode not available.')
@@ -250,35 +253,27 @@ const RealmWizard: React.FC = () => {
       ? false
       : !form.teamWallets?.length || !form.name
 
-  const checkStepCondition = (step: RealmWizardStep): boolean => {
+  const canGoNext = (step: RealmWizardStep): boolean => {
     if (step === RealmWizardStep.BESPOKE_CONFIG) {
       const errors: any = {}
       !form.name ? (errors.name = 'Name is required') : null
       !form.governanceProgramId
         ? (errors.governanceProgramId = 'Governance Program ID is required')
         : null
-      !form.communityMint
-        ? (errors.communityMint = 'Community mint is required')
-        : null
-      !form.communityMintMaxVoteWeightSource
-        ? (errors.communityMintMaxVoteWeightSource =
-            'Mint supply factor is required')
-        : null
+
       setFormErrors(errors)
 
       return !Object.values(errors).length
     }
-    if (step === RealmWizardStep.BESPOKE_COUNCIL) {
-      return true
-    }
-    return false
+
+    return true
   }
 
   const onClickNext = (): boolean => {
     if (ctl)
       switch (ctl.getMode()) {
         case RealmWizardMode.ADVANCED:
-          return checkStepCondition(ctl.getCurrentStep())
+          return canGoNext(ctl.getCurrentStep())
         default:
           return false
       }
@@ -329,7 +324,9 @@ const RealmWizard: React.FC = () => {
     <div
       className="relative w-full min-h-[60vh]"
       style={
-        ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE
+        ctl &&
+        ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE &&
+        ctl.getCurrentStep() !== RealmWizardStep.BESPOKE_INFO
           ? { maxWidth: 512 }
           : undefined
       }
