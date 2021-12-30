@@ -6,18 +6,42 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import BN from 'bn.js'
-import { MintMaxVoteWeightSource } from '../models/accounts'
+import {
+  GovernanceConfig,
+  MintMaxVoteWeightSource,
+  VoteThresholdPercentage,
+  VoteWeightSource,
+} from '../models/accounts'
 import { withCreateRealm } from '../models/withCreateRealm'
 import { RpcContext } from '../models/core/api'
 import { sendTransaction } from '../utils/send'
 import { ProgramVersion } from '@models/registry/constants'
-import { sendTransactions, SequenceType } from 'utils/sendTransactions'
+import {
+  sendTransactions,
+  SequenceType,
+  WalletSigner,
+} from 'utils/sendTransactions'
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import { chunks } from '@utils/helpers'
 import { WalletConnectionError } from '@solana/wallet-adapter-base'
 import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
+import {
+  getMintNaturalAmountFromDecimal,
+  getTimestampFromDays,
+} from '@tools/sdk/units'
+import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
+import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
+/**
+ * The default minimum amount of community tokens to create governance
+ */
+const MIN_COMM_TOKENS_TO_CREATE_GOV = 1000000
+
+/**
+ * The default amount of decimals for the community token
+ */
+const COMM_MINT_DECIMALS = 6
 
 /**
  * Prepares the council instructions
@@ -78,7 +102,7 @@ async function prepareCouncilInstructions(
   }
 
   const councilMembersChunks = chunks(councilMintInstructions, 10)
-  // only walletPk needs to sign the minting instructions and it's a signer by default and we don't have to include any more signers
+  // I tried to left as an empty array, but always get failed in signature verification
   const councilSignersChunks = Array(councilMembersChunks.length).fill(
     councilMintSigners
   )
@@ -91,17 +115,188 @@ async function prepareCouncilInstructions(
   }
 }
 
+/**
+ * Prepares the instructions to create a community mint
+ *
+ * > This should be called if a community mint is not provided.
+ * @param connection the current connection
+ * @param walletPubkey payeer
+ * @returns
+ */
+async function prepareCommunityInstructions(
+  connection: Connection,
+  walletPubkey: PublicKey
+) {
+  const communityMintInstructions: TransactionInstruction[] = []
+  const communityMintSigners: Keypair[] = []
+  // Create community mint
+  const communityMintPk = await withCreateMint(
+    connection,
+    communityMintInstructions,
+    communityMintSigners,
+    walletPubkey,
+    null,
+    COMM_MINT_DECIMALS,
+    walletPubkey
+  )
+
+  return {
+    communityMintPk,
+    communityMintInstructions,
+    communityMintSigners,
+  }
+}
+
+/**
+ * Creates a default governance config object
+ * @param yesVoteThreshold
+ * @returns
+ */
+function mountGovernanceConfig(yesVoteThreshold = 60): GovernanceConfig {
+  const minCommunityTokensToCreateAsMintValue = new BN(
+    getMintNaturalAmountFromDecimal(
+      MIN_COMM_TOKENS_TO_CREATE_GOV,
+      COMM_MINT_DECIMALS
+    )
+  )
+
+  // Put community and council mints under the realm governance with default config
+  return new GovernanceConfig({
+    voteThresholdPercentage: new VoteThresholdPercentage({
+      value: yesVoteThreshold,
+    }),
+    minCommunityTokensToCreateProposal: minCommunityTokensToCreateAsMintValue,
+    // Do not use instruction hold up time
+    minInstructionHoldUpTime: 0,
+    // max voting time 3 days
+    maxVotingTime: getTimestampFromDays(3),
+    voteWeightSource: VoteWeightSource.Deposit,
+    proposalCoolOffTime: 0,
+    minCouncilTokensToCreateProposal: new BN(1),
+  })
+}
+
+/**
+ * Sets the governance instructions into the realm
+ *
+ * @param walletPubkey payeer wallet pub key
+ * @param tokenMintPk the token mint to put under governance
+ * @param yesVoteThreshold vote quorum
+ * @param programId governance program id
+ * @param realmPk realm pub key
+ * @param tokenOwnerRecordPk
+ * @param realmInstructions realm instructions array
+ */
+async function prepareGovernanceInstructions(
+  walletPubkey: PublicKey,
+  councilMintPk: PublicKey,
+  communityMintPk: PublicKey,
+  yesVoteThreshold: number,
+  programId: PublicKey,
+  realmPk: PublicKey,
+  tokenOwnerRecordPk: PublicKey,
+  realmInstructions: TransactionInstruction[]
+) {
+  const config = mountGovernanceConfig(yesVoteThreshold)
+
+  const {
+    governanceAddress: communityMintGovPk,
+  } = await withCreateMintGovernance(
+    realmInstructions,
+    programId,
+    realmPk,
+    communityMintPk,
+    config,
+    walletPubkey as any, // TODO: is it right? Shouldn't it be !! or a true boolean?
+    walletPubkey,
+    tokenOwnerRecordPk,
+    walletPubkey
+  )
+
+  await withCreateMintGovernance(
+    realmInstructions,
+    programId,
+    realmPk,
+    councilMintPk,
+    config,
+    walletPubkey as any,
+    walletPubkey,
+    tokenOwnerRecordPk,
+    walletPubkey
+  )
+
+  // Set the community governance as the realm authority
+  withSetRealmAuthority(
+    realmInstructions,
+    programId,
+    realmPk,
+    walletPubkey,
+    communityMintGovPk
+  )
+}
+
+/**
+ * Factories the send transaction method according to the parameters
+ * @param wallet the payeer
+ * @param connection current connection
+ * @param councilMembersChunks Chunks of council members instructions
+ * @param councilSignersChunks Chunks of council signers
+ * @param communityMintInstructions Community mint instructions
+ * @param communityMintSigners Community mint signers
+ * @param realmInstructions Realm instructions
+ * @returns a promise to be executed.
+ */
+function sendTransactionFactory(
+  wallet: WalletSigner,
+  connection: Connection,
+  councilMembersChunks: TransactionInstruction[][],
+  councilSignersChunks: Keypair[][],
+  realmInstructions: TransactionInstruction[],
+  communityMintInstructions?: TransactionInstruction[],
+  communityMintSigners?: Keypair[]
+) {
+  const instructions: TransactionInstruction[][] = [realmInstructions]
+  const signerSets: Keypair[][] = [[]]
+
+  if (councilMembersChunks.length) {
+    instructions.unshift(...councilMembersChunks)
+    signerSets.unshift(...councilSignersChunks)
+  }
+
+  if (communityMintInstructions && communityMintSigners) {
+    instructions.unshift(communityMintInstructions)
+    signerSets.unshift(communityMintSigners)
+  }
+
+  if (instructions.length > 1) {
+    return sendTransactions(
+      connection,
+      wallet,
+      instructions,
+      signerSets,
+      SequenceType.Sequential
+    )
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...realmInstructions)
+    return sendTransaction({ transaction, wallet, connection })
+  }
+}
+
 export async function registerRealm(
   { connection, wallet, walletPubkey }: RpcContext,
   programId: PublicKey,
   programVersion: ProgramVersion,
   name: string,
-  communityMint: PublicKey,
+  communityMint: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
   minCommunityTokensToCreateGovernance: BN,
+  yesVoteThreshold = 60,
   councilWalletPks?: PublicKey[]
 ): Promise<PublicKey> {
+  if (!wallet) throw WalletConnectionError
+
   const realmInstructions: TransactionInstruction[] = []
 
   const {
@@ -116,13 +311,32 @@ export async function registerRealm(
     councilWalletPks
   )
 
+  let communityMintInstructions:
+    | TransactionInstruction[]
+    | undefined = undefined
+  let communityMintPk: PublicKey | undefined = communityMint
+  let communityMintSigners: Keypair[] | undefined = undefined
+
+  // If user doens't provides a community mint, we'll generate it
+  if (!communityMint) {
+    const communityDetails = await prepareCommunityInstructions(
+      connection,
+      walletPubkey
+    )
+    communityMintInstructions = communityDetails.communityMintInstructions
+    communityMintPk = communityDetails.communityMintPk
+    communityMintSigners = communityDetails.communityMintSigners
+  }
+
+  if (!communityMintPk) throw new Error('Invalid community mint public key.')
+
   const realmAddress = await withCreateRealm(
     realmInstructions,
     programId,
     programVersion,
     name,
     walletPubkey,
-    communityMint,
+    communityMintPk,
     walletPubkey,
     councilMintPk,
     communityMintMaxVoteWeightSource,
@@ -130,10 +344,12 @@ export async function registerRealm(
     undefined
   )
 
+  let tokenOwnerRecordPk: PublicKey | undefined = undefined
+
   // If the current wallet is in the team then deposit the council token
-  if (councilMintPk)
+  if (councilMintPk) {
     if (walletAtaPk) {
-      await withDepositGoverningTokens(
+      tokenOwnerRecordPk = await withDepositGoverningTokens(
         realmInstructions,
         programId,
         realmAddress,
@@ -148,23 +364,34 @@ export async function registerRealm(
       // TODO: To fix it we would have to make it temp. as part of the team and then remove after the realm is created
       throw new Error('Current wallet must be in the team')
     }
-
-  const transaction = new Transaction()
-  transaction.add(...realmInstructions)
-
-  if (!wallet) throw WalletConnectionError
-
-  if (councilMembersChunks.length) {
-    await sendTransactions(
-      connection,
-      wallet,
-      [...councilMembersChunks, realmInstructions],
-      [...councilSignersChunks, []],
-      SequenceType.Sequential
-    )
-  } else {
-    await sendTransaction({ transaction, wallet, connection })
   }
+
+  // Checks if the council AND community tokens were generated by us
+  // and put them under governance
+  if (tokenOwnerRecordPk && councilMintPk && communityMintInstructions) {
+    await prepareGovernanceInstructions(
+      walletPubkey,
+      councilMintPk,
+      communityMintPk,
+      yesVoteThreshold,
+      programId,
+      realmAddress,
+      tokenOwnerRecordPk,
+      realmInstructions
+    )
+  }
+
+  const txnToSend = sendTransactionFactory(
+    wallet,
+    connection,
+    councilMembersChunks,
+    councilSignersChunks,
+    realmInstructions,
+    communityMintInstructions,
+    communityMintSigners
+  )
+
+  await txnToSend
 
   return realmAddress
 }
