@@ -8,7 +8,7 @@ import {
   MultisigOptions,
   BespokeConfig,
   BespokeCouncil,
-  StepFour,
+  BespokeInfo,
   RealmCreated,
 } from './components/Steps'
 import { useMemo } from 'react'
@@ -254,20 +254,22 @@ const RealmWizard: React.FC = () => {
     if (step === RealmWizardStep.BESPOKE_CONFIG) {
       const errors: any = {}
       !form.name ? (errors.name = 'Name is required') : null
-      !form.communityMint
-        ? (errors.communityMint = 'Community mint is required')
-        : null
       !form.governanceProgramId
         ? (errors.governanceProgramId = 'Governance Program ID is required')
+        : null
+      !form.communityMint
+        ? (errors.communityMint = 'Community mint is required')
         : null
       !form.communityMintMaxVoteWeightSource
         ? (errors.communityMintMaxVoteWeightSource =
             'Mint supply factor is required')
         : null
-
       setFormErrors(errors)
-      console.debug(!!Object.values(errors).length)
+
       return !Object.values(errors).length
+    }
+    if (step === RealmWizardStep.BESPOKE_COUNCIL) {
+      return true
     }
     return false
   }
@@ -309,8 +311,8 @@ const RealmWizard: React.FC = () => {
             setFormErrors={setFormErrors}
           />
         )
-      case RealmWizardStep.STEP_4:
-        return <StepFour form={form} setForm={handleSetForm} />
+      case RealmWizardStep.BESPOKE_INFO:
+        return <BespokeInfo form={form} setForm={handleSetForm} />
       case RealmWizardStep.REALM_CREATED:
         return <RealmCreated realmAddress={realmAddress} />
       default:
@@ -325,7 +327,7 @@ const RealmWizard: React.FC = () => {
 
   return (
     <div
-      className="relative w-full"
+      className="relative w-full min-h-[60vh]"
       style={
         ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE
           ? { maxWidth: 512 }
@@ -358,7 +360,7 @@ const RealmWizard: React.FC = () => {
             }}
             disabled={isCreateButtonDisabled()}
           >
-            {ctl.isLastStep() ? 'Create' : 'Next'}
+            {ctl.isLastStep() ? 'Create Realm' : 'Next'}
           </Button>
         </div>
       )}

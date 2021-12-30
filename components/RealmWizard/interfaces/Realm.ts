@@ -60,9 +60,9 @@ export enum RealmWizardStep {
    */
   BESPOKE_COUNCIL,
   /**
-   * Not defined yet
+   * Information Inserted to create realm
    */
-  STEP_4,
+  BESPOKE_INFO,
   /**
    * Represents the Realm Created state
    */
