@@ -105,7 +105,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         <div className="pb-4 pr-10 mr-2">
           <Input
             label="Community Token Mint"
-            placeholder="Community mint id of this realm"
+            placeholder="(Optional) Community mint id of this realm"
             value={form?.communityMintId}
             type="text"
             error={formErrors['communityMintId'] || formErrors['communityMint']}
