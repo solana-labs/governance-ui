@@ -24,6 +24,7 @@ export const DEFAULT_GOVERNANCE_PROGRAM_ID =
  */
 export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
   'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
+
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
