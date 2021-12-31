@@ -67,7 +67,7 @@ async function prepareMintInstructions(
   connection: Connection,
   walletPubkey: PublicKey,
   tokenDecimals: number,
-  council: boolean = false,
+  council = false,
   mintPk?: PublicKey,
   otherOwners?: PublicKey[]
 ) {
