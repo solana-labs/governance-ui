@@ -11,6 +11,7 @@ import ProposalTimeStatus from './ProposalTimeStatus'
 
 import useQueryContext from '../hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
+import { format } from '@utils/helpers'
 
 type ProposalCardProps = {
   proposalPk: PublicKey
@@ -47,7 +48,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
           <StyledCardWrapper className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3">
             <div className="p-4">
               <div className="flex items-start justify-between">
-                <h3 className="text-fgd-1">{proposal.name}</h3>
+                <h3 className="text-fgd-1">{format(proposal.name, 18)}</h3>
                 <div className="flex items-center pl-4 pt-1">
                   <ProposalStateBadge
                     proposalPk={proposalPk}
