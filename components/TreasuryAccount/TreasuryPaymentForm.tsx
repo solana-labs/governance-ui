@@ -309,7 +309,9 @@ const TreasuryPaymentForm = ({ close }) => {
   const schema = getTokenTransferSchema({ form, connection })
 
   const transactionDolarAmount: number =
-    form.amount > 0 ? calculateTransactionDolarAmount(form.amount) : 0
+    Number(form.amount) > 0
+      ? calculateTransactionDolarAmount(Number(form.amount))
+      : 0
 
   const proposalTitle = `Pay ${form.amount}${
     tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
