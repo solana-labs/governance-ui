@@ -5,7 +5,7 @@ import type { EndpointInfo } from '../@types/types'
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://api.mainnet-beta.solana.com',
+    url: process.env.MAINNET_RPC || 'https://solana-api.projectserum.com',
   },
   {
     name: 'devnet',
@@ -24,6 +24,7 @@ export interface ConnectionContext {
 }
 
 export function getConnectionContext(cluster: string): ConnectionContext {
+  console.log('process.env', process.env)
   const ENDPOINT = ENDPOINTS.find((e) => e.name === cluster) || ENDPOINTS[0]
   return {
     cluster: ENDPOINT!.name as EndpointTypes,
