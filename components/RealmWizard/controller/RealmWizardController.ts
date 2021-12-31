@@ -42,8 +42,8 @@ class RealmWizardController {
       case RealmWizardMode.ADVANCED:
         this.steps.push(RealmWizardStep.BESPOKE_CONFIG)
         this.steps.push(RealmWizardStep.BESPOKE_COUNCIL)
+        this.steps.push(RealmWizardStep.GOVERNANCE)
         this.steps.push(RealmWizardStep.BESPOKE_INFO)
-
         break
       default:
         throw new Error('The selected mode is not available')

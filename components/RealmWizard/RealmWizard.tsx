@@ -362,6 +362,7 @@ const RealmWizard: React.FC = () => {
                   handleStepSelection(StepDirection.PREV)
                 }}
                 className="px-10"
+                style={{ minWidth: '142px' }}
               >
                 Previous
               </Button>
@@ -375,6 +376,7 @@ const RealmWizard: React.FC = () => {
               }}
               disabled={isCreateButtonDisabled()}
               className="px-10"
+              style={{ minWidth: '142px' }}
             >
               {ctl.isLastStep() ? 'Create Realm' : 'Next'}
             </Button>

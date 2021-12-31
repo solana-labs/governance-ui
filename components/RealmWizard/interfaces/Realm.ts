@@ -60,6 +60,10 @@ export enum RealmWizardStep {
    */
   BESPOKE_COUNCIL,
   /**
+   * Setup the governance token
+   */
+  GOVERNANCE,
+  /**
    * Information Inserted to create realm
    */
   BESPOKE_INFO,

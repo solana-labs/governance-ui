@@ -41,9 +41,9 @@ import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
 */
 
 /**
- * The default minimum amount of community tokens to create governance
+ * The default amount of community tokens with 0 supply
  */
-const MIN_COMM_TOKENS_TO_CREATE_GOV = 1000000
+const DEF_COMMUNITY_TOKENS_W_0_SUPPLY = 1000000
 
 /**
  * The default amount of decimals for the community token
@@ -168,7 +168,7 @@ function mountGovernanceConfig(yesVoteThreshold = 60): GovernanceConfig {
 
   const minCommunityTokensToCreateAsMintValue = new BN(
     getMintNaturalAmountFromDecimal(
-      MIN_COMM_TOKENS_TO_CREATE_GOV,
+      DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
       COMM_MINT_DECIMALS
     )
   )
@@ -221,7 +221,7 @@ async function prepareGovernanceInstructions(
     realmPk,
     communityMintPk,
     config,
-    walletPubkey as any, // TODO: is it right? Shouldn't it be !! or a true boolean?
+    true,
     walletPubkey,
     tokenOwnerRecordPk,
     walletPubkey
@@ -233,7 +233,7 @@ async function prepareGovernanceInstructions(
     realmPk,
     councilMintPk,
     config,
-    walletPubkey as any,
+    true,
     walletPubkey,
     tokenOwnerRecordPk,
     walletPubkey
