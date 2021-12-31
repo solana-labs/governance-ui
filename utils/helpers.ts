@@ -17,3 +17,22 @@ export class SanitizedObject {
     return Object.assign(Object.create(null), obj)
   }
 }
+
+export const format = (string: string, end = 48) => {
+  if (string.length <= end) {
+    return string
+  }
+
+  return `${string.substring(0, end)}...`
+}
+
+export const ellipsis = (string: string, start = 7, end = 4) => {
+  if (typeof string !== 'string' || string === '') {
+    return string
+  }
+
+  return `${string.substring(0, start)}...${string.substring(
+    string.length - end,
+    string.length
+  )} `
+}
