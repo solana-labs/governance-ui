@@ -147,18 +147,19 @@ async function prepareMintInstructions(
  */
 function mountGovernanceConfig(
   yesVoteThreshold = 60,
-  minCommunityTokensToCreateGovernance?: BN
+  tokenDecimals?: number,
+  minCommunityTokensToCreateGovernance?: string
 ): GovernanceConfig {
   console.debug('mounting governance config')
 
-  const minCommunityTokensToCreateAsMintValue =
-    minCommunityTokensToCreateGovernance ??
-    new BN(
-      getMintNaturalAmountFromDecimal(
-        DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
-        COMMUNITY_MINT_DECIMALS
-      )
+  const minCommunityTokensToCreateAsMintValue = new BN(
+    getMintNaturalAmountFromDecimal(
+      minCommunityTokensToCreateGovernance
+        ? +minCommunityTokensToCreateGovernance
+        : DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+      tokenDecimals ?? COMMUNITY_MINT_DECIMALS
     )
+  )
 
   // Put community and council mints under the realm governance with default config
   return new GovernanceConfig({
@@ -191,8 +192,9 @@ async function prepareGovernanceInstructions(
   walletPubkey: PublicKey,
   councilMintPk: PublicKey | undefined,
   communityMintPk: PublicKey,
+  communityTokenDecimals: number | undefined,
   yesVoteThreshold: number,
-  minCommunityTokensToCreateGovernance: BN,
+  minCommunityTokensToCreateGovernance: string,
   programId: PublicKey,
   realmPk: PublicKey,
   tokenOwnerRecordPk: PublicKey,
@@ -203,6 +205,7 @@ async function prepareGovernanceInstructions(
 
   const config = mountGovernanceConfig(
     yesVoteThreshold,
+    communityTokenDecimals,
     minCommunityTokensToCreateGovernance
   )
 
@@ -305,9 +308,10 @@ export async function registerRealm(
   communityMint: PublicKey | undefined,
   councilMint: PublicKey | undefined,
   communityMintMaxVoteWeightSource: MintMaxVoteWeightSource,
-  minCommunityTokensToCreateGovernance: BN,
+  minCommunityTokensToCreateGovernance: string,
   yesVoteThreshold = 60,
   transferAuthority = true,
+  communityMintTokenDecimals?: number,
   councilWalletPks?: PublicKey[]
 ): Promise<PublicKey> {
   if (!wallet) throw WalletConnectionError
@@ -349,6 +353,15 @@ export async function registerRealm(
 
   if (!communityMintPk) throw new Error('Invalid community mint public key.')
 
+  const _minCommunityTokensToCreateGovernance = new BN(
+    getMintNaturalAmountFromDecimal(
+      minCommunityTokensToCreateGovernance
+        ? +minCommunityTokensToCreateGovernance
+        : DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+      communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
+    )
+  )
+
   const realmAddress = await withCreateRealm(
     realmInstructions,
     programId,
@@ -359,7 +372,7 @@ export async function registerRealm(
     walletPubkey,
     councilMintPk,
     communityMintMaxVoteWeightSource,
-    minCommunityTokensToCreateGovernance,
+    _minCommunityTokensToCreateGovernance,
     undefined
   )
 
@@ -392,6 +405,7 @@ export async function registerRealm(
       walletPubkey,
       councilMintPk,
       communityMintPk,
+      communityMintTokenDecimals,
       yesVoteThreshold,
       minCommunityTokensToCreateGovernance,
       programId,

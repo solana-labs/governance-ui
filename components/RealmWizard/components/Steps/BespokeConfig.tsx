@@ -31,15 +31,12 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         const supply = mint.account.supply
         if (supply.gt(new BN(0))) {
           setForm({
-            minCommunityTokensToCreateGovernance: BN.max(
-              new BN(1),
-              // divide by 100 for a percentage
-              new BN(
-                getMintDecimalAmount(mint.account, supply)
-                  .dividedBy(100)
-                  .toString()
-              )
-            ),
+            minCommunityTokensToCreateGovernance: getMintDecimalAmount(
+              mint.account,
+              supply
+            )
+              .dividedBy(100)
+              .toString(),
             communityMintMaxVoteWeightSource: 1,
             communityMint: mint,
             transferAuthority: true,
@@ -63,7 +60,11 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
       }
     }, 250)()
     if (!form?.communityMintId?.length) {
-      setForm({ communityMint: undefined })
+      setForm({
+        communityMint: undefined,
+        minCommunityTokensToCreateGovernance: undefined,
+        communityMintId: undefined,
+      })
     }
   }, [form?.communityMintId])
 
@@ -139,7 +140,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                 onChange={(evt) => {
                   const value = evt.target.value
                   setForm({
-                    minCommunityTokensToCreateGovernance: new BN(+value),
+                    minCommunityTokensToCreateGovernance: value,
                   })
                 }}
               />

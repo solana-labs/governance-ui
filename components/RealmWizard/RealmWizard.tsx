@@ -162,6 +162,7 @@ const RealmWizard: React.FC = () => {
         form.minCommunityTokensToCreateGovernance!,
         form.yesThreshold,
         form.communityMintId ? form.transferAuthority : true,
+        form.communityMint ? form.communityMint.account.decimals : undefined,
         form.teamWallets
           ? form.teamWallets.map((w) => new PublicKey(w))
           : undefined
