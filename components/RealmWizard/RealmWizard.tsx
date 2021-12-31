@@ -154,6 +154,7 @@ const RealmWizard: React.FC = () => {
         MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
         form.minCommunityTokensToCreateGovernance!,
         form.yesThreshold,
+        form.communityMintId ? form.transferAuthority : true,
         form.teamWallets
           ? form.teamWallets.map((w) => new PublicKey(w))
           : undefined

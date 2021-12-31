@@ -12,6 +12,7 @@ export interface RealmArtifacts {
   name?: string
   communityMintId?: string
   communityMint?: ProgramAccount<MintInfo>
+  transferAuthority?: boolean
   councilMintId?: string
   councilMint?: ProgramAccount<MintInfo>
   programVersion?: ProgramVersion

@@ -2,6 +2,7 @@
 import Divider from '@components/Divider'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
+import { CheckCircleIcon } from '@heroicons/react/outline'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
@@ -34,6 +35,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 className="border-none py-1 bg-transparent"
               />
             </div>
+            <Divider dashed />
 
             <div className="pr-10 mr-2">
               <Input
@@ -64,20 +66,32 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 </div>
               )}
             </div>
-            <Divider dashed />
             {form?.communityMint && (
               <>
+                <div className="py-4 pr-10 mr-2 flex justify-start slign-center">
+                  <Input
+                    disabled
+                    className="border-none py-1 bg-transparent"
+                    readOnly
+                    label="Transfer authority"
+                    value={
+                      form.transferAuthority
+                        ? 'Will transfer authority'
+                        : "Won't transfer authority"
+                    }
+                    type="text"
+                  />
+                </div>
                 <div className="pb-4 pr-10 mr-2">
                   <Input
                     disabled
                     className="border-none py-1 bg-transparent"
                     readOnly
-                    label="Min community tokens to create governance (defaults 1% of community mint)"
+                    label="Min community tokens to create governance"
                     placeholder="Min community tokens to create governance"
-                    step="0.01"
                     value={form.minCommunityTokensToCreateGovernance}
                     error={formErrors['minCommunityTokensToCreateGovernance']}
-                    type="number"
+                    type="text"
                   />
                 </div>
                 <div className="pb-4 pr-10 mr-2">
@@ -86,14 +100,15 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     className="border-none py-1 bg-transparent"
                     readOnly
                     label="Community mint supply factor (max vote weight)"
-                    placeholder="Community mint supply factor (max vote weight)"
                     value={form.communityMintMaxVoteWeightSource}
                     error={formErrors['communityMintMaxVoteWeightSource']}
-                    type="number"
+                    type="text"
                   />
                 </div>
               </>
             )}
+            <Divider dashed />
+
             <div className="pb-4 pr-10 mr-2">
               <div className="flex flex-col relative w-full">
                 <StyledLabel>Governance Program Id</StyledLabel>

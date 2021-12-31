@@ -7,7 +7,7 @@ const ApprovalQuorumInput: React.FC<{
   onChange: (amount: number) => void
   onBlur?: () => void
   value?: number
-  slider: boolean
+  slider?: boolean
 }> = ({ onChange, onBlur, value, slider = true }) => {
   return (
     <>

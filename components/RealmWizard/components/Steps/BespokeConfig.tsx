@@ -11,6 +11,9 @@ import { tryGetMint } from '@utils/tokens'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import _ from 'lodash'
+import Switch from '@components/Switch'
+import { StyledLabel } from '@components/inputs/styles'
+import Tooltip from '@components/Tooltip'
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -40,10 +43,12 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             ),
             communityMintMaxVoteWeightSource: 1,
             communityMint: mint,
+            transferAuthority: true,
           })
         } else {
           setForm({
             communityMint: mint,
+            transferAuthority: true,
           })
         }
       }
@@ -108,6 +113,22 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         </div>
         {form?.communityMint && (
           <>
+            <div className="pb-4 pr-10 mr-2">
+              <div className="flex justify-left items-center">
+                <Tooltip content="This will transfer the token mint authority to the realm">
+                  <Switch
+                    className="mt-2 mb-2"
+                    checked={form.transferAuthority ?? false}
+                    onChange={() => {
+                      setForm({ transferAuthority: !form.transferAuthority })
+                    }}
+                  />
+                </Tooltip>
+                <StyledLabel className="mt-1.5 ml-3">
+                  Transfer authority
+                </StyledLabel>
+              </div>
+            </div>
             <div className="pb-4 pr-10 mr-2">
               <Input
                 label="Min community tokens to create governance (defaults 1% of community mint)"
