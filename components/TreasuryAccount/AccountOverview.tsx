@@ -1,15 +1,18 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
+import Modal from '@components/Modal'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
-import React from 'react'
+import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import AccountLabel from './AccountHeader'
+import SendTokens from './SendTokens'
+import TreasuryPaymentForm from './TreasuryPaymentForm'
 import { ViewState } from './Types'
 
 const AccountOverview = () => {
@@ -22,6 +25,9 @@ const AccountOverview = () => {
     (s) => s.compact.recentActivity
   )
 
+  const [openTreasuryPaymentModal, setOpenTreasuryPaymentModal] = useState(
+    false
+  )
   const {
     setCurrentCompactView,
     resetCompactViewState,
@@ -74,7 +80,7 @@ const AccountOverview = () => {
               : ''
           }
           className="sm:w-1/2 text-sm py-2.5"
-          onClick={() => setCurrentCompactView(ViewState.Send)}
+          onClick={() => setOpenTreasuryPaymentModal(!openTreasuryPaymentModal)}
           disabled={!canUseTransferInstruction}
         >
           Send
@@ -105,6 +111,19 @@ const AccountOverview = () => {
           </a>
         ))}
       </div>
+
+      {openTreasuryPaymentModal && (
+        <Modal
+          background="bg-bkg-1 md:mt-0 mt-8"
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => setOpenTreasuryPaymentModal(false)}
+          isOpen={openTreasuryPaymentModal}
+        >
+          <TreasuryPaymentForm
+            close={() => setOpenTreasuryPaymentModal(false)}
+          />
+        </Modal>
+      )}
     </>
   )
 }

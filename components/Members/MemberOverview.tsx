@@ -186,7 +186,7 @@ const MemberOverview = () => {
               {x.chatMessages.map((msg, index) => (
                 <div
                   key={index}
-                  className={`text-xs text-fgd-3 text-xs p-2 border-t border-fgd-4`}
+                  className={`text-xs text-fgd-3 p-2 border-t border-fgd-4`}
                 >
                   {msg}
                 </div>
