@@ -1,15 +1,7 @@
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-  ArrowLeftIcon,
-} from '@heroicons/react/outline'
-import { ViewState } from './types'
-import useMembersListStore from 'stores/useMembersStore'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
-import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from 'utils/formatting'
@@ -27,21 +19,33 @@ import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
+import AddMemberIcon from '@components/AddMemberIcon'
+import { ellipsis } from '@utils/helpers'
+import {
+  ArrowCircleDownIcon,
+  ArrowCircleUpIcon,
+} from '@heroicons/react/outline'
 
 interface AddMemberForm extends MintForm {
   description: string
   title: string
 }
 
-const AddMember = () => {
+const AddMemberForm = ({ close }) => {
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [showOptions, setShowOptions] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formErrors, setFormErrors] = useState({})
+
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
+
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
   const { getMintWithGovernances } = useGovernanceAssets()
+
   const {
     realmInfo,
     canChooseWhoVote,
@@ -50,7 +54,9 @@ const AddMember = () => {
     ownVoterWeight,
     mint,
   } = useRealm()
+
   const programId: PublicKey | undefined = realmInfo?.programId
+
   const [form, setForm] = useState<AddMemberForm>({
     destinationAccount: '',
     amount: 1,
@@ -59,32 +65,35 @@ const AddMember = () => {
     description: '',
     title: '',
   })
+
+  const schema = getMintSchema({ form, connection })
+
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(councilMint!)
     : 1
+
   const currentPrecision = precision(mintMinAmount)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Add council member ${form.destinationAccount}`
-  const schema = getMintSchema({ form, connection })
+
+  const proposalTitle = `Add council member ${ellipsis(
+    String(form.destinationAccount),
+    4,
+    6
+  )}`
 
   const setAmount = (event) => {
     const value = event.target.value
+
     handleSetForm({
       value: value,
       propertyName: 'amount',
     })
   }
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const handleGoBackToMainView = async () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -98,7 +107,8 @@ const AddMember = () => {
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+
+  const getInstruction = async (): Promise<UiInstruction> => {
     return getMintInstruction({
       schema,
       form,
@@ -109,16 +119,22 @@ const AddMember = () => {
       setFormErrors,
     })
   }
+
   //TODO common handle propose
   const handlePropose = async () => {
     setIsLoading(true)
+
     const instruction: UiInstruction = await getInstruction()
+
     if (instruction.isValid) {
       const governance = form.mintAccount?.governance
+
       let proposalAddress: PublicKey | null = null
+
       if (!realm) {
         setIsLoading(false)
-        throw 'No realm selected'
+
+        throw new Error('No realm selected')
       }
 
       const rpcContext = new RpcContext(
@@ -128,6 +144,7 @@ const AddMember = () => {
         connection.current,
         connection.endpoint
       )
+
       const instructionData = {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
@@ -135,8 +152,8 @@ const AddMember = () => {
         holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
+
       try {
-        // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
         )) as ParsedAccount<Governance>
@@ -161,7 +178,7 @@ const AddMember = () => {
             'There is no suitable governing token for the proposal'
           )
         }
-        //Description same as title
+
         proposalAddress = await createProposal(
           rpcContext,
           realm.pubkey,
@@ -174,22 +191,29 @@ const AddMember = () => {
           [instructionData],
           false
         )
+
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+
         router.push(url)
-      } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
+      } catch (error) {
+        notify({
+          type: 'error',
+          message: `${error}`,
+        })
       }
     }
+
     setIsLoading(false)
   }
 
   useEffect(() => {
-    async function getMintWithGovernancesFcn() {
-      const resp = await getMintWithGovernances()
+    const initForm = async () => {
+      const response = await getMintWithGovernances()
+
       handleSetForm({
-        value: resp.find(
+        value: response.find(
           (x) =>
             x.governance?.info.governedAccount.toBase58() ===
             realm?.info.config.councilMint?.toBase58()
@@ -197,117 +221,130 @@ const AddMember = () => {
         propertyName: 'mintAccount',
       })
     }
-    getMintWithGovernancesFcn()
+
+    initForm()
   }, [])
+
   return (
     <>
-      <h3 className="mb-4 flex items-center hover:cursor-pointer">
-        <>
-          <ArrowLeftIcon
-            onClick={handleGoBackToMainView}
-            className="h-4 w-4 mr-1 text-primary-light mr-2"
-          />
-          Add new member
-        </>
-      </h3>
-      <div className="space-y-4">
-        <Input
-          label="Member's wallet"
-          value={form.destinationAccount}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'destinationAccount',
-            })
-          }
-          noMaxWidth={true}
-          error={formErrors['destinationAccount']}
-        />
-        <div
-          className={'flex items-center hover:cursor-pointer w-24 mt-3'}
-          onClick={() => setShowOptions(!showOptions)}
-        >
-          {showOptions ? (
-            <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
-          ) : (
-            <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
-          )}
-          <small className="text-fgd-3">Options</small>
-        </div>
-        {showOptions && (
-          <>
-            <Input
-              noMaxWidth={true}
-              label="Proposal Title"
-              placeholder={
-                form.amount && form.destinationAccount
-                  ? proposalTitle
-                  : 'Title of your proposal'
-              }
-              value={form.title}
-              type="text"
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'title',
-                })
-              }
-            />
-            <Textarea
-              noMaxWidth={true}
-              label="Proposal Description"
-              placeholder={
-                'Description of your proposal or use a github gist link (optional)'
-              }
-              wrapperClassName="mb-5"
-              value={form.description}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'description',
-                })
-              }
-            ></Textarea>
-            <Input
-              min={mintMinAmount}
-              label="Voter weight"
-              value={form.amount}
-              type="number"
-              onChange={setAmount}
-              step={mintMinAmount}
-              error={formErrors['amount']}
-              onBlur={validateAmountOnBlur}
-            />
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
-            )}
-          </>
-        )}
+      <div className="flex justify-start items-center gap-x-3">
+        <AddMemberIcon className="w-8 mb-2" />
+
+        <h2 className="text-xl">Add new member to {realmInfo?.displayName}</h2>
       </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
+
+      <Input
+        useDefaultStyle={false}
+        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+        wrapperClassName="my-6"
+        label="Member's wallet"
+        placeholder="Member's wallet"
+        value={form.destinationAccount}
+        type="text"
+        onChange={(event) =>
+          handleSetForm({
+            value: event.target.value,
+            propertyName: 'destinationAccount',
+          })
+        }
+        noMaxWidth
+        error={formErrors['destinationAccount']}
+      />
+
+      <div
+        className={'flex items-center hover:cursor-pointer w-24 my-3'}
+        onClick={() => setShowOptions(!showOptions)}
+      >
+        {showOptions ? (
+          <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
+        ) : (
+          <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
+        )}
+        <small className="text-fgd-3">Options</small>
+      </div>
+
+      {showOptions && (
+        <>
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+            wrapperClassName="mb-6"
+            label="Title of your proposal"
+            placeholder="Title of your proposal"
+            value={form.title}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'title',
+              })
+            }
+          />
+
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+            wrapperClassName="mb-6"
+            min={mintMinAmount}
+            label="Voter weight"
+            value={form.amount}
+            type="number"
+            onChange={setAmount}
+            step={mintMinAmount}
+            error={formErrors['amount']}
+            onBlur={validateAmountOnBlur}
+          />
+
+          {canChooseWhoVote && (
+            <VoteBySwitch
+              checked={voteByCouncil}
+              onChange={() => {
+                setVoteByCouncil(!voteByCouncil)
+              }}
+            />
+          )}
+
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+            wrapperClassName="mb-6"
+            label="Description"
+            placeholder="Description of your proposal (optional)"
+            value={form.description}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'description',
+              })
+            }
+          />
+        </>
+      )}
+
+      <div className="flex gap-x-6 justify-start items-center mt-8">
         <SecondaryButton
           disabled={isLoading}
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
+          className="w-44"
+          onClick={() => close()}
         >
           Cancel
         </SecondaryButton>
+
         <Button
-          className="sm:w-1/2"
-          onClick={handlePropose}
+          disabled={!form.destinationAccount}
+          className="w-44 flex justify-center items-center"
+          onClick={() => handlePropose()}
           isLoading={isLoading}
         >
-          <div>Propose</div>
+          Add member
         </Button>
       </div>
     </>
   )
 }
 
-export default AddMember
+export default AddMemberForm

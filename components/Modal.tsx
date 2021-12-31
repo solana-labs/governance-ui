@@ -7,6 +7,7 @@ const Modal = ({
   children,
   hideClose = false,
   sizeClassName = 'sm:max-w-md',
+  background = 'bg-bkg-2',
 }) => {
   return (
     <Portal>
@@ -34,7 +35,7 @@ const Modal = ({
 
           {isOpen ? (
             <div
-              className={`inline-block bg-bkg-2 
+              className={`inline-block ${background}
               rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all 
               sm:my-8 align-middle ${sizeClassName} w-full`}
             >
