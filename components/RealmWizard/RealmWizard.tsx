@@ -354,13 +354,13 @@ const RealmWizard: React.FC = () => {
       )}
       {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>
-          <div className="flex justify-between pr-10 mr-3 mt-10">
+          <div className="flex justify-end pr-10 mr-3 mt-10">
             {!ctl.isFirstStep() ? (
               <Button
                 onClick={() => {
                   handleStepSelection(StepDirection.PREV)
                 }}
-                className="px-10"
+                className="px-10 mr-5"
                 style={{ minWidth: '142px' }}
               >
                 Previous
@@ -374,7 +374,7 @@ const RealmWizard: React.FC = () => {
                 else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
               }}
               disabled={isCreateButtonDisabled()}
-              className="px-10"
+              className={ctl.isLastStep() ? 'px-5' : 'px-10'}
               style={{ minWidth: '142px' }}
             >
               {ctl.isLastStep() ? 'Create Realm' : 'Next'}
