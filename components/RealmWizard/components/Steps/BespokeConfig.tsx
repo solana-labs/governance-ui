@@ -19,8 +19,6 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
-  setFormErrors,
-  beforeClickNext,
   onSwitch = () => null,
   isTestProgramId = false,
 }) => {
@@ -56,10 +54,6 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     } catch (e) {
       console.log('failed to set community mint', e)
     }
-  }
-
-  const handleProgramIdSelector = (governanceProgramId: string) => {
-    setForm({ governanceProgramId })
   }
 
   useEffect(() => {
@@ -138,17 +132,16 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
               <Input
                 label="Min community tokens to create governance (defaults 1% of community mint)"
                 placeholder="Min community tokens to create governance"
-                step="0.01"
-                value={form.minCommunityTokensToCreateGovernance}
+                step="1"
+                value={form.minCommunityTokensToCreateGovernance?.toString()}
                 type="number"
                 error={formErrors['minCommunityTokensToCreateGovernance']}
-                onChange={(evt) =>
+                onChange={(evt) => {
+                  const value = evt.target.value
                   setForm({
-                    minCommunityTokensToCreateGovernance: new BN(
-                      evt.target.value
-                    ),
+                    minCommunityTokensToCreateGovernance: new BN(+value),
                   })
-                }
+                }}
               />
             </div>
             <div className="pb-4 pr-10 mr-2">

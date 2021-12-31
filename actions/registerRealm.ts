@@ -145,15 +145,20 @@ async function prepareMintInstructions(
  * @param yesVoteThreshold
  * @returns
  */
-function mountGovernanceConfig(yesVoteThreshold = 60): GovernanceConfig {
+function mountGovernanceConfig(
+  yesVoteThreshold = 60,
+  minCommunityTokensToCreateGovernance?: BN
+): GovernanceConfig {
   console.debug('mounting governance config')
 
-  const minCommunityTokensToCreateAsMintValue = new BN(
-    getMintNaturalAmountFromDecimal(
-      DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
-      COMMUNITY_MINT_DECIMALS
+  const minCommunityTokensToCreateAsMintValue =
+    minCommunityTokensToCreateGovernance ??
+    new BN(
+      getMintNaturalAmountFromDecimal(
+        DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+        COMMUNITY_MINT_DECIMALS
+      )
     )
-  )
 
   // Put community and council mints under the realm governance with default config
   return new GovernanceConfig({
@@ -187,6 +192,7 @@ async function prepareGovernanceInstructions(
   councilMintPk: PublicKey | undefined,
   communityMintPk: PublicKey,
   yesVoteThreshold: number,
+  minCommunityTokensToCreateGovernance: BN,
   programId: PublicKey,
   realmPk: PublicKey,
   tokenOwnerRecordPk: PublicKey,
@@ -194,7 +200,11 @@ async function prepareGovernanceInstructions(
   transferAuthority?: boolean
 ) {
   console.debug('Preparing governance instructions')
-  const config = mountGovernanceConfig(yesVoteThreshold)
+
+  const config = mountGovernanceConfig(
+    yesVoteThreshold,
+    minCommunityTokensToCreateGovernance
+  )
 
   if (transferAuthority) {
     console.debug('transfer community mint authority')
@@ -383,6 +393,7 @@ export async function registerRealm(
       councilMintPk,
       communityMintPk,
       yesVoteThreshold,
+      minCommunityTokensToCreateGovernance,
       programId,
       realmAddress,
       tokenOwnerRecordPk,
