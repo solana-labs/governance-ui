@@ -182,10 +182,10 @@ const RealmWizard: React.FC = () => {
     try {
       const ctl = new RealmWizardController(option)
       const nextStep = ctl.getNextStep(currentStep, StepDirection.NEXT)
-      setForm({
+      handleSetForm({
         governanceProgramId:
           process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
-          DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
+          DEFAULT_GOVERNANCE_PROGRAM_ID,
         yesThreshold: 60,
       })
       setController(ctl)
@@ -304,7 +304,7 @@ const RealmWizard: React.FC = () => {
             isTestProgramId={isTestProgramId}
             onSwitch={(x: boolean) => {
               setIsTestProgramId(x)
-              setForm({
+              handleSetForm({
                 governanceProgramId: x
                   ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
                   : DEFAULT_GOVERNANCE_PROGRAM_ID,
