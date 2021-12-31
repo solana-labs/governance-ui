@@ -65,6 +65,8 @@ const RealmWizard: React.FC = () => {
   const [form, setForm] = useState<RealmArtifacts>({})
   const [formErrors, setFormErrors] = useState({})
   const [councilSwitchState, setUseCouncil] = useState(true)
+  const [isTestProgramId, setIsTestProgramId] = useState(false)
+
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
@@ -299,6 +301,15 @@ const RealmWizard: React.FC = () => {
             form={form}
             setForm={handleSetForm}
             formErrors={formErrors}
+            isTestProgramId={isTestProgramId}
+            onSwitch={(x: boolean) => {
+              setIsTestProgramId(x)
+              setForm({
+                governanceProgramId: x
+                  ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
+                  : DEFAULT_GOVERNANCE_PROGRAM_ID,
+              })
+            }}
           />
         )
       case RealmWizardStep.BESPOKE_COUNCIL:
@@ -364,14 +375,13 @@ const RealmWizard: React.FC = () => {
       )}
       {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>
-          <div className="flex justify-end pr-10 mr-3 mt-10">
+          <div
+            className={`flex justify-${
+              ctl.getMode() === RealmWizardMode.BASIC ? 'between' : 'end'
+            } pr-10 mr-3 mt-10`}
+          >
             {ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
               <div className="flex justify-left items-center">
-                <Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
-                  <StyledLabel className="mt-1.5 ml-3">
-                    Create a test realm
-                  </StyledLabel>
-                </Tooltip>
                 <Switch
                   className="mt-2 mb-2"
                   checked={testRealmCheck}
@@ -379,6 +389,11 @@ const RealmWizard: React.FC = () => {
                     setTestRealmCheck(check)
                   }}
                 />
+                <Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
+                  <StyledLabel className="mt-1.5 ml-3">
+                    Create a test realm
+                  </StyledLabel>
+                </Tooltip>
               </div>
             )}
             {!ctl.isFirstStep() ? (

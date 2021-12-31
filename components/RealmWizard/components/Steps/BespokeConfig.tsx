@@ -21,9 +21,10 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   formErrors,
   setFormErrors,
   beforeClickNext,
+  onSwitch = () => null,
+  isTestProgramId = false,
 }) => {
   const { connection } = useWalletStore((s) => s)
-
   const handleCommunityMint = async (mintId: string) => {
     try {
       const mintPublicKey = new PublicKey(mintId)
@@ -55,6 +56,10 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     } catch (e) {
       console.log('failed to set community mint', e)
     }
+  }
+
+  const handleProgramIdSelector = (governanceProgramId: string) => {
+    setForm({ governanceProgramId })
   }
 
   useEffect(() => {
@@ -164,17 +169,29 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         )}
         <div className="pb-4 pr-10 mr-2">
           <Input
-            label="Governance Program Id"
+            label="Custom program Id"
             placeholder="Id of the governance program this realm will be associated with"
             value={form?.governanceProgramId}
             type="text"
             error={formErrors['governanceProgramId']}
+            disabled={isTestProgramId}
+            readonly={isTestProgramId}
             onChange={(evt) =>
               setForm({
                 governanceProgramId: evt.target.value,
               })
             }
           />
+        </div>
+        <div className="pb-4 pr-10 mr-2">
+          <div className="flex justify-left items-center">
+            <Switch
+              className="mt-2 mb-2"
+              checked={isTestProgramId}
+              onChange={(x) => onSwitch(x)}
+            />
+            <StyledLabel className="mt-1.5 ml-3">Use test instance</StyledLabel>
+          </div>
         </div>
         <div className="pb-4 pr-10 mr-2">
           <Input
