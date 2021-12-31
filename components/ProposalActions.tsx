@@ -92,16 +92,8 @@ const ProposalActionsPanel = () => {
     ? 'Connect your wallet to finalize this proposal'
     : !hasVoteTimeExpired
     ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
-    : proposal &&
-      governance &&
-      proposalOwner &&
-      wallet?.publicKey &&
-      !proposal?.info.canWalletFinalize(
-        governance.info,
-        proposalOwner.info,
-        wallet.publicKey
-      )
-    ? 'Only the owner of the proposal can execute this action'
+    : proposal?.info.state === ProposalState.Voting
+    ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
 
   return (
