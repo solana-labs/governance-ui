@@ -7,7 +7,8 @@ const ApprovalQuorumInput: React.FC<{
   onChange: (amount: number) => void
   onBlur?: () => void
   value?: number
-}> = ({ onChange, onBlur, value }) => {
+  slider: boolean
+}> = ({ onChange, onBlur, value, slider = true }) => {
   return (
     <>
       <StyledLabel>Approval quorum (%)</StyledLabel>
@@ -27,13 +28,16 @@ const ApprovalQuorumInput: React.FC<{
           onChange(+yesThreshold)
         }}
       />
+
       <div className="pb-5" />
-      <AmountSlider
-        step={1}
-        value={value ?? 60}
-        disabled={false}
-        onChange={onChange}
-      />
+      {slider && (
+        <AmountSlider
+          step={1}
+          value={value ?? 60}
+          disabled={false}
+          onChange={onChange}
+        />
+      )}
     </>
   )
 }

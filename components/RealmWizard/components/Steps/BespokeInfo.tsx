@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
+import Divider from '@components/Divider'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
@@ -29,20 +30,26 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 value={form.name}
                 error={formErrors['name']}
                 type="text"
+                disabled
+                className="border-none py-1 bg-transparent"
               />
             </div>
 
-            <div className="pb-4 pr-10 mr-2">
+            <div className="pr-10 mr-2">
               <Input
+                disabled
+                className="border-none py-1 bg-transparent"
                 readOnly
-                label={`Community Token Mint ${
-                  !form?.communityMintId ? " (We'll generate for you)" : ''
-                } `}
-                placeholder="Community token mint of this realm"
+                label="Community Token Mint"
+                placeholder="-"
                 error={
                   formErrors['communityMintId'] || formErrors['communityMint']
                 }
-                value={form?.communityMintId}
+                value={
+                  !form?.communityMintId
+                    ? "We'll generate for you"
+                    : form.communityMintId
+                }
                 type="text"
               />
               {form?.communityMint && (
@@ -57,10 +64,13 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 </div>
               )}
             </div>
+            <Divider dashed />
             {form?.communityMint && (
               <>
                 <div className="pb-4 pr-10 mr-2">
                   <Input
+                    disabled
+                    className="border-none py-1 bg-transparent"
                     readOnly
                     label="Min community tokens to create governance (defaults 1% of community mint)"
                     placeholder="Min community tokens to create governance"
@@ -72,6 +82,8 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 </div>
                 <div className="pb-4 pr-10 mr-2">
                   <Input
+                    disabled
+                    className="border-none py-1 bg-transparent"
                     readOnly
                     label="Community mint supply factor (max vote weight)"
                     placeholder="Community mint supply factor (max vote weight)"
@@ -83,73 +95,86 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
               </>
             )}
             <div className="pb-4 pr-10 mr-2">
-              <Input
-                readOnly
-                label="Governance Program Id"
-                placeholder="Id of the governance program this realm will be associated with"
-                value={form?.governanceProgramId}
-                error={formErrors['governanceProgramId']}
-                type="text"
-              />
+              <div className="flex flex-col relative w-full">
+                <StyledLabel>Governance Program Id</StyledLabel>
+                <div className="flex align-center">
+                  <div
+                    className="bg-gray-700 px-3 py-2 rounded"
+                    style={{ fontFamily: 'monospace' }}
+                  >
+                    {form?.governanceProgramId}
+                  </div>
+                </div>
+              </div>
             </div>
-
-            <div className="pb-4 pr-10 mr-2">
+            <div className="pt-4 pr-10 mr-2">
               <Input
+                disabled
+                className="border-none py-1 bg-transparent"
                 readOnly
                 label="Governance program version"
                 placeholder={1}
-                step="1"
-                min={1}
-                value={form?.programVersion}
+                value={'V' + (form?.programVersion ?? 1)}
                 error={formErrors['programVersion']}
-                type="number"
+                type="text"
               />
             </div>
           </div>
         </div>
-        <div className="pt-5 pr-2">
+        <Divider dashed />
+        <div className="pr-2">
           {form.teamWallets?.length ? (
             <>
               <div className="pb-7 pr-10 w-full">
                 <Input
+                  disabled
+                  className="border-none py-1 bg-transparent"
                   readOnly
-                  label={`Council token mint ${
-                    !form?.councilMintId ? " (We'll generate for you)" : ''
-                  } `}
+                  label="Council token mint"
                   placeholder="(Optional) Council mint"
                   error={
                     formErrors['councilMintId'] || formErrors['councilMint']
                   }
-                  value={form?.councilMintId}
+                  value={
+                    !form?.councilMintId
+                      ? "We'll generate for you"
+                      : form.councilMintId
+                  }
                   type="text"
                 />
               </div>
-              <div className="pb-7 pr-10 w-full">
-                <ApprovalQuorumInput
-                  value={form.yesThreshold}
-                  onChange={($e) => null}
-                  onBlur={() => null}
+              <div className="pr-10 w-full border-">
+                <Input
+                  disabled
+                  className="border-none py-1 bg-transparent"
+                  readOnly
+                  label="Approval quorum (%)"
+                  placeholder="60"
+                  value={form?.yesThreshold + '%'}
+                  type="text"
                 />
               </div>
-            </>
-          ) : null}
-          {form.teamWallets?.length ? (
-            <div className="team-wallets-wrapper">
-              <StyledLabel className="py-5">Team wallets</StyledLabel>
-              {form.teamWallets?.map((wallet, index) => (
-                <div className="flex flex-col relative w-full pb-5" key={index}>
-                  <StyledLabel>Member {index + 1}:</StyledLabel>
-                  <div className="flex align-center">
-                    <div
-                      className="bg-gray-700 px-3 py-2 rounded"
-                      style={{ fontFamily: 'monospace' }}
-                    >
-                      {wallet}
+              <Divider dashed />
+              <div className="team-wallets-wrapper">
+                <StyledLabel className="pb-5">Team wallets</StyledLabel>
+                {form.teamWallets?.map((wallet, index) => (
+                  <div
+                    className="flex flex-col relative w-full pb-5"
+                    key={index}
+                  >
+                    <StyledLabel>Member {index + 1}:</StyledLabel>
+                    <div className="flex align-center">
+                      <div
+                        className="bg-gray-700 px-3 py-2 rounded"
+                        style={{ fontFamily: 'monospace' }}
+                      >
+                        {wallet}
+                      </div>
                     </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            </>
           ) : null}
         </div>
       </div>

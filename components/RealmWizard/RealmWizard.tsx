@@ -149,7 +149,6 @@ const RealmWizard: React.FC = () => {
         rpcContext.programId,
         form.programVersion ?? ProgramVersion.V1,
         form.name!,
-
         form.communityMintId ? new PublicKey(form.communityMintId) : undefined,
         form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
         MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
@@ -183,7 +182,7 @@ const RealmWizard: React.FC = () => {
       })
       setController(ctl)
       setCurrentStep(nextStep)
-    } catch (error) {
+    } catch (error: any) {
       notify({
         type: 'error',
         message: error.message,
