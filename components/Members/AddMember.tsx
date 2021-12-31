@@ -33,7 +33,6 @@ interface AddMemberForm extends MintForm {
   title: string
 }
 
-//Can add only council members for now
 const AddMember = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
