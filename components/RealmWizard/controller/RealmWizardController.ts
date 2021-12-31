@@ -83,9 +83,16 @@ class RealmWizardController {
    */
   isFirstStep(): boolean {
     return (
-      this.currentStep === this.steps[0] ||
+      this.currentStep === this.steps[1] ||
       this.currentStep === RealmWizardStep.REALM_CREATED
     )
+  }
+
+  /**
+   * Checks if the page is the mode selector
+   */
+  isModeSelect(): boolean {
+    return this.currentStep === RealmWizardStep.SELECT_MODE
   }
 
   /**

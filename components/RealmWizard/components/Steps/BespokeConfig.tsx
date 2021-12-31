@@ -52,20 +52,6 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     }
   }
 
-  const handleCouncilMint = async (mintId: string) => {
-    try {
-      const mintPublicKey = new PublicKey(mintId)
-      const mint = await tryGetMint(connection.current, mintPublicKey)
-      if (mint) {
-        setForm({
-          councilMint: mint,
-        })
-      }
-    } catch (e) {
-      console.log('failed to set council mint', e)
-    }
-  }
-
   useEffect(() => {
     _.debounce(async () => {
       if (form?.communityMintId) {

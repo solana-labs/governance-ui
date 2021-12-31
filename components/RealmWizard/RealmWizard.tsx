@@ -353,18 +353,33 @@ const RealmWizard: React.FC = () => {
       ) : (
         BoundStepComponent
       )}
-      {ctl && !(ctl.isFirstStep() || isLoading) && (
-        <div className="flex justify-end pr-10 mr-3">
-          <Button
-            onClick={() => {
-              if (ctl.isLastStep()) handleCreateRealm()
-              else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
-            }}
-            disabled={isCreateButtonDisabled()}
-          >
-            {ctl.isLastStep() ? 'Create Realm' : 'Next'}
-          </Button>
-        </div>
+      {ctl && !(ctl.isModeSelect() || isLoading) && (
+        <>
+          <div className="flex justify-between pr-10 mr-3 mt-10">
+            {!ctl.isFirstStep() ? (
+              <Button
+                onClick={() => {
+                  handleStepSelection(StepDirection.PREV)
+                }}
+                className="px-10"
+              >
+                Previous
+              </Button>
+            ) : (
+              <p>&nbsp;</p>
+            )}
+            <Button
+              onClick={() => {
+                if (ctl.isLastStep()) handleCreateRealm()
+                else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
+              }}
+              disabled={isCreateButtonDisabled()}
+              className="px-10"
+            >
+              {ctl.isLastStep() ? 'Create Realm' : 'Next'}
+            </Button>
+          </div>
+        </>
       )}
     </div>
   )
