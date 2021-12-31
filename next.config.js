@@ -16,6 +16,7 @@ module.exports = withTM({
     if (!isServer) config.resolve.fallback.fs = false
     return config
   },
+  distDir: 'out',
   env: {
     REALM: process.env.REALM,
     DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
