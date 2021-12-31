@@ -7,13 +7,16 @@ import { StyledLabel } from '@components/inputs/styles'
 import TeamWalletField from '../TeamWalletField'
 import useWalletStore from 'stores/useWalletStore'
 import ApprovalQuorumInput from '../ApprovalQuorumInput'
+import { tryGetMint } from '@utils/tokens'
+import { PublicKey } from '@solana/web3.js'
+import _ from 'lodash'
 
 const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
 }) => {
-  const { current: wallet } = useWalletStore((s) => s)
+  const { current: wallet, connection } = useWalletStore((s) => s)
   const [councilMintSwitch, setCouncilMintSwitch] = useState(true)
   const handleInsertTeamWallet = (wallets: string[]) => {
     let teamWallets: string[] = []
@@ -44,6 +47,31 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
       setForm({ teamWallets: [] })
     }
   }
+
+  const handleCouncilMint = async (mintId: string) => {
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      if (mint) {
+        setForm({
+          councilMint: mint,
+        })
+      }
+    } catch (e) {
+      console.log('failed to set council mint', e)
+    }
+  }
+
+  useEffect(() => {
+    _.debounce(async () => {
+      if (form?.councilMintId) {
+        await handleCouncilMint(form.councilMintId)
+      }
+    }, 250)()
+    if (!form?.communityMintId?.length) {
+      setForm({ communityMint: undefined })
+    }
+  }, [form?.councilMintId])
 
   useEffect(() => {
     handleWallets()

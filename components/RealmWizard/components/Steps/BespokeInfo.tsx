@@ -38,7 +38,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 label={`Community Token Mint ${
                   !form?.communityMintId ? " (We'll generate for you)" : ''
                 } `}
-                placeholder="Community mint id of this realm"
+                placeholder="Community token mint of this realm"
                 error={
                   formErrors['communityMintId'] || formErrors['communityMint']
                 }
@@ -118,7 +118,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                   } `}
                   placeholder="(Optional) Council mint"
                   error={
-                    formErrors['councilMintId'] || formErrors['councilMintId']
+                    formErrors['councilMintId'] || formErrors['councilMint']
                   }
                   value={form?.councilMintId}
                   type="text"

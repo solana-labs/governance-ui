@@ -68,9 +68,6 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
 
   useEffect(() => {
     _.debounce(async () => {
-      if (form?.councilMintId) {
-        await handleCouncilMint(form.councilMintId)
-      }
       if (form?.communityMintId) {
         await handleCommunityMint(form.communityMintId)
       }
@@ -78,7 +75,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     if (!form?.communityMintId?.length) {
       setForm({ communityMint: undefined })
     }
-  }, [form?.communityMintId, form?.councilMintId])
+  }, [form?.communityMintId])
 
   return (
     <>
@@ -105,7 +102,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         <div className="pb-4 pr-10 mr-2">
           <Input
             label="Community Token Mint"
-            placeholder="(Optional) Community mint id of this realm"
+            placeholder="(Optional) Community token mint of this realm"
             value={form?.communityMintId}
             type="text"
             error={formErrors['communityMintId'] || formErrors['communityMint']}

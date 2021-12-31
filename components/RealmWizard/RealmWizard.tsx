@@ -103,8 +103,6 @@ const RealmWizard: React.FC = () => {
       })
     }
 
-    setIsLoading(true)
-
     // TODO: make it part of the form
     const programId =
       process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ?? DEFAULT_GOVERNANCE_PROGRAM_ID
@@ -166,6 +164,7 @@ const RealmWizard: React.FC = () => {
       console.debug(validationErrors)
       setFormErrors(validationErrors)
     }
+    setIsLoading(false)
   }
 
   /**
@@ -330,7 +329,9 @@ const RealmWizard: React.FC = () => {
     <div
       className="relative w-auto min-h-[60vh]"
       style={
-        ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE
+        ctl &&
+        ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE &&
+        !isLoading
           ? { maxWidth: 512 }
           : undefined
       }
