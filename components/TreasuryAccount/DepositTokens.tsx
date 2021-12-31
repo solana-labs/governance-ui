@@ -7,6 +7,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { PublicKey } from '@solana/web3.js'
 import { getAccountName } from '@components/instructions/tools'
 import AccountLabel from './AccountHeader'
+import { DuplicateIcon } from '@heroicons/react/outline'
 
 const SendTokens = () => {
   const { setCurrentCompactView } = useTreasuryAccountStore()
@@ -25,29 +26,31 @@ const SendTokens = () => {
           Deposit {tokenInfo && tokenInfo?.symbol}
         </>
       </h3>
-
       <AccountLabel />
-
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
         <div>
           <div className="text-fgd-3 text-xs">
             {currentAccount?.token?.publicKey &&
             getAccountName(currentAccount?.token?.publicKey) ? (
-              <div className="text-sm text-th-fgd-1">
+              <small className="text-sm text-th-fgd-1">
                 {getAccountName(currentAccount.token?.publicKey)}
-              </div>
+              </small>
             ) : (
-              <div className="text-xs text-th-fgd-1">
+              <small className="text-xs text-th-fgd-1">
                 {abbreviateAddress(
                   currentAccount?.governance?.info.governedAccount as PublicKey
                 )}
-              </div>
+              </small>
             )}
           </div>
-          {abbreviateAddress(
-            currentAccount?.governance?.info.governedAccount as PublicKey
-          )}
+
+          <p>
+            {abbreviateAddress(
+              currentAccount?.governance?.info.governedAccount as PublicKey
+            )}
+          </p>
         </div>
+
         <div className="ml-auto">
           <LinkButton
             className="ml-4 text-th-fgd-1"
@@ -57,7 +60,7 @@ const SendTokens = () => {
               )
             }}
           >
-            Copy
+            <DuplicateIcon className="w-5 h-5 mt-1" />
           </LinkButton>
         </div>
       </div>
