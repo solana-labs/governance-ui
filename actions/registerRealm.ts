@@ -59,6 +59,7 @@ const COMMUNITY_MINT_DECIMALS = 6
  * @param connection
  * @param walletPubkey
  * @param tokenDecimals
+ * @param council if it is council, avoid creating the mint if otherowners is not filled
  * @param mintPk
  * @param otherOwners
  */
@@ -66,46 +67,49 @@ async function prepareMintInstructions(
   connection: Connection,
   walletPubkey: PublicKey,
   tokenDecimals: number,
+  council: boolean = false,
   mintPk?: PublicKey,
   otherOwners?: PublicKey[]
 ) {
-  console.debug('preparing council instructions')
+  console.debug('preparing mint instructions')
 
   let _mintPk: PublicKey | undefined = undefined
   let walletAtaPk: PublicKey | undefined
   const mintInstructions: TransactionInstruction[] = []
   const mintSigners: Keypair[] = []
 
-  // If mintPk is undefined, then
-  // should create the mint
-  _mintPk =
-    mintPk ??
-    (await withCreateMint(
-      connection,
-      mintInstructions,
-      mintSigners,
-      walletPubkey,
-      null,
-      tokenDecimals,
-      walletPubkey
-    ))
-
-  // If the array of other owners is not empty
-  // then should create mints to them
-  if (otherOwners?.length) {
-    for (const ownerPk of otherOwners) {
-      const ataPk = await withCreateAssociatedTokenAccount(
+  if (!council || (council && otherOwners?.length)) {
+    // If mintPk is undefined, then
+    // should create the mint
+    _mintPk =
+      mintPk ??
+      (await withCreateMint(
+        connection,
         mintInstructions,
-        _mintPk,
-        ownerPk,
+        mintSigners,
+        walletPubkey,
+        null,
+        tokenDecimals,
         walletPubkey
-      )
+      ))
 
-      // Mint 1 token to each owner
-      await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
+    // If the array of other owners is not empty
+    // then should create mints to them
+    if (otherOwners?.length) {
+      for (const ownerPk of otherOwners) {
+        const ataPk = await withCreateAssociatedTokenAccount(
+          mintInstructions,
+          _mintPk,
+          ownerPk,
+          walletPubkey
+        )
 
-      if (ownerPk.equals(walletPubkey)) {
-        walletAtaPk = ataPk
+        // Mint 1 token to each owner
+        await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
+
+        if (ownerPk.equals(walletPubkey)) {
+          walletAtaPk = ataPk
+        }
       }
     }
   }
@@ -114,7 +118,6 @@ async function prepareMintInstructions(
   // I tried to left as an empty array, but always get failed in signature verification
   const signersChunks = Array(instructionChunks.length).fill([])
   signersChunks[0] = mintSigners
-
   return {
     mintPk: _mintPk,
     walletAtaPk,
@@ -181,7 +184,7 @@ function mountGovernanceConfig(yesVoteThreshold = 60): GovernanceConfig {
  */
 async function prepareGovernanceInstructions(
   walletPubkey: PublicKey,
-  councilMintPk: PublicKey,
+  councilMintPk: PublicKey | undefined,
   communityMintPk: PublicKey,
   yesVoteThreshold: number,
   programId: PublicKey,
@@ -219,18 +222,19 @@ async function prepareGovernanceInstructions(
     )
   }
 
-  // Put council token mint under realm governance
-  await withCreateMintGovernance(
-    realmInstructions,
-    programId,
-    realmPk,
-    councilMintPk,
-    config,
-    true,
-    walletPubkey,
-    tokenOwnerRecordPk,
-    walletPubkey
-  )
+  if (councilMintPk)
+    // Put council token mint under realm governance
+    await withCreateMintGovernance(
+      realmInstructions,
+      programId,
+      realmPk,
+      councilMintPk,
+      config,
+      true,
+      walletPubkey,
+      tokenOwnerRecordPk,
+      walletPubkey
+    )
 }
 
 /**
@@ -310,6 +314,7 @@ export async function registerRealm(
     connection,
     walletPubkey,
     0,
+    true,
     councilMint,
     councilWalletPks
   )
