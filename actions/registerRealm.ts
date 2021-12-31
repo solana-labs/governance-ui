@@ -48,113 +48,92 @@ const DEF_COMMUNITY_TOKENS_W_0_SUPPLY = 1000000
 /**
  * The default amount of decimals for the community token
  */
-const COMM_MINT_DECIMALS = 6
+const COMMUNITY_MINT_DECIMALS = 6
 
 /**
- * Prepares the council instructions
+ * Prepares the mint instructions
+ *
+ * If `otherOwners` is given, then the token will be minted (1) to each wallet.
+ * This option is usually used when using council.
+ *
  * @param connection
  * @param walletPubkey
- * @param councilMint
- * @param councilWalletPks
+ * @param tokenDecimals
+ * @param mintPk
+ * @param otherOwners
  */
-async function prepareCouncilInstructions(
+async function prepareMintInstructions(
   connection: Connection,
   walletPubkey: PublicKey,
-  councilMint?: PublicKey,
-  councilWalletPks?: PublicKey[]
+  tokenDecimals: number,
+  mintPk?: PublicKey,
+  otherOwners?: PublicKey[]
 ) {
   console.debug('preparing council instructions')
 
-  let councilMintPk: PublicKey | undefined = undefined
+  let _mintPk: PublicKey | undefined = undefined
   let walletAtaPk: PublicKey | undefined
-  const councilMintInstructions: TransactionInstruction[] = []
-  const councilMintSigners: Keypair[] = []
+  const mintInstructions: TransactionInstruction[] = []
+  const mintSigners: Keypair[] = []
 
-  // If the array of council wallets is not empty
-  // then should create mints to the council
-  if (councilWalletPks && councilWalletPks.length) {
-    // If councilMint is undefined, then
-    // should create the council mint
-    councilMintPk =
-      councilMint ??
-      (await withCreateMint(
-        connection,
-        councilMintInstructions,
-        councilMintSigners,
-        walletPubkey,
-        null,
-        0,
-        walletPubkey
-      ))
+  // If mintPk is undefined, then
+  // should create the mint
+  _mintPk =
+    mintPk ??
+    (await withCreateMint(
+      connection,
+      mintInstructions,
+      mintSigners,
+      walletPubkey,
+      null,
+      tokenDecimals,
+      walletPubkey
+    ))
 
-    for (const teamWalletPk of councilWalletPks) {
+  // If the array of other owners is not empty
+  // then should create mints to them
+  if (otherOwners?.length) {
+    for (const ownerPk of otherOwners) {
       const ataPk = await withCreateAssociatedTokenAccount(
-        councilMintInstructions,
-        councilMintPk,
-        teamWalletPk,
+        mintInstructions,
+        _mintPk,
+        ownerPk,
         walletPubkey
       )
 
-      // Mint 1 council token to each team member
-      await withMintTo(
-        councilMintInstructions,
-        councilMintPk,
-        ataPk,
-        walletPubkey,
-        1
-      )
+      // Mint 1 token to each owner
+      await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
 
-      if (teamWalletPk.equals(walletPubkey)) {
+      if (ownerPk.equals(walletPubkey)) {
         walletAtaPk = ataPk
       }
     }
   }
 
-  const councilMembersChunks = chunks(councilMintInstructions, 10)
+  const instructionChunks = chunks(mintInstructions, 10)
   // I tried to left as an empty array, but always get failed in signature verification
-  const councilSignersChunks = Array(councilMembersChunks.length).fill(
-    councilMintSigners
-  )
+  const signersChunks = Array(instructionChunks.length).fill([])
+  signersChunks[0] = mintSigners
 
   return {
-    councilMintPk,
+    mintPk: _mintPk,
     walletAtaPk,
-    councilMembersChunks,
-    councilSignersChunks,
-  }
-}
-
-/**
- * Prepares the instructions to create a community mint
- *
- * > This should be called if a community mint is not provided.
- * @param connection the current connection
- * @param walletPubkey payeer
- * @returns
- */
-async function prepareCommunityInstructions(
-  connection: Connection,
-  walletPubkey: PublicKey
-) {
-  console.debug('preparing community instructions')
-
-  const communityMintInstructions: TransactionInstruction[] = []
-  const communityMintSigners: Keypair[] = []
-  // Create community mint
-  const communityMintPk = await withCreateMint(
-    connection,
-    communityMintInstructions,
-    communityMintSigners,
-    walletPubkey,
-    null,
-    COMM_MINT_DECIMALS,
-    walletPubkey
-  )
-
-  return {
-    communityMintPk,
-    communityMintInstructions,
-    communityMintSigners,
+    /**
+     * Mint instructions in chunks of 10
+     */
+    instructionChunks,
+    /**
+     * Signer sets in chunks of 10
+     */
+    signersChunks,
+    /**
+     * Array with all the instructions
+     */
+    mintInstructions,
+    /**
+     * Array with all the signer sets
+     */
+    mintSigners,
   }
 }
 
@@ -169,7 +148,7 @@ function mountGovernanceConfig(yesVoteThreshold = 60): GovernanceConfig {
   const minCommunityTokensToCreateAsMintValue = new BN(
     getMintNaturalAmountFromDecimal(
       DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
-      COMM_MINT_DECIMALS
+      COMMUNITY_MINT_DECIMALS
     )
   )
 
@@ -208,25 +187,38 @@ async function prepareGovernanceInstructions(
   programId: PublicKey,
   realmPk: PublicKey,
   tokenOwnerRecordPk: PublicKey,
-  realmInstructions: TransactionInstruction[]
+  realmInstructions: TransactionInstruction[],
+  transferAuthority?: boolean
 ) {
   console.debug('Preparing governance instructions')
   const config = mountGovernanceConfig(yesVoteThreshold)
 
-  const {
-    governanceAddress: communityMintGovPk,
-  } = await withCreateMintGovernance(
-    realmInstructions,
-    programId,
-    realmPk,
-    communityMintPk,
-    config,
-    true,
-    walletPubkey,
-    tokenOwnerRecordPk,
-    walletPubkey
-  )
+  if (transferAuthority) {
+    const {
+      governanceAddress: communityMintGovPk,
+    } = await withCreateMintGovernance(
+      realmInstructions,
+      programId,
+      realmPk,
+      communityMintPk,
+      config,
+      true,
+      walletPubkey,
+      tokenOwnerRecordPk,
+      walletPubkey
+    )
 
+    // Set the community governance as the realm authority
+    withSetRealmAuthority(
+      realmInstructions,
+      programId,
+      realmPk,
+      walletPubkey,
+      communityMintGovPk
+    )
+  }
+
+  // Put council token mint under realm governance
   await withCreateMintGovernance(
     realmInstructions,
     programId,
@@ -237,15 +229,6 @@ async function prepareGovernanceInstructions(
     walletPubkey,
     tokenOwnerRecordPk,
     walletPubkey
-  )
-
-  // Set the community governance as the realm authority
-  withSetRealmAuthority(
-    realmInstructions,
-    programId,
-    realmPk,
-    walletPubkey,
-    communityMintGovPk
   )
 }
 
@@ -317,13 +300,14 @@ export async function registerRealm(
   const realmInstructions: TransactionInstruction[] = []
 
   const {
-    councilMintPk,
+    mintPk: councilMintPk,
     walletAtaPk,
-    councilMembersChunks,
-    councilSignersChunks,
-  } = await prepareCouncilInstructions(
+    instructionChunks: councilMembersChunks,
+    signersChunks: councilSignersChunks,
+  } = await prepareMintInstructions(
     connection,
     walletPubkey,
+    0,
     councilMint,
     councilWalletPks
   )
@@ -336,13 +320,14 @@ export async function registerRealm(
 
   // If user doens't provides a community mint, we'll generate it
   if (!communityMint) {
-    const communityDetails = await prepareCommunityInstructions(
+    const communityDetails = await prepareMintInstructions(
       connection,
-      walletPubkey
+      walletPubkey,
+      COMMUNITY_MINT_DECIMALS
     )
-    communityMintInstructions = communityDetails.communityMintInstructions
-    communityMintPk = communityDetails.communityMintPk
-    communityMintSigners = communityDetails.communityMintSigners
+    communityMintInstructions = communityDetails.mintInstructions
+    communityMintPk = communityDetails.mintPk
+    communityMintSigners = communityDetails.mintSigners
   }
 
   if (!communityMintPk) throw new Error('Invalid community mint public key.')
