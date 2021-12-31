@@ -240,7 +240,7 @@ const RealmWizard: React.FC = () => {
   }
 
   const handleBackButtonClick = () => {
-    if (ctl && !ctl.isFirstStep()) {
+    if (ctl && !ctl.isModeSelect()) {
       setCurrentStep(ctl.getNextStep(currentStep, StepDirection.PREV))
     } else {
       router.push(fmtUrlWithCluster('/realms'))
