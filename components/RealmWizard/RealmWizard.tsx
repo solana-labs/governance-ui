@@ -363,7 +363,7 @@ const RealmWizard: React.FC = () => {
           <div className="flex justify-end pr-10 mr-3 mt-10">
             {ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
               <div className="flex justify-left items-center">
-                <Tooltip content="If checked, the realm will be created under the main Governance Instance">
+                <Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
                   <StyledLabel className="mt-1.5 ml-3">
                     Create a test realm
                   </StyledLabel>
