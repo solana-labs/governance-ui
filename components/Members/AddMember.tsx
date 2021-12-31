@@ -205,7 +205,7 @@ const AddMember = () => {
       <h3 className="mb-4 flex items-center hover:cursor-pointer">
         <>
           <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.MemberOverview)}
+            onClick={handleGoBackToMainView}
             className="h-4 w-4 mr-1 text-primary-light mr-2"
           />
           Add new member

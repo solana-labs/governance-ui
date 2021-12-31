@@ -1,8 +1,15 @@
-import StepOne from './StepOne'
-import StepTwo from './StepTwo'
-import StepThree from './StepThree'
+import MultisigOptions from './MultisigOptions'
+import BespokeConfig from './BespokeConfig'
+import BespokeCouncil from './BespokeCouncil'
 import StepFour from './StepFour'
 import WizardModeSelect from './WizardModeSelect'
 import RealmCreated from './RealmCreated'
 
-export { StepOne, StepTwo, StepThree, StepFour, WizardModeSelect, RealmCreated }
+export {
+  MultisigOptions,
+  BespokeConfig,
+  BespokeCouncil,
+  StepFour,
+  WizardModeSelect,
+  RealmCreated,
+}

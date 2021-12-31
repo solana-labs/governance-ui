@@ -23,6 +23,7 @@ export const withCreateMint = async (
   )
 
   const mintAccount = new Keypair()
+
   instructions.push(
     SystemProgram.createAccount({
       fromPubkey: payerPk,
@@ -43,6 +44,5 @@ export const withCreateMint = async (
       freezeAuthorityPk
     )
   )
-
   return mintAccount.publicKey
 }

@@ -2,6 +2,7 @@ import { ProgramVersion } from '@models/registry/constants'
 import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
+import React from 'react'
 
 /**
  * Default realm artifact interface
@@ -49,15 +50,15 @@ export enum RealmWizardStep {
   /**
    * Base state: set the name of the Realm and add the team wallets
    */
-  BASIC_CONFIG,
+  MULTISIG_CONFIG,
   /**
-   * Advanced config: set the token mints and governance program id
+   * Set up bespoke basic options
    */
-  TOKENS_CONFIG,
+  BESPOKE_CONFIG,
   /**
-   * Not defined yet
+   * Set up the Bespoke council options
    */
-  STEP_3,
+  BESPOKE_COUNCIL,
   /**
    * Not defined yet
    */
@@ -76,6 +77,7 @@ export enum StepDirection {
 export interface RealmWizardStepComponentProps {
   form: RealmArtifacts
   setForm: (data: RealmArtifacts) => void
+  beforeClickNext?: React.Dispatch<(...args) => boolean>
   [key: string]: any
 }
 

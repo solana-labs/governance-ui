@@ -9,6 +9,7 @@ import { PlusIcon } from '@heroicons/react/outline'
 import AddMember from './AddMember'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
+import useWalletStore from 'stores/useWalletStore'
 
 const MembersCompactWrapper = () => {
   const {
@@ -18,6 +19,7 @@ const MembersCompactWrapper = () => {
     toManyCommunityOutstandingProposalsForUser,
   } = useRealm()
   const { members } = useMembers()
+  const connected = useWalletStore((s) => s.connected)
   const membersCount = members.length
   const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
   const {
@@ -26,13 +28,23 @@ const MembersCompactWrapper = () => {
   } = useGovernanceAssets()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
-    const councilTotalVotes = current.council?.info.totalVotesCount || 0
-    const communityTotalVotes = current.community?.info.totalVotesCount || 0
-    return councilTotalVotes + communityTotalVotes + prev
+    return prev + current.votesCasted
   }, 0)
   const goToAddMemberView = () => {
     setCurrentCompactView(ViewState.AddMember)
   }
+  const addNewMemberTooltip = !connected
+    ? 'Connect your wallet to add new council member'
+    : !canMintRealmCouncilToken()
+    ? 'Your realm need mint governance for council token to add new member'
+    : !canUseMintInstruction
+    ? "You don't have enough governance power to add new council member"
+    : toManyCommunityOutstandingProposalsForUser
+    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
+    : toManyCouncilOutstandingProposalsForUse
+    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
+    : ''
+
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -40,40 +52,30 @@ const MembersCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Members ({membersCount})
-              {councilMint &&
-                canUseMintInstruction &&
-                canMintRealmCouncilToken() && (
-                  <Tooltip
-                    contentClassName="ml-auto"
-                    content={
-                      toManyCouncilOutstandingProposalsForUse &&
-                      toManyCommunityOutstandingProposalsForUser
-                        ? 'You have to many outstanding proposals'
-                        : ''
-                    }
-                  >
-                    <div
-                      onClick={goToAddMemberView}
-                      className={`bg-bkg-2 default-transition 
+              {councilMint && (
+                <Tooltip
+                  contentClassName="ml-auto"
+                  content={addNewMemberTooltip}
+                >
+                  <div
+                    onClick={goToAddMemberView}
+                    className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
                 rounded-lg hover:bg-bkg-3 ml-auto 
                 hover:cursor-pointer ${
-                  toManyCouncilOutstandingProposalsForUse &&
-                  toManyCommunityOutstandingProposalsForUser
-                    ? 'opacity-60 pointer-events-none'
-                    : ''
+                  addNewMemberTooltip ? 'opacity-60 pointer-events-none' : ''
                 }`}
-                    >
-                      <div
-                        className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
+                  >
+                    <div
+                      className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
                 font-bold items-center justify-center 
                 rounded-full text-fgd-3"
-                      >
-                        <PlusIcon />
-                      </div>
+                    >
+                      <PlusIcon />
                     </div>
-                  </Tooltip>
-                )}
+                  </div>
+                </Tooltip>
+              )}
             </h3>
             <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
               <p className="text-fgd-3 text-xs">Total votes cast</p>
