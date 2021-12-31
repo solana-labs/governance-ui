@@ -64,7 +64,7 @@ const RealmWizard: React.FC = () => {
   const [testRealmCheck, setTestRealmCheck] = useState(false)
   const [form, setForm] = useState<RealmArtifacts>({})
   const [formErrors, setFormErrors] = useState({})
-
+  const [councilSwitchState, setUseCouncil] = useState(true)
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
@@ -308,6 +308,10 @@ const RealmWizard: React.FC = () => {
             setForm={handleSetForm}
             formErrors={formErrors}
             setFormErrors={setFormErrors}
+            onSwitch={(x: boolean) => {
+              setUseCouncil(x)
+            }}
+            switchState={councilSwitchState}
           />
         )
       case RealmWizardStep.BESPOKE_INFO:
@@ -323,7 +327,7 @@ const RealmWizard: React.FC = () => {
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [currentStep, form, formErrors])
+  }, [currentStep, form, formErrors, councilSwitchState])
 
   useEffect(() => {
     // Return shouldFireCreate to the base state
@@ -332,7 +336,7 @@ const RealmWizard: React.FC = () => {
 
   return (
     <div
-      className="relative w-auto min-h-[60vh]"
+      className="relative w-auto"
       style={
         ctl &&
         ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE &&
@@ -356,7 +360,7 @@ const RealmWizard: React.FC = () => {
           <span>{loaderMessage}</span>
         </div>
       ) : (
-        BoundStepComponent
+        <div className="min-h-[60vh]">{BoundStepComponent}</div>
       )}
       {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>

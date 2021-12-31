@@ -15,9 +15,10 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
+  switchState = true,
+  onSwitch = () => null,
 }) => {
   const { current: wallet, connection } = useWalletStore((s) => s)
-  const [councilMintSwitch, setCouncilMintSwitch] = useState(true)
   const handleInsertTeamWallet = (wallets: string[]) => {
     let teamWallets: string[] = []
     if (form?.teamWallets) {
@@ -40,7 +41,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   }
 
   const handleWallets = () => {
-    if (councilMintSwitch && wallet?.publicKey) {
+    if (switchState && wallet?.publicKey) {
       // Forces to add the current wallet
       handleInsertTeamWallet([wallet.publicKey.toBase58()])
     } else {
@@ -75,7 +76,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
 
   useEffect(() => {
     handleWallets()
-  }, [councilMintSwitch])
+  }, [switchState])
 
   useEffect(() => {
     handleWallets()
@@ -92,13 +93,15 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
         <div className="flex justify-left items-center">
           <Switch
             className="mt-2 mb-2"
-            checked={councilMintSwitch}
-            onChange={() => setCouncilMintSwitch(!councilMintSwitch)}
+            checked={switchState}
+            onChange={(check) => {
+              if (typeof onSwitch === 'function') onSwitch(check)
+            }}
           />
           <StyledLabel className="mt-1.5 ml-3">Use Council</StyledLabel>
         </div>
       </div>
-      {councilMintSwitch && (
+      {switchState && (
         <>
           <div className="pb-7 pr-10 w-full">
             <Input
