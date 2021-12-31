@@ -115,7 +115,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
           <>
             <div className="pb-4 pr-10 mr-2">
               <div className="flex justify-left items-center">
-                <Tooltip content="This will transfer the token mint authority to the realm">
+                <Tooltip content="If checked, will transfer mint authority to the realm">
                   <Switch
                     className="mt-2 mb-2"
                     checked={form.transferAuthority ?? false}

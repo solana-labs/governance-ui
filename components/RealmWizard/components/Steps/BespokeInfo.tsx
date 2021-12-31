@@ -2,11 +2,9 @@
 import Divider from '@components/Divider'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
-import { CheckCircleIcon } from '@heroicons/react/outline'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
-import ApprovalQuorumInput from '../ApprovalQuorumInput'
 
 const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
