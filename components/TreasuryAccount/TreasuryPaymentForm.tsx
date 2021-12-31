@@ -1,61 +1,55 @@
-import Button, { SecondaryButton } from '@components/Button'
-import Input from '@components/inputs/Input'
-import { getAccountName } from '@components/instructions/tools'
-import useRealm from '@hooks/useRealm'
+import React, { useEffect, useState } from 'react'
+import BigNumber from 'bignumber.js'
+import { useRouter } from 'next/router'
 import { AccountInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
+import { BN } from '@project-serum/anchor'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { RpcContext } from '@models/core/api'
+import { Governance } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
+import { createProposal } from 'actions/createProposal'
 import {
-  //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
+import tokenService from '@utils/services/token'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
+import { notify } from '@utils/notifications'
+import { getTransferInstruction } from '@utils/instructionTools'
 import { precision } from '@utils/formatting'
+import { getTokenTransferSchema } from '@utils/validations'
 import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import { ViewState } from './Types'
-import { BN } from '@project-serum/anchor'
-import { getTokenTransferSchema } from '@utils/validations'
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-  ArrowLeftIcon,
-  //   InformationCircleIcon,
-} from '@heroicons/react/solid'
-import tokenService from '@utils/services/token'
-import BigNumber from 'bignumber.js'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
-import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@models/core/api'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
-import { createProposal } from 'actions/createProposal'
-import { useRouter } from 'next/router'
-import { notify } from '@utils/notifications'
-import Textarea from '@components/inputs/Textarea'
-// import { Popover } from '@headlessui/react'
-import AccountLabel from './AccountHeader'
-import Tooltip from '@components/Tooltip'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getTransferInstruction } from '@utils/instructionTools'
+import Button, { SecondaryButton } from '@components/Button'
+import Input from '@components/inputs/Input'
+import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
+import { getAccountName } from '@components/instructions/tools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
+import { ViewState } from './Types'
+import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid'
 
 const TreasuryPaymentForm = ({ close }) => {
   const {
     setCurrentCompactView,
     resetCompactViewState,
   } = useTreasuryAccountStore()
+
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+
   const connection = useWalletStore((s) => s.connection)
+
   const {
     realmInfo,
     symbol,
@@ -67,90 +61,102 @@ const TreasuryPaymentForm = ({ close }) => {
   } = useRealm()
 
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const { fmtUrlWithCluster } = useQueryContext()
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+
+  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
+
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
-    // No default transfer amount
-    amount: undefined,
+    amount: 0,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
     title: '',
     description: '',
   })
+
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
+  const [balance, setBalance] = useState<any>(0)
+  const [isLoading, setIsLoading] = useState(false)
+  const [formErrors, setFormErrors] = useState({})
+
   const [
     destinationAccount,
     setDestinationAccount,
   ] = useState<ProgramAccount<AccountInfo> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
+
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
+
   const mintMinAmount = form.governedTokenAccount?.mint
     ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
     : 1
+
   const currentPrecision = precision(mintMinAmount)
 
-  const handleGoBackToMainView = () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
+  const amountFormNotFormatted =
+    form.governedTokenAccount?.token?.account?.amount
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setAmount = (event) => {
     const value = event.target.value
+
     handleSetForm({
       value: value,
       propertyName: 'amount',
     })
   }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
+    const validAmount = value
+      ? parseFloat(
+          Math.max(
+            Number(mintMinAmount),
+            Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+          ).toFixed(currentPrecision)
+        )
+      : 0
+
     handleSetForm({
-      value: parseFloat(
-        Math.max(
-          Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed(currentPrecision)
-      ),
+      value: validAmount,
       propertyName: 'amount',
     })
   }
-  //   const setMaxAmount = () => {
-  //     const amount =
-  //       currentAccount && currentAccount.mint?.account
-  //         ? getMintDecimalAmountFromNatural(
-  //             currentAccount.mint?.account,
-  //             new BN(currentAccount.token!.account.amount)
-  //           ).toNumber()
-  //         : 0
-  //     handleSetForm({
-  //       value: amount,
-  //       propertyName: 'amount',
-  //     })
-  //   }
-  const calcTransactionDolarAmount = (amount) => {
-    const price = tokenService.getUSDTokenPrice(
-      currentAccount!.mint!.publicKey.toBase58()
-    )
-    const totalPrice = amount * price
-    const totalPriceFormatted =
-      amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
-    return totalPriceFormatted
+
+  useEffect(() => {
+    setBalance(amountFormNotFormatted?.toNumber())
+  }, [amountFormNotFormatted])
+
+  const calculateTransactionDolarAmount = (amount: number) => {
+    if (currentAccount && currentAccount.mint) {
+      const price = tokenService.getUSDTokenPrice(
+        currentAccount?.mint?.publicKey.toBase58()
+      )
+
+      const totalPrice = amount * price
+
+      const totalPriceFormatted =
+        amount && price ? new BigNumber(totalPrice).toFormat(2) : 0
+
+      return Number(totalPriceFormatted)
+    }
+
+    return 0
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
+  const getInstruction = async (): Promise<UiInstruction> => {
     return getTransferInstruction({
       schema,
       form,
@@ -161,12 +167,16 @@ const TreasuryPaymentForm = ({ close }) => {
       setFormErrors,
     })
   }
+
   const handlePropose = async () => {
     setIsLoading(true)
+
     const instruction: UiInstruction = await getInstruction()
+
     if (instruction.isValid) {
       const governance = currentAccount?.governance
       let proposalAddress: PublicKey | null = null
+
       if (!realm) {
         setIsLoading(false)
         throw 'No realm selected'
@@ -235,20 +245,34 @@ const TreasuryPaymentForm = ({ close }) => {
     }
     setIsLoading(false)
   }
-  const IsAmountNotHigherThenBalance = () => {
-    const mintValue = getMintNaturalAmountFromDecimal(
-      form.amount!,
-      form.governedTokenAccount!.mint!.account.decimals
-    )
-    let gte: boolean | undefined = false
-    try {
-      gte = form.governedTokenAccount?.token?.account?.amount?.gte(
-        new BN(mintValue)
+
+  const IsAmountNotHigherThenBalance = (): boolean => {
+    const { governedTokenAccount, amount } = form
+
+    if (
+      amount &&
+      amountFormNotFormatted &&
+      governedTokenAccount?.mint?.account.decimals
+    ) {
+      const mintValue = getMintNaturalAmountFromDecimal(
+        amount,
+        governedTokenAccount?.mint?.account.decimals
       )
-    } catch (e) {
-      //silent fail
+
+      let gte: boolean | undefined = false
+
+      try {
+        gte = governedTokenAccount?.token?.account?.amount?.gte(
+          new BN(mintValue)
+        )
+      } catch (error) {
+        console.log('error getting balance', error)
+      }
+
+      return Boolean(form.governedTokenAccount?.token?.publicKey && gte)
     }
-    return form.governedTokenAccount?.token?.publicKey && gte
+
+    return false
   }
 
   useEffect(() => {
@@ -259,24 +283,34 @@ const TreasuryPaymentForm = ({ close }) => {
       })
     }
   }, [currentAccount])
+
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.destinationAccount)
+
         if (pubKey) {
           const account = await tryGetTokenAccount(connection.current, pubKey)
+
           setDestinationAccount(account ? account : null)
-        } else {
-          setDestinationAccount(null)
+
+          return
         }
+
+        setDestinationAccount(null)
       })
-    } else {
-      setDestinationAccount(null)
+
+      return
     }
+
+    setDestinationAccount(null)
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection })
-  const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
+
+  const transactionDolarAmount: number =
+    form.amount > 0 ? calculateTransactionDolarAmount(form.amount) : 0
+
   const proposalTitle = `Pay ${form.amount}${
     tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
   }to ${form.destinationAccount}`
@@ -284,17 +318,18 @@ const TreasuryPaymentForm = ({ close }) => {
   return (
     <>
       <div className="flex justify-start items-center gap-x-3">
-        {/* <TreasuryPaymentIcon className="w-8 mb-2" /> */}
+        <TreasuryPaymentIcon className="w-8 mb-2" />
 
-        <h2 className="text-xl">Add new member to {realmInfo?.displayName}</h2>
+        <h2 className="text-xl">Treasury payment</h2>
       </div>
 
       <Input
+        noMaxWidth
         useDefaultStyle={false}
         className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
         wrapperClassName="my-6"
-        label="Member's wallet"
-        placeholder="Member's wallet"
+        label="Destination account"
+        placeholder="Destination account"
         value={form.destinationAccount}
         type="text"
         onChange={(event) =>
@@ -303,12 +338,51 @@ const TreasuryPaymentForm = ({ close }) => {
             propertyName: 'destinationAccount',
           })
         }
-        noMaxWidth
         error={formErrors['destinationAccount']}
       />
 
+      {destinationAccount && (
+        <div className="flex justify-start items-center gap-x-2 -mt-4 ml-1">
+          <p className="pb-0.5 text-fgd-3 text-xs">Account owner:</p>
+
+          <p className="text-xs break-all">
+            {destinationAccount.account.owner.toString()}
+          </p>
+        </div>
+      )}
+
+      {destinationAccountName && (
+        <div className="flex justify-start items-center gap-x-2 ml-1">
+          <p className="pb-0.5 text-fgd-3 text-xs">Account name:</p>
+
+          <p className="text-xs break-all">{destinationAccountName}</p>
+        </div>
+      )}
+
+      <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+        wrapperClassName="mt-6 mb-2"
+        min={mintMinAmount}
+        placeholder="Amount"
+        label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
+        value={form.amount}
+        type="number"
+        onChange={setAmount}
+        step={mintMinAmount}
+        error={formErrors['amount']}
+        onBlur={validateAmountOnBlur}
+      />
+
+      <small className="text-red ml-1">
+        {IsAmountNotHigherThenBalance()
+          ? `~$${transactionDolarAmount}`
+          : 'Insufficient balance'}
+      </small>
+
       <div
-        className={'flex items-center hover:cursor-pointer w-24 my-3'}
+        className="flex items-center hover:cursor-pointer w-24 mb-4"
         onClick={() => setShowOptions(!showOptions)}
       >
         {showOptions ? (
@@ -327,7 +401,7 @@ const TreasuryPaymentForm = ({ close }) => {
             className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
             wrapperClassName="mb-6"
             label="Title of your proposal"
-            placeholder="Title of your proposal"
+            placeholder={proposalTitle}
             value={form.title}
             type="text"
             onChange={(event) =>
@@ -343,32 +417,8 @@ const TreasuryPaymentForm = ({ close }) => {
             useDefaultStyle={false}
             className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
             wrapperClassName="mb-6"
-            min={mintMinAmount}
-            label="Voter weight"
-            value={form.amount}
-            type="number"
-            onChange={setAmount}
-            step={mintMinAmount}
-            error={formErrors['amount']}
-            onBlur={validateAmountOnBlur}
-          />
-
-          {canChooseWhoVote && (
-            <VoteBySwitch
-              checked={voteByCouncil}
-              onChange={() => {
-                setVoteByCouncil(!voteByCouncil)
-              }}
-            />
-          )}
-
-          <Input
-            noMaxWidth
-            useDefaultStyle={false}
-            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-            wrapperClassName="mb-6"
             label="Description"
-            placeholder="Description of your proposal (optional)"
+            placeholder="Describe your proposal (optional)"
             value={form.description}
             type="text"
             onChange={(event) =>
@@ -378,6 +428,15 @@ const TreasuryPaymentForm = ({ close }) => {
               })
             }
           />
+
+          {!canChooseWhoVote && (
+            <VoteBySwitch
+              checked={voteByCouncil}
+              onChange={() => {
+                setVoteByCouncil(!voteByCouncil)
+              }}
+            />
+          )}
         </>
       )}
 
@@ -391,12 +450,19 @@ const TreasuryPaymentForm = ({ close }) => {
         </SecondaryButton>
 
         <Button
-          disabled={!form.destinationAccount}
+          tooltipMessage={
+            !canUseTransferInstruction
+              ? 'You need to have connected wallet with ability to create treasury payment proposals'
+              : !balance
+              ? 'Insufficient balance'
+              : ''
+          }
+          disabled={!canUseTransferInstruction || isLoading || !balance}
           className="w-44 flex justify-center items-center"
-          onClick={() => handlePropose()}
+          onClick={handlePropose}
           isLoading={isLoading}
         >
-          Add member
+          Create proposal
         </Button>
       </div>
     </>
