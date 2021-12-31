@@ -21,9 +21,13 @@ import {
 } from './interfaces/Realm'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import {
+  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
+} from '@components/instructions/tools'
 import { ProgramVersion } from '@models/registry/constants'
-
+import Tooltip from '@components/Tooltip'
+import { StyledLabel } from '@components/inputs/styles'
 import { createMultisigRealm } from 'actions/createMultisigRealm'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
@@ -34,6 +38,7 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { RpcContext } from '@models/core/api'
 import { registerRealm } from 'actions/registerRealm'
 import { MintMaxVoteWeightSource } from '@models/accounts'
+import Switch from '@components/Switch'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
@@ -56,7 +61,7 @@ const RealmWizard: React.FC = () => {
    * The wizard controller instance
    */
   const [ctl, setController] = useState<RealmWizardController>()
-
+  const [testRealmCheck, setTestRealmCheck] = useState(false)
   const [form, setForm] = useState<RealmArtifacts>({})
   const [formErrors, setFormErrors] = useState({})
 
@@ -103,9 +108,9 @@ const RealmWizard: React.FC = () => {
       })
     }
 
-    // TODO: make it part of the form
-    const programId =
-      process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ?? DEFAULT_GOVERNANCE_PROGRAM_ID
+    const programId = testRealmCheck
+      ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
+      : DEFAULT_GOVERNANCE_PROGRAM_ID
 
     const results = await createMultisigRealm(
       connection.current,
@@ -178,7 +183,7 @@ const RealmWizard: React.FC = () => {
       setForm({
         governanceProgramId:
           process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
-          DEFAULT_GOVERNANCE_PROGRAM_ID,
+          DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
         yesThreshold: 60,
       })
       setController(ctl)
@@ -356,6 +361,22 @@ const RealmWizard: React.FC = () => {
       {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>
           <div className="flex justify-end pr-10 mr-3 mt-10">
+            {ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
+              <div className="flex justify-left items-center">
+                <Tooltip content="If checked, the realm will be created in a test governance program instance">
+                  <StyledLabel className="mt-1.5 ml-3">
+                    Create a test realm
+                  </StyledLabel>
+                </Tooltip>
+                <Switch
+                  className="mt-2 mb-2"
+                  checked={testRealmCheck}
+                  onChange={(check) => {
+                    setTestRealmCheck(check)
+                  }}
+                />
+              </div>
+            )}
             {!ctl.isFirstStep() ? (
               <Button
                 onClick={() => {
@@ -369,6 +390,7 @@ const RealmWizard: React.FC = () => {
             ) : (
               <p>&nbsp;</p>
             )}
+
             <Button
               onClick={() => {
                 if (ctl.isLastStep()) handleCreateRealm()
