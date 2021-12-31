@@ -35,15 +35,9 @@ import Input from '@components/inputs/Input'
 import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
 import { getAccountName } from '@components/instructions/tools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import { ViewState } from './Types'
 import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid'
 
 const TreasuryPaymentForm = ({ close }) => {
-  const {
-    setCurrentCompactView,
-    resetCompactViewState,
-  } = useTreasuryAccountStore()
-
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -189,6 +183,7 @@ const TreasuryPaymentForm = ({ close }) => {
         connection.current,
         connection.endpoint
       )
+
       const instructionData = {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
@@ -196,6 +191,7 @@ const TreasuryPaymentForm = ({ close }) => {
         holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
+
       try {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
@@ -222,6 +218,7 @@ const TreasuryPaymentForm = ({ close }) => {
             'There is no suitable governing token for the proposal'
           )
         }
+
         //Description same as title
         proposalAddress = await createProposal(
           rpcContext,
@@ -235,9 +232,11 @@ const TreasuryPaymentForm = ({ close }) => {
           [instructionData],
           false
         )
+
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -315,7 +314,7 @@ const TreasuryPaymentForm = ({ close }) => {
 
   const proposalTitle = `Pay ${form.amount}${
     tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
-  }to ${form.destinationAccount}`
+  }${form.destinationAccount ? `to ${form.destinationAccount}` : ''}`
 
   return (
     <>

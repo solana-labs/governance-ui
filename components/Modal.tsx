@@ -12,7 +12,7 @@ const Modal = ({
   return (
     <Portal>
       <div
-        className="fixed z-10 inset-0 overflow-y-auto"
+        className="fixed z-20 inset-0 overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -23,7 +23,7 @@ const Modal = ({
               className="fixed inset-0 bg-black bg-opacity-70 transition-opacity"
               aria-hidden="true"
               onClick={onClose}
-            ></div>
+            />
           ) : null}
 
           <span

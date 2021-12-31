@@ -128,7 +128,7 @@ const MemberOverview = () => {
         <>
           <ArrowLeftIcon
             onClick={handleGoBackToMainView}
-            className="h-4 w-4 mr-1 text-primary-light mr-2"
+            className="h-4 w-4 text-primary-light mr-2"
           />
           {abbreviateAddress(new PublicKey(walletAddress))}
         </>

@@ -5,7 +5,6 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
-import SendTokens from './SendTokens'
 import DepositTokens from './DepositTokens'
 import { PlusIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
@@ -20,6 +19,7 @@ const AccountsCompactWrapper = () => {
   const { resetCompactViewState } = useTreasuryAccountStore()
   const connected = useWalletStore((s) => s.connected)
   const { fmtUrlWithCluster } = useQueryContext()
+
   const {
     ownVoterWeight,
     symbol,
@@ -27,17 +27,21 @@ const AccountsCompactWrapper = () => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+
   const goToNewAccountForm = () => {
     router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
   }
+
   const canCreateGovernance = realm
     ? ownVoterWeight.canCreateGovernance(realm)
     : null
+
   const isConnectedWithGovernanceCreationPermission =
     connected &&
     canCreateGovernance &&
     !toManyCommunityOutstandingProposalsForUser &&
     !toManyCouncilOutstandingProposalsForUse
+
   const getCurrentView = () => {
     switch (currentView) {
       case ViewState.MainView:
@@ -73,24 +77,25 @@ const AccountsCompactWrapper = () => {
                 </div>
               </Tooltip>
             </h3>
+
             <HoldTokensTotalPrice />
-            <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
+
+            <div className="overflow-y-auto max-w-xs">
               <AccountsItems />
             </div>
           </>
         )
       case ViewState.AccountView:
-        return <AccountOverview></AccountOverview>
-      case ViewState.Send:
-        return <SendTokens></SendTokens>
+        return <AccountOverview />
       case ViewState.Deposit:
-        return <DepositTokens></DepositTokens>
+        return <DepositTokens />
     }
   }
 
   useEffect(() => {
     resetCompactViewState()
   }, [symbol])
+
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
   )
