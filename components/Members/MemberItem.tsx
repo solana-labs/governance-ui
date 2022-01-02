@@ -60,7 +60,7 @@ const MemberItem = ({ item }: { item: Member }) => {
         <div className="text-fgd-3 text-xs flex flex-col">
           Votes cast: {totalVotes}
         </div>
-        <div className="text-fgd-3 text-xs flex flex-row">
+        <div className="text-fgd-3 text-xs flex flex-col">
           {/* until we have community tokens match from wallets we show 0 if someone withdrawn tokens */}
           {(communityAmount || !councilAmount) && (
             <span className="flex items-center">
@@ -69,9 +69,6 @@ const MemberItem = ({ item }: { item: Member }) => {
                 <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
               )}
             </span>
-          )}
-          {communityAmount && councilAmount && (
-            <span className="ml-1 mr-1">|</span>
           )}
           {councilAmount && (
             <span className="flex items-center">
