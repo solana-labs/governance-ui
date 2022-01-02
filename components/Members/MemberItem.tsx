@@ -46,8 +46,6 @@ const MemberItem = ({ item }: { item: Member }) => {
     setCurrentCompactViewMember(item)
   }
   return (
-    //TODO: implement dynamic height with CellMeasurer
-    //for now every member item element has to be same height
     <div
       onClick={handleGoToMemberOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
@@ -61,7 +59,6 @@ const MemberItem = ({ item }: { item: Member }) => {
           Votes cast: {totalVotes}
         </div>
         <div className="text-fgd-3 text-xs flex flex-col">
-          {/* until we have community tokens match from wallets we show 0 if someone withdrawn tokens */}
           {(communityAmount || !councilAmount) && (
             <span className="flex items-center">
               {tokenName} Votes {communityAmount || 0}
