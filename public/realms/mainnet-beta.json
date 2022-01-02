@@ -179,5 +179,14 @@
     "ogImage": "/realms/MNDE/img/mnde_logo.png",
     "website": "https://marinade.finance/",
     "twitter": "@marinadefinance"
+  },
+  {
+    "symbol": "COCK",
+    "displayName": "Chicken Tribe",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "AMRC14FwwWkT5TG2ibXdLTUnVrnd2N4YsTifzCeRR22X",
+    "ogImage": "https://chickentribe.com/_next/image?url=%2Fimages%2FChickenTribe_Team01.svg&w=128&q=75",
+    "website": "https://chickentribe.com/",
+    "twitter": "@ChickenTribe"
   }
 ]
