@@ -22,6 +22,7 @@ const MemberItem = ({ item }: { item: Member }) => {
     communityVotes,
     votesCasted,
     hasCouncilTokenOutsideRealm,
+    hasCommunityTokenOutsideRealm,
   } = item
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
@@ -62,8 +63,11 @@ const MemberItem = ({ item }: { item: Member }) => {
         <div className="text-fgd-3 text-xs flex flex-row">
           {/* until we have community tokens match from wallets we show 0 if someone withdrawn tokens */}
           {(communityAmount || !councilAmount) && (
-            <span>
+            <span className="flex items-center">
               {tokenName} Votes {communityAmount || 0}
+              {hasCommunityTokenOutsideRealm && (
+                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
+              )}
             </span>
           )}
           {communityAmount && councilAmount && (

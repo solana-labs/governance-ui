@@ -1,16 +1,15 @@
 import MemberItem from './MemberItem'
-import useMembers from './useMembers'
 import { List, AutoSizer } from 'react-virtualized'
 
-const MembersItems = () => {
-  const { members } = useMembers()
+const MembersItems = ({ activeMembers }) => {
   //TODO implement auto height if needed;
   const minRowHeight = 84
-  const rowHeight = members.length > 4 ? 350 : members.length * minRowHeight
+  const rowHeight =
+    activeMembers.length > 4 ? 350 : activeMembers.length * minRowHeight
   function rowRenderer({ key, index, style }) {
     return (
       <div key={key} style={style}>
-        <MemberItem item={members[index]}></MemberItem>
+        <MemberItem item={activeMembers[index]}></MemberItem>
       </div>
     )
   }
@@ -22,7 +21,7 @@ const MembersItems = () => {
           <List
             width={width}
             height={rowHeight}
-            rowCount={members.length}
+            rowCount={activeMembers.length}
             rowHeight={minRowHeight}
             rowRenderer={rowRenderer}
           />
