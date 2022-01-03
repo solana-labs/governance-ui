@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import TeamWalletField from '../TeamWalletField'
 import Input from '@components/inputs/Input'
-import { StyledLabel } from '@components/inputs/styles'
+
 import useWalletStore from 'stores/useWalletStore'
 import ApprovalQuorumInput from '../ApprovalQuorumInput'
 
@@ -56,13 +56,18 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
 
   return (
     <div>
+      <div className="border-b border-fgd-4 pb-4 pt-2">
+        <div className="flex items-center justify-between">
+          <h1>New Multisig Realm</h1>
+        </div>
+      </div>
       <div className="pb-4 my-5 pr-10 w-full" style={{ maxWidth: 512 }}>
-        <StyledLabel>Name your realm</StyledLabel>
         <Input
           required
           type="text"
           value={form.name}
-          placeholder="The name of your realm"
+          label="Name"
+          placeholder="Name of your realm"
           onChange={($e) => {
             setForm({
               name: $e.target.value,

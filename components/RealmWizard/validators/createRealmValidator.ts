@@ -23,13 +23,12 @@ const CreateFormSchema = yup.object().shape({
   name: yup.string().required('Name is required'),
   communityMintId: yup
     .string()
-    .required('Community token mint is required')
     .test(
       'is-public-key',
       'Community token mint id is not a valid public key',
-      publicKeyValidationTest
+      (value) => (value ? publicKeyValidationTest(value) : true)
     ),
-  communityMint: yup.object().required('Community token mint is not valid'),
+  // communityMint: yup.object().required('Community token mint is not valid'),
   councilMintId: yup
     .string()
     .test(

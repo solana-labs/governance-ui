@@ -13,8 +13,18 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+/**
+ * Default governance program id instance
+ */
 export const DEFAULT_GOVERNANCE_PROGRAM_ID =
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+
+/**
+ * Default TEST governance program id instance
+ */
+export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
+  'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
+
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',

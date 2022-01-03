@@ -7,14 +7,18 @@ import { StyledLabel } from '@components/inputs/styles'
 import TeamWalletField from '../TeamWalletField'
 import useWalletStore from 'stores/useWalletStore'
 import ApprovalQuorumInput from '../ApprovalQuorumInput'
+import { tryGetMint } from '@utils/tokens'
+import { PublicKey } from '@solana/web3.js'
+import _ from 'lodash'
 
 const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
+  switchState = true,
+  onSwitch = () => null,
 }) => {
-  const { current: wallet } = useWalletStore((s) => s)
-  const [councilMintSwitch, setCouncilMintSwitch] = useState(false)
+  const { current: wallet, connection } = useWalletStore((s) => s)
   const handleInsertTeamWallet = (wallets: string[]) => {
     let teamWallets: string[] = []
     if (form?.teamWallets) {
@@ -37,7 +41,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   }
 
   const handleWallets = () => {
-    if (councilMintSwitch && wallet?.publicKey) {
+    if (switchState && wallet?.publicKey) {
       // Forces to add the current wallet
       handleInsertTeamWallet([wallet.publicKey.toBase58()])
     } else {
@@ -45,9 +49,34 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
     }
   }
 
+  const handleCouncilMint = async (mintId: string) => {
+    try {
+      const mintPublicKey = new PublicKey(mintId)
+      const mint = await tryGetMint(connection.current, mintPublicKey)
+      if (mint) {
+        setForm({
+          councilMint: mint,
+        })
+      }
+    } catch (e) {
+      console.log('failed to set council mint', e)
+    }
+  }
+
+  useEffect(() => {
+    _.debounce(async () => {
+      if (form?.councilMintId) {
+        await handleCouncilMint(form.councilMintId)
+      }
+    }, 250)()
+    if (!form?.communityMintId?.length) {
+      setForm({ communityMint: undefined })
+    }
+  }, [form?.councilMintId])
+
   useEffect(() => {
     handleWallets()
-  }, [councilMintSwitch])
+  }, [switchState])
 
   useEffect(() => {
     handleWallets()
@@ -64,17 +93,19 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
         <div className="flex justify-left items-center">
           <Switch
             className="mt-2 mb-2"
-            checked={councilMintSwitch}
-            onChange={() => setCouncilMintSwitch(!councilMintSwitch)}
+            checked={switchState}
+            onChange={(check) => {
+              if (typeof onSwitch === 'function') onSwitch(check)
+            }}
           />
           <StyledLabel className="mt-1.5 ml-3">Use Council</StyledLabel>
         </div>
       </div>
-      {councilMintSwitch && (
+      {switchState && (
         <>
           <div className="pb-7 pr-10 w-full">
             <Input
-              label="Council Mint Id"
+              label="Council token mint"
               placeholder="(Optional) Council mint"
               value={form?.councilMintId}
               type="text"

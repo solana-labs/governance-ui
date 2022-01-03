@@ -1,5 +1,5 @@
 import { ProgramVersion } from '@models/registry/constants'
-import { BN, ProgramAccount } from '@project-serum/anchor'
+import { ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import React from 'react'
@@ -12,11 +12,12 @@ export interface RealmArtifacts {
   name?: string
   communityMintId?: string
   communityMint?: ProgramAccount<MintInfo>
+  transferAuthority?: boolean
   councilMintId?: string
   councilMint?: ProgramAccount<MintInfo>
   programVersion?: ProgramVersion
   communityMintMaxVoteWeightSource?: number
-  minCommunityTokensToCreateGovernance?: BN
+  minCommunityTokensToCreateGovernance?: string
   teamWallets?: string[]
   yesThreshold?: number
 }
@@ -60,9 +61,13 @@ export enum RealmWizardStep {
    */
   BESPOKE_COUNCIL,
   /**
-   * Not defined yet
+   * Setup the governance token
    */
-  STEP_4,
+  GOVERNANCE,
+  /**
+   * Information Inserted to create realm
+   */
+  BESPOKE_INFO,
   /**
    * Represents the Realm Created state
    */
