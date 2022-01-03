@@ -3,6 +3,7 @@ import Divider from '@components/Divider'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 
@@ -87,7 +88,11 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     readOnly
                     label="Min community tokens to create governance"
                     placeholder="Min community tokens to create governance"
-                    value={form.minCommunityTokensToCreateGovernance}
+                    value={
+                      form.minCommunityTokensToCreateGovernance
+                        ? form.minCommunityTokensToCreateGovernance
+                        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+                    }
                     error={formErrors['minCommunityTokensToCreateGovernance']}
                     type="text"
                   />
@@ -98,7 +103,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     className="border-none py-1 bg-transparent"
                     readOnly
                     label="Community mint supply factor (max vote weight)"
-                    value={form.communityMintMaxVoteWeightSource}
+                    value={form.communityMintMaxVoteWeightSource ?? 1}
                     error={formErrors['communityMintMaxVoteWeightSource']}
                     type="text"
                   />

@@ -14,6 +14,7 @@ import _ from 'lodash'
 import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -134,7 +135,11 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                 label="Min community tokens to create governance (defaults 1% of community mint)"
                 placeholder="Min community tokens to create governance"
                 step="1"
-                value={form.minCommunityTokensToCreateGovernance?.toString()}
+                value={
+                  form.minCommunityTokensToCreateGovernance
+                    ? form.minCommunityTokensToCreateGovernance.toString()
+                    : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+                }
                 type="number"
                 error={formErrors['minCommunityTokensToCreateGovernance']}
                 onChange={(evt) => {
@@ -149,7 +154,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
               <Input
                 label="Community mint supply factor (max vote weight)"
                 placeholder="Community mint supply factor (max vote weight)"
-                value={form.communityMintMaxVoteWeightSource}
+                value={form.communityMintMaxVoteWeightSource ?? 1}
                 type="number"
                 error={formErrors['communityMintMaxVoteWeightSource']}
                 onChange={(evt) =>

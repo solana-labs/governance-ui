@@ -41,14 +41,14 @@ import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
 */
 
 /**
- * The default amount of community tokens with 0 supply
+ * The minimum amount of community tokens to create governance and proposals, for tokens with 0 supply
  */
-const DEF_COMMUNITY_TOKENS_W_0_SUPPLY = 1000000
+export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000
 
 /**
  * The default amount of decimals for the community token
  */
-const COMMUNITY_MINT_DECIMALS = 6
+export const COMMUNITY_MINT_DECIMALS = 6
 
 /**
  * Prepares the mint instructions
@@ -154,9 +154,10 @@ function mountGovernanceConfig(
 
   const minCommunityTokensToCreateAsMintValue = new BN(
     getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance
+      minCommunityTokensToCreateGovernance &&
+        +minCommunityTokensToCreateGovernance > 0
         ? +minCommunityTokensToCreateGovernance
-        : DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
       tokenDecimals ?? COMMUNITY_MINT_DECIMALS
     )
   )
@@ -355,9 +356,10 @@ export async function registerRealm(
 
   const _minCommunityTokensToCreateGovernance = new BN(
     getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance
+      minCommunityTokensToCreateGovernance &&
+        +minCommunityTokensToCreateGovernance > 0
         ? +minCommunityTokensToCreateGovernance
-        : DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
       communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
     )
   )
