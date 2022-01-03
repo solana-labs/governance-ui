@@ -47,7 +47,6 @@ const AccountItem = ({
 
   function handleSetTotalPrice() {
     const price = tokenService.getUSDTokenPrice(mintAddress)
-    console.log(price)
     const totalPrice = amount * price
     const totalPriceFormatted = amount
       ? new BigNumber(totalPrice).toFormat(0)
