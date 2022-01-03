@@ -93,6 +93,7 @@ export const createMultisigRealm = async (
       teamWalletPk,
       walletPk
     )
+
     // Mint 1 council token to each team member
     await withMintTo(
       councilMembersInstructions,

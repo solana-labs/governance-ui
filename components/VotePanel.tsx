@@ -109,11 +109,12 @@ const VotePanel = () => {
     setShowVoteModal(false)
   }, [])
 
-  const actionLabel = !isVoteCast
-    ? 'Cast your vote'
-    : isVoting
-    ? 'Withdraw your vote'
-    : 'Release your tokens'
+  const actionLabel =
+    !isVoteCast || !connected
+      ? 'Cast your vote'
+      : isVoting
+      ? 'Withdraw your vote'
+      : 'Release your tokens'
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -125,29 +126,36 @@ const VotePanel = () => {
 
   const voteTooltipContent = !connected
     ? 'You need to connect your wallet to be able to vote'
-    : !isVoteEnabled
-    ? !isVoting && isVoteCast
-      ? 'Proposal is not in a voting state anymore.'
-      : !voterTokenRecord
-      ? 'No voter token record found.'
-      : voterTokenRecord.info.governingTokenDepositAmount.isZero()
-      ? 'No governing token deposit amount found. You need to deposit some tokens first.'
-      : ''
+    : !isVoting && isVoteCast
+    ? 'Proposal is not in a voting state anymore.'
+    : !voterTokenRecord ||
+      voterTokenRecord.info.governingTokenDepositAmount.isZero()
+    ? 'You don’t have governance power to vote in this realm'
     : ''
 
+  const notVisibleStatesForNotConnectedWallet = [
+    ProposalState.Cancelled,
+    ProposalState.Succeeded,
+    ProposalState.Draft,
+    ProposalState.Completed,
+  ]
+
+  const isVisibleToWallet = !connected
+    ? !hasVoteTimeExpired &&
+      typeof notVisibleStatesForNotConnectedWallet.find(
+        (x) => x === proposal?.info.state
+      ) === 'undefined'
+    : !ownVoteRecord?.info.isRelinquished
+
+  const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
   return (
     <>
-      {ProposalState.Cancelled === proposal?.info.state ||
-      ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Draft === proposal?.info.state ||
-      (!isVoting && !isVoteCast) ||
-      (connected && isVoteCast && !isWithdrawEnabled) ||
-      !connected ? null : (
+      {isPanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
-            {isVoteCast ? (
+            {isVoteCast && connected ? (
               <Button
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
