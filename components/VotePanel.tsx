@@ -1,4 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+
+import { withFinalizeVote } from '@models/withFinalizeVote'
+import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
@@ -21,11 +24,11 @@ const VotePanel = () => {
     voteRecordsByVoter,
     tokenType,
   } = useWalletStore((s) => s.selectedProposal)
-  const { ownTokenRecord, ownCouncilTokenRecord, realmInfo } = useRealm()
+  const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const connected = useWalletStore((s) => s.connected)
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   const ownVoteRecord =
@@ -68,18 +71,33 @@ const VotePanel = () => {
       connection.endpoint
     )
     try {
+      const instructions: TransactionInstruction[] = []
+
+      if (proposal?.info.state === ProposalState.Voting && hasVoteTimeExpired) {
+        await withFinalizeVote(
+          instructions,
+          realmInfo!.programId,
+          realm!.pubkey,
+          proposal.info.governance,
+          proposal.pubkey,
+          proposal.info.tokenOwnerRecord,
+          proposal.info.governingTokenMint
+        )
+      }
+
       await relinquishVote(
         rpcContext,
         proposal!,
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
-        ownVoteRecord!.pubkey
+        ownVoteRecord!.pubkey,
+        instructions
       )
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }
 
-    fetchVoteRecords(proposal)
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const handleShowVoteModal = (vote) => {
@@ -91,52 +109,98 @@ const VotePanel = () => {
     setShowVoteModal(false)
   }, [])
 
-  const actionLabel = !isVoteCast
-    ? 'Cast your vote'
-    : isVoting
-    ? 'Withdraw your vote'
-    : 'Release your tokens'
+  const actionLabel =
+    !isVoteCast || !connected
+      ? 'Cast your vote'
+      : isVoting
+      ? 'Withdraw your vote'
+      : 'Release your tokens'
 
+  const withdrawTooltipContent = !connected
+    ? 'You need to connect your wallet'
+    : !isWithdrawEnabled
+    ? !ownVoteRecord?.info.isRelinquished
+      ? 'Owner vote record is not relinquished'
+      : 'The proposal is not in a valid state to execute this action.'
+    : ''
+
+  const voteTooltipContent = !connected
+    ? 'You need to connect your wallet to be able to vote'
+    : !isVoting && isVoteCast
+    ? 'Proposal is not in a voting state anymore.'
+    : !voterTokenRecord ||
+      voterTokenRecord.info.governingTokenDepositAmount.isZero()
+    ? 'You don’t have governance power to vote in this realm'
+    : ''
+
+  const notVisibleStatesForNotConnectedWallet = [
+    ProposalState.Cancelled,
+    ProposalState.Succeeded,
+    ProposalState.Draft,
+    ProposalState.Completed,
+  ]
+
+  const isVisibleToWallet = !connected
+    ? !hasVoteTimeExpired &&
+      typeof notVisibleStatesForNotConnectedWallet.find(
+        (x) => x === proposal?.info.state
+      ) === 'undefined'
+    : !ownVoteRecord?.info.isRelinquished
+
+  const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
-      <h2 className="mb-4 text-center">{actionLabel}</h2>
-      <div className="flex items-center justify-center">
-        {isVoteCast ? (
-          <Button
-            className="mx-2 w-44"
-            onClick={() => submitRelinquishVote()}
-            disabled={!isWithdrawEnabled}
-          >
-            {isVoting ? 'Withdraw Vote' : 'Release Tokens'}
-          </Button>
-        ) : (
-          <>
-            <Button
-              className="mx-2 w-44"
-              onClick={() => handleShowVoteModal(Vote.Yes)}
-              disabled={!isVoteEnabled}
-            >
-              Approve
-            </Button>
-            <Button
-              className="mx-2 w-44"
-              onClick={() => handleShowVoteModal(Vote.No)}
-              disabled={!isVoteEnabled}
-            >
-              Deny
-            </Button>
-          </>
-        )}
-      </div>
-      {showVoteModal ? (
-        <VoteCommentModal
-          isOpen={showVoteModal}
-          onClose={handleCloseShowVoteModal}
-          vote={vote!}
-          voterTokenRecord={voterTokenRecord!}
-        />
-      ) : null}
-    </div>
+    <>
+      {isPanelVisible && (
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
+          <h2 className="mb-4 text-center">{actionLabel}</h2>
+
+          <div className="items-center justify-center flex w-full gap-5">
+            {isVoteCast && connected ? (
+              <Button
+                tooltipMessage={withdrawTooltipContent}
+                onClick={() => submitRelinquishVote()}
+                disabled={!isWithdrawEnabled}
+              >
+                {isVoting ? 'Withdraw' : 'Release Tokens'}
+              </Button>
+            ) : (
+              <>
+                {isVoting && (
+                  <div className="w-full flex justify-between items-center gap-5">
+                    <Button
+                      tooltipMessage={voteTooltipContent}
+                      className="w-1/2"
+                      onClick={() => handleShowVoteModal(Vote.Yes)}
+                      disabled={!isVoteEnabled}
+                    >
+                      Approve
+                    </Button>
+
+                    <Button
+                      tooltipMessage={voteTooltipContent}
+                      className="w-1/2"
+                      onClick={() => handleShowVoteModal(Vote.No)}
+                      disabled={!isVoteEnabled}
+                    >
+                      Deny
+                    </Button>
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+
+          {showVoteModal ? (
+            <VoteCommentModal
+              isOpen={showVoteModal}
+              onClose={handleCloseShowVoteModal}
+              vote={vote!}
+              voterTokenRecord={voterTokenRecord!}
+            />
+          ) : null}
+        </div>
+      )}
+    </>
   )
 }
 

@@ -23,6 +23,7 @@ export function parseMinTokensToCreate(
     ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
     : getMintNaturalAmountFromDecimal(value, mintDecimals)
 }
+
 export function getGovernanceConfig(values: GovernanceConfigValues) {
   const minTokensToCreateProposal = parseMinTokensToCreate(
     values.minTokensToCreateProposal,

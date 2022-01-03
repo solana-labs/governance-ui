@@ -1,21 +1,21 @@
 import {
-  Account,
   Connection,
+  Keypair,
   PublicKey,
   TransactionInstruction,
 } from '@solana/web3.js'
 
 import * as serum from '@project-serum/common'
-import { IWallet } from './core/api'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 
 export const withCreateSplTokenAccount = async (
   connection: Connection,
-  wallet: IWallet | undefined,
+  wallet: SignerWalletAdapter | undefined,
   instructions: TransactionInstruction[],
-  signers: Account[],
+  signers: Keypair[],
   mint: PublicKey
 ): Promise<{ tokenAccountAddress: PublicKey }> => {
-  const tokenAccount = new Account()
+  const tokenAccount = new Keypair()
   const provider = new serum.Provider(
     connection,
     wallet as serum.Wallet,
@@ -26,7 +26,6 @@ export const withCreateSplTokenAccount = async (
       provider,
       tokenAccount.publicKey,
       mint,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       wallet!.publicKey!
     ))
   )

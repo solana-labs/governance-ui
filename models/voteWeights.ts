@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import BN from 'bn.js'
 import { MintInfo } from '@solana/spl-token'
 import BigNumber from 'bignumber.js'

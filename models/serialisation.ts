@@ -44,9 +44,7 @@ import {
   VoteWeight,
 } from './accounts'
 import { serialize } from 'borsh'
-import { ProgramVersion } from './registry/api'
-
-// Temp. workaround to support u16.
+import { ProgramVersion } from './registry/constants'
 ;(BinaryReader.prototype as any).readU16 = function () {
   const reader = (this as unknown) as BinaryReader
   const value = reader.buf.readUInt16LE(reader.offset)
@@ -95,7 +93,7 @@ export function getGovernanceSchema(programVersion: ProgramVersion) {
 }
 
 function createGovernanceSchema(programVersion: ProgramVersion) {
-  return new Map<any, any>([
+  const schemaData = [
     [
       RealmConfigArgs,
       {
@@ -520,7 +518,10 @@ function createGovernanceSchema(programVersion: ProgramVersion) {
         ],
       },
     ],
-  ])
+  ] as const
+
+  // only allow valid class keys to be used when accessing Map
+  return new Map<typeof schemaData[number][0], any>(schemaData)
 }
 
 export function getInstructionDataFromBase64(instructionDataBase64: string) {

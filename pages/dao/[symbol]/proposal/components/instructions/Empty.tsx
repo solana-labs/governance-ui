@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import {
   EmptyInstructionForm,
   UiInstruction,
@@ -12,6 +10,7 @@ import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { validateInstruction } from '@utils/instructionTools'
 
 const Empty = ({
   index,
@@ -62,17 +61,12 @@ const Empty = ({
     }
     prepGovernances()
   }, [])
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     const obj: UiInstruction = {
       serializedInstruction: '',
       isValid,
-      governedAccount: form.governedAccount?.governance,
+      governance: form.governedAccount?.governance,
     }
     return obj
   }

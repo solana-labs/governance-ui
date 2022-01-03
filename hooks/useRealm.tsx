@@ -1,6 +1,11 @@
+import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
-import { getRealmInfo, RealmInfo } from '../models/registry/api'
+import {
+  createUnchartedRealmInfo,
+  getCertifiedRealmInfo,
+  RealmInfo,
+} from '../models/registry/api'
 import { VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
@@ -27,9 +32,13 @@ export default function useRealm() {
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
 
   useMemo(async () => {
-    const realm = await getRealmInfo(symbol as string, connection)
-    setRealmInfo(realm)
-  }, [symbol])
+    const realmInfo = isPublicKey(symbol as string)
+      ? realm
+        ? createUnchartedRealmInfo(realm)
+        : undefined
+      : await getCertifiedRealmInfo(symbol as string, connection)
+    setRealmInfo(realmInfo)
+  }, [symbol, realm])
 
   const realmTokenAccount = useMemo(
     () =>
@@ -68,6 +77,23 @@ export default function useRealm() {
     [tokenRecords, wallet, connected]
   )
 
+  const canChooseWhoVote =
+    realm?.info.communityMint &&
+    !mint?.supply.isZero() &&
+    realm.info.config.councilMint &&
+    !councilMint?.supply.isZero()
+
+  //TODO take from realm config when available
+  const realmCfgMaxOutstandingProposalCount = 10
+  const toManyCommunityOutstandingProposalsForUser =
+    ownTokenRecord &&
+    ownTokenRecord?.info.outstandingProposalCount >=
+      realmCfgMaxOutstandingProposalCount
+  const toManyCouncilOutstandingProposalsForUse =
+    ownCouncilTokenRecord &&
+    ownCouncilTokenRecord?.info.outstandingProposalCount >=
+      realmCfgMaxOutstandingProposalCount
+
   return {
     realm,
     realmInfo,
@@ -86,5 +112,9 @@ export default function useRealm() {
     ownCouncilTokenRecord,
     ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
     realmDisplayName: realmInfo?.displayName ?? realm?.info?.name,
+    canChooseWhoVote,
+    councilTokenOwnerRecords,
+    toManyCouncilOutstandingProposalsForUse,
+    toManyCommunityOutstandingProposalsForUser,
   }
 }

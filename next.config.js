@@ -1,9 +1,13 @@
 // workaround for ESM module loader errors
 // see https://github.com/vercel/next.js/issues/25454
-const withTM = require('next-transpile-modules')(['react-markdown'])
+const withTM = require('next-transpile-modules')([
+  'react-markdown',
+  '@solana/wallet-adapter-base',
+  '@solana/wallet-adapter-phantom',
+  '@solana/wallet-adapter-sollet',
+])
 
 module.exports = withTM({
-  target: 'serverless',
   webpack: (config, { isServer }) => {
     config.module.rules.push({
       test: /\.svg$/,
@@ -14,5 +18,6 @@ module.exports = withTM({
   },
   env: {
     REALM: process.env.REALM,
+    DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
 })

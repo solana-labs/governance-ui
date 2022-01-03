@@ -1,47 +1,19 @@
 import { PublicKey } from '@solana/web3.js'
-import { SanitizedObject } from '@utils/helpers'
+import { SanitizedObject } from 'utils/helpers'
 import * as bs58 from 'bs58'
 import {
   GovernanceAccount,
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
-} from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
-import { RpcContext } from '../models/core/api'
-import { GOVERNANCE_SCHEMA } from '../models/serialisation'
-import { deserializeBorsh } from '../utils/borsh'
+} from 'models/accounts'
+import { ParsedAccount } from 'models/core/accounts'
+import { MemcmpFilter, RpcContext } from 'models/core/api'
+import { GOVERNANCE_SCHEMA } from 'models/serialisation'
+import { deserializeBorsh } from 'utils/borsh'
+import { sleep } from '@project-serum/common'
 
 const fetch = require('node-fetch')
-
-export interface IWallet {
-  publicKey: PublicKey
-}
-
-export class MemcmpFilter {
-  offset: number
-  bytes: Buffer
-
-  constructor(offset: number, bytes: Buffer) {
-    this.offset = offset
-    this.bytes = bytes
-  }
-
-  isMatch(buffer: Buffer) {
-    if (this.offset + this.bytes.length > buffer.length) {
-      return false
-    }
-
-    for (let i = 0; i < this.bytes.length; i++) {
-      if (this.bytes[i] !== buffer[this.offset + i]) return false
-    }
-
-    return true
-  }
-}
-
-export const pubkeyFilter = (offset: number, pubkey: PublicKey) =>
-  new MemcmpFilter(offset, pubkey.toBuffer())
 
 export async function getRealms(rpcContext: RpcContext) {
   return getGovernanceAccountsImpl<Realm>(
@@ -69,26 +41,24 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     )
   }
 
-  const promises: Promise<Record<string, ParsedAccount<TAccount>>>[] = []
-  // workaround for preventing getting rate limited by public node
-  // 1/ for of instead of map +
-  // 2/ sleep a bit
+  let accounts: Record<string, ParsedAccount<TAccount>> = {}
+
   for (const at of accountTypes) {
-    await new Promise((r) => setTimeout(r, 3000))
-    promises.push(
-      getGovernanceAccountsImpl<TAccount>(
+    accounts = {
+      ...accounts,
+      ...(await getGovernanceAccountsImpl(
         programId,
         endpoint,
         accountClass,
         at,
         filters
-      )
-    )
+      )),
+    }
+    // XXX: sleep to prevent public RPC rate limits
+    await sleep(3_000)
   }
 
-  const all = await Promise.all(promises)
-
-  return all.reduce((res, r) => ({ ...res, ...r }), {})
+  return accounts
 }
 
 async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(

@@ -1,12 +1,14 @@
 import {
   PublicKey,
+  SystemProgram,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
 } from '@solana/web3.js'
 import { GOVERNANCE_SCHEMA } from './serialisation'
 import { serialize } from 'borsh'
 import { DepositGoverningTokensArgs } from './instructions'
-import { getTokenOwnerAddress, GOVERNANCE_PROGRAM_SEED } from './accounts'
+import { TOKEN_PROGRAM_ID } from '@utils/tokens'
+import { getTokenOwnerRecordAddress, GOVERNANCE_PROGRAM_SEED } from './accounts'
 
 export const withDepositGoverningTokens = async (
   instructions: TransactionInstruction[],
@@ -16,21 +18,19 @@ export const withDepositGoverningTokens = async (
   governingTokenMint: PublicKey,
   governingTokenOwner: PublicKey,
   transferAuthority: PublicKey,
-  payer: PublicKey,
-  tokenId: PublicKey,
-  systemId: PublicKey
+  payer: PublicKey
 ) => {
   const args = new DepositGoverningTokensArgs()
   const data = Buffer.from(serialize(GOVERNANCE_SCHEMA, args))
 
-  const tokenOwnerRecordAddress = await getTokenOwnerAddress(
+  const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
     programId,
     realm,
     governingTokenMint,
     governingTokenOwner
   )
 
-  const [governingTokenHoldingAddress] = await PublicKey.findProgramAddress(
+  const [governingTokenHoldingPk] = await PublicKey.findProgramAddress(
     [
       Buffer.from(GOVERNANCE_PROGRAM_SEED),
       realm.toBuffer(),
@@ -46,7 +46,7 @@ export const withDepositGoverningTokens = async (
       isSigner: false,
     },
     {
-      pubkey: governingTokenHoldingAddress,
+      pubkey: governingTokenHoldingPk,
       isWritable: true,
       isSigner: false,
     },
@@ -76,12 +76,12 @@ export const withDepositGoverningTokens = async (
       isSigner: true,
     },
     {
-      pubkey: systemId,
+      pubkey: SystemProgram.programId,
       isWritable: false,
       isSigner: false,
     },
     {
-      pubkey: tokenId,
+      pubkey: TOKEN_PROGRAM_ID,
       isWritable: false,
       isSigner: false,
     },
@@ -99,4 +99,6 @@ export const withDepositGoverningTokens = async (
       data,
     })
   )
+
+  return tokenOwnerRecordAddress
 }

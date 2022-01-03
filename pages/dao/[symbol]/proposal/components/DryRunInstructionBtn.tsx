@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { getExplorerInspectorUrl } from '@components/explorer/tools'
 import Loading from '@components/Loading'
@@ -45,6 +44,8 @@ const DryRunInstructionBtn = ({
       }
       setIsPending(true)
       const instructionData = await getInstructionDataFcn()
+      const prerequisiteInstructionsToRun =
+        instructionData.prerequisiteInstructions
       if (!instructionData?.isValid) {
         setIsPending(false)
         throw new Error('Invalid instruction')
@@ -52,7 +53,8 @@ const DryRunInstructionBtn = ({
       const result = await dryRunInstruction(
         connection.current,
         wallet!,
-        getInstructionDataFromBase64(instructionData?.serializedInstruction)
+        getInstructionDataFromBase64(instructionData?.serializedInstruction),
+        prerequisiteInstructionsToRun
       )
       setResult(result)
       setIsOpen(true)
@@ -92,7 +94,7 @@ const DryRunInstructionBtn = ({
         disabled={isPending || !wallet?.connected}
         small
       >
-        {isPending ? <Loading></Loading> : 'Run simulation'}
+        {isPending ? <Loading></Loading> : 'Preview instruction'}
       </SecondaryButton>
 
       {result?.response && (

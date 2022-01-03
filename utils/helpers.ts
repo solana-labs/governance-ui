@@ -1,13 +1,14 @@
 export function capitalize(str?: string) {
-  const lower = str?.toLowerCase()
-  return lower ? str?.charAt(0).toUpperCase() + lower?.slice(1) : lower
+  return str ? str?.charAt(0).toUpperCase() + str?.slice(1) : str
 }
 
 export function chunks<T>(array: T[], size: number): T[][] {
-  return Array.apply(
-    0,
-    new Array(Math.ceil(array.length / size))
-  ).map((_, index) => array.slice(index * size, (index + 1) * size))
+  const result: Array<T[]> = []
+  let i, j
+  for (i = 0, j = array.length; i < j; i += size) {
+    result.push(array.slice(i, i + size))
+  }
+  return result
 }
 
 //SanitizedObject class helps prevent prototype pollution with creating obj without prototype

@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useEffect, useMemo } from 'react'
 
-import { WalletAdapter } from '../@types/types'
 import useWalletStore from '../stores/useWalletStore'
 import { notify } from '../utils/notifications'
 import {
@@ -28,10 +26,21 @@ export default function useWallet() {
     'walletProvider',
     DEFAULT_PROVIDER.url
   )
+
+  // initialize selection from local storage
+  useEffect(() => {
+    if (!selectedProviderUrl) {
+      setWalletStore((s) => {
+        s.providerUrl = savedProviderUrl
+      })
+    }
+  }, [selectedProviderUrl, savedProviderUrl])
+
   const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
     selectedProviderUrl,
   ])
 
+  // save selection in local storage
   useEffect(() => {
     if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
       setSavedProviderUrl(selectedProviderUrl)
@@ -42,10 +51,7 @@ export default function useWallet() {
     if (provider) {
       const updateWallet = () => {
         // hack to also update wallet synchronously in case it disconnects
-        const wallet = new provider.adapter(
-          provider.url,
-          connection.endpoint
-        ) as WalletAdapter
+        const wallet = provider.adapter
         setWalletStore((state) => {
           state.current = wallet
         })

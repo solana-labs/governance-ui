@@ -1,3 +1,4 @@
+import { HIDDEN_GOVERNANCES } from '@components/instructions/tools'
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
 import {
@@ -14,9 +15,10 @@ export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const { ownVoterWeight, realm, symbol } = useRealm()
-  const governancesArray = Object.keys(governances).map(
-    (key) => governances[key]
-  )
+  const governancesArray = Object.keys(governances)
+    .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
+    .map((key) => governances[key])
+
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
       (gov) => gov.info?.accountType === type
@@ -29,6 +31,27 @@ export default function useGovernanceAssets() {
       getGovernancesByAccountType(type).some((g) =>
         ownVoterWeight.canCreateProposal(g.info.config)
       )
+    )
+  }
+  const canMintRealmCommunityToken = () => {
+    const governances = getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    )
+    return !!governances.find(
+      (x) =>
+        x.info.governedAccount.toBase58() ==
+        realm?.info.communityMint.toBase58()
+    )
+  }
+  const canMintRealmCouncilToken = () => {
+    const governances = getGovernancesByAccountType(
+      GovernanceAccountType.MintGovernance
+    )
+
+    return !!governances.find(
+      (x) =>
+        x.info.governedAccount.toBase58() ==
+        realm?.info.config.councilMint?.toBase58()
     )
   }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
@@ -146,5 +169,9 @@ export default function useGovernanceAssets() {
     governedTokenAccounts,
     getMintWithGovernances,
     canUseTransferInstruction,
+    canUseMintInstruction,
+    canMintRealmCommunityToken,
+    canMintRealmCouncilToken,
+    canUseProgramUpgradeInstruction,
   }
 }

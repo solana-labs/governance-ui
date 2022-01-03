@@ -37,6 +37,8 @@ import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
+import VoteBySwitch from './components/VoteBySwitch'
+
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
 })
@@ -61,7 +63,9 @@ const New = () => {
     ownVoterWeight,
     mint,
     councilMint,
+    canChooseWhoVote,
   } = useRealm()
+
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
   const wallet = useWalletStore((s) => s.current)
@@ -70,7 +74,7 @@ const New = () => {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernances,
   } = useWalletStore((s) => s.actions)
-
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: '',
     description: '',
@@ -80,7 +84,9 @@ const New = () => {
     governance,
     setGovernance,
   ] = useState<ParsedAccount<Governance> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
+  const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+  const isLoading = isLoadingSignedProposal || isLoadingDraft
   const customInstructionFilterForSelectedGovernance = (
     instructionType: Instructions
   ) => {
@@ -99,6 +105,7 @@ const New = () => {
       }
     }
   }
+
   const getAvailableInstructionsForIndex = (index) => {
     if (index === 0) {
       return availableInstructions
@@ -142,9 +149,18 @@ const New = () => {
     }
     return instructions
   }
+  const handleTurnOffLoaders = () => {
+    setIsLoadingSignedProposal(false)
+    setIsLoadingDraft(false)
+  }
   const handleCreate = async (isDraft) => {
     setFormErrors({})
-    setIsLoading(true)
+    if (isDraft) {
+      setIsLoadingDraft(true)
+    } else {
+      setIsLoadingSignedProposal(true)
+    }
+
     const { isValid, validationErrors }: formValidation = await isFormValid(
       schema,
       form
@@ -153,14 +169,14 @@ const New = () => {
     const instructions: UiInstruction[] = await handleGetInstructions()
     let proposalAddress: PublicKey | null = null
     if (!realm) {
-      setIsLoading(false)
+      handleTurnOffLoaders()
       throw 'No realm selected'
     }
 
     if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
       let selectedGovernance = governance
       if (!governance) {
-        setIsLoading(false)
+        handleTurnOffLoaders()
         throw Error('No governance selected')
       }
 
@@ -179,6 +195,7 @@ const New = () => {
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+          prerequisiteInstructions: x.prerequisiteInstructions || [],
         }
       })
 
@@ -191,15 +208,16 @@ const New = () => {
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance.info.config
         )
-
-        // Select the governing token mint for the proposal
-        // By default we choose the community mint if it has positive supply (otherwise nobody can vote)
-        // TODO: If token holders for both mints can vote the we should add the option in the UI to choose who votes (community or the council)
-        const proposalMint = !mint?.supply.isZero()
+        const defaultProposalMint = !mint?.supply.isZero()
           ? realm.info.communityMint
           : !councilMint?.supply.isZero()
           ? realm.info.config.councilMint
           : undefined
+
+        const proposalMint =
+          canChooseWhoVote && voteByCouncil
+            ? realm.info.config.councilMint
+            : defaultProposalMint
 
         if (!proposalMint) {
           throw new Error(
@@ -219,9 +237,11 @@ const New = () => {
           instructionsData,
           isDraft
         )
+
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -229,7 +249,7 @@ const New = () => {
     } else {
       setFormErrors(validationErrors)
     }
-    setIsLoading(false)
+    handleTurnOffLoaders()
   }
   useEffect(() => {
     setInstructions([instructionsData[0]])
@@ -316,9 +336,9 @@ const New = () => {
               />
             </div>
             <Textarea
+              className="mb-3"
               label="Description"
               placeholder="Description of your proposal or use a github gist link (optional)"
-              wrapperClassName="mb-5"
               value={form.description}
               onChange={(evt) =>
                 handleSetForm({
@@ -327,6 +347,14 @@ const New = () => {
                 })
               }
             ></Textarea>
+            {canChooseWhoVote && (
+              <VoteBySwitch
+                checked={voteByCouncil}
+                onChange={() => {
+                  setVoteByCouncil(!voteByCouncil)
+                }}
+              ></VoteBySwitch>
+            )}
             <NewProposalContext.Provider
               value={{
                 instructionsData,
@@ -398,12 +426,17 @@ const New = () => {
             </div>
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
-                isLoading={isLoading}
+                disabled={isLoading}
+                isLoading={isLoadingDraft}
                 onClick={() => handleCreate(true)}
               >
                 Save draft
               </SecondaryButton>
-              <Button isLoading={isLoading} onClick={() => handleCreate(false)}>
+              <Button
+                isLoading={isLoadingSignedProposal}
+                disabled={isLoading}
+                onClick={() => handleCreate(false)}
+              >
                 Add proposal
               </Button>
             </div>

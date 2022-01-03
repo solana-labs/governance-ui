@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import {
   Base64InstructionForm,
   UiInstruction,
@@ -16,6 +14,7 @@ import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { validateInstruction } from '@utils/instructionTools'
 
 const CustomBase64 = ({
   index,
@@ -69,13 +68,8 @@ const CustomBase64 = ({
     }
     prepGovernances()
   }, [])
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
       isValid &&
@@ -87,7 +81,7 @@ const CustomBase64 = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount?.governance,
+      governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdUpTime,
     }
     return obj

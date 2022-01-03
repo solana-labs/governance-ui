@@ -1,11 +1,17 @@
-import { PublicKey } from '@solana/web3.js'
-import { ConnectionContext } from 'stores/useWalletStore'
+import { Realm } from '@models/accounts'
+import { getRealms } from '@models/api'
+import { ParsedAccount } from '@models/core/accounts'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { arrayToMap, arrayToUnique } from '@tools/core/script'
+import { ProgramDataAccountInfo } from '@tools/validators/accounts/upgradeable-program'
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
+import { create } from 'superstruct'
+import devnetRealms from 'public/realms/devnet.json'
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
+import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
+import { ProgramVersion } from './constants'
 
-export enum ProgramVersion {
-  V1 = 1,
-  V2,
-}
 export interface RealmInfo {
   symbol: string
   programId: PublicKey
@@ -21,228 +27,38 @@ export interface RealmInfo {
   twitter?: string
   // og:image
   ogImage?: string
+
+  isCertified: boolean
 }
 
-// Hardcoded list of mainnet realms
-// TODO: Once governance program clones registry program and governance accounts metadata is on-chain the list should be moved there
-const MAINNET_REALMS: RealmInfo[] = [
-  {
-    symbol: 'MNGO',
-    displayName: 'Mango DAO',
-    programId: new PublicKey('GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J'),
-    realmId: new PublicKey('DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE'),
-    website: 'https://mango.markets',
-    keywords:
-      'Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
-    twitter: '@mangomarkets',
-    ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
-  },
+interface RealmInfoAsJSON
+  extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
+  programId: string
+  realmId: string
+}
 
-  {
-    symbol: 'SOCEAN',
-    programId: new PublicKey('5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy'),
-    realmId: new PublicKey('759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK'),
-    website: 'https://www.socean.fi',
-    ogImage:
-      'https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png',
-  },
-  {
-    symbol: 'Governance',
-    displayName: 'Governance',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
-  },
-  {
-    symbol: 'Yield Farming',
-    displayName: 'Yield Farming',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('8eUUtRpBCg7sJ5FXfPUMiwSQNqC3FjFLkmS2oFPKoiBi'),
-  },
-  {
-    symbol: 'SCTF1',
-    programId: new PublicKey('gSF1T5PdLc2EutzwAyeExvdW27ySDtFp88ri5Aymah6'),
-    realmId: new PublicKey('EtZWAeFFRC5k6uesap1F1gkHFimsL2HqttVTNAeN86o8'),
-    ogImage: '/realms/SCTF1/img/sctf1.svg',
-  },
-  {
-    symbol: 'SERUM',
-    programId: new PublicKey('AVoAYTs36yB5izAaBkxRG67wL1AMwG3vo41hKtUSb8is'),
-    realmId: new PublicKey('3MMDxjv1SzEFQDKryT7csAvaydYtrgMAc3L9xL9CVLCg'),
-    website: 'https://www.projectserum.com/',
-    ogImage:
-      'https://assets.website-files.com/61284dcff241c2f0729af9f3/61285237ce2e301255d09108_logo-serum.png',
-  },
-  {
-    symbol: 'OMH',
-    displayName: 'Off My Head',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
-    ogImage: 'https://offmyhead.vercel.app/coin.png',
-    website: 'https://offmyhead.vercel.app',
-    twitter: '@nft_omh',
-  },
-  {
-    symbol: 'FRIES',
-    displayName: 'Soltato',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('7wsrKBeTpqfcribDo34qr8rdSbqXbmQq9Fog2cVirK6C'),
-    ogImage:
-      'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/FriCEbw1V99GwrJRXPnSQ6su2TabHabNxiZ3VNsVFPPN/logo.png',
-    website: 'https://soltato.io',
-    twitter: '@Soltato_NFT',
-  },
-  {
-    symbol: 'Metaplex Foundation',
-    displayName: 'Metaplex Foundation',
-    programId: new PublicKey('GmtpXy362L8cZfkRmTZMYunWVe8TyRjX5B7sodPZ63LJ'),
-    realmId: new PublicKey('2sEcHwzsNBwNoTM1yAXjtF1HTMQKUAXf8ivtdpSpo9Fv'),
-    ogImage: '/realms/metaplex/img/meta-white.png',
-    website: 'https://metaplex.com',
-    twitter: '@metaplex',
-  },
-  {
-    symbol: 'Metaplex Genesis',
-    displayName: 'Metaplex Genesis',
-    programId: new PublicKey('GMpXgTSJt2nJ7zjD1RwbT2QyPhKqD2MjAZuEaLsfPYLF'),
-    realmId: new PublicKey('Cdui9Va8XnKVng3VGZXcfBFF6XSxbqSi2XruMc7iu817'),
-    ogImage: '/realms/metaplex/img/meta-white.png',
-    website: 'https://metaplex.com',
-    twitter: '@metaplex',
-  },
-  {
-    symbol: '21DAO',
-    displayName: '21DAO',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('Dn5yLFi6ZNhkD25CX4c8qq1MV3CC2vcrH2Qujfzy22rT'),
-    ogImage: '/realms/21DAO/img/21dao_icon.png',
-    website: 'https://21dao.xyz',
-  },
-  {
-    symbol: 'CDNL',
-    displayName: 'Cardinal',
-    programId: new PublicKey('bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD'),
-    realmId: new PublicKey('8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg'),
-    ogImage: 'https://app.cardinalconsensus.io/assets/logo-colored.png',
-    website: 'https://www.cardinalconsensus.io',
-    twitter: '@cardinal_dao',
-  },
-  {
-    symbol: 'gSAIL',
-    displayName: 'GSAIL GOVERNANCE DAO',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('36fZRsuM3oXvb5VrEXXVmokbGnjADzVgKpW1pgQq7jXJ'),
-    ogImage:
-      'https://raw.githubusercontent.com/solanasail/token-list/main/assets/mainnet/Gsai2KN28MTGcSZ1gKYFswUpFpS7EM9mvdR9c8f6iVXJ/logo.png',
-    website: 'https://www.solanasail.com/',
-    twitter: '@SolanaSail',
-  },
-  {
-    symbol: 'FAFD',
-    displayName: 'Friends and Family DAO',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('371PRJu9vyU2U6WHcqorakWvz3wpfGSVhHr65BBSoaiN'),
-    ogImage: '/realms/fafd/img/fafd.png',
-    website:
-      'https://find-and-update.company-information.service.gov.uk/company/13753949',
-  },
-  {
-    symbol: '$HOPE',
-    displayName: 'The Sanctuary',
-    programId: new PublicKey('Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS'),
-    realmId: new PublicKey('CS3HBXBdZ44g7FdZfgPAz6nSBe4FSThg6ANuVdowTT6G'),
-    ogImage: '/realms/hope/img/hope_logo.svg',
-    website: 'https://www.solsanctuary.io',
-  },
-]
+// TODO: Once governance program clones registry program and governance
+//       accounts metadata is on-chain the list should be moved there
+const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
+const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
 
-// Hardcoded list of devnet realms
-const DEVNET_REALMS: RealmInfo[] = [
-  {
-    symbol: 'MNGO',
-    displayName: 'Mango DAO',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('H2iny4dUP2ngt9p4niUWVX4TKvr1h9eSWGNdP1zvwzNQ'),
-    website: 'https://mango.markets',
-    keywords:
-      'Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens',
-    twitter: '@mangomarkets',
-    ogImage: 'https://trade.mango.markets/assets/icons/logo.svg',
-  },
-  {
-    symbol: 'SOCEAN',
-    programId: new PublicKey('GSCN8n6XUGqPqoeubY5GM6e3JgtXbzTcpCUREQ1dVXFG'),
-    realmId: new PublicKey('4Z6bAwcBkDg8We6rRdnqK9rjsJz3aMqXAZkpoBZ3hxus'),
-    website: 'https://www.socean.fi',
-    ogImage:
-      'https://socean-git-enhancement-orca-price-feed-lieuzhenghong.vercel.app/static/media/socnRound.c466b499.png',
-  },
-  {
-    symbol: 'Governance',
-    displayName: 'Governance',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('FMEWULPSGR1BKVJK4K7xTjhG23NfYxeAn2bamYgNoUck'),
-  },
-  {
-    symbol: 'Hype-realm',
-    displayName: 'Hype-realm',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('Ap2qT88wk4CPENAcdZN6Q356mauZym4yrQptGXD2AqVF'),
-  },
-  {
-    symbol: 'Realm-8TitF',
-    displayName: 'Realm-8TitF',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('22XYhMSGmPv2nHC3AwbDAP9akyd3rfVRUZt6HUd3wcY5'),
-  },
-  {
-    symbol: 'OMH',
-    displayName: 'Off My Head',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('4SsH1eg4zzwfRXBJjrKTY163U2UvW7n16B35pZVPxRpX'),
-    ogImage: 'https://offmyhead.vercel.app/coin.png',
-    website: 'https://offmyhead.vercel.app',
-    twitter: '@nft_omh',
-  },
-  {
-    symbol: 'NEWDAO',
-    displayName: 'NEWDAO',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('5eZA8mX9pVXzgbA8oES1ismVSAAgsHkEipJbxvsVYb5d'),
-  },
-  {
-    symbol: 'CDNL',
-    displayName: 'Cardinal',
-    programId: new PublicKey('bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD'),
-    realmId: new PublicKey('8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg'),
-    ogImage: 'https://app.cardinalconsensus.io/assets/logo-colored.png',
-    website: 'https://www.cardinalconsensus.io',
-    twitter: '@cardinal_dao',
-  },
-  {
-    symbol: 'testgm',
-    displayName: 'testgm',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('5jdLxZkUQLVWwe8mtR9fURFLUFyT6npjiSKzowaqyCj9'),
-  },
-  {
-    symbol: 'RealM_Tuto_1',
-    displayName: 'RealM_Tuto_1',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('756iwQL9tAdTr1mDGiu4P9zWW8FzMY1K6MUXHqkwp9Nc'),
-  },
-  {
-    symbol: 'SAIA',
-    displayName: 'SAIAdao Devnet',
-    programId: new PublicKey('GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'),
-    realmId: new PublicKey('2VckEenCkkRSRik2ZpNkJN9YjcZke91nbCajYkgP5M9o'),
-  },
-]
+function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
+  return realms.map((realm) => ({
+    ...realm,
+    programId: new PublicKey(realm.programId),
+    realmId: new PublicKey(realm.realmId),
+    isCertified: true,
+  })) as ReadonlyArray<RealmInfo>
+}
 
-export function getAllRealmInfos({ cluster }: ConnectionContext) {
+// Returns certified realms
+// Note: the certification process is currently done through PRs to this repo
+// This is a temp. workaround until we have the registry up and running
+export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export async function getRealmInfo(
+export async function getCertifiedRealmInfo(
   realmId: string,
   connection: ConnectionContext
 ) {
@@ -250,11 +66,200 @@ export async function getRealmInfo(
     return undefined
   }
 
-  const realmInfo = getAllRealmInfos(connection).find(
+  const realmInfo = getCertifiedRealmInfos(connection).find(
     (r) =>
       equalsIgnoreCase(r.realmId.toBase58(), realmId) ||
       equalsIgnoreCase(r.symbol, realmId)
   )
 
   return realmInfo
+}
+
+// Whitelist of Realms we exclude even from the Unchartered category
+// This should be part of the governance/realm registry and curated by the community
+
+// Some fo the realms seem to be autogenerated using names like ckvq40oin3030171ylqhx37z53m.
+// If they keep getting added we might want to use some pattern to exclude them
+
+// Other excluded ones are know test DAOs like Test 'Grape Test' for example
+
+const EXCLUDED_REALMS = new Map<string, string>([
+  ['HtV3PXqDhuPoCTDfYhaWxrs5e7oYk96zYpiWSrWCj6FC', ''],
+  ['3mBJhp6w7Sqi6JhbnNvV6yi3RHDveUGsmzeyWprBFBWB', ''],
+  ['4Q1s1vQkgfnyZNWdhehQ8q8jwy4zAtFnznzRVqs72VF3', ''],
+  ['3wMVntu1fPdUbk1RLm5vSnGoiapK2ALqf6NENtescMqr', ''],
+  ['98hsdTteLBUTiBCLq399QGZJr3bLQMoZe4TYyzNhRkDF', ''],
+  ['2tmd2zN3TRGGjDKaRtvLRWgkwNQGQQL4p81btR59qrJX', ''],
+  ['EtwCjZW4toGDzWDtSsCHueAduEW3E2JNDssKJGf3e6fz', ''],
+  ['2yPZWLpsLgs4BT53J2k8vjqBZoXpWBNWJ3CdpmBVZdam', ''],
+  ['Gn43s7KsVPC8rYhrK4DouQ4iiG49SpegjEKfSgkeEfNW', ''],
+  ['24PDx9UiyVKsgHdtb17mdjngNDk1ZQ9ASNG3cKSWRqsU', ''],
+  ['BS1ujZP29jvLGMiVgdqsZE1GMAemEdoJvJuaWWRBMWnD', ''],
+  ['2dHH8GciYQNXVf2FqiB9rrqUTsLijoZv2U8DLZd6CfXF', ''],
+  ['2F96LbxCv2VdmAy3psyBmfwjULU5vJmnoaaW8AKAuKjd', ''],
+  ['Ad7bjv7pugibV1TbpD3FTubk17L5FxXcLWr54yF8kmj', ''],
+  ['2RQ9KQUJocKasNeNniAqwuDL3tPVsyxuPPtgjHgcKaYG', ''],
+  ['6E7RUhSYnYidySEpGFMhwfG1jDYnWqYBu6sHadmFRPXt', ''],
+  ['DU4LCYgMA3Krupm5zdiGQVTfsabD2mqhrEHdmSWkCYcQ', ''],
+  ['6smJyNvvyKSZdQu1qnvdSyQUjHPhgEB4APEDsQVELE28', ''],
+  ['6vX5gasMN6XevEEaXLHRvrkm3B8irtVnEEiMMDP37rTb', ''],
+  ['3UHqhBG1sju6685QrcH9d8WJVEW2Us5AnGsTY1Lh2Kxf', ''],
+  ['7Pm2249LrXxLLVPJumUsBVR6FuPhDJxXxfiWbjZ8DP1T', ''],
+  ['6ezQ3Z18YDCWUj83tKk21JB73ptu1CNcZCfgVBcfx59Z', ''],
+  ['DgYzfAF8uh5QQTXREYaUZK7P6crNPrWDGqLBBbytkKGs', ''],
+  ['DVYnCzaXVi8LeARnMUbMHTF9K7eN9AM8oVxvJLNmwABe', ''],
+  ['BQVzxd7BKrbE7WyZ5mzQjcyjgxpmjURXu5HpU4K4dsBg', ''],
+  ['2o7fFryGHyTfb2pB4ph3xybPSN2WAGWExp53jU8bacjW', ''],
+  ['JxTAAbnXRd13CPz5PDZeDsFpxy9ADL3BV28YsDT1N5k', ''],
+  ['HcnRFMcJNzSH9J1332swEhWc91CSGjJwfyYACpd2ZWke', ''],
+  ['2ZF1CNK1GpYHuSpBvWAjKU4LMfEziEJmZV4eGsCUNR3L', ''],
+  ['GBjvsTy4d3V7nzvUD8pgX4hTKkok4m76RDHYyHvoRTsd', ''],
+  ['6pwXZrHvHc44Mg8c6rEZbEWzSBreWnP5DAYkt2vfhWjU', ''],
+  ['5LSkHM5BsgM5m7wLy222kvhWceYK5e1sZ5DHHU8G8pP', ''],
+  ['Gj8WE4jVZf9BCEUgtkShSoicPrTU4jhoyqi4d52ayAhY', ''],
+  ['HxsBLUnTz4tTEbJzPbNY69At1B99T9yvVouskPJGEjF', 'Grape Test'],
+  ['2aia1CN3YoFergRxyDTPed5Kup4LDmZMEgWxEzZ7vaKB', ''],
+  ['AX2wfHP9NQ6z8JA4exmHnfkqgxiBb4Kcv6BjR8NJFhgL', ''],
+  ['EroKomMwa4m7Q4PEUNy3nHRjeZ49P3A5CmomNeRm2kFR', ''],
+  ['5rWb6R9bC5LZ6RuGQXLdLhxWW6F2418nrSMUnSduUHPr', ''],
+  ['5pNokKBsf5EaAVrFbKPuhoYiCu7awsiGsmYqnKwpjvxr', ''],
+  ['3DisadCQ4Tn4FoNkYHB6ZngVSxqomVmhAzCfxEVmrkj6', ''],
+  ['AeUazJsjGVrxKWkTi5PQ4S4JxWXQ3mYHNS1mURD9GeNg', ''],
+])
+
+export const PROGRAM_VERSION_V1 = 1
+export const PROGRAM_VERSION_V2 = 2
+
+// The most up to date program version
+export const PROGRAM_VERSION = PROGRAM_VERSION_V2
+
+// Returns all known realms from all known spl-gov instances which are not certified
+export async function getUnchartedRealmInfos(connection: ConnectionContext) {
+  const certifiedRealms = getCertifiedRealmInfos(connection)
+
+  const allRealms = (
+    await Promise.all(
+      // Assuming all the known spl-gov instances are already included in the certified realms list
+      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
+        getRealms(p.programId, connection.endpoint)
+      )
+    )
+  )
+    .flatMap((r) => Object.values(r))
+    .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
+
+  const excludedRealms = arrayToMap(certifiedRealms, (r) =>
+    r.realmId.toBase58()
+  )
+
+  return Object.values(allRealms)
+    .map((r) => {
+      return !(
+        excludedRealms.has(r.pubkey.toBase58()) ||
+        EXCLUDED_REALMS.has(r.pubkey.toBase58())
+      )
+        ? createUnchartedRealmInfo(r)
+        : undefined
+    })
+    .filter(Boolean) as readonly RealmInfo[]
+}
+
+export function createUnchartedRealmInfo(realm: ParsedAccount<Realm>) {
+  return {
+    symbol: realm.info.name,
+    programId: new PublicKey(realm.account.owner),
+    realmId: realm.pubkey,
+    displayName: realm.info.name,
+    isCertified: false,
+  } as RealmInfo
+}
+
+export async function getProgramVersion(
+  connection: Connection,
+  programId: string,
+  env: string
+) {
+  // For localnet always use the latest version
+  if (env === 'localnet') {
+    return PROGRAM_VERSION
+  }
+
+  const programData = await getProgramDataAccount(
+    connection,
+    new PublicKey(programId)
+  )
+
+  const slot = getLatestVersionCutOffSlot(env)
+  return programData.slot > slot ? PROGRAM_VERSION : PROGRAM_VERSION_V1
+}
+
+export async function getProgramSlot(
+  connection: Connection,
+  programId: string,
+  env: string
+) {
+  // For localnet always use the latest version
+  if (env === 'localnet') {
+    return PROGRAM_VERSION
+  }
+
+  const programData = await getProgramDataAccount(
+    connection,
+    new PublicKey(programId)
+  )
+
+  return programData.slot
+}
+
+// Returns the min deployment slot from which onwards the program should be on the latest version
+function getLatestVersionCutOffSlot(env: string) {
+  switch (env) {
+    case 'devnet':
+      return 87097690
+    default:
+      // Default to mainnet slot
+      return 111991240
+  }
+}
+
+export async function getProgramDataAddress(programId: PublicKey) {
+  const [programDataAddress] = await PublicKey.findProgramAddress(
+    [programId.toBuffer()],
+    BPF_UPGRADE_LOADER_ID
+  )
+
+  return programDataAddress
+}
+
+export async function getProgramDataAccount(
+  connection: Connection,
+  programId: PublicKey
+) {
+  const programDataAddress = await getProgramDataAddress(programId)
+  const account = await connection.getParsedAccountInfo(programDataAddress)
+
+  if (!account || !account.value) {
+    throw new Error(
+      `Program data account ${programDataAddress.toBase58()} for program ${programId.toBase58()} not found`
+    )
+  }
+
+  const accountInfo = account.value
+
+  if (
+    !(
+      'parsed' in accountInfo.data &&
+      accountInfo.data.program === 'bpf-upgradeable-loader'
+    )
+  ) {
+    throw new Error(
+      `Invalid program data account ${programDataAddress.toBase58()} for program ${programId.toBase58()}`
+    )
+  }
+
+  const programData = create(
+    accountInfo.data.parsed.info,
+    ProgramDataAccountInfo
+  )
+  return programData
 }

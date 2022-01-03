@@ -1,19 +1,11 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import Input from '@components/inputs/Input'
-import useRealm from '@hooks/useRealm'
-import { AccountInfo, Token } from '@solana/spl-token'
-import {
-  getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
-  parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
+import Input from 'components/inputs/Input'
+import useRealm from 'hooks/useRealm'
+import { AccountInfo } from '@solana/spl-token'
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
-import { serializeInstructionToBase64 } from '@models/serialisation'
-import { precision } from '@utils/formatting'
-import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
-import { tryParseKey } from '@tools/validators/pubkey'
+import { precision } from 'utils/formatting'
+import { tryParseKey } from 'tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
@@ -21,17 +13,16 @@ import {
   ProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
-import { UiInstruction, MintForm } from '@utils/uiTypes/proposalCreationTypes'
-import { getAccountName } from '@components/instructions/tools'
-import { TOKEN_PROGRAM_ID } from '@utils/tokens'
-import { debounce } from '@utils/debounce'
+import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
+import { getAccountName } from 'components/instructions/tools'
+import { debounce } from 'utils/debounce'
 import { NewProposalContext } from '../../new'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { validateDestinationAccAddressWithMint } from '@utils/validations'
+import { Governance } from 'models/accounts'
+import { ParsedAccount } from 'models/core/accounts'
+import useGovernanceAssets from 'hooks/useGovernanceAssets'
+import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-
+import { getMintInstruction } from 'utils/instructionTools'
 const Mint = ({
   index,
   governance,
@@ -51,6 +42,7 @@ const Mint = ({
     mintAccount: undefined,
     programId: programId?.toString(),
   })
+  const wallet = useWalletStore((s) => s.current)
   const [governedAccount, setGovernedAccount] = useState<
     ParsedAccount<Governance> | undefined
   >(undefined)
@@ -92,36 +84,16 @@ const Mint = ({
       propertyName: 'amount',
     })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    if (isValid && programId && form.mintAccount?.governance?.pubkey) {
-      const mintAmount = parseMintNaturalAmountFromDecimal(
-        form.amount!,
-        form.mintAccount.mintInfo?.decimals
-      )
-      const transferIx = Token.createMintToInstruction(
-        TOKEN_PROGRAM_ID,
-        form.mintAccount.governance.info.governedAccount,
-        new PublicKey(form.destinationAccount),
-        form.mintAccount.governance!.pubkey,
-        [],
-        mintAmount
-      )
-      serializedInstruction = serializeInstructionToBase64(transferIx)
-    }
-
-    const obj: UiInstruction = {
-      serializedInstruction,
-      isValid,
-      governedAccount: governedAccount,
-    }
-    return obj
+    return getMintInstruction({
+      schema,
+      form,
+      programId,
+      connection,
+      wallet,
+      governedMintInfoAccount: form.mintAccount,
+      setFormErrors,
+    })
   }
 
   useEffect(() => {
@@ -164,64 +136,7 @@ const Mint = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = yup.object().shape({
-    amount: yup
-      .number()
-      .typeError('Amount is required')
-      .test('amount', 'Invalid amount', async function (val: number) {
-        if (val && !form.mintAccount) {
-          return this.createError({
-            message: `Please select mint to validate the amount`,
-          })
-        }
-        if (val && form.mintAccount && form.mintAccount?.mintInfo) {
-          const mintValue = getMintNaturalAmountFromDecimal(
-            val,
-            form.mintAccount?.mintInfo.decimals
-          )
-          return !!(
-            form.mintAccount.governance?.info.governedAccount && mintValue
-          )
-        }
-        return this.createError({
-          message: `Amount is required`,
-        })
-      }),
-    destinationAccount: yup
-      .string()
-      .test(
-        'accountTests',
-        'Account validation error',
-        async function (val: string) {
-          if (val) {
-            try {
-              if (form.mintAccount?.governance) {
-                await validateDestinationAccAddressWithMint(
-                  connection,
-                  val,
-                  form.mintAccount.governance.info.governedAccount
-                )
-              } else {
-                return this.createError({
-                  message: `Please select mint`,
-                })
-              }
-
-              return true
-            } catch (e) {
-              return this.createError({
-                message: `${e}`,
-              })
-            }
-          } else {
-            return this.createError({
-              message: `Destination account is required`,
-            })
-          }
-        }
-      ),
-    mintAccount: yup.object().nullable().required('Mint is required'),
-  })
+  const schema = getMintSchema({ form, connection })
 
   return (
     <>

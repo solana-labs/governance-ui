@@ -51,7 +51,7 @@ class TokenService {
       )
       const coingeckoId = tokenListRecord?.extensions.coingeckoId
       if (tokenListRecord && coingeckoId) {
-        return this.tokenPriceToUSDlist[coingeckoId]?.usd
+        return this.tokenPriceToUSDlist[coingeckoId]?.usd || 0
       }
       return 0
     }

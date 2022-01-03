@@ -3,7 +3,7 @@ import { FunctionComponent } from 'react'
 interface SwitchProps {
   checked: boolean
   className?: string
-  onChange: (x) => void
+  onChange: (x: boolean) => void
 }
 
 const Switch: FunctionComponent<SwitchProps> = ({

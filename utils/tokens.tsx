@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   Connection,
   PublicKey,
   TransactionInstruction,
@@ -16,9 +16,9 @@ import {
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
 import { chunks } from './helpers'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { getAccountName } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import tokenService from './services/token'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -61,13 +61,37 @@ export async function getOwnedTokenAccounts(
   })
 }
 
+export const getTokenAccountsByMint = async (
+  connection: Connection,
+  mint: string
+): Promise<ProgramAccount<TokenAccount>[]> => {
+  const results = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
+    filters: [
+      {
+        dataSize: 165,
+      },
+      {
+        memcmp: {
+          offset: 0,
+          bytes: mint,
+        },
+      },
+    ],
+  })
+  return results.map((r) => {
+    const publicKey = r.pubkey
+    const data = Buffer.from(r.account.data)
+    const account = parseTokenAccountData(publicKey, data)
+    return { publicKey, account }
+  })
+}
+
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<ProgramAccount<MintAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = Buffer.from(result!.data)
     const account = parseMintAccountData(data)
     return {
@@ -90,7 +114,6 @@ export async function tryGetTokenAccount(
       return undefined
     }
 
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const data = Buffer.from(result!.data)
     const account = parseTokenAccountData(publicKey, data)
     return {
@@ -187,10 +210,10 @@ export function approveTokenTransfer(
 
   // if delegate is not passed ephemeral transfer authority is used
   delegate?: PublicKey,
-  existingTransferAuthority?: Account
-): Account {
+  existingTransferAuthority?: Keypair
+): Keypair {
   const tokenProgram = TOKEN_PROGRAM_ID
-  const transferAuthority = existingTransferAuthority || new Account()
+  const transferAuthority = existingTransferAuthority || new Keypair()
 
   // Coerce amount to u64 in case it's deserialized as BN which differs by buffer conversion functions only
   // Without the coercion createApproveInstruction would fail because it won't be able to serialize it
@@ -232,6 +255,7 @@ export async function getMultipleAccountInfoChunked(
   ).flat()
 }
 
+//TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
 export function getTokenAccountLabelInfo(
   acc: GovernedMultiTypeAccount | undefined
 ) {
@@ -239,13 +263,15 @@ export function getTokenAccountLabelInfo(
   let tokenName = ''
   let tokenAccountName = ''
   let amount = ''
+  let imgUrl = ''
 
   if (acc?.token && acc.mint) {
+    const info = tokenService.getTokenInfo(acc!.mint!.publicKey.toBase58())
+    imgUrl = info?.logoURI ? info.logoURI : ''
     tokenAccount = acc.token.publicKey.toBase58()
-    tokenName = getMintMetadata(acc.token.account.mint)?.name
+    tokenName = info?.name ? info.name : ''
     tokenAccountName = getAccountName(acc.token.publicKey)
     amount = formatMintNaturalAmountAsDecimal(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       acc.mint!.account,
       acc.token?.account.amount
     )
@@ -255,6 +281,7 @@ export function getTokenAccountLabelInfo(
     tokenName,
     tokenAccountName,
     amount,
+    imgUrl,
   }
 }
 
@@ -265,13 +292,16 @@ export function getMintAccountLabelInfo(
   let tokenName = ''
   let mintAccountName = ''
   let amount = ''
-
+  let imgUrl = ''
   if (acc?.mintInfo && acc.governance) {
+    const info = tokenService.getTokenInfo(
+      acc.governance.info.governedAccount.toBase58()
+    )
+    imgUrl = info?.logoURI ? info.logoURI : ''
     account = acc.governance?.info.governedAccount.toBase58()
-    tokenName = getMintMetadata(acc.governance?.info.governedAccount)?.name
+    tokenName = info?.name ? info.name : ''
     mintAccountName = getAccountName(acc.governance.info.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       acc.mintInfo,
       acc?.mintInfo.supply
     )
@@ -281,6 +311,7 @@ export function getMintAccountLabelInfo(
     tokenName,
     mintAccountName,
     amount,
+    imgUrl,
   }
 }
 

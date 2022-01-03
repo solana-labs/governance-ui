@@ -9,6 +9,9 @@ import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
 import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactWrapper'
+import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
+import Tooltip from '@components/Tooltip'
+import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -27,7 +30,13 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 }
 
 const REALM = () => {
-  const { proposals, realmTokenAccount, ownTokenRecord } = useRealm()
+  const {
+    proposals,
+    realmTokenAccount,
+    ownTokenRecord,
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse,
+  } = useRealm()
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
@@ -83,7 +92,16 @@ const REALM = () => {
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
               <div className="mr-4">
-                <NewProposalBtn />
+                <Tooltip
+                  content={
+                    toManyCommunityOutstandingProposalsForUser &&
+                    toManyCouncilOutstandingProposalsForUse
+                      ? 'You have too many outstanding proposals'
+                      : ''
+                  }
+                >
+                  <NewProposalBtn />
+                </Tooltip>
               </div>
               <ProposalFilter filters={filters} setFilters={setFilters} />
             </div>
@@ -107,6 +125,8 @@ const REALM = () => {
         <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
           <TokenBalanceCard />
           <AccountsCompactWrapper />
+          <MembersCompactWrapper></MembersCompactWrapper>
+          <AssetsCompactWrapper></AssetsCompactWrapper>
         </div>
       </div>
     </>

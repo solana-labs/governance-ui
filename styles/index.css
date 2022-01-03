@@ -119,3 +119,7 @@ button {
   background: var(--bkg-3);
   cursor: pointer;
 }
+
+.pointer {
+  cursor: pointer;
+}

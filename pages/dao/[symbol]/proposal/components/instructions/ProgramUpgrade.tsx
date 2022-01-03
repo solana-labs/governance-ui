@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
@@ -20,6 +19,8 @@ import { debounce } from '@utils/debounce'
 import { validateBuffer } from '@utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { validateInstruction } from '@utils/instructionTools'
+
 const ProgramUpgrade = ({
   index,
   governance,
@@ -51,13 +52,8 @@ const ProgramUpgrade = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
   async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
       isValid &&
@@ -76,7 +72,7 @@ const ProgramUpgrade = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      governedAccount: form.governedAccount?.governance,
+      governance: form.governedAccount?.governance,
     }
     return obj
   }
