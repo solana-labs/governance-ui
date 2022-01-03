@@ -84,7 +84,10 @@ const MembersCompactWrapper = () => {
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
 
-            <div className="overflow-y-auto w-full md:max-w-xs">
+            <div
+              className="overflow-y-auto w-full md:max-w-xx"
+              style={{ maxHeight: '350px' }}
+            >
               <MembersItems />
             </div>
 
