@@ -49,12 +49,13 @@ export default function useMembers() {
   const fetchCommunityMembersATAS = async () => {
     if (realm?.info.communityMint) {
       const ATAS: PublicKey[] = []
-      //we filter out people who never voted
+      //we filter out people who never voted and has tokens inside realm
       const communityTokenRecordsWallets = tokenRecordArray
         .filter(
           (x) =>
             x.community?.info.totalVotesCount &&
-            x.community?.info.totalVotesCount > 0
+            x.community?.info.totalVotesCount > 0 &&
+            x.community.info.governingTokenDepositAmount.isZero()
         )
         .map((x) => x.walletAddress)
       for (const walletAddress of communityTokenRecordsWallets) {

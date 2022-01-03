@@ -47,6 +47,7 @@ const AccountItem = ({
 
   function handleSetTotalPrice() {
     const price = tokenService.getUSDTokenPrice(mintAddress)
+    console.log(price)
     const totalPrice = amount * price
     const totalPriceFormatted = amount
       ? new BigNumber(totalPrice).toFormat(0)
@@ -67,6 +68,7 @@ const AccountItem = ({
     handleSetTotalPrice()
   }, [mintAddress, amount])
   const amountFormatted = new BigNumber(amount).toFormat()
+
   return tokenRecordInfo?.symbol || accountPublicKey ? (
     <div
       onClick={handleGoToAccountOverview}
