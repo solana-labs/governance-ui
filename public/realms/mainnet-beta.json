@@ -188,5 +188,13 @@
     "ogImage": "https://chickentribe.com/_next/image?url=%2Fimages%2FChickenTribe_Team01.svg&w=128&q=75",
     "website": "https://chickentribe.com/",
     "twitter": "@ChickenTribe"
+  },
+  {
+    "symbol": "Kiwi",
+    "displayName": "Kiwi Kingd◎m",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BkoiytgkhWBwyB7cwNPoMvi2DJ1Zxr51LMevaCBH5CiU",
+    "ogImage": "/realms/Kiwi/img/kiwi_logo.png"
+
   }
 ]
