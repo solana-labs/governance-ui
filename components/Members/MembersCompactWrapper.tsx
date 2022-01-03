@@ -84,7 +84,7 @@ const MembersCompactWrapper = () => {
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
 
-            <div className="max-w-xs">
+            <div className="overflow-y-auto w-full md:max-w-xs">
               <MembersItems />
             </div>
 
