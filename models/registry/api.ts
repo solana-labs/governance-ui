@@ -125,6 +125,7 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['5pNokKBsf5EaAVrFbKPuhoYiCu7awsiGsmYqnKwpjvxr', ''],
   ['3DisadCQ4Tn4FoNkYHB6ZngVSxqomVmhAzCfxEVmrkj6', ''],
   ['AeUazJsjGVrxKWkTi5PQ4S4JxWXQ3mYHNS1mURD9GeNg', ''],
+  ['AMRC14FwwWkT5TG2ibXdLTUnVrnd2N4YsTifzCeRR22X', ''], // Chicken Tribe test
 ])
 
 export const PROGRAM_VERSION_V1 = 1
