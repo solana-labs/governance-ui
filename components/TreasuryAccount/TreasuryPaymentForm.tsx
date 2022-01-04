@@ -377,9 +377,7 @@ const TreasuryPaymentForm = ({ close }) => {
       />
 
       <small className="text-red ml-1">
-        {IsAmountNotHigherThenBalance()
-          ? `~$${transactionDolarAmount}`
-          : 'Insufficient balance'}
+        {IsAmountNotHigherThenBalance() && `~$${transactionDolarAmount}`}
       </small>
 
       <div

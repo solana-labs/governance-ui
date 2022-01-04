@@ -80,7 +80,7 @@ const AccountsCompactWrapper = () => {
 
             <HoldTokensTotalPrice />
 
-            <div className="overflow-y-auto max-w-xs">
+            <div className="overflow-y-auto w-full md:max-w-xs">
               <AccountsItems />
             </div>
           </>

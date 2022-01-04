@@ -168,7 +168,7 @@ const MemberOverview = () => {
         Recent votes
       </div>
       {/* TODO virtual scroll */}
-      <div style={{ maxHeight: '350px' }} className="overflow-auto">
+      <div style={{ maxHeight: '350px' }} className="w-full md:max-w-xs">
         {ownVoteRecords.map((x) => (
           <a
             href={fmtUrlWithCluster(
