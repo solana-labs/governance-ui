@@ -9,6 +9,7 @@ interface ButtonProps {
   disabled?: boolean
   small?: boolean
   tooltipMessage?: string
+  style?: any
 }
 
 const Button: FunctionComponent<ButtonProps> = ({
@@ -18,6 +19,7 @@ const Button: FunctionComponent<ButtonProps> = ({
   isLoading,
   small,
   tooltipMessage = '',
+  style,
   ...props
 }) => {
   return (
@@ -30,6 +32,7 @@ const Button: FunctionComponent<ButtonProps> = ({
           : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'
       }`}
       {...props}
+      style={style}
       disabled={disabled}
     >
       <Tooltip content={tooltipMessage}>

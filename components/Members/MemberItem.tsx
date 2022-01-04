@@ -22,6 +22,7 @@ const MemberItem = ({ item }: { item: Member }) => {
     communityVotes,
     votesCasted,
     hasCouncilTokenOutsideRealm,
+    hasCommunityTokenOutsideRealm,
   } = item
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
@@ -45,8 +46,6 @@ const MemberItem = ({ item }: { item: Member }) => {
     setCurrentCompactViewMember(item)
   }
   return (
-    //TODO: implement dynamic height with CellMeasurer
-    //for now every member item element has to be same height
     <div
       onClick={handleGoToMemberOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
@@ -59,15 +58,14 @@ const MemberItem = ({ item }: { item: Member }) => {
         <div className="text-fgd-3 text-xs flex flex-col">
           Votes cast: {totalVotes}
         </div>
-        <div className="text-fgd-3 text-xs flex flex-row">
-          {/* until we have community tokens match from wallets we show 0 if someone withdrawn tokens */}
+        <div className="text-fgd-3 text-xs flex flex-col">
           {(communityAmount || !councilAmount) && (
-            <span>
+            <span className="flex items-center">
               {tokenName} Votes {communityAmount || 0}
+              {hasCommunityTokenOutsideRealm && (
+                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
+              )}
             </span>
-          )}
-          {communityAmount && councilAmount && (
-            <span className="ml-1 mr-1">|</span>
           )}
           {councilAmount && (
             <span className="flex items-center">

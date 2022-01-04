@@ -1,29 +1,41 @@
 import MemberItem from './MemberItem'
-import useMembers from './useMembers'
 import { List, AutoSizer } from 'react-virtualized'
+import { Member } from '@utils/uiTypes/members'
 
-const MembersItems = () => {
-  const { members } = useMembers()
-  //TODO implement auto height if needed;
+const MembersItems = ({ activeMembers }: { activeMembers: Member[] }) => {
   const minRowHeight = 84
-  const rowHeight = members.length > 4 ? 350 : members.length * minRowHeight
+  const listHeight =
+    activeMembers.length > 4
+      ? 350
+      : activeMembers.reduce((acc, member) => {
+          const hasBothVotes =
+            !member?.communityVotes.isZero() && !member?.councilVotes.isZero()
+
+          return acc + (hasBothVotes ? 100 : minRowHeight)
+        }, 0)
+  const getRowHeight = ({ index }) => {
+    const currentMember = activeMembers[index]
+    const hasBothVotes =
+      !currentMember?.communityVotes.isZero() &&
+      !currentMember?.councilVotes.isZero()
+    return hasBothVotes ? 100 : minRowHeight
+  }
   function rowRenderer({ key, index, style }) {
     return (
       <div key={key} style={style}>
-        <MemberItem item={members[index]}></MemberItem>
+        <MemberItem item={activeMembers[index]}></MemberItem>
       </div>
     )
   }
-  //TODO implement CellMeasurer for now every row has to be same height
   return (
     <div className="space-y-3">
       <AutoSizer disableHeight>
         {({ width }) => (
           <List
             width={width}
-            height={rowHeight}
-            rowCount={members.length}
-            rowHeight={minRowHeight}
+            height={listHeight}
+            rowCount={activeMembers.length}
+            rowHeight={getRowHeight}
             rowRenderer={rowRenderer}
           />
         )}
