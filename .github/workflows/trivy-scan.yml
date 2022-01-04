@@ -13,8 +13,8 @@ on:
 
 jobs:
   build:
-    name: Rrivy Vulnerability Scanner
-    runs-on: ubuntu-18.04
+    name: Trivy Vulnerability Scanner
+    runs-on: ubuntu-latest
     steps:
       # Checking out the repo to scan
       - name: Checkout code
@@ -27,12 +27,14 @@ jobs:
           scan-type: 'fs' # Filesystem mode
           ignore-unfixed: true # Ignore vulnerabilities with no available fix
           format: 'template' # Template output mode
-          template: '@/contrib/sarif.tpl' # SARIF template to be compatible with GitHub secuity tab
+          template: '@/contrib/sarif.tpl' # SARIF template to be compatible with GitHub security tab
           output: 'trivy-results.sarif' # Output file name
-          severity: 'CRITICAL,HIGH' # Report only on high and critical vulnerabilities
+          severity: 'CRITICAL' # Report error only on critical vulnerabilities. Warn on lower severities
+          exit-code: '1' # Fail the job if a critical vulnerability with fix available is found
       
       # Generate the output as SARIF and upload to the security tab
       - name: Upload Trivy results
         uses: github/codeql-action/upload-sarif@v1
+        if: always() # Upload even if the job has failed due to a vulnerability
         with:
           sarif_file: 'trivy-results.sarif'
