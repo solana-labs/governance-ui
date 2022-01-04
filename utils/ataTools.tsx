@@ -42,12 +42,17 @@ export async function createATA(
   return ata
 }
 
-export async function getATA(
-  connection: ConnectionContext,
-  receiverAddress: PublicKey,
-  mintPK: PublicKey,
+export async function getATA({
+  connection,
+  receiverAddress,
+  mintPK,
+  wallet,
+}: {
+  connection: ConnectionContext
+  receiverAddress: PublicKey
+  mintPK: PublicKey
   wallet: any
-) {
+}) {
   if (!wallet?.publicKey) {
     throw 'please connect your wallet'
   }

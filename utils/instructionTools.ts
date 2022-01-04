@@ -59,12 +59,12 @@ export async function getTransferInstruction({
       form.governedTokenAccount.mint.account.decimals
     )
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
-      connection,
-      destinationAccount,
+    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
+      connection: connection,
+      receiverAddress: destinationAccount,
       mintPK,
-      wallet!
-    )
+      wallet: wallet!,
+    })
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
@@ -129,12 +129,12 @@ export async function getMintInstruction({
     )
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
+    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
       connection,
-      destinationAccount,
+      receiverAddress: destinationAccount,
       mintPK,
-      wallet!
-    )
+      wallet: wallet!,
+    })
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {

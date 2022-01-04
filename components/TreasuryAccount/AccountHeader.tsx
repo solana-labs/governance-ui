@@ -13,7 +13,6 @@ const AccountHeader = () => {
   )
   const isNFT =
     currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
-  console.log(isNFT)
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const [totalPrice, setTotalPrice] = useState('')
   const amount =

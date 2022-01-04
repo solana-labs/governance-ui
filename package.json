@@ -27,6 +27,8 @@
     "@emotion/styled": "^11.3.0",
     "@headlessui/react": "^1.0.0",
     "@heroicons/react": "^1.0.1",
+    "@metaplex/js": "^4.10.1",
+    "@nfteyez/sol-rayz": "^0.8.0",
     "@project-serum/anchor": "^0.10.0",
     "@project-serum/borsh": "^0.2.2",
     "@project-serum/common": "^0.0.1-beta.3",

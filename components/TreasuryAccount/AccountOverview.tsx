@@ -6,9 +6,12 @@ import {
 } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
+import { useRouter } from 'next/router'
 import React from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -16,9 +19,12 @@ import AccountHeader from './AccountHeader'
 import { ViewState } from './Types'
 
 const AccountOverview = () => {
+  const router = useRouter()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const { symbol } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
   const isNFT =
     currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -64,7 +70,10 @@ const AccountOverview = () => {
         <Button
           className="sm:w-full text-sm py-2.5 mb-4"
           onClick={() => {
-            return null
+            const url = fmtUrlWithCluster(
+              `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
+            )
+            router.push(url)
           }}
         >
           Gallery
