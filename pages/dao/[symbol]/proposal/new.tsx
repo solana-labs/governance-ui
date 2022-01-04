@@ -344,7 +344,7 @@ const New = () => {
   }
 
   const StepTwo = () => {
-    return <div>tessooo 222</div>
+    return <CustomBase64 index={0} governance={governance}></CustomBase64>
   }
 
   const StepThree = () => {
