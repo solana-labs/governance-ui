@@ -1,12 +1,12 @@
-import Loading from '@components/Loading'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
+import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
-import getProposalCounts from 'scripts/getProposalCounts'
+import { getNumberOfProposalsInVotingState } from 'scripts/accountQueries'
 
 export default function RealmsDashboard({
   realms,
@@ -27,9 +27,10 @@ export default function RealmsDashboard({
 
   useEffect(() => {
     const fetchBadgeCounts = async () => {
-      setCounts(await getProposalCounts(realms))
+      setCounts(await getNumberOfProposalsInVotingState(realms))
     }
-    fetchBadgeCounts()
+    // xxx: exclude badge counts for uncharted realms for now
+    if (!header.match(/uncharted/i)) fetchBadgeCounts()
   }, [realms])
 
   const goToRealm = (realmInfo: RealmInfo) => {
@@ -104,7 +105,7 @@ export default function RealmsDashboard({
                       {realm.displayName?.charAt(0)}
                     </div>
                   )}
-                  <Badge count={counts[realm.realmId.toString()]} />
+                  <BadgeWithCount number={counts[realm.realmId.toString()]} />
                 </div>
                 <h3 className="text-center break-all">
                   {realm.displayName ?? realm.symbol}
@@ -118,9 +119,10 @@ export default function RealmsDashboard({
   )
 }
 
-const Badge = ({ count }: { count: number }) =>
-  count > 0 ? (
+function BadgeWithCount({ number }: { number: number }) {
+  return number > 0 ? (
     <span className="inline-flex items-center justify-center px-2 py-1 mr-2 text-s font-bold leading-none text-primary bg-red rounded-full absolute -top-1 -right-3">
-      {count}
+      {number}
     </span>
   ) : null
+}
