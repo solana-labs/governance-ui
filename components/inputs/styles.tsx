@@ -12,6 +12,7 @@ export const inputClasses = ({
   disabled,
   error,
   noMaxWidth = false,
+  useDefaultStyle = true,
 }) => {
   return `${
     className ? className : ''
