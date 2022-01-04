@@ -128,13 +128,14 @@ async function prepareMintInstructions(
     // then should create mints to them
     if (otherOwners?.length) {
       for (const ownerPk of otherOwners) {
-        let ata: ProgramAccount<AccountInfo> | undefined
-        let ataPk: PublicKey | undefined
+        const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
+          connection,
+          ownerPk,
+          _mintPk
+        )
+        const shouldMint = !ata?.account.amount.gt(new BN(0))
 
-        ata = await tryGetAta(connection, ownerPk, _mintPk)
-        let shouldMint = !ata?.account.amount.gt(new BN(0))
-
-        ataPk =
+        const ataPk =
           ata?.publicKey ??
           (await withCreateAssociatedTokenAccount(
             mintInstructions,
@@ -492,16 +493,12 @@ export async function registerRealm(
     communityMintInstructions,
     communityMintSigners
   )
-  try {
-    console.debug('sending transaction')
-    await txnToSend
-    console.debug('transaction sent')
-    console.debug({
-      communityMintPk,
-      councilMintPk,
-    })
-    return realmAddress
-  } catch (error: any) {
-    throw error
-  }
+  console.debug('sending transaction')
+  await txnToSend
+  console.debug('transaction sent')
+  console.debug({
+    communityMintPk,
+    councilMintPk,
+  })
+  return realmAddress
 }
