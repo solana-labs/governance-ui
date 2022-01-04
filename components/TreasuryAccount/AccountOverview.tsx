@@ -1,6 +1,9 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import { getAccountName } from '@components/instructions/tools'
+import {
+  DEFAULT_NFT_TREASURY_MINT,
+  getAccountName,
+} from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@solana/web3.js'
@@ -9,13 +12,15 @@ import BN from 'bn.js'
 import React from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import AccountLabel from './AccountHeader'
+import AccountHeader from './AccountHeader'
 import { ViewState } from './Types'
 
 const AccountOverview = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const isNFT =
+    currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(
@@ -54,7 +59,17 @@ const AccountOverview = () => {
           )}
         </>
       </h3>
-      <AccountLabel></AccountLabel>
+      <AccountHeader></AccountHeader>
+      {isNFT && (
+        <Button
+          className="sm:w-full text-sm py-2.5 mb-4"
+          onClick={() => {
+            return null
+          }}
+        >
+          Gallery
+        </Button>
+      )}
       <div
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 ${
           !canUseTransferInstruction ? 'justify-center' : ''
@@ -62,7 +77,11 @@ const AccountOverview = () => {
       >
         <Button
           className="sm:w-1/2 text-sm"
-          onClick={() => setCurrentCompactView(ViewState.Deposit)}
+          onClick={() =>
+            setCurrentCompactView(
+              isNFT ? ViewState.DepositNFT : ViewState.Deposit
+            )
+          }
         >
           Deposit
         </Button>

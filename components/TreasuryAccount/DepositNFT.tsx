@@ -8,7 +8,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getAccountName } from '@components/instructions/tools'
 import AccountLabel from './AccountHeader'
 
-const DepositTokens = () => {
+const DepositNFT = () => {
   const { setCurrentCompactView } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
@@ -63,4 +63,4 @@ const DepositTokens = () => {
   )
 }
 
-export default DepositTokens
+export default DepositNFT

@@ -12,6 +12,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
+import DepositNFT from './DepositNFT'
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const AccountsCompactWrapper = () => {
@@ -85,6 +86,8 @@ const AccountsCompactWrapper = () => {
         return <SendTokens></SendTokens>
       case ViewState.Deposit:
         return <DepositTokens></DepositTokens>
+      case ViewState.DepositNFT:
+        return <DepositNFT></DepositNFT>
     }
   }
 

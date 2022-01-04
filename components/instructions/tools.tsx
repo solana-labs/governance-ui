@@ -91,6 +91,9 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
 ])
 
+export const DEFAULT_NFT_TREASURY_MINT =
+  '3DgdChe9ShkRheUua33PKvh2mV8dWhisZdPFZpYPxjgA'
+
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
