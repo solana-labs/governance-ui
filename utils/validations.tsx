@@ -20,7 +20,8 @@ const getValidateAccount = async (
   pubKey: PublicKey
 ) => {
   const account = await connection.getParsedAccountInfo(pubKey)
-  if (!account || !account.value) {
+  //TODO find way to validate account without sols
+  if (!account) {
     throw "Account doesn't exist or has no SOLs"
   }
   return account

@@ -4,7 +4,7 @@ import {
   ArrowLeftIcon,
 } from '@heroicons/react/outline'
 import { ViewState } from './types'
-import useMembersListStore from 'stores/useMembersListStore'
+import useMembersListStore from 'stores/useMembersStore'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
@@ -41,7 +41,7 @@ const AddMember = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { setCurrentCompactView } = useMembersListStore()
+  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
   const { getMintWithGovernances } = useGovernanceAssets()
   const {
     realmInfo,
@@ -84,6 +84,7 @@ const AddMember = () => {
   }
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
+    resetCompactViewState()
   }
   const validateAmountOnBlur = () => {
     const value = form.amount

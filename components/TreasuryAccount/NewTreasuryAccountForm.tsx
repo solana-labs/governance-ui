@@ -1,40 +1,28 @@
-import Button from '@components/Button'
-import Input from '@components/inputs/Input'
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import Tooltip from '@components/Tooltip'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { RpcContext } from '@models/core/api'
+import BaseGovernanceForm, {
+  BaseGovernanceFormFields,
+} from 'components/AssetsList/BaseGovernanceForm'
+import Button from 'components/Button'
+import Input from 'components/inputs/Input'
+import PreviousRouteBtn from 'components/PreviousRouteBtn'
+import useQueryContext from 'hooks/useQueryContext'
+import useRealm from 'hooks/useRealm'
+import { RpcContext } from 'models/core/api'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import {
-  fmtPercentage,
-  getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
-  getMintSupplyAsDecimal,
-  getMintSupplyFractionAsDecimalPercentage,
-  getMintSupplyPercentageAsDecimal,
-  parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
-import { tryParseKey } from '@tools/validators/pubkey'
-import { debounce } from '@utils/debounce'
-import { isFormValid } from '@utils/formValidation'
+import { tryParseKey } from 'tools/validators/pubkey'
+import { debounce } from 'utils/debounce'
+import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
-import { notify } from '@utils/notifications'
-import tokenService, { TokenRecord } from '@utils/services/token'
-import { ProgramAccount, tryGetMint } from '@utils/tokens'
+import { notify } from 'utils/notifications'
+import tokenService, { TokenRecord } from 'utils/services/token'
+import { ProgramAccount, tryGetMint } from 'utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
-import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
-interface NewTreasuryAccountForm {
+interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
-  minCommunityTokensToCreateProposal: number
-  minInstructionHoldUpTime: number
-  maxVotingTime: number
-  voteThreshold: number
 }
 const defaultFormValues = {
   mintAddress: '',
@@ -64,9 +52,6 @@ const NewAccountForm = () => {
   const [mint, setMint] = useState<ProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const [minTokensPercentage, setMinTokensPercentage] = useState<
-    number | undefined
-  >()
 
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
@@ -77,22 +62,6 @@ const NewAccountForm = () => {
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-  }
-  const validateMinMax = (e) => {
-    const fieldName = e.target.name
-    const min = e.target.min || 0
-    const max = e.target.max || Number.MAX_SAFE_INTEGER
-    const value = form[fieldName]
-    const currentPrecision = new BigNumber(min).decimalPlaces()
-
-    handleSetForm({
-      value: parseFloat(
-        Math.max(Number(min), Math.min(Number(max), Number(value))).toFixed(
-          currentPrecision
-        )
-      ),
-      propertyName: fieldName,
-    })
   }
   const handleCreate = async () => {
     try {
@@ -146,31 +115,12 @@ const NewAccountForm = () => {
       setIsLoading(false)
     }
   }
-  function parseMinTokensToCreateProposal(
-    value: string | number,
-    mintDecimals: number
-  ) {
-    return typeof value === 'string'
-      ? parseMintNaturalAmountFromDecimal(value, mintDecimals)
-      : getMintNaturalAmountFromDecimal(value, mintDecimals)
-  }
-  const onMinTokensChange = (minTokensToCreateProposal: number | string) => {
-    const minTokens = realmMint
-      ? parseMinTokensToCreateProposal(
-          minTokensToCreateProposal,
-          realmMint.decimals
-        )
-      : 0
-    setMinTokensPercentage(getMinTokensPercentage(minTokens))
-  }
   const handleSetDefaultMintError = () => {
     const mintError = { mintAddress: 'Invalid mint address' }
     setFormErrors(mintError)
     setMint(null)
     setTokenInfo(undefined)
   }
-  const getMinTokensPercentage = (amount: number) =>
-    realmMint ? getMintSupplyFractionAsDecimalPercentage(realmMint, amount) : 0
 
   const schema = yup.object().shape({
     mintAddress: yup
@@ -216,24 +166,6 @@ const NewAccountForm = () => {
         }
       ),
   })
-  // Use 1% of mint supply as the default value for minTokensToCreateProposal and the default increment step in the input editor
-  const mintSupply1Percent = realmMint
-    ? getMintSupplyPercentageAsDecimal(realmMint, 1)
-    : 100
-  const minTokenAmount = realmMint
-    ? getMintMinAmountAsDecimal(realmMint)
-    : 0.0001
-  // If the supply is small and 1% is below the minimum mint amount then coerce to the minimum value
-  const minTokenStep = Math.max(mintSupply1Percent, minTokenAmount)
-
-  const maxTokenAmount =
-    !realmMint?.supply?.isZero() && realmMint
-      ? getMintSupplyAsDecimal(realmMint)
-      : undefined
-
-  useEffect(() => {
-    onMinTokensChange(form.minCommunityTokensToCreateProposal)
-  }, [form.minCommunityTokensToCreateProposal, realmInfo?.symbol])
   useEffect(() => {
     if (form.mintAddress) {
       debounce.debounceFcn(async () => {
@@ -293,84 +225,21 @@ const NewAccountForm = () => {
       ) : mint ? (
         <div>Mint found</div>
       ) : null}
-      <Input
-        label="Min community tokens to create proposal"
-        value={form.minCommunityTokensToCreateProposal}
-        type="number"
-        name="minCommunityTokensToCreateProposal"
-        min={minTokenAmount}
-        max={maxTokenAmount}
-        step={minTokenStep}
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'minCommunityTokensToCreateProposal',
-          })
-        }
-        error={formErrors['minCommunityTokensToCreateProposal']}
-      />
-      {maxTokenAmount &&
-        !!minTokensPercentage &&
-        !isNaN(minTokensPercentage) && (
-          <div>{`${fmtPercentage(minTokensPercentage)} of token supply`}</div>
-        )}
-      <Input
-        label="min instruction hold up time (days)"
-        value={form.minInstructionHoldUpTime}
-        type="number"
-        min={0}
-        name="minInstructionHoldUpTime"
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'minInstructionHoldUpTime',
-          })
-        }
-        error={formErrors['minInstructionHoldUpTime']}
-      />
-      <Input
-        label="Max voting time (days)"
-        value={form.maxVotingTime}
-        name="maxVotingTime"
-        type="number"
-        min={1}
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'maxVotingTime',
-          })
-        }
-        error={formErrors['maxVotingTime']}
-      />
-      <Input
-        label="Yes vote threshold (%)"
-        value={form.voteThreshold}
-        max={100}
-        min={1}
-        name="voteThreshold"
-        type="number"
-        onBlur={validateMinMax}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'voteThreshold',
-          })
-        }
-        error={formErrors['voteThreshold']}
-      />
+      <BaseGovernanceForm
+        formErrors={formErrors}
+        form={form}
+        setForm={setForm}
+        setFormErrors={setFormErrors}
+      ></BaseGovernanceForm>
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-        <Tooltip content={!connected && 'Please connect your wallet'}>
-          <Button
-            disabled={!connected || isLoading}
-            isLoading={isLoading}
-            onClick={handleCreate}
-          >
-            Create
-          </Button>
-        </Tooltip>
+        <Button
+          tooltipMessage={!connected ? 'Please connect your wallet' : ''}
+          disabled={!connected || isLoading}
+          isLoading={isLoading}
+          onClick={handleCreate}
+        >
+          Create
+        </Button>
       </div>
     </div>
   )

@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -32,7 +32,7 @@ export const createProposal = async (
   isDraft: boolean
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey

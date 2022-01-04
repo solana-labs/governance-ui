@@ -1,6 +1,6 @@
 import {
-  Account,
   PublicKey,
+  Keypair,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
@@ -18,7 +18,7 @@ export async function postChatMessage(
   body: ChatMessageBody,
   replyTo?: PublicKey
 ) {
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey

@@ -1,4 +1,4 @@
-import { Account, Transaction, TransactionInstruction } from '@solana/web3.js'
+import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
 import { Proposal, ProposalInstruction } from '../models/accounts'
 
@@ -12,7 +12,7 @@ export const executeInstruction = async (
   proposal: ParsedAccount<Proposal>,
   instruction: ParsedAccount<ProposalInstruction>
 ) => {
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   await withExecuteInstruction(

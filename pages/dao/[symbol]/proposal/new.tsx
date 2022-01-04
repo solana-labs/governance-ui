@@ -42,6 +42,7 @@ import RegisterMangoDepository from './components/instructions/RegisterMangoDepo
 import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/SetMangoDepositoriesRedeemableSoftCap'
 import DepositInsuranceToMangoDepository from './components/instructions/DepositInsuranceToMangoDepository'
 import WithdrawInsuranceFromMangoDepository from './components/instructions/WithdrawInsuranceFromMangoDepository'
+import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
 
 const schema = yup.object().shape({
@@ -317,6 +318,13 @@ const New = () => {
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
+      case Instructions.MangoMakeChangeMaxAccounts:
+        return (
+          <MakeChangeMaxAccounts
+            index={idx}
+            governance={governance}
+          ></MakeChangeMaxAccounts>
+        )
       default:
         null
     }

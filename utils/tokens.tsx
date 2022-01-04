@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   Connection,
   PublicKey,
   TransactionInstruction,
@@ -54,6 +54,31 @@ export async function getOwnedTokenAccounts(
     programId: TOKEN_PROGRAM_ID,
   })
   return results.value.map((r) => {
+    const publicKey = r.pubkey
+    const data = Buffer.from(r.account.data)
+    const account = parseTokenAccountData(publicKey, data)
+    return { publicKey, account }
+  })
+}
+
+export const getTokenAccountsByMint = async (
+  connection: Connection,
+  mint: string
+): Promise<ProgramAccount<TokenAccount>[]> => {
+  const results = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
+    filters: [
+      {
+        dataSize: 165,
+      },
+      {
+        memcmp: {
+          offset: 0,
+          bytes: mint,
+        },
+      },
+    ],
+  })
+  return results.map((r) => {
     const publicKey = r.pubkey
     const data = Buffer.from(r.account.data)
     const account = parseTokenAccountData(publicKey, data)
@@ -185,10 +210,10 @@ export function approveTokenTransfer(
 
   // if delegate is not passed ephemeral transfer authority is used
   delegate?: PublicKey,
-  existingTransferAuthority?: Account
-): Account {
+  existingTransferAuthority?: Keypair
+): Keypair {
   const tokenProgram = TOKEN_PROGRAM_ID
-  const transferAuthority = existingTransferAuthority || new Account()
+  const transferAuthority = existingTransferAuthority || new Keypair()
 
   // Coerce amount to u64 in case it's deserialized as BN which differs by buffer conversion functions only
   // Without the coercion createApproveInstruction would fail because it won't be able to serialize it

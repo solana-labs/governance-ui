@@ -24,6 +24,7 @@ class RealmWizardController {
 
   constructor(mode: RealmWizardMode) {
     this.mountSteps(mode)
+
     this.currentStep = RealmWizardStep.SELECT_MODE
   }
 
@@ -33,21 +34,15 @@ class RealmWizardController {
    */
   private mountSteps(mode: RealmWizardMode) {
     this.mode = mode
+    this.steps.push(RealmWizardStep.SELECT_MODE)
     switch (this.mode) {
       case RealmWizardMode.BASIC:
-        this.steps.push(
-          RealmWizardStep.SELECT_MODE,
-          RealmWizardStep.BASIC_CONFIG
-        )
+        this.steps.push(RealmWizardStep.MULTISIG_CONFIG)
         break
       case RealmWizardMode.ADVANCED:
-        this.steps.push(
-          RealmWizardStep.SELECT_MODE,
-          RealmWizardStep.BASIC_CONFIG,
-          RealmWizardStep.TOKENS_CONFIG,
-          RealmWizardStep.STEP_3,
-          RealmWizardStep.STEP_4
-        )
+        this.steps.push(RealmWizardStep.BESPOKE_CONFIG)
+        this.steps.push(RealmWizardStep.BESPOKE_COUNCIL)
+        this.steps.push(RealmWizardStep.BESPOKE_INFO)
         break
       default:
         throw new Error('The selected mode is not available')
@@ -65,11 +60,13 @@ class RealmWizardController {
     currentStep: RealmWizardStep,
     direction: StepDirection
   ): RealmWizardStep {
-    const nextStep = this.steps[currentStep + direction]
+    const stepIndex = this.steps.indexOf(currentStep)
+    const nextStep = this.steps[stepIndex + direction]
     if (nextStep !== undefined) {
       this.currentStep = nextStep
       return nextStep
     }
+
     throw new Error('The chosen step is not available.')
   }
 
@@ -85,9 +82,16 @@ class RealmWizardController {
    */
   isFirstStep(): boolean {
     return (
-      this.currentStep === this.steps[0] ||
+      this.currentStep === this.steps[1] ||
       this.currentStep === RealmWizardStep.REALM_CREATED
     )
+  }
+
+  /**
+   * Checks if the page is the mode selector
+   */
+  isModeSelect(): boolean {
+    return this.currentStep === RealmWizardStep.SELECT_MODE
   }
 
   /**
@@ -95,6 +99,22 @@ class RealmWizardController {
    */
   getCurrentStep(): RealmWizardStep {
     return this.currentStep
+  }
+
+  /**
+   * Returns the pagination position of the current step
+   */
+  getStepPagination(): string {
+    const currentStepIdx = this.steps.indexOf(this.currentStep) + 1
+    const pages = this.steps.length
+    return `Step ${currentStepIdx} of ${pages}`
+  }
+
+  /**
+   * Return the current wizard mode
+   */
+  getMode(): RealmWizardMode {
+    return this.mode
   }
 }
 export default RealmWizardController

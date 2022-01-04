@@ -109,23 +109,55 @@ const VotePanel = () => {
     setShowVoteModal(false)
   }, [])
 
-  const actionLabel = !isVoteCast
-    ? 'Cast your vote'
-    : isVoting
-    ? 'Withdraw your vote'
-    : 'Release your tokens'
+  const actionLabel =
+    !isVoteCast || !connected
+      ? 'Cast your vote'
+      : isVoting
+      ? 'Withdraw your vote'
+      : 'Release your tokens'
 
+  const withdrawTooltipContent = !connected
+    ? 'You need to connect your wallet'
+    : !isWithdrawEnabled
+    ? !ownVoteRecord?.info.isRelinquished
+      ? 'Owner vote record is not relinquished'
+      : 'The proposal is not in a valid state to execute this action.'
+    : ''
+
+  const voteTooltipContent = !connected
+    ? 'You need to connect your wallet to be able to vote'
+    : !isVoting && isVoteCast
+    ? 'Proposal is not in a voting state anymore.'
+    : !voterTokenRecord ||
+      voterTokenRecord.info.governingTokenDepositAmount.isZero()
+    ? 'You don’t have governance power to vote in this realm'
+    : ''
+
+  const notVisibleStatesForNotConnectedWallet = [
+    ProposalState.Cancelled,
+    ProposalState.Succeeded,
+    ProposalState.Draft,
+    ProposalState.Completed,
+  ]
+
+  const isVisibleToWallet = !connected
+    ? !hasVoteTimeExpired &&
+      typeof notVisibleStatesForNotConnectedWallet.find(
+        (x) => x === proposal?.info.state
+      ) === 'undefined'
+    : !ownVoteRecord?.info.isRelinquished
+
+  const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
   return (
     <>
-      {ProposalState.Cancelled === proposal?.info.state ||
-      ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Draft === proposal?.info.state ? null : (
+      {isPanelVisible && (
         <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
-            {isVoteCast ? (
+            {isVoteCast && connected ? (
               <Button
+                tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
                 disabled={!isWithdrawEnabled}
               >
@@ -136,13 +168,16 @@ const VotePanel = () => {
                 {isVoting && (
                   <div className="w-full flex justify-between items-center gap-5">
                     <Button
+                      tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(Vote.Yes)}
                       disabled={!isVoteEnabled}
                     >
                       Approve
                     </Button>
+
                     <Button
+                      tooltipMessage={voteTooltipContent}
                       className="w-1/2"
                       onClick={() => handleShowVoteModal(Vote.No)}
                       disabled={!isVoteEnabled}

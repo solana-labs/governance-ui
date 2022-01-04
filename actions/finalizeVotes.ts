@@ -1,7 +1,7 @@
 import { ParsedAccount } from '@models/core/accounts'
 import { RpcContext } from '@models/core/api'
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -15,7 +15,7 @@ export const finalizeVote = async (
   realm: PublicKey,
   proposal: ParsedAccount<Proposal>
 ) => {
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   withFinalizeVote(

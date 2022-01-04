@@ -94,7 +94,7 @@ const DryRunInstructionBtn = ({
         disabled={isPending || !wallet?.connected}
         small
       >
-        {isPending ? <Loading></Loading> : 'Run simulation'}
+        {isPending ? <Loading></Loading> : 'Preview instruction'}
       </SecondaryButton>
 
       {result?.response && (

@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -18,7 +18,7 @@ export const relinquishVote = async (
   voteRecord: PublicKey,
   instructions: TransactionInstruction[] = []
 ) => {
-  const signers: Account[] = []
+  const signers: Keypair[] = []
 
   const governanceAuthority = walletPubkey
   const beneficiary = walletPubkey

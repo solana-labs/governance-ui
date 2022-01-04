@@ -1,8 +1,10 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
 import TeamWalletField from '../TeamWalletField'
 import Input from '@components/inputs/Input'
-import { StyledLabel } from '@components/inputs/styles'
+
+import useWalletStore from 'stores/useWalletStore'
+import ApprovalQuorumInput from '../ApprovalQuorumInput'
 
 /**
  * This is the Step One for the Realm Wizard.
@@ -12,21 +14,22 @@ import { StyledLabel } from '@components/inputs/styles'
  *
  * @param param0 the form data and form handler.
  */
-const StepOne: React.FC<RealmWizardStepComponentProps> = ({
+const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
 }) => {
+  const DEFAULT_APPROVAL_QUORUM = 60
+  const { current: wallet } = useWalletStore((s) => s)
+
   const handleInsertTeamWallet = (wallets: string[]) => {
-    let teamWallets: string[] = []
-    if (form?.teamWallets) {
-      teamWallets = form.teamWallets
-    }
+    const teamWallets: string[] = form?.teamWallets ?? []
+
     wallets.forEach((wallet) => {
       if (!teamWallets.find((addr) => addr === wallet)) {
         teamWallets.push(wallet)
-        setForm({ teamWallets })
       }
     })
+    setForm({ teamWallets })
   }
 
   const handleRemoveTeamWallet = (index: number) => {
@@ -37,15 +40,34 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
     }
   }
 
+  const addCurrentWallet = () => {
+    if (wallet?.publicKey) {
+      handleInsertTeamWallet([wallet.publicKey?.toBase58()])
+    }
+  }
+
+  useEffect(() => {
+    addCurrentWallet()
+  }, [wallet?.publicKey])
+
+  useEffect(() => {
+    addCurrentWallet()
+  }, [])
+
   return (
-    <>
-      <h2>Name your realm</h2>
-      <div className="pb-4">
+    <div>
+      <div className="border-b border-fgd-4 pb-4 pt-2">
+        <div className="flex items-center justify-between">
+          <h1>New Multisig Realm</h1>
+        </div>
+      </div>
+      <div className="pb-4 my-5 pr-10 w-full" style={{ maxWidth: 512 }}>
         <Input
           required
           type="text"
           value={form.name}
-          placeholder="My Realm"
+          label="Name"
+          placeholder="Name of your realm"
           onChange={($e) => {
             setForm({
               name: $e.target.value,
@@ -53,18 +75,21 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
           }}
         />
       </div>
-      <div className="pb-4">
-        <StyledLabel>Vote Threshold (%)</StyledLabel>
-        <Input
-          required
-          type="number"
+      <div className="pb-7 pr-10 w-full" style={{ maxWidth: 512 }}>
+        <ApprovalQuorumInput
           value={form.yesThreshold}
-          placeholder="Vote threshold"
           onChange={($e) => {
-            if (+$e.target.value > 0 && +$e.target.value <= 100)
+            setForm({ yesThreshold: $e })
+          }}
+          onBlur={() => {
+            if (
+              !form.yesThreshold ||
+              form.yesThreshold.toString().match(/\D+/gim)
+            ) {
               setForm({
-                yesThreshold: $e.target.value,
+                yesThreshold: DEFAULT_APPROVAL_QUORUM,
               })
+            }
           }}
         />
       </div>
@@ -75,8 +100,8 @@ const StepOne: React.FC<RealmWizardStepComponentProps> = ({
           wallets={form?.teamWallets ?? []}
         />
       </div>
-    </>
+    </div>
   )
 }
 
-export default StepOne
+export default MultisigOptions

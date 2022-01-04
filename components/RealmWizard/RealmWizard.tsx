@@ -5,10 +5,10 @@ import Loading from '@components/Loading'
 import WizardModeSelect from './components/Steps/WizardModeSelect'
 import { notify } from '@utils/notifications'
 import {
-  StepOne,
-  StepTwo,
-  StepThree,
-  StepFour,
+  MultisigOptions,
+  BespokeConfig,
+  BespokeCouncil,
+  BespokeInfo,
   RealmCreated,
 } from './components/Steps'
 import { useMemo } from 'react'
@@ -21,13 +21,24 @@ import {
 } from './interfaces/Realm'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+import {
+  DEFAULT_GOVERNANCE_PROGRAM_ID,
+  DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
+} from '@components/instructions/tools'
 import { ProgramVersion } from '@models/registry/constants'
-
+import Tooltip from '@components/Tooltip'
+import { StyledLabel } from '@components/inputs/styles'
 import { createMultisigRealm } from 'actions/createMultisigRealm'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import router from 'next/router'
+import { useEffect } from 'react'
+import { CreateFormSchema } from './validators/createRealmValidator'
+import { formValidation, isFormValid } from '@utils/formValidation'
+import { RpcContext } from '@models/core/api'
+import { registerRealm } from 'actions/registerRealm'
+import { MintMaxVoteWeightSource } from '@models/accounts'
+import Switch from '@components/Switch'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
@@ -39,6 +50,8 @@ enum LoaderMessage {
   ERROR = 'We found an error while creating your Realm :/',
 }
 
+// TODO: split this component
+
 const RealmWizard: React.FC = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   // const wallet = useWalletStore((s) => s.current)
@@ -48,16 +61,18 @@ const RealmWizard: React.FC = () => {
    * The wizard controller instance
    */
   const [ctl, setController] = useState<RealmWizardController>()
+  const [testRealmCheck, setTestRealmCheck] = useState(false)
+  const [form, setForm] = useState<RealmArtifacts>({})
+  const [formErrors, setFormErrors] = useState({})
+  const [councilSwitchState, setUseCouncil] = useState(true)
+  const [isTestProgramId, setIsTestProgramId] = useState(false)
 
-  const [form, setForm] = useState<RealmArtifacts>({
-    yesThreshold: 60,
-  })
   const [isLoading, setIsLoading] = useState(false)
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
   )
   const [realmAddress] = useState('')
-  const [loaderMessage, setLoaderMessage] = useState<LoaderMessage>()
+  const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
 
   /**
    * Handles and set the form data
@@ -73,12 +88,9 @@ const RealmWizard: React.FC = () => {
   /**
    * Generate realm artifacts
    */
-  const generateRealmArtifacts = async () => {
+  const handleCreateMultisigRealm = async () => {
     if (!ctl) return
-    if (!wallet?.publicKey || !connection.current) {
-      notify({ type: 'error', message: 'Wallet not connected!' })
-      return
-    }
+    if (!wallet?.publicKey || !connection.current) return
     if (!form.name)
       return notify({
         type: 'error',
@@ -91,30 +103,76 @@ const RealmWizard: React.FC = () => {
         message: 'Team member wallets are required.',
       })
 
-    setLoaderMessage(LoaderMessage.CREATING_ARTIFACTS)
-    setIsLoading(true)
+    if (!form.yesThreshold) {
+      return notify({
+        type: 'error',
+        message: 'Approval quorum required.',
+      })
+    }
 
-    const programId =
-      process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ?? DEFAULT_GOVERNANCE_PROGRAM_ID
+    const programId = testRealmCheck
+      ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
+      : DEFAULT_GOVERNANCE_PROGRAM_ID
 
     const results = await createMultisigRealm(
       connection.current,
       new PublicKey(programId),
       ProgramVersion.V1,
       form.name,
-      60,
+      form.yesThreshold,
       form.teamWallets.map((w) => new PublicKey(w)),
       wallet
     )
 
     if (results) {
-      return results
+      router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
+      return
     }
 
     notify({
       type: 'error',
       message: 'Something bad happened during this request.',
     })
+  }
+
+  const handleCreateBespokeRealm = async () => {
+    setFormErrors({})
+
+    const { isValid, validationErrors }: formValidation = await isFormValid(
+      CreateFormSchema,
+      form
+    )
+    if (isValid) {
+      const rpcContext = new RpcContext(
+        new PublicKey(form.governanceProgramId!),
+        form.programVersion,
+        wallet,
+        connection.current,
+        connection.endpoint
+      )
+
+      const realmAddress = await registerRealm(
+        rpcContext,
+        rpcContext.programId,
+        form.programVersion ?? ProgramVersion.V1,
+        form.name!,
+        form.communityMintId ? new PublicKey(form.communityMintId) : undefined,
+        form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
+        MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+        form.minCommunityTokensToCreateGovernance!,
+        form.yesThreshold,
+        form.communityMintId ? form.transferAuthority : true,
+        form.communityMint ? form.communityMint.account.decimals : undefined,
+        form.teamWallets
+          ? form.teamWallets.map((w) => new PublicKey(w))
+          : undefined
+      )
+      router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+    } else {
+      console.debug(validationErrors)
+      setFormErrors(validationErrors)
+    }
+    setIsLoading(false)
   }
 
   /**
@@ -125,9 +183,15 @@ const RealmWizard: React.FC = () => {
     try {
       const ctl = new RealmWizardController(option)
       const nextStep = ctl.getNextStep(currentStep, StepDirection.NEXT)
+      handleSetForm({
+        governanceProgramId:
+          process.env.DEFAULT_GOVERNANCE_PROGRAM_ID ??
+          DEFAULT_GOVERNANCE_PROGRAM_ID,
+        yesThreshold: 60,
+      })
       setController(ctl)
       setCurrentStep(nextStep)
-    } catch (error) {
+    } catch (error: any) {
       notify({
         type: 'error',
         message: error.message,
@@ -150,30 +214,77 @@ const RealmWizard: React.FC = () => {
   }
 
   const handleCreateRealm = async () => {
-    setIsLoading(true)
-    try {
-      const realm = await generateRealmArtifacts()
-      setIsLoading(false)
-      if (realm) {
-        setLoaderMessage(LoaderMessage.FINISHED)
-        router.push(fmtUrlWithCluster(`/dao/${realm.realmPk.toBase58()}`))
-      }
-    } catch (error) {
-      const err = error as Error
-      setIsLoading(false)
-      notify({
+    if (!wallet?.publicKey || !connection.current)
+      return notify({
         type: 'error',
-        message: err.message,
+        message: 'Wallet not connected',
       })
+    // Handles the current misuse of the CreateRealmForm
+    if (ctl) {
+      try {
+        setIsLoading(true)
+
+        switch (ctl.getMode()) {
+          case RealmWizardMode.BASIC:
+            await handleCreateMultisigRealm()
+            break
+          case RealmWizardMode.ADVANCED:
+            await handleCreateBespokeRealm()
+            break
+          default:
+            throw new Error('Mode not available.')
+        }
+      } catch (error) {
+        const err = error as Error
+        setIsLoading(false)
+        notify({
+          type: 'error',
+          message: err.message,
+        })
+      } finally {
+        setIsLoading(false)
+      }
     }
   }
 
   const handleBackButtonClick = () => {
-    if (ctl && !ctl.isFirstStep()) {
+    if (ctl && !ctl.isModeSelect()) {
       setCurrentStep(ctl.getNextStep(currentStep, StepDirection.PREV))
     } else {
       router.push(fmtUrlWithCluster('/realms'))
     }
+  }
+
+  const isCreateButtonDisabled = () =>
+    ctl && ctl.getMode() === RealmWizardMode.ADVANCED
+      ? false
+      : !form.teamWallets?.length || !form.name
+
+  const canGoNext = (step: RealmWizardStep): boolean => {
+    if (step === RealmWizardStep.BESPOKE_CONFIG) {
+      const errors: any = {}
+      !form.name ? (errors.name = 'Name is required') : null
+      !form.governanceProgramId
+        ? (errors.governanceProgramId = 'Governance Program ID is required')
+        : null
+
+      setFormErrors(errors)
+
+      return !Object.values(errors).length
+    }
+
+    return true
+  }
+
+  const onClickNext = (): boolean => {
+    if (ctl)
+      switch (ctl.getMode()) {
+        case RealmWizardMode.ADVANCED:
+          return canGoNext(ctl.getCurrentStep())
+        default:
+          return false
+      }
+    return false
   }
 
   /**
@@ -183,59 +294,135 @@ const RealmWizard: React.FC = () => {
     switch (currentStep) {
       case RealmWizardStep.SELECT_MODE:
         return <WizardModeSelect onSelect={handleModeSelection} />
-      case RealmWizardStep.BASIC_CONFIG:
-        return <StepOne form={form} setForm={handleSetForm} />
-      case RealmWizardStep.TOKENS_CONFIG:
-        return <StepTwo form={form} setForm={handleSetForm} />
-      case RealmWizardStep.STEP_3:
-        return <StepThree form={form} setForm={handleSetForm} />
-      case RealmWizardStep.STEP_4:
-        return <StepFour form={form} setForm={handleSetForm} />
+      case RealmWizardStep.MULTISIG_CONFIG:
+        return <MultisigOptions form={form} setForm={handleSetForm} />
+      case RealmWizardStep.BESPOKE_CONFIG:
+        return (
+          <BespokeConfig
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+            isTestProgramId={isTestProgramId}
+            onSwitch={(x: boolean) => {
+              setIsTestProgramId(x)
+              handleSetForm({
+                governanceProgramId: x
+                  ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
+                  : DEFAULT_GOVERNANCE_PROGRAM_ID,
+              })
+            }}
+          />
+        )
+      case RealmWizardStep.BESPOKE_COUNCIL:
+        return (
+          <BespokeCouncil
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+            setFormErrors={setFormErrors}
+            onSwitch={(x: boolean) => {
+              setUseCouncil(x)
+            }}
+            switchState={councilSwitchState}
+          />
+        )
+      case RealmWizardStep.BESPOKE_INFO:
+        return (
+          <BespokeInfo
+            form={form}
+            setForm={handleSetForm}
+            formErrors={formErrors}
+          />
+        )
       case RealmWizardStep.REALM_CREATED:
         return <RealmCreated realmAddress={realmAddress} />
       default:
         return <h4>Sorry, but this step ran away</h4>
     }
-  }, [currentStep, form])
+  }, [currentStep, form, formErrors, councilSwitchState])
+
+  useEffect(() => {
+    // Return shouldFireCreate to the base state
+    if (Object.values(formErrors).length) setFormErrors({})
+  }, [form])
 
   return (
-    <div className="relative">
-      <>
-        <div className="pointer">
-          <a
-            className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
-            onClick={handleBackButtonClick}
-          >
-            <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-            Back
-          </a>
-        </div>
-      </>
+    <div
+      className="relative w-auto"
+      style={
+        ctl &&
+        ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE &&
+        !isLoading
+          ? { maxWidth: 512 }
+          : undefined
+      }
+    >
+      <div className="pointer">
+        <a
+          className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1"
+          onClick={handleBackButtonClick}
+        >
+          <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+          Back
+        </a>
+      </div>
       {isLoading ? (
         <div className="text-center">
           <Loading />
           <span>{loaderMessage}</span>
         </div>
       ) : (
-        BoundStepComponent
+        <div className="min-h-[60vh]">{BoundStepComponent}</div>
       )}
-      {ctl && !(ctl.isFirstStep() || isLoading) && (
+      {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>
-          <Button
-            onClick={() => handleStepSelection(StepDirection.PREV)}
-            className="mr-3"
+          <div
+            className={`flex justify-${
+              ctl.getMode() === RealmWizardMode.BASIC ? 'between' : 'end'
+            } pr-10 mr-3 mt-10`}
           >
-            Previous
-          </Button>
-          <Button
-            onClick={() => {
-              if (ctl.isLastStep()) handleCreateRealm()
-              else handleStepSelection(StepDirection.NEXT)
-            }}
-            disabled={!form.teamWallets?.length || !form.name}
-          >
-            {ctl.isLastStep() ? 'Create' : 'Next'}
-          </Button>
+            {ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
+              <div className="flex justify-left items-center">
+                <Switch
+                  className="mt-2 mb-2"
+                  checked={testRealmCheck}
+                  onChange={(check) => {
+                    setTestRealmCheck(check)
+                  }}
+                />
+                <Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
+                  <StyledLabel className="mt-1.5 ml-3">
+                    Create a test realm
+                  </StyledLabel>
+                </Tooltip>
+              </div>
+            )}
+            {!ctl.isFirstStep() ? (
+              <Button
+                onClick={() => {
+                  handleStepSelection(StepDirection.PREV)
+                }}
+                className="px-10 mr-5"
+                style={{ minWidth: '142px' }}
+              >
+                Previous
+              </Button>
+            ) : (
+              <p>&nbsp;</p>
+            )}
+
+            <Button
+              onClick={() => {
+                if (ctl.isLastStep()) handleCreateRealm()
+                else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
+              }}
+              disabled={isCreateButtonDisabled()}
+              className={ctl.isLastStep() ? 'px-5' : 'px-10'}
+              style={{ minWidth: '142px' }}
+            >
+              {ctl.isLastStep() ? 'Create Realm' : 'Next'}
+            </Button>
+          </div>
         </>
       )}
     </div>

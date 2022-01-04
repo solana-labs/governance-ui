@@ -1,6 +1,5 @@
 import React from 'react'
 import { RealmWizardMode } from '@components/RealmWizard/interfaces/Realm'
-import Tooltip from '@components/Tooltip'
 
 const WizardModeSelect: React.FC<{
   onSelect: (option: number) => void
@@ -30,21 +29,19 @@ const WizardModeSelect: React.FC<{
         </div>
         <div className="flex justify-center ">
           <div
-            className="border rounded px-5 py-3 w-6/12 hover:bg-bkg-3 opacity-50"
-            // onClick={() => {
-            //   onSelect(RealmWizardMode.ADVANCED)
-            // }}
+            className="border rounded px-5 py-3 w-6/12 hover:bg-bkg-3 pointer"
+            onClick={() => {
+              onSelect(RealmWizardMode.ADVANCED)
+            }}
           >
-            <Tooltip content="This mode is not available yet.">
-              <h2 className="mb-0">
-                <b>I want to create a bespoke realm</b>
-              </h2>
-              <p>
-                Bespoke realm is an advanced option and allows you to create a
-                realm customized for your individual requirements, community
-                structure and governance token setup.
-              </p>
-            </Tooltip>
+            <h2 className="mb-0">
+              <b>I want to create a bespoke realm</b>
+            </h2>
+            <p>
+              Bespoke realm is an advanced option and allows you to create a
+              realm customized for your individual requirements, community
+              structure and governance token setup.
+            </p>
           </div>
         </div>
       </div>

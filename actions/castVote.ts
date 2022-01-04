@@ -1,5 +1,5 @@
 import {
-  Account,
+  Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
@@ -20,7 +20,7 @@ export async function castVote(
   tokeOwnerRecord: PublicKey,
   vote: Vote
 ) {
-  const signers: Account[] = []
+  const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
