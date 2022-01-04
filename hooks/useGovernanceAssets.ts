@@ -10,11 +10,11 @@ import {
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
+
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const { ownVoterWeight, realm, symbol } = useRealm()
-
   const governancesArray = Object.keys(governances)
     .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
     .map((key) => governances[key])
@@ -127,6 +127,11 @@ export default function useGovernanceAssets() {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MangoMakeChangeMaxAccounts,
+      name: 'Mango - change max accounts',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.None,

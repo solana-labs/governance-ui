@@ -61,6 +61,31 @@ export async function getOwnedTokenAccounts(
   })
 }
 
+export const getTokenAccountsByMint = async (
+  connection: Connection,
+  mint: string
+): Promise<ProgramAccount<TokenAccount>[]> => {
+  const results = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
+    filters: [
+      {
+        dataSize: 165,
+      },
+      {
+        memcmp: {
+          offset: 0,
+          bytes: mint,
+        },
+      },
+    ],
+  })
+  return results.map((r) => {
+    const publicKey = r.pubkey
+    const data = Buffer.from(r.account.data)
+    const account = parseTokenAccountData(publicKey, data)
+    return { publicKey, account }
+  })
+}
+
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey

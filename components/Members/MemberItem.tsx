@@ -1,42 +1,44 @@
-import { UserCircleIcon } from '@heroicons/react/outline'
+import { UserCircleIcon, LogoutIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
-import { TokenRecordsWithWalletAddress } from './types'
 import tokenService from '@utils/services/token'
 import useMembersListStore from 'stores/useMembersStore'
 import { ViewState } from './types'
 import { useMemo } from 'react'
+import { Member } from '@utils/uiTypes/members'
 
-const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
+const MemberItem = ({ item }: { item: Member }) => {
   const { mint, councilMint, realm } = useRealm()
   const {
     setCurrentCompactView,
     setCurrentCompactViewMember,
   } = useMembersListStore()
-  const { walletAddress, council, community } = item
+  const {
+    walletAddress,
+    councilVotes,
+    communityVotes,
+    votesCasted,
+    hasCouncilTokenOutsideRealm,
+    hasCommunityTokenOutsideRealm,
+  } = item
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
     (x) => x.address === realm?.info.communityMint.toBase58()
   )?.symbol
-  const totalCommunityVotes = community?.info.totalVotesCount || 0
-  const totalCouncilVotes = council?.info.totalVotesCount || 0
-  const totalVotes = totalCommunityVotes + totalCouncilVotes
-  const communityAmount = community
-    ? useMemo(
-        () => fmtMintAmount(mint, community.info.governingTokenDepositAmount),
-        [community.info.governingTokenDepositAmount]
-      )
-    : null
-  const councilAmount = council
-    ? useMemo(
-        () =>
-          fmtMintAmount(councilMint, council.info.governingTokenDepositAmount),
-        [council.info.governingTokenDepositAmount]
-      )
-    : null
+  const totalVotes = votesCasted
+  const communityAmount =
+    communityVotes && !communityVotes.isZero()
+      ? useMemo(() => fmtMintAmount(mint, communityVotes), [item.walletAddress])
+      : null
+  const councilAmount =
+    councilVotes && !councilVotes.isZero()
+      ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
+          item.walletAddress,
+        ])
+      : null
   const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
 
   async function handleGoToMemberOverview() {
@@ -44,8 +46,6 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
     setCurrentCompactViewMember(item)
   }
   return (
-    //TODO: implement dynamic height with CellMeasurer
-    //for now every member item element has to be same height
     <div
       onClick={handleGoToMemberOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
@@ -58,14 +58,23 @@ const MemberItem = ({ item }: { item: TokenRecordsWithWalletAddress }) => {
         <div className="text-fgd-3 text-xs flex flex-col">
           Votes cast: {totalVotes}
         </div>
-        <div className="text-fgd-3 text-xs flex flex-row">
-          {communityAmount && (
-            <span>
-              {tokenName} Votes {communityAmount}
+        <div className="text-fgd-3 text-xs flex flex-col">
+          {(communityAmount || !councilAmount) && (
+            <span className="flex items-center">
+              {tokenName} Votes {communityAmount || 0}
+              {hasCommunityTokenOutsideRealm && (
+                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
+              )}
             </span>
           )}
-          {communityAmount && council && <span className="ml-1 mr-1">|</span>}
-          {council && <span>Council Votes {councilAmount}</span>}
+          {councilAmount && (
+            <span className="flex items-center">
+              Council Votes {councilAmount}{' '}
+              {hasCouncilTokenOutsideRealm && (
+                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
+              )}
+            </span>
+          )}
         </div>
       </div>
     </div>

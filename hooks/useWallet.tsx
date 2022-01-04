@@ -26,10 +26,21 @@ export default function useWallet() {
     'walletProvider',
     DEFAULT_PROVIDER.url
   )
+
+  // initialize selection from local storage
+  useEffect(() => {
+    if (!selectedProviderUrl) {
+      setWalletStore((s) => {
+        s.providerUrl = savedProviderUrl
+      })
+    }
+  }, [selectedProviderUrl, savedProviderUrl])
+
   const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
     selectedProviderUrl,
   ])
 
+  // save selection in local storage
   useEffect(() => {
     if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
       setSavedProviderUrl(selectedProviderUrl)

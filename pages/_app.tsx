@@ -9,6 +9,7 @@ import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
 import useRouterHistory from '@hooks/useRouterHistory'
+import Footer from '@components/Footer'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -30,7 +31,7 @@ function App({ Component, pageProps }) {
   )}/favicon.ico?v=${Date.now()}`
 
   return (
-    <>
+    <div className="relative">
       <Head>
         <title>{title}</title>
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -72,7 +73,9 @@ function App({ Component, pageProps }) {
           <Component {...pageProps} />
         </PageBodyContainer>
       </ThemeProvider>
-    </>
+
+      <Footer />
+    </div>
   )
 }
 

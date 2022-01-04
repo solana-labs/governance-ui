@@ -28,7 +28,6 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts'
-import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
 import { getGovernanceChatMessages } from '../models/chat/api'
@@ -83,7 +82,7 @@ interface WalletStore extends State {
     tokenType?: GoverningTokenType
     proposalOwner: ParsedAccount<TokenOwnerRecord> | undefined
   }
-  providerUrl: string
+  providerUrl: string | undefined
   tokenAccounts: ProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
@@ -183,7 +182,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
   selectedProposal: INITIAL_PROPOSAL_STATE,
-  providerUrl: DEFAULT_PROVIDER.url,
+  providerUrl: undefined,
   tokenAccounts: [],
   set: (fn) => set(produce(fn)),
   actions: {
@@ -191,7 +190,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       console.log('fetchRealmBySymbol', cluster, symbol)
 
       const actions = get().actions
-      const connection = get().connection
+      let connection = get().connection
       const set = get().set
       const newConnection = getConnectionContext(cluster)
       if (
@@ -201,11 +200,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         set((s) => {
           s.connection = newConnection
         })
+        connection = get().connection
       }
 
       let programId: PublicKey | undefined
       let realmId = tryParsePublicKey(symbol)
-
       if (!realmId) {
         const realmInfo = await getCertifiedRealmInfo(symbol, newConnection)
         realmId = realmInfo?.realmId
@@ -216,7 +215,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
         programId = realmAccountInfo?.owner
       }
-
       if (realmId && programId) {
         await actions.fetchAllRealms(programId)
         actions.fetchRealm(programId, realmId)
@@ -300,7 +298,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       console.log('fetchAllRealms', get().realms)
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
-      console.log('fetchRealm', programId.toBase58(), realmId.toBase58())
       const set = get().set
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
