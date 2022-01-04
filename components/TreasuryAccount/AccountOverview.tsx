@@ -83,7 +83,7 @@ const AccountOverview = () => {
       <AccountHeader></AccountHeader>
       <div
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 ${
-          !canUseTransferInstruction ? 'justify-center' : ''
+          !canUseTransferInstruction || isNFT ? 'justify-center' : ''
         }`}
       >
         <Button
