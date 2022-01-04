@@ -1,0 +1,38 @@
+# Trivy configured to scan for vulnerable dependencies in the project software composition
+
+name: Trivy Scan
+
+# Triggers on push and PR to the main branch
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    name: Rrivy Vulnerability Scanner
+    runs-on: ubuntu-18.04
+    steps:
+      # Checking out the repo to scan
+      - name: Checkout code
+        uses: actions/checkout@v2
+      
+      # Run Trivy with the following args
+      - name: Run Trivy vulnerability scanner in repo mode
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs' # Filesystem mode
+          ignore-unfixed: true # Ignore vulnerabilities with no available fix
+          format: 'template' # Template output mode
+          template: '@/contrib/sarif.tpl' # SARIF template to be compatible with GitHub secuity tab
+          output: 'trivy-results.sarif' # Output file name
+          severity: 'CRITICAL,HIGH' # Report only on high and critical vulnerabilities
+      
+      # Generate the output as SARIF and upload to the security tab
+      - name: Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: 'trivy-results.sarif'
