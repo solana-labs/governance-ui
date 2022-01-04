@@ -61,7 +61,7 @@ const RealmWizard: React.FC = () => {
    * The wizard controller instance
    */
   const [ctl, setController] = useState<RealmWizardController>()
-  const [testRealmCheck, setTestRealmCheck] = useState(false)
+  const [testRealmCheck, setTestRealmCheck] = useState(true)
   const [form, setForm] = useState<RealmArtifacts>({})
   const [formErrors, setFormErrors] = useState({})
   const [councilSwitchState, setUseCouncil] = useState(true)
@@ -150,24 +150,32 @@ const RealmWizard: React.FC = () => {
         connection.current,
         connection.endpoint
       )
-
-      const realmAddress = await registerRealm(
-        rpcContext,
-        rpcContext.programId,
-        form.programVersion ?? ProgramVersion.V1,
-        form.name!,
-        form.communityMintId ? new PublicKey(form.communityMintId) : undefined,
-        form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
-        MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
-        form.minCommunityTokensToCreateGovernance!,
-        form.yesThreshold,
-        form.communityMintId ? form.transferAuthority : true,
-        form.communityMint ? form.communityMint.account.decimals : undefined,
-        form.teamWallets
-          ? form.teamWallets.map((w) => new PublicKey(w))
-          : undefined
-      )
-      router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+      try {
+        const realmAddress = await registerRealm(
+          rpcContext,
+          rpcContext.programId,
+          form.programVersion ?? ProgramVersion.V1,
+          form.name!,
+          form.communityMintId
+            ? new PublicKey(form.communityMintId)
+            : undefined,
+          form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
+          MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+          form.minCommunityTokensToCreateGovernance!,
+          form.yesThreshold,
+          form.communityMintId ? form.transferAuthority : true,
+          form.communityMint ? form.communityMint.account.decimals : undefined,
+          form.teamWallets
+            ? form.teamWallets.map((w) => new PublicKey(w))
+            : undefined
+        )
+        router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+      } catch (error) {
+        notify({
+          type: 'error',
+          message: error.message,
+        })
+      }
     } else {
       console.debug(validationErrors)
       setFormErrors(validationErrors)

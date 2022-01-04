@@ -21,7 +21,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   form,
   formErrors,
   onSwitch = () => null,
-  isTestProgramId = false,
+  isTestProgramId = true,
 }) => {
   const { connection } = useWalletStore((s) => s)
   const handleCommunityMint = async (mintId: string) => {
