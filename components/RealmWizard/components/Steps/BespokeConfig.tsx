@@ -11,16 +11,18 @@ import { tryGetMint } from '@utils/tokens'
 import { PublicKey } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import _ from 'lodash'
+import Switch from '@components/Switch'
+import { StyledLabel } from '@components/inputs/styles'
+import Tooltip from '@components/Tooltip'
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
-  setFormErrors,
-  beforeClickNext,
+  onSwitch = () => null,
+  isTestProgramId = false,
 }) => {
   const { connection } = useWalletStore((s) => s)
-
   const handleCommunityMint = async (mintId: string) => {
     try {
       const mintPublicKey = new PublicKey(mintId)
@@ -29,20 +31,20 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         const supply = mint.account.supply
         if (supply.gt(new BN(0))) {
           setForm({
-            minCommunityTokensToCreateGovernance: BN.max(
-              new BN(1),
-              // divide by 100 for a percentage
-              new BN(
-                getMintDecimalAmount(mint.account, supply)
-                  .dividedBy(100)
-                  .toString()
-              )
-            ),
+            minCommunityTokensToCreateGovernance: getMintDecimalAmount(
+              mint.account,
+              supply
+            )
+              .dividedBy(100)
+              .toString(),
+            communityMintMaxVoteWeightSource: 1,
             communityMint: mint,
+            transferAuthority: true,
           })
         } else {
           setForm({
             communityMint: mint,
+            transferAuthority: true,
           })
         }
       }
@@ -51,30 +53,20 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     }
   }
 
-  const handleCouncilMint = async (mintId: string) => {
-    try {
-      const mintPublicKey = new PublicKey(mintId)
-      const mint = await tryGetMint(connection.current, mintPublicKey)
-      if (mint) {
-        setForm({
-          councilMint: mint,
-        })
-      }
-    } catch (e) {
-      console.log('failed to set council mint', e)
-    }
-  }
-
   useEffect(() => {
     _.debounce(async () => {
-      if (form?.councilMintId) {
-        await handleCouncilMint(form.councilMintId)
-      }
       if (form?.communityMintId) {
         await handleCommunityMint(form.communityMintId)
       }
     }, 250)()
-  }, [form?.communityMintId, form?.councilMintId])
+    if (!form?.communityMintId?.length) {
+      setForm({
+        communityMint: undefined,
+        minCommunityTokensToCreateGovernance: undefined,
+        communityMintId: undefined,
+      })
+    }
+  }, [form?.communityMintId])
 
   return (
     <>
@@ -100,8 +92,8 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         </div>
         <div className="pb-4 pr-10 mr-2">
           <Input
-            label="Community Mint Id"
-            placeholder="Community mint id of this realm"
+            label="Community Token Mint"
+            placeholder="(Optional) Community token mint of this realm"
             value={form?.communityMintId}
             type="text"
             error={formErrors['communityMintId'] || formErrors['communityMint']}
@@ -122,20 +114,35 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         {form?.communityMint && (
           <>
             <div className="pb-4 pr-10 mr-2">
+              <div className="flex justify-left items-center">
+                <Tooltip content="If checked, will transfer mint authority to the realm">
+                  <Switch
+                    className="mt-2 mb-2"
+                    checked={form.transferAuthority ?? false}
+                    onChange={() => {
+                      setForm({ transferAuthority: !form.transferAuthority })
+                    }}
+                  />
+                </Tooltip>
+                <StyledLabel className="mt-1.5 ml-3">
+                  Transfer authority
+                </StyledLabel>
+              </div>
+            </div>
+            <div className="pb-4 pr-10 mr-2">
               <Input
                 label="Min community tokens to create governance (defaults 1% of community mint)"
                 placeholder="Min community tokens to create governance"
-                step="0.01"
-                value={form.minCommunityTokensToCreateGovernance}
+                step="1"
+                value={form.minCommunityTokensToCreateGovernance?.toString()}
                 type="number"
                 error={formErrors['minCommunityTokensToCreateGovernance']}
-                onChange={(evt) =>
+                onChange={(evt) => {
+                  const value = evt.target.value
                   setForm({
-                    minCommunityTokensToCreateGovernance: new BN(
-                      evt.target.value
-                    ),
+                    minCommunityTokensToCreateGovernance: value,
                   })
-                }
+                }}
               />
             </div>
             <div className="pb-4 pr-10 mr-2">
@@ -156,17 +163,29 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         )}
         <div className="pb-4 pr-10 mr-2">
           <Input
-            label="Governance Program Id"
+            label="Custom program Id"
             placeholder="Id of the governance program this realm will be associated with"
             value={form?.governanceProgramId}
             type="text"
             error={formErrors['governanceProgramId']}
+            disabled={isTestProgramId}
+            readonly={isTestProgramId}
             onChange={(evt) =>
               setForm({
                 governanceProgramId: evt.target.value,
               })
             }
           />
+        </div>
+        <div className="pb-4 pr-10 mr-2">
+          <div className="flex justify-left items-center">
+            <Switch
+              className="mt-2 mb-2"
+              checked={isTestProgramId}
+              onChange={(x) => onSwitch(x)}
+            />
+            <StyledLabel className="mt-1.5 ml-3">Use test instance</StyledLabel>
+          </div>
         </div>
         <div className="pb-4 pr-10 mr-2">
           <Input

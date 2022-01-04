@@ -25,11 +25,15 @@ const ConnectWalletButton = (props) => {
     providerUrl,
   ])
 
-  const handleConnectDisconnect = () => {
-    if (connected) {
-      current?.disconnect()
-    } else {
-      current?.connect()
+  const handleConnectDisconnect = async () => {
+    try {
+      if (connected) {
+        await current?.disconnect()
+      } else {
+        await current?.connect()
+      }
+    } catch (e) {
+      console.warn('handleConnectDisconnect', e)
     }
   }
 

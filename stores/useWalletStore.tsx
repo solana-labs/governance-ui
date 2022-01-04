@@ -28,7 +28,6 @@ import {
   TokenOwnerRecord,
   VoteRecord,
 } from '../models/accounts'
-import { DEFAULT_PROVIDER } from '../utils/wallet-adapters'
 import { ParsedAccount } from '../models/core/accounts'
 import { fetchGistFile } from '../utils/github'
 import { getGovernanceChatMessages } from '../models/chat/api'
@@ -83,7 +82,7 @@ interface WalletStore extends State {
     tokenType?: GoverningTokenType
     proposalOwner: ParsedAccount<TokenOwnerRecord> | undefined
   }
-  providerUrl: string
+  providerUrl: string | undefined
   tokenAccounts: ProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
@@ -183,7 +182,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   ownVoteRecordsByProposal: {},
   selectedRealm: INITIAL_REALM_STATE,
   selectedProposal: INITIAL_PROPOSAL_STATE,
-  providerUrl: DEFAULT_PROVIDER.url,
+  providerUrl: undefined,
   tokenAccounts: [],
   set: (fn) => set(produce(fn)),
   actions: {
