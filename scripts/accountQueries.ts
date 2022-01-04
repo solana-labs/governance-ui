@@ -63,24 +63,20 @@ export const getNumberOfProposalsInVotingState = async (realms) => {
           accountType,
           governance: new PublicKey(governance.$metadata.pubkey!),
           state: ProposalState.Voting,
-          votingAt: (votingAt) =>
-            Boolean(
-              votingAt &&
-                governance.config?.maxVotingTime &&
-                votingAt.toNumber() + governance.config.maxVotingTime >
-                  Date.now() / 1000
-            ),
           votingCompletedAt: null,
         })
-        .injectMetadata({ realmId: governance.$metadata.realmId })
+        .injectMetadata({ governance })
     })
   })
   const proposals = await proposalAccounts.fetch()
 
   // 3/3) group open proposals by realm & return `{ [realmPubkey]: count }`
-  return proposals.reduce((acc, curr) => {
-    acc[curr.$metadata.realmId] ??= 0
-    acc[curr.$metadata.realmId] += 1
+  return proposals.reduce((acc, proposal) => {
+    if (proposal.getTimeToVoteEnd(proposal.$metadata.governance) > 0) {
+      const { realmId } = proposal.$metadata.governance.$metadata
+      acc[realmId] ??= 0
+      acc[realmId] += 1
+    }
     return acc
-  }, {})
+  }, {} as Record<string, number>)
 }
