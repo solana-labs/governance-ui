@@ -35,9 +35,13 @@ const Button: FunctionComponent<ButtonProps> = ({
       style={style}
       disabled={disabled}
     >
-      <Tooltip content={tooltipMessage}>
-        <div>{isLoading ? <Loading /> : children}</div>
-      </Tooltip>
+      {tooltipMessage ? (
+        <Tooltip content={tooltipMessage}>
+          <div>{isLoading ? <Loading /> : children}</div>
+        </Tooltip>
+      ) : (
+        <>{isLoading ? <Loading /> : children}</>
+      )}
     </button>
   )
 }
