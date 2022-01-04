@@ -1,4 +1,7 @@
-import { HIDDEN_GOVERNANCES } from '@components/instructions/tools'
+import {
+  DEFAULT_NFT_TREASURY_MINT,
+  HIDDEN_GOVERNANCES,
+} from '@components/instructions/tools'
 import { GovernanceAccountType } from '@models/accounts'
 import { MintInfo } from '@solana/spl-token'
 import {
@@ -156,6 +159,9 @@ export default function useGovernanceAssets() {
     return governedMintInfoAccounts
   }
   const governedTokenAccounts = prepareTokenGovernances()
+  const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
+    (x) => x.mint?.publicKey.toBase58() !== DEFAULT_NFT_TREASURY_MINT
+  )
   return {
     governancesArray,
     getGovernancesByAccountType,
@@ -168,5 +174,6 @@ export default function useGovernanceAssets() {
     canMintRealmCommunityToken,
     canMintRealmCouncilToken,
     canUseProgramUpgradeInstruction,
+    governedTokenAccountsWithoutNfts,
   }
 }

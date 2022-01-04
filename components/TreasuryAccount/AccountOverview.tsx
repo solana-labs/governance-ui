@@ -5,6 +5,7 @@ import {
   getAccountName,
 } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
+import { PhotographIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -37,8 +38,11 @@ const AccountOverview = () => {
     setCurrentCompactView,
     resetCompactViewState,
   } = useTreasuryAccountStore()
+  //for nfts for now we use governance pubkey
   const accountPublicKey = currentAccount
-    ? currentAccount.governance?.info.governedAccount
+    ? isNFT
+      ? currentAccount.governance?.pubkey
+      : currentAccount.governance?.info.governedAccount
     : null
 
   const handleGoBackToMainView = async () => {
@@ -63,22 +67,20 @@ const AccountOverview = () => {
               {abbreviateAddress(accountPublicKey as PublicKey)}
             </div>
           )}
+          {isNFT && (
+            <PhotographIcon
+              className="h-4 w-4 text-primary-light mr-2 hover:cursor-pointer ml-auto"
+              onClick={() => {
+                const url = fmtUrlWithCluster(
+                  `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
+                )
+                router.push(url)
+              }}
+            ></PhotographIcon>
+          )}
         </>
       </h3>
       <AccountHeader></AccountHeader>
-      {isNFT && (
-        <Button
-          className="sm:w-full text-sm py-2.5 mb-4"
-          onClick={() => {
-            const url = fmtUrlWithCluster(
-              `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
-            )
-            router.push(url)
-          }}
-        >
-          Gallery
-        </Button>
-      )}
       <div
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 ${
           !canUseTransferInstruction ? 'justify-center' : ''
@@ -95,18 +97,20 @@ const AccountOverview = () => {
           Deposit
         </Button>
 
-        <Button
-          tooltipMessage={
-            !canUseTransferInstruction
-              ? 'You need to have connected wallet with ability to create token transfer proposals'
-              : ''
-          }
-          className="sm:w-1/2 text-sm py-2.5"
-          onClick={() => setCurrentCompactView(ViewState.Send)}
-          disabled={!canUseTransferInstruction}
-        >
-          Send
-        </Button>
+        {!isNFT && (
+          <Button
+            tooltipMessage={
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : ''
+            }
+            className="sm:w-1/2 text-sm py-2.5"
+            onClick={() => setCurrentCompactView(ViewState.Send)}
+            disabled={!canUseTransferInstruction}
+          >
+            Send
+          </Button>
+        )}
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
         Recent activity

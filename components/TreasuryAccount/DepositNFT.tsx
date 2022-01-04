@@ -23,12 +23,14 @@ import { tryGetAta } from '@utils/validations'
 import useRealm from '@hooks/useRealm'
 import { createATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
+import DepositLabel from './DepositLabel'
 
 const DepositNFT = () => {
   const { setCurrentCompactView } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+
   const wallet = useWalletStore((s) => s.current)
   const { realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
@@ -39,6 +41,7 @@ const DepositNFT = () => {
   })
   const [isLoading, setIsLoading] = useState(false)
   const [nftMetaData, setNftMetaData] = useState<Metadata | null>(null)
+  const [isInvalidMint, setIsInvalidMint] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [imgUrl, setImgUrl] = useState('')
   const [ataAddress, setAtaAddress] = useState('')
@@ -86,6 +89,7 @@ const DepositNFT = () => {
     }
   }
   useEffect(() => {
+    setIsInvalidMint(false)
     if (form.mint) {
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.mint)
@@ -107,6 +111,7 @@ const DepositNFT = () => {
           }
           setIsLoading(false)
         } else {
+          setIsInvalidMint(true)
           setNftMetaData(null)
         }
       })
@@ -148,9 +153,17 @@ const DepositNFT = () => {
         </>
       </h3>
       <AccountLabel></AccountLabel>
+      <DepositLabel currentAccount={currentAccount}></DepositLabel>
       <div className="space-y-4 w-full pb-4">
+        <div className="text-sm mt-4">
+          <div className="flex flex-row text-xs items-center">
+            {
+              "If your wallet doesn't support sending nfts to shared wallets please generate address using the nft mint"
+            }
+          </div>
+        </div>
         <Input
-          label="Mint"
+          label="Mint address"
           value={form.mint}
           type="text"
           onChange={(evt) =>
@@ -162,7 +175,18 @@ const DepositNFT = () => {
           noMaxWidth={true}
           error={formErrors['mint']}
         />
-        {isLoading ? <Loading /> : imgUrl && <img src={imgUrl} />}
+        {isInvalidMint && (
+          <div className="text-xs text-red">Invalid mint address</div>
+        )}
+        {isLoading ? (
+          <Loading />
+        ) : (
+          imgUrl && (
+            <div className="flex justify-center">
+              <img style={{ width: '150px' }} src={imgUrl} />
+            </div>
+          )
+        )}
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <Button

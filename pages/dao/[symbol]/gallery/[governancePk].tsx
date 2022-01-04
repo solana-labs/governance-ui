@@ -1,16 +1,28 @@
+import { getExplorerUrl } from '@components/explorer/tools'
+import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
-import { tryParsePublicKey } from '@tools/core/pubkey'
 import { notify } from '@utils/notifications'
 import axios from 'axios'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 
+interface NFTData {
+  image: string
+  name: string
+  description: string
+}
+interface NFTWithMint {
+  val: NFTData
+  mint: string
+}
+
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const governancePk = router?.query?.governancePk
-  const [nfts, setNfts] = useState<any[]>([])
+  const [nfts, setNfts] = useState<NFTWithMint[]>([])
+
   useEffect(() => {
     const getAllNftData = async () => {
       try {
@@ -22,7 +34,7 @@ const gallery = () => {
         const arr: any[] = []
         for (let i = 0; i < data.length; i++) {
           const val = (await axios.get(data[i].data.uri)).data
-          arr.push(val)
+          arr.push({ val, mint: data[i].mint })
         }
         setNfts(arr)
       } catch (error) {
@@ -37,16 +49,30 @@ const gallery = () => {
     }
   }, [governancePk, connection.endpoint])
   return (
-    <div className="flex flex-row flex-wrap gap-4">
-      {nfts.map((x, idx) => (
-        <img
-          className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
-          width={150}
-          height={230}
-          key={idx}
-          src={x.image}
-        />
-      ))}
+    <div className="grid grid-cols-12">
+      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-12 lg:col-span-8 space-y-3">
+        <PreviousRouteBtn />
+        <div className="flex flex-row flex-wrap gap-4">
+          {nfts.map((x, idx) => (
+            <a
+              key={idx}
+              href={getExplorerUrl(connection.endpoint, x.mint)}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <img
+                className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
+                style={{
+                  width: '150px',
+                  height: '150px',
+                }}
+                src={x.val.image}
+              />
+            </a>
+          ))}
+        </div>
+      </div>
     </div>
   )
 }

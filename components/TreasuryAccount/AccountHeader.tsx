@@ -11,6 +11,7 @@ const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
   const isNFT =
     currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
@@ -45,7 +46,8 @@ const AccountHeader = () => {
       )}
       <div>
         <p className="text-fgd-3 text-xs">
-          {amountFormatted} {!isNFT ? tokenInfo?.symbol : 'NFTS'}
+          {isNFT ? nftsCount : amountFormatted}{' '}
+          {!isNFT ? tokenInfo?.symbol : 'NFTS'}
         </p>
         <h3 className="mb-0">
           {totalPrice && totalPrice !== '0' ? <>${totalPrice}</> : ''}

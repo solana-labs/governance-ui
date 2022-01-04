@@ -7,26 +7,38 @@ import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { ViewState } from './Types'
 import nftLogo from 'public/img/nft-logo.jpeg'
+import { useEffect, useState } from 'react'
+import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
 }: {
   governedAccountTokenAccount: GovernedTokenAccount
 }) => {
   const connection = useWalletStore((s) => s.connection)
+  const [nftsCount, setNftsCount] = useState(0)
   const {
     setCurrentCompactView,
     setCurrentCompactAccount,
   } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount
-    ? governedAccountTokenAccount.governance?.info.governedAccount
+    ? governedAccountTokenAccount.governance?.pubkey
     : null
 
   async function handleGoToAccountOverview() {
     setCurrentCompactView(ViewState.AccountView)
-    setCurrentCompactAccount(governedAccountTokenAccount, connection)
+    setCurrentCompactAccount(governedAccountTokenAccount, connection, nftsCount)
   }
-
+  useEffect(() => {
+    const getNftsCount = async () => {
+      const nfts = await getParsedNftAccountsByOwner({
+        publicAddress: accountPublicKey,
+        connection: connection.current,
+      })
+      setNftsCount(nfts.length)
+    }
+    getNftsCount()
+  }, [])
   return (
     <div
       onClick={handleGoToAccountOverview}
@@ -54,7 +66,7 @@ const AccountItemNFT = ({
             <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
           </a>
         </div>
-        <div className="text-fgd-3 text-xs flex flex-col">0 NFTS</div>
+        <div className="text-fgd-3 text-xs flex flex-col">{nftsCount} NFTS</div>
       </div>
     </div>
   )
