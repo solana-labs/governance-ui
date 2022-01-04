@@ -35,7 +35,6 @@ import router from 'next/router'
 import { useEffect } from 'react'
 import { CreateFormSchema } from './validators/createRealmValidator'
 import { formValidation, isFormValid } from '@utils/formValidation'
-import { RpcContext } from '@models/core/api'
 import { registerRealm } from 'actions/registerRealm'
 import { MintMaxVoteWeightSource } from '@models/accounts'
 import Switch from '@components/Switch'
@@ -143,17 +142,14 @@ const RealmWizard: React.FC = () => {
       form
     )
     if (isValid) {
-      const rpcContext = new RpcContext(
-        new PublicKey(form.governanceProgramId!),
-        form.programVersion,
-        wallet,
-        connection.current,
-        connection.endpoint
-      )
       try {
         const realmAddress = await registerRealm(
-          rpcContext,
-          rpcContext.programId,
+          {
+            connection,
+            wallet: wallet!,
+            walletPubkey: wallet!.publicKey!,
+          },
+          new PublicKey(form.governanceProgramId!),
           form.programVersion ?? ProgramVersion.V1,
           form.name!,
           form.communityMintId

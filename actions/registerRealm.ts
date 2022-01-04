@@ -13,7 +13,6 @@ import {
   VoteWeightSource,
 } from '../models/accounts'
 import { withCreateRealm } from '../models/withCreateRealm'
-import { RpcContext } from '../models/core/api'
 import { sendTransaction } from '../utils/send'
 import { ProgramVersion } from '@models/registry/constants'
 import {
@@ -25,7 +24,10 @@ import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import { chunks } from '@utils/helpers'
-import { WalletConnectionError } from '@solana/wallet-adapter-base'
+import {
+  SignerWalletAdapter,
+  WalletConnectionError,
+} from '@solana/wallet-adapter-base'
 import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
 import {
   getMintNaturalAmountFromDecimal,
@@ -33,20 +35,22 @@ import {
 } from '@tools/sdk/units'
 import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
 import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
-import {
-  AccountInfo,
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { tryGetTokenAccount } from '@utils/tokens'
+import { AccountInfo } from '@solana/spl-token'
 import { ProgramAccount } from '@project-serum/common'
+import { tryGetAta } from '@utils/validations'
+import { ConnectionContext } from '@utils/connection'
 
 /* 
   TODO: Check if the abstractions present here can be moved to a 
   separate util and replace some of the repeating code over the project
   and reduce the code complexity
 */
+
+interface RegisterRealmRpc {
+  connection: ConnectionContext
+  wallet: SignerWalletAdapter
+  walletPubkey: PublicKey
+}
 
 /**
  * The minimum amount of community tokens to create governance and proposals, for tokens with 0 supply
@@ -57,29 +61,6 @@ export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000
  * The default amount of decimals for the community token
  */
 export const COMMUNITY_MINT_DECIMALS = 6
-
-/**
- * Try to get the associated token account of an owner to a mint id
- * @param connection
- * @param owner
- * @param mint
- */
-async function tryGetAta(
-  connection: Connection,
-  owner: PublicKey,
-  mint: PublicKey
-) {
-  //we do ATA validation
-  const ata = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    mint, // mint
-    owner // owner
-  )
-
-  const tokenAccount = await tryGetTokenAccount(connection, ata)
-  return tokenAccount
-}
 
 /**
  * Prepares the mint instructions
@@ -95,7 +76,7 @@ async function tryGetAta(
  * @param otherOwners
  */
 async function prepareMintInstructions(
-  connection: Connection,
+  connection: ConnectionContext,
   walletPubkey: PublicKey,
   tokenDecimals: number,
   council = false,
@@ -115,7 +96,7 @@ async function prepareMintInstructions(
     _mintPk =
       mintPk ??
       (await withCreateMint(
-        connection,
+        connection.current,
         mintInstructions,
         mintSigners,
         walletPubkey,
@@ -148,7 +129,6 @@ async function prepareMintInstructions(
         if (shouldMint && ataPk) {
           await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
         }
-        console.debug(shouldMint ? 'WOULD MINT' : 'WOULD NOT MINT')
 
         if (ownerPk.equals(walletPubkey)) {
           walletAtaPk = ataPk
@@ -368,7 +348,7 @@ function sendTransactionFactory(
  * @param councilWalletPks Array of wallets of the council/team
  */
 export async function registerRealm(
-  { connection, wallet, walletPubkey }: RpcContext,
+  { connection, wallet, walletPubkey }: RegisterRealmRpc,
   programId: PublicKey,
   programVersion: ProgramVersion,
   name: string,
@@ -486,7 +466,7 @@ export async function registerRealm(
 
   const txnToSend = sendTransactionFactory(
     wallet,
-    connection,
+    connection.current,
     councilMembersChunks,
     councilSignersChunks,
     realmInstructions,
