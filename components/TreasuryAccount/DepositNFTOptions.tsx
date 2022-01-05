@@ -27,7 +27,7 @@ const DepositNFT = () => {
           onClick={() => setCurrentCompactView(ViewState.DepositNFTFromWallet)}
         >
           <Tooltip content={!connected && 'Please connect your wallet'}>
-            <div>I want to deposit NFTS straight from my wallet</div>
+            <div>I want to deposit NFT straight from my wallet</div>
           </Tooltip>
         </Button>
         <Button
