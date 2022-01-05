@@ -1,15 +1,11 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { PhotographIcon } from '@heroicons/react/solid'
 import AccountLabel from './AccountHeader'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import axios from 'axios'
 import { notify } from '@utils/notifications'
-import { CheckCircleIcon } from '@heroicons/react/solid'
 import { web3 } from '@project-serum/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -20,29 +16,21 @@ import { PublicKey } from '@solana/web3.js'
 import { createATA } from '@utils/ataTools'
 import { getTokenAccountsByMint } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
+import NFTSelector, { NftSelectorFunctions } from '@components/Nft/NftSelector'
 
 const DepositNFTFromWallet = () => {
+  const nftRef = useRef<NftSelectorFunctions>(null)
   const { setCurrentCompactAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
   const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
-  const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)
-  const handleSelectNft = (nft: NFTWithMint) => {
-    const isSelected = selectedNfts.find((x) => x.mint === nft.mint)
-    if (isSelected) {
-      setSelectedNfts([...selectedNfts.filter((x) => x.mint !== nft.mint)])
-    } else {
-      //For now only one nft at the time
-      setSelectedNfts([nft])
-    }
-  }
   const handleDeposit = async () => {
     setIsLoading(true)
     setSendingSuccess(false)
@@ -105,69 +93,22 @@ const DepositNFTFromWallet = () => {
     }
     setIsLoading(false)
   }
+
   useEffect(() => {
-    const getAllNftData = async () => {
-      setIsLoading(true)
-      try {
-        const nfts = await getParsedNftAccountsByOwner({
-          publicAddress: wallet?.publicKey,
-          connection: connection.current,
-        })
-        const data = Object.keys(nfts).map((key) => nfts[key])
-        const arr: any[] = []
-        for (let i = 0; i < data.length; i++) {
-          const val = (await axios.get(data[i].data.uri)).data
-          arr.push({ val, mint: data[i].mint })
-        }
-        setNfts(arr)
-      } catch (error) {
-        notify({
-          type: 'error',
-          message: 'Unable to fetch nfts',
-        })
-      }
-      setIsLoading(false)
-    }
-    if (connected || sendingSuccess) {
-      getAllNftData()
-    }
     if (sendingSuccess) {
       const newNftsCount = nftsCount! + 1
       setCurrentCompactAccount(currentAccount!, connection, newNftsCount)
     }
   }, [connected, sendingSuccess])
+
   return (
     <>
       <AccountLabel></AccountLabel>
-      <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
-        {nfts.length ? (
-          <div className="flex flex-row flex-wrap gap-4 mb-4">
-            {nfts.map((x) => (
-              <div
-                onClick={() => handleSelectNft(x)}
-                key={x.mint}
-                className="bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark relative overflow-hidden"
-                style={{
-                  width: '150px',
-                  height: '150px',
-                }}
-              >
-                {selectedNfts.find(
-                  (selectedNfts) => selectedNfts.mint === x.mint
-                ) && (
-                  <CheckCircleIcon className="w-10 h-10 absolute text-green"></CheckCircleIcon>
-                )}
-                <img style={{ width: '150px' }} src={x.val.image} />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <div className="text-fgd-3 flex flex-col items-center">
-            {"Connected wallet don't have any NFTS"}
-            <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
-          </div>
-        )}
-      </div>
+      <NFTSelector
+        ref={nftRef}
+        ownerPk={wallet!.publicKey!}
+        onNftSelect={(selected) => setSelectedNfts(selected)}
+      ></NFTSelector>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <Button
           disabled={!connected || isLoading}

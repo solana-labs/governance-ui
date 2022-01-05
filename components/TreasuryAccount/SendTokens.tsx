@@ -1,6 +1,9 @@
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
-import { getAccountName } from '@components/instructions/tools'
+import {
+  DEFAULT_NFT_TREASURY_MINT,
+  getAccountName,
+} from '@components/instructions/tools'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
@@ -63,6 +66,8 @@ const SendTokens = () => {
 
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
+  const isNFT =
+    currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
@@ -70,8 +75,7 @@ const SendTokens = () => {
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
-    // No default transfer amount
-    amount: undefined,
+    amount: isNFT ? 1 : undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,

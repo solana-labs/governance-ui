@@ -16,7 +16,6 @@ const DepositNFT = () => {
     currentDepositView,
     setCurrentDepositView,
   ] = useState<DepositState | null>(null)
-  console.log(currentDepositView)
   return (
     <>
       <h3 className="mb-4 flex items-center">Deposit NFT</h3>

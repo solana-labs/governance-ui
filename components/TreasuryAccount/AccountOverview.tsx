@@ -108,7 +108,7 @@ const AccountOverview = () => {
               : ''
           }
           className="sm:w-1/2 text-sm py-2.5"
-          onClick={() => (!isNFT ? setOpenCommonSendModal(true) : () => null)}
+          onClick={() => setOpenCommonSendModal(true)}
           disabled={!canUseTransferInstruction}
         >
           Send
