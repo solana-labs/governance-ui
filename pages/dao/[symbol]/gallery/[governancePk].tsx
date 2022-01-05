@@ -7,16 +7,7 @@ import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon } from '@heroicons/react/outline'
-
-interface NFTData {
-  image: string
-  name: string
-  description: string
-}
-interface NFTWithMint {
-  val: NFTData
-  mint: string
-}
+import { NFTWithMint } from '@utils/uiTypes/nfts'
 
 const gallery = () => {
   const router = useRouter()

@@ -4,4 +4,6 @@ export enum ViewState {
   Send,
   Deposit,
   DepositNFT,
+  DepositNFTOptions,
+  DepositNFTFromWallet,
 }

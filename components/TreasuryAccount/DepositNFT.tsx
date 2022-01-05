@@ -11,7 +11,7 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
-import Button, { LinkButton } from '@components/Button'
+import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import { PublicKey } from '@solana/web3.js'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -26,7 +26,10 @@ import { abbreviateAddress } from '@utils/formatting'
 import DepositLabel from './DepositLabel'
 
 const DepositNFT = () => {
-  const { setCurrentCompactView } = useTreasuryAccountStore()
+  const {
+    setCurrentCompactView,
+    resetCompactViewState,
+  } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -35,7 +38,6 @@ const DepositNFT = () => {
   const { realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
-  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const [form, setForm] = useState({
     mint: '',
   })
@@ -48,6 +50,10 @@ const DepositNFT = () => {
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
+  }
+  const handleGoBackToMainView = () => {
+    setCurrentCompactView(ViewState.MainView)
+    resetCompactViewState()
   }
   const handleGenerateATAAddress = async () => {
     setAtaAddress('')
@@ -146,10 +152,10 @@ const DepositNFT = () => {
       <h3 className="mb-4 flex items-center">
         <>
           <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.AccountView)}
+            onClick={() => setCurrentCompactView(ViewState.DepositNFTOptions)}
             className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
           />
-          Deposit {tokenInfo && tokenInfo?.symbol}
+          Deposit
         </>
       </h3>
       <AccountLabel></AccountLabel>
@@ -188,20 +194,8 @@ const DepositNFT = () => {
           )
         )}
       </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-        <Button
-          disabled={isLoading || !imgUrl || !connected}
-          className="sm:w-full"
-          onClick={handleGenerateATAAddress}
-          isLoading={isLoading}
-        >
-          <Tooltip content={!connected && 'Please connect your wallet'}>
-            <div>Generate Address</div>
-          </Tooltip>
-        </Button>
-      </div>
       {ataAddress && (
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-4">
+        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mb-4">
           <div>
             <div className="text-fgd-3 text-xs">
               {abbreviateAddress(new PublicKey(ataAddress))}
@@ -219,6 +213,24 @@ const DepositNFT = () => {
           </div>
         </div>
       )}
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
+        <SecondaryButton
+          className="sm:w-1/2 text-th-fgd-1"
+          onClick={handleGoBackToMainView}
+        >
+          Cancel
+        </SecondaryButton>
+        <Button
+          disabled={isLoading || !imgUrl || !connected}
+          className="sm:w-1/2"
+          onClick={handleGenerateATAAddress}
+          isLoading={isLoading}
+        >
+          <Tooltip content={!connected && 'Please connect your wallet'}>
+            <div>Generate Address</div>
+          </Tooltip>
+        </Button>
+      </div>
     </>
   )
 }

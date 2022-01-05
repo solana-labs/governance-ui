@@ -91,7 +91,7 @@ const AccountOverview = () => {
           className="sm:w-1/2 text-sm"
           onClick={() =>
             setCurrentCompactView(
-              isNFT ? ViewState.DepositNFT : ViewState.Deposit
+              isNFT ? ViewState.DepositNFTOptions : ViewState.Deposit
             )
           }
         >
