@@ -38,7 +38,7 @@ const NFTSCompactWrapper = () => {
     }
     getAllNftData()
   }, [nftsGovernedTokenAccounts.length])
-  return (
+  return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <>
         <h3 className="mb-4 flex items-center">
@@ -88,7 +88,7 @@ const NFTSCompactWrapper = () => {
         </div>
       </>
     </div>
-  )
+  ) : null
 }
 
 export default NFTSCompactWrapper
