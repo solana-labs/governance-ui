@@ -6,7 +6,6 @@ import {
   ProposalInstruction,
 } from '../../models/accounts'
 import {
-  DEFAULT_NFT_TREASURY_MINT,
   getAccountName,
   getInstructionDescriptor,
   InstructionDescriptor,
@@ -106,14 +105,16 @@ export default function InstructionCard({
       <div className="flex items-center justify-between mb-2">
         <div className="font-bold text-sm">Data</div>
       </div>
-      <InstructionData descriptor={descriptor}></InstructionData>
-      {nftImgUrl && (
+
+      {nftImgUrl ? (
         <div
           style={{ width: '150px', height: '150px' }}
           className="flex items-center overflow-hidden"
         >
           <img src={nftImgUrl}></img>
         </div>
+      ) : (
+        <InstructionData descriptor={descriptor}></InstructionData>
       )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton
