@@ -143,7 +143,6 @@ export async function getInstructionDescriptor(
   }
 
   const descriptor = descriptors && descriptors[instruction.data[0]]
-
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,

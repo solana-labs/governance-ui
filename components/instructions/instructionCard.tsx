@@ -6,6 +6,7 @@ import {
   ProposalInstruction,
 } from '../../models/accounts'
 import {
+  DEFAULT_NFT_TREASURY_MINT,
   getAccountName,
   getInstructionDescriptor,
   InstructionDescriptor,
@@ -19,6 +20,10 @@ import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
 import { ParsedAccount } from '@models/core/accounts'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import axios from 'axios'
+import { notify } from '@utils/notifications'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 export default function InstructionCard({
   index,
@@ -29,21 +34,54 @@ export default function InstructionCard({
   proposal: ParsedAccount<Proposal>
   proposalInstruction: ParsedAccount<ProposalInstruction>
 }) {
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [playing, setPlaying] = useState(
     proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed
   )
+  const [nftImgUrl, setImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
       proposalInstruction.info.instruction
     ).then((d) => setDescriptor(d))
+    const handleFetchNft = async () => {
+      const sourcePk = proposalInstruction.info.instruction.accounts[0].pubkey
+      const tokenAccount = await tryGetTokenAccount(
+        connection.current,
+        sourcePk
+      )
+      const isNFTAccount = nftsGovernedTokenAccounts.find(
+        (x) =>
+          x.governance?.pubkey.toBase58() ===
+          tokenAccount?.account.owner.toBase58()
+      )
+      if (isNFTAccount) {
+        const mint = tokenAccount?.account.mint
+        if (mint) {
+          try {
+            const metadataPDA = await Metadata.getPDA(mint)
+            const tokenMetadata = await Metadata.load(
+              connection.current,
+              metadataPDA
+            )
+            const url = (await axios.get(tokenMetadata.data.data.uri)).data
+            setImgUrl(url.image)
+          } catch (e) {
+            notify({
+              type: 'error',
+              message: 'Unable to fetch nft',
+            })
+          }
+        }
+      }
+    }
+    handleFetchNft()
   }, [proposalInstruction])
 
   const proposalAuthority = tokenRecords[proposal.account.owner.toBase58()]
-
   return (
     <div className="break-all">
       <h3 className="mb-4">
@@ -69,7 +107,14 @@ export default function InstructionCard({
         <div className="font-bold text-sm">Data</div>
       </div>
       <InstructionData descriptor={descriptor}></InstructionData>
-
+      {nftImgUrl && (
+        <div
+          style={{ width: '150px', height: '150px' }}
+          className="flex items-center overflow-hidden"
+        >
+          <img src={nftImgUrl}></img>
+        </div>
+      )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton
           instructionData={proposalInstruction.info.instruction}
