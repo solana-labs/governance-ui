@@ -49,6 +49,7 @@ import MintTokensIcon from '@components/MintTokensIcon'
 import TreasuryPaymentForm from '@components/TreasuryAccount/TreasuryPaymentForm'
 import Links from '@components/LinksCompactWrapper'
 import AddMember from '@components/Members/AddMember'
+import AddMemberForm from '@components/Members/AddMemberForm'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -396,7 +397,7 @@ const New = () => {
       case Instructions.MangoMakeChangeMaxAccounts:
         return <MakeChangeMaxAccounts index={idx} governance={governance} />
       case Instructions.AddMemberForm:
-        return <AddMember />
+        return <AddMemberForm close={null} />
       case Instructions.TreasuryPaymentForm:
         return <TreasuryPaymentForm close={null} />
       default:
