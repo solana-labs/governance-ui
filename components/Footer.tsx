@@ -8,8 +8,8 @@ const Footer = () => {
   if (REALM) return null
   else
     return (
-      <div className="flex justify-around bottom-0 bg-bkg-1  w-full absolute left-0 h-20 px-12 border-t border-primary-light">
-        <div className="flex justify-center items-center gap-x-6">
+      <div className="flex flex-row h-20   justify-around bottom-0 bg-bkg-1 gap-y-8 md:gap-y-0 w-full absolute left-0  px-12 border-t border-primary-light">
+        <div className="flex justify-center  items-center gap-x-5   md:gap-x-6  ">
           <a
             rel="noreferrer"
             href="https://docs.realms.today/"
@@ -18,18 +18,19 @@ const Footer = () => {
           >
             Docs
           </a>
-
-          <a
-            rel="noreferrer"
-            href="https://github.com/solana-labs/solana-program-library/blob/master/governance/README.md"
-            target="_blank"
-            className="text-white text-base font-light hover:text-primary-dark transition-all duration-200"
-          >
-            Programs Github
-          </a>
+          <div className=" justify-center  hidden md:flex  items-center gap-x-8 py-2 ">
+            <a
+              rel="noreferrer"
+              href="https://github.com/solana-labs/solana-program-library/blob/master/governance/README.md"
+              target="_blank"
+              className="text-white    text-base font-light hover:text-primary-dark transition-all duration-200"
+            >
+              Programs Github
+            </a>
+          </div>
         </div>
 
-        <div className="flex justify-center items-center gap-x-24">
+        <div className="flex justify-center items-center gap-x-10 sm:gap-x-20 md:gap-x-24">
           <a
             rel="noreferrer"
             target="_blank"
@@ -58,8 +59,8 @@ const Footer = () => {
           </a>
         </div>
 
-        <div className="flex justify-center items-center gap-x-1">
-          <p className="text-white text-base font-light cursor-default">
+        <div className=" justify-center items-center gap-x-1   hidden md:flex ">
+          <p className="text-white text-base font-light cursor-default ">
             Powered by
           </p>
 
