@@ -17,6 +17,7 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
 }
+
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
@@ -25,7 +26,7 @@ export interface SplTokenTransferForm {
   mintInfo: MintInfo | undefined
 }
 
-export interface SendTokenCompactViewForm extends SplTokenTransferForm {
+export interface TreasuryPaymentForm extends SplTokenTransferForm {
   description: string
   title: string
 }
@@ -35,6 +36,11 @@ export interface MintForm {
   amount: number | undefined
   mintAccount: GovernedMintInfoAccount | undefined
   programId: string | undefined
+}
+
+export interface AddMemberForm extends MintForm {
+  description: string
+  title: string
 }
 
 export interface ProgramUpgradeForm {
@@ -67,6 +73,8 @@ export enum Instructions {
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  AddMemberForm,
+  TreasuryPaymentForm,
 }
 
 export type createParams = [

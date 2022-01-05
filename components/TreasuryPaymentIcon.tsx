@@ -27,8 +27,8 @@ const TreasuryPaymentIcon = ({ color = '#E1CE7A', className }) => {
       <path
         d="M38.5988 16.8658C38.7777 16.111 38.8681 15.3366 38.9978 14.572V14.5704C38.9978 14.0265 38.9978 13.4826 38.9939 12.9386C38.9762 12.8679 38.9467 12.7971 38.9408 12.7244C38.7285 10.2497 37.901 8.00704 36.3816 6.03755C34.1389 3.12852 31.1749 1.43617 27.5268 1.07254C23.4738 0.667633 19.9692 1.96294 17.0798 4.83069C12.9816 8.89744 8.90506 12.9917 4.82652 17.0801C2.64475 19.2658 1.35141 21.8957 1.06247 24.9777C0.744049 28.3879 1.64231 31.4739 3.77101 34.1667C5.50857 36.3661 7.75127 37.8462 10.4736 38.5479C11.2814 38.7563 12.1188 38.8526 12.9423 39H14.5757C14.6465 38.9803 14.7153 38.9528 14.788 38.9469C17.9584 38.6796 20.6591 37.3981 22.9057 35.1593C23.324 34.7422 23.8662 34.2652 24.2843 33.848L23.2062 32.7338L21.8443 34.094C19.6134 36.3229 16.9147 37.459 13.4887 37.5042C8.78319 37.4983 4.30171 34.204 2.96906 29.4218C1.77597 25.1408 2.76858 21.3296 5.88989 18.1572C9.94091 14.0393 14.0489 9.97456 18.1373 5.89209C20.3505 3.68084 23.0296 2.4956 26.1509 2.49954C29.8501 2.5015 32.8908 3.9855 35.165 6.92205C36.9831 9.265 37.7084 11.9539 37.4273 14.8924C37.3126 16.0899 37.0246 17.2099 36.5728 18.253H38.1822C38.3465 17.8047 38.4857 17.3425 38.5988 16.8658Z"
         stroke={color}
-        stroke-width="1.2"
-        stroke-linejoin="round"
+        strokeWidth="1.2"
+        strokeLinejoin="round"
         mask="url(#path-1-outside-1_1732_6112)"
       />
       <path
@@ -50,30 +50,30 @@ const TreasuryPaymentIcon = ({ color = '#E1CE7A', className }) => {
       <path
         d="M29.5 32.6667L24.75 27.9167L29.5 23.1667"
         stroke={color}
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M40.5833 27.9167L24.75 27.9167"
         stroke={color}
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M45.3332 27.9167L50.0833 23.1667L45.3332 18.4167"
         stroke={color}
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M34.2499 23.1667L50.0833 23.1667"
         stroke={color}
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )

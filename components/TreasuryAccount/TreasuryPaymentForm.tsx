@@ -25,7 +25,7 @@ import { precision } from '@utils/formatting'
 import { getTokenTransferSchema } from '@utils/validations'
 import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
-  SendTokenCompactViewForm,
+  TreasuryPaymentForm as TypeTreasuryPaymentForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -63,7 +63,7 @@ const TreasuryPaymentForm = ({ close }) => {
   const router = useRouter()
   const programId: PublicKey | undefined = realmInfo?.programId
 
-  const [form, setForm] = useState<SendTokenCompactViewForm>({
+  const [form, setForm] = useState<TypeTreasuryPaymentForm>({
     destinationAccount: '',
     amount: 0,
     governedTokenAccount: undefined,

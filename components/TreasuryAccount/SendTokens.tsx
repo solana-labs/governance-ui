@@ -14,7 +14,7 @@ import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
 import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
-  SendTokenCompactViewForm,
+  TreasuryPaymentForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import React, { useEffect, useState } from 'react'
@@ -73,7 +73,7 @@ const SendTokens = () => {
   const router = useRouter()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<SendTokenCompactViewForm>({
+  const [form, setForm] = useState<TreasuryPaymentForm>({
     destinationAccount: '',
     // No default transfer amount
     amount: undefined,

@@ -16,7 +16,11 @@ import { precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
 import { useEffect, useState } from 'react'
-import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
+import {
+  AddMemberForm,
+  MintForm,
+  UiInstruction,
+} from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getInstructionDataFromBase64 } from 'models/serialisation'
 import { RpcContext } from 'models/core/api'
@@ -27,11 +31,6 @@ import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
-
-interface AddMemberForm extends MintForm {
-  description: string
-  title: string
-}
 
 //Can add only council members for now
 const AddMember = () => {
