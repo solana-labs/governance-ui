@@ -22,7 +22,7 @@ const MembersCompactWrapper = () => {
   const { members, activeMembers } = useMembers()
   const connected = useWalletStore((s) => s.connected)
   const activeMembersCount = activeMembers.length
-  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
+  const { resetCompactViewState } = useMembersListStore()
   const {
     canUseMintInstruction,
     canMintRealmCouncilToken,

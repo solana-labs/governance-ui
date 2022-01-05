@@ -20,7 +20,6 @@ import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
-import { ellipsis } from '@utils/helpers'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
