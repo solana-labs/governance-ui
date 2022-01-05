@@ -50,7 +50,7 @@ import {
   getTransferNftInstruction,
 } from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import NFTSelector from '@components/NFT/NFTSelector'
+import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 
 const SendTokens = () => {
@@ -152,7 +152,7 @@ const SendTokens = () => {
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    const selectedNftMint = selectedNfts[0].mint
+    const selectedNftMint = selectedNfts[0]?.mint
     const defaultProps = {
       schema,
       form,

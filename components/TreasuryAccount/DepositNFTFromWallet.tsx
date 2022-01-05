@@ -16,7 +16,7 @@ import { PublicKey } from '@solana/web3.js'
 import { createATA } from '@utils/ataTools'
 import { getTokenAccountsByMint } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
-import NFTSelector, { NftSelectorFunctions } from '@components/NFT/NFTSelector'
+import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
 
 const DepositNFTFromWallet = () => {
   const nftSelectorRef = useRef<NftSelectorFunctions>(null)

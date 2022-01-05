@@ -122,7 +122,6 @@ export async function getTransferNftInstruction({
   setFormErrors: any
   nftMint: string
 }): Promise<UiInstruction> {
-  console.log(form.governedTokenAccount)
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []

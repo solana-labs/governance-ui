@@ -175,7 +175,6 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           const isNft =
             form.governedTokenAccount.token?.account.mint?.toBase58() ===
             DEFAULT_NFT_TREASURY_MINT
-          console.log(form.governedTokenAccount.token)
           if (isNft) {
             return true
           }
