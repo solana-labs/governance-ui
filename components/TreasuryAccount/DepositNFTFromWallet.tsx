@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { ViewState } from './Types'
-import { ArrowLeftIcon, PhotographIcon } from '@heroicons/react/solid'
+import { PhotographIcon } from '@heroicons/react/solid'
 import AccountLabel from './AccountHeader'
 import useWalletStore from 'stores/useWalletStore'
-import Button, { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
@@ -23,11 +22,7 @@ import { getTokenAccountsByMint } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
 
 const DepositNFTFromWallet = () => {
-  const {
-    setCurrentCompactView,
-    resetCompactViewState,
-    setCurrentCompactAccount,
-  } = useTreasuryAccountStore()
+  const { setCurrentCompactAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -39,10 +34,6 @@ const DepositNFTFromWallet = () => {
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)
-  const handleGoBackToMainView = () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
   const handleSelectNft = (nft: NFTWithMint) => {
     const isSelected = selectedNfts.find((x) => x.mint === nft.mint)
     if (isSelected) {
@@ -147,15 +138,6 @@ const DepositNFTFromWallet = () => {
   }, [connected, sendingSuccess])
   return (
     <>
-      <h3 className="mb-4 flex items-center">
-        <>
-          <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.DepositNFTOptions)}
-            className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
-          />
-          Deposit
-        </>
-      </h3>
       <AccountLabel></AccountLabel>
       <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
         {nfts.length ? (
@@ -187,15 +169,9 @@ const DepositNFTFromWallet = () => {
         )}
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-        <SecondaryButton
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
-        >
-          Cancel
-        </SecondaryButton>
         <Button
           disabled={!connected || isLoading}
-          className="sm:w-1/2"
+          className="sm:w-1/2 ml-auto"
           onClick={handleDeposit}
           isLoading={isLoading}
         >

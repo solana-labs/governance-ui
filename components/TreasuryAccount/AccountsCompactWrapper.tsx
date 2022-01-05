@@ -5,16 +5,13 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
-import SendTokens from './SendTokens'
 import DepositTokens from './DepositTokens'
 import { PlusIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
-import DepositNFT from './DepositNFT'
-import DepositNFTOptions from './DepositNFTOptions'
-import DepositNFTFromWallet from './DepositNFTFromWallet'
+
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const AccountsCompactWrapper = () => {
@@ -84,16 +81,8 @@ const AccountsCompactWrapper = () => {
         )
       case ViewState.AccountView:
         return <AccountOverview></AccountOverview>
-      case ViewState.Send:
-        return <SendTokens></SendTokens>
       case ViewState.Deposit:
         return <DepositTokens></DepositTokens>
-      case ViewState.DepositNFT:
-        return <DepositNFT></DepositNFT>
-      case ViewState.DepositNFTOptions:
-        return <DepositNFTOptions></DepositNFTOptions>
-      case ViewState.DepositNFTFromWallet:
-        return <DepositNFTFromWallet></DepositNFTFromWallet>
     }
   }
 

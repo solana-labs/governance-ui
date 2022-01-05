@@ -4,6 +4,7 @@ import {
   DEFAULT_NFT_TREASURY_MINT,
   getAccountName,
 } from '@components/instructions/tools'
+import Modal from '@components/Modal'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -12,11 +13,13 @@ import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import AccountHeader from './AccountHeader'
+import DepositNFT from './DepositNFT'
 import { ViewState } from './Types'
+import SendTokens from './SendTokens'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -32,7 +35,8 @@ const AccountOverview = () => {
   const recentActivity = useTreasuryAccountStore(
     (s) => s.compact.recentActivity
   )
-
+  const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+  const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const {
     setCurrentCompactView,
     resetCompactViewState,
@@ -90,28 +94,25 @@ const AccountOverview = () => {
         <Button
           className="sm:w-1/2 text-sm"
           onClick={() =>
-            setCurrentCompactView(
-              isNFT ? ViewState.DepositNFTOptions : ViewState.Deposit
-            )
+            isNFT
+              ? setOpenNftDepositModal(true)
+              : setCurrentCompactView(ViewState.Deposit)
           }
         >
           Deposit
         </Button>
-
-        {!isNFT && (
-          <Button
-            tooltipMessage={
-              !canUseTransferInstruction
-                ? 'You need to have connected wallet with ability to create token transfer proposals'
-                : ''
-            }
-            className="sm:w-1/2 text-sm py-2.5"
-            onClick={() => setCurrentCompactView(ViewState.Send)}
-            disabled={!canUseTransferInstruction}
-          >
-            Send
-          </Button>
-        )}
+        <Button
+          tooltipMessage={
+            !canUseTransferInstruction
+              ? 'You need to have connected wallet with ability to create token transfer proposals'
+              : ''
+          }
+          className="sm:w-1/2 text-sm py-2.5"
+          onClick={() => (!isNFT ? setOpenCommonSendModal(true) : () => null)}
+          disabled={!canUseTransferInstruction}
+        >
+          Send
+        </Button>
       </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
         Recent activity
@@ -138,6 +139,28 @@ const AccountOverview = () => {
           </a>
         ))}
       </div>
+      {openNftDepositModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenNftDepositModal(false)
+          }}
+          isOpen={openNftDepositModal}
+        >
+          <DepositNFT></DepositNFT>
+        </Modal>
+      )}
+      {openCommonSendModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenCommonSendModal(false)
+          }}
+          isOpen={openCommonSendModal}
+        >
+          <SendTokens></SendTokens>
+        </Modal>
+      )}
     </>
   )
 }

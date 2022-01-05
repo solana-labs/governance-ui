@@ -3,6 +3,7 @@ import {
   DEFAULT_NFT_TREASURY_MINT,
   getAccountName,
 } from '@components/instructions/tools'
+import { DuplicateIcon } from '@heroicons/react/outline'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
 import { GovernedTokenAccount } from '@utils/tokens'
@@ -37,7 +38,7 @@ const DepositLabel = ({
             navigator.clipboard.writeText(address!.toBase58())
           }}
         >
-          Copy
+          <DuplicateIcon className="w-5 h-5 mt-1" />
         </LinkButton>
       </div>
     </div>
