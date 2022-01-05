@@ -74,11 +74,7 @@ const AddMemberForm = ({ close }) => {
 
   const currentPrecision = precision(mintMinAmount)
 
-  const proposalTitle = `Add council member ${ellipsis(
-    String(form.destinationAccount),
-    4,
-    6
-  )}`
+  const proposalTitle = `Add council member ${form.destinationAccount}`
 
   const setAmount = (event) => {
     const value = event.target.value
@@ -272,7 +268,7 @@ const AddMemberForm = ({ close }) => {
             wrapperClassName="mb-6"
             label="Title of your proposal"
             placeholder="Title of your proposal"
-            value={form.title}
+            value={form.title ? form.title : proposalTitle}
             type="text"
             onChange={(event) =>
               handleSetForm({
