@@ -45,8 +45,13 @@ import Textarea from '@components/inputs/Textarea'
 import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getTransferInstruction } from '@utils/instructionTools'
+import {
+  getTransferInstruction,
+  getTransferNftInstruction,
+} from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
+import NFTSelector from '@components/NFT/NFTSelector'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
 
 const SendTokens = () => {
   const { resetCompactViewState } = useTreasuryAccountStore()
@@ -82,6 +87,7 @@ const SendTokens = () => {
     title: '',
     description: '',
   })
+  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [
@@ -146,7 +152,8 @@ const SendTokens = () => {
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    return getTransferInstruction({
+    const selectedNftMint = selectedNfts[0].mint
+    const defaultProps = {
       schema,
       form,
       programId,
@@ -154,7 +161,13 @@ const SendTokens = () => {
       wallet,
       currentAccount,
       setFormErrors,
-    })
+    }
+    return isNFT
+      ? getTransferNftInstruction({
+          ...defaultProps,
+          nftMint: selectedNftMint,
+        })
+      : getTransferInstruction(defaultProps)
   }
   const handlePropose = async () => {
     setIsLoading(true)
@@ -273,9 +286,13 @@ const SendTokens = () => {
 
   const schema = getTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const proposalTitle = `Pay ${form.amount}${
-    tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
-  }to ${form.destinationAccount}`
+  const nftTitle = `Send NFT to ${form.destinationAccount}`
+  const proposalTitle = isNFT
+    ? nftTitle
+    : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
+        form.destinationAccount
+      }`
+  console.log(form)
   return (
     <>
       <h3 className="mb-4 flex items-center">
@@ -310,17 +327,24 @@ const SendTokens = () => {
             <div className="text-xs break-all">{destinationAccountName}</div>
           </div>
         )}
-        <Input
-          min={mintMinAmount}
-          label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
-          value={form.amount}
-          type="number"
-          onChange={setAmount}
-          step={mintMinAmount}
-          error={formErrors['amount']}
-          onBlur={validateAmountOnBlur}
-          noMaxWidth={true}
-        />
+        {isNFT ? (
+          <NFTSelector
+            onNftSelect={(nfts) => setSelectedNfts(nfts)}
+            ownerPk={currentAccount.governance!.pubkey}
+          ></NFTSelector>
+        ) : (
+          <Input
+            min={mintMinAmount}
+            label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
+            value={form.amount}
+            type="number"
+            onChange={setAmount}
+            step={mintMinAmount}
+            error={formErrors['amount']}
+            onBlur={validateAmountOnBlur}
+            noMaxWidth={true}
+          />
+        )}
         <small className="text-red">
           {transactionDolarAmount
             ? IsAmountNotHigherThenBalance()
@@ -400,7 +424,11 @@ const SendTokens = () => {
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <Button
-          disabled={!canUseTransferInstruction || isLoading}
+          disabled={
+            !canUseTransferInstruction ||
+            isLoading ||
+            (isNFT && !selectedNfts.length)
+          }
           className="sm:w-1/2 ml-auto"
           onClick={handlePropose}
           isLoading={isLoading}
