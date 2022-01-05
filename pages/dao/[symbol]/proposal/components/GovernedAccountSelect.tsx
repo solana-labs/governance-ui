@@ -17,6 +17,8 @@ const GovernedAccountSelect = ({
   shouldBeGoverned,
   governance,
   label,
+  useDefaultStyle = true,
+  className = '',
 }: {
   onChange
   value
@@ -25,6 +27,8 @@ const GovernedAccountSelect = ({
   shouldBeGoverned
   governance: ParsedAccount<Governance> | null | undefined
   label
+  useDefaultStyle?: boolean
+  className?: string
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
@@ -109,6 +113,11 @@ const GovernedAccountSelect = ({
   }, [JSON.stringify(governedAccounts)])
   return (
     <Select
+      useDefaultStyle={useDefaultStyle}
+      className={
+        className ||
+        'p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none'
+      }
       label={label}
       onChange={onChange}
       componentLabel={getLabel(value)}

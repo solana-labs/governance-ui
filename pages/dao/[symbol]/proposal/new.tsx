@@ -50,6 +50,8 @@ import TreasuryPaymentForm from '@components/TreasuryAccount/TreasuryPaymentForm
 import Links from '@components/LinksCompactWrapper'
 import AddMember from '@components/Members/AddMember'
 import AddMemberForm from '@components/Members/AddMemberForm'
+import UpgradeProgramForm from '@components/AssetsList/UpgradeProgram'
+import UpgradeProgramNewForm from '@components/AssetsList/UpgradeProgramForm'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -387,7 +389,13 @@ const New = () => {
       case Instructions.Transfer:
         return <TreasuryPaymentForm close={null} />
       case Instructions.ProgramUpgrade:
-        return <ProgramUpgrade index={idx} governance={governance} />
+        return (
+          <UpgradeProgramNewForm
+            close={null}
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance} />
       case Instructions.Base64:
@@ -407,7 +415,7 @@ const New = () => {
 
   const StepTwo = () => {
     return (
-      <div className="w-full max-w-xl mt-16 rounded-xl">
+      <div className="w-full max-w-xl mt-8 rounded-xl">
         {selectedType.idx > -1 &&
           getCurrentInstruction({
             typeId: selectedType.idx,

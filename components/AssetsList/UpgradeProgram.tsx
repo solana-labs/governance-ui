@@ -36,12 +36,12 @@ import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/create
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 
-interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
+interface UpgradeProgramFormCompactForm extends ProgramUpgradeForm {
   description: string
   title: string
 }
 
-const UpgradeProgram = () => {
+const UpgradeProgramForm = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -62,7 +62,7 @@ const UpgradeProgram = () => {
     mint,
   } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<UpgradeProgramCompactForm>({
+  const [form, setForm] = useState<UpgradeProgramFormCompactForm>({
     governedAccount: governedAccount,
     programId: programId?.toString(),
     bufferAddress: '',
@@ -338,4 +338,4 @@ const UpgradeProgram = () => {
   )
 }
 
-export default UpgradeProgram
+export default UpgradeProgramForm

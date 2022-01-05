@@ -236,16 +236,20 @@ const AddMemberForm = ({ close }) => {
 
   return (
     <>
-      <div className="flex justify-start items-center gap-x-3">
-        <AddMemberIcon className="w-8 mb-2" />
+      {close && (
+        <div className="flex justify-start items-center gap-x-3">
+          <AddMemberIcon className="w-8 mb-2" />
 
-        <h2 className="text-xl">Add new member to {realmInfo?.displayName}</h2>
-      </div>
+          <h2 className="text-xl">
+            Add new member to {realmInfo?.displayName}
+          </h2>
+        </div>
+      )}
 
       <Input
         useDefaultStyle={false}
         className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-        wrapperClassName="my-6"
+        wrapperClassName={`${close ? 'mt-0 mb-6' : 'my-6'}`}
         label="Member's wallet"
         placeholder="Member's wallet"
         value={form.destinationAccount}
@@ -334,14 +338,20 @@ const AddMemberForm = ({ close }) => {
         </>
       )}
 
-      <div className="flex gap-x-6 justify-start items-center mt-8">
-        <SecondaryButton
-          disabled={isLoading}
-          className="w-44"
-          onClick={() => close()}
-        >
-          Cancel
-        </SecondaryButton>
+      <div
+        className={`${
+          close ? 'justify-start' : 'justify-center'
+        } flex gap-x-6 items-center mt-8`}
+      >
+        {close && (
+          <SecondaryButton
+            disabled={isLoading}
+            className="w-44"
+            onClick={() => close()}
+          >
+            Cancel
+          </SecondaryButton>
+        )}
 
         <Button
           disabled={!form.destinationAccount}
