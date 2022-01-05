@@ -15,7 +15,7 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 
 export interface NftSelectorFunctions {
-  someExposedProperty: () => void
+  getNfts: () => void
 }
 
 function NFTSelector(
@@ -63,12 +63,8 @@ function NFTSelector(
     }
     setIsLoading(false)
   }
-  console.log(ref)
-  console.log('123123')
   useImperativeHandle(ref, () => ({
-    someExposedProperty: () => {
-      console.log(`we're inside the exposed property function!`)
-    },
+    getNfts,
   }))
 
   useEffect(() => {

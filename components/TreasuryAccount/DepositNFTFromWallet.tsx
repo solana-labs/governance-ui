@@ -19,7 +19,7 @@ import { sendTransaction } from '@utils/send'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFT/NFTSelector'
 
 const DepositNFTFromWallet = () => {
-  const nftRef = useRef<NftSelectorFunctions>(null)
+  const nftSelectorRef = useRef<NftSelectorFunctions>(null)
   const { setCurrentCompactAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
@@ -85,6 +85,7 @@ const DepositNFTFromWallet = () => {
         successMessage: 'NFT has been deposited',
       })
       setSendingSuccess(true)
+      nftSelectorRef.current?.getNfts()
     } catch (e) {
       notify({
         type: 'error',
@@ -105,7 +106,7 @@ const DepositNFTFromWallet = () => {
     <>
       <AccountLabel></AccountLabel>
       <NFTSelector
-        ref={nftRef}
+        ref={nftSelectorRef}
         ownerPk={wallet!.publicKey!}
         onNftSelect={(selected) => setSelectedNfts(selected)}
       ></NFTSelector>
