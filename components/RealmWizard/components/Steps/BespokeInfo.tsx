@@ -15,7 +15,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
     <>
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Realm summary</h1>
+          <h1>DAO summary</h1>
         </div>
       </div>
       <div>
