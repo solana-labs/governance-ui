@@ -95,7 +95,9 @@ const AccountsCompactWrapper = () => {
     resetCompactViewState()
   }, [symbol])
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
+      {getCurrentView()}
+    </div>
   )
 }
 

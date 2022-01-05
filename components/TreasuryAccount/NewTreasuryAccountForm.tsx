@@ -208,7 +208,7 @@ const NewAccountForm = () => {
         </div>
       </div>
       <div className="text-sm mb-3">
-        <div className="mb-2">NFT account</div>
+        <div className="mb-2">NFT Treasury</div>
         <div className="flex flex-row text-xs items-center">
           <Switch checked={isNFT} onChange={() => setIsNFT(!isNFT)} />
         </div>

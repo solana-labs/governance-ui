@@ -26,11 +26,7 @@ const DepositLabel = ({
             <div className="text-sm text-th-fgd-1">
               {getAccountName(currentAccount.token?.publicKey)}
             </div>
-          ) : (
-            <div className="text-xs text-th-fgd-1">
-              {abbreviateAddress(address as PublicKey)}
-            </div>
-          )}
+          ) : null}
         </div>
         {abbreviateAddress(address as PublicKey)}
       </div>

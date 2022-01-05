@@ -51,7 +51,7 @@ const gallery = () => {
   }, [governancePk, connection.endpoint])
   return (
     <div className="grid grid-cols-12">
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-12 lg:col-span-8 space-y-3">
+      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
         <PreviousRouteBtn />
         {nfts.length ? (
           <div className="flex flex-row flex-wrap gap-4">
@@ -76,7 +76,7 @@ const gallery = () => {
           </div>
         ) : (
           <div className="text-fgd-3 flex flex-col items-center">
-            No NFTS stored
+            There are no NFTs in the treasury
             <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
           </div>
         )}

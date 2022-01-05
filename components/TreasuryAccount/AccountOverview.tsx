@@ -1,11 +1,10 @@
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import {
   DEFAULT_NFT_TREASURY_MINT,
   getAccountName,
 } from '@components/instructions/tools'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
-import { PhotographIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -68,15 +67,17 @@ const AccountOverview = () => {
             </div>
           )}
           {isNFT && (
-            <PhotographIcon
-              className="h-4 w-4 text-primary-light mr-2 hover:cursor-pointer ml-auto"
+            <SecondaryButton
+              className="ml-auto text-xs"
               onClick={() => {
                 const url = fmtUrlWithCluster(
                   `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
                 )
                 router.push(url)
               }}
-            ></PhotographIcon>
+            >
+              See all
+            </SecondaryButton>
           )}
         </>
       </h3>

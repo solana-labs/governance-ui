@@ -156,7 +156,7 @@ const DepositNFT = () => {
       <DepositLabel currentAccount={currentAccount}></DepositLabel>
       <div className="space-y-4 w-full pb-4">
         <div className="text-sm mt-4">
-          <div className="flex flex-row text-xs items-center">
+          <div className="flex flex-row text-xs items-center border border-fgd-4 default-transition rounded-lg px-4 py-2">
             {
               "If your wallet doesn't support sending nfts to shared wallets please generate address using the nft mint"
             }
