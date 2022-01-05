@@ -35,7 +35,6 @@ export default function InstructionCard({
   const [playing, setPlaying] = useState(
     proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed
   )
-
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,

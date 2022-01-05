@@ -19,6 +19,11 @@ import { chunks } from './helpers'
 import { getAccountName } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import tokenService from './services/token'
+import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
+import axios from 'axios'
+import { notify } from './notifications'
+import { ConnectionContext } from './connection'
+import { NFTWithMint } from './uiTypes/nfts'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -346,4 +351,29 @@ export const deserializeMint = (data: Buffer) => {
   }
 
   return mintInfo as MintInfo
+}
+
+export const getNfts = async (
+  connection: ConnectionContext,
+  ownerPk: PublicKey
+) => {
+  try {
+    const nfts = await getParsedNftAccountsByOwner({
+      publicAddress: ownerPk,
+      connection: connection.current,
+    })
+    const data = Object.keys(nfts).map((key) => nfts[key])
+    const arr: NFTWithMint[] = []
+    for (let i = 0; i < data.length; i++) {
+      const val = (await axios.get(data[i].data.uri)).data
+      arr.push({ val, mint: data[i].mint })
+    }
+    return arr
+  } catch (error) {
+    notify({
+      type: 'error',
+      message: 'Unable to fetch nfts',
+    })
+  }
+  return []
 }

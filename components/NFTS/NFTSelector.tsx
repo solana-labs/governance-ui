@@ -6,16 +6,14 @@ import React, {
 } from 'react'
 import { PhotographIcon } from '@heroicons/react/solid'
 import useWalletStore from 'stores/useWalletStore'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import axios from 'axios'
-import { notify } from '@utils/notifications'
 import { CheckCircleIcon } from '@heroicons/react/solid'
 import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
+import { getNfts } from '@utils/tokens'
 
 export interface NftSelectorFunctions {
-  getNfts: () => void
+  handleGetNfts: () => void
 }
 
 function NFTSelector(
@@ -41,35 +39,19 @@ function NFTSelector(
       setSelectedNfts([nft])
     }
   }
-  const getNfts = async () => {
+  const handleGetNfts = async () => {
     setIsLoading(true)
-    try {
-      const nfts = await getParsedNftAccountsByOwner({
-        publicAddress: ownerPk,
-        connection: connection.current,
-      })
-      const data = Object.keys(nfts).map((key) => nfts[key])
-      const arr: any[] = []
-      for (let i = 0; i < data.length; i++) {
-        const val = (await axios.get(data[i].data.uri)).data
-        arr.push({ val, mint: data[i].mint })
-      }
-      setNfts(arr)
-    } catch (error) {
-      notify({
-        type: 'error',
-        message: 'Unable to fetch nfts',
-      })
-    }
+    const nfts = await getNfts(connection, ownerPk)
+    setNfts(nfts)
     setIsLoading(false)
   }
   useImperativeHandle(ref, () => ({
-    getNfts,
+    handleGetNfts,
   }))
 
   useEffect(() => {
     if (ownerPk) {
-      getNfts()
+      handleGetNfts()
     }
   }, [ownerPk])
   useEffect(() => {

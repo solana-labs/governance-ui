@@ -1,4 +1,4 @@
-import Button, { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import {
   DEFAULT_NFT_TREASURY_MINT,
@@ -7,12 +7,9 @@ import {
 import Modal from '@components/Modal'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
-import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -22,12 +19,9 @@ import { ViewState } from './Types'
 import SendTokens from './SendTokens'
 
 const AccountOverview = () => {
-  const router = useRouter()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
-  const { symbol } = useRealm()
-  const { fmtUrlWithCluster } = useQueryContext()
   const isNFT =
     currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -69,19 +63,6 @@ const AccountOverview = () => {
             <div className="text-xs text-th-fgd-1">
               {abbreviateAddress(accountPublicKey as PublicKey)}
             </div>
-          )}
-          {isNFT && (
-            <SecondaryButton
-              className="ml-auto text-xs"
-              onClick={() => {
-                const url = fmtUrlWithCluster(
-                  `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
-                )
-                router.push(url)
-              }}
-            >
-              See all
-            </SecondaryButton>
           )}
         </>
       </h3>

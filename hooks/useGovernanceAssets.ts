@@ -167,6 +167,9 @@ export default function useGovernanceAssets() {
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => x.mint?.publicKey.toBase58() !== DEFAULT_NFT_TREASURY_MINT
   )
+  const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
+    (x) => x.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+  )
   return {
     governancesArray,
     getGovernancesByAccountType,
@@ -180,5 +183,6 @@ export default function useGovernanceAssets() {
     canMintRealmCouncilToken,
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
+    nftsGovernedTokenAccounts,
   }
 }

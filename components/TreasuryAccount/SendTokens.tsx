@@ -286,13 +286,15 @@ const SendTokens = () => {
 
   const schema = getTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const nftTitle = `Send NFT to ${form.destinationAccount}`
+  const nftName = selectedNfts[0]?.val?.name
+  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+    form.destinationAccount
+  }`
   const proposalTitle = isNFT
     ? nftTitle
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
         form.destinationAccount
       }`
-  console.log(form)
   return (
     <>
       <h3 className="mb-4 flex items-center">

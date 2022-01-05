@@ -1,39 +1,44 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
-import { notify } from '@utils/notifications'
-import axios from 'axios'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
+import { getNfts } from '@utils/tokens'
+import { PublicKey } from '@solana/web3.js'
+import Loading from '@components/Loading'
+import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const governancePk = router?.query?.governancePk
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const fetchAllNftsForRealm = DEFAULT_NFT_TREASURY_MINT === governancePk
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
-
+  const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
     const getAllNftData = async () => {
-      try {
-        const nfts = await getParsedNftAccountsByOwner({
-          publicAddress: governancePk,
-          connection: connection.current,
-        })
-        const data = Object.keys(nfts).map((key) => nfts[key])
-        const arr: any[] = []
-        for (let i = 0; i < data.length; i++) {
-          const val = (await axios.get(data[i].data.uri)).data
-          arr.push({ val, mint: data[i].mint })
+      if (governancePk) {
+        setIsLoading(true)
+        let realmNfts: NFTWithMint[] = []
+
+        //TODO If we will have many nft accounts we would need to rethink performance of this.
+        if (fetchAllNftsForRealm) {
+          for (const acc of nftsGovernedTokenAccounts) {
+            const nfts = acc.governance?.pubkey
+              ? await getNfts(connection, acc.governance.pubkey)
+              : []
+            realmNfts = [...realmNfts, ...nfts]
+          }
+        } else {
+          realmNfts = await getNfts(connection, new PublicKey(governancePk))
         }
-        setNfts(arr)
-      } catch (error) {
-        notify({
-          type: 'error',
-          message: 'Unable to fetch nfts',
-        })
+
+        setNfts(realmNfts)
+        setIsLoading(false)
       }
     }
     if (governancePk) {
@@ -44,7 +49,9 @@ const gallery = () => {
     <div className="grid grid-cols-12">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
         <PreviousRouteBtn />
-        {nfts.length ? (
+        {isLoading ? (
+          <Loading></Loading>
+        ) : nfts.length ? (
           <div className="flex flex-row flex-wrap gap-4">
             {nfts.map((x, idx) => (
               <a

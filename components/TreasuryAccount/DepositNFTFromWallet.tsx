@@ -85,7 +85,7 @@ const DepositNFTFromWallet = () => {
         successMessage: 'NFT has been deposited',
       })
       setSendingSuccess(true)
-      nftSelectorRef.current?.getNfts()
+      nftSelectorRef.current?.handleGetNfts()
     } catch (e) {
       notify({
         type: 'error',

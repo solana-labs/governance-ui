@@ -12,6 +12,7 @@ import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactW
 import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
 import Tooltip from '@components/Tooltip'
 import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
+import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -125,6 +126,7 @@ const REALM = () => {
         <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
           <TokenBalanceCard />
           <AccountsCompactWrapper />
+          <NFTSCompactWrapper></NFTSCompactWrapper>
           <MembersCompactWrapper></MembersCompactWrapper>
           <AssetsCompactWrapper></AssetsCompactWrapper>
         </div>
