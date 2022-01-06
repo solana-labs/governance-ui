@@ -41,7 +41,7 @@ const AccountItemNFT = ({
       setNftsCount(nfts.length)
     }
     getNftsCount()
-  }, [])
+  }, [governedAccountTokenAccount.governance?.pubkey.toBase58()])
   return (
     <div
       onClick={onClick ? onClick : handleGoToAccountOverview}
