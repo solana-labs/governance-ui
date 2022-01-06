@@ -3,7 +3,7 @@ import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
 import DepositNFT from '@components/TreasuryAccount/DepositNFT'
-import { PhotographIcon } from '@heroicons/react/outline'
+import { ArrowsExpandIcon, PhotographIcon } from '@heroicons/react/outline'
 import { PlusIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -50,17 +50,16 @@ const NFTSCompactWrapper = () => {
   return nftsGovernedTokenAccounts.length && nftsCount ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <h3 className="mb-4 flex items-center">
-        Collectables{' '}
-        <img
+        Collectables
+        <ArrowsExpandIcon
           onClick={() => {
             const url = fmtUrlWithCluster(
               `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
             )
             router.push(url)
           }}
-          src="/img/collectablesIcon.svg"
-          className="flex-shrink-0 h-5 w-5 ml-auto cursor-pointer"
-        />
+          className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer"
+        ></ArrowsExpandIcon>
         <div
           onClick={() => {
             setCurrentCompactAccount(nftsGovernedTokenAccounts[0], connection)

@@ -17,6 +17,7 @@ import AccountHeader from './AccountHeader'
 import DepositNFT from './DepositNFT'
 import { ViewState } from './Types'
 import SendTokens from './SendTokens'
+import { ExternalLinkIcon, ArrowsExpandIcon } from '@heroicons/react/outline'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -68,18 +69,31 @@ const AccountOverview = () => {
                 abbreviateAddress(accountPublicKey as PublicKey)}
             </div>
           )}
-          {isNFT && (
-            <img
-              onClick={() => {
-                const url = fmtUrlWithCluster(
-                  `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
-                )
-                router.push(url)
-              }}
-              src="/img/collectablesIcon.svg"
-              className="h-8 mr-3 cursor-pointer w-5 h-5 ml-auto"
-            />
-          )}
+          <a
+            href={
+              accountPublicKey
+                ? getExplorerUrl(connection.endpoint, accountPublicKey)
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+          </a>
+          <div className="ml-auto flex flex-row">
+            {isNFT && (
+              <ArrowsExpandIcon
+                className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer"
+                onClick={() => {
+                  const url = fmtUrlWithCluster(
+                    `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
+                  )
+                  router.push(url)
+                }}
+              ></ArrowsExpandIcon>
+            )}
+          </div>
         </>
       </h3>
       <AccountHeader></AccountHeader>

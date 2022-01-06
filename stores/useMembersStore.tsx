@@ -1,15 +1,13 @@
 import create, { State } from 'zustand'
-import {
-  TokenRecordsWithWalletAddress,
-  ViewState,
-} from '@components/Members/types'
+import { ViewState } from '@components/Members/types'
+import { Member } from '@utils/uiTypes/members'
 
 interface MembersStore extends State {
   compact: {
     currentView: ViewState
-    currentMember: TokenRecordsWithWalletAddress | null
+    currentMember: Member | null
   }
-  setCurrentCompactViewMember: (item: TokenRecordsWithWalletAddress) => void
+  setCurrentCompactViewMember: (item: Member) => void
   setCurrentCompactView: (viewState: ViewState) => void
   resetCompactViewState: () => void
 }

@@ -294,7 +294,9 @@ const SendTokens = () => {
   return (
     <>
       <h3 className="mb-4 flex items-center">
-        <>Send {tokenInfo && tokenInfo?.symbol}</>
+        <>
+          Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
+        </>
       </h3>
       <AccountLabel></AccountLabel>
       <div className="space-y-4 w-full pb-4">

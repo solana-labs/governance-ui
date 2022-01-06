@@ -1,23 +1,16 @@
-import { getExplorerUrl } from '@components/explorer/tools'
-import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
 
 const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
-  const connection = useWalletStore((s) => s.connection)
   const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
   const isNFT = currentAccount?.isNft
-  const address = isNFT
-    ? currentAccount.governance?.pubkey.toBase58()
-    : currentAccount?.token?.publicKey.toBase58()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const [totalPrice, setTotalPrice] = useState('')
   const amount =
@@ -57,15 +50,6 @@ const AccountHeader = () => {
           {totalPrice && totalPrice !== '0' ? <>${totalPrice}</> : ''}
         </h3>
       </div>
-      <a
-        className="ml-auto self-start"
-        href={address ? getExplorerUrl(connection.endpoint, address) : ''}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-      </a>
     </div>
   )
 }
