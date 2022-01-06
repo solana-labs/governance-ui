@@ -42,6 +42,9 @@ function NFTSelector(
   const handleGetNfts = async () => {
     setIsLoading(true)
     const nfts = await getNfts(connection, ownerPk)
+    if (nfts.length === 1) {
+      handleSelectNft(nfts[0])
+    }
     setNfts(nfts)
     setIsLoading(false)
   }
@@ -84,7 +87,7 @@ function NFTSelector(
             </div>
           ) : (
             <div className="text-fgd-3 flex flex-col items-center">
-              {"Connected wallet don't have any NFTS"}
+              {"Connected wallet doesn't have any NFTs"}
               <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
             </div>
           )

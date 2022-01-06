@@ -5,6 +5,7 @@ import tokenService, { TokenRecord } from '@utils/services/token'
 import { ConfirmedSignatureInfo } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 
 interface TreasuryAccountStore extends State {
   compact: {
@@ -16,11 +17,7 @@ interface TreasuryAccountStore extends State {
     nftsCount?: number
   }
   setCurrentCompactView: (viewState: ViewState) => void
-  setCurrentCompactAccount: (
-    account: GovernedTokenAccount,
-    connection,
-    nftsCount?
-  ) => void
+  setCurrentCompactAccount: (account: GovernedTokenAccount, connection) => void
   resetCompactViewState: () => void
   handleFetchRecentActivity: (account: GovernedTokenAccount, connection) => void
 }
@@ -43,10 +40,24 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.compact.currentView = viewState
     })
   },
-  setCurrentCompactAccount: (account, connection, nftsCount = 0) => {
+  setCurrentCompactAccount: async (account, connection) => {
     const mintAddress =
       account && account.token ? account.token.account.mint.toBase58() : ''
+    const isNftMint = mintAddress === DEFAULT_NFT_TREASURY_MINT
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
+    let nftsCount = 0
+    if (isNftMint) {
+      try {
+        nftsCount = (
+          await getParsedNftAccountsByOwner({
+            publicAddress: account.governance?.pubkey,
+            connection: connection.current,
+          })
+        ).length
+      } catch (e) {
+        console.log(e)
+      }
+    }
 
     set((s) => {
       s.compact.currentAccount = account

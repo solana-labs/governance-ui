@@ -24,7 +24,6 @@ const DepositNFTFromWallet = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
-  const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -97,8 +96,7 @@ const DepositNFTFromWallet = () => {
 
   useEffect(() => {
     if (sendingSuccess) {
-      const newNftsCount = nftsCount! + 1
-      setCurrentCompactAccount(currentAccount!, connection, newNftsCount)
+      setCurrentCompactAccount(currentAccount!, connection)
     }
   }, [connected, sendingSuccess])
 
@@ -112,12 +110,20 @@ const DepositNFTFromWallet = () => {
       ></NFTSelector>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
         <Button
-          disabled={!connected || isLoading}
-          className="sm:w-1/2 ml-auto"
+          disabled={!connected || isLoading || selectedNfts.length === 0}
+          className="ml-auto"
           onClick={handleDeposit}
           isLoading={isLoading}
         >
-          <Tooltip content={!connected && 'Please connect your wallet'}>
+          <Tooltip
+            content={
+              !connected
+                ? 'Please connect your wallet'
+                : selectedNfts.length === 0
+                ? 'Please select nft'
+                : ''
+            }
+          >
             <div>Deposit</div>
           </Tooltip>
         </Button>

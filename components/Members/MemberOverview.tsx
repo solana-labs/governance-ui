@@ -3,8 +3,9 @@ import {
   ArrowLeftIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
+  UserCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/solid'
+} from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { VoteRecord } from '@models/accounts'
@@ -133,21 +134,19 @@ const MemberOverview = () => {
           {abbreviateAddress(new PublicKey(walletAddress))}
         </>
       </h3>
-      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex">
-        <div>
-          {abbreviateAddress(new PublicKey(walletAddress))}
-          <div className="text-fgd-3 text-xs flex flex-col">
-            Votes cast: {totalVotes}
-          </div>
-          <div className="text-fgd-3 text-xs flex flex-row">
-            {communityAmount && (
-              <span>
-                {tokenName} Votes {communityAmount}
-              </span>
-            )}
-            {communityAmount && council && <span className="ml-1 mr-1">|</span>}
-            {council && <span>Council Votes {councilAmount}</span>}
-          </div>
+      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
+        <UserCircleIcon className="h-6 text-fgd-3 w-6 mr-2.5" />
+        <div className="text-fgd-3 text-xs flex flex-col">
+          Votes cast: {totalVotes}
+        </div>
+        <div className="text-fgd-3 text-xs flex flex-row">
+          {communityAmount && (
+            <span>
+              {tokenName} Votes {communityAmount}
+            </span>
+          )}
+          {communityAmount && council && <span className="ml-1 mr-1">|</span>}
+          {council && <span>Council Votes {councilAmount}</span>}
         </div>
         <div className="ml-auto">
           <a

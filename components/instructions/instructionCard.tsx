@@ -23,6 +23,7 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import axios from 'axios'
 import { notify } from '@utils/notifications'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import tokenService from '@utils/services/token'
 
 export default function InstructionCard({
   index,
@@ -40,13 +41,14 @@ export default function InstructionCard({
   const [playing, setPlaying] = useState(
     proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed
   )
-  const [nftImgUrl, setImgUrl] = useState('')
+  const [nftImgUrl, setNftImgUrl] = useState('')
+  const [tokenImgUrl, setTokenImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
       proposalInstruction.info.instruction
     ).then((d) => setDescriptor(d))
-    const handleFetchNft = async () => {
+    const getAmountImg = async () => {
       const sourcePk = proposalInstruction.info.instruction.accounts[0].pubkey
       const tokenAccount = await tryGetTokenAccount(
         connection.current,
@@ -67,7 +69,7 @@ export default function InstructionCard({
               metadataPDA
             )
             const url = (await axios.get(tokenMetadata.data.data.uri)).data
-            setImgUrl(url.image)
+            setNftImgUrl(url.image)
           } catch (e) {
             notify({
               type: 'error',
@@ -75,17 +77,25 @@ export default function InstructionCard({
             })
           }
         }
+      } else {
+        const mint = tokenAccount?.account.mint
+        if (mint) {
+          const info = tokenService.getTokenInfo(mint.toBase58())
+          const imgUrl = info?.logoURI ? info.logoURI : ''
+          setTokenImgUrl(imgUrl)
+        }
       }
     }
-    handleFetchNft()
+    getAmountImg()
   }, [proposalInstruction])
 
   const proposalAuthority = tokenRecords[proposal.account.owner.toBase58()]
   return (
     <div className="break-all">
-      <h3 className="mb-4">
+      <h3 className="mb-4 flex">
         {`Instruction ${index} `}
-        {descriptor?.name && `– ${descriptor.name}`}
+        {descriptor?.name && `– ${descriptor.name}`}{' '}
+        {tokenImgUrl && <img className="w-5 h-5 ml-2" src={tokenImgUrl}></img>}
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}

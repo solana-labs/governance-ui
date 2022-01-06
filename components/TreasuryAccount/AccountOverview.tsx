@@ -7,9 +7,12 @@ import {
 import Modal from '@components/Modal'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
+import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -19,9 +22,13 @@ import { ViewState } from './Types'
 import SendTokens from './SendTokens'
 
 const AccountOverview = () => {
+  const router = useRouter()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
+  const { symbol } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
   const isNFT =
     currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -61,8 +68,21 @@ const AccountOverview = () => {
             </div>
           ) : (
             <div className="text-xs text-th-fgd-1">
-              {abbreviateAddress(accountPublicKey as PublicKey)}
+              {accountPublicKey &&
+                abbreviateAddress(accountPublicKey as PublicKey)}
             </div>
+          )}
+          {isNFT && (
+            <img
+              onClick={() => {
+                const url = fmtUrlWithCluster(
+                  `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
+                )
+                router.push(url)
+              }}
+              src="/img/collectablesIcon.svg"
+              className="h-8 mr-3 cursor-pointer w-5 h-5 ml-auto"
+            />
           )}
         </>
       </h3>
@@ -86,11 +106,13 @@ const AccountOverview = () => {
           tooltipMessage={
             !canUseTransferInstruction
               ? 'You need to have connected wallet with ability to create token transfer proposals'
+              : isNFT && nftsCount === 0
+              ? 'Please deposit nfts first'
               : ''
           }
           className="sm:w-1/2 text-sm py-2.5"
           onClick={() => setOpenCommonSendModal(true)}
-          disabled={!canUseTransferInstruction}
+          disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
         >
           Send
         </Button>

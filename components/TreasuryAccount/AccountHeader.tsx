@@ -1,19 +1,25 @@
+import { getExplorerUrl } from '@components/explorer/tools'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import nftLogo from 'public/img/nft-logo.jpeg'
+import useWalletStore from 'stores/useWalletStore'
 
 const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const connection = useWalletStore((s) => s.connection)
   const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
   const isNFT =
     currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+  const address = isNFT
+    ? currentAccount.governance?.pubkey.toBase58()
+    : currentAccount?.token?.publicKey.toBase58()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const [totalPrice, setTotalPrice] = useState('')
   const amount =
@@ -40,8 +46,8 @@ const AccountHeader = () => {
     <div className="bg-bkg-1 mb-4 px-4 py-2 rounded-md w-full flex items-center">
       {(tokenInfo?.logoURI || isNFT) && (
         <img
-          className="flex-shrink-0 h-6 w-6 mr-2.5 rounded-full"
-          src={isNFT ? nftLogo.src : tokenInfo?.logoURI}
+          className={`flex-shrink-0 h-5 w-5 mr-2.5 ${!isNFT && 'rounded-full'}`}
+          src={isNFT ? '/img/collectablesIcon.svg' : tokenInfo?.logoURI}
         />
       )}
       <div>
@@ -53,6 +59,15 @@ const AccountHeader = () => {
           {totalPrice && totalPrice !== '0' ? <>${totalPrice}</> : ''}
         </h3>
       </div>
+      <a
+        className="ml-auto self-start"
+        href={address ? getExplorerUrl(connection.endpoint, address) : ''}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={(e) => e.stopPropagation()}
+      >
+        <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+      </a>
     </div>
   )
 }

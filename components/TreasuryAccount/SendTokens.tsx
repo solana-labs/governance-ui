@@ -431,14 +431,17 @@ const SendTokens = () => {
             isLoading ||
             (isNFT && !selectedNfts.length)
           }
-          className="sm:w-1/2 ml-auto"
+          className="ml-auto"
           onClick={handlePropose}
           isLoading={isLoading}
         >
           <Tooltip
             content={
-              !canUseTransferInstruction &&
-              'You need to have connected wallet with ability to create token transfer proposals'
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : isNFT && !selectedNfts.length
+                ? 'Please select nft'
+                : ''
             }
           >
             <div>Propose</div>
