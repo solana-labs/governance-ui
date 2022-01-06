@@ -1,8 +1,5 @@
 import { LinkButton } from '@components/Button'
-import {
-  DEFAULT_NFT_TREASURY_MINT,
-  getAccountName,
-} from '@components/instructions/tools'
+import { getAccountName } from '@components/instructions/tools'
 import { DuplicateIcon } from '@heroicons/react/outline'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
@@ -13,8 +10,7 @@ const DepositLabel = ({
 }: {
   currentAccount: GovernedTokenAccount | null
 }) => {
-  const isNFT =
-    currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+  const isNFT = currentAccount?.isNft
   const address = !isNFT
     ? currentAccount!.governance!.info.governedAccount
     : currentAccount?.governance?.pubkey

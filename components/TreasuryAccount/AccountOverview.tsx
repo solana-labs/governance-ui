@@ -1,9 +1,6 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
-import {
-  DEFAULT_NFT_TREASURY_MINT,
-  getAccountName,
-} from '@components/instructions/tools'
+import { getAccountName } from '@components/instructions/tools'
 import Modal from '@components/Modal'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -29,8 +26,7 @@ const AccountOverview = () => {
   const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const isNFT =
-    currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+  const isNFT = currentAccount?.isNft
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(

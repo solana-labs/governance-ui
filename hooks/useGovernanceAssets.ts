@@ -96,6 +96,7 @@ export default function useGovernanceAssets() {
         governance: i,
         token: realmTokenAccount,
         mint,
+        isNft: mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT,
       }
       governedTokenAccounts.push(obj)
     }
@@ -139,6 +140,7 @@ export default function useGovernanceAssets() {
       g.governance &&
       ownVoterWeight.canCreateProposal(g.governance?.info?.config)
   )
+
   const availableInstructions = [
     {
       id: Instructions.Transfer,

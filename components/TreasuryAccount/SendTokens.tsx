@@ -1,9 +1,6 @@
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
-import {
-  DEFAULT_NFT_TREASURY_MINT,
-  getAccountName,
-} from '@components/instructions/tools'
+import { getAccountName } from '@components/instructions/tools'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
@@ -71,8 +68,7 @@ const SendTokens = () => {
 
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
-  const isNFT =
-    currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+  const isNFT = currentAccount?.isNft
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()

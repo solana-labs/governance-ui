@@ -1,5 +1,4 @@
 import { getExplorerUrl } from '@components/explorer/tools'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
@@ -15,8 +14,7 @@ const AccountHeader = () => {
   )
   const connection = useWalletStore((s) => s.connection)
   const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
-  const isNFT =
-    currentAccount?.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+  const isNFT = currentAccount?.isNft
   const address = isNFT
     ? currentAccount.governance?.pubkey.toBase58()
     : currentAccount?.token?.publicKey.toBase58()

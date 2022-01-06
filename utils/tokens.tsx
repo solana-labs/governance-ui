@@ -31,6 +31,7 @@ export type GovernedTokenAccount = {
   token: ProgramAccount<AccountInfo> | undefined
   mint: ProgramAccount<MintInfo> | undefined
   governance: ParsedAccount<Governance> | undefined
+  isNft: boolean
 }
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo

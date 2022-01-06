@@ -14,7 +14,6 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -172,9 +171,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft =
-            form.governedTokenAccount.token?.account.mint?.toBase58() ===
-            DEFAULT_NFT_TREASURY_MINT
+          const isNft = form.governedTokenAccount.isNft
           if (isNft) {
             return true
           }
