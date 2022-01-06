@@ -15,6 +15,7 @@ import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
+import { MintMaxVoteWeightSource } from '@models/accounts'
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -52,6 +53,20 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     } catch (e) {
       console.log('failed to set community mint', e)
     }
+  }
+
+  const getMintSupplyFactorPercent = () => {
+    let value = '0%'
+    if (!form.communityMintMaxVoteWeightSource) return value
+
+    if (+form.communityMintMaxVoteWeightSource === 1) value = 'max'
+    else
+      value =
+        (+form.communityMintMaxVoteWeightSource! * 100).toFixed(
+          MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS - 2
+        ) + '%'
+
+    return value + ' vote weight'
   }
 
   useEffect(() => {
@@ -150,22 +165,35 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                 }}
               />
             </div>
-            <div className="pb-4 pr-10 mr-2">
-              <Input
-                label="Community mint supply factor (max vote weight)"
-                placeholder="Community mint supply factor (max vote weight)"
-                value={form.communityMintMaxVoteWeightSource ?? 1}
-                type="number"
-                error={formErrors['communityMintMaxVoteWeightSource']}
-                onChange={(evt) =>
-                  setForm({
-                    communityMintMaxVoteWeightSource: evt.target.value,
-                  })
-                }
-              />
-            </div>
           </>
         )}
+        <div className="pb-4 pr-10 mr-2">
+          <Input
+            label={`Community mint supply factor (${getMintSupplyFactorPercent()})`}
+            placeholder="Community mint supply factor"
+            value={form.communityMintMaxVoteWeightSource}
+            step="0.0000000001"
+            max="1"
+            type="number"
+            error={formErrors['communityMintMaxVoteWeightSource']}
+            onBlur={() => {
+              if (!form.communityMintMaxVoteWeightSource?.length) {
+                setForm({
+                  communityMintMaxVoteWeightSource: '1',
+                })
+              }
+            }}
+            onChange={(evt) => {
+              const value =
+                +evt.target.value <= 1 && +evt.target.value >= 0
+                  ? evt.target.value
+                  : 1
+              setForm({
+                communityMintMaxVoteWeightSource: value,
+              })
+            }}
+          />
+        </div>
         <div className="pb-4 pr-10 mr-2">
           <Input
             label="Custom program Id"

@@ -39,6 +39,7 @@ import { registerRealm } from 'actions/registerRealm'
 import { MintMaxVoteWeightSource } from '@models/accounts'
 import Switch from '@components/Switch'
 import { BN } from '@project-serum/anchor'
+import BigNumber from 'bignumber.js'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -62,7 +63,9 @@ const RealmWizard: React.FC = () => {
    */
   const [ctl, setController] = useState<RealmWizardController>()
   const [testRealmCheck, setTestRealmCheck] = useState(true)
-  const [form, setForm] = useState<RealmArtifacts>({})
+  const [form, setForm] = useState<RealmArtifacts>({
+    communityMintMaxVoteWeightSource: '1',
+  })
   const [formErrors, setFormErrors] = useState({})
   const [councilSwitchState, setUseCouncil] = useState(true)
   const [isTestProgramId, setIsTestProgramId] = useState(false)
@@ -138,12 +141,19 @@ const RealmWizard: React.FC = () => {
   /**
    * Get the mint max vote weight parsed to `MintMaxVoteWeightSource`
    */
-  const getMintMaxVoteWeight = () =>
-    form.communityMintMaxVoteWeightSource
-      ? new MintMaxVoteWeightSource({
-          value: new BN(form.communityMintMaxVoteWeightSource),
-        })
-      : MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+  const getMintMaxVoteWeight = () => {
+    let value = MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION.value
+    if (form.communityMintMaxVoteWeightSource) {
+      const fraction = new BigNumber(form.communityMintMaxVoteWeightSource)
+        .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+        .toString()
+      value = new BN(fraction)
+    }
+
+    return new MintMaxVoteWeightSource({
+      value,
+    })
+  }
 
   /**
    * Get the array of wallets parsed into public keys or undefined if not eligible
