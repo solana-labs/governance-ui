@@ -39,7 +39,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             )
               .dividedBy(100)
               .toString(),
-            communityMintMaxVoteWeightSource: 1,
+            communityMintMaxVoteWeightSource: '1',
             communityMint: mint,
             transferAuthority: true,
           })
