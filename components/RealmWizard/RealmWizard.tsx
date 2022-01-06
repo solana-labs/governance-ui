@@ -38,6 +38,7 @@ import { formValidation, isFormValid } from '@utils/formValidation'
 import { registerRealm } from 'actions/registerRealm'
 import { MintMaxVoteWeightSource } from '@models/accounts'
 import Switch from '@components/Switch'
+import { BN } from '@project-serum/anchor'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -134,6 +135,22 @@ const RealmWizard: React.FC = () => {
     })
   }
 
+  /**
+   * Get the mint max vote weight parsed to `MintMaxVoteWeightSource`
+   */
+  const getMintMaxVoteWeight = () =>
+    form.communityMintMaxVoteWeightSource
+      ? new MintMaxVoteWeightSource({
+          value: new BN(form.communityMintMaxVoteWeightSource),
+        })
+      : MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+
+  /**
+   * Get the array of wallets parsed into public keys or undefined if not eligible
+   */
+  const getTeamWallets = (): PublicKey[] | undefined =>
+    form.teamWallets ? form.teamWallets.map((w) => new PublicKey(w)) : undefined
+
   const handleCreateBespokeRealm = async () => {
     setFormErrors({})
 
@@ -156,14 +173,12 @@ const RealmWizard: React.FC = () => {
             ? new PublicKey(form.communityMintId)
             : undefined,
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,
-          MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION,
+          getMintMaxVoteWeight(),
           form.minCommunityTokensToCreateGovernance!,
           form.yesThreshold,
           form.communityMintId ? form.transferAuthority : true,
           form.communityMint ? form.communityMint.account.decimals : undefined,
-          form.teamWallets
-            ? form.teamWallets.map((w) => new PublicKey(w))
-            : undefined
+          getTeamWallets()
         )
         router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
       } catch (error) {
