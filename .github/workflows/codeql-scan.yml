@@ -1,8 +1,8 @@
-# Native GitHub SAST (static application security testing) tool to scan the repository code for vulnerable code
+# GitHub SAST (static application security testing) tool that scans code for security bugs and unsafe coding practices
 
 name: "CodeQL Scan"
 
-# Run on push and PR to the main branch
+# Events that triggers CodeQL to run
 on:
   push:
     branches: [ main ]
@@ -27,6 +27,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+        # Add more languages if relevnt to the project
         language: [ 'javascript' ]
         # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
 
