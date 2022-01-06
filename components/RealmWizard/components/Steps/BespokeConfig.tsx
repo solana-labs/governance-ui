@@ -14,7 +14,6 @@ import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
-import { MintMaxVoteWeightSource } from '@models/accounts'
 import BigNumber from 'bignumber.js'
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
@@ -63,6 +62,12 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     return value + '%'
   }
 
+  const getSubtitleForMinTokenToCreate = () => {
+    if (!form.communityMint || form.communityMint.account.supply.eq(new BN(0)))
+      return 'Default is 10,000,000 for mints with no supply'
+    return 'Default is 1% of community mint'
+  }
+
   const getMinTokensToCreatePercent = () => {
     let value = '0'
     if (!form.minCommunityTokensToCreateGovernance) return value + '%'
@@ -77,7 +82,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         .toString()
     }
 
-    return value + '%'
+    return (isFinite(+value) ? value : 0) + '%'
   }
 
   useEffect(() => {
@@ -159,7 +164,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             <div className="pb-4 pr-10 mr-2 relative">
               <Input
                 label="Min community tokens to create governance"
-                subtitle="Default is 1% of community mint"
+                subtitle={getSubtitleForMinTokenToCreate()}
                 placeholder="Min community tokens to create governance"
                 className="w-36"
                 step="1"
