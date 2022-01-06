@@ -117,7 +117,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3">
           <Input
             label="Community Token Mint"
             placeholder="(Optional) Community token mint of this realm"
@@ -183,7 +183,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             </div>
           </>
         )}
-        <div className="pb-4 pr-10 mr-2 relative">
+        <div className="pb-4 pr-10 mr-2  mt-3 relative">
           <Input
             label="Community mint supply factor"
             subtitle="Max vote weight"
@@ -215,7 +215,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             {getMintSupplyFactorPercent()} vote weight
           </p>
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3 ">
           <Input
             label="Custom program Id"
             placeholder="Id of the governance program this realm will be associated with"
@@ -231,7 +231,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3">
           <div className="flex justify-left items-center">
             <Switch
               className="mt-2 mb-2"
@@ -241,7 +241,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             <StyledLabel className="mt-1.5 ml-3">Use test instance</StyledLabel>
           </div>
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3 ">
           <Input
             label="Governance program version"
             placeholder={1}

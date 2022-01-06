@@ -30,7 +30,7 @@ const Input = ({
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
-      {subtitle && <p className="text-gray-500 mb-3">{subtitle}</p>}
+      {subtitle && <p className="text-gray-500 mb-1 -mt-2">{subtitle}</p>}
       <input
         max={max}
         min={min}
