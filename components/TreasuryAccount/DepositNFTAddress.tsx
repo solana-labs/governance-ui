@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import AccountLabel from './AccountHeader'
 import Input from '@components/inputs/Input'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
@@ -21,17 +20,18 @@ import { tryGetAta } from '@utils/validations'
 import useRealm from '@hooks/useRealm'
 import { createATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
+import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import AccountItemNFT from './AccountItemNFT'
+import Select from '@components/inputs/Select'
 import DepositLabel from './DepositLabel'
-import { DuplicateIcon } from '@heroicons/react/outline'
-
-const DepositNFTAddress = () => {
+const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
 
   const wallet = useWalletStore((s) => s.current)
   const { realm } = useRealm()
-  const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const [form, setForm] = useState({
     mint: '',
@@ -42,6 +42,9 @@ const DepositNFTAddress = () => {
   const [formErrors, setFormErrors] = useState({})
   const [imgUrl, setImgUrl] = useState('')
   const [ataAddress, setAtaAddress] = useState('')
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const { setCurrentCompactAccount } = useTreasuryAccountStore()
+  const connection = useWalletStore((s) => s.connection)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -140,11 +143,39 @@ const DepositNFTAddress = () => {
   }, [JSON.stringify(nftMetaData)])
   return (
     <>
-      <AccountLabel></AccountLabel>
+      <Select
+        noMaxWidth={true}
+        className="w-full mb-2 max-w-full"
+        onChange={(value) => setCurrentCompactAccount(value, connection)}
+        value={currentAccount?.governance?.pubkey.toBase58()}
+        componentLabel={
+          currentAccount && (
+            <AccountItemNFT
+              className="m-0 p-0 border-0 hover:bg-bkg-1"
+              onClick={() => null}
+              governedAccountTokenAccount={currentAccount}
+            ></AccountItemNFT>
+          )
+        }
+      >
+        {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
+          <Select.Option
+            key={accountWithGovernance?.governance?.pubkey.toBase58()}
+            value={accountWithGovernance}
+          >
+            <AccountItemNFT
+              onClick={() => null}
+              className="m-0 p-0 border-0 hover:bg-bkg-2"
+              governedAccountTokenAccount={accountWithGovernance}
+            />
+          </Select.Option>
+        ))}
+      </Select>
       <DepositLabel currentAccount={currentAccount}></DepositLabel>
       <div className="space-y-4 w-full pb-4">
         <div className="text-sm mt-4">
-          <div className="flex flex-row text-xs items-center border-t border-fgd-4 default-transition px-4 py-2">
+          <div className="flex flex-row text-xs items-center border-t border-fgd-4 default-transition py-4">
+            <ExclamationIcon className="w-5 h-5 mr-2 text-primary-light"></ExclamationIcon>
             {
               "If your wallet doesn't support sending nfts to shared wallets please generate address using the nft mint"
             }
@@ -163,6 +194,15 @@ const DepositNFTAddress = () => {
           noMaxWidth={true}
           error={formErrors['mint']}
         />
+        <Button
+          disabled={isLoading || !imgUrl || !connected}
+          onClick={handleGenerateATAAddress}
+          isLoading={isLoading}
+        >
+          <Tooltip content={!connected && 'Please connect your wallet'}>
+            <div>Generate Address</div>
+          </Tooltip>
+        </Button>
         {isInvalidMint && (
           <div className="text-xs text-red">Invalid mint address</div>
         )}
@@ -196,16 +236,7 @@ const DepositNFTAddress = () => {
         </div>
       )}
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-        <Button
-          disabled={isLoading || !imgUrl || !connected}
-          className="ml-auto"
-          onClick={handleGenerateATAAddress}
-          isLoading={isLoading}
-        >
-          <Tooltip content={!connected && 'Please connect your wallet'}>
-            <div>Generate Address</div>
-          </Tooltip>
-        </Button>
+        <div className="ml-auto">{additionalBtns}</div>
       </div>
     </>
   )

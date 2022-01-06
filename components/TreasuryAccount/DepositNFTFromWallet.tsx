@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import AccountLabel from './AccountHeader'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
@@ -17,8 +16,11 @@ import { createATA } from '@utils/ataTools'
 import { getTokenAccountsByMint } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
+import Select from '@components/inputs/Select'
+import AccountItemNFT from './AccountItemNFT'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
-const DepositNFTFromWallet = () => {
+const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const nftSelectorRef = useRef<NftSelectorFunctions>(null)
   const { setCurrentCompactAccount } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
@@ -30,6 +32,7 @@ const DepositNFTFromWallet = () => {
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const [sendingSuccess, setSendingSuccess] = useState(false)
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const handleDeposit = async () => {
     setIsLoading(true)
     setSendingSuccess(false)
@@ -102,31 +105,61 @@ const DepositNFTFromWallet = () => {
 
   return (
     <>
-      <AccountLabel></AccountLabel>
+      <Select
+        className="w-full mb-2  max-w-full"
+        noMaxWidth={true}
+        onChange={(value) => setCurrentCompactAccount(value, connection)}
+        value={currentAccount?.governance?.pubkey.toBase58()}
+        componentLabel={
+          currentAccount && (
+            <AccountItemNFT
+              className="m-0 p-0 border-0 hover:bg-bkg-1"
+              onClick={() => null}
+              governedAccountTokenAccount={currentAccount}
+            ></AccountItemNFT>
+          )
+        }
+      >
+        {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
+          <Select.Option
+            key={accountWithGovernance?.governance?.pubkey.toBase58()}
+            value={accountWithGovernance}
+          >
+            <AccountItemNFT
+              onClick={() => null}
+              className="m-0 p-0 border-0 hover:bg-bkg-2"
+              governedAccountTokenAccount={accountWithGovernance}
+            />
+          </Select.Option>
+        ))}
+      </Select>
       <NFTSelector
         ref={nftSelectorRef}
         ownerPk={wallet!.publicKey!}
         onNftSelect={(selected) => setSelectedNfts(selected)}
       ></NFTSelector>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
-        <Button
-          disabled={!connected || isLoading || selectedNfts.length === 0}
-          className="ml-auto"
-          onClick={handleDeposit}
-          isLoading={isLoading}
-        >
-          <Tooltip
-            content={
-              !connected
-                ? 'Please connect your wallet'
-                : selectedNfts.length === 0
-                ? 'Please select nft'
-                : ''
-            }
+        <div className="ml-auto">
+          {additionalBtns}
+          <Button
+            disabled={!connected || isLoading || selectedNfts.length === 0}
+            className="ml-2"
+            onClick={handleDeposit}
+            isLoading={isLoading}
           >
-            <div>Deposit</div>
-          </Tooltip>
-        </Button>
+            <Tooltip
+              content={
+                !connected
+                  ? 'Please connect your wallet'
+                  : selectedNfts.length === 0
+                  ? 'Please select nft'
+                  : ''
+              }
+            >
+              <div>Deposit</div>
+            </Tooltip>
+          </Button>
+        </div>
       </div>
     </>
   )

@@ -160,7 +160,11 @@ const AccountOverview = () => {
           }}
           isOpen={openNftDepositModal}
         >
-          <DepositNFT></DepositNFT>
+          <DepositNFT
+            onClose={() => {
+              setOpenNftDepositModal(false)
+            }}
+          ></DepositNFT>
         </Modal>
       )}
       {openCommonSendModal && (

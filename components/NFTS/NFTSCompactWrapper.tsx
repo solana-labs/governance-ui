@@ -24,6 +24,10 @@ const NFTSCompactWrapper = () => {
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+  const handleCloseModal = () => {
+    setOpenNftDepositModal(false)
+    resetCompactViewState()
+  }
   const {
     setCurrentCompactAccount,
     resetCompactViewState,
@@ -33,7 +37,6 @@ const NFTSCompactWrapper = () => {
     const getAllNftData = async () => {
       setIsLoading(true)
       let realmNfts: NFTWithMint[] = []
-
       //TODO If we will have many nft accounts we would need to rethink performance of this.
       for (const acc of nftsGovernedTokenAccounts) {
         const nfts = acc.governance?.pubkey
@@ -41,7 +44,6 @@ const NFTSCompactWrapper = () => {
           : []
         realmNfts = [...realmNfts, ...nfts]
       }
-
       setNfts(realmNfts)
       setIsLoading(false)
     }
@@ -104,13 +106,10 @@ const NFTSCompactWrapper = () => {
       {openNftDepositModal && (
         <Modal
           sizeClassName="sm:max-w-3xl"
-          onClose={() => {
-            setOpenNftDepositModal(false)
-            resetCompactViewState()
-          }}
+          onClose={handleCloseModal}
           isOpen={openNftDepositModal}
         >
-          <DepositNFT></DepositNFT>
+          <DepositNFT onClose={handleCloseModal}></DepositNFT>
         </Modal>
       )}
     </div>

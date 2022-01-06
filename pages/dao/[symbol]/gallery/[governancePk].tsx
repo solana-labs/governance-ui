@@ -10,13 +10,22 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import Select from '@components/inputs/Select'
+import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT'
+import useRealm from '@hooks/useRealm'
+import useQueryContext from '@hooks/useQueryContext'
 
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
+  const { symbol } = useRealm()
   const governancePk = router?.query?.governancePk
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const { fmtUrlWithCluster } = useQueryContext()
   const fetchAllNftsForRealm = DEFAULT_NFT_TREASURY_MINT === governancePk
+  const currentAccount = nftsGovernedTokenAccounts.find(
+    (x) => x.governance?.pubkey.toBase58() === governancePk
+  )
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
@@ -44,11 +53,57 @@ const gallery = () => {
     if (governancePk) {
       getAllNftData()
     }
-  }, [governancePk, connection.endpoint])
+  }, [governancePk, connection.endpoint, nftsGovernedTokenAccounts.length])
   return (
     <div className="grid grid-cols-12">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
-        <PreviousRouteBtn />
+        <div className="flex flex-row">
+          <PreviousRouteBtn />
+          <div className="ml-auto">
+            <Select
+              className="w-44"
+              onChange={(value) => {
+                console.log(value)
+                router.push(
+                  fmtUrlWithCluster(`/dao/${symbol}/gallery/${value}`)
+                )
+              }}
+              value={currentAccount?.governance?.pubkey.toBase58()}
+              componentLabel={
+                currentAccount ? (
+                  <AccountItemNFT
+                    className="m-0 p-0 border-0 hover:bg-bkg-1"
+                    onClick={() => null}
+                    governedAccountTokenAccount={currentAccount}
+                  ></AccountItemNFT>
+                ) : (
+                  <div>All</div>
+                )
+              }
+            >
+              <Select.Option
+                key={DEFAULT_NFT_TREASURY_MINT}
+                value={DEFAULT_NFT_TREASURY_MINT}
+              >
+                <div>All</div>
+              </Select.Option>
+
+              {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
+                <Select.Option
+                  key={accountWithGovernance?.governance?.pubkey.toBase58()}
+                  value={accountWithGovernance.governance?.pubkey.toBase58()}
+                >
+                  <AccountItemNFT
+                    onClick={() => null}
+                    className="m-0 p-0 border-0 hover:bg-bkg-2"
+                    governedAccountTokenAccount={accountWithGovernance}
+                  />
+                </Select.Option>
+              ))}
+            </Select>
+          </div>
+        </div>
+
         {isLoading ? (
           <Loading></Loading>
         ) : nfts.length ? (
