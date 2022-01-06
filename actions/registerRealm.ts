@@ -127,6 +127,7 @@ async function prepareMintInstructions(
 
         // Mint 1 token to each owner
         if (shouldMint && ataPk) {
+          console.debug('will mint to ', { ataPk })
           await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
         }
 
@@ -296,7 +297,7 @@ function sendTransactionFactory(
 ) {
   console.debug('factoring sendtransaction')
 
-  const instructions: TransactionInstruction[][] = []
+  const instructions: TransactionInstruction[][] = [realmInstructions]
   const signerSets: Keypair[][] = [[]]
 
   if (councilMembersChunks.length) {
