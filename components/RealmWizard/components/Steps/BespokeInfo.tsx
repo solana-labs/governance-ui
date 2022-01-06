@@ -6,6 +6,7 @@ import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
+import { getMintSupplyFactorPercent } from './BespokeConfig'
 
 const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -103,7 +104,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     className="border-none py-1 bg-transparent"
                     readOnly
                     label="Community mint supply factor (max vote weight)"
-                    value={form.communityMintMaxVoteWeightSource ?? 1}
+                    value={getMintSupplyFactorPercent(form)}
                     error={formErrors['communityMintMaxVoteWeightSource']}
                     type="text"
                   />

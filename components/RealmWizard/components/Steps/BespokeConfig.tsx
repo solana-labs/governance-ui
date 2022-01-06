@@ -1,5 +1,8 @@
 import React, { useEffect } from 'react'
-import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm'
+import {
+  RealmArtifacts,
+  RealmWizardStepComponentProps,
+} from '@components/RealmWizard/interfaces/Realm'
 import Input from '@components/inputs/Input'
 import {
   formatMintNaturalAmountAsDecimal,
@@ -15,6 +18,37 @@ import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
 import BigNumber from 'bignumber.js'
+
+export const getMintSupplyFactorPercent = (form: RealmArtifacts) => {
+  let value = '0'
+  if (!form.communityMintMaxVoteWeightSource) return value
+  value = (+form.communityMintMaxVoteWeightSource! * 100).toFixed(2)
+
+  return value + '%'
+}
+
+export const getSubtitleForMinTokenToCreate = (form: RealmArtifacts) => {
+  if (!form.communityMint || form.communityMint.account.supply.eq(new BN(0)))
+    return 'Default is 10,000,000 for mints with no supply'
+  return 'Default is 1% of community mint'
+}
+
+export const getMinTokensToCreatePercent = (form: RealmArtifacts) => {
+  let value = '0'
+  if (!form.minCommunityTokensToCreateGovernance) return value + '%'
+  if (form.communityMint?.account.supply) {
+    value = new BigNumber(form.minCommunityTokensToCreateGovernance)
+      .dividedBy(
+        new BigNumber(form.communityMint.account.supply.toString()).shiftedBy(
+          -form.communityMint.account.decimals
+        )
+      )
+      .times(100)
+      .toString()
+  }
+
+  return (isFinite(+value) ? value : 0) + '%'
+}
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -52,37 +86,6 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
     } catch (e) {
       console.log('failed to set community mint', e)
     }
-  }
-
-  const getMintSupplyFactorPercent = () => {
-    let value = '0'
-    if (!form.communityMintMaxVoteWeightSource) return value
-    value = (+form.communityMintMaxVoteWeightSource! * 100).toFixed(2)
-
-    return value + '%'
-  }
-
-  const getSubtitleForMinTokenToCreate = () => {
-    if (!form.communityMint || form.communityMint.account.supply.eq(new BN(0)))
-      return 'Default is 10,000,000 for mints with no supply'
-    return 'Default is 1% of community mint'
-  }
-
-  const getMinTokensToCreatePercent = () => {
-    let value = '0'
-    if (!form.minCommunityTokensToCreateGovernance) return value + '%'
-    if (form.communityMint?.account.supply) {
-      value = new BigNumber(form.minCommunityTokensToCreateGovernance)
-        .dividedBy(
-          new BigNumber(form.communityMint.account.supply.toString()).shiftedBy(
-            -form.communityMint.account.decimals
-          )
-        )
-        .times(100)
-        .toString()
-    }
-
-    return (isFinite(+value) ? value : 0) + '%'
   }
 
   useEffect(() => {
@@ -166,7 +169,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
         <div className="pb-4 pr-10 mr-2 relative">
           <Input
             label="Min community tokens to create governance"
-            subtitle={getSubtitleForMinTokenToCreate()}
+            subtitle={getSubtitleForMinTokenToCreate(form)}
             placeholder="Min community tokens to create governance"
             className="w-36"
             step="1"
@@ -185,7 +188,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             }}
           />
           <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
-            {getMinTokensToCreatePercent()} of token supply
+            {getMinTokensToCreatePercent(form)} of token supply
           </p>{' '}
         </div>
 
@@ -218,7 +221,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             }}
           />
           <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
-            {getMintSupplyFactorPercent()} vote weight
+            {getMintSupplyFactorPercent(form)} vote weight
           </p>
         </div>
         <div className="pb-4 pr-10 mr-2 mt-3 ">
