@@ -91,6 +91,12 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
 ])
 
+export const DEFAULT_NFT_TREASURY_MINT =
+  'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
+
+export const DEFAULT_NATIVE_SOL_MINT =
+  'GSoL95LSRcKYxwVkvAxbYLp47uBn1QtP6pDUZQxp3Mg4'
+
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
@@ -138,7 +144,6 @@ export async function getInstructionDescriptor(
   }
 
   const descriptor = descriptors && descriptors[instruction.data[0]]
-
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,

@@ -2,6 +2,7 @@ import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getProgramName } from '@components/instructions/programs/names'
 import Tooltip from '@components/Tooltip'
+import { CogIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getProgramSlot } from '@models/registry/api'
@@ -51,16 +52,6 @@ const AssetOverview = () => {
           <div className="text-xs text-th-fgd-1">
             {name ? name : governedAccount}
           </div>
-        </>
-      </h3>
-      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex mb-4">
-        <div>
-          Program
-          <div className="text-fgd-3 text-xs flex flex-col">
-            {currentAsset?.info.governedAccount.toBase58()}
-          </div>
-        </div>
-        <div className="ml-auto">
           <a
             href={
               currentAsset
@@ -76,6 +67,12 @@ const AssetOverview = () => {
           >
             <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
           </a>
+        </>
+      </h3>
+      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex mb-4 items-center">
+        <CogIcon className="h-6 text-fgd-3 w-6 mr-2.5" />
+        <div className="mr-1 text-xs text-fgd-3">
+          <span className="text-fgd-1">Last deployed slot:</span> {slot}
         </div>
       </div>
       <div
@@ -95,9 +92,6 @@ const AssetOverview = () => {
             <div>Upgrade</div>
           </Tooltip>
         </Button>
-      </div>
-      <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
-        Last deployed slot: <span className="text-fgd-1">{slot}</span>
       </div>
       <div></div>
     </>
