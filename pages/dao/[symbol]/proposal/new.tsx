@@ -49,9 +49,11 @@ import MintTokensIcon from '@components/MintTokensIcon'
 import TreasuryPaymentForm from '@components/TreasuryAccount/TreasuryPaymentForm'
 import Links from '@components/LinksCompactWrapper'
 import AddMember from '@components/Members/AddMember'
-import AddMemberForm from '@components/Members/AddMemberForm'
 import UpgradeProgramForm from '@components/AssetsList/UpgradeProgram'
 import UpgradeProgramNewForm from '@components/AssetsList/UpgradeProgramForm'
+import Spinner from '@components/Spinner'
+import AddMemberFormFullScreen from './FullscreenViews/AddMemberForm'
+import TreasuryPaymentFormFullScreen from './FullscreenViews/TreasuryPaymentForm'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -292,95 +294,107 @@ const New = () => {
 
   const StepOne = () => {
     return (
-      <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-md mt-16 rounded-xl">
-        <Button
-          onClick={() =>
-            goToStepTwo({
-              value: 'Transfer Tokens',
-              idx: Instructions.TreasuryPaymentForm,
-            })
-          }
-          disabled={treasuryPaymentTooltip !== ''}
-          tooltipMessage={treasuryPaymentTooltip}
-          className="flex justify-center items-center h-10 w-full"
-        >
-          <div className="flex justify-center items-center gap-x-3">
-            <TreasuryPaymentIcon
-              className={`${treasuryPaymentTooltip !== '' && 'opacity-50'} w-8`}
-              color="#000"
-            />
+      <>
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-md mt-16 rounded-xl">
+          <Button
+            onClick={() =>
+              goToStepTwo({
+                value: 'Transfer Tokens',
+                idx: Instructions.TreasuryPaymentForm,
+              })
+            }
+            disabled={treasuryPaymentTooltip !== ''}
+            tooltipMessage={treasuryPaymentTooltip}
+            className="flex justify-center items-center h-10 w-full"
+          >
+            <div className="flex justify-center items-center gap-x-3">
+              <TreasuryPaymentIcon
+                className={`${
+                  treasuryPaymentTooltip !== '' && 'opacity-50'
+                } w-8`}
+                color="#000"
+              />
 
-            <span>Treasury payment</span>
-          </div>
-        </Button>
+              <span>Treasury payment</span>
+            </div>
+          </Button>
 
-        <Button
-          onClick={() =>
-            goToStepTwo({
-              value: 'Add Member',
-              idx: Instructions.AddMemberForm,
-            })
-          }
-          disabled={addNewMemberTooltip !== ''}
-          tooltipMessage={addNewMemberTooltip}
-          className="flex justify-center items-center h-10 w-full"
-        >
-          <div className="flex justify-center items-center gap-x-3">
-            <AddMemberIcon
-              className={`${addNewMemberTooltip !== '' && 'opacity-50'} w-8`}
-              color="#000"
-            />
+          <Button
+            onClick={() =>
+              goToStepTwo({
+                value: 'Add Member',
+                idx: Instructions.AddMemberForm,
+              })
+            }
+            disabled={addNewMemberTooltip !== ''}
+            tooltipMessage={addNewMemberTooltip}
+            className="flex justify-center items-center h-10 w-full"
+          >
+            <div className="flex justify-center items-center gap-x-3">
+              <AddMemberIcon
+                className={`${addNewMemberTooltip !== '' && 'opacity-50'} w-8`}
+                color="#000"
+              />
 
-            <span>Add new member</span>
-          </div>
-        </Button>
+              <span>Add new member</span>
+            </div>
+          </Button>
 
-        <Button
-          onClick={() =>
-            goToStepTwo({
-              value: 'Program Upgrade',
-              idx: Instructions.ProgramUpgrade,
-            })
-          }
-          disabled={false}
-          tooltipMessage={programUpgradeTooltip}
-          className="flex justify-center items-center h-10 w-full"
-        >
-          <div className="flex justify-center items-center gap-x-3">
-            <ProgramUpgradeIcon
-              className={`${programUpgradeTooltip !== '' && 'opacity-50'} w-8`}
-              color="#000"
-            />
+          <Button
+            onClick={() =>
+              goToStepTwo({
+                value: 'Program Upgrade',
+                idx: Instructions.ProgramUpgrade,
+              })
+            }
+            disabled={false}
+            tooltipMessage={programUpgradeTooltip}
+            className="flex justify-center items-center h-10 w-full"
+          >
+            <div className="flex justify-center items-center gap-x-3">
+              <ProgramUpgradeIcon
+                className={`${
+                  programUpgradeTooltip !== '' && 'opacity-50'
+                } w-8`}
+                color="#000"
+              />
 
-            <span>Upgrade a program</span>
-          </div>
-        </Button>
+              <span>Upgrade a program</span>
+            </div>
+          </Button>
 
-        <Button
-          onClick={() =>
-            goToStepTwo({
-              value: 'Mint Tokens',
-              idx: Instructions.Mint,
-            })
-          }
-          disabled={mintTokensTooltip !== ''}
-          tooltipMessage={mintTokensTooltip}
-          className="flex justify-center items-center h-10 w-full"
-        >
-          <div className="flex justify-center items-center gap-x-3">
-            <MintTokensIcon
-              className={`${mintTokensTooltip !== '' && 'opacity-50'} w-6`}
-              color="#000"
-            />
+          <Button
+            onClick={() =>
+              goToStepTwo({
+                value: 'Mint Tokens',
+                idx: Instructions.Mint,
+              })
+            }
+            disabled={mintTokensTooltip !== ''}
+            tooltipMessage={mintTokensTooltip}
+            className="flex justify-center items-center h-10 w-full"
+          >
+            <div className="flex justify-center items-center gap-x-3">
+              <MintTokensIcon
+                className={`${mintTokensTooltip !== '' && 'opacity-50'} w-6`}
+                color="#000"
+              />
 
-            <span>Mint tokens</span>
-          </div>
-        </Button>
+              <span>Mint tokens</span>
+            </div>
+          </Button>
 
-        <SecondaryButton disabled={!connected} className="w-full h-10">
-          Customize your proposal
-        </SecondaryButton>
-      </div>
+          <SecondaryButton disabled={!connected} className="w-full h-10">
+            Customize your proposal
+          </SecondaryButton>
+        </div>
+
+        <div className="max-w-xs w-full mt-16">
+          <TokenBalanceCard />
+
+          <Links />
+        </div>
+      </>
     )
   }
 
@@ -405,9 +419,22 @@ const New = () => {
       case Instructions.MangoMakeChangeMaxAccounts:
         return <MakeChangeMaxAccounts index={idx} governance={governance} />
       case Instructions.AddMemberForm:
-        return <AddMemberForm close={null} />
+        return <AddMemberFormFullScreen />
       case Instructions.TreasuryPaymentForm:
-        return <TreasuryPaymentForm close={null} />
+        return (
+          <>
+            <TreasuryPaymentFormFullScreen
+              index={idx}
+              governance={governance}
+            />
+
+            {/* <div className="max-w-xs w-full mt-16">
+              <TokenBalanceCard />
+
+              <Links />
+            </div> */}
+          </>
+        )
       default:
         null
     }
@@ -415,13 +442,15 @@ const New = () => {
 
   const StepTwo = () => {
     return (
-      <div className="w-full max-w-xl mt-8 rounded-xl">
-        {selectedType.idx > -1 &&
-          getCurrentInstruction({
-            typeId: selectedType.idx,
-            idx: selectedType.idx,
-          })}
-      </div>
+      <>
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-md mt-8 rounded-xl">
+          {selectedType.idx > -1 &&
+            getCurrentInstruction({
+              typeId: selectedType.idx,
+              idx: selectedType.idx,
+            })}
+        </div>
+      </>
     )
   }
 
@@ -510,12 +539,6 @@ const New = () => {
           {selectedStep === 0 && <StepOne />}
           {selectedStep === 1 && <StepTwo />}
           {selectedStep === 2 && <StepThree />}
-
-          <div className="max-w-xs w-full mt-16">
-            <TokenBalanceCard />
-
-            <Links />
-          </div>
         </div>
       </div>
     </NewProposalContext.Provider>

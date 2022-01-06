@@ -366,7 +366,7 @@ const TreasuryPaymentForm = ({ close }) => {
         noMaxWidth
         useDefaultStyle={false}
         className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-        wrapperClassName="mt-6 mb-2"
+        wrapperClassName="mt-6 mb-2 w-full"
         min={mintMinAmount}
         placeholder="Amount"
         label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
@@ -400,7 +400,7 @@ const TreasuryPaymentForm = ({ close }) => {
             noMaxWidth
             useDefaultStyle={false}
             className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-            wrapperClassName="mb-6"
+            wrapperClassName="mb-6 w-full"
             label="Title of your proposal"
             placeholder={proposalTitle}
             value={form.title}
@@ -417,7 +417,7 @@ const TreasuryPaymentForm = ({ close }) => {
             noMaxWidth
             useDefaultStyle={false}
             className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-            wrapperClassName="mb-6"
+            wrapperClassName="mb-6 w-full"
             label="Description"
             placeholder="Describe your proposal (optional)"
             value={form.description}
