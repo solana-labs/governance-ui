@@ -161,33 +161,34 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                 </StyledLabel>
               </div>
             </div>
-            <div className="pb-4 pr-10 mr-2 relative">
-              <Input
-                label="Min community tokens to create governance"
-                subtitle={getSubtitleForMinTokenToCreate()}
-                placeholder="Min community tokens to create governance"
-                className="w-36"
-                step="1"
-                value={
-                  form.minCommunityTokensToCreateGovernance
-                    ? form.minCommunityTokensToCreateGovernance.toString()
-                    : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
-                }
-                type="number"
-                error={formErrors['minCommunityTokensToCreateGovernance']}
-                onChange={(evt) => {
-                  const value = evt.target.value
-                  setForm({
-                    minCommunityTokensToCreateGovernance: value,
-                  })
-                }}
-              />
-              <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
-                {getMinTokensToCreatePercent()} of token supply
-              </p>{' '}
-            </div>
           </>
         )}
+        <div className="pb-4 pr-10 mr-2 relative">
+          <Input
+            label="Min community tokens to create governance"
+            subtitle={getSubtitleForMinTokenToCreate()}
+            placeholder="Min community tokens to create governance"
+            className="w-36"
+            step="1"
+            value={
+              form.minCommunityTokensToCreateGovernance
+                ? form.minCommunityTokensToCreateGovernance.toString()
+                : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+            }
+            type="number"
+            error={formErrors['minCommunityTokensToCreateGovernance']}
+            onChange={(evt) => {
+              const value = evt.target.value
+              setForm({
+                minCommunityTokensToCreateGovernance: value,
+              })
+            }}
+          />
+          <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
+            {getMinTokensToCreatePercent()} of token supply
+          </p>{' '}
+        </div>
+
         <div className="pb-4 pr-10 mr-2  mt-3 relative">
           <Input
             label="Community mint supply factor"
