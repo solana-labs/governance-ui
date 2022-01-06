@@ -40,13 +40,13 @@ import { MintMaxVoteWeightSource } from '@models/accounts'
 import Switch from '@components/Switch'
 
 enum LoaderMessage {
-  CREATING_ARTIFACTS = 'Creating the Realm artifacts..',
+  CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
   MINTING_COUNCIL_TOKENS = 'Minting the council tokens..',
   MINTING_COMMUNITY_TOKENS = 'Minting the community tokens..',
-  DEPLOYING_REALM = 'Deploying the Realm..',
-  COMPLETING_REALM = 'Finishing the Realm buildings..',
-  FINISHED = "Realm successfully created. Redirecting to the realm's page",
-  ERROR = 'We found an error while creating your Realm :/',
+  DEPLOYING_REALM = 'Building your DAO...',
+  COMPLETING_REALM = 'Finishing the DAO buildings..',
+  FINISHED = "DAO successfully created. Redirecting to the DAO's page",
+  ERROR = 'We found an error while creating your DAO :/',
 }
 
 // TODO: split this component
@@ -396,7 +396,7 @@ const RealmWizard: React.FC = () => {
                 />
                 <Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
                   <StyledLabel className="mt-1.5 ml-3">
-                    Create a test realm
+                    Create a test DAO
                   </StyledLabel>
                 </Tooltip>
               </div>
@@ -424,7 +424,7 @@ const RealmWizard: React.FC = () => {
               className={ctl.isLastStep() ? 'px-5' : 'px-10'}
               style={{ minWidth: '142px' }}
             >
-              {ctl.isLastStep() ? 'Create Realm' : 'Next'}
+              {ctl.isLastStep() ? 'Create DAO' : 'Next'}
             </Button>
           </div>
         </>
