@@ -2,14 +2,12 @@
 
 name: Trivy Scan
 
-# Triggers on push and PR to the main branch
+# Events that triggers Trivy to run
 on:
   push:
-    branches:
-      - main
+    branches: [ main ]
   pull_request:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
@@ -23,7 +21,7 @@ jobs:
         uses: actions/checkout@v2
       
       # Run Trivy with the following args
-      - name: Run Trivy vulnerability scanner in repo mode
+      - name: Run Trivy
         uses: aquasecurity/trivy-action@master
         with:
           scan-type: 'fs' # Filesystem mode
