@@ -64,8 +64,8 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   }
 
   const getMinTokensToCreatePercent = () => {
-    let value = 'defaults 1%'
-    if (!form.minCommunityTokensToCreateGovernance) return value
+    let value = '0'
+    if (!form.minCommunityTokensToCreateGovernance) return value + '%'
     if (form.communityMint?.account.supply) {
       value = new BigNumber(form.minCommunityTokensToCreateGovernance)
         .dividedBy(
@@ -156,10 +156,12 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                 </StyledLabel>
               </div>
             </div>
-            <div className="pb-4 pr-10 mr-2">
+            <div className="pb-4 pr-10 mr-2 relative">
               <Input
-                label={`Min community tokens to create governance (defaults 1% of community mint)`}
+                label="Min community tokens to create governance"
+                subtitle="Default is 1% of community mint"
                 placeholder="Min community tokens to create governance"
+                className="w-36"
                 step="1"
                 value={
                   form.minCommunityTokensToCreateGovernance
@@ -175,16 +177,18 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                   })
                 }}
               />
-              <p className="mt-1 ml-3 text-gray-400">
+              <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
                 {getMinTokensToCreatePercent()} of token supply
-              </p>
+              </p>{' '}
             </div>
           </>
         )}
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 relative">
           <Input
-            label={`Community mint supply factor (max vote weight)`}
+            label="Community mint supply factor"
+            subtitle="Max vote weight"
             placeholder="Community mint supply factor"
+            className="w-36"
             value={form.communityMintMaxVoteWeightSource}
             step="0.0000000001"
             max="1"
@@ -207,7 +211,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
               })
             }}
           />
-          <p className="mt-1 ml-3 text-gray-400">
+          <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
             {getMintSupplyFactorPercent()} vote weight
           </p>
         </div>
