@@ -10,10 +10,12 @@ const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
   onClick,
+  border = false,
 }: {
   governedAccountTokenAccount: GovernedTokenAccount
   className?: string
   onClick?: () => void
+  border?: boolean
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const [nftsCount, setNftsCount] = useState(0)
@@ -43,7 +45,9 @@ const AccountItemNFT = ({
   return (
     <div
       onClick={onClick ? onClick : handleGoToAccountOverview}
-      className={`cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3 ${
+      className={`cursor-pointer default-transition flex items-start text-fgd-1 ${
+        border && 'border'
+      } border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3 ${
         className && className
       }`}
     >

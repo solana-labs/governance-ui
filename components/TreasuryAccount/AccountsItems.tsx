@@ -27,6 +27,7 @@ const AccountsItems = () => {
         ) {
           return (
             <AccountItemNFT
+              border={true}
               governedAccountTokenAccount={accountWithGovernance}
               key={accountWithGovernance?.governance?.pubkey.toBase58()}
             />

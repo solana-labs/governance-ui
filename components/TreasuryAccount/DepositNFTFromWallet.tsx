@@ -113,7 +113,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
         componentLabel={
           currentAccount && (
             <AccountItemNFT
-              className="m-0 p-0 border-0 hover:bg-bkg-1"
+              className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-1"
               onClick={() => null}
               governedAccountTokenAccount={currentAccount}
             ></AccountItemNFT>
@@ -127,7 +127,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
           >
             <AccountItemNFT
               onClick={() => null}
-              className="m-0 p-0 border-0 hover:bg-bkg-2"
+              className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-2"
               governedAccountTokenAccount={accountWithGovernance}
             />
           </Select.Option>
