@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect } from 'react'
 import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm'
 import Input from '@components/inputs/Input'
@@ -16,6 +15,7 @@ import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
 import { MintMaxVoteWeightSource } from '@models/accounts'
+import BigNumber from 'bignumber.js'
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -56,17 +56,28 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   }
 
   const getMintSupplyFactorPercent = () => {
-    let value = '0%'
+    let value = '0'
     if (!form.communityMintMaxVoteWeightSource) return value
+    value = (+form.communityMintMaxVoteWeightSource! * 100).toFixed(2)
 
-    if (+form.communityMintMaxVoteWeightSource === 1) value = 'max'
-    else
-      value =
-        (+form.communityMintMaxVoteWeightSource! * 100).toFixed(
-          MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS - 2
-        ) + '%'
+    return value + '%'
+  }
 
-    return value + ' vote weight'
+  const getMinTokensToCreatePercent = () => {
+    let value = 'defaults 1%'
+    if (!form.minCommunityTokensToCreateGovernance) return value
+    if (form.communityMint?.account.supply) {
+      value = new BigNumber(form.minCommunityTokensToCreateGovernance)
+        .dividedBy(
+          new BigNumber(form.communityMint.account.supply.toString()).shiftedBy(
+            -form.communityMint.account.decimals
+          )
+        )
+        .times(100)
+        .toString()
+    }
+
+    return value + '%'
   }
 
   useEffect(() => {
@@ -147,7 +158,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             </div>
             <div className="pb-4 pr-10 mr-2">
               <Input
-                label="Min community tokens to create governance (defaults 1% of community mint)"
+                label={`Min community tokens to create governance (defaults 1% of community mint)`}
                 placeholder="Min community tokens to create governance"
                 step="1"
                 value={
@@ -164,12 +175,15 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                   })
                 }}
               />
+              <p className="mt-1 ml-3 text-gray-400">
+                {getMinTokensToCreatePercent()} of token supply
+              </p>
             </div>
           </>
         )}
         <div className="pb-4 pr-10 mr-2">
           <Input
-            label={`Community mint supply factor (${getMintSupplyFactorPercent()})`}
+            label={`Community mint supply factor (max vote weight)`}
             placeholder="Community mint supply factor"
             value={form.communityMintMaxVoteWeightSource}
             step="0.0000000001"
@@ -193,6 +207,9 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
               })
             }}
           />
+          <p className="mt-1 ml-3 text-gray-400">
+            {getMintSupplyFactorPercent()} vote weight
+          </p>
         </div>
         <div className="pb-4 pr-10 mr-2">
           <Input
