@@ -14,7 +14,6 @@ interface TreasuryAccountStore extends State {
     mintAddress: string
     tokenInfo: TokenRecord | null
     recentActivity: ConfirmedSignatureInfo[]
-    nftsCount?: number
   }
   allNfts: NFTWithMint[]
   governanceNfts: {
@@ -37,7 +36,6 @@ const compactDefaultState = {
   mintAddress: '',
   tokenInfo: null,
   recentActivity: [],
-  nftsCount: 0,
 }
 
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
@@ -83,18 +81,11 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   setCurrentCompactAccount: async (account, connection) => {
     const mintAddress =
       account && account.token ? account.token.account.mint.toBase58() : ''
-    const isNftMint = account.isNft
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
-    let nftsCount = 0
-    if (isNftMint && account.governance) {
-      nftsCount = _get().governanceNfts[account.governance?.pubkey.toBase58()]
-        ?.length
-    }
     set((s) => {
       s.compact.currentAccount = account
       s.compact.mintAddress = mintAddress
       s.compact.tokenInfo = mintAddress && tokenInfo ? tokenInfo : null
-      s.compact.nftsCount = nftsCount
     })
     _get().handleFetchRecentActivity(account, connection)
   },
