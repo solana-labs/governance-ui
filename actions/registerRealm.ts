@@ -13,7 +13,6 @@ import {
   VoteWeightSource,
 } from '../models/accounts'
 import { withCreateRealm } from '../models/withCreateRealm'
-import { RpcContext } from '../models/core/api'
 import { sendTransaction } from '../utils/send'
 import { ProgramVersion } from '@models/registry/constants'
 import {
@@ -25,7 +24,10 @@ import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import { chunks } from '@utils/helpers'
-import { WalletConnectionError } from '@solana/wallet-adapter-base'
+import {
+  SignerWalletAdapter,
+  WalletConnectionError,
+} from '@solana/wallet-adapter-base'
 import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
 import {
   getMintNaturalAmountFromDecimal,
@@ -33,6 +35,10 @@ import {
 } from '@tools/sdk/units'
 import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
 import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
+import { AccountInfo } from '@solana/spl-token'
+import { ProgramAccount } from '@project-serum/common'
+import { tryGetAta } from '@utils/validations'
+import { ConnectionContext } from '@utils/connection'
 
 /* 
   TODO: Check if the abstractions present here can be moved to a 
@@ -40,15 +46,21 @@ import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
   and reduce the code complexity
 */
 
+interface RegisterRealmRpc {
+  connection: ConnectionContext
+  wallet: SignerWalletAdapter
+  walletPubkey: PublicKey
+}
+
 /**
- * The default amount of community tokens with 0 supply
+ * The minimum amount of community tokens to create governance and proposals, for tokens with 0 supply
  */
-const DEF_COMMUNITY_TOKENS_W_0_SUPPLY = 1000000
+export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000
 
 /**
  * The default amount of decimals for the community token
  */
-const COMMUNITY_MINT_DECIMALS = 6
+export const COMMUNITY_MINT_DECIMALS = 6
 
 /**
  * Prepares the mint instructions
@@ -64,7 +76,7 @@ const COMMUNITY_MINT_DECIMALS = 6
  * @param otherOwners
  */
 async function prepareMintInstructions(
-  connection: Connection,
+  connection: ConnectionContext,
   walletPubkey: PublicKey,
   tokenDecimals: number,
   council = false,
@@ -84,7 +96,7 @@ async function prepareMintInstructions(
     _mintPk =
       mintPk ??
       (await withCreateMint(
-        connection,
+        connection.current,
         mintInstructions,
         mintSigners,
         walletPubkey,
@@ -97,15 +109,27 @@ async function prepareMintInstructions(
     // then should create mints to them
     if (otherOwners?.length) {
       for (const ownerPk of otherOwners) {
-        const ataPk = await withCreateAssociatedTokenAccount(
-          mintInstructions,
-          _mintPk,
+        const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
+          connection,
           ownerPk,
-          walletPubkey
+          _mintPk
         )
+        const shouldMint = !ata?.account.amount.gt(new BN(0))
+
+        const ataPk =
+          ata?.publicKey ??
+          (await withCreateAssociatedTokenAccount(
+            mintInstructions,
+            _mintPk,
+            ownerPk,
+            walletPubkey
+          ))
 
         // Mint 1 token to each owner
-        await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
+        if (shouldMint && ataPk) {
+          console.debug('will mint to ', { ataPk })
+          await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
+        }
 
         if (ownerPk.equals(walletPubkey)) {
           walletAtaPk = ataPk
@@ -154,9 +178,10 @@ function mountGovernanceConfig(
 
   const minCommunityTokensToCreateAsMintValue = new BN(
     getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance
+      minCommunityTokensToCreateGovernance &&
+        +minCommunityTokensToCreateGovernance > 0
         ? +minCommunityTokensToCreateGovernance
-        : DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
       tokenDecimals ?? COMMUNITY_MINT_DECIMALS
     )
   )
@@ -300,8 +325,31 @@ function sendTransactionFactory(
   }
 }
 
+/**
+ * Performs the necessary operations to register a realm, including:
+ *
+ *  - Create community mint instructions (if eligible)
+ *  - Create council mint instructions (if eligible)
+ *  - Deposit owner goverance tokens instruction (if eligible)
+ *  - Create governance config
+ *  - Create ATAs instructions
+ *  - Create realm instruction
+ *
+ * @param RpcContext
+ * @param programId Pubkey of the governance program
+ * @param programVersion
+ * @param name The name of the realm
+ * @param communityMint the community mint id
+ * @param councilMint the council mint id
+ * @param communityMintMaxVoteWeightSource
+ * @param minCommunityTokensToCreateGovernance Minimum amount of community tokens to create a governance
+ * @param yesVoteThreshold minimum percentage of yes votes to the proposal to pass
+ * @param transferAuthority if set to true, will transfer the authority of the community token to the realm
+ * @param communityMintTokenDecimals Token amount decimals
+ * @param councilWalletPks Array of wallets of the council/team
+ */
 export async function registerRealm(
-  { connection, wallet, walletPubkey }: RpcContext,
+  { connection, wallet, walletPubkey }: RegisterRealmRpc,
   programId: PublicKey,
   programVersion: ProgramVersion,
   name: string,
@@ -355,9 +403,10 @@ export async function registerRealm(
 
   const _minCommunityTokensToCreateGovernance = new BN(
     getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance
+      minCommunityTokensToCreateGovernance &&
+        +minCommunityTokensToCreateGovernance > 0
         ? +minCommunityTokensToCreateGovernance
-        : DEF_COMMUNITY_TOKENS_W_0_SUPPLY,
+        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
       communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
     )
   )
@@ -399,7 +448,7 @@ export async function registerRealm(
   }
 
   // Checks if the council token was generated by us and if transferAuthority is true
-  // and put them under governance
+  // then put them under governance
   if (tokenOwnerRecordPk) {
     await prepareGovernanceInstructions(
       walletPubkey,
@@ -418,7 +467,7 @@ export async function registerRealm(
 
   const txnToSend = sendTransactionFactory(
     wallet,
-    connection,
+    connection.current,
     councilMembersChunks,
     councilSignersChunks,
     realmInstructions,
@@ -428,6 +477,9 @@ export async function registerRealm(
   console.debug('sending transaction')
   await txnToSend
   console.debug('transaction sent')
-
+  console.debug({
+    communityMintPk,
+    councilMintPk,
+  })
   return realmAddress
 }
