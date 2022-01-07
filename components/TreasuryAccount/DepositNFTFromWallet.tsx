@@ -16,9 +16,8 @@ import { createATA } from '@utils/ataTools'
 import { getTokenAccountsByMint } from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
-import Select from '@components/inputs/Select'
-import AccountItemNFT from './AccountItemNFT'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import NFTAccountSelect from './NFTAccountSelect'
 
 const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const nftSelectorRef = useRef<NftSelectorFunctions>(null)
@@ -105,34 +104,11 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
 
   return (
     <>
-      <Select
-        className="w-full mb-2  max-w-full"
-        noMaxWidth={true}
+      <NFTAccountSelect
         onChange={(value) => setCurrentCompactAccount(value, connection)}
-        value={currentAccount?.governance?.pubkey.toBase58()}
-        componentLabel={
-          currentAccount && (
-            <AccountItemNFT
-              className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-1"
-              onClick={() => null}
-              governedAccountTokenAccount={currentAccount}
-            ></AccountItemNFT>
-          )
-        }
-      >
-        {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
-          <Select.Option
-            key={accountWithGovernance?.governance?.pubkey.toBase58()}
-            value={accountWithGovernance}
-          >
-            <AccountItemNFT
-              onClick={() => null}
-              className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-2"
-              governedAccountTokenAccount={accountWithGovernance}
-            />
-          </Select.Option>
-        ))}
-      </Select>
+        currentAccount={currentAccount}
+        nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
+      ></NFTAccountSelect>
       <NFTSelector
         ref={nftSelectorRef}
         ownerPk={wallet!.publicKey!}
