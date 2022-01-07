@@ -62,7 +62,10 @@ function NFTSelector(
   }, [selectedNfts])
   return (
     <>
-      <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
+      <div
+        style={{ maxHeight: '350px', minHeight: '100px' }}
+        className="overflow-y-auto"
+      >
         {!isLoading ? (
           nfts.length ? (
             <div className="flex flex-row flex-wrap gap-4 mb-4">
