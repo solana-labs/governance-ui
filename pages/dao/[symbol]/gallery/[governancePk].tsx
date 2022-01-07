@@ -17,6 +17,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
+  const { getNfts } = useTreasuryAccountStore()
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
@@ -31,6 +32,9 @@ const gallery = () => {
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   useEffect(() => {
     const getAllNftData = async () => {
+      if (!realmNfts.length) {
+        await getNfts(nftsGovernedTokenAccounts, connection.current)
+      }
       if (governancePk) {
         if (fetchAllNftsForRealm) {
           setNfts(realmNfts)
@@ -42,7 +46,12 @@ const gallery = () => {
     if (governancePk) {
       getAllNftData()
     }
-  }, [governancePk, connection.endpoint, nftsGovernedTokenAccounts.length])
+  }, [
+    governancePk,
+    connection.endpoint,
+    nftsGovernedTokenAccounts.length,
+    realmNfts.length,
+  ])
   return (
     <div className="grid grid-cols-12">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
