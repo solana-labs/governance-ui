@@ -32,7 +32,6 @@ const NFTSCompactWrapper = () => {
     setCurrentCompactAccount,
     resetCompactViewState,
   } = useTreasuryAccountStore()
-  const nftsCount = nfts.length
   useEffect(() => {
     const getAllNftData = async () => {
       setIsLoading(true)
@@ -49,7 +48,7 @@ const NFTSCompactWrapper = () => {
     }
     getAllNftData()
   }, [nftsGovernedTokenAccounts.length])
-  return nftsGovernedTokenAccounts.length && nftsCount ? (
+  return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <h3 className="mb-4 flex items-center">
         Collectables
