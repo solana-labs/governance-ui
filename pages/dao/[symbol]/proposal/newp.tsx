@@ -56,14 +56,14 @@
 //             }}
 //           ></VoteBySwitch>
 //         )}
-//         <NewProposalContext.Provider
-//           value={{
-//             instructionsData,
-//             handleSetInstructions,
-//             governance,
-//             setGovernance,
-//           }}
-//         >
+// <NewProposalContext.Provider
+//   value={{
+//     instructionsData,
+//     handleSetInstructions,
+//     governance,
+//     setGovernance,
+//   }}
+// >
 //           <h2>Instructions</h2>
 //           {instructionsData.map((instruction, idx) => {
 //             const availableInstructionsForIdx = getAvailableInstructionsForIndex(
@@ -280,17 +280,17 @@ export {}
 //       connection.endpoint
 //     )
 
-//     const instructionsData = instructions.map((x) => {
-//       return {
-//         data: x.serializedInstruction
-//           ? getInstructionDataFromBase64(x.serializedInstruction)
-//           : null,
-//         holdUpTime: x.customHoldUpTime
-//           ? getTimestampFromDays(x.customHoldUpTime)
-//           : selectedGovernance?.info?.config.minInstructionHoldUpTime,
-//         prerequisiteInstructions: x.prerequisiteInstructions || [],
-//       }
-//     })
+// const instructionsData = instructions.map((x) => {
+//   return {
+//     data: x.serializedInstruction
+//       ? getInstructionDataFromBase64(x.serializedInstruction)
+//       : null,
+//     holdUpTime: x.customHoldUpTime
+//       ? getTimestampFromDays(x.customHoldUpTime)
+//       : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+//     prerequisiteInstructions: x.prerequisiteInstructions || [],
+//   }
+// })
 
 //     try {
 //       selectedGovernance = (await fetchRealmGovernance(
