@@ -25,6 +25,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const { getNfts } = useTreasuryAccountStore()
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -87,6 +88,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       })
       setSendingSuccess(true)
       nftSelectorRef.current?.handleGetNfts()
+      getNfts(nftsGovernedTokenAccounts, connection.current)
     } catch (e) {
       notify({
         type: 'error',

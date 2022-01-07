@@ -13,6 +13,8 @@ import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
 import Tooltip from '@components/Tooltip'
 import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
 import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -38,6 +40,9 @@ const REALM = () => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const connection = useWalletStore((s) => s.connection.current)
+  const { getNfts } = useTreasuryAccountStore()
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
@@ -68,6 +73,10 @@ const REALM = () => {
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
   }, [proposals])
+
+  useEffect(() => {
+    getNfts(nftsGovernedTokenAccounts, connection)
+  }, [JSON.stringify(nftsGovernedTokenAccounts)])
   // DEBUG print remove
   console.log(
     'governance page tokenAccount',

@@ -1,10 +1,12 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/TreasuryAccount/Types'
-import { GovernedTokenAccount } from '@utils/tokens'
+import { getNfts, GovernedTokenAccount } from '@utils/tokens'
 import tokenService, { TokenRecord } from '@utils/services/token'
 import { ConfirmedSignatureInfo } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
+import { Connection } from '@solana/web3.js'
 
 interface TreasuryAccountStore extends State {
   compact: {
@@ -15,10 +17,19 @@ interface TreasuryAccountStore extends State {
     recentActivity: ConfirmedSignatureInfo[]
     nftsCount?: number
   }
+  allNfts: NFTWithMint[]
+  governanceNfts: {
+    [governance: string]: NFTWithMint[]
+  }
+  isLoadingNfts: boolean
   setCurrentCompactView: (viewState: ViewState) => void
   setCurrentCompactAccount: (account: GovernedTokenAccount, connection) => void
   resetCompactViewState: () => void
   handleFetchRecentActivity: (account: GovernedTokenAccount, connection) => void
+  getNfts: (
+    nftsGovernedTokenAccounts: GovernedTokenAccount[],
+    connection: Connection
+  ) => void
 }
 
 const compactDefaultState = {
@@ -33,6 +44,37 @@ const compactDefaultState = {
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   compact: {
     ...compactDefaultState,
+  },
+  allNfts: [],
+  governanceNfts: {},
+  isLoadingNfts: false,
+  getNfts: async (nftsGovernedTokenAccounts, connection) => {
+    set((s) => {
+      s.isLoadingNfts = true
+    })
+    let realmNfts: NFTWithMint[] = []
+    const governanceNfts = {}
+    for (const acc of nftsGovernedTokenAccounts) {
+      const governance = acc.governance?.pubkey.toBase58()
+      try {
+        const nfts = acc.governance?.pubkey
+          ? await getNfts(connection, acc.governance.pubkey)
+          : []
+        realmNfts = [...realmNfts, ...nfts]
+        if (governance) {
+          governanceNfts[governance] = [...nfts]
+        }
+      } catch (e) {
+        notify({
+          message: `Unable to fetch nfts for governance ${governance}`,
+        })
+      }
+    }
+    set((s) => {
+      s.allNfts = realmNfts
+      s.governanceNfts = governanceNfts
+      s.isLoadingNfts = false
+    })
   },
   setCurrentCompactView: (viewState) => {
     set((s) => {

@@ -22,6 +22,7 @@ const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realmInfo } = useRealm()
   const { proposal, description } = useProposal()
+
   const {
     yesVoteProgress,
     yesVoteCount,
