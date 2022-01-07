@@ -35,25 +35,23 @@ const Footer = () => {
             rel="noreferrer"
             target="_blank"
             href="https://twitter.com/solana"
-            className="text-primary-light text-base font-light"
+            className="text-primary-light text-base font-light transform transition duration-500 hover:scale-125 shadow-sm"
           >
             <TwitterIcon className="" />
           </a>
-
           <a
             rel="noreferrer"
             target="_blank"
             href="https://github.com/solana-labs/governance-ui"
-            className="text-primary-light text-base font-light"
+            className="text-primary-light text-base font-light transform transition duration-500 hover:scale-125  shadow-sm"
           >
             <GithubIcon className="" />
           </a>
-
           <a
             rel="noreferrer"
             target="_blank"
             href="https://discord.com/invite/VsPbrK2hJk"
-            className="text-primary-light text-base font-light"
+            className="text-primary-light text-base font-light transform transition duration-500 hover:scale-125 shadow-sm"
           >
             <DiscordIcon className="" />
           </a>
