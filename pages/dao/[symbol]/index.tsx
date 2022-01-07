@@ -15,6 +15,7 @@ import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
 import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { usePrevious } from '@hooks/usePrevious'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -41,6 +42,9 @@ const REALM = () => {
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
+    JSON.stringify(nftsGovernedTokenAccounts)
+  )
   const connection = useWalletStore((s) => s.connection.current)
   const { getNfts } = useTreasuryAccountStore()
   const [filters, setFilters] = useState<ProposalState[]>([])
@@ -75,7 +79,12 @@ const REALM = () => {
   }, [proposals])
 
   useEffect(() => {
-    getNfts(nftsGovernedTokenAccounts, connection)
+    if (
+      prevStringifyNftsGovernedTokenAccounts !==
+      JSON.stringify(nftsGovernedTokenAccounts)
+    ) {
+      getNfts(nftsGovernedTokenAccounts, connection)
+    }
   }, [JSON.stringify(nftsGovernedTokenAccounts)])
   // DEBUG print remove
   console.log(

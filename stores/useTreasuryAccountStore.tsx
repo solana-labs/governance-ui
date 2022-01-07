@@ -4,7 +4,6 @@ import { getNfts, GovernedTokenAccount } from '@utils/tokens'
 import tokenService, { TokenRecord } from '@utils/services/token'
 import { ConfirmedSignatureInfo } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 
@@ -87,19 +86,10 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     const isNftMint = account.isNft
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
     let nftsCount = 0
-    if (isNftMint) {
-      try {
-        nftsCount = (
-          await getParsedNftAccountsByOwner({
-            publicAddress: account.governance?.pubkey,
-            connection: connection.current,
-          })
-        ).length
-      } catch (e) {
-        console.log(e)
-      }
+    if (isNftMint && account.governance) {
+      nftsCount = _get().governanceNfts[account.governance?.pubkey.toBase58()]
+        ?.length
     }
-
     set((s) => {
       s.compact.currentAccount = account
       s.compact.mintAddress = mintAddress
