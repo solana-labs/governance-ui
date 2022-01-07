@@ -111,7 +111,11 @@ const gallery = () => {
             {nfts.map((x, idx) => (
               <a
                 key={idx}
-                href={getExplorerUrl(connection.endpoint, x.mint)}
+                href={
+                  connection.endpoint && x.mint
+                    ? getExplorerUrl(connection.endpoint, x.mint)
+                    : ''
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
