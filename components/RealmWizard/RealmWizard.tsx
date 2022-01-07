@@ -62,7 +62,7 @@ const RealmWizard: React.FC = () => {
    * The wizard controller instance
    */
   const [ctl, setController] = useState<RealmWizardController>()
-  const [testRealmCheck, setTestRealmCheck] = useState(true)
+  const [testRealmCheck, setTestRealmCheck] = useState(false)
   const [form, setForm] = useState<RealmArtifacts>({
     communityMintMaxVoteWeightSource: '1',
   })
