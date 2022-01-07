@@ -1,8 +1,7 @@
-import useMembersListStore from 'stores/useMembersStore'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
-import Button, { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from 'utils/formatting'
@@ -20,25 +19,16 @@ import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
-import AddMemberIcon from '@components/AddMemberIcon'
-import Tooltip from '@components/Tooltip'
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-} from '@heroicons/react/outline'
-import Spinner from '@components/Spinner'
 
 interface AddMemberFormFullScreen extends MintForm {
   description: string
   title: string
 }
 
-const AddMemberFormFullScreen = () => {
+const AddMemberFormFullScreen = ({ title, description }) => {
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const [lastStep, setLastStep] = useState(false)
   const [submitted, setSubmitted] = useState(false)
 
   const router = useRouter()
@@ -66,9 +56,11 @@ const AddMemberFormFullScreen = () => {
     amount: 1,
     mintAccount: undefined,
     programId: programId?.toString(),
-    description: '',
-    title: '',
+    description: description || '',
+    title: title || '',
   })
+
+  const proposalTitle = `Add council member ${form.destinationAccount}`
 
   const schema = getMintSchema({ form, connection })
 
@@ -77,19 +69,6 @@ const AddMemberFormFullScreen = () => {
     : 1
 
   const currentPrecision = precision(mintMinAmount)
-
-  const proposalTitle = `Add council member ${form.destinationAccount}`
-
-  const defaultProposalMint = !mint?.supply.isZero()
-    ? realm?.info.communityMint
-    : !councilMint?.supply.isZero()
-    ? realm?.info.config.councilMint
-    : undefined
-
-  const proposalMint =
-    canChooseWhoVote && voteByCouncil
-      ? realm?.info.config.councilMint
-      : defaultProposalMint
 
   const setAmount = (event) => {
     const value = event.target.value
@@ -243,129 +222,57 @@ const AddMemberFormFullScreen = () => {
 
   return (
     <>
-      {submitted ? (
-        <div className="w-full flex gap-y-5 justify-start items-start max-w-md mt-16 rounded-xl">
-          <div className="flex flex-col gap-y-3 justify-center items-center">
-            <Spinner className="" />
+      <Input
+        useDefaultStyle={false}
+        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+        wrapperClassName="my-6 w-full"
+        label="Member's wallet"
+        placeholder="Member's wallet"
+        value={form.destinationAccount}
+        type="text"
+        onChange={(event) =>
+          handleSetForm({
+            value: event.target.value,
+            propertyName: 'destinationAccount',
+          })
+        }
+        noMaxWidth
+        error={formErrors['destinationAccount']}
+      />
 
-            <p className="text-base">Creating proposal...</p>
+      <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+        wrapperClassName="mb-6 w-1/2"
+        min={mintMinAmount}
+        label="Voter weight"
+        value={form.amount}
+        type="number"
+        onChange={setAmount}
+        step={mintMinAmount}
+        error={formErrors['amount']}
+        onBlur={validateAmountOnBlur}
+      />
 
-            <p className="text-sm">This can take a few seconds</p>
-          </div>
+      <VoteBySwitch
+        disabled={!canChooseWhoVote}
+        checked={voteByCouncil}
+        onChange={() => {
+          setVoteByCouncil(!voteByCouncil)
+        }}
+      />
 
-          <div className="w-full mt-16">
-            <p>Title: {form.title}</p>
-            <p>Description: {form.description}</p>
-            <p>Destination account: {form.destinationAccount}</p>
-            <p>Amount: {form.amount}</p>
-          </div>
-        </div>
-      ) : (
-        <>
-          <Input
-            useDefaultStyle={false}
-            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-            wrapperClassName="my-6"
-            label="Member's wallet"
-            placeholder="Member's wallet"
-            value={form.destinationAccount}
-            type="text"
-            onChange={(event) =>
-              handleSetForm({
-                value: event.target.value,
-                propertyName: 'destinationAccount',
-              })
-            }
-            noMaxWidth
-            error={formErrors['destinationAccount']}
-          />
-
-          <div
-            className={'flex items-center hover:cursor-pointer w-24 my-3'}
-            onClick={() => setShowOptions(!showOptions)}
-          >
-            {showOptions ? (
-              <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
-            ) : (
-              <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
-            )}
-            <small className="text-fgd-3">Options</small>
-          </div>
-
-          {showOptions && (
-            <>
-              <Input
-                noMaxWidth
-                useDefaultStyle={false}
-                className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-                wrapperClassName="mb-6"
-                label="Title of your proposal"
-                placeholder="Title of your proposal"
-                value={form.title}
-                type="text"
-                onChange={(event) =>
-                  handleSetForm({
-                    value: event.target.value,
-                    propertyName: 'title',
-                  })
-                }
-              />
-
-              <Input
-                noMaxWidth
-                useDefaultStyle={false}
-                className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-                wrapperClassName="mb-6"
-                min={mintMinAmount}
-                label="Voter weight"
-                value={form.amount}
-                type="number"
-                onChange={setAmount}
-                step={mintMinAmount}
-                error={formErrors['amount']}
-                onBlur={validateAmountOnBlur}
-              />
-
-              {canChooseWhoVote && (
-                <VoteBySwitch
-                  checked={voteByCouncil}
-                  onChange={() => {
-                    setVoteByCouncil(!voteByCouncil)
-                  }}
-                />
-              )}
-
-              <Input
-                noMaxWidth
-                useDefaultStyle={false}
-                className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-                wrapperClassName="mb-6"
-                label="Description"
-                placeholder="Describe your proposal (optional)"
-                value={form.description}
-                type="text"
-                onChange={(event) =>
-                  handleSetForm({
-                    value: event.target.value,
-                    propertyName: 'description',
-                  })
-                }
-              />
-            </>
-          )}
-
-          <div className="justify-center flex gap-x-6 items-center mt-8">
-            <Button
-              disabled={!form.destinationAccount}
-              className="w-44 flex justify-center items-center"
-              onClick={() => handlePropose()}
-              isLoading={isLoading}
-            >
-              Add member
-            </Button>
-          </div>
-        </>
-      )}
+      <div className="justify-center flex gap-x-6 items-center mt-8">
+        <Button
+          disabled={!form.destinationAccount}
+          className="w-44 flex justify-center items-center"
+          onClick={() => handlePropose()}
+          isLoading={isLoading}
+        >
+          Add member
+        </Button>
+      </div>
     </>
   )
 }

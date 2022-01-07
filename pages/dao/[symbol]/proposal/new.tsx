@@ -54,6 +54,8 @@ import UpgradeProgramNewForm from '@components/AssetsList/UpgradeProgramForm'
 import Spinner from '@components/Spinner'
 import AddMemberFormFullScreen from './FullscreenViews/AddMemberForm'
 import TreasuryPaymentFormFullScreen from './FullscreenViews/TreasuryPaymentForm'
+import OptionalForm from './FullscreenViews/OptionalForm'
+import { tooltipMessage } from './components/TooltipMessages'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -69,37 +71,28 @@ export const NewProposalContext = createContext<InstructionsContext>(
 )
 
 const New = () => {
-  const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const { symbol, realmDisplayName } = useRealm()
+
   const {
-    symbol,
-    realm,
-    realmInfo,
-    realmDisplayName,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    canChooseWhoVote,
-    toManyCouncilOutstandingProposalsForUse,
-    toManyCommunityOutstandingProposalsForUser,
-  } = useRealm()
+    treasuryPaymentTooltip,
+    addNewMemberTooltip,
+    programUpgradeTooltip,
+    mintTokensTooltip,
+  } = tooltipMessage()
 
   const connected = useWalletStore((s) => s.connected)
 
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const {
-    fetchRealmGovernance,
-    fetchTokenAccountsForSelectedRealmGovernances,
-  } = useWalletStore((s) => s.actions)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const { fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore(
+    (s) => s.actions
+  )
   const [form, setForm] = useState({
     title: '',
     description: '',
   })
-  const [formErrors, setFormErrors] = useState({})
+  const [, /*formErrors*/ setFormErrors] = useState({})
   const [
     governance,
     setGovernance,
@@ -111,33 +104,26 @@ const New = () => {
     value: '',
     idx: -1,
   })
-  const isLoading = isLoadingSignedProposal || isLoadingDraft
-  const {
-    canUseMintInstruction,
-    canMintRealmCouncilToken,
-    canUseProgramUpgradeInstruction,
-    canUseTransferInstruction,
-    canMintRealmCommunityToken,
-  } = useGovernanceAssets()
+  // const isLoading = isLoadingSignedProposal || isLoadingDraft
 
-  const customInstructionFilterForSelectedGovernance = (
-    instructionType: Instructions
-  ) => {
-    if (!governance) {
-      return true
-    } else {
-      const governanceType = governance.info.accountType
-      const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-      switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernance:
-          return instructionsAvailiableAfterProgramGovernance.includes(
-            instructionType
-          )
-        default:
-          return true
-      }
-    }
-  }
+  // const customInstructionFilterForSelectedGovernance = (
+  //   instructionType: Instructions
+  // ) => {
+  //   if (!governance) {
+  //     return true
+  //   } else {
+  //     const governanceType = governance.info.accountType
+  //     const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
+  //     switch (governanceType) {
+  //       case GovernanceAccountType.ProgramGovernance:
+  //         return instructionsAvailiableAfterProgramGovernance.includes(
+  //           instructionType
+  //         )
+  //       default:
+  //         return true
+  //     }
+  //   }
+  // }
 
   // const getAvailableInstructionsForIndex = (index) => {
   //   if (index === 0) {
@@ -164,8 +150,6 @@ const New = () => {
   }
 
   const goToStepTwo = ({ value, idx }) => {
-    console.log('selected instruction', value, idx)
-
     const newInstruction = {
       type: value,
     }
@@ -180,46 +164,42 @@ const New = () => {
     handleSetInstructions(newInstruction, idx)
   }
 
-  const addInstruction = () => {
-    setInstructions([...instructionsData, { type: undefined }])
-  }
+  // const addInstruction = () => {
+  //   setInstructions([...instructionsData, { type: undefined }])
+  // }
 
-  const removeInstruction = (idx) => {
-    setInstructions([...instructionsData.filter((x, index) => index !== idx)])
-  }
+  // const removeInstruction = (idx) => {
+  //   setInstructions([...instructionsData.filter((x, index) => index !== idx)])
+  // }
 
-  const handleGetInstructions = async () => {
-    const instructions: UiInstruction[] = []
+  // const handleGetInstructions = async () => {
+  //   const instructions: UiInstruction[] = []
 
-    for (const inst of instructionsData) {
-      if (inst.getInstruction) {
-        const instruction: UiInstruction = await inst?.getInstruction()
+  //   for (const inst of instructionsData) {
+  //     if (inst.getInstruction) {
+  //       const instruction: UiInstruction = await inst?.getInstruction()
 
-        instructions.push(instruction)
-      }
-    }
+  //       instructions.push(instruction)
+  //     }
+  //   }
 
-    return instructions
-  }
+  //   return instructions
+  // }
 
-  const handleTurnOffLoaders = () => {
-    setIsLoadingSignedProposal(false)
-    setIsLoadingDraft(false)
-  }
+  // const handleTurnOffLoaders = () => {
+  //   setIsLoadingSignedProposal(false)
+  //   setIsLoadingDraft(false)
+  // }
 
-  const checkForDraft = (isDraft) => {
-    if (isDraft) {
-      setIsLoadingDraft(true)
+  // const checkForDraft = (isDraft) => {
+  //   if (isDraft) {
+  //     setIsLoadingDraft(true)
 
-      return
-    }
+  //     return
+  //   }
 
-    setIsLoadingSignedProposal(true)
-  }
-
-  useEffect(() => {
-    setInstructions([instructionsData[0]])
-  }, [instructionsData[0].governedAccount?.pubkey])
+  //   setIsLoadingSignedProposal(true)
+  // }
 
   useEffect(() => {
     const firstInstruction = instructionsData[0]
@@ -232,70 +212,20 @@ const New = () => {
     fetchTokenAccountsForSelectedRealmGovernances()
   }, [])
 
-  const getAvailableInstructionsForIndex = (index) => {
-    if (index === 0) {
-      return availableInstructions
-    }
+  // const getAvailableInstructionsForIndex = (index) => {
+  //   if (index === 0) {
+  //     return availableInstructions
+  //   }
 
-    return []
-  }
+  //   return []
+  // }
 
-  const classNames = (...classes) => {
-    return classes.filter(Boolean).join(' ')
-  }
-
-  const availableInstructionsForIdx = getAvailableInstructionsForIndex(0)
-
-  useEffect(() => {
-    console.log('current available instructions', availableInstructionsForIdx)
-  }, [availableInstructionsForIdx])
-
-  const treasuryPaymentTooltip = !connected
-    ? 'Connect your wallet to make a treasury payment'
-    : !canUseTransferInstruction
-    ? "You don't have enough governance power to make a treasury payment"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new treasury payment proposal.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new treasury payment proposal.'
-    : ''
-
-  const addNewMemberTooltip = !connected
-    ? 'Connect your wallet to add new council member'
-    : !canMintRealmCouncilToken()
-    ? 'Your realm need mint governance for council token to add new member'
-    : !canUseMintInstruction
-    ? "You don't have enough governance power to add new council member"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
-    : ''
-
-  const programUpgradeTooltip = !connected
-    ? 'Connect your wallet to upgrade a program'
-    : !canUseProgramUpgradeInstruction
-    ? "You don't have enough governance power to upgrade a program"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
-    : ''
-
-  const mintTokensTooltip = !connected
-    ? 'Connect your wallet to mint tokens'
-    : !canUseMintInstruction
-    ? "You don't have enough governance power to mint tokens"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
-    : ''
+  // const availableInstructionsForIdx = getAvailableInstructionsForIndex(0)
 
   const StepOne = () => {
     return (
       <>
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-md mt-16 rounded-xl">
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-md rounded-xl">
           <Button
             onClick={() =>
               goToStepTwo({
@@ -389,7 +319,7 @@ const New = () => {
           </SecondaryButton>
         </div>
 
-        <div className="max-w-xs w-full mt-16">
+        <div className="max-w-xs w-full">
           <TokenBalanceCard />
 
           <Links />
@@ -419,21 +349,21 @@ const New = () => {
       case Instructions.MangoMakeChangeMaxAccounts:
         return <MakeChangeMaxAccounts index={idx} governance={governance} />
       case Instructions.AddMemberForm:
-        return <AddMemberFormFullScreen />
+        return (
+          <AddMemberFormFullScreen
+            title={form.title || ''}
+            description={form.description || ''}
+          />
+        )
       case Instructions.TreasuryPaymentForm:
         return (
-          <>
-            <TreasuryPaymentFormFullScreen
-              index={idx}
-              governance={governance}
-            />
-
-            {/* <div className="max-w-xs w-full mt-16">
-              <TokenBalanceCard />
-
-              <Links />
-            </div> */}
-          </>
+          <TreasuryPaymentFormFullScreen
+            index={idx}
+            governance={governance}
+            setGovernance={setGovernance}
+            title={form.title || ''}
+            description={form.description || ''}
+          />
         )
       default:
         null
@@ -443,12 +373,17 @@ const New = () => {
   const StepTwo = () => {
     return (
       <>
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-md mt-8 rounded-xl">
-          {selectedType.idx > -1 &&
-            getCurrentInstruction({
-              typeId: selectedType.idx,
-              idx: selectedType.idx,
-            })}
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+          {getCurrentInstruction({
+            typeId: selectedType.idx,
+            idx: selectedType.idx,
+          })}
+        </div>
+
+        <div className="max-w-xs w-full mt-6">
+          <OptionalForm form={form} handleSetForm={handleSetForm} />
+
+          <TokenBalanceCard />
         </div>
       </>
     )
@@ -535,7 +470,11 @@ const New = () => {
           ))}
         </ul>
 
-        <div className="flex justify-between w-full">
+        <div
+          className={`${
+            selectedStep === 0 ? 'mt-16' : 'mt-8'
+          } flex justify-between w-full`}
+        >
           {selectedStep === 0 && <StepOne />}
           {selectedStep === 1 && <StepTwo />}
           {selectedStep === 2 && <StepThree />}

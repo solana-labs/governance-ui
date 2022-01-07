@@ -20,7 +20,7 @@ export const inputClasses = ({
   const defaultStyle = `${
     disabled
       ? disabledStyle
-      : 'p-3 w-full border border-fgd-3 default-transition text-sm text-fgd-1 rounded-md hover:border-primary-light focus:border-primary-light focus:outline-none bg-bkg-1'
+      : 'p-4 w-full border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md hover:border-primary-light focus:border-primary-light focus:outline-none bg-bkg-1'
   }`
 
   return `

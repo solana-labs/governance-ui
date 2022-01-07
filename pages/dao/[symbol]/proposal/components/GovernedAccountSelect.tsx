@@ -19,6 +19,7 @@ const GovernedAccountSelect = ({
   label,
   useDefaultStyle = true,
   className = '',
+  noMaxWidth = false,
 }: {
   onChange
   value
@@ -29,10 +30,12 @@ const GovernedAccountSelect = ({
   label
   useDefaultStyle?: boolean
   className?: string
+  noMaxWidth?: boolean
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
       const accountType = value.governance.info.accountType
+
       switch (accountType) {
         case GovernanceAccountType.MintGovernance:
           return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
@@ -43,10 +46,11 @@ const GovernedAccountSelect = ({
         default:
           return value.governance.info.governedAccount.toBase58()
       }
-    } else {
-      return null
     }
+
+    return null
   }
+
   //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
   function getMintAccountLabelComponent({
     account,
@@ -103,6 +107,7 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
+
   useEffect(() => {
     if (governedAccounts.length == 1) {
       //wait for microtask queue to be empty
@@ -111,6 +116,7 @@ const GovernedAccountSelect = ({
       })
     }
   }, [JSON.stringify(governedAccounts)])
+
   return (
     <Select
       useDefaultStyle={useDefaultStyle}
@@ -124,6 +130,7 @@ const GovernedAccountSelect = ({
       placeholder="Please select..."
       value={value?.governance?.info.governedAccount.toBase58()}
       error={error}
+      noMaxWidth={noMaxWidth}
     >
       {governedAccounts
         .filter((x) =>

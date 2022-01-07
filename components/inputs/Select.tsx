@@ -66,7 +66,11 @@ const Select = ({
               {open ? (
                 <Listbox.Options
                   static
-                  className={`text-fgd-1 text-sm max-h-64 max-w-2xl overflow-auto z-20 w-full p-1 absolute left-0 mt-1 bg-bkg-1 origin-top-left divide-y divide-bkg-3 shadow-lg outline-none rounded-md thin-scroll`}
+                  className={`${
+                    useDefaultStyle
+                      ? 'text-fgd-1 text-sm max-h-64 max-w-2xl overflow-auto z-20 w-full p-1 absolute left-0 mt-1 bg-bkg-1 origin-top-left divide-y divide-bkg-3 shadow-lg outline-none rounded-md thin-scroll'
+                      : 'text-fgd-1 text-sm max-h-64 max-w-2xl overflow-auto z-20 w-full p-1 absolute left-0 mt-3 bg-bkg-3 origin-top-left divide-opacity-20 shadow-lg outline-none rounded-md thin-scroll'
+                  }`}
                 >
                   {children}
                 </Listbox.Options>

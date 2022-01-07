@@ -187,8 +187,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {
-      console.log('fetchRealmBySymbol', cluster, symbol)
-
       const actions = get().actions
       let connection = get().connection
       const set = get().set
@@ -232,11 +230,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           connection,
           walletOwner
         )
-        console.log(
-          'fetchWalletTokenAccounts',
-          connected,
-          ownedTokenAccounts.map((t) => t.account.mint.toBase58())
-        )
 
         set((state) => {
           state.tokenAccounts = ownedTokenAccounts
@@ -262,8 +255,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           walletOwner
         )
 
-        console.log('fetchOwnVoteRecords', connected, ownVoteRecordsByProposal)
-
         set((state) => {
           state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
         })
@@ -280,8 +271,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
     },
     async fetchAllRealms(programId: PublicKey) {
-      console.log('fetchAllRealms', programId.toBase58())
-
       const endpoint = get().connection.endpoint
       const set = get().set
 
@@ -295,8 +284,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       set((s) => {
         s.realms = realms
       })
-
-      console.log('fetchAllRealms', get().realms)
     },
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set
@@ -356,14 +343,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
       ])
 
-      console.log('fetchRealm mint', realmMint)
-      console.log('fetchRealm councilMint', realmCouncilMint)
-      console.log('fetchRealm governances', governances)
-      console.log('fetchRealm tokenRecords', {
-        tokenRecords,
-        councilTokenOwnerRecords,
-      })
-
       set((s) => {
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
@@ -391,8 +370,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ...proposalsByGovernance
       )
 
-      console.log('fetchRealm proposals', proposals)
-
       set((s) => {
         s.selectedRealm.proposals = proposals
       })
@@ -403,8 +380,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           return [k, await resolveProposalDescription(v.info.descriptionLink)]
         }
       )
-
-      console.log('fetchRealm proposalDescriptions', proposalDescriptions)
 
       set((s) => {
         s.selectedRealm.proposalDescriptions = proposalDescriptions
@@ -427,8 +402,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     },
 
     async fetchProposal(proposalPk: string) {
-      console.log('fetchProposal', proposalPk)
-
       const connection = get().connection.current
       const endpoint = get().connection.endpoint
       const realmMints = get().selectedRealm.mints
@@ -500,18 +473,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       )
         ? GoverningTokenType.Community
         : GoverningTokenType.Council
-
-      console.log('fetchProposal fetched', {
-        governance,
-        proposal,
-        realm,
-        instructions,
-        voteRecordsByVoter,
-        signatories,
-        chatMessages,
-        tokenType,
-        proposalOwner,
-      })
 
       set((s) => {
         s.selectedProposal.proposal = proposal
