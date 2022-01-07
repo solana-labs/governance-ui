@@ -17,6 +17,7 @@ import useRealm from './useRealm'
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
+
   const { ownVoterWeight, realm, symbol } = useRealm()
   const governancesArray = Object.keys(governances)
     .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
@@ -177,6 +178,7 @@ export default function useGovernanceAssets() {
         ),
     },
   ]
+
   return {
     governancesArray,
     getGovernancesByAccountType,

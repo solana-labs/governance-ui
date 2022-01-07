@@ -1,10 +1,11 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/TreasuryAccount/Types'
-import { GovernedTokenAccount } from '@utils/tokens'
+import { getNfts, GovernedTokenAccount } from '@utils/tokens'
 import tokenService, { TokenRecord } from '@utils/services/token'
 import { ConfirmedSignatureInfo } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
+import { Connection } from '@solana/web3.js'
 
 interface TreasuryAccountStore extends State {
   compact: {
@@ -13,12 +14,20 @@ interface TreasuryAccountStore extends State {
     mintAddress: string
     tokenInfo: TokenRecord | null
     recentActivity: ConfirmedSignatureInfo[]
-    nftsCount?: number
   }
+  allNfts: NFTWithMint[]
+  governanceNfts: {
+    [governance: string]: NFTWithMint[]
+  }
+  isLoadingNfts: boolean
   setCurrentCompactView: (viewState: ViewState) => void
   setCurrentCompactAccount: (account: GovernedTokenAccount, connection) => void
   resetCompactViewState: () => void
   handleFetchRecentActivity: (account: GovernedTokenAccount, connection) => void
+  getNfts: (
+    nftsGovernedTokenAccounts: GovernedTokenAccount[],
+    connection: Connection
+  ) => void
 }
 
 const compactDefaultState = {
@@ -27,12 +36,42 @@ const compactDefaultState = {
   mintAddress: '',
   tokenInfo: null,
   recentActivity: [],
-  nftsCount: 0,
 }
 
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   compact: {
     ...compactDefaultState,
+  },
+  allNfts: [],
+  governanceNfts: {},
+  isLoadingNfts: false,
+  getNfts: async (nftsGovernedTokenAccounts, connection) => {
+    set((s) => {
+      s.isLoadingNfts = true
+    })
+    let realmNfts: NFTWithMint[] = []
+    const governanceNfts = {}
+    for (const acc of nftsGovernedTokenAccounts) {
+      const governance = acc.governance?.pubkey.toBase58()
+      try {
+        const nfts = acc.governance?.pubkey
+          ? await getNfts(connection, acc.governance.pubkey)
+          : []
+        realmNfts = [...realmNfts, ...nfts]
+        if (governance) {
+          governanceNfts[governance] = [...nfts]
+        }
+      } catch (e) {
+        notify({
+          message: `Unable to fetch nfts for governance ${governance}`,
+        })
+      }
+    }
+    set((s) => {
+      s.allNfts = realmNfts
+      s.governanceNfts = governanceNfts
+      s.isLoadingNfts = false
+    })
   },
   setCurrentCompactView: (viewState) => {
     set((s) => {
@@ -42,27 +81,11 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   setCurrentCompactAccount: async (account, connection) => {
     const mintAddress =
       account && account.token ? account.token.account.mint.toBase58() : ''
-    const isNftMint = account.isNft
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
-    let nftsCount = 0
-    if (isNftMint) {
-      try {
-        nftsCount = (
-          await getParsedNftAccountsByOwner({
-            publicAddress: account.governance?.pubkey,
-            connection: connection.current,
-          })
-        ).length
-      } catch (e) {
-        console.log(e)
-      }
-    }
-
     set((s) => {
       s.compact.currentAccount = account
       s.compact.mintAddress = mintAddress
       s.compact.tokenInfo = mintAddress && tokenInfo ? tokenInfo : null
-      s.compact.nftsCount = nftsCount
     })
     _get().handleFetchRecentActivity(account, connection)
   },

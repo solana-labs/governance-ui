@@ -9,7 +9,12 @@ const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
-  const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
+  const nftsCount =
+    currentAccount?.governance && currentAccount.isNft
+      ? useTreasuryAccountStore((s) => s.governanceNfts)[
+          currentAccount?.governance?.pubkey.toBase58()
+        ]?.length
+      : 0
   const isNFT = currentAccount?.isNft
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const [totalPrice, setTotalPrice] = useState('')

@@ -22,7 +22,6 @@ import tokenService from './services/token'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import axios from 'axios'
 import { notify } from './notifications'
-import { ConnectionContext } from './connection'
 import { NFTWithMint } from './uiTypes/nfts'
 
 export type TokenAccount = AccountInfo
@@ -354,14 +353,11 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-export const getNfts = async (
-  connection: ConnectionContext,
-  ownerPk: PublicKey
-) => {
+export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
   try {
     const nfts = await getParsedNftAccountsByOwner({
       publicAddress: ownerPk,
-      connection: connection.current,
+      connection: connection,
     })
     const data = Object.keys(nfts).map((key) => nfts[key])
     const arr: NFTWithMint[] = []
