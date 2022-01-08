@@ -19,19 +19,30 @@ jobs:
       # Checking out the repo to scan
       - name: Checkout code
         uses: actions/checkout@v2
-      
-      # Run Trivy with the following args
-      - name: Run Trivy
+
+      # Run Trivy to fail the job on critical vulnerabiliies with fix available
+      - name: Run Trivy for critical vulnerabilities
         uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs' # Filesystem mode
+          ignore-unfixed: true # Ignore vulnerabilities with no available fix
+          format: 'table' # Table output mode as next step will report in security tab
+          severity: 'CRITICAL' # Error only on critical vulnerabilities
+          exit-code: '1' # Fail the job if a critical vulnerability with fix available is found
+
+      # Run Trivy reporting all vulnerabilities to the security tab
+      - name: Run Trivy for reporting all vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        if: always() # Run this step even if job fails due to critical vuln
         with:
           scan-type: 'fs' # Filesystem mode
           ignore-unfixed: true # Ignore vulnerabilities with no available fix
           format: 'template' # Template output mode
           template: '@/contrib/sarif.tpl' # SARIF template to be compatible with GitHub security tab
           output: 'trivy-results.sarif' # Output file name
-          severity: 'CRITICAL' # Report error only on critical vulnerabilities. Warn on lower severities
-          exit-code: '1' # Fail the job if a critical vulnerability with fix available is found
-      
+          severity: 'CRITICAL,HIGH,MEDIUM' # Report on critical/high/medium vulnerabiliies
+          exit-code: '0' # No failing as for reporting purposes
+
       # Generate the output as SARIF and upload to the security tab
       - name: Upload Trivy results
         uses: github/codeql-action/upload-sarif@v1
