@@ -58,7 +58,7 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
     <div>
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>New Multisig Realm</h1>
+          <h1>New Multisig DAO</h1>
         </div>
       </div>
       <div className="pb-4 my-5 pr-10 w-full" style={{ maxWidth: 512 }}>

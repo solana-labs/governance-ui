@@ -16,7 +16,7 @@ export interface RealmArtifacts {
   councilMintId?: string
   councilMint?: ProgramAccount<MintInfo>
   programVersion?: ProgramVersion
-  communityMintMaxVoteWeightSource?: number
+  communityMintMaxVoteWeightSource?: string
   minCommunityTokensToCreateGovernance?: string
   teamWallets?: string[]
   yesThreshold?: number

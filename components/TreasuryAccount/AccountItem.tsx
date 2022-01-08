@@ -1,12 +1,10 @@
 import { PublicKey } from '@solana/web3.js'
-import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getAccountName } from '@components/instructions/tools'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService, { TokenRecord } from '@utils/services/token'
 import { GovernedTokenAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import { abbreviateAddress } from '@utils/formatting'
-import { getExplorerUrl } from '../explorer/tools'
 import useWalletStore from '../../stores/useWalletStore'
 import BN from 'bn.js'
 import BigNumber from 'bignumber.js'
@@ -91,18 +89,6 @@ const AccountItem = ({
                 {abbreviateAddress(accountPublicKey as PublicKey)}
               </div>
             )}
-            <a
-              href={
-                accountPublicKey
-                  ? getExplorerUrl(connection.endpoint, accountPublicKey)
-                  : ''
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-            </a>
           </div>
         )}
         <div className="text-fgd-3 text-xs flex flex-col">
