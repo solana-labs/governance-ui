@@ -81,72 +81,6 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(g.info.config)
     )
 
-  const availableInstructions = [
-    {
-      id: Instructions.InitializeController,
-      name: 'Initialize Controller',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.SetRedeemableGlobalSupplyCap,
-      name: 'Set Redeemable Global Supply Cap',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
-      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.RegisterMangoDepository,
-      name: 'Register Mango Depository',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.DepositInsuranceToMangoDepository,
-      name: 'Deposit Insurance To Mango Depository',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.WithdrawInsuranceFromMangoDepository,
-      name: 'Withdraw Insurance From Mango Depository',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.Transfer,
-      name: 'Transfer Tokens',
-      isVisible: canUseTransferInstruction,
-    },
-    {
-      id: Instructions.ProgramUpgrade,
-      name: 'Upgrade Program',
-      isVisible: canUseProgramUpgradeInstruction,
-    },
-    {
-      id: Instructions.Mint,
-      name: 'Mint Tokens',
-      isVisible: canUseMintInstruction,
-    },
-    {
-      id: Instructions.Base64,
-      name: 'Execute Custom Instruction',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MangoMakeChangeMaxAccounts,
-      name: 'Mango - change max accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.None,
-      name: 'None',
-      isVisible:
-        realm &&
-        Object.values(governances).some((g) =>
-          ownVoterWeight.canCreateProposal(g.info.config)
-        ),
-    },
-  ]
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)
   }
@@ -211,6 +145,73 @@ export default function useGovernanceAssets() {
       g.governance &&
       ownVoterWeight.canCreateProposal(g.governance?.info?.config)
   )
+
+  const availableInstructions = [
+    {
+      id: Instructions.InitializeController,
+      name: 'Initialize Controller',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.SetRedeemableGlobalSupplyCap,
+      name: 'Set Redeemable Global Supply Cap',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
+      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.RegisterMangoDepository,
+      name: 'Register Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.DepositInsuranceToMangoDepository,
+      name: 'Deposit Insurance To Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.WithdrawInsuranceFromMangoDepository,
+      name: 'Withdraw Insurance From Mango Depository',
+      isVisible: canUseUxdInstructions,
+    },
+    {
+      id: Instructions.Transfer,
+      name: 'Transfer Tokens',
+      isVisible: canUseTokenTransferInstruction,
+    },
+    {
+      id: Instructions.ProgramUpgrade,
+      name: 'Upgrade Program',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
+      id: Instructions.Mint,
+      name: 'Mint Tokens',
+      isVisible: canUseMintInstruction,
+    },
+    {
+      id: Instructions.Base64,
+      name: 'Execute Custom Instruction',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.MangoMakeChangeMaxAccounts,
+      name: 'Mango - change max accounts',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.None,
+      name: 'None',
+      isVisible:
+        realm &&
+        Object.values(governances).some((g) =>
+          ownVoterWeight.canCreateProposal(g.info.config)
+        ),
+    },
+  ]
 
   return {
     governancesArray,
