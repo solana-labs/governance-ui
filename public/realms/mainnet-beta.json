@@ -90,9 +90,9 @@
     "displayName": "Cardinal",
     "programId": "bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD",
     "realmId": "8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg",
-    "ogImage": "https://app.cardinalconsensus.io/assets/logo-colored.png",
-    "website": "https://www.cardinalconsensus.io",
-    "twitter": "@cardinal_dao"
+    "ogImage": "https://app.cardinal.so/assets/logo-colored.png",
+    "website": "https://www.cardinal.so",
+    "twitter": "@cardinal__so"
   },
   {
     "symbol": "gSAIL",
@@ -192,8 +192,8 @@
   {
     "symbol": "COCK",
     "displayName": "Chicken Tribe",
-    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
-    "realmId": "AMRC14FwwWkT5TG2ibXdLTUnVrnd2N4YsTifzCeRR22X",
+    "programId": "GCockTxUjxuMdojHiABVZ5NKp6At8eTKDiizbPjiCo4m",
+    "realmId": "FuqmCzaTqH1QbokY3agcYQaJqoWog1UkSrcNCDBPXusu",
     "ogImage": "https://chickentribe.com/_next/image?url=%2Fimages%2FChickenTribe_Team01.svg&w=128&q=75",
     "website": "https://chickentribe.com/",
     "twitter": "@ChickenTribe"
@@ -211,8 +211,25 @@
     "displayName": "The Exiled Apes",
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
     "realmId": "2J1YbWH991rv7ZAsUVdV2cWXNf89XNuhqUsabaAP3Hc1",
-    "ogImage": "/realms/XAPE/img/xapes_logo.png",
+    "ogImage": "/realms/XAPE/img/logo_xape_nobckg.png",
     "website": "https://exiledapes.academy",
     "twitter": "@ExiledApes"
+  },
+  {
+    "symbol": "SF",
+    "displayName": "Succeed.Finance",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CnnUUMnLcFL7ZxiGQoJaU8dgeCr3kwHn6Z1xpkWfQDHj",
+    "ogImage": "/realms/SF/img/succeedfinance.png",
+    "website": "https://www.succeed.finance",
+    "twitter": "@succeedfinance"
+  },
+  {
+    "symbol": "IADAO",
+    "displayName": "Investment Analyst DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BgezhGfctjcM8x5SsScCmX58txz8cUDikYp3ifk2vEqM",
+    "ogImage": "/realms/IADAO/img/IA-DAO_LOGO.png",
+    "website": "https://www.ia.finance"
   }
 ]

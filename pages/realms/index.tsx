@@ -59,7 +59,7 @@ const Realms = () => {
         <RealmsDashboard
           realms={unchartedRealms}
           isLoading={isLoadingUncharted}
-          header={'Uncharted Realms'}
+          header={'Uncharted Organisations'}
         ></RealmsDashboard>
       </div>
     </div>
