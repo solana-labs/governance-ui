@@ -13,7 +13,6 @@ import BN from 'bn.js'
 import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import AccountLabel from './AccountHeader'
 import { useRouter } from 'next/router'
 import DepositNFT from './DepositNFT'
 import { ViewState } from './Types'
@@ -45,9 +44,6 @@ const AccountOverview = () => {
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(
     (s) => s.compact.recentActivity
-  )
-  const [openTreasuryPaymentModal, setOpenTreasuryPaymentModal] = useState(
-    false
   )
 
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)

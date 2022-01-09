@@ -37,10 +37,8 @@ import { ParsedAccount } from '@models/core/accounts'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
-import Textarea from '@components/inputs/Textarea'
 // import { Popover } from '@headlessui/react'
 import AccountLabel from './AccountHeader'
-import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   getTransferInstruction,
