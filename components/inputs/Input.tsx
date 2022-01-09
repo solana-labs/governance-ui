@@ -29,6 +29,7 @@ const Input = ({
   step,
   noMaxWidth,
   subtitle,
+  useDefaultStyle = true,
   ...props
 }: InputProps) => {
   return (

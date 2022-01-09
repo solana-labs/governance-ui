@@ -13,6 +13,7 @@ const Select = ({
   disabled = false,
   label = '',
   componentLabel,
+  useDefaultStyle = true,
   noMaxWidth = false,
 }: {
   value: any | undefined
@@ -25,6 +26,8 @@ const Select = ({
   label?: string | undefined
   componentLabel?: any | undefined
   noMaxWidth?: boolean | undefined
+  useDefault?: boolean
+  useDefaultStyle?: boolean
 }) => {
   return (
     <div className="mt-6">
