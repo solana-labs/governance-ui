@@ -20,13 +20,11 @@ import {
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import { ViewState } from './Types'
 import { BN } from '@project-serum/anchor'
 import { getTokenTransferSchema } from '@utils/validations'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
-  ArrowLeftIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
@@ -44,14 +42,17 @@ import Textarea from '@components/inputs/Textarea'
 import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getTransferInstruction } from '@utils/instructionTools'
+import {
+  getTransferInstruction,
+  getTransferNftInstruction,
+} from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
+import NFTSelector from '@components/NFTS/NFTSelector'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
+import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
 
-const SendTokens = () => {
-  const {
-    setCurrentCompactView,
-    resetCompactViewState,
-  } = useTreasuryAccountStore()
+const SendTokens = ({ close }) => {
+  const { resetCompactViewState } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -68,6 +69,7 @@ const SendTokens = () => {
 
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
+  const isNFT = currentAccount?.isNft
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
@@ -75,14 +77,14 @@ const SendTokens = () => {
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
-    // No default transfer amount
-    amount: undefined,
+    amount: isNFT ? 1 : undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
     title: '',
     description: '',
   })
+  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [
@@ -99,10 +101,6 @@ const SendTokens = () => {
     : 1
   const currentPrecision = precision(mintMinAmount)
 
-  const handleGoBackToMainView = () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -151,7 +149,8 @@ const SendTokens = () => {
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    return getTransferInstruction({
+    const selectedNftMint = selectedNfts[0]?.mint
+    const defaultProps = {
       schema,
       form,
       programId,
@@ -159,8 +158,26 @@ const SendTokens = () => {
       wallet,
       currentAccount,
       setFormErrors,
-    })
+    }
+    return isNFT
+      ? getTransferNftInstruction({
+          ...defaultProps,
+          nftMint: selectedNftMint,
+        })
+      : getTransferInstruction(defaultProps)
   }
+
+  const nftName = selectedNfts[0]?.val?.name
+  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+    form.destinationAccount
+  }`
+
+  const proposalTitle = isNFT
+    ? nftTitle
+    : `Pay ${form.amount || ''}${
+        tokenInfo ? ` ${tokenInfo?.symbol} ` : ''
+      } to ${form.destinationAccount}`
+
   const handlePropose = async () => {
     setIsLoading(true)
     const instruction: UiInstruction = await getInstruction()
@@ -228,6 +245,7 @@ const SendTokens = () => {
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -277,69 +295,89 @@ const SendTokens = () => {
 
   const schema = getTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const proposalTitle = `Pay ${form.amount}${
-    tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
-  }to ${form.destinationAccount}`
+
   return (
     <>
-      <h3 className="mb-4 flex items-center">
-        <>
-          <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.AccountView)}
-            className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
-          />
-          Send {tokenInfo && tokenInfo?.symbol}
-        </>
-      </h3>
-      <AccountLabel></AccountLabel>
+      <div className="flex justify-start items-center gap-x-3 mb-8">
+        <TreasuryPaymentIcon className="w-8 mb-2" />
+
+        <h2 className="text-xl">Treasury payment</h2>
+      </div>
+
+      <p className="pb-0.5 text-fgd-3 text-xs">Your balance</p>
+
+      <AccountLabel background="bg-bkg-2" />
+
       <div className="space-y-4 w-full pb-4">
         <Input
+          noMaxWidth
+          useDefaultStyle={false}
+          className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+          wrapperClassName="my-6"
           label="Destination account"
+          placeholder="Destination account"
           value={form.destinationAccount}
           type="text"
-          onChange={(evt) =>
+          onChange={(event) =>
             handleSetForm({
-              value: evt.target.value,
+              value: event.target.value,
               propertyName: 'destinationAccount',
             })
           }
-          noMaxWidth={true}
           error={formErrors['destinationAccount']}
         />
+
         {destinationAccount && (
-          <div>
-            <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>
-            <div className="text-xs break-all">
+          <div className="flex justify-start items-center gap-x-2 -mt-4 ml-1">
+            <p className="pb-0.5 text-fgd-3 text-xs">Account owner:</p>
+
+            <p className="text-xs break-all">
               {destinationAccount.account.owner.toString()}
-            </div>
+            </p>
           </div>
         )}
+
         {destinationAccountName && (
-          <div>
-            <div className="pb-0.5 text-fgd-3 text-xs">Account name</div>
-            <div className="text-xs break-all">{destinationAccountName}</div>
+          <div className="flex justify-start items-center gap-x-2 ml-1">
+            <p className="pb-0.5 text-fgd-3 text-xs">Account name:</p>
+
+            <p className="text-xs break-all">{destinationAccountName}</p>
           </div>
         )}
-        <Input
-          min={mintMinAmount}
-          label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
-          value={form.amount}
-          type="number"
-          onChange={setAmount}
-          step={mintMinAmount}
-          error={formErrors['amount']}
-          onBlur={validateAmountOnBlur}
-          noMaxWidth={true}
-        />
-        <small className="text-red">
+
+        {isNFT ? (
+          <NFTSelector
+            onNftSelect={(nfts) => setSelectedNfts(nfts)}
+            ownerPk={currentAccount.governance!.pubkey}
+          />
+        ) : (
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+            wrapperClassName="mt-6 mb-2"
+            min={mintMinAmount}
+            placeholder="Amount"
+            label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
+            value={form.amount}
+            type="number"
+            onChange={setAmount}
+            step={mintMinAmount}
+            error={formErrors['amount']}
+            onBlur={validateAmountOnBlur}
+          />
+        )}
+
+        <small className="text-red ml-1">
           {transactionDolarAmount
             ? IsAmountNotHigherThenBalance()
               ? `~$${transactionDolarAmount}`
               : 'Insufficient balance'
             : null}
         </small>
+
         <div
-          className={'flex items-center hover:cursor-pointer w-24'}
+          className="flex items-center hover:cursor-pointer w-24 mb-4"
           onClick={() => setShowOptions(!showOptions)}
         >
           {showOptions ? (
@@ -348,88 +386,87 @@ const SendTokens = () => {
             <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
           )}
           <small className="text-fgd-3">Options</small>
-          {/* popover with description maybe will be needed later */}
-          {/* <Popover className="relative ml-auto border-none flex">
-            <Popover.Button className="focus:outline-none">
-              <InformationCircleIcon className="h-4 w-4 mr-1 text-primary-light hover:cursor-pointer" />
-            </Popover.Button>
-
-            <Popover.Panel className="absolute z-10 right-4 top-4 w-80">
-              <div className="bg-bkg-1 px-4 py-2 rounded-md text-xs">
-                {`In case of empty fields of advanced options, title and description will be
-                combination of amount token symbol and destination account e.g
-                "Pay 10 sol to PF295R1YJ8n1..."`}
-              </div>
-            </Popover.Panel>
-          </Popover> */}
         </div>
+
         {showOptions && (
           <>
             <Input
-              noMaxWidth={true}
-              label="Title"
-              placeholder={
-                form.amount && form.destinationAccount
-                  ? proposalTitle
-                  : 'Title of your proposal'
-              }
+              noMaxWidth
+              useDefaultStyle={false}
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+              wrapperClassName="mb-6"
+              label="Title of your proposal"
+              placeholder={proposalTitle}
               value={form.title}
               type="text"
-              onChange={(evt) =>
+              onChange={(event) =>
                 handleSetForm({
-                  value: evt.target.value,
+                  value: event.target.value,
                   propertyName: 'title',
                 })
               }
             />
-            <Textarea
-              noMaxWidth={true}
+
+            <Input
+              noMaxWidth
+              useDefaultStyle={false}
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+              wrapperClassName="mb-6"
               label="Description"
-              placeholder={
-                'Description of your proposal or use a github gist link (optional)'
-              }
-              wrapperClassName="mb-5"
+              placeholder="Describe your proposal (optional)"
               value={form.description}
-              onChange={(evt) =>
+              type="text"
+              onChange={(event) =>
                 handleSetForm({
-                  value: evt.target.value,
+                  value: event.target.value,
                   propertyName: 'description',
                 })
               }
-            ></Textarea>
-            {canChooseWhoVote && (
+            />
+
+            {!canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
                   setVoteByCouncil(!voteByCouncil)
                 }}
-              ></VoteBySwitch>
+              />
             )}
           </>
         )}
       </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
+
+      <div className="flex gap-x-6 justify-start items-center mt-8">
         <SecondaryButton
           disabled={isLoading}
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
+          className="w-44"
+          onClick={() => close()}
         >
           Cancel
         </SecondaryButton>
+
         <Button
-          disabled={!canUseTransferInstruction || isLoading}
-          className="sm:w-1/2"
+          tooltipMessage={
+            isNFT && !selectedNfts.length
+              ? 'Please, select NFT'
+              : !canUseTransferInstruction
+              ? 'You need to have connected wallet with ability to create treasury payment proposals'
+              : !transactionDolarAmount || !IsAmountNotHigherThenBalance()
+              ? 'Insufficient balance'
+              : ''
+          }
+          disabled={
+            !canUseTransferInstruction ||
+            isLoading ||
+            !transactionDolarAmount ||
+            !IsAmountNotHigherThenBalance() ||
+            (isNFT && !selectedNfts.length)
+          }
+          className="w-44 flex justify-center items-center"
           onClick={handlePropose}
           isLoading={isLoading}
         >
-          <Tooltip
-            content={
-              !canUseTransferInstruction &&
-              'You need to have connected wallet with ability to create token transfer proposals'
-            }
-          >
-            <div>Propose</div>
-          </Tooltip>
+          Create proposal
         </Button>
       </div>
     </>

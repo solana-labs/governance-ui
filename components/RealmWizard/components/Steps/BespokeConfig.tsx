@@ -1,6 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import React, { useEffect } from 'react'
-import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm'
+import {
+  RealmArtifacts,
+  RealmWizardStepComponentProps,
+} from '@components/RealmWizard/interfaces/Realm'
 import Input from '@components/inputs/Input'
 import {
   formatMintNaturalAmountAsDecimal,
@@ -14,13 +16,48 @@ import _ from 'lodash'
 import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
+import BigNumber from 'bignumber.js'
+
+export const getMintSupplyFactorPercent = (form: RealmArtifacts) => {
+  let value = '0'
+  if (!form.communityMintMaxVoteWeightSource) return value
+  value = (+form.communityMintMaxVoteWeightSource! * 100).toFixed(2)
+
+  return value + '%'
+}
+
+export const getSubtitleForMinTokenToCreate = (form: RealmArtifacts) => {
+  if (!form.communityMint || form.communityMint.account.supply.eq(new BN(0)))
+    return `Default is ${Intl.NumberFormat(navigator.language).format(
+      MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+    )} for mints with no supply`
+  return 'Default is 1% of community mint'
+}
+
+export const getMinTokensToCreatePercent = (form: RealmArtifacts) => {
+  let value = '0'
+  if (!form.minCommunityTokensToCreateGovernance) return value + '%'
+  if (form.communityMint?.account.supply) {
+    value = new BigNumber(form.minCommunityTokensToCreateGovernance)
+      .dividedBy(
+        new BigNumber(form.communityMint.account.supply.toString()).shiftedBy(
+          -form.communityMint.account.decimals
+        )
+      )
+      .times(100)
+      .toString()
+  }
+
+  return (isFinite(+value) ? value : 0) + '%'
+}
 
 const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
   formErrors,
   onSwitch = () => null,
-  isTestProgramId = false,
+  isTestProgramId = true,
 }) => {
   const { connection } = useWalletStore((s) => s)
   const handleCommunityMint = async (mintId: string) => {
@@ -37,7 +74,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             )
               .dividedBy(100)
               .toString(),
-            communityMintMaxVoteWeightSource: 1,
+            communityMintMaxVoteWeightSource: '1',
             communityMint: mint,
             transferAuthority: true,
           })
@@ -90,7 +127,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3">
           <Input
             label="Community Token Mint"
             placeholder="(Optional) Community token mint of this realm"
@@ -129,39 +166,67 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
                 </StyledLabel>
               </div>
             </div>
-            <div className="pb-4 pr-10 mr-2">
-              <Input
-                label="Min community tokens to create governance (defaults 1% of community mint)"
-                placeholder="Min community tokens to create governance"
-                step="1"
-                value={form.minCommunityTokensToCreateGovernance?.toString()}
-                type="number"
-                error={formErrors['minCommunityTokensToCreateGovernance']}
-                onChange={(evt) => {
-                  const value = evt.target.value
-                  setForm({
-                    minCommunityTokensToCreateGovernance: value,
-                  })
-                }}
-              />
-            </div>
-            <div className="pb-4 pr-10 mr-2">
-              <Input
-                label="Community mint supply factor (max vote weight)"
-                placeholder="Community mint supply factor (max vote weight)"
-                value={form.communityMintMaxVoteWeightSource}
-                type="number"
-                error={formErrors['communityMintMaxVoteWeightSource']}
-                onChange={(evt) =>
-                  setForm({
-                    communityMintMaxVoteWeightSource: evt.target.value,
-                  })
-                }
-              />
-            </div>
           </>
         )}
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 relative">
+          <Input
+            label="Min community tokens to create governance"
+            subtitle={getSubtitleForMinTokenToCreate(form)}
+            placeholder="Min community tokens to create governance"
+            className="w-36"
+            step="1"
+            value={
+              form.minCommunityTokensToCreateGovernance
+                ? form.minCommunityTokensToCreateGovernance.toString()
+                : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+            }
+            type="number"
+            error={formErrors['minCommunityTokensToCreateGovernance']}
+            onChange={(evt) => {
+              const value = evt.target.value
+              setForm({
+                minCommunityTokensToCreateGovernance: value,
+              })
+            }}
+          />
+          <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
+            {getMinTokensToCreatePercent(form)} of token supply
+          </p>{' '}
+        </div>
+
+        <div className="pb-4 pr-10 mr-2  mt-3 relative">
+          <Input
+            label="Community mint supply factor"
+            subtitle="Max vote weight"
+            placeholder="Community mint supply factor"
+            className="w-36"
+            value={form.communityMintMaxVoteWeightSource}
+            step="0.0000000001"
+            max="1"
+            type="number"
+            error={formErrors['communityMintMaxVoteWeightSource']}
+            onBlur={() => {
+              if (!form.communityMintMaxVoteWeightSource?.length) {
+                setForm({
+                  communityMintMaxVoteWeightSource: '1',
+                })
+              }
+            }}
+            onChange={(evt) => {
+              const value =
+                +evt.target.value <= 1 && +evt.target.value >= 0
+                  ? evt.target.value
+                  : 1
+              setForm({
+                communityMintMaxVoteWeightSource: value,
+              })
+            }}
+          />
+          <p className="text-gray-500 mt-1 absolute bottom-5 sm:bottom-7 left-14 ml-12 pl-12">
+            {getMintSupplyFactorPercent(form)} vote weight
+          </p>
+        </div>
+        <div className="pb-4 pr-10 mr-2 mt-3 ">
           <Input
             label="Custom program Id"
             placeholder="Id of the governance program this realm will be associated with"
@@ -177,7 +242,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             }
           />
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3">
           <div className="flex justify-left items-center">
             <Switch
               className="mt-2 mb-2"
@@ -187,7 +252,7 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             <StyledLabel className="mt-1.5 ml-3">Use test instance</StyledLabel>
           </div>
         </div>
-        <div className="pb-4 pr-10 mr-2">
+        <div className="pb-4 pr-10 mr-2 mt-3 ">
           <Input
             label="Governance program version"
             placeholder={1}
