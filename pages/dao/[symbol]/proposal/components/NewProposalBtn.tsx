@@ -34,10 +34,9 @@ const NewProposalBtn = () => {
         ownVoterWeight.canCreateProposal(g.info.config)
       )
     ? "You don't have enough governance power to create a new proposal"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'Too many community outstanding proposals. You need to finalize them before creating a new one.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'Too many council outstanding proposals. You need to finalize them before creating a new one.'
+    : toManyCommunityOutstandingProposalsForUser ||
+      toManyCouncilOutstandingProposalsForUse
+    ? 'Too many outstanding proposals. You need to finalize them before creating a new one'
     : ''
 
   return (

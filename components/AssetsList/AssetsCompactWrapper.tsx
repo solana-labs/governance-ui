@@ -36,10 +36,9 @@ const AssetsCompactWrapper = () => {
     ? 'Connect your wallet to create new asset'
     : !canCreateGovernance
     ? "You don't have enough governance power to create a new asset"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new asset.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new asset.'
+    : toManyCouncilOutstandingProposalsForUse ||
+      toManyCommunityOutstandingProposalsForUser
+    ? 'You have too many outstanding proposals. You need to finalize them before creating a new asset.'
     : ''
 
   useEffect(() => {

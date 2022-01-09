@@ -94,7 +94,7 @@ const REALM = () => {
               <div className="mr-4">
                 <Tooltip
                   content={
-                    toManyCommunityOutstandingProposalsForUser &&
+                    toManyCommunityOutstandingProposalsForUser ||
                     toManyCouncilOutstandingProposalsForUse
                       ? 'You have too many outstanding proposals'
                       : ''

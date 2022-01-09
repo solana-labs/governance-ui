@@ -40,10 +40,9 @@ const MembersCompactWrapper = () => {
     ? 'Your realm need mint governance for council token to add new member'
     : !canUseMintInstruction
     ? "You don't have enough governance power to add new council member"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
+    : toManyCouncilOutstandingProposalsForUse ||
+      toManyCommunityOutstandingProposalsForUser
+    ? 'You have too many outstanding proposals. You need to finalize them before creating a new council member.'
     : ''
 
   const getCurrentView = () => {
