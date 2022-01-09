@@ -11,7 +11,7 @@ export default function RealmsDashboard({
   realms,
   isLoading,
   showNewButton,
-  header = 'Realms',
+  header = 'Organisations',
 }: {
   realms: readonly RealmInfo[]
   isLoading: boolean
@@ -67,7 +67,7 @@ export default function RealmsDashboard({
         <h1>{header}</h1>
         {showNewButton && (
           <Button className="px-10 " onClick={handleCreateRealmButtonClick}>
-            Create Realm
+            Create DAO
           </Button>
         )}
       </div>

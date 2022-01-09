@@ -36,7 +36,7 @@ const SplTokenTransfer = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
@@ -139,7 +139,9 @@ const SplTokenTransfer = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={governedTokenAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={
+          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
+        }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}

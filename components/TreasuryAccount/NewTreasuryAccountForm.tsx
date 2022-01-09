@@ -21,6 +21,9 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
+import Switch from '@components/Switch'
+import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
@@ -52,7 +55,7 @@ const NewAccountForm = () => {
   const [mint, setMint] = useState<ProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-
+  const [isNFT, setIsNFT] = useState(false)
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
@@ -189,6 +192,13 @@ const NewAccountForm = () => {
     }
   }, [form.mintAddress])
 
+  useEffect(() => {
+    handleSetForm({
+      value: isNFT ? DEFAULT_NFT_TREASURY_MINT : '',
+      propertyName: 'mintAddress',
+    })
+  }, [isNFT])
+
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
@@ -197,34 +207,44 @@ const NewAccountForm = () => {
           <h1>Create new treasury account</h1>
         </div>
       </div>
-      <Input
-        label="Mint address"
-        value={form.mintAddress}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'mintAddress',
-          })
-        }
-        error={formErrors['mintAddress']}
-      />
-      {tokenInfo ? (
-        <div className="flex items-center">
-          {tokenInfo?.logoURI && (
-            <img
-              className="flex-shrink-0 h-6 w-6 mr-2.5"
-              src={tokenInfo.logoURI}
-            />
-          )}
-          <div>
-            {tokenInfo.name}
-            <p className="text-fgd-3 text-xs">{tokenInfo?.symbol}</p>
-          </div>
+      <div className="text-sm mb-3">
+        <div className="mb-2">NFT Treasury</div>
+        <div className="flex flex-row text-xs items-center">
+          <Switch checked={isNFT} onChange={() => setIsNFT(!isNFT)} />
         </div>
-      ) : mint ? (
-        <div>Mint found</div>
-      ) : null}
+      </div>
+      {!isNFT && (
+        <>
+          <Input
+            label="Mint address"
+            value={form.mintAddress}
+            type="text"
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'mintAddress',
+              })
+            }
+            error={formErrors['mintAddress']}
+          />
+          {tokenInfo ? (
+            <div className="flex items-center">
+              {tokenInfo?.logoURI && (
+                <img
+                  className="flex-shrink-0 h-6 w-6 mr-2.5"
+                  src={tokenInfo.logoURI}
+                />
+              )}
+              <div>
+                {tokenInfo.name}
+                <p className="text-fgd-3 text-xs">{tokenInfo?.symbol}</p>
+              </div>
+            </div>
+          ) : mint ? (
+            <div>Mint found</div>
+          ) : null}
+        </>
+      )}
       <BaseGovernanceForm
         formErrors={formErrors}
         form={form}
