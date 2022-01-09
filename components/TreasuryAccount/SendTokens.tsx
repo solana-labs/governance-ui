@@ -286,7 +286,7 @@ const SendTokens = () => {
         <>
           <ArrowLeftIcon
             onClick={() => setCurrentCompactView(ViewState.AccountView)}
-            className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
+            className="h-4 w-4 text-primary-light mr-2 hover:cursor-pointer"
           />
           Send {tokenInfo && tokenInfo?.symbol}
         </>
@@ -399,6 +399,7 @@ const SendTokens = () => {
             ></Textarea>
             {canChooseWhoVote && (
               <VoteBySwitch
+                disabled={!canChooseWhoVote}
                 checked={voteByCouncil}
                 onChange={() => {
                   setVoteByCouncil(!voteByCouncil)

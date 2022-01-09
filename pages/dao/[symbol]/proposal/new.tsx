@@ -37,11 +37,6 @@ import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
-import VoteBySwitch from './components/VoteBySwitch'
-import { Tab } from '@headlessui/react'
-import CloudIcon from '@components/CloudIcon'
-import DocIcon from '@components/DocIcon'
-import LinkIcon from '@components/LinkIcon'
 import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
 import AddMemberIcon from '@components/AddMemberIcon'
 import ProgramUpgradeIcon from '@components/ProgramUpgradeIcon'
@@ -277,7 +272,7 @@ const New = () => {
                 idx: Instructions.ProgramUpgrade,
               })
             }
-            disabled={false}
+            disabled={programUpgradeTooltip !== ''}
             tooltipMessage={programUpgradeTooltip}
             className="flex justify-center items-center h-10 w-full"
           >
