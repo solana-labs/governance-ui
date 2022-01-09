@@ -6,11 +6,11 @@ import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 
 const HoldTokensTotalPrice = () => {
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const [totalPriceFormatted, setTotalPriceFormatted] = useState('')
   useEffect(() => {
     async function calcTotalTokensPrice() {
-      const totalPrice = governedTokenAccounts
+      const totalPrice = governedTokenAccountsWithoutNfts
         .filter(
           (x) => typeof x.mint !== 'undefined' && typeof x.token !== 'undefined'
         )
@@ -29,11 +29,11 @@ const HoldTokensTotalPrice = () => {
         totalPrice ? new BigNumber(totalPrice).toFormat(0) : ''
       )
     }
-    if (governedTokenAccounts.length) {
+    if (governedTokenAccountsWithoutNfts.length) {
       calcTotalTokensPrice()
     }
   }, [
-    JSON.stringify(governedTokenAccounts),
+    JSON.stringify(governedTokenAccountsWithoutNfts),
     JSON.stringify(tokenService.tokenPriceToUSDlist),
   ])
   return totalPriceFormatted ? (

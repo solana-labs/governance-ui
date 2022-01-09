@@ -5,13 +5,13 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
-import SendTokens from './SendTokens'
 import DepositTokens from './DepositTokens'
 import { PlusIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
+
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const AccountsCompactWrapper = () => {
@@ -80,8 +80,6 @@ const AccountsCompactWrapper = () => {
         )
       case ViewState.AccountView:
         return <AccountOverview></AccountOverview>
-      case ViewState.Send:
-        return <SendTokens></SendTokens>
       case ViewState.Deposit:
         return <DepositTokens></DepositTokens>
     }
@@ -91,7 +89,9 @@ const AccountsCompactWrapper = () => {
     resetCompactViewState()
   }, [symbol])
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
+      {getCurrentView()}
+    </div>
   )
 }
 

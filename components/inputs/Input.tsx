@@ -28,13 +28,13 @@ const Input = ({
   max = Number.MAX_SAFE_INTEGER,
   step,
   noMaxWidth,
-  useDefaultStyle = true,
+  subtitle,
   ...props
 }: InputProps) => {
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
-
+      {subtitle && <p className="text-gray-500 mb-1 -mt-2">{subtitle}</p>}
       <input
         max={max}
         min={min}
