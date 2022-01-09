@@ -21,11 +21,7 @@ const MembersCompactWrapper = () => {
   } = useRealm()
   const { members, activeMembers } = useMembers()
   const connected = useWalletStore((s) => s.connected)
-<<<<<<< HEAD
   const activeMembersCount = activeMembers.length
-=======
-  const membersCount = members.length
->>>>>>> e0316c0 (chore: remove unused code)
   const { resetCompactViewState } = useMembersListStore()
   const {
     canUseMintInstruction,
@@ -87,14 +83,8 @@ const MembersCompactWrapper = () => {
 
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
-<<<<<<< HEAD
             <div style={{ maxHeight: '350px' }} className="w-full md:max-w-xs">
               <MembersItems activeMembers={activeMembers} />
-=======
-
-            <div className="max-w-xs">
-              <MembersItems />
->>>>>>> e0316c0 (chore: remove unused code)
             </div>
 
             {openAddMemberModal && (
