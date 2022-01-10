@@ -23,13 +23,17 @@ import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import Switch from '@components/Switch'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
 const defaultFormValues = {
   mintAddress: '',
-  minCommunityTokensToCreateProposal: 100,
+  // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
+  // This should be dynamic and set to 1% of the community mint supply or
+  // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
+  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,

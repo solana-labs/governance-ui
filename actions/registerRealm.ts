@@ -39,6 +39,7 @@ import { AccountInfo } from '@solana/spl-token'
 import { ProgramAccount } from '@project-serum/common'
 import { tryGetAta } from '@utils/validations'
 import { ConnectionContext } from '@utils/connection'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 
 /* 
   TODO: Check if the abstractions present here can be moved to a 
@@ -51,11 +52,6 @@ interface RegisterRealmRpc {
   wallet: SignerWalletAdapter
   walletPubkey: PublicKey
 }
-
-/**
- * The minimum amount of community tokens to create governance and proposals, for tokens with 0 supply
- */
-export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000
 
 /**
  * The default amount of decimals for the community token
