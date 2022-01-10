@@ -222,5 +222,14 @@
     "realmId": "BgezhGfctjcM8x5SsScCmX58txz8cUDikYp3ifk2vEqM",
     "ogImage": "/realms/IADAO/img/IA-DAO_LOGO.png",
     "website": "https://www.ia.finance"
+  },
+  {
+    "symbol": "WOOFDAO",
+    "displayName": "WOOF DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3BHrYe5SV2VqHqpEyxYYLbNeNGEnKBjYG4kt6pF5Xu5K",
+    "ogImage": "/realms/WoofDAO/img/wooflogo.png",
+    "website": "https://woofsolana.io/",
+    "twitter": "@WoofSolana"
   }
 ]
