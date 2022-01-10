@@ -118,9 +118,10 @@ const ProposalActionsPanel = () => {
       notify({
         type: 'error',
         message: `Error: Could not finalize vote.`,
+        description: `${error}`,
       })
 
-      console.log('error finalizing vote', error)
+      console.error('error finalizing vote', error)
     }
   }
 
@@ -143,10 +144,10 @@ const ProposalActionsPanel = () => {
       notify({
         type: 'error',
         message: `Error: Could not sign off proposal.`,
-        description: `Error: ${error}`,
+        description: `${error}`,
       })
 
-      console.log('error sign off', error)
+      console.error('error sign off', error)
     }
   }
   const handleCancelProposal = async (
@@ -170,9 +171,10 @@ const ProposalActionsPanel = () => {
       notify({
         type: 'error',
         message: `Error: Could not cancel proposal.`,
+        description: `${error}`,
       })
 
-      console.log('error cancelling proposal', error)
+      console.error('error cancelling proposal', error)
     }
   }
   return (
