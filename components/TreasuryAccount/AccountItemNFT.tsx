@@ -4,8 +4,6 @@ import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { ViewState } from './Types'
-import { useEffect, useState } from 'react'
-import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
@@ -18,7 +16,7 @@ const AccountItemNFT = ({
   border?: boolean
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const [nftsCount, setNftsCount] = useState(0)
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const {
     setCurrentCompactView,
     setCurrentCompactAccount,
@@ -32,16 +30,6 @@ const AccountItemNFT = ({
     setCurrentCompactView(ViewState.AccountView)
     setCurrentCompactAccount(governedAccountTokenAccount, connection)
   }
-  useEffect(() => {
-    const getNftsCount = async () => {
-      const nfts = await getParsedNftAccountsByOwner({
-        publicAddress: accountPublicKey,
-        connection: connection.current,
-      })
-      setNftsCount(nfts.length)
-    }
-    getNftsCount()
-  }, [governedAccountTokenAccount.governance?.pubkey.toBase58()])
   return (
     <div
       onClick={onClick ? onClick : handleGoToAccountOverview}
@@ -61,7 +49,14 @@ const AccountItemNFT = ({
             {abbreviateAddress(accountPublicKey as PublicKey)}
           </div>
         </div>
-        <div className="text-fgd-3 text-xs flex flex-col">{nftsCount} NFTS</div>
+        <div className="text-fgd-3 text-xs flex flex-col">
+          {governedAccountTokenAccount.governance
+            ? governanceNfts[
+                governedAccountTokenAccount.governance?.pubkey.toBase58()
+              ]?.length
+            : 0}{' '}
+          NFTS
+        </div>
       </div>
     </div>
   )

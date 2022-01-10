@@ -6,7 +6,7 @@ import DepositNFTFromWallet from './DepositNFTFromWallet'
 import DepositNFTAddress from './DepositNFTAddress'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { abbreviateAddress } from '@utils/formatting'
-import { ExternalLinkIcon } from '@heroicons/react/solid'
+import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import { getExplorerUrl } from '@components/explorer/tools'
 
 enum DepositState {
@@ -28,7 +28,13 @@ const DepositNFT = ({ onClose }) => {
   return (
     <>
       <h3 className="mb-4 flex items-center">
-        Deposit NFT to{' '}
+        {currentDepositView !== null && (
+          <ArrowLeftIcon
+            className="h-4 w-4 mr-1 text-primary-light cursor-pointer"
+            onClick={() => setCurrentDepositView(null)}
+          />
+        )}
+        Deposit NFT to
         {currentAccount
           ? abbreviateAddress(currentAccount!.governance!.pubkey)
           : ''}

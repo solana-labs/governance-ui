@@ -29,7 +29,9 @@ export const getMintSupplyFactorPercent = (form: RealmArtifacts) => {
 
 export const getSubtitleForMinTokenToCreate = (form: RealmArtifacts) => {
   if (!form.communityMint || form.communityMint.account.supply.eq(new BN(0)))
-    return 'Default is 10,000,000 for mints with no supply'
+    return `Default is ${Intl.NumberFormat(navigator.language).format(
+      MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+    )} for mints with no supply`
   return 'Default is 1% of community mint'
 }
 

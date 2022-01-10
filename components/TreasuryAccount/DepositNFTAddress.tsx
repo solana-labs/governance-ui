@@ -22,9 +22,9 @@ import { createATA } from '@utils/ataTools'
 import { abbreviateAddress } from '@utils/formatting'
 import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import AccountItemNFT from './AccountItemNFT'
-import Select from '@components/inputs/Select'
 import DepositLabel from './DepositLabel'
+import NFTAccountSelect from './NFTAccountSelect'
+import ImgWithLoader from '@components/ImgWithLoader'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
@@ -143,34 +143,11 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   }, [JSON.stringify(nftMetaData)])
   return (
     <>
-      <Select
-        noMaxWidth={true}
-        className="w-full mb-2 max-w-full"
+      <NFTAccountSelect
         onChange={(value) => setCurrentCompactAccount(value, connection)}
-        value={currentAccount?.governance?.pubkey.toBase58()}
-        componentLabel={
-          currentAccount && (
-            <AccountItemNFT
-              className="m-0 p-0 py-0 px-0 hover:bg-bkg-1"
-              onClick={() => null}
-              governedAccountTokenAccount={currentAccount}
-            ></AccountItemNFT>
-          )
-        }
-      >
-        {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
-          <Select.Option
-            key={accountWithGovernance?.governance?.pubkey.toBase58()}
-            value={accountWithGovernance}
-          >
-            <AccountItemNFT
-              onClick={() => null}
-              className="m-0 p-0 py-0 px-0 hover:bg-bkg-2"
-              governedAccountTokenAccount={accountWithGovernance}
-            />
-          </Select.Option>
-        ))}
-      </Select>
+        currentAccount={currentAccount}
+        nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
+      ></NFTAccountSelect>
       <DepositLabel currentAccount={currentAccount}></DepositLabel>
       <div className="space-y-4 w-full pb-4">
         <div className="text-sm mt-4">
@@ -211,7 +188,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         ) : (
           imgUrl && (
             <div className="flex justify-center">
-              <img style={{ width: '150px' }} src={imgUrl} />
+              <ImgWithLoader style={{ width: '150px' }} src={imgUrl} />
             </div>
           )
         )}

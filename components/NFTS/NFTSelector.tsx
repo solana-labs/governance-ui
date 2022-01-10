@@ -11,6 +11,7 @@ import { CheckCircleIcon } from '@heroicons/react/solid'
 import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
+import ImgWithLoader from '@components/ImgWithLoader'
 
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
@@ -41,7 +42,7 @@ function NFTSelector(
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
-    const nfts = await getNfts(connection, ownerPk)
+    const nfts = await getNfts(connection.current, ownerPk)
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
     }
@@ -62,7 +63,10 @@ function NFTSelector(
   }, [selectedNfts])
   return (
     <>
-      <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
+      <div
+        style={{ maxHeight: '350px', minHeight: '100px' }}
+        className="overflow-y-auto"
+      >
         {!isLoading ? (
           nfts.length ? (
             <div className="flex flex-row flex-wrap gap-4 mb-4">
@@ -81,7 +85,7 @@ function NFTSelector(
                   ) && (
                     <CheckCircleIcon className="w-10 h-10 absolute text-green"></CheckCircleIcon>
                   )}
-                  <img style={{ width: '150px' }} src={x.val.image} />
+                  <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />
                 </div>
               ))}
             </div>

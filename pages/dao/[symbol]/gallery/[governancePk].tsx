@@ -5,8 +5,6 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { getNfts } from '@utils/tokens'
-import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -14,10 +12,16 @@ import Select from '@components/inputs/Select'
 import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import ImgWithLoader from '@components/ImgWithLoader'
 
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
+  const { getNfts } = useTreasuryAccountStore()
+  const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
+  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const { symbol } = useRealm()
   const governancePk = router?.query?.governancePk
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
@@ -27,38 +31,29 @@ const gallery = () => {
     (x) => x.governance?.pubkey.toBase58() === governancePk
   )
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  const [isLoading, setIsLoading] = useState(false)
   useEffect(() => {
-    const getAllNftData = async () => {
-      if (governancePk) {
-        setIsLoading(true)
-        let realmNfts: NFTWithMint[] = []
-
-        //TODO If we will have many nft accounts we would need to rethink performance of this.
-        if (fetchAllNftsForRealm) {
-          for (const acc of nftsGovernedTokenAccounts) {
-            const nfts = acc.governance?.pubkey
-              ? await getNfts(connection, acc.governance.pubkey)
-              : []
-            realmNfts = [...realmNfts, ...nfts]
-          }
-        } else {
-          realmNfts = await getNfts(connection, new PublicKey(governancePk))
-        }
-
-        setNfts(realmNfts)
-        setIsLoading(false)
-      }
-    }
     if (governancePk) {
-      getAllNftData()
+      getNfts(nftsGovernedTokenAccounts, connection.current)
     }
-  }, [governancePk, connection.endpoint, nftsGovernedTokenAccounts.length])
+  }, [
+    governancePk,
+    connection.endpoint,
+    JSON.stringify(nftsGovernedTokenAccounts),
+  ])
+  useEffect(() => {
+    const governedNfts = governanceNfts[governancePk as string]
+    if (fetchAllNftsForRealm) {
+      setNfts(realmNfts)
+    } else if (governedNfts) {
+      setNfts(governanceNfts[governancePk as string])
+    }
+  }, [realmNfts.length, JSON.stringify(governanceNfts), governancePk])
   return (
     <div className="grid grid-cols-12">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
-        <div className="flex flex-row">
+        <div className="flex flex-row items-center">
           <PreviousRouteBtn />
+          <h1 className="ml-3">Collectables</h1>
           <div className="ml-auto">
             <Select
               className="w-44 border-0"
@@ -110,12 +105,16 @@ const gallery = () => {
             {nfts.map((x, idx) => (
               <a
                 key={idx}
-                href={getExplorerUrl(connection.endpoint, x.mint)}
+                href={
+                  connection.endpoint && x.mint
+                    ? getExplorerUrl(connection.endpoint, x.mint)
+                    : ''
+                }
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <img
+                <ImgWithLoader
                   className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
                   style={{
                     width: '150px',
@@ -128,7 +127,6 @@ const gallery = () => {
           </div>
         ) : (
           <div className="text-fgd-3 flex flex-col items-center">
-            There are no NFTs in the treasury
             <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
           </div>
         )}

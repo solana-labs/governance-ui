@@ -24,7 +24,12 @@ const AccountOverview = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
-  const nftsCount = useTreasuryAccountStore((s) => s.compact.nftsCount)
+  const nftsCount =
+    currentAccount?.governance && currentAccount.isNft
+      ? useTreasuryAccountStore((s) => s.governanceNfts)[
+          currentAccount?.governance?.pubkey.toBase58()
+        ]?.length
+      : 0
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
