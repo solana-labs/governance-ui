@@ -1,110 +1,22 @@
-import { MintInfo } from '@solana/spl-token'
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import BN from 'bn.js'
-import useRealm from '../../hooks/useRealm'
-import { Proposal, ProposalState } from '../../models/accounts'
-import { getProposal, getUnrelinquishedVoteRecords } from '../../models/api'
-import { withDepositGoverningTokens } from '../../models/withDepositGoverningTokens'
-import { withRelinquishVote } from '../../models/withRelinquishVote'
-import { withWithdrawGoverningTokens } from '../../models/withWithdrawGoverningTokens'
-import useWalletStore from '../../stores/useWalletStore'
-import { sendTransaction } from '../../utils/send'
-import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../../utils/tokens'
-import Button from '../Button'
-import { Option } from '../../tools/core/option'
-import { GoverningTokenType } from '../../models/enums'
-import { fmtMintAmount } from '../../tools/sdk/units'
-import { getMintMetadata } from '../instructions/programs/splToken'
+import Button from '@components/Button'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
+import useRealm from '@hooks/useRealm'
+import { ProposalState } from '@models/accounts'
+import { getUnrelinquishedVoteRecords, getProposal } from '@models/api'
+import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
 import { withFinalizeVote } from '@models/withFinalizeVote'
+import { withRelinquishVote } from '@models/withRelinquishVote'
+import { withWithdrawGoverningTokens } from '@models/withWithdrawGoverningTokens'
+import { BN } from '@project-serum/anchor'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { TransactionInstruction, Keypair, Transaction } from '@solana/web3.js'
+import { fmtMintAmount } from '@tools/sdk/units'
 import { chunks } from '@utils/helpers'
-import {
-  ArrowsExpandIcon,
-  QuestionMarkCircleIcon,
-} from '@heroicons/react/outline'
-import Link from 'next/link'
-import useQueryContext from '@hooks/useQueryContext'
-import Tooltip from '@components/Tooltip'
+import { sendTransaction } from '@utils/send'
+import { approveTokenTransfer } from '@utils/tokens'
+import useWalletStore from 'stores/useWalletStore'
 
-const LockPluginTokenBalanceCard = ({
-  proposal,
-}: {
-  proposal?: Option<Proposal>
-}) => {
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol } = useRealm()
-
-  const isDepositVisible = (
-    depositMint: MintInfo | undefined,
-    realmMint: PublicKey | undefined
-  ) =>
-    depositMint &&
-    (!proposal ||
-      (proposal.isSome() &&
-        proposal.value.governingTokenMint.toBase58() === realmMint?.toBase58()))
-
-  const communityDepositVisible =
-    // If there is no council then community deposit is the only option to show
-    !realm?.info.config.councilMint ||
-    isDepositVisible(mint, realm?.info.communityMint)
-
-  const councilDepositVisible = isDepositVisible(
-    councilMint,
-    realm?.info.config.councilMint
-  )
-
-  const hasLoaded = mint || councilMint
-
-  return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4 flex">
-        Account
-        <Link href={fmtUrlWithCluster(`/dao/${symbol}/account`)}>
-          <ArrowsExpandIcon className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer"></ArrowsExpandIcon>
-        </Link>
-      </h3>
-      {hasLoaded ? (
-        <>
-          {communityDepositVisible && (
-            <TokenDeposit
-              mint={mint}
-              tokenType={GoverningTokenType.Community}
-              councilVote={false}
-            />
-          )}
-          {councilDepositVisible && (
-            <div className="mt-4">
-              <TokenDeposit
-                mint={councilMint}
-                tokenType={GoverningTokenType.Council}
-                councilVote={true}
-              />
-            </div>
-          )}
-        </>
-      ) : (
-        <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
-        </>
-      )}
-    </div>
-  )
-}
-
-const TokenDeposit = ({
-  mint,
-  tokenType,
-  councilVote,
-}: {
-  mint: MintInfo | undefined
-  tokenType: GoverningTokenType
-  councilVote?: boolean
-}) => {
+const LockTokensAccount = () => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
@@ -117,38 +29,25 @@ const TokenDeposit = ({
     realmInfo,
     realmTokenAccount,
     ownTokenRecord,
-    ownCouncilTokenRecord,
-    councilTokenAccount,
     proposals,
     governances,
     toManyCommunityOutstandingProposalsForUser,
-    toManyCouncilOutstandingProposalsForUse,
+    mint,
   } = useRealm()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
   }
 
-  const depositTokenRecord =
-    tokenType === GoverningTokenType.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
+  const depositTokenRecord = ownTokenRecord
 
-  const depositTokenAccount =
-    tokenType === GoverningTokenType.Community
-      ? realmTokenAccount
-      : councilTokenAccount
+  const depositTokenAccount = realmTokenAccount
 
-  const depositMint =
-    tokenType === GoverningTokenType.Community
-      ? realm?.info.communityMint
-      : realm?.info.config.councilMint
+  const depositMint = realm?.info.communityMint
 
   const tokenName = getMintMetadata(depositMint)?.name ?? realm?.info.name
 
-  const depositTokenName = `${tokenName} ${
-    tokenType === GoverningTokenType.Community ? '' : 'Council'
-  }`
+  const depositTokenName = `${tokenName}`
 
   const depositTokens = async function (amount: BN) {
     const instructions: TransactionInstruction[] = []
@@ -307,9 +206,7 @@ const TokenDeposit = ({
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited
     ? "You don't have any tokens deposited to withdraw."
-    : !councilVote &&
-      (toManyCouncilOutstandingProposalsForUse ||
-        toManyCommunityOutstandingProposalsForUser)
+    : toManyCommunityOutstandingProposalsForUser
     ? "You don't have any governance tokens to withdraw."
     : ''
 
@@ -318,68 +215,52 @@ const TokenDeposit = ({
       ? fmtMintAmount(mint, depositTokenRecord.info.governingTokenDepositAmount)
       : '0'
 
-  const canShowAvailableTokensMessage =
-    !hasTokensDeposited && hasTokensInWallet && connected
-  const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  const canDepositToken = !hasTokensDeposited && hasTokensInWallet
-  const tokensToShow =
-    canDepositToken && depositTokenAccount
-      ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-      : canDepositToken
-      ? availableTokens
-      : 0
-
+  //   const canShowAvailableTokensMessage =
+  //     !hasTokensDeposited && hasTokensInWallet && connected
+  //   const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
+  //   const canDepositToken = !hasTokensDeposited && hasTokensInWallet
+  //   const tokensToShow =
+  //     canDepositToken && depositTokenAccount
+  //       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
+  //       : canDepositToken
+  //       ? availableTokens
+  //       : 0
   return (
-    <>
-      <div className="flex space-x-4 items-center mt-8">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <h3 className="mb-0 py-2 flex items-center">
-            {availableTokens}{' '}
-            <Tooltip content="Lorem ipsum">
-              <div className="rounded-full px-2 py-1 ml-3 border text-xs border-fgd-3 flex">
-                1x
-                <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
-              </div>
-            </Tooltip>
-          </h3>
+    <div className="grid grid-cols-12 gap-4">
+      <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg">
+        <h1 className="flex mb-8">
+          Account
+          <div className="ml-auto">
+            <Button
+              tooltipMessage={depositTooltipContent}
+              disabled={!connected || !hasTokensInWallet}
+              onClick={depositAllTokens}
+            >
+              Deposit
+            </Button>
+            <Button
+              className="ml-4"
+              tooltipMessage={withdrawTooltipContent}
+              disabled={
+                !connected ||
+                !hasTokensDeposited ||
+                toManyCommunityOutstandingProposalsForUser
+              }
+              onClick={withdrawAllTokens}
+            >
+              Withdraw
+            </Button>
+          </div>
+        </h1>
+        <div className="flex">
+          <div className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex">
+            <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
+            <h3 className="mb-0">{availableTokens}</h3>
+          </div>
         </div>
       </div>
-
-      <p
-        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
-          canShowAvailableTokensMessage ? 'block' : 'hidden'
-        }`}
-      >
-        You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p>
-
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <Button
-          tooltipMessage={depositTooltipContent}
-          className="sm:w-1/2"
-          disabled={!connected || !hasTokensInWallet}
-          onClick={depositAllTokens}
-        >
-          Deposit
-        </Button>
-
-        <Button
-          tooltipMessage={withdrawTooltipContent}
-          className="sm:w-1/2"
-          disabled={
-            !connected ||
-            !hasTokensDeposited ||
-            (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-            toManyCouncilOutstandingProposalsForUse
-          }
-          onClick={withdrawAllTokens}
-        >
-          Withdraw
-        </Button>
-      </div>
-    </>
+    </div>
   )
 }
 
-export default LockPluginTokenBalanceCard
+export default LockTokensAccount
