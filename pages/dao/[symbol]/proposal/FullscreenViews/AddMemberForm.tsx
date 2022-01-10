@@ -19,13 +19,16 @@ import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
+import TokenBalanceCard from '@components/TokenBalanceCard'
+import Spinner from '@components/Spinner'
+import LoadingPage from './Loading'
 
 interface AddMemberFormFullScreen extends MintForm {
   description: string
   title: string
 }
 
-const AddMemberFormFullScreen = ({ title, description }) => {
+const AddMemberFormFullScreen = ({ nextStep, title, description }) => {
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
@@ -113,7 +116,6 @@ const AddMemberFormFullScreen = ({ title, description }) => {
   //TODO common handle propose
   const handlePropose = async () => {
     setIsLoading(true)
-    setSubmitted(true)
 
     const instruction: UiInstruction = await getInstruction()
 
@@ -183,15 +185,21 @@ const AddMemberFormFullScreen = ({ title, description }) => {
           false
         )
 
+        setIsLoading(false)
+        setSubmitted(true)
+
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
 
-        router.push(url)
+        nextStep({
+          url,
+          error: null,
+        })
       } catch (error) {
-        notify({
-          type: 'error',
-          message: `${error}`,
+        nextStep({
+          url: null,
+          error,
         })
       }
 
@@ -216,62 +224,96 @@ const AddMemberFormFullScreen = ({ title, description }) => {
     initForm()
   }, [])
 
-  useEffect(() => {
-    console.log('waiting', submitted)
-  }, [submitted])
-
   return (
     <>
-      <Input
-        useDefaultStyle={false}
-        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-        wrapperClassName="my-6 w-full"
-        label="Member's wallet"
-        placeholder="Member's wallet"
-        value={form.destinationAccount}
-        type="text"
-        onChange={(event) =>
-          handleSetForm({
-            value: event.target.value,
-            propertyName: 'destinationAccount',
-          })
-        }
-        noMaxWidth
-        error={formErrors['destinationAccount']}
-      />
+      <div className="w-full flex justify-between items-start">
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+          <Input
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+            wrapperClassName="mb-6 w-full"
+            label="Member's wallet"
+            placeholder="Member's wallet"
+            value={form.destinationAccount}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'destinationAccount',
+              })
+            }
+            noMaxWidth
+            error={formErrors['destinationAccount']}
+          />
 
-      <Input
-        noMaxWidth
-        useDefaultStyle={false}
-        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-        wrapperClassName="mb-6 w-1/2"
-        min={mintMinAmount}
-        label="Voter weight"
-        value={form.amount}
-        type="number"
-        onChange={setAmount}
-        step={mintMinAmount}
-        error={formErrors['amount']}
-        onBlur={validateAmountOnBlur}
-      />
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+            wrapperClassName="mb-6 w-1/2"
+            min={mintMinAmount}
+            label="Voter weight"
+            value={form.amount}
+            type="number"
+            onChange={setAmount}
+            step={mintMinAmount}
+            error={formErrors['amount']}
+            onBlur={validateAmountOnBlur}
+          />
 
-      <VoteBySwitch
-        disabled={!canChooseWhoVote}
-        checked={voteByCouncil}
-        onChange={() => {
-          setVoteByCouncil(!voteByCouncil)
-        }}
-      />
+          <VoteBySwitch
+            disabled={!canChooseWhoVote}
+            checked={voteByCouncil}
+            onChange={() => {
+              setVoteByCouncil(!voteByCouncil)
+            }}
+          />
 
-      <div className="justify-center flex gap-x-6 items-center mt-8">
-        <Button
-          disabled={!form.destinationAccount}
-          className="w-44 flex justify-center items-center"
-          onClick={() => handlePropose()}
-          isLoading={isLoading}
-        >
-          Add member
-        </Button>
+          <Button
+            disabled={!form.destinationAccount}
+            className="w-44 flex justify-center items-center mt-8"
+            onClick={() => handlePropose()}
+            isLoading={isLoading || formErrors['destinationAccount']}
+          >
+            Add member
+          </Button>
+        </div>
+
+        <div className="max-w-xs w-full">
+          <Input
+            noMaxWidth
+            useDefaultStyle
+            wrapperClassName="mb-6"
+            label="Title of your proposal"
+            placeholder="Title of your proposal (optional)"
+            value={form.title || proposalTitle}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'title',
+              })
+            }
+          />
+
+          <Input
+            noMaxWidth
+            useDefaultStyle
+            wrapperClassName="mb-20"
+            label="Description"
+            placeholder="Describe your proposal (optional)"
+            value={form.description}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'description',
+              })
+            }
+          />
+
+          <TokenBalanceCard />
+        </div>
       </div>
     </>
   )

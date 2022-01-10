@@ -1,4 +1,10 @@
-const MintTokensIcon = ({ color = '#E1CE7A', className }) => {
+const MintTokensIcon = ({
+  color = '#E1CE7A',
+  className,
+}: {
+  color?: string
+  className?: string
+}) => {
   return (
     <svg
       className={className}

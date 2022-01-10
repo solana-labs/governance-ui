@@ -21,7 +21,7 @@ function NFTSelector(
     ownerPk,
     onNftSelect,
   }: {
-    ownerPk: PublicKey
+    ownerPk: PublicKey | string
     onNftSelect: (nfts: NFTWithMint[]) => void
   },
   ref: React.Ref<NftSelectorFunctions>
@@ -62,40 +62,35 @@ function NFTSelector(
   }, [selectedNfts])
   return (
     <>
-      <div
-        style={{ maxHeight: '350px', minHeight: '100px' }}
-        className="overflow-y-auto"
-      >
+      <div className="overflow-y-auto w-full bg-bkg-3 px-3 py-6 rounded-lg">
         {!isLoading ? (
           nfts.length ? (
-            <div className="flex flex-row flex-wrap gap-4 mb-4">
+            <div className="flex flex-row flex-wrap gap-4 justify-start items-center mx-auto">
               {nfts.map((x) => (
                 <div
                   onClick={() => handleSelectNft(x)}
                   key={x.mint}
-                  className="bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark relative overflow-hidden"
-                  style={{
-                    width: '150px',
-                    height: '150px',
-                  }}
+                  className="bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark relative overflow-hidden w-28 h-28"
                 >
                   {selectedNfts.find(
                     (selectedNfts) => selectedNfts.mint === x.mint
                   ) && (
-                    <CheckCircleIcon className="w-10 h-10 absolute text-green"></CheckCircleIcon>
+                    <CheckCircleIcon className="w-10 h-10 absolute text-green" />
                   )}
-                  <img style={{ width: '150px' }} src={x.val.image} />
+
+                  <img className="w-28" src={x.val.image} />
                 </div>
               ))}
             </div>
           ) : (
-            <div className="text-fgd-3 flex flex-col items-center">
-              {"Connected wallet doesn't have any NFTs"}
-              <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
+            <div className="text-white flex flex-col items-center">
+              <p>Connected wallet doesn't have any NFTs</p>
+
+              <PhotographIcon className="opacity-5 w-56 h-56" />
             </div>
           )
         ) : (
-          <Loading></Loading>
+          <Loading />
         )}
       </div>
     </>

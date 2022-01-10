@@ -432,6 +432,7 @@ const TreasuryPaymentForm = ({ close }) => {
 
           {!canChooseWhoVote && (
             <VoteBySwitch
+              disabled={!canChooseWhoVote}
               checked={voteByCouncil}
               onChange={() => {
                 setVoteByCouncil(!voteByCouncil)
@@ -443,8 +444,8 @@ const TreasuryPaymentForm = ({ close }) => {
 
       <div
         className={`${
-          close ? 'justify-start' : 'justify-center'
-        } flex gap-x-6 items-center mt-8`}
+          close ? 'justify-center ml-44' : 'justify-center items-center'
+        } flex gap-x-6  mt-8`}
       >
         {close && (
           <SecondaryButton

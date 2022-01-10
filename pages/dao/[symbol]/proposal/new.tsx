@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon, CheckCircleIcon } from '@heroicons/react/outline'
 
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import useRealm from '@hooks/useRealm'
@@ -31,12 +31,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
-import ProgramUpgrade from './components/instructions/ProgramUpgrade'
-import Empty from './components/instructions/Empty'
+import Empty from './FullscreenViews/None'
 import Mint from './components/instructions/Mint'
-import CustomBase64 from './components/instructions/CustomBase64'
+import CustomBase64 from './FullscreenViews/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
-import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
+import MakeChangeMaxAccounts from './FullscreenViews/MakeChangeMaxAccounts'
 import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
 import AddMemberIcon from '@components/AddMemberIcon'
 import ProgramUpgradeIcon from '@components/ProgramUpgradeIcon'
@@ -49,8 +48,12 @@ import UpgradeProgramNewForm from '@components/AssetsList/UpgradeProgramForm'
 import Spinner from '@components/Spinner'
 import AddMemberFormFullScreen from './FullscreenViews/AddMemberForm'
 import TreasuryPaymentFormFullScreen from './FullscreenViews/TreasuryPaymentForm'
-import OptionalForm from './FullscreenViews/OptionalForm'
 import { tooltipMessage } from './components/TooltipMessages'
+import Modal from '@components/Modal'
+import MintTokens from './FullscreenViews/MintTokens'
+import ProgramUpgrade from './FullscreenViews/ProgramUpgrade'
+import MangoMakeIcon from '@components/MangoMakeIcon'
+import CodeIcon from '@components/CodeIcon'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -65,9 +68,15 @@ export const NewProposalContext = createContext<InstructionsContext>(
   defaultGovernanceCtx
 )
 
+export type OptionalForm = {
+  description?: string
+  title?: string
+}
+
 const New = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realmDisplayName } = useRealm()
+  const router = useRouter()
 
   const {
     treasuryPaymentTooltip,
@@ -83,52 +92,24 @@ const New = () => {
   const { fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore(
     (s) => s.actions
   )
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<OptionalForm>({
     title: '',
     description: '',
   })
-  const [, /*formErrors*/ setFormErrors] = useState({})
+  const [formErrors, setFormErrors] = useState({})
+  const [dataCreation, setDataCreation] = useState<any>(undefined)
+  const [proposalAddress, setProposalAddress] = useState<any>(undefined)
   const [
     governance,
     setGovernance,
   ] = useState<ParsedAccount<Governance> | null>(null)
-  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
-  const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+  const [openCustom, setOpenCustom] = useState(false)
+  const [openErrorDetails, setOpenErrorDetails] = useState(false)
   const [selectedStep, setSelectedStep] = useState(0)
   const [selectedType, setSelectedType] = useState({
     value: '',
     idx: -1,
   })
-  // const isLoading = isLoadingSignedProposal || isLoadingDraft
-
-  // const customInstructionFilterForSelectedGovernance = (
-  //   instructionType: Instructions
-  // ) => {
-  //   if (!governance) {
-  //     return true
-  //   } else {
-  //     const governanceType = governance.info.accountType
-  //     const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-  //     switch (governanceType) {
-  //       case GovernanceAccountType.ProgramGovernance:
-  //         return instructionsAvailiableAfterProgramGovernance.includes(
-  //           instructionType
-  //         )
-  //       default:
-  //         return true
-  //     }
-  //   }
-  // }
-
-  // const getAvailableInstructionsForIndex = (index) => {
-  //   if (index === 0) {
-  //     return availableInstructions
-  //   } else {
-  //     return availableInstructions.filter((x) =>
-  //       customInstructionFilterForSelectedGovernance(x.id)
-  //     )
-  //   }
-  // }
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
@@ -137,11 +118,6 @@ const New = () => {
     const newInstructions = [...instructionsData]
     newInstructions[index] = { ...instructionsData[index], ...val }
     setInstructions(newInstructions)
-  }
-
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
   }
 
   const goToStepTwo = ({ value, idx }) => {
@@ -159,43 +135,6 @@ const New = () => {
     handleSetInstructions(newInstruction, idx)
   }
 
-  // const addInstruction = () => {
-  //   setInstructions([...instructionsData, { type: undefined }])
-  // }
-
-  // const removeInstruction = (idx) => {
-  //   setInstructions([...instructionsData.filter((x, index) => index !== idx)])
-  // }
-
-  // const handleGetInstructions = async () => {
-  //   const instructions: UiInstruction[] = []
-
-  //   for (const inst of instructionsData) {
-  //     if (inst.getInstruction) {
-  //       const instruction: UiInstruction = await inst?.getInstruction()
-
-  //       instructions.push(instruction)
-  //     }
-  //   }
-
-  //   return instructions
-  // }
-
-  // const handleTurnOffLoaders = () => {
-  //   setIsLoadingSignedProposal(false)
-  //   setIsLoadingDraft(false)
-  // }
-
-  // const checkForDraft = (isDraft) => {
-  //   if (isDraft) {
-  //     setIsLoadingDraft(true)
-
-  //     return
-  //   }
-
-  //   setIsLoadingSignedProposal(true)
-  // }
-
   useEffect(() => {
     const firstInstruction = instructionsData[0]
     if (firstInstruction && firstInstruction.governedAccount) {
@@ -207,16 +146,6 @@ const New = () => {
     fetchTokenAccountsForSelectedRealmGovernances()
   }, [])
 
-  // const getAvailableInstructionsForIndex = (index) => {
-  //   if (index === 0) {
-  //     return availableInstructions
-  //   }
-
-  //   return []
-  // }
-
-  // const availableInstructionsForIdx = getAvailableInstructionsForIndex(0)
-
   const StepOne = () => {
     return (
       <>
@@ -225,7 +154,7 @@ const New = () => {
             onClick={() =>
               goToStepTwo({
                 value: 'Transfer Tokens',
-                idx: Instructions.TreasuryPaymentForm,
+                idx: Instructions.Transfer,
               })
             }
             disabled={treasuryPaymentTooltip !== ''}
@@ -237,7 +166,7 @@ const New = () => {
                 className={`${
                   treasuryPaymentTooltip !== '' && 'opacity-50'
                 } w-8`}
-                color="#000"
+                color={`${treasuryPaymentTooltip !== '' ? '#FFF' : '#000'}`}
               />
 
               <span>Treasury payment</span>
@@ -257,8 +186,8 @@ const New = () => {
           >
             <div className="flex justify-center items-center gap-x-3">
               <AddMemberIcon
-                className={`${addNewMemberTooltip !== '' && 'opacity-50'} w-8`}
-                color="#000"
+                className="w-6"
+                color={`${addNewMemberTooltip !== '' ? '#FFF' : '#000'}`}
               />
 
               <span>Add new member</span>
@@ -278,10 +207,8 @@ const New = () => {
           >
             <div className="flex justify-center items-center gap-x-3">
               <ProgramUpgradeIcon
-                className={`${
-                  programUpgradeTooltip !== '' && 'opacity-50'
-                } w-8`}
-                color="#000"
+                className="w-6"
+                color={`${programUpgradeTooltip !== '' ? '#FFF' : '#000'}`}
               />
 
               <span>Upgrade a program</span>
@@ -301,17 +228,78 @@ const New = () => {
           >
             <div className="flex justify-center items-center gap-x-3">
               <MintTokensIcon
-                className={`${mintTokensTooltip !== '' && 'opacity-50'} w-6`}
-                color="#000"
+                className="w-6"
+                color={`${mintTokensTooltip !== '' ? '#FFF' : '#000'}`}
               />
 
               <span>Mint tokens</span>
             </div>
           </Button>
 
-          <SecondaryButton disabled={!connected} className="w-full h-10">
-            Customize your proposal
+          <Button
+            onClick={() =>
+              goToStepTwo({
+                value: 'Mango',
+                idx: Instructions.MangoMakeChangeMaxAccounts,
+              })
+            }
+            disabled={mintTokensTooltip !== ''}
+            tooltipMessage={mintTokensTooltip}
+            className="flex justify-center items-center h-10 w-full"
+          >
+            <div className="flex justify-center items-center gap-x-3">
+              <MangoMakeIcon
+                className="w-6"
+                color={`${mintTokensTooltip !== '' ? '#FFF' : '#000'}`}
+              />
+
+              <span>Mango - Change max accounts</span>
+            </div>
+          </Button>
+
+          <Button
+            onClick={() =>
+              goToStepTwo({
+                value: 'Mint Tokens',
+                idx: Instructions.Base64,
+              })
+            }
+            disabled={mintTokensTooltip !== ''}
+            tooltipMessage={mintTokensTooltip}
+            className="flex justify-center items-center h-10 w-full"
+          >
+            <div className="flex justify-center items-center gap-x-3">
+              <CodeIcon
+                className="w-6"
+                color={`${mintTokensTooltip !== '' ? '#FFF' : '#000'}`}
+              />
+
+              <span>Custom instruction</span>
+            </div>
+          </Button>
+
+          <SecondaryButton
+            onClick={() => setOpenCustom(true)}
+            disabled={!connected}
+            className="w-full h-10"
+          >
+            No instruction - Vote only
           </SecondaryButton>
+
+          {openCustom && (
+            <Modal
+              sizeClassName="max-w-xl"
+              background="bg-bkg-1"
+              isOpen={openCustom}
+              onClose={() => setOpenCustom(false)}
+            >
+              <Empty
+                setGovernance={setGovernance}
+                index={Instructions.None}
+                governance={governance}
+              />
+            </Modal>
+          )}
         </div>
 
         <div className="max-w-xs w-full">
@@ -323,40 +311,67 @@ const New = () => {
     )
   }
 
+  const goToStepThree = (data?: any) => {
+    setDataCreation(data)
+    setSelectedStep(2)
+  }
+
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
-        return <TreasuryPaymentForm close={null} />
-      case Instructions.ProgramUpgrade:
-        return (
-          <UpgradeProgramNewForm
-            close={null}
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.Mint:
-        return <Mint index={idx} governance={governance} />
-      case Instructions.Base64:
-        return <CustomBase64 index={idx} governance={governance} />
-      case Instructions.None:
-        return <Empty index={idx} governance={governance} />
-      case Instructions.MangoMakeChangeMaxAccounts:
-        return <MakeChangeMaxAccounts index={idx} governance={governance} />
-      case Instructions.AddMemberForm:
-        return (
-          <AddMemberFormFullScreen
-            title={form.title || ''}
-            description={form.description || ''}
-          />
-        )
-      case Instructions.TreasuryPaymentForm:
         return (
           <TreasuryPaymentFormFullScreen
             index={idx}
             governance={governance}
             setGovernance={setGovernance}
+            nextStep={goToStepThree}
+          />
+        )
+      case Instructions.ProgramUpgrade:
+        return (
+          <ProgramUpgrade
+            setGovernance={setGovernance}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.Mint:
+        return (
+          <MintTokens
+            setGovernance={setGovernance}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.Base64:
+        return (
+          <CustomBase64
+            setGovernance={setGovernance}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.None:
+        return (
+          <Empty
+            setGovernance={setGovernance}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.MangoMakeChangeMaxAccounts:
+        return (
+          <MakeChangeMaxAccounts
+            setGovernance={setGovernance}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.AddMemberForm:
+        return (
+          <AddMemberFormFullScreen
             title={form.title || ''}
+            nextStep={goToStepThree}
             description={form.description || ''}
           />
         )
@@ -368,24 +383,138 @@ const New = () => {
   const StepTwo = () => {
     return (
       <>
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+        <div className="w-full">
           {getCurrentInstruction({
             typeId: selectedType.idx,
             idx: selectedType.idx,
           })}
         </div>
-
-        <div className="max-w-xs w-full mt-6">
-          <OptionalForm form={form} handleSetForm={handleSetForm} />
-
-          <TokenBalanceCard />
-        </div>
       </>
     )
   }
 
+  const ErrorDetailsCard = () => {
+    return (
+      <div>
+        <h2>Error log</h2>
+
+        <p className="bg-bkg-2 p-2 my-6 rounded-lg">
+          {`${dataCreation.error}`}
+        </p>
+
+        <div className="flex justify-start gap-x-4 mt-8 items-center">
+          <SecondaryButton
+            className="w-36"
+            onClick={() => setOpenErrorDetails(!openErrorDetails)}
+          >
+            Close
+          </SecondaryButton>
+
+          <Button
+            className="w-36 flex justify-center items-center"
+            onClick={() => {
+              navigator.clipboard.writeText(`${dataCreation.error}`)
+            }}
+          >
+            Copy
+          </Button>
+        </div>
+      </div>
+    )
+  }
+
   const StepThree = () => {
-    return <div className="w-full max-w-xl mt-16 rounded-xl">asdasd 3432</div>
+    const index = String(dataCreation.error).indexOf(':')
+
+    return (
+      <div className="w-full max-w-xl mt-16 rounded-xl">
+        {dataCreation.error ? (
+          <>
+            <div className="flex justify-center gap-x-3 items-start">
+              <XCircleIcon className="w-12 h-12 text-red" />
+
+              <div className="flex gap-y-2 flex-col">
+                <h2>Could not create proposal</h2>
+
+                {`${
+                  index > -1
+                    ? dataCreation.error.toString().slice(index + 1)
+                    : dataCreation.error
+                }`}
+
+                <div className="flex justify-center gap-x-4 mt-4 items-center">
+                  <SecondaryButton
+                    className="w-36"
+                    onClick={() => setOpenErrorDetails(!openErrorDetails)}
+                  >
+                    See details
+                  </SecondaryButton>
+
+                  <Button
+                    className="w-36 flex justify-center items-center"
+                    onClick={() => setSelectedStep(0)}
+                  >
+                    Try again
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {openErrorDetails && (
+              <Modal
+                onClose={() => setOpenErrorDetails(false)}
+                isOpen={openErrorDetails}
+                background="bg-bkg-1"
+              >
+                <ErrorDetailsCard />
+              </Modal>
+            )}
+          </>
+        ) : (
+          <>
+            <div className="flex justify-center gap-x-3 items-start">
+              <CheckCircleIcon className="w-12 h-12 text-green" />
+
+              <div className="flex gap-y-2 flex-col">
+                <h2>Proposal created successfully</h2>
+
+                <p>Share the link to your proposal for members start voting</p>
+
+                <div className="flex justify-center gap-x-4 mt-4 items-center">
+                  <SecondaryButton
+                    className="w-44"
+                    onClick={() => {
+                      navigator.clipboard.writeText(`${dataCreation.url}`)
+                    }}
+                  >
+                    Copy link
+                  </SecondaryButton>
+
+                  <Button
+                    className="w-44 flex justify-center items-center"
+                    onClick={() => {
+                      router.push(dataCreation.url)
+                    }}
+                  >
+                    See proposal
+                  </Button>
+                </div>
+              </div>
+            </div>
+
+            {openErrorDetails && (
+              <Modal
+                onClose={() => setOpenErrorDetails(false)}
+                isOpen={openErrorDetails}
+                background="bg-bkg-1"
+              >
+                <ErrorDetailsCard />
+              </Modal>
+            )}
+          </>
+        )}
+      </div>
+    )
   }
 
   const steps = {
@@ -465,11 +594,7 @@ const New = () => {
           ))}
         </ul>
 
-        <div
-          className={`${
-            selectedStep === 0 ? 'mt-16' : 'mt-8'
-          } flex justify-between w-full`}
-        >
+        <div className={`mt-16 flex justify-between w-full`}>
           {selectedStep === 0 && <StepOne />}
           {selectedStep === 1 && <StepTwo />}
           {selectedStep === 2 && <StepThree />}

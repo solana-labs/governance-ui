@@ -2,7 +2,10 @@ import React, { useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
+import {
+  getMintMinAmountAsDecimal,
+  getMintNaturalAmountFromDecimal,
+} from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
@@ -15,7 +18,7 @@ import {
 import {
   ComponentInstructionData,
   Instructions,
-  SplTokenTransferForm,
+  TreasuryPaymentForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
@@ -24,7 +27,10 @@ import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
 import { ParsedAccount } from '@models/core/accounts'
-import { getTransferInstruction } from '@utils/instructionTools'
+import {
+  getTransferInstruction,
+  getTransferNftInstruction,
+} from '@utils/instructionTools'
 import { NewProposalContext } from '../new'
 import GovernedAccountSelect from '../components/GovernedAccountSelect'
 import Button from '@components/Button'
@@ -33,23 +39,27 @@ import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { createProposal } from 'actions/createProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
-import { notify } from '@utils/notifications'
 import VoteBySwitch from '../components/VoteBySwitch'
+import TokenBalanceCard from '@components/TokenBalanceCard'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
+import tokenService from '@utils/services/token'
+import BigNumber from 'bignumber.js'
+import { BN } from '@project-serum/anchor'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import NFTSelector from '@components/NFTS/NFTSelector'
+import AccountLabel from '@components/TreasuryAccount/AccountHeader'
 
 const TreasuryPaymentFormFullScreen = ({
   index,
   governance,
   setGovernance,
-  title,
-  description,
+  nextStep,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
   setGovernance: any
-  title?: string
-  description?: string
+  nextStep: any
 }) => {
-  const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
 
@@ -69,6 +79,10 @@ const TreasuryPaymentFormFullScreen = ({
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
+  const [isNFT, setIsNFT] = useState(false)
+  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
+
+  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
 
   const [governedAccount, setGovernedAccount] = useState<
     ParsedAccount<Governance> | undefined
@@ -86,13 +100,21 @@ const TreasuryPaymentFormFullScreen = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const shouldBeGoverned = index !== 0 && governance
 
-  const [form, setForm] = useState<SplTokenTransferForm>({
+  const [form, setForm] = useState<TreasuryPaymentForm>({
     destinationAccount: '',
-    amount: undefined,
+    amount: isNFT ? 1 : undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
+    description: '',
+    title: '',
   })
+
+  useEffect(() => {
+    if (form.governedTokenAccount) {
+      setIsNFT(form.governedTokenAccount.isNft)
+    }
+  }, [form.governedTokenAccount])
 
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
@@ -134,8 +156,43 @@ const TreasuryPaymentFormFullScreen = ({
 
   const schema = getTokenTransferSchema({ form, connection })
 
+  const calcTransactionDolarAmount = (amount: number | undefined) => {
+    if (form.governedTokenAccount && form.governedTokenAccount.mint) {
+      const price = tokenService.getUSDTokenPrice(
+        form.governedTokenAccount.mint.publicKey.toBase58()
+      )
+      const totalPrice = Number(amount) * price
+      const totalPriceFormatted =
+        amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
+
+      return totalPriceFormatted
+    }
+
+    return ''
+  }
+
+  const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
+
+  const IsAmountNotHigherThenBalance = () => {
+    const mintValue = getMintNaturalAmountFromDecimal(
+      form.amount!,
+      form.governedTokenAccount!.mint!.account.decimals
+    )
+    let gte: boolean | undefined = false
+    try {
+      gte = form.governedTokenAccount?.token?.account?.amount?.gte(
+        new BN(mintValue)
+      )
+    } catch (e) {
+      //silent fail
+    }
+
+    return form.governedTokenAccount?.token?.publicKey && gte
+  }
+
   const getInstruction = async (): Promise<UiInstruction> => {
-    return getTransferInstruction({
+    const selectedNftMint = selectedNfts[0]?.mint
+    const defaultProps = {
       schema,
       form,
       programId,
@@ -143,7 +200,14 @@ const TreasuryPaymentFormFullScreen = ({
       wallet,
       currentAccount: form.governedTokenAccount || null,
       setFormErrors,
-    })
+    }
+
+    return isNFT
+      ? getTransferNftInstruction({
+          ...defaultProps,
+          nftMint: selectedNftMint,
+        })
+      : getTransferInstruction(defaultProps)
   }
 
   const handleSetInstructions = (val: any, index) => {
@@ -262,9 +326,11 @@ const TreasuryPaymentFormFullScreen = ({
           realm.pubkey,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
-          title ? title : `Pay ${form.amount} to ${form.destinationAccount}`,
-          description
-            ? description
+          form.title
+            ? form.title
+            : `Pay ${form.amount} to ${form.destinationAccount}`,
+          form.description
+            ? form.description
             : `Pay ${form.amount} to ${form.destinationAccount}`,
           proposalMint,
           selectedGovernance?.info?.proposalCount,
@@ -276,13 +342,29 @@ const TreasuryPaymentFormFullScreen = ({
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
 
-        router.push(url)
-      } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
+        nextStep({
+          url,
+          error: null,
+        })
+      } catch (error) {
+        nextStep({
+          url: null,
+          error,
+        })
       }
     }
     setIsLoading(false)
   }
+
+  const nftName = selectedNfts[0]?.val?.name
+  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+    form.destinationAccount
+  }`
+  const proposalTitle = isNFT
+    ? nftTitle
+    : `Pay ${form.amount || ''}${
+        tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
+      }to ${form.destinationAccount}`
 
   return (
     <NewProposalContext.Provider
@@ -293,87 +375,155 @@ const TreasuryPaymentFormFullScreen = ({
         setGovernance,
       }}
     >
-      <div className="w-full">
-        <GovernedAccountSelect
-          noMaxWidth
-          useDefaultStyle={false}
-          className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
-          label="Source account"
-          governedAccounts={governedTokenAccounts as GovernedMultiTypeAccount[]}
-          onChange={(value) => {
-            handleSetForm({ value, propertyName: 'governedTokenAccount' })
-          }}
-          value={form.governedTokenAccount}
-          error={formErrors['governedTokenAccount']}
-          shouldBeGoverned={shouldBeGoverned}
-          governance={governance}
-        />
-
-        <Input
-          noMaxWidth
-          useDefaultStyle={false}
-          className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
-          wrapperClassName="my-6"
-          label="Destination account"
-          placeholder="Destination account"
-          value={form.destinationAccount}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'destinationAccount',
-            })
-          }
-          error={formErrors['destinationAccount']}
-        />
-
-        {destinationAccount && (
-          <div className="flex justify-start items-center gap-x-2">
-            <p className="pb-0.5 text-fgd-3 text-xs">Account owner:</p>
-            <p className="text-xs">{form.destinationAccount}</p>
+      <div className="w-full flex justify-between items-start">
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+          <div className="w-full">
+            <p className="text-white pb-0.5 text-xs">Your balance</p>
+            <AccountLabel background="bg-bkg-3" />
           </div>
-        )}
 
-        {destinationAccountName && (
-          <div className="flex justify-start items-center gap-x-2">
-            <p className="pb-0.5 text-fgd-3 text-xs">Account name:</p>
-            <p className="text-xs">{destinationAccountName}</p>
-          </div>
-        )}
+          <GovernedAccountSelect
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            label="Source account"
+            governedAccounts={
+              governedTokenAccounts as GovernedMultiTypeAccount[]
+            }
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: 'governedTokenAccount' })
+            }}
+            value={form.governedTokenAccount}
+            error={formErrors['governedTokenAccount']}
+            shouldBeGoverned={shouldBeGoverned}
+            governance={governance}
+          />
 
-        <Input
-          noMaxWidth
-          useDefaultStyle={false}
-          className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
-          wrapperClassName="my-6"
-          placeholder="Amount"
-          min={mintMinAmount}
-          label="Amount"
-          value={form.amount}
-          type="number"
-          onChange={setAmount}
-          step={mintMinAmount}
-          error={formErrors['amount']}
-          onBlur={validateAmountOnBlur}
-        />
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            wrapperClassName="my-6 w-full"
+            label="Destination account"
+            placeholder="Destination account"
+            value={form.destinationAccount}
+            type="text"
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'destinationAccount',
+              })
+            }
+            error={formErrors['destinationAccount']}
+          />
 
-        <VoteBySwitch
-          disabled={!canChooseWhoVote}
-          checked={voteByCouncil}
-          onChange={() => {
-            setVoteByCouncil(!voteByCouncil)
-          }}
-        />
-      </div>
+          {!isNFT ? (
+            <NFTSelector
+              onNftSelect={(nfts) => setSelectedNfts(nfts)}
+              ownerPk={
+                form.governedTokenAccount &&
+                form.governedTokenAccount.governance
+                  ? form.governedTokenAccount.governance.pubkey
+                  : ''
+              }
+            />
+          ) : (
+            <Input
+              noMaxWidth
+              useDefaultStyle={false}
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+              wrapperClassName="mb-6 w-full"
+              placeholder="Amount"
+              min={mintMinAmount}
+              label="Amount"
+              value={form.amount}
+              type="number"
+              onChange={setAmount}
+              step={mintMinAmount}
+              error={formErrors['amount']}
+              onBlur={validateAmountOnBlur}
+            />
+          )}
 
-      <div className="justify-center flex gap-x-6 items-center mt-8">
-        <Button
-          className="w-44 flex justify-center items-center"
-          onClick={handlePropose}
-          isLoading={isLoading}
-        >
-          Create proposal
-        </Button>
+          {destinationAccount && (
+            <div className="flex justify-start items-center gap-x-2">
+              <p className="pb-0.5 text-fgd-3 text-xs">Account owner:</p>
+              <p className="text-xs">{form.destinationAccount}</p>
+            </div>
+          )}
+
+          {destinationAccountName && (
+            <div className="flex justify-start items-center gap-x-2">
+              <p className="pb-0.5 text-fgd-3 text-xs">Account name:</p>
+              <p className="text-xs">{destinationAccountName}</p>
+            </div>
+          )}
+
+          <small className="text-red">
+            {transactionDolarAmount
+              ? IsAmountNotHigherThenBalance()
+                ? `~$${transactionDolarAmount}`
+                : 'Insufficient balance'
+              : null}
+          </small>
+
+          <VoteBySwitch
+            disabled={!canChooseWhoVote}
+            checked={voteByCouncil}
+            onChange={() => {
+              setVoteByCouncil(!voteByCouncil)
+            }}
+          />
+
+          <Button
+            className="w-44 flex justify-center items-center mt-8"
+            onClick={handlePropose}
+            isLoading={isLoading}
+            disabled={
+              (isNFT && !selectedNfts.length) ||
+              isLoading ||
+              !form.destinationAccount
+            }
+          >
+            Create proposal
+          </Button>
+        </div>
+
+        <div className="max-w-xs w-full">
+          <Input
+            noMaxWidth
+            useDefaultStyle
+            wrapperClassName="mb-6"
+            label="Title of your proposal"
+            placeholder="Title of your proposal (optional)"
+            value={form.title || proposalTitle}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'title',
+              })
+            }
+          />
+
+          <Input
+            noMaxWidth
+            useDefaultStyle
+            wrapperClassName="mb-20"
+            label="Description"
+            placeholder="Describe your proposal (optional)"
+            value={form.description}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'description',
+              })
+            }
+          />
+
+          <TokenBalanceCard />
+        </div>
       </div>
     </NewProposalContext.Provider>
   )

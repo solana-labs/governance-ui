@@ -56,6 +56,12 @@ export interface MangoMakeChangeMaxAccountsForm {
   maxMangoAccounts: number
 }
 
+export interface MangoMakeChangeMaxAccountsTypeForm
+  extends MangoMakeChangeMaxAccountsForm {
+  description: string
+  title: string
+}
+
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string
@@ -74,7 +80,6 @@ export enum Instructions {
   None,
   MangoMakeChangeMaxAccounts,
   AddMemberForm,
-  TreasuryPaymentForm,
 }
 
 export type createParams = [

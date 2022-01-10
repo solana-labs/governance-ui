@@ -1,0 +1,271 @@
+import React, { useContext, useEffect, useState } from 'react'
+import * as yup from 'yup'
+import {
+  Base64InstructionForm,
+  ComponentInstructionData,
+  Instructions,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { Governance } from '@models/accounts'
+import { ParsedAccount } from '@models/core/accounts'
+import useWalletStore from 'stores/useWalletStore'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
+import Input from '@components/inputs/Input'
+import Textarea from '@components/inputs/Textarea'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { validateInstruction } from '@utils/instructionTools'
+import Button from '@components/Button'
+import TokenBalanceCard from '@components/TokenBalanceCard'
+import { NewProposalContext } from '../new'
+import GovernedAccountSelect from '../components/GovernedAccountSelect'
+
+export type Base64InstructionTypeForm = {
+  governedAccount: any | undefined
+  base64: string
+  holdUpTime: number
+  title?: string
+  description?: string
+}
+
+const CustomBase64 = ({
+  index,
+  governance,
+  setGovernance,
+}: {
+  index: number
+  governance: ParsedAccount<Governance> | null
+  setGovernance: any
+}) => {
+  const wallet = useWalletStore((s) => s.current)
+  const {
+    governancesArray,
+    governedTokenAccounts,
+    getMintWithGovernances,
+  } = useGovernanceAssets()
+  const shouldBeGoverned = index !== 0 && governance
+  const [governedAccounts, setGovernedAccounts] = useState<
+    GovernedMultiTypeAccount[]
+  >([])
+  const [form, setForm] = useState<Base64InstructionTypeForm>({
+    governedAccount: undefined,
+    base64: '',
+    holdUpTime: 0,
+    title: '',
+    description: '',
+  })
+  const [formErrors, setFormErrors] = useState({})
+  const handleSetForm = ({ propertyName, value }) => {
+    setFormErrors({})
+    setForm({ ...form, [propertyName]: value })
+  }
+  const [instructionsData, setInstructions] = useState<
+    ComponentInstructionData[]
+  >([{ type: Instructions.Transfer }])
+
+  useEffect(() => {
+    async function prepGovernances() {
+      const mintWithGovernances = await getMintWithGovernances()
+      const matchedGovernances = governancesArray.map((gov) => {
+        const governedTokenAccount = governedTokenAccounts.find(
+          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+        )
+        const mintGovernance = mintWithGovernances.find(
+          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+        )
+        if (governedTokenAccount) {
+          return governedTokenAccount as GovernedMultiTypeAccount
+        }
+        if (mintGovernance) {
+          return mintGovernance as GovernedMultiTypeAccount
+        }
+        return {
+          governance: gov,
+        }
+      })
+      setGovernedAccounts(matchedGovernances)
+    }
+    prepGovernances()
+  }, [])
+  async function getInstruction(): Promise<UiInstruction> {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    let serializedInstruction = ''
+    if (
+      isValid &&
+      form.governedAccount?.governance?.info &&
+      wallet?.publicKey
+    ) {
+      serializedInstruction = form.base64
+    }
+    const obj: UiInstruction = {
+      serializedInstruction: serializedInstruction,
+      isValid,
+      governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdUpTime,
+    }
+    return obj
+  }
+  const handleSetInstructions = (val: any, index) => {
+    const newInstructions = [...instructionsData]
+
+    newInstructions[index] = { ...instructionsData[index], ...val }
+
+    setInstructions(newInstructions)
+  }
+
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: form.governedAccount?.governance, getInstruction },
+      index
+    )
+  }, [form])
+  const schema = yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Governed account is required'),
+    base64: yup
+      .string()
+      .required('Instruction is required')
+      .test('base64Test', 'Invalid base64', function (val: string) {
+        if (val) {
+          try {
+            getInstructionDataFromBase64(val)
+            return true
+          } catch (e) {
+            return false
+          }
+        } else {
+          return this.createError({
+            message: `Instruction is required`,
+          })
+        }
+      }),
+  })
+  const validateAmountOnBlur = () => {
+    const value = form.holdUpTime
+
+    handleSetForm({
+      value: parseFloat(
+        Math.max(
+          Number(0),
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
+        ).toFixed()
+      ),
+      propertyName: 'holdUpTime',
+    })
+  }
+  return (
+    <NewProposalContext.Provider
+      value={{
+        instructionsData,
+        handleSetInstructions,
+        governance,
+        setGovernance,
+      }}
+    >
+      <div className="w-full flex justify-between items-start">
+        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+          <GovernedAccountSelect
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            label="Governance"
+            governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
+            onChange={(value) => {
+              handleSetForm({ value, propertyName: 'governedAccount' })
+            }}
+            value={form.governedAccount}
+            error={formErrors['governedAccount']}
+            shouldBeGoverned={shouldBeGoverned}
+            governance={governance}
+          />
+
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            wrapperClassName="my-6 w-full"
+            min={0}
+            label="Hold up time (days)"
+            value={form.holdUpTime}
+            type="number"
+            onChange={(event) => {
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'holdUpTime',
+              })
+            }}
+            step={1}
+            error={formErrors['holdUpTime']}
+            onBlur={validateAmountOnBlur}
+          />
+
+          <Textarea
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            wrapperClassName="mb-6 w-full"
+            label="Instruction"
+            placeholder="Base64 encoded serialized Solana instruction"
+            value={form.base64}
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'base64',
+              })
+            }
+            error={formErrors['base64']}
+          />
+
+          <Button
+            className="w-44 flex justify-center items-center mt-8"
+            // onClick={handlePropose}
+            // isLoading={isLoading}
+            // disabled={(isNFT && !selectedNfts.length) || isLoading || !form.destinationAccount}
+          >
+            Create proposal
+          </Button>
+        </div>
+
+        <div className="max-w-xs w-full">
+          <Input
+            noMaxWidth
+            useDefaultStyle
+            wrapperClassName="mb-6"
+            label="Title of your proposal"
+            placeholder="Title of your proposal (optional)"
+            value={form.title || ''}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'title',
+              })
+            }
+          />
+
+          <Input
+            noMaxWidth
+            useDefaultStyle
+            wrapperClassName="mb-20"
+            label="Description"
+            placeholder="Describe your proposal (optional)"
+            value={form.description}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'description',
+              })
+            }
+          />
+
+          <TokenBalanceCard />
+        </div>
+      </div>
+    </NewProposalContext.Provider>
+  )
+}
+
+export default CustomBase64

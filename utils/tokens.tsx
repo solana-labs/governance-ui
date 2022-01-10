@@ -353,7 +353,10 @@ export const deserializeMint = (data: Buffer) => {
   return mintInfo as MintInfo
 }
 
-export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
+export const getNfts = async (
+  connection: Connection,
+  ownerPk: PublicKey | string
+) => {
   try {
     const nfts = await getParsedNftAccountsByOwner({
       publicAddress: ownerPk,
