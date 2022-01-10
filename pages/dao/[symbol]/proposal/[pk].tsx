@@ -3,7 +3,6 @@ import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from 'hooks/useProposal'
 import ProposalStateBadge from 'components/ProposalStatusBadge'
-import TokenBalanceCard from 'components/TokenBalanceCard'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
 import VotePanel from 'components/VotePanel'
@@ -17,6 +16,7 @@ import useQueryContext from 'hooks/useQueryContext'
 import React from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
@@ -91,7 +91,7 @@ const Proposal = () => {
       </div>
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-        <TokenBalanceCard proposal={option(proposal?.info)} />
+        <TokenBalanceCardWrapper proposal={option(proposal?.info)} />
         <div className="bg-bkg-2 rounded-lg">
           <div className="p-4 md:p-6">
             <h3 className="mb-4">Results</h3>
