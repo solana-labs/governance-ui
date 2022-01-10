@@ -24,6 +24,7 @@ import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import DepositLabel from './DepositLabel'
 import NFTAccountSelect from './NFTAccountSelect'
+import ImgWithLoader from '@components/ImgWithLoader'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
@@ -187,7 +188,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         ) : (
           imgUrl && (
             <div className="flex justify-center">
-              <img style={{ width: '150px' }} src={imgUrl} />
+              <ImgWithLoader style={{ width: '150px' }} src={imgUrl} />
             </div>
           )
         )}
