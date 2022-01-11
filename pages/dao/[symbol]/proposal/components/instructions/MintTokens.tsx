@@ -25,11 +25,11 @@ import { ParsedAccount } from 'models/core/accounts'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import { getMintInstruction } from 'utils/instructionTools'
-import { NewProposalContext } from '../new'
-import GovernedAccountSelect from '../components/GovernedAccountSelect'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 import Button from '@components/Button'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import { handlePropose } from 'actions/handleCreateProposal'
+import { NewProposalContext } from '../../new'
 
 export type MintTokensForm = {
   destinationAccount: string

@@ -1,7 +1,6 @@
 import { StyledLabel, StyledSuffix, inputClasses } from './styles'
 import ErrorField from './ErrorField'
-import { CheckCircleIcon, XCircleIcon } from '@heroicons/react/outline'
-import Loading from '@components/Loading'
+import { CheckCircleIcon } from '@heroicons/react/outline'
 
 interface InputProps {
   type: string

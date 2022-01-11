@@ -31,10 +31,9 @@ import {
   getTransferInstruction,
   getTransferNftInstruction,
 } from '@utils/instructionTools'
-import { NewProposalContext } from '../new'
-import GovernedAccountSelect from '../components/GovernedAccountSelect'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 import Button from '@components/Button'
-import VoteBySwitch from '../components/VoteBySwitch'
+import VoteBySwitch from '../VoteBySwitch'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import tokenService from '@utils/services/token'
@@ -44,6 +43,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import AccountLabel from '@components/TreasuryAccount/AccountHeader'
 import { handlePropose } from 'actions/handleCreateProposal'
+import { NewProposalContext } from '../../new'
 
 const TreasuryPaymentFormFullScreen = ({
   index,

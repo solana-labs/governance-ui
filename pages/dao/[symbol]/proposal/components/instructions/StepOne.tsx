@@ -9,9 +9,9 @@ import MangoMakeIcon from '@components/MangoMakeIcon'
 import MintTokensIcon from '@components/MintTokensIcon'
 import ProgramUpgradeIcon from '@components/ProgramUpgradeIcon'
 import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
-import { tooltipMessage } from '../components/TooltipMessages'
 import useWalletStore from 'stores/useWalletStore'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { tooltipMessage } from '../TooltipMessages'
 
 const StepOne = ({
   handleSetInstructions,

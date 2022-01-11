@@ -12,9 +12,9 @@ import {
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ParsedAccount } from '@models/core/accounts'
 import { Governance } from '@models/accounts'
-import StepOne from './FullscreenViews/StepOne'
-import StepThree from './FullscreenViews/StepThree'
-import StepTwo from './FullscreenViews/StepTwo'
+import StepOne from './components/instructions/StepOne'
+import StepThree from './components/instructions/StepThree'
+import StepTwo from './components/instructions/StepTwo'
 
 const defaultGovernanceCtx: InstructionsContext = {
   instructionsData: [],

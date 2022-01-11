@@ -18,11 +18,11 @@ import Input from '@components/inputs/Input'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { makeChangeMaxMangoAccountsInstruction } from '@blockworks-foundation/mango-client'
 import { BN } from '@project-serum/anchor'
-import { NewProposalContext } from '../new'
-import GovernedAccountSelect from '../components/GovernedAccountSelect'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import Button from '@components/Button'
 import { handlePropose } from 'actions/handleCreateProposal'
+import { NewProposalContext } from '../../new'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 
 const MakeChangeMaxAccounts = ({
   index,

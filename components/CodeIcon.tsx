@@ -17,16 +17,16 @@ const CodeIcon = ({
       <path
         d="M24 27L33 18L24 9"
         stroke={color}
-        stroke-width="3.00312"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="3.00312"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
       <path
         d="M12 9L3 18L12 27"
         stroke={color}
-        stroke-width="3.00312"
-        stroke-linecap="round"
-        stroke-linejoin="round"
+        strokeWidth="3.00312"
+        strokeLinecap="round"
+        strokeLinejoin="round"
       />
     </svg>
   )

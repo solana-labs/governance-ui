@@ -24,8 +24,8 @@ import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/Govern
 const UpgradeProgramNewForm = ({
   index,
   governance,
-  close,
-}: {
+}: // close,
+{
   index: number
   governance: ParsedAccount<Governance> | null
   close?: any
