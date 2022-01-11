@@ -16,6 +16,7 @@ import { finalizeVote } from 'actions/finalizeVotes'
 import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -105,13 +106,9 @@ const ProposalActionsPanel = () => {
   const handleFinalizeVote = async () => {
     try {
       if (proposal && realmInfo && governance) {
-        if (!realmInfo?.programVersion) {
-          throw Error('Program version undefined')
-        }
-
         const rpcContext = new RpcContext(
           proposal.owner,
-          realmInfo?.programVersion,
+          getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
           connection.endpoint
@@ -135,13 +132,9 @@ const ProposalActionsPanel = () => {
   const handleSignOffProposal = async () => {
     try {
       if (proposal && realmInfo) {
-        if (!realmInfo?.programVersion) {
-          throw Error('Program version undefined')
-        }
-
         const rpcContext = new RpcContext(
           proposal.owner,
-          realmInfo?.programVersion,
+          getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
           connection.endpoint
@@ -166,13 +159,9 @@ const ProposalActionsPanel = () => {
   ) => {
     try {
       if (proposal && realmInfo) {
-        if (!realmInfo?.programVersion) {
-          throw Error('Program version undefined')
-        }
-
         const rpcContext = new RpcContext(
           proposal.owner,
-          realmInfo.programVersion,
+          getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
           connection.endpoint

@@ -24,6 +24,7 @@ import * as yup from 'yup'
 import Switch from '@components/Switch'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
@@ -86,13 +87,9 @@ const NewAccountForm = () => {
       if (isValid && realmMint) {
         setIsLoading(true)
 
-        if (!realmInfo?.programVersion) {
-          throw Error('Program version undefined')
-        }
-
         const rpcContext = new RpcContext(
           new PublicKey(realm.owner.toString()),
-          realmInfo?.programVersion,
+          getProgramVersionForRealm(realmInfo!),
           wallet!,
           connection.current,
           connection.endpoint

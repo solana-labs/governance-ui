@@ -8,6 +8,7 @@ import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -24,13 +25,9 @@ const DiscussionForm = () => {
   const submitComment = async () => {
     setSubmitting(true)
 
-    if (!realmInfo?.programVersion) {
-      throw Error('Program version undefined')
-    }
-
     const rpcContext = new RpcContext(
       proposal!.owner,
-      realmInfo?.programVersion,
+      getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection.current,
       connection.endpoint

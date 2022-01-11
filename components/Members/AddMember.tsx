@@ -27,6 +27,7 @@ import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -122,13 +123,9 @@ const AddMember = () => {
         throw 'No realm selected'
       }
 
-      if (!realmInfo?.programVersion) {
-        throw Error('Program version undefined')
-      }
-
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        realmInfo?.programVersion,
+        getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
         connection.endpoint

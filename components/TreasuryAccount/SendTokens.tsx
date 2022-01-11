@@ -49,6 +49,7 @@ import {
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const SendTokens = () => {
   const { resetCompactViewState } = useTreasuryAccountStore()
@@ -176,12 +177,9 @@ const SendTokens = () => {
         throw 'No realm selected'
       }
 
-      if (!realmInfo?.programVersion) {
-        throw Error('Program version undefined')
-      }
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        realmInfo.programVersion,
+        getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
         connection.endpoint

@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import { isYesVote } from '@models/voteRecords'
 import { VoteRecord } from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
@@ -210,7 +211,7 @@ const MemberOverview = () => {
               ))}
             </div>
             <div className="ml-auto text-fgd-3 text-xs flex flex-col">
-              {x.account.isYes() ? (
+              {isYesVote(x.account) ? (
                 <CheckCircleIcon className="h-4 mr-1 text-green w-4" />
               ) : (
                 <XCircleIcon className="h-4 mr-1 text-red w-4" />

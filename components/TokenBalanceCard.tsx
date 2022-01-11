@@ -22,6 +22,7 @@ import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -147,14 +148,10 @@ const TokenDeposit = ({
 
     signers.push(transferAuthority)
 
-    if (!realmInfo?.programVersion) {
-      throw Error('Program version undefined')
-    }
-
     await withDepositGoverningTokens(
       instructions,
       realmInfo!.programId,
-      realmInfo!.programVersion,
+      getProgramVersionForRealm(realmInfo!),
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenAccount!.account.mint,

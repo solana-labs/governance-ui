@@ -22,6 +22,7 @@ import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { getProgramVersionForRealm } from '@models/registry/api'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -83,13 +84,9 @@ const NewProgramForm = () => {
       if (isValid && realmMint) {
         setIsLoading(true)
 
-        if (!realmInfo?.programVersion) {
-          throw Error('Program version undefined')
-        }
-
         const rpcContext = new RpcContext(
           new PublicKey(realm.owner.toString()),
-          realmInfo?.programVersion,
+          getProgramVersionForRealm(realmInfo!),
           wallet!,
           connection.current,
           connection.endpoint

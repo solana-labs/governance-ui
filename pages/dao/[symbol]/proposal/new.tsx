@@ -38,6 +38,7 @@ import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -180,13 +181,9 @@ const New = () => {
         throw Error('No governance selected')
       }
 
-      if (!realmInfo?.programVersion) {
-        throw Error('Program version undefined')
-      }
-
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        realmInfo.programVersion!,
+        getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
         connection.endpoint

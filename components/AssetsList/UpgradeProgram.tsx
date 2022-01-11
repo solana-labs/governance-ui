@@ -35,6 +35,7 @@ import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -146,13 +147,9 @@ const UpgradeProgram = () => {
         throw 'No realm selected'
       }
 
-      if (!realmInfo?.programVersion) {
-        throw Error('Program version undefined')
-      }
-
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        realmInfo?.programVersion,
+        getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
         connection.endpoint

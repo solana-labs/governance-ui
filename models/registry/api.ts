@@ -1,4 +1,8 @@
-import { Realm } from '@solana/spl-governance'
+import {
+  PROGRAM_VERSION,
+  PROGRAM_VERSION_V1,
+  Realm,
+} from '@solana/spl-governance'
 import { getRealms } from '@models/api'
 import { ProgramAccount } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
@@ -30,6 +34,11 @@ export interface RealmInfo {
   isCertified: boolean
 }
 
+export function getProgramVersionForRealm(realmInfo: RealmInfo) {
+  // TODO: as a temp fix V1 is returned by default
+  return realmInfo?.programVersion ?? PROGRAM_VERSION_V1
+}
+
 interface RealmInfoAsJSON
   extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
   programId: string
@@ -47,6 +56,8 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     programId: new PublicKey(realm.programId),
     realmId: new PublicKey(realm.realmId),
     isCertified: true,
+    // TODO: dynamically resolve the program version
+    programVersion: PROGRAM_VERSION_V1,
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -127,12 +138,6 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['AMRC14FwwWkT5TG2ibXdLTUnVrnd2N4YsTifzCeRR22X', ''], // Chicken Tribe test
   ['oW5X5C9wrnchcd4oucv8RG7t1uQLRKyevgy3GPMDTst', ''], // Succeed.Finance test
 ])
-
-export const PROGRAM_VERSION_V1 = 1
-export const PROGRAM_VERSION_V2 = 2
-
-// The most up to date program version
-export const PROGRAM_VERSION = PROGRAM_VERSION_V2
 
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {

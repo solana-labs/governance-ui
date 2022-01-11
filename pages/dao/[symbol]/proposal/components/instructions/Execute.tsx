@@ -8,6 +8,7 @@ import Modal from '@components/Modal'
 import { executeInstruction } from 'actions/executeInstruction'
 import { ProposalInstruction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 type ExecuteInstructionProps = {
   onClose: () => void
@@ -26,15 +27,11 @@ const ExecuteInstruction = ({
   const { realmInfo } = useRealm()
 
   const handleExecuteInstruction = async () => {
-    if (!realmInfo?.programVersion) {
-      throw Error('Program version undefined')
-    }
-
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
           proposal.owner,
-          realmInfo.programVersion,
+          getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
           connection.endpoint

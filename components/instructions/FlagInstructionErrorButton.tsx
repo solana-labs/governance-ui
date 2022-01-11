@@ -16,6 +16,7 @@ import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import { PublicKey } from '@solana/web3.js'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -43,13 +44,9 @@ export function FlagInstructionErrorButton({
 
   const onFlagError = async () => {
     try {
-      if (!realmInfo?.programVersion) {
-        throw Error('Program version undefined')
-      }
-
       const rpcContext = new RpcContext(
         new PublicKey(proposal.owner.toString()),
-        realmInfo?.programVersion,
+        getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
         connection.endpoint

@@ -4,7 +4,7 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal } from '@solana/spl-governance'
+import { Proposal, YesNoVote } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 
@@ -18,7 +18,7 @@ export async function castVote(
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
-  vote: Vote
+  yesNoVote: YesNoVote
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -37,7 +37,7 @@ export async function castVote(
     tokeOwnerRecord,
     governanceAuthority,
     proposal.account.governingTokenMint,
-    vote,
+    Vote.fromYesNoVote(yesNoVote),
     payer
   )
 

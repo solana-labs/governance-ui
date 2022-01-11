@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
@@ -24,13 +25,9 @@ export function InstructionPanel() {
 
   useEffect(() => {
     if (ineligibleToSee && proposal) {
-      if (!realmInfo?.programVersion) {
-        throw Error('Program version undefined')
-      }
-
       const rpcContext = new RpcContext(
         proposal?.owner,
-        realmInfo?.programVersion,
+        getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
         connection.endpoint

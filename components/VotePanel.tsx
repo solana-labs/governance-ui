@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { withFinalizeVote } from '@solana/spl-governance'
+import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
@@ -14,10 +14,11 @@ import { Vote } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import VoteCommentModal from './VoteCommentModal'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
-  const [vote, setVote] = useState(null)
+  const [vote, setVote] = useState<YesNoVote | null>(null)
   const {
     governance,
     proposal,
@@ -63,13 +64,9 @@ const VotePanel = () => {
       proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
-    if (!realmInfo?.programVersion) {
-      throw Error('Program version undefined')
-    }
-
     const rpcContext = new RpcContext(
       proposal!.owner,
-      realmInfo.programVersion,
+      getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection.current,
       connection.endpoint
@@ -107,7 +104,7 @@ const VotePanel = () => {
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const handleShowVoteModal = (vote) => {
+  const handleShowVoteModal = (vote: YesNoVote) => {
     setVote(vote)
     setShowVoteModal(true)
   }
@@ -177,7 +174,7 @@ const VotePanel = () => {
                     <Button
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
-                      onClick={() => handleShowVoteModal(Vote.Yes)}
+                      onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
                       Approve
@@ -186,7 +183,7 @@ const VotePanel = () => {
                     <Button
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
-                      onClick={() => handleShowVoteModal(Vote.No)}
+                      onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
                       Deny
