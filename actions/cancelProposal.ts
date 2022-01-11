@@ -33,5 +33,6 @@ export const cancelProposal = async (
     signers,
     sendingMessage: 'Cancelling proposal',
     successMessage: 'Proposal cancelled',
+    showNotification: false,
   })
 }

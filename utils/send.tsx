@@ -33,6 +33,7 @@ export async function sendTransaction({
   sendingMessage = 'Sending transaction...',
   successMessage = 'Transaction confirmed',
   timeout = DEFAULT_TIMEOUT,
+  showNotification = true,
 }: {
   transaction: Transaction
   wallet: Wallet
@@ -41,6 +42,7 @@ export async function sendTransaction({
   sendingMessage?: string
   successMessage?: string
   timeout?: number
+  showNotification?: boolean
 }) {
   const signedTransaction = await signTransaction({
     transaction,
@@ -55,6 +57,7 @@ export async function sendTransaction({
     sendingMessage,
     successMessage,
     timeout,
+    showNotification,
   })
 }
 
@@ -110,12 +113,14 @@ export async function sendSignedTransaction({
   sendingMessage = 'Sending transaction...',
   successMessage = 'Transaction confirmed',
   timeout = DEFAULT_TIMEOUT,
+  showNotification = true,
 }: {
   signedTransaction: Transaction
   connection: Connection
   sendingMessage?: string
   successMessage?: string
   timeout?: number
+  showNotification?: boolean
 }): Promise<string> {
   // debugger
   console.log('raw tx')
@@ -123,10 +128,10 @@ export async function sendSignedTransaction({
   const startTime = getUnixTs()
 
   console.log('raw tx', rawTransaction)
-
-  notify({ message: sendingMessage })
-  console.log('notify')
-
+  if (showNotification) {
+    notify({ message: sendingMessage })
+    console.log('notify')
+  }
   const txid: TransactionSignature = await connection.sendRawTransaction(
     rawTransaction,
     {
@@ -200,9 +205,9 @@ export async function sendSignedTransaction({
   } finally {
     done = true
   }
-
-  notify({ message: successMessage, type: 'success', txid })
-
+  if (showNotification) {
+    notify({ message: successMessage, type: 'success', txid })
+  }
   console.log('Latency', txid, getUnixTs() - startTime)
   return txid
 }

@@ -238,12 +238,11 @@ const ProposalActionsPanel = () => {
                 Finalize
               </Button>
             )}
-            {errorTransaction && (
-              <ProposalTransactionNotification
-                details={errorTransaction}
-                setDetails={setErrorTransaction}
-              />
-            )}
+
+            <ProposalTransactionNotification
+              details={errorTransaction}
+              setDetails={setErrorTransaction}
+            />
           </div>
         </div>
       )}

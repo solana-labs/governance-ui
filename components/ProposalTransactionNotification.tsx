@@ -14,37 +14,41 @@ export const ProposalTransactionNotification = ({
   const [expandDetails, setExpandDetails] = useState<boolean>(false)
   return (
     <>
-      {details && details === 'success' ? (
-        <div className="w-full flex flex-col items-center gap-y-6 mt-6">
-          <CheckCircleIcon className={''} />
-          <div>The transaction was made successfully</div>
+      {details && (
+        <>
+          {details === 'success' ? (
+            <div className="w-full flex flex-col items-center gap-y-6 mt-6">
+              <CheckCircleIcon className={''} />
+              <div>The transaction was made successfully</div>
 
-          <Button onClick={() => setDetails('')} className="w-1/2">
-            OK
-          </Button>
-        </div>
-      ) : (
-        <div className="w-full flex flex-col items-center gap-y-6 mt-6">
-          <XCircleIcon className={''} />
-          <div>Transaction Failed, please try again</div>
-          <div className="w-full flex  gap-x-2.5  ">
-            <Button onClick={() => setDetails('')} className="w-1/2">
-              Ok
-            </Button>
-            <SecondaryButton
-              onClick={() => setExpandDetails(!expandDetails)}
-              className="w-1/2"
-            >
-              See details
-            </SecondaryButton>
-          </div>
+              <Button onClick={() => setDetails('')} className="w-1/2">
+                OK
+              </Button>
+            </div>
+          ) : (
+            <div className="w-full flex flex-col items-center gap-y-6 mt-6">
+              <XCircleIcon className={''} />
+              <div>Transaction Failed, please try again</div>
+              <div className="w-full flex  gap-x-2.5  ">
+                <Button onClick={() => setDetails('')} className="w-1/2">
+                  Ok
+                </Button>
+                <SecondaryButton
+                  onClick={() => setExpandDetails(!expandDetails)}
+                  className="w-1/2"
+                >
+                  See details
+                </SecondaryButton>
+              </div>
 
-          {expandDetails && (
-            <div className="w-full flex items-center justify-center text-center	 ">
-              {details}
+              {expandDetails && (
+                <div className="w-full flex items-center justify-center text-center	 ">
+                  {details}
+                </div>
+              )}
             </div>
           )}
-        </div>
+        </>
       )}
     </>
   )

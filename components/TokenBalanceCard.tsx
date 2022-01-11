@@ -376,12 +376,11 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
-      {transactionError && (
-        <ProposalTransactionNotification
-          details={transactionError}
-          setDetails={setTransactionError}
-        />
-      )}
+
+      <ProposalTransactionNotification
+        details={transactionError}
+        setDetails={setTransactionError}
+      />
     </>
   )
 }

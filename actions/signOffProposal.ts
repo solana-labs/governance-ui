@@ -32,5 +32,6 @@ export const signOffProposal = async (
     signers,
     sendingMessage: 'Signing off proposal',
     successMessage: 'Proposal signed off',
+    showNotification: false,
   })
 }

@@ -39,5 +39,6 @@ export const finalizeVote = async (
     signers,
     sendingMessage: 'Finalizing votes',
     successMessage: 'Votes finalized',
+    showNotification: false,
   })
 }
