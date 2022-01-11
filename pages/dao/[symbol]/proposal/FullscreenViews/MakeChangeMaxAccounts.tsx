@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
@@ -23,19 +22,31 @@ import { NewProposalContext } from '../new'
 import GovernedAccountSelect from '../components/GovernedAccountSelect'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import Button from '@components/Button'
+import { handlePropose } from 'actions/handleCreateProposal'
 
 const MakeChangeMaxAccounts = ({
   index,
   governance,
   setGovernance,
+  callback,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
   setGovernance: any
+  callback: any
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { realmInfo } = useRealm()
+  const connection = useWalletStore((s) => s.connection)
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+
+  const [isLoading, setIsLoading] = useState(false)
+
+  const realmData = useRealm()
+
+  const { realmInfo } = realmData
+
   const { getGovernancesByAccountType } = useGovernanceAssets()
+
   const governedProgramAccounts = getGovernancesByAccountType(
     GovernanceAccountType.ProgramGovernance
   ).map((x) => {
@@ -43,8 +54,10 @@ const MakeChangeMaxAccounts = ({
       governance: x,
     }
   })
+
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
+
   const [form, setForm] = useState<MangoMakeChangeMaxAccountsTypeForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
@@ -53,22 +66,39 @@ const MakeChangeMaxAccounts = ({
     description: '',
     title: '',
   })
+
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: Instructions.MangoMakeChangeMaxAccounts }])
+
   const [formErrors, setFormErrors] = useState({})
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
+  const schema = yup.object().shape({
+    bufferAddress: yup.number(),
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
+  })
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
+
     setFormErrors(validationErrors)
+
     return isValid
   }
-  async function getInstruction(): Promise<UiInstruction> {
+
+  const getInstruction = async (): Promise<UiInstruction> => {
     const isValid = await validateInstruction()
+
     let serializedInstruction = ''
+
     if (
       isValid &&
       programId &&
@@ -87,13 +117,36 @@ const MakeChangeMaxAccounts = ({
         setMaxMangoAccountsInstr
       )
     }
+
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
     }
+
     return obj
   }
+
+  const getSelectedGovernance = async () => {
+    return (await fetchRealmGovernance(
+      form.governedAccount?.governance?.pubkey
+    )) as ParsedAccount<Governance>
+  }
+
+  const confirmPropose = async () => {
+    return await handlePropose({
+      getInstruction,
+      form,
+      connection,
+      callback,
+      governance: form.governedAccount?.governance,
+      realmData,
+      wallet,
+      getSelectedGovernance,
+      setIsLoading,
+    })
+  }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -115,13 +168,6 @@ const MakeChangeMaxAccounts = ({
       index
     )
   }, [form])
-  const schema = yup.object().shape({
-    bufferAddress: yup.number(),
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-  })
 
   return (
     <NewProposalContext.Provider
@@ -132,8 +178,8 @@ const MakeChangeMaxAccounts = ({
         setGovernance,
       }}
     >
-      <div className="w-full flex justify-between items-start">
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+      <div className="w-full flex md:flex-row flex-col justify-between items-start">
+        <div className="w-full flex md:mb-0 mb-20 flex-col gap-y-5 justify-start items-start md:max-w-xl rounded-xl">
           <GovernedAccountSelect
             noMaxWidth
             useDefaultStyle={false}
@@ -188,9 +234,9 @@ const MakeChangeMaxAccounts = ({
 
           <Button
             className="w-44 flex justify-center items-center mt-8"
-            // onClick={handlePropose}
-            // isLoading={isLoading}
-            // disabled={(isNFT && !selectedNfts.length) || isLoading || !form.destinationAccount}
+            onClick={confirmPropose}
+            disabled={!form.mangoGroupKey || isLoading || !form.governedAccount}
+            isLoading={isLoading}
           >
             Create proposal
           </Button>

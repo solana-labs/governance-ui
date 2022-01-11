@@ -4,14 +4,20 @@ import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import React from 'react'
 
-const VoteBySwitch = ({ checked, onChange, disabled }) => {
+const VoteBySwitch = ({
+  checked,
+  onChange,
+  disabled,
+  label = 'Vote by council',
+  tooltip = 'You can choose who vote on this proposal (council or community) if you have community token mint or council mint.',
+}) => {
   const { toManyCouncilOutstandingProposalsForUse } = useRealm()
 
   return !toManyCouncilOutstandingProposalsForUse ? (
     <div className="text-sm mb-3 flex items-center gap-x-3">
-      <div>Vote by council</div>
+      <div>{label}</div>
 
-      <Tooltip content="You can choose who vote on this proposal (council or community) if you have community token mint or council mint.">
+      <Tooltip content={tooltip}>
         <QuestionMarkCircleIcon className="w-5 h-5 text-fgd-3" />
       </Tooltip>
 

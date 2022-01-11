@@ -1,15 +1,16 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import useMembersListStore from 'stores/useMembersStore'
 import { ViewState } from './types'
 import MembersItems from './MembersItems'
 import useMembers from './useMembers'
 import MemberOverview from './MemberOverview'
 import { PlusIcon } from '@heroicons/react/outline'
-import AddMember from './AddMember'
+import AddMember from './AddMemberForm'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
+import Modal from '@components/Modal'
 
 const MembersCompactWrapper = () => {
   const {
@@ -20,8 +21,9 @@ const MembersCompactWrapper = () => {
   } = useRealm()
   const { members, activeMembers } = useMembers()
   const connected = useWalletStore((s) => s.connected)
+  const [openAddNewMember, setOpenAddNewMember] = useState(false)
   const activeMembersCount = activeMembers.length
-  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
+  const { resetCompactViewState } = useMembersListStore()
   const {
     canUseMintInstruction,
     canMintRealmCouncilToken,
@@ -30,9 +32,7 @@ const MembersCompactWrapper = () => {
   const totalVotesCast = members.reduce((prev, current) => {
     return prev + current.votesCasted
   }, 0)
-  const goToAddMemberView = () => {
-    setCurrentCompactView(ViewState.AddMember)
-  }
+
   const addNewMemberTooltip = !connected
     ? 'Connect your wallet to add new council member'
     : !canMintRealmCouncilToken()
@@ -58,7 +58,7 @@ const MembersCompactWrapper = () => {
                   content={addNewMemberTooltip}
                 >
                   <div
-                    onClick={goToAddMemberView}
+                    onClick={() => setOpenAddNewMember(true)}
                     className={`bg-bkg-2 default-transition 
                 flex flex-col items-center justify-center
                 rounded-lg hover:bg-bkg-3 ml-auto 
@@ -77,19 +77,30 @@ const MembersCompactWrapper = () => {
                 </Tooltip>
               )}
             </h3>
+
             <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
               <p className="text-fgd-3 text-xs">Total votes cast</p>
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
+
             <div style={{ maxHeight: '350px' }}>
-              <MembersItems activeMembers={activeMembers}></MembersItems>
+              <MembersItems activeMembers={activeMembers} />
             </div>
+
+            {openAddNewMember && (
+              <Modal
+                background="bg-bkg-1"
+                sizeClassName="md:max-w-2xl sm:max-w-md w-full"
+                isOpen={openAddNewMember}
+                onClose={() => setOpenAddNewMember(false)}
+              >
+                <AddMember close={() => setOpenAddNewMember(false)} />
+              </Modal>
+            )}
           </>
         )
       case ViewState.MemberOverview:
-        return <MemberOverview></MemberOverview>
-      case ViewState.AddMember:
-        return <AddMember></AddMember>
+        return <MemberOverview />
     }
   }
   useEffect(() => {

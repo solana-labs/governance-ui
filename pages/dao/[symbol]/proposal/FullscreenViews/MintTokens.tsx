@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import Input from 'components/inputs/Input'
 import useRealm from 'hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
@@ -15,7 +15,6 @@ import {
 } from '@utils/tokens'
 import {
   UiInstruction,
-  MintForm,
   Instructions,
   ComponentInstructionData,
 } from 'utils/uiTypes/proposalCreationTypes'
@@ -30,6 +29,7 @@ import { NewProposalContext } from '../new'
 import GovernedAccountSelect from '../components/GovernedAccountSelect'
 import Button from '@components/Button'
 import TokenBalanceCard from '@components/TokenBalanceCard'
+import { handlePropose } from 'actions/handleCreateProposal'
 
 export type MintTokensForm = {
   destinationAccount: string
@@ -44,17 +44,26 @@ const MintTokens = ({
   index,
   governance,
   setGovernance,
+  callback,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
   setGovernance: any
+  callback?: any
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const { realmInfo } = useRealm()
+  const realmData = useRealm()
+
+  const { realmInfo } = realmData
+
   const { getMintWithGovernances } = useGovernanceAssets()
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
+
   const [isLoading, setIsLoading] = useState(false)
+
   const [form, setForm] = useState<MintTokensForm>({
     destinationAccount: '',
     // No default mint amount
@@ -64,14 +73,17 @@ const MintTokens = ({
     title: '',
     description: '',
   })
+
   const wallet = useWalletStore((s) => s.current)
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: Instructions.Mint }])
+
   const [governedAccount, setGovernedAccount] = useState<
     ParsedAccount<Governance> | undefined
   >(undefined)
+
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
 
@@ -84,19 +96,25 @@ const MintTokens = ({
     destinationAccount,
     setDestinationAccount,
   ] = useState<ProgramAccount<AccountInfo> | null>(null)
+
   const [formErrors, setFormErrors] = useState({})
+
   const [
     mintGovernancesWithMintInfo,
     setMintGovernancesWithMintInfo,
   ] = useState<GovernedMintInfoAccount[]>([])
+
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(form.mintAccount.mintInfo)
     : 1
+
   const currentPrecision = precision(mintMinAmount)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -104,6 +122,7 @@ const MintTokens = ({
       propertyName: 'amount',
     })
   }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -117,7 +136,8 @@ const MintTokens = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+
+  const getInstruction = async (): Promise<UiInstruction> => {
     return getMintInstruction({
       schema,
       form,
@@ -135,6 +155,7 @@ const MintTokens = ({
       value: programId?.toString(),
     })
   }, [realmInfo?.programId])
+
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -150,15 +171,18 @@ const MintTokens = ({
       setDestinationAccount(null)
     }
   }, [form.destinationAccount])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form, governedAccount])
+
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
   }, [form.mintAccount])
+
   useEffect(() => {
     async function getMintWithGovernancesFcn() {
       const resp = await getMintWithGovernances()
@@ -166,10 +190,32 @@ const MintTokens = ({
     }
     getMintWithGovernancesFcn()
   }, [])
+
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
+
   const schema = getMintSchema({ form, connection })
+
+  const getSelectedGovernance = async () => {
+    return (await fetchRealmGovernance(
+      form.mintAccount?.governance?.pubkey
+    )) as ParsedAccount<Governance>
+  }
+
+  const handleConfirm = async () => {
+    return await handlePropose({
+      getInstruction,
+      form,
+      connection,
+      callback,
+      governance: form.mintAccount?.governance,
+      realmData,
+      wallet,
+      getSelectedGovernance,
+      setIsLoading,
+    })
+  }
 
   return (
     <NewProposalContext.Provider
@@ -180,8 +226,8 @@ const MintTokens = ({
         setGovernance,
       }}
     >
-      <div className="w-full flex justify-between items-start">
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+      <div className="w-full flex md:flex-row flex-col justify-between items-start">
+        <div className="w-full flex md:mb-0 mb-20 flex-col gap-y-5 justify-start items-start md:max-w-xl rounded-xl">
           <GovernedAccountSelect
             label="Mint account"
             noMaxWidth
@@ -249,7 +295,7 @@ const MintTokens = ({
 
           <Button
             className="w-44 flex justify-center items-center mt-8"
-            onClick={undefined}
+            onClick={handleConfirm}
             isLoading={isLoading}
             disabled={isLoading || !form.destinationAccount}
           >

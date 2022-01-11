@@ -14,6 +14,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
+import { getInstructionDataFromBase64 } from '@models/serialisation'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -301,5 +302,69 @@ export const getMintSchema = ({ form, connection }) => {
         }
       ),
     mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}
+
+export const getCustomNoneSchema = ({ custom }) => {
+  return !custom
+    ? yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Governed account is required'),
+        base64: yup
+          .string()
+          .required('Instruction is required')
+          .test('base64Test', 'Invalid base64', function (val: string) {
+            if (val) {
+              try {
+                getInstructionDataFromBase64(val)
+                return true
+              } catch (e) {
+                return false
+              }
+            } else {
+              return this.createError({
+                message: `Instruction is required`,
+              })
+            }
+          }),
+      })
+    : yup.object().shape({
+        governedAccount: yup
+          .object()
+          .nullable()
+          .required('Governed account is required'),
+      })
+}
+
+export const getProgramUpgradeSchema = ({ form, connection }) => {
+  return yup.object().shape({
+    bufferAddress: yup
+      .string()
+      .test('bufferTest', 'Invalid buffer', async function (val: string) {
+        if (val) {
+          try {
+            await validateBuffer(
+              connection,
+              val,
+              form.governedAccount?.governance?.pubkey
+            )
+            return true
+          } catch (e) {
+            return this.createError({
+              message: `${e}`,
+            })
+          }
+        } else {
+          return this.createError({
+            message: `Buffer address is required`,
+          })
+        }
+      }),
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
   })
 }

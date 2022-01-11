@@ -1,11 +1,9 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
-import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ProgramUpgradeForm,
   ComponentInstructionData,
   Instructions,
 } from '@utils/uiTypes/proposalCreationTypes'
@@ -17,13 +15,14 @@ import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/create
 import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import { validateBuffer } from '@utils/validations'
+import { getProgramUpgradeSchema } from '@utils/validations'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { validateInstruction } from '@utils/instructionTools'
 import { NewProposalContext } from '../new'
 import GovernedAccountSelect from '../components/GovernedAccountSelect'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import Button from '@components/Button'
+import { handlePropose } from 'actions/handleCreateProposal'
 
 export type ProgramUpgradeFormType = {
   governedAccount: any | undefined
@@ -37,15 +36,25 @@ const ProgramUpgrade = ({
   index,
   governance,
   setGovernance,
+  callback,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
   setGovernance: any
+  callback?: any
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realmInfo } = useRealm()
+
+  const [isLoading, setIsLoading] = useState(false)
+  const [formErrors, setFormErrors] = useState({})
+
+  const realmData = useRealm()
+
+  const { realmInfo } = realmData
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { getGovernancesByAccountType } = useGovernanceAssets()
+
   const governedProgramAccounts = getGovernancesByAccountType(
     GovernanceAccountType.ProgramGovernance
   ).map((x) => {
@@ -53,8 +62,10 @@ const ProgramUpgrade = ({
       governance: x,
     }
   })
+
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
+
   const [form, setForm] = useState<ProgramUpgradeFormType>({
     governedAccount: undefined,
     programId: programId?.toString(),
@@ -63,10 +74,12 @@ const ProgramUpgrade = ({
     description: '',
   })
 
+  const schema = getProgramUpgradeSchema({ form, connection })
+
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: Instructions.ProgramUpgrade }])
-  const [formErrors, setFormErrors] = useState({})
+
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
 
@@ -74,13 +87,17 @@ const ProgramUpgrade = ({
 
     setInstructions(newInstructions)
   }
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+
+  const getInstruction = async (): Promise<UiInstruction> => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
+
     let serializedInstruction = ''
+
     if (
       isValid &&
       programId &&
@@ -93,15 +110,19 @@ const ProgramUpgrade = ({
         form.governedAccount.governance.pubkey,
         wallet!.publicKey
       )
+
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
+
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
     }
+
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -117,40 +138,36 @@ const ProgramUpgrade = ({
       })
     }
   }, [form.bufferAddress])
+
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form.governedAccount?.governance, getInstruction },
+      {
+        governedAccount: form.governedAccount?.governance,
+        getInstruction,
+      },
       index
     )
   }, [form])
-  const schema = yup.object().shape({
-    bufferAddress: yup
-      .string()
-      .test('bufferTest', 'Invalid buffer', async function (val: string) {
-        if (val) {
-          try {
-            await validateBuffer(
-              connection,
-              val,
-              form.governedAccount?.governance?.pubkey
-            )
-            return true
-          } catch (e) {
-            return this.createError({
-              message: `${e}`,
-            })
-          }
-        } else {
-          return this.createError({
-            message: `Buffer address is required`,
-          })
-        }
-      }),
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-  })
+
+  const getSelectedGovernance = async () => {
+    return (await fetchRealmGovernance(
+      form.governedAccount?.governance.pubkey
+    )) as ParsedAccount<Governance>
+  }
+
+  const confirmPropose = async () => {
+    return await handlePropose({
+      getInstruction,
+      form,
+      connection,
+      callback,
+      governance: form.governedAccount?.governance,
+      realmData,
+      wallet,
+      getSelectedGovernance,
+      setIsLoading,
+    })
+  }
 
   return (
     <NewProposalContext.Provider
@@ -161,8 +178,8 @@ const ProgramUpgrade = ({
         setGovernance,
       }}
     >
-      <div className="w-full flex justify-between items-start">
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+      <div className="w-full flex md:flex-row flex-col justify-between items-start">
+        <div className="w-full flex md:mb-0 mb-20 flex-col gap-y-5 justify-start items-start md:max-w-xl rounded-xl">
           <GovernedAccountSelect
             noMaxWidth
             useDefaultStyle={false}
@@ -200,8 +217,8 @@ const ProgramUpgrade = ({
 
           <Button
             className="w-44 flex justify-center items-center mt-8"
-            // onClick={handlePropose}
-            // isLoading={isLoading}
+            onClick={confirmPropose}
+            isLoading={isLoading}
             disabled={!form.bufferAddress}
           >
             Create proposal

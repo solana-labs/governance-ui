@@ -1,8 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react'
-import * as yup from 'yup'
+import React, { useEffect, useState } from 'react'
 import {
-  Base64InstructionForm,
   ComponentInstructionData,
+  EmptyInstructionForm,
   Instructions,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
@@ -13,12 +12,15 @@ import useWalletStore from 'stores/useWalletStore'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { validateInstruction } from '@utils/instructionTools'
 import Button from '@components/Button'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import { NewProposalContext } from '../new'
 import GovernedAccountSelect from '../components/GovernedAccountSelect'
+import VoteBySwitch from '../components/VoteBySwitch'
+import useRealm from '@hooks/useRealm'
+import { getCustomNoneSchema } from '@utils/validations'
+import { handlePropose } from 'actions/handleCreateProposal'
 
 export type Base64InstructionTypeForm = {
   governedAccount: any | undefined
@@ -26,70 +28,121 @@ export type Base64InstructionTypeForm = {
   holdUpTime: number
   title?: string
   description?: string
+  voteByCouncil?: boolean
 }
 
-const CustomBase64 = ({
+export interface NoneInstructions extends EmptyInstructionForm {
+  title?: string
+  description?: string
+}
+
+const CustomInstruction = ({
   index,
   governance,
   setGovernance,
+  callback,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
   setGovernance: any
+  callback: any
+  instructions?: any
 }) => {
   const wallet = useWalletStore((s) => s.current)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection)
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+
+  const realmData = useRealm()
+
+  const { canChooseWhoVote } = realmData
+
+  const shouldBeGoverned = index !== 0 && governance
+
   const {
     governancesArray,
     governedTokenAccounts,
     getMintWithGovernances,
   } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
+
+  const [formErrors, setFormErrors] = useState({})
+  const [custom, setCustom] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
+
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
   >([])
+
   const [form, setForm] = useState<Base64InstructionTypeForm>({
     governedAccount: undefined,
     base64: '',
     holdUpTime: 0,
     title: '',
     description: '',
+    voteByCouncil,
   })
-  const [formErrors, setFormErrors] = useState({})
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
   >([{ type: Instructions.Transfer }])
 
   useEffect(() => {
-    async function prepGovernances() {
+    const prepGovernances = async () => {
       const mintWithGovernances = await getMintWithGovernances()
+
       const matchedGovernances = governancesArray.map((gov) => {
         const governedTokenAccount = governedTokenAccounts.find(
           (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
         )
+
         const mintGovernance = mintWithGovernances.find(
           (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
         )
+
         if (governedTokenAccount) {
           return governedTokenAccount as GovernedMultiTypeAccount
         }
+
         if (mintGovernance) {
           return mintGovernance as GovernedMultiTypeAccount
         }
+
         return {
           governance: gov,
         }
       })
+
       setGovernedAccounts(matchedGovernances)
     }
+
     prepGovernances()
   }, [])
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
+
+  const getInstruction = async (): Promise<UiInstruction> => {
+    const isValid = await validateInstruction({
+      schema,
+      form,
+      setFormErrors,
+    })
+
+    if (custom) {
+      const obj: UiInstruction = {
+        serializedInstruction: '',
+        isValid,
+        governance: form.governedAccount?.governance,
+      }
+
+      return obj
+    }
+
     let serializedInstruction = ''
+
     if (
       isValid &&
       form.governedAccount?.governance?.info &&
@@ -97,14 +150,17 @@ const CustomBase64 = ({
     ) {
       serializedInstruction = form.base64
     }
+
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdUpTime,
     }
+
     return obj
   }
+
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
 
@@ -115,33 +171,16 @@ const CustomBase64 = ({
 
   useEffect(() => {
     handleSetInstructions(
-      { governedAccount: form.governedAccount?.governance, getInstruction },
+      {
+        governedAccount: form.governedAccount?.governance,
+        getInstruction,
+      },
       index
     )
   }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Governed account is required'),
-    base64: yup
-      .string()
-      .required('Instruction is required')
-      .test('base64Test', 'Invalid base64', function (val: string) {
-        if (val) {
-          try {
-            getInstructionDataFromBase64(val)
-            return true
-          } catch (e) {
-            return false
-          }
-        } else {
-          return this.createError({
-            message: `Instruction is required`,
-          })
-        }
-      }),
-  })
+
+  const schema = getCustomNoneSchema({ custom })
+
   const validateAmountOnBlur = () => {
     const value = form.holdUpTime
 
@@ -155,6 +194,27 @@ const CustomBase64 = ({
       propertyName: 'holdUpTime',
     })
   }
+
+  const getSelectedGovernance = async () => {
+    return (await fetchRealmGovernance(
+      form.governedAccount?.governance.pubkey
+    )) as ParsedAccount<Governance>
+  }
+
+  const confirmPropose = async () => {
+    return await handlePropose({
+      getInstruction,
+      form,
+      connection,
+      callback,
+      governance: form.governedAccount?.governance,
+      realmData,
+      wallet,
+      getSelectedGovernance,
+      setIsLoading,
+    })
+  }
+
   return (
     <NewProposalContext.Provider
       value={{
@@ -164,8 +224,16 @@ const CustomBase64 = ({
         setGovernance,
       }}
     >
-      <div className="w-full flex justify-between items-start">
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+      <div className="w-full flex md:flex-row flex-col justify-between items-start">
+        <div className="w-full flex md:mb-0 mb-20 flex-col gap-y-5 justify-start items-start md:max-w-xl rounded-xl">
+          <VoteBySwitch
+            tooltip="You can choose if you want to customize your proposal using a serialized instruction or if it will be for vote only. Enable for vote only and disable to customize."
+            label="Vote only"
+            disabled={!connected}
+            checked={custom}
+            onChange={() => setCustom(!custom)}
+          />
+
           <GovernedAccountSelect
             noMaxWidth
             useDefaultStyle={false}
@@ -181,48 +249,58 @@ const CustomBase64 = ({
             governance={governance}
           />
 
-          <Input
-            noMaxWidth
-            useDefaultStyle={false}
-            className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
-            wrapperClassName="my-6 w-full"
-            min={0}
-            label="Hold up time (days)"
-            value={form.holdUpTime}
-            type="number"
-            onChange={(event) => {
-              handleSetForm({
-                value: event.target.value,
-                propertyName: 'holdUpTime',
-              })
-            }}
-            step={1}
-            error={formErrors['holdUpTime']}
-            onBlur={validateAmountOnBlur}
-          />
+          {!custom && (
+            <>
+              <Input
+                noMaxWidth
+                useDefaultStyle={false}
+                className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+                wrapperClassName="my-6 w-full"
+                min={0}
+                label="Hold up time (days)"
+                value={form.holdUpTime}
+                type="number"
+                onChange={(event) => {
+                  handleSetForm({
+                    value: event.target.value,
+                    propertyName: 'holdUpTime',
+                  })
+                }}
+                step={1}
+                error={formErrors['holdUpTime']}
+                onBlur={validateAmountOnBlur}
+              />
 
-          <Textarea
-            noMaxWidth
-            useDefaultStyle={false}
-            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
-            wrapperClassName="mb-6 w-full"
-            label="Instruction"
-            placeholder="Base64 encoded serialized Solana instruction"
-            value={form.base64}
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'base64',
-              })
-            }
-            error={formErrors['base64']}
+              <Textarea
+                noMaxWidth
+                useDefaultStyle={false}
+                className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+                wrapperClassName="mb-6 w-full"
+                label="Instruction"
+                placeholder="Base64 encoded serialized Solana instruction"
+                value={form.base64}
+                onChange={(evt) =>
+                  handleSetForm({
+                    value: evt.target.value,
+                    propertyName: 'base64',
+                  })
+                }
+                error={formErrors['base64']}
+              />
+            </>
+          )}
+
+          <VoteBySwitch
+            disabled={!canChooseWhoVote}
+            checked={voteByCouncil}
+            onChange={() => setVoteByCouncil(!voteByCouncil)}
           />
 
           <Button
             className="w-44 flex justify-center items-center mt-8"
-            // onClick={handlePropose}
-            // isLoading={isLoading}
-            // disabled={(isNFT && !selectedNfts.length) || isLoading || !form.destinationAccount}
+            onClick={confirmPropose}
+            isLoading={isLoading}
+            disabled={isLoading || !form.governedAccount}
           >
             Create proposal
           </Button>
@@ -232,7 +310,7 @@ const CustomBase64 = ({
           <Input
             noMaxWidth
             useDefaultStyle
-            wrapperClassName="mb-6"
+            wrapperClassName="my-6"
             label="Title of your proposal"
             placeholder="Title of your proposal (optional)"
             value={form.title || ''}
@@ -248,7 +326,7 @@ const CustomBase64 = ({
           <Input
             noMaxWidth
             useDefaultStyle
-            wrapperClassName="mb-20"
+            wrapperClassName="mb-6"
             label="Description"
             placeholder="Describe your proposal (optional)"
             value={form.description}
@@ -261,11 +339,13 @@ const CustomBase64 = ({
             }
           />
 
-          <TokenBalanceCard />
+          <div className="mt-20">
+            <TokenBalanceCard />
+          </div>
         </div>
       </div>
     </NewProposalContext.Provider>
   )
 }
 
-export default CustomBase64
+export default CustomInstruction

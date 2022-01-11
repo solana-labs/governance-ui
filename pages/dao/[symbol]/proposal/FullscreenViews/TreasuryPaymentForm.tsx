@@ -34,11 +34,6 @@ import {
 import { NewProposalContext } from '../new'
 import GovernedAccountSelect from '../components/GovernedAccountSelect'
 import Button from '@components/Button'
-import { RpcContext } from '@models/core/api'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
-import { createProposal } from 'actions/createProposal'
-import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
 import VoteBySwitch from '../components/VoteBySwitch'
 import TokenBalanceCard from '@components/TokenBalanceCard'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
@@ -48,33 +43,28 @@ import { BN } from '@project-serum/anchor'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import AccountLabel from '@components/TreasuryAccount/AccountHeader'
+import { handlePropose } from 'actions/handleCreateProposal'
 
 const TreasuryPaymentFormFullScreen = ({
   index,
   governance,
   setGovernance,
-  nextStep,
+  callback,
 }: {
   index: number
   governance: ParsedAccount<Governance> | null
   setGovernance: any
-  nextStep: any
+  callback: any
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
 
-  const {
-    realmInfo,
-    symbol,
-    realm,
-    canChooseWhoVote,
-    ownVoterWeight,
-    mint,
-    councilMint,
-  } = useRealm()
+  const realmData = useRealm()
+
+  const { realmInfo, canChooseWhoVote } = realmData
+
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { governedTokenAccounts } = useGovernanceAssets()
-  const { fmtUrlWithCluster } = useQueryContext()
 
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -264,96 +254,24 @@ const TreasuryPaymentFormFullScreen = ({
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
 
-  const handlePropose = async () => {
-    setIsLoading(true)
+  const getSelectedGovernance = async () => {
+    return (await fetchRealmGovernance(
+      form.governedTokenAccount?.governance?.pubkey
+    )) as ParsedAccount<Governance>
+  }
 
-    const instruction: UiInstruction = await getInstruction()
-
-    if (instruction.isValid) {
-      const governance = form.governedTokenAccount?.governance
-      let proposalAddress: PublicKey | null = null
-
-      if (!realm) {
-        setIsLoading(false)
-        throw 'No realm selected'
-      }
-
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
-        connection.current,
-        connection.endpoint
-      )
-
-      const instructionData = {
-        data: instruction.serializedInstruction
-          ? getInstructionDataFromBase64(instruction.serializedInstruction)
-          : null,
-        holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-      }
-
-      try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ParsedAccount<Governance>
-
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.info.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm.pubkey,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title
-            ? form.title
-            : `Pay ${form.amount} to ${form.destinationAccount}`,
-          form.description
-            ? form.description
-            : `Pay ${form.amount} to ${form.destinationAccount}`,
-          proposalMint,
-          selectedGovernance?.info?.proposalCount,
-          [instructionData],
-          false
-        )
-
-        const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
-
-        nextStep({
-          url,
-          error: null,
-        })
-      } catch (error) {
-        nextStep({
-          url: null,
-          error,
-        })
-      }
-    }
-    setIsLoading(false)
+  const confirmPropose = async () => {
+    return await handlePropose({
+      getInstruction,
+      form,
+      connection,
+      callback,
+      governance: form.governedTokenAccount?.governance,
+      realmData,
+      wallet,
+      getSelectedGovernance,
+      setIsLoading,
+    })
   }
 
   const nftName = selectedNfts[0]?.val?.name
@@ -417,7 +335,7 @@ const TreasuryPaymentFormFullScreen = ({
             error={formErrors['destinationAccount']}
           />
 
-          {!isNFT ? (
+          {isNFT ? (
             <NFTSelector
               onNftSelect={(nfts) => setSelectedNfts(nfts)}
               ownerPk={
@@ -477,7 +395,7 @@ const TreasuryPaymentFormFullScreen = ({
 
           <Button
             className="w-44 flex justify-center items-center mt-8"
-            onClick={handlePropose}
+            onClick={confirmPropose}
             isLoading={isLoading}
             disabled={
               (isNFT && !selectedNfts.length) ||

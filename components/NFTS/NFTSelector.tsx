@@ -63,7 +63,7 @@ function NFTSelector(
   return (
     <>
       <div className="overflow-y-auto w-full bg-bkg-3 px-3 py-6 rounded-lg">
-        {!isLoading ? (
+        {isLoading ? (
           nfts.length ? (
             <div className="flex flex-row flex-wrap gap-4 justify-start items-center mx-auto">
               {nfts.map((x) => (
@@ -84,7 +84,7 @@ function NFTSelector(
             </div>
           ) : (
             <div className="text-white flex flex-col items-center">
-              <p>Connected wallet doesn't have any NFTs</p>
+              <p>{`Connected wallet doesn't have any NFTs`}</p>
 
               <PhotographIcon className="opacity-5 w-56 h-56" />
             </div>
