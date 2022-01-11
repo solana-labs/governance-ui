@@ -35,11 +35,12 @@ import {
 } from '@tools/sdk/units'
 import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
 import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
-import { AccountInfo } from '@solana/spl-token'
+import { AccountInfo, u64 } from '@solana/spl-token'
 import { ProgramAccount } from '@project-serum/common'
 import { tryGetAta } from '@utils/validations'
 import { ConnectionContext } from '@utils/connection'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import BigNumber from 'bignumber.js'
 
 /* 
   TODO: Check if the abstractions present here can be moved to a 
@@ -74,7 +75,7 @@ export const COMMUNITY_MINT_DECIMALS = 6
 async function prepareMintInstructions(
   connection: ConnectionContext,
   walletPubkey: PublicKey,
-  tokenDecimals: number,
+  tokenDecimals = 0,
   council = false,
   mintPk?: PublicKey,
   otherOwners?: PublicKey[]
@@ -124,7 +125,13 @@ async function prepareMintInstructions(
         // Mint 1 token to each owner
         if (shouldMint && ataPk) {
           console.debug('will mint to ', { ataPk })
-          await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
+          await withMintTo(
+            mintInstructions,
+            _mintPk,
+            ataPk,
+            walletPubkey,
+            new u64(new BigNumber(1).shiftedBy(tokenDecimals).toString())
+          )
         }
 
         if (ownerPk.equals(walletPubkey)) {
@@ -356,6 +363,7 @@ export async function registerRealm(
   yesVoteThreshold = 60,
   transferAuthority = true,
   communityMintTokenDecimals?: number,
+  councilMintTokenDecimals?: number,
   councilWalletPks?: PublicKey[]
 ): Promise<PublicKey> {
   if (!wallet) throw WalletConnectionError
@@ -371,7 +379,7 @@ export async function registerRealm(
   } = await prepareMintInstructions(
     connection,
     walletPubkey,
-    0,
+    councilMintTokenDecimals,
     true,
     councilMint,
     councilWalletPks
