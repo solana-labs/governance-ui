@@ -28,7 +28,7 @@ import {
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { Governance, GovernanceAccountType } from '@models/accounts'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
@@ -83,7 +83,7 @@ const New = () => {
   const [
     governance,
     setGovernance,
-  ] = useState<ParsedAccount<Governance> | null>(null)
+  ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
@@ -181,7 +181,7 @@ const New = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.data.owner.toString()),
+        new PublicKey(realm.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -203,7 +203,7 @@ const New = () => {
         // Fetch governance to get up to date proposalCount
         selectedGovernance = (await fetchRealmGovernance(
           governance.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance.account.config

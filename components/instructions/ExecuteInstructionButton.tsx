@@ -12,7 +12,7 @@ import Button from '@components/Button'
 import { RpcContext } from '@models/core/api'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 
@@ -29,8 +29,8 @@ export function ExecuteInstructionButton({
   setPlaying,
   proposalInstruction,
 }: {
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
 }) {
@@ -49,7 +49,7 @@ export function ExecuteInstructionButton({
   const ineligibleToSee = currentSlot - canExecuteAt >= 0
 
   const rpcContext = new RpcContext(
-    new PublicKey(proposal.data.owner.toString()),
+    new PublicKey(proposal.owner.toString()),
     realmInfo?.programVersion,
     wallet,
     connection.current,

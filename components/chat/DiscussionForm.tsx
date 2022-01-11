@@ -25,7 +25,7 @@ const DiscussionForm = () => {
     setSubmitting(true)
 
     const rpcContext = new RpcContext(
-      proposal!.data.owner,
+      proposal!.owner,
       realmInfo?.programVersion,
       wallet,
       connection.current,

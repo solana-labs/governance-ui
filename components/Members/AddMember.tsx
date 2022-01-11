@@ -21,7 +21,7 @@ import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getInstructionDataFromBase64 } from 'models/serialisation'
 import { RpcContext } from 'models/core/api'
 import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
@@ -123,7 +123,7 @@ const AddMember = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.data.owner.toString()),
+        new PublicKey(realm.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -140,7 +140,7 @@ const AddMember = () => {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance!.account.config

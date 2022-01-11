@@ -33,7 +33,7 @@ import { getInstructionDataFromBase64 } from '@models/serialisation'
 import useQueryContext from '@hooks/useQueryContext'
 import { RpcContext } from '@models/core/api'
 import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
@@ -177,7 +177,7 @@ const SendTokens = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.data.owner.toString()),
+        new PublicKey(realm.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -194,7 +194,7 @@ const SendTokens = () => {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance!.account.config

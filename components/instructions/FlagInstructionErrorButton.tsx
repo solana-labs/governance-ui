@@ -6,7 +6,7 @@ import {
   ProposalInstruction,
   TokenOwnerRecord,
 } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@models/core/api'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
@@ -23,10 +23,10 @@ export function FlagInstructionErrorButton({
   playState,
   proposalAuthority,
 }: {
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
   playState: PlayState
-  proposalAuthority: ParsedAccount<TokenOwnerRecord> | undefined
+  proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
@@ -44,7 +44,7 @@ export function FlagInstructionErrorButton({
   const onFlagError = async () => {
     try {
       const rpcContext = new RpcContext(
-        new PublicKey(proposal.data.owner.toString()),
+        new PublicKey(proposal.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,

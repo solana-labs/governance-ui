@@ -1,6 +1,6 @@
 import { Realm } from '@models/accounts'
 import { getRealms } from '@models/api'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { arrayToMap, arrayToUnique } from '@tools/core/script'
 import { ProgramDataAccountInfo } from '@tools/validators/accounts/upgradeable-program'
@@ -166,10 +166,10 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     .filter(Boolean) as readonly RealmInfo[]
 }
 
-export function createUnchartedRealmInfo(realm: ParsedAccount<Realm>) {
+export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
   return {
     symbol: realm.account.name,
-    programId: new PublicKey(realm.data.owner),
+    programId: new PublicKey(realm.owner),
     realmId: realm.pubkey,
     displayName: realm.account.name,
     isCertified: false,

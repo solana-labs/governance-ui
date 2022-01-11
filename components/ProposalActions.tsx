@@ -11,7 +11,7 @@ import { signOffProposal } from 'actions/signOffProposal'
 import { notify } from '@utils/notifications'
 import { finalizeVote } from 'actions/finalizeVotes'
 import { Proposal } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 
 const ProposalActionsPanel = () => {
@@ -103,7 +103,7 @@ const ProposalActionsPanel = () => {
     try {
       if (proposal && realmInfo && governance) {
         const rpcContext = new RpcContext(
-          proposal.data.owner,
+          proposal.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,
@@ -129,7 +129,7 @@ const ProposalActionsPanel = () => {
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
-          proposal.data.owner,
+          proposal.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,
@@ -151,12 +151,12 @@ const ProposalActionsPanel = () => {
     }
   }
   const handleCancelProposal = async (
-    proposal: ParsedAccount<Proposal> | undefined
+    proposal: ProgramAccount<Proposal> | undefined
   ) => {
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
-          proposal.data.owner,
+          proposal.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,

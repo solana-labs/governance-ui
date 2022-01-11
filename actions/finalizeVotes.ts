@@ -1,4 +1,4 @@
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@models/core/api'
 import {
   Keypair,
@@ -13,7 +13,7 @@ import { withFinalizeVote } from '../models/withFinalizeVote'
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
   realm: PublicKey,
-  proposal: ParsedAccount<Proposal>
+  proposal: ProgramAccount<Proposal>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []

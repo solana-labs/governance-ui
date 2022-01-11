@@ -25,7 +25,7 @@ export function InstructionPanel() {
   useEffect(() => {
     if (ineligibleToSee && proposal) {
       const rpcContext = new RpcContext(
-        proposal?.data.owner,
+        proposal?.owner,
         realmInfo?.programVersion,
         wallet,
         connection.current,

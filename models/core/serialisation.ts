@@ -2,22 +2,20 @@ import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { deserializeBorsh } from '../../utils/borsh'
 
 import { Schema } from 'borsh'
-import { ParsedAccountBase } from './accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 
 export function BorshAccountParser(
   classType: any,
   schema: Schema
-): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ParsedAccountBase {
+): (pubKey: PublicKey, info: AccountInfo<Buffer>) => ProgramAccount<any> {
   return (pubKey: PublicKey, info: AccountInfo<Buffer>) => {
     const buffer = Buffer.from(info.data)
     const data = deserializeBorsh(schema, classType, buffer)
 
     return {
       pubkey: pubKey,
-      data: {
-        ...info,
-      },
+      owner: info.owner,
       account: data,
-    } as ParsedAccountBase
+    } as ProgramAccount<any>
   }
 }

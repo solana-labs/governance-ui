@@ -7,12 +7,12 @@ import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
 import { executeInstruction } from 'actions/executeInstruction'
 import { ProposalInstruction } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 
 type ExecuteInstructionProps = {
   onClose: () => void
   isOpen: boolean
-  instruction: ParsedAccount<ProposalInstruction> | any
+  instruction: ProgramAccount<ProposalInstruction> | any
 }
 
 const ExecuteInstruction = ({
@@ -29,7 +29,7 @@ const ExecuteInstruction = ({
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
-          proposal.data.owner,
+          proposal.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,

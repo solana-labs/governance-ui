@@ -13,7 +13,7 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { Governance } from '@models/accounts'
 import { chunks } from './helpers'
 import { getAccountName } from '@components/instructions/tools'
@@ -29,20 +29,20 @@ export type MintAccount = MintInfo
 export type GovernedTokenAccount = {
   token: TokenProgramAccount<AccountInfo> | undefined
   mint: TokenProgramAccount<MintInfo> | undefined
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
   isNft: boolean
 }
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedProgramAccount = {
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedMultiTypeAccount = {
   token?: TokenProgramAccount<AccountInfo> | undefined
   mint?: TokenProgramAccount<MintInfo> | undefined
-  governance: ParsedAccount<Governance>
+  governance: ProgramAccount<Governance>
   mintInfo?: MintInfo | undefined
 }
 

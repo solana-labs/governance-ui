@@ -12,7 +12,7 @@ import {
   VoteRecord,
 } from './accounts'
 
-import { ParsedAccount } from './core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import {
   booleanFilter,
   getBorshProgramAccounts,
@@ -128,7 +128,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
 
   return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
     string,
-    ParsedAccount<TAccount>
+    ProgramAccount<TAccount>
   >
 }
 
@@ -150,5 +150,5 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
     accountInfo
   )
 
-  return account as ParsedAccount<TAccount>
+  return account as ProgramAccount<TAccount>
 }

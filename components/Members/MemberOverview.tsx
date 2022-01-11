@@ -12,7 +12,7 @@ import useRealm from '@hooks/useRealm'
 import { VoteRecord } from '@models/accounts'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
-import { ParsedAccount } from '@models/core/accounts'
+
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -68,7 +68,7 @@ const MemberOverview = () => {
     resetCompactViewState()
   }
   const getVoteRecordsAndChatMsgs = async () => {
-    let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
+    let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
       const results = await Promise.all([

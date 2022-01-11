@@ -2,7 +2,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { WalletNotConnectedError } from './errors'
 import bs58 from 'bs58'
 
-import { ParsedAccount, ProgramAccountWithType } from '../core/accounts'
+import { ProgramAccount, ProgramAccountWithType } from '@solana/spl-governance'
 import { Schema } from 'borsh'
 import { deserializeBorsh } from '../../utils/borsh'
 import { ProgramVersion } from 'models/registry/constants'
@@ -111,22 +111,20 @@ export async function getBorshProgramAccounts<
     }),
   })
   const rawAccounts = (await getProgramAccounts.json())['result']
-  const accounts: { [pubKey: string]: ParsedAccount<TAccount> } = {}
+  const accounts: { [pubKey: string]: ProgramAccount<TAccount> } = {}
 
   if (rawAccounts) {
     for (const rawAccount of rawAccounts) {
       try {
         const account = {
           pubkey: new PublicKey(rawAccount.pubkey),
-          data: {
-            ...rawAccount.account,
-            data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
-          },
+
           account: deserializeBorsh(
             borshSchema,
             accountFactory,
             Buffer.from(rawAccount.account.data[0], 'base64')
           ),
+          owner: rawAccount.account.owner,
         }
 
         accounts[account.pubkey.toBase58()] = account

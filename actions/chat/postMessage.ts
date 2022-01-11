@@ -7,13 +7,13 @@ import {
 import { Proposal } from '../../models/accounts'
 import { ChatMessageBody } from '@solana/spl-governance'
 import { withPostChatMessage } from '@solana/spl-governance'
-import { ParsedAccount } from '../../models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '../../models/core/api'
 import { sendTransaction } from '../../utils/send'
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   body: ChatMessageBody,
   replyTo?: PublicKey

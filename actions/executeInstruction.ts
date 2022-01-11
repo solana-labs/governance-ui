@@ -4,13 +4,13 @@ import { Proposal, ProposalInstruction } from '../models/accounts'
 
 import { withExecuteInstruction } from '../models/withExecuteInstruction'
 import { RpcContext } from '@models/core/api'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 
 export const executeInstruction = async (
   { connection, wallet, programId }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
-  instruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>,
+  instruction: ProgramAccount<ProposalInstruction>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []

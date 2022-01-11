@@ -22,7 +22,7 @@ import { NewProposalContext } from '../../new'
 import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getTransferInstruction } from '@utils/instructionTools'
 
@@ -31,7 +31,7 @@ const SplTokenTransfer = ({
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -48,7 +48,7 @@ const SplTokenTransfer = ({
     mintInfo: undefined,
   })
   const [governedAccount, setGovernedAccount] = useState<
-    ParsedAccount<Governance> | undefined
+    ProgramAccount<Governance> | undefined
   >(undefined)
   const [
     destinationAccount,

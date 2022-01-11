@@ -1,6 +1,6 @@
 import Select from '@components/inputs/Select'
 import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
   getTokenAccountLabelInfo,
@@ -23,7 +23,7 @@ const GovernedAccountSelect = ({
   error
   governedAccounts: GovernedMultiTypeAccount[]
   shouldBeGoverned
-  governance: ParsedAccount<Governance> | null | undefined
+  governance: ProgramAccount<Governance> | null | undefined
   label
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
@@ -90,7 +90,7 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function getProgramAccountLabel(val: ParsedAccount<Governance>) {
+  function getProgramAccountLabel(val: ProgramAccount<Governance>) {
     const name = val ? getProgramName(val.account.governedAccount) : ''
     return (
       <div className="flex flex-col">

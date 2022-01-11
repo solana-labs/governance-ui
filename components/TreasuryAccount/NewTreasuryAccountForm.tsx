@@ -86,7 +86,7 @@ const NewAccountForm = () => {
       if (isValid && realmMint) {
         setIsLoading(true)
         const rpcContext = new RpcContext(
-          new PublicKey(realm.data.owner.toString()),
+          new PublicKey(realm.owner.toString()),
           realmInfo?.programVersion,
           wallet,
           connection.current,

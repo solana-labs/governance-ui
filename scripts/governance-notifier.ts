@@ -3,7 +3,7 @@ import axios from 'axios'
 import { getConnectionContext } from 'utils/connection'
 import { pubkeyFilter } from 'models/core/api'
 import { getAccountTypes, Governance, Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { getCertifiedRealmInfo } from '../models/registry/api'
 import { getGovernanceAccounts } from './api'
 
@@ -50,7 +50,7 @@ async function runNotifier() {
   )
 
   const proposals: {
-    [proposal: string]: ParsedAccount<Proposal>
+    [proposal: string]: ProgramAccount<Proposal>
   } = Object.assign({}, ...proposalsByGovernance)
 
   const realmGovernances = Object.fromEntries(

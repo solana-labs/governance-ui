@@ -8,16 +8,16 @@ import {
   Realm,
   TokenOwnerRecord,
 } from './accounts'
-import { ParsedAccount } from './core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 
 /// VoterWeight encapsulates logic to determine voter weights from token records (community or council)
 export class VoterWeight {
-  communityTokenRecord: ParsedAccount<TokenOwnerRecord> | undefined
-  councilTokenRecord: ParsedAccount<TokenOwnerRecord> | undefined
+  communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
 
   constructor(
-    communityTokenRecord: ParsedAccount<TokenOwnerRecord> | undefined,
-    councilTokenRecord: ParsedAccount<TokenOwnerRecord> | undefined
+    communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+    councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   ) {
     this.communityTokenRecord = communityTokenRecord
     this.councilTokenRecord = councilTokenRecord
@@ -66,7 +66,7 @@ export class VoterWeight {
       this.hasMinCouncilWeight(config.minCouncilTokensToCreateProposal)
     )
   }
-  canCreateGovernanceUsingCommunityTokens(realm: ParsedAccount<Realm>) {
+  canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
     return this.hasMinCommunityWeight(
       realm.account.config.minCommunityTokensToCreateGovernance
     )
@@ -77,7 +77,7 @@ export class VoterWeight {
       !this.councilTokenRecord.account.governingTokenDepositAmount.isZero()
     )
   }
-  canCreateGovernance(realm: ParsedAccount<Realm>) {
+  canCreateGovernance(realm: ProgramAccount<Realm>) {
     return (
       this.canCreateGovernanceUsingCommunityTokens(realm) ||
       this.canCreateGovernanceUsingCouncilTokens()

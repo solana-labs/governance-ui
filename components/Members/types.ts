@@ -1,5 +1,5 @@
 import { TokenOwnerRecord, VoteRecord } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 
 export enum ViewState {
   MainView,
@@ -9,12 +9,12 @@ export enum ViewState {
 
 export interface TokenRecordsWithWalletAddress {
   walletAddress: string
-  council?: ParsedAccount<TokenOwnerRecord> | undefined
-  community?: ParsedAccount<TokenOwnerRecord> | undefined
+  council?: ProgramAccount<TokenOwnerRecord> | undefined
+  community?: ProgramAccount<TokenOwnerRecord> | undefined
 }
 
 export interface WalletTokenRecordWithProposal
-  extends ParsedAccount<VoteRecord> {
+  extends ProgramAccount<VoteRecord> {
   proposalPublicKey: string
   proposalName: string
   chatMessages: string[]

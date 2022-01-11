@@ -13,13 +13,13 @@ import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
   vote: Vote
-  voterTokenRecord: ParsedAccount<TokenOwnerRecord>
+  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }
 
 const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
@@ -41,7 +41,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
-      proposal!.data.owner,
+      proposal!.owner,
       realmInfo?.programVersion,
       wallet,
       connection.current,

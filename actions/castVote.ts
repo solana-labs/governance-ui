@@ -5,7 +5,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '../models/core/api'
 
 import { Vote } from '../models/instructions'
@@ -16,7 +16,7 @@ import { sendTransaction } from '../utils/send'
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: PublicKey,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   vote: Vote
 ) {
