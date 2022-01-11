@@ -6,7 +6,7 @@ import {
   getMultipleAccountInfoChunked,
   getTokenAccountsByMint,
   parseTokenAccountData,
-  ProgramAccount,
+  TokenProgramAccount,
 } from '@utils/tokens'
 import {
   AccountInfo,
@@ -30,7 +30,7 @@ export default function useMembers() {
         connection.current,
         realm.account.config.councilMint.toBase58()
       )
-      const tokenAccountsInfo: ProgramAccount<AccountInfo>[] = []
+      const tokenAccountsInfo: TokenProgramAccount<AccountInfo>[] = []
       for (const acc of tokenAccounts) {
         tokenAccountsInfo.push(acc)
       }
@@ -71,7 +71,7 @@ export default function useMembers() {
         connection.current,
         ATAS
       )
-      const ownersAtasParsed: ProgramAccount<AccountInfo>[] = ownersAtas
+      const ownersAtasParsed: TokenProgramAccount<AccountInfo>[] = ownersAtas
         .filter((x) => x)
         .map((r) => {
           const publicKey = r!.owner

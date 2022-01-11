@@ -12,7 +12,7 @@ import {
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
   UiInstruction,
@@ -89,7 +89,7 @@ const SendTokens = () => {
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =

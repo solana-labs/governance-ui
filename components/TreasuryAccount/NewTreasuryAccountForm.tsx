@@ -15,7 +15,7 @@ import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import tokenService, { TokenRecord } from 'utils/services/token'
-import { ProgramAccount, tryGetMint } from 'utils/tokens'
+import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -56,7 +56,7 @@ const NewAccountForm = () => {
     ...defaultFormValues,
   })
   const [tokenInfo, setTokenInfo] = useState<TokenRecord | undefined>(undefined)
-  const [mint, setMint] = useState<ProgramAccount<MintInfo> | null>(null)
+  const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [isNFT, setIsNFT] = useState(false)

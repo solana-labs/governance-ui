@@ -10,7 +10,7 @@ import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
-  ProgramAccount,
+  TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
@@ -49,7 +49,7 @@ const Mint = ({
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const [
     mintGovernancesWithMintInfo,

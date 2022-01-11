@@ -9,7 +9,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMultiTypeAccount,
-  ProgramAccount,
+  TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
 import {
@@ -53,7 +53,7 @@ const SplTokenTransfer = ({
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)

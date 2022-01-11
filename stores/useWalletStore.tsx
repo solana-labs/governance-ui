@@ -2,7 +2,7 @@ import create, { State } from 'zustand'
 import produce from 'immer'
 import { PublicKey } from '@solana/web3.js'
 import {
-  ProgramAccount,
+  TokenProgramAccount,
   TokenAccount,
   MintAccount,
   tryGetMint,
@@ -56,8 +56,8 @@ interface WalletStore extends State {
     programId?: PublicKey
     councilMint?: MintAccount
     governances: { [governance: string]: ParsedAccount<Governance> }
-    tokenMints: ProgramAccount<MintInfo>[]
-    tokenAccounts: ProgramAccount<TokenAccount>[]
+    tokenMints: TokenProgramAccount<MintInfo>[]
+    tokenAccounts: TokenProgramAccount<TokenAccount>[]
     proposals: { [proposal: string]: ParsedAccount<Proposal> }
     proposalDescriptions: { [proposal: string]: string }
     /// Community token records by owner
@@ -83,7 +83,7 @@ interface WalletStore extends State {
     proposalOwner: ParsedAccount<TokenOwnerRecord> | undefined
   }
   providerUrl: string | undefined
-  tokenAccounts: ProgramAccount<TokenAccount>[]
+  tokenAccounts: TokenProgramAccount<TokenAccount>[]
   set: (x: any) => void
   actions: any
 }
@@ -556,11 +556,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       fetchMintsForTokenAccounts(get().selectedRealm.tokenAccounts)
     },
     async fetchMintsForTokenAccounts(
-      tokenAccounts: ProgramAccount<AccountInfo>[]
+      tokenAccounts: TokenProgramAccount<AccountInfo>[]
     ) {
       const set = get().set
       const connection = get().connection.current
-      const tokenMints: ProgramAccount<MintInfo>[] = []
+      const tokenMints: TokenProgramAccount<MintInfo>[] = []
       const tokenAccountsMintInfo = await getMultipleAccountInfoChunked(
         connection,
         tokenAccounts.map((x) => x.account.mint)
@@ -589,7 +589,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         get().selectedRealm.governances
       )
       const connection = get().connection.current
-      const tokenAccounts: ProgramAccount<AccountInfo>[] = []
+      const tokenAccounts: TokenProgramAccount<AccountInfo>[] = []
       const tokenGovernances = selectedRealmGovernances.filter(
         (gov) =>
           gov.account?.accountType === GovernanceAccountType.TokenGovernance
