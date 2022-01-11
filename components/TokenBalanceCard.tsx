@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { MintInfo } from '@solana/spl-token'
 import {
   Keypair,
@@ -22,7 +23,7 @@ import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { chunks } from '@utils/helpers'
-
+import { ProposalTransactionNotification } from './ProposalTransactionNotification'
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
 
@@ -95,6 +96,9 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
+  const [withdrawLoading, setWithdrawLoading] = useState(false)
+  const [depositLoading, setDepositLoading] = useState(false)
+  const [transactionError, setTransactionError] = useState<string>('')
   const {
     realm,
     realmInfo,
@@ -174,10 +178,23 @@ const TokenDeposit = ({
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount!.account.amount)
+  const depositAllTokens = async () => {
+    setDepositLoading(true)
+    setTransactionError('')
+    try {
+      await depositTokens(depositTokenAccount!.account.amount)
+      setDepositLoading(false)
+      setTransactionError('success')
+    } catch (err) {
+      setTransactionError(err.message)
+      console.debug(err)
+      setDepositLoading(false)
+    }
+  }
 
   const withdrawAllTokens = async function () {
+    setWithdrawLoading(true)
+    setTransactionError('')
     const instructions: TransactionInstruction[] = []
 
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
@@ -268,7 +285,11 @@ const TokenDeposit = ({
       }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      setWithdrawLoading(false)
+      setTransactionError('success')
     } catch (ex) {
+      setWithdrawLoading(false)
+      setTransactionError(ex.message)
       console.error("Can't withdraw tokens", ex)
     }
   }
@@ -333,8 +354,9 @@ const TokenDeposit = ({
         <Button
           tooltipMessage={depositTooltipContent}
           className="sm:w-1/2"
-          disabled={!connected || !hasTokensInWallet}
           onClick={depositAllTokens}
+          disabled={!connected || !hasTokensInWallet}
+          isLoading={depositLoading}
         >
           Deposit
         </Button>
@@ -348,11 +370,18 @@ const TokenDeposit = ({
             (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
             toManyCouncilOutstandingProposalsForUse
           }
+          isLoading={withdrawLoading}
           onClick={withdrawAllTokens}
         >
           Withdraw
         </Button>
       </div>
+      {transactionError && (
+        <ProposalTransactionNotification
+          details={transactionError}
+          setDetails={setTransactionError}
+        />
+      )}
     </>
   )
 }

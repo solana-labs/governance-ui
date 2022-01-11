@@ -8,7 +8,7 @@ import Button, { SecondaryButton } from './Button'
 
 import { RpcContext } from 'models/core/api'
 import { signOffProposal } from 'actions/signOffProposal'
-import { notify } from '@utils/notifications'
+
 import { finalizeVote } from 'actions/finalizeVotes'
 import { Proposal } from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
@@ -126,12 +126,6 @@ const ProposalActionsPanel = () => {
       setLoadingFinalize(false)
       setErrorTransaction(`${error}`)
 
-      notify({
-        type: 'error',
-        message: `Error: Could not finalize vote.`,
-        description: `${error}`,
-      })
-
       console.error('error finalizing vote', error)
     }
   }
@@ -158,11 +152,6 @@ const ProposalActionsPanel = () => {
     } catch (error) {
       setLoadingSignoff(false)
       setErrorTransaction(`${error}`)
-      notify({
-        type: 'error',
-        message: `Error: Could not sign off proposal.`,
-        description: `${error}`,
-      })
 
       console.error('error sign off', error)
     }
@@ -191,11 +180,6 @@ const ProposalActionsPanel = () => {
     } catch (error) {
       setLoadingCancel(false)
       setErrorTransaction(`${error}`)
-      notify({
-        type: 'error',
-        message: `Error: Could not cancel proposal.`,
-        description: `${error}`,
-      })
 
       console.error('error cancelling proposal', error)
     }
@@ -205,7 +189,18 @@ const ProposalActionsPanel = () => {
       {ProposalState.Cancelled === proposal?.info.state ||
       ProposalState.Succeeded === proposal?.info.state ||
       ProposalState.Defeated === proposal?.info.state ||
-      (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
+      (!canCancelProposal && !canSignOff && !canFinalizeVote) ? (
+        <>
+          {errorTransaction && (
+            <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
+              <ProposalTransactionNotification
+                details={errorTransaction}
+                setDetails={setErrorTransaction}
+              />
+            </div>
+          )}
+        </>
+      ) : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
             {canSignOff && (
