@@ -336,12 +336,14 @@ const TokenDeposit = ({
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
           <h3 className="mb-0 py-2 flex items-center">
             {availableTokens}{' '}
-            <Tooltip content="Lorem ipsum">
-              <div className="rounded-full px-2 py-1 ml-3 border text-xs border-fgd-3 flex">
-                1x
-                <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
-              </div>
-            </Tooltip>
+            {tokenType === GoverningTokenType.Community && (
+              <Tooltip content="Lorem ipsum">
+                <div className="rounded-full px-2 py-1 ml-3 border text-xs border-fgd-3 flex">
+                  1x
+                  <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
+                </div>
+              </Tooltip>
+            )}
           </h3>
         </div>
       </div>

@@ -14,7 +14,9 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
+import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import LockTokensModal from './LockTokensModal'
 
 const LockTokensAccount = () => {
   const wallet = useWalletStore((s) => s.current)
@@ -34,6 +36,7 @@ const LockTokensAccount = () => {
     toManyCommunityOutstandingProposalsForUser,
     mint,
   } = useRealm()
+  const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
@@ -252,13 +255,31 @@ const LockTokensAccount = () => {
             </Button>
           </div>
         </h1>
-        <div className="flex">
-          <div className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex">
-            <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
+        <div className="flex mb-8">
+          <div className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex flex-col">
+            <p className="text-fgd-3 text-xs">{depositTokenName} Deposited</p>
             <h3 className="mb-0">{availableTokens}</h3>
           </div>
         </div>
+        <h1 className="mb-8">Locked Tokens</h1>
+        <div className="flex">
+          <div className="flex flex-col items-center p-8 rounded-lg bg-bkg-4">
+            <div className="flex text-center mb-6">
+              Increase your voting power by<br></br> locking your {tokenName}{' '}
+              tokens.
+            </div>
+            <Button onClick={() => setIsLockModalOpen(true)}>
+              Lock Tokens
+            </Button>
+          </div>
+        </div>
       </div>
+      {isLockModalOpen && (
+        <LockTokensModal
+          isOpen={isLockModalOpen}
+          onClose={() => setIsLockModalOpen(false)}
+        ></LockTokensModal>
+      )}
     </div>
   )
 }
