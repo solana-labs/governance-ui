@@ -34,7 +34,7 @@ export function FlagInstructionErrorButton({
 
   if (
     playState !== PlayState.Error ||
-    proposalInstruction.info.executionStatus !==
+    proposalInstruction.account.executionStatus !==
       InstructionExecutionStatus.Error ||
     !proposalAuthority
   ) {
@@ -44,7 +44,7 @@ export function FlagInstructionErrorButton({
   const onFlagError = async () => {
     try {
       const rpcContext = new RpcContext(
-        new PublicKey(proposal.account.owner.toString()),
+        new PublicKey(proposal.data.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,

@@ -26,7 +26,7 @@ export const flagInstructionError = async (
     instructions,
     programId,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
     governanceAuthority,
     proposalInstruction
   )

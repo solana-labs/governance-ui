@@ -9,13 +9,13 @@ import { PublicKey } from '@solana/web3.js'
 
 const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
   const { setCurrentCompactView, setCurrentCompactViewAsset } = useAssetsStore()
-  const name = item ? getProgramName(item.info.governedAccount) : ''
+  const name = item ? getProgramName(item.account.governedAccount) : ''
   async function handleGoToMemberOverview() {
     setCurrentCompactView(ViewState.AssetOverview)
     setCurrentCompactViewAsset(item)
   }
   const governedAccount = item
-    ? abbreviateAddress(item?.info.governedAccount as PublicKey)
+    ? abbreviateAddress(item?.account.governedAccount as PublicKey)
     : ''
   return (
     <div

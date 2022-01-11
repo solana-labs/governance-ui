@@ -260,7 +260,7 @@ export const getMintSchema = ({ form, connection }) => {
             form.mintAccount?.mintInfo.decimals
           )
           return !!(
-            form.mintAccount.governance?.info.governedAccount && mintValue
+            form.mintAccount.governance?.account.governedAccount && mintValue
           )
         }
         return this.createError({
@@ -279,7 +279,7 @@ export const getMintSchema = ({ form, connection }) => {
                 await validateDestinationAccAddressWithMint(
                   connection,
                   val,
-                  form.mintAccount.governance.info.governedAccount
+                  form.mintAccount.governance.account.governedAccount
                 )
               } else {
                 return this.createError({

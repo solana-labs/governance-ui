@@ -18,10 +18,10 @@ export const executeInstruction = async (
   await withExecuteInstruction(
     instructions,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     instruction.pubkey,
-    instruction.info.instruction
+    instruction.account.instruction
   )
 
   const transaction = new Transaction()

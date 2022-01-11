@@ -46,7 +46,7 @@ const MemberOverview = () => {
   } = member!
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
-    (x) => x.address === realm?.info.communityMint.toBase58()
+    (x) => x.address === realm?.account.communityMint.toBase58()
   )?.symbol
   const totalVotes = votesCasted
   const communityAmount =
@@ -103,8 +103,8 @@ const MemberOverview = () => {
           const prevProposal = proposals[a]
           const nextProposal = proposals[b]
           return (
-            prevProposal?.info.getStateTimestamp() -
-            nextProposal?.info.getStateTimestamp()
+            prevProposal?.account.getStateTimestamp() -
+            nextProposal?.account.getStateTimestamp()
           )
         })
         .reverse()
@@ -113,15 +113,15 @@ const MemberOverview = () => {
           const currentProposal = proposals[x]
           const currentChatsMsgPk = Object.keys(chat).filter(
             (c) =>
-              chat[c]?.info.proposal.toBase58() ===
+              chat[c]?.account.proposal.toBase58() ===
               currentProposal?.pubkey.toBase58()
           )
           const currentChatMsgs = currentChatsMsgPk.map(
-            (c) => chat[c].info.body.value
+            (c) => chat[c].account.body.value
           )
           return {
             proposalPublicKey: x,
-            proposalName: currentProposal?.info.name,
+            proposalName: currentProposal?.account.name,
             chatMessages: currentChatMsgs,
             ...voteRecords[x],
           }
@@ -210,7 +210,7 @@ const MemberOverview = () => {
               ))}
             </div>
             <div className="ml-auto text-fgd-3 text-xs flex flex-col">
-              {x.info.isYes() ? (
+              {x.account.isYes() ? (
                 <CheckCircleIcon className="h-4 mr-1 text-green w-4" />
               ) : (
                 <XCircleIcon className="h-4 mr-1 text-red w-4" />

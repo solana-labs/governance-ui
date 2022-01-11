@@ -83,7 +83,7 @@ const NewProgramForm = () => {
       if (isValid && realmMint) {
         setIsLoading(true)
         const rpcContext = new RpcContext(
-          new PublicKey(realm.account.owner.toString()),
+          new PublicKey(realm.data.owner.toString()),
           realmInfo?.programVersion,
           wallet,
           connection.current,

@@ -148,7 +148,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     )
   )
     .flatMap((r) => Object.values(r))
-    .sort((r1, r2) => r1.info.name.localeCompare(r2.info.name))
+    .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
     r.realmId.toBase58()
@@ -168,10 +168,10 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
 
 export function createUnchartedRealmInfo(realm: ParsedAccount<Realm>) {
   return {
-    symbol: realm.info.name,
-    programId: new PublicKey(realm.account.owner),
+    symbol: realm.account.name,
+    programId: new PublicKey(realm.data.owner),
     realmId: realm.pubkey,
-    displayName: realm.info.name,
+    displayName: realm.account.name,
     isCertified: false,
   } as RealmInfo
 }

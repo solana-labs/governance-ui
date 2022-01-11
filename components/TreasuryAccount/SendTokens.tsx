@@ -177,7 +177,7 @@ const SendTokens = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
+        new PublicKey(realm.data.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -187,7 +187,7 @@ const SendTokens = () => {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
-        holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
+        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
@@ -197,18 +197,18 @@ const SendTokens = () => {
         )) as ParsedAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.info.config
+          governance!.account.config
         )
 
         const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
+          ? realm.account.communityMint
           : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : undefined
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
+            ? realm.account.config.councilMint
             : defaultProposalMint
 
         if (!proposalMint) {
@@ -225,7 +225,7 @@ const SendTokens = () => {
           form.title ? form.title : proposalTitle,
           form.description ? form.description : '',
           proposalMint,
-          selectedGovernance?.info?.proposalCount,
+          selectedGovernance?.account?.proposalCount,
           [instructionData],
           false
         )
