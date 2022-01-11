@@ -576,15 +576,15 @@ export class Proposal {
     return this.isFinalState() ? 0 : 1
   }
 
-  /// Returns true if Proposal has not been voted on yet
-  isPreVotingState() {
+  /** Returns true if Proposal has not been voted on yet */
+  get isPreVotingState() {
     return !this.votingAtSlot
   }
 
   getTimeToVoteEnd(governance: Governance) {
     const now = moment().unix()
 
-    return this.isPreVotingState()
+    return this.isPreVotingState
       ? governance.config.maxVotingTime
       : (this.votingAt?.toNumber() ?? 0) + governance.config.maxVotingTime - now
   }

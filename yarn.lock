@@ -4333,6 +4333,11 @@ get-value@^2.0.3, get-value@^2.0.6:
   resolved "https://registry.yarnpkg.com/get-value/-/get-value-2.0.6.tgz#dc15ca1c672387ca76bd37ac0a395ba2042a2c28"
   integrity sha1-3BXKHGcjh8p2vTesCjlbogQqLCg=
 
+glasseater@^0.2.6:
+  version "0.2.6"
+  resolved "https://registry.yarnpkg.com/glasseater/-/glasseater-0.2.6.tgz#f0841609f716791a5e69986a0130d31f2ef00404"
+  integrity sha512-C8RdxavKlpp3gZncUVbLjXuigNclmrtDycO8F7mf57WBy1imuXznGbDXieoTKwzY9idTBFB1vEdZD0S1y6BFRg==
+
 glob-base@^0.3.0:
   version "0.3.0"
   resolved "https://registry.yarnpkg.com/glob-base/-/glob-base-0.3.0.tgz#dbb164f6221b1c0b1ccf82aea328b497df0ea3c4"
