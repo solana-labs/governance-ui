@@ -62,12 +62,12 @@ const MakeChangeMaxAccounts = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
       const setMaxMangoAccountsInstr = makeChangeMaxMangoAccountsInstruction(
-        form.governedAccount.governance.info.governedAccount,
+        form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.mangoGroupKey!),
         form.governedAccount.governance.pubkey,
         new BN(form.maxMangoAccounts)

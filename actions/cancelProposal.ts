@@ -18,7 +18,7 @@ export const cancelProposal = async (
     instructions,
     programId,
     proposal!.pubkey,
-    proposal!.info.tokenOwnerRecord,
+    proposal!.account.tokenOwnerRecord,
     governanceAuthority
   )
 

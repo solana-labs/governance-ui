@@ -26,10 +26,10 @@ export const relinquishVote = async (
   withRelinquishVote(
     instructions,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     tokenOwnerRecord,
-    proposal.info.governingTokenMint,
+    proposal.account.governingTokenMint,
     voteRecord,
     governanceAuthority,
     beneficiary

@@ -17,7 +17,7 @@ function App({ Component, pageProps }) {
   useRouterHistory()
   const { realm, realmInfo, symbol } = useRealm()
 
-  const realmName = realmInfo?.displayName ?? realm?.info?.name
+  const realmName = realmInfo?.displayName ?? realm?.account?.name
 
   const title = realmName ? `${realmName}` : 'Solana Governance'
   const description = `Discuss and vote on ${title} proposals.`

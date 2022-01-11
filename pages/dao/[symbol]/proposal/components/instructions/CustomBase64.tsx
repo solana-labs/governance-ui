@@ -73,7 +73,7 @@ const CustomBase64 = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       serializedInstruction = form.base64

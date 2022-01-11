@@ -20,12 +20,12 @@ const AssetOverview = () => {
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const name = currentAsset
-    ? getProgramName(currentAsset.info.governedAccount)
+    ? getProgramName(currentAsset.account.governedAccount)
     : ''
   const governedAccount = currentAsset
-    ? abbreviateAddress(currentAsset?.info.governedAccount as PublicKey)
+    ? abbreviateAddress(currentAsset?.account.governedAccount as PublicKey)
     : ''
-  const programId = currentAsset!.info.governedAccount.toBase58()
+  const programId = currentAsset!.account.governedAccount.toBase58()
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
@@ -57,7 +57,7 @@ const AssetOverview = () => {
               currentAsset
                 ? getExplorerUrl(
                     connection.endpoint,
-                    currentAsset?.info.governedAccount.toBase58()
+                    currentAsset?.account.governedAccount.toBase58()
                   )
                 : ''
             }

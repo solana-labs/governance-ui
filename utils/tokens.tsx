@@ -300,12 +300,12 @@ export function getMintAccountLabelInfo(
   let imgUrl = ''
   if (acc?.mintInfo && acc.governance) {
     const info = tokenService.getTokenInfo(
-      acc.governance.info.governedAccount.toBase58()
+      acc.governance.account.governedAccount.toBase58()
     )
     imgUrl = info?.logoURI ? info.logoURI : ''
-    account = acc.governance?.info.governedAccount.toBase58()
+    account = acc.governance?.account.governedAccount.toBase58()
     tokenName = info?.name ? info.name : ''
-    mintAccountName = getAccountName(acc.governance.info.governedAccount)
+    mintAccountName = getAccountName(acc.governance.account.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
       acc.mintInfo,
       acc?.mintInfo.supply

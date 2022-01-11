@@ -14,10 +14,10 @@ export function BorshAccountParser(
 
     return {
       pubkey: pubKey,
-      account: {
+      data: {
         ...info,
       },
-      info: data,
+      account: data,
     } as ParsedAccountBase
   }
 }

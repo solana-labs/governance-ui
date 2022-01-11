@@ -118,11 +118,11 @@ export async function getBorshProgramAccounts<
       try {
         const account = {
           pubkey: new PublicKey(rawAccount.pubkey),
-          account: {
+          data: {
             ...rawAccount.account,
             data: [], // There is no need to keep the raw data around once we deserialize it into TAccount
           },
-          info: deserializeBorsh(
+          account: deserializeBorsh(
             borshSchema,
             accountFactory,
             Buffer.from(rawAccount.account.data[0], 'base64')

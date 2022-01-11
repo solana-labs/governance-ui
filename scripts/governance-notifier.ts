@@ -55,13 +55,13 @@ async function runNotifier() {
 
   const realmGovernances = Object.fromEntries(
     Object.entries(governances).filter(([_k, v]) =>
-      v.info.realm.equals(realmInfo!.realmId)
+      v.account.realm.equals(realmInfo!.realmId)
     )
   )
 
   const realmProposals = Object.fromEntries(
     Object.entries(proposals).filter(([_k, v]) =>
-      Object.keys(realmGovernances).includes(v.info.governance.toBase58())
+      Object.keys(realmGovernances).includes(v.account.governance.toBase58())
     )
   )
 
@@ -74,7 +74,7 @@ async function runNotifier() {
 
     if (
       // voting is closed
-      proposal.info.votingCompletedAt
+      proposal.account.votingCompletedAt
     ) {
       countClosed++
       continue
@@ -82,7 +82,7 @@ async function runNotifier() {
 
     if (
       // voting has not started yet
-      !proposal.info.votingAt
+      !proposal.account.votingAt
     ) {
       countVotingNotStartedYet++
       continue
@@ -90,7 +90,7 @@ async function runNotifier() {
 
     if (
       // proposal opened in last 5 mins
-      nowInSeconds - proposal.info.votingAt.toNumber() <=
+      nowInSeconds - proposal.account.votingAt.toNumber() <=
       fiveMinutesSeconds + toleranceSeconds
       // proposal opened in last 24 hrs - useful to notify when bot recently stopped working
       // and missed the 5 min window
@@ -100,7 +100,7 @@ async function runNotifier() {
       countJustOpenedForVoting++
 
       const msg = `“${
-        proposal.info.name
+        proposal.account.name
       }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
         REALM_SYMBOL
       )}/proposal/${k}`

@@ -16,8 +16,8 @@ export function InstructionPanel() {
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  const canExecuteAt = proposal!.info.votingCompletedAt
-    ? proposal!.info.votingCompletedAt.toNumber() + 1
+  const canExecuteAt = proposal!.account.votingCompletedAt
+    ? proposal!.account.votingCompletedAt.toNumber() + 1
     : 0
 
   const ineligibleToSee = currentSlot - canExecuteAt >= 0
@@ -25,7 +25,7 @@ export function InstructionPanel() {
   useEffect(() => {
     if (ineligibleToSee && proposal) {
       const rpcContext = new RpcContext(
-        proposal?.account.owner,
+        proposal?.data.owner,
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -71,7 +71,7 @@ export function InstructionPanel() {
               {Object.values(instructions)
                 .sort(
                   (i1, i2) =>
-                    i1.info.instructionIndex - i2.info.instructionIndex
+                    i1.account.instructionIndex - i2.account.instructionIndex
                 )
                 .map((pi, idx) => (
                   <div key={pi.pubkey.toBase58()}>

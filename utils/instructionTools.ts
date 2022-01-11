@@ -213,7 +213,7 @@ export async function getMintInstruction({
   if (isValid && programId && form.mintAccount?.governance?.pubkey) {
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
-    const mintPK = form.mintAccount.governance.info.governedAccount
+    const mintPK = form.mintAccount.governance.account.governedAccount
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
       form.mintAccount.mintInfo?.decimals
@@ -242,7 +242,7 @@ export async function getMintInstruction({
     }
     const transferIx = Token.createMintToInstruction(
       TOKEN_PROGRAM_ID,
-      form.mintAccount.governance.info.governedAccount,
+      form.mintAccount.governance.account.governedAccount,
       receiverAddress,
       form.mintAccount.governance!.pubkey,
       [],

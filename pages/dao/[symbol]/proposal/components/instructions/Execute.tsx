@@ -29,7 +29,7 @@ const ExecuteInstruction = ({
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
-          proposal.account.owner,
+          proposal.data.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,
