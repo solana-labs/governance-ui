@@ -188,6 +188,7 @@ const RealmWizard: React.FC = () => {
           form.yesThreshold,
           form.communityMintId ? form.transferAuthority : true,
           form.communityMint ? form.communityMint.account.decimals : undefined,
+          form.councilMint ? form.councilMint.account.decimals : undefined,
           getTeamWallets()
         )
         router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
