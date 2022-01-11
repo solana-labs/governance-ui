@@ -1,4 +1,5 @@
 import {
+  getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
@@ -86,6 +87,7 @@ export const createMultisigRealm = async (
   )
 
   let walletAtaPk: PublicKey | undefined
+  const tokenAmount = 1
 
   for (const teamWalletPk of councilWalletPks) {
     const ataPk = await withCreateAssociatedTokenAccount(
@@ -101,7 +103,7 @@ export const createMultisigRealm = async (
       councilMintPk,
       ataPk,
       walletPk,
-      1
+      tokenAmount
     )
 
     if (teamWalletPk.equals(walletPk)) {
@@ -139,14 +141,24 @@ export const createMultisigRealm = async (
 
   // If the current wallet is in the team then deposit the council token
   if (walletAtaPk) {
-    tokenOwnerRecordPk = await withDepositGoverningTokens(
+    await withDepositGoverningTokens(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       walletAtaPk,
       councilMintPk,
       walletPk,
       walletPk,
+      walletPk,
+      new BN(tokenAmount)
+    )
+
+    // TODO: return from withDepositGoverningTokens in the SDK
+    tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+      programId,
+      realmPk,
+      councilMintPk,
       walletPk
     )
   } else {
@@ -181,6 +193,7 @@ export const createMultisigRealm = async (
     walletPk,
     walletPk,
     tokenOwnerRecordPk,
+    walletPk,
     walletPk
   )
 
@@ -193,6 +206,7 @@ export const createMultisigRealm = async (
     walletPk,
     walletPk,
     tokenOwnerRecordPk,
+    walletPk,
     walletPk
   )
 

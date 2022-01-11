@@ -147,15 +147,21 @@ const TokenDeposit = ({
 
     signers.push(transferAuthority)
 
+    if (!realmInfo?.programVersion) {
+      throw Error('Program version undefined')
+    }
+
     await withDepositGoverningTokens(
       instructions,
       realmInfo!.programId,
+      realmInfo!.programVersion,
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenAccount!.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey!
+      wallet!.publicKey!,
+      amount
     )
 
     const transaction = new Transaction()
@@ -243,8 +249,7 @@ const TokenDeposit = ({
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID
+      wallet!.publicKey!
     )
 
     try {

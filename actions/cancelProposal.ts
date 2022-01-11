@@ -7,7 +7,7 @@ import { sendTransaction } from 'utils/send'
 import { withCancelProposal } from '@solana/spl-governance'
 
 export const cancelProposal = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   proposal: ProgramAccount<Proposal> | undefined
 ) => {
   const instructions: TransactionInstruction[] = []
@@ -17,9 +17,11 @@ export const cancelProposal = async (
   withCancelProposal(
     instructions,
     programId,
+    programVersion,
     proposal!.pubkey,
     proposal!.account.tokenOwnerRecord,
-    governanceAuthority
+    governanceAuthority,
+    proposal!.account.governance
   )
 
   const transaction = new Transaction({ feePayer: walletPubkey })

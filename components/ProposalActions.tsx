@@ -105,10 +105,14 @@ const ProposalActionsPanel = () => {
   const handleFinalizeVote = async () => {
     try {
       if (proposal && realmInfo && governance) {
+        if (!realmInfo?.programVersion) {
+          throw Error('Program version undefined')
+        }
+
         const rpcContext = new RpcContext(
           proposal.owner,
           realmInfo?.programVersion,
-          wallet,
+          wallet!,
           connection.current,
           connection.endpoint
         )
@@ -131,10 +135,14 @@ const ProposalActionsPanel = () => {
   const handleSignOffProposal = async () => {
     try {
       if (proposal && realmInfo) {
+        if (!realmInfo?.programVersion) {
+          throw Error('Program version undefined')
+        }
+
         const rpcContext = new RpcContext(
           proposal.owner,
           realmInfo?.programVersion,
-          wallet,
+          wallet!,
           connection.current,
           connection.endpoint
         )

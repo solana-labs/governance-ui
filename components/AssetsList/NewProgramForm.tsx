@@ -82,10 +82,15 @@ const NewProgramForm = () => {
       setFormErrors(validationErrors)
       if (isValid && realmMint) {
         setIsLoading(true)
+
+        if (!realmInfo?.programVersion) {
+          throw Error('Program version undefined')
+        }
+
         const rpcContext = new RpcContext(
           new PublicKey(realm.owner.toString()),
           realmInfo?.programVersion,
-          wallet,
+          wallet!,
           connection.current,
           connection.endpoint
         )

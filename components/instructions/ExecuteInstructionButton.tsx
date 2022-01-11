@@ -48,10 +48,14 @@ export function ExecuteInstructionButton({
 
   const ineligibleToSee = currentSlot - canExecuteAt >= 0
 
+  if (!realmInfo?.programVersion) {
+    throw Error('Program version undefined')
+  }
+
   const rpcContext = new RpcContext(
     new PublicKey(proposal.owner.toString()),
     realmInfo?.programVersion,
-    wallet,
+    wallet!,
     connection.current,
     connection.endpoint
   )

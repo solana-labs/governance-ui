@@ -10,11 +10,11 @@ import { RpcContext } from '@solana/spl-governance'
 
 import { Vote } from '@solana/spl-governance'
 
-import { withCastVote } from '../models/withCastVote'
+import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 
 export async function castVote(
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
@@ -29,6 +29,7 @@ export async function castVote(
   await withCastVote(
     instructions,
     programId,
+    programVersion,
     realm,
     proposal.account.governance,
     proposal.pubkey,

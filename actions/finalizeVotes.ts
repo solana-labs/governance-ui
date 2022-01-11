@@ -8,7 +8,7 @@ import {
 } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import { Proposal } from '@solana/spl-governance'
-import { withFinalizeVote } from '../models/withFinalizeVote'
+import { withFinalizeVote } from '@solana/spl-governance'
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
