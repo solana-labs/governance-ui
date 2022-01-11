@@ -33,10 +33,10 @@ const Proposal = () => {
 
   return (
     <div className="grid grid-cols-12 gap-4">
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
+      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3 ">
         {proposal ? (
           <>
-            <div className="flex flex-items justify-between">
+            <div className="flex flex-items justify-between ">
               <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
                 <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
                   <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
@@ -58,9 +58,9 @@ const Proposal = () => {
               </div>
             </div>
 
-            <div className="border-b border-fgd-4 py-4">
-              <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2">{proposal?.info.name}</h1>
+            <div className="border-b border-fgd-4 py-4  ">
+              <div className="flex  items-center justify-between mb-1 h-full	">
+                <h1 className="mr-2 break-all		">{proposal?.info.name}</h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.info}
