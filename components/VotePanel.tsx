@@ -10,7 +10,6 @@ import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
 
-import { Vote } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import VoteCommentModal from './VoteCommentModal'
