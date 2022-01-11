@@ -42,14 +42,14 @@ export function ExecuteInstructionButton({
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  const canExecuteAt = proposal?.info.votingCompletedAt
-    ? proposal.info.votingCompletedAt.toNumber() + 1
+  const canExecuteAt = proposal?.account.votingCompletedAt
+    ? proposal.account.votingCompletedAt.toNumber() + 1
     : 0
 
   const ineligibleToSee = currentSlot - canExecuteAt >= 0
 
   const rpcContext = new RpcContext(
-    new PublicKey(proposal.account.owner.toString()),
+    new PublicKey(proposal.data.owner.toString()),
     realmInfo?.programVersion,
     wallet,
     connection.current,
@@ -86,7 +86,7 @@ export function ExecuteInstructionButton({
   }
 
   if (
-    proposalInstruction.info.executionStatus ===
+    proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
   ) {
     return (
@@ -97,9 +97,9 @@ export function ExecuteInstructionButton({
   }
 
   if (
-    proposal.info.state !== ProposalState.Executing &&
-    proposal.info.state !== ProposalState.ExecutingWithErrors &&
-    proposal.info.state !== ProposalState.Succeeded
+    proposal.account.state !== ProposalState.Executing &&
+    proposal.account.state !== ProposalState.ExecutingWithErrors &&
+    proposal.account.state !== ProposalState.Succeeded
   ) {
     return null
   }
@@ -110,7 +110,7 @@ export function ExecuteInstructionButton({
 
   if (
     playing === PlayState.Unplayed &&
-    proposalInstruction.info.executionStatus !==
+    proposalInstruction.account.executionStatus !==
       InstructionExecutionStatus.Error
   ) {
     return (
@@ -126,7 +126,7 @@ export function ExecuteInstructionButton({
 
   if (
     playing === PlayState.Error ||
-    proposalInstruction.info.executionStatus ===
+    proposalInstruction.account.executionStatus ===
       InstructionExecutionStatus.Error
   ) {
     return (

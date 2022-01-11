@@ -33,7 +33,7 @@ const ProposalActionsPanel = () => {
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   const canFinalizeVote =
-    hasVoteTimeExpired && proposal?.info.state === ProposalState.Voting
+    hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
 
   const walletPk = wallet?.publicKey
 
@@ -57,17 +57,17 @@ const ProposalActionsPanel = () => {
 
   const canSignOff =
     signatoryRecord &&
-    (proposal?.info.state === ProposalState.Draft ||
-      proposal?.info.state === ProposalState.SigningOff)
+    (proposal?.account.state === ProposalState.Draft ||
+      proposal?.account.state === ProposalState.SigningOff)
 
   const canCancelProposal =
     proposal &&
     governance &&
     proposalOwner &&
     wallet?.publicKey &&
-    proposal.info.canWalletCancel(
-      governance.info,
-      proposalOwner.info,
+    proposal.account.canWalletCancel(
+      governance.account,
+      proposalOwner.account,
       wallet.publicKey
     )
 
@@ -76,8 +76,8 @@ const ProposalActionsPanel = () => {
     : !signatoryRecord
     ? 'Only a  signatory of the proposal can sign it off'
     : !(
-        proposal?.info.state === ProposalState.Draft ||
-        proposal?.info.state === ProposalState.SigningOff
+        proposal?.account.state === ProposalState.Draft ||
+        proposal?.account.state === ProposalState.SigningOff
       )
     ? 'Invalid proposal state. To sign off a proposal, it must be a draft or be in signing off state after creation.'
     : ''
@@ -88,9 +88,9 @@ const ProposalActionsPanel = () => {
       governance &&
       proposalOwner &&
       wallet?.publicKey &&
-      !proposal?.info.canWalletCancel(
-        governance.info,
-        proposalOwner.info,
+      !proposal?.account.canWalletCancel(
+        governance.account,
+        proposalOwner.account,
         wallet.publicKey
       )
     ? 'Only the owner of the proposal can execute this action'
@@ -100,7 +100,7 @@ const ProposalActionsPanel = () => {
     ? 'Connect your wallet to finalize this proposal'
     : !hasVoteTimeExpired
     ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
-    : proposal?.info.state === ProposalState.Voting
+    : proposal?.account.state === ProposalState.Voting
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
   const handleFinalizeVote = async () => {
@@ -109,14 +109,14 @@ const ProposalActionsPanel = () => {
       if (proposal && realmInfo && governance) {
         setLoadingFinalize(true)
         const rpcContext = new RpcContext(
-          proposal.account.owner,
+          proposal.data.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,
           connection.endpoint
         )
 
-        await finalizeVote(rpcContext, governance?.info.realm, proposal)
+        await finalizeVote(rpcContext, governance?.account.realm, proposal)
 
         await fetchProposal(proposal.pubkey)
         setLoadingFinalize(false)
@@ -136,7 +136,7 @@ const ProposalActionsPanel = () => {
       if (proposal && realmInfo) {
         setLoadingSignoff(true)
         const rpcContext = new RpcContext(
-          proposal.account.owner,
+          proposal.data.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,
@@ -164,7 +164,7 @@ const ProposalActionsPanel = () => {
       if (proposal && realmInfo) {
         setLoadingCancel(true)
         const rpcContext = new RpcContext(
-          proposal.account.owner,
+          proposal.data.owner,
           realmInfo?.programVersion,
           wallet,
           connection.current,
@@ -186,9 +186,9 @@ const ProposalActionsPanel = () => {
   }
   return (
     <>
-      {ProposalState.Cancelled === proposal?.info.state ||
-      ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Defeated === proposal?.info.state ||
+      {ProposalState.Cancelled === proposal?.account.state ||
+      ProposalState.Succeeded === proposal?.account.state ||
+      ProposalState.Defeated === proposal?.account.state ||
       (!canCancelProposal && !canSignOff && !canFinalizeVote) ? (
         <>
           {errorTransaction && (

@@ -28,13 +28,13 @@ export const GOVERNANCE_INSTRUCTIONS = {
         ) as SetGovernanceConfigArgs
 
         const governance = await getGovernance(connection, accounts[0].pubkey)
-        const realm = await getRealm(connection, governance.info.realm)
+        const realm = await getRealm(connection, governance.account.realm)
         const communityMint = await tryGetMint(
           connection,
-          realm.info.communityMint
+          realm.account.communityMint
         )
-        const councilMint = realm.info.config.councilMint
-          ? await tryGetMint(connection, realm.info.config.councilMint)
+        const councilMint = realm.account.config.councilMint
+          ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
 
         return (
@@ -96,7 +96,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const realm = await getRealm(connection, accounts[0].pubkey)
         const communityMint = await tryGetMint(
           connection,
-          realm.info.communityMint
+          realm.account.communityMint
         )
 
         return (

@@ -93,7 +93,7 @@ const New = () => {
     if (!governance) {
       return true
     } else {
-      const governanceType = governance.info.accountType
+      const governanceType = governance.account.accountType
       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
       switch (governanceType) {
         case GovernanceAccountType.ProgramGovernance:
@@ -181,7 +181,7 @@ const New = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
+        new PublicKey(realm.data.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -194,7 +194,7 @@ const New = () => {
             : null,
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
-            : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+            : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
         }
       })
@@ -206,17 +206,17 @@ const New = () => {
         )) as ParsedAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance.info.config
+          governance.account.config
         )
         const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
+          ? realm.account.communityMint
           : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : undefined
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
+            ? realm.account.config.councilMint
             : defaultProposalMint
 
         if (!proposalMint) {
@@ -233,7 +233,7 @@ const New = () => {
           form.title,
           form.description,
           proposalMint,
-          selectedGovernance?.info?.proposalCount,
+          selectedGovernance?.account?.proposalCount,
           instructionsData,
           isDraft
         )

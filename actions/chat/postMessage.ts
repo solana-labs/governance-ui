@@ -28,7 +28,7 @@ export async function postChatMessage(
     instructions,
     signers,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     tokeOwnerRecord,
     governanceAuthority,

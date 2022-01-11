@@ -30,12 +30,12 @@ export async function castVote(
     instructions,
     programId,
     realm,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
     tokeOwnerRecord,
     governanceAuthority,
-    proposal.info.governingTokenMint,
+    proposal.account.governingTokenMint,
     vote,
     payer
   )

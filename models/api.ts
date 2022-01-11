@@ -57,7 +57,7 @@ export async function getTokenOwnerRecordsByTokenOwner(
         [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, governingTokenMintPk)]
       ).then((tors) =>
         mapFromEntries(tors, ([_k, v]) => [
-          v.info.governingTokenOwner.toBase58(),
+          v.account.governingTokenOwner.toBase58(),
           v,
         ])
       )

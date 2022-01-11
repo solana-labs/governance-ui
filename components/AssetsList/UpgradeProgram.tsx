@@ -73,7 +73,7 @@ const UpgradeProgram = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.info.governedAccount.toBase58()}`
+  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -117,11 +117,11 @@ const UpgradeProgram = () => {
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.info.governedAccount,
+        form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.bufferAddress),
         form.governedAccount.governance.pubkey,
         wallet!.publicKey
@@ -147,7 +147,7 @@ const UpgradeProgram = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
+        new PublicKey(realm.data.owner.toString()),
         realmInfo?.programVersion,
         wallet,
         connection.current,
@@ -157,7 +157,7 @@ const UpgradeProgram = () => {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
-        holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
+        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
@@ -167,18 +167,18 @@ const UpgradeProgram = () => {
         )) as ParsedAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.info.config
+          governance!.account.config
         )
 
         const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
+          ? realm.account.communityMint
           : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : undefined
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
+            ? realm.account.config.councilMint
             : defaultProposalMint
 
         if (!proposalMint) {
@@ -195,7 +195,7 @@ const UpgradeProgram = () => {
           form.title ? form.title : proposalTitle,
           form.description ? form.description : '',
           proposalMint,
-          selectedGovernance?.info?.proposalCount,
+          selectedGovernance?.account?.proposalCount,
           [instructionData],
           false
         )

@@ -60,7 +60,7 @@ const ProposalStateBadge = ({
 
   if (ownVoteRecord) {
     statusLabel =
-      statusLabel + ': ' + (ownVoteRecord.info.isYes() ? 'Yes' : 'No')
+      statusLabel + ': ' + (ownVoteRecord.account.isYes() ? 'Yes' : 'No')
   }
 
   return (

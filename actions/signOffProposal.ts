@@ -16,7 +16,7 @@ export const signOffProposal = async (
   withSignOffProposal(
     instructions,
     programId,
-    signatoryRecord?.info.proposal,
+    signatoryRecord?.account.proposal,
     signatoryRecord?.pubkey,
     walletPubkey
   )

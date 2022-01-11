@@ -8,11 +8,11 @@ export const useHasVoteTimeExpired = (
 ) => {
   return useIsBeyondTimestamp(
     proposal
-      ? proposal.info.isVoteFinalized()
+      ? proposal.account.isVoteFinalized()
         ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
-        : proposal.info.votingAt && governance
-        ? proposal.info.votingAt.toNumber() +
-          governance.info.config.maxVotingTime
+        : proposal.account.votingAt && governance
+        ? proposal.account.votingAt.toNumber() +
+          governance.account.config.maxVotingTime
         : undefined
       : undefined
   )

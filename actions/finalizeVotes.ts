@@ -22,10 +22,10 @@ export const finalizeVote = async (
     instructions,
     programId,
     realm,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
-    proposal.info.governingTokenMint
+    proposal.account.tokenOwnerRecord,
+    proposal.account.governingTokenMint
   )
 
   const transaction = new Transaction()

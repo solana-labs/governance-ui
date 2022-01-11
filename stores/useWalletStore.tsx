@@ -115,7 +115,7 @@ export async function getVoteRecordsByProposal(
     getAccountTypes(VoteRecord),
     [pubkeyFilter(33, voter)]
   ).then((vrs) =>
-    mapFromEntries(vrs, ([_, v]) => [v.info.proposal.toBase58(), v])
+    mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
   )
 }
 
@@ -131,7 +131,10 @@ export async function getVoteRecordsByVoter(
     getAccountTypes(VoteRecord),
     [pubkeyFilter(1, proposalPubKey)]
   ).then((vrs) =>
-    mapFromEntries(vrs, ([_, v]) => [v.info.governingTokenOwner.toBase58(), v])
+    mapFromEntries(vrs, ([_, v]) => [
+      v.account.governingTokenOwner.toBase58(),
+      v,
+    ])
   )
 }
 
@@ -323,9 +326,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         )
       })
       const realmMints = get().selectedRealm.mints
-      const realmMintPk = realm.info.communityMint
+      const realmMintPk = realm.account.communityMint
       const realmMint = realmMints[realmMintPk.toBase58()]
-      const realmCouncilMintPk = realm.info.config.councilMint
+      const realmCouncilMintPk = realm.account.config.councilMint
       const realmCouncilMint =
         realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
       const [
@@ -400,7 +403,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const proposalDescriptions = await mapFromPromisedEntries(
         proposals,
         async ([k, v]: [string, ParsedAccount<Proposal>]) => {
-          return [k, await resolveProposalDescription(v.info.descriptionLink)]
+          return [
+            k,
+            await resolveProposalDescription(v.account.descriptionLink),
+          ]
         }
       )
 
@@ -447,9 +453,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       )
 
       const proposalMint =
-        realmMints[proposal.info.governingTokenMint.toBase58()]
+        realmMints[proposal.account.governingTokenMint.toBase58()]
 
-      const programId = proposal.account.owner
+      const programId = proposal.data.owner
 
       const [
         description,
@@ -460,10 +466,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         chatMessages,
         proposalOwner,
       ] = await Promise.all([
-        resolveProposalDescription(proposal.info.descriptionLink),
+        resolveProposalDescription(proposal.account.descriptionLink),
         getGovernanceAccount<Governance>(
           connection,
-          proposal.info.governance,
+          proposal.account.governance,
           Governance
         ),
         getGovernanceAccounts<ProposalInstruction>(
@@ -484,19 +490,19 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         getGovernanceChatMessages(endpoint, proposalPubKey),
         getGovernanceAccount<TokenOwnerRecord>(
           connection,
-          proposal.info.tokenOwnerRecord,
+          proposal.account.tokenOwnerRecord,
           TokenOwnerRecord
         ),
       ])
 
       const realm = await getGovernanceAccount<Realm>(
         connection,
-        governance.info.realm,
+        governance.account.realm,
         Realm
       )
 
-      const tokenType = realm.info.communityMint.equals(
-        proposal.info.governingTokenMint
+      const tokenType = realm.account.communityMint.equals(
+        proposal.account.governingTokenMint
       )
         ? GoverningTokenType.Community
         : GoverningTokenType.Council
@@ -585,14 +591,15 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection.current
       const tokenAccounts: ProgramAccount<AccountInfo>[] = []
       const tokenGovernances = selectedRealmGovernances.filter(
-        (gov) => gov.info?.accountType === GovernanceAccountType.TokenGovernance
+        (gov) =>
+          gov.account?.accountType === GovernanceAccountType.TokenGovernance
       )
       const tokenAccountsInfo = await getMultipleAccountInfoChunked(
         connection,
-        tokenGovernances.map((x) => x.info.governedAccount)
+        tokenGovernances.map((x) => x.account.governedAccount)
       )
       tokenAccountsInfo.forEach((tokenAccountInfo, index) => {
-        const publicKey = tokenGovernances[index].info.governedAccount
+        const publicKey = tokenGovernances[index].account.governedAccount
         if (!tokenAccountInfo) {
           throw new Error(`Missing tokenAccountInfo: ${publicKey.toBase58()}`)
         }
@@ -622,7 +629,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const endpoint = get().connection.endpoint
       const set = get().set
 
-      const programId = proposal.account.owner
+      const programId = proposal.data.owner
       const voteRecordsByVoter = await getVoteRecordsByVoter(
         programId,
         endpoint,

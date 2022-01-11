@@ -26,8 +26,8 @@ export class VoterWeight {
   // Checks if the voter has any voting weight
   hasAnyWeight() {
     return (
-      !this.communityTokenRecord?.info.governingTokenDepositAmount.isZero() ||
-      !this.councilTokenRecord?.info.governingTokenDepositAmount.isZero()
+      !this.communityTokenRecord?.account.governingTokenDepositAmount.isZero() ||
+      !this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
     )
   }
 
@@ -46,7 +46,7 @@ export class VoterWeight {
   hasMinCommunityWeight(minCommunityWeight: BN) {
     return (
       this.communityTokenRecord &&
-      this.communityTokenRecord.info.governingTokenDepositAmount.cmp(
+      this.communityTokenRecord.account.governingTokenDepositAmount.cmp(
         minCommunityWeight
       ) >= 0
     )
@@ -54,7 +54,7 @@ export class VoterWeight {
   hasMinCouncilWeight(minCouncilWeight: BN) {
     return (
       this.councilTokenRecord &&
-      this.councilTokenRecord.info.governingTokenDepositAmount.cmp(
+      this.councilTokenRecord.account.governingTokenDepositAmount.cmp(
         minCouncilWeight
       ) >= 0
     )
@@ -68,13 +68,13 @@ export class VoterWeight {
   }
   canCreateGovernanceUsingCommunityTokens(realm: ParsedAccount<Realm>) {
     return this.hasMinCommunityWeight(
-      realm.info.config.minCommunityTokensToCreateGovernance
+      realm.account.config.minCommunityTokensToCreateGovernance
     )
   }
   canCreateGovernanceUsingCouncilTokens() {
     return (
       this.councilTokenRecord &&
-      !this.councilTokenRecord.info.governingTokenDepositAmount.isZero()
+      !this.councilTokenRecord.account.governingTokenDepositAmount.isZero()
     )
   }
   canCreateGovernance(realm: ParsedAccount<Realm>) {
