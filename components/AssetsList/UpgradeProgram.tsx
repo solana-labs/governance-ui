@@ -309,6 +309,7 @@ const UpgradeProgramForm = () => {
             ></Textarea>
             {canChooseWhoVote && (
               <VoteBySwitch
+                disabled={!canChooseWhoVote}
                 checked={voteByCouncil}
                 onChange={() => {
                   setVoteByCouncil(!voteByCouncil)
