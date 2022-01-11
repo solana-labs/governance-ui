@@ -1,4 +1,5 @@
 import { getExplorerUrl } from '@components/explorer/tools'
+import ImgWithLoader from '@components/ImgWithLoader'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import Loading from '@components/Loading'
 import Modal from '@components/Modal'
@@ -53,7 +54,10 @@ const NFTSCompactWrapper = () => {
           <PlusIcon />
         </div>
       </h3>
-      <div className="overflow-y-auto" style={{ maxHeight: '210px' }}>
+      <div
+        className="overflow-y-auto"
+        style={{ maxHeight: '210px', minHeight: '50px' }}
+      >
         {isLoading ? (
           <Loading></Loading>
         ) : realmNfts.length ? (
@@ -66,7 +70,7 @@ const NFTSCompactWrapper = () => {
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <img
+                <ImgWithLoader
                   className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
                   style={{
                     width: '60px',
@@ -79,7 +83,6 @@ const NFTSCompactWrapper = () => {
           </div>
         ) : (
           <div className="text-fgd-3 flex flex-col items-center">
-            {"There are no NFTs in the treasury's"}
             <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
           </div>
         )}

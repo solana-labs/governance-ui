@@ -5,9 +5,14 @@ import useRealm from '../hooks/useRealm'
 import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
 import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
-import CancelProposalModal from './CancelProposalModal'
-import FinalizeVotesModal from './FinalizeVotesModal'
-import SignOffProposalModal from './SignOffProposalModal'
+
+import { RpcContext } from 'models/core/api'
+import { signOffProposal } from 'actions/signOffProposal'
+import { notify } from '@utils/notifications'
+import { finalizeVote } from 'actions/finalizeVotes'
+import { Proposal } from 'models/accounts'
+import { ParsedAccount } from 'models/core/accounts'
+import { cancelProposal } from 'actions/cancelProposal'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -18,11 +23,10 @@ const ProposalActionsPanel = () => {
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
+  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
+  const connection = useWalletStore((s) => s.connection)
 
-  const [showSignOffModal, setShowSignOffModal] = useState(false)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
-  const [showCancelModal, setShowCancelModal] = useState(false)
 
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.info.state === ProposalState.Voting
@@ -95,7 +99,84 @@ const ProposalActionsPanel = () => {
     : proposal?.info.state === ProposalState.Voting
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
+  const handleFinalizeVote = async () => {
+    try {
+      if (proposal && realmInfo && governance) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
 
+        await finalizeVote(rpcContext, governance?.info.realm, proposal)
+
+        await fetchProposal(proposal.pubkey)
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not finalize vote.`,
+        description: `${error}`,
+      })
+
+      console.error('error finalizing vote', error)
+    }
+  }
+
+  const handleSignOffProposal = async () => {
+    try {
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
+
+        await signOffProposal(rpcContext, signatoryRecord)
+
+        await fetchProposal(proposal.pubkey)
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not sign off proposal.`,
+        description: `${error}`,
+      })
+
+      console.error('error sign off', error)
+    }
+  }
+  const handleCancelProposal = async (
+    proposal: ParsedAccount<Proposal> | undefined
+  ) => {
+    try {
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.account.owner,
+          realmInfo?.programVersion,
+          wallet,
+          connection.current,
+          connection.endpoint
+        )
+
+        await cancelProposal(rpcContext, proposal)
+
+        await fetchProposal(proposal.pubkey)
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not cancel proposal.`,
+        description: `${error}`,
+      })
+
+      console.error('error cancelling proposal', error)
+    }
+  }
   return (
     <>
       {ProposalState.Cancelled === proposal?.info.state ||
@@ -108,7 +189,7 @@ const ProposalActionsPanel = () => {
               <Button
                 tooltipMessage={signOffTooltipContent}
                 className="w-1/2"
-                onClick={() => setShowSignOffModal(true)}
+                onClick={handleSignOffProposal}
                 disabled={!connected || !canSignOff}
               >
                 Sign Off
@@ -119,7 +200,7 @@ const ProposalActionsPanel = () => {
               <SecondaryButton
                 tooltipMessage={cancelTooltipContent}
                 className="w-1/2"
-                onClick={() => setShowCancelModal(true)}
+                onClick={() => handleCancelProposal(proposal)}
                 disabled={!connected}
               >
                 Cancel
@@ -130,38 +211,13 @@ const ProposalActionsPanel = () => {
               <Button
                 tooltipMessage={finalizeVoteTooltipContent}
                 className="w-1/2"
-                onClick={() => setShowFinalizeVoteModal(true)}
+                onClick={handleFinalizeVote}
                 disabled={!connected || !canFinalizeVote}
               >
                 Finalize
               </Button>
             )}
           </div>
-
-          {showSignOffModal && (
-            <SignOffProposalModal
-              isOpen={showSignOffModal && canSignOff}
-              onClose={() => setShowSignOffModal(false)}
-              signatoryRecord={signatoryRecord}
-            />
-          )}
-
-          {showFinalizeVoteModal && (
-            <FinalizeVotesModal
-              isOpen={showFinalizeVoteModal && canFinalizeVote ? true : false}
-              onClose={() => setShowFinalizeVoteModal(false)}
-              proposal={proposal}
-              governance={governance}
-            />
-          )}
-
-          {showCancelModal && (
-            <CancelProposalModal
-              // @ts-ignore
-              isOpen={showCancelModal && canCancelProposal}
-              onClose={() => setShowCancelModal(false)}
-            />
-          )}
         </div>
       )}
     </>

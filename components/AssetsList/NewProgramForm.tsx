@@ -21,6 +21,7 @@ import { registerGovernance } from 'actions/registerGovernance'
 import { GovernanceType } from 'models/enums'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -28,7 +29,10 @@ interface NewProgramForm extends BaseGovernanceFormFields {
 
 const defaultFormValues = {
   programId: '',
-  minCommunityTokensToCreateProposal: 100,
+  // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
+  // This should be dynamic and set to 1% of the community mint supply or
+  // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
+  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,

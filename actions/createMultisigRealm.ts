@@ -31,6 +31,7 @@ import {
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
@@ -57,7 +58,7 @@ export const createMultisigRealm = async (
     MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
 
   // The community mint is going to have 0 supply and we arbitrarily set it to 1m
-  const minCommunityTokensToCreate = 1000000
+  const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
 
   // Community mint decimals
   const communityMintDecimals = 6
