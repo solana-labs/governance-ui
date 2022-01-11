@@ -4,11 +4,11 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal } from '../models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '../models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 
-import { Vote } from '../models/instructions'
+import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '../models/withCastVote'
 import { sendTransaction } from '../utils/send'

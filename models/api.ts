@@ -1,7 +1,8 @@
 import { Connection, PublicKey } from '@solana/web3.js'
-import { GOVERNANCE_SCHEMA } from './serialisation'
+
 import {
   getAccountTypes,
+  getGovernanceSchemaForAccount,
   Governance,
   GovernanceAccount,
   GovernanceAccountClass,
@@ -10,17 +11,19 @@ import {
   Realm,
   TokenOwnerRecord,
   VoteRecord,
-} from './accounts'
+} from '@solana/spl-governance'
 
 import { ProgramAccount } from '@solana/spl-governance'
 import {
-  booleanFilter,
   getBorshProgramAccounts,
   MemcmpFilter,
   pubkeyFilter,
-} from './core/api'
-import { BorshAccountParser } from './core/serialisation'
+} from '@solana/spl-governance'
+import { BorshAccountParser } from '@solana/spl-governance'
 import { mapFromEntries } from '../tools/core/script'
+
+export const booleanFilter = (offset: number, value: boolean) =>
+  new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]))
 
 // VoteRecords
 
@@ -31,11 +34,11 @@ export async function getUnrelinquishedVoteRecords(
 ) {
   return getBorshProgramAccounts<VoteRecord>(
     programId,
-    GOVERNANCE_SCHEMA,
+    (at) => getGovernanceSchemaForAccount(at),
     endpoint,
     VoteRecord,
     [
-      pubkeyFilter(1 + 32, tokenOwnerRecordPk),
+      pubkeyFilter(1 + 32, tokenOwnerRecordPk)!,
       booleanFilter(1 + 32 + 32, false),
     ]
   )
@@ -54,7 +57,7 @@ export async function getTokenOwnerRecordsByTokenOwner(
         endpoint,
         TokenOwnerRecord,
         getAccountTypes(TokenOwnerRecord),
-        [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, governingTokenMintPk)]
+        [pubkeyFilter(1, realmId)!, pubkeyFilter(1 + 32, governingTokenMintPk)!]
       ).then((tors) =>
         mapFromEntries(tors, ([_k, v]) => [
           v.account.governingTokenOwner.toBase58(),
@@ -89,7 +92,7 @@ export async function getRealm(connection: Connection, realmPk: PublicKey) {
 export async function getRealms(programId: PublicKey, endpoint: string) {
   return getBorshProgramAccounts<Realm>(
     programId,
-    GOVERNANCE_SCHEMA,
+    (at) => getGovernanceSchemaForAccount(at),
     endpoint,
     Realm
   )
@@ -105,7 +108,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
   if (accountTypes.length === 1) {
     return getBorshProgramAccounts<TAccount>(
       programId,
-      GOVERNANCE_SCHEMA,
+      (at) => getGovernanceSchemaForAccount(at),
       endpoint,
       accountClass as any,
       filters,
@@ -117,7 +120,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     accountTypes.map((at) =>
       getBorshProgramAccounts<TAccount>(
         programId,
-        GOVERNANCE_SCHEMA,
+        (at) => getGovernanceSchemaForAccount(at),
         endpoint,
         accountClass as any,
         filters,
@@ -145,10 +148,9 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
     )
   }
 
-  const account = BorshAccountParser(accountClass, GOVERNANCE_SCHEMA)(
-    accountPubKey,
-    accountInfo
-  )
+  const account = BorshAccountParser(accountClass, (at) =>
+    getGovernanceSchemaForAccount(at)
+  )(accountPubKey, accountInfo)
 
   return account as ProgramAccount<TAccount>
 }

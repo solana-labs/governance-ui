@@ -1,9 +1,9 @@
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { Proposal, ProposalInstruction } from '../models/accounts'
+import { Proposal, ProposalInstruction } from '@solana/spl-governance'
 
 import { withExecuteInstruction } from '../models/withExecuteInstruction'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 

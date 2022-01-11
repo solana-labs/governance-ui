@@ -1,5 +1,5 @@
 import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import {
   Keypair,
   PublicKey,
@@ -7,7 +7,7 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-import { Proposal } from '../models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '../models/withFinalizeVote'
 
 export const finalizeVote = async (

@@ -1,5 +1,5 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@models/accounts'
+import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,

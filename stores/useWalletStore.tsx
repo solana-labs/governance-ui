@@ -27,13 +27,13 @@ import {
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
-} from '../models/accounts'
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { fetchGistFile } from '../utils/github'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
 import { mapFromEntries, mapEntries } from '../tools/core/script'
-import { GoverningTokenType } from '../models/enums'
+import { GoverningTokenType } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
@@ -41,7 +41,7 @@ import { getCertifiedRealmInfo } from '@models/registry/api'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
-import { pubkeyFilter } from 'models/core/api'
+import { pubkeyFilter } from '@solana/spl-governance'
 
 interface WalletStore extends State {
   connected: boolean
@@ -113,7 +113,7 @@ export async function getVoteRecordsByProposal(
     endpoint,
     VoteRecord,
     getAccountTypes(VoteRecord),
-    [pubkeyFilter(33, voter)]
+    [pubkeyFilter(33, voter)!]
   ).then((vrs) =>
     mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
   )
@@ -129,7 +129,7 @@ export async function getVoteRecordsByVoter(
     endpoint,
     VoteRecord,
     getAccountTypes(VoteRecord),
-    [pubkeyFilter(1, proposalPubKey)]
+    [pubkeyFilter(1, proposalPubKey)!]
   ).then((vrs) =>
     mapFromEntries(vrs, ([_, v]) => [
       v.account.governingTokenOwner.toBase58(),
@@ -339,7 +339,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           endpoint,
           Governance,
           getAccountTypes(Governance),
-          [pubkeyFilter(1, realmId)]
+          [pubkeyFilter(1, realmId)!]
         ),
 
         getTokenOwnerRecordsByTokenOwner(
@@ -383,7 +383,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
             endpoint,
             Proposal,
             getAccountTypes(Proposal),
-            [pubkeyFilter(1, new PublicKey(g))]
+            [pubkeyFilter(1, new PublicKey(g))!]
           )
         )
       )
@@ -475,7 +475,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           endpoint,
           ProposalInstruction,
           getAccountTypes(ProposalInstruction),
-          [pubkeyFilter(1, proposalPubKey)]
+          [pubkeyFilter(1, proposalPubKey)!]
         ),
         getVoteRecordsByVoter(programId, endpoint, proposalPubKey),
         getGovernanceAccounts<SignatoryRecord>(
@@ -483,7 +483,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           endpoint,
           SignatoryRecord,
           getAccountTypes(SignatoryRecord),
-          [pubkeyFilter(1, proposalPubKey)]
+          [pubkeyFilter(1, proposalPubKey)!]
         ),
         getGovernanceChatMessages(endpoint, proposalPubKey),
         getGovernanceAccount<TokenOwnerRecord>(

@@ -21,9 +21,9 @@ import {
 import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
-} from 'models/serialisation'
-import { RpcContext } from 'models/core/api'
-import { Governance } from 'models/accounts'
+} from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'

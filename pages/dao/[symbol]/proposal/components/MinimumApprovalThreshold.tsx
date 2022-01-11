@@ -1,6 +1,6 @@
 import ProgressBar from '@components/ProgressBar'
 
-import { Governance } from '@models/accounts'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import React from 'react'
 

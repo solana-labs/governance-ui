@@ -9,7 +9,7 @@ import {
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { VoteRecord } from '@models/accounts'
+import { VoteRecord } from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 

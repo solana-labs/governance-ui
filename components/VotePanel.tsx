@@ -1,16 +1,16 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { withFinalizeVote } from '@models/withFinalizeVote'
+import { withFinalizeVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { ProposalState } from '../models/accounts'
-import { RpcContext } from '../models/core/api'
-import { GoverningTokenType } from '../models/enums'
+import { ProposalState } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { GoverningTokenType } from '@solana/spl-governance'
 
-import { Vote } from '../models/instructions'
+import { Vote } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import VoteCommentModal from './VoteCommentModal'
@@ -63,10 +63,14 @@ const VotePanel = () => {
       proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
+    if (!realmInfo?.programVersion) {
+      throw Error('Program version undefined')
+    }
+
     const rpcContext = new RpcContext(
       proposal!.owner,
-      realmInfo?.programVersion,
-      wallet,
+      realmInfo.programVersion,
+      wallet!,
       connection.current,
       connection.endpoint
     )

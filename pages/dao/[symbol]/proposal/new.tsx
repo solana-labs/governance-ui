@@ -11,10 +11,10 @@ import Select from '@components/inputs/Select'
 import React, { createContext, useEffect, useState } from 'react'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { notify } from 'utils/notifications'
@@ -29,7 +29,7 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ProgramAccount } from '@solana/spl-governance'
-import { Governance, GovernanceAccountType } from '@models/accounts'
+import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
 import Empty from './components/instructions/Empty'
@@ -180,10 +180,14 @@ const New = () => {
         throw Error('No governance selected')
       }
 
+      if (!realmInfo?.programVersion) {
+        throw Error('Program version undefined')
+      }
+
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        realmInfo.programVersion!,
+        wallet!,
         connection.current,
         connection.endpoint
       )

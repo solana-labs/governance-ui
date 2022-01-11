@@ -4,11 +4,11 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal } from '../../models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import { ChatMessageBody } from '@solana/spl-governance'
 import { withPostChatMessage } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '../../models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '../../utils/send'
 
 export async function postChatMessage(

@@ -29,10 +29,10 @@ import {
 } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@models/core/api'
-import { Governance } from '@models/accounts'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
@@ -176,10 +176,13 @@ const SendTokens = () => {
         throw 'No realm selected'
       }
 
+      if (!realmInfo?.programVersion) {
+        throw Error('Program version undefined')
+      }
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        realmInfo.programVersion,
+        wallet!,
         connection.current,
         connection.endpoint
       )

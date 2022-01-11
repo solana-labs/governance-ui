@@ -6,7 +6,7 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
@@ -85,10 +85,15 @@ const NewAccountForm = () => {
       setFormErrors(validationErrors)
       if (isValid && realmMint) {
         setIsLoading(true)
+
+        if (!realmInfo?.programVersion) {
+          throw Error('Program version undefined')
+        }
+
         const rpcContext = new RpcContext(
           new PublicKey(realm.owner.toString()),
           realmInfo?.programVersion,
-          wallet,
+          wallet!,
           connection.current,
           connection.endpoint
         )

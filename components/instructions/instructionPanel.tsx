@@ -4,7 +4,7 @@ import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 
 export function InstructionPanel() {

@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/AssetsList/types'
-import { Governance } from '@models/accounts'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 
 interface AssetsStore extends State {

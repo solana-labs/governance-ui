@@ -1,4 +1,4 @@
-import { TokenOwnerRecord, VoteRecord } from '@models/accounts'
+import { TokenOwnerRecord, VoteRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 
 export enum ViewState {

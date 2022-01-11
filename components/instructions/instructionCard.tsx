@@ -4,7 +4,7 @@ import {
   AccountMetaData,
   Proposal,
   ProposalInstruction,
-} from '../../models/accounts'
+} from '@solana/spl-governance'
 import {
   getAccountName,
   getInstructionDescriptor,

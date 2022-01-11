@@ -5,10 +5,10 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { Proposal } from '../models/accounts'
+import { Proposal } from '@solana/spl-governance'
 
-import { withFlagInstructionError } from '../models/withFlagInstructionError'
-import { RpcContext } from '../models/core/api'
+import { withFlagInstructionError } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 

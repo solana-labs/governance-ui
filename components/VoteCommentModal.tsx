@@ -1,18 +1,18 @@
 import React, { FunctionComponent, useState } from 'react'
 import { postChatMessage } from '../actions/chat/postMessage'
 import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
-import { RpcContext } from '../models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import useRealm from '../hooks/useRealm'
 import { castVote } from '../actions/castVote'
-import { Vote } from '../models/instructions'
+import { Vote } from '@solana/spl-governance'
 import Button, { SecondaryButton } from './Button'
 // import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
-import { TokenOwnerRecord } from '../models/accounts'
+import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 
 interface VoteCommentModalProps {
@@ -40,10 +40,15 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
   const submitVote = async (vote: Vote) => {
     setSubmitting(true)
+
+    if (!realmInfo?.programVersion) {
+      throw Error('Program version undefined')
+    }
+
     const rpcContext = new RpcContext(
       proposal!.owner,
-      realmInfo?.programVersion,
-      wallet,
+      realmInfo.programVersion,
+      wallet!,
       connection.current,
       connection.endpoint
     )

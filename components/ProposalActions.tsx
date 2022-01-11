@@ -2,15 +2,18 @@
 import { useEffect, useState } from 'react'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
+import {
+  getSignatoryRecordAddress,
+  ProposalState,
+} from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { signOffProposal } from 'actions/signOffProposal'
 import { notify } from '@utils/notifications'
 import { finalizeVote } from 'actions/finalizeVotes'
-import { Proposal } from 'models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 
@@ -155,10 +158,14 @@ const ProposalActionsPanel = () => {
   ) => {
     try {
       if (proposal && realmInfo) {
+        if (!realmInfo?.programVersion) {
+          throw Error('Program version undefined')
+        }
+
         const rpcContext = new RpcContext(
           proposal.owner,
-          realmInfo?.programVersion,
-          wallet,
+          realmInfo.programVersion,
+          wallet!,
           connection.current,
           connection.endpoint
         )

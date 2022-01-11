@@ -3,12 +3,12 @@ import {
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
   VoteWeightSource,
-} from '@models/accounts'
-import { ProgramVersion } from '@models/registry/constants'
-import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
-import { withCreateRealm } from '@models/withCreateRealm'
-import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
-import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
+} from '@solana/spl-governance'
+
+import { withCreateMintGovernance } from '@solana/spl-governance'
+import { withCreateRealm } from '@solana/spl-governance'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
+import { withSetRealmAuthority } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import {
   Connection,
@@ -38,7 +38,7 @@ import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 export const createMultisigRealm = async (
   connection: Connection,
   programId: PublicKey,
-  programVersion: ProgramVersion,
+  programVersion: number,
 
   name: string,
   yesVoteThreshold: number,

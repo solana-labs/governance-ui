@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js'
 import useRealmGovernance from '../hooks/useRealmGovernance'
-import { Proposal, ProposalState } from '../models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 
 function getProposalStateLabel(state: ProposalState, hasVoteEnded: boolean) {

@@ -1,4 +1,4 @@
-import { Realm } from '@models/accounts'
+import { Realm } from '@solana/spl-governance'
 import { getRealms } from '@models/api'
 import { ProgramAccount } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
@@ -10,12 +10,11 @@ import devnetRealms from 'public/realms/devnet.json'
 import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
 import type { ConnectionContext } from 'utils/connection'
 import { equalsIgnoreCase } from '../../tools/core/strings'
-import { ProgramVersion } from './constants'
 
 export interface RealmInfo {
   symbol: string
   programId: PublicKey
-  programVersion?: ProgramVersion
+  programVersion?: number
   realmId: PublicKey
   website?: string
   // Specifies the realm mainnet name for resource lookups

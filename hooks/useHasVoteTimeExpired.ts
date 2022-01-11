@@ -1,4 +1,4 @@
-import { Governance, Proposal } from '../models/accounts'
+import { Governance, Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { useIsBeyondTimestamp } from './useIsBeyondTimestamp'
 

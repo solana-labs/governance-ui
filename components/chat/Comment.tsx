@@ -1,6 +1,6 @@
 import moment from 'moment'
 import React from 'react'
-import { VoteRecord } from '../../models/accounts'
+import { VoteRecord } from '@solana/spl-governance'
 import {
   CheckCircleIcon,
   UserCircleIcon,

@@ -11,10 +11,10 @@ import {
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
   VoteWeightSource,
-} from '../models/accounts'
-import { withCreateRealm } from '../models/withCreateRealm'
+} from '@solana/spl-governance'
+import { withCreateRealm } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
-import { ProgramVersion } from '@models/registry/constants'
+import { ProgramVersion } from '@solana/spl-governance'
 import {
   sendTransactions,
   SequenceType,
@@ -28,13 +28,13 @@ import {
   SignerWalletAdapter,
   WalletConnectionError,
 } from '@solana/wallet-adapter-base'
-import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
 } from '@tools/sdk/units'
-import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
-import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
+import { withCreateMintGovernance } from '@solana/spl-governance'
+import { withSetRealmAuthority } from '@solana/spl-governance'
 import { AccountInfo, u64 } from '@solana/spl-token'
 import { ProgramAccount } from '@project-serum/common'
 import { tryGetAta } from '@utils/validations'

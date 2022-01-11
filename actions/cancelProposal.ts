@@ -1,10 +1,10 @@
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { RpcContext } from '../models/core/api'
-import { Proposal } from '@models/accounts'
+import { RpcContext } from '@solana/spl-governance'
+import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
-import { withCancelProposal } from '@models/withCancelProposal'
+import { withCancelProposal } from '@solana/spl-governance'
 
 export const cancelProposal = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

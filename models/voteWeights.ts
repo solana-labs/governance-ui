@@ -7,7 +7,7 @@ import {
   Proposal,
   Realm,
   TokenOwnerRecord,
-} from './accounts'
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 
 /// VoterWeight encapsulates logic to determine voter weights from token records (community or council)

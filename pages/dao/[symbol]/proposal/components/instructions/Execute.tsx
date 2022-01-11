@@ -1,12 +1,12 @@
 import React from 'react'
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
 import { executeInstruction } from 'actions/executeInstruction'
-import { ProposalInstruction } from '@models/accounts'
+import { ProposalInstruction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 
 type ExecuteInstructionProps = {
@@ -26,12 +26,16 @@ const ExecuteInstruction = ({
   const { realmInfo } = useRealm()
 
   const handleExecuteInstruction = async () => {
+    if (!realmInfo?.programVersion) {
+      throw Error('Program version undefined')
+    }
+
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
           proposal.owner,
-          realmInfo?.programVersion,
-          wallet,
+          realmInfo.programVersion,
+          wallet!,
           connection.current,
           connection.endpoint
         )

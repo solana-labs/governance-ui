@@ -14,7 +14,7 @@ import {
   u64,
 } from '@solana/spl-token'
 import { ProgramAccount } from '@solana/spl-governance'
-import { Governance } from '@models/accounts'
+import { Governance } from '@solana/spl-governance'
 import { chunks } from './helpers'
 import { getAccountName } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'

@@ -5,11 +5,11 @@ import {
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '@models/accounts'
+} from '@solana/spl-governance'
 import React from 'react'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { ProgramAccount } from '@solana/spl-governance'

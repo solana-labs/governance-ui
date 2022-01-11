@@ -6,10 +6,10 @@ import {
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
-} from 'models/accounts'
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { MemcmpFilter, RpcContext } from 'models/core/api'
-import { GOVERNANCE_SCHEMA } from 'models/serialisation'
+import { MemcmpFilter, RpcContext } from '@solana/spl-governance'
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { deserializeBorsh } from 'utils/borsh'
 import { sleep } from '@project-serum/common'
 

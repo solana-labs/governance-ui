@@ -7,11 +7,11 @@ import {
 
 import { withCreateProposal } from '../models/withCreateProposal'
 import { withAddSignatory } from '../models/withAddSignatory'
-import { RpcContext } from '../models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { withInsertInstruction } from '@models/withInsertInstruction'
-import { InstructionData } from '@models/accounts'
+import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
-import { withSignOffProposal } from '@models/withSignOffProposal'
+import { withSignOffProposal } from '@solana/spl-governance'
 
 interface InstructionDataWithHoldUpTime {
   data: InstructionData | null

@@ -5,9 +5,9 @@ import {
   Proposal,
   ProposalInstruction,
   TokenOwnerRecord,
-} from '@models/accounts'
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { PlayState } from './ExecuteInstructionButton'
