@@ -13,7 +13,7 @@ import { finalizeVote } from 'actions/finalizeVotes'
 import { Proposal } from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { cancelProposal } from 'actions/cancelProposal'
-
+import { ProposalTransactionNotification } from './ProposalTransactionNotification'
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
@@ -25,6 +25,10 @@ const ProposalActionsPanel = () => {
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const connection = useWalletStore((s) => s.connection)
+  const [loadingCancel, setLoadingCancel] = useState<boolean>(false)
+  const [loadingFinalize, setLoadingFinalize] = useState<boolean>(false)
+  const [loadingSignoff, setLoadingSignoff] = useState<boolean>(false)
+  const [errorTransaction, setErrorTransaction] = useState<string>('')
 
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
@@ -100,8 +104,10 @@ const ProposalActionsPanel = () => {
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
   const handleFinalizeVote = async () => {
+    setErrorTransaction('')
     try {
       if (proposal && realmInfo && governance) {
+        setLoadingFinalize(true)
         const rpcContext = new RpcContext(
           proposal.account.owner,
           realmInfo?.programVersion,
@@ -113,8 +119,13 @@ const ProposalActionsPanel = () => {
         await finalizeVote(rpcContext, governance?.info.realm, proposal)
 
         await fetchProposal(proposal.pubkey)
+        setLoadingFinalize(false)
+        setErrorTransaction('success')
       }
     } catch (error) {
+      setLoadingFinalize(false)
+      setErrorTransaction(`${error}`)
+
       notify({
         type: 'error',
         message: `Error: Could not finalize vote.`,
@@ -126,8 +137,10 @@ const ProposalActionsPanel = () => {
   }
 
   const handleSignOffProposal = async () => {
+    setErrorTransaction('')
     try {
       if (proposal && realmInfo) {
+        setLoadingSignoff(true)
         const rpcContext = new RpcContext(
           proposal.account.owner,
           realmInfo?.programVersion,
@@ -139,8 +152,12 @@ const ProposalActionsPanel = () => {
         await signOffProposal(rpcContext, signatoryRecord)
 
         await fetchProposal(proposal.pubkey)
+        setLoadingSignoff(false)
+        setErrorTransaction('success')
       }
     } catch (error) {
+      setLoadingSignoff(false)
+      setErrorTransaction(`${error}`)
       notify({
         type: 'error',
         message: `Error: Could not sign off proposal.`,
@@ -153,8 +170,10 @@ const ProposalActionsPanel = () => {
   const handleCancelProposal = async (
     proposal: ParsedAccount<Proposal> | undefined
   ) => {
+    setErrorTransaction('')
     try {
       if (proposal && realmInfo) {
+        setLoadingCancel(true)
         const rpcContext = new RpcContext(
           proposal.account.owner,
           realmInfo?.programVersion,
@@ -166,8 +185,12 @@ const ProposalActionsPanel = () => {
         await cancelProposal(rpcContext, proposal)
 
         await fetchProposal(proposal.pubkey)
+        setLoadingCancel(false)
+        setErrorTransaction('success')
       }
     } catch (error) {
+      setLoadingCancel(false)
+      setErrorTransaction(`${error}`)
       notify({
         type: 'error',
         message: `Error: Could not cancel proposal.`,
@@ -191,6 +214,7 @@ const ProposalActionsPanel = () => {
                 className="w-1/2"
                 onClick={handleSignOffProposal}
                 disabled={!connected || !canSignOff}
+                isLoading={loadingSignoff}
               >
                 Sign Off
               </Button>
@@ -201,7 +225,8 @@ const ProposalActionsPanel = () => {
                 tooltipMessage={cancelTooltipContent}
                 className="w-1/2"
                 onClick={() => handleCancelProposal(proposal)}
-                disabled={!connected}
+                disabled={!connected || !canCancelProposal}
+                isLoading={loadingCancel}
               >
                 Cancel
               </SecondaryButton>
@@ -213,9 +238,16 @@ const ProposalActionsPanel = () => {
                 className="w-1/2"
                 onClick={handleFinalizeVote}
                 disabled={!connected || !canFinalizeVote}
+                isLoading={loadingFinalize}
               >
                 Finalize
               </Button>
+            )}
+            {errorTransaction && (
+              <ProposalTransactionNotification
+                details={errorTransaction}
+                setDetails={setErrorTransaction}
+              />
             )}
           </div>
         </div>
