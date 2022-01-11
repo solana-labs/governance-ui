@@ -42,12 +42,6 @@ import { ConnectionContext } from '@utils/connection'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import BigNumber from 'bignumber.js'
 
-/* 
-  TODO: Check if the abstractions present here can be moved to a 
-  separate util and replace some of the repeating code over the project
-  and reduce the code complexity
-*/
-
 interface RegisterRealmRpc {
   connection: ConnectionContext
   wallet: SignerWalletAdapter
@@ -142,7 +136,6 @@ async function prepareMintInstructions(
   }
 
   const instructionChunks = chunks(mintInstructions, 10)
-  // I tried to left as an empty array, but always get failed in signature verification
   const signersChunks = Array(instructionChunks.length).fill([])
   signersChunks[0] = mintSigners
   return {
