@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState } from 'react'
 import { postChatMessage } from '../actions/chat/postMessage'
-import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
+import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { RpcContext } from '../models/core/api'
 import useWalletStore from '../stores/useWalletStore'
 import useRealm from '../hooks/useRealm'

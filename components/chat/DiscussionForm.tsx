@@ -4,10 +4,7 @@ import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
 import { RpcContext } from '../../models/core/api'
-import {
-  ChatMessageBody,
-  ChatMessageBodyType,
-} from '../../models/chat/accounts'
+import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'

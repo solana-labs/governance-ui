@@ -291,6 +291,11 @@ const SendTokens = () => {
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
         form.destinationAccount
       }`
+
+  if (!currentAccount) {
+    return null
+  }
+
   return (
     <>
       <h3 className="mb-4 flex items-center">

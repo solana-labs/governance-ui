@@ -7,7 +7,7 @@ import {
   XCircleIcon,
 } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
-import { ChatMessage } from '../../models/chat/accounts'
+import { ChatMessage } from '@solana/spl-governance'
 import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
 import useRealm from '../../hooks/useRealm'
 import { MintInfo } from '@solana/spl-token'

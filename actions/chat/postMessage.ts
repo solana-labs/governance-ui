@@ -5,8 +5,8 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { Proposal } from '../../models/accounts'
-import { ChatMessageBody } from '../../models/chat/accounts'
-import { withPostChatMessage } from '../../models/chat/withPostChatMessage'
+import { ChatMessageBody } from '@solana/spl-governance'
+import { withPostChatMessage } from '@solana/spl-governance'
 import { ParsedAccount } from '../../models/core/accounts'
 import { RpcContext } from '../../models/core/api'
 import { sendTransaction } from '../../utils/send'
