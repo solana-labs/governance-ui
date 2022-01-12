@@ -213,7 +213,9 @@ const ProposalActionsPanel = () => {
                 tooltipMessage={signOffTooltipContent}
                 className="w-1/2"
                 onClick={handleSignOffProposal}
-                disabled={!connected || !canSignOff || !!errorTransaction}
+                disabled={
+                  !connected || !canSignOff || !!errorTransaction || loading
+                }
               >
                 Sign Off
               </Button>
