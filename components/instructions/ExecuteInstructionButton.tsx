@@ -5,16 +5,17 @@ import {
   Proposal,
   ProposalInstruction,
   ProposalState,
-} from '@models/accounts'
+} from '@solana/spl-governance'
 import React from 'react'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export enum PlayState {
   Played,
@@ -29,8 +30,8 @@ export function ExecuteInstructionButton({
   setPlaying,
   proposalInstruction,
 }: {
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
 }) {
@@ -49,9 +50,9 @@ export function ExecuteInstructionButton({
   const ineligibleToSee = currentSlot - canExecuteAt >= 0
 
   const rpcContext = new RpcContext(
-    new PublicKey(proposal.data.owner.toString()),
-    realmInfo?.programVersion,
-    wallet,
+    new PublicKey(proposal.owner.toString()),
+    getProgramVersionForRealm(realmInfo!),
+    wallet!,
     connection.current,
     connection.endpoint
   )

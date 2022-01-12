@@ -12,7 +12,7 @@ import {
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
   UiInstruction,
@@ -29,11 +29,11 @@ import {
 } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@models/core/api'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
@@ -49,6 +49,7 @@ import {
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const SendTokens = () => {
   const { resetCompactViewState } = useTreasuryAccountStore()
@@ -89,7 +90,7 @@ const SendTokens = () => {
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =
@@ -177,9 +178,9 @@ const SendTokens = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.data.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )
@@ -194,7 +195,7 @@ const SendTokens = () => {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance!.account.config
@@ -291,6 +292,11 @@ const SendTokens = () => {
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
         form.destinationAccount
       }`
+
+  if (!currentAccount) {
+    return null
+  }
+
   return (
     <>
       <h3 className="mb-4 flex items-center">

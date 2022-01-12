@@ -1,26 +1,29 @@
 import { Connection, PublicKey } from '@solana/web3.js'
-import { GOVERNANCE_SCHEMA } from './serialisation'
+
 import {
   getAccountTypes,
+  getGovernanceAccounts,
+  getGovernanceSchemaForAccount,
   Governance,
   GovernanceAccount,
   GovernanceAccountClass,
-  GovernanceAccountType,
   Proposal,
   Realm,
   TokenOwnerRecord,
   VoteRecord,
-} from './accounts'
+} from '@solana/spl-governance'
 
-import { ParsedAccount } from './core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import {
-  booleanFilter,
   getBorshProgramAccounts,
   MemcmpFilter,
   pubkeyFilter,
-} from './core/api'
-import { BorshAccountParser } from './core/serialisation'
+} from '@solana/spl-governance'
+import { BorshAccountParser } from '@solana/spl-governance'
 import { mapFromEntries } from '../tools/core/script'
+
+export const booleanFilter = (offset: number, value: boolean) =>
+  new MemcmpFilter(offset, Buffer.from(value ? [1] : [0]))
 
 // VoteRecords
 
@@ -29,13 +32,13 @@ export async function getUnrelinquishedVoteRecords(
   endpoint: string,
   tokenOwnerRecordPk: PublicKey
 ) {
-  return getBorshProgramAccounts<VoteRecord>(
+  return getGovernanceAccounts<VoteRecord>(
     programId,
-    GOVERNANCE_SCHEMA,
     endpoint,
     VoteRecord,
+    getAccountTypes(VoteRecord),
     [
-      pubkeyFilter(1 + 32, tokenOwnerRecordPk),
+      pubkeyFilter(1 + 32, tokenOwnerRecordPk)!,
       booleanFilter(1 + 32 + 32, false),
     ]
   )
@@ -54,7 +57,7 @@ export async function getTokenOwnerRecordsByTokenOwner(
         endpoint,
         TokenOwnerRecord,
         getAccountTypes(TokenOwnerRecord),
-        [pubkeyFilter(1, realmId), pubkeyFilter(1 + 32, governingTokenMintPk)]
+        [pubkeyFilter(1, realmId)!, pubkeyFilter(1 + 32, governingTokenMintPk)!]
       ).then((tors) =>
         mapFromEntries(tors, ([_k, v]) => [
           v.account.governingTokenOwner.toBase58(),
@@ -89,47 +92,10 @@ export async function getRealm(connection: Connection, realmPk: PublicKey) {
 export async function getRealms(programId: PublicKey, endpoint: string) {
   return getBorshProgramAccounts<Realm>(
     programId,
-    GOVERNANCE_SCHEMA,
+    (at) => getGovernanceSchemaForAccount(at),
     endpoint,
     Realm
   )
-}
-
-export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
-  programId: PublicKey,
-  endpoint: string,
-  accountClass: GovernanceAccountClass,
-  accountTypes: GovernanceAccountType[],
-  filters: MemcmpFilter[] = []
-) {
-  if (accountTypes.length === 1) {
-    return getBorshProgramAccounts<TAccount>(
-      programId,
-      GOVERNANCE_SCHEMA,
-      endpoint,
-      accountClass as any,
-      filters,
-      accountTypes[0]
-    )
-  }
-
-  const all = await Promise.all(
-    accountTypes.map((at) =>
-      getBorshProgramAccounts<TAccount>(
-        programId,
-        GOVERNANCE_SCHEMA,
-        endpoint,
-        accountClass as any,
-        filters,
-        at
-      )
-    )
-  )
-
-  return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
-    string,
-    ParsedAccount<TAccount>
-  >
 }
 
 export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
@@ -145,10 +111,9 @@ export async function getGovernanceAccount<TAccount extends GovernanceAccount>(
     )
   }
 
-  const account = BorshAccountParser(accountClass, GOVERNANCE_SCHEMA)(
-    accountPubKey,
-    accountInfo
-  )
+  const account = BorshAccountParser(accountClass, (at) =>
+    getGovernanceSchemaForAccount(at)
+  )(accountPubKey, accountInfo)
 
-  return account as ParsedAccount<TAccount>
+  return account as ProgramAccount<TAccount>
 }

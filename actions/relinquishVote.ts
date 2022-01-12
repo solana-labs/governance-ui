@@ -5,15 +5,15 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { Proposal } from '../models/accounts'
-import { RpcContext } from '../models/core/api'
-import { ParsedAccount } from '../models/core/accounts'
+import { Proposal } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
-import { withRelinquishVote } from '@models/withRelinquishVote'
+import { withRelinquishVote } from '@solana/spl-governance'
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   voteRecord: PublicKey,
   instructions: TransactionInstruction[] = []

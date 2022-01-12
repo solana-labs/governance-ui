@@ -9,10 +9,11 @@ import {
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { VoteRecord } from '@models/accounts'
-import { ChatMessage } from '@models/chat/accounts'
-import { getGovernanceChatMessagesByVoter } from '@models/chat/api'
-import { ParsedAccount } from '@models/core/accounts'
+import { isYesVote } from '@models/voteRecords'
+import { VoteRecord } from '@solana/spl-governance'
+import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
+import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
+
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -68,10 +69,10 @@ const MemberOverview = () => {
     resetCompactViewState()
   }
   const getVoteRecordsAndChatMsgs = async () => {
-    let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
-    let chat: { [pubKey: string]: ParsedAccount<ChatMessage> } = {}
+    let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
+    let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
-      const responsnes = await Promise.all([
+      const results = await Promise.all([
         getVoteRecordsByProposal(
           selectedRealm!.programId!,
           connection.endpoint,
@@ -82,15 +83,15 @@ const MemberOverview = () => {
           new PublicKey(member!.walletAddress)
         ),
       ])
-      voteRecords = responsnes[0]
-      chat = responsnes[1]
+      voteRecords = results[0]
+      chatMessages = results[1]
     } catch (e) {
       notify({
         message: 'Unable to fetch vote records for selected wallet address',
         type: 'error',
       })
     }
-    return { voteRecords, chat }
+    return { voteRecords, chat: chatMessages }
   }
   useEffect(() => {
     //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
@@ -210,7 +211,7 @@ const MemberOverview = () => {
               ))}
             </div>
             <div className="ml-auto text-fgd-3 text-xs flex flex-col">
-              {x.account.isYes() ? (
+              {isYesVote(x.account) ? (
                 <CheckCircleIcon className="h-4 mr-1 text-green w-4" />
               ) : (
                 <XCircleIcon className="h-4 mr-1 text-red w-4" />

@@ -25,7 +25,7 @@ import {
   DEFAULT_GOVERNANCE_PROGRAM_ID,
   DEFAULT_TEST_GOVERNANCE_PROGRAM_ID,
 } from '@components/instructions/tools'
-import { ProgramVersion } from '@models/registry/constants'
+
 import Tooltip from '@components/Tooltip'
 import { StyledLabel } from '@components/inputs/styles'
 import { createMultisigRealm } from 'actions/createMultisigRealm'
@@ -36,7 +36,10 @@ import { useEffect } from 'react'
 import { CreateFormSchema } from './validators/createRealmValidator'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { registerRealm } from 'actions/registerRealm'
-import { MintMaxVoteWeightSource } from '@models/accounts'
+import {
+  MintMaxVoteWeightSource,
+  PROGRAM_VERSION_V1,
+} from '@solana/spl-governance'
 import Switch from '@components/Switch'
 import { BN } from '@project-serum/anchor'
 import BigNumber from 'bignumber.js'
@@ -120,7 +123,7 @@ const RealmWizard: React.FC = () => {
     const results = await createMultisigRealm(
       connection.current,
       new PublicKey(programId),
-      ProgramVersion.V1,
+      PROGRAM_VERSION_V1,
       form.name,
       form.yesThreshold,
       form.teamWallets.map((w) => new PublicKey(w)),
@@ -177,7 +180,7 @@ const RealmWizard: React.FC = () => {
             walletPubkey: wallet!.publicKey!,
           },
           new PublicKey(form.governanceProgramId!),
-          form.programVersion ?? ProgramVersion.V1,
+          form.programVersion ?? PROGRAM_VERSION_V1,
           form.name!,
           form.communityMintId
             ? new PublicKey(form.communityMintId)

@@ -1,7 +1,8 @@
 import { PublicKey } from '@solana/web3.js'
 import useRealmGovernance from '../hooks/useRealmGovernance'
-import { Proposal, ProposalState } from '../models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
+import { isYesVote } from '@models/voteRecords'
 
 function getProposalStateLabel(state: ProposalState, hasVoteEnded: boolean) {
   switch (state) {
@@ -60,7 +61,7 @@ const ProposalStateBadge = ({
 
   if (ownVoteRecord) {
     statusLabel =
-      statusLabel + ': ' + (ownVoteRecord.account.isYes() ? 'Yes' : 'No')
+      statusLabel + ': ' + (isYesVote(ownVoteRecord.account) ? 'Yes' : 'No')
   }
 
   return (

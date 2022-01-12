@@ -5,7 +5,7 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '../../models/accounts'
+import { AccountMetaData, InstructionData } from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'

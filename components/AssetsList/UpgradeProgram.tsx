@@ -21,10 +21,10 @@ import {
 import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
-} from 'models/serialisation'
-import { RpcContext } from 'models/core/api'
-import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+} from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
@@ -35,6 +35,7 @@ import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -147,9 +148,9 @@ const UpgradeProgram = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.data.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )
@@ -164,7 +165,7 @@ const UpgradeProgram = () => {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance!.account.config

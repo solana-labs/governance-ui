@@ -1,25 +1,30 @@
 import React, { FunctionComponent, useState } from 'react'
 import { postChatMessage } from '../actions/chat/postMessage'
-import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
-import { RpcContext } from '../models/core/api'
+import {
+  ChatMessageBody,
+  ChatMessageBodyType,
+  YesNoVote,
+} from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import useRealm from '../hooks/useRealm'
 import { castVote } from '../actions/castVote'
-import { Vote } from '../models/instructions'
+
 import Button, { SecondaryButton } from './Button'
 // import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
-import { TokenOwnerRecord } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { TokenOwnerRecord } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
-  vote: Vote
-  voterTokenRecord: ParsedAccount<TokenOwnerRecord>
+  vote: YesNoVote
+  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }
 
 const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
@@ -38,12 +43,13 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { realm, realmInfo } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
 
-  const submitVote = async (vote: Vote) => {
+  const submitVote = async (vote: YesNoVote) => {
     setSubmitting(true)
+
     const rpcContext = new RpcContext(
-      proposal!.data.owner,
-      realmInfo?.programVersion,
-      wallet,
+      proposal!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
       connection.current,
       connection.endpoint
     )
@@ -83,7 +89,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const voteString = vote === 0 ? 'Approve' : 'Deny'
+  const voteString = vote === YesNoVote.Yes ? 'Approve' : 'Deny'
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>

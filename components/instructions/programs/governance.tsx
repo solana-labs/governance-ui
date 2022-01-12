@@ -1,9 +1,9 @@
-import { AccountMetaData, VoteWeightSource } from '@models/accounts'
+import { AccountMetaData, VoteWeightSource } from '@solana/spl-governance'
 import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
-} from '@models/instructions'
-import { GOVERNANCE_SCHEMA } from '@models/serialisation'
+} from '@solana/spl-governance'
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'

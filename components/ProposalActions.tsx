@@ -2,19 +2,24 @@
 import { useEffect, useState } from 'react'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
+import {
+  getSignatoryRecordAddress,
+  ProposalState,
+} from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { signOffProposal } from 'actions/signOffProposal'
 
 import { finalizeVote } from 'actions/finalizeVotes'
-import { Proposal } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { Proposal } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { ProposalTransactionNotification } from './ProposalTransactionNotification'
 import Loading from './Loading'
+import { getProgramVersionForRealm } from '@models/registry/api'
+
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
@@ -109,9 +114,9 @@ const ProposalActionsPanel = () => {
       if (proposal && realmInfo && governance) {
         setLoading(true)
         const rpcContext = new RpcContext(
-          proposal.data.owner,
-          realmInfo?.programVersion,
-          wallet,
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
           connection.current,
           connection.endpoint
         )
@@ -140,9 +145,9 @@ const ProposalActionsPanel = () => {
       if (proposal && realmInfo) {
         setLoading(true)
         const rpcContext = new RpcContext(
-          proposal.data.owner,
-          realmInfo?.programVersion,
-          wallet,
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
           connection.current,
           connection.endpoint
         )
@@ -161,16 +166,16 @@ const ProposalActionsPanel = () => {
     }
   }
   const handleCancelProposal = async (
-    proposal: ParsedAccount<Proposal> | undefined
+    proposal: ProgramAccount<Proposal> | undefined
   ) => {
     setErrorTransaction('')
     try {
       if (proposal && realmInfo) {
         setLoading(true)
         const rpcContext = new RpcContext(
-          proposal.data.owner,
-          realmInfo?.programVersion,
-          wallet,
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
           connection.current,
           connection.endpoint
         )

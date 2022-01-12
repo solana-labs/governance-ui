@@ -8,22 +8,23 @@ import {
 } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '../hooks/useRealm'
-import { Proposal, ProposalState } from '../models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import { getProposal, getUnrelinquishedVoteRecords } from '../models/api'
-import { withDepositGoverningTokens } from '../models/withDepositGoverningTokens'
-import { withRelinquishVote } from '../models/withRelinquishVote'
-import { withWithdrawGoverningTokens } from '../models/withWithdrawGoverningTokens'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
+import { withRelinquishVote } from '@solana/spl-governance'
+import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import { sendTransaction } from '../utils/send'
-import { approveTokenTransfer, TOKEN_PROGRAM_ID } from '../utils/tokens'
+import { approveTokenTransfer } from '../utils/tokens'
 import Button from './Button'
 import { Option } from '../tools/core/option'
-import { GoverningTokenType } from '../models/enums'
+import { GoverningTokenType } from '@solana/spl-governance'
 import { fmtMintAmount } from '../tools/sdk/units'
 import { getMintMetadata } from './instructions/programs/splToken'
-import { withFinalizeVote } from '@models/withFinalizeVote'
+import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { ProposalTransactionNotification } from './ProposalTransactionNotification'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 import Loading from './Loading'
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
@@ -157,12 +158,14 @@ const TokenDeposit = ({
     await withDepositGoverningTokens(
       instructions,
       realmInfo!.programId,
+      getProgramVersionForRealm(realmInfo!),
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenAccount!.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey!
+      wallet!.publicKey!,
+      amount
     )
 
     const transaction = new Transaction()
@@ -212,6 +215,8 @@ const TokenDeposit = ({
         endpoint,
         depositTokenRecord!.account!.governingTokenOwner
       )
+
+      console.log('Vote Records', voteRecords)
 
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()]
@@ -269,8 +274,7 @@ const TokenDeposit = ({
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID
+      wallet!.publicKey!
     )
 
     try {

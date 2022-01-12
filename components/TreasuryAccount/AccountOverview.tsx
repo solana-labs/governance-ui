@@ -55,6 +55,11 @@ const AccountOverview = () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
+
+  if (!currentAccount) {
+    return null
+  }
+
   return (
     <>
       <h3 className="mb-4 flex items-center">

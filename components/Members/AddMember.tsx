@@ -18,15 +18,16 @@ import { getMintSchema } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
-import { getInstructionDataFromBase64 } from 'models/serialisation'
-import { RpcContext } from 'models/core/api'
-import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -123,9 +124,9 @@ const AddMember = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.data.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )
@@ -140,7 +141,7 @@ const AddMember = () => {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
           governance!.account.config
