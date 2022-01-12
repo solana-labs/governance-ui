@@ -14,11 +14,11 @@ import {
 import {
   getGovernance,
   getGovernanceAccount,
-  getGovernanceAccounts,
   getTokenOwnerRecordsByTokenOwner,
 } from '../models/api'
 import {
   getAccountTypes,
+  getGovernanceAccounts,
   Governance,
   GovernanceAccountType,
   Proposal,

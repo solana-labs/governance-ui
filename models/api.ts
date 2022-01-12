@@ -2,11 +2,11 @@ import { Connection, PublicKey } from '@solana/web3.js'
 
 import {
   getAccountTypes,
+  getGovernanceAccounts,
   getGovernanceSchemaForAccount,
   Governance,
   GovernanceAccount,
   GovernanceAccountClass,
-  GovernanceAccountType,
   Proposal,
   Realm,
   TokenOwnerRecord,
@@ -32,11 +32,11 @@ export async function getUnrelinquishedVoteRecords(
   endpoint: string,
   tokenOwnerRecordPk: PublicKey
 ) {
-  return getBorshProgramAccounts<VoteRecord>(
+  return getGovernanceAccounts<VoteRecord>(
     programId,
-    (at) => getGovernanceSchemaForAccount(at),
     endpoint,
     VoteRecord,
+    getAccountTypes(VoteRecord),
     [
       pubkeyFilter(1 + 32, tokenOwnerRecordPk)!,
       booleanFilter(1 + 32 + 32, false),
@@ -96,43 +96,6 @@ export async function getRealms(programId: PublicKey, endpoint: string) {
     endpoint,
     Realm
   )
-}
-
-export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
-  programId: PublicKey,
-  endpoint: string,
-  accountClass: GovernanceAccountClass,
-  accountTypes: GovernanceAccountType[],
-  filters: MemcmpFilter[] = []
-) {
-  if (accountTypes.length === 1) {
-    return getBorshProgramAccounts<TAccount>(
-      programId,
-      (at) => getGovernanceSchemaForAccount(at),
-      endpoint,
-      accountClass as any,
-      filters,
-      accountTypes[0]
-    )
-  }
-
-  const all = await Promise.all(
-    accountTypes.map((at) =>
-      getBorshProgramAccounts<TAccount>(
-        programId,
-        (at) => getGovernanceSchemaForAccount(at),
-        endpoint,
-        accountClass as any,
-        filters,
-        at
-      )
-    )
-  )
-
-  return all.reduce((res, r) => ({ ...res, ...r }), {}) as Record<
-    string,
-    ProgramAccount<TAccount>
-  >
 }
 
 export async function getGovernanceAccount<TAccount extends GovernanceAccount>(

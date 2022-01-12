@@ -5,8 +5,9 @@ import Tooltip from '@components/Tooltip'
 import { CogIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getProgramSlot } from '@models/registry/api'
+
 import { PublicKey } from '@solana/web3.js'
+import { getProgramSlot } from '@tools/sdk/bpfUpgradeableLoader/accounts'
 import { abbreviateAddress } from '@utils/formatting'
 import React, { useEffect, useState } from 'react'
 import useAssetsStore from 'stores/useAssetsStore'
@@ -32,11 +33,7 @@ const AssetOverview = () => {
   }
   useEffect(() => {
     const handleSetProgramVersion = async () => {
-      const slot = await getProgramSlot(
-        connection.current,
-        programId,
-        connection.endpoint
-      )
+      const slot = await getProgramSlot(connection.current, programId)
       setSlot(slot)
     }
     handleSetProgramVersion()
