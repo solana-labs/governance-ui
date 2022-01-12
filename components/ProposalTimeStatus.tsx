@@ -1,6 +1,6 @@
 import { ClockIcon } from '@heroicons/react/outline'
 import useRealm from '../hooks/useRealm'
-import { Proposal, ProposalState } from '../models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import { fmtUnixTime } from '../utils/formatting'
 import { VoteCountdown } from './VoteCountdown'
 
@@ -10,7 +10,7 @@ type ProposalTimeStatusProps = {
 
 const ProposalTimeStatus = ({ proposal }: ProposalTimeStatusProps) => {
   const { governances } = useRealm()
-  const governance = governances[proposal?.governance.toBase58()]?.info
+  const governance = governances[proposal?.governance.toBase58()]?.account
 
   return proposal && governance ? (
     <div className="flex items-center text-fgd-3 text-sm">

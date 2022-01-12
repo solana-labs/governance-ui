@@ -21,10 +21,10 @@ import {
 import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
-} from 'models/serialisation'
-import { RpcContext } from 'models/core/api'
-import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+} from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
@@ -35,6 +35,7 @@ import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -73,7 +74,7 @@ const UpgradeProgram = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.info.governedAccount.toBase58()}`
+  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -117,11 +118,11 @@ const UpgradeProgram = () => {
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.info.governedAccount,
+        form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.bufferAddress),
         form.governedAccount.governance.pubkey,
         wallet!.publicKey
@@ -147,9 +148,9 @@ const UpgradeProgram = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )
@@ -157,28 +158,28 @@ const UpgradeProgram = () => {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
-        holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
+        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.info.config
+          governance!.account.config
         )
 
         const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
+          ? realm.account.communityMint
           : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : undefined
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
+            ? realm.account.config.councilMint
             : defaultProposalMint
 
         if (!proposalMint) {
@@ -195,7 +196,7 @@ const UpgradeProgram = () => {
           form.title ? form.title : proposalTitle,
           form.description ? form.description : '',
           proposalMint,
-          selectedGovernance?.info?.proposalCount,
+          selectedGovernance?.account?.proposalCount,
           [instructionData],
           false
         )

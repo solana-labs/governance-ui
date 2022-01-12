@@ -1,4 +1,4 @@
-import { Proposal } from '../models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import useRealm from './useRealm'
@@ -7,11 +7,11 @@ export default function useProposalVotes(proposal?: Proposal) {
   const { realm, mint, councilMint, governances } = useRealm()
 
   const governance =
-    proposal && governances[proposal.governance?.toBase58()]?.info
+    proposal && governances[proposal.governance?.toBase58()]?.account
 
   const proposalMint =
     proposal?.governingTokenMint.toBase58() ===
-    realm?.info.communityMint.toBase58()
+    realm?.account.communityMint.toBase58()
       ? mint
       : councilMint
 
@@ -30,7 +30,7 @@ export default function useProposalVotes(proposal?: Proposal) {
     governance.config.voteThresholdPercentage.value
 
   const maxVoteWeight = getProposalMaxVoteWeight(
-    realm.info,
+    realm.account,
     proposal,
     proposalMint
   )

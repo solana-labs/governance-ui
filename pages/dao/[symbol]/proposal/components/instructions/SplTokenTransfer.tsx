@@ -9,7 +9,7 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMultiTypeAccount,
-  ProgramAccount,
+  TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
 import {
@@ -21,8 +21,8 @@ import { debounce } from '@utils/debounce'
 import { NewProposalContext } from '../../new'
 import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getTransferInstruction } from '@utils/instructionTools'
 
@@ -31,12 +31,12 @@ const SplTokenTransfer = ({
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SplTokenTransferForm>({
@@ -48,12 +48,12 @@ const SplTokenTransfer = ({
     mintInfo: undefined,
   })
   const [governedAccount, setGovernedAccount] = useState<
-    ParsedAccount<Governance> | undefined
+    ProgramAccount<Governance> | undefined
   >(undefined)
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
@@ -139,7 +139,9 @@ const SplTokenTransfer = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={governedTokenAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={
+          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
+        }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}

@@ -1,4 +1,4 @@
-import Button, { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getAccountName } from '@components/instructions/tools'
 import useRealm from '@hooks/useRealm'
@@ -12,7 +12,7 @@ import {
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
 import { precision } from '@utils/formatting'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
   UiInstruction,
@@ -20,22 +20,20 @@ import {
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import { ViewState } from './Types'
 import { BN } from '@project-serum/anchor'
 import { getTokenTransferSchema } from '@utils/validations'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
-  ArrowLeftIcon,
   //   InformationCircleIcon,
 } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@models/core/api'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { RpcContext } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
@@ -44,14 +42,17 @@ import Textarea from '@components/inputs/Textarea'
 import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getTransferInstruction } from '@utils/instructionTools'
+import {
+  getTransferInstruction,
+  getTransferNftInstruction,
+} from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
+import NFTSelector from '@components/NFTS/NFTSelector'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const SendTokens = () => {
-  const {
-    setCurrentCompactView,
-    resetCompactViewState,
-  } = useTreasuryAccountStore()
+  const { resetCompactViewState } = useTreasuryAccountStore()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -68,6 +69,7 @@ const SendTokens = () => {
 
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
+  const isNFT = currentAccount?.isNft
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
@@ -75,20 +77,20 @@ const SendTokens = () => {
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
-    // No default transfer amount
-    amount: undefined,
+    amount: isNFT ? 1 : undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
     title: '',
     description: '',
   })
+  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =
@@ -99,10 +101,6 @@ const SendTokens = () => {
     : 1
   const currentPrecision = precision(mintMinAmount)
 
-  const handleGoBackToMainView = () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -151,7 +149,8 @@ const SendTokens = () => {
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    return getTransferInstruction({
+    const selectedNftMint = selectedNfts[0]?.mint
+    const defaultProps = {
       schema,
       form,
       programId,
@@ -159,7 +158,13 @@ const SendTokens = () => {
       wallet,
       currentAccount,
       setFormErrors,
-    })
+    }
+    return isNFT
+      ? getTransferNftInstruction({
+          ...defaultProps,
+          nftMint: selectedNftMint,
+        })
+      : getTransferInstruction(defaultProps)
   }
   const handlePropose = async () => {
     setIsLoading(true)
@@ -173,9 +178,9 @@ const SendTokens = () => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )
@@ -183,28 +188,28 @@ const SendTokens = () => {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
-        holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
+        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
       try {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
           governance?.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.info.config
+          governance!.account.config
         )
 
         const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
+          ? realm.account.communityMint
           : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : undefined
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
+            ? realm.account.config.councilMint
             : defaultProposalMint
 
         if (!proposalMint) {
@@ -221,13 +226,14 @@ const SendTokens = () => {
           form.title ? form.title : proposalTitle,
           form.description ? form.description : '',
           proposalMint,
-          selectedGovernance?.info?.proposalCount,
+          selectedGovernance?.account?.proposalCount,
           [instructionData],
           false
         )
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -277,18 +283,25 @@ const SendTokens = () => {
 
   const schema = getTokenTransferSchema({ form, connection })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const proposalTitle = `Pay ${form.amount}${
-    tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
-  }to ${form.destinationAccount}`
+  const nftName = selectedNfts[0]?.val?.name
+  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+    form.destinationAccount
+  }`
+  const proposalTitle = isNFT
+    ? nftTitle
+    : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
+        form.destinationAccount
+      }`
+
+  if (!currentAccount) {
+    return null
+  }
+
   return (
     <>
       <h3 className="mb-4 flex items-center">
         <>
-          <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.AccountView)}
-            className="h-4 w-4 mr-1 text-primary-light mr-2 hover:cursor-pointer"
-          />
-          Send {tokenInfo && tokenInfo?.symbol}
+          Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
         </>
       </h3>
       <AccountLabel></AccountLabel>
@@ -320,17 +333,24 @@ const SendTokens = () => {
             <div className="text-xs break-all">{destinationAccountName}</div>
           </div>
         )}
-        <Input
-          min={mintMinAmount}
-          label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
-          value={form.amount}
-          type="number"
-          onChange={setAmount}
-          step={mintMinAmount}
-          error={formErrors['amount']}
-          onBlur={validateAmountOnBlur}
-          noMaxWidth={true}
-        />
+        {isNFT ? (
+          <NFTSelector
+            onNftSelect={(nfts) => setSelectedNfts(nfts)}
+            ownerPk={currentAccount.governance!.pubkey}
+          ></NFTSelector>
+        ) : (
+          <Input
+            min={mintMinAmount}
+            label={`Amount ${tokenInfo ? tokenInfo?.symbol : ''}`}
+            value={form.amount}
+            type="number"
+            onChange={setAmount}
+            step={mintMinAmount}
+            error={formErrors['amount']}
+            onBlur={validateAmountOnBlur}
+            noMaxWidth={true}
+          />
+        )}
         <small className="text-red">
           {transactionDolarAmount
             ? IsAmountNotHigherThenBalance()
@@ -409,23 +429,23 @@ const SendTokens = () => {
         )}
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <SecondaryButton
-          disabled={isLoading}
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
-        >
-          Cancel
-        </SecondaryButton>
         <Button
-          disabled={!canUseTransferInstruction || isLoading}
-          className="sm:w-1/2"
+          disabled={
+            !canUseTransferInstruction ||
+            isLoading ||
+            (isNFT && !selectedNfts.length)
+          }
+          className="ml-auto"
           onClick={handlePropose}
           isLoading={isLoading}
         >
           <Tooltip
             content={
-              !canUseTransferInstruction &&
-              'You need to have connected wallet with ability to create token transfer proposals'
+              !canUseTransferInstruction
+                ? 'You need to have connected wallet with ability to create token transfer proposals'
+                : isNFT && !selectedNfts.length
+                ? 'Please select nft'
+                : ''
             }
           >
             <div>Propose</div>

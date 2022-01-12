@@ -1,14 +1,14 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/AssetsList/types'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 
 interface AssetsStore extends State {
   compact: {
     currentView: ViewState
-    currentAsset: ParsedAccount<Governance> | null
+    currentAsset: ProgramAccount<Governance> | null
   }
-  setCurrentCompactViewAsset: (item: ParsedAccount<Governance> | null) => void
+  setCurrentCompactViewAsset: (item: ProgramAccount<Governance> | null) => void
   setCurrentCompactView: (viewState: ViewState) => void
   resetCompactViewState: () => void
 }

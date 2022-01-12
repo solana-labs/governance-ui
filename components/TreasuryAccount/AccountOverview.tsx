@@ -1,39 +1,65 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getAccountName } from '@components/instructions/tools'
+import Modal from '@components/Modal'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
 import BN from 'bn.js'
-import React from 'react'
+import { useRouter } from 'next/router'
+import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import AccountLabel from './AccountHeader'
+import AccountHeader from './AccountHeader'
+import DepositNFT from './DepositNFT'
 import { ViewState } from './Types'
+import SendTokens from './SendTokens'
+import { ExternalLinkIcon, ArrowsExpandIcon } from '@heroicons/react/outline'
 
 const AccountOverview = () => {
+  const router = useRouter()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  const nftsCount =
+    currentAccount?.governance && currentAccount.isNft
+      ? useTreasuryAccountStore((s) => s.governanceNfts)[
+          currentAccount?.governance?.pubkey.toBase58()
+        ]?.length
+      : 0
+  const { symbol } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const isNFT = currentAccount?.isNft
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(
     (s) => s.compact.recentActivity
   )
-
+  const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+  const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const {
     setCurrentCompactView,
     resetCompactViewState,
   } = useTreasuryAccountStore()
+  //for nfts for now we use governance pubkey
   const accountPublicKey = currentAccount
-    ? currentAccount.governance?.info.governedAccount
+    ? isNFT
+      ? currentAccount.governance?.pubkey
+      : currentAccount.governance?.account.governedAccount
     : null
 
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
+
+  if (!currentAccount) {
+    return null
+  }
+
   return (
     <>
       <h3 className="mb-4 flex items-center">
@@ -49,33 +75,64 @@ const AccountOverview = () => {
             </div>
           ) : (
             <div className="text-xs text-th-fgd-1">
-              {abbreviateAddress(accountPublicKey as PublicKey)}
+              {accountPublicKey &&
+                abbreviateAddress(accountPublicKey as PublicKey)}
             </div>
           )}
+          <a
+            href={
+              accountPublicKey
+                ? getExplorerUrl(connection.endpoint, accountPublicKey)
+                : ''
+            }
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+          </a>
+          <div className="ml-auto flex flex-row">
+            {isNFT && (
+              <ArrowsExpandIcon
+                className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer"
+                onClick={() => {
+                  const url = fmtUrlWithCluster(
+                    `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
+                  )
+                  router.push(url)
+                }}
+              ></ArrowsExpandIcon>
+            )}
+          </div>
         </>
       </h3>
-      <AccountLabel></AccountLabel>
+      <AccountHeader></AccountHeader>
       <div
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 ${
-          !canUseTransferInstruction ? 'justify-center' : ''
+          !canUseTransferInstruction || isNFT ? 'justify-center' : ''
         }`}
       >
         <Button
           className="sm:w-1/2 text-sm"
-          onClick={() => setCurrentCompactView(ViewState.Deposit)}
+          onClick={() =>
+            isNFT
+              ? setOpenNftDepositModal(true)
+              : setCurrentCompactView(ViewState.Deposit)
+          }
         >
           Deposit
         </Button>
-
         <Button
           tooltipMessage={
             !canUseTransferInstruction
               ? 'You need to have connected wallet with ability to create token transfer proposals'
+              : isNFT && nftsCount === 0
+              ? 'Please deposit nfts first'
               : ''
           }
           className="sm:w-1/2 text-sm py-2.5"
-          onClick={() => setCurrentCompactView(ViewState.Send)}
-          disabled={!canUseTransferInstruction}
+          onClick={() => setOpenCommonSendModal(true)}
+          disabled={!canUseTransferInstruction || (isNFT && nftsCount === 0)}
         >
           Send
         </Button>
@@ -105,6 +162,32 @@ const AccountOverview = () => {
           </a>
         ))}
       </div>
+      {openNftDepositModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenNftDepositModal(false)
+          }}
+          isOpen={openNftDepositModal}
+        >
+          <DepositNFT
+            onClose={() => {
+              setOpenNftDepositModal(false)
+            }}
+          ></DepositNFT>
+        </Modal>
+      )}
+      {openCommonSendModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenCommonSendModal(false)
+          }}
+          isOpen={openCommonSendModal}
+        >
+          <SendTokens></SendTokens>
+        </Modal>
+      )}
     </>
   )
 }

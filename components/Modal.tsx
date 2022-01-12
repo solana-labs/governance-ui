@@ -7,11 +7,12 @@ const Modal = ({
   children,
   hideClose = false,
   sizeClassName = 'sm:max-w-md',
+  background = 'bg-bkg-2',
 }) => {
   return (
     <Portal>
       <div
-        className="fixed z-10 inset-0 overflow-y-auto"
+        className="fixed z-30 inset-0 overflow-y-auto"
         aria-labelledby="modal-title"
         role="dialog"
         aria-modal="true"
@@ -34,7 +35,7 @@ const Modal = ({
 
           {isOpen ? (
             <div
-              className={`inline-block bg-bkg-2 
+              className={`inline-block bg-bkg-2 ${background}
               rounded-lg text-left px-8 pt-6 pb-8 shadow-lg transform transition-all 
               sm:my-8 align-middle ${sizeClassName} w-full`}
             >

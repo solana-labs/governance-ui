@@ -5,7 +5,7 @@ import {
   // Account,
   // Transaction,
 } from '@solana/web3.js'
-import { AccountMetaData, InstructionData } from '../../models/accounts'
+import { AccountMetaData, InstructionData } from '@solana/spl-governance'
 
 import { BPF_UPGRADEABLE_LOADER_INSTRUCTIONS } from './programs/bpfUpgradeableLoader'
 import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
@@ -13,17 +13,27 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+/**
+ * Default governance program id instance
+ */
 export const DEFAULT_GOVERNANCE_PROGRAM_ID =
   'GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw'
+
+/**
+ * Default TEST governance program id instance
+ */
+export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
+  'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
+
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3':
     'Mango DAO MNGO Treasury Governance',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
-    'Mango DAO Insurance Fund Vault',
+    'Mango DAO USDC Treasury Vault',
   '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
-    'Mango DAO Insurance Fund Governance',
+    'Mango DAO USDC Treasury Governance',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
@@ -81,6 +91,12 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
 ])
 
+export const DEFAULT_NFT_TREASURY_MINT =
+  'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
+
+export const DEFAULT_NATIVE_SOL_MINT =
+  'GSoL95LSRcKYxwVkvAxbYLp47uBn1QtP6pDUZQxp3Mg4'
+
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
@@ -128,7 +144,6 @@ export async function getInstructionDescriptor(
   }
 
   const descriptor = descriptors && descriptors[instruction.data[0]]
-
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,

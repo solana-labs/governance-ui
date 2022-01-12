@@ -8,8 +8,10 @@ import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
 import { RealmWizardStepComponentProps } from '../interfaces/Realm'
 import Input from '@components/inputs/Input'
-import { RpcContext } from '@models/core/api'
-import { MintMaxVoteWeightSource } from 'models/accounts'
+import {
+  MintMaxVoteWeightSource,
+  PROGRAM_VERSION_V1,
+} from '@solana/spl-governance'
 import { registerRealm } from 'actions/registerRealm'
 import { notify } from 'utils/notifications'
 import { formValidation, isFormValid } from '@utils/formValidation'
@@ -17,7 +19,7 @@ import { PublicKey } from '@solana/web3.js'
 import { CreateFormSchema } from '../validators/createRealmValidator'
 import _ from 'lodash'
 import useQueryContext from '@hooks/useQueryContext'
-import { ProgramVersion } from '@models/registry/constants'
+
 import router from 'next/router'
 
 const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
@@ -52,19 +54,15 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
     )
 
     if (isValid) {
-      const rpcContext = new RpcContext(
-        new PublicKey(form.governanceProgramId!),
-        form.programVersion,
-        wallet,
-        connection.current,
-        connection.endpoint
-      )
-
       try {
         const realmAddress = await registerRealm(
-          rpcContext,
-          rpcContext.programId,
-          form.programVersion ?? ProgramVersion.V1,
+          {
+            connection,
+            wallet: wallet!,
+            walletPubkey: wallet!.publicKey!,
+          },
+          new PublicKey(form.governanceProgramId!),
+          form.programVersion ?? PROGRAM_VERSION_V1,
           form.name!,
           new PublicKey(form.communityMintId!),
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,

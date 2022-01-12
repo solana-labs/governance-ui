@@ -4,10 +4,10 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { GovernanceType } from '../models/enums'
-import { GovernanceConfig } from '../models/accounts'
-import { withCreateProgramGovernance } from '../models/withCreateProgramGovernance'
-import { RpcContext } from '../models/core/api'
+import { GovernanceType } from '@solana/spl-governance'
+import { GovernanceConfig } from '@solana/spl-governance'
+import { withCreateProgramGovernance } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 
 export const registerGovernance = async (

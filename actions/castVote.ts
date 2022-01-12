@@ -4,21 +4,21 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
-import { RpcContext } from '../models/core/api'
+import { Proposal, YesNoVote } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 
-import { Vote } from '../models/instructions'
+import { Vote } from '@solana/spl-governance'
 
-import { withCastVote } from '../models/withCastVote'
+import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 
 export async function castVote(
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
-  vote: Vote
+  yesNoVote: YesNoVote
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -29,14 +29,15 @@ export async function castVote(
   await withCastVote(
     instructions,
     programId,
+    programVersion,
     realm,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
     tokeOwnerRecord,
     governanceAuthority,
-    proposal.info.governingTokenMint,
-    vote,
+    proposal.account.governingTokenMint,
+    Vote.fromYesNoVote(yesNoVote),
     payer
   )
 

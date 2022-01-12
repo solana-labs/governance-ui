@@ -1,4 +1,7 @@
-import { GovernanceConfig, VoteThresholdPercentage } from '@models/accounts'
+import {
+  GovernanceConfig,
+  VoteThresholdPercentage,
+} from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import {
   getMintNaturalAmountFromDecimal,

@@ -4,7 +4,7 @@ import {
   AccountMetaData,
   Proposal,
   ProposalInstruction,
-} from '../../models/accounts'
+} from '@solana/spl-governance'
 import {
   getAccountName,
   getInstructionDescriptor,
@@ -16,9 +16,14 @@ import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import axios from 'axios'
+import { notify } from '@utils/notifications'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import tokenService from '@utils/services/token'
 
 export default function InstructionCard({
   index,
@@ -26,37 +31,81 @@ export default function InstructionCard({
   proposalInstruction,
 }: {
   index: number
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
 }) {
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [playing, setPlaying] = useState(
-    proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed
+    proposalInstruction.account.executedAt
+      ? PlayState.Played
+      : PlayState.Unplayed
   )
-
+  const [nftImgUrl, setNftImgUrl] = useState('')
+  const [tokenImgUrl, setTokenImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
-      proposalInstruction.info.instruction
+      proposalInstruction.account.instruction
     ).then((d) => setDescriptor(d))
+    const getAmountImg = async () => {
+      const sourcePk =
+        proposalInstruction.account.instruction.accounts[0].pubkey
+      const tokenAccount = await tryGetTokenAccount(
+        connection.current,
+        sourcePk
+      )
+      const isNFTAccount = nftsGovernedTokenAccounts.find(
+        (x) =>
+          x.governance?.pubkey.toBase58() ===
+          tokenAccount?.account.owner.toBase58()
+      )
+      if (isNFTAccount) {
+        const mint = tokenAccount?.account.mint
+        if (mint) {
+          try {
+            const metadataPDA = await Metadata.getPDA(mint)
+            const tokenMetadata = await Metadata.load(
+              connection.current,
+              metadataPDA
+            )
+            const url = (await axios.get(tokenMetadata.data.data.uri)).data
+            setNftImgUrl(url.image)
+          } catch (e) {
+            notify({
+              type: 'error',
+              message: 'Unable to fetch nft',
+            })
+          }
+        }
+      } else {
+        const mint = tokenAccount?.account.mint
+        if (mint) {
+          const info = tokenService.getTokenInfo(mint.toBase58())
+          const imgUrl = info?.logoURI ? info.logoURI : ''
+          setTokenImgUrl(imgUrl)
+        }
+      }
+    }
+    getAmountImg()
   }, [proposalInstruction])
 
-  const proposalAuthority = tokenRecords[proposal.account.owner.toBase58()]
-
+  const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
   return (
     <div className="break-all">
-      <h3 className="mb-4">
+      <h3 className="mb-4 flex">
         {`Instruction ${index} `}
-        {descriptor?.name && `– ${descriptor.name}`}
+        {descriptor?.name && `– ${descriptor.name}`}{' '}
+        {tokenImgUrl && <img className="w-5 h-5 ml-2" src={tokenImgUrl}></img>}
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}
-        programId={proposalInstruction.info.instruction.programId}
+        programId={proposalInstruction.account.instruction.programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
-        {proposalInstruction.info.instruction.accounts.map((am, idx) => (
+        {proposalInstruction.account.instruction.accounts.map((am, idx) => (
           <InstructionAccount
             endpoint={connection.endpoint}
             key={idx}
@@ -69,11 +118,20 @@ export default function InstructionCard({
       <div className="flex items-center justify-between mb-2">
         <div className="font-bold text-sm">Data</div>
       </div>
-      <InstructionData descriptor={descriptor}></InstructionData>
 
+      {nftImgUrl ? (
+        <div
+          style={{ width: '150px', height: '150px' }}
+          className="flex items-center overflow-hidden"
+        >
+          <img src={nftImgUrl}></img>
+        </div>
+      ) : (
+        <InstructionData descriptor={descriptor}></InstructionData>
+      )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton
-          instructionData={proposalInstruction.info.instruction}
+          instructionData={proposalInstruction.account.instruction}
         />
 
         <FlagInstructionErrorButton

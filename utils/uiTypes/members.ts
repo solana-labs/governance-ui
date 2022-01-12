@@ -6,4 +6,5 @@ export interface Member {
   councilVotes: BN
   communityVotes: BN
   hasCouncilTokenOutsideRealm?: boolean
+  hasCommunityTokenOutsideRealm?: boolean
 }

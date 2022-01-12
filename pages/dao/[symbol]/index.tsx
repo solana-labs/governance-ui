@@ -4,7 +4,7 @@ import React, { useEffect, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
 import ProposalCard from 'components/ProposalCard'
 import TokenBalanceCard from 'components/TokenBalanceCard'
-import { Proposal, ProposalState } from 'models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
@@ -12,6 +12,10 @@ import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactW
 import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
 import Tooltip from '@components/Tooltip'
 import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
+import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { usePrevious } from '@hooks/usePrevious'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -37,6 +41,12 @@ const REALM = () => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
+    JSON.stringify(nftsGovernedTokenAccounts)
+  )
+  const connection = useWalletStore((s) => s.connection.current)
+  const { getNfts } = useTreasuryAccountStore()
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
@@ -45,13 +55,13 @@ const REALM = () => {
   const wallet = useWalletStore((s) => s.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].info, a[1].info)
+    compareProposals(b[1].account, a[1].account)
   )
 
   useEffect(() => {
     if (filters.length > 0) {
       const proposals = displayedProposals.filter(
-        ([, v]) => !filters.includes(v.info.state)
+        ([, v]) => !filters.includes(v.account.state)
       )
       setFilteredProposals(proposals)
     } else {
@@ -62,11 +72,20 @@ const REALM = () => {
   useEffect(() => {
     const proposals =
       filters.length > 0
-        ? allProposals.filter(([, v]) => !filters.includes(v.info.state))
+        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
         : allProposals
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
   }, [proposals])
+
+  useEffect(() => {
+    if (
+      prevStringifyNftsGovernedTokenAccounts !==
+      JSON.stringify(nftsGovernedTokenAccounts)
+    ) {
+      getNfts(nftsGovernedTokenAccounts, connection)
+    }
+  }, [JSON.stringify(nftsGovernedTokenAccounts)])
   // DEBUG print remove
   console.log(
     'governance page tokenAccount',
@@ -112,7 +131,7 @@ const REALM = () => {
                 <ProposalCard
                   key={k}
                   proposalPk={new PublicKey(k)}
-                  proposal={v.info}
+                  proposal={v.account}
                 />
               ))
             ) : (
@@ -124,6 +143,7 @@ const REALM = () => {
         </div>
         <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
           <TokenBalanceCard />
+          <NFTSCompactWrapper></NFTSCompactWrapper>
           <AccountsCompactWrapper />
           <MembersCompactWrapper></MembersCompactWrapper>
           <AssetsCompactWrapper></AssetsCompactWrapper>
