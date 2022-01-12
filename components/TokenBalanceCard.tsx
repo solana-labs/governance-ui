@@ -24,6 +24,8 @@ import { getMintMetadata } from './instructions/programs/splToken'
 import { withFinalizeVote } from '@models/withFinalizeVote'
 import { chunks } from '@utils/helpers'
 import { ProposalTransactionNotification } from './ProposalTransactionNotification'
+
+import Loading from './Loading'
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
 
@@ -96,8 +98,9 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
-  const [withdrawLoading, setWithdrawLoading] = useState(false)
-  const [depositLoading, setDepositLoading] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  const [txIdHash, setTxIdHash] = useState<string>('')
   const [transactionError, setTransactionError] = useState<string>('')
   const {
     realm,
@@ -165,7 +168,7 @@ const TokenDeposit = ({
     const transaction = new Transaction()
     transaction.add(...instructions)
 
-    await sendTransaction({
+    const txId = await sendTransaction({
       connection,
       wallet,
       transaction,
@@ -176,24 +179,29 @@ const TokenDeposit = ({
 
     await fetchWalletTokenAccounts()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    return txId
   }
 
   const depositAllTokens = async () => {
-    setDepositLoading(true)
+    setLoading(true)
     setTransactionError('')
+    setTxIdHash('')
     try {
-      await depositTokens(depositTokenAccount!.account.amount)
-      setDepositLoading(false)
+      const txId = await depositTokens(depositTokenAccount!.account.amount)
+      setTxIdHash(txId)
+      setLoading(false)
+
       setTransactionError('success')
     } catch (err) {
       setTransactionError(err.message)
       console.debug(err)
-      setDepositLoading(false)
+      setLoading(false)
     }
   }
 
   const withdrawAllTokens = async function () {
-    setWithdrawLoading(true)
+    setTxIdHash('')
+    setLoading(true)
     setTransactionError('')
     const instructions: TransactionInstruction[] = []
 
@@ -207,6 +215,7 @@ const TokenDeposit = ({
 
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()]
+
         if (!proposal) {
           continue
         }
@@ -284,12 +293,13 @@ const TokenDeposit = ({
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
+
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      setWithdrawLoading(false)
+      setLoading(false)
       setTransactionError('success')
     } catch (ex) {
-      setWithdrawLoading(false)
+      setLoading(false)
       setTransactionError(ex.message)
       console.error("Can't withdraw tokens", ex)
     }
@@ -359,8 +369,7 @@ const TokenDeposit = ({
           tooltipMessage={depositTooltipContent}
           className="sm:w-1/2"
           onClick={depositAllTokens}
-          disabled={!connected || !hasTokensInWallet}
-          isLoading={depositLoading}
+          disabled={!connected || !hasTokensInWallet || !!transactionError}
         >
           Deposit
         </Button>
@@ -372,18 +381,20 @@ const TokenDeposit = ({
             !connected ||
             !hasTokensDeposited ||
             (!councilVote && toManyCommunityOutstandingProposalsForUser) ||
-            toManyCouncilOutstandingProposalsForUse
+            toManyCouncilOutstandingProposalsForUse ||
+            !!transactionError ||
+            loading
           }
-          isLoading={withdrawLoading}
           onClick={withdrawAllTokens}
         >
           Withdraw
         </Button>
       </div>
-
+      {loading ? <Loading className="h-8 w-8 mt-9"></Loading> : null}
       <ProposalTransactionNotification
         details={transactionError}
         setDetails={setTransactionError}
+        txIdHash={txIdHash}
       />
     </>
   )

@@ -14,6 +14,7 @@ import { Proposal } from 'models/accounts'
 import { ParsedAccount } from 'models/core/accounts'
 import { cancelProposal } from 'actions/cancelProposal'
 import { ProposalTransactionNotification } from './ProposalTransactionNotification'
+import Loading from './Loading'
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
     (s) => s.selectedProposal
@@ -25,11 +26,10 @@ const ProposalActionsPanel = () => {
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const connection = useWalletStore((s) => s.connection)
-  const [loadingCancel, setLoadingCancel] = useState<boolean>(false)
-  const [loadingFinalize, setLoadingFinalize] = useState<boolean>(false)
-  const [loadingSignoff, setLoadingSignoff] = useState<boolean>(false)
-  const [errorTransaction, setErrorTransaction] = useState<string>('')
+  const [loading, setLoading] = useState<boolean>(false)
 
+  const [errorTransaction, setErrorTransaction] = useState<string>('')
+  const [txIdHash, setTxIdHash] = useState<string>('')
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   const canFinalizeVote =
@@ -107,7 +107,7 @@ const ProposalActionsPanel = () => {
     setErrorTransaction('')
     try {
       if (proposal && realmInfo && governance) {
-        setLoadingFinalize(true)
+        setLoading(true)
         const rpcContext = new RpcContext(
           proposal.data.owner,
           realmInfo?.programVersion,
@@ -116,14 +116,18 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await finalizeVote(rpcContext, governance?.account.realm, proposal)
-
+        const txId = await finalizeVote(
+          rpcContext,
+          governance?.account.realm,
+          proposal
+        )
+        setTxIdHash(txId)
         await fetchProposal(proposal.pubkey)
-        setLoadingFinalize(false)
+        setLoading(false)
         setErrorTransaction('success')
       }
     } catch (error) {
-      setLoadingFinalize(false)
+      setLoading(false)
       setErrorTransaction(`${error}`)
 
       console.error('error finalizing vote', error)
@@ -134,7 +138,7 @@ const ProposalActionsPanel = () => {
     setErrorTransaction('')
     try {
       if (proposal && realmInfo) {
-        setLoadingSignoff(true)
+        setLoading(true)
         const rpcContext = new RpcContext(
           proposal.data.owner,
           realmInfo?.programVersion,
@@ -143,14 +147,14 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await signOffProposal(rpcContext, signatoryRecord)
-
+        const txId = await signOffProposal(rpcContext, signatoryRecord)
+        setTxIdHash(txId)
         await fetchProposal(proposal.pubkey)
-        setLoadingSignoff(false)
+        setLoading(false)
         setErrorTransaction('success')
       }
     } catch (error) {
-      setLoadingSignoff(false)
+      setLoading(false)
       setErrorTransaction(`${error}`)
 
       console.error('error sign off', error)
@@ -162,7 +166,7 @@ const ProposalActionsPanel = () => {
     setErrorTransaction('')
     try {
       if (proposal && realmInfo) {
-        setLoadingCancel(true)
+        setLoading(true)
         const rpcContext = new RpcContext(
           proposal.data.owner,
           realmInfo?.programVersion,
@@ -171,14 +175,14 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await cancelProposal(rpcContext, proposal)
-
+        const txId = await cancelProposal(rpcContext, proposal)
+        setTxIdHash(txId)
         await fetchProposal(proposal.pubkey)
-        setLoadingCancel(false)
+        setLoading(false)
         setErrorTransaction('success')
       }
     } catch (error) {
-      setLoadingCancel(false)
+      setLoading(false)
       setErrorTransaction(`${error}`)
 
       console.error('error cancelling proposal', error)
@@ -196,6 +200,7 @@ const ProposalActionsPanel = () => {
               <ProposalTransactionNotification
                 details={errorTransaction}
                 setDetails={setErrorTransaction}
+                txIdHash={txIdHash}
               />
             </div>
           )}
@@ -208,8 +213,7 @@ const ProposalActionsPanel = () => {
                 tooltipMessage={signOffTooltipContent}
                 className="w-1/2"
                 onClick={handleSignOffProposal}
-                disabled={!connected || !canSignOff}
-                isLoading={loadingSignoff}
+                disabled={!connected || !canSignOff || !!errorTransaction}
               >
                 Sign Off
               </Button>
@@ -220,8 +224,12 @@ const ProposalActionsPanel = () => {
                 tooltipMessage={cancelTooltipContent}
                 className="w-1/2"
                 onClick={() => handleCancelProposal(proposal)}
-                disabled={!connected || !canCancelProposal}
-                isLoading={loadingCancel}
+                disabled={
+                  !connected ||
+                  !canCancelProposal ||
+                  !!errorTransaction ||
+                  loading
+                }
               >
                 Cancel
               </SecondaryButton>
@@ -232,16 +240,21 @@ const ProposalActionsPanel = () => {
                 tooltipMessage={finalizeVoteTooltipContent}
                 className="w-1/2"
                 onClick={handleFinalizeVote}
-                disabled={!connected || !canFinalizeVote}
-                isLoading={loadingFinalize}
+                disabled={
+                  !connected ||
+                  !canFinalizeVote ||
+                  !!errorTransaction ||
+                  loading
+                }
               >
                 Finalize
               </Button>
             )}
-
+            {loading ? <Loading className="h-8 w-8 mt-9"></Loading> : null}
             <ProposalTransactionNotification
               details={errorTransaction}
               setDetails={setErrorTransaction}
+              txIdHash={txIdHash}
             />
           </div>
         </div>

@@ -32,7 +32,7 @@ export const finalizeVote = async (
 
   transaction.add(...instructions)
 
-  await sendTransaction({
+  const txId = await sendTransaction({
     transaction,
     wallet,
     connection,
@@ -41,4 +41,5 @@ export const finalizeVote = async (
     successMessage: 'Votes finalized',
     showNotification: false,
   })
+  return txId
 }
