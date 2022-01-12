@@ -3,14 +3,12 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext } from '../../models/core/api'
-import {
-  ChatMessageBody,
-  ChatMessageBodyType,
-} from '../../models/chat/accounts'
+import { RpcContext } from '@solana/spl-governance'
+import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -28,9 +26,9 @@ const DiscussionForm = () => {
     setSubmitting(true)
 
     const rpcContext = new RpcContext(
-      proposal!.data.owner,
-      realmInfo?.programVersion,
-      wallet,
+      proposal!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
       connection.current,
       connection.endpoint
     )

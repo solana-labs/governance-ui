@@ -1,4 +1,4 @@
-import { Proposal } from '../models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import useRealm from './useRealm'

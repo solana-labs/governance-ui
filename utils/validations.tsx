@@ -130,7 +130,7 @@ export const validateBuffer = async (
     throw 'Program governed account not selected'
   }
   if (pubKey) {
-    await connection.current.getParsedAccountInfo(pubKey).then((data) => {
+    await connection.current.getProgramAccountInfo(pubKey).then((data) => {
       if (!data || !data.value) {
         throw "account doesn't exist or has no SOLs"
       }

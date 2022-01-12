@@ -48,7 +48,7 @@ const Proposal = () => {
                 <a
                   href={`https://${getRealmExplorerHost(
                     realmInfo
-                  )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.data.owner.toBase58()}`}
+                  )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.owner.toBase58()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

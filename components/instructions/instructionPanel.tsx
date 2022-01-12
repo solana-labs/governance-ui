@@ -4,8 +4,9 @@ import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
@@ -25,9 +26,9 @@ export function InstructionPanel() {
   useEffect(() => {
     if (ineligibleToSee && proposal) {
       const rpcContext = new RpcContext(
-        proposal?.data.owner,
-        realmInfo?.programVersion,
-        wallet,
+        proposal?.owner,
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )

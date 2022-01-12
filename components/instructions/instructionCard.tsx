@@ -4,7 +4,7 @@ import {
   AccountMetaData,
   Proposal,
   ProposalInstruction,
-} from '../../models/accounts'
+} from '@solana/spl-governance'
 import {
   getAccountName,
   getInstructionDescriptor,
@@ -16,7 +16,7 @@ import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
@@ -31,8 +31,8 @@ export default function InstructionCard({
   proposalInstruction,
 }: {
   index: number
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
 }) {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
@@ -92,7 +92,7 @@ export default function InstructionCard({
     getAmountImg()
   }, [proposalInstruction])
 
-  const proposalAuthority = tokenRecords[proposal.data.owner.toBase58()]
+  const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
   return (
     <div className="break-all">
       <h3 className="mb-4 flex">

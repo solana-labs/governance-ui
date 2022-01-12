@@ -1,10 +1,10 @@
-import { Governance, Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { Governance, Proposal } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { useIsBeyondTimestamp } from './useIsBeyondTimestamp'
 
 export const useHasVoteTimeExpired = (
-  governance: ParsedAccount<Governance> | undefined,
-  proposal: ParsedAccount<Proposal>
+  governance: ProgramAccount<Governance> | undefined,
+  proposal: ProgramAccount<Proposal>
 ) => {
   return useIsBeyondTimestamp(
     proposal

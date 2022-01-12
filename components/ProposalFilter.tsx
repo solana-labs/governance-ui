@@ -3,7 +3,7 @@ import styled from '@emotion/styled'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Disclosure } from '@headlessui/react'
 import Switch from './Switch'
-import { ProposalState } from 'models/accounts'
+import { ProposalState } from '@solana/spl-governance'
 
 const initialFilterSettings = {
   [ProposalState.Cancelled]: true,

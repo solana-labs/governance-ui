@@ -2,7 +2,7 @@ import {
   DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
 } from '@components/instructions/tools'
-import { GovernanceAccountType } from '@models/accounts'
+import { GovernanceAccountType } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import {
   getMultipleAccountInfoChunked,

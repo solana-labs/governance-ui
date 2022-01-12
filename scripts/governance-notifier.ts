@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { getConnectionContext } from 'utils/connection'
-import { pubkeyFilter } from 'models/core/api'
-import { getAccountTypes, Governance, Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { pubkeyFilter } from '@solana/spl-governance'
+import { getAccountTypes, Governance, Proposal } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { getCertifiedRealmInfo } from '../models/registry/api'
 import { getGovernanceAccounts } from './api'
 
@@ -32,7 +32,7 @@ async function runNotifier() {
     MAINNET_RPC_NODE,
     Governance,
     getAccountTypes(Governance),
-    [pubkeyFilter(1, realmInfo!.realmId)]
+    [pubkeyFilter(1, realmInfo!.realmId)!]
   )
 
   const governanceIds = Object.keys(governances).map((k) => new PublicKey(k))
@@ -44,13 +44,13 @@ async function runNotifier() {
         MAINNET_RPC_NODE,
         Proposal,
         getAccountTypes(Proposal),
-        [pubkeyFilter(1, governanceId)]
+        [pubkeyFilter(1, governanceId)!]
       )
     })
   )
 
   const proposals: {
-    [proposal: string]: ParsedAccount<Proposal>
+    [proposal: string]: ProgramAccount<Proposal>
   } = Object.assign({}, ...proposalsByGovernance)
 
   const realmGovernances = Object.fromEntries(

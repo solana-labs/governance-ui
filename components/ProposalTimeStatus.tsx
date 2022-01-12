@@ -1,6 +1,6 @@
 import { ClockIcon } from '@heroicons/react/outline'
 import useRealm from '../hooks/useRealm'
-import { Proposal, ProposalState } from '../models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import { fmtUnixTime } from '../utils/formatting'
 import { VoteCountdown } from './VoteCountdown'
 
