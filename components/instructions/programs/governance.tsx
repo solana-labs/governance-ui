@@ -1,4 +1,9 @@
-import { AccountMetaData, VoteWeightSource } from '@solana/spl-governance'
+import {
+  AccountMetaData,
+  getGovernance,
+  getRealm,
+  VoteWeightSource,
+} from '@solana/spl-governance'
 import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
@@ -8,7 +13,6 @@ import { Connection } from '@solana/web3.js'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
-import { getGovernance, getRealm } from '@models/api'
 import { tryGetMint } from '../../../utils/tokens'
 
 export const GOVERNANCE_INSTRUCTIONS = {
