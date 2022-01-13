@@ -182,7 +182,6 @@ const TokenDeposit = ({
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
-
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
     if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(

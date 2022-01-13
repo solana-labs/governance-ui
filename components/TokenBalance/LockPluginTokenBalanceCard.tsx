@@ -1,21 +1,25 @@
-import { MintInfo } from '@solana/spl-token'
+import { MintInfo, Token } from '@solana/spl-token'
 import {
   Keypair,
   PublicKey,
+  SystemProgram,
+  SYSVAR_RENT_PUBKEY,
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '../../hooks/useRealm'
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  Proposal,
+  ProposalState,
+  withCreateTokenOwnerRecord,
+} from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '../../models/api'
 import { getProposal } from '@solana/spl-governance'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '../../utils/send'
-import { approveTokenTransfer } from '../../utils/tokens'
 import Button from '../Button'
 import { Option } from '../../tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
@@ -30,7 +34,9 @@ import {
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import Tooltip from '@components/Tooltip'
-import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from '@hooks/useVoteRegistry'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -39,7 +45,6 @@ const LockPluginTokenBalanceCard = ({
 }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol } = useRealm()
-
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -60,12 +65,14 @@ const LockPluginTokenBalanceCard = ({
   )
 
   const hasLoaded = mint || councilMint
-
+  const backLink = fmtUrlWithCluster(`/dao/${symbol}/account`)
+    ? fmtUrlWithCluster(`/dao/${symbol}/account`)
+    : ''
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4 flex">
         Account
-        <Link href={fmtUrlWithCluster(`/dao/${symbol}/account`)}>
+        <Link href={backLink}>
           <ArrowsExpandIcon className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer"></ArrowsExpandIcon>
         </Link>
       </h3>
@@ -114,6 +121,7 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
+  const { client, getRegistrar } = useVoteRegistry()
   const {
     realm,
     realmInfo,
@@ -123,6 +131,7 @@ const TokenDeposit = ({
     councilTokenAccount,
     proposals,
     governances,
+    tokenRecords,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
@@ -153,46 +162,114 @@ const TokenDeposit = ({
   }`
 
   const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Keypair[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      depositTokenAccount!.publicKey,
-      wallet!.publicKey!,
-      amount
+    const { registrar } = await getRegistrar()
+    const SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey(
+      'Sysvar1nstructions1111111111111111111111111'
+    )
+    const systemProgram = SystemProgram.programId
+    const rent = SYSVAR_RENT_PUBKEY
+    const [voter, voterBump] = await PublicKey.findProgramAddress(
+      [
+        registrar.toBuffer(),
+        Buffer.from('voter'),
+        wallet!.publicKey!.toBuffer(),
+      ],
+      client!.program.programId
+    )
+    const [voterWeight, voterWeightBump] = await PublicKey.findProgramAddress(
+      [
+        registrar.toBuffer(),
+        Buffer.from('voter-weight-record'),
+        wallet!.publicKey!.toBuffer(),
+      ],
+      client!.program.programId
     )
 
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo!.programId,
-      getProgramVersionForRealm(realmInfo!),
-      realm!.pubkey,
-      depositTokenAccount!.publicKey,
-      depositTokenAccount!.account.mint,
-      wallet!.publicKey!,
-      transferAuthority.publicKey,
-      wallet!.publicKey!,
-      amount
+    if (!tokenRecords[wallet!.publicKey!.toBase58()]) {
+      const instruction: TransactionInstruction[] = []
+      await withCreateTokenOwnerRecord(
+        instruction,
+        new PublicKey(realm!.owner.toString()),
+        realm!.pubkey,
+        wallet!.publicKey!,
+        realm!.account.communityMint,
+        wallet!.publicKey!
+      )
+      const transaction = new Transaction()
+      transaction.add(...instruction)
+      const signers: Keypair[] = []
+      await sendTransaction({
+        transaction,
+        wallet,
+        connection,
+        signers,
+        sendingMessage: `creating owner record`,
+        successMessage: `owner eco created`,
+      })
+    }
+    try {
+      await client?.program.account.voter.fetch(voter)
+    } catch (e) {
+      console.log(e)
+      await client?.program.rpc.createVoter(voterBump, voterWeightBump, {
+        accounts: {
+          registrar: registrar,
+          voter: voter,
+          voterAuthority: wallet!.publicKey!,
+          voterWeightRecord: voterWeight,
+          payer: wallet!.publicKey!,
+          systemProgram: systemProgram,
+          rent: rent,
+          instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
+        },
+      })
+      const ataPk = await Token.getAssociatedTokenAddress(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        realm!.account.communityMint,
+        voter
+      )
+      await client?.program.rpc.createDepositEntry(
+        0,
+        { none: {} },
+        new BN(new Date().getTime()),
+        0,
+        false,
+        {
+          accounts: {
+            registrar: registrar,
+            voter: voter,
+            payer: wallet!.publicKey!,
+            voterAuthority: wallet!.publicKey!,
+            depositMint: realm!.account.communityMint,
+            rent: rent,
+            systemProgram: systemProgram,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            vault: ataPk,
+          },
+        }
+      )
+    }
+    const toAtaPk = await Token.getAssociatedTokenAddress(
+      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+      realm!.account.communityMint,
+      voter
     )
-
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
+    await client?.program.rpc.deposit(0, new BN(10000), {
+      accounts: {
+        registrar: registrar,
+        voter: voter,
+        vault: toAtaPk,
+        depositToken: realmTokenAccount!.publicKey,
+        depositAuthority: wallet!.publicKey!,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
     })
 
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    // await fetchWalletTokenAccounts()
+    // await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const depositAllTokens = async () =>
