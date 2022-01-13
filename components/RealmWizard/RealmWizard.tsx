@@ -171,6 +171,7 @@ const RealmWizard: React.FC = () => {
       CreateFormSchema,
       form
     )
+
     if (isValid) {
       try {
         const realmAddress = await registerRealm(
