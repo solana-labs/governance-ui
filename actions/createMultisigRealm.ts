@@ -1,14 +1,15 @@
 import {
+  getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
   VoteWeightSource,
-} from '@models/accounts'
-import { ProgramVersion } from '@models/registry/constants'
-import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
-import { withCreateRealm } from '@models/withCreateRealm'
-import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
-import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
+} from '@solana/spl-governance'
+
+import { withCreateMintGovernance } from '@solana/spl-governance'
+import { withCreateRealm } from '@solana/spl-governance'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
+import { withSetRealmAuthority } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import {
   Connection,
@@ -31,13 +32,14 @@ import {
   WalletSigner,
 } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
 export const createMultisigRealm = async (
   connection: Connection,
   programId: PublicKey,
-  programVersion: ProgramVersion,
+  programVersion: number,
 
   name: string,
   yesVoteThreshold: number,
@@ -57,7 +59,7 @@ export const createMultisigRealm = async (
     MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
 
   // The community mint is going to have 0 supply and we arbitrarily set it to 1m
-  const minCommunityTokensToCreate = 1000000
+  const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
 
   // Community mint decimals
   const communityMintDecimals = 6
@@ -85,6 +87,7 @@ export const createMultisigRealm = async (
   )
 
   let walletAtaPk: PublicKey | undefined
+  const tokenAmount = 1
 
   for (const teamWalletPk of councilWalletPks) {
     const ataPk = await withCreateAssociatedTokenAccount(
@@ -100,7 +103,7 @@ export const createMultisigRealm = async (
       councilMintPk,
       ataPk,
       walletPk,
-      1
+      tokenAmount
     )
 
     if (teamWalletPk.equals(walletPk)) {
@@ -138,14 +141,24 @@ export const createMultisigRealm = async (
 
   // If the current wallet is in the team then deposit the council token
   if (walletAtaPk) {
-    tokenOwnerRecordPk = await withDepositGoverningTokens(
+    await withDepositGoverningTokens(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       walletAtaPk,
       councilMintPk,
       walletPk,
       walletPk,
+      walletPk,
+      new BN(tokenAmount)
+    )
+
+    // TODO: return from withDepositGoverningTokens in the SDK
+    tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+      programId,
+      realmPk,
+      councilMintPk,
       walletPk
     )
   } else {
@@ -180,6 +193,7 @@ export const createMultisigRealm = async (
     walletPk,
     walletPk,
     tokenOwnerRecordPk,
+    walletPk,
     walletPk
   )
 
@@ -192,6 +206,7 @@ export const createMultisigRealm = async (
     walletPk,
     walletPk,
     tokenOwnerRecordPk,
+    walletPk,
     walletPk
   )
 

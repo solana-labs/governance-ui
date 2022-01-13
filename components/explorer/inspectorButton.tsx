@@ -1,5 +1,5 @@
 import { dryRunInstruction } from '../../actions/dryRunInstruction'
-import { InstructionData } from '../../models/accounts'
+import { InstructionData } from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
 import { getExplorerInspectorUrl } from './tools'
 import { SecondaryButton } from '../Button'

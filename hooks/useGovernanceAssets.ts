@@ -2,7 +2,7 @@ import {
   DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
 } from '@components/instructions/tools'
-import { GovernanceAccountType } from '@models/accounts'
+import { GovernanceAccountType } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import {
   getMultipleAccountInfoChunked,
@@ -25,7 +25,7 @@ export default function useGovernanceAssets() {
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
-      (gov) => gov.info?.accountType === type
+      (gov) => gov.account?.accountType === type
     )
     return governancesFiltered
   }
@@ -33,7 +33,7 @@ export default function useGovernanceAssets() {
     return (
       realm &&
       getGovernancesByAccountType(type).some((g) =>
-        ownVoterWeight.canCreateProposal(g.info.config)
+        ownVoterWeight.canCreateProposal(g.account.config)
       )
     )
   }
@@ -43,8 +43,8 @@ export default function useGovernanceAssets() {
     )
     return !!governances.find(
       (x) =>
-        x.info.governedAccount.toBase58() ==
-        realm?.info.communityMint.toBase58()
+        x.account.governedAccount.toBase58() ==
+        realm?.account.communityMint.toBase58()
     )
   }
   const canMintRealmCouncilToken = () => {
@@ -54,8 +54,8 @@ export default function useGovernanceAssets() {
 
     return !!governances.find(
       (x) =>
-        x.info.governedAccount.toBase58() ==
-        realm?.info.config.councilMint?.toBase58()
+        x.account.governedAccount.toBase58() ==
+        realm?.account.config.councilMint?.toBase58()
     )
   }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
@@ -74,7 +74,7 @@ export default function useGovernanceAssets() {
   const canUseAnyInstruction =
     realm &&
     governancesArray.some((g) =>
-      ownVoterWeight.canCreateProposal(g.info.config)
+      ownVoterWeight.canCreateProposal(g.account.config)
     )
 
   const getAvailableInstructions = () => {
@@ -87,7 +87,7 @@ export default function useGovernanceAssets() {
     const governedTokenAccounts: GovernedTokenAccount[] = []
     for (const i of tokenGovernances) {
       const realmTokenAccount = realmTokenAccounts.find(
-        (x) => x.publicKey.toBase58() === i.info.governedAccount.toBase58()
+        (x) => x.publicKey.toBase58() === i.account.governedAccount.toBase58()
       )
       const mint = tokenMints.find(
         (x) =>
@@ -110,7 +110,7 @@ export default function useGovernanceAssets() {
     const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
       connection,
-      mintGovernances.map((x) => x.info.governedAccount)
+      mintGovernances.map((x) => x.account.governedAccount)
     )
     mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
       const governance = mintGovernances[index]
@@ -139,7 +139,7 @@ export default function useGovernanceAssets() {
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
     (g) =>
       g.governance &&
-      ownVoterWeight.canCreateProposal(g.governance?.info?.config)
+      ownVoterWeight.canCreateProposal(g.governance?.account?.config)
   )
 
   const availableInstructions = [
@@ -174,7 +174,7 @@ export default function useGovernanceAssets() {
       isVisible:
         realm &&
         Object.values(governances).some((g) =>
-          ownVoterWeight.canCreateProposal(g.info.config)
+          ownVoterWeight.canCreateProposal(g.account.config)
         ),
     },
   ]

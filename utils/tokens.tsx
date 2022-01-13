@@ -13,8 +13,8 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ParsedAccount } from '@models/core/accounts'
-import { Governance } from '@models/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { chunks } from './helpers'
 import { getAccountName } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
@@ -27,26 +27,26 @@ import { NFTWithMint } from './uiTypes/nfts'
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
 export type GovernedTokenAccount = {
-  token: ProgramAccount<AccountInfo> | undefined
-  mint: ProgramAccount<MintInfo> | undefined
-  governance: ParsedAccount<Governance> | undefined
+  token: TokenProgramAccount<AccountInfo> | undefined
+  mint: TokenProgramAccount<MintInfo> | undefined
+  governance: ProgramAccount<Governance> | undefined
   isNft: boolean
 }
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedProgramAccount = {
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedMultiTypeAccount = {
-  token?: ProgramAccount<AccountInfo> | undefined
-  mint?: ProgramAccount<MintInfo> | undefined
-  governance: ParsedAccount<Governance>
+  token?: TokenProgramAccount<AccountInfo> | undefined
+  mint?: TokenProgramAccount<MintInfo> | undefined
+  governance: ProgramAccount<Governance>
   mintInfo?: MintInfo | undefined
 }
 
-export type ProgramAccount<T> = {
+export type TokenProgramAccount<T> = {
   publicKey: PublicKey
   account: T
 }
@@ -54,7 +54,7 @@ export type ProgramAccount<T> = {
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<TokenAccount>[]> {
+): Promise<TokenProgramAccount<TokenAccount>[]> {
   const results = await connection.getTokenAccountsByOwner(publicKey, {
     programId: TOKEN_PROGRAM_ID,
   })
@@ -69,7 +69,7 @@ export async function getOwnedTokenAccounts(
 export const getTokenAccountsByMint = async (
   connection: Connection,
   mint: string
-): Promise<ProgramAccount<TokenAccount>[]> => {
+): Promise<TokenProgramAccount<TokenAccount>[]> => {
   const results = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
     filters: [
       {
@@ -94,7 +94,7 @@ export const getTokenAccountsByMint = async (
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<MintAccount> | undefined> {
+): Promise<TokenProgramAccount<MintAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
     const data = Buffer.from(result!.data)
@@ -111,7 +111,7 @@ export async function tryGetMint(
 export async function tryGetTokenAccount(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<TokenAccount> | undefined> {
+): Promise<TokenProgramAccount<TokenAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
 
@@ -134,7 +134,7 @@ export async function tryGetTokenAccount(
 export async function tryGetTokenMint(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<MintAccount> | undefined> {
+): Promise<TokenProgramAccount<MintAccount> | undefined> {
   const tokenAccount = await tryGetTokenAccount(connection, publicKey)
   return tokenAccount && tryGetMint(connection, tokenAccount.account.mint)
 }
@@ -300,12 +300,12 @@ export function getMintAccountLabelInfo(
   let imgUrl = ''
   if (acc?.mintInfo && acc.governance) {
     const info = tokenService.getTokenInfo(
-      acc.governance.info.governedAccount.toBase58()
+      acc.governance.account.governedAccount.toBase58()
     )
     imgUrl = info?.logoURI ? info.logoURI : ''
-    account = acc.governance?.info.governedAccount.toBase58()
+    account = acc.governance?.account.governedAccount.toBase58()
     tokenName = info?.name ? info.name : ''
-    mintAccountName = getAccountName(acc.governance.info.governedAccount)
+    mintAccountName = getAccountName(acc.governance.account.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
       acc.mintInfo,
       acc?.mintInfo.supply

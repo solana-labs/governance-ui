@@ -1,10 +1,10 @@
 // import useWalletStore from '../stores/useWalletStore'
 import { calculateBalance } from '../utils/balance'
-import { ProgramAccount, TokenAccount } from '../utils/tokens'
+import { TokenProgramAccount, TokenAccount } from '../utils/tokens'
 
 export function findLargestBalanceAccountForMint(
   mints,
-  tokenAccounts: ProgramAccount<TokenAccount>[],
+  tokenAccounts: TokenProgramAccount<TokenAccount>[],
   mintPk
 ) {
   const accounts = tokenAccounts.filter((a) => a.account.mint.equals(mintPk))

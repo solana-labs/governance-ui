@@ -1,17 +1,18 @@
 import moment from 'moment'
 import React from 'react'
-import { VoteRecord } from '../../models/accounts'
+import { VoteRecord } from '@solana/spl-governance'
 import {
   CheckCircleIcon,
   UserCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
-import { ChatMessage } from '../../models/chat/accounts'
+import { ChatMessage } from '@solana/spl-governance'
 import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
 import useRealm from '../../hooks/useRealm'
 import { MintInfo } from '@solana/spl-token'
 import { isPublicKey } from '@tools/core/pubkey'
+import { getVoteWeight, isYesVote } from '@models/voteRecords'
 
 const Comment = ({
   chatMessage,
@@ -60,17 +61,17 @@ const Comment = ({
         {voteRecord && (
           <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
             <div className="flex items-center pr-2 text-fgd-1 text-xs">
-              {voteRecord.isYes() ? (
+              {isYesVote(voteRecord) ? (
                 <CheckCircleIcon className="h-5 mr-1 text-green w-5" />
               ) : (
                 <XCircleIcon className="h-5 mr-1 text-red w-5" />
               )}
-              {voteRecord.isYes() ? 'Approve' : 'Deny'}
+              {isYesVote(voteRecord) ? 'Approve' : 'Deny'}
             </div>
             <span className="text-fgd-4">|</span>
             <span className="pl-2 text-xs">
               {`${fmtTokenAmount(
-                voteRecord.getVoteWeight(),
+                getVoteWeight(voteRecord)!,
                 proposalMint?.decimals
               ).toLocaleString()} ${voteSymbol}`}
             </span>

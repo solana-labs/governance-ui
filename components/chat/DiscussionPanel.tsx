@@ -20,12 +20,15 @@ const DiscussionPanel = () => {
       </div>
       {Object.values(chatMessages)
         .sort(
-          (m1, m2) => m2.info.postedAt.toNumber() - m1.info.postedAt.toNumber()
+          (m1, m2) =>
+            m2.account.postedAt.toNumber() - m1.account.postedAt.toNumber()
         )
         .map((cm) => (
           <Comment
-            chatMessage={cm.info}
-            voteRecord={voteRecordsByVoter[cm.info.author.toBase58()]?.info}
+            chatMessage={cm.account}
+            voteRecord={
+              voteRecordsByVoter[cm.account.author.toBase58()]?.account
+            }
             key={cm.pubkey.toBase58()}
             proposalMint={proposalMint}
           />

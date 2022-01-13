@@ -6,7 +6,7 @@ import {
   getMultipleAccountInfoChunked,
   getTokenAccountsByMint,
   parseTokenAccountData,
-  ProgramAccount,
+  TokenProgramAccount,
 } from '@utils/tokens'
 import {
   AccountInfo,
@@ -25,12 +25,12 @@ export default function useMembers() {
   const previousRealmPubKey = usePrevious(realm?.pubkey.toBase58()) as string
 
   const fetchCouncilMembersWithTokensOutsideRealm = async () => {
-    if (realm?.info.config.councilMint) {
+    if (realm?.account.config.councilMint) {
       const tokenAccounts = await getTokenAccountsByMint(
         connection.current,
-        realm.info.config.councilMint.toBase58()
+        realm.account.config.councilMint.toBase58()
       )
-      const tokenAccountsInfo: ProgramAccount<AccountInfo>[] = []
+      const tokenAccountsInfo: TokenProgramAccount<AccountInfo>[] = []
       for (const acc of tokenAccounts) {
         tokenAccountsInfo.push(acc)
       }
@@ -47,22 +47,22 @@ export default function useMembers() {
 
   //This will need to be rewritten for better performance if some realm hits more then +-5k+ members
   const fetchCommunityMembersATAS = async () => {
-    if (realm?.info.communityMint) {
+    if (realm?.account.communityMint) {
       const ATAS: PublicKey[] = []
       //we filter out people who never voted and has tokens inside realm
       const communityTokenRecordsWallets = tokenRecordArray
         .filter(
           (x) =>
-            x.community?.info.totalVotesCount &&
-            x.community?.info.totalVotesCount > 0 &&
-            x.community.info.governingTokenDepositAmount.isZero()
+            x.community?.account.totalVotesCount &&
+            x.community?.account.totalVotesCount > 0 &&
+            x.community.account.governingTokenDepositAmount.isZero()
         )
         .map((x) => x.walletAddress)
       for (const walletAddress of communityTokenRecordsWallets) {
         const ata = await Token.getAssociatedTokenAddress(
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          realm!.info.communityMint, // mint
+          realm!.account.communityMint, // mint
           new PublicKey(walletAddress) // owner
         )
         ATAS.push(ata)
@@ -71,7 +71,7 @@ export default function useMembers() {
         connection.current,
         ATAS
       )
-      const ownersAtasParsed: ProgramAccount<AccountInfo>[] = ownersAtas
+      const ownersAtasParsed: TokenProgramAccount<AccountInfo>[] = ownersAtas
         .filter((x) => x)
         .map((r) => {
           const publicKey = r!.owner
@@ -150,8 +150,8 @@ export default function useMembers() {
   const communityAndCouncilTokenRecords = [
     ...tokenRecordArray.filter(
       (x) =>
-        x.community?.info.totalVotesCount &&
-        x.community?.info.totalVotesCount > 0
+        x.community?.account.totalVotesCount &&
+        x.community?.account.totalVotesCount > 0
     ),
     ...councilRecordArray,
   ]
@@ -174,17 +174,17 @@ export default function useMembers() {
                     ...acc,
                     walletAddress: curr.walletAddress,
                     communityVotes: curr.community
-                      ? curr.community.info.governingTokenDepositAmount
+                      ? curr.community.account.governingTokenDepositAmount
                       : acc.communityVotes,
                     councilVotes: curr.council
-                      ? curr.council.info.governingTokenDepositAmount
+                      ? curr.council.account.governingTokenDepositAmount
                       : acc.councilVotes,
                   }
                   if (curr.community) {
-                    obj['votesCasted'] += curr.community.info.totalVotesCount
+                    obj['votesCasted'] += curr.community.account.totalVotesCount
                   }
                   if (curr.council) {
-                    obj['votesCasted'] += curr.council.info.totalVotesCount
+                    obj['votesCasted'] += curr.council.account.totalVotesCount
                   }
                   return obj
                 },

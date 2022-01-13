@@ -1,4 +1,4 @@
-import { InstructionData } from '../models/accounts'
+import { InstructionData } from '@solana/spl-governance'
 
 import {
   Connection,

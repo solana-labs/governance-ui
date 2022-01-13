@@ -3,7 +3,7 @@ import useRealm from 'hooks/useRealm'
 import React, { useEffect, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
 import ProposalCard from 'components/ProposalCard'
-import { Proposal, ProposalState } from 'models/accounts'
+import { Proposal, ProposalState } from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
@@ -55,13 +55,13 @@ const REALM = () => {
   const wallet = useWalletStore((s) => s.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].info, a[1].info)
+    compareProposals(b[1].account, a[1].account)
   )
 
   useEffect(() => {
     if (filters.length > 0) {
       const proposals = displayedProposals.filter(
-        ([, v]) => !filters.includes(v.info.state)
+        ([, v]) => !filters.includes(v.account.state)
       )
       setFilteredProposals(proposals)
     } else {
@@ -72,7 +72,7 @@ const REALM = () => {
   useEffect(() => {
     const proposals =
       filters.length > 0
-        ? allProposals.filter(([, v]) => !filters.includes(v.info.state))
+        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
         : allProposals
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
@@ -131,7 +131,7 @@ const REALM = () => {
                 <ProposalCard
                   key={k}
                   proposalPk={new PublicKey(k)}
-                  proposal={v.info}
+                  proposal={v.account}
                 />
               ))
             ) : (

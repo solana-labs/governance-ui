@@ -1,21 +1,21 @@
 import { CogIcon } from '@heroicons/react/outline'
 import { ViewState } from './types'
 import useAssetsStore from 'stores/useAssetsStore'
-import { ParsedAccount } from '@models/core/accounts'
-import { Governance } from '@models/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { getProgramName } from '@components/instructions/programs/names'
 import { abbreviateAddress } from '@utils/formatting'
 import { PublicKey } from '@solana/web3.js'
 
-const MemberItem = ({ item }: { item: ParsedAccount<Governance> }) => {
+const MemberItem = ({ item }: { item: ProgramAccount<Governance> }) => {
   const { setCurrentCompactView, setCurrentCompactViewAsset } = useAssetsStore()
-  const name = item ? getProgramName(item.info.governedAccount) : ''
+  const name = item ? getProgramName(item.account.governedAccount) : ''
   async function handleGoToMemberOverview() {
     setCurrentCompactView(ViewState.AssetOverview)
     setCurrentCompactViewAsset(item)
   }
   const governedAccount = item
-    ? abbreviateAddress(item?.info.governedAccount as PublicKey)
+    ? abbreviateAddress(item?.account.governedAccount as PublicKey)
     : ''
   return (
     <div

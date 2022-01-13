@@ -1,5 +1,5 @@
 import { Connection, PublicKey } from '@solana/web3.js'
-import { AccountMetaData } from '../../../models/accounts'
+import { AccountMetaData } from '@solana/spl-governance'
 import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
