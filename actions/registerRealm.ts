@@ -31,7 +31,6 @@ import {
 } from '@solana/wallet-adapter-base'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import {
-  getMintNaturalAmountFromDecimal,
   getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
 } from '@tools/sdk/units'
