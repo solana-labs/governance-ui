@@ -78,9 +78,10 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
   const getSupplyPercent = () => {
     const hasMinTokensPercentage =
       !!minTokensPercentage && !isNaN(minTokensPercentage)
-    const percent = hasMinTokensPercentage
-      ? fmtPercentage(minTokensPercentage)
-      : ''
+    const percent =
+      hasMinTokensPercentage && minTokensPercentage
+        ? fmtPercentage(minTokensPercentage)
+        : ''
     return hasMinTokensPercentage && <div>{`${percent} of token supply`}</div>
   }
 

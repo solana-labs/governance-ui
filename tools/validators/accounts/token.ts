@@ -1,7 +1,7 @@
 // Copied from Explorer code https://github.com/solana-labs/solana/blob/master/explorer/src/validators/accounts/token.ts
 
 import { PublicKey } from '@solana/web3.js'
-import { ProgramAccount, TokenAccount } from '@utils/tokens'
+import { TokenProgramAccount, TokenAccount } from '@utils/tokens'
 import {
   Infer,
   number,
@@ -36,7 +36,7 @@ export const TokenAccountInfo = type({
 })
 
 export function validateTokenAccountMint(
-  tokenAccount: ProgramAccount<TokenAccount>,
+  tokenAccount: TokenProgramAccount<TokenAccount>,
   mint: PublicKey | undefined
 ) {
   if (mint && tokenAccount.account.mint.toBase58() !== mint.toBase58()) {

@@ -1,16 +1,16 @@
 import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
 
-import { Proposal, ProposalInstruction } from '../models/accounts'
+import { Proposal, ProposalInstruction } from '@solana/spl-governance'
 
-import { withExecuteInstruction } from '../models/withExecuteInstruction'
-import { RpcContext } from '@models/core/api'
-import { ParsedAccount } from '@models/core/accounts'
+import { withExecuteInstruction } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 
 export const executeInstruction = async (
   { connection, wallet, programId }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
-  instruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>,
+  instruction: ProgramAccount<ProposalInstruction>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -18,10 +18,10 @@ export const executeInstruction = async (
   await withExecuteInstruction(
     instructions,
     programId,
-    proposal.info.governance,
+    proposal.account.governance,
     proposal.pubkey,
     instruction.pubkey,
-    instruction.info.instruction
+    instruction.account.instruction
   )
 
   const transaction = new Transaction()

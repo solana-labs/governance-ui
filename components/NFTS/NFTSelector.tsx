@@ -11,6 +11,7 @@ import { CheckCircleIcon } from '@heroicons/react/solid'
 import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
+import ImgWithLoader from '@components/ImgWithLoader'
 
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
@@ -84,7 +85,7 @@ function NFTSelector(
                   ) && (
                     <CheckCircleIcon className="w-10 h-10 absolute text-green"></CheckCircleIcon>
                   )}
-                  <img style={{ width: '150px' }} src={x.val.image} />
+                  <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />
                 </div>
               ))}
             </div>

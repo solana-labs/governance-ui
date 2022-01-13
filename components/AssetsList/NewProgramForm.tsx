@@ -4,7 +4,7 @@ import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
@@ -18,9 +18,11 @@ import BaseGovernanceForm, {
   BaseGovernanceFormFields,
 } from './BaseGovernanceForm'
 import { registerGovernance } from 'actions/registerGovernance'
-import { GovernanceType } from 'models/enums'
+import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { getProgramVersionForRealm } from '@models/registry/api'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -28,7 +30,10 @@ interface NewProgramForm extends BaseGovernanceFormFields {
 
 const defaultFormValues = {
   programId: '',
-  minCommunityTokensToCreateProposal: 100,
+  // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
+  // This should be dynamic and set to 1% of the community mint supply or
+  // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
+  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
@@ -78,10 +83,11 @@ const NewProgramForm = () => {
       setFormErrors(validationErrors)
       if (isValid && realmMint) {
         setIsLoading(true)
+
         const rpcContext = new RpcContext(
-          new PublicKey(realm.account.owner.toString()),
-          realmInfo?.programVersion,
-          wallet,
+          new PublicKey(realm.owner.toString()),
+          getProgramVersionForRealm(realmInfo!),
+          wallet!,
           connection.current,
           connection.endpoint
         )

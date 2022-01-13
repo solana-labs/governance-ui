@@ -1,18 +1,19 @@
 import React from 'react'
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
 import { executeInstruction } from 'actions/executeInstruction'
-import { ProposalInstruction } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProposalInstruction } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 type ExecuteInstructionProps = {
   onClose: () => void
   isOpen: boolean
-  instruction: ParsedAccount<ProposalInstruction> | any
+  instruction: ProgramAccount<ProposalInstruction> | any
 }
 
 const ExecuteInstruction = ({
@@ -29,9 +30,9 @@ const ExecuteInstruction = ({
     try {
       if (proposal && realmInfo) {
         const rpcContext = new RpcContext(
-          proposal.account.owner,
-          realmInfo?.programVersion,
-          wallet,
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
           connection.current,
           connection.endpoint
         )

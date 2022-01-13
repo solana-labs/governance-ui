@@ -5,8 +5,9 @@ import Tooltip from '@components/Tooltip'
 import { CogIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { getProgramSlot } from '@models/registry/api'
+
 import { PublicKey } from '@solana/web3.js'
+import { getProgramSlot } from '@tools/sdk/bpfUpgradeableLoader/accounts'
 import { abbreviateAddress } from '@utils/formatting'
 import React, { useEffect, useState } from 'react'
 import useAssetsStore from 'stores/useAssetsStore'
@@ -20,23 +21,19 @@ const AssetOverview = () => {
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const name = currentAsset
-    ? getProgramName(currentAsset.info.governedAccount)
+    ? getProgramName(currentAsset.account.governedAccount)
     : ''
   const governedAccount = currentAsset
-    ? abbreviateAddress(currentAsset?.info.governedAccount as PublicKey)
+    ? abbreviateAddress(currentAsset?.account.governedAccount as PublicKey)
     : ''
-  const programId = currentAsset!.info.governedAccount.toBase58()
+  const programId = currentAsset!.account.governedAccount.toBase58()
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
   useEffect(() => {
     const handleSetProgramVersion = async () => {
-      const slot = await getProgramSlot(
-        connection.current,
-        programId,
-        connection.endpoint
-      )
+      const slot = await getProgramSlot(connection.current, programId)
       setSlot(slot)
     }
     handleSetProgramVersion()
@@ -57,7 +54,7 @@ const AssetOverview = () => {
               currentAsset
                 ? getExplorerUrl(
                     connection.endpoint,
-                    currentAsset?.info.governedAccount.toBase58()
+                    currentAsset?.account.governedAccount.toBase58()
                   )
                 : ''
             }

@@ -1,6 +1,6 @@
 import { Connection } from '@solana/web3.js'
 import { nu64, struct, u8 } from 'buffer-layout'
-import { AccountMetaData } from '../../../models/accounts'
+import { AccountMetaData } from '@solana/spl-governance'
 import { fmtMintAmount } from '../../../tools/sdk/units'
 import { tryGetTokenMint } from '../../../utils/tokens'
 
