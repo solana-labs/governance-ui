@@ -1,18 +1,18 @@
-import { Proposal } from '@models/accounts'
+import { Proposal } from '@solana/spl-governance'
 import TokenBalanceCard from './TokenBalanceCard'
 import { Option } from 'tools/core/option'
 import LockPluginTokenBalanceCard from './LockPluginTokenBalanceCard'
-//import useRealm from '@hooks/useRealm'
+import useRealm from '@hooks/useRealm'
 
 const TokenBalanceCardWrapper = ({
   proposal,
 }: {
   proposal?: Option<Proposal>
 }) => {
-  //const { realmInfo } = useRealm()
+  const { realm } = useRealm()
   const getTokenBalanceCard = () => {
     //based on realm config it will provide proper tokenBalanceCardComponent
-    const isLockTokensMode = true
+    const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
     if (isLockTokensMode) {
       return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
     }

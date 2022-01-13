@@ -100,7 +100,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   const { ownTokenRecord, mint, realm } = useRealm()
   const depositedTokens =
     ownTokenRecord && mint
-      ? fmtMintAmount(mint, ownTokenRecord.info.governingTokenDepositAmount)
+      ? fmtMintAmount(mint, ownTokenRecord.account.governingTokenDepositAmount)
       : '0'
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
   //TODO get tokens from wallet
@@ -111,15 +111,17 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     ownTokenRecord && mint
       ? getMintDecimalAmount(
           mint,
-          ownTokenRecord.info.governingTokenDepositAmount
+          ownTokenRecord.account.governingTokenDepositAmount
         )
       : 0
   const maxAmountFtm =
     ownTokenRecord && mint
-      ? fmtMintAmount(mint, ownTokenRecord.info.governingTokenDepositAmount)
+      ? fmtMintAmount(mint, ownTokenRecord.account.governingTokenDepositAmount)
       : '0'
   //
-  const tokenName = mint ? getMintMetadata(realm?.info.communityMint)?.name : ''
+  const tokenName = mint
+    ? getMintMetadata(realm?.account.communityMint)?.name
+    : ''
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>(undefined)
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')

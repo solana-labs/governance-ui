@@ -1,14 +1,14 @@
 import Button from '@components/Button'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useRealm from '@hooks/useRealm'
-import { ProposalState } from '@models/accounts'
-import { getUnrelinquishedVoteRecords, getProposal } from '@models/api'
-import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
-import { withFinalizeVote } from '@models/withFinalizeVote'
-import { withRelinquishVote } from '@models/withRelinquishVote'
-import { withWithdrawGoverningTokens } from '@models/withWithdrawGoverningTokens'
+import { ProposalState } from '@solana/spl-governance'
+import { getUnrelinquishedVoteRecords } from '@models/api'
+import { getProposal } from '@solana/spl-governance'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
+import { withFinalizeVote } from '@solana/spl-governance'
+import { withRelinquishVote } from '@solana/spl-governance'
+import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { TransactionInstruction, Keypair, Transaction } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { chunks } from '@utils/helpers'
@@ -17,6 +17,7 @@ import { approveTokenTransfer } from '@utils/tokens'
 import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import LockTokensModal from './LockTokensModal'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const LockTokensAccount = () => {
   const wallet = useWalletStore((s) => s.current)
@@ -46,9 +47,9 @@ const LockTokensAccount = () => {
 
   const depositTokenAccount = realmTokenAccount
 
-  const depositMint = realm?.info.communityMint
+  const depositMint = realm?.account.communityMint
 
-  const tokenName = getMintMetadata(depositMint)?.name ?? realm?.info.name
+  const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
 
   const depositTokenName = `${tokenName}`
 
@@ -69,12 +70,14 @@ const LockTokensAccount = () => {
     await withDepositGoverningTokens(
       instructions,
       realmInfo!.programId,
+      getProgramVersionForRealm(realmInfo!),
       realm!.pubkey,
       depositTokenAccount!.publicKey,
       depositTokenAccount!.account.mint,
       wallet!.publicKey!,
       transferAuthority.publicKey,
-      wallet!.publicKey!
+      wallet!.publicKey!,
+      amount
     )
 
     const transaction = new Transaction()
@@ -100,28 +103,29 @@ const LockTokensAccount = () => {
     const instructions: TransactionInstruction[] = []
 
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
-    if (depositTokenRecord!.info!.unrelinquishedVotesCount > 0) {
+    if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(
         realmInfo!.programId,
         endpoint,
-        depositTokenRecord!.info!.governingTokenOwner
+        depositTokenRecord!.account!.governingTokenOwner
       )
 
       for (const voteRecord of Object.values(voteRecords)) {
-        let proposal = proposals[voteRecord.info.proposal.toBase58()]
+        let proposal = proposals[voteRecord.account.proposal.toBase58()]
         if (!proposal) {
           continue
         }
 
-        if (proposal.info.state === ProposalState.Voting) {
+        if (proposal.account.state === ProposalState.Voting) {
           // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
           proposal = await getProposal(connection, proposal.pubkey)
-          if (proposal.info.state === ProposalState.Voting) {
-            const governance = governances[proposal.info.governance.toBase58()]
-            if (proposal.info.getTimeToVoteEnd(governance.info) > 0) {
+          if (proposal.account.state === ProposalState.Voting) {
+            const governance =
+              governances[proposal.account.governance.toBase58()]
+            if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               throw new Error(
-                `Can't withdraw tokens while Proposal ${proposal.info.name} is being voted on. Please withdraw your vote first`
+                `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`
               )
             } else {
               // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
@@ -129,10 +133,10 @@ const LockTokensAccount = () => {
                 instructions,
                 realmInfo!.programId,
                 realm!.pubkey,
-                proposal.info.governance,
+                proposal.account.governance,
                 proposal.pubkey,
-                proposal.info.tokenOwnerRecord,
-                proposal.info.governingTokenMint
+                proposal.account.tokenOwnerRecord,
+                proposal.account.governingTokenMint
               )
             }
           }
@@ -144,12 +148,12 @@ const LockTokensAccount = () => {
         withRelinquishVote(
           instructions,
           realmInfo!.programId,
-          proposal.info.governance,
+          proposal.account.governance,
           proposal.pubkey,
           depositTokenRecord!.pubkey,
-          proposal.info.governingTokenMint,
+          proposal.account.governingTokenMint,
           voteRecord.pubkey,
-          depositTokenRecord!.info.governingTokenOwner,
+          depositTokenRecord!.account.governingTokenOwner,
           wallet!.publicKey!
         )
       }
@@ -160,9 +164,8 @@ const LockTokensAccount = () => {
       realmInfo!.programId,
       realm!.pubkey,
       depositTokenAccount!.publicKey,
-      depositTokenRecord!.info.governingTokenMint,
-      wallet!.publicKey!,
-      TOKEN_PROGRAM_ID
+      depositTokenRecord!.account.governingTokenMint,
+      wallet!.publicKey!
     )
 
     try {
@@ -197,7 +200,7 @@ const LockTokensAccount = () => {
 
   const hasTokensDeposited =
     depositTokenRecord &&
-    depositTokenRecord.info.governingTokenDepositAmount.gt(new BN(0))
+    depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0))
 
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'
@@ -215,7 +218,10 @@ const LockTokensAccount = () => {
 
   const availableTokens =
     depositTokenRecord && mint
-      ? fmtMintAmount(mint, depositTokenRecord.info.governingTokenDepositAmount)
+      ? fmtMintAmount(
+          mint,
+          depositTokenRecord.account.governingTokenDepositAmount
+        )
       : '0'
 
   //   const canShowAvailableTokensMessage =
