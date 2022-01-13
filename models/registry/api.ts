@@ -1,5 +1,5 @@
-import { PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance'
-import { getRealms } from '@models/api'
+import { getRealms, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance'
+
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { arrayToMap, arrayToUnique } from '@tools/core/script'
@@ -141,7 +141,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
       arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(p.programId, connection.endpoint)
+        getRealms(connection.endpoint, p.programId)
       )
     )
   )
