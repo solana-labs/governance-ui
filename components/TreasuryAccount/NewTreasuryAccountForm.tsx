@@ -6,7 +6,7 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
@@ -15,7 +15,7 @@ import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import { notify } from 'utils/notifications'
 import tokenService, { TokenRecord } from 'utils/services/token'
-import { ProgramAccount, tryGetMint } from 'utils/tokens'
+import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
@@ -23,13 +23,18 @@ import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import Switch from '@components/Switch'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
 const defaultFormValues = {
   mintAddress: '',
-  minCommunityTokensToCreateProposal: 100,
+  // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
+  // This should be dynamic and set to 1% of the community mint supply or
+  // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
+  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
@@ -52,7 +57,7 @@ const NewAccountForm = () => {
     ...defaultFormValues,
   })
   const [tokenInfo, setTokenInfo] = useState<TokenRecord | undefined>(undefined)
-  const [mint, setMint] = useState<ProgramAccount<MintInfo> | null>(null)
+  const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [isNFT, setIsNFT] = useState(false)
@@ -81,10 +86,11 @@ const NewAccountForm = () => {
       setFormErrors(validationErrors)
       if (isValid && realmMint) {
         setIsLoading(true)
+
         const rpcContext = new RpcContext(
-          new PublicKey(realm.account.owner.toString()),
-          realmInfo?.programVersion,
-          wallet,
+          new PublicKey(realm.owner.toString()),
+          getProgramVersionForRealm(realmInfo!),
+          wallet!,
           connection.current,
           connection.endpoint
         )

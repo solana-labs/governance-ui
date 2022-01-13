@@ -5,9 +5,9 @@ import {
   Proposal,
   ProposalInstruction,
   TokenOwnerRecord,
-} from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
-import { RpcContext } from '@models/core/api'
+} from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { PlayState } from './ExecuteInstructionButton'
@@ -16,6 +16,7 @@ import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import { notify } from '@utils/notifications'
 import { PublicKey } from '@solana/web3.js'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -23,10 +24,10 @@ export function FlagInstructionErrorButton({
   playState,
   proposalAuthority,
 }: {
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
   playState: PlayState
-  proposalAuthority: ParsedAccount<TokenOwnerRecord> | undefined
+  proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
@@ -34,7 +35,7 @@ export function FlagInstructionErrorButton({
 
   if (
     playState !== PlayState.Error ||
-    proposalInstruction.info.executionStatus !==
+    proposalInstruction.account.executionStatus !==
       InstructionExecutionStatus.Error ||
     !proposalAuthority
   ) {
@@ -44,9 +45,9 @@ export function FlagInstructionErrorButton({
   const onFlagError = async () => {
     try {
       const rpcContext = new RpcContext(
-        new PublicKey(proposal.account.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
+        new PublicKey(proposal.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
         connection.current,
         connection.endpoint
       )

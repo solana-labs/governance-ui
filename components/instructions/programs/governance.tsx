@@ -1,14 +1,18 @@
-import { AccountMetaData, VoteWeightSource } from '@models/accounts'
+import {
+  AccountMetaData,
+  getGovernance,
+  getRealm,
+  VoteWeightSource,
+} from '@solana/spl-governance'
 import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
-} from '@models/instructions'
-import { GOVERNANCE_SCHEMA } from '@models/serialisation'
+} from '@solana/spl-governance'
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
-import { getGovernance, getRealm } from '@models/api'
 import { tryGetMint } from '../../../utils/tokens'
 
 export const GOVERNANCE_INSTRUCTIONS = {
@@ -28,13 +32,13 @@ export const GOVERNANCE_INSTRUCTIONS = {
         ) as SetGovernanceConfigArgs
 
         const governance = await getGovernance(connection, accounts[0].pubkey)
-        const realm = await getRealm(connection, governance.info.realm)
+        const realm = await getRealm(connection, governance.account.realm)
         const communityMint = await tryGetMint(
           connection,
-          realm.info.communityMint
+          realm.account.communityMint
         )
-        const councilMint = realm.info.config.councilMint
-          ? await tryGetMint(connection, realm.info.config.councilMint)
+        const councilMint = realm.account.config.councilMint
+          ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
 
         return (
@@ -96,7 +100,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const realm = await getRealm(connection, accounts[0].pubkey)
         const communityMint = await tryGetMint(
           connection,
-          realm.info.communityMint
+          realm.account.communityMint
         )
 
         return (

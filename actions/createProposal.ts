@@ -5,13 +5,17 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { withCreateProposal } from '../models/withCreateProposal'
-import { withAddSignatory } from '../models/withAddSignatory'
-import { RpcContext } from '../models/core/api'
-import { withInsertInstruction } from '@models/withInsertInstruction'
-import { InstructionData } from '@models/accounts'
+import {
+  getSignatoryRecordAddress,
+  VoteType,
+  withCreateProposal,
+} from '@solana/spl-governance'
+import { withAddSignatory } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { withInsertInstruction } from '@solana/spl-governance'
+import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
-import { withSignOffProposal } from '@models/withSignOffProposal'
+import { withSignOffProposal } from '@solana/spl-governance'
 
 interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -20,7 +24,7 @@ interface InstructionDataWithHoldUpTime {
 }
 
 export const createProposal = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: PublicKey,
   governance: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -38,9 +42,16 @@ export const createProposal = async (
   const payer = walletPubkey
   const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
+
+  // V2 Approve/Deny configuration
+  const voteType = VoteType.SINGLE_CHOICE
+  const options = ['Approve']
+  const useDenyOption = true
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
+    programVersion,
     realm,
     governance,
     tokenOwnerRecord,
@@ -49,10 +60,13 @@ export const createProposal = async (
     governingTokenMint,
     governanceAuthority,
     proposalIndex,
+    voteType,
+    options,
+    useDenyOption,
     payer
   )
 
-  const signatoryRecordAddress = await withAddSignatory(
+  await withAddSignatory(
     instructions,
     programId,
     proposalAddress,
@@ -60,6 +74,13 @@ export const createProposal = async (
     governanceAuthority,
     signatory,
     payer
+  )
+
+  // TODO: Return signatoryRecordAddress from the SDK call
+  const signatoryRecordAddress = await getSignatoryRecordAddress(
+    programId,
+    proposalAddress,
+    signatory
   )
 
   for (const [index, instruction] of instructionsData
@@ -72,6 +93,7 @@ export const createProposal = async (
       await withInsertInstruction(
         instructions,
         programId,
+        programVersion,
         governance,
         proposalAddress,
         tokenOwnerRecord,

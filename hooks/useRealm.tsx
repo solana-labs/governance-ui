@@ -44,7 +44,7 @@ export default function useRealm() {
     () =>
       realm &&
       tokenAccounts.find((a) =>
-        a.account.mint.equals(realm.info.communityMint)
+        a.account.mint.equals(realm.account.communityMint)
       ),
     [realm, tokenAccounts]
   )
@@ -63,8 +63,8 @@ export default function useRealm() {
       councilMint &&
       tokenAccounts.find(
         (a) =>
-          realm.info.config.councilMint &&
-          a.account.mint.equals(realm.info.config.councilMint)
+          realm.account.config.councilMint &&
+          a.account.mint.equals(realm.account.config.councilMint)
       ),
     [realm, tokenAccounts]
   )
@@ -78,20 +78,20 @@ export default function useRealm() {
   )
 
   const canChooseWhoVote =
-    realm?.info.communityMint &&
+    realm?.account.communityMint &&
     !mint?.supply.isZero() &&
-    realm.info.config.councilMint &&
+    realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
   //TODO take from realm config when available
   const realmCfgMaxOutstandingProposalCount = 10
   const toManyCommunityOutstandingProposalsForUser =
     ownTokenRecord &&
-    ownTokenRecord?.info.outstandingProposalCount >=
+    ownTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
   const toManyCouncilOutstandingProposalsForUse =
     ownCouncilTokenRecord &&
-    ownCouncilTokenRecord?.info.outstandingProposalCount >=
+    ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
 
   return {
@@ -111,7 +111,7 @@ export default function useRealm() {
     councilTokenAccount,
     ownCouncilTokenRecord,
     ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
-    realmDisplayName: realmInfo?.displayName ?? realm?.info?.name,
+    realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
     canChooseWhoVote,
     councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,

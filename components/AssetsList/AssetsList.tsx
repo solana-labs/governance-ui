@@ -1,6 +1,6 @@
 import AssetItem from './AssetItem'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernanceAccountType } from '@models/accounts'
+import { GovernanceAccountType } from '@solana/spl-governance'
 
 const AssetsList = () => {
   const { getGovernancesByAccountType } = useGovernanceAssets()

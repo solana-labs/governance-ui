@@ -12,7 +12,7 @@ const DepositLabel = ({
 }) => {
   const isNFT = currentAccount?.isNft
   const address = !isNFT
-    ? currentAccount!.governance!.info.governedAccount
+    ? currentAccount!.governance!.account.governedAccount
     : currentAccount?.governance?.pubkey
   return (
     <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">

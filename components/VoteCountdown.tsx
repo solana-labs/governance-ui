@@ -1,6 +1,6 @@
 import moment from 'moment'
 import React, { useEffect, useState } from 'react'
-import { Governance, Proposal } from '../models/accounts'
+import { Governance, Proposal } from '@solana/spl-governance'
 
 interface CountdownState {
   days: number

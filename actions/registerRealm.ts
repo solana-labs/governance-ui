@@ -7,14 +7,15 @@ import {
 } from '@solana/web3.js'
 import BN from 'bn.js'
 import {
+  getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
   VoteThresholdPercentage,
   VoteWeightSource,
-} from '../models/accounts'
-import { withCreateRealm } from '../models/withCreateRealm'
+} from '@solana/spl-governance'
+import { withCreateRealm } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
-import { ProgramVersion } from '@models/registry/constants'
+
 import {
   sendTransactions,
   SequenceType,
@@ -28,34 +29,25 @@ import {
   SignerWalletAdapter,
   WalletConnectionError,
 } from '@solana/wallet-adapter-base'
-import { withDepositGoverningTokens } from '@models/withDepositGoverningTokens'
+import { withDepositGoverningTokens } from '@solana/spl-governance'
 import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
 } from '@tools/sdk/units'
-import { withCreateMintGovernance } from '@models/withCreateMintGovernance'
-import { withSetRealmAuthority } from '@models/withSetRealmAuthority'
-import { AccountInfo } from '@solana/spl-token'
+import { withCreateMintGovernance } from '@solana/spl-governance'
+import { withSetRealmAuthority } from '@solana/spl-governance'
+import { AccountInfo, u64 } from '@solana/spl-token'
 import { ProgramAccount } from '@project-serum/common'
 import { tryGetAta } from '@utils/validations'
 import { ConnectionContext } from '@utils/connection'
-
-/* 
-  TODO: Check if the abstractions present here can be moved to a 
-  separate util and replace some of the repeating code over the project
-  and reduce the code complexity
-*/
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import BigNumber from 'bignumber.js'
 
 interface RegisterRealmRpc {
   connection: ConnectionContext
   wallet: SignerWalletAdapter
   walletPubkey: PublicKey
 }
-
-/**
- * The minimum amount of community tokens to create governance and proposals, for tokens with 0 supply
- */
-export const MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY = 1000000
 
 /**
  * The default amount of decimals for the community token
@@ -78,7 +70,7 @@ export const COMMUNITY_MINT_DECIMALS = 6
 async function prepareMintInstructions(
   connection: ConnectionContext,
   walletPubkey: PublicKey,
-  tokenDecimals: number,
+  tokenDecimals = 0,
   council = false,
   mintPk?: PublicKey,
   otherOwners?: PublicKey[]
@@ -89,6 +81,10 @@ async function prepareMintInstructions(
   let walletAtaPk: PublicKey | undefined
   const mintInstructions: TransactionInstruction[] = []
   const mintSigners: Keypair[] = []
+
+  const councilTokenAmount = new u64(
+    new BigNumber(1).shiftedBy(tokenDecimals).toString()
+  )
 
   if (!council || (council && otherOwners?.length)) {
     // If mintPk is undefined, then
@@ -128,7 +124,13 @@ async function prepareMintInstructions(
         // Mint 1 token to each owner
         if (shouldMint && ataPk) {
           console.debug('will mint to ', { ataPk })
-          await withMintTo(mintInstructions, _mintPk, ataPk, walletPubkey, 1)
+          await withMintTo(
+            mintInstructions,
+            _mintPk,
+            ataPk,
+            walletPubkey,
+            councilTokenAmount
+          )
         }
 
         if (ownerPk.equals(walletPubkey)) {
@@ -139,7 +141,6 @@ async function prepareMintInstructions(
   }
 
   const instructionChunks = chunks(mintInstructions, 10)
-  // I tried to left as an empty array, but always get failed in signature verification
   const signersChunks = Array(instructionChunks.length).fill([])
   signersChunks[0] = mintSigners
   return {
@@ -161,6 +162,10 @@ async function prepareMintInstructions(
      * Array with all the signer sets
      */
     mintSigners,
+    /**
+     * Amount of tokens minted to the council members
+     */
+    councilTokenAmount,
   }
 }
 
@@ -247,6 +252,7 @@ async function prepareGovernanceInstructions(
       true,
       walletPubkey,
       tokenOwnerRecordPk,
+      walletPubkey,
       walletPubkey
     )
 
@@ -271,6 +277,7 @@ async function prepareGovernanceInstructions(
       true,
       walletPubkey,
       tokenOwnerRecordPk,
+      walletPubkey,
       walletPubkey
     )
 }
@@ -351,7 +358,7 @@ function sendTransactionFactory(
 export async function registerRealm(
   { connection, wallet, walletPubkey }: RegisterRealmRpc,
   programId: PublicKey,
-  programVersion: ProgramVersion,
+  programVersion: number,
   name: string,
   communityMint: PublicKey | undefined,
   councilMint: PublicKey | undefined,
@@ -360,6 +367,7 @@ export async function registerRealm(
   yesVoteThreshold = 60,
   transferAuthority = true,
   communityMintTokenDecimals?: number,
+  councilMintTokenDecimals?: number,
   councilWalletPks?: PublicKey[]
 ): Promise<PublicKey> {
   if (!wallet) throw WalletConnectionError
@@ -372,10 +380,11 @@ export async function registerRealm(
     walletAtaPk,
     instructionChunks: councilMembersChunks,
     signersChunks: councilSignersChunks,
+    councilTokenAmount,
   } = await prepareMintInstructions(
     connection,
     walletPubkey,
-    0,
+    councilMintTokenDecimals,
     true,
     councilMint,
     councilWalletPks
@@ -430,15 +439,25 @@ export async function registerRealm(
   // If the current wallet is in the team then deposit the council token
   if (councilMintPk) {
     if (walletAtaPk) {
-      tokenOwnerRecordPk = await withDepositGoverningTokens(
+      // TODO: return tokenOwnerRecordPk from the sdk call
+      tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
+        programId,
+        realmAddress,
+        councilMintPk,
+        walletPubkey
+      )
+
+      await withDepositGoverningTokens(
         realmInstructions,
         programId,
+        programVersion,
         realmAddress,
         walletAtaPk,
         councilMintPk,
         walletPubkey,
         walletPubkey,
-        walletPubkey
+        walletPubkey,
+        councilTokenAmount
       )
     } else {
       // Let's throw for now if the current wallet isn't in the team

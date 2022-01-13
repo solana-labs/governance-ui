@@ -16,7 +16,7 @@ import _ from 'lodash'
 import Switch from '@components/Switch'
 import { StyledLabel } from '@components/inputs/styles'
 import Tooltip from '@components/Tooltip'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from 'actions/registerRealm'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import BigNumber from 'bignumber.js'
 
 export const getMintSupplyFactorPercent = (form: RealmArtifacts) => {

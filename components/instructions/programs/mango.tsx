@@ -1,5 +1,5 @@
 import { Connection } from '@solana/web3.js'
-import { AccountMetaData } from '../../../models/accounts'
+import { AccountMetaData } from '@solana/spl-governance'
 import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
 
 function displayInstructionArgument(decodedArgs, argName) {

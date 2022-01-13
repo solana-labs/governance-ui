@@ -10,15 +10,15 @@ import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
-  ProgramAccount,
+  TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
 import { debounce } from 'utils/debounce'
 import { NewProposalContext } from '../../new'
-import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { Governance } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
@@ -28,7 +28,7 @@ const Mint = ({
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
@@ -44,12 +44,12 @@ const Mint = ({
   })
   const wallet = useWalletStore((s) => s.current)
   const [governedAccount, setGovernedAccount] = useState<
-    ParsedAccount<Governance> | undefined
+    ProgramAccount<Governance> | undefined
   >(undefined)
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const [
     mintGovernancesWithMintInfo,
