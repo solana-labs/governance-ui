@@ -11,13 +11,10 @@ import {
   parseTokenAccountData,
   getMultipleAccountInfoChunked,
 } from '../utils/tokens'
+
 import {
   getGovernance,
   getGovernanceAccount,
-  getTokenOwnerRecordsByTokenOwner,
-} from '../models/api'
-import {
-  getAccountTypes,
   getGovernanceAccounts,
   Governance,
   GovernanceAccountType,
@@ -42,6 +39,7 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
 import { pubkeyFilter } from '@solana/spl-governance'
+import { getTokenOwnerRecordsByTokenOwner } from '@models/api'
 
 interface WalletStore extends State {
   connected: boolean
@@ -108,13 +106,9 @@ export async function getVoteRecordsByProposal(
   endpoint: string,
   voter: PublicKey
 ) {
-  return getGovernanceAccounts<VoteRecord>(
-    programId,
-    endpoint,
-    VoteRecord,
-    getAccountTypes(VoteRecord),
-    [pubkeyFilter(33, voter)!]
-  ).then((vrs) =>
+  return getGovernanceAccounts(endpoint, programId, VoteRecord, [
+    pubkeyFilter(33, voter)!,
+  ]).then((vrs) =>
     mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
   )
 }
@@ -124,13 +118,9 @@ export async function getVoteRecordsByVoter(
   endpoint: string,
   proposalPubKey: PublicKey
 ) {
-  return getGovernanceAccounts<VoteRecord>(
-    programId,
-    endpoint,
-    VoteRecord,
-    getAccountTypes(VoteRecord),
-    [pubkeyFilter(1, proposalPubKey)!]
-  ).then((vrs) =>
+  return getGovernanceAccounts<VoteRecord>(endpoint, programId, VoteRecord, [
+    pubkeyFilter(1, proposalPubKey)!,
+  ]).then((vrs) =>
     mapFromEntries(vrs, ([_, v]) => [
       v.account.governingTokenOwner.toBase58(),
       v,
@@ -289,10 +279,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
 
       const realms = await getGovernanceAccounts<Realm>(
-        programId,
         endpoint,
-        Realm,
-        getAccountTypes(Realm)
+        programId,
+        Realm
       )
 
       set((s) => {
@@ -334,13 +323,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenRecords,
         councilTokenOwnerRecords,
       ] = await Promise.all([
-        getGovernanceAccounts<Governance>(
-          programId,
-          endpoint,
-          Governance,
-          getAccountTypes(Governance),
-          [pubkeyFilter(1, realmId)!]
-        ),
+        getGovernanceAccounts<Governance>(endpoint, programId, Governance, [
+          pubkeyFilter(1, realmId)!,
+        ]),
 
         getTokenOwnerRecordsByTokenOwner(
           programId,
@@ -378,13 +363,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
       const proposalsByGovernance = await Promise.all(
         mapKeys(governances, (g) =>
-          getGovernanceAccounts<Proposal>(
-            programId,
-            endpoint,
-            Proposal,
-            getAccountTypes(Proposal),
-            [pubkeyFilter(1, new PublicKey(g))!]
-          )
+          getGovernanceAccounts(endpoint, programId, Proposal, [
+            pubkeyFilter(1, new PublicKey(g))!,
+          ])
         )
       )
 
@@ -465,35 +446,27 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         proposalOwner,
       ] = await Promise.all([
         resolveProposalDescription(proposal.account.descriptionLink),
-        getGovernanceAccount<Governance>(
+        getGovernanceAccount(
           connection,
           proposal.account.governance,
           Governance
         ),
-        getGovernanceAccounts<ProposalInstruction>(
-          programId,
-          endpoint,
-          ProposalInstruction,
-          getAccountTypes(ProposalInstruction),
-          [pubkeyFilter(1, proposalPubKey)!]
-        ),
+        getGovernanceAccounts(endpoint, programId, ProposalInstruction, [
+          pubkeyFilter(1, proposalPubKey)!,
+        ]),
         getVoteRecordsByVoter(programId, endpoint, proposalPubKey),
-        getGovernanceAccounts<SignatoryRecord>(
-          programId,
-          endpoint,
-          SignatoryRecord,
-          getAccountTypes(SignatoryRecord),
-          [pubkeyFilter(1, proposalPubKey)!]
-        ),
+        getGovernanceAccounts(endpoint, programId, SignatoryRecord, [
+          pubkeyFilter(1, proposalPubKey)!,
+        ]),
         getGovernanceChatMessages(endpoint, proposalPubKey),
-        getGovernanceAccount<TokenOwnerRecord>(
+        getGovernanceAccount(
           connection,
           proposal.account.tokenOwnerRecord,
           TokenOwnerRecord
         ),
       ])
 
-      const realm = await getGovernanceAccount<Realm>(
+      const realm = await getGovernanceAccount(
         connection,
         governance.account.realm,
         Realm
