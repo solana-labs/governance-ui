@@ -1,9 +1,9 @@
-import BN from 'bn.js'
+import { BN } from '@project-serum/anchor'
 import moment from 'moment'
 import { PublicKey } from '@solana/web3.js'
 
 const votePrecision = 10000
-export const calculatePct = (c: BN, total?: BN) => {
+export const calculatePct = (c: BN = new BN(0), total?: BN) => {
   if (total?.isZero()) {
     return 0
   }
@@ -17,7 +17,7 @@ export const calculatePct = (c: BN, total?: BN) => {
   )
 }
 
-export const fmtTokenAmount = (c: BN, decimals?: number) =>
+export const fmtTokenAmount = (c: BN = new BN(0), decimals?: number) =>
   c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber()
 
 export const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()
