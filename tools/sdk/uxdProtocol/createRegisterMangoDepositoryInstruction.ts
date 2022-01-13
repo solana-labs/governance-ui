@@ -1,4 +1,4 @@
-import { serializeInstructionToBase64 } from '@models/serialisation'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { Provider } from '@project-serum/anchor'
 import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'

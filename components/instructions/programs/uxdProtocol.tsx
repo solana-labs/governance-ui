@@ -1,6 +1,6 @@
 import { Connection } from '@solana/web3.js'
 import { struct, u8, u48 } from 'buffer-layout'
-import { AccountMetaData } from '../../../models/accounts'
+import { AccountMetaData } from '@solana/spl-governance'
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXGA4U6nmCkdpVnhrhRzgFWYtmY4uHpNzLn3h9nVXNa: {
