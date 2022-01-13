@@ -32,6 +32,7 @@ import {
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import {
   getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
 } from '@tools/sdk/units'
 import { withCreateMintGovernance } from '@solana/spl-governance'
@@ -174,21 +175,19 @@ async function prepareMintInstructions(
  * @param yesVoteThreshold
  * @returns
  */
-function mountGovernanceConfig(
+function createGovernanceConfig(
   yesVoteThreshold = 60,
   tokenDecimals?: number,
   minCommunityTokensToCreateGovernance?: string
 ): GovernanceConfig {
   console.debug('mounting governance config')
 
-  const minCommunityTokensToCreateAsMintValue = new BN(
-    getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance &&
-        +minCommunityTokensToCreateGovernance > 0
-        ? +minCommunityTokensToCreateGovernance
-        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-      tokenDecimals ?? COMMUNITY_MINT_DECIMALS
-    )
+  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
+    minCommunityTokensToCreateGovernance &&
+      +minCommunityTokensToCreateGovernance > 0
+      ? +minCommunityTokensToCreateGovernance
+      : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+    tokenDecimals ?? COMMUNITY_MINT_DECIMALS
   )
 
   // Put community and council mints under the realm governance with default config
@@ -233,7 +232,7 @@ async function prepareGovernanceInstructions(
 ) {
   console.debug('Preparing governance instructions')
 
-  const config = mountGovernanceConfig(
+  const config = createGovernanceConfig(
     yesVoteThreshold,
     communityTokenDecimals,
     minCommunityTokensToCreateGovernance
@@ -410,14 +409,12 @@ export async function registerRealm(
 
   if (!communityMintPk) throw new Error('Invalid community mint public key.')
 
-  const _minCommunityTokensToCreateGovernance = new BN(
-    getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance &&
-        +minCommunityTokensToCreateGovernance > 0
-        ? +minCommunityTokensToCreateGovernance
-        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-      communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
-    )
+  const _minCommunityTokensToCreateGovernance = getMintNaturalAmountFromDecimalAsBN(
+    minCommunityTokensToCreateGovernance &&
+      +minCommunityTokensToCreateGovernance > 0
+      ? +minCommunityTokensToCreateGovernance
+      : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+    communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
   )
 
   const realmAddress = await withCreateRealm(

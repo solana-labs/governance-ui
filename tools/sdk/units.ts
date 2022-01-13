@@ -55,6 +55,14 @@ export function getMintNaturalAmountFromDecimal(
   return new BigNumber(decimalAmount).shiftedBy(decimals).toNumber()
 }
 
+// Converts amount in decimals to mint amount (natural units)
+export function getMintNaturalAmountFromDecimalAsBN(
+  decimalAmount: number,
+  decimals: number
+) {
+  return new BN(new BigNumber(decimalAmount).shiftedBy(decimals).toString())
+}
+
 // Calculates mint min amount as decimal
 export function getMintMinAmountAsDecimal(mint: MintInfo) {
   return new BigNumber(1).shiftedBy(-mint.decimals).toNumber()
