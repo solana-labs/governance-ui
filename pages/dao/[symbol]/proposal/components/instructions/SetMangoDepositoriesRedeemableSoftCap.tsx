@@ -10,22 +10,25 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction'
+import {
+  ProgramAccount,
+  serializeInstructionToBase64,
+  Governance,
+  GovernanceAccountType,
+} from '@solana/spl-governance'
 
 const SetMangoDepositoriesRedeemableSoftCap = ({
   index,
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -63,12 +66,12 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
         connection.current,
-        form.governedAccount.governance?.info.governedAccount,
+        form.governedAccount.governance?.account.governedAccount,
         form.softCap,
         form.governedAccount?.governance.pubkey,
         wallet

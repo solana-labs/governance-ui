@@ -10,21 +10,24 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction'
+import {
+  ProgramAccount,
+  serializeInstructionToBase64,
+  Governance,
+  GovernanceAccountType,
+} from '@solana/spl-governance'
 
 const InitializeController = ({
   index,
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -61,12 +64,12 @@ const InitializeController = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       form.mintDecimals &&
       wallet?.publicKey
     ) {
       const initializeControllerIx = createInitializeControllerInstruction(
-        form.governedAccount?.governance.info.governedAccount,
+        form.governedAccount?.governance.account.governedAccount,
         form.mintDecimals,
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),

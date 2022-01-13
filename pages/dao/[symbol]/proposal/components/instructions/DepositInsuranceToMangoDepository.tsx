@@ -10,10 +10,7 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import GovernedAccountSelect from '../GovernedAccountSelect'
@@ -24,13 +21,19 @@ import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
 } from '@tools/sdk/uxdProtocol/uxdClient'
+import {
+  ProgramAccount,
+  serializeInstructionToBase64,
+  Governance,
+  GovernanceAccountType,
+} from '@solana/spl-governance'
 
 const DepositInsuranceToMangoDepository = ({
   index,
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -69,12 +72,12 @@ const DepositInsuranceToMangoDepository = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const createIx = await createDepositInsuranceToMangoDepositoryInstruction(
         connection,
-        form.governedAccount?.governance.info.governedAccount,
+        form.governedAccount?.governance.account.governedAccount,
         form.governedAccount?.governance.pubkey,
         form.collateralName,
         form.insuranceName,
