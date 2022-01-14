@@ -42,3 +42,30 @@ export async function getUnrelinquishedVoteRecords(
     booleanFilter(1 + 32 + 32, false),
   ])
 }
+
+export async function getVoteRecordsByVoterMapByProposal(
+  connection: Connection,
+  programId: PublicKey,
+  voter: PublicKey
+) {
+  return getGovernanceAccounts(connection, programId, VoteRecord, [
+    pubkeyFilter(33, voter)!,
+  ]).then((vrs) =>
+    mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
+  )
+}
+
+export async function getVoteRecordsByProposalMapByVoter(
+  connection: Connection,
+  programId: PublicKey,
+  proposalPubKey: PublicKey
+) {
+  return getGovernanceAccounts(connection, programId, VoteRecord, [
+    pubkeyFilter(1, proposalPubKey)!,
+  ]).then((vrs) =>
+    mapFromEntries(vrs, ([_, v]) => [
+      v.account.governingTokenOwner.toBase58(),
+      v,
+    ])
+  )
+}

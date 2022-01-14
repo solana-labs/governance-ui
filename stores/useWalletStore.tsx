@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import {
   TokenProgramAccount,
   TokenAccount,
@@ -29,7 +29,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { fetchGistFile } from '../utils/github'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
-import { mapFromEntries, mapEntries } from '../tools/core/script'
+import { mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
@@ -39,7 +39,11 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
 import { pubkeyFilter } from '@solana/spl-governance'
-import { getTokenOwnerRecordsForRealmMintMapByOwner } from '@models/api'
+import {
+  getTokenOwnerRecordsForRealmMintMapByOwner,
+  getVoteRecordsByProposalMapByVoter,
+  getVoteRecordsByVoterMapByProposal,
+} from '@models/api'
 
 interface WalletStore extends State {
   connected: boolean
@@ -99,33 +103,6 @@ async function mapFromPromisedEntries(
 
 function merge(...os) {
   return Object.assign({}, ...os)
-}
-
-export async function getVoteRecordsByVoterMapByProposal(
-  connection: Connection,
-  programId: PublicKey,
-  voter: PublicKey
-) {
-  return getGovernanceAccounts(connection, programId, VoteRecord, [
-    pubkeyFilter(33, voter)!,
-  ]).then((vrs) =>
-    mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
-  )
-}
-
-export async function getVoteRecordsByProposalMapByVoter(
-  connection: Connection,
-  programId: PublicKey,
-  proposalPubKey: PublicKey
-) {
-  return getGovernanceAccounts(connection, programId, VoteRecord, [
-    pubkeyFilter(1, proposalPubKey)!,
-  ]).then((vrs) =>
-    mapFromEntries(vrs, ([_, v]) => [
-      v.account.governingTokenOwner.toBase58(),
-      v,
-    ])
-  )
 }
 
 async function resolveProposalDescription(description: string) {
