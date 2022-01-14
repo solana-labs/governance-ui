@@ -236,7 +236,7 @@
     "symbol": "WOOFDAO",
     "displayName": "WOOF DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "3BHrYe5SV2VqHqpEyxYYLbNeNGEnKBjYG4kt6pF5Xu5K",
+    "realmId": "DGnx2hbyT16bBMQFsVuHJJnnoRSucdreyG5egVJXqk8z",
     "ogImage": "/realms/WoofDAO/img/wooflogo.png",
     "website": "https://woofsolana.io/",
     "twitter": "@WoofSolana"
@@ -258,5 +258,12 @@
     "ogImage": "/realms/DAINV/img/DAI_LOGO_2.png",
     "website": "http://www.dainvest.org",
     "twitter": "@dainvestors"
+  },
+  {
+    "symbol": "KiwiDAO",
+    "displayName": "𝕂𝕚𝕨𝕚 𝔻𝔸◎",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AvfMYqHjddR93zvmZXcQGUTkRu3GJYppTU93iKhMUWRF",
+    "ogImage": "/realms/KiwiDAO/img/kiwi_logo.png"
   }
 ]

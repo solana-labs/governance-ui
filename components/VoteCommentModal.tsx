@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState } from 'react'
-import { postChatMessage } from '../actions/chat/postMessage'
+
 import {
   ChatMessageBody,
   ChatMessageBodyType,
@@ -54,10 +54,12 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
       connection.endpoint
     )
 
-    const msg = new ChatMessageBody({
-      type: ChatMessageBodyType.Text,
-      value: comment,
-    })
+    const msg = comment
+      ? new ChatMessageBody({
+          type: ChatMessageBodyType.Text,
+          value: comment,
+        })
+      : undefined
 
     try {
       await castVote(
@@ -65,16 +67,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         realm!.pubkey,
         proposal!,
         voterTokenRecord.pubkey,
-        vote
+        vote,
+        msg
       )
-      if (comment) {
-        await postChatMessage(
-          rpcContext,
-          proposal!,
-          voterTokenRecord.pubkey,
-          msg
-        )
-      }
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex)

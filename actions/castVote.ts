@@ -4,7 +4,12 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal, YesNoVote } from '@solana/spl-governance'
+import {
+  ChatMessageBody,
+  Proposal,
+  withPostChatMessage,
+  YesNoVote,
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 
@@ -18,7 +23,8 @@ export async function castVote(
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
-  yesNoVote: YesNoVote
+  yesNoVote: YesNoVote,
+  message?: ChatMessageBody | undefined
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -40,6 +46,21 @@ export async function castVote(
     Vote.fromYesNoVote(yesNoVote),
     payer
   )
+
+  if (message) {
+    await withPostChatMessage(
+      instructions,
+      signers,
+      programId,
+      proposal.account.governance,
+      proposal.pubkey,
+      tokeOwnerRecord,
+      governanceAuthority,
+      payer,
+      undefined,
+      message
+    )
+  }
 
   const transaction = new Transaction()
   transaction.add(...instructions)
