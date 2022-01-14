@@ -1,19 +1,8 @@
-import { MintInfo, Token } from '@solana/spl-token'
-import {
-  Keypair,
-  PublicKey,
-  SystemProgram,
-  SYSVAR_RENT_PUBKEY,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { MintInfo } from '@solana/spl-token'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '../../hooks/useRealm'
-import {
-  Proposal,
-  ProposalState,
-  withCreateTokenOwnerRecord,
-} from '@solana/spl-governance'
+import { Proposal, ProposalState, RpcContext } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '../../models/api'
 import { getProposal } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
@@ -34,9 +23,9 @@ import {
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import Tooltip from '@components/Tooltip'
+import { voteRegistryDeposit } from 'actions/voteRegistryDeposit'
+import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from '@hooks/useVoteRegistry'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -121,7 +110,6 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
-  const { client, getRegistrar } = useVoteRegistry()
   const {
     realm,
     realmInfo,
@@ -135,6 +123,7 @@ const TokenDeposit = ({
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+  const { client } = useVoteRegistry()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
@@ -161,119 +150,35 @@ const TokenDeposit = ({
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
 
-  const depositTokens = async function (amount: BN) {
-    const { registrar } = await getRegistrar()
-    const SYSVAR_INSTRUCTIONS_PUBKEY = new PublicKey(
-      'Sysvar1nstructions1111111111111111111111111'
+  const depositTokens = async function () {
+    if (!realm) {
+      throw 'No realm selected'
+    }
+    const hasSPLaccount =
+      typeof tokenRecords[wallet!.publicKey!.toBase58()] !== 'undefined'
+    const rpcContext = new RpcContext(
+      realm.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection,
+      endpoint
     )
-    const systemProgram = SystemProgram.programId
-    const rent = SYSVAR_RENT_PUBKEY
-    const [voter, voterBump] = await PublicKey.findProgramAddress(
-      [
-        registrar.toBuffer(),
-        Buffer.from('voter'),
-        wallet!.publicKey!.toBuffer(),
-      ],
-      client!.program.programId
-    )
-    const [voterWeight, voterWeightBump] = await PublicKey.findProgramAddress(
-      [
-        registrar.toBuffer(),
-        Buffer.from('voter-weight-record'),
-        wallet!.publicKey!.toBuffer(),
-      ],
-      client!.program.programId
+    await voteRegistryDeposit(
+      rpcContext,
+      depositTokenAccount!.publicKey,
+      depositMint!,
+      realm.pubkey,
+      realm.owner,
+      new BN(10000),
+      hasSPLaccount,
+      client
     )
 
-    if (!tokenRecords[wallet!.publicKey!.toBase58()]) {
-      const instruction: TransactionInstruction[] = []
-      await withCreateTokenOwnerRecord(
-        instruction,
-        new PublicKey(realm!.owner.toString()),
-        realm!.pubkey,
-        wallet!.publicKey!,
-        realm!.account.communityMint,
-        wallet!.publicKey!
-      )
-      const transaction = new Transaction()
-      transaction.add(...instruction)
-      const signers: Keypair[] = []
-      await sendTransaction({
-        transaction,
-        wallet,
-        connection,
-        signers,
-        sendingMessage: `creating owner record`,
-        successMessage: `owner eco created`,
-      })
-    }
-    try {
-      await client?.program.account.voter.fetch(voter)
-    } catch (e) {
-      console.log(e)
-      await client?.program.rpc.createVoter(voterBump, voterWeightBump, {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: wallet!.publicKey!,
-          voterWeightRecord: voterWeight,
-          payer: wallet!.publicKey!,
-          systemProgram: systemProgram,
-          rent: rent,
-          instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-        },
-      })
-      const ataPk = await Token.getAssociatedTokenAddress(
-        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-        realm!.account.communityMint,
-        voter
-      )
-      await client?.program.rpc.createDepositEntry(
-        0,
-        { none: {} },
-        new BN(new Date().getTime()),
-        0,
-        false,
-        {
-          accounts: {
-            registrar: registrar,
-            voter: voter,
-            payer: wallet!.publicKey!,
-            voterAuthority: wallet!.publicKey!,
-            depositMint: realm!.account.communityMint,
-            rent: rent,
-            systemProgram: systemProgram,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            vault: ataPk,
-          },
-        }
-      )
-    }
-    const toAtaPk = await Token.getAssociatedTokenAddress(
-      ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-      TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-      realm!.account.communityMint,
-      voter
-    )
-    await client?.program.rpc.deposit(0, new BN(10000), {
-      accounts: {
-        registrar: registrar,
-        voter: voter,
-        vault: toAtaPk,
-        depositToken: realmTokenAccount!.publicKey,
-        depositAuthority: wallet!.publicKey!,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      },
-    })
-
-    // await fetchWalletTokenAccounts()
-    // await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await fetchWalletTokenAccounts()
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount!.account.amount)
+  const depositAllTokens = async () => await depositTokens()
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
