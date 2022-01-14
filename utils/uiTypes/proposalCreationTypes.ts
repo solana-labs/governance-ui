@@ -43,6 +43,12 @@ export interface ProgramUpgradeForm {
   bufferAddress: string
 }
 
+export interface ProgramAuthorityForm {
+  governedAccount: GovernedProgramAccount | GovernedTokenAccount | undefined
+  accountId: string | undefined
+  destinationAuthority: string
+}
+
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
@@ -63,6 +69,7 @@ export interface EmptyInstructionForm {
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
+  SetProgramAuthority,
   Mint,
   Base64,
   None,

@@ -32,6 +32,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/ProgramUpgrade'
+import SetProgramAuthority from './components/instructions/SetProgramAuthority'
 import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
@@ -285,6 +286,13 @@ const New = () => {
       case Instructions.ProgramUpgrade:
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+        )
+      case Instructions.SetProgramAuthority:
+        return (
+          <SetProgramAuthority
+            index={idx}
+            governance={governance}
+          ></SetProgramAuthority>
         )
       case Instructions.InitializeController:
         return <InitializeController index={idx} governance={governance} />

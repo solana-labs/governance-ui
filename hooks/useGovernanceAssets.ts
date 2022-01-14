@@ -188,6 +188,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
+      id: Instructions.SetProgramAuthority,
+      name: 'Set Program Authority',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
       id: Instructions.Mint,
       name: 'Mint Tokens',
       isVisible: canUseMintInstruction,
