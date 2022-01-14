@@ -40,7 +40,6 @@ import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
 import { pubkeyFilter } from '@solana/spl-governance'
 import { getTokenOwnerRecordsByTokenOwner } from '@models/api'
-import { connection } from '@project-serum/common'
 
 interface WalletStore extends State {
   connected: boolean
