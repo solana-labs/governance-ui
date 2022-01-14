@@ -11,7 +11,7 @@ import { pubkeyFilter } from '@solana/spl-governance'
 import { mapFromEntries } from '@tools/core/script'
 
 // TokenOwnerRecords
-export async function getTokenOwnerRecordsByTokenOwner(
+export async function getTokenOwnerRecordsForRealmMintMapByOwner(
   connection: Connection,
   programId: PublicKey,
   realmId: PublicKey,

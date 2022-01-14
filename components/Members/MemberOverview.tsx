@@ -22,7 +22,9 @@ import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
 import useMembersListStore from 'stores/useMembersStore'
-import useWalletStore, { getVoteRecordsByProposal } from 'stores/useWalletStore'
+import useWalletStore, {
+  getVoteRecordsByVoterMapByProposal,
+} from 'stores/useWalletStore'
 import { ViewState, WalletTokenRecordWithProposal } from './types'
 
 const MemberOverview = () => {
@@ -73,7 +75,7 @@ const MemberOverview = () => {
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
       const results = await Promise.all([
-        getVoteRecordsByProposal(
+        getVoteRecordsByVoterMapByProposal(
           connection.current,
           selectedRealm!.programId!,
           new PublicKey(member!.walletAddress)
