@@ -8,7 +8,7 @@ import {
 } from '@solana/spl-governance'
 
 import { pubkeyFilter } from '@solana/spl-governance'
-import { mapFromEntries } from '@tools/core/script'
+import { arrayToRecord } from '@tools/core/script'
 
 // TokenOwnerRecords
 export async function getTokenOwnerRecordsForRealmMintMapByOwner(
@@ -22,10 +22,7 @@ export async function getTokenOwnerRecordsForRealmMintMapByOwner(
         pubkeyFilter(1, realmId)!,
         pubkeyFilter(1 + 32, governingTokenMintPk)!,
       ]).then((tors) =>
-        mapFromEntries(tors, ([_k, v]) => [
-          v.account.governingTokenOwner.toBase58(),
-          v,
-        ])
+        arrayToRecord(tors, (tor) => tor.account.governingTokenOwner.toBase58())
       )
     : undefined
 }
@@ -50,9 +47,7 @@ export async function getVoteRecordsByVoterMapByProposal(
 ) {
   return getGovernanceAccounts(connection, programId, VoteRecord, [
     pubkeyFilter(33, voter)!,
-  ]).then((vrs) =>
-    mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
-  )
+  ]).then((vrs) => arrayToRecord(vrs, (vr) => vr.account.proposal.toBase58()))
 }
 
 export async function getVoteRecordsByProposalMapByVoter(
@@ -63,9 +58,6 @@ export async function getVoteRecordsByProposalMapByVoter(
   return getGovernanceAccounts(connection, programId, VoteRecord, [
     pubkeyFilter(1, proposalPubKey)!,
   ]).then((vrs) =>
-    mapFromEntries(vrs, ([_, v]) => [
-      v.account.governingTokenOwner.toBase58(),
-      v,
-    ])
+    arrayToRecord(vrs, (vr) => vr.account.governingTokenOwner.toBase58())
   )
 }

@@ -17,6 +17,7 @@ import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
@@ -85,7 +86,7 @@ const MemberOverview = () => {
         ),
       ])
       voteRecords = results[0]
-      chatMessages = results[1]
+      chatMessages = accountsToPubkeyMap(results[1])
     } catch (e) {
       notify({
         message: 'Unable to fetch vote records for selected wallet address',

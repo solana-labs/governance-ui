@@ -29,7 +29,6 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { fetchGistFile } from '../utils/github'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
-import { mapEntries } from '../tools/core/script'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import tokenService from '@utils/services/token'
@@ -44,6 +43,8 @@ import {
   getVoteRecordsByProposalMapByVoter,
   getVoteRecordsByVoterMapByProposal,
 } from '@models/api'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
+import { mapEntries } from '@tools/core/script'
 
 interface WalletStore extends State {
   connected: boolean
@@ -90,19 +91,11 @@ interface WalletStore extends State {
   actions: any
 }
 
-function mapKeys(xs: any, mapFn: (k: string) => any) {
-  return Object.keys(xs).map(mapFn)
-}
-
 async function mapFromPromisedEntries(
   xs: any,
   mapFn: (kv: [string, any]) => Promise<[string, any]>
 ) {
   return Object.fromEntries(await Promise.all(mapEntries(xs, mapFn)))
-}
-
-function merge(...os) {
-  return Object.assign({}, ...os)
 }
 
 async function resolveProposalDescription(description: string) {
@@ -258,7 +251,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realms = await getGovernanceAccounts(connection, programId, Realm)
 
       set((s) => {
-        s.realms = realms
+        s.realms = accountsToPubkeyMap(realms)
       })
 
       console.log('fetchAllRealms', get().realms)
@@ -314,9 +307,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
       ])
 
+      const governancesMap = accountsToPubkeyMap(governances)
+
       console.log('fetchRealm mint', realmMint)
       console.log('fetchRealm councilMint', realmCouncilMint)
-      console.log('fetchRealm governances', governances)
+      console.log('fetchRealm governances', governancesMap)
       console.log('fetchRealm tokenRecords', {
         tokenRecords,
         councilTokenOwnerRecords,
@@ -327,22 +322,23 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.mint = realmMint
         s.selectedRealm.programId = programId
         s.selectedRealm.councilMint = realmCouncilMint
-        s.selectedRealm.governances = governances
+        s.selectedRealm.governances = governancesMap
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
       })
       get().actions.fetchOwnVoteRecords()
       get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
+
       const proposalsByGovernance = await Promise.all(
-        mapKeys(governances, (g) =>
+        governances.map((g) =>
           getGovernanceAccounts(connection, programId, Proposal, [
-            pubkeyFilter(1, new PublicKey(g))!,
+            pubkeyFilter(1, g.pubkey)!,
           ])
         )
       )
 
-      const proposals: Record<string, ProgramAccount<Proposal>> = merge(
-        ...proposalsByGovernance
+      const proposals = accountsToPubkeyMap(
+        proposalsByGovernance.flatMap((p) => p)
       )
 
       console.log('fetchRealm proposals', proposals)
@@ -470,10 +466,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedProposal.description = description
         s.selectedProposal.governance = governance
         s.selectedProposal.realm = realm
-        s.selectedProposal.instructions = instructions
+        s.selectedProposal.instructions = accountsToPubkeyMap(instructions)
         s.selectedProposal.voteRecordsByVoter = voteRecordsByVoter
-        s.selectedProposal.signatories = signatories
-        s.selectedProposal.chatMessages = chatMessages
+        s.selectedProposal.signatories = accountsToPubkeyMap(signatories)
+        s.selectedProposal.chatMessages = accountsToPubkeyMap(chatMessages)
         s.selectedProposal.proposalMint = proposalMint
         s.selectedProposal.loading = false
         s.selectedProposal.tokenType = tokenType
