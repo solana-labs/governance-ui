@@ -29,7 +29,6 @@ const InitializeController = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useGovernanceAssets()
@@ -72,9 +71,7 @@ const InitializeController = ({
         form.governedAccount?.governance.account.governedAccount,
         form.mintDecimals,
         form.governedAccount?.governance.pubkey,
-        new PublicKey(wallet.publicKey.toBase58()),
-        connection.current,
-        wallet
+        new PublicKey(wallet.publicKey.toBase58())
       )
       serializedInstruction = serializeInstructionToBase64(
         initializeControllerIx

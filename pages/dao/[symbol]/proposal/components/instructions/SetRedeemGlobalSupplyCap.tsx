@@ -30,7 +30,6 @@ const SetRedeemGlobalSupplyCap = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useGovernanceAssets()
@@ -69,11 +68,9 @@ const SetRedeemGlobalSupplyCap = ({
       wallet?.publicKey
     ) {
       const createIx = createSetRedeemableGlobalSupplyCapInstruction(
-        connection.current,
         form.governedAccount.governance?.account.governedAccount,
         form.supplyCap,
-        form.governedAccount?.governance.pubkey,
-        wallet
+        form.governedAccount?.governance.pubkey
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }

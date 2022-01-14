@@ -1,17 +1,14 @@
 import { Provider } from '@project-serum/anchor'
-import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
-import { TransactionInstruction, PublicKey, Connection } from '@solana/web3.js'
+import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { Controller } from '@uxdprotocol/uxd-client'
 import { getControllerPda, uxdClient } from './uxdClient'
 
 const createSetMangoDepositoriesRedeemableSoftCapInstruction = (
-  connection: Connection,
   uxdProgramId: PublicKey,
   softCapUiAmount: number,
-  authority: PublicKey,
-  wallet: SignerWalletAdapter
+  authority: PublicKey
 ): TransactionInstruction => {
-  const client = uxdClient(connection, uxdProgramId, wallet)
+  const client = uxdClient(uxdProgramId)
 
   return client.createSetMangoDepositoriesRedeemableSoftCapInstruction(
     { pda: getControllerPda(uxdProgramId) } as Controller,

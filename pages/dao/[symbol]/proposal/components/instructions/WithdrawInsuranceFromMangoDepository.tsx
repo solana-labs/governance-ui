@@ -81,8 +81,7 @@ const WithdrawInsuranceFromMangoDepository = ({
         form.governedAccount?.governance.pubkey,
         form.collateralName,
         form.insuranceName,
-        form.insuranceWithdrawnAmount,
-        wallet
+        form.insuranceWithdrawnAmount
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }

@@ -1,7 +1,6 @@
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { Provider } from '@project-serum/anchor'
 import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
 import { Controller, findATAAddrSync } from '@uxdprotocol/uxd-client'
@@ -21,14 +20,9 @@ const createRegisterMangoDepositoryInstruction = async (
   authority: PublicKey,
   payer: PublicKey,
   depositoryMintName: string,
-  insuranceMintName: string,
-  wallet: SignerWalletAdapter
+  insuranceMintName: string
 ): Promise<TransactionInstruction> => {
-  const mango = await initializeMango(
-    connection.current,
-    connection.cluster,
-    wallet
-  )
+  const mango = await initializeMango(connection.current, connection.cluster)
 
   const depositoryMint = getDepositoryMintKey(
     connection.cluster,
@@ -45,7 +39,7 @@ const createRegisterMangoDepositoryInstruction = async (
     insuranceMint
   )
 
-  const client = uxdClient(connection.current, uxdProgramId, wallet)
+  const client = uxdClient(uxdProgramId)
   const [authorityInsuranceATA] = findATAAddrSync(authority, insuranceMint)
   const createAuthorityInsuranceItx = Token.createAssociatedTokenAccountInstruction(
     ASSOCIATED_TOKEN_PROGRAM_ID,

@@ -30,7 +30,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useGovernanceAssets()
@@ -70,11 +69,9 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       wallet?.publicKey
     ) {
       const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
-        connection.current,
         form.governedAccount.governance?.account.governedAccount,
         form.softCap,
-        form.governedAccount?.governance.pubkey,
-        wallet
+        form.governedAccount?.governance.pubkey
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }

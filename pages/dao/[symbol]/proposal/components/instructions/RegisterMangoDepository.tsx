@@ -80,8 +80,7 @@ const RegisterMangoDepository = ({
         form.governedAccount?.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58()),
         form.collateralName,
-        form.insuranceName,
-        wallet
+        form.insuranceName
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
