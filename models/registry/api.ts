@@ -142,7 +142,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
       arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(connection.endpoint, p.programId)
+        getRealms(connection.current, p.programId)
       )
     )
   )
