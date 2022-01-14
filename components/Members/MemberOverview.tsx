@@ -74,12 +74,12 @@ const MemberOverview = () => {
     try {
       const results = await Promise.all([
         getVoteRecordsByProposal(
+          connection.current,
           selectedRealm!.programId!,
-          connection.endpoint,
           new PublicKey(member!.walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
-          connection!.endpoint,
+          connection!.current,
           new PublicKey(member!.walletAddress)
         ),
       ])

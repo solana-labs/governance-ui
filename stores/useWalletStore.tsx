@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import {
   TokenProgramAccount,
   TokenAccount,
@@ -40,6 +40,7 @@ import type { ConnectionContext } from 'utils/connection'
 import { getConnectionContext } from 'utils/connection'
 import { pubkeyFilter } from '@solana/spl-governance'
 import { getTokenOwnerRecordsByTokenOwner } from '@models/api'
+import { connection } from '@project-serum/common'
 
 interface WalletStore extends State {
   connected: boolean
@@ -102,11 +103,11 @@ function merge(...os) {
 }
 
 export async function getVoteRecordsByProposal(
+  connection: Connection,
   programId: PublicKey,
-  endpoint: string,
   voter: PublicKey
 ) {
-  return getGovernanceAccounts(endpoint, programId, VoteRecord, [
+  return getGovernanceAccounts(connection, programId, VoteRecord, [
     pubkeyFilter(33, voter)!,
   ]).then((vrs) =>
     mapFromEntries(vrs, ([_, v]) => [v.account.proposal.toBase58(), v])
@@ -114,11 +115,11 @@ export async function getVoteRecordsByProposal(
 }
 
 export async function getVoteRecordsByVoter(
+  connection: Connection,
   programId: PublicKey,
-  endpoint: string,
   proposalPubKey: PublicKey
 ) {
-  return getGovernanceAccounts<VoteRecord>(endpoint, programId, VoteRecord, [
+  return getGovernanceAccounts<VoteRecord>(connection, programId, VoteRecord, [
     pubkeyFilter(1, proposalPubKey)!,
   ]).then((vrs) =>
     mapFromEntries(vrs, ([_, v]) => [
@@ -241,7 +242,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       }
     },
     async fetchOwnVoteRecords() {
-      const endpoint = get().connection.endpoint
+      const connection = get().connection.current
       const connected = get().connected
       const programId = get().selectedRealm.programId
       const wallet = get().current
@@ -250,8 +251,8 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       if (connected && walletOwner && programId) {
         const ownVoteRecordsByProposal = await getVoteRecordsByProposal(
+          connection,
           programId,
-          endpoint,
           walletOwner
         )
 
@@ -275,11 +276,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchAllRealms(programId: PublicKey) {
       console.log('fetchAllRealms', programId.toBase58())
 
-      const endpoint = get().connection.endpoint
+      const connection = get().connection.current
       const set = get().set
 
       const realms = await getGovernanceAccounts<Realm>(
-        endpoint,
+        connection,
         programId,
         Realm
       )
@@ -293,7 +294,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
     async fetchRealm(programId: PublicKey, realmId: PublicKey) {
       const set = get().set
       const connection = get().connection.current
-      const endpoint = get().connection.endpoint
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
       const mintsArray = (
@@ -323,20 +323,20 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         tokenRecords,
         councilTokenOwnerRecords,
       ] = await Promise.all([
-        getGovernanceAccounts<Governance>(endpoint, programId, Governance, [
+        getGovernanceAccounts<Governance>(connection, programId, Governance, [
           pubkeyFilter(1, realmId)!,
         ]),
 
         getTokenOwnerRecordsByTokenOwner(
+          connection,
           programId,
-          endpoint,
           realmId,
           realmMintPk
         ),
 
         getTokenOwnerRecordsByTokenOwner(
+          connection,
           programId,
-          endpoint,
           realmId,
           realmCouncilMintPk
         ),
@@ -363,7 +363,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
       const proposalsByGovernance = await Promise.all(
         mapKeys(governances, (g) =>
-          getGovernanceAccounts(endpoint, programId, Proposal, [
+          getGovernanceAccounts(connection, programId, Proposal, [
             pubkeyFilter(1, new PublicKey(g))!,
           ])
         )
@@ -415,7 +415,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       console.log('fetchProposal', proposalPk)
 
       const connection = get().connection.current
-      const endpoint = get().connection.endpoint
       const realmMints = get().selectedRealm.mints
       const set = get().set
 
@@ -451,14 +450,14 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           proposal.account.governance,
           Governance
         ),
-        getGovernanceAccounts(endpoint, programId, ProposalInstruction, [
+        getGovernanceAccounts(connection, programId, ProposalInstruction, [
           pubkeyFilter(1, proposalPubKey)!,
         ]),
-        getVoteRecordsByVoter(programId, endpoint, proposalPubKey),
-        getGovernanceAccounts(endpoint, programId, SignatoryRecord, [
+        getVoteRecordsByVoter(connection, programId, proposalPubKey),
+        getGovernanceAccounts(connection, programId, SignatoryRecord, [
           pubkeyFilter(1, proposalPubKey)!,
         ]),
-        getGovernanceChatMessages(endpoint, proposalPubKey),
+        getGovernanceChatMessages(connection, proposalPubKey),
         getGovernanceAccount(
           connection,
           proposal.account.tokenOwnerRecord,
@@ -506,11 +505,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
     },
     async fetchChatMessages(proposalPubKey: PublicKey) {
-      const endpoint = get().connection.endpoint
+      const connection = get().connection.current
       const set = get().set
 
       const chatMessages = await getGovernanceChatMessages(
-        endpoint,
+        connection,
         proposalPubKey
       )
 
@@ -597,13 +596,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
     },
     async fetchVoteRecords(proposal: ProgramAccount<Proposal>) {
-      const endpoint = get().connection.endpoint
+      const connection = get().connection.current
       const set = get().set
 
       const programId = proposal.owner
       const voteRecordsByVoter = await getVoteRecordsByVoter(
+        connection,
         programId,
-        endpoint,
         proposal.pubkey
       )
 
