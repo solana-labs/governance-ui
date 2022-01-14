@@ -1,5 +1,23 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
+
+interface LockupKindNone {
+  none: object
+}
+interface Lockup {
+  endTs: BN
+  kind: LockupKindNone
+  startTs: BN
+}
+export interface Deposit {
+  allowClawback: boolean
+  amountDepositedNative: BN
+  amountInitiallyLockedNative: BN
+  isUsed: boolean
+  lockup: Lockup
+  votingMintConfigIdx: number
+}
 
 export const getRegistrarPDA = async (
   realmPubKey: PublicKey,
@@ -62,4 +80,27 @@ export const tryGetVoter = async (
   } catch (e) {
     return null
   }
+}
+
+export const getUsedDeposit = async (
+  realmPubKey: PublicKey,
+  mint: PublicKey,
+  walletPubKey: PublicKey,
+  client: VsrClient,
+  kind: 'none'
+) => {
+  const clientProgramId = client.program.programId
+  const { registrar } = await getRegistrarPDA(
+    realmPubKey,
+    mint,
+    clientProgramId
+  )
+  const { voter } = await getVoterPDA(registrar, walletPubKey, clientProgramId)
+  const existingVoter = await tryGetVoter(voter, client)
+
+  const deposit = (existingVoter?.deposits as Deposit[]).find(
+    (x) => x.isUsed && typeof x.lockup.kind[kind] !== 'undefined'
+  )
+  console.log(deposit)
+  return deposit
 }

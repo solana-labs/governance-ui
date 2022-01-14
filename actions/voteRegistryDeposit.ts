@@ -17,6 +17,7 @@ import {
 } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import {
+  Deposit,
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
@@ -35,7 +36,7 @@ export const voteRegistryDeposit = async (
   amount: BN,
   hasTokenRecordInsideSPL: boolean,
   client?: VsrClient
-): Promise<null> => {
+) => {
   if (!client) {
     throw 'no vote registry plugin'
   }
@@ -72,7 +73,8 @@ export const voteRegistryDeposit = async (
   )
 
   if (!hasTokenRecordInsideSPL) {
-    withCreateTokenOwnerRecord(
+    //do we need await here ?
+    await withCreateTokenOwnerRecord(
       instructions,
       realmOwner,
       realmPubKey,
@@ -97,23 +99,25 @@ export const voteRegistryDeposit = async (
       })
     )
   }
-  //@ts-ignore
-  const indexOfDepositEntryWithTypeNone = existingVoter?.deposits.findIndex(
+  //TODO Check mint of deposit ?
+  const indexOfDepositEntryWithTypeNone = (existingVoter?.deposits as Deposit[]).findIndex(
     (x) => x.isUsed && typeof x.lockup.kind.none !== 'undefined'
   )
   const isExistingDepositEntry = indexOfDepositEntryWithTypeNone !== -1
-  //@ts-ignore
-  const firstFreeIdx = existingVoter?.deposits.findIndex((x) => !x.isUsed)
+  const firstFreeIdx = (existingVoter?.deposits as Deposit[]).findIndex(
+    (x) => !x.isUsed
+  )
 
   if (!isExistingDepositEntry) {
     const lockUpPeriodInSeconds = 0
     const allowClawback = false
+    const startTime = new BN(new Date().getTime())
     //TODO are we sure ata is created here and we dont need to init it ?
     instructions.push(
       client?.program.instruction.createDepositEntry(
         firstFreeIdx,
         { none: {} },
-        new BN(new Date().getTime()),
+        startTime,
         lockUpPeriodInSeconds,
         allowClawback,
         {
@@ -161,6 +165,4 @@ export const voteRegistryDeposit = async (
     sendingMessage: `Depositing`,
     successMessage: `Deposit successful`,
   })
-
-  return null
 }

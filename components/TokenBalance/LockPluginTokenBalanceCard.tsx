@@ -6,7 +6,6 @@ import { Proposal, ProposalState, RpcContext } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '../../models/api'
 import { getProposal } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
-import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '../../utils/send'
 import Button from '../Button'
@@ -26,6 +25,9 @@ import Tooltip from '@components/Tooltip'
 import { voteRegistryDeposit } from 'actions/voteRegistryDeposit'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from '@hooks/useVoteRegistry'
+import { withVoteRegistryWithdraw } from 'actions/withVoteRegistryWithdraw'
+import { Deposit, getUsedDeposit } from '@utils/voteRegistryTools'
+import { useEffect, useState } from 'react'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -128,6 +130,7 @@ const TokenDeposit = ({
   if (!mint || mint.supply.isZero()) {
     return null
   }
+  const [depositRecord, setDeposit] = useState<Deposit | null>(null)
 
   const depositTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -150,7 +153,7 @@ const TokenDeposit = ({
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
 
-  const depositTokens = async function () {
+  const depositTokens = async function (amount: BN) {
     if (!realm) {
       throw 'No realm selected'
     }
@@ -169,7 +172,7 @@ const TokenDeposit = ({
       depositMint!,
       realm.pubkey,
       realm.owner,
-      new BN(10000),
+      amount,
       hasSPLaccount,
       client
     )
@@ -178,7 +181,8 @@ const TokenDeposit = ({
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const depositAllTokens = async () => await depositTokens()
+  const depositAllTokens = async () =>
+    await depositTokens(depositTokenAccount!.account.amount)
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
@@ -241,14 +245,16 @@ const TokenDeposit = ({
         )
       }
     }
-
-    await withWithdrawGoverningTokens(
+    //todo amount from
+    await withVoteRegistryWithdraw(
       instructions,
-      realmInfo!.programId,
-      realm!.pubkey,
-      depositTokenAccount!.publicKey,
+      wallet!.publicKey!,
+      depositTokenAccount!.publicKey!,
       depositTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!
+      realm!.pubkey!,
+      depositRecord!.amountDepositedNative,
+      tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
+      client
     )
 
     try {
@@ -273,8 +279,21 @@ const TokenDeposit = ({
       }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      handleGetUsedDeposit()
     } catch (ex) {
       console.error("Can't withdraw tokens", ex)
+    }
+  }
+  const handleGetUsedDeposit = async () => {
+    const deposit = await getUsedDeposit(
+      realm!.pubkey,
+      depositTokenRecord!.account.governingTokenMint,
+      wallet!.publicKey!,
+      client!,
+      'none'
+    )
+    if (deposit) {
+      setDeposit(deposit)
     }
   }
 
@@ -282,8 +301,7 @@ const TokenDeposit = ({
     depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0))
 
   const hasTokensDeposited =
-    depositTokenRecord &&
-    depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0))
+    depositRecord && depositRecord.amountDepositedNative.gt(new BN(0))
 
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'
@@ -302,11 +320,8 @@ const TokenDeposit = ({
     : ''
 
   const availableTokens =
-    depositTokenRecord && mint
-      ? fmtMintAmount(
-          mint,
-          depositTokenRecord.account.governingTokenDepositAmount
-        )
+    depositRecord && mint
+      ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
       : '0'
 
   const canShowAvailableTokensMessage =
@@ -319,6 +334,12 @@ const TokenDeposit = ({
       : canDepositToken
       ? availableTokens
       : 0
+
+  useEffect(() => {
+    if (client && wallet?.connected) {
+      handleGetUsedDeposit()
+    }
+  }, [wallet?.connected, client])
 
   return (
     <>
