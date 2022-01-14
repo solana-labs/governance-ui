@@ -33,6 +33,7 @@ export async function sendTransaction({
   sendingMessage = 'Sending transaction...',
   successMessage = 'Transaction confirmed',
   timeout = DEFAULT_TIMEOUT,
+  notifyUser = true,
 }: {
   transaction: Transaction
   wallet: Wallet
@@ -41,6 +42,7 @@ export async function sendTransaction({
   sendingMessage?: string
   successMessage?: string
   timeout?: number
+  notifyUser?: boolean
 }) {
   const signedTransaction = await signTransaction({
     transaction,
@@ -55,6 +57,7 @@ export async function sendTransaction({
     sendingMessage,
     successMessage,
     timeout,
+    notifyUser,
   })
 }
 
@@ -110,22 +113,21 @@ export async function sendSignedTransaction({
   sendingMessage = 'Sending transaction...',
   successMessage = 'Transaction confirmed',
   timeout = DEFAULT_TIMEOUT,
+  notifyUser = true,
 }: {
   signedTransaction: Transaction
   connection: Connection
   sendingMessage?: string
   successMessage?: string
   timeout?: number
+  notifyUser?: boolean
 }): Promise<string> {
-  // debugger
-  console.log('raw tx')
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
 
-  console.log('raw tx', rawTransaction)
-
-  notify({ message: sendingMessage })
-  console.log('notify')
+  if (notifyUser) {
+    notify({ message: sendingMessage })
+  }
 
   const txid: TransactionSignature = await connection.sendRawTransaction(
     rawTransaction,
@@ -133,9 +135,6 @@ export async function sendSignedTransaction({
       skipPreflight: true,
     }
   )
-  console.log('notify2')
-
-  console.log('Started awaiting confirmation for', txid)
 
   let done = false
 
@@ -150,8 +149,6 @@ export async function sendSignedTransaction({
   })()
 
   try {
-    console.log('calling confirmation sig', txid, timeout, connection)
-
     console.log(
       'calling signatures confirmation',
       await awaitTransactionSignatureConfirmation(txid, timeout, connection)
@@ -194,16 +191,17 @@ export async function sendSignedTransaction({
       throw new TransactionError(JSON.stringify(simulateResult.err), txid)
     }
 
-    console.log('transaction error lasdkasdn')
-
     throw new TransactionError('Transaction failed', txid)
   } finally {
     done = true
   }
 
-  notify({ message: successMessage, type: 'success', txid })
+  if (notifyUser) {
+    notify({ message: successMessage, type: 'success', txid })
+  }
 
   console.log('Latency', txid, getUnixTs() - startTime)
+
   return txid
 }
 

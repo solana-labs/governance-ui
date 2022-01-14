@@ -1,11 +1,15 @@
 import { RpcContext } from '@models/core/api'
 import { getInstructionDataFromBase64 } from '@models/serialisation'
 import { PublicKey } from '@solana/web3.js'
+import { getTimestampFromDays } from '@tools/sdk/units'
+import { formValidation, isFormValid } from '@utils/formValidation'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { createProposal } from './createProposal'
 
 export const handlePropose = async ({
   getInstruction,
   form,
+  schema,
   governance,
   connection,
   callback,
@@ -26,12 +30,13 @@ export const handlePropose = async ({
 
   setIsLoading(true)
 
-  const instruction = await getInstruction()
+  const instructions: UiInstruction[] = await getInstruction()
 
-  console.log('calling handle common', instruction)
+  console.log('calling handle common', instructions)
 
-  if (instruction.isValid) {
-    console.log('calling handle valid')
+  const { isValid }: formValidation = await isFormValid(schema, form)
+
+  if (isValid && instructions.every((x) => x.isValid)) {
     const selectedGovernance = await getSelectedGovernance()
 
     let proposalAddress: PublicKey | null = null
@@ -54,13 +59,17 @@ export const handlePropose = async ({
       connection.endpoint
     )
 
-    const instructionData = {
-      data: instruction.serializedInstruction
-        ? getInstructionDataFromBase64(instruction.serializedInstruction)
-        : null,
-      holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
-      prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-    }
+    const instructionsData = instructions.map((x) => {
+      return {
+        data: x.serializedInstruction
+          ? getInstructionDataFromBase64(x.serializedInstruction)
+          : null,
+        holdUpTime: x.customHoldUpTime
+          ? getTimestampFromDays(x.customHoldUpTime)
+          : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+        prerequisiteInstructions: x.prerequisiteInstructions || [],
+      }
+    })
 
     try {
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
@@ -91,7 +100,7 @@ export const handlePropose = async ({
         form.description ? form.description : '',
         proposalMint,
         selectedGovernance?.info?.proposalCount,
-        [instructionData],
+        instructionsData,
         false
       )
 

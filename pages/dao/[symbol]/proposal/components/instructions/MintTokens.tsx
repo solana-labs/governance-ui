@@ -137,8 +137,10 @@ const MintTokens = ({
     })
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return getMintInstruction({
+  const getInstruction = async (): Promise<UiInstruction[]> => {
+    const instructions: UiInstruction[] = []
+
+    const mintInstruction = await getMintInstruction({
       schema,
       form,
       programId,
@@ -147,6 +149,10 @@ const MintTokens = ({
       governedMintInfoAccount: form.mintAccount,
       setFormErrors,
     })
+
+    instructions.push(mintInstruction)
+
+    return instructions
   }
 
   useEffect(() => {
@@ -207,6 +213,7 @@ const MintTokens = ({
     return await handlePropose({
       getInstruction,
       form,
+      schema,
       connection,
       callback,
       governance: form.mintAccount?.governance,
@@ -216,6 +223,8 @@ const MintTokens = ({
       setIsLoading,
     })
   }
+
+  const proposalTitle = `Mint ${form.amount} tokens using mint account ${form.mintAccount}`
 
   return (
     <NewProposalContext.Provider
@@ -296,7 +305,6 @@ const MintTokens = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={handleConfirm}
-            isLoading={isLoading}
             disabled={isLoading || !form.destinationAccount}
           >
             Mint tokens
@@ -310,7 +318,7 @@ const MintTokens = ({
             wrapperClassName="mb-6"
             label="Title of your proposal"
             placeholder="Title of your proposal (optional)"
-            value={form.title || ''}
+            value={form.title || proposalTitle}
             type="text"
             onChange={(event) =>
               handleSetForm({

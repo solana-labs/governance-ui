@@ -14,7 +14,6 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -312,23 +311,6 @@ export const getCustomNoneSchema = ({ custom }) => {
           .object()
           .nullable()
           .required('Governed account is required'),
-        base64: yup
-          .string()
-          .required('Instruction is required')
-          .test('base64Test', 'Invalid base64', function (val: string) {
-            if (val) {
-              try {
-                getInstructionDataFromBase64(val)
-                return true
-              } catch (e) {
-                return false
-              }
-            } else {
-              return this.createError({
-                message: `Instruction is required`,
-              })
-            }
-          }),
       })
     : yup.object().shape({
         governedAccount: yup

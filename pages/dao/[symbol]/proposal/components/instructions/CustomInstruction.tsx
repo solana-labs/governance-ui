@@ -46,7 +46,6 @@ const CustomInstruction = ({
   governance: ParsedAccount<Governance> | null
   setGovernance: any
   callback: any
-  instructions?: any
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -63,7 +62,14 @@ const CustomInstruction = ({
     governancesArray,
     governedTokenAccounts,
     getMintWithGovernances,
+    getAvailableInstructions,
   } = useGovernanceAssets()
+
+  const availableInstructions = getAvailableInstructions()
+  const initialInstruction = availableInstructions.find(
+    (instruction) =>
+      instruction.id === (!custom ? Instructions.Base64 : Instructions.None)
+  )
 
   const [formErrors, setFormErrors] = useState({})
   const [custom, setCustom] = useState(false)
@@ -90,7 +96,20 @@ const CustomInstruction = ({
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
-  >([{ type: Instructions.Transfer }])
+  >([{ type: initialInstruction }])
+
+  useEffect(() => {
+    console.log('000', instructionsData[0])
+    // setInstructions([instructionsData[0]])
+  }, [instructionsData[0].governedAccount?.pubkey])
+
+  useEffect(() => {
+    const firstInstruction = instructionsData[0]
+
+    if (firstInstruction && firstInstruction.governedAccount) {
+      setGovernance(firstInstruction.governedAccount)
+    }
+  }, [instructionsData[0]])
 
   useEffect(() => {
     const prepGovernances = async () => {
@@ -124,22 +143,16 @@ const CustomInstruction = ({
     prepGovernances()
   }, [])
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const schema = getCustomNoneSchema({ custom })
+
+  const getInstruction = async (): Promise<UiInstruction[]> => {
+    const instructions: UiInstruction[] = []
+
     const isValid = await validateInstruction({
       schema,
       form,
       setFormErrors,
     })
-
-    if (custom) {
-      const obj: UiInstruction = {
-        serializedInstruction: '',
-        isValid,
-        governance: form.governedAccount?.governance,
-      }
-
-      return obj
-    }
 
     let serializedInstruction = ''
 
@@ -152,13 +165,15 @@ const CustomInstruction = ({
     }
 
     const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
+      serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
       customHoldUpTime: form.holdUpTime,
     }
 
-    return obj
+    instructions.push(obj)
+
+    return instructions
   }
 
   const handleSetInstructions = (val: any, index) => {
@@ -166,20 +181,10 @@ const CustomInstruction = ({
 
     newInstructions[index] = { ...instructionsData[index], ...val }
 
+    console.log(newInstructions)
+
     setInstructions(newInstructions)
   }
-
-  useEffect(() => {
-    handleSetInstructions(
-      {
-        governedAccount: form.governedAccount?.governance,
-        getInstruction,
-      },
-      index
-    )
-  }, [form])
-
-  const schema = getCustomNoneSchema({ custom })
 
   const validateAmountOnBlur = () => {
     const value = form.holdUpTime
@@ -205,6 +210,7 @@ const CustomInstruction = ({
     return await handlePropose({
       getInstruction,
       form,
+      schema,
       connection,
       callback,
       governance: form.governedAccount?.governance,
@@ -214,6 +220,25 @@ const CustomInstruction = ({
       setIsLoading,
     })
   }
+
+  useEffect(() => {
+    handleSetInstructions(
+      {
+        governedAccount: form.governedAccount?.governance,
+        getInstruction,
+      },
+      index
+    )
+
+    handleSetForm({
+      value: governedAccounts[0],
+      propertyName: 'governedAccount',
+    })
+  }, [])
+
+  const proposalTitle = !custom
+    ? 'Custom instruction proposal'
+    : 'Vote only proposal'
 
   return (
     <NewProposalContext.Provider
@@ -243,7 +268,7 @@ const CustomInstruction = ({
             onChange={(value) => {
               handleSetForm({ value, propertyName: 'governedAccount' })
             }}
-            value={form.governedAccount}
+            value={form.governedAccount || governedAccounts[0]}
             error={formErrors['governedAccount']}
             shouldBeGoverned={shouldBeGoverned}
             governance={governance}
@@ -271,22 +296,23 @@ const CustomInstruction = ({
                 onBlur={validateAmountOnBlur}
               />
 
-              <Textarea
-                noMaxWidth
-                useDefaultStyle={false}
-                className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
-                wrapperClassName="mb-6 w-full"
-                label="Instruction"
-                placeholder="Base64 encoded serialized Solana instruction"
-                value={form.base64}
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'base64',
-                  })
-                }
-                error={formErrors['base64']}
-              />
+              <div className="w-full flex items-center justify-center gap-x-4">
+                <Textarea
+                  noMaxWidth
+                  useDefaultStyle={false}
+                  className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+                  wrapperClassName="mb-6 w-full"
+                  label="Instruction"
+                  placeholder="Base64 encoded serialized Solana instruction"
+                  value={form.base64}
+                  onChange={(event) =>
+                    handleSetForm({
+                      value: event.target.value,
+                      propertyName: 'base64',
+                    })
+                  }
+                />
+              </div>
             </>
           )}
 
@@ -299,8 +325,7 @@ const CustomInstruction = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={confirmPropose}
-            isLoading={isLoading}
-            disabled={isLoading || !form.governedAccount}
+            disabled={isLoading || (!custom && !form.governedAccount)}
           >
             Create proposal
           </Button>
@@ -313,7 +338,7 @@ const CustomInstruction = ({
             wrapperClassName="my-6"
             label="Title of your proposal"
             placeholder="Title of your proposal (optional)"
-            value={form.title || ''}
+            value={form.title || proposalTitle}
             type="text"
             onChange={(event) =>
               handleSetForm({

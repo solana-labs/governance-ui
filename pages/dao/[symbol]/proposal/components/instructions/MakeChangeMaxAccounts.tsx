@@ -94,7 +94,9 @@ const MakeChangeMaxAccounts = ({
     return isValid
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const getInstruction = async (): Promise<UiInstruction[]> => {
+    const instructions: UiInstruction[] = []
+
     const isValid = await validateInstruction()
 
     let serializedInstruction = ''
@@ -124,7 +126,9 @@ const MakeChangeMaxAccounts = ({
       governance: form.governedAccount?.governance,
     }
 
-    return obj
+    instructions.push(obj)
+
+    return instructions
   }
 
   const getSelectedGovernance = async () => {
@@ -137,6 +141,7 @@ const MakeChangeMaxAccounts = ({
     return await handlePropose({
       getInstruction,
       form,
+      schema,
       connection,
       callback,
       governance: form.governedAccount?.governance,
@@ -203,6 +208,7 @@ const MakeChangeMaxAccounts = ({
             className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
             wrapperClassName="my-6 w-full"
             label="Mango group key"
+            placeholder="Mango group key"
             value={form.mangoGroupKey}
             type="text"
             onChange={(evt) =>
@@ -236,7 +242,6 @@ const MakeChangeMaxAccounts = ({
             className="w-44 flex justify-center items-center mt-8"
             onClick={confirmPropose}
             disabled={!form.mangoGroupKey || isLoading || !form.governedAccount}
-            isLoading={isLoading}
           >
             Create proposal
           </Button>
@@ -249,7 +254,7 @@ const MakeChangeMaxAccounts = ({
             wrapperClassName="mb-6"
             label="Title of your proposal"
             placeholder="Title of your proposal (optional)"
-            value={form.title || ''}
+            value={form.title || 'Mango - Change max accounts'}
             type="text"
             onChange={(event) =>
               handleSetForm({

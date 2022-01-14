@@ -5,11 +5,11 @@ import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 
-export type AccountLabel = {
+const AccountHeader = ({
+  background = 'bg-bkg-1',
+}: {
   background?: string
-}
-
-const AccountHeader = ({ background = 'bg-bkg-1' }: AccountLabel) => {
+}) => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -44,7 +44,7 @@ const AccountHeader = ({ background = 'bg-bkg-1' }: AccountLabel) => {
   }, [currentAccount])
   return (
     <div
-      className={`${background} mb-4 px-4 py-2 rounded-md w-full flex items-center`}
+      className={`${background} mb-4 p-4 border border-primary-dark rounded-md w-full flex items-center`}
     >
       {(tokenInfo?.logoURI || isNFT) && (
         <img

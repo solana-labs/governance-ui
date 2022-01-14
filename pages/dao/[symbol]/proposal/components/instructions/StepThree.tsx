@@ -10,7 +10,7 @@ const StepThree = ({ dataCreation, setSelectedStep }) => {
     <div className="w-full max-w-xl mt-16 rounded-xl">
       {dataCreation.error ? (
         <>
-          <div className="flex justify-center gap-x-3 items-start">
+          <div className="flex justify-start gap-x-3 items-start">
             <XCircleIcon className="w-12 h-12 text-red" />
 
             <div className="flex gap-y-2 flex-col">
@@ -18,7 +18,7 @@ const StepThree = ({ dataCreation, setSelectedStep }) => {
 
               {`${dataCreation.error}`}
 
-              <div className="flex justify-center gap-x-4 mt-4 items-center">
+              <div className="flex justify-start gap-x-4 mt-4 items-center">
                 <Button
                   className="w-36 flex justify-center items-center"
                   onClick={() => setSelectedStep(0)}
@@ -31,7 +31,7 @@ const StepThree = ({ dataCreation, setSelectedStep }) => {
         </>
       ) : (
         <>
-          <div className="flex justify-center gap-x-3 items-start">
+          <div className="flex justify-start gap-x-3 items-start">
             <CheckCircleIcon className="w-12 h-12 text-green" />
 
             <div className="flex gap-y-2 flex-col">
@@ -39,7 +39,7 @@ const StepThree = ({ dataCreation, setSelectedStep }) => {
 
               <p>Share the link to your proposal for members start voting</p>
 
-              <div className="flex justify-center gap-x-4 mt-4 items-center">
+              <div className="flex justify-start gap-x-4 mt-4 items-center">
                 <SecondaryButton
                   className="md:w-44 w-32"
                   onClick={() => {

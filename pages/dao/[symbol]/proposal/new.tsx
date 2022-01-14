@@ -7,7 +7,6 @@ import useWalletStore from 'stores/useWalletStore'
 import {
   ComponentInstructionData,
   InstructionsContext,
-  // UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ParsedAccount } from '@models/core/accounts'
@@ -104,22 +103,6 @@ const New = () => {
     },
   }
 
-  // TODO: handle multiple instructions in custom proposal
-
-  // const handleGetInstructions = async () => {
-  //   const instructions: UiInstruction[] = []
-
-  //   for (const inst of instructionsData) {
-  //     if (inst && inst.getInstruction) {
-  //       const instruction: UiInstruction = await inst?.getInstruction()
-
-  //       instructions.push(instruction)
-  //     }
-  //   }
-
-  //   return instructions
-  // }
-
   return (
     <NewProposalContext.Provider
       value={{
@@ -177,9 +160,9 @@ const New = () => {
 
           {selectedStep === 1 && (
             <StepTwo
-              selectedType={selectedType}
               governance={governance}
               setGovernance={setGovernance}
+              selectedType={selectedType}
               setDataCreation={setDataCreation}
               setSelectedStep={setSelectedStep}
             />

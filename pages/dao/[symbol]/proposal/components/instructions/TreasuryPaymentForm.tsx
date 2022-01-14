@@ -180,8 +180,11 @@ const TreasuryPaymentFormFullScreen = ({
     return form.governedTokenAccount?.token?.publicKey && gte
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const getInstruction = async (): Promise<UiInstruction[]> => {
+    const instructions: UiInstruction[] = []
+
     const selectedNftMint = selectedNfts[0]?.mint
+
     const defaultProps = {
       schema,
       form,
@@ -192,12 +195,16 @@ const TreasuryPaymentFormFullScreen = ({
       setFormErrors,
     }
 
-    return isNFT
-      ? getTransferNftInstruction({
-          ...defaultProps,
-          nftMint: selectedNftMint,
-        })
-      : getTransferInstruction(defaultProps)
+    const nftTransferInstruction = await getTransferNftInstruction({
+      ...defaultProps,
+      nftMint: selectedNftMint,
+    })
+
+    const transferInstruction = await getTransferInstruction(defaultProps)
+
+    instructions.push(isNFT ? nftTransferInstruction : transferInstruction)
+
+    return instructions
   }
 
   const handleSetInstructions = (val: any, index) => {
@@ -264,6 +271,7 @@ const TreasuryPaymentFormFullScreen = ({
     return await handlePropose({
       getInstruction,
       form,
+      schema,
       connection,
       callback,
       governance: form.governedTokenAccount?.governance,
@@ -295,11 +303,6 @@ const TreasuryPaymentFormFullScreen = ({
     >
       <div className="w-full flex justify-between items-start">
         <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
-          <div className="w-full">
-            <p className="text-white pb-0.5 text-xs">Your balance</p>
-            <AccountLabel background="bg-bkg-3" />
-          </div>
-
           <GovernedAccountSelect
             noMaxWidth
             useDefaultStyle={false}
@@ -408,6 +411,11 @@ const TreasuryPaymentFormFullScreen = ({
         </div>
 
         <div className="max-w-xs w-full">
+          <div className="w-full">
+            <p className="text-white pb-0.5 text-xs">Your balance</p>
+            <AccountLabel background="bg-bkg-1" />
+          </div>
+
           <Input
             noMaxWidth
             useDefaultStyle

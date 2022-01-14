@@ -93,7 +93,9 @@ const ProgramUpgrade = ({
     setForm({ ...form, [propertyName]: value })
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const getInstruction = async (): Promise<UiInstruction[]> => {
+    const instructions: UiInstruction[] = []
+
     const isValid = await validateInstruction({ schema, form, setFormErrors })
 
     let serializedInstruction = ''
@@ -120,7 +122,9 @@ const ProgramUpgrade = ({
       governance: form.governedAccount?.governance,
     }
 
-    return obj
+    instructions.push(obj)
+
+    return instructions
   }
 
   useEffect(() => {
@@ -134,6 +138,7 @@ const ProgramUpgrade = ({
     if (form.bufferAddress) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
+
         setFormErrors(validationErrors)
       })
     }
@@ -159,6 +164,7 @@ const ProgramUpgrade = ({
     return await handlePropose({
       getInstruction,
       form,
+      schema,
       connection,
       callback,
       governance: form.governedAccount?.governance,
@@ -168,6 +174,8 @@ const ProgramUpgrade = ({
       setIsLoading,
     })
   }
+
+  const proposalTitle = `Upgrade program ${form.governedAccount} using ${form.bufferAddress}`
 
   return (
     <NewProposalContext.Provider
@@ -218,8 +226,7 @@ const ProgramUpgrade = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={confirmPropose}
-            isLoading={isLoading}
-            disabled={!form.bufferAddress}
+            disabled={!form.bufferAddress || isLoading}
           >
             Create proposal
           </Button>
@@ -232,7 +239,7 @@ const ProgramUpgrade = ({
             wrapperClassName="mb-6"
             label="Title of your proposal"
             placeholder="Title of your proposal (optional)"
-            value={form.title || ''}
+            value={form.title || proposalTitle}
             type="text"
             onChange={(event) =>
               handleSetForm({

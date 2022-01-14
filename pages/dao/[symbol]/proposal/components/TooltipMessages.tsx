@@ -46,13 +46,14 @@ export const tooltipMessage = () => {
       : ''
 
   const programUpgradeTooltip = validate(canUseProgramUpgradeInstruction)
-
   const mintTokensTooltip = validate(canUseMintInstruction)
+  const genericTooltip = validate(undefined)
 
   return {
     treasuryPaymentTooltip,
     addNewMemberTooltip,
     programUpgradeTooltip,
     mintTokensTooltip,
+    genericTooltip,
   }
 }

@@ -14,13 +14,17 @@ const Links = () => {
       <div className="bg-bkg-2 w-full p-4 rounded-md flex items-start justify-start gap-x-3">
         <LinkIcon className="" />
 
-        <a href="#">Docs & tutorials</a>
+        <a href="https://docs.realms.today/" rel="noreferrer" target="_blank">
+          Docs & tutorials
+        </a>
       </div>
 
       <div className="bg-bkg-2 mt-4 w-full p-4 rounded-md flex items-start justify-start gap-x-3">
         <DocIcon className="mr-1" />
 
-        <a href="#">About SPL</a>
+        <a href="https://spl.solana.com/" rel="noreferrer" target="_blank">
+          About SPL
+        </a>
       </div>
     </>
   )

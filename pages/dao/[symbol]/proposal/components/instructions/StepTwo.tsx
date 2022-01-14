@@ -9,12 +9,11 @@ import ProgramUpgrade from './ProgramUpgrade'
 import TreasuryPaymentFormFullScreen from './TreasuryPaymentForm'
 
 const StepTwo = ({
-  selectedType,
   setDataCreation,
   setSelectedStep,
+  selectedType,
   governance,
   setGovernance,
-  // handleGetInstructions
 }) => {
   const { fmtUrlWithCluster } = useQueryContext()
 
@@ -36,10 +35,8 @@ const StepTwo = ({
     setSelectedStep(2)
   }
 
-  // const instructions = handleGetInstructions();
-
-  const getCurrentInstruction = ({ typeId, idx }) => {
-    switch (typeId) {
+  const getCurrentInstruction = ({ selectedType, idx }) => {
+    switch (selectedType) {
       case Instructions.Transfer:
         return (
           <TreasuryPaymentFormFullScreen
@@ -52,8 +49,8 @@ const StepTwo = ({
       case Instructions.ProgramUpgrade:
         return (
           <ProgramUpgrade
-            setGovernance={setGovernance}
             index={idx}
+            setGovernance={setGovernance}
             governance={governance}
             callback={callback}
           />
@@ -61,8 +58,8 @@ const StepTwo = ({
       case Instructions.Mint:
         return (
           <MintTokens
-            setGovernance={setGovernance}
             index={idx}
+            setGovernance={setGovernance}
             governance={governance}
             callback={callback}
           />
@@ -70,8 +67,8 @@ const StepTwo = ({
       case Instructions.Base64 || Instructions.None:
         return (
           <CustomInstruction
-            setGovernance={setGovernance}
             index={idx}
+            setGovernance={setGovernance}
             governance={governance}
             callback={callback}
           />
@@ -79,27 +76,32 @@ const StepTwo = ({
       case Instructions.MangoMakeChangeMaxAccounts:
         return (
           <MakeChangeMaxAccounts
+            index={idx}
             callback={callback}
             setGovernance={setGovernance}
-            index={idx}
             governance={governance}
           />
         )
       case Instructions.AddMemberForm:
         return <AddMemberForm close={null} callback={callback} />
       default:
-        null
+        return (
+          <CustomInstruction
+            index={idx}
+            setGovernance={setGovernance}
+            governance={governance}
+            callback={callback}
+          />
+        )
     }
   }
 
   return (
     <>
-      <div className="w-full">
-        {getCurrentInstruction({
-          typeId: selectedType.idx,
-          idx: selectedType.idx,
-        })}
-      </div>
+      {getCurrentInstruction({
+        selectedType: selectedType.value,
+        idx: selectedType.idx,
+      })}
     </>
   )
 }

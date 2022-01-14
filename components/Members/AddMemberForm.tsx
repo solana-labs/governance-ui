@@ -103,8 +103,10 @@ const AddMemberForm = ({
 
   const schema = getMintSchema({ form, connection })
 
-  const getInstruction = async (): Promise<UiInstruction> => {
-    return getMintInstruction({
+  const getInstruction = async (): Promise<UiInstruction[]> => {
+    const instructions: UiInstruction[] = []
+
+    const mintInstruction = await getMintInstruction({
       schema,
       form,
       programId,
@@ -113,6 +115,10 @@ const AddMemberForm = ({
       governedMintInfoAccount: form.mintAccount,
       setFormErrors,
     })
+
+    instructions.push(mintInstruction)
+
+    return instructions
   }
 
   const getSelectedGovernance = async () => {
@@ -168,6 +174,7 @@ const AddMemberForm = ({
     return await handlePropose({
       getInstruction,
       form,
+      schema,
       connection,
       callback: close ? modalCallback : callback,
       governance: form.mintAccount?.governance,
@@ -297,10 +304,9 @@ const AddMemberForm = ({
             </SecondaryButton>
 
             <Button
-              disabled={!form.destinationAccount}
+              disabled={!form.destinationAccount || isLoading}
               className="w-44 flex justify-center items-center"
               onClick={confirmPropose}
-              isLoading={isLoading}
             >
               Add member
             </Button>
@@ -351,10 +357,13 @@ const AddMemberForm = ({
             />
 
             <Button
-              disabled={!form.destinationAccount}
+              disabled={
+                !form.destinationAccount ||
+                isLoading ||
+                formErrors['destinationAccount']
+              }
               className="w-44 flex justify-center items-center mt-8"
               onClick={confirmPropose}
-              isLoading={isLoading || formErrors['destinationAccount']}
             >
               Add member
             </Button>

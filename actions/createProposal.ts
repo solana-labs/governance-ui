@@ -107,6 +107,7 @@ export const createProposal = async (
     signers,
     sendingMessage: `creating ${notificationTitle}`,
     successMessage: `${notificationTitle} created`,
+    notifyUser: false,
   })
 
   return proposalAddress
