@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
 import { VoteRecord } from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
@@ -22,9 +23,7 @@ import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
 import useMembersListStore from 'stores/useMembersStore'
-import useWalletStore, {
-  getVoteRecordsByVoterMapByProposal,
-} from 'stores/useWalletStore'
+import useWalletStore from 'stores/useWalletStore'
 import { ViewState, WalletTokenRecordWithProposal } from './types'
 
 const MemberOverview = () => {
