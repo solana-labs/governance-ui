@@ -9,6 +9,7 @@ import {
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
 import { VoteRecord } from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
@@ -16,13 +17,14 @@ import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
 import useMembersListStore from 'stores/useMembersStore'
-import useWalletStore, { getVoteRecordsByProposal } from 'stores/useWalletStore'
+import useWalletStore from 'stores/useWalletStore'
 import { ViewState, WalletTokenRecordWithProposal } from './types'
 
 const MemberOverview = () => {
@@ -73,18 +75,18 @@ const MemberOverview = () => {
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
       const results = await Promise.all([
-        getVoteRecordsByProposal(
+        getVoteRecordsByVoterMapByProposal(
+          connection.current,
           selectedRealm!.programId!,
-          connection.endpoint,
           new PublicKey(member!.walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
-          connection!.endpoint,
+          connection!.current,
           new PublicKey(member!.walletAddress)
         ),
       ])
       voteRecords = results[0]
-      chatMessages = results[1]
+      chatMessages = accountsToPubkeyMap(results[1])
     } catch (e) {
       notify({
         message: 'Unable to fetch vote records for selected wallet address',

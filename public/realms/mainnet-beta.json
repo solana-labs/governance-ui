@@ -265,5 +265,25 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "AvfMYqHjddR93zvmZXcQGUTkRu3GJYppTU93iKhMUWRF",
     "ogImage": "/realms/KiwiDAO/img/kiwi_logo.png"
+  },
+  {
+    "symbol": "FIDA",
+    "displayName": "Bonfida DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
+    "website": "https://bonfida.org",
+    "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@bonfida",
+    "ogImage": "https://bonfida.org/static/media/fida.b16d451b.svg"
+  },
+  {
+    "symbol": "N&F",
+    "displayName": "Nick & Family",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BuquUQDYsCBPxUsGXxWx7k9bS93kVXyPrb1wyw47fegs",
+    "website": "https://www.gofundme.com/f/support-nicks-fight-with-cancer?utm_campaign=p_cp+share-sheet&utm_medium=copy_link_all&utm_source=customer",
+    "twitter": "@NShaw89",
+    "ogImage": "/realms/N&F/img/Nick.png",
+    "bannerImage": "/realms/N&F/img/Nick-banner.jpeg"
   }
 ]
