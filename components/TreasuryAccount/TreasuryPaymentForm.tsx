@@ -203,14 +203,14 @@ const TreasuryPaymentForm = ({ close }) => {
         )
 
         const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
+          ? realm.account.communityMint
           : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : undefined
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
+            ? realm.account.config.councilMint
             : defaultProposalMint
 
         if (!proposalMint) {
