@@ -25,6 +25,9 @@ export interface RealmInfo {
   // og:image
   ogImage?: string
 
+  // banner mage
+  bannerImage?: string
+
   isCertified: boolean
 }
 
