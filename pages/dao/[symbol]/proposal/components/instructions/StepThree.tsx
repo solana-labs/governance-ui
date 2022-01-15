@@ -21,7 +21,7 @@ const StepThree = ({ dataCreation, setSelectedStep }) => {
               <div className="flex justify-start gap-x-4 mt-4 items-center">
                 <Button
                   className="w-36 flex justify-center items-center"
-                  onClick={() => setSelectedStep(0)}
+                  onClick={() => setSelectedStep(1)}
                 >
                   Try again
                 </Button>

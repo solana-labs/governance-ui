@@ -224,7 +224,7 @@ const MintTokens = ({
     })
   }
 
-  const proposalTitle = `Mint ${form.amount} tokens using mint account ${form.mintAccount}`
+  const proposalTitle = `Mint ${form.amount ? form.amount : ''} tokens`
 
   return (
     <NewProposalContext.Provider
@@ -305,7 +305,12 @@ const MintTokens = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={handleConfirm}
-            disabled={isLoading || !form.destinationAccount}
+            disabled={
+              isLoading ||
+              !form.destinationAccount ||
+              !form.amount ||
+              !form.mintAccount
+            }
           >
             Mint tokens
           </Button>

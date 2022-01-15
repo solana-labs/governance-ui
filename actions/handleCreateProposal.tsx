@@ -109,6 +109,8 @@ export const handlePropose = async ({
         error: null,
       })
     } catch (error) {
+      console.log(error)
+
       callback({
         error,
         url: null,

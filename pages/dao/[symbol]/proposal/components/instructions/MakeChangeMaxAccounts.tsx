@@ -241,7 +241,12 @@ const MakeChangeMaxAccounts = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={confirmPropose}
-            disabled={!form.mangoGroupKey || isLoading || !form.governedAccount}
+            disabled={
+              !form.mangoGroupKey ||
+              isLoading ||
+              !form.governedAccount ||
+              !form.maxMangoAccounts
+            }
           >
             Create proposal
           </Button>

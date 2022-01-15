@@ -175,7 +175,9 @@ const ProgramUpgrade = ({
     })
   }
 
-  const proposalTitle = `Upgrade program ${form.governedAccount} using ${form.bufferAddress}`
+  const proposalTitle = `Upgrade program ${
+    form.governedAccount ? form.governedAccount : ''
+  }`
 
   return (
     <NewProposalContext.Provider
@@ -226,7 +228,7 @@ const ProgramUpgrade = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={confirmPropose}
-            disabled={!form.bufferAddress || isLoading}
+            disabled={!form.bufferAddress || isLoading || !form.governedAccount}
           >
             Create proposal
           </Button>

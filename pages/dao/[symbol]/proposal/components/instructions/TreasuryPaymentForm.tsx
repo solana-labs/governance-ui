@@ -403,7 +403,8 @@ const TreasuryPaymentFormFullScreen = ({
             disabled={
               (isNFT && !selectedNfts.length) ||
               isLoading ||
-              !form.destinationAccount
+              !form.destinationAccount ||
+              (!isNFT && !form.amount)
             }
           >
             Create proposal

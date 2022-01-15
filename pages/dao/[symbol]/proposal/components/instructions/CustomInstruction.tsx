@@ -325,7 +325,9 @@ const CustomInstruction = ({
           <Button
             className="w-44 flex justify-center items-center mt-8"
             onClick={confirmPropose}
-            disabled={isLoading || (!custom && !form.governedAccount)}
+            disabled={
+              isLoading || !form.governedAccount || (!custom && !form.base64)
+            }
           >
             Create proposal
           </Button>
