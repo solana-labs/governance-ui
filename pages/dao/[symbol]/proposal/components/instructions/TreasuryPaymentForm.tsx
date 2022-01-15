@@ -301,8 +301,8 @@ const TreasuryPaymentFormFullScreen = ({
         setGovernance,
       }}
     >
-      <div className="w-full flex justify-between items-start">
-        <div className="w-full flex flex-col gap-y-5 justify-start items-start max-w-xl rounded-xl">
+      <div className="w-full flex lg:flex-row flex-col justify-between items-start">
+        <div className="w-full flex lg:mb-0 mb-20 flex-col gap-y-5 justify-start items-start lg:max-w-xl rounded-xl">
           <GovernedAccountSelect
             noMaxWidth
             useDefaultStyle={false}
@@ -411,7 +411,7 @@ const TreasuryPaymentFormFullScreen = ({
           </Button>
         </div>
 
-        <div className="max-w-xs w-full">
+        <div className="lg:max-w-xs max-w-xl w-full">
           <div className="w-full">
             <p className="text-white pb-0.5 text-xs">Your balance</p>
             <AccountLabel background="bg-bkg-1" />

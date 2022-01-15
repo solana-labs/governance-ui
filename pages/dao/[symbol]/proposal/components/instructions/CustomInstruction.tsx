@@ -249,8 +249,8 @@ const CustomInstruction = ({
         setGovernance,
       }}
     >
-      <div className="w-full flex md:flex-row flex-col justify-between items-start">
-        <div className="w-full flex md:mb-0 mb-20 flex-col gap-y-5 justify-start items-start md:max-w-xl rounded-xl">
+      <div className="w-full flex lg:flex-row flex-col justify-between items-start">
+        <div className="w-full flex lg:mb-0 mb-20 flex-col gap-y-5 justify-start items-start lg:max-w-xl rounded-xl">
           <VoteBySwitch
             tooltip="You can choose if you want to customize your proposal using a serialized instruction or if it will be for vote only. Enable for vote only and disable to customize."
             label="Vote only"
@@ -333,7 +333,7 @@ const CustomInstruction = ({
           </Button>
         </div>
 
-        <div className="max-w-xs w-full">
+        <div className="lg:max-w-xs max-w-xl w-full">
           <Input
             noMaxWidth
             useDefaultStyle

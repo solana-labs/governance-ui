@@ -220,7 +220,7 @@ const AddMemberForm = ({
           />
 
           <div
-            className={'flex items-center hover:cursor-pointer w-24 my-3'}
+            className="flex items-center hover:cursor-pointer w-24 my-3"
             onClick={() => setShowOptions(!showOptions)}
           >
             {showOptions ? (
@@ -317,11 +317,11 @@ const AddMemberForm = ({
           </div>
         </>
       ) : (
-        <div className="w-full flex md:flex-row flex-col justify-between items-start">
-          <div className="w-full flex md:mb-0 mb-20 flex-col gap-y-5 justify-start items-start md:max-w-xl rounded-xl">
+        <div className="w-full flex lg:flex-row flex-col justify-between items-start">
+          <div className="w-full flex lg:mb-0 mb-20 flex-col gap-y-5 justify-start items-start lg:max-w-xl rounded-xl">
             <Input
               useDefaultStyle={false}
-              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
               wrapperClassName="mb-6 w-full"
               label="Member's wallet"
               placeholder="Member's wallet"
@@ -340,8 +340,8 @@ const AddMemberForm = ({
             <Input
               noMaxWidth
               useDefaultStyle={false}
-              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-              wrapperClassName="mb-6 w-full md:w-1/2"
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+              wrapperClassName="mb-6 w-full lg:w-1/2"
               min={mintMinAmount}
               label="Voter weight"
               value={form.amount}
@@ -373,7 +373,7 @@ const AddMemberForm = ({
             </Button>
           </div>
 
-          <div className="md:max-w-xs w-full">
+          <div className="lg:max-w-xs max-w-xl w-full">
             <Input
               noMaxWidth
               useDefaultStyle
