@@ -10,7 +10,6 @@ import useWalletStore from 'stores/useWalletStore'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
-  ProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
 import {
@@ -20,8 +19,7 @@ import {
 } from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
 import { debounce } from 'utils/debounce'
-import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import { getMintInstruction } from 'utils/instructionTools'
@@ -47,7 +45,7 @@ const MintTokens = ({
   callback,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
   setGovernance: any
   callback?: any
 }) => {
@@ -81,7 +79,7 @@ const MintTokens = ({
   >([{ type: Instructions.Mint }])
 
   const [governedAccount, setGovernedAccount] = useState<
-    ParsedAccount<Governance> | undefined
+    ProgramAccount<Governance> | undefined
   >(undefined)
 
   const handleSetInstructions = (val: any, index) => {
@@ -92,10 +90,9 @@ const MintTokens = ({
     setInstructions(newInstructions)
   }
 
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] = useState<
+    ProgramAccount<AccountInfo> | undefined
+  >(undefined)
 
   const [formErrors, setFormErrors] = useState({})
 
@@ -167,14 +164,19 @@ const MintTokens = ({
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.destinationAccount)
         if (pubKey) {
-          const account = await tryGetTokenAccount(connection.current, pubKey)
-          setDestinationAccount(account ? account : null)
-        } else {
-          setDestinationAccount(null)
+          const account:
+            | ProgramAccount<AccountInfo>
+            | any = await tryGetTokenAccount(connection.current, pubKey)
+
+          setDestinationAccount(account ? account : undefined)
+
+          return
         }
+
+        setDestinationAccount(undefined)
       })
-    } else {
-      setDestinationAccount(null)
+
+      return
     }
   }, [form.destinationAccount])
 
@@ -198,7 +200,7 @@ const MintTokens = ({
   }, [])
 
   const destinationAccountName =
-    destinationAccount?.publicKey &&
+    destinationAccount?.pubkey &&
     getAccountName(destinationAccount?.account.address)
 
   const schema = getMintSchema({ form, connection })
@@ -206,7 +208,7 @@ const MintTokens = ({
   const getSelectedGovernance = async () => {
     return (await fetchRealmGovernance(
       form.mintAccount?.governance?.pubkey
-    )) as ParsedAccount<Governance>
+    )) as ProgramAccount<Governance>
   }
 
   const handleConfirm = async () => {

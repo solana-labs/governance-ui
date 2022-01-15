@@ -4,7 +4,7 @@ import {
   AccountMetaData,
   Proposal,
   ProposalInstruction,
-} from '../../models/accounts'
+} from '@solana/spl-governance'
 import {
   getAccountName,
   getInstructionDescriptor,
@@ -16,7 +16,7 @@ import { getExplorerUrl } from '../explorer/tools'
 import { getProgramName } from './programs/names'
 import { tryGetTokenAccount } from '@utils/tokens'
 import { ExecuteInstructionButton, PlayState } from './ExecuteInstructionButton'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import InspectorButton from '@components/explorer/inspectorButton'
 import { FlagInstructionErrorButton } from './FlagInstructionErrorButton'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
@@ -31,25 +31,28 @@ export default function InstructionCard({
   proposalInstruction,
 }: {
   index: number
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalInstruction>
 }) {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
   const [playing, setPlaying] = useState(
-    proposalInstruction.info.executedAt ? PlayState.Played : PlayState.Unplayed
+    proposalInstruction.account.executedAt
+      ? PlayState.Played
+      : PlayState.Unplayed
   )
   const [nftImgUrl, setNftImgUrl] = useState('')
   const [tokenImgUrl, setTokenImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
-      proposalInstruction.info.instruction
+      proposalInstruction.account.instruction
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
-      const sourcePk = proposalInstruction.info.instruction.accounts[0].pubkey
+      const sourcePk =
+        proposalInstruction.account.instruction.accounts[0].pubkey
       const tokenAccount = await tryGetTokenAccount(
         connection.current,
         sourcePk
@@ -89,7 +92,7 @@ export default function InstructionCard({
     getAmountImg()
   }, [proposalInstruction])
 
-  const proposalAuthority = tokenRecords[proposal.account.owner.toBase58()]
+  const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
   return (
     <div className="break-all">
       <h3 className="mb-4 flex">
@@ -99,10 +102,10 @@ export default function InstructionCard({
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}
-        programId={proposalInstruction.info.instruction.programId}
+        programId={proposalInstruction.account.instruction.programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
-        {proposalInstruction.info.instruction.accounts.map((am, idx) => (
+        {proposalInstruction.account.instruction.accounts.map((am, idx) => (
           <InstructionAccount
             endpoint={connection.endpoint}
             key={idx}
@@ -128,7 +131,7 @@ export default function InstructionCard({
       )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton
-          instructionData={proposalInstruction.info.instruction}
+          instructionData={proposalInstruction.account.instruction}
         />
 
         <FlagInstructionErrorButton

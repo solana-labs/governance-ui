@@ -8,7 +8,10 @@ import { tryGetMint } from '@utils/tokens'
 import useWalletStore from 'stores/useWalletStore'
 import { RealmWizardStepComponentProps } from '../interfaces/Realm'
 import Input from '@components/inputs/Input'
-import { MintMaxVoteWeightSource } from 'models/accounts'
+import {
+  MintMaxVoteWeightSource,
+  PROGRAM_VERSION_V1,
+} from '@solana/spl-governance'
 import { registerRealm } from 'actions/registerRealm'
 import { notify } from 'utils/notifications'
 import { formValidation, isFormValid } from '@utils/formValidation'
@@ -16,7 +19,7 @@ import { PublicKey } from '@solana/web3.js'
 import { CreateFormSchema } from '../validators/createRealmValidator'
 import _ from 'lodash'
 import useQueryContext from '@hooks/useQueryContext'
-import { ProgramVersion } from '@models/registry/constants'
+
 import router from 'next/router'
 
 const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
@@ -59,7 +62,7 @@ const CreateRealmForm: React.FC<RealmWizardStepComponentProps> = ({
             walletPubkey: wallet!.publicKey!,
           },
           new PublicKey(form.governanceProgramId!),
-          form.programVersion ?? ProgramVersion.V1,
+          form.programVersion ?? PROGRAM_VERSION_V1,
           form.name!,
           new PublicKey(form.communityMintId!),
           form.councilMintId ? new PublicKey(form.councilMintId) : undefined,

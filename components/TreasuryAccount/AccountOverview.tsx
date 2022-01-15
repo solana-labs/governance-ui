@@ -48,13 +48,18 @@ const AccountOverview = () => {
   const accountPublicKey = currentAccount
     ? isNFT
       ? currentAccount.governance?.pubkey
-      : currentAccount.governance?.info.governedAccount
+      : currentAccount.governance?.account.governedAccount
     : null
 
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
+
+  if (!currentAccount) {
+    return null
+  }
+
   return (
     <>
       <h3 className="mb-4 flex items-center">

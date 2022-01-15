@@ -40,7 +40,7 @@ const AccountItem = ({
       : 0
 
   const accountPublicKey = governedAccountTokenAccount
-    ? governedAccountTokenAccount.governance?.info.governedAccount
+    ? governedAccountTokenAccount.governance?.account.governedAccount
     : null
 
   function handleSetTotalPrice() {

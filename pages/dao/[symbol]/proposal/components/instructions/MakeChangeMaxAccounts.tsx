@@ -10,10 +10,13 @@ import {
   Instructions,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import {
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@models/serialisation'
 import Input from '@components/inputs/Input'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { makeChangeMaxMangoAccountsInstruction } from '@blockworks-foundation/mango-client'
@@ -31,7 +34,7 @@ const MakeChangeMaxAccounts = ({
   callback,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
   setGovernance: any
   callback: any
 }) => {
@@ -104,12 +107,12 @@ const MakeChangeMaxAccounts = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
       const setMaxMangoAccountsInstr = makeChangeMaxMangoAccountsInstruction(
-        form.governedAccount.governance.info.governedAccount,
+        form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.mangoGroupKey!),
         form.governedAccount.governance.pubkey,
         new BN(form.maxMangoAccounts)
@@ -134,7 +137,7 @@ const MakeChangeMaxAccounts = ({
   const getSelectedGovernance = async () => {
     return (await fetchRealmGovernance(
       form.governedAccount?.governance?.pubkey
-    )) as ParsedAccount<Governance>
+    )) as ProgramAccount<Governance>
   }
 
   const confirmPropose = async () => {

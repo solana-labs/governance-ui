@@ -10,8 +10,7 @@ import { getMintSchema } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
-import { Governance } from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { getMintInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
 import {
@@ -62,7 +61,7 @@ const AddMemberForm = ({
     mintAccount: undefined,
     programId: programId?.toString(),
     description: '',
-    title: '',
+    title: 'Add council member',
   })
 
   const mintMinAmount = form.mintAccount
@@ -124,7 +123,7 @@ const AddMemberForm = ({
   const getSelectedGovernance = async () => {
     return (await fetchRealmGovernance(
       form.mintAccount?.governance?.pubkey
-    )) as ParsedAccount<Governance>
+    )) as ProgramAccount<Governance>
   }
 
   useEffect(() => {
@@ -134,8 +133,8 @@ const AddMemberForm = ({
       handleSetForm({
         value: response.find(
           (x) =>
-            x.governance?.info.governedAccount.toBase58() ===
-            realm?.info.config.councilMint?.toBase58()
+            x.governance?.account.governedAccount.toBase58() ===
+            realm?.account.config.councilMint?.toBase58()
         ),
         propertyName: 'mintAccount',
       })
@@ -185,7 +184,7 @@ const AddMemberForm = ({
         setIsLoading,
       })
     } catch (error) {
-      console.log('error minting tokens', error)
+      console.log('error adding member', error)
     }
   }
 
@@ -240,7 +239,7 @@ const AddMemberForm = ({
                 wrapperClassName="mb-6"
                 label="Title of your proposal"
                 placeholder="Title of your proposal"
-                value={form.title}
+                value={form.title || proposalTitle}
                 type="text"
                 onChange={(event) =>
                   handleSetForm({

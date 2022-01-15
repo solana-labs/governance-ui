@@ -2,12 +2,21 @@
 import { useEffect, useState } from 'react'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { getSignatoryRecordAddress, ProposalState } from '../models/accounts'
+import {
+  getSignatoryRecordAddress,
+  ProposalState,
+} from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
-import CancelProposalModal from './CancelProposalModal'
-import FinalizeVotesModal from './FinalizeVotesModal'
-import SignOffProposalModal from './SignOffProposalModal'
+
+import { RpcContext } from '@solana/spl-governance'
+import { signOffProposal } from 'actions/signOffProposal'
+import { notify } from '@utils/notifications'
+import { finalizeVote } from 'actions/finalizeVotes'
+import { Proposal } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { cancelProposal } from 'actions/cancelProposal'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -18,14 +27,13 @@ const ProposalActionsPanel = () => {
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
+  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
+  const connection = useWalletStore((s) => s.connection)
 
-  const [showSignOffModal, setShowSignOffModal] = useState(false)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-  const [showFinalizeVoteModal, setShowFinalizeVoteModal] = useState(false)
-  const [showCancelModal, setShowCancelModal] = useState(false)
 
   const canFinalizeVote =
-    hasVoteTimeExpired && proposal?.info.state === ProposalState.Voting
+    hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
 
   const walletPk = wallet?.publicKey
 
@@ -49,17 +57,17 @@ const ProposalActionsPanel = () => {
 
   const canSignOff =
     signatoryRecord &&
-    (proposal?.info.state === ProposalState.Draft ||
-      proposal?.info.state === ProposalState.SigningOff)
+    (proposal?.account.state === ProposalState.Draft ||
+      proposal?.account.state === ProposalState.SigningOff)
 
   const canCancelProposal =
     proposal &&
     governance &&
     proposalOwner &&
     wallet?.publicKey &&
-    proposal.info.canWalletCancel(
-      governance.info,
-      proposalOwner.info,
+    proposal.account.canWalletCancel(
+      governance.account,
+      proposalOwner.account,
       wallet.publicKey
     )
 
@@ -68,8 +76,8 @@ const ProposalActionsPanel = () => {
     : !signatoryRecord
     ? 'Only a  signatory of the proposal can sign it off'
     : !(
-        proposal?.info.state === ProposalState.Draft ||
-        proposal?.info.state === ProposalState.SigningOff
+        proposal?.account.state === ProposalState.Draft ||
+        proposal?.account.state === ProposalState.SigningOff
       )
     ? 'Invalid proposal state. To sign off a proposal, it must be a draft or be in signing off state after creation.'
     : ''
@@ -80,9 +88,9 @@ const ProposalActionsPanel = () => {
       governance &&
       proposalOwner &&
       wallet?.publicKey &&
-      !proposal?.info.canWalletCancel(
-        governance.info,
-        proposalOwner.info,
+      !proposal?.account.canWalletCancel(
+        governance.account,
+        proposalOwner.account,
         wallet.publicKey
       )
     ? 'Only the owner of the proposal can execute this action'
@@ -92,15 +100,92 @@ const ProposalActionsPanel = () => {
     ? 'Connect your wallet to finalize this proposal'
     : !hasVoteTimeExpired
     ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
-    : proposal?.info.state === ProposalState.Voting
+    : proposal?.account.state === ProposalState.Voting
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
+  const handleFinalizeVote = async () => {
+    try {
+      if (proposal && realmInfo && governance) {
+        const rpcContext = new RpcContext(
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
+          connection.current,
+          connection.endpoint
+        )
 
+        await finalizeVote(rpcContext, governance?.account.realm, proposal)
+
+        await fetchProposal(proposal.pubkey)
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not finalize vote.`,
+        description: `${error}`,
+      })
+
+      console.error('error finalizing vote', error)
+    }
+  }
+
+  const handleSignOffProposal = async () => {
+    try {
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
+          connection.current,
+          connection.endpoint
+        )
+
+        await signOffProposal(rpcContext, signatoryRecord)
+
+        await fetchProposal(proposal.pubkey)
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not sign off proposal.`,
+        description: `${error}`,
+      })
+
+      console.error('error sign off', error)
+    }
+  }
+  const handleCancelProposal = async (
+    proposal: ProgramAccount<Proposal> | undefined
+  ) => {
+    try {
+      if (proposal && realmInfo) {
+        const rpcContext = new RpcContext(
+          proposal.owner,
+          getProgramVersionForRealm(realmInfo),
+          wallet!,
+          connection.current,
+          connection.endpoint
+        )
+
+        await cancelProposal(rpcContext, proposal)
+
+        await fetchProposal(proposal.pubkey)
+      }
+    } catch (error) {
+      notify({
+        type: 'error',
+        message: `Error: Could not cancel proposal.`,
+        description: `${error}`,
+      })
+
+      console.error('error cancelling proposal', error)
+    }
+  }
   return (
     <>
-      {ProposalState.Cancelled === proposal?.info.state ||
-      ProposalState.Succeeded === proposal?.info.state ||
-      ProposalState.Defeated === proposal?.info.state ||
+      {ProposalState.Cancelled === proposal?.account.state ||
+      ProposalState.Succeeded === proposal?.account.state ||
+      ProposalState.Defeated === proposal?.account.state ||
       (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">
@@ -108,7 +193,7 @@ const ProposalActionsPanel = () => {
               <Button
                 tooltipMessage={signOffTooltipContent}
                 className="w-1/2"
-                onClick={() => setShowSignOffModal(true)}
+                onClick={handleSignOffProposal}
                 disabled={!connected || !canSignOff}
               >
                 Sign Off
@@ -119,7 +204,7 @@ const ProposalActionsPanel = () => {
               <SecondaryButton
                 tooltipMessage={cancelTooltipContent}
                 className="w-1/2"
-                onClick={() => setShowCancelModal(true)}
+                onClick={() => handleCancelProposal(proposal)}
                 disabled={!connected}
               >
                 Cancel
@@ -130,38 +215,13 @@ const ProposalActionsPanel = () => {
               <Button
                 tooltipMessage={finalizeVoteTooltipContent}
                 className="w-1/2"
-                onClick={() => setShowFinalizeVoteModal(true)}
+                onClick={handleFinalizeVote}
                 disabled={!connected || !canFinalizeVote}
               >
                 Finalize
               </Button>
             )}
           </div>
-
-          {showSignOffModal && (
-            <SignOffProposalModal
-              isOpen={showSignOffModal && canSignOff}
-              onClose={() => setShowSignOffModal(false)}
-              signatoryRecord={signatoryRecord}
-            />
-          )}
-
-          {showFinalizeVoteModal && (
-            <FinalizeVotesModal
-              isOpen={showFinalizeVoteModal && canFinalizeVote ? true : false}
-              onClose={() => setShowFinalizeVoteModal(false)}
-              proposal={proposal}
-              governance={governance}
-            />
-          )}
-
-          {showCancelModal && (
-            <CancelProposalModal
-              // @ts-ignore
-              isOpen={showCancelModal && canCancelProposal}
-              onClose={() => setShowCancelModal(false)}
-            />
-          )}
         </div>
       )}
     </>

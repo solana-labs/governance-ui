@@ -94,7 +94,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     const isNFT = account.isNft
     const address = isNFT
       ? account!.governance!.pubkey
-      : account!.governance!.info.governedAccount
+      : account!.governance!.account.governedAccount
     try {
       recentActivity = await connection.current.getConfirmedSignaturesForAddress2(
         address,

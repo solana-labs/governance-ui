@@ -26,7 +26,7 @@ const MemberItem = ({ item }: { item: Member }) => {
   } = item
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = tokenService.tokenList.find(
-    (x) => x.address === realm?.info.communityMint.toBase58()
+    (x) => x.address === realm?.account.communityMint.toBase58()
   )?.symbol
   const totalVotes = votesCasted
   const communityAmount =

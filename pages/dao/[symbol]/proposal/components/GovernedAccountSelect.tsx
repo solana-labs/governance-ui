@@ -1,6 +1,9 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import {
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+} from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
   getTokenAccountLabelInfo,
@@ -26,7 +29,7 @@ const GovernedAccountSelect = ({
   error
   governedAccounts: GovernedMultiTypeAccount[]
   shouldBeGoverned
-  governance: ParsedAccount<Governance> | null | undefined
+  governance: ProgramAccount<Governance> | null | undefined
   label
   useDefaultStyle?: boolean
   className?: string
@@ -34,8 +37,7 @@ const GovernedAccountSelect = ({
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
-      const accountType = value.governance.info.accountType
-
+      const accountType = value.governance.account.accountType
       switch (accountType) {
         case GovernanceAccountType.MintGovernance:
           return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
@@ -44,7 +46,7 @@ const GovernedAccountSelect = ({
         case GovernanceAccountType.ProgramGovernance:
           return getProgramAccountLabel(value.governance)
         default:
-          return value.governance.info.governedAccount.toBase58()
+          return value.governance.account.governedAccount.toBase58()
       }
     }
 
@@ -98,12 +100,12 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
-  function getProgramAccountLabel(val: ParsedAccount<Governance>) {
-    const name = val ? getProgramName(val.info.governedAccount) : ''
+  function getProgramAccountLabel(val: ProgramAccount<Governance>) {
+    const name = val ? getProgramName(val.account.governedAccount) : ''
     return (
       <div className="flex flex-col">
         {name && <div>{name}</div>}
-        <div>{val?.info?.governedAccount?.toBase58()}</div>
+        <div>{val?.account?.governedAccount?.toBase58()}</div>
       </div>
     )
   }
@@ -128,7 +130,7 @@ const GovernedAccountSelect = ({
       onChange={onChange}
       componentLabel={getLabel(value)}
       placeholder="Please select..."
-      value={value?.governance?.info.governedAccount.toBase58()}
+      value={value?.governance?.account.governedAccount.toBase58()}
       error={error}
       noMaxWidth={noMaxWidth}
     >
@@ -142,7 +144,7 @@ const GovernedAccountSelect = ({
         .map((acc) => {
           return (
             <Select.Option
-              key={acc.governance?.info.governedAccount.toBase58()}
+              key={acc.governance?.account.governedAccount.toBase58()}
               value={acc}
             >
               {getLabel(acc)}

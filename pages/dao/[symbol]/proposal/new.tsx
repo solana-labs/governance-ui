@@ -9,8 +9,7 @@ import {
   InstructionsContext,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { ParsedAccount } from '@models/core/accounts'
-import { Governance } from '@models/accounts'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import StepOne from './components/instructions/StepOne'
 import StepThree from './components/instructions/StepThree'
 import StepTwo from './components/instructions/StepTwo'
@@ -45,7 +44,7 @@ const New = () => {
   const [
     governance,
     setGovernance,
-  ] = useState<ParsedAccount<Governance> | null>(null)
+  ] = useState<ProgramAccount<Governance> | null>(null)
 
   const [selectedStep, setSelectedStep] = useState(0)
 

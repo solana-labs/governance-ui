@@ -29,7 +29,7 @@ const Proposal = () => {
     noVoteCount,
     relativeNoVotes,
     relativeYesVotes,
-  } = useProposalVotes(proposal?.info)
+  } = useProposalVotes(proposal?.account)
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -48,7 +48,7 @@ const Proposal = () => {
                 <a
                   href={`https://${getRealmExplorerHost(
                     realmInfo
-                  )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.account.owner.toBase58()}`}
+                  )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.owner.toBase58()}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}
@@ -60,14 +60,14 @@ const Proposal = () => {
 
             <div className="border-b border-fgd-4 py-4">
               <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2">{proposal?.info.name}</h1>
+                <h1 className="mr-2">{proposal?.account.name}</h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
-                  proposal={proposal.info}
+                  proposal={proposal.account}
                   open={true}
                 />
               </div>
-              <ProposalTimeStatus proposal={proposal?.info} />
+              <ProposalTimeStatus proposal={proposal?.account} />
             </div>
 
             {description && (
@@ -91,7 +91,7 @@ const Proposal = () => {
       </div>
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-        <TokenBalanceCard proposal={option(proposal?.info)} />
+        <TokenBalanceCard proposal={option(proposal?.account)} />
         <div className="bg-bkg-2 rounded-lg">
           <div className="p-4 md:p-6">
             <h3 className="mb-4">Results</h3>

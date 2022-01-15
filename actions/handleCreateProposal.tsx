@@ -1,10 +1,13 @@
-import { RpcContext } from '@models/core/api'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
+import {
+  RpcContext,
+  getInstructionDataFromBase64,
+} from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { getTimestampFromDays } from '@tools/sdk/units'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { createProposal } from './createProposal'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export const handlePropose = async ({
   getInstruction,
@@ -30,6 +33,8 @@ export const handlePropose = async ({
 
   setIsLoading(true)
 
+  console.log('form', form)
+
   const instructions: UiInstruction[] = await getInstruction()
 
   console.log('calling handle common', instructions)
@@ -41,19 +46,15 @@ export const handlePropose = async ({
 
     let proposalAddress: PublicKey | null = null
 
-    console.log('after proposal address')
-
     if (!realm) {
       setIsLoading(false)
 
       throw new Error('No realm selected')
     }
 
-    console.log('govern', selectedGovernance)
-
     const rpcContext = new RpcContext(
-      new PublicKey(realm.account.owner.toString()),
-      realmInfo?.programVersion,
+      new PublicKey(realm.owner.toString()),
+      getProgramVersionForRealm(realmInfo!),
       wallet,
       connection.current,
       connection.endpoint
@@ -66,25 +67,30 @@ export const handlePropose = async ({
           : null,
         holdUpTime: x.customHoldUpTime
           ? getTimestampFromDays(x.customHoldUpTime)
-          : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+          : governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: x.prerequisiteInstructions || [],
       }
     })
 
+    console.log('instructions data', instructionsData)
+
     try {
+      console.log('ytycathc')
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-        governance.info.config
+        governance.account.config
       )
 
+      console.log('own token record', councilMint)
+
       const defaultProposalMint = !mint?.supply.isZero()
-        ? realm.info.communityMint
+        ? realm.account.communityMint
         : !councilMint?.supply.isZero()
-        ? realm.info.config.councilMint
+        ? realm.account.config.councilMint
         : undefined
 
       const proposalMint =
         canChooseWhoVote && form.voteByCouncil
-          ? realm.info.config.councilMint
+          ? realm.account.config.councilMint
           : defaultProposalMint
 
       if (!proposalMint) {
@@ -96,10 +102,10 @@ export const handlePropose = async ({
         realm.pubkey,
         selectedGovernance.pubkey,
         ownTokenRecord.pubkey,
-        form.title ? form.title : `Add proposal to ${symbol}`,
+        form.title ? form.title : 'Proposal',
         form.description ? form.description : '',
         proposalMint,
-        selectedGovernance?.info?.proposalCount,
+        selectedGovernance?.account.proposalCount,
         instructionsData,
         false
       )

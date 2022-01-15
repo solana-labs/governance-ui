@@ -1,23 +1,23 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { withFinalizeVote } from '@models/withFinalizeVote'
+import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
 import { TransactionInstruction } from '@solana/web3.js'
 import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { ProposalState } from '../models/accounts'
-import { RpcContext } from '../models/core/api'
-import { GoverningTokenType } from '../models/enums'
+import { ProposalState } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { GoverningTokenType } from '@solana/spl-governance'
 
-import { Vote } from '../models/instructions'
 import useWalletStore from '../stores/useWalletStore'
 import Button from './Button'
 import VoteCommentModal from './VoteCommentModal'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
-  const [vote, setVote] = useState(null)
+  const [vote, setVote] = useState<YesNoVote | null>(null)
   const {
     governance,
     proposal,
@@ -41,47 +41,50 @@ const VotePanel = () => {
 
   const isVoteCast = ownVoteRecord !== undefined
   const isVoting =
-    proposal?.info.state === ProposalState.Voting && !hasVoteTimeExpired
+    proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
 
   const isVoteEnabled =
     connected &&
     isVoting &&
     !isVoteCast &&
     voterTokenRecord &&
-    !voterTokenRecord.info.governingTokenDepositAmount.isZero()
+    !voterTokenRecord.account.governingTokenDepositAmount.isZero()
 
   const isWithdrawEnabled =
     connected &&
     ownVoteRecord &&
-    !ownVoteRecord?.info.isRelinquished &&
+    !ownVoteRecord?.account.isRelinquished &&
     proposal &&
-    (proposal!.info.state === ProposalState.Voting ||
-      proposal!.info.state === ProposalState.Completed ||
-      proposal!.info.state === ProposalState.Cancelled ||
-      proposal!.info.state === ProposalState.Succeeded ||
-      proposal!.info.state === ProposalState.Executing ||
-      proposal!.info.state === ProposalState.Defeated)
+    (proposal!.account.state === ProposalState.Voting ||
+      proposal!.account.state === ProposalState.Completed ||
+      proposal!.account.state === ProposalState.Cancelled ||
+      proposal!.account.state === ProposalState.Succeeded ||
+      proposal!.account.state === ProposalState.Executing ||
+      proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
     const rpcContext = new RpcContext(
-      proposal!.account.owner,
-      realmInfo?.programVersion,
-      wallet,
+      proposal!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
       connection.current,
       connection.endpoint
     )
     try {
       const instructions: TransactionInstruction[] = []
 
-      if (proposal?.info.state === ProposalState.Voting && hasVoteTimeExpired) {
+      if (
+        proposal?.account.state === ProposalState.Voting &&
+        hasVoteTimeExpired
+      ) {
         await withFinalizeVote(
           instructions,
           realmInfo!.programId,
           realm!.pubkey,
-          proposal.info.governance,
+          proposal.account.governance,
           proposal.pubkey,
-          proposal.info.tokenOwnerRecord,
-          proposal.info.governingTokenMint
+          proposal.account.tokenOwnerRecord,
+          proposal.account.governingTokenMint
         )
       }
 
@@ -100,7 +103,7 @@ const VotePanel = () => {
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const handleShowVoteModal = (vote) => {
+  const handleShowVoteModal = (vote: YesNoVote) => {
     setVote(vote)
     setShowVoteModal(true)
   }
@@ -119,7 +122,7 @@ const VotePanel = () => {
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
     : !isWithdrawEnabled
-    ? !ownVoteRecord?.info.isRelinquished
+    ? !ownVoteRecord?.account.isRelinquished
       ? 'Owner vote record is not relinquished'
       : 'The proposal is not in a valid state to execute this action.'
     : ''
@@ -129,7 +132,7 @@ const VotePanel = () => {
     : !isVoting && isVoteCast
     ? 'Proposal is not in a voting state anymore.'
     : !voterTokenRecord ||
-      voterTokenRecord.info.governingTokenDepositAmount.isZero()
+      voterTokenRecord.account.governingTokenDepositAmount.isZero()
     ? 'You don’t have governance power to vote in this realm'
     : ''
 
@@ -143,9 +146,9 @@ const VotePanel = () => {
   const isVisibleToWallet = !connected
     ? !hasVoteTimeExpired &&
       typeof notVisibleStatesForNotConnectedWallet.find(
-        (x) => x === proposal?.info.state
+        (x) => x === proposal?.account.state
       ) === 'undefined'
-    : !ownVoteRecord?.info.isRelinquished
+    : !ownVoteRecord?.account.isRelinquished
 
   const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
   return (
@@ -170,7 +173,7 @@ const VotePanel = () => {
                     <Button
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
-                      onClick={() => handleShowVoteModal(Vote.Yes)}
+                      onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
                       Approve
@@ -179,7 +182,7 @@ const VotePanel = () => {
                     <Button
                       tooltipMessage={voteTooltipContent}
                       className="w-1/2"
-                      onClick={() => handleShowVoteModal(Vote.No)}
+                      onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
                       Deny

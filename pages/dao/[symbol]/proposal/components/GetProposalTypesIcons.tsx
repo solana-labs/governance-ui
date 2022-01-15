@@ -4,16 +4,14 @@ import MangoMakeIcon from '@components/MangoMakeIcon'
 import MintTokensIcon from '@components/MintTokensIcon'
 import ProgramUpgradeIcon from '@components/ProgramUpgradeIcon'
 import TreasuryPaymentIcon from '@components/TreasuryPaymentIcon'
-import { tooltipMessage } from './TooltipMessages'
 
-export const getIcon = ({ icon }) => {
-  const {
-    treasuryPaymentTooltip,
-    addNewMemberTooltip,
-    programUpgradeTooltip,
-    mintTokensTooltip,
-  } = tooltipMessage()
-
+export const getIcon = ({
+  icon,
+  treasuryPaymentTooltip,
+  addNewMemberTooltip,
+  programUpgradeTooltip,
+  mintTokensTooltip,
+}) => {
   const helper: { [key: string]: any } = {
     treasury: (
       <TreasuryPaymentIcon

@@ -8,11 +8,11 @@ import {
   ProgramUpgradeForm as TypeProgramUpgrade,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
-import { serializeInstructionToBase64 } from '@models/serialisation'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import { validateBuffer } from '@utils/validations'
@@ -27,8 +27,8 @@ const UpgradeProgramNewForm = ({
 }: // close,
 {
   index: number
-  governance: ParsedAccount<Governance> | null
   close?: any
+  governance: ProgramAccount<Governance> | null
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -60,14 +60,14 @@ const UpgradeProgramNewForm = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.info.governedAccount,
+        form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.bufferAddress),
         form.governedAccount.governance.pubkey,
-        wallet!.publicKey
+        wallet?.publicKey
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }

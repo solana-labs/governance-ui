@@ -13,6 +13,7 @@ import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import ImgWithLoader from '@components/ImgWithLoader'
 
 const gallery = () => {
   const router = useRouter()
@@ -31,27 +32,22 @@ const gallery = () => {
   )
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   useEffect(() => {
-    const getAllNftData = async () => {
-      if (!realmNfts.length) {
-        await getNfts(nftsGovernedTokenAccounts, connection.current)
-      }
-      if (governancePk) {
-        if (fetchAllNftsForRealm) {
-          setNfts(realmNfts)
-        } else {
-          setNfts(governanceNfts[governancePk as string])
-        }
-      }
-    }
     if (governancePk) {
-      getAllNftData()
+      getNfts(nftsGovernedTokenAccounts, connection.current)
     }
   }, [
     governancePk,
     connection.endpoint,
-    nftsGovernedTokenAccounts.length,
-    realmNfts.length,
+    JSON.stringify(nftsGovernedTokenAccounts),
   ])
+  useEffect(() => {
+    const governedNfts = governanceNfts[governancePk as string]
+    if (fetchAllNftsForRealm) {
+      setNfts(realmNfts)
+    } else if (governedNfts) {
+      setNfts(governanceNfts[governancePk as string])
+    }
+  }, [realmNfts.length, JSON.stringify(governanceNfts), governancePk])
   return (
     <div className="grid grid-cols-12">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
@@ -118,7 +114,7 @@ const gallery = () => {
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
               >
-                <img
+                <ImgWithLoader
                   className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
                   style={{
                     width: '150px',
@@ -131,7 +127,6 @@ const gallery = () => {
           </div>
         ) : (
           <div className="text-fgd-3 flex flex-col items-center">
-            There are no NFTs in the treasury
             <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
           </div>
         )}

@@ -6,11 +6,11 @@ import {
 } from '@solana/web3.js'
 
 import * as serum from '@project-serum/common'
-import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import { WalletSigner } from '@solana/spl-governance'
 
 export const withCreateSplTokenAccount = async (
   connection: Connection,
-  wallet: SignerWalletAdapter | undefined,
+  wallet: WalletSigner | undefined,
   instructions: TransactionInstruction[],
   signers: Keypair[],
   mint: PublicKey

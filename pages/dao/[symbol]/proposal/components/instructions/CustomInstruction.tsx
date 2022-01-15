@@ -6,8 +6,7 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Input from '@components/inputs/Input'
@@ -43,7 +42,7 @@ const CustomInstruction = ({
   callback,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
   setGovernance: any
   callback: any
 }) => {
@@ -203,7 +202,7 @@ const CustomInstruction = ({
   const getSelectedGovernance = async () => {
     return (await fetchRealmGovernance(
       form.governedAccount?.governance.pubkey
-    )) as ParsedAccount<Governance>
+    )) as ProgramAccount<Governance>
   }
 
   const confirmPropose = async () => {

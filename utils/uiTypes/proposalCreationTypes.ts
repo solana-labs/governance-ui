@@ -1,6 +1,6 @@
-import { Governance, InstructionData } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
-import { RpcContext } from '@models/core/api'
+import { Governance, InstructionData } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
@@ -13,7 +13,7 @@ import {
 export interface UiInstruction {
   serializedInstruction: string
   isValid: boolean
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
 }
@@ -97,13 +97,13 @@ export type createParams = [
 ]
 
 export interface ComponentInstructionData {
-  governedAccount?: ParsedAccount<Governance> | undefined
+  governedAccount?: ProgramAccount<Governance> | undefined
   getInstruction?: () => Promise<UiInstruction>
   type: any
 }
 export interface InstructionsContext {
   instructionsData: ComponentInstructionData[]
   handleSetInstructions: (val, index) => void
-  governance: ParsedAccount<Governance> | null | undefined
+  governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
 }

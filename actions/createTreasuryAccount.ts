@@ -5,10 +5,10 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { GovernanceConfig } from '../models/accounts'
+import { GovernanceConfig } from '@solana/spl-governance'
 
-import { withCreateTokenGovernance } from '../models/withCreateTokenGovernance'
-import { RpcContext } from '../models/core/api'
+import { withCreateTokenGovernance } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
 
@@ -24,7 +24,7 @@ export const createTreasuryAccount = async (
 
   const tokenAccount = await withCreateSplTokenAccount(
     connection,
-    wallet,
+    wallet!,
     instructions,
     signers,
     mint

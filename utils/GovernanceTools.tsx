@@ -1,4 +1,7 @@
-import { GovernanceConfig, VoteThresholdPercentage } from '@models/accounts'
+import {
+  GovernanceConfig,
+  VoteThresholdPercentage,
+} from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import {
   getMintNaturalAmountFromDecimal,
@@ -34,7 +37,9 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     voteThresholdPercentage: new VoteThresholdPercentage({
       value: values.voteThresholdPercentage,
     }),
-    minCommunityTokensToCreateProposal: new BN(minTokensToCreateProposal),
+    minCommunityTokensToCreateProposal: new BN(
+      minTokensToCreateProposal.toString()
+    ),
     minInstructionHoldUpTime: getTimestampFromDays(
       values.minInstructionHoldUpTime
     ),

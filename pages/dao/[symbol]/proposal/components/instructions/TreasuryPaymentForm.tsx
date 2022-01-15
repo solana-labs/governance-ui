@@ -10,11 +10,7 @@ import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  GovernedMultiTypeAccount,
-  ProgramAccount,
-  tryGetTokenAccount,
-} from '@utils/tokens'
+import { GovernedMultiTypeAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   ComponentInstructionData,
   Instructions,
@@ -25,8 +21,7 @@ import { getAccountName } from '@components/instructions/tools'
 import { debounce } from '@utils/debounce'
 import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import {
   getTransferInstruction,
   getTransferNftInstruction,
@@ -52,7 +47,7 @@ const TreasuryPaymentFormFullScreen = ({
   callback,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
   setGovernance: any
   callback: any
 }) => {
@@ -75,13 +70,12 @@ const TreasuryPaymentFormFullScreen = ({
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
 
   const [governedAccount, setGovernedAccount] = useState<
-    ParsedAccount<Governance> | undefined
+    ProgramAccount<Governance> | undefined
   >(undefined)
 
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] = useState<
+    ProgramAccount<AccountInfo> | undefined
+  >(undefined)
 
   const [instructionsData, setInstructions] = useState<
     ComponentInstructionData[]
@@ -234,22 +228,21 @@ const TreasuryPaymentFormFullScreen = ({
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.destinationAccount)
-
         if (pubKey) {
-          const account = await tryGetTokenAccount(connection.current, pubKey)
+          const account:
+            | ProgramAccount<AccountInfo>
+            | any = await tryGetTokenAccount(connection.current, pubKey)
 
-          setDestinationAccount(account ? account : null)
+          setDestinationAccount(account ? account : undefined)
 
           return
         }
 
-        setDestinationAccount(null)
+        setDestinationAccount(undefined)
       })
 
       return
     }
-
-    setDestinationAccount(null)
   }, [form.destinationAccount])
 
   useEffect(() => {
@@ -258,13 +251,13 @@ const TreasuryPaymentFormFullScreen = ({
   }, [form.governedTokenAccount])
 
   const destinationAccountName =
-    destinationAccount?.publicKey &&
+    destinationAccount?.pubkey &&
     getAccountName(destinationAccount?.account.address)
 
   const getSelectedGovernance = async () => {
     return (await fetchRealmGovernance(
       form.governedTokenAccount?.governance?.pubkey
-    )) as ParsedAccount<Governance>
+    )) as ProgramAccount<Governance>
   }
 
   const confirmPropose = async () => {
