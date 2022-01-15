@@ -190,8 +190,8 @@ const TokenDeposit = ({
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
     if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(
+        connection,
         realmInfo!.programId,
-        endpoint,
         depositTokenRecord!.account!.governingTokenOwner
       )
 
