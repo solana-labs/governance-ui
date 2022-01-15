@@ -102,7 +102,9 @@ const NewAccountForm = () => {
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
         }
+
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
+
         await createTreasuryAccount(
           rpcContext,
           realm.pubkey,
@@ -115,6 +117,7 @@ const NewAccountForm = () => {
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {
+      console.error('Create Treasury', e)
       //TODO how do we present errors maybe something more generic ?
       notify({
         type: 'error',

@@ -25,6 +25,9 @@ export interface RealmInfo {
   // og:image
   ogImage?: string
 
+  // banner mage
+  bannerImage?: string
+
   isCertified: boolean
 }
 
@@ -131,6 +134,7 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['AeUazJsjGVrxKWkTi5PQ4S4JxWXQ3mYHNS1mURD9GeNg', ''],
   ['AMRC14FwwWkT5TG2ibXdLTUnVrnd2N4YsTifzCeRR22X', ''], // Chicken Tribe test
   ['oW5X5C9wrnchcd4oucv8RG7t1uQLRKyevgy3GPMDTst', ''], // Succeed.Finance test
+  ['3BHrYe5SV2VqHqpEyxYYLbNeNGEnKBjYG4kt6pF5Xu5K', ''], // Woof DAO test
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
@@ -141,7 +145,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
       arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(connection.endpoint, p.programId)
+        getRealms(connection.current, p.programId)
       )
     )
   )

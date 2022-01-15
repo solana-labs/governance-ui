@@ -92,7 +92,6 @@ const TokenDeposit = ({
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
@@ -185,8 +184,8 @@ const TokenDeposit = ({
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
     if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(
+        connection,
         realmInfo!.programId,
-        endpoint,
         depositTokenRecord!.account!.governingTokenOwner
       )
 
