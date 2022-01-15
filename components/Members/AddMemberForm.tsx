@@ -171,18 +171,22 @@ const AddMemberForm = ({
   }
 
   const confirmPropose = async () => {
-    return await handlePropose({
-      getInstruction,
-      form,
-      schema,
-      connection,
-      callback: close ? modalCallback : callback,
-      governance: form.mintAccount?.governance,
-      realmData,
-      wallet,
-      getSelectedGovernance,
-      setIsLoading,
-    })
+    try {
+      await handlePropose({
+        getInstruction,
+        form,
+        schema,
+        connection,
+        callback: close ? modalCallback : callback,
+        governance: form.mintAccount?.governance,
+        realmData,
+        wallet,
+        getSelectedGovernance,
+        setIsLoading,
+      })
+    } catch (error) {
+      console.log('error minting tokens', error)
+    }
   }
 
   return (

@@ -210,18 +210,22 @@ const MintTokens = ({
   }
 
   const handleConfirm = async () => {
-    return await handlePropose({
-      getInstruction,
-      form,
-      schema,
-      connection,
-      callback,
-      governance: form.mintAccount?.governance,
-      realmData,
-      wallet,
-      getSelectedGovernance,
-      setIsLoading,
-    })
+    try {
+      await handlePropose({
+        getInstruction,
+        form,
+        schema,
+        connection,
+        callback,
+        governance: form.mintAccount?.governance,
+        realmData,
+        wallet,
+        getSelectedGovernance,
+        setIsLoading,
+      })
+    } catch (error) {
+      console.log('error minting tokens', error)
+    }
   }
 
   const proposalTitle = `Mint ${form.amount ? form.amount : ''} tokens`

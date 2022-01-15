@@ -43,7 +43,9 @@ const StepThree = ({ dataCreation, setSelectedStep }) => {
                 <SecondaryButton
                   className="md:w-44 w-32"
                   onClick={() => {
-                    navigator.clipboard.writeText(`${dataCreation.url}`)
+                    navigator.clipboard.writeText(
+                      `${window.location.origin}${dataCreation.url}`
+                    )
                   }}
                 >
                   Copy link
