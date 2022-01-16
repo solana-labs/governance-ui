@@ -7,11 +7,12 @@ import {
 import { BN } from '@project-serum/anchor'
 import {
   Deposit,
+  getMintCfgIdx,
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
   tryGetVoter,
-} from '@utils/voteRegistryTools'
+} from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const withVoteRegistryWithdraw = async (
@@ -53,14 +54,17 @@ export const withVoteRegistryWithdraw = async (
     mint,
     voter
   )
-  //TODO Check mint of deposit ?
-  const indexOfDepositEntryWithTypeNone = (existingVoter?.deposits as Deposit[]).findIndex(
-    (x) => x.isUsed && typeof x.lockup.kind.none !== 'undefined'
+  const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
+  const indexOfDepositEntryWithTypeNone = existingVoter?.deposits.findIndex(
+    (x) =>
+      x.isUsed &&
+      typeof x.lockup.kind.none !== 'undefined' &&
+      x.votingMintConfigIdx === mintCfgIdx
   )
 
   instructions.push(
     client?.program.instruction.withdraw(
-      indexOfDepositEntryWithTypeNone,
+      indexOfDepositEntryWithTypeNone!,
       amount,
       {
         accounts: {

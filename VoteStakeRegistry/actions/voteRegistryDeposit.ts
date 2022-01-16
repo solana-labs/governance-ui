@@ -18,23 +18,24 @@ import {
 import { BN } from '@project-serum/anchor'
 import {
   Deposit,
+  getMintCfgIdx,
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
   tryGetVoter,
-} from '@utils/voteRegistryTools'
+} from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const voteRegistryDeposit = async (
   { connection, wallet }: RpcContext,
   //from where we deposit our founds
-  fromPubKey: PublicKey,
+  fromPk: PublicKey,
   //e.g council or community
   mint: PublicKey,
-  realmPubKey: PublicKey,
-  realmOwner: PublicKey,
+  realmPk: PublicKey,
+  programId: PublicKey,
   amount: BN,
-  hasTokenRecordInsideSPL: boolean,
+  hasTokenOwnerRecord: boolean,
   client?: VsrClient
 ) => {
   if (!client) {
@@ -49,7 +50,7 @@ export const voteRegistryDeposit = async (
   const clientProgramId = client!.program.programId
 
   const { registrar } = await getRegistrarPDA(
-    realmPubKey,
+    realmPk,
     mint,
     client!.program.programId
   )
@@ -72,12 +73,12 @@ export const voteRegistryDeposit = async (
     voter
   )
 
-  if (!hasTokenRecordInsideSPL) {
+  if (!hasTokenOwnerRecord) {
     //do we need await here ?
     await withCreateTokenOwnerRecord(
       instructions,
-      realmOwner,
-      realmPubKey,
+      programId,
+      realmPk,
       wallet!.publicKey!,
       mint,
       wallet!.publicKey!
@@ -99,11 +100,15 @@ export const voteRegistryDeposit = async (
       })
     )
   }
-  //TODO Check mint of deposit ?
-  const indexOfDepositEntryWithTypeNone = (existingVoter?.deposits as Deposit[]).findIndex(
-    (x) => x.isUsed && typeof x.lockup.kind.none !== 'undefined'
+  const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
+  const indexOfDepositEntryWithTypeNone = existingVoter?.deposits.findIndex(
+    (x) =>
+      x.isUsed &&
+      typeof x.lockup.kind.none !== 'undefined' &&
+      x.votingMintConfigIdx === mintCfgIdx
   )
   const isExistingDepositEntry = indexOfDepositEntryWithTypeNone !== -1
+  //TODO what if we have more grants then we have indexes
   const firstFreeIdx = (existingVoter?.deposits as Deposit[]).findIndex(
     (x) => !x.isUsed
   )
@@ -112,7 +117,6 @@ export const voteRegistryDeposit = async (
     const lockUpPeriodInSeconds = 0
     const allowClawback = false
     const startTime = new BN(new Date().getTime())
-    //TODO are we sure ata is created here and we dont need to init it ?
     instructions.push(
       client?.program.instruction.createDepositEntry(
         firstFreeIdx,
@@ -139,15 +143,16 @@ export const voteRegistryDeposit = async (
   }
 
   const depositIdx = isExistingDepositEntry
-    ? indexOfDepositEntryWithTypeNone
+    ? indexOfDepositEntryWithTypeNone!
     : firstFreeIdx
+
   instructions.push(
     client?.program.instruction.deposit(depositIdx, amount, {
       accounts: {
         registrar: registrar,
         voter: voter,
         vault: voterATAPk,
-        depositToken: fromPubKey,
+        depositToken: fromPk,
         depositAuthority: wallet!.publicKey!,
         tokenProgram: TOKEN_PROGRAM_ID,
       },

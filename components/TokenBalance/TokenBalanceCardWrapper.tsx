@@ -1,8 +1,8 @@
 import { Proposal } from '@solana/spl-governance'
 import TokenBalanceCard from './TokenBalanceCard'
 import { Option } from 'tools/core/option'
-import LockPluginTokenBalanceCard from './LockPluginTokenBalanceCard'
 import useRealm from '@hooks/useRealm'
+import LockPluginTokenBalanceCard from 'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
 
 const TokenBalanceCardWrapper = ({
   proposal,

@@ -1,18 +1,18 @@
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import BN from 'bn.js'
-import useRealm from '../../hooks/useRealm'
+import useRealm from '@hooks/useRealm'
 import { Proposal, ProposalState, RpcContext } from '@solana/spl-governance'
-import { getUnrelinquishedVoteRecords } from '../../models/api'
+import { getUnrelinquishedVoteRecords } from '@models/api'
 import { getProposal } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
-import useWalletStore from '../../stores/useWalletStore'
-import { sendTransaction } from '../../utils/send'
-import Button from '../Button'
-import { Option } from '../../tools/core/option'
+import useWalletStore from '../../../stores/useWalletStore'
+import { sendTransaction } from '@utils/send'
+import Button from '@components/Button'
+import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
-import { fmtMintAmount } from '../../tools/sdk/units'
-import { getMintMetadata } from '../instructions/programs/splToken'
+import { fmtMintAmount } from '@tools/sdk/units'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import {
@@ -22,11 +22,14 @@ import {
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import Tooltip from '@components/Tooltip'
-import { voteRegistryDeposit } from 'actions/voteRegistryDeposit'
+import { voteRegistryDeposit } from 'VoteStakeRegistry/actions/voteRegistryDeposit'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from '@hooks/useVoteRegistry'
-import { withVoteRegistryWithdraw } from 'actions/withVoteRegistryWithdraw'
-import { Deposit, getUsedDeposit } from '@utils/voteRegistryTools'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
+import {
+  Deposit,
+  getUsedDeposit,
+} from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { useEffect, useState } from 'react'
 
 const LockPluginTokenBalanceCard = ({
@@ -157,7 +160,7 @@ const TokenDeposit = ({
     if (!realm) {
       throw 'No realm selected'
     }
-    const hasSPLaccount =
+    const hasTokenOwnerRecord =
       typeof tokenRecords[wallet!.publicKey!.toBase58()] !== 'undefined'
     const rpcContext = new RpcContext(
       realm.owner,
@@ -173,10 +176,11 @@ const TokenDeposit = ({
       realm.pubkey,
       realm.owner,
       amount,
-      hasSPLaccount,
+      hasTokenOwnerRecord,
       client
     )
 
+    handleGetUsedDeposit()
     await fetchWalletTokenAccounts()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
