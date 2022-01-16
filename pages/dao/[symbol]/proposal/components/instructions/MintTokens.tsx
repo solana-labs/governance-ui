@@ -211,11 +211,14 @@ const MintTokens = ({
     )) as ProgramAccount<Governance>
   }
 
+  const proposalTitle = `Mint ${form.amount ? form.amount : ''} tokens`
+
   const handleConfirm = async () => {
     try {
       await handlePropose({
         getInstruction,
         form,
+        proposalTitle,
         schema,
         connection,
         callback,
@@ -229,8 +232,6 @@ const MintTokens = ({
       console.log('error minting tokens', error)
     }
   }
-
-  const proposalTitle = `Mint ${form.amount ? form.amount : ''} tokens`
 
   return (
     <NewProposalContext.Provider

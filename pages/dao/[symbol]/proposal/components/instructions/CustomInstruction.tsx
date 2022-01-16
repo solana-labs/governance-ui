@@ -205,6 +205,10 @@ const CustomInstruction = ({
     )) as ProgramAccount<Governance>
   }
 
+  const proposalTitle = !custom
+    ? 'Custom instruction proposal'
+    : 'Vote only proposal'
+
   const confirmPropose = async () => {
     return await handlePropose({
       getInstruction,
@@ -217,6 +221,7 @@ const CustomInstruction = ({
       wallet,
       getSelectedGovernance,
       setIsLoading,
+      proposalTitle,
     })
   }
 
@@ -234,10 +239,6 @@ const CustomInstruction = ({
       propertyName: 'governedAccount',
     })
   }, [])
-
-  const proposalTitle = !custom
-    ? 'Custom instruction proposal'
-    : 'Vote only proposal'
 
   return (
     <NewProposalContext.Provider

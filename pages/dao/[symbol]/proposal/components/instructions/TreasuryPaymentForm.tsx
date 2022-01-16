@@ -260,6 +260,16 @@ const TreasuryPaymentFormFullScreen = ({
     )) as ProgramAccount<Governance>
   }
 
+  const nftName = selectedNfts[0]?.val?.name
+  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
+    form.destinationAccount
+  }`
+  const proposalTitle = isNFT
+    ? nftTitle
+    : `Pay ${form.amount || ''}${
+        tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
+      }to ${form.destinationAccount}`
+
   const confirmPropose = async () => {
     return await handlePropose({
       getInstruction,
@@ -272,18 +282,9 @@ const TreasuryPaymentFormFullScreen = ({
       wallet,
       getSelectedGovernance,
       setIsLoading,
+      proposalTitle,
     })
   }
-
-  const nftName = selectedNfts[0]?.val?.name
-  const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
-    form.destinationAccount
-  }`
-  const proposalTitle = isNFT
-    ? nftTitle
-    : `Pay ${form.amount || ''}${
-        tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '
-      }to ${form.destinationAccount}`
 
   return (
     <NewProposalContext.Provider

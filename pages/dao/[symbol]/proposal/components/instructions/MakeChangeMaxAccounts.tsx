@@ -152,6 +152,7 @@ const MakeChangeMaxAccounts = ({
       wallet,
       getSelectedGovernance,
       setIsLoading,
+      proposalTitle: 'Mango - max change accounts',
     })
   }
 

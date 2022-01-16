@@ -167,6 +167,8 @@ const AddMemberForm = ({
     }
   }
 
+  const proposalTitle = `Add council member ${form.destinationAccount}`
+
   const confirmPropose = async () => {
     try {
       await handlePropose({
@@ -180,13 +182,12 @@ const AddMemberForm = ({
         wallet,
         getSelectedGovernance,
         setIsLoading,
+        proposalTitle,
       })
     } catch (error) {
       console.log('error adding member', error)
     }
   }
-
-  const proposalTitle = `Add council member ${form.destinationAccount}`
 
   return (
     <>

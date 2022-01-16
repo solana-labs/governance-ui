@@ -20,6 +20,7 @@ export const handlePropose = async ({
   wallet,
   getSelectedGovernance,
   setIsLoading,
+  proposalTitle,
 }) => {
   const {
     realmInfo,
@@ -72,15 +73,10 @@ export const handlePropose = async ({
       }
     })
 
-    console.log('instructions data', instructionsData)
-
     try {
-      console.log('ytycathc')
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
         governance.account.config
       )
-
-      console.log('own token record', councilMint)
 
       const defaultProposalMint = !mint?.supply.isZero()
         ? realm.account.communityMint
@@ -97,12 +93,14 @@ export const handlePropose = async ({
         throw new Error('There is no suitable governing token for the proposal')
       }
 
+      console.log('form sent', form, proposalTitle)
+
       proposalAddress = await createProposal(
         rpcContext,
         realm.pubkey,
         selectedGovernance.pubkey,
         ownTokenRecord.pubkey,
-        form.title ? form.title : 'Proposal',
+        form.title !== '' ? form.title : proposalTitle,
         form.description ? form.description : '',
         proposalMint,
         selectedGovernance?.account.proposalCount,

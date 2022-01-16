@@ -163,6 +163,10 @@ const ProgramUpgrade = ({
     )) as ProgramAccount<Governance>
   }
 
+  const proposalTitle = `Upgrade program ${
+    form.governedAccount ? form.governedAccount : ''
+  }`
+
   const confirmPropose = async () => {
     return await handlePropose({
       getInstruction,
@@ -175,12 +179,9 @@ const ProgramUpgrade = ({
       wallet,
       getSelectedGovernance,
       setIsLoading,
+      proposalTitle,
     })
   }
-
-  const proposalTitle = `Upgrade program ${
-    form.governedAccount ? form.governedAccount : ''
-  }`
 
   return (
     <NewProposalContext.Provider
