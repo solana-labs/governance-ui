@@ -1,20 +1,25 @@
 import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
 import useRealm from '@hooks/useRealm'
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 
 const account = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realm } = useRealm()
+  const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
   const getAccountView = () => {
-    const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
     if (isLockTokensMode) {
       return <LockTokensAccount></LockTokensAccount>
     }
-    //no default for now redirect to main view
-    router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
+    return null
   }
+  useEffect(() => {
+    if (!isLockTokensMode) {
+      router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
+    }
+  }, [isLockTokensMode])
   return getAccountView()
 }
 

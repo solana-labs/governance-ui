@@ -1,6 +1,8 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
+import { MintInfo } from '@solana/spl-token'
+import { Connection, PublicKey } from '@solana/web3.js'
+import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
 
 interface Voter {
   deposits: Deposit[]
@@ -44,6 +46,12 @@ export interface Deposit {
   isUsed: boolean
   lockup: Lockup
   votingMintConfigIdx: number
+}
+
+export const unusedMintPk = '11111111111111111111111111111111'
+
+export interface DepositWithMintPk extends Deposit {
+  mint: TokenProgramAccount<MintInfo>
 }
 
 export const getRegistrarPDA = async (
@@ -153,4 +161,43 @@ export const getUsedDeposit = async (
       x.votingMintConfigIdx === mintCfgIdx
   )
   return deposit
+}
+
+export const getUsedDeposits = async (
+  realmPk: PublicKey,
+  walletPk: PublicKey,
+  communityMintPk: PublicKey,
+  client: VsrClient,
+  connection: Connection
+) => {
+  const clientProgramId = client.program.programId
+  const { registrar } = await getRegistrarPDA(
+    realmPk,
+    communityMintPk,
+    clientProgramId
+  )
+  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
+  const existingVoter = await tryGetVoter(voter, client)
+  const existingRegistrar = await tryGetRegistrar(registrar, client)
+  const mintCfgs = existingRegistrar?.votingMints
+  const mints = {}
+  if (mintCfgs) {
+    for (const i of mintCfgs) {
+      if (i.mint.toBase58() !== unusedMintPk) {
+        const mint = await tryGetMint(connection, i.mint)
+        mints[i.mint.toBase58()] = mint
+      }
+    }
+  }
+  console.log(existingVoter)
+  const deposits = existingVoter?.deposits
+    .filter((x) => x.isUsed)
+    .map(
+      (x) =>
+        ({
+          ...x,
+          mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
+        } as DepositWithMintPk)
+    )
+  return deposits
 }

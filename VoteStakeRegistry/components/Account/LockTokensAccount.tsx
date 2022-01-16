@@ -1,28 +1,33 @@
 import Button from '@components/Button'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useRealm from '@hooks/useRealm'
-import { ProposalState } from '@solana/spl-governance'
+import { ProposalState, RpcContext } from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
 import { getProposal } from '@solana/spl-governance'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
-import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
-import { TransactionInstruction, Keypair, Transaction } from '@solana/web3.js'
+import { TransactionInstruction, Transaction } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
-import { approveTokenTransfer } from '@utils/tokens'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import LockTokensModal from './LockTokensModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import {
+  DepositWithMintPk,
+  getUsedDeposits,
+} from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { voteRegistryDeposit } from 'VoteStakeRegistry/actions/voteRegistryDeposit'
+import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
 
 const LockTokensAccount = () => {
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
+  const endpoint = useWalletStore((s) => s.connection.endpoint)
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
@@ -35,62 +40,48 @@ const LockTokensAccount = () => {
     governances,
     toManyCommunityOutstandingProposalsForUser,
     mint,
+    tokenRecords,
   } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
+  const { client } = useVoteRegistry()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
   }
-
+  const [depositRecords, setDeposits] = useState<DepositWithMintPk[] | null>(
+    null
+  )
   const depositTokenRecord = ownTokenRecord
 
   const depositTokenAccount = realmTokenAccount
 
   const depositMint = realm?.account.communityMint
 
-  const tokenName = getMintMetadata(depositMint)?.name ?? realm?.account.name
-
-  const depositTokenName = `${tokenName}`
-
   const depositTokens = async function (amount: BN) {
-    const instructions: TransactionInstruction[] = []
-    const signers: Keypair[] = []
-
-    const transferAuthority = approveTokenTransfer(
-      instructions,
-      [],
-      depositTokenAccount!.publicKey,
-      wallet!.publicKey!,
-      amount
-    )
-
-    signers.push(transferAuthority)
-
-    await withDepositGoverningTokens(
-      instructions,
-      realmInfo!.programId,
+    if (!realm) {
+      throw 'No realm selected'
+    }
+    const hasTokenOwnerRecord =
+      typeof tokenRecords[wallet!.publicKey!.toBase58()] !== 'undefined'
+    const rpcContext = new RpcContext(
+      realm.owner,
       getProgramVersionForRealm(realmInfo!),
-      realm!.pubkey,
+      wallet!,
+      connection,
+      endpoint
+    )
+    await voteRegistryDeposit(
+      rpcContext,
       depositTokenAccount!.publicKey,
-      depositTokenAccount!.account.mint,
-      wallet!.publicKey!,
-      transferAuthority.publicKey,
-      wallet!.publicKey!,
-      amount
+      depositMint!,
+      realm.pubkey,
+      realm.owner,
+      amount,
+      hasTokenOwnerRecord,
+      client
     )
 
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      connection,
-      wallet,
-      transaction,
-      signers,
-      sendingMessage: 'Depositing tokens',
-      successMessage: 'Tokens have been deposited',
-    })
-
+    handleGetUsedDeposits()
     await fetchWalletTokenAccounts()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
@@ -108,6 +99,8 @@ const LockTokensAccount = () => {
         realmInfo!.programId,
         depositTokenRecord!.account!.governingTokenOwner
       )
+
+      console.log('Vote Records', voteRecords)
 
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()]
@@ -157,14 +150,21 @@ const LockTokensAccount = () => {
         )
       }
     }
-
-    await withWithdrawGoverningTokens(
+    const amount = depositRecords!.find(
+      (x) =>
+        x.lockup.kind.none &&
+        x.mint.publicKey.toBase58() ===
+          depositTokenRecord!.account.governingTokenMint.toBase58()
+    )!.amountDepositedNative
+    await withVoteRegistryWithdraw(
       instructions,
-      realmInfo!.programId,
-      realm!.pubkey,
-      depositTokenAccount!.publicKey,
+      wallet!.publicKey!,
+      depositTokenAccount!.publicKey!,
       depositTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!
+      realm!.pubkey!,
+      amount,
+      tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
+      client
     )
 
     try {
@@ -189,8 +189,22 @@ const LockTokensAccount = () => {
       }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      handleGetUsedDeposits()
     } catch (ex) {
       console.error("Can't withdraw tokens", ex)
+    }
+  }
+
+  const handleGetUsedDeposits = async () => {
+    const deposits = await getUsedDeposits(
+      realm!.pubkey,
+      wallet!.publicKey!,
+      depositTokenRecord!.account.governingTokenMint,
+      client!,
+      connection
+    )
+    if (deposits) {
+      setDeposits(deposits)
     }
   }
 
@@ -215,24 +229,12 @@ const LockTokensAccount = () => {
     ? "You don't have any governance tokens to withdraw."
     : ''
 
-  const availableTokens =
-    depositTokenRecord && mint
-      ? fmtMintAmount(
-          mint,
-          depositTokenRecord.account.governingTokenDepositAmount
-        )
-      : '0'
+  useEffect(() => {
+    if (client && connection) {
+      handleGetUsedDeposits()
+    }
+  }, [connection, client])
 
-  //   const canShowAvailableTokensMessage =
-  //     !hasTokensDeposited && hasTokensInWallet && connected
-  //   const canExecuteAction = !hasTokensDeposited ? 'deposit' : 'withdraw'
-  //   const canDepositToken = !hasTokensDeposited && hasTokensInWallet
-  //   const tokensToShow =
-  //     canDepositToken && depositTokenAccount
-  //       ? fmtMintAmount(mint, depositTokenAccount.account.amount)
-  //       : canDepositToken
-  //       ? availableTokens
-  //       : 0
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg">
@@ -261,17 +263,37 @@ const LockTokensAccount = () => {
           </div>
         </h1>
         <div className="flex mb-8">
-          <div className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex flex-col">
-            <p className="text-fgd-3 text-xs">{depositTokenName} Deposited</p>
-            <h3 className="mb-0">{availableTokens}</h3>
-          </div>
+          {depositRecords?.map((x, idx) => {
+            const availableTokens = fmtMintAmount(
+              x.mint.account,
+              x.amountDepositedNative
+            )
+            const tokenName =
+              getMintMetadata(x.mint.publicKey)?.name ||
+              x.mint.publicKey.toBase58() ===
+                realm?.account.communityMint.toBase58()
+                ? realm?.account.name
+                : ''
+
+            const depositTokenName = `${tokenName}`
+            return (
+              <div
+                key={idx}
+                className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex flex-col"
+              >
+                <p className="text-fgd-3 text-xs">
+                  {depositTokenName} Deposited
+                </p>
+                <h3 className="mb-0">{availableTokens}</h3>
+              </div>
+            )
+          })}
         </div>
         <h1 className="mb-8">Locked Tokens</h1>
         <div className="flex">
           <div className="flex flex-col items-center p-8 rounded-lg bg-bkg-4">
             <div className="flex text-center mb-6">
-              Increase your voting power by<br></br> locking your {tokenName}{' '}
-              tokens.
+              Increase your voting power by<br></br> locking your tokens.
             </div>
             <Button onClick={() => setIsLockModalOpen(true)}>
               Lock Tokens
