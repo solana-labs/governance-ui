@@ -1,28 +1,10 @@
-import {
-  PublicKey,
-  SystemProgram,
-  SYSVAR_INSTRUCTIONS_PUBKEY,
-  SYSVAR_RENT_PUBKEY,
-  TransactionInstruction,
-} from '@solana/web3.js'
-import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { RpcContext } from '@solana/spl-governance'
-import {
-  ASSOCIATED_TOKEN_PROGRAM_ID,
-  Token,
-  TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
-import {
-  Deposit,
-  getMintCfgIdx,
-  getRegistrarPDA,
-  getVoterPDA,
-  getVoterWeightPDA,
-  LockupKinds,
-  tryGetVoter,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { LockupKinds } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { getPrepareDepositInstructions } from './getPrepareDepositInstructions'
 
 export const withVoteRegistryDepositInstructions = async ({
   rpcContext,
@@ -35,6 +17,7 @@ export const withVoteRegistryDepositInstructions = async ({
   hasTokenOwnerRecord,
   lockUpPeriodInSeconds = 0,
   lockupKind = 'none',
+  //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
   client,
 }: {
@@ -53,117 +36,35 @@ export const withVoteRegistryDepositInstructions = async ({
   client?: VsrClient
 }) => {
   const { wallet } = rpcContext
+  const instructions: TransactionInstruction[] = []
   if (!client) {
     throw 'no vote registry plugin'
   }
   if (!wallet.publicKey) {
     throw 'no wallet connected'
   }
-  const systemProgram = SystemProgram.programId
-  const instructions: TransactionInstruction[] = []
-  const clientProgramId = client!.program.programId
-  const { registrar } = await getRegistrarPDA(
+  const {
+    instructions: prepareDepositInstructions,
+    depositIdx,
+    voter,
+    registrar,
+    voterATAPk,
+  } = await getPrepareDepositInstructions({
+    rpcContext,
+    mint,
     realmPk,
-    mint,
-    client!.program.programId
-  )
-  const { voter, voterBump } = await getVoterPDA(
-    registrar,
-    wallet!.publicKey!,
-    clientProgramId
-  )
-  const { voterWeight, voterWeightBump } = await getVoterWeightPDA(
-    registrar,
-    wallet!.publicKey!,
-    clientProgramId
-  )
-  const existingVoter = await tryGetVoter(voter, client)
+    programId,
+    hasTokenOwnerRecord,
+    lockUpPeriodInSeconds,
+    lockupKind,
+    forceCreateNew,
+    client,
+  })
 
-  const voterATAPk = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    mint,
-    voter
-  )
-
-  if (!hasTokenOwnerRecord && !forceCreateNew) {
-    //do we need await here ?
-    await withCreateTokenOwnerRecord(
-      instructions,
-      programId,
-      realmPk,
-      wallet!.publicKey!,
-      mint,
-      wallet!.publicKey!
-    )
-  }
-  if (!existingVoter) {
-    instructions.push(
-      client?.program.instruction.createVoter(voterBump, voterWeightBump, {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: wallet!.publicKey!,
-          voterWeightRecord: voterWeight,
-          payer: wallet!.publicKey!,
-          systemProgram: systemProgram,
-          rent: SYSVAR_RENT_PUBKEY,
-          instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
-        },
-      })
-    )
-  }
-  const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
-  const indexOfDepositEntryWithTypeNone = existingVoter?.deposits.findIndex(
-    (x) =>
-      x.isUsed &&
-      typeof x.lockup.kind[lockupKind] !== 'undefined' &&
-      x.votingMintConfigIdx === mintCfgIdx
-  )
-  const isExistingDepositEntry = indexOfDepositEntryWithTypeNone !== -1
-  const firstFreeIdx = (existingVoter?.deposits as Deposit[]).findIndex(
-    (x) => !x.isUsed
-  )
-
-  if (firstFreeIdx === -1) {
-    throw 'You have to much active deposits'
-  }
-
-  if (!isExistingDepositEntry || forceCreateNew) {
-    const allowClawback = false
-    const startTime = new BN(new Date().getTime())
-    instructions.push(
-      client?.program.instruction.createDepositEntry(
-        firstFreeIdx,
-        { [lockupKind]: {} },
-        startTime,
-        lockUpPeriodInSeconds,
-        allowClawback,
-        {
-          accounts: {
-            registrar: registrar,
-            voter: voter,
-            payer: wallet!.publicKey!,
-            voterAuthority: wallet!.publicKey!,
-            depositMint: mint,
-            rent: SYSVAR_RENT_PUBKEY,
-            systemProgram: systemProgram,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            vault: voterATAPk,
-          },
-        }
-      )
-    )
-  }
-
-  const depositIdx =
-    isExistingDepositEntry && !forceCreateNew
-      ? indexOfDepositEntryWithTypeNone!
-      : firstFreeIdx
-
-  instructions.push(
-    client?.program.instruction.deposit(depositIdx, amount, {
+  const depositInstruction = client?.program.instruction.deposit(
+    depositIdx,
+    amount,
+    {
       accounts: {
         registrar: registrar,
         voter: voter,
@@ -172,8 +73,10 @@ export const withVoteRegistryDepositInstructions = async ({
         depositAuthority: wallet!.publicKey!,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
-    })
+    }
   )
+
+  instructions.push(...prepareDepositInstructions, depositInstruction)
 
   return instructions
 }
