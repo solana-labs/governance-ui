@@ -7,10 +7,13 @@ import { BN } from '@project-serum/anchor'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
-import { RpcContext } from '@models/core/api'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import {
+  Governance,
+  ProgramAccount,
+  getInstructionDataFromBase64,
+  RpcContext,
+} from '@solana/spl-governance'
+import { getProgramVersionForRealm } from '@models/registry/api'
 import { createProposal } from 'actions/createProposal'
 import {
   getMintMinAmountAsDecimal,
@@ -23,7 +26,7 @@ import { notify } from '@utils/notifications'
 import { getTransferInstruction } from '@utils/instructionTools'
 import { precision } from '@utils/formatting'
 import { getTokenTransferSchema } from '@utils/validations'
-import { ProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+import { tryGetTokenAccount } from '@utils/tokens'
 import {
   TreasuryPaymentForm as TypeTreasuryPaymentForm,
   UiInstruction,
@@ -79,13 +82,12 @@ const TreasuryPaymentForm = ({ close }) => {
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
 
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<ProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] = useState<
+    ProgramAccount<AccountInfo> | undefined
+  >(undefined)
 
   const destinationAccountName =
-    destinationAccount?.publicKey &&
+    destinationAccount?.pubkey &&
     getAccountName(destinationAccount?.account.address)
 
   const mintMinAmount = form.governedTokenAccount?.mint
@@ -167,7 +169,7 @@ const TreasuryPaymentForm = ({ close }) => {
 
     const instruction: UiInstruction = await getInstruction()
 
-    if (instruction.isValid) {
+    if (instruction.isValid && wallet) {
       const governance = currentAccount?.governance
       let proposalAddress: PublicKey | null = null
 
@@ -177,8 +179,8 @@ const TreasuryPaymentForm = ({ close }) => {
       }
 
       const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
-        realmInfo?.programVersion,
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
         wallet,
         connection.current,
         connection.endpoint
@@ -188,56 +190,58 @@ const TreasuryPaymentForm = ({ close }) => {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
-        holdUpTime: governance?.info?.config.minInstructionHoldUpTime,
+        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
       }
 
       try {
         // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ParsedAccount<Governance>
+        if (governance) {
+          const selectedGovernance = (await fetchRealmGovernance(
+            governance?.pubkey
+          )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.info.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
+          const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+            governance.account.config
           )
+
+          const defaultProposalMint = !mint?.supply.isZero()
+            ? realm.account.communityMint
+            : !councilMint?.supply.isZero()
+            ? realm.account.config.councilMint
+            : undefined
+
+          const proposalMint =
+            canChooseWhoVote && voteByCouncil
+              ? realm.account.config.councilMint
+              : defaultProposalMint
+
+          if (!proposalMint) {
+            throw new Error(
+              'There is no suitable governing token for the proposal'
+            )
+          }
+
+          //Description same as title
+          proposalAddress = await createProposal(
+            rpcContext,
+            realm.pubkey,
+            selectedGovernance.pubkey,
+            ownTokenRecord.pubkey,
+            form.title ? form.title : proposalTitle,
+            form.description ? form.description : '',
+            proposalMint,
+            selectedGovernance?.account?.proposalCount,
+            [instructionData],
+            false
+          )
+
+          const url = fmtUrlWithCluster(
+            `/dao/${symbol}/proposal/${proposalAddress}`
+          )
+
+          router.push(url)
         }
-
-        //Description same as title
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm.pubkey,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title ? form.title : proposalTitle,
-          form.description ? form.description : '',
-          proposalMint,
-          selectedGovernance?.info?.proposalCount,
-          [instructionData],
-          false
-        )
-
-        const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
-
-        router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
       }
@@ -287,22 +291,21 @@ const TreasuryPaymentForm = ({ close }) => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
         const pubKey = tryParseKey(form.destinationAccount)
-
         if (pubKey) {
-          const account = await tryGetTokenAccount(connection.current, pubKey)
+          const account:
+            | ProgramAccount<AccountInfo>
+            | any = await tryGetTokenAccount(connection.current, pubKey)
 
-          setDestinationAccount(account ? account : null)
+          setDestinationAccount(account ? account : undefined)
 
           return
         }
 
-        setDestinationAccount(null)
+        setDestinationAccount(undefined)
       })
 
       return
     }
-
-    setDestinationAccount(null)
   }, [form.destinationAccount])
 
   const schema = getTokenTransferSchema({ form, connection })
