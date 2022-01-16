@@ -7,6 +7,7 @@ import Tooltip from '@components/Tooltip'
 import { Tab } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
+import { BN } from '@project-serum/anchor'
 import {
   fmtMintAmount,
   getMintDecimalAmount,
@@ -15,6 +16,12 @@ import {
 import { precision } from '@utils/formatting'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import {
+  Deposit,
+  getUsedDeposit,
+} from 'VoteStakeRegistry/utils/voteRegistryTools'
 interface Period {
   value: number
   display: string
@@ -47,30 +54,38 @@ const lockupTypes: LockupType[] = [
       'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released weekly, monthly or yearly. Vote weight increase declines linearly over the period.',
   },
 ]
+const oneDaySecs = 86400
+const oneYearDays = 365.24
+const yearToSecs = (val) => {
+  return oneDaySecs * oneYearDays * val
+}
+const secsToYear = (val) => {
+  return val / oneDaySecs / oneYearDays
+}
 //TODO read multiplier from program
 const lockupPeriods: Period[] = [
   {
-    value: 1,
+    value: yearToSecs(1),
     display: '1y',
     multiplier: 1.2,
   },
   {
-    value: 2,
+    value: yearToSecs(2),
     display: '2y',
     multiplier: 1.4,
   },
   {
-    value: 3,
+    value: yearToSecs(3),
     display: '3y',
     multiplier: 1.6,
   },
   {
-    value: 4,
+    value: yearToSecs(4),
     display: '4y',
     multiplier: 1.8,
   },
   {
-    value: 5,
+    value: yearToSecs(5),
     display: '5y',
     multiplier: 2,
   },
@@ -97,31 +112,11 @@ const YES = 'YES'
 const NO = 'NO'
 
 const LockTokensModal = ({ onClose, isOpen }) => {
-  const { ownTokenRecord, mint, realm } = useRealm()
-  const depositedTokens =
-    ownTokenRecord && mint
-      ? fmtMintAmount(mint, ownTokenRecord.account.governingTokenDepositAmount)
-      : '0'
-  const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
-  //TODO get tokens from wallet
-  const hasMoreTokensInWallet = false
-  const currentPrecision = precision(mintMinAmount)
-  //TODO if tokens in wallet add wallet amout to this
-  const maxAmountToLock =
-    ownTokenRecord && mint
-      ? getMintDecimalAmount(
-          mint,
-          ownTokenRecord.account.governingTokenDepositAmount
-        )
-      : 0
-  const maxAmountFtm =
-    ownTokenRecord && mint
-      ? fmtMintAmount(mint, ownTokenRecord.account.governingTokenDepositAmount)
-      : '0'
-  //
-  const tokenName = mint
-    ? getMintMetadata(realm?.account.communityMint)?.name
-    : ''
+  const { client } = useVoteRegistry()
+  const connection = useWalletStore((s) => s.connection.current)
+  const wallet = useWalletStore((s) => s.current)
+  const { ownTokenRecord, mint, realm, realmTokenAccount } = useRealm()
+  const [depositRecord, setDeposit] = useState<Deposit | null>(null)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>(undefined)
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
@@ -130,6 +125,39 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     vestingPeriods[0]
   )
   const [currentStep, setCurrentStep] = useState(0)
+  const depositedTokens = depositRecord
+    ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
+    : '0'
+  const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
+  const hasMoreTokensInWallet = !realmTokenAccount?.account.amount.isZero()
+  const wantToLockMoreThenDeposited = lockMoreThenDeposited === 'YES'
+  const currentPrecision = precision(mintMinAmount)
+  const maxAmountToLock =
+    depositRecord && mint
+      ? wantToLockMoreThenDeposited
+        ? getMintDecimalAmount(
+            mint,
+            depositRecord?.amountDepositedNative.add(
+              new BN(realmTokenAccount!.account.amount)
+            )
+          )
+        : getMintDecimalAmount(mint, depositRecord?.amountDepositedNative)
+      : 0
+  const maxAmountFtm =
+    depositRecord && mint
+      ? wantToLockMoreThenDeposited
+        ? fmtMintAmount(
+            mint,
+            depositRecord?.amountDepositedNative.add(
+              new BN(realmTokenAccount!.account.amount)
+            )
+          )
+        : fmtMintAmount(mint, depositRecord?.amountDepositedNative)
+      : 0
+
+  const tokenName = mint
+    ? getMintMetadata(realm?.account.communityMint)?.name
+    : ''
   const currentPercentOfMaxMultiplier =
     (100 * lockupPeriod.multiplier) / maxMultiplier
 
@@ -155,19 +183,35 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     setAmount(val)
   }
   const handleSaveLock = () => {
-    //TODO integrate
+    const model = {
+      period: lockupPeriod.value,
+      lockupType: lockupType.value,
+    }
+    return model
     onClose()
   }
-
+  const handleGetUsedDeposit = async () => {
+    const deposit = await getUsedDeposit(
+      realm!.pubkey,
+      ownTokenRecord!.account.governingTokenMint,
+      wallet!.publicKey!,
+      client!,
+      'none'
+    )
+    if (deposit) {
+      setDeposit(deposit)
+    }
+  }
   const baseTabClasses =
     'w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark'
-  const tabClasses = ({ val, index, currentValue, lastItemIdx }) =>
-    classNames(
+  const tabClasses = ({ val, index, currentValue, lastItemIdx }) => {
+    return classNames(
       baseTabClasses,
       val === currentValue ? 'bg-primary-light text-bkg-2' : '',
-      index === 0 && 'rounded-bl-lg rounded-tl-lg',
-      index === lastItemIdx + 1 && 'rounded-br-lg rounded-tr-lg'
+      index === 0 ? 'rounded-l-lg' : '',
+      index === lastItemIdx + 1 ? 'rounded-r-lg' : ''
     )
+  }
   const labelClasses = 'text-xs mb-2'
   const DoYouWantToDepositMoreComponent = () => (
     <>
@@ -183,14 +227,14 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       >
         <Tab.List className="flex mb-6">
           <Tab
-            className={`${baseTabClasses} rounded-bl-lg rounded-tl-lg ${
+            className={`${baseTabClasses} rounded-l-lg ${
               lockMoreThenDeposited === YES && 'bg-primary-light text-bkg-2'
             }`}
           >
             Yes
           </Tab>
           <Tab
-            className={`${baseTabClasses} rounded-br-lg rounded-tr-lg ${
+            className={`${baseTabClasses} rounded-r-lg ${
               lockMoreThenDeposited === NO && 'bg-primary-light text-bkg-2'
             }`}
           >
@@ -322,8 +366,8 @@ const LockTokensModal = ({ onClose, isOpen }) => {
         return (
           <div className="flex flex-col text-center mb-6">
             <h2>
-              Lock {amount} for {lockupPeriod.value} {tokenName}
-              {lockupPeriod.value > 1 ? 'years' : 'year'}?
+              Lock {amount} for {secsToYear(lockupPeriod.value)} {tokenName}
+              {lockupPeriod.value > yearToSecs(1) ? 'years' : 'year'}?
             </h2>
             <div className="text-xs">Locking tokens can’t be undone.</div>
           </div>
@@ -343,7 +387,14 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       handleNextStep()
     }
   }, [currentStep])
-
+  useEffect(() => {
+    if (client && connection) {
+      handleGetUsedDeposit()
+    }
+  }, [client, connection])
+  useEffect(() => {
+    validateAmountOnBlur()
+  }, [lockMoreThenDeposited])
   const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 1
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
@@ -375,7 +426,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
         {currentStep === 2 && (
           <div className="ml-auto">
             <Select
-              className="text-xs w-28"
+              className="text-xs w-24"
               onChange={handleSetLockupType}
               value={lockupType.value}
             >

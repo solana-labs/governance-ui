@@ -169,16 +169,16 @@ const TokenDeposit = ({
       connection,
       endpoint
     )
-    await voteRegistryDeposit(
+    await voteRegistryDeposit({
       rpcContext,
-      depositTokenAccount!.publicKey,
-      depositMint!,
-      realm.pubkey,
-      realm.owner,
+      fromPk: depositTokenAccount!.publicKey,
+      mint: depositMint!,
+      realmPk: realm.pubkey,
+      programId: realm.owner,
       amount,
       hasTokenOwnerRecord,
-      client
-    )
+      client,
+    })
 
     handleGetUsedDeposit()
     await fetchWalletTokenAccounts()

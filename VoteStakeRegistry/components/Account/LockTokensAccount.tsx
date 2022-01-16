@@ -70,16 +70,16 @@ const LockTokensAccount = () => {
       connection,
       endpoint
     )
-    await voteRegistryDeposit(
+    await voteRegistryDeposit({
       rpcContext,
-      depositTokenAccount!.publicKey,
-      depositMint!,
-      realm.pubkey,
-      realm.owner,
+      fromPk: depositTokenAccount!.publicKey,
+      mint: depositMint!,
+      realmPk: realm.pubkey,
+      programId: realm.owner,
       amount,
       hasTokenOwnerRecord,
-      client
-    )
+      client,
+    })
 
     handleGetUsedDeposits()
     await fetchWalletTokenAccounts()
@@ -208,12 +208,18 @@ const LockTokensAccount = () => {
     }
   }
 
+  const mainCommunityDepoist = depositRecords?.find(
+    (x) =>
+      x.mint.publicKey.toBase58() ===
+        depositTokenRecord?.account.governingTokenMint.toBase58() &&
+      x.lockup.kind.none
+  )
   const hasTokensInWallet =
     depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0))
 
   const hasTokensDeposited =
-    depositTokenRecord &&
-    depositTokenRecord.account.governingTokenDepositAmount.gt(new BN(0))
+    mainCommunityDepoist &&
+    mainCommunityDepoist.amountDepositedNative.gt(new BN(0))
 
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'

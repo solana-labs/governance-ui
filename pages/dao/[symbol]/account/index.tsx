@@ -16,10 +16,10 @@ const account = () => {
     return null
   }
   useEffect(() => {
-    if (!isLockTokensMode) {
+    if (!isLockTokensMode && symbol) {
       router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
     }
-  }, [isLockTokensMode])
+  }, [isLockTokensMode, symbol])
   return getAccountView()
 }
 

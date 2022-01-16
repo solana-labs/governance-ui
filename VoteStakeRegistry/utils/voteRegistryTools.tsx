@@ -19,6 +19,7 @@ interface votingMint {
   mint: PublicKey
 }
 
+export type LockupKinds = 'none' | 'daily' | 'monthly' | 'cliff' | 'constant'
 interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey
@@ -27,7 +28,7 @@ interface Registrar {
   votingMints: votingMint[]
   //there are more fields but no use for them on ui yet
 }
-interface LockupKindNone {
+export interface LockupKind {
   none: object
   daily: object
   monthly: object
@@ -36,7 +37,7 @@ interface LockupKindNone {
 }
 interface Lockup {
   endTs: BN
-  kind: LockupKindNone
+  kind: LockupKind
   startTs: BN
 }
 export interface Deposit {
@@ -147,7 +148,7 @@ export const getUsedDeposit = async (
   mint: PublicKey,
   walletPk: PublicKey,
   client: VsrClient,
-  kind: 'none' | 'daily' | 'monthly' | 'cliff' | 'constant'
+  kind: LockupKinds
 ) => {
   const clientProgramId = client.program.programId
   const { registrar } = await getRegistrarPDA(realmPk, mint, clientProgramId)
@@ -189,7 +190,6 @@ export const getUsedDeposits = async (
       }
     }
   }
-  console.log(existingVoter)
   const deposits = existingVoter?.deposits
     .filter((x) => x.isUsed)
     .map(
