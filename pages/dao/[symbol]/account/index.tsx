@@ -1,15 +1,14 @@
-import LockTokensAccount from '@components/Account/LockTokensAccount'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import useRealm from '@hooks/useRealm'
+import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 
 const account = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol } = useRealm()
+  const { symbol, realm } = useRealm()
   const getAccountView = () => {
-    //based on realm config it will provide proper account view
-    const isLockTokensMode = true
+    const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
     if (isLockTokensMode) {
       return <LockTokensAccount></LockTokensAccount>
     }

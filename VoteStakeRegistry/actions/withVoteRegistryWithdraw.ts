@@ -6,7 +6,6 @@ import {
 } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import {
-  Deposit,
   getMintCfgIdx,
   getRegistrarPDA,
   getVoterPDA,
