@@ -61,7 +61,7 @@ const AddMemberForm = ({
     mintAccount: undefined,
     programId: programId?.toString(),
     description: '',
-    title: 'Add council member',
+    title: '',
   })
 
   const mintMinAmount = form.mintAccount
@@ -69,8 +69,6 @@ const AddMemberForm = ({
     : 1
 
   const currentPrecision = precision(mintMinAmount)
-
-  const proposalTitle = `Add council member ${form.destinationAccount}`
 
   const setAmount = (event) => {
     const value = event.target.value
@@ -187,6 +185,8 @@ const AddMemberForm = ({
       console.log('error adding member', error)
     }
   }
+
+  const proposalTitle = `Add council member ${form.destinationAccount}`
 
   return (
     <>
