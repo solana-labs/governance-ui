@@ -101,7 +101,7 @@ export const validateDestinationAccAddress = async (
 }
 
 export const validateDestinationAccAddressWithMint = async (
-  connection,
+  connection: ConnectionContext,
   val: any,
   mintPubKey: PublicKey
 ) => {
@@ -121,7 +121,7 @@ export const validateDestinationAccAddressWithMint = async (
 }
 
 export const validateBuffer = async (
-  connection,
+  connection: ConnectionContext,
   val: string,
   governedAccount?: PublicKey
 ) => {
