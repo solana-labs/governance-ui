@@ -345,7 +345,7 @@ const LockTokensAccount = () => {
               return (
                 <div
                   key={idx}
-                  className="border border-bkg-4 w-80 mr-3 rounded-lg"
+                  className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3"
                 >
                   <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
                     <h3 className="mb-0">{availableTokens}</h3>
