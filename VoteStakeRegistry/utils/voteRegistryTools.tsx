@@ -48,16 +48,17 @@ export interface Deposit {
   lockup: Lockup
   votingMintConfigIdx: number
 }
-
 export interface DepositWithIdx extends Deposit {
+  index: number
+}
+export interface DepositWithMintPk extends Deposit {
+  mint: TokenProgramAccount<MintInfo>
   index: number
 }
 
 export const unusedMintPk = '11111111111111111111111111111111'
-
-export interface DepositWithMintPk extends Deposit {
-  mint: TokenProgramAccount<MintInfo>
-}
+export const oneYearDays = 365.242199
+export const oneDaySeconds = 8640
 
 export const getRegistrarPDA = async (
   realmPk: PublicKey,
@@ -159,7 +160,6 @@ export const getUsedDeposit = async (
   const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const existingVoter = await tryGetVoter(voter, client)
   const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
-  console.log(existingVoter?.deposits)
   const findFcn = (x) =>
     x.isUsed &&
     typeof x.lockup.kind[kind] !== 'undefined' &&
@@ -196,13 +196,15 @@ export const getUsedDeposits = async (
     }
   }
   const deposits = existingVoter?.deposits
-    .filter((x) => x.isUsed)
     .map(
-      (x) =>
+      (x, idx) =>
         ({
           ...x,
           mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
+          index: idx,
         } as DepositWithMintPk)
     )
+    .filter((x) => x.isUsed)
+  console.log(deposits)
   return deposits
 }

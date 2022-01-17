@@ -24,6 +24,7 @@ export const withVoteRegistryWithdraw = async (
   realmPubKey: PublicKey,
   amount: BN,
   tokenOwnerRecordPubKey: PublicKey,
+  depositIndex?: number,
   client?: VsrClient
 ) => {
   if (!client) {
@@ -54,12 +55,15 @@ export const withVoteRegistryWithdraw = async (
     voter
   )
   const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
-  const indexOfDepositEntryWithTypeNone = existingVoter?.deposits.findIndex(
-    (x) =>
-      x.isUsed &&
-      typeof x.lockup.kind.none !== 'undefined' &&
-      x.votingMintConfigIdx === mintCfgIdx
-  )
+  const indexOfDepositEntryWithTypeNone =
+    typeof depositIndex === 'undefined'
+      ? existingVoter?.deposits.findIndex(
+          (x) =>
+            x.isUsed &&
+            typeof x.lockup.kind.none !== 'undefined' &&
+            x.votingMintConfigIdx === mintCfgIdx
+        )
+      : depositIndex
 
   instructions.push(
     client?.program.instruction.withdraw(

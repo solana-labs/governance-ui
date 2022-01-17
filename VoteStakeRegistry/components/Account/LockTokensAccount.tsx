@@ -18,10 +18,12 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import {
   DepositWithMintPk,
   getUsedDeposits,
+  oneDaySeconds,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { voteRegistryDeposit } from 'VoteStakeRegistry/actions/voteRegistryDeposit'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
+import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
 
 const LockTokensAccount = () => {
   const wallet = useWalletStore((s) => s.current)
@@ -156,6 +158,7 @@ const LockTokensAccount = () => {
         x.mint.publicKey.toBase58() ===
           depositTokenRecord!.account.governingTokenMint.toBase58()
     )!.amountDepositedNative
+
     await withVoteRegistryWithdraw(
       instructions,
       wallet!.publicKey!,
@@ -164,6 +167,7 @@ const LockTokensAccount = () => {
       realm!.pubkey!,
       amount,
       tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
+      undefined,
       client
     )
 
@@ -210,6 +214,27 @@ const LockTokensAccount = () => {
     }
   }
 
+  const handleWithDrawFromDeposit = async (depositEntry: DepositWithMintPk) => {
+    const rpcContext = new RpcContext(
+      realm!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection,
+      endpoint
+    )
+    await voteRegistryWithdraw(
+      rpcContext,
+      depositTokenAccount!.publicKey!,
+      depositTokenRecord!.account.governingTokenMint,
+      realm!.pubkey!,
+      depositEntry.amountDepositedNative,
+      tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
+      depositEntry.index,
+      client
+    )
+    handleGetUsedDeposits()
+  }
+
   const mainCommunityDepoist = depositRecords?.find(
     (x) =>
       x.mint.publicKey.toBase58() ===
@@ -243,6 +268,14 @@ const LockTokensAccount = () => {
     }
   }, [connection, client, depositTokenRecord])
 
+  const cardLabel = (label, value) => {
+    return (
+      <div className="flex flex-col w-1/2 p-2">
+        <div className="text-xs text-fgd-3">{label}</div>
+        <div>{value}</div>
+      </div>
+    )
+  }
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg">
@@ -290,7 +323,10 @@ const LockTokensAccount = () => {
                 className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex flex-col mr-3"
               >
                 <p className="text-fgd-3 text-xs">
-                  {depositTokenName} Deposited
+                  {depositTokenName}{' '}
+                  {typeof x.lockup.kind.none !== 'undefined'
+                    ? 'Deposited'
+                    : 'Locked'}
                 </p>
                 <h3 className="mb-0">{availableTokens}</h3>
               </div>
@@ -298,6 +334,57 @@ const LockTokensAccount = () => {
           })}
         </div>
         <h1 className="mb-8">Locked Tokens</h1>
+        <div className="flex mb-8">
+          {depositRecords
+            ?.filter((x) => typeof x.lockup.kind.none === 'undefined')
+            ?.map((x, idx) => {
+              const availableTokens = fmtMintAmount(
+                x.mint.account,
+                x.amountDepositedNative
+              )
+              return (
+                <div
+                  key={idx}
+                  className="border border-bkg-4 w-80 mr-3 rounded-lg"
+                >
+                  <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
+                    <h3 className="mb-0">{availableTokens}</h3>
+                  </div>
+                  <div className="p-4 bg-bkg-1 rounded-lg">
+                    <div className="flex flex-row flex-wrap">
+                      {cardLabel('Type', Object.keys(x.lockup.kind)[0])}
+                      {cardLabel(
+                        'Initial amount',
+                        fmtMintAmount(
+                          x.mint.account,
+                          x.amountInitiallyLockedNative
+                        )
+                      )}
+                      {cardLabel('Schedule', 'xxx p/m')}
+                      {cardLabel('Vote multiplier', 'x')}
+                      {cardLabel(
+                        'Time left',
+                        `${Math.round(
+                          x.lockup.endTs.sub(x.lockup.startTs).toNumber() /
+                            oneDaySeconds
+                        )} days`
+                      )}
+                      {cardLabel(
+                        'Available',
+                        fmtMintAmount(x.mint.account, x.amountDepositedNative)
+                      )}
+                    </div>
+                    <Button
+                      className="w-full mt-4"
+                      onClick={() => handleWithDrawFromDeposit(x)}
+                    >
+                      Withdraw
+                    </Button>
+                  </div>
+                </div>
+              )
+            })}
+        </div>
         <div className="flex">
           <div className="flex flex-col items-center p-8 rounded-lg bg-bkg-4">
             <div className="flex text-center mb-6">

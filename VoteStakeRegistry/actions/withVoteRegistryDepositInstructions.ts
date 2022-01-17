@@ -4,7 +4,7 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import { LockupKinds } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { getPrepareDepositInstructions } from './getPrepareDepositInstructions'
+import { createNewDepositInstructions } from './createNewDepositInstructions'
 
 export const withVoteRegistryDepositInstructions = async ({
   rpcContext,
@@ -49,7 +49,7 @@ export const withVoteRegistryDepositInstructions = async ({
     voter,
     registrar,
     voterATAPk,
-  } = await getPrepareDepositInstructions({
+  } = await createNewDepositInstructions({
     rpcContext,
     mint,
     realmPk,

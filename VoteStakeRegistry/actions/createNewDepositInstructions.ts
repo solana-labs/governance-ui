@@ -23,7 +23,7 @@ import {
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
-export const getPrepareDepositInstructions = async ({
+export const createNewDepositInstructions = async ({
   rpcContext,
   mint,
   realmPk,
@@ -125,18 +125,19 @@ export const getPrepareDepositInstructions = async ({
   }
 
   if (!isExistingDepositEntry || forceCreateNew) {
-    const oneMonthDays = 30.5
+    const oneMonthDays = 30.4368499
     const period =
       lockupKind !== 'monthly'
         ? lockUpPeriodInDays
         : lockUpPeriodInDays / oneMonthDays
+    const roundedPeriod = Math.round(period)
     const allowClawback = false
     const startTime = new BN(new Date().getTime())
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
       startTime,
-      period,
+      roundedPeriod,
       allowClawback,
       {
         accounts: {

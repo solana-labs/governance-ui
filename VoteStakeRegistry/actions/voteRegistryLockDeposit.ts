@@ -5,9 +5,9 @@ import { sendTransaction } from 'utils/send'
 import { BN } from '@project-serum/anchor'
 import { LockupKinds } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { getPrepareDepositInstructions } from './getPrepareDepositInstructions'
+import { createNewDepositInstructions } from './createNewDepositInstructions'
 
-export const voteRegistryDepositWithInternalTransferInstruction = async ({
+export const voteRegistryLockDeposit = async ({
   rpcContext,
   mint,
   realmPk,
@@ -53,7 +53,7 @@ export const voteRegistryDepositWithInternalTransferInstruction = async ({
     voterATAPk,
     tokenOwnerRecordPubKey,
     voterWeight,
-  } = await getPrepareDepositInstructions({
+  } = await createNewDepositInstructions({
     rpcContext,
     mint,
     realmPk,

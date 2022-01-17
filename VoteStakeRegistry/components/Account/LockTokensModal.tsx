@@ -14,17 +14,19 @@ import {
   fmtMintAmount,
   getMintDecimalAmount,
   getMintMinAmountAsDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { voteRegistryDepositWithInternalTransferInstruction } from 'VoteStakeRegistry/actions/voteRegistryDepositWithInternalTransferInstruction'
+import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithIdx,
   getUsedDeposit,
   LockupKinds,
+  oneYearDays,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 interface Period {
   value: number
@@ -62,7 +64,7 @@ const lockupTypes: LockupType[] = [
       'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released weekly, monthly or yearly. Vote weight increase declines linearly over the period.',
   },
 ]
-const oneYearDays = 365
+
 const yearToDays = (val) => {
   return oneYearDays * val
 }
@@ -133,7 +135,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   } = useRealm()
   const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
-  const [amount, setAmount] = useState<number | undefined>()
+  const [amount, setAmount] = useState<number | undefined>(0)
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
   const [lockupType, setLockupType] = useState<LockupType>(lockupTypes[0])
   const [vestingPeriod, setVestingPeriod] = useState<VestingPeriod>(
@@ -205,14 +207,26 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       connection,
       endpoint
     )
+    const totalAmountToLock = getMintNaturalAmountFromDecimalAsBN(
+      amount!,
+      mint!.decimals
+    )
+    const totalAmountInDeposit =
+      depositRecord?.amountDepositedNative || new BN(0)
+    const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
+      totalAmountToLock
+    )
+    const amountFromDeposit = whatWillBeLeftInsideDeposit.isNeg()
+      ? totalAmountInDeposit
+      : totalAmountToLock
 
-    await voteRegistryDepositWithInternalTransferInstruction({
+    await voteRegistryLockDeposit({
       rpcContext,
       mint: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
-      fromRealmDepositAmount: new BN(1000),
-      totalTransferAmount: new BN(1000),
+      fromRealmDepositAmount: amountFromDeposit,
+      totalTransferAmount: totalAmountToLock,
       lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
@@ -222,6 +236,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       tokenOwnerRecordPk: tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
       client,
     })
+    handleGetUsedDeposit()
     onClose()
   }
   const handleGetUsedDeposit = async () => {
