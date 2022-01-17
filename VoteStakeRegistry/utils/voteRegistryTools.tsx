@@ -58,7 +58,7 @@ export interface DepositWithMintPk extends Deposit {
 
 export const unusedMintPk = '11111111111111111111111111111111'
 export const oneYearDays = 365.242199
-export const oneDaySeconds = 8640
+export const oneDaySeconds = 86400
 
 export const getRegistrarPDA = async (
   realmPk: PublicKey,
@@ -205,6 +205,5 @@ export const getUsedDeposits = async (
         } as DepositWithMintPk)
     )
     .filter((x) => x.isUsed)
-  console.log(deposits)
   return deposits
 }

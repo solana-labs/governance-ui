@@ -364,10 +364,10 @@ const LockTokensAccount = () => {
                       {cardLabel('Vote multiplier', 'x')}
                       {cardLabel(
                         'Time left',
-                        `${Math.round(
+                        `${
                           x.lockup.endTs.sub(x.lockup.startTs).toNumber() /
-                            oneDaySeconds
-                        )} days`
+                          oneDaySeconds
+                        } days`
                       )}
                       {cardLabel(
                         'Available',
