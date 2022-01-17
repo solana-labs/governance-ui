@@ -101,7 +101,7 @@ export const validateDestinationAccAddress = async (
 }
 
 export const validateDestinationAccAddressWithMint = async (
-  connection,
+  connection: ConnectionContext,
   val: any,
   mintPubKey: PublicKey
 ) => {
@@ -121,7 +121,7 @@ export const validateDestinationAccAddressWithMint = async (
 }
 
 export const validateBuffer = async (
-  connection,
+  connection: ConnectionContext,
   val: string,
   governedAccount?: PublicKey
 ) => {
@@ -130,7 +130,7 @@ export const validateBuffer = async (
     throw 'Program governed account not selected'
   }
   if (pubKey) {
-    await connection.current.getProgramAccountInfo(pubKey).then((data) => {
+    await connection.current.getParsedAccountInfo(pubKey).then((data) => {
       if (!data || !data.value) {
         throw "account doesn't exist or has no SOLs"
       }
