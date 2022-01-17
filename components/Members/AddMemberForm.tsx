@@ -234,6 +234,7 @@ const AddMemberForm = ({ close }) => {
       </div>
 
       <Input
+        disabled
         useDefaultStyle={false}
         className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
         wrapperClassName="my-6"
