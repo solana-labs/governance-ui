@@ -18,10 +18,12 @@ import { getMintSchema } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import {
+  getInstructionDataFromBase64,
+  RpcContext,
+  Governance,
+  ProgramAccount,
+} from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
@@ -207,7 +209,7 @@ const AddMember = () => {
         <>
           <ArrowLeftIcon
             onClick={handleGoBackToMainView}
-            className="h-4 w-4 mr-1 text-primary-light mr-2"
+            className="h-4 w-4 text-primary-light mr-2"
           />
           Add new member
         </>
