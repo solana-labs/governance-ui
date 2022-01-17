@@ -16,7 +16,7 @@ export const voteRegistryDeposit = async ({
   programId,
   amount,
   hasTokenOwnerRecord,
-  lockUpPeriodInSeconds = 0,
+  lockUpPeriodInDays = 0,
   lockupKind = 'none',
   forceCreateNew = false,
   client,
@@ -30,7 +30,7 @@ export const voteRegistryDeposit = async ({
   programId: PublicKey
   amount: BN
   hasTokenOwnerRecord: boolean
-  lockUpPeriodInSeconds?: number
+  lockUpPeriodInDays?: number
   lockupKind?: LockupKinds
   forceCreateNew?: boolean
   client?: VsrClient
@@ -46,7 +46,7 @@ export const voteRegistryDeposit = async ({
     programId,
     amount,
     hasTokenOwnerRecord,
-    lockUpPeriodInSeconds,
+    lockUpPeriodInDays,
     lockupKind,
     forceCreateNew,
     client,

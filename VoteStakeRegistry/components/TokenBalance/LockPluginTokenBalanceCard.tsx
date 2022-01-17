@@ -179,8 +179,10 @@ const TokenDeposit = ({
       hasTokenOwnerRecord,
       client,
     })
+    if (depositTokenRecord) {
+      handleGetUsedDeposit()
+    }
 
-    handleGetUsedDeposit()
     await fetchWalletTokenAccounts()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
@@ -340,10 +342,10 @@ const TokenDeposit = ({
       : 0
 
   useEffect(() => {
-    if (client && wallet?.connected) {
+    if (client && wallet?.connected && depositTokenRecord) {
       handleGetUsedDeposit()
     }
-  }, [wallet?.connected, client])
+  }, [wallet?.connected, client, depositTokenRecord])
 
   return (
     <>

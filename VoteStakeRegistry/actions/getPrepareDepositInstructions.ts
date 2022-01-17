@@ -14,7 +14,6 @@ import {
 } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import {
-  Deposit,
   getMintCfgIdx,
   getRegistrarPDA,
   getVoterPDA,
@@ -30,7 +29,7 @@ export const getPrepareDepositInstructions = async ({
   realmPk,
   programId,
   hasTokenOwnerRecord,
-  lockUpPeriodInSeconds = 0,
+  lockUpPeriodInDays = 0,
   lockupKind = 'none',
   //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
@@ -42,7 +41,7 @@ export const getPrepareDepositInstructions = async ({
   realmPk: PublicKey
   programId: PublicKey
   hasTokenOwnerRecord: boolean
-  lockUpPeriodInSeconds?: number
+  lockUpPeriodInDays?: number
   lockupKind?: LockupKinds
   forceCreateNew?: boolean
   client?: VsrClient
@@ -110,29 +109,34 @@ export const getPrepareDepositInstructions = async ({
     )
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
-  const indexOfDepositEntryWithTypeNone = existingVoter?.deposits.findIndex(
+  const indexOfExistingDeposit = existingVoter?.deposits.findIndex(
     (x) =>
       x.isUsed &&
       typeof x.lockup.kind[lockupKind] !== 'undefined' &&
       x.votingMintConfigIdx === mintCfgIdx
   )
-  const isExistingDepositEntry = indexOfDepositEntryWithTypeNone !== -1
-  const firstFreeIdx = (existingVoter?.deposits as Deposit[]).findIndex(
-    (x) => !x.isUsed
-  )
+  const isExistingDepositEntry =
+    typeof indexOfExistingDeposit !== 'undefined' &&
+    indexOfExistingDeposit !== -1
+  const firstFreeIdx = existingVoter?.deposits?.findIndex((x) => !x.isUsed) || 0
 
   if (firstFreeIdx === -1) {
     throw 'You have to much active deposits'
   }
 
   if (!isExistingDepositEntry || forceCreateNew) {
+    const oneMonthDays = 30.5
+    const period =
+      lockupKind !== 'monthly'
+        ? lockUpPeriodInDays
+        : lockUpPeriodInDays / oneMonthDays
     const allowClawback = false
     const startTime = new BN(new Date().getTime())
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
       startTime,
-      lockUpPeriodInSeconds,
+      period,
       allowClawback,
       {
         accounts: {
@@ -162,7 +166,7 @@ export const getPrepareDepositInstructions = async ({
 
   const depositIdx =
     isExistingDepositEntry && !forceCreateNew
-      ? indexOfDepositEntryWithTypeNone!
+      ? indexOfExistingDeposit!
       : firstFreeIdx
 
   return {

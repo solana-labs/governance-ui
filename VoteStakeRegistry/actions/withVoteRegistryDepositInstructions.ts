@@ -15,7 +15,7 @@ export const withVoteRegistryDepositInstructions = async ({
   programId,
   amount,
   hasTokenOwnerRecord,
-  lockUpPeriodInSeconds = 0,
+  lockUpPeriodInDays = 0,
   lockupKind = 'none',
   //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
@@ -30,7 +30,7 @@ export const withVoteRegistryDepositInstructions = async ({
   programId: PublicKey
   amount: BN
   hasTokenOwnerRecord: boolean
-  lockUpPeriodInSeconds?: number
+  lockUpPeriodInDays?: number
   lockupKind?: LockupKinds
   forceCreateNew?: boolean
   client?: VsrClient
@@ -55,12 +55,11 @@ export const withVoteRegistryDepositInstructions = async ({
     realmPk,
     programId,
     hasTokenOwnerRecord,
-    lockUpPeriodInSeconds,
+    lockUpPeriodInDays,
     lockupKind,
     forceCreateNew,
     client,
   })
-
   const depositInstruction = client?.program.instruction.deposit(
     depositIdx,
     amount,

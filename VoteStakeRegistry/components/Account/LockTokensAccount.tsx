@@ -189,7 +189,9 @@ const LockTokensAccount = () => {
       }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      handleGetUsedDeposits()
+      if (depositTokenRecord) {
+        handleGetUsedDeposits()
+      }
     } catch (ex) {
       console.error("Can't withdraw tokens", ex)
     }
@@ -236,10 +238,10 @@ const LockTokensAccount = () => {
     : ''
 
   useEffect(() => {
-    if (client && connection) {
+    if (client && connection && depositTokenRecord) {
       handleGetUsedDeposits()
     }
-  }, [connection, client])
+  }, [connection, client, depositTokenRecord])
 
   return (
     <div className="grid grid-cols-12 gap-4">

@@ -14,7 +14,7 @@ export const voteRegistryDepositWithInternalTransferInstruction = async ({
   programId,
   fromRealmDepositAmount,
   totalTransferAmount,
-  lockUpPeriodInSeconds = 0,
+  lockUpPeriodInDays = 0,
   lockupKind = 'none',
   sourceDepositIdx,
   client,
@@ -30,7 +30,7 @@ export const voteRegistryDepositWithInternalTransferInstruction = async ({
   fromRealmDepositAmount: BN
   totalTransferAmount: BN
   hasTokenOwnerRecord: boolean
-  lockUpPeriodInSeconds: number
+  lockUpPeriodInDays: number
   lockupKind?: LockupKinds
   sourceDepositIdx: number
   tokenOwnerRecordPk: PublicKey
@@ -59,7 +59,7 @@ export const voteRegistryDepositWithInternalTransferInstruction = async ({
     realmPk,
     programId,
     hasTokenOwnerRecord,
-    lockUpPeriodInSeconds,
+    lockUpPeriodInDays,
     lockupKind,
     forceCreateNew: true,
     client,

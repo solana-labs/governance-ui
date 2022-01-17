@@ -62,38 +62,37 @@ const lockupTypes: LockupType[] = [
       'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released weekly, monthly or yearly. Vote weight increase declines linearly over the period.',
   },
 ]
-const oneDaySecs = 86400
-const oneYearDays = 365.24
-const yearToSecs = (val) => {
-  return oneDaySecs * oneYearDays * val
+const oneYearDays = 365
+const yearToDays = (val) => {
+  return oneYearDays * val
 }
-const secsToYear = (val) => {
-  return val / oneDaySecs / oneYearDays
+const daysToYear = (val) => {
+  return val / oneYearDays
 }
 //TODO read multiplier from program
 const lockupPeriods: Period[] = [
   {
-    value: yearToSecs(1),
+    value: yearToDays(1),
     display: '1y',
     multiplier: 1.2,
   },
   {
-    value: yearToSecs(2),
+    value: yearToDays(2),
     display: '2y',
     multiplier: 1.4,
   },
   {
-    value: yearToSecs(3),
+    value: yearToDays(3),
     display: '3y',
     multiplier: 1.6,
   },
   {
-    value: yearToSecs(4),
+    value: yearToDays(4),
     display: '4y',
     multiplier: 1.8,
   },
   {
-    value: yearToSecs(5),
+    value: yearToDays(5),
     display: '5y',
     multiplier: 2,
   },
@@ -214,7 +213,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       programId: realm!.owner,
       fromRealmDepositAmount: new BN(1000),
       totalTransferAmount: new BN(1000),
-      lockUpPeriodInSeconds: lockupPeriod.value,
+      lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
       hasTokenOwnerRecord:
@@ -401,8 +400,8 @@ const LockTokensModal = ({ onClose, isOpen }) => {
         return (
           <div className="flex flex-col text-center mb-6">
             <h2>
-              Lock {amount} for {secsToYear(lockupPeriod.value)} {tokenName}
-              {lockupPeriod.value > yearToSecs(1) ? 'years' : 'year'}?
+              Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}
+              {lockupPeriod.value > yearToDays(1) ? 'years' : 'year'}?
             </h2>
             <div className="text-xs">Locking tokens can’t be undone.</div>
           </div>
