@@ -287,7 +287,7 @@ const LockTokensAccount = () => {
             return (
               <div
                 key={idx}
-                className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex flex-col"
+                className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex flex-col mr-3"
               >
                 <p className="text-fgd-3 text-xs">
                   {depositTokenName} Deposited
