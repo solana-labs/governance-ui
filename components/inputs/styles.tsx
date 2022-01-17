@@ -15,13 +15,13 @@ export const inputClasses = ({
   useDefaultStyle = true,
 }) => {
   const disabledStyle =
-    'cursor-pointer opacity-60 text-fgd-3 hover:border-fgd-3 border border-bkg-4'
+    'cursor-not-allowed opacity-50 text-fgd-3 border bg-bkg-1 border-bkg-1'
 
   const defaultStyle = `${
     disabled
       ? disabledStyle
-      : 'p-3 w-full border border-fgd-3 default-transition text-sm text-fgd-1 rounded-md hover:border-primary-light focus:border-primary-light focus:outline-none bg-bkg-1'
-  }`
+      : 'hover:border-primary-light focus:border-primary-light focus:outline-none bg-bkg-1'
+  } p-3 w-full border border-fgd-3 default-transition text-sm text-fgd-1 rounded-md`
 
   return `
     ${
