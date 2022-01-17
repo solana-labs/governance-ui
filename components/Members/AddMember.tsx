@@ -217,6 +217,7 @@ const AddMember = () => {
       <div className="space-y-4">
         <Input
           label="Member's wallet"
+          placeholder="Member's wallet"
           value={form.destinationAccount}
           type="text"
           onChange={(evt) =>
