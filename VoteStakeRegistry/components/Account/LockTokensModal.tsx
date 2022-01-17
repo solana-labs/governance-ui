@@ -7,7 +7,9 @@ import Tooltip from '@components/Tooltip'
 import { Tab } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
+import { getProgramVersionForRealm } from '@models/registry/api'
 import { BN } from '@project-serum/anchor'
+import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
   getMintDecimalAmount,
@@ -17,10 +19,12 @@ import { precision } from '@utils/formatting'
 import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import { voteRegistryDepositWithInternalTransferInstruction } from 'VoteStakeRegistry/actions/voteRegistryDepositWithInternalTransferInstruction'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
-  Deposit,
+  DepositWithIdx,
   getUsedDeposit,
+  LockupKinds,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 interface Period {
   value: number
@@ -28,28 +32,32 @@ interface Period {
   multiplier: number
 }
 interface LockupType {
-  value: string
+  value: LockupKinds
   info: string
+  displayName: string
 }
 interface VestingPeriod {
   value: number
   display: string
   info: string
 }
-const VESTED = 'Vested'
+const MONTHLY = 'monthly'
 const lockupTypes: LockupType[] = [
   {
-    value: 'Cliff',
+    value: 'cliff',
+    displayName: 'Cliff',
     info:
       'Tokens are locked for a set timeframe and are released in full at the end of the period. Vote weight increase declines linearly over the period.',
   },
   {
-    value: 'Constant',
+    value: 'constant',
+    displayName: 'Cliff',
     info:
       'Tokens are locked permanently for a timeframe. At any time a constant lockup can be converted to a cliff lockup with a timeframe greater than or equal to the constant lockup period. Vote weight increase stays constant until the lockup is converted to a cliff type lockup.',
   },
   {
-    value: VESTED,
+    value: MONTHLY,
+    displayName: 'Vested',
     info:
       'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released weekly, monthly or yearly. Vote weight increase declines linearly over the period.',
   },
@@ -114,11 +122,19 @@ const NO = 'NO'
 const LockTokensModal = ({ onClose, isOpen }) => {
   const { client } = useVoteRegistry()
   const connection = useWalletStore((s) => s.connection.current)
+  const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletStore((s) => s.current)
-  const { ownTokenRecord, mint, realm, realmTokenAccount } = useRealm()
-  const [depositRecord, setDeposit] = useState<Deposit | null>(null)
+  const {
+    ownTokenRecord,
+    mint,
+    realm,
+    realmTokenAccount,
+    realmInfo,
+    tokenRecords,
+  } = useRealm()
+  const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
-  const [amount, setAmount] = useState<number | undefined>(undefined)
+  const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
   const [lockupType, setLockupType] = useState<LockupType>(lockupTypes[0])
   const [vestingPeriod, setVestingPeriod] = useState<VestingPeriod>(
@@ -182,12 +198,31 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     )
     setAmount(val)
   }
-  const handleSaveLock = () => {
-    const model = {
-      period: lockupPeriod.value,
-      lockupType: lockupType.value,
-    }
-    return model
+  const handleSaveLock = async () => {
+    const rpcContext = new RpcContext(
+      realm!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection,
+      endpoint
+    )
+
+    await voteRegistryDepositWithInternalTransferInstruction({
+      rpcContext,
+      mint: realm!.account.communityMint!,
+      realmPk: realm!.pubkey!,
+      programId: realm!.owner,
+      fromRealmDepositAmount: new BN(1000),
+      totalTransferAmount: new BN(1000),
+      lockUpPeriodInSeconds: lockupPeriod.value,
+      lockupKind: lockupType.value,
+      sourceDepositIdx: depositRecord!.index,
+      hasTokenOwnerRecord:
+        typeof tokenRecords[wallet!.publicKey!.toBase58()] !== 'undefined',
+      tempHolderPk: realmTokenAccount!.publicKey,
+      tokenOwnerRecordPk: tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
+      client,
+    })
     onClose()
   }
   const handleGetUsedDeposit = async () => {
@@ -262,7 +297,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
                       lastItemIdx: lockupTypes.length,
                     })}
                   >
-                    {type.value}
+                    {type.displayName}
                   </Tab>
                 ))}
               </Tab.List>
@@ -321,7 +356,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
                 ))}
               </Tab.List>
             </Tab.Group>
-            {lockupType.value === 'Vested' && (
+            {lockupType.value === MONTHLY && (
               <div className="mb-6">
                 <div className={labelClasses}>Vesting Period</div>
                 <Tab.Group onChange={handleSetVestingPeriod}>

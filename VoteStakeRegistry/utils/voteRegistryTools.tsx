@@ -49,6 +49,10 @@ export interface Deposit {
   votingMintConfigIdx: number
 }
 
+export interface DepositWithIdx extends Deposit {
+  index: number
+}
+
 export const unusedMintPk = '11111111111111111111111111111111'
 
 export interface DepositWithMintPk extends Deposit {
@@ -155,13 +159,14 @@ export const getUsedDeposit = async (
   const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const existingVoter = await tryGetVoter(voter, client)
   const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
-  const deposit = existingVoter?.deposits.find(
-    (x) =>
-      x.isUsed &&
-      typeof x.lockup.kind[kind] !== 'undefined' &&
-      x.votingMintConfigIdx === mintCfgIdx
-  )
-  return deposit
+  console.log(existingVoter?.deposits)
+  const findFcn = (x) =>
+    x.isUsed &&
+    typeof x.lockup.kind[kind] !== 'undefined' &&
+    x.votingMintConfigIdx === mintCfgIdx
+  const index = existingVoter?.deposits.findIndex(findFcn)
+  const deposit = existingVoter?.deposits.find(findFcn)
+  return { ...deposit, index } as DepositWithIdx
 }
 
 export const getUsedDeposits = async (

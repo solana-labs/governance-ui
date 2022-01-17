@@ -9,32 +9,32 @@ import { getPrepareDepositInstructions } from './getPrepareDepositInstructions'
 
 export const voteRegistryDepositWithInternalTransferInstruction = async ({
   rpcContext,
-  //except transferring founds between deposits we can additionally run deposit from wallet
-  fromWalletPk,
   mint,
   realmPk,
   programId,
-  walletAmount,
-  transferAmount,
+  fromRealmDepositAmount,
+  totalTransferAmount,
   lockUpPeriodInSeconds = 0,
   lockupKind = 'none',
   sourceDepositIdx,
   client,
+  tokenOwnerRecordPk,
+  tempHolderPk,
+  hasTokenOwnerRecord,
 }: {
   rpcContext: RpcContext
-  //from where we deposit our founds
-  fromWalletPk?: PublicKey
   //e.g council or community
   mint: PublicKey
   realmPk: PublicKey
   programId: PublicKey
-  //if we want to deposit from wallet to
-  walletAmount?: BN
-  transferAmount: BN
+  fromRealmDepositAmount: BN
+  totalTransferAmount: BN
   hasTokenOwnerRecord: boolean
-  lockUpPeriodInSeconds?: number
+  lockUpPeriodInSeconds: number
   lockupKind?: LockupKinds
   sourceDepositIdx: number
+  tokenOwnerRecordPk: PublicKey
+  tempHolderPk: PublicKey
   client?: VsrClient
 }) => {
   const signers: Keypair[] = []
@@ -51,12 +51,14 @@ export const voteRegistryDepositWithInternalTransferInstruction = async ({
     voter,
     registrar,
     voterATAPk,
+    tokenOwnerRecordPubKey,
+    voterWeight,
   } = await getPrepareDepositInstructions({
     rpcContext,
     mint,
     realmPk,
     programId,
-    hasTokenOwnerRecord: false,
+    hasTokenOwnerRecord,
     lockUpPeriodInSeconds,
     lockupKind,
     forceCreateNew: true,
@@ -65,39 +67,43 @@ export const voteRegistryDepositWithInternalTransferInstruction = async ({
   const transaction = new Transaction()
   transaction.add(...prepareDepositInstructions)
 
-  const transferInstruction = client.program.instruction.internalTransfer(
-    sourceDepositIdx,
-    depositIdx,
-    transferAmount,
-    {
-      accounts: {
-        registrar: registrar,
-        voter: voter,
-        voterAuthority: wallet.publicKey,
-      },
-    }
-  )
-
-  transaction.add(transferInstruction)
-
-  //with internal transfer its available to deposit from wallet
-  if (fromWalletPk && walletAmount) {
-    const depositInstruction = client?.program.instruction.deposit(
-      depositIdx,
-      walletAmount,
+  if (!fromRealmDepositAmount.isZero()) {
+    const withdrawInstruction = client?.program.instruction.withdraw(
+      sourceDepositIdx!,
+      fromRealmDepositAmount,
       {
         accounts: {
           registrar: registrar,
           voter: voter,
+          voterAuthority: wallet!.publicKey,
+          tokenOwnerRecord: tokenOwnerRecordPubKey || tokenOwnerRecordPk,
+          voterWeightRecord: voterWeight,
           vault: voterATAPk,
-          depositToken: fromWalletPk,
-          depositAuthority: wallet!.publicKey!,
+          destination: tempHolderPk,
           tokenProgram: TOKEN_PROGRAM_ID,
         },
       }
     )
-    transaction.add(depositInstruction)
+
+    transaction.add(withdrawInstruction)
   }
+
+  const depositInstruction = client?.program.instruction.deposit(
+    depositIdx,
+    totalTransferAmount,
+    {
+      accounts: {
+        registrar: registrar,
+        voter: voter,
+        vault: voterATAPk,
+        depositToken: tempHolderPk,
+        depositAuthority: wallet!.publicKey!,
+        tokenProgram: TOKEN_PROGRAM_ID,
+      },
+    }
+  )
+  transaction.add(depositInstruction)
+
   await sendTransaction({
     transaction,
     wallet,

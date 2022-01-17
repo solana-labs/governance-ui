@@ -249,7 +249,7 @@ const TokenDeposit = ({
         )
       }
     }
-    //todo amount from
+
     await withVoteRegistryWithdraw(
       instructions,
       wallet!.publicKey!,

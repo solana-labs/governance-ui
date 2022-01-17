@@ -57,6 +57,8 @@ export const getPrepareDepositInstructions = async ({
   const systemProgram = SystemProgram.programId
   const instructions: TransactionInstruction[] = []
   const clientProgramId = client!.program.programId
+  let tokenOwnerRecordPubKey: PublicKey | null = null
+
   const { registrar } = await getRegistrarPDA(
     realmPk,
     mint,
@@ -82,8 +84,7 @@ export const getPrepareDepositInstructions = async ({
   )
 
   if (!hasTokenOwnerRecord) {
-    //do we need await here ?
-    await withCreateTokenOwnerRecord(
+    tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
       programId,
       realmPk,
@@ -127,35 +128,50 @@ export const getPrepareDepositInstructions = async ({
   if (!isExistingDepositEntry || forceCreateNew) {
     const allowClawback = false
     const startTime = new BN(new Date().getTime())
-    instructions.push(
-      client?.program.instruction.createDepositEntry(
-        firstFreeIdx,
-        { [lockupKind]: {} },
-        startTime,
-        lockUpPeriodInSeconds,
-        allowClawback,
-        {
-          accounts: {
-            registrar: registrar,
-            voter: voter,
-            payer: wallet!.publicKey!,
-            voterAuthority: wallet!.publicKey!,
-            depositMint: mint,
-            rent: SYSVAR_RENT_PUBKEY,
-            systemProgram: systemProgram,
-            tokenProgram: TOKEN_PROGRAM_ID,
-            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-            vault: voterATAPk,
-          },
-        }
-      )
+    const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
+      firstFreeIdx,
+      { [lockupKind]: {} },
+      startTime,
+      lockUpPeriodInSeconds,
+      allowClawback,
+      {
+        accounts: {
+          registrar: registrar,
+          voter: voter,
+          payer: wallet!.publicKey!,
+          voterAuthority: wallet!.publicKey!,
+          depositMint: mint,
+          rent: SYSVAR_RENT_PUBKEY,
+          systemProgram: systemProgram,
+          tokenProgram: TOKEN_PROGRAM_ID,
+          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+          vault: voterATAPk,
+        },
+      }
     )
+    instructions.push(createDepositEntryInstruction)
   }
+
+  //   const close = client.program.instruction.closeDepositEntry(2, {
+  //     accounts: {
+  //       voter: voter,
+  //       voterAuthority: wallet.publicKey,
+  //     },
+  //   })
+  //   instructions.push(close)
 
   const depositIdx =
     isExistingDepositEntry && !forceCreateNew
       ? indexOfDepositEntryWithTypeNone!
       : firstFreeIdx
 
-  return { instructions, depositIdx, registrar, voterATAPk, voter }
+  return {
+    instructions,
+    depositIdx,
+    registrar,
+    voterATAPk,
+    voter,
+    tokenOwnerRecordPubKey,
+    voterWeight,
+  }
 }
