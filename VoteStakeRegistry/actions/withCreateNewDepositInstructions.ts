@@ -19,9 +19,9 @@ import {
   getVoterPDA,
   getVoterWeightPDA,
   LockupType,
-  DAYS_PER_MONTH,
   tryGetVoter,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { DAYS_PER_MONTH } from 'VoteStakeRegistry/utils/dateTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const withCreateNewDepositInstructions = async ({
