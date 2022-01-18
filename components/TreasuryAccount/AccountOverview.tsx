@@ -177,15 +177,17 @@ const AccountOverview = () => {
           ></DepositNFT>
         </Modal>
       )}
+
       {openCommonSendModal && (
         <Modal
+          background="bg-bkg-1"
           sizeClassName="sm:max-w-3xl"
           onClose={() => {
             setOpenCommonSendModal(false)
           }}
           isOpen={openCommonSendModal}
         >
-          <SendTokens></SendTokens>
+          <SendTokens close={() => setOpenCommonSendModal(false)} />
         </Modal>
       )}
     </>

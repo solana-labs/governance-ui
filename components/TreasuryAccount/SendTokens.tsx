@@ -22,22 +22,19 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import { BN } from '@project-serum/anchor'
 import { getTokenTransferSchema } from '@utils/validations'
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-  //   InformationCircleIcon,
-} from '@heroicons/react/solid'
+import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid'
 import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import {
+  getInstructionDataFromBase64,
+  RpcContext,
+  Governance,
+  ProgramAccount,
+} from '@solana/spl-governance'
 import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
-// import { Popover } from '@headlessui/react'
 import AccountLabel from './AccountHeader'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
@@ -399,8 +396,8 @@ const SendTokens = ({ close }) => {
               className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
               wrapperClassName="mb-6"
               label="Title of your proposal"
-              placeholder={proposalTitle}
-              value={form.title}
+              placeholder="Title of your proposal"
+              value={form.title || proposalTitle}
               type="text"
               onChange={(event) =>
                 handleSetForm({
