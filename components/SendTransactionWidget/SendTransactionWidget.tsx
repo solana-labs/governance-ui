@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import { SequenceType } from '@utils/sendTransactions'
-import NamedTransaction from './class/NamedTransaction'
 import { TransactionFlow } from './model/NamedTransaction'
-import { SendTransactionOptions } from '@solana/wallet-adapter-base'
 import { sendTransaction } from '@utils/send'
 import useWalletStore from 'stores/useWalletStore'
+import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
+import { simulateTransaction } from '@solana/spl-governance'
 
 interface ProgressBarProps {
   progressBarOuterClass?: string
@@ -15,7 +15,7 @@ interface ProgressBarProps {
    */
   transactions: TransactionFlow[]
   /**
-   * When the progress is finished, this callback will be triggered with 2s delay
+   * When the progress is finished, this callback will be triggered
    */
   onFinish?: (txIds: string[]) => void
   /**
@@ -61,7 +61,8 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   const [stepName, setStepName] = useState('')
   const [currentStep, setCurrentStep] = useState(-1)
 
-  const [hasError, setHasError] = useState<Error>()
+  const [progressMaxSteps, setProgressMaxSteps] = useState<number>(1)
+  const [progressStep, setProgressStep] = useState<number>(0)
 
   const pushTxn = (...txnId: string[]) => {
     const txns = txnIds
@@ -73,10 +74,15 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     return `Executing step ${name ?? currentStep}`
   }
 
+  const getTxnName = (name?: string) => {
+    return `Transaction ${name ?? currentTxn}`
+  }
+
   const executeSequential = async (txn: TransactionFlow) => {
     for (const [index, tx] of txn.transactions.entries()) {
+      setTxnName(getTxnName(tx.name))
       setCurrentTxn(index)
-      setTxnName(tx.name)
+      await _simulateTransaction(tx)
       const txId = await sendTransaction({
         connection: connection.current,
         transaction: tx,
@@ -89,19 +95,64 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
 
   const executeParallel = async (txn: TransactionFlow) => {
     const promises: Promise<string>[] = []
+    const names = txn.transactions.map((t) => t.name)
+    setTxnName(names.join(', ') + ' in parallel')
+
     txn.transactions.forEach((tx) => {
       promises.push(
-        sendTransaction({
-          connection: connection.current,
-          transaction: tx,
-          wallet,
+        new Promise(async (resolve) => {
+          await _simulateTransaction(tx),
+            resolve(
+              sendTransaction({
+                connection: connection.current,
+                transaction: tx,
+                wallet,
+              })
+            )
         })
       )
     })
+
     if (promises.length) {
       const txIds = await Promise.all(promises)
       pushTxn(...txIds)
       if (onSendParallel) onSendParallel(txIds)
+    }
+  }
+
+  const calcProgressSteps = () => {
+    let maxSteps = transactions.length
+    transactions.forEach((t) => {
+      maxSteps += t.transactions.length
+    })
+    setProgressMaxSteps(maxSteps)
+  }
+
+  const _simulateTransaction = async (signedTransaction: Transaction) => {
+    let simulateResult: SimulatedTransactionResponse | null = null
+    try {
+      simulateResult = (
+        await simulateTransaction(
+          connection.current,
+          signedTransaction,
+          'single'
+        )
+      ).value
+    } catch (e) {
+      //
+    }
+    if (simulateResult && simulateResult.err) {
+      if (simulateResult.logs) {
+        simulateResult.logs.forEach((line) => {
+          const keyoword = 'Program log: '
+          if (line.startsWith(keyoword)) {
+            throw new Error(
+              'Transaction failed: ' + line.slice(keyoword.length)
+            )
+          }
+        })
+        throw new Error(JSON.stringify(simulateResult.err))
+      }
     }
   }
 
@@ -110,7 +161,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
       for (const [index, tf] of transactions.entries()) {
         setStepName(getStepName(tf.name))
         setCurrentStep(index)
-
+        setProgressStep(progressStep + 1)
         const handler: (txn: TransactionFlow) => Promise<void> =
           tf.sequenceType === SequenceType.Parallel
             ? executeParallel
@@ -126,6 +177,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   }
 
   useEffect(() => {
+    calcProgressSteps()
     sendTransactions()
   }, [])
 
@@ -143,6 +195,8 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
         style={{ textAlign: 'center', marginBottom: '1rem' }}
       >
         {stepName}
+        <br />
+        {txnName}
       </h3>
       <div
         className={progressBarOuterClass}
@@ -165,7 +219,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
             position: 'absolute',
             left: 0,
             background: '#4BB543',
-            width: (currentTxn / txnLen) * 100 + '%',
+            width: (progressStep / progressMaxSteps) * 100 + '%',
             transition: 'ease-in-out 100ms',
           }}
         ></span>
