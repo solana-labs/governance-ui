@@ -101,6 +101,7 @@ const SendTokens = ({ close }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -108,6 +109,7 @@ const SendTokens = ({ close }) => {
       propertyName: 'amount',
     })
   }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -121,19 +123,7 @@ const SendTokens = ({ close }) => {
       propertyName: 'amount',
     })
   }
-  //   const setMaxAmount = () => {
-  //     const amount =
-  //       currentAccount && currentAccount.mint?.account
-  //         ? getMintDecimalAmountFromNatural(
-  //             currentAccount.mint?.account,
-  //             new BN(currentAccount.token!.account.amount)
-  //           ).toNumber()
-  //         : 0
-  //     handleSetForm({
-  //       value: amount,
-  //       propertyName: 'amount',
-  //     })
-  //   }
+
   const calcTransactionDolarAmount = (amount) => {
     const price = tokenService.getUSDTokenPrice(
       currentAccount!.mint!.publicKey.toBase58()
@@ -466,7 +456,7 @@ const SendTokens = ({ close }) => {
           onClick={handlePropose}
           isLoading={isLoading}
         >
-          Create proposal
+          Add proposal
         </Button>
       </div>
     </>
