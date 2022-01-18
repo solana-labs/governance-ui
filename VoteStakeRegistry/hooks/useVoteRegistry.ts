@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { BN, Provider, Wallet } from '@project-serum/anchor'
+import { Provider, Wallet } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
@@ -32,14 +32,16 @@ export function useVoteRegistry() {
         depositScaledFactor,
         lockupScaledFactor,
       } = mintCfg
-
+      const depositScaledFactorNum = depositScaledFactor.toNumber()
+      const lockupScaledFactorNum = lockupScaledFactor.toNumber()
+      const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
       //(deposit_scaled_factor + lockup_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor
       const calc =
-        (depositScaledFactor.toNumber() +
-          (lockupScaledFactor.toNumber() *
-            Math.min(lockupSecs, lockupSaturationSecs.toNumber())) /
-            lockupSaturationSecs.toNumber()) /
-        depositScaledFactor.toNumber()
+        (depositScaledFactorNum +
+          (lockupScaledFactorNum *
+            Math.min(lockupSecs, lockupSaturationSecsNum)) /
+            lockupSaturationSecsNum) /
+        depositScaledFactorNum
 
       return parseFloat(calc.toFixed(2))
     }
