@@ -339,7 +339,7 @@ const AddMemberForm = ({ close }) => {
           className="w-44 flex justify-center items-center"
           onClick={() => handlePropose()}
         >
-          Add member
+          Add proposal
         </Button>
       </div>
     </>
