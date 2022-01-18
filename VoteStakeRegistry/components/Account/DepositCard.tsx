@@ -9,8 +9,11 @@ import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithMintAccount,
   LockupType,
-  SECS_PER_DAY,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import {
+  secsToDays,
+  getFormattedStringFromDays,
+} from 'VoteStakeRegistry/utils/dateTools'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const wallet = useWalletStore((s) => s.current)
@@ -52,6 +55,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositEntry.index,
       client
     )
+    //TODO
     //getDeposits
   }
   const CardLabel = ({ label, value }) => {
@@ -105,10 +109,11 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           )}
           <CardLabel
             label={isConstant ? 'Min. Duration' : 'Time left'}
-            value={`${
-              deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() /
-              SECS_PER_DAY
-            } days`}
+            value={getFormattedStringFromDays(
+              secsToDays(
+                deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber()
+              )
+            )}
           />
           <CardLabel
             label="Available"

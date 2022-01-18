@@ -26,15 +26,18 @@ import {
   DepositWithIdx,
   getUsedDeposit,
   LockupType,
-  SECS_PER_DAY,
-  DAYS_PER_YEAR,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import {
+  yearToDays,
+  yearToSecs,
+  daysToYear,
+} from 'VoteStakeRegistry/utils/dateTools'
 interface Period {
   value: number
   display: string
   multiplier: number
 }
-interface LockupType {
+interface LockupKind {
   value: LockupType
   info: string
   displayName: string
@@ -45,7 +48,7 @@ interface VestingPeriod {
   info: string
 }
 const MONTHLY = 'monthly'
-const lockupTypes: LockupType[] = [
+const lockupTypes: LockupKind[] = [
   {
     value: 'cliff',
     displayName: 'Cliff',
@@ -65,16 +68,6 @@ const lockupTypes: LockupType[] = [
       'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released weekly, monthly or yearly. Vote weight increase declines linearly over the period.',
   },
 ]
-
-const yearToDays = (val) => {
-  return DAYS_PER_YEAR * val
-}
-const daysToYear = (val) => {
-  return val / DAYS_PER_YEAR
-}
-const yearToSecs = (val) => {
-  return DAYS_PER_YEAR * val * SECS_PER_DAY
-}
 
 const vestingPeriods: VestingPeriod[] = [
   {
@@ -150,7 +143,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>(0)
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
-  const [lockupType, setLockupType] = useState<LockupType>(lockupTypes[0])
+  const [lockupType, setLockupType] = useState<LockupKind>(lockupTypes[0])
   const [vestingPeriod, setVestingPeriod] = useState<VestingPeriod>(
     vestingPeriods[0]
   )
