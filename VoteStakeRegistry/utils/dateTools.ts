@@ -12,7 +12,8 @@ export function getFormattedStringFromDays(numberOfDays) {
   const monthsDisplay =
     months > 0 ? months + (months == 1 ? ' month ' : ' months ') : ''
   const daysDisplay = days > 0 ? days + (days == 1 ? ' day' : ' days') : ''
-  return yearsDisplay + monthsDisplay + daysDisplay
+  const text = yearsDisplay + monthsDisplay + daysDisplay
+  return text ? text : 0
 }
 
 export const yearToDays = (val) => {
