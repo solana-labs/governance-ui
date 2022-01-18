@@ -27,7 +27,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
 import {
-  Deposit,
+  DepositWithIdx,
   getUsedDeposit,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { useEffect, useState } from 'react'
@@ -133,7 +133,7 @@ const TokenDeposit = ({
   if (!mint || mint.supply.isZero()) {
     return null
   }
-  const [depositRecord, setDeposit] = useState<Deposit | null>(null)
+  const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
 
   const depositTokenRecord =
     tokenType === GoverningTokenType.Community
@@ -260,7 +260,7 @@ const TokenDeposit = ({
       realm!.pubkey!,
       depositRecord!.amountDepositedNative,
       tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
-      undefined,
+      depositRecord!.index,
       client
     )
 

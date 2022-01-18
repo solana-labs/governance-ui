@@ -19,6 +19,7 @@ import {
   getVoterPDA,
   getVoterWeightPDA,
   LockupKinds,
+  oneMonthDays,
   tryGetVoter,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
@@ -125,7 +126,6 @@ export const createNewDepositInstructions = async ({
   }
 
   if (!isExistingDepositEntry || forceCreateNew) {
-    const oneMonthDays = 30.4368499
     const period =
       lockupKind !== 'monthly'
         ? lockUpPeriodInDays

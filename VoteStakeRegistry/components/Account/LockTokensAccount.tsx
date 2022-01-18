@@ -45,7 +45,11 @@ const LockTokensAccount = () => {
     tokenRecords,
   } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const { client } = useVoteRegistry()
+  const {
+    client,
+    calcMintMultiplier,
+    communityMintRegistrar,
+  } = useVoteRegistry()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
@@ -152,12 +156,13 @@ const LockTokensAccount = () => {
         )
       }
     }
-    const amount = depositRecords!.find(
+    const mainDeposit = depositRecords!.find(
       (x) =>
         x.lockup.kind.none &&
         x.mint.publicKey.toBase58() ===
           depositTokenRecord!.account.governingTokenMint.toBase58()
-    )!.amountDepositedNative
+    )
+    const amount = mainDeposit!.amountDepositedNative
 
     await withVoteRegistryWithdraw(
       instructions,
@@ -167,7 +172,7 @@ const LockTokensAccount = () => {
       realm!.pubkey!,
       amount,
       tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
-      undefined,
+      mainDeposit!.index,
       client
     )
 
@@ -222,6 +227,7 @@ const LockTokensAccount = () => {
       connection,
       endpoint
     )
+
     await voteRegistryWithdraw(
       rpcContext,
       depositTokenAccount!.publicKey!,
@@ -334,7 +340,7 @@ const LockTokensAccount = () => {
           })}
         </div>
         <h1 className="mb-8">Locked Tokens</h1>
-        <div className="flex mb-8">
+        <div className="flex mb-8 flex-wrap">
           {depositRecords
             ?.filter((x) => typeof x.lockup.kind.none === 'undefined')
             ?.map((x, idx) => {
@@ -361,7 +367,13 @@ const LockTokensAccount = () => {
                         )
                       )}
                       {cardLabel('Schedule', 'xxx p/m')}
-                      {cardLabel('Vote multiplier', 'x')}
+                      {cardLabel(
+                        'Vote multiplier',
+                        calcMintMultiplier(
+                          x.lockup.endTs.sub(x.lockup.startTs).toNumber(),
+                          communityMintRegistrar
+                        )
+                      )}
                       {cardLabel(
                         'Time left',
                         `${

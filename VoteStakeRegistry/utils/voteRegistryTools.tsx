@@ -20,7 +20,7 @@ interface votingMint {
 }
 
 export type LockupKinds = 'none' | 'daily' | 'monthly' | 'cliff' | 'constant'
-interface Registrar {
+export interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey
   realmAuthority: PublicKey
@@ -57,8 +57,9 @@ export interface DepositWithMintPk extends Deposit {
 }
 
 export const unusedMintPk = '11111111111111111111111111111111'
-export const oneYearDays = 365.242199
+export const oneYearDays = 365.24
 export const oneDaySeconds = 86400
+export const oneMonthDays = 30.43
 
 export const getRegistrarPDA = async (
   realmPk: PublicKey,

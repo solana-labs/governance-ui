@@ -19,7 +19,7 @@ export const voteRegistryWithdraw = async (
   realmPubKey: PublicKey,
   amount: BN,
   tokenOwnerRecordPubKey: PublicKey,
-  depositIndex?: number,
+  depositIndex: number,
   client?: VsrClient
 ) => {
   const signers: Keypair[] = []

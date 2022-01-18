@@ -26,6 +26,7 @@ import {
   DepositWithIdx,
   getUsedDeposit,
   LockupKinds,
+  oneDaySeconds,
   oneYearDays,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 interface Period {
@@ -71,35 +72,10 @@ const yearToDays = (val) => {
 const daysToYear = (val) => {
   return val / oneYearDays
 }
-//TODO read multiplier from program
-const lockupPeriods: Period[] = [
-  {
-    value: yearToDays(1),
-    display: '1y',
-    multiplier: 1.2,
-  },
-  {
-    value: yearToDays(2),
-    display: '2y',
-    multiplier: 1.4,
-  },
-  {
-    value: yearToDays(3),
-    display: '3y',
-    multiplier: 1.6,
-  },
-  {
-    value: yearToDays(4),
-    display: '4y',
-    multiplier: 1.8,
-  },
-  {
-    value: yearToDays(5),
-    display: '5y',
-    multiplier: 2,
-  },
-]
-const maxMultiplier = 2
+const yearToSecs = (val) => {
+  return oneYearDays * val * oneDaySeconds
+}
+
 const vestingPeriods: VestingPeriod[] = [
   {
     value: 7,
@@ -121,7 +97,44 @@ const YES = 'YES'
 const NO = 'NO'
 
 const LockTokensModal = ({ onClose, isOpen }) => {
-  const { client } = useVoteRegistry()
+  const {
+    client,
+    calcMintMultiplier,
+    communityMintRegistrar,
+  } = useVoteRegistry()
+  const lockupPeriods: Period[] = [
+    {
+      value: yearToDays(1),
+      display: '1y',
+      multiplier: calcMintMultiplier(yearToSecs(1), communityMintRegistrar),
+    },
+    {
+      value: yearToDays(2),
+      display: '2y',
+      multiplier: calcMintMultiplier(yearToSecs(2), communityMintRegistrar),
+    },
+    {
+      value: yearToDays(3),
+      display: '3y',
+      multiplier: calcMintMultiplier(yearToSecs(3), communityMintRegistrar),
+    },
+    {
+      value: yearToDays(4),
+      display: '4y',
+      multiplier: calcMintMultiplier(yearToSecs(4), communityMintRegistrar),
+    },
+    {
+      value: yearToDays(5),
+      display: '5y',
+      multiplier: calcMintMultiplier(yearToSecs(5), communityMintRegistrar),
+    },
+  ]
+
+  const maxMultiplier = lockupPeriods
+    .map((x) => x.multiplier)
+    .reduce((prev, current) => {
+      return prev > current ? prev : current
+    })
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletStore((s) => s.current)
@@ -444,6 +457,9 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   useEffect(() => {
     validateAmountOnBlur()
   }, [lockMoreThenDeposited])
+  useEffect(() => {
+    setLockupPeriod(lockupPeriods[0])
+  }, [communityMintRegistrar])
   const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 1
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
