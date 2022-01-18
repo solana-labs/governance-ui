@@ -235,7 +235,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
 
     await voteRegistryLockDeposit({
       rpcContext,
-      mint: realm!.account.communityMint!,
+      mintPk: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
       fromRealmDepositAmount: amountFromDeposit,
@@ -243,10 +243,9 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
-      hasTokenOwnerRecord:
-        typeof tokenRecords[wallet!.publicKey!.toBase58()] !== 'undefined',
       tempHolderPk: realmTokenAccount!.publicKey,
-      tokenOwnerRecordPk: tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey,
+      tokenOwnerRecordPk:
+        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client,
     })
     handleGetUsedDeposit()

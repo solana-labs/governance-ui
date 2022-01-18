@@ -10,13 +10,13 @@ export const withVoteRegistryDepositInstructions = async ({
   rpcContext,
   //from where we deposit our founds
   fromPk,
-  mint,
+  mintPk,
   realmPk,
   programId,
   amount,
-  hasTokenOwnerRecord,
-  lockUpPeriodInDays = 0,
-  lockupKind = 'none',
+  tokenOwnerRecordPk,
+  lockUpPeriodInDays,
+  lockupKind,
   //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
   client,
@@ -24,14 +24,13 @@ export const withVoteRegistryDepositInstructions = async ({
   rpcContext: RpcContext
   //from where we deposit our founds
   fromPk: PublicKey
-  //e.g council or community
-  mint: PublicKey
+  mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
   amount: BN
-  hasTokenOwnerRecord: boolean
-  lockUpPeriodInDays?: number
-  lockupKind?: LockupKinds
+  tokenOwnerRecordPk: PublicKey | null
+  lockUpPeriodInDays: number
+  lockupKind: LockupKinds
   forceCreateNew?: boolean
   client?: VsrClient
 }) => {
@@ -51,10 +50,10 @@ export const withVoteRegistryDepositInstructions = async ({
     voterATAPk,
   } = await createNewDepositInstructions({
     rpcContext,
-    mint,
+    mintPk,
     realmPk,
     programId,
-    hasTokenOwnerRecord,
+    tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
     forceCreateNew,

@@ -14,8 +14,7 @@ export const voteRegistryWithdraw = async (
   rpcContext: RpcContext,
   //from where we deposit our founds
   toPubKey: PublicKey,
-  //e.g council or community
-  mint: PublicKey,
+  mintPk: PublicKey,
   realmPubKey: PublicKey,
   amount: BN,
   tokenOwnerRecordPubKey: PublicKey,
@@ -35,13 +34,21 @@ export const voteRegistryWithdraw = async (
     instructions,
     wallet!.publicKey!,
     toPubKey,
-    mint,
+    mintPk,
     realmPubKey,
     amount,
     tokenOwnerRecordPubKey,
     depositIndex,
     client
   )
+
+  //   const close = client.program.instruction.closeDepositEntry(0, {
+  //     accounts: {
+  //       voter: voter,
+  //       voterAuthority: wallet.publicKey,
+  //     },
+  //   })
+  //   instructions.push(close)
 
   const transaction = new Transaction()
   transaction.add(...instructions)

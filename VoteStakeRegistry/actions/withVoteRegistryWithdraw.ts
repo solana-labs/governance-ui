@@ -17,8 +17,7 @@ export const withVoteRegistryWithdraw = async (
   walletPubKey: PublicKey,
   //from where we deposit our founds
   toPubKey: PublicKey,
-  //e.g council or community
-  mint: PublicKey,
+  mintPk: PublicKey,
   realmPubKey: PublicKey,
   amount: BN,
   tokenOwnerRecordPubKey: PublicKey,
@@ -35,7 +34,7 @@ export const withVoteRegistryWithdraw = async (
 
   const { registrar } = await getRegistrarPDA(
     realmPubKey,
-    mint,
+    mintPk,
     client!.program.programId
   )
   const { voter } = await getVoterPDA(registrar, walletPubKey, clientProgramId)
@@ -48,7 +47,7 @@ export const withVoteRegistryWithdraw = async (
   const voterATAPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    mint,
+    mintPk,
     voter
   )
 

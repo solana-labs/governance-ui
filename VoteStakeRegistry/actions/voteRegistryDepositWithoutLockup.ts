@@ -3,52 +3,45 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
-import { LockupKinds } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withVoteRegistryDepositInstructions } from './withVoteRegistryDepositInstructions'
 
-export const voteRegistryDeposit = async ({
+export const voteRegistryDepositWithoutLockup = async ({
   rpcContext,
   //from where we deposit our founds
   fromPk,
-  mint,
+  mintPk,
   realmPk,
   programId,
   amount,
-  hasTokenOwnerRecord,
-  lockUpPeriodInDays = 0,
-  lockupKind = 'none',
-  forceCreateNew = false,
+  tokenOwnerRecordPk,
   client,
 }: {
   rpcContext: RpcContext
   //from where we deposit our founds
   fromPk: PublicKey
-  //e.g council or community
-  mint: PublicKey
+  mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
   amount: BN
-  hasTokenOwnerRecord: boolean
-  lockUpPeriodInDays?: number
-  lockupKind?: LockupKinds
-  forceCreateNew?: boolean
+  tokenOwnerRecordPk: PublicKey | null
   client?: VsrClient
 }) => {
+  const lockUpPeriodInDays = 0
+  const lockupKind = 'none'
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
   const instructions = await withVoteRegistryDepositInstructions({
     rpcContext,
     //from where we deposit our founds
     fromPk,
-    mint,
+    mintPk,
     realmPk,
     programId,
     amount,
-    hasTokenOwnerRecord,
+    tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    forceCreateNew,
     client,
   })
 

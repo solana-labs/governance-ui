@@ -18,6 +18,7 @@ export function useVoteRegistry() {
     communityMintRegistrar,
     setCommunityMintRegistrar,
   ] = useState<Registrar | null>(null)
+
   const calcMintMultiplier = (
     lockupSecs: number,
     registrar: Registrar | null

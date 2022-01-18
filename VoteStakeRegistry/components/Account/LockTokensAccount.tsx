@@ -1,16 +1,8 @@
 import Button from '@components/Button'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useRealm from '@hooks/useRealm'
-import { ProposalState, RpcContext } from '@solana/spl-governance'
-import { getUnrelinquishedVoteRecords } from '@models/api'
-import { getProposal } from '@solana/spl-governance'
-import { withFinalizeVote } from '@solana/spl-governance'
-import { withRelinquishVote } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
-import { TransactionInstruction, Transaction } from '@solana/web3.js'
+import { RpcContext } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { chunks } from '@utils/helpers'
-import { sendTransaction } from '@utils/send'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import LockTokensModal from './LockTokensModal'
@@ -21,26 +13,19 @@ import {
   oneDaySeconds,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import { voteRegistryDeposit } from 'VoteStakeRegistry/actions/voteRegistryDeposit'
-import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
+import DepositCommunityTokensBtn from '../TokenBalance/DepositCommunityTokensBtn'
+import WithDrawCommunityTokens from '../TokenBalance/WithdrawCommunityTokensBtn'
 
 const LockTokensAccount = () => {
   const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
-    (s) => s.actions
-  )
   const {
     realm,
     realmInfo,
     realmTokenAccount,
     ownTokenRecord,
-    proposals,
-    governances,
-    toManyCommunityOutstandingProposalsForUser,
     mint,
     tokenRecords,
   } = useRealm()
@@ -60,151 +45,6 @@ const LockTokensAccount = () => {
   const depositTokenRecord = ownTokenRecord
 
   const depositTokenAccount = realmTokenAccount
-
-  const depositMint = realm?.account.communityMint
-
-  const depositTokens = async function (amount: BN) {
-    if (!realm) {
-      throw 'No realm selected'
-    }
-    const hasTokenOwnerRecord =
-      typeof tokenRecords[wallet!.publicKey!.toBase58()] !== 'undefined'
-    const rpcContext = new RpcContext(
-      realm.owner,
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
-      connection,
-      endpoint
-    )
-    await voteRegistryDeposit({
-      rpcContext,
-      fromPk: depositTokenAccount!.publicKey,
-      mint: depositMint!,
-      realmPk: realm.pubkey,
-      programId: realm.owner,
-      amount,
-      hasTokenOwnerRecord,
-      client,
-    })
-
-    handleGetUsedDeposits()
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-  }
-
-  const depositAllTokens = async () =>
-    await depositTokens(depositTokenAccount!.account.amount)
-
-  const withdrawAllTokens = async function () {
-    const instructions: TransactionInstruction[] = []
-
-    // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
-    if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
-      const voteRecords = await getUnrelinquishedVoteRecords(
-        connection,
-        realmInfo!.programId,
-        depositTokenRecord!.account!.governingTokenOwner
-      )
-
-      console.log('Vote Records', voteRecords)
-
-      for (const voteRecord of Object.values(voteRecords)) {
-        let proposal = proposals[voteRecord.account.proposal.toBase58()]
-        if (!proposal) {
-          continue
-        }
-
-        if (proposal.account.state === ProposalState.Voting) {
-          // If the Proposal is in Voting state refetch it to make sure we have the latest state to avoid false positives
-          proposal = await getProposal(connection, proposal.pubkey)
-          if (proposal.account.state === ProposalState.Voting) {
-            const governance =
-              governances[proposal.account.governance.toBase58()]
-            if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
-              // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
-              throw new Error(
-                `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`
-              )
-            } else {
-              // finalize proposal before withdrawing tokens so we don't stop the vote from succeeding
-              await withFinalizeVote(
-                instructions,
-                realmInfo!.programId,
-                realm!.pubkey,
-                proposal.account.governance,
-                proposal.pubkey,
-                proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint
-              )
-            }
-          }
-        }
-
-        // Note: We might hit single transaction limits here (accounts and size) if user has too many unrelinquished votes
-        // It's not going to be an issue for now due to the limited number of proposals so I'm leaving it for now
-        // As a temp. work around I'm leaving the 'Release Tokens' button on finalized Proposal to make it possible to release the tokens from one Proposal at a time
-        withRelinquishVote(
-          instructions,
-          realmInfo!.programId,
-          proposal.account.governance,
-          proposal.pubkey,
-          depositTokenRecord!.pubkey,
-          proposal.account.governingTokenMint,
-          voteRecord.pubkey,
-          depositTokenRecord!.account.governingTokenOwner,
-          wallet!.publicKey!
-        )
-      }
-    }
-    const mainDeposit = depositRecords!.find(
-      (x) =>
-        x.lockup.kind.none &&
-        x.mint.publicKey.toBase58() ===
-          depositTokenRecord!.account.governingTokenMint.toBase58()
-    )
-    const amount = mainDeposit!.amountDepositedNative
-
-    await withVoteRegistryWithdraw(
-      instructions,
-      wallet!.publicKey!,
-      depositTokenAccount!.publicKey!,
-      depositTokenRecord!.account.governingTokenMint,
-      realm!.pubkey!,
-      amount,
-      tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
-      mainDeposit!.index,
-      client
-    )
-
-    try {
-      // use chunks of 8 here since we added finalize,
-      // because previously 9 withdraws used to fit into one tx
-      const ixChunks = chunks(instructions, 8)
-      for (const [index, chunk] of ixChunks.entries()) {
-        const transaction = new Transaction().add(...chunk)
-        await sendTransaction({
-          connection,
-          wallet,
-          transaction,
-          sendingMessage:
-            index == ixChunks.length - 1
-              ? 'Withdrawing tokens'
-              : `Releasing tokens (${index}/${ixChunks.length - 2})`,
-          successMessage:
-            index == ixChunks.length - 1
-              ? 'Tokens have been withdrawn'
-              : `Released tokens (${index}/${ixChunks.length - 2})`,
-        })
-      }
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      if (depositTokenRecord) {
-        handleGetUsedDeposits()
-      }
-    } catch (ex) {
-      console.error("Can't withdraw tokens", ex)
-    }
-  }
 
   const handleGetUsedDeposits = async () => {
     const deposits = await getUsedDeposits(
@@ -241,33 +81,6 @@ const LockTokensAccount = () => {
     handleGetUsedDeposits()
   }
 
-  const mainCommunityDepoist = depositRecords?.find(
-    (x) =>
-      x.mint.publicKey.toBase58() ===
-        depositTokenRecord?.account.governingTokenMint.toBase58() &&
-      x.lockup.kind.none
-  )
-  const hasTokensInWallet =
-    depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0))
-
-  const hasTokensDeposited =
-    mainCommunityDepoist &&
-    mainCommunityDepoist.amountDepositedNative.gt(new BN(0))
-
-  const depositTooltipContent = !connected
-    ? 'Connect your wallet to deposit'
-    : !hasTokensInWallet
-    ? "You don't have any governance tokens in your wallet to deposit."
-    : ''
-
-  const withdrawTooltipContent = !connected
-    ? 'Connect your wallet to withdraw'
-    : !hasTokensDeposited
-    ? "You don't have any tokens deposited to withdraw."
-    : toManyCommunityOutstandingProposalsForUser
-    ? "You don't have any governance tokens to withdraw."
-    : ''
-
   useEffect(() => {
     if (client && connection && depositTokenRecord) {
       handleGetUsedDeposits()
@@ -288,25 +101,16 @@ const LockTokensAccount = () => {
         <h1 className="flex mb-8">
           Account
           <div className="ml-auto">
-            <Button
-              tooltipMessage={depositTooltipContent}
-              disabled={!connected || !hasTokensInWallet}
-              onClick={depositAllTokens}
-            >
-              Deposit
-            </Button>
-            <Button
-              className="ml-4"
-              tooltipMessage={withdrawTooltipContent}
-              disabled={
-                !connected ||
-                !hasTokensDeposited ||
-                toManyCommunityOutstandingProposalsForUser
-              }
-              onClick={withdrawAllTokens}
-            >
-              Withdraw
-            </Button>
+            <DepositCommunityTokensBtn
+              afterDepositFcn={() => {
+                if (depositTokenRecord) {
+                  handleGetUsedDeposits()
+                }
+              }}
+            ></DepositCommunityTokensBtn>
+            <WithDrawCommunityTokens
+              afterWithdrawFcn={handleGetUsedDeposits}
+            ></WithDrawCommunityTokens>
           </div>
         </h1>
         <div className="flex mb-8">

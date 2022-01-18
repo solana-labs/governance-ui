@@ -26,24 +26,23 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const createNewDepositInstructions = async ({
   rpcContext,
-  mint,
+  mintPk,
   realmPk,
   programId,
-  hasTokenOwnerRecord,
-  lockUpPeriodInDays = 0,
-  lockupKind = 'none',
+  tokenOwnerRecordPk,
+  lockUpPeriodInDays,
+  lockupKind,
   //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
   client,
 }: {
   rpcContext: RpcContext
-  //e.g council or community
-  mint: PublicKey
+  mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
-  hasTokenOwnerRecord: boolean
-  lockUpPeriodInDays?: number
-  lockupKind?: LockupKinds
+  tokenOwnerRecordPk: PublicKey | null
+  lockUpPeriodInDays: number
+  lockupKind: LockupKinds
   forceCreateNew?: boolean
   client?: VsrClient
 }) => {
@@ -57,11 +56,11 @@ export const createNewDepositInstructions = async ({
   const systemProgram = SystemProgram.programId
   const instructions: TransactionInstruction[] = []
   const clientProgramId = client!.program.programId
-  let tokenOwnerRecordPubKey: PublicKey | null = null
+  let tokenOwnerRecordPubKey = tokenOwnerRecordPk
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
-    mint,
+    mintPk,
     client!.program.programId
   )
   const { voter, voterBump } = await getVoterPDA(
@@ -79,17 +78,17 @@ export const createNewDepositInstructions = async ({
   const voterATAPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    mint,
+    mintPk,
     voter
   )
 
-  if (!hasTokenOwnerRecord) {
+  if (!tokenOwnerRecordPubKey) {
     tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
       programId,
       realmPk,
       wallet!.publicKey!,
-      mint,
+      mintPk,
       wallet!.publicKey!
     )
   }
@@ -109,7 +108,7 @@ export const createNewDepositInstructions = async ({
       })
     )
   }
-  const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
+  const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
   const indexOfExistingDeposit = existingVoter?.deposits.findIndex(
     (x) =>
       x.isUsed &&
@@ -119,6 +118,7 @@ export const createNewDepositInstructions = async ({
   const isExistingDepositEntry =
     typeof indexOfExistingDeposit !== 'undefined' &&
     indexOfExistingDeposit !== -1
+
   const firstFreeIdx = existingVoter?.deposits?.findIndex((x) => !x.isUsed) || 0
 
   if (firstFreeIdx === -1) {
@@ -145,7 +145,7 @@ export const createNewDepositInstructions = async ({
           voter: voter,
           payer: wallet!.publicKey!,
           voterAuthority: wallet!.publicKey!,
-          depositMint: mint,
+          depositMint: mintPk,
           rent: SYSVAR_RENT_PUBKEY,
           systemProgram: systemProgram,
           tokenProgram: TOKEN_PROGRAM_ID,
@@ -156,14 +156,6 @@ export const createNewDepositInstructions = async ({
     )
     instructions.push(createDepositEntryInstruction)
   }
-
-  //   const close = client.program.instruction.closeDepositEntry(2, {
-  //     accounts: {
-  //       voter: voter,
-  //       voterAuthority: wallet.publicKey,
-  //     },
-  //   })
-  //   instructions.push(close)
 
   const depositIdx =
     isExistingDepositEntry && !forceCreateNew

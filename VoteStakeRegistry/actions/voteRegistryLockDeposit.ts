@@ -9,31 +9,29 @@ import { createNewDepositInstructions } from './createNewDepositInstructions'
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,
-  mint,
+  mintPk,
   realmPk,
   programId,
   fromRealmDepositAmount,
   totalTransferAmount,
-  lockUpPeriodInDays = 0,
-  lockupKind = 'none',
+  lockUpPeriodInDays,
+  lockupKind,
   sourceDepositIdx,
   client,
   tokenOwnerRecordPk,
   tempHolderPk,
-  hasTokenOwnerRecord,
 }: {
   rpcContext: RpcContext
   //e.g council or community
-  mint: PublicKey
+  mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
   fromRealmDepositAmount: BN
   totalTransferAmount: BN
-  hasTokenOwnerRecord: boolean
   lockUpPeriodInDays: number
-  lockupKind?: LockupKinds
+  lockupKind: LockupKinds
   sourceDepositIdx: number
-  tokenOwnerRecordPk: PublicKey
+  tokenOwnerRecordPk: PublicKey | null
   tempHolderPk: PublicKey
   client?: VsrClient
 }) => {
@@ -55,10 +53,10 @@ export const voteRegistryLockDeposit = async ({
     voterWeight,
   } = await createNewDepositInstructions({
     rpcContext,
-    mint,
+    mintPk,
     realmPk,
     programId,
-    hasTokenOwnerRecord,
+    tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
     forceCreateNew: true,
