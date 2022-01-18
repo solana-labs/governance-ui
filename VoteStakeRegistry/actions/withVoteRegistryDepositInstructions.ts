@@ -2,11 +2,12 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { RpcContext } from '@solana/spl-governance'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
-import { LockupKinds } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { createNewDepositInstructions } from './createNewDepositInstructions'
+import { withCreateNewDepositInstructions } from './withCreateNewDepositInstructions'
 
 export const withVoteRegistryDepositInstructions = async ({
+  instructions,
   rpcContext,
   //from where we deposit our founds
   fromPk,
@@ -21,6 +22,7 @@ export const withVoteRegistryDepositInstructions = async ({
   forceCreateNew = false,
   client,
 }: {
+  instructions: TransactionInstruction[]
   rpcContext: RpcContext
   //from where we deposit our founds
   fromPk: PublicKey
@@ -30,12 +32,11 @@ export const withVoteRegistryDepositInstructions = async ({
   amount: BN
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
-  lockupKind: LockupKinds
+  lockupKind: LockupType
   forceCreateNew?: boolean
   client?: VsrClient
 }) => {
   const { wallet } = rpcContext
-  const instructions: TransactionInstruction[] = []
   if (!client) {
     throw 'no vote registry plugin'
   }
@@ -43,12 +44,12 @@ export const withVoteRegistryDepositInstructions = async ({
     throw 'no wallet connected'
   }
   const {
-    instructions: prepareDepositInstructions,
     depositIdx,
     voter,
     registrar,
     voterATAPk,
-  } = await createNewDepositInstructions({
+  } = await withCreateNewDepositInstructions({
+    instructions,
     rpcContext,
     mintPk,
     realmPk,
@@ -74,7 +75,5 @@ export const withVoteRegistryDepositInstructions = async ({
     }
   )
 
-  instructions.push(...prepareDepositInstructions, depositInstruction)
-
-  return instructions
+  instructions.push(...instructions, depositInstruction)
 }

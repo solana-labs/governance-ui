@@ -59,7 +59,9 @@ const LockPluginTokenBalanceCard = ({
       <h3 className="mb-4 flex">
         Account
         <Link href={backLink}>
-          <ArrowsExpandIcon className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer"></ArrowsExpandIcon>
+          <a className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer">
+            <ArrowsExpandIcon></ArrowsExpandIcon>
+          </a>
         </Link>
       </h3>
       {hasLoaded ? (

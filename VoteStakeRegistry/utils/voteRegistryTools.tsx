@@ -19,7 +19,7 @@ interface votingMint {
   mint: PublicKey
 }
 
-export type LockupKinds = 'none' | 'daily' | 'monthly' | 'cliff' | 'constant'
+export type LockupType = 'none' | 'daily' | 'monthly' | 'cliff' | 'constant'
 export interface Registrar {
   governanceProgramId: PublicKey
   realm: PublicKey
@@ -51,15 +51,15 @@ export interface Deposit {
 export interface DepositWithIdx extends Deposit {
   index: number
 }
-export interface DepositWithMintPk extends Deposit {
+export interface DepositWithMintAccount extends Deposit {
   mint: TokenProgramAccount<MintInfo>
   index: number
 }
 
 export const unusedMintPk = '11111111111111111111111111111111'
-export const oneYearDays = 365.24
-export const oneDaySeconds = 86400
-export const oneMonthDays = 30.43
+export const DAYS_PER_YEAR = 365
+export const SECS_PER_DAY = 86400
+export const DAYS_PER_MONTH = DAYS_PER_YEAR / 12
 
 export const getRegistrarPDA = async (
   realmPk: PublicKey,
@@ -154,7 +154,7 @@ export const getUsedDeposit = async (
   mint: PublicKey,
   walletPk: PublicKey,
   client: VsrClient,
-  kind: LockupKinds
+  kind: LockupType
 ) => {
   const clientProgramId = client.program.programId
   const { registrar } = await getRegistrarPDA(realmPk, mint, clientProgramId)
@@ -203,7 +203,7 @@ export const getUsedDeposits = async (
           ...x,
           mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
           index: idx,
-        } as DepositWithMintPk)
+        } as DepositWithMintAccount)
     )
     .filter((x) => x.isUsed)
   return deposits

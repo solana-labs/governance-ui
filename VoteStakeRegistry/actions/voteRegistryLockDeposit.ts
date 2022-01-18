@@ -1,11 +1,16 @@
-import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { RpcContext, TOKEN_PROGRAM_ID } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
-import { LockupKinds } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { createNewDepositInstructions } from './createNewDepositInstructions'
+import { withCreateNewDepositInstructions } from './withCreateNewDepositInstructions'
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,
@@ -29,7 +34,7 @@ export const voteRegistryLockDeposit = async ({
   fromRealmDepositAmount: BN
   totalTransferAmount: BN
   lockUpPeriodInDays: number
-  lockupKind: LockupKinds
+  lockupKind: LockupType
   sourceDepositIdx: number
   tokenOwnerRecordPk: PublicKey | null
   tempHolderPk: PublicKey
@@ -43,15 +48,16 @@ export const voteRegistryLockDeposit = async ({
   if (!wallet.publicKey) {
     throw 'no wallet connected'
   }
+  const instructions: TransactionInstruction[] = []
   const {
-    instructions: prepareDepositInstructions,
     depositIdx,
     voter,
     registrar,
     voterATAPk,
     tokenOwnerRecordPubKey,
     voterWeight,
-  } = await createNewDepositInstructions({
+  } = await withCreateNewDepositInstructions({
+    instructions,
     rpcContext,
     mintPk,
     realmPk,
@@ -62,8 +68,6 @@ export const voteRegistryLockDeposit = async ({
     forceCreateNew: true,
     client,
   })
-  const transaction = new Transaction()
-  transaction.add(...prepareDepositInstructions)
 
   if (!fromRealmDepositAmount.isZero()) {
     const withdrawInstruction = client?.program.instruction.withdraw(
@@ -83,7 +87,7 @@ export const voteRegistryLockDeposit = async ({
       }
     )
 
-    transaction.add(withdrawInstruction)
+    instructions.push(withdrawInstruction)
   }
 
   const depositInstruction = client?.program.instruction.deposit(
@@ -100,7 +104,10 @@ export const voteRegistryLockDeposit = async ({
       },
     }
   )
-  transaction.add(depositInstruction)
+  instructions.push(depositInstruction)
+
+  const transaction = new Transaction()
+  transaction.add(...instructions)
 
   await sendTransaction({
     transaction,

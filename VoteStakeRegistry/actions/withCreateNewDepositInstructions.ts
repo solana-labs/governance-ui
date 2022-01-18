@@ -18,13 +18,14 @@ import {
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
-  LockupKinds,
-  oneMonthDays,
+  LockupType,
+  DAYS_PER_MONTH,
   tryGetVoter,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
-export const createNewDepositInstructions = async ({
+export const withCreateNewDepositInstructions = async ({
+  instructions,
   rpcContext,
   mintPk,
   realmPk,
@@ -36,13 +37,14 @@ export const createNewDepositInstructions = async ({
   forceCreateNew = false,
   client,
 }: {
+  instructions: TransactionInstruction[]
   rpcContext: RpcContext
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
-  lockupKind: LockupKinds
+  lockupKind: LockupType
   forceCreateNew?: boolean
   client?: VsrClient
 }) => {
@@ -54,7 +56,6 @@ export const createNewDepositInstructions = async ({
     throw 'no wallet connected'
   }
   const systemProgram = SystemProgram.programId
-  const instructions: TransactionInstruction[] = []
   const clientProgramId = client!.program.programId
   let tokenOwnerRecordPubKey = tokenOwnerRecordPk
 
@@ -129,7 +130,7 @@ export const createNewDepositInstructions = async ({
     const period =
       lockupKind !== 'monthly'
         ? lockUpPeriodInDays
-        : lockUpPeriodInDays / oneMonthDays
+        : lockUpPeriodInDays / DAYS_PER_MONTH
     const roundedPeriod = Math.round(period)
     const allowClawback = false
     const startTime = new BN(new Date().getTime())
@@ -163,7 +164,6 @@ export const createNewDepositInstructions = async ({
       : firstFreeIdx
 
   return {
-    instructions,
     depositIdx,
     registrar,
     voterATAPk,

@@ -25,9 +25,9 @@ import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithIdx,
   getUsedDeposit,
-  LockupKinds,
-  oneDaySeconds,
-  oneYearDays,
+  LockupType,
+  SECS_PER_DAY,
+  DAYS_PER_YEAR,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 interface Period {
   value: number
@@ -35,7 +35,7 @@ interface Period {
   multiplier: number
 }
 interface LockupType {
-  value: LockupKinds
+  value: LockupType
   info: string
   displayName: string
 }
@@ -67,13 +67,13 @@ const lockupTypes: LockupType[] = [
 ]
 
 const yearToDays = (val) => {
-  return oneYearDays * val
+  return DAYS_PER_YEAR * val
 }
 const daysToYear = (val) => {
-  return val / oneYearDays
+  return val / DAYS_PER_YEAR
 }
 const yearToSecs = (val) => {
-  return oneYearDays * val * oneDaySeconds
+  return DAYS_PER_YEAR * val * SECS_PER_DAY
 }
 
 const vestingPeriods: VestingPeriod[] = [

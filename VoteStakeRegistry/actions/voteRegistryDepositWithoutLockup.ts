@@ -1,4 +1,9 @@
-import { Keypair, PublicKey, Transaction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
@@ -31,7 +36,9 @@ export const voteRegistryDepositWithoutLockup = async ({
   const lockupKind = 'none'
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
-  const instructions = await withVoteRegistryDepositInstructions({
+  const instructions: TransactionInstruction[] = []
+  await withVoteRegistryDepositInstructions({
+    instructions,
     rpcContext,
     //from where we deposit our founds
     fromPk,
