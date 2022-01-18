@@ -57,7 +57,7 @@ const lockupTypes: LockupKind[] = [
   },
   {
     value: 'constant',
-    displayName: 'Cliff',
+    displayName: 'Constant',
     info:
       'Tokens are locked permanently for a timeframe. At any time a constant lockup can be converted to a cliff lockup with a timeframe greater than or equal to the constant lockup period. Vote weight increase stays constant until the lockup is converted to a cliff type lockup.',
   },
@@ -71,19 +71,9 @@ const lockupTypes: LockupKind[] = [
 
 const vestingPeriods: VestingPeriod[] = [
   {
-    value: 7,
-    display: 'Weekly',
-    info: 'per week',
-  },
-  {
     value: 30,
     display: 'Monthly',
     info: 'per month',
-  },
-  {
-    value: 365,
-    display: 'Yearly',
-    info: 'per year',
   },
 ]
 const YES = 'YES'
@@ -141,7 +131,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   } = useRealm()
   const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
-  const [amount, setAmount] = useState<number | undefined>(0)
+  const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
   const [lockupType, setLockupType] = useState<LockupKind>(lockupTypes[0])
   const [vestingPeriod, setVestingPeriod] = useState<VestingPeriod>(
@@ -447,7 +437,9 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     }
   }, [client, connection])
   useEffect(() => {
-    validateAmountOnBlur()
+    if (amount) {
+      validateAmountOnBlur()
+    }
   }, [lockMoreThenDeposited])
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
@@ -489,7 +481,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
             >
               {lockupTypes.map((x, idx) => (
                 <Select.Option key={x.value} value={idx}>
-                  <div>{x.value}</div>
+                  <div>{x.displayName}</div>
                 </Select.Option>
               ))}
             </Select>
