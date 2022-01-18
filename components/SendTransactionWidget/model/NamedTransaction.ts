@@ -18,7 +18,7 @@ interface SignableInstruction {
 
 interface TransactionFlow {
   name?: string
-  opts: SendTransactionOptions
+  opts?: SendTransactionOptions
   transactions: NamedTransaction[]
   sequenceType: SequenceType
 }

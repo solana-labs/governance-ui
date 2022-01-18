@@ -64,6 +64,8 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   const [progressMaxSteps, setProgressMaxSteps] = useState<number>(1)
   const [progressStep, setProgressStep] = useState<number>(0)
 
+  const [finished, setFinished] = useState<boolean>(false)
+
   const pushTxn = (...txnId: string[]) => {
     const txns = txnIds
     txns.push(...txnId)
@@ -168,7 +170,10 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
             : executeSequential
         await handler(tf)
       }
-      if (onFinish) onFinish(txnIds)
+      if (onFinish) {
+        setFinished(true)
+        onFinish(txnIds)
+      }
     } catch (error) {
       if (onError) onError(error)
     } finally {
@@ -194,9 +199,15 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
         className={textClass}
         style={{ textAlign: 'center', marginBottom: '1rem' }}
       >
-        {stepName}
-        <br />
-        {txnName}
+        {finished ? (
+          <>Finished sending transactions.</>
+        ) : (
+          <>
+            {stepName}
+            <br />
+            {txnName}
+          </>
+        )}
       </h3>
       <div
         className={progressBarOuterClass}

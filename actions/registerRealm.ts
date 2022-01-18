@@ -42,6 +42,8 @@ import { tryGetAta } from '@utils/validations'
 import { ConnectionContext } from '@utils/connection'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import BigNumber from 'bignumber.js'
+import { TransactionFlow } from '@components/SendTransactionWidget/model/NamedTransaction'
+import NamedTransaction from '@components/SendTransactionWidget/class/NamedTransaction'
 
 interface RegisterRealmRpc {
   connection: ConnectionContext
@@ -291,7 +293,7 @@ async function prepareGovernanceInstructions(
  * @param realmInstructions Realm instructions
  * @returns a promise to be executed.
  */
-function sendTransactionFactory(
+async function sendTransactionFactory(
   wallet: WalletSigner,
   connection: Connection,
   councilMembersChunks: TransactionInstruction[][],
@@ -301,33 +303,85 @@ function sendTransactionFactory(
   communityMintSigners?: Keypair[]
 ) {
   console.debug('factoring sendtransaction')
-
+  const block = await connection.getRecentBlockhash()
   const instructions: TransactionInstruction[][] = [realmInstructions]
   const signerSets: Keypair[][] = [[]]
-
-  if (councilMembersChunks.length) {
-    instructions.unshift(...councilMembersChunks)
-    signerSets.unshift(...councilSignersChunks)
-  }
+  const txn: TransactionFlow[] = []
 
   if (communityMintInstructions && communityMintSigners) {
-    instructions.unshift(communityMintInstructions)
-    signerSets.unshift(communityMintSigners)
+    const t = new NamedTransaction({
+      name: 'Minting community token',
+      feePayer: wallet.publicKey,
+    })
+
+    t.add(...communityMintInstructions)
+    t.recentBlockhash = block.blockhash
+    t.partialSign(...communityMintSigners)
+
+    txn.push({
+      name: 'Community Mint',
+      sequenceType: SequenceType.Sequential,
+      transactions: [t],
+    })
+
+    // instructions.unshift(communityMintInstructions)
+    // signerSets.unshift(communityMintSigners)
+  }
+  if (councilMembersChunks.length) {
+    const transactions: NamedTransaction[] = []
+
+    councilMembersChunks.forEach((chunk, index) => {
+      const t = new NamedTransaction({
+        name: `Minting council token chunk ${index + 1} of ${
+          councilMembersChunks.length
+        }`,
+        feePayer: wallet.publicKey,
+      })
+      t.recentBlockhash = block.blockhash
+      t.add(...chunk)
+      t.partialSign(...councilSignersChunks[index])
+      transactions.push(t)
+    })
+
+    txn.push({
+      name: 'Council Mint',
+      sequenceType: SequenceType.Sequential,
+      transactions,
+    })
+
+    // instructions.unshift(...councilMembersChunks)
+    // signerSets.unshift(...councilSignersChunks)
   }
 
-  if (instructions.length > 1) {
-    return sendTransactions(
-      connection,
-      wallet,
-      instructions,
-      signerSets,
-      SequenceType.Sequential
-    )
-  } else {
-    const transaction = new Transaction()
-    transaction.add(...realmInstructions)
-    return sendTransaction({ transaction, wallet, connection })
-  }
+  const t = new NamedTransaction({
+    name: 'Deploying DAO',
+    feePayer: wallet.publicKey,
+  })
+
+  t.recentBlockhash = block.blockhash
+  t.add(...realmInstructions)
+
+  txn.push({
+    name: 'DAO',
+    sequenceType: SequenceType.Sequential,
+    transactions: [t],
+  })
+
+  return txn
+
+  // if (instructions.length > 1) {
+  //   return sendTransactions(
+  //     connection,
+  //     wallet,
+  //     instructions,
+  //     signerSets,
+  //     SequenceType.Sequential
+  //   )
+  // } else {
+  //   const transaction = new Transaction()
+  //   transaction.add(...realmInstructions)
+  //   return sendTransaction({ transaction, wallet, connection })
+  // }
 }
 
 /**
@@ -367,7 +421,10 @@ export async function registerRealm(
   communityMintTokenDecimals?: number,
   councilMintTokenDecimals?: number,
   councilWalletPks?: PublicKey[]
-): Promise<PublicKey> {
+): Promise<{
+  realmAddress: PublicKey
+  txnToSend: TransactionFlow[]
+}> {
   if (!wallet) throw WalletConnectionError
   console.debug('starting register realm')
 
@@ -480,7 +537,7 @@ export async function registerRealm(
     )
   }
 
-  const txnToSend = sendTransactionFactory(
+  const txnToSend = await sendTransactionFactory(
     wallet,
     connection.current,
     councilMembersChunks,
@@ -489,12 +546,12 @@ export async function registerRealm(
     communityMintInstructions,
     communityMintSigners
   )
-  console.debug('sending transaction')
-  await txnToSend
-  console.debug('transaction sent')
-  console.debug({
-    communityMintPk,
-    councilMintPk,
-  })
-  return realmAddress
+  // console.debug('sending transaction')
+  // await txnToSend
+  // console.debug('transaction sent')
+  // console.debug({
+  //   communityMintPk,
+  //   councilMintPk,
+  // })
+  return { realmAddress, txnToSend }
 }

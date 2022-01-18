@@ -43,6 +43,8 @@ import {
 import Switch from '@components/Switch'
 import { BN } from '@project-serum/anchor'
 import BigNumber from 'bignumber.js'
+import { TransactionFlow } from '@components/SendTransactionWidget/model/NamedTransaction'
+import SendTransactionWidget from '@components/SendTransactionWidget/SendTransactionWidget'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -77,8 +79,10 @@ const RealmWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
   )
-  const [realmAddress] = useState('')
+  const [realmAddress, setRealmAddress] = useState('')
   const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
+
+  const [txnToSend, setTxnToSend] = useState<TransactionFlow[]>()
 
   /**
    * Handles and set the form data
@@ -174,7 +178,7 @@ const RealmWizard: React.FC = () => {
 
     if (isValid) {
       try {
-        const realmAddress = await registerRealm(
+        const { realmAddress, txnToSend: flow } = await registerRealm(
           {
             connection,
             wallet: wallet!,
@@ -195,7 +199,8 @@ const RealmWizard: React.FC = () => {
           form.councilMint ? form.councilMint.account.decimals : undefined,
           getTeamWallets()
         )
-        router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+        setTxnToSend(flow)
+        setRealmAddress(realmAddress.toBase58())
       } catch (error) {
         notify({
           type: 'error',
@@ -376,7 +381,6 @@ const RealmWizard: React.FC = () => {
   }, [currentStep, form, formErrors, councilSwitchState])
 
   useEffect(() => {
-    // Return shouldFireCreate to the base state
     if (Object.values(formErrors).length) setFormErrors({})
   }, [form])
 
@@ -400,10 +404,24 @@ const RealmWizard: React.FC = () => {
           Back
         </a>
       </div>
-      {isLoading ? (
+      {isLoading && txnToSend ? (
         <div className="text-center">
-          <Loading />
-          <span>{loaderMessage}</span>
+          <SendTransactionWidget
+            transactions={txnToSend}
+            onError={(error) => {
+              notify({
+                type: 'error',
+                message: error.message,
+              })
+            }}
+            onFinish={() => {
+              setTimeout(() => {
+                router.push(fmtUrlWithCluster(`/dao/${realmAddress}`))
+              }, 2000)
+            }}
+          />
+          {/* <Loading /> */}
+          {/* <span>{loaderMessage}</span> */}
         </div>
       ) : (
         <div className="min-h-[60vh]">{BoundStepComponent}</div>
