@@ -39,6 +39,7 @@ import { getTimestampFromDays } from '@tools/sdk/units'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import LinksCompactWrapper from '@components/LinksCompactWrapper'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -299,43 +300,36 @@ const New = () => {
   }
 
   return (
-    <div className="grid grid-cols-12 gap-4">
-      <div
-        className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${
-          isLoading ? 'pointer-events-none' : ''
-        }`}
-      >
-        <>
-          <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-            <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-              <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-              Back
-            </a>
-          </Link>
-          <div className="border-b border-fgd-4 pb-4 pt-2">
-            <div className="flex items-center justify-between">
-              <h1>
-                Add a proposal
-                {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
-              </h1>
-            </div>
-          </div>
-          <div className="pt-2">
-            <div className="pb-4">
-              <Input
-                label="Title"
-                placeholder="Title of your proposal"
-                value={form.title}
-                type="text"
-                error={formErrors['title']}
-                onChange={(evt) =>
-                  handleSetForm({
-                    value: evt.target.value,
-                    propertyName: 'title',
-                  })
-                }
-              />
-            </div>
+    <div>
+      <div>
+        <h1 className="my-3">
+          Add a proposal
+          {realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
+        </h1>
+
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+          <a className="flex items-center text-fgd-3 font-bold text-base gap-x-2 transition-all hover:text-fgd-1">
+            <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+            Realm
+          </a>
+        </Link>
+
+        <div className="w-full flex lg:flex-row flex-col justify-between items-start mt-16">
+          <div className="w-full flex lg:mb-0 mb-20 flex-col gap-y-5 justify-start items-start lg:max-w-xl rounded-xl">
+            <Input
+              label="Title"
+              placeholder="Title of your proposal"
+              value={form.title}
+              type="text"
+              error={formErrors['title']}
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'title',
+                })
+              }
+            />
+
             <Textarea
               className="mb-3"
               label="Description"
@@ -347,7 +341,8 @@ const New = () => {
                   propertyName: 'description',
                 })
               }
-            ></Textarea>
+            />
+
             {canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
@@ -356,6 +351,7 @@ const New = () => {
                 }}
               ></VoteBySwitch>
             )}
+
             <NewProposalContext.Provider
               value={{
                 instructionsData,
@@ -416,15 +412,15 @@ const New = () => {
                 )
               })}
             </NewProposalContext.Provider>
-            <div className="flex justify-end mt-4 mb-8 px-6">
-              <LinkButton
-                className="flex font-bold items-center text-fgd-1 text-sm"
-                onClick={addInstruction}
-              >
-                <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-                Add instruction
-              </LinkButton>
-            </div>
+
+            <LinkButton
+              className="flex font-bold items-center text-fgd-1 text-sm"
+              onClick={addInstruction}
+            >
+              <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
+              Add instruction
+            </LinkButton>
+
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
                 disabled={isLoading}
@@ -442,10 +438,13 @@ const New = () => {
               </Button>
             </div>
           </div>
-        </>
-      </div>
-      <div className="col-span-12 md:col-span-5 lg:col-span-4">
-        <TokenBalanceCard />
+
+          <div className="md:max-w-xs w-full">
+            <TokenBalanceCard />
+
+            <LinksCompactWrapper />
+          </div>
+        </div>
       </div>
     </div>
   )
