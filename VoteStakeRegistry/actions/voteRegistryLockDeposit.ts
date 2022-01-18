@@ -17,7 +17,7 @@ export const voteRegistryLockDeposit = async ({
   mintPk,
   realmPk,
   programId,
-  fromRealmDepositAmount,
+  amountFromVoteRegistryDeposit,
   totalTransferAmount,
   lockUpPeriodInDays,
   lockupKind,
@@ -27,16 +27,18 @@ export const voteRegistryLockDeposit = async ({
   tempHolderPk,
 }: {
   rpcContext: RpcContext
-  //e.g council or community
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
-  fromRealmDepositAmount: BN
+  //amount that will be taken from vote registry deposit
+  amountFromVoteRegistryDeposit: BN
+  //tokens can be transferred from wallet and deposit together.
   totalTransferAmount: BN
   lockUpPeriodInDays: number
   lockupKind: LockupType
   sourceDepositIdx: number
   tokenOwnerRecordPk: PublicKey | null
+  //to deposit from one deposit to another we need to withdraw tokens somewhere first
   tempHolderPk: PublicKey
   client?: VsrClient
 }) => {
@@ -69,10 +71,11 @@ export const voteRegistryLockDeposit = async ({
     client,
   })
 
-  if (!fromRealmDepositAmount.isZero()) {
+  //to transfer tokens from one deposit to another we need to withdraw them first to some tokenaccount.
+  if (!amountFromVoteRegistryDeposit.isZero()) {
     const withdrawInstruction = client?.program.instruction.withdraw(
       sourceDepositIdx!,
-      fromRealmDepositAmount,
+      amountFromVoteRegistryDeposit,
       {
         accounts: {
           registrar: registrar,

@@ -12,7 +12,6 @@ import { sendTransaction } from '@utils/send'
 
 export const voteRegistryWithdraw = async (
   rpcContext: RpcContext,
-  //from where we deposit our founds
   toPubKey: PublicKey,
   mintPk: PublicKey,
   realmPubKey: PublicKey,
@@ -23,12 +22,6 @@ export const voteRegistryWithdraw = async (
 ) => {
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
-  if (!client) {
-    throw 'no vote registry plugin'
-  }
-  if (!wallet) {
-    throw 'no wallet connected'
-  }
   const instructions: TransactionInstruction[] = []
   await withVoteRegistryWithdraw(
     instructions,
@@ -42,6 +35,7 @@ export const voteRegistryWithdraw = async (
     client
   )
 
+  //todo close deposit if 0 tokens inside
   //   const close = client.program.instruction.closeDepositEntry(0, {
   //     accounts: {
   //       voter: voter,

@@ -13,7 +13,6 @@ import { withVoteRegistryDepositInstructions } from './withVoteRegistryDepositIn
 
 export const voteRegistryDepositWithoutLockup = async ({
   rpcContext,
-  //from where we deposit our founds
   fromPk,
   mintPk,
   realmPk,
@@ -40,7 +39,6 @@ export const voteRegistryDepositWithoutLockup = async ({
   await withVoteRegistryDepositInstructions({
     instructions,
     rpcContext,
-    //from where we deposit our founds
     fromPk,
     mintPk,
     realmPk,

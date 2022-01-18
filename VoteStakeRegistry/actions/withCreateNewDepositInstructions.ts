@@ -33,7 +33,6 @@ export const withCreateNewDepositInstructions = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
   client,
 }: {
@@ -45,15 +44,13 @@ export const withCreateNewDepositInstructions = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
+  //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew?: boolean
   client?: VsrClient
 }) => {
   const { wallet } = rpcContext
   if (!client) {
     throw 'no vote registry plugin'
-  }
-  if (!wallet.publicKey) {
-    throw 'no wallet connected'
   }
   const systemProgram = SystemProgram.programId
   const clientProgramId = client!.program.programId
@@ -77,12 +74,13 @@ export const withCreateNewDepositInstructions = async ({
   const existingVoter = await tryGetVoter(voter, client)
 
   const voterATAPk = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
     mintPk,
     voter
   )
 
+  //spl governance tokenownerrecord pubkey
   if (!tokenOwnerRecordPubKey) {
     tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
@@ -127,6 +125,7 @@ export const withCreateNewDepositInstructions = async ({
   }
 
   if (!isExistingDepositEntry || forceCreateNew) {
+    //in case we do monthly close up we pass months not days.
     const period =
       lockupKind !== 'monthly'
         ? lockUpPeriodInDays

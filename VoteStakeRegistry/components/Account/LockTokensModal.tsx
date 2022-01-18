@@ -221,7 +221,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       mintPk: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
-      fromRealmDepositAmount: amountFromDeposit,
+      amountFromVoteRegistryDeposit: amountFromDeposit,
       totalTransferAmount: totalAmountToLock,
       lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,

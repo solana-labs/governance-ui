@@ -9,7 +9,6 @@ import { withCreateNewDepositInstructions } from './withCreateNewDepositInstruct
 export const withVoteRegistryDepositInstructions = async ({
   instructions,
   rpcContext,
-  //from where we deposit our founds
   fromPk,
   mintPk,
   realmPk,
@@ -18,7 +17,6 @@ export const withVoteRegistryDepositInstructions = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew = false,
   client,
 }: {
@@ -33,6 +31,7 @@ export const withVoteRegistryDepositInstructions = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
+  //force create new means that new deposit will be created regardless of other conditions
   forceCreateNew?: boolean
   client?: VsrClient
 }) => {

@@ -15,7 +15,6 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 export const withVoteRegistryWithdraw = async (
   instructions: TransactionInstruction[],
   walletPubKey: PublicKey,
-  //from where we deposit our founds
   toPubKey: PublicKey,
   mintPk: PublicKey,
   realmPubKey: PublicKey,
@@ -26,9 +25,6 @@ export const withVoteRegistryWithdraw = async (
 ) => {
   if (!client) {
     throw 'no vote registry plugin'
-  }
-  if (!walletPubKey) {
-    throw 'no wallet connected'
   }
   const clientProgramId = client!.program.programId
 
@@ -45,8 +41,8 @@ export const withVoteRegistryWithdraw = async (
   )
 
   const voterATAPk = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
     mintPk,
     voter
   )
