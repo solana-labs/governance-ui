@@ -129,6 +129,9 @@ const ProgramUpgrade = ({
   return (
     <>
       <GovernedAccountSelect
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
         label="Program"
         governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
@@ -138,8 +141,14 @@ const ProgramUpgrade = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
+
       <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="my-6 w-full"
+        placeholder="Buffer address"
         label="Buffer address"
         value={form.bufferAddress}
         type="text"

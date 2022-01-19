@@ -168,7 +168,7 @@ const CustomBase64 = ({
       <Textarea
         noMaxWidth
         useDefaultStyle={false}
-        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
         wrapperClassName="my-6 w-full"
         label="Instruction"
         placeholder="Base64 encoded serialized Solana instruction"
@@ -180,7 +180,7 @@ const CustomBase64 = ({
           })
         }
         error={formErrors['base64']}
-      ></Textarea>
+      />
     </>
   )
 }

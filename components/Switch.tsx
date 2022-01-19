@@ -3,6 +3,7 @@ import { FunctionComponent } from 'react'
 interface SwitchProps {
   checked: boolean
   className?: string
+  disabled?: boolean
   onChange: (x: boolean) => void
 }
 
@@ -11,6 +12,7 @@ const Switch: FunctionComponent<SwitchProps> = ({
   className = '',
   children,
   onChange,
+  disabled = false,
 }) => {
   const handleClick = () => {
     onChange(!checked)
@@ -22,11 +24,12 @@ const Switch: FunctionComponent<SwitchProps> = ({
         <span className="">{children}</span>
       </span>
       <button
+        disabled={disabled}
         type="button"
-        className={`${
-          checked ? 'bg-primary-light' : 'bg-bkg-4'
+        className={`${checked ? 'bg-primary-light' : 'bg-bkg-4'} ${
+          disabled ? 'opacity-40 cursor-not-allowed' : 'cursor-pointer'
         } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent 
-        rounded-full cursor-pointer transition-colors ease-in-out duration-200 
+        rounded-full transition-colors ease-in-out duration-200 
         focus:outline-none`}
         role="switch"
         aria-checked={checked}

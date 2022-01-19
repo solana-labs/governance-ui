@@ -29,7 +29,7 @@ const Select = ({
   noMaxWidth?: boolean
 }) => {
   return (
-    <div className="mt-6">
+    <div>
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>

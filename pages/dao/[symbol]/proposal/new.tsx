@@ -312,14 +312,15 @@ const New = () => {
                 setGovernance,
               }}
             >
-              <h2>Choose your instructions</h2>
-
               {instructionsData.map((instruction, idx) => {
                 const availableInstructionsForIdx = getAvailableInstructionsForIndex(
                   idx
                 )
                 return (
-                  <div key={idx} className="mb-3 rounded-lg w-full">
+                  <div
+                    key={idx}
+                    className="mb-3 w-full border-b pb-8 border-bkg-3"
+                  >
                     <Select
                       useDefaultStyle={false}
                       className="w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
@@ -345,7 +346,14 @@ const New = () => {
                       ))}
                     </Select>
 
-                    <div className="flex items-end pt-4">
+                    <VoteBySwitch
+                      checked={voteByCouncil}
+                      onChange={() => {
+                        setVoteByCouncil(!voteByCouncil)
+                      }}
+                    />
+
+                    <div className="flex mt-8 items-end">
                       <InstructionContentContainer
                         idx={idx}
                         instructionsData={instructionsData}
@@ -378,13 +386,6 @@ const New = () => {
               <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
               Add instruction
             </LinkButton>
-
-            <VoteBySwitch
-              checked={voteByCouncil}
-              onChange={() => {
-                setVoteByCouncil(!voteByCouncil)
-              }}
-            />
 
             <div className="flex w-full justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
