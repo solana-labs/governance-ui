@@ -178,6 +178,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseUxdInstructions,
     },
     {
+      id: Instructions.AddLiquidityRaydium,
+      name: 'Add To Raydium Liquidity Pool',
+      isVisible: canUseUxdInstructions,
+    },
+    {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,

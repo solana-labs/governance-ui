@@ -126,6 +126,19 @@ const SplTokenTransfer = ({
       index
     )
   }, [form])
+
+  console.log(
+    'governance owner',
+    form.governedTokenAccount?.governance?.owner.toBase58()
+  )
+  console.log(
+    'governance pubkey',
+    form.governedTokenAccount?.governance?.pubkey.toBase58()
+  )
+  console.log(
+    'governance governed account',
+    form.governedTokenAccount?.governance?.account.governedAccount.toBase58()
+  )
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.mint?.account)

@@ -46,6 +46,7 @@ import WithdrawInsuranceFromMangoDepository from './components/instructions/With
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import AddLiquidityRaydium from './components/instructions/raydium/AddLiquidity'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -294,6 +295,8 @@ const New = () => {
             governance={governance}
           ></SetProgramAuthority>
         )
+      case Instructions.AddLiquidityRaydium:
+        return <AddLiquidityRaydium index={idx} governance={governance} />
       case Instructions.InitializeController:
         return <InitializeController index={idx} governance={governance} />
       case Instructions.SetRedeemableGlobalSupplyCap:

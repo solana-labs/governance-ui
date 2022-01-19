@@ -49,6 +49,14 @@ export interface ProgramAuthorityForm {
   destinationAuthority: string
 }
 
+export interface AddLiquidityRaydiumForm {
+  governedAccount: GovernedTokenAccount | undefined
+  baseTokenName: string
+  quoteTokenName: string
+  baseAmountIn: number
+  quoteAmountIn: number
+}
+
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
@@ -73,6 +81,7 @@ export enum Instructions {
   Mint,
   Base64,
   None,
+  AddLiquidityRaydium,
   InitializeController,
   SetRedeemableGlobalSupplyCap,
   SetMangoDepositoriesRedeemableSoftCap,
