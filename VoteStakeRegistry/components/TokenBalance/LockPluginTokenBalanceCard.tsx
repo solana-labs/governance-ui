@@ -8,13 +8,9 @@ import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import {
-  ArrowsExpandIcon,
-  QuestionMarkCircleIcon,
-} from '@heroicons/react/outline'
+import { ArrowsExpandIcon } from '@heroicons/react/outline'
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
-import Tooltip from '@components/Tooltip'
 import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
@@ -99,6 +95,7 @@ const TokenDeposit = ({
   const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const deposits = useDepositStore((s) => s.state.deposits)
+  const votingPower = useDepositStore((s) => s.state.votingPower)
 
   const depositRecord = deposits.find(
     (x) =>
@@ -132,6 +129,8 @@ const TokenDeposit = ({
   const hasTokensDeposited =
     depositRecord && depositRecord.amountDepositedNative.gt(new BN(0))
 
+  const votingPowerFmt =
+    votingPower && mint ? fmtMintAmount(mint, votingPower) : '0'
   const availableTokens =
     depositRecord && mint
       ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
@@ -152,21 +151,14 @@ const TokenDeposit = ({
     <>
       <div className="flex space-x-4 items-center mt-8">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <h3 className="mb-0 py-2 flex items-center">
-            {availableTokens}{' '}
-            {tokenType === GoverningTokenType.Community && (
-              <Tooltip content="Lorem ipsum">
-                <div className="rounded-full px-2 py-1 ml-3 border text-xs border-fgd-3 flex">
-                  1x
-                  <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
-                </div>
-              </Tooltip>
-            )}
-          </h3>
+          <p className="text-fgd-3 text-xs">Votes</p>
+          <h3 className="mb-0 py-2 flex items-center">{votingPowerFmt} </h3>
         </div>
       </div>
-
+      <p className="flex flex-row mt-2 items-center">
+        <span className="text-xs">{depositTokenName} Deposited:</span>
+        <span className="ml-auto">{availableTokens}</span>
+      </p>
       <p
         className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
           canShowAvailableTokensMessage ? 'block' : 'hidden'

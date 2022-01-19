@@ -104,7 +104,18 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               )}
             />
           )}
-          {isVest && <CardLabel label="Schedule" value="xxx p/m" />}
+          {isVest && (
+            <CardLabel
+              label="Schedule"
+              value={
+                deposit.vestingRate &&
+                `${fmtMintAmount(
+                  deposit.mint.account,
+                  deposit.vestingRate
+                )} p/m`
+              }
+            />
+          )}
           {isRealmCommunityMint && (
             <CardLabel
               label="Vote multiplier"
@@ -124,10 +135,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           />
           <CardLabel
             label="Available"
-            value={fmtMintAmount(
-              deposit.mint.account,
-              deposit.amountDepositedNative
-            )}
+            value={fmtMintAmount(deposit.mint.account, deposit.available)}
           />
         </div>
         {

@@ -7,15 +7,26 @@ import {
   tryGetVoter,
   unusedMintPk,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
-import { Connection, PublicKey } from '@solana/web3.js'
+import {
+  Connection,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { tryGetMint } from '@utils/tokens'
+import { simulateTransaction } from '@solana/spl-governance'
+import {
+  BN,
+  EventParser,
+} from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor'
 
 interface DepositStore extends State {
   state: {
     deposits: DepositWithMintAccount[]
+    votingPower: BN
   }
-  resetDepositStore: () => void
+  resetDepositState: () => void
   getDeposits: ({
     isUsed,
     realmPk,
@@ -35,11 +46,17 @@ interface DepositStore extends State {
 
 const defaultState = {
   deposits: [],
+  votingPower: new BN(0),
 }
 
 const useDepositStore = create<DepositStore>((set, _get) => ({
   state: {
     ...defaultState,
+  },
+  resetDepositState: () => {
+    set((s) => {
+      s.state = { ...defaultState }
+    })
   },
   getDeposits: async ({
     isUsed = true,
@@ -60,7 +77,6 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
     const existingRegistrar = await tryGetRegistrar(registrar, client)
     const mintCfgs = existingRegistrar?.votingMints
     const mints = {}
-    let deposits: DepositWithMintAccount[] = []
     if (mintCfgs) {
       for (const i of mintCfgs) {
         if (i.mint.toBase58() !== unusedMintPk) {
@@ -70,7 +86,8 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
       }
     }
     if (existingVoter) {
-      deposits = existingVoter.deposits
+      let votingPower = new BN(0)
+      let deposits = existingVoter.deposits
         .map(
           (x, idx) =>
             ({
@@ -80,16 +97,80 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
             } as DepositWithMintAccount)
         )
         .filter((x) => typeof isUsed === 'undefined' || x.isUsed === isUsed)
-    }
 
-    set((s) => {
-      s.state.deposits = deposits
-    })
-  },
-  resetDepositStore: () => {
-    set((s) => {
-      s.state = { ...defaultState }
-    })
+      const usedDeposits = deposits.filter((x) => x.isUsed)
+      const isThereAnyUsedDeposits = usedDeposits.length
+      if (isThereAnyUsedDeposits) {
+        const instructions: TransactionInstruction[] = []
+        // The wallet can be any existing account for the simulation
+        // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
+        const walletPk = new PublicKey(
+          'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
+        )
+        const isThereIndexHigherIndexHigherThen16 =
+          typeof usedDeposits.find((x) => x.index > 15) !== 'undefined'
+
+        instructions.push(
+          client.program.instruction.logVoterInfo(0, {
+            accounts: {
+              registrar,
+              voter,
+            },
+          })
+        )
+        if (isThereIndexHigherIndexHigherThen16) {
+          instructions.push(
+            client.program.instruction.logVoterInfo(16, {
+              accounts: {
+                registrar,
+                voter,
+              },
+            })
+          )
+        }
+
+        const transaction = new Transaction({ feePayer: walletPk })
+        transaction.add(...instructions)
+        const getMoreDepositInfo = await simulateTransaction(
+          connection,
+          transaction,
+          'recent'
+        )
+        //because we switch wallet in here we can't use rpc from npm module
+        //anchor dont allow to switch wallets inside existing client
+        //parse events response as anchor do
+        const events: any = []
+        const parser = new EventParser(
+          client.program.programId,
+          client.program.coder
+        )
+        parser.parseLogs(getMoreDepositInfo.value.logs!, (event) => {
+          events.push(event)
+        })
+        const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
+        const VOTER_INFO_EVENT_NAME = 'VoterInfo'
+        const depositsInfo = events.filter((x) => x.name === DEPOSIT_EVENT_NAME)
+        const votingPowerEntry = events.find(
+          (x) => x.name === VOTER_INFO_EVENT_NAME
+        )
+        deposits = deposits.map((x) => {
+          const additionalInfoData = depositsInfo.find(
+            (info) => info.data.depositEntryIndex === x.index
+          ).data
+          x.available = additionalInfoData.withdrawable
+          x.vestingRate = additionalInfoData.locking.vesting?.rate
+          return x
+        })
+        if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
+          votingPower = votingPowerEntry.data.votingPower
+        }
+      }
+
+      set((s) => {
+        s.state.votingPower = votingPower
+        s.state.deposits = deposits
+      })
+    }
   },
 }))
 

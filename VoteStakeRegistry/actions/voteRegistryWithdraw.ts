@@ -43,7 +43,6 @@ export const voteRegistryWithdraw = async (
   //     },
   //   })
   //   instructions.push(close)
-
   const transaction = new Transaction()
   transaction.add(...instructions)
 

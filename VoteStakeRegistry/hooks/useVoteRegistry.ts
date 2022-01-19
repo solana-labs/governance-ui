@@ -8,11 +8,9 @@ import {
   Registrar,
   tryGetRegistrar,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
-import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 export function useVoteRegistry() {
-  const { realm, ownTokenRecord } = useRealm()
-  const { getDeposits } = useDepositStore()
+  const { realm } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
@@ -71,17 +69,7 @@ export function useVoteRegistry() {
       handleSetClient()
     }
   }, [connection.endpoint, wallet?.connected])
-  useEffect(() => {
-    if (realm && ownTokenRecord && wallet?.connected && client) {
-      getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection: connection.current,
-      })
-    }
-  }, [realm?.pubkey, ownTokenRecord, wallet?.connected, client])
+
   useEffect(() => {
     const handleSetRegistrar = async () => {
       const clientProgramId = client!.program.programId
@@ -91,7 +79,12 @@ export function useVoteRegistry() {
         clientProgramId
       )
       const existingRegistrar = await tryGetRegistrar(registrar, client!)
-      setCommunityMintRegistrar(existingRegistrar)
+      if (
+        JSON.stringify(existingRegistrar) !==
+        JSON.stringify(communityMintRegistrar)
+      ) {
+        setCommunityMintRegistrar(existingRegistrar)
+      }
     }
     if (realm?.pubkey && client) {
       handleSetRegistrar()

@@ -51,6 +51,8 @@ export interface Deposit {
 export interface DepositWithMintAccount extends Deposit {
   mint: TokenProgramAccount<MintInfo>
   index: number
+  available: BN
+  vestingRate: BN | null
 }
 
 export const unusedMintPk = '11111111111111111111111111111111'

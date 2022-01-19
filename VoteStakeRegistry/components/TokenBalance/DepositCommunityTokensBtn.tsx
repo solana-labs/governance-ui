@@ -8,7 +8,7 @@ import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/vote
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
-const DepositCommunityTokensBtn = () => {
+const DepositCommunityTokensBtn = ({ className = '' }) => {
   const { getDeposits } = useDepositStore()
   const {
     realm,
@@ -75,7 +75,7 @@ const DepositCommunityTokensBtn = () => {
   return (
     <Button
       tooltipMessage={depositTooltipContent}
-      className="sm:w-1/2"
+      className={`sm:w-1/2 ${className}`}
       disabled={!connected || !hasTokensInWallet}
       onClick={depositAllTokens}
     >
