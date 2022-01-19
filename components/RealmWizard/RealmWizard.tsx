@@ -211,7 +211,6 @@ const RealmWizard: React.FC = () => {
       console.debug(validationErrors)
       setFormErrors(validationErrors)
     }
-    setIsLoading(false)
   }
 
   /**
@@ -280,8 +279,6 @@ const RealmWizard: React.FC = () => {
           type: 'error',
           message: err.message,
         })
-      } finally {
-        setIsLoading(false)
       }
     }
   }
@@ -409,13 +406,17 @@ const RealmWizard: React.FC = () => {
           <SendTransactionWidget
             transactions={txnToSend}
             onError={(error) => {
+              setIsLoading(false)
+              setTxnToSend(undefined)
               notify({
                 type: 'error',
                 message: error.message,
               })
             }}
             onFinish={() => {
+              setTxnToSend(undefined)
               setTimeout(() => {
+                setIsLoading(false)
                 router.push(fmtUrlWithCluster(`/dao/${realmAddress}`))
               }, 2000)
             }}

@@ -308,7 +308,11 @@ async function sendTransactionFactory(
   const signerSets: Keypair[][] = [[]]
   const txn: TransactionFlow[] = []
 
-  if (communityMintInstructions && communityMintSigners) {
+  if (
+    communityMintInstructions &&
+    communityMintSigners &&
+    communityMintInstructions.length
+  ) {
     const t = new NamedTransaction({
       name: 'Minting community token',
       feePayer: wallet.publicKey,
@@ -316,7 +320,7 @@ async function sendTransactionFactory(
 
     t.add(...communityMintInstructions)
     t.recentBlockhash = block.blockhash
-    t.partialSign(...communityMintSigners)
+    if (communityMintSigners.length) t.partialSign(...communityMintSigners)
 
     txn.push({
       name: 'Community Mint',
@@ -327,10 +331,12 @@ async function sendTransactionFactory(
     // instructions.unshift(communityMintInstructions)
     // signerSets.unshift(communityMintSigners)
   }
-  if (councilMembersChunks.length) {
+
+  if (councilMembersChunks) {
     const transactions: NamedTransaction[] = []
 
     councilMembersChunks.forEach((chunk, index) => {
+      if (!chunk.length) return
       const t = new NamedTransaction({
         name: `Minting council token chunk ${index + 1} of ${
           councilMembersChunks.length
@@ -339,7 +345,9 @@ async function sendTransactionFactory(
       })
       t.recentBlockhash = block.blockhash
       t.add(...chunk)
-      t.partialSign(...councilSignersChunks[index])
+      if (councilSignersChunks[index].length) {
+        t.partialSign(...councilSignersChunks[index])
+      }
       transactions.push(t)
     })
 
@@ -370,7 +378,7 @@ async function sendTransactionFactory(
   return txn
 
   // if (instructions.length > 1) {
-  //   return sendTransactions(
+  // return sendTransactions(
   //     connection,
   //     wallet,
   //     instructions,
