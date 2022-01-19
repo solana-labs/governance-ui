@@ -16,12 +16,14 @@ export const withUpdateVoterWeightRecord = async (
   walletPubKey: PublicKey,
   realm: ProgramAccount<Realm>
 ) => {
+  //if no plugin then we dont do anything
+  if (!realm.account.config.useCommunityVoterWeightAddin) {
+    return
+  }
+  //TODO remove coupling to ui hook
   const { client } = useVoteRegistry()
   if (!client) {
     throw 'no vote registry plugin'
-  }
-  if (!realm.account.config.useCommunityVoterWeightAddin) {
-    return
   }
   const clientProgramId = client!.program.programId
 

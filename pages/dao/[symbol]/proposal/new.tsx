@@ -227,7 +227,7 @@ const New = () => {
 
         proposalAddress = await createProposal(
           rpcContext,
-          realm.pubkey,
+          realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title,

@@ -107,7 +107,7 @@ const NewAccountForm = () => {
 
         await createTreasuryAccount(
           rpcContext,
-          realm.pubkey,
+          realm,
           new PublicKey(form.mintAddress),
           governanceConfig,
           tokenOwnerRecord!.pubkey

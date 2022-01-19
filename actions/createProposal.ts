@@ -7,6 +7,8 @@ import {
 
 import {
   getSignatoryRecordAddress,
+  ProgramAccount,
+  Realm,
   VoteType,
   withCreateProposal,
 } from '@solana/spl-governance'
@@ -16,6 +18,7 @@ import { withInsertInstruction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/actions/withUpdateVoterWeightRecord'
 
 interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -25,7 +28,7 @@ interface InstructionDataWithHoldUpTime {
 
 export const createProposal = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  realm: PublicKey,
+  realm: ProgramAccount<Realm>,
   governance: PublicKey,
   tokenOwnerRecord: PublicKey,
   name: string,
@@ -48,11 +51,14 @@ export const createProposal = async (
   const options = ['Approve']
   const useDenyOption = true
 
+  //will run only with plugin
+  await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
     programVersion,
-    realm,
+    realm.pubkey!,
     governance,
     tokenOwnerRecord,
     name,

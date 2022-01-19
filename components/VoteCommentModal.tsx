@@ -64,7 +64,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     try {
       await castVote(
         rpcContext,
-        realm!.pubkey,
+        realm!,
         proposal!,
         voterTokenRecord.pubkey,
         vote,

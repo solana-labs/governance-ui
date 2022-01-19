@@ -103,7 +103,7 @@ const NewProgramForm = () => {
         await registerGovernance(
           rpcContext,
           GovernanceType.Program,
-          realm.pubkey,
+          realm,
           new PublicKey(form.programId),
           governanceConfig,
           form.transferAuthority,

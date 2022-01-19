@@ -4,16 +4,17 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { GovernanceType } from '@solana/spl-governance'
+import { GovernanceType, ProgramAccount, Realm } from '@solana/spl-governance'
 import { GovernanceConfig } from '@solana/spl-governance'
 import { withCreateProgramGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/actions/withUpdateVoterWeightRecord'
 
 export const registerGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   governanceType: GovernanceType,
-  realm: PublicKey,
+  realm: ProgramAccount<Realm>,
   governedAccount: PublicKey,
   config: GovernanceConfig,
   transferAuthority: boolean,
@@ -24,13 +25,16 @@ export const registerGovernance = async (
   let governanceAddress
   const governanceAuthority = walletPubkey
 
+  //will run only with plugin
+  await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
+
   switch (governanceType) {
     case GovernanceType.Program: {
       governanceAddress = (
         await withCreateProgramGovernance(
           instructions,
           programId,
-          realm,
+          realm.pubkey,
           governedAccount,
           config,
           transferAuthority!,

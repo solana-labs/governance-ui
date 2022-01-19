@@ -220,7 +220,7 @@ const SendTokens = () => {
         //Description same as title
         proposalAddress = await createProposal(
           rpcContext,
-          realm.pubkey,
+          realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title ? form.title : proposalTitle,
