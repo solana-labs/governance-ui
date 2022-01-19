@@ -19,9 +19,11 @@ import { validateInstruction } from '@utils/instructionTools'
 const CustomBase64 = ({
   index,
   governance,
+  setProposalTitle,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
+  setProposalTitle: any
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const {
@@ -115,6 +117,7 @@ const CustomBase64 = ({
         }
       }),
   })
+
   const validateAmountOnBlur = () => {
     const value = form.holdUpTime
 
@@ -128,6 +131,11 @@ const CustomBase64 = ({
       propertyName: 'holdUpTime',
     })
   }
+
+  useEffect(() => {
+    setProposalTitle('Custom instruction')
+  }, [])
+
   return (
     <>
       <GovernedAccountSelect

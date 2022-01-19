@@ -151,7 +151,7 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
-      isVisible: true,
+      isVisible: canUseProgramUpgradeInstruction,
     },
     {
       id: Instructions.Mint,
@@ -161,7 +161,7 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.MangoMakeChangeMaxAccounts,
       name: 'Mango - Change max accounts',
-      isVisible: true,
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.None,

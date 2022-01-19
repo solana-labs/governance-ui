@@ -24,9 +24,11 @@ import { validateInstruction } from '@utils/instructionTools'
 const ProgramUpgrade = ({
   index,
   governance,
+  setProposalTitle,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
+  setProposalTitle: any
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -125,6 +127,12 @@ const ProgramUpgrade = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
+  useEffect(() => {
+    setProposalTitle(
+      `Upgrade program ${form.bufferAddress ? form.bufferAddress : ''}`
+    )
+  }, [form.bufferAddress])
 
   return (
     <>

@@ -23,9 +23,11 @@ import { BN } from '@project-serum/anchor'
 const MakeChangeMaxAccounts = ({
   index,
   governance,
+  setProposalTitle,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
+  setProposalTitle: any
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
@@ -45,17 +47,21 @@ const MakeChangeMaxAccounts = ({
     mangoGroupKey: undefined,
     maxMangoAccounts: 1,
   })
+
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
     return isValid
   }
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
@@ -84,6 +90,7 @@ const MakeChangeMaxAccounts = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -97,6 +104,7 @@ const MakeChangeMaxAccounts = ({
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
     bufferAddress: yup.number(),
     governedAccount: yup
@@ -104,6 +112,10 @@ const MakeChangeMaxAccounts = ({
       .nullable()
       .required('Program governed account is required'),
   })
+
+  useEffect(() => {
+    setProposalTitle('Mango - Change max accounts')
+  }, [])
 
   return (
     <>

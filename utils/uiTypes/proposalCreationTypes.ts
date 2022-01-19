@@ -30,6 +30,11 @@ export interface SendTokenCompactViewForm extends SplTokenTransferForm {
   title: string
 }
 
+export interface TreasuryPaymentForm extends SplTokenTransferForm {
+  description: string
+  title: string
+}
+
 export interface MintForm {
   destinationAccount: string
   amount: number | undefined

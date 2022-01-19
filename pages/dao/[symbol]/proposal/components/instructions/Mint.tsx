@@ -23,12 +23,15 @@ import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
+
 const Mint = ({
   index,
   governance,
+  setProposalTitle,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
+  setProposalTitle: any
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
@@ -60,10 +63,12 @@ const Mint = ({
     : 1
   const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setAmount = (event) => {
     const value = event.target.value
     handleSetForm({
@@ -71,6 +76,7 @@ const Mint = ({
       propertyName: 'amount',
     })
   }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -84,7 +90,8 @@ const Mint = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+
+  const getInstruction = (): Promise<UiInstruction> => {
     return getMintInstruction({
       schema,
       form,
@@ -102,6 +109,7 @@ const Mint = ({
       value: programId?.toString(),
     })
   }, [realmInfo?.programId])
+
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
@@ -109,23 +117,22 @@ const Mint = ({
         if (pubKey) {
           const account = await tryGetTokenAccount(connection.current, pubKey)
           setDestinationAccount(account ? account : null)
-        } else {
-          setDestinationAccount(null)
         }
       })
-    } else {
-      setDestinationAccount(null)
     }
   }, [form.destinationAccount])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form, governedAccount])
+
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
   }, [form.mintAccount])
+
   useEffect(() => {
     async function getMintWithGovernancesFcn() {
       const resp = await getMintWithGovernances()
@@ -133,14 +140,23 @@ const Mint = ({
     }
     getMintWithGovernancesFcn()
   }, [])
+
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
+
   const schema = getMintSchema({ form, connection })
+
+  useEffect(() => {
+    setProposalTitle(`Mint ${form.amount ? form.amount : ''} tokens`)
+  }, [form.amount, form.destinationAccount])
 
   return (
     <>
       <GovernedAccountSelect
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
         label="Mint"
         governedAccounts={
           mintGovernancesWithMintInfo as GovernedMultiTypeAccount[]
@@ -152,8 +168,14 @@ const Mint = ({
         error={formErrors['mintAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
+
       <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="my-6 w-full"
+        placeholder="Destination account"
         label="Destination account"
         value={form.destinationAccount}
         type="text"
@@ -165,23 +187,31 @@ const Mint = ({
         }
         error={formErrors['destinationAccount']}
       />
+
       {destinationAccount && (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>
-          <div className="text-xs">
+          <div className="text-xs break-all">
             {destinationAccount.account.owner.toString()}
           </div>
         </div>
       )}
+
       {destinationAccountName && (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">Account name</div>
-          <div className="text-xs">{destinationAccountName}</div>
+          <div className="text-xs break-all">{destinationAccountName}</div>
         </div>
       )}
+
       <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="my-6 w-full"
         min={mintMinAmount}
         label="Amount"
+        placeholder="Amount"
         value={form.amount}
         type="number"
         onChange={setAmount}

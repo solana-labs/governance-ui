@@ -15,9 +15,11 @@ import { validateInstruction } from '@utils/instructionTools'
 const Empty = ({
   index,
   governance,
+  setProposalTitle,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
+  setProposalTitle
 }) => {
   const {
     governancesArray,
@@ -28,15 +30,18 @@ const Empty = ({
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
   >([])
+
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
+
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   useEffect(() => {
     async function prepGovernances() {
       const mintWithGovernances = await getMintWithGovernances()
@@ -61,6 +66,7 @@ const Empty = ({
     }
     prepGovernances()
   }, [])
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     const obj: UiInstruction = {
@@ -77,15 +83,24 @@ const Empty = ({
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
       .nullable()
       .required('Governed account is required'),
   })
+
+  useEffect(() => {
+    setProposalTitle('Vote only')
+  }, [])
+
   return (
     <>
       <GovernedAccountSelect
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
         label="Governance"
         governedAccounts={governedAccounts}
         onChange={(value) => {
@@ -95,7 +110,7 @@ const Empty = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
     </>
   )
 }

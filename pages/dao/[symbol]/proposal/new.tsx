@@ -40,6 +40,7 @@ import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMax
 import VoteBySwitch from './components/VoteBySwitch'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import LinksCompactWrapper from '@components/LinksCompactWrapper'
+import AddMember from '@components/Members/AddMember'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -69,99 +70,132 @@ const New = () => {
   } = useRealm()
 
   const { getAvailableInstructions } = useGovernanceAssets()
-  const availableInstructions = getAvailableInstructions()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
+
   const {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernances,
   } = useWalletStore((s) => s.actions)
+
+  const availableInstructions = getAvailableInstructions()
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection)
+
   const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [proposalTitle, setProposalTitle] = useState('Proposal')
+  const [formErrors, setFormErrors] = useState({})
+  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
+  const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+
+  const [instructionsData, setInstructions] = useState<
+    ComponentInstructionData[]
+  >([{ type: availableInstructions[0] }])
+
   const [form, setForm] = useState({
     title: '',
     description: '',
   })
-  const [formErrors, setFormErrors] = useState({})
+
   const [
     governance,
     setGovernance,
   ] = useState<ProgramAccount<Governance> | null>(null)
-  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
-  const [isLoadingDraft, setIsLoadingDraft] = useState(false)
+
   const isLoading = isLoadingSignedProposal || isLoadingDraft
+
   const customInstructionFilterForSelectedGovernance = (
     instructionType: Instructions
   ) => {
     if (!governance) {
       return true
-    } else {
-      const governanceType = governance.account.accountType
-      const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-      switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernance:
-          return instructionsAvailiableAfterProgramGovernance.includes(
-            instructionType
-          )
-        default:
-          return true
-      }
+    }
+
+    const governanceType = governance.account.accountType
+    const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
+
+    switch (governanceType) {
+      case GovernanceAccountType.ProgramGovernance:
+        return instructionsAvailiableAfterProgramGovernance.includes(
+          instructionType
+        )
+      default:
+        return true
     }
   }
 
   const getAvailableInstructionsForIndex = (index) => {
     if (index === 0) {
       return availableInstructions
-    } else {
-      return availableInstructions.filter((x) =>
-        customInstructionFilterForSelectedGovernance(x.id)
-      )
     }
+
+    return availableInstructions.filter((x) =>
+      customInstructionFilterForSelectedGovernance(x.id)
+    )
   }
-  const [instructionsData, setInstructions] = useState<
-    ComponentInstructionData[]
-  >([{ type: availableInstructions[0] }])
+
   const handleSetInstructions = (val: any, index) => {
     const newInstructions = [...instructionsData]
+
     newInstructions[index] = { ...instructionsData[index], ...val }
+
+    console.log('instructions', newInstructions)
+
     setInstructions(newInstructions)
   }
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const setInstructionType = ({ value, idx }) => {
     const newInstruction = {
       type: value,
     }
+
     handleSetInstructions(newInstruction, idx)
   }
+
   const addInstruction = () => {
     setInstructions([...instructionsData, { type: undefined }])
   }
+
   const removeInstruction = (idx) => {
     setInstructions([...instructionsData.filter((x, index) => index !== idx)])
   }
+
   const handleGetInstructions = async () => {
     const instructions: UiInstruction[] = []
+
     for (const inst of instructionsData) {
       if (inst.getInstruction) {
         const instruction: UiInstruction = await inst?.getInstruction()
+
         instructions.push(instruction)
       }
     }
+
     return instructions
   }
+
   const handleTurnOffLoaders = () => {
     setIsLoadingSignedProposal(false)
     setIsLoadingDraft(false)
   }
-  const handleCreate = async (isDraft) => {
-    setFormErrors({})
+
+  const checkForDraft = (isDraft: boolean) => {
     if (isDraft) {
       setIsLoadingDraft(true)
-    } else {
-      setIsLoadingSignedProposal(true)
+
+      return
     }
+
+    setIsLoadingSignedProposal(true)
+  }
+
+  const handleCreate = async (isDraft) => {
+    setFormErrors({})
+
+    checkForDraft(isDraft)
 
     const { isValid, validationErrors }: formValidation = await isFormValid(
       schema,
@@ -169,26 +203,37 @@ const New = () => {
     )
 
     const instructions: UiInstruction[] = await handleGetInstructions()
+
     let proposalAddress: PublicKey | null = null
+
     if (!realm) {
       handleTurnOffLoaders()
-      throw 'No realm selected'
+
+      throw new Error('No realm selected')
     }
 
-    if (isValid && instructions.every((x: UiInstruction) => x.isValid)) {
+    if (
+      wallet &&
+      realmInfo &&
+      isValid &&
+      instructions.every((x: UiInstruction) => x.isValid)
+    ) {
       let selectedGovernance = governance
+
       if (!governance) {
         handleTurnOffLoaders()
-        throw Error('No governance selected')
+
+        throw new Error('No governance selected')
       }
 
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
+        getProgramVersionForRealm(realmInfo),
+        wallet,
         connection.current,
         connection.endpoint
       )
+
       const instructionsData = instructions.map((x) => {
         return {
           data: x.serializedInstruction
@@ -232,7 +277,7 @@ const New = () => {
           realm.pubkey,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
-          form.title,
+          form.title ? form.title : proposalTitle,
           form.description,
           proposalMint,
           selectedGovernance?.account?.proposalCount,
@@ -245,43 +290,98 @@ const New = () => {
         )
 
         router.push(url)
-      } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
+
+        return
+      } catch (error) {
+        notify({ type: 'error', message: `${error}` })
+
+        handleTurnOffLoaders()
+
+        return
       }
-    } else {
-      setFormErrors(validationErrors)
     }
+
+    setFormErrors(validationErrors)
+
     handleTurnOffLoaders()
   }
+
   useEffect(() => {
     setInstructions([instructionsData[0]])
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
     const firstInstruction = instructionsData[0]
+
     if (firstInstruction && firstInstruction.governedAccount) {
       setGovernance(firstInstruction.governedAccount)
     }
   }, [instructionsData[0]])
+
   useEffect(() => {
     //fetch to be up to date with amounts
     fetchTokenAccountsForSelectedRealmGovernances()
   }, [])
 
+  useEffect(() => {
+    handleSetForm({
+      propertyName: 'title',
+      value: proposalTitle,
+    })
+  }, [proposalTitle])
+
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
-        return <SplTokenTransfer index={idx} governance={governance} />
+        return (
+          <SplTokenTransfer
+            setProposalTitle={setProposalTitle}
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.ProgramUpgrade:
-        return <ProgramUpgrade index={idx} governance={governance} />
+        return (
+          <ProgramUpgrade
+            setProposalTitle={setProposalTitle}
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.Mint:
-        return <Mint index={idx} governance={governance} />
+        return (
+          <Mint
+            setProposalTitle={setProposalTitle}
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.Base64:
-        return <CustomBase64 index={idx} governance={governance} />
+        return (
+          <CustomBase64
+            setProposalTitle={setProposalTitle}
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.None:
-        return <Empty index={idx} governance={governance} />
+        return (
+          <Empty
+            setProposalTitle={setProposalTitle}
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.MangoMakeChangeMaxAccounts:
-        return <MakeChangeMaxAccounts index={idx} governance={governance} />
+        return (
+          <MakeChangeMaxAccounts
+            setProposalTitle={setProposalTitle}
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.AddMember:
+        return <AddMember setProposalTitle={setProposalTitle} index={idx} />
       default:
         null
     }
@@ -347,6 +447,7 @@ const New = () => {
                     </Select>
 
                     <VoteBySwitch
+                      disabled={!canChooseWhoVote}
                       checked={voteByCouncil}
                       onChange={() => {
                         setVoteByCouncil(!voteByCouncil)
@@ -395,6 +496,7 @@ const New = () => {
               >
                 Save draft
               </SecondaryButton>
+
               <Button
                 isLoading={isLoadingSignedProposal}
                 disabled={isLoading}
@@ -411,7 +513,11 @@ const New = () => {
               noMaxWidth
               label="Title"
               placeholder="Title of your proposal"
-              value={form.title}
+              value={
+                instructionsData.length > 1
+                  ? 'Proposal'
+                  : form.title || proposalTitle
+              }
               type="text"
               error={formErrors['title']}
               onChange={(evt) =>

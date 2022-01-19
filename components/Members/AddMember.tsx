@@ -15,7 +15,7 @@ import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
@@ -30,6 +30,7 @@ import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -37,7 +38,13 @@ interface AddMemberForm extends MintForm {
 }
 
 //Can add only council members for now
-const AddMember = () => {
+const AddMember = ({
+  setProposalTitle,
+  index,
+}: {
+  setProposalTitle?: any
+  index?: number
+}) => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -54,6 +61,7 @@ const AddMember = () => {
     ownVoterWeight,
     mint,
   } = useRealm()
+  const { handleSetInstructions } = useContext(NewProposalContext)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AddMemberForm>({
     destinationAccount: '',
@@ -71,7 +79,9 @@ const AddMember = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Add council member ${form.destinationAccount}`
+  const proposalTitle = `Add council member ${
+    form.destinationAccount ? form.destinationAccount : ''
+  }`
   const schema = getMintSchema({ form, connection })
 
   const setAmount = (event) => {
@@ -85,10 +95,12 @@ const AddMember = () => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
     resetCompactViewState()
   }
+
   const validateAmountOnBlur = () => {
     const value = form.amount
 
@@ -102,6 +114,7 @@ const AddMember = () => {
       propertyName: 'amount',
     })
   }
+
   async function getInstruction(): Promise<UiInstruction> {
     return getMintInstruction({
       schema,
@@ -113,6 +126,7 @@ const AddMember = () => {
       setFormErrors,
     })
   }
+
   //TODO common handle propose
   const handlePropose = async () => {
     setIsLoading(true)
@@ -203,113 +217,176 @@ const AddMember = () => {
     }
     getMintWithGovernancesFcn()
   }, [])
+
+  useEffect(() => {
+    if (setProposalTitle) {
+      setProposalTitle(
+        `Add council member ${
+          form.destinationAccount ? form.destinationAccount : ''
+        }`
+      )
+    }
+  }, [form.destinationAccount, setProposalTitle])
+
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: form.mintAccount?.governance, getInstruction },
+      index
+    )
+  }, [form])
+
   return (
     <>
-      <h3 className="mb-4 flex items-center hover:cursor-pointer">
+      {setProposalTitle ? (
         <>
-          <ArrowLeftIcon
-            onClick={handleGoBackToMainView}
-            className="h-4 w-4 text-primary-light mr-2"
+          <Input
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            wrapperClassName="mb-6 w-full"
+            label="Member's wallet"
+            placeholder="Member's wallet"
+            value={form.destinationAccount}
+            type="text"
+            onChange={(event) =>
+              handleSetForm({
+                value: event.target.value,
+                propertyName: 'destinationAccount',
+              })
+            }
+            noMaxWidth
+            error={formErrors['destinationAccount']}
           />
-          Add new member
+
+          <Input
+            noMaxWidth
+            useDefaultStyle={false}
+            className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+            wrapperClassName="mb-6 w-full lg:w-1/2"
+            min={mintMinAmount}
+            label="Voter weight"
+            value={form.amount}
+            type="number"
+            onChange={setAmount}
+            step={mintMinAmount}
+            error={formErrors['amount']}
+            onBlur={validateAmountOnBlur}
+          />
         </>
-      </h3>
-      <div className="space-y-4">
-        <Input
-          label="Member's wallet"
-          value={form.destinationAccount}
-          type="text"
-          onChange={(evt) =>
-            handleSetForm({
-              value: evt.target.value,
-              propertyName: 'destinationAccount',
-            })
-          }
-          noMaxWidth={true}
-          error={formErrors['destinationAccount']}
-        />
-        <div
-          className={'flex items-center hover:cursor-pointer w-24 mt-3'}
-          onClick={() => setShowOptions(!showOptions)}
-        >
-          {showOptions ? (
-            <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
-          ) : (
-            <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
-          )}
-          <small className="text-fgd-3">Options</small>
-        </div>
-        {showOptions && (
-          <>
+      ) : (
+        <>
+          <h3 className="mb-4 flex items-center hover:cursor-pointer">
+            <>
+              <ArrowLeftIcon
+                onClick={handleGoBackToMainView}
+                className="h-4 w-4 text-primary-light mr-2"
+              />
+              Add new member
+            </>
+          </h3>
+
+          <div className="space-y-4">
             <Input
-              noMaxWidth={true}
-              label="Proposal Title"
-              placeholder={
-                form.amount && form.destinationAccount
-                  ? proposalTitle
-                  : 'Title of your proposal'
-              }
-              value={form.title}
+              label="Member's wallet"
+              value={form.destinationAccount}
               type="text"
               onChange={(evt) =>
                 handleSetForm({
                   value: evt.target.value,
-                  propertyName: 'title',
+                  propertyName: 'destinationAccount',
                 })
               }
-            />
-            <Textarea
               noMaxWidth={true}
-              label="Proposal Description"
-              placeholder={
-                'Description of your proposal or use a github gist link (optional)'
-              }
-              wrapperClassName="mb-5"
-              value={form.description}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'description',
-                })
-              }
-            ></Textarea>
-            <Input
-              min={mintMinAmount}
-              label="Voter weight"
-              value={form.amount}
-              type="number"
-              onChange={setAmount}
-              step={mintMinAmount}
-              error={formErrors['amount']}
-              onBlur={validateAmountOnBlur}
+              error={formErrors['destinationAccount']}
             />
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
+            <div
+              className={'flex items-center hover:cursor-pointer w-24 mt-3'}
+              onClick={() => setShowOptions(!showOptions)}
+            >
+              {showOptions ? (
+                <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
+              ) : (
+                <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
+              )}
+              <small className="text-fgd-3">Options</small>
+            </div>
+            {showOptions && (
+              <>
+                <Input
+                  noMaxWidth
+                  label="Proposal Title"
+                  placeholder={
+                    form.amount && form.destinationAccount
+                      ? proposalTitle
+                      : 'Title of your proposal'
+                  }
+                  value={form.title || proposalTitle}
+                  type="text"
+                  onChange={(evt) =>
+                    handleSetForm({
+                      value: evt.target.value,
+                      propertyName: 'title',
+                    })
+                  }
+                />
+
+                <Textarea
+                  noMaxWidth
+                  label="Proposal Description"
+                  placeholder={
+                    'Description of your proposal or use a github gist link (optional)'
+                  }
+                  value={form.description}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      value: evt.target.value,
+                      propertyName: 'description',
+                    })
+                  }
+                />
+
+                <Input
+                  noMaxWidth
+                  placeholder="Amount"
+                  min={mintMinAmount}
+                  label="Voter weight"
+                  value={form.amount}
+                  type="number"
+                  onChange={setAmount}
+                  step={mintMinAmount}
+                  error={formErrors['amount']}
+                  onBlur={validateAmountOnBlur}
+                />
+
+                <VoteBySwitch
+                  disabled={!canChooseWhoVote}
+                  checked={voteByCouncil}
+                  onChange={() => {
+                    setVoteByCouncil(!voteByCouncil)
+                  }}
+                />
+              </>
             )}
-          </>
-        )}
-      </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <SecondaryButton
-          disabled={isLoading}
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
-        >
-          Cancel
-        </SecondaryButton>
-        <Button
-          className="sm:w-1/2"
-          onClick={handlePropose}
-          isLoading={isLoading}
-        >
-          <div>Propose</div>
-        </Button>
-      </div>
+          </div>
+
+          <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
+            <SecondaryButton
+              disabled={isLoading}
+              className="sm:w-1/2 text-th-fgd-1"
+              onClick={handleGoBackToMainView}
+            >
+              Cancel
+            </SecondaryButton>
+
+            <Button
+              className="sm:w-1/2"
+              onClick={handlePropose}
+              isLoading={isLoading}
+            >
+              <div>Add proposal</div>
+            </Button>
+          </div>
+        </>
+      )}
     </>
   )
 }
