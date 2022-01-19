@@ -36,13 +36,13 @@ const Select = ({
           {({ open }) => (
             <>
               <Listbox.Button
-                className={inputClasses({
+                className={`${inputClasses({
                   className,
                   disabled,
                   error,
                   useDefaultStyle,
                   noMaxWidth,
-                })}
+                })} p-4`}
               >
                 <div
                   className={`flex items-center justify-between text-fgd-1 text-left`}

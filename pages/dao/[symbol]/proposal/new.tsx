@@ -317,6 +317,10 @@ const New = () => {
         <div className="w-full flex lg:flex-row flex-col justify-between items-start mt-16">
           <div className="w-full flex lg:mb-0 mb-20 flex-col gap-y-5 justify-start items-start lg:max-w-xl rounded-xl">
             <Input
+              useDefaultStyle={false}
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+              wrapperClassName="mb-6 w-full"
+              noMaxWidth
               label="Title"
               placeholder="Title of your proposal"
               value={form.title}
@@ -331,9 +335,12 @@ const New = () => {
             />
 
             <Textarea
-              className="mb-3"
+              useDefaultStyle={false}
+              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+              wrapperClassName="my-6 w-full"
+              noMaxWidth
               label="Description"
-              placeholder="Description of your proposal or use a github gist link (optional)"
+              placeholder="Describe your proposal or use a github gist link (optional)"
               value={form.description}
               onChange={(evt) =>
                 handleSetForm({
@@ -342,15 +349,6 @@ const New = () => {
                 })
               }
             />
-
-            {canChooseWhoVote && (
-              <VoteBySwitch
-                checked={voteByCouncil}
-                onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
-                }}
-              ></VoteBySwitch>
-            )}
 
             <NewProposalContext.Provider
               value={{
@@ -361,17 +359,17 @@ const New = () => {
               }}
             >
               <h2>Instructions</h2>
+
               {instructionsData.map((instruction, idx) => {
                 const availableInstructionsForIdx = getAvailableInstructionsForIndex(
                   idx
                 )
                 return (
-                  <div
-                    key={idx}
-                    className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg"
-                  >
+                  <div key={idx} className="mb-3 rounded-lg w-full">
                     <Select
-                      className="h-12"
+                      useDefaultStyle={false}
+                      className="w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
+                      noMaxWidth
                       disabled={!getAvailableInstructionsForIndex.length}
                       placeholder={`${
                         availableInstructionsForIdx.length
@@ -383,11 +381,16 @@ const New = () => {
                       value={instruction.type?.name}
                     >
                       {availableInstructionsForIdx.map((inst) => (
-                        <Select.Option key={inst.id} value={inst}>
+                        <Select.Option
+                          className="bg-bkg-3"
+                          key={inst.id}
+                          value={inst}
+                        >
                           <span>{inst.name}</span>
                         </Select.Option>
                       ))}
                     </Select>
+
                     <div className="flex items-end pt-4">
                       <InstructionContentContainer
                         idx={idx}
@@ -398,6 +401,7 @@ const New = () => {
                           idx,
                         })}
                       </InstructionContentContainer>
+
                       {idx !== 0 && (
                         <LinkButton
                           className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
@@ -421,7 +425,14 @@ const New = () => {
               Add instruction
             </LinkButton>
 
-            <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+            <VoteBySwitch
+              checked={voteByCouncil}
+              onChange={() => {
+                setVoteByCouncil(!voteByCouncil)
+              }}
+            />
+
+            <div className="flex w-full justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
                 disabled={isLoading}
                 isLoading={isLoadingDraft}
