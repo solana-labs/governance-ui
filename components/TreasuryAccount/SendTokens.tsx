@@ -426,7 +426,7 @@ const SendTokens = ({ close }) => {
         )}
       </div>
 
-      <div className="flex gap-x-6 justify-start items-center mt-8">
+      <div className="flex gap-x-6 justify-end items-center mt-8">
         <SecondaryButton
           disabled={isLoading}
           className="w-44"

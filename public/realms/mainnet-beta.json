@@ -276,5 +276,13 @@
     "twitter": "@NShaw89",
     "ogImage": "/realms/N&F/img/Nick.png",
     "bannerImage": "/realms/N&F/img/Nick-banner.jpeg"
+  },
+  {
+    "symbol": "LeDAO",
+    "displayName": "Le DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CGSwgi67ZKcv7dwXewSQbzD89CncB9Vmhb8adgsWNJMJ",
+    "twitter": "@ledao_solana",
+    "ogImage": "/realms/LeDao/img/leDao-logo.png"
   }
 ]
