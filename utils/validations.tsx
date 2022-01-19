@@ -171,15 +171,18 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = form.governedTokenAccount.isNft
-          if (isNft) {
-            return true
+          if (form.governedTokenAccount) {
+            if (form.governedTokenAccount.isNft) {
+              return true
+            }
           }
+
           if (val && !form.governedTokenAccount) {
             return this.createError({
               message: `Please select source account to validate the amount`,
             })
           }
+
           if (
             val &&
             form.governedTokenAccount &&

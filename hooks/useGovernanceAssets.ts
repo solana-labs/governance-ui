@@ -17,6 +17,7 @@ import useRealm from './useRealm'
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
+  const connected = useWalletStore((s) => s.connected)
 
   const { ownVoterWeight, realm, symbol } = useRealm()
   const governancesArray = Object.keys(governances)
@@ -146,27 +147,29 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.Transfer,
       name: 'Treasury payment',
-      isVisible: canUseTokenTransferInstruction,
+      isVisible: connected && canUseTokenTransferInstruction,
     },
     {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: connected && canUseProgramUpgradeInstruction,
     },
     {
       id: Instructions.Mint,
       name: 'Mint Tokens',
-      isVisible: canUseMintInstruction,
+      isVisible: connected && canUseMintInstruction,
     },
     {
       id: Instructions.MangoMakeChangeMaxAccounts,
       name: 'Mango - Change max accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+      isVisible:
+        connected && canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.None,
       name: 'Vote only',
       isVisible:
+        connected &&
         realm &&
         Object.values(governances).some((g) =>
           ownVoterWeight.canCreateProposal(g.account.config)
@@ -175,12 +178,12 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.AddMember,
       name: 'Add Member',
-      isVisible: realm && canMintRealmCouncilToken(),
+      isVisible: connected && realm && canMintRealmCouncilToken(),
     },
     {
       id: Instructions.Base64,
       name: 'Custom Instruction',
-      isVisible: canUseAnyInstruction,
+      isVisible: connected && canUseAnyInstruction,
     },
   ]
 

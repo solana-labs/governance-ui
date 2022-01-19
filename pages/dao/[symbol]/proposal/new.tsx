@@ -490,7 +490,9 @@ const New = () => {
 
             <div className="flex w-full justify-end mt-6 pt-6 space-x-4">
               <SecondaryButton
-                disabled={isLoading}
+                disabled={
+                  isLoading || !instructionsData || !realm || !governance
+                }
                 isLoading={isLoadingDraft}
                 onClick={() => handleCreate(true)}
               >
@@ -499,7 +501,9 @@ const New = () => {
 
               <Button
                 isLoading={isLoadingSignedProposal}
-                disabled={isLoading}
+                disabled={
+                  isLoading || !instructionsData || !realm || !governance
+                }
                 onClick={() => handleCreate(false)}
               >
                 Add proposal
