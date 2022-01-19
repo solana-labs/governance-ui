@@ -271,29 +271,17 @@ const New = () => {
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
-        return (
-          <SplTokenTransfer
-            index={idx}
-            governance={governance}
-          ></SplTokenTransfer>
-        )
+        return <SplTokenTransfer index={idx} governance={governance} />
       case Instructions.ProgramUpgrade:
-        return (
-          <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-        )
+        return <ProgramUpgrade index={idx} governance={governance} />
       case Instructions.Mint:
-        return <Mint index={idx} governance={governance}></Mint>
+        return <Mint index={idx} governance={governance} />
       case Instructions.Base64:
-        return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+        return <CustomBase64 index={idx} governance={governance} />
       case Instructions.None:
-        return <Empty index={idx} governance={governance}></Empty>
+        return <Empty index={idx} governance={governance} />
       case Instructions.MangoMakeChangeMaxAccounts:
-        return (
-          <MakeChangeMaxAccounts
-            index={idx}
-            governance={governance}
-          ></MakeChangeMaxAccounts>
-        )
+        return <MakeChangeMaxAccounts index={idx} governance={governance} />
       default:
         null
     }
@@ -316,40 +304,6 @@ const New = () => {
 
         <div className="w-full flex lg:flex-row flex-col justify-between items-start mt-16">
           <div className="w-full flex lg:mb-0 mb-20 flex-col gap-y-5 justify-start items-start lg:max-w-xl rounded-xl">
-            <Input
-              useDefaultStyle={false}
-              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-              wrapperClassName="mb-6 w-full"
-              noMaxWidth
-              label="Title"
-              placeholder="Title of your proposal"
-              value={form.title}
-              type="text"
-              error={formErrors['title']}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'title',
-                })
-              }
-            />
-
-            <Textarea
-              useDefaultStyle={false}
-              className="p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
-              wrapperClassName="my-6 w-full"
-              noMaxWidth
-              label="Description"
-              placeholder="Describe your proposal or use a github gist link (optional)"
-              value={form.description}
-              onChange={(evt) =>
-                handleSetForm({
-                  value: evt.target.value,
-                  propertyName: 'description',
-                })
-              }
-            />
-
             <NewProposalContext.Provider
               value={{
                 instructionsData,
@@ -358,7 +312,7 @@ const New = () => {
                 setGovernance,
               }}
             >
-              <h2>Instructions</h2>
+              <h2>Choose your instructions</h2>
 
               {instructionsData.map((instruction, idx) => {
                 const availableInstructionsForIdx = getAvailableInstructionsForIndex(
@@ -451,6 +405,36 @@ const New = () => {
           </div>
 
           <div className="md:max-w-xs w-full">
+            <Input
+              wrapperClassName="w-full"
+              noMaxWidth
+              label="Title"
+              placeholder="Title of your proposal"
+              value={form.title}
+              type="text"
+              error={formErrors['title']}
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'title',
+                })
+              }
+            />
+
+            <Textarea
+              wrapperClassName="mt-6 mb-16 w-full"
+              noMaxWidth
+              label="Description"
+              placeholder="Describe your proposal or use a github gist link (optional)"
+              value={form.description}
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'description',
+                })
+              }
+            />
+
             <TokenBalanceCard />
 
             <LinksCompactWrapper />

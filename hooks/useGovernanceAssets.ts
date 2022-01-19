@@ -145,13 +145,13 @@ export default function useGovernanceAssets() {
   const availableInstructions = [
     {
       id: Instructions.Transfer,
-      name: 'Transfer Tokens',
+      name: 'Treasury payment',
       isVisible: canUseTokenTransferInstruction,
     },
     {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
-      isVisible: canUseProgramUpgradeInstruction,
+      isVisible: true,
     },
     {
       id: Instructions.Mint,
@@ -159,23 +159,28 @@ export default function useGovernanceAssets() {
       isVisible: canUseMintInstruction,
     },
     {
-      id: Instructions.Base64,
-      name: 'Execute Custom Instruction',
-      isVisible: canUseAnyInstruction,
-    },
-    {
       id: Instructions.MangoMakeChangeMaxAccounts,
-      name: 'Mango - change max accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+      name: 'Mango - Change max accounts',
+      isVisible: true,
     },
     {
       id: Instructions.None,
-      name: 'None',
+      name: 'Vote only',
       isVisible:
         realm &&
         Object.values(governances).some((g) =>
           ownVoterWeight.canCreateProposal(g.account.config)
         ),
+    },
+    {
+      id: Instructions.AddMember,
+      name: 'Add Member',
+      isVisible: realm && canMintRealmCouncilToken(),
+    },
+    {
+      id: Instructions.Base64,
+      name: 'Custom Instruction',
+      isVisible: canUseAnyInstruction,
     },
   ]
 

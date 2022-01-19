@@ -37,6 +37,11 @@ export interface MintForm {
   programId: string | undefined
 }
 
+export interface AddMember extends MintForm {
+  description: string
+  title: string
+}
+
 export interface ProgramUpgradeForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
@@ -67,6 +72,7 @@ export enum Instructions {
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  AddMember,
 }
 
 export type createParams = [

@@ -110,6 +110,9 @@ const MakeChangeMaxAccounts = ({
       {/* if you need more fields add theme to interface MangoMakeChangeMaxAccountsForm
         then you can add inputs in here */}
       <GovernedAccountSelect
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
         label="Program"
         governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
@@ -119,9 +122,15 @@ const MakeChangeMaxAccounts = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
+
       <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="my-6 w-full"
         label="Mango group key"
+        placeholder="Mango group key"
         value={form.mangoGroupKey}
         type="text"
         onChange={(evt) =>
@@ -132,7 +141,12 @@ const MakeChangeMaxAccounts = ({
         }
         error={formErrors['mangoGroupKey']}
       />
+
       <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="mb-6 w-full"
         label="Max accounts"
         value={form.maxMangoAccounts}
         type="number"

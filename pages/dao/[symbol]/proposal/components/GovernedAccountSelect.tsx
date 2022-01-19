@@ -1,6 +1,9 @@
 import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import {
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+} from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
   getTokenAccountLabelInfo,
@@ -17,6 +20,9 @@ const GovernedAccountSelect = ({
   shouldBeGoverned,
   governance,
   label,
+  useDefaultStyle = true,
+  className = '',
+  noMaxWidth = false,
 }: {
   onChange
   value
@@ -25,6 +31,9 @@ const GovernedAccountSelect = ({
   shouldBeGoverned
   governance: ProgramAccount<Governance> | null | undefined
   label
+  useDefaultStyle?: boolean
+  className?: string
+  noMaxWidth?: boolean
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
@@ -39,10 +48,11 @@ const GovernedAccountSelect = ({
         default:
           return value.governance.account.governedAccount.toBase58()
       }
-    } else {
-      return null
     }
+
+    return null
   }
+
   //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
   function getMintAccountLabelComponent({
     account,
@@ -99,6 +109,7 @@ const GovernedAccountSelect = ({
       </div>
     )
   }
+
   useEffect(() => {
     if (governedAccounts.length == 1) {
       //wait for microtask queue to be empty
@@ -107,14 +118,21 @@ const GovernedAccountSelect = ({
       })
     }
   }, [JSON.stringify(governedAccounts)])
+
   return (
     <Select
+      useDefaultStyle={useDefaultStyle}
+      className={
+        className ||
+        'p-4 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none'
+      }
       label={label}
       onChange={onChange}
       componentLabel={getLabel(value)}
       placeholder="Please select..."
       value={value?.governance?.account.governedAccount.toBase58()}
       error={error}
+      noMaxWidth={noMaxWidth}
     >
       {governedAccounts
         .filter((x) =>

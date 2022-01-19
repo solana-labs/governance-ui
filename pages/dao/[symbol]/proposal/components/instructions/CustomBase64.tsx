@@ -131,8 +131,11 @@ const CustomBase64 = ({
   return (
     <>
       <GovernedAccountSelect
-        label="Governance"
-        governedAccounts={governedAccounts}
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-2 w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        label="Program"
+        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
@@ -140,8 +143,13 @@ const CustomBase64 = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
+
       <Input
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="my-6 w-full"
         min={0}
         label="Hold up time (days)"
         value={form.holdUpTime}
@@ -156,10 +164,14 @@ const CustomBase64 = ({
         error={formErrors['holdUpTime']}
         onBlur={validateAmountOnBlur}
       />
+
       <Textarea
+        noMaxWidth
+        useDefaultStyle={false}
+        className="p-4 w-fullb bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none max-w-xl"
+        wrapperClassName="my-6 w-full"
         label="Instruction"
         placeholder="Base64 encoded serialized Solana instruction"
-        wrapperClassName="mb-5"
         value={form.base64}
         onChange={(evt) =>
           handleSetForm({

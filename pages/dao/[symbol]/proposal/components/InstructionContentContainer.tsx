@@ -17,7 +17,7 @@ const InstructionContentContainer = ({
   const currentInstruction = instructionsData ? instructionsData[idx] : null
 
   return (
-    <div className="space-y-4 w-full">
+    <div className="w-full">
       {children}
 
       {currentInstruction?.type?.id !== Instructions.None && (
