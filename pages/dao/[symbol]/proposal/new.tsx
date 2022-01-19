@@ -421,6 +421,20 @@ const New = () => {
                     key={idx}
                     className="mb-3 w-full border-b pb-8 border-bkg-3"
                   >
+                    <div className="text-xs flex justify-between items-center mb-0.5 w-full">
+                      <p>Instruction {idx + 1}</p>
+
+                      {idx !== 0 && (
+                        <LinkButton
+                          className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
+                          onClick={() => removeInstruction(idx)}
+                        >
+                          <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+                          Remove
+                        </LinkButton>
+                      )}
+                    </div>
+
                     <Select
                       useDefaultStyle={false}
                       className="w-full bg-bkg-3 border border-bkg-3 default-transition text-sm text-fgd-1 rounded-md focus:border-bkg-3 focus:outline-none"
@@ -431,7 +445,6 @@ const New = () => {
                           ? 'Select instruction'
                           : 'No available instructions'
                       }`}
-                      label={`Instruction ${idx + 1}`}
                       onChange={(value) => setInstructionType({ value, idx })}
                       value={instruction.type?.name}
                     >
@@ -454,27 +467,15 @@ const New = () => {
                       }}
                     />
 
-                    <div className="flex mt-8 items-end">
-                      <InstructionContentContainer
-                        idx={idx}
-                        instructionsData={instructionsData}
-                      >
-                        {getCurrentInstruction({
-                          typeId: instruction.type?.id,
-                          idx,
-                        })}
-                      </InstructionContentContainer>
-
-                      {idx !== 0 && (
-                        <LinkButton
-                          className="flex font-bold items-center ml-4 text-fgd-1 text-sm"
-                          onClick={() => removeInstruction(idx)}
-                        >
-                          <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-                          Remove
-                        </LinkButton>
-                      )}
-                    </div>
+                    <InstructionContentContainer
+                      idx={idx}
+                      instructionsData={instructionsData}
+                    >
+                      {getCurrentInstruction({
+                        typeId: instruction.type?.id,
+                        idx,
+                      })}
+                    </InstructionContentContainer>
                   </div>
                 )
               })}
