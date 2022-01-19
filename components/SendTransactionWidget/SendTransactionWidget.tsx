@@ -86,9 +86,9 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     for (const [index, tx] of txn.transactions.entries()) {
       setTxnName(getTxnName(tx.name))
       setCurrentTxn(index)
-      await _simulateTransaction(tx)
+      await _simulateTransaction(tx.transaction)
       const { txid: txId } = await sendSignedTransaction({
-        signedTransaction: tx,
+        signedTransaction: tx.transaction,
         connection: connection.current,
       })
       pushTxn(txId)
@@ -104,11 +104,11 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     txn.transactions.forEach((tx) => {
       promises.push(
         new Promise(async (resolve) => {
-          await _simulateTransaction(tx),
+          await _simulateTransaction(tx.transaction),
             resolve(
               sendSignedTransaction({
                 connection: connection.current,
-                signedTransaction: tx,
+                signedTransaction: tx.transaction,
               })
             )
         })
@@ -161,35 +161,26 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   const signTransactions = async (): Promise<TransactionFlow[]> => {
     if (!wallet?.publicKey) throw new WalletNotConnectedError()
     const unsigned: Transaction[] = []
-    const sliceMap: [number, string[]][] = []
+    const sliceMap: number[] = []
+
     transactions.forEach((txn) => {
-      unsigned.push(...txn.transactions)
-      sliceMap.push([
-        txn.transactions.length,
-        txn.transactions.map((t) => t.name),
-      ])
+      unsigned.push(...txn.transactions.map((t) => t.transaction))
+      sliceMap.push(txn.transactions.length)
     })
 
-    const signed = (await wallet.signAllTransactions(
-      unsigned
-    )) as NamedTransaction[]
-
+    const signed = await wallet.signAllTransactions(unsigned)
     sliceMap.forEach((map, index) => {
-      const txn = signed.slice(index, index + map[0])
-      transactions[index].transactions = txn.map((t, i) => {
-        t.name = map[1][i]
-        return t
+      const txn = signed.slice(index, index + map)
+      transactions[index].transactions.forEach((t, i) => {
+        t.transaction = txn[i]
       })
     })
-
     return transactions
   }
 
   const sendTransactions = async () => {
     try {
-      console.debug(transactions)
       const signedTxn = await signTransactions()
-      console.debug('sigend', signedTxn)
       for (const [index, tf] of signedTxn.entries()) {
         setStepName(getStepName(tf.name))
         setCurrentStep(index)

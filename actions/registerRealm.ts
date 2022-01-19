@@ -313,19 +313,21 @@ async function sendTransactionFactory(
     communityMintSigners &&
     communityMintInstructions.length
   ) {
-    const t = new NamedTransaction({
-      name: 'Minting community token',
+    const nt = new NamedTransaction('Minting community token')
+    const t = new Transaction({
       feePayer: wallet.publicKey,
     })
-
     t.add(...communityMintInstructions)
     t.recentBlockhash = block.blockhash
-    if (communityMintSigners.length) t.partialSign(...communityMintSigners)
+    nt.transaction = t
+    if (communityMintSigners.length) {
+      t.partialSign(...communityMintSigners)
+    }
 
     txn.push({
       name: 'Community Mint',
       sequenceType: SequenceType.Sequential,
-      transactions: [t],
+      transactions: [nt],
     })
 
     // instructions.unshift(communityMintInstructions)
@@ -337,10 +339,12 @@ async function sendTransactionFactory(
 
     councilMembersChunks.forEach((chunk, index) => {
       if (!chunk.length) return
-      const t = new NamedTransaction({
-        name: `Minting council token chunk ${index + 1} of ${
+      const nt = new NamedTransaction(
+        `Minting council token chunk ${index + 1} of ${
           councilMembersChunks.length
-        }`,
+        }`
+      )
+      const t = new Transaction({
         feePayer: wallet.publicKey,
       })
       t.recentBlockhash = block.blockhash
@@ -348,7 +352,8 @@ async function sendTransactionFactory(
       if (councilSignersChunks[index].length) {
         t.partialSign(...councilSignersChunks[index])
       }
-      transactions.push(t)
+      nt.transaction = t
+      transactions.push(nt)
     })
 
     txn.push({
@@ -361,18 +366,17 @@ async function sendTransactionFactory(
     // signerSets.unshift(...councilSignersChunks)
   }
 
-  const t = new NamedTransaction({
-    name: 'Deploying DAO',
+  const nt = new NamedTransaction('Deploying DAO')
+  const t = new Transaction({
     feePayer: wallet.publicKey,
   })
-
   t.recentBlockhash = block.blockhash
   t.add(...realmInstructions)
-
+  nt.transaction = t
   txn.push({
     name: 'DAO',
     sequenceType: SequenceType.Sequential,
-    transactions: [t],
+    transactions: [nt],
   })
 
   return txn
