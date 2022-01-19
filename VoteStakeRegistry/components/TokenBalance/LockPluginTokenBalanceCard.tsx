@@ -15,14 +15,9 @@ import {
 import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import Tooltip from '@components/Tooltip'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import {
-  DepositWithIdx,
-  getUsedDeposit,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
-import { useEffect, useState } from 'react'
 import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -101,26 +96,19 @@ const TokenDeposit = ({
   tokenType: GoverningTokenType
   councilVote?: boolean
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const { realm, realmTokenAccount, councilTokenAccount } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const {
-    realm,
-    realmTokenAccount,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-    councilTokenAccount,
-  } = useRealm()
-  const { client } = useVoteRegistry()
+  const deposits = useDepositStore((s) => s.state.deposits)
+
+  const depositRecord = deposits.find(
+    (x) =>
+      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.lockup.kind.none
+  )
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
     return null
   }
-  const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
-
-  const depositTokenRecord =
-    tokenType === GoverningTokenType.Community
-      ? ownTokenRecord
-      : ownCouncilTokenRecord
 
   const depositTokenAccount =
     tokenType === GoverningTokenType.Community
@@ -137,19 +125,6 @@ const TokenDeposit = ({
   const depositTokenName = `${tokenName} ${
     tokenType === GoverningTokenType.Community ? '' : 'Council'
   }`
-
-  const handleGetUsedDeposit = async () => {
-    const deposit = await getUsedDeposit(
-      realm!.pubkey,
-      depositTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!,
-      client!,
-      'none'
-    )
-    if (deposit) {
-      setDeposit(deposit)
-    }
-  }
 
   const hasTokensInWallet =
     depositTokenAccount && depositTokenAccount.account.amount.gt(new BN(0))
@@ -172,12 +147,6 @@ const TokenDeposit = ({
       : canDepositToken
       ? availableTokens
       : 0
-
-  useEffect(() => {
-    if (client && wallet?.connected && depositTokenRecord) {
-      handleGetUsedDeposit()
-    }
-  }, [wallet?.connected, client, depositTokenRecord])
 
   return (
     <>
@@ -207,17 +176,9 @@ const TokenDeposit = ({
       </p>
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <DepositCommunityTokensBtn
-          afterDepositFcn={() => {
-            if (depositTokenRecord) {
-              handleGetUsedDeposit()
-            }
-          }}
-        ></DepositCommunityTokensBtn>
+        <DepositCommunityTokensBtn></DepositCommunityTokensBtn>
 
-        <WithDrawCommunityTokens
-          afterWithdrawFcn={handleGetUsedDeposit}
-        ></WithDrawCommunityTokens>
+        <WithDrawCommunityTokens></WithDrawCommunityTokens>
       </div>
     </>
   )

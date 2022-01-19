@@ -11,23 +11,14 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
-import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import {
-  DepositWithIdx,
-  getUsedDeposit,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
-const WithDrawCommunityTokens = ({ afterWithdrawFcn }) => {
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
-  const connection = useWalletStore((s) => s.connection.current)
-
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
-    (s) => s.actions
-  )
+const WithDrawCommunityTokens = () => {
+  const { getDeposits } = useDepositStore()
+  const { client } = useVoteRegistry()
   const {
     realm,
     realmInfo,
@@ -40,8 +31,19 @@ const WithDrawCommunityTokens = ({ afterWithdrawFcn }) => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
-  const { client } = useVoteRegistry()
-  const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
+  const wallet = useWalletStore((s) => s.current)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection.current)
+  const deposits = useDepositStore((s) => s.state.deposits)
+  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
+    (s) => s.actions
+  )
+
+  const depositRecord = deposits.find(
+    (x) =>
+      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.lockup.kind.none
+  )
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
 
@@ -138,21 +140,15 @@ const WithDrawCommunityTokens = ({ afterWithdrawFcn }) => {
       }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      afterWithdrawFcn()
+      await getDeposits({
+        realmPk: realm!.pubkey,
+        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        walletPk: wallet!.publicKey!,
+        client: client!,
+        connection,
+      })
     } catch (ex) {
       console.error("Can't withdraw tokens", ex)
-    }
-  }
-  const handleGetUsedDeposit = async () => {
-    const deposit = await getUsedDeposit(
-      realm!.pubkey,
-      ownTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!,
-      client!,
-      'none'
-    )
-    if (deposit) {
-      setDeposit(deposit)
     }
   }
   const hasTokensDeposited =
@@ -165,11 +161,6 @@ const WithDrawCommunityTokens = ({ afterWithdrawFcn }) => {
       toManyCommunityOutstandingProposalsForUser
     ? "You don't have any governance tokens to withdraw."
     : ''
-  useEffect(() => {
-    if (client && wallet?.connected && ownTokenRecord) {
-      handleGetUsedDeposit()
-    }
-  }, [wallet?.connected, client, ownTokenRecord])
   return (
     <Button
       tooltipMessage={withdrawTooltipContent}

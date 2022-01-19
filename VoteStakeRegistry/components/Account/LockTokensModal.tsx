@@ -22,16 +22,13 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import {
-  DepositWithIdx,
-  getUsedDeposit,
-  LockupType,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import {
   yearToDays,
   yearToSecs,
   daysToYear,
 } from 'VoteStakeRegistry/utils/dateTools'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 interface Period {
   value: number
   display: string
@@ -80,11 +77,25 @@ const YES = 'YES'
 const NO = 'NO'
 
 const LockTokensModal = ({ onClose, isOpen }) => {
+  const { getDeposits } = useDepositStore()
+  const {
+    ownTokenRecord,
+    mint,
+    realm,
+    realmTokenAccount,
+    realmInfo,
+    tokenRecords,
+  } = useRealm()
   const {
     client,
     calcMintMultiplier,
     communityMintRegistrar,
   } = useVoteRegistry()
+  const connection = useWalletStore((s) => s.connection.current)
+  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const wallet = useWalletStore((s) => s.current)
+  const deposits = useDepositStore((s) => s.state.deposits)
+
   const lockupPeriods: Period[] = [
     {
       value: yearToDays(1),
@@ -118,18 +129,11 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     .reduce((prev, current) => {
       return prev > current ? prev : current
     })
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const wallet = useWalletStore((s) => s.current)
-  const {
-    ownTokenRecord,
-    mint,
-    realm,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-  } = useRealm()
-  const [depositRecord, setDeposit] = useState<DepositWithIdx | null>(null)
+  const depositRecord = deposits.find(
+    (x) =>
+      x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
+      x.lockup.kind.none
+  )
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
@@ -138,6 +142,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     vestingPeriods[0]
   )
   const [currentStep, setCurrentStep] = useState(0)
+
   const depositedTokens = depositRecord
     ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
     : '0'
@@ -231,20 +236,14 @@ const LockTokensModal = ({ onClose, isOpen }) => {
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client,
     })
-    handleGetUsedDeposit()
+    await getDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: ownTokenRecord!.account.governingTokenMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
     onClose()
-  }
-  const handleGetUsedDeposit = async () => {
-    const deposit = await getUsedDeposit(
-      realm!.pubkey,
-      ownTokenRecord!.account.governingTokenMint,
-      wallet!.publicKey!,
-      client!,
-      'none'
-    )
-    if (deposit) {
-      setDeposit(deposit)
-    }
   }
   const baseTabClasses =
     'w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark'
@@ -431,11 +430,6 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       handleNextStep()
     }
   }, [currentStep])
-  useEffect(() => {
-    if (client && connection) {
-      handleGetUsedDeposit()
-    }
-  }, [client, connection])
   useEffect(() => {
     if (amount) {
       validateAmountOnBlur()

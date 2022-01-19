@@ -14,11 +14,10 @@ import {
   secsToDays,
   getFormattedStringFromDays,
 } from 'VoteStakeRegistry/utils/dateTools'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const { getDeposits } = useDepositStore()
   const {
     realm,
     realmInfo,
@@ -31,8 +30,11 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     calcMintMultiplier,
     communityMintRegistrar,
   } = useVoteRegistry()
-  const depositTokenRecord = ownTokenRecord
+  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection.current)
+  const endpoint = useWalletStore((s) => s.connection.endpoint)
 
+  const depositTokenRecord = ownTokenRecord
   const depositTokenAccount = realmTokenAccount
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
@@ -55,16 +57,13 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositEntry.index,
       client
     )
-    //TODO
-    //getDeposits
-  }
-  const CardLabel = ({ label, value }) => {
-    return (
-      <div className="flex flex-col w-1/2 p-2">
-        <div className="text-xs text-fgd-3">{label}</div>
-        <div>{value}</div>
-      </div>
-    )
+    await getDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: ownTokenRecord!.account.governingTokenMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
   }
   const availableTokens = fmtMintAmount(
     deposit.mint.account,
@@ -77,6 +76,14 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     deposit.mint.publicKey.toBase58() ===
     realm?.account.communityMint.toBase58()
   const isConstant = type === 'constant'
+  const CardLabel = ({ label, value }) => {
+    return (
+      <div className="flex flex-col w-1/2 p-2">
+        <div className="text-xs text-fgd-3">{label}</div>
+        <div>{value}</div>
+      </div>
+    )
+  }
   return (
     <div className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3 flex flex-col">
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">

@@ -2,47 +2,17 @@ import Button from '@components/Button'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { useState } from 'react'
 import LockTokensModal from './LockTokensModal'
-import {
-  DepositWithMintAccount,
-  getUsedDeposits,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import DepositCommunityTokensBtn from '../TokenBalance/DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from '../TokenBalance/WithdrawCommunityTokensBtn'
 import DepositCard from './DepositCard'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 const LockTokensAccount = () => {
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection.current)
-  const { realm, ownTokenRecord } = useRealm()
+  const { realm } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const { client } = useVoteRegistry()
-  const [depositRecords, setDeposits] = useState<
-    DepositWithMintAccount[] | null
-  >(null)
-  const depositTokenRecord = ownTokenRecord
-
-  const handleGetUsedDeposits = async () => {
-    const deposits = await getUsedDeposits(
-      realm!.pubkey,
-      wallet!.publicKey!,
-      depositTokenRecord!.account.governingTokenMint,
-      client!,
-      connection
-    )
-    if (deposits) {
-      setDeposits(deposits)
-    }
-  }
-
-  useEffect(() => {
-    if (client && connection && depositTokenRecord) {
-      handleGetUsedDeposits()
-    }
-  }, [connection, client, depositTokenRecord])
+  const deposits = useDepositStore((s) => s.state.deposits)
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -50,20 +20,12 @@ const LockTokensAccount = () => {
         <h1 className="flex mb-8">
           Account
           <div className="ml-auto">
-            <DepositCommunityTokensBtn
-              afterDepositFcn={() => {
-                if (depositTokenRecord) {
-                  handleGetUsedDeposits()
-                }
-              }}
-            ></DepositCommunityTokensBtn>
-            <WithDrawCommunityTokens
-              afterWithdrawFcn={handleGetUsedDeposits}
-            ></WithDrawCommunityTokens>
+            <DepositCommunityTokensBtn></DepositCommunityTokensBtn>
+            <WithDrawCommunityTokens></WithDrawCommunityTokens>
           </div>
         </h1>
         <div className="flex mb-8">
-          {depositRecords?.map((x, idx) => {
+          {deposits?.map((x, idx) => {
             const availableTokens = fmtMintAmount(
               x.mint.account,
               x.amountDepositedNative
@@ -94,7 +56,7 @@ const LockTokensAccount = () => {
         </div>
         <h1 className="mb-8">Locked Tokens</h1>
         <div className="flex mb-8 flex-wrap">
-          {depositRecords
+          {deposits
             ?.filter((x) => typeof x.lockup.kind.none === 'undefined')
             ?.map((x, idx) => (
               <DepositCard deposit={x} key={idx}></DepositCard>

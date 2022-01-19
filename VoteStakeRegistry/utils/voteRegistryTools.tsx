@@ -1,8 +1,8 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { TokenProgramAccount, tryGetMint } from '@utils/tokens'
+import { PublicKey } from '@solana/web3.js'
+import { TokenProgramAccount } from '@utils/tokens'
 
 interface Voter {
   deposits: Deposit[]
@@ -47,9 +47,6 @@ export interface Deposit {
   isUsed: boolean
   lockup: Lockup
   votingMintConfigIdx: number
-}
-export interface DepositWithIdx extends Deposit {
-  index: number
 }
 export interface DepositWithMintAccount extends Deposit {
   mint: TokenProgramAccount<MintInfo>
@@ -144,64 +141,4 @@ export const getMintCfgIdx = async (
     throw 'mint not configured to use'
   }
   return mintCfgIdx
-}
-
-export const getUsedDeposit = async (
-  realmPk: PublicKey,
-  mint: PublicKey,
-  walletPk: PublicKey,
-  client: VsrClient,
-  kind: LockupType
-) => {
-  const clientProgramId = client.program.programId
-  const { registrar } = await getRegistrarPDA(realmPk, mint, clientProgramId)
-  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
-  const existingVoter = await tryGetVoter(voter, client)
-  const mintCfgIdx = await getMintCfgIdx(registrar, mint, client)
-  const findFcn = (x) =>
-    x.isUsed &&
-    typeof x.lockup.kind[kind] !== 'undefined' &&
-    x.votingMintConfigIdx === mintCfgIdx
-  const index = existingVoter?.deposits.findIndex(findFcn)
-  const deposit = existingVoter?.deposits.find(findFcn)
-  return { ...deposit, index } as DepositWithIdx
-}
-
-export const getUsedDeposits = async (
-  realmPk: PublicKey,
-  walletPk: PublicKey,
-  communityMintPk: PublicKey,
-  client: VsrClient,
-  connection: Connection
-) => {
-  const clientProgramId = client.program.programId
-  const { registrar } = await getRegistrarPDA(
-    realmPk,
-    communityMintPk,
-    clientProgramId
-  )
-  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
-  const existingVoter = await tryGetVoter(voter, client)
-  const existingRegistrar = await tryGetRegistrar(registrar, client)
-  const mintCfgs = existingRegistrar?.votingMints
-  const mints = {}
-  if (mintCfgs) {
-    for (const i of mintCfgs) {
-      if (i.mint.toBase58() !== unusedMintPk) {
-        const mint = await tryGetMint(connection, i.mint)
-        mints[i.mint.toBase58()] = mint
-      }
-    }
-  }
-  const deposits = existingVoter?.deposits
-    .map(
-      (x, idx) =>
-        ({
-          ...x,
-          mint: mints[mintCfgs![x.votingMintConfigIdx].mint.toBase58()],
-          index: idx,
-        } as DepositWithMintAccount)
-    )
-    .filter((x) => x.isUsed)
-  return deposits
 }

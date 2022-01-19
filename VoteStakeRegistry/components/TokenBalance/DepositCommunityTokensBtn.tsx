@@ -6,8 +6,18 @@ import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
-const DepositCommunityTokensBtn = ({ afterDepositFcn }) => {
+const DepositCommunityTokensBtn = () => {
+  const { getDeposits } = useDepositStore()
+  const {
+    realm,
+    realmInfo,
+    realmTokenAccount,
+    tokenRecords,
+    ownTokenRecord,
+  } = useRealm()
+  const { client } = useVoteRegistry()
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
@@ -15,8 +25,7 @@ const DepositCommunityTokensBtn = ({ afterDepositFcn }) => {
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
-  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
-  const { client } = useVoteRegistry()
+
   const depositAllTokens = async function () {
     if (!realm) {
       throw 'No realm selected'
@@ -43,7 +52,13 @@ const DepositCommunityTokensBtn = ({ afterDepositFcn }) => {
       tokenOwnerRecordPk,
       client,
     })
-    afterDepositFcn()
+    await getDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: ownTokenRecord!.account.governingTokenMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
     await fetchWalletTokenAccounts()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
