@@ -15,7 +15,7 @@ export const inputClasses = ({
   useDefaultStyle = true,
 }) => {
   const disabledStyle =
-    'cursor-not-allowed opacity-50 text-fgd-3 border bg-bkg-1 border-bkg-1'
+    'cursor-not-allowed opacity-50 text-fgd-3 border bg-bkg-1 border-bkg-4'
 
   const defaultStyle = `${
     disabled
