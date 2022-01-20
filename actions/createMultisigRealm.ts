@@ -182,9 +182,7 @@ export const createMultisigRealm = async (
     minCouncilTokensToCreateProposal: new BN(1),
   })
 
-  const {
-    governanceAddress: communityMintGovPk,
-  } = await withCreateMintGovernance(
+  const communityMintGovPk = await withCreateMintGovernance(
     realmInstructions,
     programId,
     realmPk,
