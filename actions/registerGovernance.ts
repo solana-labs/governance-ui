@@ -25,7 +25,7 @@ export const registerGovernance = async (
   let governanceAddress
   const governanceAuthority = walletPubkey
 
-  //will run only with plugin
+  //will run only if plugin is connected with realm
   await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
 
   switch (governanceType) {

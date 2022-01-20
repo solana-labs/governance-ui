@@ -67,7 +67,6 @@ export const voteRegistryLockDeposit = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    forceCreateNew: true,
     client,
   })
 

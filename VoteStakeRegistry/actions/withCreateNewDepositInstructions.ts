@@ -33,7 +33,6 @@ export const withCreateNewDepositInstructions = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  forceCreateNew = false,
   client,
 }: {
   instructions: TransactionInstruction[]
@@ -44,8 +43,6 @@ export const withCreateNewDepositInstructions = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
-  //force create new means that new deposit will be created regardless of other conditions
-  forceCreateNew?: boolean
   client?: VsrClient
 }) => {
   const { wallet } = rpcContext
@@ -81,6 +78,7 @@ export const withCreateNewDepositInstructions = async ({
   )
 
   //spl governance tokenownerrecord pubkey
+  console.log(tokenOwnerRecordPubKey)
   if (!tokenOwnerRecordPubKey) {
     tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
@@ -108,15 +106,22 @@ export const withCreateNewDepositInstructions = async ({
     )
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
-  const indexOfExistingDeposit = existingVoter?.deposits.findIndex(
-    (x) =>
-      x.isUsed &&
-      typeof x.lockup.kind[lockupKind] !== 'undefined' &&
-      x.votingMintConfigIdx === mintCfgIdx
-  )
-  const isExistingDepositEntry =
-    typeof indexOfExistingDeposit !== 'undefined' &&
-    indexOfExistingDeposit !== -1
+
+  //none type deposits are used only to store tokens that will be withdrawable immediately so there is no need to create new every time
+  //for other kinds of deposits we always want to create new deposit
+  const indexOfNoneTypeDeposit =
+    lockupKind === 'none'
+      ? existingVoter?.deposits.findIndex(
+          (x) =>
+            x.isUsed &&
+            typeof x.lockup.kind[lockupKind] !== 'undefined' &&
+            x.votingMintConfigIdx === mintCfgIdx
+        )
+      : -1
+
+  const createNewDeposit =
+    typeof indexOfNoneTypeDeposit !== 'undefined' &&
+    indexOfNoneTypeDeposit !== -1
 
   const firstFreeIdx = existingVoter?.deposits?.findIndex((x) => !x.isUsed) || 0
 
@@ -124,7 +129,7 @@ export const withCreateNewDepositInstructions = async ({
     throw 'You have to much active deposits'
   }
 
-  if (!isExistingDepositEntry || forceCreateNew) {
+  if (createNewDeposit) {
     //in case we do monthly close up we pass months not days.
     const period =
       lockupKind !== 'monthly'
@@ -157,10 +162,7 @@ export const withCreateNewDepositInstructions = async ({
     instructions.push(createDepositEntryInstruction)
   }
 
-  const depositIdx =
-    isExistingDepositEntry && !forceCreateNew
-      ? indexOfExistingDeposit!
-      : firstFreeIdx
+  const depositIdx = !createNewDeposit ? indexOfNoneTypeDeposit! : firstFreeIdx
 
   return {
     depositIdx,

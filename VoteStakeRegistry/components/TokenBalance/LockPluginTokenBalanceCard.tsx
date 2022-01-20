@@ -160,7 +160,7 @@ const TokenDeposit = ({
         <span className="ml-auto">{availableTokens}</span>
       </p>
       <p
-        className={`mt-2 opacity-70 mb-4 ml-1 text-xs ${
+        className={`mt-2 opacity-70 mb-4 text-xs ${
           canShowAvailableTokensMessage ? 'block' : 'hidden'
         }`}
       >

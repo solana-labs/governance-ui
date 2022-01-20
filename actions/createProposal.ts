@@ -51,7 +51,7 @@ export const createProposal = async (
   const options = ['Approve']
   const useDenyOption = true
 
-  //will run only with plugin
+  //will run only if plugin is connected with realm
   await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
 
   const proposalAddress = await withCreateProposal(

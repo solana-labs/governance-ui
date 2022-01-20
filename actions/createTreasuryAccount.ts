@@ -23,7 +23,7 @@ export const createTreasuryAccount = async (
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
 
-  //will run only with plugin
+  //will run only if plugin is connected with realm
   await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
 
   const tokenAccount = await withCreateSplTokenAccount(

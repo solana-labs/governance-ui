@@ -17,7 +17,6 @@ export const withVoteRegistryDepositInstructions = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  forceCreateNew = false,
   client,
 }: {
   instructions: TransactionInstruction[]
@@ -31,8 +30,6 @@ export const withVoteRegistryDepositInstructions = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
-  //force create new means that new deposit will be created regardless of other conditions
-  forceCreateNew?: boolean
   client?: VsrClient
 }) => {
   const { wallet } = rpcContext
@@ -56,7 +53,6 @@ export const withVoteRegistryDepositInstructions = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    forceCreateNew,
     client,
   })
   const depositInstruction = client?.program.instruction.deposit(
