@@ -28,6 +28,7 @@ import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -37,6 +38,7 @@ interface AddMemberForm extends MintForm {
 //Can add only council members for now
 const AddMember = () => {
   const router = useRouter()
+  const { client } = useVoteRegistry()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { fmtUrlWithCluster } = useQueryContext()
@@ -174,7 +176,8 @@ const AddMember = () => {
           proposalMint,
           selectedGovernance?.account?.proposalCount,
           [instructionData],
-          false
+          false,
+          client
         )
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`

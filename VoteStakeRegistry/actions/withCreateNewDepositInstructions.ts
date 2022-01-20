@@ -78,7 +78,6 @@ export const withCreateNewDepositInstructions = async ({
   )
 
   //spl governance tokenownerrecord pubkey
-  console.log(tokenOwnerRecordPubKey)
   if (!tokenOwnerRecordPubKey) {
     tokenOwnerRecordPubKey = await withCreateTokenOwnerRecord(
       instructions,
@@ -107,7 +106,7 @@ export const withCreateNewDepositInstructions = async ({
   }
   const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
 
-  //none type deposits are used only to store tokens that will be withdrawable immediately so there is no need to create new every time
+  //none type deposits are used only to store tokens that will be withdrawable immediately so there is no need to create new every time and there should be one per mint
   //for other kinds of deposits we always want to create new deposit
   const indexOfNoneTypeDeposit =
     lockupKind === 'none'
@@ -120,8 +119,8 @@ export const withCreateNewDepositInstructions = async ({
       : -1
 
   const createNewDeposit =
-    typeof indexOfNoneTypeDeposit !== 'undefined' &&
-    indexOfNoneTypeDeposit !== -1
+    typeof indexOfNoneTypeDeposit === 'undefined' ||
+    indexOfNoneTypeDeposit === -1
 
   const firstFreeIdx = existingVoter?.deposits?.findIndex((x) => !x.isUsed) || 0
 
@@ -163,7 +162,6 @@ export const withCreateNewDepositInstructions = async ({
   }
 
   const depositIdx = !createNewDeposit ? indexOfNoneTypeDeposit! : firstFreeIdx
-
   return {
     depositIdx,
     registrar,

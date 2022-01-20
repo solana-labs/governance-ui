@@ -12,19 +12,26 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/actions/withUpdateVoterWeightRecord'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   mint: PublicKey,
   config: GovernanceConfig,
-  tokenOwnerRecord: PublicKey
+  tokenOwnerRecord: PublicKey,
+  client?: VsrClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
 
   //will run only if plugin is connected with realm
-  await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
+  await withUpdateVoterWeightRecord(
+    instructions,
+    wallet.publicKey!,
+    realm,
+    client
+  )
 
   const tokenAccount = await withCreateSplTokenAccount(
     connection,

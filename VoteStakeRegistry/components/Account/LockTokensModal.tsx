@@ -27,6 +27,7 @@ import {
   yearToDays,
   yearToSecs,
   daysToYear,
+  daysToMonths,
 } from 'VoteStakeRegistry/utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 interface Period {
@@ -236,13 +237,16 @@ const LockTokensModal = ({ onClose, isOpen }) => {
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client,
     })
-    await getDeposits({
-      realmPk: realm!.pubkey,
-      communityMintPk: ownTokenRecord!.account.governingTokenMint,
-      walletPk: wallet!.publicKey!,
-      client: client!,
-      connection,
-    })
+    if (ownTokenRecord) {
+      await getDeposits({
+        realmPk: realm!.pubkey,
+        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        walletPk: wallet!.publicKey!,
+        client: client!,
+        connection,
+      })
+    }
+
     onClose()
   }
   const baseTabClasses =
@@ -385,8 +389,12 @@ const LockTokensModal = ({ onClose, isOpen }) => {
                   </Tab.List>
                 </Tab.Group>
                 <div className={labelClasses}>Vesting rate</div>
-                {/* TODO tokens */}
-                <div className="text-xs">xxx {vestingPeriod.info}</div>
+                {amount && (
+                  <div className="text-xs">
+                    {(amount / daysToMonths(lockupPeriod.value)).toFixed(2)}{' '}
+                    {vestingPeriod.info}
+                  </div>
+                )}
               </div>
             )}
             {/* TODO tooltip */}
@@ -471,7 +479,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
             <Select
               className="text-xs w-24"
               onChange={handleSetLockupType}
-              value={lockupType.value}
+              value={lockupType.displayName}
             >
               {lockupTypes.map((x, idx) => (
                 <Select.Option key={x.value} value={idx}>

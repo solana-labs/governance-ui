@@ -38,6 +38,7 @@ import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMax
 import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -54,6 +55,7 @@ export const NewProposalContext = createContext<InstructionsContext>(
 
 const New = () => {
   const router = useRouter()
+  const { client } = useVoteRegistry()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
@@ -235,7 +237,8 @@ const New = () => {
           proposalMint,
           selectedGovernance?.account?.proposalCount,
           instructionsData,
-          isDraft
+          isDraft,
+          client
         )
 
         const url = fmtUrlWithCluster(

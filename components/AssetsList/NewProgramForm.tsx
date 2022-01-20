@@ -23,6 +23,7 @@ import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -42,6 +43,7 @@ const defaultFormValues = {
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const { client } = useVoteRegistry()
   const {
     realmInfo,
     realm,
@@ -107,7 +109,8 @@ const NewProgramForm = () => {
           new PublicKey(form.programId),
           governanceConfig,
           form.transferAuthority,
-          tokenOwnerRecord!.pubkey
+          tokenOwnerRecord!.pubkey,
+          client
         )
         setIsLoading(false)
         fetchRealm(realmInfo!.programId, realmInfo!.realmId)

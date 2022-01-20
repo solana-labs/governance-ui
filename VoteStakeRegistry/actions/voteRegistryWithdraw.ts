@@ -35,14 +35,6 @@ export const voteRegistryWithdraw = async (
     client
   )
 
-  //todo close deposit if 0 tokens inside
-  //   const close = client.program.instruction.closeDepositEntry(0, {
-  //     accounts: {
-  //       voter: voter,
-  //       voterAuthority: wallet.publicKey,
-  //     },
-  //   })
-  //   instructions.push(close)
   const transaction = new Transaction()
   transaction.add(...instructions)
 

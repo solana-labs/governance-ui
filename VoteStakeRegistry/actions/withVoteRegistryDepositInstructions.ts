@@ -69,6 +69,5 @@ export const withVoteRegistryDepositInstructions = async ({
       },
     }
   )
-
-  instructions.push(...instructions, depositInstruction)
+  instructions.push(depositInstruction)
 }

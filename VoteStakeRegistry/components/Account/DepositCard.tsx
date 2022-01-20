@@ -57,13 +57,15 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositEntry.index,
       client
     )
-    await getDeposits({
-      realmPk: realm!.pubkey,
-      communityMintPk: ownTokenRecord!.account.governingTokenMint,
-      walletPk: wallet!.publicKey!,
-      client: client!,
-      connection,
-    })
+    if (ownTokenRecord) {
+      await getDeposits({
+        realmPk: realm!.pubkey,
+        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        walletPk: wallet!.publicKey!,
+        client: client!,
+        connection,
+      })
+    }
   }
   const availableTokens = fmtMintAmount(
     deposit.mint.account,

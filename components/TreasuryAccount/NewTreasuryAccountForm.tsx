@@ -25,6 +25,7 @@ import Switch from '@components/Switch'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
@@ -41,6 +42,7 @@ const defaultFormValues = {
 }
 const NewAccountForm = () => {
   const router = useRouter()
+  const { client } = useVoteRegistry()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     realmInfo,
@@ -110,7 +112,8 @@ const NewAccountForm = () => {
           realm,
           new PublicKey(form.mintAddress),
           governanceConfig,
-          tokenOwnerRecord!.pubkey
+          tokenOwnerRecord!.pubkey,
+          client
         )
         setIsLoading(false)
         fetchRealm(realmInfo!.programId, realmInfo!.realmId)

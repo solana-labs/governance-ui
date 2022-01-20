@@ -9,11 +9,98 @@ import {
   TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
+
+interface VoterWeightInterface {
+  votingPower?: BN
+  communityTokenRecord?: ProgramAccount<TokenOwnerRecord> | undefined
+  councilTokenRecord?: ProgramAccount<TokenOwnerRecord> | undefined
+  hasAnyWeight: () => boolean
+  getTokenRecord: () => PublicKey
+  hasMinCommunityWeight: (minCommunityWeight: BN) => boolean | undefined
+  hasMinCouncilWeight: (minCouncilWeight: BN) => boolean | undefined
+  canCreateProposal: (config: GovernanceConfig) => boolean | undefined
+  canCreateGovernanceUsingCommunityTokens: (
+    realm: ProgramAccount<Realm>
+  ) => boolean | undefined
+  canCreateGovernanceUsingCouncilTokens: () => boolean | undefined
+  canCreateGovernance: (realm: ProgramAccount<Realm>) => boolean | undefined
+  getTokenRecordToCreateProposal: (
+    config: GovernanceConfig
+  ) => ProgramAccount<TokenOwnerRecord>
+}
 
 /// VoterWeight encapsulates logic to determine voter weights from token records (community or council)
-export class VoterWeight {
+export class VoteRegistryVoterWeight implements VoterWeightInterface {
+  //TODO implement council
   communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
   councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  votingPower: BN
+
+  constructor(
+    communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+    votingPower: BN
+  ) {
+    this.communityTokenRecord = communityTokenRecord
+    this.councilTokenRecord = undefined
+    this.votingPower = votingPower
+  }
+
+  // Checks if the voter has any voting weight
+  hasAnyWeight() {
+    return !this.votingPower.isZero()
+  }
+
+  // Returns first available tokenRecord
+  getTokenRecord() {
+    if (this.communityTokenRecord) {
+      return this.communityTokenRecord.pubkey
+    }
+
+    throw new Error('Current wallet has no Token Owner Records')
+  }
+
+  hasMinCommunityWeight(minCommunityWeight: BN) {
+    return (
+      this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
+    )
+  }
+  hasMinCouncilWeight() {
+    return false
+  }
+
+  canCreateProposal(config: GovernanceConfig) {
+    return this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)
+  }
+  canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
+    return this.hasMinCommunityWeight(
+      realm.account.config.minCommunityTokensToCreateGovernance
+    )
+  }
+  canCreateGovernanceUsingCouncilTokens() {
+    return false
+  }
+  canCreateGovernance(realm: ProgramAccount<Realm>) {
+    return (
+      this.canCreateGovernanceUsingCommunityTokens(realm) ||
+      this.canCreateGovernanceUsingCouncilTokens()
+    )
+  }
+
+  getTokenRecordToCreateProposal(config: GovernanceConfig) {
+    // Prefer community token owner record as proposal owner
+    if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
+      return this.communityTokenRecord!
+    }
+    throw new Error('Not enough vote weight to create proposal')
+  }
+}
+
+export class VoterWeight implements VoterWeightInterface {
+  communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  councilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  //votingPower used only with plugin
+  votingPower?: BN | undefined
 
   constructor(
     communityTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,

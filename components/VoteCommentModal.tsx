@@ -19,6 +19,7 @@ import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -33,6 +34,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
+  const { client } = useVoteRegistry()
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
@@ -68,7 +70,8 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         proposal!,
         voterTokenRecord.pubkey,
         vote,
-        msg
+        msg,
+        client
       )
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?

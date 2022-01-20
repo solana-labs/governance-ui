@@ -19,6 +19,7 @@ import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/actions/withUpdateVoterWeightRecord'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -36,7 +37,8 @@ export const createProposal = async (
   governingTokenMint: PublicKey,
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
-  isDraft: boolean
+  isDraft: boolean,
+  client?: VsrClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
@@ -52,7 +54,12 @@ export const createProposal = async (
   const useDenyOption = true
 
   //will run only if plugin is connected with realm
-  await withUpdateVoterWeightRecord(instructions, wallet.publicKey!, realm)
+  await withUpdateVoterWeightRecord(
+    instructions,
+    wallet.publicKey!,
+    realm,
+    client
+  )
 
   const proposalAddress = await withCreateProposal(
     instructions,
