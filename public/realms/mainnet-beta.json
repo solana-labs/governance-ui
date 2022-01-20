@@ -284,5 +284,14 @@
     "realmId": "CGSwgi67ZKcv7dwXewSQbzD89CncB9Vmhb8adgsWNJMJ",
     "twitter": "@ledao_solana",
     "ogImage": "/realms/LeDao/img/leDao-logo.png"
+  },
+  {
+    "symbol": "1SOL",
+    "displayName": "1Sol DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "26yUdUTWSfpwpNMshahupbXoQKi2NkaTECSyE45VMutU",
+    "website": "https://1sol.io",
+    "twitter": "@1solProtocol",
+    "ogImage": "/realms/1SolDAO/img/1SolDAO-logo.svg"
   }
 ]
