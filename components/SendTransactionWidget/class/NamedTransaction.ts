@@ -15,6 +15,18 @@ class NamedTransaction {
     this._name = name
   }
 
+  /**
+   * Rebuilds this object with a new transaction
+   * @param transaction
+   * @param name
+   * @returns
+   */
+  rebuild(transaction: Transaction, name?: string) {
+    const nt = new NamedTransaction(name ?? this.name)
+    nt.transaction = transaction
+    return nt
+  }
+
   set name(name: string) {
     this._name = name
   }
@@ -25,6 +37,7 @@ class NamedTransaction {
 
   set transaction(txns: Transaction) {
     this._transaction = txns
+    console.debug('updated transaction')
   }
 
   get transaction() {

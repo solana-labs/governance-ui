@@ -309,14 +309,15 @@ async function sendTransactionFactory(
     communityMintInstructions.length
   ) {
     const nt = new NamedTransaction('Minting community token')
-    const t = new Transaction({
+    nt.transaction = new Transaction({
       feePayer: wallet.publicKey,
     })
-    t.add(...communityMintInstructions)
-    t.recentBlockhash = block.blockhash
-    nt.transaction = t
+
+    nt.transaction.add(...communityMintInstructions)
+    nt.transaction.recentBlockhash = block.blockhash
+
     if (communityMintSigners.length) {
-      t.partialSign(...communityMintSigners)
+      nt.transaction.partialSign(...communityMintSigners)
     }
 
     txn.push({
@@ -493,7 +494,6 @@ export async function registerRealm(
     _minCommunityTokensToCreateGovernance,
     undefined
   )
-
   let tokenOwnerRecordPk: PublicKey | undefined = undefined
 
   // If the current wallet is in the team then deposit the council token

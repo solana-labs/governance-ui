@@ -5,7 +5,8 @@ import useWalletStore from 'stores/useWalletStore'
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
 import { simulateTransaction } from '@solana/spl-governance'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
-import { sleep } from '@blockworks-foundation/mango-client'
+import NamedTransaction from './class/NamedTransaction'
+import { sendTransaction } from '@utils/send'
 
 interface ProgressBarProps {
   progressBarOuterClass?: string
@@ -86,11 +87,11 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     return `Transaction: ${name ?? currentTxn}`
   }
 
-  const executeSequential = async (txn: TransactionFlow) => {
-    for (const [index, tx] of txn.transactions.entries()) {
+  const executeSequential = async (txn: NamedTransaction[]) => {
+    for (const [index, tx] of txn.entries()) {
       setTxnName(getTxnName(tx.name))
       setCurrentTxn(index)
-      await _simulateTransaction(tx.transaction)
+      // await _simulateTransaction(tx.transaction)
       const { txid: txId } = await sendSignedTransaction({
         signedTransaction: tx.transaction,
         connection: connection.current,
@@ -100,12 +101,12 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     }
   }
 
-  const executeParallel = async (txn: TransactionFlow) => {
+  const executeParallel = async (txn: NamedTransaction[]) => {
     const promises: Promise<{ txid: string; slot: number }>[] = []
-    const names = txn.transactions.map((t) => t.name)
+    const names = txn.map((t) => t.name)
     setTxnName(names.join(', ') + ' in parallel')
 
-    txn.transactions.forEach((tx) => {
+    txn.forEach((tx) => {
       promises.push(
         new Promise(async (resolve) => {
           await _simulateTransaction(tx.transaction),
@@ -172,36 +173,49 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
       unsigned.push(...txn.transactions.map((t) => t.transaction))
       sliceMap.push(txn.transactions.length)
     })
-
+    setStepName('Waiting for signature')
+    console.debug(unsigned[0])
     const signed = await wallet.signAllTransactions(unsigned)
-    sliceMap.forEach((map, index) => {
-      const txn = signed.slice(index, index + map)
-      transactions[index].transactions.forEach((t, i) => {
-        t.transaction = txn[i]
-      })
+    console.debug(signed[0])
+
+    const txnArr = sliceMap.map((count, index) => {
+      const sliced = signed.slice(index, index + count)
+      const { name, sequenceType, opts } = transactions[index]
+      return {
+        name,
+        sequenceType,
+        opts,
+        transactions: transactions[index].transactions.map((t, i) => {
+          const nt = t.rebuild(sliced[i])
+          return nt
+        }),
+      } as TransactionFlow
     })
-    return transactions
+
+    return txnArr
   }
 
   const sendTransactions = async () => {
     try {
       const signedTxn = await signTransactions()
+
       for (const [index, tf] of signedTxn.entries()) {
         setStepName(getStepName(tf.name))
         setCurrentStep(index)
-        const handler: (txn: TransactionFlow) => Promise<void> =
+        const handler: (txn: NamedTransaction[]) => Promise<void> =
           tf.sequenceType === SequenceType.Parallel
             ? executeParallel
             : executeSequential
-        await handler(tf)
+        await handler(tf.transactions)
       }
       if (onFinish) {
+        console.log('came to onFinish')
         setFinished(true)
         onFinish(txnIds)
       }
       // if (onError) onError(new Error('Avoided'))
     } catch (error) {
-      console.error(error)
+      console.log('came to error')
       if (onError) onError(error)
     } finally {
       if (onFinally) onFinally()

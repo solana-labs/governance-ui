@@ -178,7 +178,7 @@ const RealmWizard: React.FC = () => {
 
     if (isValid) {
       try {
-        const { realmAddress, txnToSend: flow } = await registerRealm(
+        const { realmAddress: realm, txnToSend: flow } = await registerRealm(
           {
             connection,
             wallet: wallet!,
@@ -200,8 +200,10 @@ const RealmWizard: React.FC = () => {
           getTeamWallets()
         )
         setTxnToSend(flow)
-        setRealmAddress(realmAddress.toBase58())
+        console.log('REAAAALM ADD', realm.toBase58())
+        setRealmAddress(realm.toBase58())
       } catch (error) {
+        setRealmAddress('')
         notify({
           type: 'error',
           message: error.message,
@@ -381,6 +383,10 @@ const RealmWizard: React.FC = () => {
     if (Object.values(formErrors).length) setFormErrors({})
   }, [form])
 
+  // useEffect(() => {
+
+  // })
+
   return (
     <div
       className="relative w-auto"
@@ -401,11 +407,23 @@ const RealmWizard: React.FC = () => {
           Back
         </a>
       </div>
-      {isLoading && txnToSend ? (
+
+      {isLoading && !txnToSend ? (
+        <div className="text-center">
+          <Loading />
+          <span>{loaderMessage}</span>
+        </div>
+      ) : (
+        !isLoading &&
+        !txnToSend && <div className="min-h-[60vh]">{BoundStepComponent}</div>
+      )}
+      {isLoading && txnToSend && realmAddress && (
         <div className="text-center">
           <SendTransactionWidget
             transactions={txnToSend}
             onError={(error) => {
+              console.debug('realmadd', realmAddress)
+
               setIsLoading(false)
               setTxnToSend(undefined)
               notify({
@@ -421,11 +439,7 @@ const RealmWizard: React.FC = () => {
               }, 2000)
             }}
           />
-          {/* <Loading /> */}
-          {/* <span>{loaderMessage}</span> */}
         </div>
-      ) : (
-        <div className="min-h-[60vh]">{BoundStepComponent}</div>
       )}
       {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>
