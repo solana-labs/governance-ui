@@ -142,6 +142,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         </div>
         {
           <Button
+            disabled={deposit.available.isZero()}
             style={{ marginTop: 'auto' }}
             className="w-full"
             onClick={() => handleWithDrawFromDeposit(deposit)}

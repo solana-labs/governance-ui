@@ -37,7 +37,7 @@ export async function castVote(
   const payer = walletPubkey
 
   //will run only if plugin is connected with realm
-  await withUpdateVoterWeightRecord(
+  const voterWeight = await withUpdateVoterWeightRecord(
     instructions,
     wallet.publicKey!,
     realm,
@@ -56,7 +56,8 @@ export async function castVote(
     governanceAuthority,
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
-    payer
+    payer,
+    voterWeight
   )
 
   if (message) {

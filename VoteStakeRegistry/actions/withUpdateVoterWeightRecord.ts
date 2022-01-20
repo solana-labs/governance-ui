@@ -49,4 +49,5 @@ export const withUpdateVoterWeightRecord = async (
       },
     })
   )
+  return voterWeight
 }

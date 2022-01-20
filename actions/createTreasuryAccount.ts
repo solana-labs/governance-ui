@@ -26,7 +26,7 @@ export const createTreasuryAccount = async (
   const signers: Keypair[] = []
 
   //will run only if plugin is connected with realm
-  await withUpdateVoterWeightRecord(
+  const voterWeight = await withUpdateVoterWeightRecord(
     instructions,
     wallet.publicKey!,
     realm,
@@ -43,20 +43,19 @@ export const createTreasuryAccount = async (
 
   const governanceAuthority = walletPubkey
 
-  const governanceAddress = (
-    await withCreateTokenGovernance(
-      instructions,
-      programId,
-      realm.pubkey,
-      tokenAccount.tokenAccountAddress,
-      config,
-      true,
-      walletPubkey,
-      tokenOwnerRecord,
-      walletPubkey,
-      governanceAuthority
-    )
-  ).governanceAddress
+  const governanceAddress = await withCreateTokenGovernance(
+    instructions,
+    programId,
+    realm.pubkey,
+    tokenAccount.tokenAccountAddress,
+    config,
+    true,
+    walletPubkey,
+    tokenOwnerRecord,
+    walletPubkey,
+    governanceAuthority,
+    voterWeight
+  )
 
   const transaction = new Transaction()
   transaction.add(...instructions)

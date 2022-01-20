@@ -28,7 +28,7 @@ export const registerGovernance = async (
   const governanceAuthority = walletPubkey
 
   //will run only if plugin is connected with realm
-  await withUpdateVoterWeightRecord(
+  const voterWeight = await withUpdateVoterWeightRecord(
     instructions,
     wallet.publicKey!,
     realm,
@@ -37,20 +37,19 @@ export const registerGovernance = async (
 
   switch (governanceType) {
     case GovernanceType.Program: {
-      governanceAddress = (
-        await withCreateProgramGovernance(
-          instructions,
-          programId,
-          realm.pubkey,
-          governedAccount,
-          config,
-          transferAuthority!,
-          walletPubkey,
-          tokenOwnerRecord,
-          walletPubkey,
-          governanceAuthority
-        )
-      ).governanceAddress
+      governanceAddress = await withCreateProgramGovernance(
+        instructions,
+        programId,
+        realm.pubkey,
+        governedAccount,
+        config,
+        transferAuthority!,
+        walletPubkey,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+        voterWeight
+      )
       break
     }
     default: {

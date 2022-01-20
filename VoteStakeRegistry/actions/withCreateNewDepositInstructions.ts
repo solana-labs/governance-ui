@@ -134,14 +134,13 @@ export const withCreateNewDepositInstructions = async ({
       lockupKind !== 'monthly'
         ? lockUpPeriodInDays
         : lockUpPeriodInDays / DAYS_PER_MONTH
-    const roundedPeriod = Math.round(period)
     const allowClawback = false
     const startTime = new BN(new Date().getTime())
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
       startTime,
-      roundedPeriod,
+      period,
       allowClawback,
       {
         accounts: {
