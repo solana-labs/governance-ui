@@ -106,17 +106,18 @@ const WithDrawCommunityTokens = () => {
       }
     }
 
-    await withVoteRegistryWithdraw(
+    await withVoteRegistryWithdraw({
       instructions,
-      wallet!.publicKey!,
-      realmTokenAccount!.publicKey!,
-      ownTokenRecord!.account.governingTokenMint,
-      realm!.pubkey!,
-      depositRecord!.amountDepositedNative,
-      tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
-      depositRecord!.index,
-      client
-    )
+      walletPk: wallet!.publicKey!,
+      toPubKey: realmTokenAccount!.publicKey!,
+      mintPk: ownTokenRecord!.account.governingTokenMint,
+      realmPk: realm!.pubkey!,
+      amount: depositRecord!.amountDepositedNative,
+      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
+        .pubkey!,
+      depositIndex: depositRecord!.index,
+      client,
+    })
 
     try {
       // use chunks of 8 here since we added finalize,

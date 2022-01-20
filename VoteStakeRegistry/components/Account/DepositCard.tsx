@@ -46,17 +46,20 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       connection,
       endpoint
     )
-
-    await voteRegistryWithdraw(
+    await voteRegistryWithdraw({
       rpcContext,
-      depositTokenAccount!.publicKey!,
-      depositTokenRecord!.account.governingTokenMint,
-      realm!.pubkey!,
-      depositEntry.amountDepositedNative,
-      tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
-      depositEntry.index,
-      client
-    )
+      toPubKey: depositTokenAccount!.publicKey!,
+      mintPk: depositTokenRecord!.account.governingTokenMint,
+      realmPk: realm!.pubkey!,
+      amount: depositEntry.available,
+      amountAfterOperation: depositEntry.currentlyLocked.sub(
+        depositEntry.available
+      ),
+      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
+        .pubkey!,
+      depositIndex: depositEntry.index,
+      client,
+    })
     if (ownTokenRecord) {
       await getDeposits({
         realmPk: realm!.pubkey,

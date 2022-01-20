@@ -12,31 +12,44 @@ import {
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
-export const withVoteRegistryWithdraw = async (
-  instructions: TransactionInstruction[],
-  walletPubKey: PublicKey,
-  toPubKey: PublicKey,
-  mintPk: PublicKey,
-  realmPubKey: PublicKey,
-  amount: BN,
-  tokenOwnerRecordPubKey: PublicKey,
-  depositIndex: number,
+export const withVoteRegistryWithdraw = async ({
+  instructions,
+  walletPk,
+  toPubKey,
+  mintPk,
+  realmPk,
+  amount,
+  tokenOwnerRecordPubKey,
+  depositIndex,
+  amountAfterOperation,
+  client,
+}: {
+  instructions: TransactionInstruction[]
+  walletPk: PublicKey
+  toPubKey: PublicKey
+  mintPk: PublicKey
+  realmPk: PublicKey
+  amount: BN
+  tokenOwnerRecordPubKey: PublicKey
+  depositIndex: number
+  //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
+  amountAfterOperation?: BN
   client?: VsrClient
-) => {
+}) => {
   if (!client) {
     throw 'no vote registry plugin'
   }
   const clientProgramId = client!.program.programId
 
   const { registrar } = await getRegistrarPDA(
-    realmPubKey,
+    realmPk,
     mintPk,
     client!.program.programId
   )
-  const { voter } = await getVoterPDA(registrar, walletPubKey, clientProgramId)
+  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const { voterWeight } = await getVoterWeightPDA(
     registrar,
-    walletPubKey,
+    walletPk,
     clientProgramId
   )
 
@@ -52,7 +65,7 @@ export const withVoteRegistryWithdraw = async (
       accounts: {
         registrar: registrar,
         voter: voter,
-        voterAuthority: walletPubKey,
+        voterAuthority: walletPk,
         tokenOwnerRecord: tokenOwnerRecordPubKey,
         voterWeightRecord: voterWeight,
         vault: voterATAPk,
@@ -61,13 +74,13 @@ export const withVoteRegistryWithdraw = async (
       },
     })
   )
-
-  //todo close deposit if 0 tokens inside
-  //   const close = client.program.instruction.closeDepositEntry(0, {
-  //     accounts: {
-  //       voter: voter,
-  //       voterAuthority: wallet.publicKey,
-  //     },
-  //   })
-  //   instructions.push(close)
+  if (amountAfterOperation && amountAfterOperation?.isZero()) {
+    const close = client.program.instruction.closeDepositEntry(0, {
+      accounts: {
+        voter: voter,
+        voterAuthority: walletPk,
+      },
+    })
+    instructions.push(close)
+  }
 }

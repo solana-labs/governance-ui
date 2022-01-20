@@ -153,10 +153,12 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
         const votingPowerEntry = events.find(
           (x) => x.name === VOTER_INFO_EVENT_NAME
         )
+
         deposits = deposits.map((x) => {
           const additionalInfoData = depositsInfo.find(
             (info) => info.data.depositEntryIndex === x.index
           ).data
+          x.currentlyLocked = additionalInfoData.locking.amount
           x.available = additionalInfoData.withdrawable
           x.vestingRate = additionalInfoData.locking.vesting?.rate
           return x
