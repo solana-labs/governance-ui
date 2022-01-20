@@ -1,12 +1,11 @@
 import React, { FunctionComponent, useEffect, useState } from 'react'
 import { sendSignedTransaction, SequenceType } from '@utils/sendTransactions'
 import { TransactionFlow } from './model/NamedTransaction'
-import { sendTransaction } from '@utils/send'
 import useWalletStore from 'stores/useWalletStore'
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
 import { simulateTransaction } from '@solana/spl-governance'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
-import NamedTransaction from './class/NamedTransaction'
+import { sleep } from '@blockworks-foundation/mango-client'
 
 interface ProgressBarProps {
   progressBarOuterClass?: string
@@ -64,7 +63,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   const [currentStep, setCurrentStep] = useState(-1)
 
   const [progressMaxSteps, setProgressMaxSteps] = useState<number>(1)
-  const [progressStep, setProgressStep] = useState<number>(0)
+  const [progressStep, setProgressStep] = useState<number>(-2)
 
   const [finished, setFinished] = useState<boolean>(false)
 
@@ -72,6 +71,11 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     const txns = txnIds
     txns.push(...txnId)
     setTxnIds(txns)
+  }
+
+  const updateProgressStep = () => {
+    const p = progressStep + 1
+    setProgressStep(p)
   }
 
   const getStepName = (name?: string) => {
@@ -117,13 +121,14 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
 
     if (promises.length) {
       const txIds = await Promise.all(promises)
+      // setProgressStep(progressStep + txn.transactions.length)
       pushTxn(...txIds.map((t) => t.txid))
       if (onSendParallel) onSendParallel(txIds.map((t) => t.txid))
     }
   }
 
   const calcProgressSteps = () => {
-    let maxSteps = transactions.length
+    let maxSteps = 0
     transactions.forEach((t) => {
       maxSteps += t.transactions.length
     })
@@ -141,7 +146,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
         )
       ).value
     } catch (e) {
-      //
+      // throw e
     }
     if (simulateResult && simulateResult.err) {
       if (simulateResult.logs) {
@@ -184,7 +189,6 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
       for (const [index, tf] of signedTxn.entries()) {
         setStepName(getStepName(tf.name))
         setCurrentStep(index)
-        setProgressStep(progressStep + 1)
         const handler: (txn: TransactionFlow) => Promise<void> =
           tf.sequenceType === SequenceType.Parallel
             ? executeParallel
@@ -195,7 +199,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
         setFinished(true)
         onFinish(txnIds)
       }
-      if (onError) onError(new Error('Avoided'))
+      // if (onError) onError(new Error('Avoided'))
     } catch (error) {
       console.error(error)
       if (onError) onError(error)
@@ -211,6 +215,10 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     }
   }, [transactions])
 
+  useEffect(() => {
+    setProgressStep(progressStep + 1)
+  }, [txnName, finished])
+
   return (
     <div
       style={{
@@ -225,7 +233,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
         style={{ textAlign: 'center', marginBottom: '1rem' }}
       >
         {finished ? (
-          <>Finished sending transactions.</>
+          <>Finished.</>
         ) : (
           <>
             {stepName}
