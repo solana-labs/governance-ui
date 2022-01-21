@@ -14,7 +14,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import VotesBox from './votesBox'
+import VotingPowerBox from './VotingPowerBox'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -162,12 +162,12 @@ const TokenDeposit = ({
   return (
     <>
       <div className="flex space-x-4 items-center mt-8">
-        <VotesBox
+        <VotingPowerBox
           votingPower={votingPower}
           mint={mint}
           votingPowerFromDeposits={votingPowerFromDeposits}
           className="w-full px-4 py-2"
-        ></VotesBox>
+        ></VotingPowerBox>
       </div>
       <p className="flex flex-row mt-2 items-center">
         <span className="text-xs">{depositTokenName} Deposited:</span>

@@ -2,7 +2,10 @@ import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
-import { fmtMintAmount } from '@tools/sdk/units'
+import {
+  fmtMintAmount,
+  getMintDecimalAmountFromNatural,
+} from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
@@ -15,6 +18,7 @@ import {
   getFormattedStringFromDays,
 } from 'VoteStakeRegistry/utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import tokenService from '@utils/services/token'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
@@ -71,9 +75,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       })
     }
   }
-  const availableTokens = fmtMintAmount(
+  const lockedTokens = fmtMintAmount(
     deposit.mint.account,
-    deposit.amountDepositedNative
+    deposit.currentlyLocked
   )
   const type = Object.keys(deposit.lockup.kind)[0] as LockupType
   const typeName = type !== 'monthly' ? type : 'Vested'
@@ -90,10 +94,27 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       </div>
     )
   }
+  const price =
+    getMintDecimalAmountFromNatural(
+      deposit.mint.account,
+      deposit.currentlyLocked
+    ).toNumber() *
+    tokenService.getUSDTokenPrice(deposit.mint.publicKey.toBase58())
+  const img = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
+    ?.logoURI
+  const formatter = Intl.NumberFormat('en', { notation: 'compact' })
   return (
     <div className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3 flex flex-col">
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
-        <h3 className="mb-0">{availableTokens}</h3>
+        <h3 className="mb-0 flex flex-items items-center">
+          {img && <img className="w-6 h-6 mr-2" src={img}></img>}
+          {lockedTokens}
+          {price ? (
+            <span className="text-xs opacity-70 font-light ml-1">
+              =${formatter.format(price)}
+            </span>
+          ) : null}
+        </h3>
       </div>
       <div
         className="p-4 pb-6 bg-bkg-1 rounded-lg flex flex-col"
