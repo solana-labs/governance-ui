@@ -14,6 +14,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import VotesBox from './votesBox'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -96,6 +97,16 @@ const TokenDeposit = ({
   const connected = useWalletStore((s) => s.connected)
   const deposits = useDepositStore((s) => s.state.deposits)
   const votingPower = useDepositStore((s) => s.state.votingPower)
+  const votingPowerFromDeposits = useDepositStore(
+    (s) => s.state.votingPowerFromDeposits
+  )
+  const lockedTokensAmount = deposits
+    .filter(
+      (x) =>
+        typeof x.lockup.kind['none'] === 'undefined' &&
+        x.mint.publicKey.toBase58() === realm?.account.communityMint.toBase58()
+    )
+    .reduce((curr, next) => curr.add(next.currentlyLocked), new BN(0))
 
   const depositRecord = deposits.find(
     (x) =>
@@ -129,8 +140,9 @@ const TokenDeposit = ({
   const hasTokensDeposited =
     depositRecord && depositRecord.amountDepositedNative.gt(new BN(0))
 
-  const votingPowerFmt =
-    votingPower && mint ? fmtMintAmount(mint, votingPower) : '0'
+  const lockTokensFmt =
+    lockedTokensAmount && mint ? fmtMintAmount(mint, lockedTokensAmount) : '0'
+
   const availableTokens =
     depositRecord && mint
       ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
@@ -150,14 +162,20 @@ const TokenDeposit = ({
   return (
     <>
       <div className="flex space-x-4 items-center mt-8">
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">Votes</p>
-          <h3 className="mb-0 py-2 flex items-center">{votingPowerFmt} </h3>
-        </div>
+        <VotesBox
+          votingPower={votingPower}
+          mint={mint}
+          votingPowerFromDeposits={votingPowerFromDeposits}
+          className="w-full px-4 py-2"
+        ></VotesBox>
       </div>
       <p className="flex flex-row mt-2 items-center">
         <span className="text-xs">{depositTokenName} Deposited:</span>
         <span className="ml-auto">{availableTokens}</span>
+      </p>
+      <p className="flex flex-row mt-2 items-center">
+        <span className="text-xs">{depositTokenName} Locked:</span>
+        <span className="ml-auto">{lockTokensFmt}</span>
       </p>
       <p
         className={`mt-2 opacity-70 mb-4 text-xs ${
@@ -169,7 +187,6 @@ const TokenDeposit = ({
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <DepositCommunityTokensBtn></DepositCommunityTokensBtn>
-
         <WithDrawCommunityTokens></WithDrawCommunityTokens>
       </div>
     </>

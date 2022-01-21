@@ -46,6 +46,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       connection,
       endpoint
     )
+    //TODO withdraw to ATA
     await voteRegistryWithdraw({
       rpcContext,
       toPubKey: depositTokenAccount!.publicKey!,

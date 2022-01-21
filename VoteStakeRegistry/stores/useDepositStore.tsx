@@ -25,6 +25,7 @@ interface DepositStore extends State {
   state: {
     deposits: DepositWithMintAccount[]
     votingPower: BN
+    votingPowerFromDeposits: BN
   }
   resetDepositState: () => void
   getDeposits: ({
@@ -47,6 +48,7 @@ interface DepositStore extends State {
 const defaultState = {
   deposits: [],
   votingPower: new BN(0),
+  votingPowerFromDeposits: new BN(0),
 }
 
 const useDepositStore = create<DepositStore>((set, _get) => ({
@@ -87,6 +89,7 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
     }
     if (existingVoter) {
       let votingPower = new BN(0)
+      let votingPowerFromDeposits = new BN(0)
       let deposits = existingVoter.deposits
         .map(
           (x, idx) =>
@@ -163,6 +166,12 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
           x.vestingRate = additionalInfoData.locking.vesting?.rate
           return x
         })
+        if (
+          votingPowerEntry &&
+          !votingPowerEntry.data.votingPowerDepositOnly.isZero()
+        ) {
+          votingPowerFromDeposits = votingPowerEntry.data.votingPowerDepositOnly
+        }
         if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
           votingPower = votingPowerEntry.data.votingPower
         }
@@ -171,6 +180,7 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
       set((s) => {
         s.state.votingPower = votingPower
         s.state.deposits = deposits
+        s.state.votingPowerFromDeposits = votingPowerFromDeposits
       })
     }
   },
