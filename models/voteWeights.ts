@@ -28,6 +28,7 @@ interface VoterWeightInterface {
   getTokenRecordToCreateProposal: (
     config: GovernanceConfig
   ) => ProgramAccount<TokenOwnerRecord>
+  hasMinAmountToVote: (mintPk: PublicKey) => boolean | undefined
 }
 
 /// VoterWeight encapsulates logic to determine voter weights from token records (community or council)
@@ -85,6 +86,20 @@ export class VoteRegistryVoterWeight implements VoterWeightInterface {
       this.canCreateGovernanceUsingCommunityTokens(realm) ||
       this.canCreateGovernanceUsingCouncilTokens()
     )
+  }
+  hasMinAmountToVote(mintPk: PublicKey) {
+    const isCommunity =
+      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
+      mintPk.toBase58()
+    const isCouncil =
+      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
+      mintPk.toBase58()
+    if (isCouncil) {
+      return false
+    }
+    if (isCommunity) {
+      return !this.votingPower.isZero()
+    }
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
@@ -169,6 +184,20 @@ export class VoterWeight implements VoterWeightInterface {
       this.canCreateGovernanceUsingCommunityTokens(realm) ||
       this.canCreateGovernanceUsingCouncilTokens()
     )
+  }
+  hasMinAmountToVote(mintPk: PublicKey) {
+    const isCommunity =
+      this.communityTokenRecord?.account.governingTokenMint.toBase58() ===
+      mintPk.toBase58()
+    const isCouncil =
+      this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
+      mintPk.toBase58()
+    if (isCouncil) {
+      return !this.councilTokenRecord?.account.governingTokenDepositAmount.isZero()
+    }
+    if (isCommunity) {
+      return !this.communityTokenRecord?.account.governingTokenDepositAmount.isZero()
+    }
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
