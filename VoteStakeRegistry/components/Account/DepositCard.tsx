@@ -14,7 +14,6 @@ import {
   LockupType,
 } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import {
-  secsToDays,
   getFormattedStringFromDays,
   SECS_PER_DAY,
 } from 'VoteStakeRegistry/utils/dateTools'
