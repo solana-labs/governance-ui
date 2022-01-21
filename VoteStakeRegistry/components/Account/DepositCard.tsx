@@ -16,6 +16,7 @@ import {
 import {
   secsToDays,
   getFormattedStringFromDays,
+  SECS_PER_DAY,
 } from 'VoteStakeRegistry/utils/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenService from '@utils/services/token'
@@ -155,8 +156,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           <CardLabel
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={getFormattedStringFromDays(
-              secsToDays(deposit.lockup.endTs.toNumber()) -
-                secsToDays(deposit.lockup.startTs.toNumber())
+              deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() /
+                SECS_PER_DAY
             )}
           />
           <CardLabel
