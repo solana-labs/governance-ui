@@ -155,9 +155,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           <CardLabel
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={getFormattedStringFromDays(
-              secsToDays(
-                deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber()
-              )
+              secsToDays(deposit.lockup.endTs.toNumber()) -
+                secsToDays(deposit.lockup.startTs.toNumber())
             )}
           />
           <CardLabel

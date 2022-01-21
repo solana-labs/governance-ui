@@ -135,7 +135,7 @@ export const withCreateNewDepositInstructions = async ({
         ? lockUpPeriodInDays
         : lockUpPeriodInDays / DAYS_PER_MONTH
     const allowClawback = false
-    const startTime = new BN(new Date().getTime())
+    const startTime = new BN(new Date().getTime() / 1000)
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
