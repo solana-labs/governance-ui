@@ -255,7 +255,7 @@ async function prepareGovernanceInstructions(
       programId,
       realmPk,
       walletPubkey,
-      communityMintGovPk
+      communityMintGovPk.governanceAddress
     )
   }
 

@@ -57,5 +57,5 @@ export const createTreasuryAccount = async (
     successMessage: 'Treasury account has been created',
   })
 
-  return governanceAddress
+  return governanceAddress.governanceAddress
 }

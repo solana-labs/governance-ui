@@ -210,7 +210,7 @@ export const createMultisigRealm = async (
     programId,
     realmPk,
     walletPk,
-    communityMintGovPk
+    communityMintGovPk.governanceAddress
   )
 
   try {
