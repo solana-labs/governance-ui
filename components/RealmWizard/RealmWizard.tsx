@@ -436,7 +436,7 @@ const RealmWizard: React.FC = () => {
                 message: error.message,
               })
             }}
-            onFinish={(txIds) => {
+            onFinish={() => {
               setTxnToSend(undefined)
               setTimeout(() => {
                 setIsLoading(false)

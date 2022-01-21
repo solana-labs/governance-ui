@@ -2,11 +2,9 @@ import React, { FunctionComponent, useEffect, useState } from 'react'
 import { sendSignedTransaction, SequenceType } from '@utils/sendTransactions'
 import { TransactionFlow } from './model/NamedTransaction'
 import useWalletStore from 'stores/useWalletStore'
-import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
-import { simulateTransaction } from '@solana/spl-governance'
+import { Transaction } from '@solana/web3.js'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import NamedTransaction from './class/NamedTransaction'
-import { sendTransaction } from '@utils/send'
 import { sleep } from '@project-serum/common'
 
 interface ProgressBarProps {
@@ -57,7 +55,6 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
 }) => {
   const { connection, current: wallet } = useWalletStore((s) => s)
 
-  const [txnLen, setTxnLen] = useState<number>(0)
   const [txnIds, setTxnIds] = useState<string[]>([])
 
   const [currentTxn, setCurrentTxn] = useState<number>(-1)
@@ -75,11 +72,6 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     const txns = txnIds
     txns.push(...txnId)
     setTxnIds(txns)
-  }
-
-  const updateProgressStep = () => {
-    const p = progressStep + 1
-    setProgressStep(p)
   }
 
   const getStepName = (name?: string) => {

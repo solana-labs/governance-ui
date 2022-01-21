@@ -25,12 +25,7 @@ import {
   getMintNaturalAmountFromDecimal,
   getTimestampFromDays,
 } from '@tools/sdk/units'
-import {
-  getWalletPublicKey,
-  sendTransactions,
-  SequenceType,
-  WalletSigner,
-} from 'utils/sendTransactions'
+import { getWalletPublicKey, WalletSigner } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { sendTransactionFactory } from './registerRealm'
@@ -114,7 +109,7 @@ export const createMultisigRealm = async (
 
   // Create realm
   const realmInstructions: TransactionInstruction[] = []
-  const realmSigners: Keypair[] = []
+  // const realmSigners: Keypair[] = []
 
   // Convert to mint natural amount
   const minCommunityTokensToCreateAsMintValue = new BN(
