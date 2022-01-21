@@ -124,25 +124,28 @@ const RealmWizard: React.FC = () => {
       ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
       : DEFAULT_GOVERNANCE_PROGRAM_ID
 
-    const results = await createMultisigRealm(
-      connection.current,
-      new PublicKey(programId),
-      PROGRAM_VERSION_V1,
-      form.name,
-      form.yesThreshold,
-      form.teamWallets.map((w) => new PublicKey(w)),
-      wallet
-    )
+    try {
+      const {
+        txnToSend: flow,
+        realmAddress: realm,
+      } = await createMultisigRealm(
+        connection.current,
+        new PublicKey(programId),
+        PROGRAM_VERSION_V1,
+        form.name,
+        form.yesThreshold,
+        form.teamWallets.map((w) => new PublicKey(w)),
+        wallet
+      )
 
-    if (results) {
-      router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
-      return
+      setTxnToSend(flow)
+      setRealmAddress(realm.toBase58())
+    } catch (error: any) {
+      notify({
+        type: 'error',
+        message: error.message,
+      })
     }
-
-    notify({
-      type: 'error',
-      message: 'Something bad happened during this request.',
-    })
   }
 
   /**

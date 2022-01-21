@@ -288,7 +288,7 @@ async function prepareGovernanceInstructions(
  * @param realmInstructions Realm instructions
  * @returns a promise to be executed.
  */
-async function sendTransactionFactory(
+export async function sendTransactionFactory(
   wallet: WalletSigner,
   connection: Connection,
   councilMembersChunks: TransactionInstruction[][],
