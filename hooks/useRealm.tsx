@@ -1,3 +1,4 @@
+import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -34,11 +35,20 @@ export default function useRealm() {
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
 
   useMemo(async () => {
-    const realmInfo = isPublicKey(symbol as string)
+    let realmInfo = isPublicKey(symbol as string)
       ? realm
         ? createUnchartedRealmInfo(realm)
         : undefined
       : await getCertifiedRealmInfo(symbol as string, connection)
+
+    if (realmInfo && !realmInfo?.programVersion) {
+      const programVersion = await getGovernanceProgramVersion(
+        connection.current,
+        realmInfo?.programId
+      )
+      realmInfo = { ...realmInfo, programVersion: programVersion }
+    }
+
     setRealmInfo(realmInfo)
   }, [symbol, realm])
 
