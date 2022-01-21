@@ -299,9 +299,25 @@ async function sendTransactionFactory(
 ) {
   console.debug('factoring sendtransaction')
   const block = await connection.getRecentBlockhash()
-  const instructions: TransactionInstruction[][] = [realmInstructions]
-  const signerSets: Keypair[][] = [[]]
+  // const instructions: TransactionInstruction[][] = [realmInstructions]
+  // const signerSets: Keypair[][] = [[]]
   const txn: TransactionFlow[] = []
+
+  const addRealmTxn = (txn: TransactionFlow[]) => {
+    {
+      const nt = new NamedTransaction('Deploying DAO')
+      nt.transaction = new Transaction({
+        feePayer: wallet.publicKey,
+      })
+      nt.transaction.recentBlockhash = block.blockhash
+      nt.transaction.add(...realmInstructions)
+      txn.push({
+        name: 'DAO',
+        sequenceType: SequenceType.Sequential,
+        transactions: [nt],
+      })
+    }
+  }
 
   if (
     communityMintInstructions &&
@@ -331,49 +347,36 @@ async function sendTransactionFactory(
   }
 
   if (councilMembersChunks) {
-    const transactions: NamedTransaction[] = []
-
     councilMembersChunks.forEach((chunk, index) => {
-      if (!chunk.length) return
       const nt = new NamedTransaction(
         `Minting council token chunk ${index + 1} of ${
           councilMembersChunks.length
         }`
       )
-      const t = new Transaction({
+      nt.transaction = new Transaction({
         feePayer: wallet.publicKey,
       })
-      t.recentBlockhash = block.blockhash
-      t.add(...chunk)
-      if (councilSignersChunks[index].length) {
-        t.partialSign(...councilSignersChunks[index])
-      }
-      nt.transaction = t
-      transactions.push(nt)
-    })
 
-    txn.push({
-      name: 'Council Mint',
-      sequenceType: SequenceType.Sequential,
-      transactions,
+      nt.transaction.recentBlockhash = block.blockhash
+      nt.transaction.add(...chunk)
+
+      if (councilSignersChunks[index].length) {
+        nt.transaction.partialSign(...councilSignersChunks[index])
+      }
+      // TODO: find out why when I have more than 1 chunk of transactions;
+      // the system can't send the next flow correctly
+      txn.push({
+        name: 'Council Mint',
+        sequenceType: SequenceType.Sequential,
+        transactions: [nt],
+      })
     })
 
     // instructions.unshift(...councilMembersChunks)
     // signerSets.unshift(...councilSignersChunks)
   }
 
-  const nt = new NamedTransaction('Deploying DAO')
-  const t = new Transaction({
-    feePayer: wallet.publicKey,
-  })
-  t.recentBlockhash = block.blockhash
-  t.add(...realmInstructions)
-  nt.transaction = t
-  txn.push({
-    name: 'DAO',
-    sequenceType: SequenceType.Sequential,
-    transactions: [nt],
-  })
+  addRealmTxn(txn)
 
   return txn
 
@@ -553,6 +556,7 @@ export async function registerRealm(
     communityMintInstructions,
     communityMintSigners
   )
+
   // console.debug('sending transaction')
   // await txnToSend
   // console.debug('transaction sent')

@@ -169,6 +169,7 @@ export async function sendSignedTransaction({
   signedTransaction,
   connection,
   timeout = DEFAULT_TIMEOUT,
+  name,
 }: {
   signedTransaction: Transaction
   connection: Connection
@@ -176,6 +177,7 @@ export async function sendSignedTransaction({
   sentMessage?: string
   successMessage?: string
   timeout?: number
+  name?: string
 }): Promise<{ txid: string; slot: number }> {
   const rawTransaction = signedTransaction.serialize()
   const startTime = getUnixTs()
@@ -187,6 +189,7 @@ export async function sendSignedTransaction({
     }
   )
 
+  console.debug('TXN NAME', name, txid)
   console.log('Started awaiting confirmation for', txid)
 
   let done = false

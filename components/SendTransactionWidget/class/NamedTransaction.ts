@@ -1,5 +1,4 @@
 import { Transaction } from '@solana/web3.js'
-import { NamedTransactionProps } from '../model/NamedTransaction'
 
 /**
  * Extends Transaction class to create a named transaction class

@@ -200,7 +200,6 @@ const RealmWizard: React.FC = () => {
           getTeamWallets()
         )
         setTxnToSend(flow)
-        console.log('REAAAALM ADD', realm.toBase58())
         setRealmAddress(realm.toBase58())
       } catch (error) {
         setRealmAddress('')
@@ -408,22 +407,25 @@ const RealmWizard: React.FC = () => {
         </a>
       </div>
 
-      {isLoading && !txnToSend ? (
+      {isLoading && !txnToSend?.length ? (
         <div className="text-center">
           <Loading />
           <span>{loaderMessage}</span>
         </div>
       ) : (
         !isLoading &&
-        !txnToSend && <div className="min-h-[60vh]">{BoundStepComponent}</div>
+        !txnToSend?.length && (
+          <div className="min-h-[60vh]">{BoundStepComponent}</div>
+        )
       )}
-      {isLoading && txnToSend && realmAddress && (
+      {isLoading && txnToSend?.length && realmAddress && (
         <div className="text-center">
           <SendTransactionWidget
             transactions={txnToSend}
+            finishedText="DAO creation completed. Redirecting to the DAO's page"
             onError={(error) => {
               console.debug('realmadd', realmAddress)
-
+              setRealmAddress('')
               setIsLoading(false)
               setTxnToSend(undefined)
               notify({
@@ -431,10 +433,11 @@ const RealmWizard: React.FC = () => {
                 message: error.message,
               })
             }}
-            onFinish={() => {
+            onFinish={(txIds) => {
               setTxnToSend(undefined)
               setTimeout(() => {
                 setIsLoading(false)
+                console.debug('REALM ADDRESS', realmAddress)
                 router.push(fmtUrlWithCluster(`/dao/${realmAddress}`))
               }, 2000)
             }}

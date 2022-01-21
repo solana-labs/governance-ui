@@ -7,11 +7,13 @@ import { simulateTransaction } from '@solana/spl-governance'
 import { WalletNotConnectedError } from '@solana/wallet-adapter-base'
 import NamedTransaction from './class/NamedTransaction'
 import { sendTransaction } from '@utils/send'
+import { sleep } from '@project-serum/common'
 
 interface ProgressBarProps {
   progressBarOuterClass?: string
   progressBarInnerClass?: string
   textClass?: string
+  finishedText?: string
   /**
    * The promise listener that the send transaction method should return.
    */
@@ -45,6 +47,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   textClass = '',
   progressBarOuterClass = '',
   progressBarInnerClass = '',
+  finishedText = 'Finished.',
   transactions,
   onFinish,
   onFinally,
@@ -88,15 +91,16 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   }
 
   const executeSequential = async (txn: NamedTransaction[]) => {
-    for (const [index, tx] of txn.entries()) {
-      setTxnName(getTxnName(tx.name))
+    for (const [index, current] of txn.entries()) {
+      setTxnName(getTxnName(current.name))
       setCurrentTxn(index)
-      // await _simulateTransaction(tx.transaction)
       const { txid: txId } = await sendSignedTransaction({
-        signedTransaction: tx.transaction,
+        signedTransaction: current.transaction,
         connection: connection.current,
+        name: current.name,
       })
       pushTxn(txId)
+      await sleep(1000)
       if (onSend) onSend(txId)
     }
   }
@@ -104,18 +108,13 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
   const executeParallel = async (txn: NamedTransaction[]) => {
     const promises: Promise<{ txid: string; slot: number }>[] = []
     const names = txn.map((t) => t.name)
-    setTxnName(names.join(', ') + ' in parallel')
+    setTxnName(names.join(`,\n`))
 
     txn.forEach((tx) => {
       promises.push(
-        new Promise(async (resolve) => {
-          await _simulateTransaction(tx.transaction),
-            resolve(
-              sendSignedTransaction({
-                connection: connection.current,
-                signedTransaction: tx.transaction,
-              })
-            )
+        sendSignedTransaction({
+          connection: connection.current,
+          signedTransaction: tx.transaction,
         })
       )
     })
@@ -136,34 +135,6 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
     setProgressMaxSteps(maxSteps)
   }
 
-  const _simulateTransaction = async (signedTransaction: Transaction) => {
-    let simulateResult: SimulatedTransactionResponse | null = null
-    try {
-      simulateResult = (
-        await simulateTransaction(
-          connection.current,
-          signedTransaction,
-          'single'
-        )
-      ).value
-    } catch (e) {
-      // throw e
-    }
-    if (simulateResult && simulateResult.err) {
-      if (simulateResult.logs) {
-        simulateResult.logs.forEach((line) => {
-          const keyoword = 'Program log: '
-          if (line.startsWith(keyoword)) {
-            throw new Error(
-              'Transaction failed: ' + line.slice(keyoword.length)
-            )
-          }
-        })
-        throw new Error(JSON.stringify(simulateResult.err))
-      }
-    }
-  }
-
   const signTransactions = async (): Promise<TransactionFlow[]> => {
     if (!wallet?.publicKey) throw new WalletNotConnectedError()
     const unsigned: Transaction[] = []
@@ -173,10 +144,10 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
       unsigned.push(...txn.transactions.map((t) => t.transaction))
       sliceMap.push(txn.transactions.length)
     })
+
     setStepName('Waiting for signature')
-    console.debug(unsigned[0])
+
     const signed = await wallet.signAllTransactions(unsigned)
-    console.debug(signed[0])
 
     const txnArr = sliceMap.map((count, index) => {
       const sliced = signed.slice(index, index + count)
@@ -202,20 +173,19 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
       for (const [index, tf] of signedTxn.entries()) {
         setStepName(getStepName(tf.name))
         setCurrentStep(index)
+        console.log(tf.name, tf)
         const handler: (txn: NamedTransaction[]) => Promise<void> =
           tf.sequenceType === SequenceType.Parallel
             ? executeParallel
             : executeSequential
         await handler(tf.transactions)
       }
+      setFinished(true)
       if (onFinish) {
-        console.log('came to onFinish')
-        setFinished(true)
+        await sleep(1000)
         onFinish(txnIds)
       }
-      // if (onError) onError(new Error('Avoided'))
     } catch (error) {
-      console.log('came to error')
       if (onError) onError(error)
     } finally {
       if (onFinally) onFinally()
@@ -247,7 +217,7 @@ const SendTransactionWidget: FunctionComponent<ProgressBarProps> = ({
         style={{ textAlign: 'center', marginBottom: '1rem' }}
       >
         {finished ? (
-          <>Finished.</>
+          <>{finishedText}</>
         ) : (
           <>
             {stepName}
