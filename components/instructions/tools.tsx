@@ -87,7 +87,8 @@ export const ACCOUNT_NAMES = {
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
 
   //UXD DAO
-  '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO Treasury Vault',
+  '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO USDC Treasury Vault',
+  GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXD DAO UXP Treasury Vault',
 }
 
 // Blacklisted governances which should not be displayed in the UI
