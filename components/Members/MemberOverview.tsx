@@ -11,7 +11,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
-import { VoteRecord } from '@solana/spl-governance'
+import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
@@ -82,6 +82,7 @@ const MemberOverview = () => {
         ),
         getGovernanceChatMessagesByVoter(
           connection!.current,
+          GOVERNANCE_CHAT_PROGRAM_ID,
           new PublicKey(member!.walletAddress)
         ),
       ])
