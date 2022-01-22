@@ -6,6 +6,7 @@ import {
 } from '@solana/web3.js'
 import {
   ChatMessageBody,
+  GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   withPostChatMessage,
   YesNoVote,
@@ -51,7 +52,9 @@ export async function castVote(
     await withPostChatMessage(
       instructions,
       signers,
+      GOVERNANCE_CHAT_PROGRAM_ID,
       programId,
+      realm,
       proposal.account.governance,
       proposal.pubkey,
       tokeOwnerRecord,
