@@ -18,7 +18,7 @@ import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/actions/withUpdateVoterWeightRecord'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export async function castVote(

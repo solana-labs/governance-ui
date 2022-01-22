@@ -4,9 +4,9 @@ import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withCreateNewDepositInstructions } from './withCreateNewDepositInstructions'
+import { withCreateNewDeposit } from './withCreateNewDeposit'
 
-export const withVoteRegistryDepositInstructions = async ({
+export const withVoteRegistryDeposit = async ({
   instructions,
   rpcContext,
   fromPk,
@@ -17,7 +17,7 @@ export const withVoteRegistryDepositInstructions = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  client,
+  vsrClient,
 }: {
   instructions: TransactionInstruction[]
   rpcContext: RpcContext
@@ -30,10 +30,10 @@ export const withVoteRegistryDepositInstructions = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
-  client?: VsrClient
+  vsrClient?: VsrClient
 }) => {
   const { wallet } = rpcContext
-  if (!client) {
+  if (!vsrClient) {
     throw 'no vote registry plugin'
   }
   if (!wallet.publicKey) {
@@ -44,7 +44,7 @@ export const withVoteRegistryDepositInstructions = async ({
     voter,
     registrar,
     voterATAPk,
-  } = await withCreateNewDepositInstructions({
+  } = await withCreateNewDeposit({
     instructions,
     rpcContext,
     mintPk,
@@ -53,9 +53,9 @@ export const withVoteRegistryDepositInstructions = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    client,
+    vsrClient,
   })
-  const depositInstruction = client?.program.instruction.deposit(
+  const depositInstruction = vsrClient?.program.instruction.deposit(
     depositIdx,
     amount,
     {

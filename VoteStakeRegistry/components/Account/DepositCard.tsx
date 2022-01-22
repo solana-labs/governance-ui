@@ -63,7 +63,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositEntry.index,
-      client,
+      vsrClient: client,
     })
     if (ownTokenRecord) {
       await getDeposits({

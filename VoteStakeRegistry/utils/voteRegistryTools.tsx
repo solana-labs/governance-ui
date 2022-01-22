@@ -94,7 +94,7 @@ export const getVoterWeightPDA = async (
   walletPk: PublicKey,
   clientProgramId: PublicKey
 ) => {
-  const [voterWeight, voterWeightBump] = await PublicKey.findProgramAddress(
+  const [voterWeightPk, voterWeightBump] = await PublicKey.findProgramAddress(
     [
       registrar.toBuffer(),
       Buffer.from('voter-weight-record'),
@@ -104,7 +104,7 @@ export const getVoterWeightPDA = async (
   )
 
   return {
-    voterWeight,
+    voterWeightPk,
     voterWeightBump,
   }
 }

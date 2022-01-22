@@ -6,7 +6,7 @@ import {
 } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withVoteRegistryWithdraw } from './withVoteRegistryWithdraw'
+import { withVoteRegistryWithdraw } from '../sdk/withVoteRegistryWithdraw'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 
@@ -19,7 +19,7 @@ export const voteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey,
   depositIndex,
   amountAfterOperation,
-  client,
+  vsrClient,
 }: {
   rpcContext: RpcContext
   toPubKey: PublicKey
@@ -30,7 +30,7 @@ export const voteRegistryWithdraw = async ({
   depositIndex: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
   amountAfterOperation?: BN
-  client?: VsrClient
+  vsrClient?: VsrClient
 }) => {
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
@@ -45,7 +45,7 @@ export const voteRegistryWithdraw = async ({
     tokenOwnerRecordPubKey,
     depositIndex,
     amountAfterOperation,
-    client,
+    vsrClient,
   })
 
   const transaction = new Transaction()

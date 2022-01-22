@@ -24,7 +24,7 @@ import {
 import { DAYS_PER_MONTH } from 'VoteStakeRegistry/utils/dateTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
-export const withCreateNewDepositInstructions = async ({
+export const withCreateNewDeposit = async ({
   instructions,
   rpcContext,
   mintPk,
@@ -33,7 +33,7 @@ export const withCreateNewDepositInstructions = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  client,
+  vsrClient,
 }: {
   instructions: TransactionInstruction[]
   rpcContext: RpcContext
@@ -43,32 +43,32 @@ export const withCreateNewDepositInstructions = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
-  client?: VsrClient
+  vsrClient?: VsrClient
 }) => {
   const { wallet } = rpcContext
-  if (!client) {
+  if (!vsrClient) {
     throw 'no vote registry plugin'
   }
   const systemProgram = SystemProgram.programId
-  const clientProgramId = client!.program.programId
+  const clientProgramId = vsrClient!.program.programId
   let tokenOwnerRecordPubKey = tokenOwnerRecordPk
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
     mintPk,
-    client!.program.programId
+    vsrClient!.program.programId
   )
   const { voter, voterBump } = await getVoterPDA(
     registrar,
     wallet!.publicKey!,
     clientProgramId
   )
-  const { voterWeight, voterWeightBump } = await getVoterWeightPDA(
+  const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
     registrar,
     wallet!.publicKey!,
     clientProgramId
   )
-  const existingVoter = await tryGetVoter(voter, client)
+  const existingVoter = await tryGetVoter(voter, vsrClient)
 
   const voterATAPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -90,12 +90,12 @@ export const withCreateNewDepositInstructions = async ({
   }
   if (!existingVoter) {
     instructions.push(
-      client?.program.instruction.createVoter(voterBump, voterWeightBump, {
+      vsrClient?.program.instruction.createVoter(voterBump, voterWeightBump, {
         accounts: {
           registrar: registrar,
           voter: voter,
           voterAuthority: wallet!.publicKey!,
-          voterWeightRecord: voterWeight,
+          voterWeightRecord: voterWeightPk,
           payer: wallet!.publicKey!,
           systemProgram: systemProgram,
           rent: SYSVAR_RENT_PUBKEY,
@@ -104,7 +104,7 @@ export const withCreateNewDepositInstructions = async ({
       })
     )
   }
-  const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
+  const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, vsrClient)
 
   //none type deposits are used only to store tokens that will be withdrawable immediately so there is no need to create new every time and there should be one per mint
   //for other kinds of deposits we always want to create new deposit
@@ -136,7 +136,7 @@ export const withCreateNewDepositInstructions = async ({
         : lockUpPeriodInDays / DAYS_PER_MONTH
     const allowClawback = false
     const startTime = new BN(new Date().getTime() / 1000)
-    const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
+    const createDepositEntryInstruction = vsrClient?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
       startTime,
@@ -167,6 +167,6 @@ export const withCreateNewDepositInstructions = async ({
     voterATAPk,
     voter,
     tokenOwnerRecordPubKey,
-    voterWeight,
+    voterWeightPk,
   }
 }

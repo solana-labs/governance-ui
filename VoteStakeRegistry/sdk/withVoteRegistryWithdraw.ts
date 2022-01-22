@@ -22,7 +22,7 @@ export const withVoteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey,
   depositIndex,
   amountAfterOperation,
-  client,
+  vsrClient,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
@@ -34,20 +34,20 @@ export const withVoteRegistryWithdraw = async ({
   depositIndex: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
   amountAfterOperation?: BN
-  client?: VsrClient
+  vsrClient?: VsrClient
 }) => {
-  if (!client) {
+  if (!vsrClient) {
     throw 'no vote registry plugin'
   }
-  const clientProgramId = client!.program.programId
+  const clientProgramId = vsrClient!.program.programId
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
     mintPk,
-    client!.program.programId
+    vsrClient!.program.programId
   )
   const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
-  const { voterWeight } = await getVoterWeightPDA(
+  const { voterWeightPk } = await getVoterWeightPDA(
     registrar,
     walletPk,
     clientProgramId
@@ -61,13 +61,13 @@ export const withVoteRegistryWithdraw = async ({
   )
 
   instructions.push(
-    client?.program.instruction.withdraw(depositIndex!, amount, {
+    vsrClient?.program.instruction.withdraw(depositIndex!, amount, {
       accounts: {
         registrar: registrar,
         voter: voter,
         voterAuthority: walletPk,
         tokenOwnerRecord: tokenOwnerRecordPubKey,
-        voterWeightRecord: voterWeight,
+        voterWeightRecord: voterWeightPk,
         vault: voterATAPk,
         destination: toPubKey,
         tokenProgram: TOKEN_PROGRAM_ID,
@@ -75,7 +75,7 @@ export const withVoteRegistryWithdraw = async ({
     })
   )
   if (amountAfterOperation && amountAfterOperation?.isZero()) {
-    const close = client.program.instruction.closeDepositEntry(0, {
+    const close = vsrClient.program.instruction.closeDepositEntry(0, {
       accounts: {
         voter: voter,
         voterAuthority: walletPk,

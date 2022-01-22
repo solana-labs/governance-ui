@@ -10,7 +10,7 @@ import { sendTransaction } from 'utils/send'
 import { BN } from '@project-serum/anchor'
 import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withCreateNewDepositInstructions } from './withCreateNewDepositInstructions'
+import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,
@@ -22,7 +22,7 @@ export const voteRegistryLockDeposit = async ({
   lockUpPeriodInDays,
   lockupKind,
   sourceDepositIdx,
-  client,
+  vsrClient,
   tokenOwnerRecordPk,
   tempHolderPk,
 }: {
@@ -40,11 +40,11 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   //to deposit from one deposit to another we need to withdraw tokens somewhere first
   tempHolderPk: PublicKey
-  client?: VsrClient
+  vsrClient?: VsrClient
 }) => {
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
-  if (!client) {
+  if (!vsrClient) {
     throw 'no vote registry plugin'
   }
   if (!wallet.publicKey) {
@@ -57,8 +57,8 @@ export const voteRegistryLockDeposit = async ({
     registrar,
     voterATAPk,
     tokenOwnerRecordPubKey,
-    voterWeight,
-  } = await withCreateNewDepositInstructions({
+    voterWeightPk,
+  } = await withCreateNewDeposit({
     instructions,
     rpcContext,
     mintPk,
@@ -67,12 +67,12 @@ export const voteRegistryLockDeposit = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    client,
+    vsrClient,
   })
 
   //to transfer tokens from one deposit to another we need to withdraw them first to some tokenaccount.
   if (!amountFromVoteRegistryDeposit.isZero()) {
-    const withdrawInstruction = client?.program.instruction.withdraw(
+    const withdrawInstruction = vsrClient?.program.instruction.withdraw(
       sourceDepositIdx!,
       amountFromVoteRegistryDeposit,
       {
@@ -81,7 +81,7 @@ export const voteRegistryLockDeposit = async ({
           voter: voter,
           voterAuthority: wallet!.publicKey,
           tokenOwnerRecord: tokenOwnerRecordPubKey || tokenOwnerRecordPk,
-          voterWeightRecord: voterWeight,
+          voterWeightRecord: voterWeightPk,
           vault: voterATAPk,
           destination: tempHolderPk,
           tokenProgram: TOKEN_PROGRAM_ID,
@@ -92,7 +92,7 @@ export const voteRegistryLockDeposit = async ({
     instructions.push(withdrawInstruction)
   }
 
-  const depositInstruction = client?.program.instruction.deposit(
+  const depositInstruction = vsrClient?.program.instruction.deposit(
     depositIdx,
     totalTransferAmount,
     {

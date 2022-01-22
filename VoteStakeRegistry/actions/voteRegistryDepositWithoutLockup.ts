@@ -9,7 +9,7 @@ import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withVoteRegistryDepositInstructions } from './withVoteRegistryDepositInstructions'
+import { withVoteRegistryDeposit } from '../sdk/withVoteRegistryDeposit'
 
 export const voteRegistryDepositWithoutLockup = async ({
   rpcContext,
@@ -19,7 +19,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   programId,
   amount,
   tokenOwnerRecordPk,
-  client,
+  vsrClient,
 }: {
   rpcContext: RpcContext
   //from where we deposit our founds
@@ -29,14 +29,14 @@ export const voteRegistryDepositWithoutLockup = async ({
   programId: PublicKey
   amount: BN
   tokenOwnerRecordPk: PublicKey | null
-  client?: VsrClient
+  vsrClient?: VsrClient
 }) => {
   const lockUpPeriodInDays = 0
   const lockupKind = 'none'
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
   const instructions: TransactionInstruction[] = []
-  await withVoteRegistryDepositInstructions({
+  await withVoteRegistryDeposit({
     instructions,
     rpcContext,
     fromPk,
@@ -47,7 +47,7 @@ export const voteRegistryDepositWithoutLockup = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    client,
+    vsrClient,
   })
 
   const transaction = new Transaction()

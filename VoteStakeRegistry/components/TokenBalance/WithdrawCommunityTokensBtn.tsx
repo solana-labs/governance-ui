@@ -12,7 +12,7 @@ import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
 import useWalletStore from 'stores/useWalletStore'
-import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/actions/withVoteRegistryWithdraw'
+import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
@@ -116,7 +116,7 @@ const WithDrawCommunityTokens = () => {
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositRecord!.index,
-      client,
+      vsrClient: client,
     })
 
     try {

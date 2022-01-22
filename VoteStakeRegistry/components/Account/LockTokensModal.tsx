@@ -235,7 +235,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       tempHolderPk: realmTokenAccount!.publicKey,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
-      client,
+      vsrClient: client,
     })
     if (ownTokenRecord) {
       await getDeposits({

@@ -11,7 +11,7 @@ import { withCreateTokenGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/actions/withUpdateVoterWeightRecord'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const createTreasuryAccount = async (

@@ -33,7 +33,7 @@ export const withUpdateVoterWeightRecord = async (
     client!.program.programId
   )
   const { voter } = await getVoterPDA(registrar, walletPubKey, clientProgramId)
-  const { voterWeight } = await getVoterWeightPDA(
+  const { voterWeightPk } = await getVoterWeightPDA(
     registrar,
     walletPubKey,
     clientProgramId
@@ -44,10 +44,10 @@ export const withUpdateVoterWeightRecord = async (
       accounts: {
         registrar,
         voter,
-        voterWeightRecord: voterWeight,
+        voterWeightRecord: voterWeightPk,
         systemProgram: SYSTEM_PROGRAM_ID,
       },
     })
   )
-  return voterWeight
+  return voterWeightPk
 }

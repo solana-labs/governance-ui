@@ -50,7 +50,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
       programId: realm.owner,
       amount: realmTokenAccount!.account.amount,
       tokenOwnerRecordPk,
-      client,
+      vsrClient: client,
     })
     if (ownTokenRecord) {
       await getDeposits({
