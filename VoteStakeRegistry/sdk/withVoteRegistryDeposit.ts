@@ -1,5 +1,4 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { RpcContext } from '@solana/spl-governance'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
@@ -8,7 +7,7 @@ import { withCreateNewDeposit } from './withCreateNewDeposit'
 
 export const withVoteRegistryDeposit = async ({
   instructions,
-  rpcContext,
+  walletPk,
   fromPk,
   mintPk,
   realmPk,
@@ -20,7 +19,7 @@ export const withVoteRegistryDeposit = async ({
   vsrClient,
 }: {
   instructions: TransactionInstruction[]
-  rpcContext: RpcContext
+  walletPk: PublicKey
   //from where we deposit our founds
   fromPk: PublicKey
   mintPk: PublicKey
@@ -32,13 +31,10 @@ export const withVoteRegistryDeposit = async ({
   lockupKind: LockupType
   vsrClient?: VsrClient
 }) => {
-  const { wallet } = rpcContext
   if (!vsrClient) {
     throw 'no vote registry plugin'
   }
-  if (!wallet.publicKey) {
-    throw 'no wallet connected'
-  }
+
   const {
     depositIdx,
     voter,
@@ -46,7 +42,7 @@ export const withVoteRegistryDeposit = async ({
     voterATAPk,
   } = await withCreateNewDeposit({
     instructions,
-    rpcContext,
+    walletPk,
     mintPk,
     realmPk,
     programId,
@@ -64,7 +60,7 @@ export const withVoteRegistryDeposit = async ({
         voter: voter,
         vault: voterATAPk,
         depositToken: fromPk,
-        depositAuthority: wallet!.publicKey!,
+        depositAuthority: walletPk,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
     }

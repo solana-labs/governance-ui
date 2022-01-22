@@ -6,7 +6,6 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -26,7 +25,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const withCreateNewDeposit = async ({
   instructions,
-  rpcContext,
+  walletPk,
   mintPk,
   realmPk,
   programId,
@@ -36,7 +35,7 @@ export const withCreateNewDeposit = async ({
   vsrClient,
 }: {
   instructions: TransactionInstruction[]
-  rpcContext: RpcContext
+  walletPk: PublicKey
   mintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
@@ -45,7 +44,6 @@ export const withCreateNewDeposit = async ({
   lockupKind: LockupType
   vsrClient?: VsrClient
 }) => {
-  const { wallet } = rpcContext
   if (!vsrClient) {
     throw 'no vote registry plugin'
   }
@@ -60,12 +58,12 @@ export const withCreateNewDeposit = async ({
   )
   const { voter, voterBump } = await getVoterPDA(
     registrar,
-    wallet!.publicKey!,
+    walletPk,
     clientProgramId
   )
   const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
     registrar,
-    wallet!.publicKey!,
+    walletPk,
     clientProgramId
   )
   const existingVoter = await tryGetVoter(voter, vsrClient)
@@ -83,9 +81,9 @@ export const withCreateNewDeposit = async ({
       instructions,
       programId,
       realmPk,
-      wallet!.publicKey!,
+      walletPk,
       mintPk,
-      wallet!.publicKey!
+      walletPk
     )
   }
   if (!existingVoter) {
@@ -94,9 +92,9 @@ export const withCreateNewDeposit = async ({
         accounts: {
           registrar: registrar,
           voter: voter,
-          voterAuthority: wallet!.publicKey!,
+          voterAuthority: walletPk,
           voterWeightRecord: voterWeightPk,
-          payer: wallet!.publicKey!,
+          payer: walletPk,
           systemProgram: systemProgram,
           rent: SYSVAR_RENT_PUBKEY,
           instructions: SYSVAR_INSTRUCTIONS_PUBKEY,
@@ -146,8 +144,8 @@ export const withCreateNewDeposit = async ({
         accounts: {
           registrar: registrar,
           voter: voter,
-          payer: wallet!.publicKey!,
-          voterAuthority: wallet!.publicKey!,
+          payer: walletPk,
+          voterAuthority: walletPk,
           depositMint: mintPk,
           rent: SYSVAR_RENT_PUBKEY,
           systemProgram: systemProgram,

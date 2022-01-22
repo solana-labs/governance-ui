@@ -13,34 +13,34 @@ import {
 
 export const withUpdateVoterWeightRecord = async (
   instructions: TransactionInstruction[],
-  walletPubKey: PublicKey,
+  walletPk: PublicKey,
   realm: ProgramAccount<Realm>,
-  client?: VsrClient
+  vsrClient?: VsrClient
 ) => {
   //if no plugin then we dont do anything
   if (!realm.account.config.useCommunityVoterWeightAddin) {
     return
   }
-  if (!client) {
+  if (!vsrClient) {
     throw 'no vote registry plugin'
   }
-  const clientProgramId = client!.program.programId
+  const clientProgramId = vsrClient!.program.programId
 
   //TODO support both mints for now only community is supported
   const { registrar } = await getRegistrarPDA(
     realm.pubkey,
     realm.account.communityMint,
-    client!.program.programId
+    vsrClient!.program.programId
   )
-  const { voter } = await getVoterPDA(registrar, walletPubKey, clientProgramId)
+  const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const { voterWeightPk } = await getVoterWeightPDA(
     registrar,
-    walletPubKey,
+    walletPk,
     clientProgramId
   )
 
   instructions.push(
-    client.program.instruction.updateVoterWeightRecord({
+    vsrClient.program.instruction.updateVoterWeightRecord({
       accounts: {
         registrar,
         voter,

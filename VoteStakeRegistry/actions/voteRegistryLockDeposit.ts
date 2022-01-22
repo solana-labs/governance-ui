@@ -60,7 +60,7 @@ export const voteRegistryLockDeposit = async ({
     voterWeightPk,
   } = await withCreateNewDeposit({
     instructions,
-    rpcContext,
+    walletPk: rpcContext.walletPubkey,
     mintPk,
     realmPk,
     programId,
