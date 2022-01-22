@@ -62,9 +62,11 @@ const Notification = ({ type, message, description, txid }) => {
             {type === 'success' ? (
               <CheckCircleIcon className={`h-8 w-8 mr-1 text-green`} />
             ) : null}
-            {type === 'info' && <XCircleIcon className={`h-8 w-8 mr-1`} />}
+            {type === 'info' && (
+              <InformationCircleIcon className={`h-8 w-8 mr-1`} />
+            )}
             {type === 'error' && (
-              <InformationCircleIcon className={`h-8 w-8 mr-1 text-red`} />
+              <XCircleIcon className={`h-8 w-8 mr-1 text-red`} />
             )}
           </div>
           <div className={`ml-2 w-0 flex-1`}>

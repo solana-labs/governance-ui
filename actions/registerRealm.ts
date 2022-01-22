@@ -239,9 +239,7 @@ async function prepareGovernanceInstructions(
 
   if (transferAuthority) {
     console.debug('transfer community mint authority')
-    const {
-      governanceAddress: communityMintGovPk,
-    } = await withCreateMintGovernance(
+    const communityMintGovPk = await withCreateMintGovernance(
       realmInstructions,
       programId,
       realmPk,
