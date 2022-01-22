@@ -26,20 +26,18 @@ export const registerGovernance = async (
 
   switch (governanceType) {
     case GovernanceType.Program: {
-      governanceAddress = (
-        await withCreateProgramGovernance(
-          instructions,
-          programId,
-          realm,
-          governedAccount,
-          config,
-          transferAuthority!,
-          walletPubkey,
-          tokenOwnerRecord,
-          walletPubkey,
-          governanceAuthority
-        )
-      ).governanceAddress
+      governanceAddress = await withCreateProgramGovernance(
+        instructions,
+        programId,
+        realm,
+        governedAccount,
+        config,
+        transferAuthority!,
+        walletPubkey,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority
+      )
       break
     }
     default: {

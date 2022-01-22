@@ -6,6 +6,7 @@ interface TextareaProps {
   onChange?: (e) => void
   className?: string
   disabled?: boolean
+  useDefaultStyle?: boolean
   [x: string]: any
 }
 
@@ -19,19 +20,29 @@ const TextareaProps = ({
   suffix,
   error = '',
   noMaxWidth = false,
+  useDefaultStyle = true,
   ...props
 }: TextareaProps) => {
   return (
     <div className={`flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
+
       <textarea
         value={value}
         onChange={onChange}
-        className={inputClasses({ className, disabled, error, noMaxWidth })}
+        className={inputClasses({
+          className,
+          disabled,
+          error,
+          noMaxWidth,
+          useDefaultStyle,
+        })}
         disabled={disabled}
         {...props}
       />
+
       {suffix ? <StyledSuffix>{suffix}</StyledSuffix> : null}
+
       <ErrorField text={error}></ErrorField>
     </div>
   )
