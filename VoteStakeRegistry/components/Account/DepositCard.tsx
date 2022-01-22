@@ -12,11 +12,11 @@ import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithMintAccount,
   LockupType,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+} from 'VoteStakeRegistry/sdk/accounts'
 import {
   getFormattedStringFromDays,
   SECS_PER_DAY,
-} from 'VoteStakeRegistry/utils/dateTools'
+} from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenService from '@utils/services/token'
 

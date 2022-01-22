@@ -8,7 +8,7 @@ import { RpcContext, TOKEN_PROGRAM_ID } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 
 import { BN } from '@project-serum/anchor'
-import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
 

@@ -22,13 +22,13 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import { LockupType } from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearToDays,
   yearToSecs,
   daysToYear,
   daysToMonths,
-} from 'VoteStakeRegistry/utils/dateTools'
+} from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 interface Period {
   value: number

@@ -9,7 +9,7 @@ import {
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+} from 'VoteStakeRegistry/sdk/accounts'
 
 export const withUpdateVoterWeightRecord = async (
   instructions: TransactionInstruction[],

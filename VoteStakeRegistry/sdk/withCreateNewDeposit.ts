@@ -13,15 +13,14 @@ import {
 } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import {
-  getMintCfgIdx,
   getRegistrarPDA,
   getVoterPDA,
   getVoterWeightPDA,
   LockupType,
-  tryGetVoter,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
-import { DAYS_PER_MONTH } from 'VoteStakeRegistry/utils/dateTools'
+} from 'VoteStakeRegistry/sdk/accounts'
+import { DAYS_PER_MONTH } from 'VoteStakeRegistry/tools/dateTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { getMintCfgIdx, tryGetVoter } from './api'
 
 export const withCreateNewDeposit = async ({
   instructions,

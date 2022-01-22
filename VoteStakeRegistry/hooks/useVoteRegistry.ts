@@ -3,11 +3,8 @@ import { Provider, Wallet } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
-import {
-  getRegistrarPDA,
-  Registrar,
-  tryGetRegistrar,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
+import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 
 export function useVoteRegistry() {
   const { realm } = useRealm()

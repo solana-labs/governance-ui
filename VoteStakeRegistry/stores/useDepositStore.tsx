@@ -3,10 +3,8 @@ import {
   DepositWithMintAccount,
   getRegistrarPDA,
   getVoterPDA,
-  tryGetRegistrar,
-  tryGetVoter,
   unusedMintPk,
-} from 'VoteStakeRegistry/utils/voteRegistryTools'
+} from 'VoteStakeRegistry/sdk/accounts'
 import {
   Connection,
   PublicKey,
@@ -20,6 +18,7 @@ import {
   BN,
   EventParser,
 } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor'
+import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 
 interface DepositStore extends State {
   state: {
