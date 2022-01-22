@@ -302,5 +302,14 @@
     "website": "https://1sol.io",
     "twitter": "@1solProtocol",
     "ogImage": "/realms/1SolDAO/img/1SolDAO-logo.svg"
+  },
+  {
+    "symbol": "NFT4CauseDAO",
+    "displayName": "NFT 4 Cause DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HB9Csze8DQ54skiMzw6VvAS9oeZ2i3zTDgWuJhQMCQab",
+    "website": "https://www.nft4cause.app",
+    "twitter": "@NFT4cause",
+    "ogImage": "/realms/NFT4CauseDAO/img/logo.png"
   }
 ]
