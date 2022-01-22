@@ -14,22 +14,56 @@ import {
 
 export const DEPOSITORY_MINTS = {
   devnet: {
-    BTC: '3UNBZ6o52WTWwjac2kPUb4FyodhU1vFkRJheu1Sh2TvU',
-    SOL: 'So11111111111111111111111111111111111111112',
+    BTC: {
+      address: '3UNBZ6o52WTWwjac2kPUb4FyodhU1vFkRJheu1Sh2TvU',
+      decimals: 6,
+    },
+    SOL: {
+      address: 'So11111111111111111111111111111111111111112',
+      decimals: 9,
+    },
   },
   mainnet: {
-    BTC: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
-    SOL: 'So11111111111111111111111111111111111111112',
-    MSOL: 'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
+    BTC: {
+      address: '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E',
+      decimals: 6,
+    },
+    SOL: {
+      address: 'So11111111111111111111111111111111111111112',
+      decimals: 9,
+    },
+    MSOL: {
+      address: 'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
+      decimals: 6,
+    },
   },
 }
 
 export const INSURANCE_MINTS = {
   devnet: {
-    USDC: '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN',
+    USDC: {
+      address: '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN',
+      decimals: 6,
+    },
   },
   mainnet: {
-    USDC: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+    USDC: {
+      address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      decimals: 6,
+    },
+  },
+}
+
+export const GOVERNANCE_MINTS = {
+  mainnet: {
+    USDC: {
+      address: 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v',
+      decimals: 6,
+    },
+    UXP: {
+      address: 'UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M',
+      decimals: 9,
+    },
   },
 }
 
@@ -39,7 +73,10 @@ export const getDepositoryMintSymbols = (cluster: Cluster): string[] => [
 export const getDepositoryMintKey = (
   cluster: Cluster,
   symbol: string
-): PublicKey => new PublicKey(DEPOSITORY_MINTS[cluster][symbol])
+): PublicKey => new PublicKey(DEPOSITORY_MINTS[cluster][symbol].address)
+
+export const getDepositoryToken = (cluster: Cluster, symbol: string) =>
+  DEPOSITORY_MINTS[cluster][symbol]
 
 export const getInsuranceMintSymbols = (cluster: Cluster): string[] => [
   ...Object.keys(INSURANCE_MINTS[cluster]),
@@ -47,7 +84,18 @@ export const getInsuranceMintSymbols = (cluster: Cluster): string[] => [
 export const getInsuranceMintKey = (
   cluster: Cluster,
   symbol: string
-): PublicKey => new PublicKey(INSURANCE_MINTS[cluster][symbol])
+): PublicKey => new PublicKey(INSURANCE_MINTS[cluster][symbol].address)
+
+export const getGovernanceMintSymbols = (cluster: Cluster): string[] => [
+  ...Object.keys(GOVERNANCE_MINTS[cluster]),
+]
+export const getGovernanceMintKey = (
+  cluster: Cluster,
+  symbol: string
+): PublicKey => new PublicKey(GOVERNANCE_MINTS[cluster][symbol].address)
+
+export const getGovernanceToken = (cluster: Cluster, symbol: string) =>
+  GOVERNANCE_MINTS[cluster][symbol]
 
 export const isDepositoryRegistered = async (
   connection: Connection,
