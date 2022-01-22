@@ -1,4 +1,6 @@
+import { BN } from '@project-serum/anchor'
 import {
+  AmountSide,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Liquidity,
   TOKEN_PROGRAM_ID,
@@ -10,10 +12,11 @@ import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import { UXP_USDC_POOL_KEYS } from './poolKeys'
 
 export const createAddLiquidityInstruction = (
-  baseTokenAccount: PublicKey, //TokenA  we want to deposit (USDC or UXP)
-  quoteTokenAccount: PublicKey, //Value in TokenB of TokenA  (UXP or USDC)
-  baseAmountIn: number,
-  quoteAmountIn: number,
+  tokenMintA: PublicKey, //TokenA  we want to deposit (USDC or UXP)
+  tokenMintB: PublicKey, //Value in TokenB of TokenA  (UXP or USDC)
+  amountA: BN,
+  amountB: BN,
+  fixedSide: AmountSide,
   owner: PublicKey,
   payer: PublicKey
 ): TransactionInstruction => {
@@ -33,21 +36,71 @@ export const createAddLiquidityInstruction = (
   )
 
   console.log(
-    `Initialize Authority Insurance ATA (${lpTokenAccount.toBase58()}) itx:`,
+    `Initialize Authority LP token ATA (${lpTokenAccount.toBase58()}) itx:`,
     serializeInstructionToBase64(createlpTokenAccountItx)
   )
+
+  const [baseTokenAccount] = findATAAddrSync(owner, UXP_USDC_POOL_KEYS.baseMint)
+  console.log(
+    'usdc token account to create if not exist: ',
+    baseTokenAccount.toBase58()
+  )
+
+  const createBaseTokenAccountItx = Token.createAssociatedTokenAccountInstruction(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    UXP_USDC_POOL_KEYS.quoteMint,
+    baseTokenAccount,
+    owner, // owner
+    payer // payer
+  )
+
+  console.log(
+    `Initialize Authority BASE token ATA (${baseTokenAccount.toBase58()}) itx:`,
+    serializeInstructionToBase64(createBaseTokenAccountItx)
+  )
+
+  const [quoteTokenAccount] = findATAAddrSync(
+    owner,
+    UXP_USDC_POOL_KEYS.quoteMint
+  )
+  console.log(
+    'usdc token account to create if not exist: ',
+    quoteTokenAccount.toBase58()
+  )
+
+  const createQuoteTokenAccountItx = Token.createAssociatedTokenAccountInstruction(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    UXP_USDC_POOL_KEYS.quoteMint,
+    quoteTokenAccount,
+    owner, // owner
+    payer // payer
+  )
+
+  console.log(
+    `Initialize Authority QUOTE token ATA (${quoteTokenAccount.toBase58()}) itx:`,
+    serializeInstructionToBase64(createQuoteTokenAccountItx)
+  )
+
+  let baseAmountIn = amountA
+  let quoteAmountIn = amountB
+  if (tokenMintA.equals(UXP_USDC_POOL_KEYS.quoteMint)) {
+    baseAmountIn = amountB
+    quoteAmountIn = amountA
+  }
 
   const itx = Liquidity.makeAddLiquidityInstruction({
     poolKeys: UXP_USDC_POOL_KEYS,
     userKeys: {
       baseTokenAccount,
       quoteTokenAccount,
-      lpTokenAccount: findATAAddrSync(owner, UXP_USDC_POOL_KEYS.lpMint)[0],
+      lpTokenAccount,
       owner,
     },
     baseAmountIn,
     quoteAmountIn,
-    fixedSide: 'quote',
+    fixedSide,
   })
 
   return itx

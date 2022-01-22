@@ -180,7 +180,7 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.AddLiquidityRaydium,
       name: 'Add To Raydium Liquidity Pool',
-      isVisible: canUseUxdInstructions,
+      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.Transfer,

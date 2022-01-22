@@ -16,19 +16,19 @@ import { debounce } from '@utils/debounce'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Select from '@components/inputs/Select'
 import {
-  getGovernanceMintKey,
   getGovernanceMintSymbols,
+  getGovernanceToken,
 } from '@tools/sdk/uxdProtocol/uxdClient'
 import {
   ProgramAccount,
   serializeInstructionToBase64,
   Governance,
-  GovernanceAccountType,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { createAddLiquidityInstruction } from '@tools/sdk/raydium/createAddLiquidityInstruction'
 import { getAmountOut } from '@tools/sdk/raydium/helpers'
 import { UXP_USDC_POOL_KEYS } from '@tools/sdk/raydium/poolKeys'
+import { BN } from '@project-serum/anchor'
 
 const AddLiquidityRaydium = ({
   index,
@@ -40,14 +40,47 @@ const AddLiquidityRaydium = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountType } = useGovernanceAssets()
-  const governedProgramAccounts = getGovernancesByAccountType(
-    GovernanceAccountType.ProgramGovernance
-  ).map((x) => {
-    return {
-      governance: x,
+  // const { getGovernancesByAccountType } = useGovernanceAssets()
+  const [governedAccounts, setGovernedAccounts] = useState<
+    GovernedMultiTypeAccount[]
+  >([])
+  const {
+    governancesArray,
+    governedTokenAccounts,
+    getMintWithGovernances,
+  } = useGovernanceAssets()
+  // const governedProgramAccounts = getGovernancesByAccountType(
+  //   GovernanceAccountType.ProgramGovernance
+  // ).map((x) => {
+  //   return {
+  //     governance: x,
+  //   }
+  // })
+
+  useEffect(() => {
+    async function prepGovernances() {
+      const mintWithGovernances = await getMintWithGovernances()
+      const matchedGovernances = governancesArray.map((gov) => {
+        const governedTokenAccount = governedTokenAccounts.find(
+          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+        )
+        const mintGovernance = mintWithGovernances.find(
+          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+        )
+        if (governedTokenAccount) {
+          return governedTokenAccount as GovernedMultiTypeAccount
+        }
+        if (mintGovernance) {
+          return mintGovernance as GovernedMultiTypeAccount
+        }
+        return {
+          governance: gov,
+        }
+      })
+      setGovernedAccounts(matchedGovernances)
     }
-  })
+    prepGovernances()
+  }, [])
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AddLiquidityRaydiumForm>({
@@ -56,6 +89,7 @@ const AddLiquidityRaydium = ({
     quoteTokenName: '',
     baseAmountIn: 0,
     quoteAmountIn: 0,
+    fixedSide: 'base',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -77,11 +111,21 @@ const AddLiquidityRaydium = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const baseToken = getGovernanceToken(
+        connection.cluster,
+        form.baseTokenName
+      )
+      const quoteToken = getGovernanceToken(
+        connection.cluster,
+        form.quoteTokenName
+      )
+
       const createIx = createAddLiquidityInstruction(
-        getGovernanceMintKey(connection.cluster, form.baseTokenName),
-        getGovernanceMintKey(connection.cluster, form.quoteTokenName),
-        form.baseAmountIn,
-        form.quoteAmountIn,
+        new PublicKey(baseToken.address),
+        new PublicKey(quoteToken.address),
+        new BN(form.baseAmountIn * 10 ** baseToken.decimals),
+        new BN(form.quoteAmountIn * 10 ** quoteToken.decimals),
+        form.fixedSide,
         form.governedAccount.governance.pubkey,
         new PublicKey(wallet.publicKey.toBase58())
       )
@@ -176,13 +220,17 @@ const AddLiquidityRaydium = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    fixedSide: yup
+      .string()
+      .equals(['base', 'quote'])
+      .required('Fixed Side is required'),
   })
 
   return (
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
@@ -254,6 +302,21 @@ const AddLiquidityRaydium = ({
         disabled={true}
         error={formErrors['quoteAmountIn']}
       />
+      <Select
+        label="Fixed Side"
+        value={form.fixedSide}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'fixedSide' })
+        }
+        error={formErrors['fixedSide']}
+      >
+        {['base', 'quote'].map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
     </>
   )
 }

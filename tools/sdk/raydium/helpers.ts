@@ -18,7 +18,6 @@ export const getAmountOut = async (
 ) => {
   const tokenInData = getGovernanceToken(connection.cluster, tokenNameIn)
   const tokenOutData = getGovernanceToken(connection.cluster, tokenNameOut)
-
   const amountOut = Liquidity.computeCurrencyAmountOut({
     poolKeys,
     poolInfo: await Liquidity.fetchInfo({
@@ -27,14 +26,15 @@ export const getAmountOut = async (
     }),
     currencyAmountIn: new TokenAmount(
       new Token(new PublicKey(tokenInData.address), tokenInData.decimals),
-      amountIn
+      Number(amountIn) * 10 ** tokenInData.decimals
     ),
     currencyOut: new Token(
       new PublicKey(tokenOutData.address),
       tokenOutData.decimals
     ),
-    slippage: new Percent(1, 100),
+    slippage: new Percent(5, 1000),
   })
+  const currentPrice = amountOut.currentPrice.toFixed(tokenOutData.decimals)
 
-  return amountOut.amountOut
+  return Number(currentPrice) * amountIn
 }
