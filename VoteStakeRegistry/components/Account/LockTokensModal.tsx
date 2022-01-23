@@ -3,7 +3,6 @@ import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Modal from '@components/Modal'
-import Tooltip from '@components/Tooltip'
 import { Tab } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
@@ -400,9 +399,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
             {/* TODO tooltip */}
             <div className={`${labelClasses} flex`}>
               Initial Vote Weight Multiplier
-              <Tooltip content="Lorem ipsum">
-                <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
-              </Tooltip>
+              <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
               <span className="ml-auto">{lockupPeriod.multiplier}x</span>
             </div>
             <div className="w-full h-2 bg-bkg-1 rounded-lg">

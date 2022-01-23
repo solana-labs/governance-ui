@@ -1,4 +1,5 @@
 import { getExplorerUrl } from '@components/explorer/tools'
+import { CHAT_PROGRAM_ID } from '@components/instructions/tools'
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -82,6 +83,7 @@ const MemberOverview = () => {
         ),
         getGovernanceChatMessagesByVoter(
           connection!.current,
+          CHAT_PROGRAM_ID,
           new PublicKey(member!.walletAddress)
         ),
       ])

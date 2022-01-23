@@ -45,6 +45,7 @@ import {
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { mapEntries } from '@tools/core/script'
+import { CHAT_PROGRAM_ID } from '@components/instructions/tools'
 
 interface WalletStore extends State {
   connected: boolean
@@ -429,7 +430,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         getGovernanceAccounts(connection, programId, SignatoryRecord, [
           pubkeyFilter(1, proposalPubKey)!,
         ]),
-        getGovernanceChatMessages(connection, proposalPubKey),
+        getGovernanceChatMessages(connection, CHAT_PROGRAM_ID, proposalPubKey),
         getGovernanceAccount(
           connection,
           proposal.account.tokenOwnerRecord,
@@ -482,6 +483,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const chatMessages = await getGovernanceChatMessages(
         connection,
+        CHAT_PROGRAM_ID,
         proposalPubKey
       )
 

@@ -101,6 +101,10 @@ export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
 
+export const CHAT_PROGRAM_ID = new PublicKey(
+  '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
+)
+
 export interface AccountDescriptor {
   name: string
   important?: boolean
