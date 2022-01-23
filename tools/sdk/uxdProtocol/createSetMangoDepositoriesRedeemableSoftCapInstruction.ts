@@ -1,7 +1,6 @@
 import { Provider } from '@project-serum/anchor'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { Controller } from '@uxdprotocol/uxd-client'
-import { getControllerPda, uxdClient } from './uxdClient'
+import { instantiateController, uxdClient } from './uxdClient'
 
 const createSetMangoDepositoriesRedeemableSoftCapInstruction = (
   uxdProgramId: PublicKey,
@@ -9,9 +8,8 @@ const createSetMangoDepositoriesRedeemableSoftCapInstruction = (
   authority: PublicKey
 ): TransactionInstruction => {
   const client = uxdClient(uxdProgramId)
-
   return client.createSetMangoDepositoriesRedeemableSoftCapInstruction(
-    { pda: getControllerPda(uxdProgramId) } as Controller,
+    instantiateController(uxdProgramId),
     authority,
     softCapUiAmount,
     Provider.defaultOptions()
