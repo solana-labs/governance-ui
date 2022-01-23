@@ -139,10 +139,9 @@ export const getControllerPda = (uxdProgramId: PublicKey): PublicKey => {
   return findAddrSync([Buffer.from('CONTROLLER')], uxdProgramId)[0]
 }
 
-// We do not need the mint symbol so it is just set with a placeholder value
 export const instantiateController = (
   uxdProgramId: PublicKey,
-  mintDecimals: number,
+  mintDecimals = 6,
   mintSymbol = 'UXD'
 ) => {
   return new Controller(mintSymbol, mintDecimals, uxdProgramId)
