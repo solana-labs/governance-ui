@@ -16,7 +16,7 @@ export const withVoteRegistryDeposit = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  vsrClient,
+  client,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
@@ -29,9 +29,9 @@ export const withVoteRegistryDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
-  vsrClient?: VsrClient
+  client?: VsrClient
 }) => {
-  if (!vsrClient) {
+  if (!client) {
     throw 'no vote registry plugin'
   }
 
@@ -49,9 +49,9 @@ export const withVoteRegistryDeposit = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    vsrClient,
+    client,
   })
-  const depositInstruction = vsrClient?.program.instruction.deposit(
+  const depositInstruction = client?.program.instruction.deposit(
     depositIdx,
     amount,
     {

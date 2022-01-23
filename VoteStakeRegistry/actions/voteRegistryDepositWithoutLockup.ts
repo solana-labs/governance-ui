@@ -19,7 +19,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   programId,
   amount,
   tokenOwnerRecordPk,
-  vsrClient,
+  client,
 }: {
   rpcContext: RpcContext
   //from where we deposit our founds
@@ -29,7 +29,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   programId: PublicKey
   amount: BN
   tokenOwnerRecordPk: PublicKey | null
-  vsrClient?: VsrClient
+  client?: VsrClient
 }) => {
   const lockUpPeriodInDays = 0
   const lockupKind = 'none'
@@ -47,7 +47,7 @@ export const voteRegistryDepositWithoutLockup = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    vsrClient,
+    client,
   })
 
   const transaction = new Transaction()
