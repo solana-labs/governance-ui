@@ -21,6 +21,7 @@ import {
 import { DAYS_PER_MONTH } from 'VoteStakeRegistry/tools/dateTools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { getMintCfgIdx, tryGetVoter } from './api'
+const MONTHLY = 'monthly'
 
 export const withCreateNewDeposit = async ({
   instructions,
@@ -122,15 +123,25 @@ export const withCreateNewDeposit = async ({
   const firstFreeIdx = existingVoter?.deposits?.findIndex((x) => !x.isUsed) || 0
 
   if (firstFreeIdx === -1) {
-    throw 'You have to much active deposits'
+    throw 'User has to much active deposits'
   }
 
   if (createNewDeposit) {
     //in case we do monthly close up we pass months not days.
     const period =
-      lockupKind !== 'monthly'
+      lockupKind !== MONTHLY
         ? lockUpPeriodInDays
         : lockUpPeriodInDays / DAYS_PER_MONTH
+    const maxMonthsNumber = 72
+    const daysLimit = 2190
+    //additional prevention of lockup being to high in case of monthly lockup 72 months as 6 years
+    //in case of other types 2190 days as 6 years
+    if (lockupKind === MONTHLY && period > maxMonthsNumber) {
+      throw 'lockup period is to hight'
+    }
+    if (lockupKind !== MONTHLY && period > daysLimit) {
+      throw 'lockup period is to hight'
+    }
     const allowClawback = false
     const startTime = new BN(new Date().getTime() / 1000)
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(

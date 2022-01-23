@@ -3,7 +3,7 @@ export const SECS_PER_DAY = 86400
 export const DAYS_PER_MONTH = DAYS_PER_YEAR / 12
 export const SECS_PER_MONTH = DAYS_PER_MONTH * SECS_PER_DAY
 
-export function getFormattedStringFromDays(numberOfDays) {
+export function getFormattedStringFromDays(numberOfDays: number) {
   const years = Math.floor(numberOfDays / DAYS_PER_YEAR)
   const months = Math.floor((numberOfDays % DAYS_PER_YEAR) / DAYS_PER_MONTH)
   const days = Math.floor((numberOfDays % DAYS_PER_YEAR) % DAYS_PER_MONTH)
@@ -16,20 +16,20 @@ export function getFormattedStringFromDays(numberOfDays) {
   return text ? text : 0
 }
 
-export const yearToDays = (val) => {
-  return DAYS_PER_YEAR * val
+export const yearsToDays = (years: number) => {
+  return DAYS_PER_YEAR * years
 }
-export const daysToYear = (val) => {
-  return val / DAYS_PER_YEAR
+export const daysToYear = (days: number) => {
+  return days / DAYS_PER_YEAR
 }
-export const yearToSecs = (val) => {
-  return DAYS_PER_YEAR * val * SECS_PER_DAY
-}
-
-export const secsToDays = (val) => {
-  return val / SECS_PER_DAY
+export const yearsToSecs = (years: number) => {
+  return DAYS_PER_YEAR * years * SECS_PER_DAY
 }
 
-export const daysToMonths = (val) => {
-  return val / DAYS_PER_MONTH
+export const secsToDays = (secs: number) => {
+  return secs / SECS_PER_DAY
+}
+
+export const daysToMonths = (days: number) => {
+  return days / DAYS_PER_MONTH
 }

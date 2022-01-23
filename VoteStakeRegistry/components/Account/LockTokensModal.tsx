@@ -23,8 +23,8 @@ import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryL
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
-  yearToDays,
-  yearToSecs,
+  yearsToDays,
+  yearsToSecs,
   daysToYear,
   daysToMonths,
 } from 'VoteStakeRegistry/tools/dateTools'
@@ -98,29 +98,29 @@ const LockTokensModal = ({ onClose, isOpen }) => {
 
   const lockupPeriods: Period[] = [
     {
-      value: yearToDays(1),
+      value: yearsToDays(1),
       display: '1y',
-      multiplier: calcMintMultiplier(yearToSecs(1), communityMintRegistrar),
+      multiplier: calcMintMultiplier(yearsToSecs(1), communityMintRegistrar),
     },
     {
-      value: yearToDays(2),
+      value: yearsToDays(2),
       display: '2y',
-      multiplier: calcMintMultiplier(yearToSecs(2), communityMintRegistrar),
+      multiplier: calcMintMultiplier(yearsToSecs(2), communityMintRegistrar),
     },
     {
-      value: yearToDays(3),
+      value: yearsToDays(3),
       display: '3y',
-      multiplier: calcMintMultiplier(yearToSecs(3), communityMintRegistrar),
+      multiplier: calcMintMultiplier(yearsToSecs(3), communityMintRegistrar),
     },
     {
-      value: yearToDays(4),
+      value: yearsToDays(4),
       display: '4y',
-      multiplier: calcMintMultiplier(yearToSecs(4), communityMintRegistrar),
+      multiplier: calcMintMultiplier(yearsToSecs(4), communityMintRegistrar),
     },
     {
-      value: yearToDays(5),
+      value: yearsToDays(5),
       display: '5y',
-      multiplier: calcMintMultiplier(yearToSecs(5), communityMintRegistrar),
+      multiplier: calcMintMultiplier(yearsToSecs(5), communityMintRegistrar),
     },
   ]
 
@@ -220,7 +220,6 @@ const LockTokensModal = ({ onClose, isOpen }) => {
     const amountFromDeposit = whatWillBeLeftInsideDeposit.isNeg()
       ? totalAmountInDeposit
       : totalAmountToLock
-
     await voteRegistryLockDeposit({
       rpcContext,
       mintPk: realm!.account.communityMint!,
@@ -415,7 +414,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
           <div className="flex flex-col text-center mb-6">
             <h2>
               Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}
-              {lockupPeriod.value > yearToDays(1) ? 'years' : 'year'}?
+              {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
             </h2>
             <div className="text-xs">Locking tokens can’t be undone.</div>
           </div>
