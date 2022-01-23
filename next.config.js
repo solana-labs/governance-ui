@@ -25,6 +25,8 @@ module.exports = withTM({
   },
   env: {
     REALM: process.env.REALM,
+    MAINNET_RPC: process.env.MAINNET_RPC,
+    DEVNET_RPC: process.env.DEVNET_RPC,
     DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
 })
