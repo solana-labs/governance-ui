@@ -22,7 +22,7 @@ export const withVoteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey,
   depositIndex,
   amountAfterOperation,
-  vsrClient,
+  client,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
@@ -34,17 +34,17 @@ export const withVoteRegistryWithdraw = async ({
   depositIndex: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
   amountAfterOperation?: BN
-  vsrClient?: VsrClient
+  client?: VsrClient
 }) => {
-  if (!vsrClient) {
+  if (!client) {
     throw 'no vote registry plugin'
   }
-  const clientProgramId = vsrClient!.program.programId
+  const clientProgramId = client!.program.programId
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
     mintPk,
-    vsrClient!.program.programId
+    client!.program.programId
   )
   const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const { voterWeightPk } = await getVoterWeightPDA(
@@ -61,7 +61,7 @@ export const withVoteRegistryWithdraw = async ({
   )
 
   instructions.push(
-    vsrClient?.program.instruction.withdraw(depositIndex!, amount, {
+    client?.program.instruction.withdraw(depositIndex!, amount, {
       accounts: {
         registrar: registrar,
         voter: voter,
@@ -75,7 +75,7 @@ export const withVoteRegistryWithdraw = async ({
     })
   )
   if (amountAfterOperation && amountAfterOperation?.isZero()) {
-    const close = vsrClient.program.instruction.closeDepositEntry(0, {
+    const close = client.program.instruction.closeDepositEntry(0, {
       accounts: {
         voter: voter,
         voterAuthority: walletPk,

@@ -116,7 +116,7 @@ const WithDrawCommunityTokens = () => {
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositRecord!.index,
-      vsrClient: client,
+      client: client,
     })
 
     try {

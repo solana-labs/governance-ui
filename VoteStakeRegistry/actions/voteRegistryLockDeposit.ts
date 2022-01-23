@@ -22,7 +22,7 @@ export const voteRegistryLockDeposit = async ({
   lockUpPeriodInDays,
   lockupKind,
   sourceDepositIdx,
-  vsrClient,
+  client,
   tokenOwnerRecordPk,
   tempHolderPk,
 }: {
@@ -40,11 +40,11 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   //to deposit from one deposit to another we need to withdraw tokens somewhere first
   tempHolderPk: PublicKey
-  vsrClient?: VsrClient
+  client?: VsrClient
 }) => {
   const signers: Keypair[] = []
   const { wallet, connection } = rpcContext
-  if (!vsrClient) {
+  if (!client) {
     throw 'no vote registry plugin'
   }
   if (!wallet.publicKey) {
@@ -67,12 +67,12 @@ export const voteRegistryLockDeposit = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
-    vsrClient,
+    client,
   })
 
   //to transfer tokens from one deposit to another we need to withdraw them first to some tokenaccount.
   if (!amountFromVoteRegistryDeposit.isZero()) {
-    const withdrawInstruction = vsrClient?.program.instruction.withdraw(
+    const withdrawInstruction = client?.program.instruction.withdraw(
       sourceDepositIdx!,
       amountFromVoteRegistryDeposit,
       {
@@ -92,7 +92,7 @@ export const voteRegistryLockDeposit = async ({
     instructions.push(withdrawInstruction)
   }
 
-  const depositInstruction = vsrClient?.program.instruction.deposit(
+  const depositInstruction = client?.program.instruction.deposit(
     depositIdx,
     totalTransferAmount,
     {

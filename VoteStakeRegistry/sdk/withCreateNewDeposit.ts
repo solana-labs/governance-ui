@@ -31,7 +31,7 @@ export const withCreateNewDeposit = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
-  vsrClient,
+  client,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
@@ -41,19 +41,19 @@ export const withCreateNewDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
-  vsrClient?: VsrClient
+  client?: VsrClient
 }) => {
-  if (!vsrClient) {
+  if (!client) {
     throw 'no vote registry plugin'
   }
   const systemProgram = SystemProgram.programId
-  const clientProgramId = vsrClient!.program.programId
+  const clientProgramId = client!.program.programId
   let tokenOwnerRecordPubKey = tokenOwnerRecordPk
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
     mintPk,
-    vsrClient!.program.programId
+    client!.program.programId
   )
   const { voter, voterBump } = await getVoterPDA(
     registrar,
@@ -65,7 +65,7 @@ export const withCreateNewDeposit = async ({
     walletPk,
     clientProgramId
   )
-  const existingVoter = await tryGetVoter(voter, vsrClient)
+  const existingVoter = await tryGetVoter(voter, client)
 
   const voterATAPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
@@ -87,7 +87,7 @@ export const withCreateNewDeposit = async ({
   }
   if (!existingVoter) {
     instructions.push(
-      vsrClient?.program.instruction.createVoter(voterBump, voterWeightBump, {
+      client?.program.instruction.createVoter(voterBump, voterWeightBump, {
         accounts: {
           registrar: registrar,
           voter: voter,
@@ -101,7 +101,7 @@ export const withCreateNewDeposit = async ({
       })
     )
   }
-  const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, vsrClient)
+  const mintCfgIdx = await getMintCfgIdx(registrar, mintPk, client)
 
   //none type deposits are used only to store tokens that will be withdrawable immediately so there is no need to create new every time and there should be one per mint
   //for other kinds of deposits we always want to create new deposit
@@ -133,7 +133,7 @@ export const withCreateNewDeposit = async ({
         : lockUpPeriodInDays / DAYS_PER_MONTH
     const allowClawback = false
     const startTime = new BN(new Date().getTime() / 1000)
-    const createDepositEntryInstruction = vsrClient?.program.instruction.createDepositEntry(
+    const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
       startTime,
