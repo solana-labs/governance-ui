@@ -19,6 +19,7 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenService from '@utils/services/token'
+import { BN } from '@project-serum/anchor'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
@@ -63,7 +64,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositEntry.index,
-      vsrClient: client,
+      client: client,
     })
     if (ownTokenRecord) {
       await getDeposits({
@@ -103,6 +104,17 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const img = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
     ?.logoURI
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
+  const getMinDuration = (deposit: DepositWithMintAccount) => {
+    return getFormattedStringFromDays(
+      deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() / SECS_PER_DAY
+    )
+  }
+  const getTimeLeftFromNow = (deposit: DepositWithMintAccount) => {
+    const dateNowSecTimeStampBN = new BN(new Date().getTime() / 1000)
+    return getFormattedStringFromDays(
+      deposit.lockup.endTs.sub(dateNowSecTimeStampBN).toNumber() / SECS_PER_DAY
+    )
+  }
   return (
     <div className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3 flex flex-col">
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
@@ -117,8 +129,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         </h3>
       </div>
       <div
-        className="p-4 pb-6 bg-bkg-1 rounded-lg flex flex-col"
-        style={{ height: '275px' }}
+        className="p-4 pb-6 bg-bkg-1 rounded-lg flex flex-col h-full"
+        style={{ minHeight: '290px' }}
       >
         <div className="flex flex-row flex-wrap">
           <CardLabel label="Type" value={typeName} />
@@ -154,14 +166,25 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           )}
           <CardLabel
             label={isConstant ? 'Min. Duration' : 'Time left'}
-            value={getFormattedStringFromDays(
-              deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() /
-                SECS_PER_DAY
-            )}
+            value={
+              isConstant ? getMinDuration(deposit) : getTimeLeftFromNow(deposit)
+            }
           />
           <CardLabel
             label="Available"
             value={fmtMintAmount(deposit.mint.account, deposit.available)}
+          />
+          <CardLabel
+            label="Lock from"
+            value={new Date(
+              deposit.lockup.startTs.toNumber() * 1000
+            ).toDateString()}
+          />
+          <CardLabel
+            label="Lock to"
+            value={new Date(
+              deposit.lockup.endTs.toNumber() * 1000
+            ).toDateString()}
           />
         </div>
         {

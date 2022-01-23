@@ -8,11 +8,10 @@ export function getFormattedStringFromDays(numberOfDays) {
   const months = Math.floor((numberOfDays % DAYS_PER_YEAR) / DAYS_PER_MONTH)
   const days = Math.floor((numberOfDays % DAYS_PER_YEAR) % DAYS_PER_MONTH)
 
-  const yearsDisplay =
-    years > 0 ? years + (years == 1 ? ' year ' : ' years ') : ''
+  const yearsDisplay = years > 0 ? years + (years == 1 ? ' yr ' : ' yrs ') : ''
   const monthsDisplay =
-    months > 0 ? months + (months == 1 ? ' month ' : ' months ') : ''
-  const daysDisplay = days > 0 ? days + (days == 1 ? ' day' : ' days') : ''
+    months > 0 ? months + (months == 1 ? ' mth ' : ' mths ') : ''
+  const daysDisplay = days > 0 ? days + (days == 1 ? ' d' : ' days') : ''
   const text = yearsDisplay + monthsDisplay + daysDisplay
   return text ? text : 0
 }

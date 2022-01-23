@@ -14,6 +14,7 @@ import { useEffect } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import ErrorBoundary from '@components/ErrorBoundary'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -96,15 +97,15 @@ function App({ Component, pageProps }) {
           <meta name="twitter:site" content={realmInfo.twitter} />
         )}
       </Head>
-
-      <ThemeProvider defaultTheme="Mango">
-        <NavBar />
-        <Notifications />
-        <PageBodyContainer>
-          <Component {...pageProps} />
-        </PageBodyContainer>
-      </ThemeProvider>
-
+      <ErrorBoundary>
+        <ThemeProvider defaultTheme="Mango">
+          <NavBar />
+          <Notifications />
+          <PageBodyContainer>
+            <Component {...pageProps} />
+          </PageBodyContainer>
+        </ThemeProvider>
+      </ErrorBoundary>
       <Footer />
     </div>
   )
