@@ -1,20 +1,10 @@
 import axios from 'axios'
+import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
+import { notify } from '@utils/notifications'
 const coingeckoPriceEndpoint = 'https://api.coingecko.com/api/v3/simple/price'
 
-interface Extensions {
-  coingeckoId: string
-}
-
-export interface TokenRecord {
-  extensions: Extensions
-  symbol: string
-  logoURI: string
-  name: string
-  address: string
-}
-
 class TokenService {
-  _tokenList: TokenRecord[]
+  _tokenList: TokenInfo[]
   _tokenPriceToUSDlist: any
   constructor() {
     this._tokenList = []
@@ -22,36 +12,54 @@ class TokenService {
     this.fetchSolanaTokenList()
   }
   async fetchSolanaTokenList() {
-    const response = await axios.get(
-      'https://token-list.solana.com/solana.tokenlist.json'
-    )
-    if (response.data?.tokens && response.data?.tokens?.length) {
-      this._tokenList = response.data.tokens
+    try {
+      const tokens = await new TokenListProvider().resolve()
+      const tokenList = tokens.filterByClusterSlug('mainnet-beta').getList()
+      if (tokenList && tokenList.length) {
+        this._tokenList = tokenList
+      }
+    } catch (e) {
+      console.log(e)
+      notify({
+        type: 'error',
+        message: 'unable to fetch token list',
+      })
     }
   }
   async fetchTokenPrices(mintAddresses: string[]) {
-    if (!this._tokenList?.length) {
+    if (!this._tokenList.length) {
       await this.fetchSolanaTokenList()
     }
     const tokenListRecords = this._tokenList?.filter((x) =>
       mintAddresses.includes(x.address)
     )
     const coingeckoIds = tokenListRecords
-      .map((x) => x.extensions.coingeckoId)
+      .map((x) => x.extensions?.coingeckoId)
       .join(',')
-    const priceToUsdResponse = await axios.get(
-      `${coingeckoPriceEndpoint}?ids=${coingeckoIds}&vs_currencies=usd`
-    )
-    const priceToUsd = priceToUsdResponse.data
-    this._tokenPriceToUSDlist = { ...this._tokenPriceToUSDlist, ...priceToUsd }
-    return priceToUsd
+    try {
+      const priceToUsdResponse = await axios.get(
+        `${coingeckoPriceEndpoint}?ids=${coingeckoIds}&vs_currencies=usd`
+      )
+      const priceToUsd = priceToUsdResponse.data
+      this._tokenPriceToUSDlist = {
+        ...this._tokenPriceToUSDlist,
+        ...priceToUsd,
+      }
+      return priceToUsd
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: 'unable to fetch token prices',
+      })
+      return {}
+    }
   }
   getUSDTokenPrice(mintAddress: string): number {
     if (mintAddress) {
       const tokenListRecord = this._tokenList?.find(
         (x) => x.address === mintAddress
       )
-      const coingeckoId = tokenListRecord?.extensions.coingeckoId
+      const coingeckoId = tokenListRecord?.extensions?.coingeckoId
       if (tokenListRecord && coingeckoId) {
         return this._tokenPriceToUSDlist[coingeckoId]?.usd || 0
       }
