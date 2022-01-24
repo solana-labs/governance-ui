@@ -204,7 +204,7 @@ const LockTokensModal = ({
     : maxAmountToLockFmt
 
   const tokenName = mint
-    ? getMintMetadata(realm?.account.communityMint)?.name
+    ? getMintMetadata(realm?.account.communityMint)?.name || 'tokens'
     : ''
   const currentPercentOfMaxMultiplier =
     (100 * lockupPeriod.multiplier) / maxMultiplier
@@ -268,6 +268,44 @@ const LockTokensModal = ({
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
+    if (ownTokenRecord) {
+      await getDeposits({
+        realmPk: realm!.pubkey,
+        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        walletPk: wallet!.publicKey!,
+        client: client!,
+        connection,
+      })
+    }
+
+    onClose()
+  }
+
+  const handleSaveUnlock = async () => {
+    if (!depositToUnlock) {
+      throw 'No deposit to unlock selected'
+    }
+    const rpcContext = new RpcContext(
+      realm!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection,
+      endpoint
+    )
+    const totalAmountToUnlock = getMintNaturalAmountFromDecimalAsBN(
+      amount!,
+      mint!.decimals
+    )
+    const totalAmountInDeposit = depositToUnlock.amountDepositedNative
+
+    const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
+      totalAmountToUnlock
+    )
+    console.log(
+      whatWillBeLeftInsideDeposit.toNumber(),
+      totalAmountToUnlock.toNumber(),
+      rpcContext
+    )
     if (ownTokenRecord) {
       await getDeposits({
         realmPk: realm!.pubkey,
@@ -358,6 +396,11 @@ const LockTokensModal = ({
       case 2:
         return (
           <div className="mb-6">
+            <div className="text-xs mb-6">
+              To initiate the unlock process you need to convert all, or part of
+              your constant lockup to a cliff lockup with a duration greater
+              than or equal to the constant lockup duration.
+            </div>
             {hasMoreTokensInWallet && !depositToUnlock && (
               <DoYouWantToDepositMoreComponent></DoYouWantToDepositMoreComponent>
             )}
@@ -501,7 +544,10 @@ const LockTokensModal = ({
         )
       case 3:
         return (
-          <Button className="mb-4" onClick={handleSaveLock}>
+          <Button
+            className="mb-4"
+            onClick={depositToUnlock ? handleSaveUnlock : handleSaveLock}
+          >
             Confirm
           </Button>
         )
@@ -517,10 +563,9 @@ const LockTokensModal = ({
     <Modal onClose={onClose} isOpen={isOpen}>
       <h2 className="mb-6 flex flex-row items-center">
         {isTitleVisible && (depositToUnlock ? 'Start unlock' : 'Lock Tokens')}
-        {currentStep === 2 && (
+        {currentStep === 2 && !depositToUnlock && (
           <div className="ml-auto">
             <Select
-              disabled={!!depositToUnlock}
               className="text-xs w-24"
               onChange={handleSetLockupType}
               value={lockupType.displayName}
