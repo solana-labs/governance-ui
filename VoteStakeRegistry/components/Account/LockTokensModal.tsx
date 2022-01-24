@@ -21,12 +21,16 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
+import {
+  DepositWithMintAccount,
+  LockupType,
+} from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
   yearsToSecs,
   daysToYear,
   daysToMonths,
+  getMinDurationInDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 interface Period {
@@ -76,7 +80,15 @@ const vestingPeriods: VestingPeriod[] = [
 const YES = 'YES'
 const NO = 'NO'
 
-const LockTokensModal = ({ onClose, isOpen }) => {
+const LockTokensModal = ({
+  onClose,
+  isOpen,
+  depositToUnlock,
+}: {
+  onClose: () => void
+  isOpen: boolean
+  depositToUnlock?: DepositWithMintAccount | null
+}) => {
   const { getDeposits } = useDepositStore()
   const {
     ownTokenRecord,
@@ -122,7 +134,9 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       display: '5y',
       multiplier: calcMintMultiplier(yearsToSecs(5), communityMintRegistrar),
     },
-  ]
+  ].filter((x) =>
+    depositToUnlock ? getMinDurationInDays(depositToUnlock) <= x.value : true
+  )
 
   const maxMultiplier = lockupPeriods
     .map((x) => x.multiplier)
@@ -150,6 +164,12 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   const hasMoreTokensInWallet = !realmTokenAccount?.account.amount.isZero()
   const wantToLockMoreThenDeposited = lockMoreThenDeposited === 'YES'
   const currentPrecision = precision(mintMinAmount)
+  const maxAmountToUnlock = depositToUnlock
+    ? getMintDecimalAmount(
+        depositToUnlock.mint.account,
+        depositToUnlock?.amountInitiallyLockedNative
+      )
+    : 0
   const maxAmountToLock =
     depositRecord && mint
       ? wantToLockMoreThenDeposited
@@ -161,7 +181,8 @@ const LockTokensModal = ({ onClose, isOpen }) => {
           )
         : getMintDecimalAmount(mint, depositRecord?.amountDepositedNative)
       : 0
-  const maxAmountFtm =
+  const maxAmount = depositToUnlock ? maxAmountToUnlock : maxAmountToLock
+  const maxAmountToLockFmt =
     depositRecord && mint
       ? wantToLockMoreThenDeposited
         ? fmtMintAmount(
@@ -172,6 +193,15 @@ const LockTokensModal = ({ onClose, isOpen }) => {
           )
         : fmtMintAmount(mint, depositRecord?.amountDepositedNative)
       : 0
+  const maxAmountToUnlockFmt = depositToUnlock
+    ? fmtMintAmount(
+        depositToUnlock.mint.account,
+        depositToUnlock?.amountInitiallyLockedNative
+      )
+    : 0
+  const maxAmountFmt = depositToUnlock
+    ? maxAmountToUnlockFmt
+    : maxAmountToLockFmt
 
   const tokenName = mint
     ? getMintMetadata(realm?.account.communityMint)?.name
@@ -179,23 +209,26 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   const currentPercentOfMaxMultiplier =
     (100 * lockupPeriod.multiplier) / maxMultiplier
 
-  const handleSetVestingPeriod = (idx) => {
+  const handleSetVestingPeriod = (idx: number) => {
     setVestingPeriod(vestingPeriods[idx])
   }
-  const handleSetLockupPeriod = (idx) => {
+  const handleSetLockupPeriod = (idx: number) => {
     setLockupPeriod(lockupPeriods[idx])
   }
-  const handleSetLockupType = (idx) => {
+  const handleSetLockupType = (idx: number) => {
     setLockupType(lockupTypes[idx])
   }
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1)
   }
+  const goToStep = (val: number) => {
+    setCurrentStep(val)
+  }
   const validateAmountOnBlur = () => {
     const val = parseFloat(
       Math.max(
         Number(mintMinAmount),
-        Math.min(Number(maxAmountToLock), Number(amount))
+        Math.min(Number(maxAmount), Number(amount))
       ).toFixed(currentPrecision)
     )
     setAmount(val)
@@ -325,7 +358,7 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       case 2:
         return (
           <div className="mb-6">
-            {hasMoreTokensInWallet && (
+            {hasMoreTokensInWallet && !depositToUnlock && (
               <DoYouWantToDepositMoreComponent></DoYouWantToDepositMoreComponent>
             )}
             <div className="mb-6">
@@ -333,13 +366,13 @@ const LockTokensModal = ({ onClose, isOpen }) => {
                 Amount to lock{' '}
                 <div
                   className="ml-auto underline cursor-pointer"
-                  onClick={() => setAmount(Number(maxAmountToLock))}
+                  onClick={() => setAmount(Number(maxAmount))}
                 >
-                  Max: {maxAmountFtm}
+                  Max: {maxAmountFmt}
                 </div>
               </div>
               <Input
-                max={maxAmountToLock}
+                max={maxAmount}
                 min={mintMinAmount}
                 value={amount}
                 type="number"
@@ -412,11 +445,20 @@ const LockTokensModal = ({ onClose, isOpen }) => {
       case 3:
         return (
           <div className="flex flex-col text-center mb-6">
-            <h2>
-              Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}
-              {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
-            </h2>
-            <div className="text-xs">Locking tokens can’t be undone.</div>
+            {depositToUnlock ? (
+              <h2>
+                This will convert {amount} {tokenName} into a cliff type lockup
+                that unlocks in {daysToYear(lockupPeriod.value)} years.
+              </h2>
+            ) : (
+              <h2>
+                Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}
+                {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
+              </h2>
+            )}
+            {!depositToUnlock && (
+              <div className="text-xs">Locking tokens can’t be undone.</div>
+            )}
           </div>
         )
       default:
@@ -442,14 +484,19 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
   }, [communityMintRegistrar])
+  useEffect(() => {
+    if (depositToUnlock) {
+      goToStep(2)
+    }
+  }, [depositToUnlock])
   const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 1
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
     switch (currentStep) {
       case 2:
         return (
-          <Button className="mb-4" onClick={handleNextStep}>
-            Lock Tokens
+          <Button className="mb-4" onClick={handleNextStep} disabled={!amount}>
+            {depositToUnlock ? 'Start unlock' : 'Lock Tokens'}
           </Button>
         )
       case 3:
@@ -469,10 +516,11 @@ const LockTokensModal = ({ onClose, isOpen }) => {
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <h2 className="mb-6 flex flex-row items-center">
-        {isTitleVisible && 'Lock Tokens'}
+        {isTitleVisible && (depositToUnlock ? 'Start unlock' : 'Lock Tokens')}
         {currentStep === 2 && (
           <div className="ml-auto">
             <Select
+              disabled={!!depositToUnlock}
               className="text-xs w-24"
               onChange={handleSetLockupType}
               value={lockupType.displayName}
