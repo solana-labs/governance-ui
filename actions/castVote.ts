@@ -6,6 +6,7 @@ import {
 } from '@solana/web3.js'
 import {
   ChatMessageBody,
+  GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
   withPostChatMessage,
@@ -20,7 +21,6 @@ import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { CHAT_PROGRAM_ID } from '@components/instructions/tools'
 
 export async function castVote(
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
@@ -65,7 +65,7 @@ export async function castVote(
     await withPostChatMessage(
       instructions,
       signers,
-      CHAT_PROGRAM_ID,
+      GOVERNANCE_CHAT_PROGRAM_ID,
       programId,
       realm.pubkey,
       proposal.account.governance,

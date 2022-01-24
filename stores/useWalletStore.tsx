@@ -18,6 +18,7 @@ import {
   getGovernanceAccounts,
   Governance,
   GovernanceAccountType,
+  GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   ProposalInstruction,
   Realm,
@@ -45,7 +46,6 @@ import {
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { mapEntries } from '@tools/core/script'
-import { CHAT_PROGRAM_ID } from '@components/instructions/tools'
 
 interface WalletStore extends State {
   connected: boolean
@@ -430,7 +430,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         getGovernanceAccounts(connection, programId, SignatoryRecord, [
           pubkeyFilter(1, proposalPubKey)!,
         ]),
-        getGovernanceChatMessages(connection, CHAT_PROGRAM_ID, proposalPubKey),
+        getGovernanceChatMessages(
+          connection,
+          GOVERNANCE_CHAT_PROGRAM_ID,
+          proposalPubKey
+        ),
         getGovernanceAccount(
           connection,
           proposal.account.tokenOwnerRecord,
@@ -483,7 +487,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const chatMessages = await getGovernanceChatMessages(
         connection,
-        CHAT_PROGRAM_ID,
+        GOVERNANCE_CHAT_PROGRAM_ID,
         proposalPubKey
       )
 

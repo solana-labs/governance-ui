@@ -19,6 +19,8 @@ const ENDPOINTS: EndpointInfo[] = [
   },
 ]
 
+console.log('deployed ENDPOINTS:', ENDPOINTS)
+
 export interface ConnectionContext {
   cluster: EndpointTypes
   current: Connection

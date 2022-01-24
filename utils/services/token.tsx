@@ -25,13 +25,15 @@ class TokenService {
     const response = await axios.get(
       'https://token-list.solana.com/solana.tokenlist.json'
     )
-    this.tokenList = response.data.tokens
+    if (response.data.tokens && response.data.tokens.length) {
+      this.tokenList = response.data.tokens
+    }
   }
   async fetchTokenPrices(mintAddresses: string[]) {
     if (!this.tokenList.length) {
       await this.fetchSolanaTokenList()
     }
-    const tokenListRecords = this.tokenList.filter((x) =>
+    const tokenListRecords = this.tokenList?.filter((x) =>
       mintAddresses.includes(x.address)
     )
     const coingeckoIds = tokenListRecords
@@ -46,7 +48,7 @@ class TokenService {
   }
   getUSDTokenPrice(mintAddress: string): number {
     if (mintAddress) {
-      const tokenListRecord = this.tokenList.find(
+      const tokenListRecord = this.tokenList?.find(
         (x) => x.address === mintAddress
       )
       const coingeckoId = tokenListRecord?.extensions.coingeckoId

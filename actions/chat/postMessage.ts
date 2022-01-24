@@ -4,13 +4,16 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal, Realm } from '@solana/spl-governance'
+import {
+  GOVERNANCE_CHAT_PROGRAM_ID,
+  Proposal,
+  Realm,
+} from '@solana/spl-governance'
 import { ChatMessageBody } from '@solana/spl-governance'
 import { withPostChatMessage } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '../../utils/send'
-import { CHAT_PROGRAM_ID } from '@components/instructions/tools'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 
@@ -40,7 +43,7 @@ export async function postChatMessage(
   await withPostChatMessage(
     instructions,
     signers,
-    CHAT_PROGRAM_ID,
+    GOVERNANCE_CHAT_PROGRAM_ID,
     programId,
     realm.pubkey,
     proposal.account.governance,
