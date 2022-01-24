@@ -52,10 +52,10 @@ export interface ProgramAuthorityForm {
 
 export interface AddLiquidityRaydiumForm {
   governedAccount: GovernedMultiTypeAccount | undefined
-  baseTokenName: string
-  quoteTokenName: string
-  baseAmountIn: number
-  quoteAmountIn: number
+  tokenAName: string
+  tokenBName: string
+  tokenAAmountIn: number
+  tokenBAmountIn: number
   fixedSide: AmountSide
 }
 
