@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import { getAccountName } from '@components/instructions/tools'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import tokenService, { TokenRecord } from '@utils/services/token'
+import tokenService from '@utils/services/token'
 import { GovernedTokenAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import { abbreviateAddress } from '@utils/formatting'
@@ -10,6 +10,7 @@ import BN from 'bn.js'
 import BigNumber from 'bignumber.js'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { ViewState } from './Types'
+import { TokenInfo } from '@solana/spl-token-registry'
 
 const AccountItem = ({
   governedAccountTokenAccount,
@@ -17,9 +18,9 @@ const AccountItem = ({
   governedAccountTokenAccount: GovernedTokenAccount
 }) => {
   const [totalPrice, setTotalPrice] = useState('')
-  const [tokenRecordInfo, setTokenRecordInfo] = useState<
-    TokenRecord | undefined
-  >(undefined)
+  const [tokenRecordInfo, setTokenRecordInfo] = useState<TokenInfo | undefined>(
+    undefined
+  )
   const connection = useWalletStore((s) => s.connection)
   const {
     setCurrentCompactView,

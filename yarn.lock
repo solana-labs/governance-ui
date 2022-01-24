@@ -1299,6 +1299,13 @@
     tweetnacl "^1.0.3"
     webpack-dev-server "^3.11.2"
 
+"@solana/spl-token-registry@^0.2.1733":
+  version "0.2.1733"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.1733.tgz#b85b8f9c21a7143853f0fcbd1aac99740ba24eb3"
+  integrity sha512-+QCMa8m7GIYeqN6CD79abYSqvP0/RhqfOPLq93ok85hYz0OlDrYG4fjcQeHH6M+7WoHX29ka3i3NZtft/I7oVQ==
+  dependencies:
+    cross-fetch "3.0.6"
+
 "@solana/spl-token@0.1.6":
   version "0.1.6"
   resolved "https://registry.npmjs.org/@solana/spl-token/-/spl-token-0.1.6.tgz"
@@ -3087,6 +3094,13 @@ create-require@^1.1.0:
   version "1.1.1"
   resolved "https://registry.npmjs.org/create-require/-/create-require-1.1.1.tgz"
   integrity sha512-dcKFX3jn0MpIaXjisoRvexIJVEKzaq7z2rZKxf+MSr9TkdmHmsU4m2lcLojrj/FHl8mk5VxMmYA+ftRkP/3oKQ==
+
+cross-fetch@3.0.6:
+  version "3.0.6"
+  resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.0.6.tgz#3a4040bc8941e653e0e9cf17f29ebcd177d3365c"
+  integrity sha512-KBPUbqgFjzWlVcURG+Svp9TlhA5uliYtiNx/0r8nv0pdypeQCRJ9IaSIc3q/x3q8t3F75cHuwxVql1HFGHCNJQ==
+  dependencies:
+    node-fetch "2.6.1"
 
 cross-fetch@^3.1.4:
   version "3.1.4"
