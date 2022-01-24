@@ -25,7 +25,7 @@ class TokenService {
     const response = await axios.get(
       'https://token-list.solana.com/solana.tokenlist.json'
     )
-    this.tokenList = response.data.tokens
+    this.tokenList = response.data.tokens ?? []
   }
   async fetchTokenPrices(mintAddresses: string[]) {
     if (!this.tokenList.length) {
