@@ -3,18 +3,6 @@ import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import { notify } from '@utils/notifications'
 const coingeckoPriceEndpoint = 'https://api.coingecko.com/api/v3/simple/price'
 
-interface Extensions {
-  coingeckoId: string
-}
-
-export interface TokenRecord {
-  extensions: Extensions
-  symbol: string
-  logoURI: string
-  name: string
-  address: string
-}
-
 class TokenService {
   _tokenList: TokenInfo[]
   _tokenPriceToUSDlist: any

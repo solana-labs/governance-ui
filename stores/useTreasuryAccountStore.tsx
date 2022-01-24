@@ -1,18 +1,18 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/TreasuryAccount/Types'
 import { getNfts, GovernedTokenAccount } from '@utils/tokens'
-import tokenService, { TokenRecord } from '@utils/services/token'
+import tokenService from '@utils/services/token'
 import { ConfirmedSignatureInfo } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
-
+import { TokenInfo } from '@solana/spl-token-registry'
 interface TreasuryAccountStore extends State {
   compact: {
     currentView: ViewState
     currentAccount: GovernedTokenAccount | null
     mintAddress: string
-    tokenInfo: TokenRecord | null
+    tokenInfo: TokenInfo | null
     recentActivity: ConfirmedSignatureInfo[]
   }
   allNfts: NFTWithMint[]
