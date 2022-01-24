@@ -1,7 +1,5 @@
 import Link from 'next/link'
 import { ArrowLeftIcon } from '@heroicons/react/outline'
-
-import TokenBalanceCard from '@components/TokenBalanceCard'
 import useRealm from '@hooks/useRealm'
 
 import useQueryContext from '@hooks/useQueryContext'
@@ -38,7 +36,9 @@ import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -55,6 +55,7 @@ export const NewProposalContext = createContext<InstructionsContext>(
 
 const New = () => {
   const router = useRouter()
+  const { client } = useVoteRegistry()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
@@ -228,7 +229,7 @@ const New = () => {
 
         proposalAddress = await createProposal(
           rpcContext,
-          realm.pubkey,
+          realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title,
@@ -236,7 +237,8 @@ const New = () => {
           proposalMint,
           selectedGovernance?.account?.proposalCount,
           instructionsData,
-          isDraft
+          isDraft,
+          client
         )
 
         const url = fmtUrlWithCluster(
@@ -445,7 +447,7 @@ const New = () => {
         </>
       </div>
       <div className="col-span-12 md:col-span-5 lg:col-span-4">
-        <TokenBalanceCard />
+        <TokenBalanceCardWrapper />
       </div>
     </div>
   )

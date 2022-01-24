@@ -4,39 +4,51 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { GovernanceType } from '@solana/spl-governance'
+import { GovernanceType, ProgramAccount, Realm } from '@solana/spl-governance'
 import { GovernanceConfig } from '@solana/spl-governance'
 import { withCreateProgramGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const registerGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   governanceType: GovernanceType,
-  realm: PublicKey,
+  realm: ProgramAccount<Realm>,
   governedAccount: PublicKey,
   config: GovernanceConfig,
   transferAuthority: boolean,
-  tokenOwnerRecord: PublicKey
+  tokenOwnerRecord: PublicKey,
+  client?: VsrClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
   let governanceAddress
   const governanceAuthority = walletPubkey
 
+  //will run only if plugin is connected with realm
+  const voterWeight = await withUpdateVoterWeightRecord(
+    instructions,
+    wallet.publicKey!,
+    realm,
+    client
+  )
+
   switch (governanceType) {
     case GovernanceType.Program: {
       governanceAddress = await withCreateProgramGovernance(
         instructions,
         programId,
-        realm,
+        realm.pubkey,
         governedAccount,
         config,
         transferAuthority!,
         walletPubkey,
         tokenOwnerRecord,
         walletPubkey,
-        governanceAuthority
+        governanceAuthority,
+        voterWeight
       )
       break
     }

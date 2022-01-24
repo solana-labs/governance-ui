@@ -23,6 +23,7 @@ import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
@@ -40,6 +41,7 @@ const AddMemberForm = ({ close }) => {
   const [formErrors, setFormErrors] = useState({})
 
   const router = useRouter()
+  const { client } = useVoteRegistry()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
 
@@ -179,7 +181,7 @@ const AddMemberForm = ({ close }) => {
 
         proposalAddress = await createProposal(
           rpcContext,
-          realm.pubkey,
+          realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title ? form.title : proposalTitle,
@@ -187,7 +189,8 @@ const AddMemberForm = ({ close }) => {
           proposalMint,
           selectedGovernance?.account?.proposalCount,
           [instructionData],
-          false
+          false,
+          client
         )
 
         const url = fmtUrlWithCluster(
