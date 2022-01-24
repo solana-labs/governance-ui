@@ -1,5 +1,6 @@
 import { Provider } from '@project-serum/anchor'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
+import { Controller, UXD_DECIMALS } from '@uxdprotocol/uxd-client'
 import type { ConnectionContext } from 'utils/connection'
 import {
   uxdClient,
@@ -7,7 +8,6 @@ import {
   instantiateMangoDepository,
   getDepositoryMintKey,
   getInsuranceMintKey,
-  instantiateController,
 } from './uxdClient'
 
 const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
@@ -30,7 +30,7 @@ const createWithdrawInsuranceFromMangoDepositoryInstruction = async (
 
   return client.createWithdrawInsuranceFromMangoDepositoryInstruction(
     insuranceWithdrawnAmount,
-    instantiateController(uxdProgramId),
+    new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     depository,
     mango,
     authority,
