@@ -13,7 +13,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const { ownVoterWeight, realmInfo } = useRealm()
+  const { ownVoterWeight, realmInfo, realm } = useRealm()
 
   const [submitting, setSubmitting] = useState(false)
 
@@ -41,6 +41,7 @@ const DiscussionForm = () => {
     try {
       await postChatMessage(
         rpcContext,
+        realm!.pubkey,
         proposal!,
         ownVoterWeight.getTokenRecord(),
         msg

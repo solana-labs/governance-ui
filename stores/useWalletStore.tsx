@@ -18,6 +18,7 @@ import {
   getGovernanceAccounts,
   Governance,
   GovernanceAccountType,
+  GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   ProposalInstruction,
   Realm,
@@ -428,7 +429,11 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         getGovernanceAccounts(connection, programId, SignatoryRecord, [
           pubkeyFilter(1, proposalPubKey)!,
         ]),
-        getGovernanceChatMessages(connection, proposalPubKey),
+        getGovernanceChatMessages(
+          connection,
+          GOVERNANCE_CHAT_PROGRAM_ID,
+          proposalPubKey
+        ),
         getGovernanceAccount(
           connection,
           proposal.account.tokenOwnerRecord,
@@ -481,6 +486,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const chatMessages = await getGovernanceChatMessages(
         connection,
+        GOVERNANCE_CHAT_PROGRAM_ID,
         proposalPubKey
       )
 
