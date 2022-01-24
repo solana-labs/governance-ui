@@ -1,6 +1,7 @@
 import { Provider } from '@project-serum/anchor'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { instantiateController, uxdClient } from './uxdClient'
+import { Controller, UXD_DECIMALS } from '@uxdprotocol/uxd-client'
+import { uxdClient } from './uxdClient'
 
 const createSetRedeemableGlobalSupplyCapInstruction = (
   uxdProgramId: PublicKey,
@@ -9,7 +10,7 @@ const createSetRedeemableGlobalSupplyCapInstruction = (
 ): TransactionInstruction => {
   const client = uxdClient(uxdProgramId)
   return client.createSetRedeemableGlobalSupplyCapInstruction(
-    instantiateController(uxdProgramId),
+    new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     authority,
     supplyCapUiAmount,
     Provider.defaultOptions()

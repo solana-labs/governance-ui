@@ -10,6 +10,7 @@ import {
   MangoDepository,
   UXD,
   UXDHelpers,
+  UXD_DECIMALS,
 } from '@uxdprotocol/uxd-client'
 
 export const DEPOSITORY_MINTS = {
@@ -137,14 +138,6 @@ export const initializeMango = async (
 
 export const getControllerPda = (uxdProgramId: PublicKey): PublicKey => {
   return findAddrSync([Buffer.from('CONTROLLER')], uxdProgramId)[0]
-}
-
-export const instantiateController = (
-  uxdProgramId: PublicKey,
-  mintDecimals = 6,
-  mintSymbol = 'UXD'
-) => {
-  return new Controller(mintSymbol, mintDecimals, uxdProgramId)
 }
 
 // We do not need the decimals and names for both depository and insurance

@@ -1,6 +1,7 @@
 import { Provider } from '@project-serum/anchor'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { instantiateController, uxdClient } from './uxdClient'
+import { Controller, UXD_DECIMALS } from '@uxdprotocol/uxd-client'
+import { uxdClient } from './uxdClient'
 
 const createInitializeControllerInstruction = (
   uxdProgramId: PublicKey,
@@ -11,7 +12,7 @@ const createInitializeControllerInstruction = (
   const client = uxdClient(uxdProgramId)
 
   return client.createInitializeControllerInstruction(
-    instantiateController(uxdProgramId, mintDecimals),
+    new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     authority,
     Provider.defaultOptions(),
     payer
