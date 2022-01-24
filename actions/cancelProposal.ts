@@ -28,12 +28,14 @@ export const cancelProposal = async (
 
   transaction.add(...instructions)
 
-  await sendTransaction({
+  const txId = await sendTransaction({
     transaction,
     wallet,
     connection,
     signers,
     sendingMessage: 'Cancelling proposal',
     successMessage: 'Proposal cancelled',
+    showNotification: false,
   })
+  return txId
 }

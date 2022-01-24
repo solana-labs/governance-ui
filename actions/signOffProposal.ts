@@ -25,12 +25,14 @@ export const signOffProposal = async (
 
   transaction.add(...instructions)
 
-  await sendTransaction({
+  const txId = await sendTransaction({
     transaction,
     wallet,
     connection,
     signers,
     sendingMessage: 'Signing off proposal',
     successMessage: 'Proposal signed off',
+    showNotification: false,
   })
+  return txId
 }
