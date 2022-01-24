@@ -3,12 +3,14 @@ import {
   Liquidity,
   LiquidityPoolKeys,
   Percent,
-  Token,
   TokenAmount,
+  Token,
 } from '@raydium-io/raydium-sdk'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Connection } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
+import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import { getGovernanceToken } from '../uxdProtocol/uxdClient'
+import { Token as SPLToken } from '@solana/spl-token'
 
 export const getAmountOut = async (
   poolKeys: LiquidityPoolKeys,
@@ -44,4 +46,21 @@ export const getAmountOut = async (
   const currentPrice = amountOut.currentPrice.toFixed(tokenOutData.decimals)
 
   return Number(currentPrice) * amountIn
+}
+
+export const getLPMintInfo = async (
+  connection: ConnectionContext,
+  lpMint: PublicKey,
+  user: PublicKey
+) => {
+  const [lpTokenAccount] = findATAAddrSync(user, lpMint)
+  const lpInfo = await connection.current.getTokenSupply(lpMint)
+  const lpUserBalance = await connection.current.getTokenAccountBalance(
+    lpTokenAccount
+  )
+  return {
+    lpTokenAccount,
+    maxBalance: lpUserBalance.value.uiAmount ?? 0,
+    decimals: lpInfo.value.decimals,
+  }
 }

@@ -81,6 +81,11 @@ export interface AddLiquidityRaydiumForm {
   fixedSide: AmountSide
 }
 
+export interface RemoveLiquidityRaydiumForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
+  amountIn: number
+}
+
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
