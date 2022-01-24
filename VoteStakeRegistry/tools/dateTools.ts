@@ -18,7 +18,9 @@ export function getFormattedStringFromDays(numberOfDays: number) {
   const daysDisplay = days > 0 ? days + (days == 1 ? ' d' : ' days') : ''
   const hoursDisplay = hours > 0 ? ` ${hoursInt} h ${minutes} min` : ''
   const text =
-    days <= 1 ? hoursDisplay : yearsDisplay + monthsDisplay + daysDisplay
+    days <= 1
+      ? daysDisplay + hoursDisplay
+      : yearsDisplay + monthsDisplay + daysDisplay
   return text ? text : 0
 }
 
