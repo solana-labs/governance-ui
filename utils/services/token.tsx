@@ -14,26 +14,26 @@ export interface TokenRecord {
 }
 
 class TokenService {
-  tokenList: TokenRecord[]
-  tokenPriceToUSDlist: any
+  _tokenList: TokenRecord[]
+  _tokenPriceToUSDlist: any
   constructor() {
-    this.tokenList = []
-    this.tokenPriceToUSDlist = {}
+    this._tokenList = []
+    this._tokenPriceToUSDlist = {}
     this.fetchSolanaTokenList()
   }
   async fetchSolanaTokenList() {
     const response = await axios.get(
       'https://token-list.solana.com/solana.tokenlist.json'
     )
-    if (response.data.tokens && response.data.tokens.length) {
-      this.tokenList = response.data.tokens
+    if (response.data?.tokens && response.data?.tokens?.length) {
+      this._tokenList = response.data.tokens
     }
   }
   async fetchTokenPrices(mintAddresses: string[]) {
-    if (!this.tokenList.length) {
+    if (!this._tokenList?.length) {
       await this.fetchSolanaTokenList()
     }
-    const tokenListRecords = this.tokenList?.filter((x) =>
+    const tokenListRecords = this._tokenList?.filter((x) =>
       mintAddresses.includes(x.address)
     )
     const coingeckoIds = tokenListRecords
@@ -43,17 +43,17 @@ class TokenService {
       `${coingeckoPriceEndpoint}?ids=${coingeckoIds}&vs_currencies=usd`
     )
     const priceToUsd = priceToUsdResponse.data
-    this.tokenPriceToUSDlist = { ...this.tokenPriceToUSDlist, ...priceToUsd }
+    this._tokenPriceToUSDlist = { ...this._tokenPriceToUSDlist, ...priceToUsd }
     return priceToUsd
   }
   getUSDTokenPrice(mintAddress: string): number {
     if (mintAddress) {
-      const tokenListRecord = this.tokenList?.find(
+      const tokenListRecord = this._tokenList?.find(
         (x) => x.address === mintAddress
       )
       const coingeckoId = tokenListRecord?.extensions.coingeckoId
       if (tokenListRecord && coingeckoId) {
-        return this.tokenPriceToUSDlist[coingeckoId]?.usd || 0
+        return this._tokenPriceToUSDlist[coingeckoId]?.usd || 0
       }
       return 0
     }
@@ -61,7 +61,7 @@ class TokenService {
     return 0
   }
   getTokenInfo(mintAddress: string) {
-    const tokenListRecord = this.tokenList.find(
+    const tokenListRecord = this._tokenList?.find(
       (x) => x.address === mintAddress
     )
     return tokenListRecord
