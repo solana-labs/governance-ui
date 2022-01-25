@@ -311,5 +311,35 @@
     "website": "https://www.nft4cause.app",
     "twitter": "@NFT4cause",
     "ogImage": "/realms/NFT4CauseDAO/img/logo.png"
+  },
+  {
+    "symbol": "Bears",
+    "displayName": "Bears Reloaded",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "8x3bs2CUu7FZCw9zoTz29eBNwKjfJiCHjWz4T53NWLbJ"
+  },
+  {
+    "symbol": "SlattsDAO",
+    "displayName": "SlattsDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "8uhFgGgDWF23pNDS17a6TemzrjSrFhKN1skGXTjjRszj"
+  },
+  {
+    "symbol": "metaCOLLECTIVE",
+    "displayName": "metaCOLLECTIVE",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EPB9JbK5NiHoHkrRmpo9v4oJ2bKSVjfA731jeBModC1e",
+    "website": "https://meta-collective.digital",
+    "twitter": "@_metaCOLLECTIVE",
+    "ogImage": "https://governance.meta-collective.digital/realms/META/img/logo.png"
+  },
+  {
+    "symbol": "UXD",
+    "displayName": "UXDProtocol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GBXLYo4ycRNfzuzYeudu6y2ng4afNeW14WcpM2E4JJSL",
+    "website": "https://uxd.fi",
+    "twitter": "@UXDProtocol",
+    "ogImage": "/realms/UXD/img/uxd_logo.png"
   }
 ]
