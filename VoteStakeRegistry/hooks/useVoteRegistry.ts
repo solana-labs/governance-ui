@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Provider, Wallet } from '@project-serum/anchor'
+import { Provider } from '@project-serum/anchor'
+import { Wallet } from '@project-serum/sol-wallet-adapter'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
