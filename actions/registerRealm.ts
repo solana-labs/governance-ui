@@ -224,6 +224,7 @@ async function prepareGovernanceInstructions(
   yesVoteThreshold: number,
   minCommunityTokensToCreateGovernance: string,
   programId: PublicKey,
+  programVersion: number,
   realmPk: PublicKey,
   tokenOwnerRecordPk: PublicKey,
   realmInstructions: TransactionInstruction[],
@@ -256,6 +257,7 @@ async function prepareGovernanceInstructions(
     withSetRealmAuthority(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       walletPubkey,
       communityMintGovPk
@@ -471,6 +473,7 @@ export async function registerRealm(
       yesVoteThreshold,
       minCommunityTokensToCreateGovernance,
       programId,
+      programVersion,
       realmAddress,
       tokenOwnerRecordPk,
       realmInstructions,

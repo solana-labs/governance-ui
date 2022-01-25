@@ -161,9 +161,9 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
             (info) => info.data.depositEntryIndex === x.index
           ).data
 
-          x.currentlyLocked = additionalInfoData.locking?.amount
+          x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0)
           x.available = additionalInfoData.withdrawable
-          x.vestingRate = additionalInfoData.locking?.vesting?.rate
+          x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
           return x
         })
         if (

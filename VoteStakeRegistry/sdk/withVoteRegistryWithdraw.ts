@@ -21,7 +21,7 @@ export const withVoteRegistryWithdraw = async ({
   amount,
   tokenOwnerRecordPubKey,
   depositIndex,
-  amountAfterOperation,
+  closeDepositAfterOperation,
   client,
 }: {
   instructions: TransactionInstruction[]
@@ -33,7 +33,7 @@ export const withVoteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey: PublicKey
   depositIndex: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
-  amountAfterOperation?: BN
+  closeDepositAfterOperation?: boolean
   client?: VsrClient
 }) => {
   if (!client) {
@@ -74,7 +74,8 @@ export const withVoteRegistryWithdraw = async ({
       },
     })
   )
-  if (amountAfterOperation && amountAfterOperation?.isZero()) {
+
+  if (closeDepositAfterOperation) {
     const close = client.program.instruction.closeDepositEntry(depositIndex, {
       accounts: {
         voter: voter,

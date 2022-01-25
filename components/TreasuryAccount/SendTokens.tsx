@@ -7,7 +7,7 @@ import { PublicKey } from '@solana/web3.js'
 import {
   //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
@@ -20,7 +20,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import { BN } from '@project-serum/anchor'
+
 import { getTokenTransferSchema } from '@utils/validations'
 import {
   ArrowCircleDownIcon,
@@ -244,15 +244,13 @@ const SendTokens = () => {
     setIsLoading(false)
   }
   const IsAmountNotHigherThenBalance = () => {
-    const mintValue = getMintNaturalAmountFromDecimal(
+    const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
       form.governedTokenAccount!.mint!.account.decimals
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount?.token?.account?.amount?.gte(
-        new BN(mintValue)
-      )
+      gte = form.governedTokenAccount?.token?.account?.amount?.gte(mintValue)
     } catch (e) {
       //silent fail
     }

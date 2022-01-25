@@ -22,7 +22,7 @@ import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreate
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import {
-  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
 } from '@tools/sdk/units'
 import {
@@ -116,11 +116,9 @@ export const createMultisigRealm = async (
   const realmSigners: Keypair[] = []
 
   // Convert to mint natural amount
-  const minCommunityTokensToCreateAsMintValue = new BN(
-    getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreate,
-      communityMintDecimals
-    )
+  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
+    minCommunityTokensToCreate,
+    communityMintDecimals
   )
 
   const realmPk = await withCreateRealm(
@@ -212,6 +210,7 @@ export const createMultisigRealm = async (
   withSetRealmAuthority(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     walletPk,
     communityMintGovPk

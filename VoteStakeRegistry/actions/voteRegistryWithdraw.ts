@@ -18,7 +18,7 @@ export const voteRegistryWithdraw = async ({
   amount,
   tokenOwnerRecordPubKey,
   depositIndex,
-  amountAfterOperation,
+  closeDepositAfterOperation,
   client,
 }: {
   rpcContext: RpcContext
@@ -29,7 +29,7 @@ export const voteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey: PublicKey
   depositIndex: number
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
-  amountAfterOperation?: BN
+  closeDepositAfterOperation?: boolean
   client?: VsrClient
 }) => {
   const signers: Keypair[] = []
@@ -44,7 +44,7 @@ export const voteRegistryWithdraw = async ({
     amount,
     tokenOwnerRecordPubKey,
     depositIndex,
-    amountAfterOperation,
+    closeDepositAfterOperation,
     client,
   })
 
