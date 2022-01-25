@@ -303,7 +303,7 @@ const LockTokensModal = ({
     const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
       totalAmountToUnlock
     )
-    console.log(totalAmountToUnlock.toNumber())
+
     await voteRegistryStartUnlock({
       rpcContext,
       mintPk: depositToUnlock!.mint.publicKey,
@@ -312,7 +312,7 @@ const LockTokensModal = ({
       transferAmount: totalAmountToUnlock,
       amountAfterOperation: whatWillBeLeftInsideDeposit,
       lockUpPeriodInDays: lockupPeriod.value,
-      sourceDepositIdx: depositRecord!.index,
+      sourceDepositIdx: depositToUnlock!.index,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
