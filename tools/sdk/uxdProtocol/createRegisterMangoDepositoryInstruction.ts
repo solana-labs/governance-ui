@@ -3,13 +3,16 @@ import { Provider } from '@project-serum/anchor'
 import { Token, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
 import { TOKEN_PROGRAM_ID } from '@utils/tokens'
-import { findATAAddrSync } from '@uxdprotocol/uxd-client'
+import {
+  Controller,
+  findATAAddrSync,
+  UXD_DECIMALS,
+} from '@uxdprotocol/uxd-client'
 import type { ConnectionContext } from 'utils/connection'
 import {
   getDepositoryMintKey,
   getInsuranceMintKey,
   initializeMango,
-  instantiateController,
   instantiateMangoDepository,
   uxdClient,
 } from './uxdClient'
@@ -56,7 +59,7 @@ const createRegisterMangoDepositoryInstruction = async (
   )
 
   return client.createRegisterMangoDepositoryInstruction(
-    instantiateController(uxdProgramId),
+    new Controller('UXD', UXD_DECIMALS, uxdProgramId),
     depository,
     mango,
     authority,

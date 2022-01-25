@@ -1,3 +1,4 @@
+import { BN } from '@project-serum/anchor'
 import {
   Liquidity,
   LiquidityPoolKeys,
@@ -18,6 +19,12 @@ export const getAmountOut = async (
 ) => {
   const tokenInData = getGovernanceToken(connection.cluster, tokenNameIn)
   const tokenOutData = getGovernanceToken(connection.cluster, tokenNameOut)
+  const amountInBN = new BN(
+    (
+      Number(amountIn.toFixed(tokenInData.decimals)) *
+      10 ** tokenInData.decimals
+    ).toString()
+  )
   const amountOut = Liquidity.computeCurrencyAmountOut({
     poolKeys,
     poolInfo: await Liquidity.fetchInfo({
@@ -26,7 +33,7 @@ export const getAmountOut = async (
     }),
     currencyAmountIn: new TokenAmount(
       new Token(new PublicKey(tokenInData.address), tokenInData.decimals),
-      Number(amountIn) * 10 ** tokenInData.decimals
+      amountInBN
     ),
     currencyOut: new Token(
       new PublicKey(tokenOutData.address),
