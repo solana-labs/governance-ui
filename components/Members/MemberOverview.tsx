@@ -165,14 +165,16 @@ const MemberOverview = () => {
         </>
       </h3>
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
-        <AddressImage
-          dark={true}
-          connection={connection.current}
-          address={walletPublicKey}
-          height="30px"
-          width="30px"
-          placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
-        />
+        <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
+          <AddressImage
+            dark={true}
+            connection={connection.current}
+            address={walletPublicKey}
+            height="30px"
+            width="30px"
+            placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+          />
+        </div>
         <div>
           <div className="text-fgd-3 text-xs flex flex-col">
             Votes cast: {totalVotes}
