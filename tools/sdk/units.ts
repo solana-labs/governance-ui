@@ -47,6 +47,15 @@ export function parseMintNaturalAmountFromDecimal(
   return getMintNaturalAmountFromDecimal(floatAmount, mintDecimals)
 }
 
+export function parseMintNaturalAmountFromDecimalAsBN(
+  decimalAmount: string | number,
+  mintDecimals: number
+) {
+  return new BN(
+    parseMintNaturalAmountFromDecimal(decimalAmount, mintDecimals).toString()
+  )
+}
+
 // Converts amount in decimals to mint amount (natural units)
 export function getMintNaturalAmountFromDecimal(
   decimalAmount: number,
