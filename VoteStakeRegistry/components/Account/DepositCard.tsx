@@ -13,13 +13,14 @@ import {
   DepositWithMintAccount,
   LockupType,
 } from 'VoteStakeRegistry/sdk/accounts'
-import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import tokenService from '@utils/services/token'
-import { BN } from '@project-serum/anchor'
+import LockTokensModal from './LockTokensModal'
+import { useState } from 'react'
+import {
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+} from 'VoteStakeRegistry/tools/dateTools'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
@@ -38,6 +39,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
 
   const depositTokenRecord = ownTokenRecord
   const depositTokenAccount = realmTokenAccount
@@ -58,9 +60,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       mintPk: depositTokenRecord!.account.governingTokenMint,
       realmPk: realm!.pubkey!,
       amount: depositEntry.available,
-      amountAfterOperation: depositEntry.currentlyLocked.sub(
-        depositEntry.available
-      ),
+      closeDepositAfterOperation: depositEntry.currentlyLocked.isZero(),
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositEntry.index,
@@ -76,6 +76,10 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       })
     }
   }
+  const handleStartUnlock = () => {
+    setIsUnlockModalOpen(true)
+  }
+
   const lockedTokens = fmtMintAmount(
     deposit.mint.account,
     deposit.currentlyLocked
@@ -104,17 +108,6 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const img = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
     ?.logoURI
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
-  const getMinDuration = (deposit: DepositWithMintAccount) => {
-    return getFormattedStringFromDays(
-      deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber() / SECS_PER_DAY
-    )
-  }
-  const getTimeLeftFromNow = (deposit: DepositWithMintAccount) => {
-    const dateNowSecTimeStampBN = new BN(new Date().getTime() / 1000)
-    return getFormattedStringFromDays(
-      deposit.lockup.endTs.sub(dateNowSecTimeStampBN).toNumber() / SECS_PER_DAY
-    )
-  }
   return (
     <div className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3 flex flex-col">
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
@@ -151,7 +144,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
                 `${fmtMintAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                )} p/m`
+                )} p/mo`
               }
             />
           )}
@@ -167,7 +160,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           <CardLabel
             label={isConstant ? 'Min. Duration' : 'Time left'}
             value={
-              isConstant ? getMinDuration(deposit) : getTimeLeftFromNow(deposit)
+              isConstant
+                ? getMinDurationFmt(deposit)
+                : getTimeLeftFromNowFmt(deposit)
             }
           />
           <CardLabel
@@ -189,15 +184,26 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         </div>
         {
           <Button
-            disabled={deposit.available.isZero()}
+            disabled={!isConstant && deposit.available.isZero()}
             style={{ marginTop: 'auto' }}
             className="w-full"
-            onClick={() => handleWithDrawFromDeposit(deposit)}
+            onClick={() =>
+              !isConstant
+                ? handleWithDrawFromDeposit(deposit)
+                : handleStartUnlock()
+            }
           >
             {!isConstant ? 'Withdraw' : 'Start Unlock'}
           </Button>
         }
       </div>
+      {isUnlockModalOpen && (
+        <LockTokensModal
+          depositToUnlock={deposit}
+          isOpen={isUnlockModalOpen}
+          onClose={() => setIsUnlockModalOpen(false)}
+        ></LockTokensModal>
+      )}
     </div>
   )
 }
