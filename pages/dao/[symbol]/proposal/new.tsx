@@ -39,6 +39,7 @@ import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -295,6 +296,8 @@ const New = () => {
             governance={governance}
           ></MakeChangeMaxAccounts>
         )
+      case Instructions.Grant:
+        return <Grant index={idx} governance={governance}></Grant>
       default:
         null
     }

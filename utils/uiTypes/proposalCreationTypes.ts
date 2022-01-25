@@ -67,6 +67,7 @@ export enum Instructions {
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  Grant,
 }
 
 export type createParams = [
