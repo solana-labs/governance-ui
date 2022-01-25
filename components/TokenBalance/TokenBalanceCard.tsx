@@ -6,20 +6,20 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 import BN from 'bn.js'
-import useRealm from '../hooks/useRealm'
+import useRealm from '@hooks/useRealm'
 import { getProposal, Proposal, ProposalState } from '@solana/spl-governance'
-import { getUnrelinquishedVoteRecords } from '../models/api'
+import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { withWithdrawGoverningTokens } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
-import { sendTransaction } from '../utils/send'
-import { approveTokenTransfer } from '../utils/tokens'
-import Button from './Button'
-import { Option } from '../tools/core/option'
+import useWalletStore from '../../stores/useWalletStore'
+import { sendTransaction } from '@utils/send'
+import { approveTokenTransfer } from '@utils/tokens'
+import Button from '../Button'
+import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
-import { fmtMintAmount } from '../tools/sdk/units'
-import { getMintMetadata } from './instructions/programs/splToken'
+import { fmtMintAmount } from '@tools/sdk/units'
+import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -181,7 +181,6 @@ const TokenDeposit = ({
 
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
-
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
     if (depositTokenRecord!.account!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(

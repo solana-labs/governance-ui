@@ -24,7 +24,13 @@ const VotePanel = () => {
     voteRecordsByVoter,
     tokenType,
   } = useWalletStore((s) => s.selectedProposal)
-  const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
+  const {
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+    realm,
+    realmInfo,
+    ownVoterWeight,
+  } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -48,7 +54,9 @@ const VotePanel = () => {
     isVoting &&
     !isVoteCast &&
     voterTokenRecord &&
-    !voterTokenRecord.account.governingTokenDepositAmount.isZero()
+    ownVoterWeight.hasMinAmountToVote(
+      voterTokenRecord.account.governingTokenMint
+    )
 
   const isWithdrawEnabled =
     connected &&
@@ -132,7 +140,9 @@ const VotePanel = () => {
     : !isVoting && isVoteCast
     ? 'Proposal is not in a voting state anymore.'
     : !voterTokenRecord ||
-      voterTokenRecord.account.governingTokenDepositAmount.isZero()
+      ownVoterWeight.hasMinAmountToVote(
+        voterTokenRecord.account.governingTokenMint
+      )
     ? 'You don’t have governance power to vote in this realm'
     : ''
 

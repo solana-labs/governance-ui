@@ -8,6 +8,7 @@ import {
   ChatMessageBody,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
+  Realm,
   withPostChatMessage,
   YesNoVote,
 } from '@solana/spl-governance'
@@ -18,14 +19,17 @@ import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export async function castVote(
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  realm: PublicKey,
+  realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   yesNoVote: YesNoVote,
-  message?: ChatMessageBody | undefined
+  message?: ChatMessageBody | undefined,
+  client?: VsrClient
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -33,11 +37,19 @@ export async function castVote(
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
 
+  //will run only if plugin is connected with realm
+  const voterWeight = await withUpdateVoterWeightRecord(
+    instructions,
+    wallet.publicKey!,
+    realm,
+    client
+  )
+
   await withCastVote(
     instructions,
     programId,
     programVersion,
-    realm,
+    realm.pubkey,
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
@@ -45,7 +57,8 @@ export async function castVote(
     governanceAuthority,
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
-    payer
+    payer,
+    voterWeight
   )
 
   if (message) {
@@ -54,14 +67,15 @@ export async function castVote(
       signers,
       GOVERNANCE_CHAT_PROGRAM_ID,
       programId,
-      realm,
+      realm.pubkey,
       proposal.account.governance,
       proposal.pubkey,
       tokeOwnerRecord,
       governanceAuthority,
       payer,
       undefined,
-      message
+      message,
+      voterWeight
     )
   }
 
