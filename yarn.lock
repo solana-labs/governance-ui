@@ -602,10 +602,10 @@
     "@solana/spl-token" "^0.1.8"
     typescript "^4.5.4"
 
-"@cardinal/namespaces-components@2.4.24":
-  version "2.4.24"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces-components/-/namespaces-components-2.4.24.tgz#150dee8e1d9eb2176d749b5f88e56f7beb6743ee"
-  integrity sha512-0wIx3YI5q8Gr6K9iVkHTv+fiqX7Hs+IJohSYCe/Cs4aLrGUBc1f9Zx2fBuBG68gvsBqEsJ789T45tARB0JwudQ==
+"@cardinal/namespaces-components@2.4.25":
+  version "2.4.25"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces-components/-/namespaces-components-2.4.25.tgz#744cbb481eaf00eb536c5cce86093a0e82d3f6ad"
+  integrity sha512-iN6BMWe0W0gamFbgQMpbVa5Ar/VmmRhE+v/GJvpp73Vonuy90eQ6eLrf7Yl5J1u9pmpI63W/kIY/rKnSF7OTRg==
   dependencies:
     "@cardinal/certificates" "^1.2.3"
     "@cardinal/namespaces" "^3.0.23"
@@ -1721,7 +1721,7 @@
 
 "@solana/wallet-adapter-base@^0.7.1":
   version "0.7.1"
-  resolved "https://registry.npmjs.org/@solana/wallet-adapter-base/-/wallet-adapter-base-0.7.1.tgz"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-base/-/wallet-adapter-base-0.7.1.tgz#9d352e946f406b5d5342515f2e14c82f11425c1c"
   integrity sha512-NgdLrsOouBP6Cr563PjxW+4viBo1yx6q2N86LJQzwlrk8Aug48p0AgBPX+F1t9WyulDwRWVTPEALBhmggMpZIg==
   dependencies:
     eventemitter3 "^4.0.7"
@@ -1762,7 +1762,7 @@
 
 "@solana/wallet-adapter-phantom@^0.7.0":
   version "0.7.0"
-  resolved "https://registry.npmjs.org/@solana/wallet-adapter-phantom/-/wallet-adapter-phantom-0.7.0.tgz"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-phantom/-/wallet-adapter-phantom-0.7.0.tgz#fc71557a3d61b20c45e53c99e24f0f03f3a5a199"
   integrity sha512-u2SkJ6LO+A2MKTgN9bsG5Ro0Vn9KL7NKsGPT0JrYI2rvXm3yZnhlAE0i0oq+/nFAjkL/+Onm9boOaYF0/Z7vBQ==
 
 "@solana/wallet-adapter-phantom@^0.9.2":
@@ -1802,7 +1802,7 @@
 
 "@solana/wallet-adapter-sollet@^0.8.0":
   version "0.8.0"
-  resolved "https://registry.npmjs.org/@solana/wallet-adapter-sollet/-/wallet-adapter-sollet-0.8.0.tgz"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-sollet/-/wallet-adapter-sollet-0.8.0.tgz#d2e24a6b1430c40b974b239b8b7442886d57f5fe"
   integrity sha512-9Bxj2IFT9XPh7Nl9IQaTyNwS3uoowQahqE43Ei2DbFJCrlN8qC6wSnJwHGAUPMKnL85Gg0IEZmtZfmuVmyTGQg==
   dependencies:
     "@project-serum/sol-wallet-adapter" "^0.2.5"
@@ -1855,7 +1855,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0":
+"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0":
   version "1.32.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.32.0.tgz#b9821de52d0e773c363516c3dcef9be701295d82"
   integrity sha512-jquZ/VBvM3zXAaTJvdWd9mlP0WiZaZqjji0vw5UAsb5IKIossrLhHtyUqMfo41Qkdwu1aVwf7YWG748i4XIJnw==
@@ -2896,6 +2896,16 @@ bonjour@^3.5.0:
     dns-txt "^2.0.2"
     multicast-dns "^6.0.1"
     multicast-dns-service-types "^1.1.0"
+
+borsh@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/borsh/-/borsh-0.3.1.tgz#c31c3a149610e37913deada80e89073fb15cf55b"
+  integrity sha512-gJoSTnhwLxN/i2+15Y7uprU8h3CKI+Co4YKZKvrGYUy0FwHWM20x5Sx7eU8Xv4HQqV+7rb4r3P7K1cBIQe3q8A==
+  dependencies:
+    "@types/bn.js" "^4.11.5"
+    bn.js "^5.0.0"
+    bs58 "^4.0.0"
+    text-encoding-utf-8 "^1.0.2"
 
 borsh@^0.4.0:
   version "0.4.0"
@@ -9553,9 +9563,9 @@ superstruct@^0.14.2:
   resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.14.2.tgz#0dbcdf3d83676588828f1cf5ed35cda02f59025b"
   integrity sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==
 
-superstruct@^0.15.3:
+superstruct@^0.15.2, superstruct@^0.15.3:
   version "0.15.3"
-  resolved "https://registry.npmjs.org/superstruct/-/superstruct-0.15.3.tgz"
+  resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.15.3.tgz#07edfc715259ebfe3b4b2e4cb53e8e45b51674a4"
   integrity sha512-wilec1Rg3FtKuRjRyCt70g5W29YUEuaLnybdVQUI+VQ7m0bw8k7TzrRv5iYmo6IpjLVrwxP5t3RgjAVqhYh4Fg==
 
 supports-color@^5.3.0, supports-color@^5.4.0:

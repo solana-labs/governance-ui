@@ -160,11 +160,8 @@ const ConnectWalletButton = (props) => {
                         key={'twitter'}
                         onClick={() =>
                           show(
-                            {
-                              signAllTransactions: current.signAllTransactions,
-                              signTransaction: current.signTransaction,
-                              publicKey: current.publicKey!,
-                            },
+                            // @ts-ignore
+                            current,
                             connection.current,
                             connection.cluster
                           )
