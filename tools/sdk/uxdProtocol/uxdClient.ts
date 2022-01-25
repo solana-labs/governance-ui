@@ -4,13 +4,11 @@ import { Program, Provider } from '@project-serum/anchor'
 import Wallet from '@project-serum/sol-wallet-adapter'
 import { Connection, PublicKey } from '@solana/web3.js'
 import {
-  Controller,
   createAndInitializeMango,
   findAddrSync,
   MangoDepository,
   UXD,
   UXDHelpers,
-  UXD_DECIMALS,
 } from '@uxdprotocol/uxd-client'
 
 export const DEPOSITORY_MINTS = {
