@@ -3,6 +3,7 @@ import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
+  u64,
 } from '@solana/spl-token'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
@@ -62,6 +63,7 @@ export async function getTransferInstruction({
       form.amount!,
       form.governedTokenAccount.mint.account.decimals
     )
+
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
     const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
       connection: connection,
@@ -89,7 +91,7 @@ export async function getTransferInstruction({
       receiverAddress,
       form.governedTokenAccount.governance!.pubkey,
       [],
-      mintAmount
+      new u64(mintAmount.toString())
     )
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
