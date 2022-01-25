@@ -28,7 +28,7 @@ export interface Registrar {
   votingMints: votingMint[]
   //there are more fields but no use for them on ui yet
 }
-export interface LockupKind {
+interface LockupKind {
   none: object
   daily: object
   monthly: object

@@ -1,3 +1,4 @@
+import { BN } from '@project-serum/anchor'
 import { Governance, InstructionData } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -9,6 +10,7 @@ import {
   GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
+import { LockupKind } from 'VoteStakeRegistry/tools/types'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -23,6 +25,18 @@ export interface SplTokenTransferForm {
   governedTokenAccount: GovernedTokenAccount | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
+}
+
+export interface GrantForm {
+  destinationAccount: string
+  amount: number | undefined
+  governedTokenAccount: GovernedTokenAccount | undefined
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+  lockupKind: LockupKind
+  startDateUnixSeconds: BN
+  periods: number
+  allowClawback: boolean
 }
 
 export interface SendTokenCompactViewForm extends SplTokenTransferForm {

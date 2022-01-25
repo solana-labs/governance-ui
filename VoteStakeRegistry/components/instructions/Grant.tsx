@@ -12,10 +12,7 @@ import {
   TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
-import {
-  SplTokenTransferForm,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { GrantForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { debounce } from '@utils/debounce'
 import { getTokenTransferSchema } from '@utils/validations'
@@ -25,6 +22,10 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { getTransferInstruction } from '@utils/instructionTools'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
+import { BN } from '@project-serum/anchor'
+import { lockupTypes } from 'VoteStakeRegistry/tools/types'
+import Select from '@components/inputs/Select'
+import Switch from '@components/Switch'
 
 const Grant = ({
   index,
@@ -33,19 +34,24 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const dateNow = new BN(new Date().getTime() / 1000)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<SplTokenTransferForm>({
+  const [form, setForm] = useState<GrantForm>({
     destinationAccount: '',
     // No default transfer amount
     amount: undefined,
     governedTokenAccount: undefined,
     programId: programId?.toString(),
     mintInfo: undefined,
+    startDateUnixSeconds: dateNow,
+    periods: 0,
+    allowClawback: true,
+    lockupKind: lockupTypes[0],
   })
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
@@ -137,6 +143,23 @@ const Grant = ({
 
   return (
     <>
+      <Select
+        label={'Lock up kind'}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'lockupKind' })
+        }}
+        placeholder="Please select..."
+        value={form.lockupKind.displayName}
+      >
+        {lockupTypes.map((lockup, idx) => {
+          return (
+            <Select.Option key={idx} value={lockup}>
+              {lockup.displayName}
+            </Select.Option>
+          )
+        })}
+      </Select>
+      <div className="text-xs max-w-lg">{form.lockupKind.info}</div>
       <GovernedAccountSelect
         label="Source account"
         governedAccounts={
@@ -150,6 +173,21 @@ const Grant = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+      <div className="text-sm mb-3">
+        <div className="mb-2">Allow dao to clawback</div>
+        <div className="flex flex-row text-xs items-center">
+          <Switch
+            checked={form.allowClawback}
+            onChange={(checked) =>
+              handleSetForm({
+                value: checked,
+                propertyName: 'allowClawback',
+              })
+            }
+          />
+        </div>
+      </div>
+
       <Input
         label="Destination account"
         value={form.destinationAccount}
