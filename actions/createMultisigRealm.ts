@@ -212,6 +212,7 @@ export const createMultisigRealm = async (
   withSetRealmAuthority(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     walletPk,
     communityMintGovPk
