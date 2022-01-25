@@ -9,12 +9,13 @@ import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
   const { ownVoterWeight, realmInfo, realm } = useRealm()
-
+  const { client } = useVoteRegistry()
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletStore((s) => s.current)
@@ -41,10 +42,12 @@ const DiscussionForm = () => {
     try {
       await postChatMessage(
         rpcContext,
-        realm!.pubkey,
+        realm!,
         proposal!,
         ownVoterWeight.getTokenRecord(),
-        msg
+        msg,
+        undefined,
+        client
       )
 
       setComment('')

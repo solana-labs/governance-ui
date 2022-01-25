@@ -1,12 +1,14 @@
+import { getGovernanceProgramVersion } from '@solana/spl-governance'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import {
   createUnchartedRealmInfo,
   getCertifiedRealmInfo,
   RealmInfo,
 } from '../models/registry/api'
-import { VoterWeight } from '../models/voteWeights'
+import { VoteRegistryVoterWeight, VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
 
@@ -29,14 +31,24 @@ export default function useRealm() {
     tokenRecords,
     councilTokenOwnerRecords,
   } = useWalletStore((s) => s.selectedRealm)
+  const votingPower = useDepositStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
 
   useMemo(async () => {
-    const realmInfo = isPublicKey(symbol as string)
+    let realmInfo = isPublicKey(symbol as string)
       ? realm
         ? createUnchartedRealmInfo(realm)
         : undefined
       : await getCertifiedRealmInfo(symbol as string, connection)
+
+    if (realmInfo && !realmInfo?.programVersion) {
+      const programVersion = await getGovernanceProgramVersion(
+        connection.current,
+        realmInfo?.programId
+      )
+      realmInfo = { ...realmInfo, programVersion: programVersion }
+    }
+
     setRealmInfo(realmInfo)
   }, [symbol, realm])
 
@@ -94,6 +106,10 @@ export default function useRealm() {
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
 
+  //TODO change when more plugins implemented
+  const ownVoterWeight = realm?.account.config.useCommunityVoterWeightAddin
+    ? new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+    : new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
   return {
     realm,
     realmInfo,
@@ -110,7 +126,7 @@ export default function useRealm() {
     ownTokenRecord,
     councilTokenAccount,
     ownCouncilTokenRecord,
-    ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
+    ownVoterWeight,
     realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
     canChooseWhoVote,
     councilTokenOwnerRecords,

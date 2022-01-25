@@ -34,15 +34,15 @@ export default function useProposalVotes(proposal?: Proposal) {
     proposal,
     proposalMint
   )
-  const yesVotePct = calculatePct(proposal.yesVotesCount, maxVoteWeight)
+  const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
 
   const yesVoteCount = fmtTokenAmount(
-    proposal.yesVotesCount,
+    proposal.getYesVoteCount(),
     proposalMint.decimals
   )
   const noVoteCount = fmtTokenAmount(
-    proposal.noVotesCount,
+    proposal.getNoVoteCount(),
     proposalMint.decimals
   )
 

@@ -3,7 +3,6 @@ import useRealm from 'hooks/useRealm'
 import React, { useEffect, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
 import ProposalCard from 'components/ProposalCard'
-import TokenBalanceCard from 'components/TokenBalanceCard'
 import { Proposal, ProposalState } from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from 'components/RealmHeader'
@@ -16,6 +15,7 @@ import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -152,7 +152,7 @@ const REALM = () => {
           </div>
         </div>
         <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-          <TokenBalanceCard />
+          <TokenBalanceCardWrapper />
           <NFTSCompactWrapper></NFTSCompactWrapper>
           <AccountsCompactWrapper />
           <MembersCompactWrapper></MembersCompactWrapper>

@@ -7,6 +7,8 @@ import {
 
 import {
   getSignatoryRecordAddress,
+  ProgramAccount,
+  Realm,
   VoteType,
   withCreateProposal,
 } from '@solana/spl-governance'
@@ -16,6 +18,8 @@ import { withInsertInstruction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
@@ -27,7 +31,7 @@ interface InstructionDataWithHoldUpTime {
 
 export const createProposal = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
-  realm: PublicKey,
+  realm: ProgramAccount<Realm>,
   governance: PublicKey,
   tokenOwnerRecord: PublicKey,
   name: string,
@@ -35,7 +39,8 @@ export const createProposal = async (
   governingTokenMint: PublicKey,
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
-  isDraft: boolean
+  isDraft: boolean,
+  client?: VsrClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
@@ -51,11 +56,19 @@ export const createProposal = async (
   const options = ['Approve']
   const useDenyOption = true
 
+  //will run only if plugin is connected with realm
+  const voterWeight = await withUpdateVoterWeightRecord(
+    instructions,
+    wallet.publicKey!,
+    realm,
+    client
+  )
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
     programVersion,
-    realm,
+    realm.pubkey!,
     governance,
     tokenOwnerRecord,
     name,
@@ -66,7 +79,8 @@ export const createProposal = async (
     voteType,
     options,
     useDenyOption,
-    payer
+    payer,
+    voterWeight
   )
 
   await withAddSignatory(
