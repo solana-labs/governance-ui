@@ -21,6 +21,7 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
+import { BN } from '@project-serum/anchor'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
@@ -60,9 +61,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       mintPk: depositTokenRecord!.account.governingTokenMint,
       realmPk: realm!.pubkey!,
       amount: depositEntry.available,
-      amountAfterOperation: depositEntry.currentlyLocked.sub(
-        depositEntry.available
-      ),
+      amountAfterOperation: !depositEntry.currentlyLocked.isZero()
+        ? depositEntry.currentlyLocked.sub(depositEntry.available)
+        : new BN(0),
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositEntry.index,
@@ -81,6 +82,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
   }
+
   const lockedTokens = fmtMintAmount(
     deposit.mint.account,
     deposit.currentlyLocked

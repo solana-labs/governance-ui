@@ -33,6 +33,7 @@ import {
   getMinDurationInDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
 interface Period {
   value: number
   display: string
@@ -294,18 +295,28 @@ const LockTokensModal = ({
     )
     const totalAmountToUnlock = getMintNaturalAmountFromDecimalAsBN(
       amount!,
-      mint!.decimals
+      depositToUnlock!.mint.account.decimals
     )
-    const totalAmountInDeposit = depositToUnlock.amountDepositedNative
+
+    const totalAmountInDeposit = depositToUnlock.currentlyLocked
 
     const whatWillBeLeftInsideDeposit = totalAmountInDeposit.sub(
       totalAmountToUnlock
     )
-    console.log(
-      whatWillBeLeftInsideDeposit.toNumber(),
-      totalAmountToUnlock.toNumber(),
-      rpcContext
-    )
+    console.log(totalAmountToUnlock.toNumber())
+    await voteRegistryStartUnlock({
+      rpcContext,
+      mintPk: depositToUnlock!.mint.publicKey,
+      realmPk: realm!.pubkey!,
+      programId: realm!.owner,
+      transferAmount: totalAmountToUnlock,
+      amountAfterOperation: whatWillBeLeftInsideDeposit,
+      lockUpPeriodInDays: lockupPeriod.value,
+      sourceDepositIdx: depositRecord!.index,
+      tokenOwnerRecordPk:
+        tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
+      client: client,
+    })
     if (ownTokenRecord) {
       await getDeposits({
         realmPk: realm!.pubkey,

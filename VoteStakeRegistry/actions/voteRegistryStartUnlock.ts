@@ -11,7 +11,7 @@ import { BN } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
 
-export const voteRegistryLockDeposit = async ({
+export const voteRegistryStartUnlock = async ({
   rpcContext,
   mintPk,
   realmPk,
