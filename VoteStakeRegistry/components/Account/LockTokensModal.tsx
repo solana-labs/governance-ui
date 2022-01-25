@@ -495,7 +495,7 @@ const LockTokensModal = ({
               </h2>
             ) : (
               <h2>
-                Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}
+                Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}{' '}
                 {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
               </h2>
             )}
