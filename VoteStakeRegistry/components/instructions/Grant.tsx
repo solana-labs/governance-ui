@@ -2,7 +2,10 @@ import React, { useContext, useEffect, useState } from 'react'
 import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
+import {
+  getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimal,
+} from '@tools/sdk/units'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
@@ -25,7 +28,6 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
-import { BN } from '@project-serum/anchor'
 import { lockupTypes } from 'VoteStakeRegistry/tools/types'
 import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
@@ -117,12 +119,17 @@ const Grant = ({
     ) {
       const sourceAccount = form.governedTokenAccount.token?.account.address
       const destinationAccount = new PublicKey(form.destinationAccount)
-      const mintAmount = new BN(0)
+      const mintAmount = parseMintNaturalAmountFromDecimal(
+        form.amount!,
+        form.governedTokenAccount.mint.account.decimals
+      )
+
       const grantIx = await getGrantInstruction({
         fromPk: sourceAccount,
         toPk: destinationAccount,
         realmMint: realm!.account.communityMint!,
         realmPk: realm!.pubkey,
+        realmAuthority: realm!.account.authority!,
         grantMintPk: form.governedTokenAccount.mint.publicKey,
         amount: mintAmount,
         lockupPeriod: form.periods,

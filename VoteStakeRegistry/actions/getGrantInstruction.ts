@@ -26,6 +26,7 @@ export const getGrantInstruction = async ({
   startTime,
   lockupKind,
   allowClawback,
+  realmAuthority,
   feePayerPk,
   client,
 }: {
@@ -34,7 +35,8 @@ export const getGrantInstruction = async ({
   grantMintPk: PublicKey
   toPk: PublicKey
   realmPk: PublicKey
-  amount: BN
+  realmAuthority: PublicKey
+  amount: number
   //days or months in case of monthly vesting lockup type
   lockupPeriod: number
   lockupKind: LockupType
@@ -47,13 +49,14 @@ export const getGrantInstruction = async ({
   const { registrar } = await getRegistrarPDA(
     realmPk,
     realmMint,
-    client!.program.programId
+    clientProgramId
   )
   const { voter, voterBump } = await getVoterPDA(
     registrar,
     toPk,
     clientProgramId
   )
+
   const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
     registrar,
     toPk,
@@ -62,26 +65,27 @@ export const getGrantInstruction = async ({
   const ata = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    grantMintPk, // mint
-    toPk // owner
+    realmMint, // mint
+    voter // owner
   )
-  return client?.program.instruction.grant(
+
+  const grantIx = client?.program.instruction.grant(
     voterBump,
     voterWeightBump,
-    lockupKind,
+    { [lockupKind]: {} },
     new BN(startTime),
     lockupPeriod,
     allowClawback,
-    amount,
+    new BN(amount),
     {
       accounts: {
         registrar,
         voter,
-        voterAuthority: fromPk,
+        voterAuthority: toPk,
         voterWeightRecord: voterWeightPk,
         vault: ata,
         depositToken: fromPk,
-        authority: realmPk,
+        authority: realmAuthority,
         payer: feePayerPk,
         depositMint: grantMintPk,
         systemProgram: SYSTEM_PROGRAM_ID,
@@ -91,4 +95,5 @@ export const getGrantInstruction = async ({
       },
     }
   )
+  return grantIx
 }

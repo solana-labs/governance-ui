@@ -1,4 +1,3 @@
-import { BN } from '@project-serum/anchor'
 import { Governance, InstructionData } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
