@@ -34,7 +34,7 @@ export interface GrantForm {
   programId: string | undefined
   mintInfo: MintInfo | undefined
   lockupKind: LockupKind
-  startDateUnixSeconds: BN
+  startDateUnixSeconds: number
   periods: number
   allowClawback: boolean
 }

@@ -3,7 +3,7 @@ import Input from '@components/inputs/Input'
 import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
@@ -17,9 +17,12 @@ import { getAccountName } from '@components/instructions/tools'
 import { debounce } from '@utils/debounce'
 import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
+import {
+  Governance,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { getTransferInstruction } from '@utils/instructionTools'
+import { validateInstruction } from '@utils/instructionTools'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { BN } from '@project-serum/anchor'
@@ -29,6 +32,8 @@ import Switch from '@components/Switch'
 import moment from 'moment'
 import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
 import * as yup from 'yup'
+import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
 const Grant = ({
   index,
@@ -37,10 +42,11 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const dateNow = new BN(new Date().getTime() / 1000)
+  const { client } = useVoteRegistry()
+  const dateNow = moment().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realmInfo } = useRealm()
+  const { realmInfo, realm } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -99,15 +105,43 @@ const Grant = ({
     })
   }
   async function getInstruction(): Promise<UiInstruction> {
-    return getTransferInstruction({
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      currentAccount: form.governedTokenAccount || null,
-      setFormErrors,
-    })
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    if (
+      isValid &&
+      programId &&
+      form.governedTokenAccount?.token?.publicKey &&
+      form.governedTokenAccount?.token &&
+      form.governedTokenAccount?.mint?.account
+    ) {
+      const sourceAccount = form.governedTokenAccount.token?.account.address
+      const destinationAccount = new PublicKey(form.destinationAccount)
+      const mintAmount = new BN(0)
+      const grantIx = await getGrantInstruction({
+        fromPk: sourceAccount,
+        toPk: destinationAccount,
+        realmMint: realm!.account.communityMint!,
+        realmPk: realm!.pubkey,
+        grantMintPk: form.governedTokenAccount.mint.publicKey,
+        amount: mintAmount,
+        lockupPeriod: form.periods,
+        startTime: form.startDateUnixSeconds,
+        lockupKind: form.lockupKind.value,
+        allowClawback: form.allowClawback,
+        feePayerPk: wallet!.publicKey!,
+        client: client!,
+      })
+      serializedInstruction = serializeInstructionToBase64(grantIx!)
+    }
+
+    const obj: UiInstruction = {
+      serializedInstruction,
+      isValid,
+      governance: form.governedTokenAccount?.governance,
+      prerequisiteInstructions: prerequisiteInstructions,
+    }
+    return obj
   }
   const handleChangeStartDate = (e) => {
     const value = e.target.value

@@ -1,5 +1,5 @@
 import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
-import { RpcContext, SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
+import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
 
 import { BN } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
@@ -16,7 +16,6 @@ import {
 } from '@solana/spl-token'
 
 export const getGrantInstruction = async ({
-  rpcContext,
   fromPk,
   toPk,
   realmMint,
@@ -27,27 +26,24 @@ export const getGrantInstruction = async ({
   startTime,
   lockupKind,
   allowClawback,
+  feePayerPk,
   client,
 }: {
-  rpcContext: RpcContext
-  //from where we deposit our founds
   fromPk: PublicKey
   realmMint: PublicKey
   grantMintPk: PublicKey
   toPk: PublicKey
   realmPk: PublicKey
-  programId: PublicKey
   amount: BN
-  tokenOwnerRecordPk: PublicKey | null
   //days or months in case of monthly vesting lockup type
   lockupPeriod: number
   lockupKind: LockupType
   startTime: number
+  feePayerPk: PublicKey
   allowClawback: boolean
   client?: VsrClient
 }) => {
   const clientProgramId = client!.program.programId
-  const { wallet } = rpcContext
   const { registrar } = await getRegistrarPDA(
     realmPk,
     realmMint,
@@ -86,7 +82,7 @@ export const getGrantInstruction = async ({
         vault: ata,
         depositToken: fromPk,
         authority: realmPk,
-        payer: wallet.publicKey!,
+        payer: feePayerPk,
         depositMint: grantMintPk,
         systemProgram: SYSTEM_PROGRAM_ID,
         tokenProgram: TOKEN_PROGRAM_ID,
