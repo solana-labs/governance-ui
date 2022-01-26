@@ -27,7 +27,7 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
     ) {
       values.validationErrors[fieldName] = err.errors
     } else {
-      err.inner.forEach((error) => {
+      err.inner?.forEach((error) => {
         const fieldName = error.path
         if (
           error.path &&

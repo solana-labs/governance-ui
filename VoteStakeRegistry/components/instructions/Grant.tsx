@@ -28,6 +28,7 @@ import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
 import moment from 'moment'
 import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
+import * as yup from 'yup'
 
 const Grant = ({
   index,
@@ -113,7 +114,7 @@ const Grant = ({
     setStartDate(value)
     const unixDate = moment(value).unix()
     handleSetForm({
-      value: unixDate,
+      value: !isNaN(unixDate) ? unixDate : 0,
       propertyName: 'startDateUnixSeconds',
     })
   }
@@ -173,8 +174,18 @@ const Grant = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const schema = getTokenTransferSchema({ form, connection })
-
+  const schema = getTokenTransferSchema({ form, connection }).concat(
+    yup.object().shape({
+      startDateUnixSeconds: yup
+        .number()
+        .required('Start date required')
+        .min(1, 'Start date required'),
+      periods: yup
+        .number()
+        .required('End date required')
+        .min(1, 'End date required'),
+    })
+  )
   return (
     <>
       <Select
@@ -226,12 +237,14 @@ const Grant = ({
         type="date"
         value={startDate}
         onChange={handleChangeStartDate}
+        error={formErrors['startDateUnixSeconds']}
       />
       <Input
         label="End date"
         type="date"
         value={endDate}
         onChange={handleChangeEndDate}
+        error={formErrors['periods']}
       />
       {form.periods !== 0 && (
         <div>
