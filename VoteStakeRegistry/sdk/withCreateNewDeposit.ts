@@ -51,11 +51,7 @@ export const withCreateNewDeposit = async ({
   const clientProgramId = client!.program.programId
   let tokenOwnerRecordPubKey = tokenOwnerRecordPk
 
-  const { registrar } = await getRegistrarPDA(
-    realmPk,
-    mintPk,
-    client!.program.programId
-  )
+  const { registrar } = await getRegistrarPDA(realmPk, mintPk, clientProgramId)
   const { voter, voterBump } = await getVoterPDA(
     registrar,
     walletPk,

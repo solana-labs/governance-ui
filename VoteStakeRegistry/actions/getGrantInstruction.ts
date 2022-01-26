@@ -1,5 +1,4 @@
-import { PublicKey, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
-import { SYSTEM_PROGRAM_ID } from '@solana/spl-governance'
+import { PublicKey, SystemProgram, SYSVAR_RENT_PUBKEY } from '@solana/web3.js'
 
 import { BN } from '@project-serum/anchor'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
@@ -18,7 +17,6 @@ import {
 export const getGrantInstruction = async ({
   fromPk,
   toPk,
-  realmMint,
   realmPk,
   grantMintPk,
   amount,
@@ -45,10 +43,12 @@ export const getGrantInstruction = async ({
   allowClawback: boolean
   client?: VsrClient
 }) => {
+  const systemProgram = SystemProgram.programId
   const clientProgramId = client!.program.programId
+
   const { registrar } = await getRegistrarPDA(
     realmPk,
-    realmMint,
+    grantMintPk,
     clientProgramId
   )
   const { voter, voterBump } = await getVoterPDA(
@@ -56,17 +56,16 @@ export const getGrantInstruction = async ({
     toPk,
     clientProgramId
   )
-
   const { voterWeightPk, voterWeightBump } = await getVoterWeightPDA(
     registrar,
     toPk,
     clientProgramId
   )
-  const ata = await Token.getAssociatedTokenAddress(
-    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-    realmMint, // mint
-    voter // owner
+  const voterATAPk = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+    TOKEN_PROGRAM_ID,
+    grantMintPk,
+    voter
   )
 
   const grantIx = client?.program.instruction.grant(
@@ -83,12 +82,12 @@ export const getGrantInstruction = async ({
         voter,
         voterAuthority: toPk,
         voterWeightRecord: voterWeightPk,
-        vault: ata,
+        vault: voterATAPk,
         depositToken: fromPk,
         authority: realmAuthority,
         payer: feePayerPk,
         depositMint: grantMintPk,
-        systemProgram: SYSTEM_PROGRAM_ID,
+        systemProgram: systemProgram,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
         rent: SYSVAR_RENT_PUBKEY,
