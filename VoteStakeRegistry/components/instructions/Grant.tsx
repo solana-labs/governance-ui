@@ -26,6 +26,8 @@ import { BN } from '@project-serum/anchor'
 import { lockupTypes } from 'VoteStakeRegistry/tools/types'
 import Select from '@components/inputs/Select'
 import Switch from '@components/Switch'
+import moment from 'moment'
+import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
 
 const Grant = ({
   index,
@@ -41,6 +43,8 @@ const Grant = ({
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
+  const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
+  const [endDate, setEndDate] = useState('')
   const [form, setForm] = useState<GrantForm>({
     destinationAccount: '',
     // No default transfer amount
@@ -104,7 +108,37 @@ const Grant = ({
       setFormErrors,
     })
   }
-
+  const handleChangeStartDate = (e) => {
+    const value = e.target.value
+    setStartDate(value)
+    const unixDate = moment(value).unix()
+    handleSetForm({
+      value: unixDate,
+      propertyName: 'startDateUnixSeconds',
+    })
+  }
+  const handleChangeEndDate = (e) => {
+    const value = e.target.value
+    setEndDate(value)
+  }
+  useEffect(() => {
+    if (
+      startDate &&
+      endDate &&
+      moment(startDate).isValid() &&
+      moment(endDate).isValid()
+    ) {
+      const daysDifference = moment(endDate).diff(moment(startDate), 'days')
+      const monthsDifference = moment(endDate).diff(moment(startDate), 'months')
+      const periods =
+        form.lockupKind.value !== 'monthly' ? daysDifference : monthsDifference
+      console.log(periods)
+      handleSetForm({
+        value: periods > 0 ? periods : 0,
+        propertyName: 'periods',
+      })
+    }
+  }, [startDate, endDate, form.lockupKind.value])
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -187,7 +221,28 @@ const Grant = ({
           />
         </div>
       </div>
-
+      <Input
+        label="Start Date"
+        type="date"
+        value={startDate}
+        onChange={handleChangeStartDate}
+      />
+      <Input
+        label="End date"
+        type="date"
+        value={endDate}
+        onChange={handleChangeEndDate}
+      />
+      {form.periods !== 0 && (
+        <div>
+          <div className="text-xs">Period</div>
+          <div className="pt-2">
+            {form.lockupKind.value !== 'monthly'
+              ? getFormattedStringFromDays(form.periods)
+              : `${form.periods} m`}
+          </div>
+        </div>
+      )}
       <Input
         label="Destination account"
         value={form.destinationAccount}
@@ -224,6 +279,9 @@ const Grant = ({
         error={formErrors['amount']}
         onBlur={validateAmountOnBlur}
       />
+      {form.lockupKind.value === 'monthly' && form.amount && (
+        <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
+      )}
     </>
   )
 }

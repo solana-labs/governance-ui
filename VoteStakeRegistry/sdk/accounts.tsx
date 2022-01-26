@@ -11,7 +11,7 @@ export interface Voter {
 }
 
 export interface votingMint {
-  depositScaledFactor: BN
+  unlockedScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
   lockupSaturationSecs: BN

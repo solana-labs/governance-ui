@@ -60,7 +60,7 @@ export const voteRegistryStartUnlock = async ({
     client,
   })
 
-  const internalTransferInst = client?.program.instruction.internalTransfer(
+  const internalTransferInst = client?.program.instruction.internalTransferLocked(
     sourceDepositIdx,
     depositIdx,
     transferAmount,
