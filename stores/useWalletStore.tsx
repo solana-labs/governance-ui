@@ -47,7 +47,6 @@ import {
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { mapEntries } from '@tools/core/script'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
-import { reduceEachTrailingCommentRange } from 'typescript'
 
 interface WalletStore extends State {
   connected: boolean
