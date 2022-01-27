@@ -118,6 +118,7 @@ export const createProposal = async (
         tokenOwnerRecord,
         governanceAuthority,
         index,
+        0,
         instruction.holdUpTime || 0,
         instruction.data,
         payer

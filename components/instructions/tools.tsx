@@ -93,6 +93,12 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['2j2oe8YXdYJyS7G8CeEW5KARijdjjZkuPy5MnN8gBQqQ', ''],
 ])
 
+// Blacklisted proposals which should not be displayed in the UI
+// TODO: Add this to on-chain metadata to Proposal account
+export const HIDDEN_PROPOSALS = new Map<string, string>([
+  ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
+])
+
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
