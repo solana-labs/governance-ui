@@ -100,7 +100,7 @@ const ProposalActionsPanel = () => {
     ? 'Connect your wallet to finalize this proposal'
     : !hasVoteTimeExpired
     ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
-    : proposal?.account.state === ProposalState.Voting
+    : proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
   const handleFinalizeVote = async () => {
