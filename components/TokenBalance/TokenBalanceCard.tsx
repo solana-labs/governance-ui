@@ -23,6 +23,7 @@ import { getMintMetadata } from '../instructions/programs/splToken'
 import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { notify } from '@utils/notifications'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -272,6 +273,8 @@ const TokenDeposit = ({
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     } catch (ex) {
+      //TODO change to more friendly notification
+      notify({ type: 'error', message: `${ex}` })
       console.error("Can't withdraw tokens", ex)
     }
   }
