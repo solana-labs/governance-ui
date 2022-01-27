@@ -602,13 +602,23 @@
     "@solana/spl-token" "^0.1.8"
     typescript "^4.5.4"
 
-"@cardinal/namespaces-components@2.4.26":
-  version "2.4.26"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces-components/-/namespaces-components-2.4.26.tgz#0e4397b0fda7f225f3fae0020d67e1589f9e12cc"
-  integrity sha512-zsY/cOQwJ6JRlo8ErGCNCi5zXRbQXmudDPyCaYOhZHlAyedmlkFbSluxlCt3T4YaZf2suIkJvtyj3zevjb3OVw==
+"@cardinal/certificates@^1.3.0":
+  version "1.3.0"
+  resolved "https://registry.yarnpkg.com/@cardinal/certificates/-/certificates-1.3.0.tgz#32961546de819d0491b6fce633b63c55002d51ea"
+  integrity sha512-UmCxerq++uzcts4TJlh2Dtrq5wuZvM16pISmjrC4N24IYKle/9GIKc4+rwKwJjeAcaBsM0CDGUITQjH/JnanwA==
   dependencies:
-    "@cardinal/certificates" "^1.2.3"
-    "@cardinal/namespaces" "^3.0.23"
+    "@project-serum/anchor" "0.20.1"
+    "@saberhq/solana-contrib" "^1.12.23"
+    "@solana/spl-token" "^0.1.8"
+    typescript "^4.5.4"
+
+"@cardinal/namespaces-components@^2.5.0":
+  version "2.5.0"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces-components/-/namespaces-components-2.5.0.tgz#9eb7238faab8ede3d08edf4625c093d14a96b4d8"
+  integrity sha512-Xv9oQX8ewpx6Xta/oVm4wNFRET+btlHzKlEVFUp7FlvEzm50ncOPq2+Uxzg/SV72XvzzxMH5X3wC1JipQC9djw==
+  dependencies:
+    "@cardinal/certificates" "^1.3.0"
+    "@cardinal/namespaces" "^3.1.0"
     "@emotion/react" "^11.7.1"
     "@emotion/styled" "^11.6.0"
     "@metaplex/js" "^4.2.1"
@@ -620,7 +630,9 @@
     "@solana/buffer-layout" "^4.0.0"
     "@solana/spl-token" "^0.1.8"
     "@solana/web3.js" "^1.31.0"
+    "@types/react" "^17.0.38"
     polished "^4.1.3"
+    react "^17.0.2"
     react-content-loader "^6.1.0"
     react-device-detect "^2.1.2"
     react-icons "^4.3.1"
@@ -641,10 +653,10 @@
     "@solana/spl-token" "^0.1.8"
     typescript "^4.5.4"
 
-"@cardinal/namespaces@^3.0.23":
-  version "3.0.32"
-  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-3.0.32.tgz#b3f89694f70542a1dc89bff954029d783c782ee5"
-  integrity sha512-ZJrw3wxYfzJ3g2tmnqoesX5tTAfdXLHhr+Ix+SF91b16b5XZahb1YkTPc5rhwTa63D1OUwgqckuXHZ4zUVmziA==
+"@cardinal/namespaces@^3.1.0":
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/@cardinal/namespaces/-/namespaces-3.1.0.tgz#bee4acdf3d2bcf63aa5c02502f61fb8024ac4039"
+  integrity sha512-eX44mI0EFZrzvIHKGS/j0iUJPmCrl1av89jfSqWf6ldYYwLyENQysyOQv2az718pbJd9H5IQb+kJX0JLlQCo/w==
   dependencies:
     "@cardinal/certificates" "^1.2.3"
     "@cardinal/namespaces" "^2.0.42"
@@ -1651,12 +1663,24 @@
   dependencies:
     buffer "~6.0.3"
 
+"@solana/buffer-layout@^4.0.0":
+  version "4.0.0"
+  resolved "https://registry.yarnpkg.com/@solana/buffer-layout/-/buffer-layout-4.0.0.tgz#75b1b11adc487234821c81dfae3119b73a5fd734"
+  integrity sha512-lR0EMP2HC3+Mxwd4YcnZb0smnaDw7Bl2IQWZiTevRH5ZZBZn6VRWn3/92E3qdU4SSImJkA6IDHawOHAnx/qUvQ==
+  dependencies:
+    buffer "~6.0.3"
+
 "@solana/spl-governance@^0.0.19":
   version "0.0.19"
   resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.19.tgz#56d738db82e7609b3a1779c148863a337d79d2a6"
   integrity sha512-/HRfTL7zj6ygHb0T4oCf1LOisTF/f6kmCmLtOvcSfRP/owV2fp9FZcWZ0x2VGZY6lEH8ij6mT6vr7ZhC42E7WA==
   dependencies:
-    buffer "~6.0.3"
+    "@solana/web3.js" "^1.22.0"
+    bignumber.js "^9.0.1"
+    bn.js "^5.1.3"
+    borsh "^0.3.1"
+    bs58 "^4.0.1"
+    superstruct "^0.15.2"
 
 "@solana/spl-name-service@^0.1.3":
   version "0.1.3"
@@ -1855,7 +1879,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0":
+"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0":
   version "1.32.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.32.0.tgz#b9821de52d0e773c363516c3dcef9be701295d82"
   integrity sha512-jquZ/VBvM3zXAaTJvdWd9mlP0WiZaZqjji0vw5UAsb5IKIossrLhHtyUqMfo41Qkdwu1aVwf7YWG748i4XIJnw==
@@ -2200,6 +2224,15 @@
 "@types/react@^17.0.1":
   version "17.0.3"
   resolved "https://registry.npmjs.org/@types/react/-/react-17.0.3.tgz"
+  dependencies:
+    "@types/prop-types" "*"
+    "@types/scheduler" "*"
+    csstype "^3.0.2"
+
+"@types/react@^17.0.38":
+  version "17.0.38"
+  resolved "https://registry.yarnpkg.com/@types/react/-/react-17.0.38.tgz#f24249fefd89357d5fa71f739a686b8d7c7202bd"
+  integrity sha512-SI92X1IA+FMnP3qM5m4QReluXzhcmovhZnLNm3pyeQlooi02qI7sLiepEYqT678uNiyc25XfCqxREFpy3W7YhQ==
   dependencies:
     "@types/prop-types" "*"
     "@types/scheduler" "*"
@@ -2896,16 +2929,6 @@ bonjour@^3.5.0:
     dns-txt "^2.0.2"
     multicast-dns "^6.0.1"
     multicast-dns-service-types "^1.1.0"
-
-borsh@^0.3.1:
-  version "0.3.1"
-  resolved "https://registry.yarnpkg.com/borsh/-/borsh-0.3.1.tgz#c31c3a149610e37913deada80e89073fb15cf55b"
-  integrity sha512-gJoSTnhwLxN/i2+15Y7uprU8h3CKI+Co4YKZKvrGYUy0FwHWM20x5Sx7eU8Xv4HQqV+7rb4r3P7K1cBIQe3q8A==
-  dependencies:
-    "@types/bn.js" "^4.11.5"
-    bn.js "^5.0.0"
-    bs58 "^4.0.0"
-    text-encoding-utf-8 "^1.0.2"
 
 borsh@^0.4.0:
   version "0.4.0"
@@ -8631,7 +8654,7 @@ react-virtualized@^9.22.3:
     prop-types "^15.7.2"
     react-lifecycles-compat "^3.0.4"
 
-react@^17.0.1:
+react@^17.0.1, react@^17.0.2:
   version "17.0.2"
   resolved "https://registry.npmjs.org/react/-/react-17.0.2.tgz"
   dependencies:
@@ -9563,7 +9586,7 @@ superstruct@^0.14.2:
   resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.14.2.tgz#0dbcdf3d83676588828f1cf5ed35cda02f59025b"
   integrity sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==
 
-superstruct@^0.15.2, superstruct@^0.15.3:
+superstruct@^0.15.3:
   version "0.15.3"
   resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.15.3.tgz#07edfc715259ebfe3b4b2e4cb53e8e45b51674a4"
   integrity sha512-wilec1Rg3FtKuRjRyCt70g5W29YUEuaLnybdVQUI+VQ7m0bw8k7TzrRv5iYmo6IpjLVrwxP5t3RgjAVqhYh4Fg==
