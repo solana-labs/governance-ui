@@ -174,7 +174,7 @@ const Grant = ({
       const monthsDifference = moment(endDate).diff(moment(startDate), 'months')
       const periods =
         form.lockupKind.value !== 'monthly' ? daysDifference : monthsDifference
-      console.log(periods)
+
       handleSetForm({
         value: periods > 0 ? periods : 0,
         propertyName: 'periods',
@@ -298,7 +298,7 @@ const Grant = ({
         </div>
       )}
       <Input
-        label="Destination account"
+        label="Wallet address"
         value={form.destinationAccount}
         type="text"
         onChange={(evt) =>

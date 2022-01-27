@@ -1,9 +1,4 @@
-import {
-  Keypair,
-  PublicKey,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 
 import {
   getSignatoryRecordAddress,
@@ -16,7 +11,6 @@ import { withAddSignatory } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { withInsertInstruction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
@@ -43,12 +37,10 @@ export const createProposal = async (
   client?: VsrClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-  const signers: Keypair[] = []
 
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
-  const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
 
   // V2 Approve/Deny configuration
@@ -125,7 +117,7 @@ export const createProposal = async (
     }
   }
 
-  const insertInstructionCount = insertInstructions.length
+  //   const insertInstructionCount = insertInstructions.length
 
   if (!isDraft) {
     withSignOffProposal(
@@ -140,39 +132,51 @@ export const createProposal = async (
   // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
   // This is conservative setting and we might need to revise it if we have more empirical examples or
   // reliable way to determine Tx size
-  if (insertInstructionCount <= 2) {
-    const transaction = new Transaction()
-    // We merge instructions with prerequisiteInstructions
-    // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
-    // For example we create ATAs if they don't exist as part of the proposal creation flow
-    transaction.add(
-      ...prerequisiteInstructions,
-      ...instructions,
-      ...insertInstructions
-    )
+  //   if (insertInstructionCount <= 2) {
+  //     const transaction = new Transaction()
+  // We merge instructions with prerequisiteInstructions
+  // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
+  // For example we create ATAs if they don't exist as part of the proposal creation flow
+  //     transaction.add(
+  //       ...prerequisiteInstructions,
+  //       ...instructions,
+  //       ...insertInstructions
+  //     )
 
-    await sendTransaction({
-      transaction,
-      wallet,
-      connection,
-      signers,
-      sendingMessage: `creating ${notificationTitle}`,
-      successMessage: `${notificationTitle} created`,
-    })
-  } else {
-    const insertChunks = chunks(insertInstructions, 2)
-    const signerChunks = Array(insertChunks.length).fill([])
+  //     await sendTransaction({
+  //       transaction,
+  //       wallet,
+  //       connection,
+  //       signers,
+  //       sendingMessage: `creating ${notificationTitle}`,
+  //       successMessage: `${notificationTitle} created`,
+  //     })
+  //   } else {
+  //     const insertChunks = chunks(insertInstructions, 2)
+  //     const signerChunks = Array(insertChunks.length).fill([])
 
-    console.log(`Creating proposal using ${insertChunks.length} chunks`)
+  //     console.log(`Creating proposal using ${insertChunks.length} chunks`)
 
-    await sendTransactions(
-      connection,
-      wallet,
-      [prerequisiteInstructions, instructions, ...insertChunks],
-      [[], [], ...signerChunks],
-      SequenceType.Sequential
-    )
-  }
+  //     await sendTransactions(
+  //       connection,
+  //       wallet,
+  //       [prerequisiteInstructions, instructions, ...insertChunks],
+  //       [[], [], ...signerChunks],
+  //       SequenceType.Sequential
+  //     )
+  //   }
+  const insertChunks = chunks(insertInstructions, 2)
+  const signerChunks = Array(insertChunks.length).fill([])
+
+  console.log(`Creating proposal using ${insertChunks.length} chunks`)
+
+  await sendTransactions(
+    connection,
+    wallet,
+    [prerequisiteInstructions, instructions, ...insertChunks],
+    [[], [], ...signerChunks],
+    SequenceType.Sequential
+  )
 
   return proposalAddress
 }
