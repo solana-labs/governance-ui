@@ -164,6 +164,7 @@ export const validateBuffer = async (
 
 export const getTokenTransferSchema = ({ form, connection }) => {
   return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
       .number()
       .typeError('Amount is required')
@@ -171,7 +172,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = form.governedTokenAccount.isNft
+          const isNft = form.governedTokenAccount?.isNft
           if (isNft) {
             return true
           }
@@ -236,10 +237,6 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           }
         }
       ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
   })
 }
 
