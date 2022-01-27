@@ -34,7 +34,7 @@
     "@project-serum/borsh": "^0.2.2",
     "@project-serum/common": "^0.0.1-beta.3",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
-    "@solana/spl-governance": "^0.0.18",
+    "@solana/spl-governance": "^0.0.19",
     "@solana/spl-token": "^0.1.3",
     "@solana/spl-token-registry": "^0.2.1733",
     "@solana/wallet-adapter-base": "^0.7.1",
