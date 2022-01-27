@@ -46,6 +46,8 @@ import {
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { mapEntries } from '@tools/core/script'
+import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
+import { reduceEachTrailingCommentRange } from 'typescript'
 
 interface WalletStore extends State {
   connected: boolean
@@ -339,7 +341,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       )
 
       const proposals = accountsToPubkeyMap(
-        proposalsByGovernance.flatMap((p) => p)
+        proposalsByGovernance
+          .flatMap((p) => p)
+          .filter((p) => !HIDDEN_PROPOSALS.has(p.pubkey.toBase58()))
       )
 
       console.log('fetchRealm proposals', proposals)
@@ -382,6 +386,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
     async fetchProposal(proposalPk: string) {
       console.log('fetchProposal', proposalPk)
+
+      if (HIDDEN_PROPOSALS.has(proposalPk)) {
+        return
+      }
 
       const connection = get().connection.current
       const realmMints = get().selectedRealm.mints
