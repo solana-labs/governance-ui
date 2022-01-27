@@ -4,8 +4,11 @@ import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
 import { tryGetTokenAccount } from './tokens'
 import * as yup from 'yup'
-import { getMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { BN } from '@project-serum/anchor'
+import {
+  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
+
 import type { ConnectionContext } from 'utils/connection'
 import {
   AccountInfo,
@@ -186,15 +189,13 @@ export const getTokenTransferSchema = ({ form, connection }) => {
             form.governedTokenAccount &&
             form.governedTokenAccount?.mint
           ) {
-            const mintValue = getMintNaturalAmountFromDecimal(
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               form.governedTokenAccount?.mint.account.decimals
             )
             return !!(
               form.governedTokenAccount?.token?.publicKey &&
-              form.governedTokenAccount.token.account.amount.gte(
-                new BN(mintValue)
-              )
+              form.governedTokenAccount.token.account.amount.gte(mintValue)
             )
           }
           return this.createError({
