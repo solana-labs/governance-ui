@@ -24,13 +24,7 @@ import {
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
-  const {
-    realm,
-    realmInfo,
-    realmTokenAccount,
-    ownTokenRecord,
-    tokenRecords,
-  } = useRealm()
+  const { realm, realmInfo, ownTokenRecord, tokenRecords } = useRealm()
   const {
     client,
     calcMintMultiplier,
@@ -42,7 +36,6 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
 
   const depositTokenRecord = ownTokenRecord
-  const depositTokenAccount = realmTokenAccount
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
@@ -53,10 +46,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       connection,
       endpoint
     )
-    //TODO withdraw to ATA
+
     await voteRegistryWithdraw({
       rpcContext,
-      toPubKey: depositTokenAccount!.publicKey!,
       mintPk: depositTokenRecord!.account.governingTokenMint,
       realmPk: realm!.pubkey!,
       amount: depositEntry.available,

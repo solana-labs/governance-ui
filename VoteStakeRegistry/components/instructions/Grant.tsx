@@ -129,7 +129,7 @@ const Grant = ({
         toPk: destinationAccount,
         realmMint: realm!.account.communityMint!,
         realmPk: realm!.pubkey,
-        realmAuthority: realm!.account.authority!,
+        grantAuthority: form.governedTokenAccount.governance!.pubkey,
         grantMintPk: form.governedTokenAccount.mint.publicKey,
         amount: mintAmount,
         lockupPeriod: form.periods,

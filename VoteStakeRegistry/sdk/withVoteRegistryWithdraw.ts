@@ -1,4 +1,4 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -11,11 +11,11 @@ import {
   getVoterWeightPDA,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { tryGetTokenAccount } from '@utils/tokens'
 
 export const withVoteRegistryWithdraw = async ({
   instructions,
   walletPk,
-  toPubKey,
   mintPk,
   realmPk,
   amount,
@@ -23,15 +23,16 @@ export const withVoteRegistryWithdraw = async ({
   depositIndex,
   closeDepositAfterOperation,
   client,
+  connection,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
-  toPubKey: PublicKey
   mintPk: PublicKey
   realmPk: PublicKey
   amount: BN
   tokenOwnerRecordPubKey: PublicKey
   depositIndex: number
+  connection: Connection
   //if we want to close deposit after doing operation we need to fill this because we can close only deposits that have 0 tokens inside
   closeDepositAfterOperation?: boolean
   client?: VsrClient
@@ -60,6 +61,25 @@ export const withVoteRegistryWithdraw = async ({
     voter
   )
 
+  const ataPk = await Token.getAssociatedTokenAddress(
+    ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+    TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+    mintPk, // mint
+    walletPk // owner
+  )
+  const isExistingAta = await tryGetTokenAccount(connection, ataPk)
+  if (!isExistingAta) {
+    instructions.push(
+      Token.createAssociatedTokenAccountInstruction(
+        ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+        TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+        mintPk, // mint
+        ataPk, // ata
+        walletPk, // owner of token account
+        walletPk // fee payer
+      )
+    )
+  }
   instructions.push(
     client?.program.instruction.withdraw(depositIndex!, amount, {
       accounts: {
@@ -69,7 +89,7 @@ export const withVoteRegistryWithdraw = async ({
         tokenOwnerRecord: tokenOwnerRecordPubKey,
         voterWeightRecord: voterWeightPk,
         vault: voterATAPk,
-        destination: toPubKey,
+        destination: ataPk,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
     })

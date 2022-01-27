@@ -22,9 +22,7 @@ const WithDrawCommunityTokens = () => {
   const {
     realm,
     realmInfo,
-    realmTokenAccount,
     ownTokenRecord,
-
     proposals,
     governances,
     tokenRecords,
@@ -109,13 +107,13 @@ const WithDrawCommunityTokens = () => {
     await withVoteRegistryWithdraw({
       instructions,
       walletPk: wallet!.publicKey!,
-      toPubKey: realmTokenAccount!.publicKey!,
       mintPk: ownTokenRecord!.account.governingTokenMint,
       realmPk: realm!.pubkey!,
       amount: depositRecord!.amountDepositedNative,
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositRecord!.index,
+      connection,
       client: client,
     })
 

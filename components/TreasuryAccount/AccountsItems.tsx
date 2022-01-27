@@ -17,6 +17,7 @@ const AccountsItems = () => {
     }
     prepTreasuryAccounts()
   }, [JSON.stringify(governedTokenAccounts)])
+
   return (
     <div className="space-y-3">
       {treasuryAccounts.map((accountWithGovernance) => {

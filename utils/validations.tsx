@@ -46,7 +46,7 @@ const validateDoseTokenAccountMatchMint = (
 }
 
 export const tryGetAta = async (
-  connection: ConnectionContext,
+  connection: Connection,
   mint: PublicKey,
   owner: PublicKey
 ) => {
@@ -57,7 +57,7 @@ export const tryGetAta = async (
     mint, // mint
     owner // owner
   )
-  const tokenAccount = await tryGetTokenAccount(connection.current, ata)
+  const tokenAccount = await tryGetTokenAccount(connection, ata)
   return tokenAccount
 }
 
