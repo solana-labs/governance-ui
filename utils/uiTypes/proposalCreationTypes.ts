@@ -82,6 +82,7 @@ export enum Instructions {
   None,
   MangoMakeChangeMaxAccounts,
   Grant,
+  Clawback,
 }
 
 export type createParams = [

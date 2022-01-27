@@ -156,6 +156,13 @@ export default function useGovernanceAssets() {
         realm?.account.config.useCommunityVoterWeightAddin,
     },
     {
+      id: Instructions.Clawback,
+      name: 'Clawback',
+      isVisible:
+        canUseTokenTransferInstruction &&
+        realm?.account.config.useCommunityVoterWeightAddin,
+    },
+    {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,
