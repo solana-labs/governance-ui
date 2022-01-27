@@ -199,6 +199,7 @@ const New = () => {
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
+          chunkSplitByDefault: x.chunkSplitByDefault || false,
         }
       })
 

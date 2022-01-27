@@ -17,6 +17,7 @@ export interface UiInstruction {
   governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
+  chunkSplitByDefault?: boolean
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
