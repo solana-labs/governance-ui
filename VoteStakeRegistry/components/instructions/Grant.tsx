@@ -308,20 +308,36 @@ const Grant = ({
         onChange={handleChangeStartDate}
         error={formErrors['startDateUnixSeconds']}
       />
-      <Input
-        label="End date"
-        type="date"
-        value={endDate}
-        onChange={handleChangeEndDate}
-        error={formErrors['periods']}
-      />
+      {form.lockupKind.value !== 'monthly' ? (
+        <Input
+          label="End date"
+          type="date"
+          value={endDate}
+          onChange={handleChangeEndDate}
+          error={formErrors['periods']}
+        />
+      ) : (
+        <Input
+          type="number"
+          label="Number of months"
+          min="1"
+          value={form.periods}
+          onChange={(e) => {
+            handleSetForm({
+              value: e.target.value,
+              propertyName: 'periods',
+            })
+          }}
+          error={formErrors['periods']}
+        ></Input>
+      )}
       {form.periods !== 0 && (
         <div>
           <div className="text-xs">Period</div>
           <div className="pt-2">
             {form.lockupKind.value !== 'monthly'
               ? getFormattedStringFromDays(form.periods)
-              : `${form.periods} m`}
+              : `${form.periods || 0} months`}
           </div>
         </div>
       )}
