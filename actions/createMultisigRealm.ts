@@ -25,14 +25,10 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
 } from '@tools/sdk/units'
-import {
-  getWalletPublicKey,
-  sendTransactions,
-  SequenceType,
-  WalletSigner,
-} from 'utils/sendTransactions'
+import { getWalletPublicKey, WalletSigner } from 'utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { sendTransactionFactory } from './registerRealm'
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
@@ -113,7 +109,7 @@ export const createMultisigRealm = async (
 
   // Create realm
   const realmInstructions: TransactionInstruction[] = []
-  const realmSigners: Keypair[] = []
+  // const realmSigners: Keypair[] = []
 
   // Convert to mint natural amount
   const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
@@ -213,7 +209,7 @@ export const createMultisigRealm = async (
     programVersion,
     realmPk,
     walletPk,
-    communityMintGovPk
+    communityMintGovPk.governanceAddress
   )
 
   try {
@@ -223,17 +219,27 @@ export const createMultisigRealm = async (
       []
     )
 
-    const tx = await sendTransactions(
-      connection,
+    const txnToSend = await sendTransactionFactory(
       wallet,
-      [mintsSetupInstructions, ...councilMembersChunks, realmInstructions],
-      [mintsSetupSigners, ...councilMembersSignersChunks, realmSigners],
-      SequenceType.Sequential
+      connection,
+      councilMembersChunks,
+      councilMembersSignersChunks,
+      realmInstructions,
+      mintsSetupInstructions,
+      mintsSetupSigners
     )
 
+    // const tx = await sendTransactions(
+    //   connection,
+    //   wallet,
+    //   [mintsSetupInstructions, ...councilMembersChunks, realmInstructions],
+    //   [mintsSetupSigners, ...councilMembersSignersChunks, realmSigners],
+    //   SequenceType.Sequential
+    // )
+
     return {
-      tx,
-      realmPk,
+      txnToSend,
+      realmAddress: realmPk,
       communityMintPk,
       councilMintPk,
     }

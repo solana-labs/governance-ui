@@ -43,6 +43,8 @@ import {
 import Switch from '@components/Switch'
 import { BN } from '@project-serum/anchor'
 import BigNumber from 'bignumber.js'
+import { TransactionFlow } from '@components/SendTransactionWidget/model/NamedTransaction'
+import SendTransactionWidget from '@components/SendTransactionWidget/SendTransactionWidget'
 
 enum LoaderMessage {
   CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -77,8 +79,10 @@ const RealmWizard: React.FC = () => {
   const [currentStep, setCurrentStep] = useState<RealmWizardStep>(
     RealmWizardStep.SELECT_MODE
   )
-  const [realmAddress] = useState('')
+  const [realmAddress, setRealmAddress] = useState('')
   const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
+
+  const [txnToSend, setTxnToSend] = useState<TransactionFlow[]>()
 
   /**
    * Handles and set the form data
@@ -120,25 +124,28 @@ const RealmWizard: React.FC = () => {
       ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
       : DEFAULT_GOVERNANCE_PROGRAM_ID
 
-    const results = await createMultisigRealm(
-      connection.current,
-      new PublicKey(programId),
-      PROGRAM_VERSION_V1,
-      form.name,
-      form.yesThreshold,
-      form.teamWallets.map((w) => new PublicKey(w)),
-      wallet
-    )
+    try {
+      const {
+        txnToSend: flow,
+        realmAddress: realm,
+      } = await createMultisigRealm(
+        connection.current,
+        new PublicKey(programId),
+        PROGRAM_VERSION_V1,
+        form.name,
+        form.yesThreshold,
+        form.teamWallets.map((w) => new PublicKey(w)),
+        wallet
+      )
 
-    if (results) {
-      router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
-      return
+      setTxnToSend(flow)
+      setRealmAddress(realm.toBase58())
+    } catch (error: any) {
+      notify({
+        type: 'error',
+        message: error.message,
+      })
     }
-
-    notify({
-      type: 'error',
-      message: 'Something bad happened during this request.',
-    })
   }
 
   /**
@@ -174,7 +181,7 @@ const RealmWizard: React.FC = () => {
 
     if (isValid) {
       try {
-        const realmAddress = await registerRealm(
+        const { realmAddress: realm, txnToSend: flow } = await registerRealm(
           {
             connection,
             wallet: wallet!,
@@ -195,8 +202,10 @@ const RealmWizard: React.FC = () => {
           form.councilMint ? form.councilMint.account.decimals : undefined,
           getTeamWallets()
         )
-        router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+        setTxnToSend(flow)
+        setRealmAddress(realm.toBase58())
       } catch (error) {
+        setRealmAddress('')
         notify({
           type: 'error',
           message: error.message,
@@ -206,7 +215,6 @@ const RealmWizard: React.FC = () => {
       console.debug(validationErrors)
       setFormErrors(validationErrors)
     }
-    setIsLoading(false)
   }
 
   /**
@@ -275,8 +283,6 @@ const RealmWizard: React.FC = () => {
           type: 'error',
           message: err.message,
         })
-      } finally {
-        setIsLoading(false)
       }
     }
   }
@@ -376,9 +382,12 @@ const RealmWizard: React.FC = () => {
   }, [currentStep, form, formErrors, councilSwitchState])
 
   useEffect(() => {
-    // Return shouldFireCreate to the base state
     if (Object.values(formErrors).length) setFormErrors({})
   }, [form])
+
+  // useEffect(() => {
+
+  // })
 
   return (
     <div
@@ -400,13 +409,43 @@ const RealmWizard: React.FC = () => {
           Back
         </a>
       </div>
-      {isLoading ? (
+
+      {isLoading && !txnToSend?.length ? (
         <div className="text-center">
           <Loading />
           <span>{loaderMessage}</span>
         </div>
       ) : (
-        <div className="min-h-[60vh]">{BoundStepComponent}</div>
+        !isLoading &&
+        !txnToSend?.length && (
+          <div className="min-h-[60vh]">{BoundStepComponent}</div>
+        )
+      )}
+      {isLoading && txnToSend?.length && realmAddress && (
+        <div className="text-center">
+          <SendTransactionWidget
+            transactions={txnToSend}
+            finishedText="DAO creation completed. Redirecting to the DAO's page"
+            onError={(error) => {
+              console.debug('realmadd', realmAddress)
+              setRealmAddress('')
+              setIsLoading(false)
+              setTxnToSend(undefined)
+              notify({
+                type: 'error',
+                message: error.message,
+              })
+            }}
+            onFinish={() => {
+              setTxnToSend(undefined)
+              setTimeout(() => {
+                setIsLoading(false)
+                console.debug('REALM ADDRESS', realmAddress)
+                router.push(fmtUrlWithCluster(`/dao/${realmAddress}`))
+              }, 2000)
+            }}
+          />
+        </div>
       )}
       {ctl && !(ctl.isModeSelect() || isLoading) && (
         <>
