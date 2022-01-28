@@ -219,6 +219,7 @@ const LockTokensModal = ({
     await voteRegistryLockDeposit({
       rpcContext,
       mintPk: realm!.account.communityMint!,
+      communityMintPk: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
       amountFromVoteRegistryDeposit: amountFromDeposit,
@@ -275,6 +276,7 @@ const LockTokensModal = ({
       amountAfterOperation: whatWillBeLeftInsideDeposit,
       lockUpPeriodInDays: lockupPeriod.value,
       sourceDepositIdx: depositToUnlock!.index,
+      communityMintPk: realm!.account.communityMint,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,

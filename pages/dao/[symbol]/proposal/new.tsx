@@ -40,6 +40,7 @@ import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWr
 import { getProgramVersionForRealm } from '@models/registry/api'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -299,6 +300,8 @@ const New = () => {
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>
+      case Instructions.Clawback:
+        return <Clawback index={idx} governance={governance}></Clawback>
       default:
         null
     }

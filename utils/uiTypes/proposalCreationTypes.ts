@@ -9,6 +9,7 @@ import {
   GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
+import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 
 export interface UiInstruction {
@@ -31,12 +32,17 @@ export interface GrantForm {
   destinationAccount: string
   amount: number | undefined
   governedTokenAccount: GovernedTokenAccount | undefined
-  programId: string | undefined
   mintInfo: MintInfo | undefined
   lockupKind: LockupKind
   startDateUnixSeconds: number
   periods: number
   allowClawback: boolean
+}
+
+export interface ClawbackForm {
+  governedTokenAccount: GovernedTokenAccount | undefined
+  voter: Voter | null
+  deposit: DepositWithMintAccount | null
 }
 
 export interface SendTokenCompactViewForm extends SplTokenTransferForm {

@@ -48,10 +48,9 @@ const Grant = ({
   const dateNow = moment().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realmInfo, realm } = useRealm()
+  const { realm } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
-  const programId: PublicKey | undefined = realmInfo?.programId
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState('')
   const [form, setForm] = useState<GrantForm>({
@@ -59,7 +58,6 @@ const Grant = ({
     // No default transfer amount
     amount: undefined,
     governedTokenAccount: undefined,
-    programId: programId?.toString(),
     mintInfo: undefined,
     startDateUnixSeconds: dateNow,
     periods: 0,
@@ -112,7 +110,6 @@ const Grant = ({
     const prerequisiteInstructions: TransactionInstruction[] = []
     if (
       isValid &&
-      programId &&
       form.governedTokenAccount?.token?.publicKey &&
       form.governedTokenAccount?.token &&
       form.governedTokenAccount?.mint?.account
@@ -123,12 +120,13 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.mint.account.decimals
       )
-
+      //TODO council mint
       const grantIx = await getGrantInstruction({
         fromPk: sourceAccount,
         toPk: destinationAccount,
         realmMint: realm!.account.communityMint!,
         realmPk: realm!.pubkey,
+        communityMintPk: realm!.account.communityMint,
         grantAuthority: form.governedTokenAccount.governance!.pubkey,
         grantMintPk: form.governedTokenAccount.mint.publicKey,
         amount: mintAmount,
@@ -182,12 +180,6 @@ const Grant = ({
       })
     }
   }, [startDate, endDate, form.lockupKind.value])
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {

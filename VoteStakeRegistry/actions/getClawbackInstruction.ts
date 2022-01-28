@@ -11,30 +11,36 @@ import {
 export const getClawbackInstruction = async ({
   realmPk,
   realmAuthority,
-  walletAddress,
+  voterWalletAddress,
   tokenOwnerRecord,
   destination,
   voterDepositIndex,
   grantMintPk,
+  realmCommunityMintPk,
   client,
 }: {
   realmPk: PublicKey
   realmAuthority: PublicKey
-  walletAddress: PublicKey
+  voterWalletAddress: PublicKey
   tokenOwnerRecord: PublicKey
   destination: PublicKey
   voterDepositIndex: number
   grantMintPk: PublicKey
+  realmCommunityMintPk: PublicKey
   client?: VsrClient
 }) => {
   const clientProgramId = client!.program.programId
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
-    grantMintPk,
+    realmCommunityMintPk,
     clientProgramId
   )
-  const { voter } = await getVoterPDA(registrar, walletAddress, clientProgramId)
+  const { voter } = await getVoterPDA(
+    registrar,
+    voterWalletAddress,
+    clientProgramId
+  )
 
   const voterATAPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,

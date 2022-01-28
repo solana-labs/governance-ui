@@ -110,6 +110,7 @@ const WithDrawCommunityTokens = () => {
       mintPk: ownTokenRecord!.account.governingTokenMint,
       realmPk: realm!.pubkey!,
       amount: depositRecord!.amountDepositedNative,
+      communityMintPk: realm!.account.communityMint,
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositRecord!.index,

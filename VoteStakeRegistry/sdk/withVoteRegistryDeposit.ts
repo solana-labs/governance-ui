@@ -16,6 +16,7 @@ export const withVoteRegistryDeposit = async ({
   tokenOwnerRecordPk,
   lockUpPeriodInDays,
   lockupKind,
+  communityMintPk,
   client,
 }: {
   instructions: TransactionInstruction[]
@@ -26,6 +27,7 @@ export const withVoteRegistryDeposit = async ({
   realmPk: PublicKey
   programId: PublicKey
   amount: BN
+  communityMintPk: PublicKey
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
@@ -49,6 +51,7 @@ export const withVoteRegistryDeposit = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
+    communityMintPk,
     client,
   })
   const depositInstruction = client?.program.instruction.deposit(

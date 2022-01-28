@@ -19,6 +19,7 @@ export const getGrantInstruction = async ({
   toPk,
   realmPk,
   grantMintPk,
+  communityMintPk,
   amount,
   lockupPeriod,
   startTime,
@@ -31,6 +32,7 @@ export const getGrantInstruction = async ({
   fromPk: PublicKey
   realmMint: PublicKey
   grantMintPk: PublicKey
+  communityMintPk: PublicKey
   toPk: PublicKey
   realmPk: PublicKey
   grantAuthority: PublicKey
@@ -48,7 +50,7 @@ export const getGrantInstruction = async ({
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
-    grantMintPk,
+    communityMintPk,
     clientProgramId
   )
   const { voter, voterBump } = await getVoterPDA(

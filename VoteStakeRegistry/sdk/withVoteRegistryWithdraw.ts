@@ -21,6 +21,7 @@ export const withVoteRegistryWithdraw = async ({
   amount,
   tokenOwnerRecordPubKey,
   depositIndex,
+  communityMintPk,
   closeDepositAfterOperation,
   client,
   connection,
@@ -29,6 +30,7 @@ export const withVoteRegistryWithdraw = async ({
   walletPk: PublicKey
   mintPk: PublicKey
   realmPk: PublicKey
+  communityMintPk: PublicKey
   amount: BN
   tokenOwnerRecordPubKey: PublicKey
   depositIndex: number
@@ -44,7 +46,7 @@ export const withVoteRegistryWithdraw = async ({
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
-    mintPk,
+    communityMintPk,
     client!.program.programId
   )
   const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)

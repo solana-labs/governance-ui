@@ -18,11 +18,13 @@ export const voteRegistryWithdraw = async ({
   tokenOwnerRecordPubKey,
   depositIndex,
   closeDepositAfterOperation,
+  communityMintPk,
   client,
 }: {
   rpcContext: RpcContext
   mintPk: PublicKey
   realmPk: PublicKey
+  communityMintPk: PublicKey
   amount: BN
   tokenOwnerRecordPubKey: PublicKey
   depositIndex: number
@@ -42,6 +44,7 @@ export const voteRegistryWithdraw = async ({
     tokenOwnerRecordPubKey,
     depositIndex,
     closeDepositAfterOperation,
+    communityMintPk,
     connection,
     client,
   })
