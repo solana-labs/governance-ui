@@ -23,6 +23,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
   serializeInstructionToBase64,
+  withCreateTokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
@@ -48,7 +49,7 @@ const Grant = ({
   const dateNow = moment().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { realm } = useRealm()
+  const { realm, tokenRecords } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
@@ -120,7 +121,17 @@ const Grant = ({
         form.amount!,
         form.governedTokenAccount.mint.account.decimals
       )
-      //TODO council mint
+      const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
+      if (!currentTokenOwnerRecord) {
+        await withCreateTokenOwnerRecord(
+          prerequisiteInstructions,
+          realm!.owner,
+          realm!.pubkey,
+          destinationAccount,
+          form.governedTokenAccount.mint.publicKey,
+          wallet!.publicKey!
+        )
+      }
       const grantIx = await getGrantInstruction({
         fromPk: sourceAccount,
         toPk: destinationAccount,
