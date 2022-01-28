@@ -46,31 +46,44 @@ const MemberItem = ({ item }: { item: Member }) => {
     setCurrentCompactView(ViewState.MemberOverview)
     setCurrentCompactViewMember(item)
   }
+
+  const address = useMemo(
+    () => (
+      <AddressImage
+        dark={true}
+        connection={connection.current}
+        address={walletPublicKey}
+        height="30px"
+        width="30px"
+        placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+      />
+    ),
+    [item.walletAddress]
+  )
+
+  const addressName = useMemo(
+    () => (
+      <DisplayAddress
+        connection={connection.current}
+        address={walletPublicKey}
+        height="12px"
+        width="100px"
+        dark={true}
+      />
+    ),
+    [item.walletAddress]
+  )
+
   return (
     <div
       onClick={handleGoToMemberOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 pr-0 rounded-lg w-full hover:bg-bkg-3"
     >
       <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
-        <AddressImage
-          dark={true}
-          connection={connection.current}
-          address={walletPublicKey}
-          height="30px"
-          width="30px"
-          placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
-        />
+        {address}
       </div>
       <div>
-        <div className="text-xs text-th-fgd-1 h-5">
-          <DisplayAddress
-            connection={connection.current}
-            address={walletPublicKey}
-            height="12px"
-            width="100px"
-            dark={true}
-          />
-        </div>
+        <div className="text-xs text-th-fgd-1 h-5">{addressName}</div>
         <div className="text-fgd-3 text-xs flex flex-col">
           Votes cast: {totalVotes}
         </div>
