@@ -68,7 +68,7 @@ const AccountItemSol = ({
     >
       {tokenRecordInfo?.logoURI && (
         <img
-          className="flex-shrink-0 h-6 w-6 mr-2.5 mt-1"
+          className="flex-shrink-0 h-6 w-6 mr-2.5 mt-1 rounded-full"
           src={tokenRecordInfo.logoURI}
         />
       )}
