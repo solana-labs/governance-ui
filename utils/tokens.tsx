@@ -4,6 +4,7 @@ import {
   PublicKey,
   TransactionInstruction,
   Commitment,
+  ParsedAccountData,
 } from '@solana/web3.js'
 import {
   AccountInfo,
@@ -31,6 +32,9 @@ export type GovernedTokenAccount = {
   mint: TokenProgramAccount<MintInfo> | undefined
   governance: ProgramAccount<Governance> | undefined
   isNft: boolean
+  isSol: boolean
+  transferAddress: PublicKey | null
+  solAccount: null | AccountInfoGen<Buffer | ParsedAccountData>
 }
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
