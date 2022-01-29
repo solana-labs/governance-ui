@@ -140,7 +140,7 @@ const VotePanel = () => {
     : !isVoting && isVoteCast
     ? 'Proposal is not in a voting state anymore.'
     : !voterTokenRecord ||
-      ownVoterWeight.hasMinAmountToVote(
+      !ownVoterWeight.hasMinAmountToVote(
         voterTokenRecord.account.governingTokenMint
       )
     ? 'You don’t have governance power to vote in this realm'
