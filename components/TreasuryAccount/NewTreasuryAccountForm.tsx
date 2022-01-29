@@ -21,12 +21,12 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
-import Switch from '@components/Switch'
 import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { TokenInfo } from '@solana/spl-token-registry'
+import Select from '@components/inputs/Select'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
@@ -40,6 +40,17 @@ const defaultFormValues = {
   maxVotingTime: 3,
   voteThreshold: 60,
 }
+
+const SOL = 'SOL'
+const OTHER = 'OTHER'
+const NFT = 'NFT'
+
+const types = [
+  { name: 'Other', value: OTHER },
+  { name: 'Native SOL', value: SOL },
+  { name: 'NFT', value: NFT },
+]
+
 const NewAccountForm = () => {
   const router = useRouter()
   const { client } = useVoteRegistry()
@@ -62,7 +73,7 @@ const NewAccountForm = () => {
   const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const [isNFT, setIsNFT] = useState(false)
+  const [treasuryType, setTreasuryType] = useState(types[0])
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
@@ -205,11 +216,16 @@ const NewAccountForm = () => {
   }, [form.mintAddress])
 
   useEffect(() => {
+    let mint = ''
+    if (treasuryType.value === NFT) {
+      mint = DEFAULT_NFT_TREASURY_MINT
+    }
+
     handleSetForm({
-      value: isNFT ? DEFAULT_NFT_TREASURY_MINT : '',
+      value: mint,
       propertyName: 'mintAddress',
     })
-  }, [isNFT])
+  }, [treasuryType])
 
   return (
     <div className="space-y-3">
@@ -219,13 +235,21 @@ const NewAccountForm = () => {
           <h1>Create new treasury account</h1>
         </div>
       </div>
-      <div className="text-sm mb-3">
-        <div className="mb-2">NFT Treasury</div>
-        <div className="flex flex-row text-xs items-center">
-          <Switch checked={isNFT} onChange={() => setIsNFT(!isNFT)} />
-        </div>
-      </div>
-      {!isNFT && (
+      <Select
+        label={'Type'}
+        onChange={setTreasuryType}
+        placeholder="Please select..."
+        value={treasuryType.name}
+      >
+        {types.map((x) => {
+          return (
+            <Select.Option key={x.value} value={x}>
+              {x.name}
+            </Select.Option>
+          )
+        })}
+      </Select>
+      {treasuryType.value === OTHER && (
         <>
           <Input
             label="Mint address"
