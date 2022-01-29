@@ -1,13 +1,9 @@
-import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { Connection } from '@solana/web3.js'
 import { struct, u8, u48 } from 'buffer-layout'
-import {
-  AccountMetaData,
-  serializeInstructionToBase64,
-} from '@solana/spl-governance'
-import { Wallet } from '@project-serum/sol-wallet-adapter'
-import { Program, Provider } from '@project-serum/anchor'
-import { uxdIdl } from '@uxdprotocol/uxd-client'
-import { u128 } from '@project-serum/borsh'
+import { AccountMetaData } from '@solana/spl-governance'
+import { u128, u64 } from '@project-serum/borsh'
+import { tryGetTokenMint } from '@utils/tokens'
+import { fmtMintAmount } from '@tools/sdk/units'
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
@@ -48,48 +44,31 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[],
-        programId: PublicKey
+        _accounts: AccountMetaData[]
       ) => {
         const dataLayout = struct([
           u8('instruction'),
+          u8('SIGHASH_1'),
+          u8('SIGHASH_2'),
+          u8('SIGHASH_3'),
+          u8('SIGHASH_4'),
+          u8('SIGHASH_5'),
+          u8('SIGHASH_6'),
+          u8('SIGHASH_7'),
           u128('redeemableGlobalSupplyCap'),
         ])
 
-        const itx = new TransactionInstruction({
-          programId,
-          keys: _accounts,
-          data: Buffer.from(data),
-        })
-        const program = new Program(
-          uxdIdl,
-          programId,
-          new Provider(
-            _connection,
-            (null as unknown) as Wallet,
-            Provider.defaultOptions()
-          )
-        )
-        console.debug(
-          'itx',
-          program.coder.instruction.decode(
-            program.coder.instruction.encode(
-              'SetRedeemableGlobalSupplyCap',
-              serializeInstructionToBase64(itx)
-            )
-          )?.data['redeemableGlobalSupplyCap']
-        )
-
         const args = dataLayout.decode(Buffer.from(data)) as any
-        console.debug('args', args)
         return (
           <>
-            <p>test</p>
+            <p>{`Redeemable Global Supply Cap: ${
+              args.redeemableGlobalSupplyCap.toNumber() * 10 ** -6
+            }`}</p>
           </>
         )
       },
     },
-    3: {
+    213: {
       name: 'UXD - Set Mango Depositories Redeemable Supply Soft Cap',
       accounts: ['authority', 'controller'],
       getDataUI: (
@@ -97,18 +76,29 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
+        const dataLayout = struct([
+          u8('instruction'),
+          u8('SIGHASH_1'),
+          u8('SIGHASH_2'),
+          u8('SIGHASH_3'),
+          u8('SIGHASH_4'),
+          u8('SIGHASH_5'),
+          u8('SIGHASH_6'),
+          u8('SIGHASH_7'),
+          u128('softCap'),
+        ])
         const args = dataLayout.decode(Buffer.from(data)) as any
         console.log('args', args)
         return (
           <>
-            <p>{args}</p>
+            <p>{`Redeemable Supply Soft Cap: ${
+              args.softCap.toNumber() * 10 ** -6
+            }`}</p>
           </>
         )
       },
     },
-    4: {
+    133: {
       name: 'UXD - Register Mango Depository',
       accounts: [
         'authority',
@@ -125,108 +115,6 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         'systemProgram',
         'tokenProgram',
         'mangoProgram',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
-        return (
-          <>
-            <p>{args}</p>
-          </>
-        )
-      },
-    },
-    5: {
-      name: 'UXD - Deposit Insurance To Mango Depository',
-      accounts: [
-        'authority',
-        'controller',
-        'depository',
-        'insuranceMint',
-        'authorityInsurance',
-        'depositoryInsurancePassthroughAccount',
-        'depositoryMangoAccount',
-        // mango accounts for CPI
-        'mangoGroup',
-        'mangoCache',
-        'mangoRootBank',
-        'mangoNodeBank',
-        'mangoVault',
-        //
-        'tokenProgram',
-        'mangoProgram',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
-        return (
-          <>
-            <p>{args}</p>
-          </>
-        )
-      },
-    },
-    6: {
-      name: 'UXD - Withdraw Insurance From Mango Depository',
-      accounts: [
-        'authority',
-        'controller',
-        'depository',
-        'insuranceMint',
-        'authorityInsurance',
-        'depositoryInsurancePassthroughAccount',
-        'depositoryMangoAccount',
-        // mango accounts for CPI
-        'mangoGroup',
-        'mangoCache',
-        'mangoSigner',
-        'mangoRootBank',
-        'mangoNodeBank',
-        'mangoVault',
-        //
-        'tokenProgram',
-        'mangoProgram',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
-        return (
-          <>
-            <p>{args}</p>
-          </>
-        )
-      },
-    },
-  },
-  CBSkoqgGtB4772H7FqeE6wz56rLbsxxbVjxEG6JmHzwG: {
-    1: {
-      name: 'UXD - Initialize Controller',
-      accounts: [
-        'authority',
-        'payer',
-        'controller',
-        'redeemableMint',
-        'systemProgram',
-        'tokenProgram',
-        'rent',
       ],
       getDataUI: (
         _connection: Connection,
@@ -234,93 +122,32 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         _accounts: AccountMetaData[]
       ) => {
         const dataLayout = struct([
+          u8('instruction'),
+          u8('SIGHASH_1'),
+          u8('SIGHASH_2'),
+          u8('SIGHASH_3'),
+          u8('SIGHASH_4'),
+          u8('SIGHASH_5'),
+          u8('SIGHASH_6'),
+          u8('SIGHASH_7'),
           u8('bump'),
-          u8('redeemableBump'),
-          u8('redeemableMintDecimals'),
+          u8('collateralPassthroughBump'),
+          u8('insurancePassthroughBump'),
+          u8('mangoAccountBump'),
         ])
-
         const args = dataLayout.decode(Buffer.from(data)) as any
         console.log('args', args)
         return (
           <>
-            <p>{args}</p>
+            <p>{`bump: ${args.bump.toString()}`}</p>
+            <p>{`collateralPassthroughBump: ${args.collateralPassthroughBump.toString()}`}</p>
+            <p>{`insurancePassthroughBump: ${args.insurancePassthroughBump.toString()}`}</p>
+            <p>{`mangoAccountBump: ${args.mangoAccountBump.toString()}`}</p>
           </>
         )
       },
     },
-    2: {
-      name: 'UXD - Set Redeemable Global Supply Cap',
-      accounts: ['authority', 'controller'],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
-        return (
-          <>
-            <p>{args}</p>
-          </>
-        )
-      },
-    },
-    3: {
-      name: 'UXD - Set Mango Depositories Redeemable Supply Soft Cap',
-      accounts: ['authority', 'controller'],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
-        return (
-          <>
-            <p>{args}</p>
-          </>
-        )
-      },
-    },
-    4: {
-      name: 'UXD - Register Mango Depository',
-      accounts: [
-        'authority',
-        'payer',
-        'controller',
-        'depository',
-        'collateralMint', // BTC/ WSOL.....
-        'insuranceMint', // USDC
-        'depositoryCollateralPassthroughAccount',
-        'depositoryInsurancePassthroughAccount',
-        'depositoryMangoAccount',
-        'mangoGroup',
-        'rent',
-        'systemProgram',
-        'tokenProgram',
-        'mangoProgram',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        _accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
-
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
-        return (
-          <>
-            <p>{args}</p>
-          </>
-        )
-      },
-    },
-    5: {
+    198: {
       name: 'UXD - Deposit Insurance To Mango Depository',
       accounts: [
         'authority',
@@ -333,7 +160,6 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         // mango accounts for CPI
         'mangoGroup',
         'mangoCache',
-        'mangoSigner',
         'mangoRootBank',
         'mangoNodeBank',
         'mangoVault',
@@ -341,23 +167,40 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         'tokenProgram',
         'mangoProgram',
       ],
-      getDataUI: (
-        _connection: Connection,
+      getDataUI: async (
+        connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        accounts: AccountMetaData[]
       ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
+        const dataLayout = struct([
+          u8('instruction'),
+          u8('SIGHASH_1'),
+          u8('SIGHASH_2'),
+          u8('SIGHASH_3'),
+          u8('SIGHASH_4'),
+          u8('SIGHASH_5'),
+          u8('SIGHASH_6'),
+          u8('SIGHASH_7'),
+          u64('insuranceAmount'),
+        ])
+        const insuranceMint = await tryGetTokenMint(
+          connection,
+          accounts[3].pubkey
+        )
 
         const args = dataLayout.decode(Buffer.from(data)) as any
         console.log('args', args)
         return (
           <>
-            <p>{args}</p>
+            <p>{`Insurance Amount to deposit: ${fmtMintAmount(
+              insuranceMint?.account,
+              args.insuranceAmount
+            )}`}</p>
           </>
         )
       },
     },
-    6: {
+    227: {
       name: 'UXD - Withdraw Insurance From Mango Depository',
       accounts: [
         'authority',
@@ -370,6 +213,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         // mango accounts for CPI
         'mangoGroup',
         'mangoCache',
+        'mangoSigner',
         'mangoRootBank',
         'mangoNodeBank',
         'mangoVault',
