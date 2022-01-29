@@ -2,12 +2,13 @@ import { Connection } from '@solana/web3.js'
 import { struct, u8, u48 } from 'buffer-layout'
 import { AccountMetaData } from '@solana/spl-governance'
 import { u128, u64 } from '@project-serum/borsh'
-import { tryGetTokenMint } from '@utils/tokens'
-import { fmtMintAmount } from '@tools/sdk/units'
+import BigNumber from 'bignumber.js'
+import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient'
+import { UXD_DECIMALS } from '@uxdprotocol/uxd-client'
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
-    1: {
+    137: {
       name: 'UXD - Initialize Controller',
       accounts: [
         'authority',
@@ -24,6 +25,14 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         _accounts: AccountMetaData[]
       ) => {
         const dataLayout = struct([
+          u8('instruction'),
+          u8('SIGHASH_1'),
+          u8('SIGHASH_2'),
+          u8('SIGHASH_3'),
+          u8('SIGHASH_4'),
+          u8('SIGHASH_5'),
+          u8('SIGHASH_6'),
+          u8('SIGHASH_7'),
           u8('bump'),
           u8('redeemableBump'),
           u8('redeemableMintDecimals'),
@@ -33,7 +42,9 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         console.log('args', args)
         return (
           <>
-            <p>{args}</p>
+            <p>{`bump: ${args.bump}`}</p>
+            <p>{`redeemable bump: ${args.redeemableBump}`}</p>
+            <p>{`redeemable mint decimals: ${args.redeemableMintDecimals.toString()}`}</p>
           </>
         )
       },
@@ -61,9 +72,11 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         const args = dataLayout.decode(Buffer.from(data)) as any
         return (
           <>
-            <p>{`Redeemable Global Supply Cap: ${
-              args.redeemableGlobalSupplyCap.toNumber() * 10 ** -6
-            }`}</p>
+            <p>{`Redeemable Global Supply Cap: ${new BigNumber(
+              args.redeemableGlobalSupplyCap.toString()
+            )
+              .shiftedBy(-UXD_DECIMALS)
+              .toFormat()}`}</p>
           </>
         )
       },
@@ -91,9 +104,11 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         console.log('args', args)
         return (
           <>
-            <p>{`Redeemable Supply Soft Cap: ${
-              args.softCap.toNumber() * 10 ** -6
-            }`}</p>
+            <p>{`Redeemable Supply Soft Cap: ${new BigNumber(
+              args.softCap.toString()
+            )
+              .shiftedBy(-UXD_DECIMALS)
+              .toFormat()}`}</p>
           </>
         )
       },
@@ -168,9 +183,9 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         'mangoProgram',
       ],
       getDataUI: async (
-        connection: Connection,
+        _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        _accounts: AccountMetaData[]
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -183,19 +198,16 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           u8('SIGHASH_7'),
           u64('insuranceAmount'),
         ])
-        const insuranceMint = await tryGetTokenMint(
-          connection,
-          accounts[3].pubkey
-        )
 
         const args = dataLayout.decode(Buffer.from(data)) as any
         console.log('args', args)
         return (
           <>
-            <p>{`Insurance Amount to deposit: ${fmtMintAmount(
-              insuranceMint?.account,
-              args.insuranceAmount
-            )}`}</p>
+            <p>{`Insurance Amount to deposit: ${new BigNumber(
+              args.insuranceAmount.toString()
+            )
+              .shiftedBy(-INSURANCE_MINTS.mainnet.USDC.decimals)
+              .toFormat()}`}</p>
           </>
         )
       },
