@@ -114,12 +114,18 @@ const Clawback = ({
         realm!.account.communityMint,
         client!.program.programId
       )
-      const resp = await client?.program.account.voter.all()
+      const resp = await client?.program.account.voter.all([
+        {
+          memcmp: {
+            offset: 40,
+            bytes: registrar.toString(),
+          },
+        },
+      ])
       const voters =
         resp
           ?.filter(
             (x) =>
-              x.account.registrar.toBase58() === registrar.toBase58() &&
               (x.account.deposits as Deposit[]).filter(
                 (depo) => depo.allowClawback
               ).length
