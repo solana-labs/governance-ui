@@ -113,21 +113,10 @@ export async function tryGetTokenAccount(
   publicKey: PublicKey
 ): Promise<TokenProgramAccount<TokenAccount> | undefined> {
   try {
-    if (
-      publicKey.toBase58() === '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E'
-    ) {
-      console.debug('publicKey', publicKey.toBase58())
-    }
     const result = await connection.getAccountInfo(publicKey)
 
     if (!result?.owner.equals(TOKEN_PROGRAM_ID)) {
       return undefined
-    }
-
-    if (
-      publicKey.toBase58() === '9n4nbM75f5Ui33ZbPYXn59EwSgE8CGsHtAeTH5YFeJ9E'
-    ) {
-      console.debug('result owned by token program', result)
     }
 
     const data = Buffer.from(result!.data)
