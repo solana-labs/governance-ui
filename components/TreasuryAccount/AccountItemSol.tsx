@@ -1,4 +1,4 @@
-import { getAccountName } from '@components/instructions/tools'
+import { getAccountName, wSolMint } from '@components/instructions/tools'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { GovernedTokenAccount } from '@utils/tokens'
@@ -16,8 +16,6 @@ const AccountItemSol = ({
 }: {
   governedAccountTokenAccount: GovernedTokenAccount
 }) => {
-  //hack to fetch price for sol from tokenlist
-  const wSolMint = 'So11111111111111111111111111111111111111112'
   const [totalPrice, setTotalPrice] = useState('')
   const [tokenRecordInfo, setTokenRecordInfo] = useState<TokenInfo | undefined>(
     undefined
@@ -27,11 +25,6 @@ const AccountItemSol = ({
     setCurrentCompactView,
     setCurrentCompactAccount,
   } = useTreasuryAccountStore()
-
-  const mintAddress =
-    governedAccountTokenAccount && governedAccountTokenAccount.token
-      ? governedAccountTokenAccount.token.account.mint.toBase58()
-      : ''
 
   //substract minimal lamparts ammount
   //get minimal lamparts
@@ -46,7 +39,7 @@ const AccountItemSol = ({
       : 0
 
   function handleSetTotalPrice() {
-    const price = tokenService.getUSDTokenPrice(mintAddress)
+    const price = tokenService.getUSDTokenPrice(wSolMint)
     const totalPrice = amount * price
     const totalPriceFormatted = amount
       ? new BigNumber(totalPrice).toFormat(0)
@@ -64,7 +57,7 @@ const AccountItemSol = ({
   useEffect(() => {
     handleSetTokenInfo()
     handleSetTotalPrice()
-  }, [mintAddress, amount])
+  }, [wSolMint, amount])
   const amountFormatted = new BigNumber(amount).toFormat()
 
   return tokenRecordInfo?.symbol ||
