@@ -16,6 +16,8 @@ const AccountItemSol = ({
 }: {
   governedAccountTokenAccount: GovernedTokenAccount
 }) => {
+  //hack to fetch price for sol from tokenlist
+  const wSolMint = 'So11111111111111111111111111111111111111112'
   const [totalPrice, setTotalPrice] = useState('')
   const [tokenRecordInfo, setTokenRecordInfo] = useState<TokenInfo | undefined>(
     undefined
@@ -31,6 +33,8 @@ const AccountItemSol = ({
       ? governedAccountTokenAccount.token.account.mint.toBase58()
       : ''
 
+  //substract minimal lamparts ammount
+  //get minimal lamparts
   const amount =
     governedAccountTokenAccount &&
     governedAccountTokenAccount.mint?.account &&
@@ -50,7 +54,7 @@ const AccountItemSol = ({
     setTotalPrice(totalPriceFormatted)
   }
   async function handleSetTokenInfo() {
-    const info = tokenService.getTokenInfo(mintAddress)
+    const info = tokenService.getTokenInfo(wSolMint)
     setTokenRecordInfo(info)
   }
   async function handleGoToAccountOverview() {
@@ -90,7 +94,7 @@ const AccountItemSol = ({
           </div>
         )}
         <div className="text-fgd-3 text-xs flex flex-col">
-          {amountFormatted} {tokenRecordInfo?.symbol}
+          {amountFormatted} SOL
         </div>
         {totalPrice && totalPrice !== '0' ? (
           <div className="mt-0.5 text-fgd-3 text-xs">${totalPrice}</div>

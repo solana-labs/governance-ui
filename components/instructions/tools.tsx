@@ -103,7 +103,7 @@ export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
 export const DEFAULT_NATIVE_SOL_MINT =
-  'GSoL95LSRcKYxwVkvAxbYLp47uBn1QtP6pDUZQxp3Mg4'
+  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
