@@ -21,7 +21,10 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import {
+  DEFAULT_NATIVE_SOL_MINT,
+  DEFAULT_NFT_TREASURY_MINT,
+} from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
@@ -45,12 +48,6 @@ const SOL = 'SOL'
 const OTHER = 'OTHER'
 const NFT = 'NFT'
 
-const types = [
-  { name: 'Other', value: OTHER },
-  { name: 'Native SOL', value: SOL },
-  { name: 'NFT', value: NFT },
-]
-
 const NewAccountForm = () => {
   const router = useRouter()
   const { client } = useVoteRegistry()
@@ -62,6 +59,16 @@ const NewAccountForm = () => {
     symbol,
     ownVoterWeight,
   } = useRealm()
+  const types = [
+    { name: 'Other', value: OTHER, defaultMint: '' },
+    {
+      name: 'Native SOL',
+      value: SOL,
+      defaultMint: DEFAULT_NATIVE_SOL_MINT,
+      hide: realmInfo?.programVersion !== 2,
+    },
+    { name: 'NFT', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
+  ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -216,13 +223,8 @@ const NewAccountForm = () => {
   }, [form.mintAddress])
 
   useEffect(() => {
-    let mint = ''
-    if (treasuryType.value === NFT) {
-      mint = DEFAULT_NFT_TREASURY_MINT
-    }
-
     handleSetForm({
-      value: mint,
+      value: treasuryType.defaultMint,
       propertyName: 'mintAddress',
     })
   }, [treasuryType])
@@ -241,13 +243,15 @@ const NewAccountForm = () => {
         placeholder="Please select..."
         value={treasuryType.name}
       >
-        {types.map((x) => {
-          return (
-            <Select.Option key={x.value} value={x}>
-              {x.name}
-            </Select.Option>
-          )
-        })}
+        {types
+          .filter((x) => !x.hide)
+          .map((x) => {
+            return (
+              <Select.Option key={x.value} value={x}>
+                {x.name}
+              </Select.Option>
+            )
+          })}
       </Select>
       {treasuryType.value === OTHER && (
         <>
