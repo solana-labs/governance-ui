@@ -135,10 +135,7 @@ export async function tryGetTokenMint(
   connection: Connection,
   publicKey: PublicKey
 ): Promise<TokenProgramAccount<MintAccount> | undefined> {
-  console.log('publicKey', publicKey.toBase58())
-
   const tokenAccount = await tryGetTokenAccount(connection, publicKey)
-  console.log('tokenAccount', tokenAccount)
   return tokenAccount && tryGetMint(connection, tokenAccount.account.mint)
 }
 
