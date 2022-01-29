@@ -161,13 +161,13 @@ export async function getInstructionDescriptor(
   } else {
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
-
   const descriptor = descriptors && descriptors[instruction.data[0]]
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,
       instruction.data,
-      instruction.accounts
+      instruction.accounts,
+      instruction.programId
     ))) ?? <>{JSON.stringify(instruction.data)}</>
 
   return {

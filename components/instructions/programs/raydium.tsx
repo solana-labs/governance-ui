@@ -44,6 +44,7 @@ const RAYDIUM_AMM_INSTRUCTIONS = {
           nu64('maxPcAmount'),
           nu64('fixedFromCoin'),
         ])
+        console.debug('buffer', Buffer.from(data))
 
         const args = dataLayout.decode(Buffer.from(data)) as any
 
