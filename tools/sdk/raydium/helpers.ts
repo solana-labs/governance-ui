@@ -6,11 +6,10 @@ import {
   TokenAmount,
   Token,
 } from '@raydium-io/raydium-sdk'
-import { PublicKey, Connection } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import { getGovernanceToken } from '../uxdProtocol/uxdClient'
-import { Token as SPLToken } from '@solana/spl-token'
 
 export const getAmountOut = async (
   poolKeys: LiquidityPoolKeys,

@@ -49,13 +49,6 @@ const AddLiquidityRaydium = ({
     governedTokenAccounts,
     getMintWithGovernances,
   } = useGovernanceAssets()
-  // const governedProgramAccounts = getGovernancesByAccountType(
-  //   GovernanceAccountType.ProgramGovernance
-  // ).map((x) => {
-  //   return {
-  //     governance: x,
-  //   }
-  // })
 
   useEffect(() => {
     async function prepGovernances() {

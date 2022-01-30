@@ -8,7 +8,7 @@ import { UXP_USDC_POOL_KEYS } from './poolKeys'
 // only working now because we have just one pool (UXP/USDC)
 export const createRemoveLiquidityInstruction = (
   owner: PublicKey,
-  amountIn: BN // amount of LP token to redeem?
+  amountIn: string // amount of LP token to redeem?
 ): TransactionInstruction => {
   const [lpTokenAccount] = findATAAddrSync(owner, UXP_USDC_POOL_KEYS.lpMint)
   const [baseTokenAccount] = findATAAddrSync(owner, UXP_USDC_POOL_KEYS.baseMint)
@@ -25,7 +25,7 @@ export const createRemoveLiquidityInstruction = (
       lpTokenAccount,
       owner,
     },
-    amountIn,
+    amountIn: new BN(amountIn),
   })
 
   return itx

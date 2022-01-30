@@ -12,20 +12,17 @@ import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Select from '@components/inputs/Select'
-import {
-  getGovernanceMintSymbols,
-  getGovernanceToken,
-} from '@tools/sdk/uxdProtocol/uxdClient'
+import { getGovernanceMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient'
 import {
   ProgramAccount,
   serializeInstructionToBase64,
   Governance,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getAmountOut } from '@tools/sdk/raydium/helpers'
+import { getLPMintInfo } from '@tools/sdk/raydium/helpers'
 import { UXP_USDC_POOL_KEYS } from '@tools/sdk/raydium/poolKeys'
-import { BN } from '@project-serum/anchor'
 import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction'
+import BigNumber from 'bignumber.js'
 
 const RemoveLiquidityRaydium = ({
   index,
@@ -46,13 +43,6 @@ const RemoveLiquidityRaydium = ({
     governedTokenAccounts,
     getMintWithGovernances,
   } = useGovernanceAssets()
-  // const governedProgramAccounts = getGovernancesByAccountType(
-  //   GovernanceAccountType.ProgramGovernance
-  // ).map((x) => {
-  //   return {
-  //     governance: x,
-  //   }
-  // })
 
   useEffect(() => {
     async function prepGovernances() {
@@ -88,20 +78,20 @@ const RemoveLiquidityRaydium = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  // const [, setMaxLPAmount] = useState(0)
-  // const [, setLpDecimals] = useState(9)
+  const [maxLPAmount, setMaxLPAmount] = useState(0)
+  const [LPDecimals, setLPDecimals] = useState(9)
   useEffect(() => {
-    // const fetchLpData = async () => {
-    //   if (!form.governedAccount?.governance.pubkey) return
-    //   const { maxBalance, decimals } = await getLPMintInfo(
-    //     connection,
-    //     UXP_USDC_POOL_KEYS.lpMint,
-    //     form.governedAccount.governance.pubkey
-    //   )
-    //   setMaxLPAmount(maxBalance)
-    //   setLpDecimals(decimals)
-    // }
-    // fetchLpData()
+    const fetchLpData = async () => {
+      if (!form.governedAccount?.governance.pubkey) return
+      const { maxBalance, decimals } = await getLPMintInfo(
+        connection,
+        UXP_USDC_POOL_KEYS.lpMint,
+        form.governedAccount.governance.pubkey
+      )
+      setMaxLPAmount(maxBalance)
+      setLPDecimals(decimals)
+    }
+    fetchLpData()
   }, [form.governedAccount?.governance.pubkey])
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -122,14 +112,9 @@ const RemoveLiquidityRaydium = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const baseToken = getGovernanceToken(
-        connection.cluster,
-        form.baseTokenName
-      )
-
       const createIx = createRemoveLiquidityInstruction(
-        new PublicKey(baseToken.address),
-        new BN(form.baseAmountIn * 10 ** baseToken.decimals)
+        new PublicKey(form.governedAccount.governance.pubkey),
+        new BigNumber(form.amountIn).shiftedBy(LPDecimals).toString()
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -166,16 +151,6 @@ const RemoveLiquidityRaydium = ({
   useEffect(() => {
     if (form.baseAmountIn) {
       debounce.debounceFcn(async () => {
-        handleSetForm({
-          value: await getAmountOut(
-            UXP_USDC_POOL_KEYS,
-            form.baseTokenName,
-            form.baseAmountIn,
-            form.quoteTokenName,
-            connection
-          ),
-          propertyName: 'quoteAmountIn',
-        })
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
@@ -192,22 +167,14 @@ const RemoveLiquidityRaydium = ({
   const schema = yup.object().shape({
     baseTokenName: yup.string().required('Base Token Name is required'),
     quoteTokenName: yup.string().required('Quote Token Name is required'),
-    baseAmountIn: yup
+    amountIn: yup
       .number()
-      .moreThan(0, 'Amount for base token should be more than 0')
-      .required('Amount for base token is required'),
-    quoteAmountIn: yup
-      .number()
-      .moreThan(0, 'Amount for quote token should be more than 0')
-      .required('Amount for quote token is required'),
+      .moreThan(0, 'Amount for LP token should be more than 0')
+      .required('Amount for LP token is required'),
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
-    fixedSide: yup
-      .string()
-      .equals(['base', 'quote'])
-      .required('Fixed Side is required'),
   })
 
   return (
@@ -257,50 +224,19 @@ const RemoveLiquidityRaydium = ({
       </Select>
 
       <Input
-        label="Base Token Amount to deposit"
-        value={form.baseAmountIn}
+        label={`LP Token Amount to withdraw - max: ${maxLPAmount}`}
+        value={form.amountIn}
         type="number"
         min={0}
         max={10 ** 12}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'baseAmountIn',
+            propertyName: 'amountIn',
           })
         }
-        error={formErrors['baseAmountIn']}
+        error={formErrors['amountIn']}
       />
-
-      <Input
-        label="Quote Token Amount to deposit"
-        value={form.quoteAmountIn}
-        type="number"
-        min={0}
-        max={10 ** 12}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'quoteAmountIn',
-          })
-        }
-        disabled={true}
-        error={formErrors['quoteAmountIn']}
-      />
-      <Select
-        label="Fixed Side"
-        value={form.fixedSide}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'fixedSide' })
-        }
-        error={formErrors['fixedSide']}
-      >
-        {['base', 'quote'].map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
     </>
   )
 }
