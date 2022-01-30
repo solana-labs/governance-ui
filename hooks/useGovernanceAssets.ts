@@ -72,7 +72,7 @@ export default function useGovernanceAssets() {
   )
 
   const canUseUxdInstructions =
-    //symbol === 'UXD' &&
+    symbol === 'UXP' &&
     canUseGovernanceForInstruction(GovernanceAccountType.ProgramGovernance)
 
   const canUseAnyInstruction =

@@ -29,4 +29,13 @@ module.exports = withTM({
     DEVNET_RPC: process.env.DEVNET_RPC,
     DEFAULT_GOVERNANCE_PROGRAM_ID: process.env.DEFAULT_GOVERNANCE_PROGRAM_ID,
   },
+  async redirects() {
+    return [
+      {
+        source: '/dao/UXD/:path*',
+        destination: '/dao/UXP/:path*',
+        permanent: true,
+      },
+    ]
+  },
 })
