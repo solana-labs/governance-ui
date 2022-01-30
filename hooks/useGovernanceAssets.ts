@@ -20,6 +20,7 @@ import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
+import { AccountLayout } from '@solana/spl-token'
 
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
@@ -194,10 +195,17 @@ export default function useGovernanceAssets() {
           )
           transferAddress = solAddress
           const resp = await connection.getParsedAccountInfo(solAddress)
+          const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
+            AccountLayout.span
+          )
           if (resp.value) {
             solAccount = resp.value as AccountInfoGen<
               Buffer | ParsedAccountData
             >
+            solAccount.lamports =
+              solAccount.lamports !== 0
+                ? solAccount.lamports - mintRentAmount
+                : solAccount.lamports
           }
         }
         const obj = {

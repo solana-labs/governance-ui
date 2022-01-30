@@ -61,7 +61,6 @@ class TokenService {
       const tokenListRecord = this._tokenList?.find(
         (x) => x.address === mintAddress
       )
-      console.log(tokenListRecord)
       const coingeckoId = tokenListRecord?.extensions?.coingeckoId
       if (tokenListRecord && coingeckoId) {
         return this._tokenPriceToUSDlist[coingeckoId]?.usd || 0

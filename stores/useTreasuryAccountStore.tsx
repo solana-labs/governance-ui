@@ -7,6 +7,7 @@ import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
+import { wSolMint } from '@components/instructions/tools'
 interface TreasuryAccountStore extends State {
   compact: {
     currentView: ViewState
@@ -79,8 +80,11 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     })
   },
   setCurrentCompactAccount: async (account, connection) => {
-    const mintAddress =
+    let mintAddress =
       account && account.token ? account.token.account.mint.toBase58() : ''
+    if (account.isSol) {
+      mintAddress = wSolMint
+    }
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
     set((s) => {
       s.compact.currentAccount = account
