@@ -217,37 +217,42 @@ export default function useGovernanceAssets() {
     },
     {
       id: Instructions.InitializeController,
-      name: 'Initialize Controller',
+      name: 'UXD: Initialize Controller',
       isVisible: canUseUxdInstructions,
     },
     {
       id: Instructions.SetRedeemableGlobalSupplyCap,
-      name: 'Set Redeemable Global Supply Cap',
+      name: 'UXD: Set Redeemable Global Supply Cap',
       isVisible: canUseUxdInstructions,
     },
     {
       id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
-      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
+      name: 'UXD: Set Mango Depositories Redeemable Supply Soft Cap',
       isVisible: canUseUxdInstructions,
     },
     {
       id: Instructions.RegisterMangoDepository,
-      name: 'Register Mango Depository',
+      name: 'UXD: Register Mango Depository',
       isVisible: canUseUxdInstructions,
     },
     {
       id: Instructions.DepositInsuranceToMangoDepository,
-      name: 'Deposit Insurance To Mango Depository',
+      name: 'UXD: Deposit Insurance To Mango Depository',
       isVisible: canUseUxdInstructions,
     },
     {
       id: Instructions.WithdrawInsuranceFromMangoDepository,
-      name: 'Withdraw Insurance From Mango Depository',
+      name: 'UXD: Withdraw Insurance From Mango Depository',
       isVisible: canUseUxdInstructions,
     },
     {
       id: Instructions.AddLiquidityRaydium,
-      name: 'Add To Raydium Liquidity Pool',
+      name: 'Raydium: Add To Liquidity Pool',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RemoveLiquidityRaydium,
+      name: 'Raydium: Remove From Liquidity Pool',
       isVisible: canUseAnyInstruction,
     },
     {

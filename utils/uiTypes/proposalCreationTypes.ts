@@ -146,6 +146,7 @@ export enum Instructions {
   Base64,
   None,
   AddLiquidityRaydium,
+  RemoveLiquidityRaydium,
   InitializeController,
   SetRedeemableGlobalSupplyCap,
   SetMangoDepositoriesRedeemableSoftCap,

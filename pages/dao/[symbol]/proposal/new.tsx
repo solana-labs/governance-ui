@@ -56,6 +56,7 @@ import RefreshObligation from './components/instructions/solend/RefreshObligatio
 import RefreshReserve from './components/instructions/solend/RefreshReserve'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import RemoveLiquidityRaydium from './components/instructions/raydium/RemoveLiquidity'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -355,6 +356,8 @@ const New = () => {
         )
       case Instructions.AddLiquidityRaydium:
         return <AddLiquidityRaydium index={idx} governance={governance} />
+      case Instructions.RemoveLiquidityRaydium:
+        return <RemoveLiquidityRaydium index={idx} governance={governance} />
       case Instructions.InitializeController:
         return <InitializeController index={idx} governance={governance} />
       case Instructions.SetRedeemableGlobalSupplyCap:
