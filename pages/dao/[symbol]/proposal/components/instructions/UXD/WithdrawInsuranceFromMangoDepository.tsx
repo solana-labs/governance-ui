@@ -6,28 +6,29 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  RegisterMangoDepositoryForm,
+  WithdrawInsuranceFromMangoDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
+import {
+  serializeInstructionToBase64,
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+} from '@solana/spl-governance'
+import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction'
+import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction'
 import Select from '@components/inputs/Select'
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
 } from '@tools/sdk/uxdProtocol/uxdClient'
-import {
-  ProgramAccount,
-  Governance,
-  GovernanceAccountType,
-  serializeInstructionToBase64,
-} from '@solana/spl-governance'
 
-const RegisterMangoDepository = ({
+const WithdrawInsuranceFromMangoDepository = ({
   index,
   governance,
 }: {
@@ -48,11 +49,12 @@ const RegisterMangoDepository = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<RegisterMangoDepositoryForm>({
+  const [form, setForm] = useState<WithdrawInsuranceFromMangoDepositoryForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
     collateralName: '',
     insuranceName: '',
+    insuranceWithdrawnAmount: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -72,16 +74,15 @@ const RegisterMangoDepository = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
-      form.insuranceName &&
       wallet?.publicKey
     ) {
-      const createIx = await createRegisterMangoDepositoryInstruction(
+      const createIx = await createWithdrawInsuranceFromMangoDepositoryInstruction(
         connection,
         form.governedAccount?.governance.account.governedAccount,
         form.governedAccount?.governance.pubkey,
-        new PublicKey(wallet.publicKey.toBase58()),
         form.collateralName,
-        form.insuranceName
+        form.insuranceName,
+        form.insuranceWithdrawnAmount
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -92,7 +93,6 @@ const RegisterMangoDepository = ({
     }
     return obj
   }
-
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -119,6 +119,15 @@ const RegisterMangoDepository = ({
   }, [form.insuranceName])
 
   useEffect(() => {
+    if (form.insuranceWithdrawnAmount) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceWithdrawnAmount])
+
+  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
@@ -126,8 +135,12 @@ const RegisterMangoDepository = ({
   }, [form])
 
   const schema = yup.object().shape({
-    collateralName: yup.string().required('Valid Collateral name is required'),
-    insuranceName: yup.string().required('Valid Insurance name is required'),
+    collateralName: yup.string().required('Collateral Name is required'),
+    insuranceName: yup.string().required('Insurance Name is required'),
+    insuranceWithdrawnAmount: yup
+      .number()
+      .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
+      .required('Insurance Withdrawn amount is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -179,8 +192,22 @@ const RegisterMangoDepository = ({
           </Select.Option>
         ))}
       </Select>
+
+      <Input
+        label="Insurance Withdrawn Amount"
+        value={form.insuranceWithdrawnAmount}
+        type="number"
+        min={0}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'insuranceWithdrawnAmount',
+          })
+        }
+        error={formErrors['insuranceWithdrawnAmount']}
+      />
     </>
   )
 }
 
-export default RegisterMangoDepository
+export default WithdrawInsuranceFromMangoDepository

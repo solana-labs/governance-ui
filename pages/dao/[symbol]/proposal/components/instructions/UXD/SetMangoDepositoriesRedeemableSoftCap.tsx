@@ -6,36 +6,30 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  WithdrawInsuranceFromMangoDepositoryForm,
+  SetMangoDepositoriesRedeemableSoftCapForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
+import Input from '@components/inputs/Input'
+import { debounce } from '@utils/debounce'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
+import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction'
 import {
+  ProgramAccount,
   serializeInstructionToBase64,
   Governance,
   GovernanceAccountType,
-  ProgramAccount,
 } from '@solana/spl-governance'
-import Input from '@components/inputs/Input'
-import { debounce } from '@utils/debounce'
-import GovernedAccountSelect from '../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction'
-import Select from '@components/inputs/Select'
-import {
-  getDepositoryMintSymbols,
-  getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient'
 
-const WithdrawInsuranceFromMangoDepository = ({
+const SetMangoDepositoriesRedeemableSoftCap = ({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
@@ -49,12 +43,10 @@ const WithdrawInsuranceFromMangoDepository = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<WithdrawInsuranceFromMangoDepositoryForm>({
+  const [form, setForm] = useState<SetMangoDepositoriesRedeemableSoftCapForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    collateralName: '',
-    insuranceName: '',
-    insuranceWithdrawnAmount: 0,
+    softCap: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -70,19 +62,17 @@ const WithdrawInsuranceFromMangoDepository = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
+
     if (
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const createIx = await createWithdrawInsuranceFromMangoDepositoryInstruction(
-        connection,
-        form.governedAccount?.governance.account.governedAccount,
-        form.governedAccount?.governance.pubkey,
-        form.collateralName,
-        form.insuranceName,
-        form.insuranceWithdrawnAmount
+      const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
+        form.governedAccount.governance?.account.governedAccount,
+        form.softCap,
+        form.governedAccount?.governance.pubkey
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -93,6 +83,7 @@ const WithdrawInsuranceFromMangoDepository = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -101,31 +92,13 @@ const WithdrawInsuranceFromMangoDepository = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.collateralName) {
+    if (form.softCap) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.collateralName])
-
-  useEffect(() => {
-    if (form.insuranceName) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.insuranceName])
-
-  useEffect(() => {
-    if (form.insuranceWithdrawnAmount) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.insuranceWithdrawnAmount])
+  }, [form.softCap])
 
   useEffect(() => {
     handleSetInstructions(
@@ -135,12 +108,10 @@ const WithdrawInsuranceFromMangoDepository = ({
   }, [form])
 
   const schema = yup.object().shape({
-    collateralName: yup.string().required('Collateral Name is required'),
-    insuranceName: yup.string().required('Insurance Name is required'),
-    insuranceWithdrawnAmount: yup
+    softCap: yup
       .number()
-      .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
-      .required('Insurance Withdrawn amount is required'),
+      .moreThan(0, 'Redeemable soft cap should be more than 0')
+      .required('Redeemable soft cap is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -161,53 +132,21 @@ const WithdrawInsuranceFromMangoDepository = ({
         governance={governance}
       ></GovernedAccountSelect>
 
-      <Select
-        label="Collateral Name"
-        value={form.collateralName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'collateralName' })
-        }
-        error={formErrors['collateralName']}
-      >
-        {getDepositoryMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
-
-      <Select
-        label="Insurance Name"
-        value={form.insuranceName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'insuranceName' })
-        }
-        error={formErrors['insuranceName']}
-      >
-        {getInsuranceMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
-
       <Input
-        label="Insurance Withdrawn Amount"
-        value={form.insuranceWithdrawnAmount}
+        label="Redeem Global Supply Cap"
+        value={form.softCap}
         type="number"
         min={0}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'insuranceWithdrawnAmount',
+            propertyName: 'softCap',
           })
         }
-        error={formErrors['insuranceWithdrawnAmount']}
+        error={formErrors['softCap']}
       />
     </>
   )
 }
 
-export default WithdrawInsuranceFromMangoDepository
+export default SetMangoDepositoriesRedeemableSoftCap
