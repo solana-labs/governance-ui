@@ -1,4 +1,4 @@
-import { getAccountName, wSolMint } from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { GovernedTokenAccount } from '@utils/tokens'
@@ -39,7 +39,7 @@ const AccountItemSol = ({
       : 0
 
   function handleSetTotalPrice() {
-    const price = tokenService.getUSDTokenPrice(wSolMint)
+    const price = tokenService.getUSDTokenPrice(WSOL_MINT)
     const totalPrice = amount * price
     const totalPriceFormatted = amount
       ? new BigNumber(totalPrice).toFormat(0)
@@ -47,7 +47,7 @@ const AccountItemSol = ({
     setTotalPrice(totalPriceFormatted)
   }
   async function handleSetTokenInfo() {
-    const info = tokenService.getTokenInfo(wSolMint)
+    const info = tokenService.getTokenInfo(WSOL_MINT)
     setTokenRecordInfo(info)
   }
   async function handleGoToAccountOverview() {
@@ -57,7 +57,7 @@ const AccountItemSol = ({
   useEffect(() => {
     handleSetTokenInfo()
     handleSetTotalPrice()
-  }, [wSolMint, amount])
+  }, [WSOL_MINT, amount])
   const amountFormatted = new BigNumber(amount).toFormat()
 
   return tokenRecordInfo?.symbol ||

@@ -113,7 +113,7 @@ export const CHAT_PROGRAM_ID = new PublicKey(
   '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
 )
 
-export const wSolMint = 'So11111111111111111111111111111111111111112'
+export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 
 export interface AccountDescriptor {
   name: string

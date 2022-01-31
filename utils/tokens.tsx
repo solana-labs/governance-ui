@@ -17,13 +17,14 @@ import {
 import { ProgramAccount } from '@solana/spl-governance'
 import { Governance } from '@solana/spl-governance'
 import { chunks } from './helpers'
-import { getAccountName } from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import tokenService from './services/token'
 import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
 import axios from 'axios'
 import { notify } from './notifications'
 import { NFTWithMint } from './uiTypes/nfts'
+import { BN } from '@project-serum/anchor'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -48,6 +49,9 @@ export type GovernedMultiTypeAccount = {
   mint?: TokenProgramAccount<MintInfo> | undefined
   governance: ProgramAccount<Governance>
   mintInfo?: MintInfo | undefined
+  isSol?: boolean
+  transferAddress?: PublicKey | null
+  solAccount?: null | AccountInfoGen<Buffer | ParsedAccountData>
 }
 
 export type TokenProgramAccount<T> = {
@@ -283,6 +287,34 @@ export function getTokenAccountLabelInfo(
     amount = formatMintNaturalAmountAsDecimal(
       acc.mint!.account,
       acc.token?.account.amount
+    )
+  }
+  return {
+    tokenAccount,
+    tokenName,
+    tokenAccountName,
+    amount,
+    imgUrl,
+  }
+}
+
+export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
+  let tokenAccount = ''
+  let tokenName = ''
+  let tokenAccountName = ''
+  let amount = ''
+  let imgUrl = ''
+
+  if (acc?.token && acc.mint) {
+    const info = tokenService.getTokenInfo(WSOL_MINT)
+    imgUrl = info?.logoURI ? info.logoURI : ''
+    tokenAccount =
+      acc.transferAddress?.toBase58() || acc.token.publicKey.toBase58()
+    tokenName = 'SOL'
+    tokenAccountName = getAccountName(acc.token.publicKey)
+    amount = formatMintNaturalAmountAsDecimal(
+      acc.mint!.account,
+      new BN(acc.solAccount!.lamports)
     )
   }
   return {

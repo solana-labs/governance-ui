@@ -20,7 +20,6 @@ import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
-import { AccountLayout } from '@solana/spl-token'
 
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
@@ -129,7 +128,7 @@ export default function useGovernanceAssets() {
       g.governance &&
       ownVoterWeight.canCreateProposal(g.governance?.account?.config)
   )
-
+  console.log(tokenGovernances)
   const availableInstructions = [
     {
       id: Instructions.Transfer,
@@ -168,7 +167,7 @@ export default function useGovernanceAssets() {
   ]
   useEffect(() => {
     async function prepareTokenGovernances() {
-      const governedTokenAccounts: GovernedTokenAccount[] = []
+      const governedTokenAccountsArray: GovernedTokenAccount[] = []
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
           (x) =>
@@ -196,7 +195,7 @@ export default function useGovernanceAssets() {
           transferAddress = solAddress
           const resp = await connection.getParsedAccountInfo(solAddress)
           const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
-            AccountLayout.span
+            0
           )
           if (resp.value) {
             solAccount = resp.value as AccountInfoGen<
@@ -217,17 +216,20 @@ export default function useGovernanceAssets() {
           transferAddress,
           solAccount,
         }
-        governedTokenAccounts.push(obj)
+        governedTokenAccountsArray.push(obj)
       }
       if (mounted.current) {
-        setGovernedTokenAccounts(governedTokenAccounts)
+        setGovernedTokenAccounts(governedTokenAccountsArray)
       }
     }
+
     prepareTokenGovernances()
   }, [
-    JSON.stringify(governances),
     JSON.stringify(tokenMints),
     JSON.stringify(realmTokenAccounts),
+    JSON.stringify(tokenGovernances),
+    JSON.stringify(governances),
+    mounted.current,
   ])
   useEffect(() => {
     mounted.current = true

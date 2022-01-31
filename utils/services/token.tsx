@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { TokenListProvider, TokenInfo } from '@solana/spl-token-registry'
 import { notify } from '@utils/notifications'
-import { wSolMint } from '@components/instructions/tools'
+import { WSOL_MINT } from '@components/instructions/tools'
 const coingeckoPriceEndpoint = 'https://api.coingecko.com/api/v3/simple/price'
 
 class TokenService {
@@ -28,7 +28,7 @@ class TokenService {
     }
   }
   async fetchTokenPrices(mintAddresses: string[]) {
-    const mintAddressesWithSol = [...mintAddresses, wSolMint]
+    const mintAddressesWithSol = [...mintAddresses, WSOL_MINT]
     if (!this._tokenList.length) {
       await this.fetchSolanaTokenList()
     }

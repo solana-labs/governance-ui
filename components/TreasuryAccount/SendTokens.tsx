@@ -43,6 +43,7 @@ import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
+  getSolTransferInstruction,
   getTransferInstruction,
   getTransferNftInstruction,
 } from '@utils/instructionTools'
@@ -71,6 +72,7 @@ const SendTokens = () => {
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const isNFT = currentAccount?.isNft
+  const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
@@ -160,12 +162,16 @@ const SendTokens = () => {
       currentAccount,
       setFormErrors,
     }
-    return isNFT
-      ? getTransferNftInstruction({
-          ...defaultProps,
-          nftMint: selectedNftMint,
-        })
-      : getTransferInstruction(defaultProps)
+    if (isNFT) {
+      return getTransferNftInstruction({
+        ...defaultProps,
+        nftMint: selectedNftMint,
+      })
+    }
+    if (isSol) {
+      return getSolTransferInstruction(defaultProps)
+    }
+    return getTransferInstruction(defaultProps)
   }
   const handlePropose = async () => {
     setIsLoading(true)

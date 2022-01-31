@@ -6,7 +6,11 @@ import {
   u64,
 } from '@solana/spl-token'
 import { WalletAdapter } from '@solana/wallet-adapter-base'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import {
+  PublicKey,
+  SystemProgram,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 import type { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
@@ -48,20 +52,21 @@ export async function getTransferInstruction({
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
+  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   if (
     isValid &&
     programId &&
-    form.governedTokenAccount?.token?.publicKey &&
-    form.governedTokenAccount?.token &&
-    form.governedTokenAccount?.mint?.account
+    governedTokenAccount?.token?.publicKey &&
+    governedTokenAccount?.token &&
+    governedTokenAccount?.mint?.account
   ) {
-    const sourceAccount = form.governedTokenAccount.token?.account.address
+    const sourceAccount = governedTokenAccount.token?.account.address
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
     const mintPK = form.governedTokenAccount.mint.publicKey
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
-      form.governedTokenAccount.mint.account.decimals
+      governedTokenAccount.mint.account.decimals
     )
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
@@ -89,10 +94,61 @@ export async function getTransferInstruction({
       TOKEN_PROGRAM_ID,
       sourceAccount,
       receiverAddress,
-      form.governedTokenAccount.governance!.pubkey,
+      governedTokenAccount.governance!.pubkey,
       [],
       new u64(mintAmount.toString())
     )
+    serializedInstruction = serializeInstructionToBase64(transferIx)
+  }
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: currentAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
+  return obj
+}
+
+export async function getSolTransferInstruction({
+  schema,
+  form,
+  programId,
+  currentAccount,
+  setFormErrors,
+}: {
+  schema: any
+  form: any
+  programId: PublicKey | undefined
+  connection: ConnectionContext
+  wallet: WalletAdapter | undefined
+  currentAccount: GovernedTokenAccount | null
+  setFormErrors: any
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  let serializedInstruction = ''
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  if (
+    isValid &&
+    programId &&
+    governedTokenAccount?.token?.publicKey &&
+    governedTokenAccount?.token &&
+    governedTokenAccount?.mint?.account
+  ) {
+    const sourceAccount = governedTokenAccount.transferAddress
+    const destinationAccount = new PublicKey(form.destinationAccount)
+    //We have configured mint that has same decimals settings as SOL
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      form.amount!,
+      governedTokenAccount.mint.account.decimals
+    )
+
+    const transferIx = SystemProgram.transfer({
+      fromPubkey: sourceAccount!,
+      toPubkey: destinationAccount,
+      lamports: mintAmount,
+    })
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
 

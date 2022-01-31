@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { ProgramBufferAccount } from '@tools/validators/accounts/upgradeable-program'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
-import { tryGetTokenAccount } from './tokens'
+import { GovernedTokenAccount, tryGetTokenAccount } from './tokens'
 import * as yup from 'yup'
 import {
   getMintNaturalAmountFromDecimal,
@@ -17,6 +17,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
+import { BN } from '@project-serum/anchor'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -166,6 +167,7 @@ export const validateBuffer = async (
 }
 
 export const getTokenTransferSchema = ({ form, connection }) => {
+  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
     amount: yup
       .number()
@@ -174,7 +176,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = form.governedTokenAccount.isNft
+          const isNft = governedTokenAccount.isNft
           if (isNft) {
             return true
           }
@@ -183,19 +185,17 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               message: `Please select source account to validate the amount`,
             })
           }
-          if (
-            val &&
-            form.governedTokenAccount &&
-            form.governedTokenAccount?.mint
-          ) {
+          if (val && governedTokenAccount && governedTokenAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
-              form.governedTokenAccount?.mint.account.decimals
+              governedTokenAccount?.mint.account.decimals
             )
-            return !!(
-              form.governedTokenAccount?.token?.publicKey &&
-              form.governedTokenAccount.token.account.amount.gte(mintValue)
-            )
+            return !!(governedTokenAccount?.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.token.account.amount.gte(mintValue)
+              : new BN(governedTokenAccount.solAccount!.lamports).gte(
+                  mintValue
+                ))
           }
           return this.createError({
             message: `Amount is required`,
@@ -211,8 +211,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           if (val) {
             try {
               if (
-                form.governedTokenAccount?.token?.account.address.toBase58() ==
-                val
+                governedTokenAccount?.token?.account.address.toBase58() == val
               ) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
@@ -221,7 +220,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               await validateDestinationAccAddress(
                 connection,
                 val,
-                form.governedTokenAccount?.token?.account.address
+                governedTokenAccount?.token?.account.address
               )
               return true
             } catch (e) {
