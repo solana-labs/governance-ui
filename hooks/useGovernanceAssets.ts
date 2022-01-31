@@ -128,7 +128,6 @@ export default function useGovernanceAssets() {
       g.governance &&
       ownVoterWeight.canCreateProposal(g.governance?.account?.config)
   )
-  console.log(tokenGovernances)
   const availableInstructions = [
     {
       id: Instructions.Transfer,
@@ -222,8 +221,9 @@ export default function useGovernanceAssets() {
         setGovernedTokenAccounts(governedTokenAccountsArray)
       }
     }
-
-    prepareTokenGovernances()
+    if (mounted.current) {
+      prepareTokenGovernances()
+    }
   }, [
     JSON.stringify(tokenMints),
     JSON.stringify(realmTokenAccounts),
