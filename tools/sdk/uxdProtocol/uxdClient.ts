@@ -35,6 +35,10 @@ export const DEPOSITORY_MINTS = {
       address: 'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
       decimals: 6,
     },
+    ETH: {
+      address: '2FPyTwcZLUg1MDrwsyoP4D6s1tM7hAkHYRjkNb5w6Pxk',
+      decimals: 6,
+    },
   },
 }
 
