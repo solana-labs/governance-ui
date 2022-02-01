@@ -104,8 +104,8 @@ export default function useGovernanceAssets() {
     return availableInstructions.filter((x) => x.isVisible)
   }
   const tokenGovernances = getGovernancesByAccountTypes([
-    GovernanceAccountType.TokenGovernanceV1 ||
-      GovernanceAccountType.TokenGovernanceV2,
+    GovernanceAccountType.TokenGovernanceV1,
+    GovernanceAccountType.TokenGovernanceV2,
   ])
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
