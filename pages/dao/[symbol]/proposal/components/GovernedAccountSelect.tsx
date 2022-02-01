@@ -30,11 +30,14 @@ const GovernedAccountSelect = ({
     if (value) {
       const accountType = value.governance.account.accountType
       switch (accountType) {
-        case GovernanceAccountType.MintGovernance:
+        case GovernanceAccountType.MintGovernanceV1:
+        case GovernanceAccountType.MintGovernanceV2:
           return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-        case GovernanceAccountType.TokenGovernance:
+        case GovernanceAccountType.TokenGovernanceV1:
+        case GovernanceAccountType.TokenGovernanceV2:
           return getTokenAccountLabelComponent(getTokenAccountLabelInfo(value))
-        case GovernanceAccountType.ProgramGovernance:
+        case GovernanceAccountType.ProgramGovernanceV1:
+        case GovernanceAccountType.ProgramGovernanceV2:
           return getProgramAccountLabel(value.governance)
         default:
           return value.governance.account.governedAccount.toBase58()

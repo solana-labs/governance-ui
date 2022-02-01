@@ -14,7 +14,7 @@ import {
 } from '@solana/spl-governance'
 import { withAddSignatory } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import { withInsertInstruction } from '@solana/spl-governance'
+import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
@@ -86,6 +86,7 @@ export const createProposal = async (
   await withAddSignatory(
     instructions,
     programId,
+    programVersion,
     proposalAddress,
     tokenOwnerRecord,
     governanceAuthority,
@@ -109,7 +110,7 @@ export const createProposal = async (
       if (instruction.prerequisiteInstructions) {
         prerequisiteInstructions.push(...instruction.prerequisiteInstructions)
       }
-      await withInsertInstruction(
+      await withInsertTransaction(
         insertInstructions,
         programId,
         programVersion,
@@ -120,7 +121,7 @@ export const createProposal = async (
         index,
         0,
         instruction.holdUpTime || 0,
-        instruction.data,
+        [instruction.data],
         payer
       )
     }
@@ -132,9 +133,13 @@ export const createProposal = async (
     withSignOffProposal(
       insertInstructions, // SingOff proposal needs to be executed after inserting instructions hence we add it to insertInstructions
       programId,
+      programVersion,
+      realm.pubkey,
+      governance,
       proposalAddress,
+      signatory,
       signatoryRecordAddress,
-      signatory
+      undefined
     )
   }
 
