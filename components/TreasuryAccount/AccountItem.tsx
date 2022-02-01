@@ -16,6 +16,7 @@ const AccountItem = ({
     name,
     symbol,
     displayPrice,
+    isSol,
   } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
   const {
     setCurrentCompactView,
@@ -32,7 +33,14 @@ const AccountItem = ({
       onClick={handleGoToAccountOverview}
       className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
     >
-      {logo && <img className="flex-shrink-0 h-6 w-6 mr-2.5 mt-1" src={logo} />}
+      {logo && (
+        <img
+          className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-1 ${
+            isSol && 'rounded-full'
+          }`}
+          src={logo}
+        />
+      )}
       <div className="w-full">
         <div className="flex items-start justify-between mb-1">
           <div className="text-xs text-th-fgd-1">{name}</div>

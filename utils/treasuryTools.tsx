@@ -67,7 +67,7 @@ export const getTreasuryAccountItemInfo = (
     : governedAccountTokenAccount.isSol
     ? 'SOL'
     : info?.symbol
-
+  const isSol = governedAccountTokenAccount.isSol
   const displayPrice =
     totalPriceFormatted && totalPriceFormatted !== '0'
       ? totalPriceFormatted
@@ -80,5 +80,6 @@ export const getTreasuryAccountItemInfo = (
     symbol,
     displayPrice,
     info,
+    isSol,
   }
 }
