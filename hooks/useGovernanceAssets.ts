@@ -80,18 +80,18 @@ export default function useGovernanceAssets() {
   }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
   const canUseTransferInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.TokenGovernanceV1 ||
-      GovernanceAccountType.TokenGovernanceV2,
+    GovernanceAccountType.TokenGovernanceV1,
+    GovernanceAccountType.TokenGovernanceV2,
   ])
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.ProgramGovernanceV1 ||
-      GovernanceAccountType.ProgramGovernanceV2,
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
   ])
 
   const canUseMintInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.MintGovernanceV1 ||
-      GovernanceAccountType.MintGovernanceV2,
+    GovernanceAccountType.MintGovernanceV1,
+    GovernanceAccountType.MintGovernanceV2,
   ])
 
   const canUseAnyInstruction =
@@ -109,8 +109,8 @@ export default function useGovernanceAssets() {
   ])
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1 ||
-        GovernanceAccountType.MintGovernanceV2,
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
     ])
     const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(

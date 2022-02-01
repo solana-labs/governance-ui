@@ -5,8 +5,8 @@ import { GovernanceAccountType } from '@solana/spl-governance'
 const AssetsList = () => {
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
   const programGovernances = getGovernancesByAccountTypes([
-    GovernanceAccountType.ProgramGovernanceV1 ||
-      GovernanceAccountType.ProgramGovernanceV2,
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
   ])
   return (
     <div className="space-y-3">
