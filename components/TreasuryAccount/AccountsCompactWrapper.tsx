@@ -6,11 +6,12 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
 import DepositTokens from './DepositTokens'
-import { ArrowsExpandIcon, PlusIcon } from '@heroicons/react/solid'
+import { PlusIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
+import { ArrowsExpandIcon } from '@heroicons/react/outline'
 
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -43,7 +44,7 @@ const AccountsCompactWrapper = () => {
       case ViewState.MainView:
         return (
           <>
-            <h3 className="mb-4 flex items-center">
+            <h3 className="bg-bkg-2 mb-4 flex items-center">
               Treasury
               <div className="ml-auto flex items-center">
                 <ArrowsExpandIcon
