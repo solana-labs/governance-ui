@@ -21,7 +21,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { DEFAULT_NATIVE_SOL_MINT } from '@components/instructions/tools'
 
 export const createTreasuryAccount = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   mint: PublicKey,
   config: GovernanceConfig,
@@ -52,6 +52,7 @@ export const createTreasuryAccount = async (
   const governanceAddress = await withCreateTokenGovernance(
     instructions,
     programId,
+    programVersion,
     realm.pubkey,
     tokenAccount.tokenAccountAddress,
     config,

@@ -3,10 +3,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { GovernanceAccountType } from '@solana/spl-governance'
 
 const AssetsList = () => {
-  const { getGovernancesByAccountType } = useGovernanceAssets()
-  const programGovernances = getGovernancesByAccountType(
-    GovernanceAccountType.ProgramGovernance
-  )
+  const { getGovernancesByAccountTypes } = useGovernanceAssets()
+  const programGovernances = getGovernancesByAccountTypes([
+    GovernanceAccountType.ProgramGovernanceV1 ||
+      GovernanceAccountType.ProgramGovernanceV2,
+  ])
   return (
     <div className="space-y-3">
       {programGovernances.map((x) => (
