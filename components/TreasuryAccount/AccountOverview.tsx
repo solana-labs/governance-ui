@@ -44,12 +44,7 @@ const AccountOverview = () => {
     setCurrentCompactView,
     resetCompactViewState,
   } = useTreasuryAccountStore()
-  //for nfts for now we use governance pubkey
-  const accountPublicKey = currentAccount
-    ? isNFT
-      ? currentAccount.governance?.pubkey
-      : currentAccount.governance?.account.governedAccount
-    : null
+  const accountPublicKey = currentAccount?.transferAddress
 
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
@@ -68,10 +63,10 @@ const AccountOverview = () => {
             onClick={handleGoBackToMainView}
             className="h-4 w-4 text-primary-light mr-2 hover:cursor-pointer"
           />
-          {currentAccount?.token?.publicKey &&
-          getAccountName(currentAccount?.token?.publicKey) ? (
+          {currentAccount?.transferAddress &&
+          getAccountName(currentAccount.transferAddress) ? (
             <div className="text-sm text-th-fgd-1">
-              {getAccountName(currentAccount.token?.publicKey)}
+              {getAccountName(currentAccount.transferAddress)}
             </div>
           ) : (
             <div className="text-xs text-th-fgd-1">
@@ -97,7 +92,7 @@ const AccountOverview = () => {
                 className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer"
                 onClick={() => {
                   const url = fmtUrlWithCluster(
-                    `/dao/${symbol}/gallery/${currentAccount.governance?.pubkey.toBase58()}`
+                    `/dao/${symbol}/gallery/${currentAccount.transferAddress}`
                   )
                   router.push(url)
                 }}

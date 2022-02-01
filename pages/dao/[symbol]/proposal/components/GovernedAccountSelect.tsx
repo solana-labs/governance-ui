@@ -3,6 +3,7 @@ import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
+  getSolAccountLabel,
   getTokenAccountLabelInfo,
   GovernedMultiTypeAccount,
 } from '@utils/tokens'
@@ -35,7 +36,11 @@ const GovernedAccountSelect = ({
           return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
         case GovernanceAccountType.TokenGovernanceV1:
         case GovernanceAccountType.TokenGovernanceV2:
-          return getTokenAccountLabelComponent(getTokenAccountLabelInfo(value))
+          return getTokenAccountLabelComponent(
+            value.isSol
+              ? getSolAccountLabel(value)
+              : getTokenAccountLabelInfo(value)
+          )
         case GovernanceAccountType.ProgramGovernanceV1:
         case GovernanceAccountType.ProgramGovernanceV2:
           return getProgramAccountLabel(value.governance)

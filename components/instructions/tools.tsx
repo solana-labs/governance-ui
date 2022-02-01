@@ -13,6 +13,7 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+import { SYSTEM_INSTRUCTIONS } from './programs/system'
 /**
  * Default governance program id instance
  */
@@ -103,7 +104,7 @@ export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
 export const DEFAULT_NATIVE_SOL_MINT =
-  'GSoL95LSRcKYxwVkvAxbYLp47uBn1QtP6pDUZQxp3Mg4'
+  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
@@ -112,6 +113,8 @@ export function getAccountName(accountPk: PublicKey) {
 export const CHAT_PROGRAM_ID = new PublicKey(
   '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
 )
+
+export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 
 export interface AccountDescriptor {
   name: string
@@ -140,6 +143,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...SYSTEM_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -162,7 +166,6 @@ export async function getInstructionDescriptor(
       instruction.data,
       instruction.accounts
     ))) ?? <>{JSON.stringify(instruction.data)}</>
-
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,
