@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { executeInstruction } from 'actions/executeInstruction'
+import { executeTransaction } from 'actions/executetransaction'
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   ProposalState,
 } from '@solana/spl-governance'
 import React from 'react'
@@ -31,7 +31,7 @@ export function ExecuteInstructionButton({
   proposalInstruction,
 }: {
   proposal: ProgramAccount<Proposal>
-  proposalInstruction: ProgramAccount<ProposalInstruction>
+  proposalInstruction: ProgramAccount<ProposalTransaction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
 }) {
@@ -73,7 +73,7 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
-      await executeInstruction(rpcContext, proposal, proposalInstruction)
+      await executeTransaction(rpcContext, proposal, proposalInstruction)
       await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
     } catch (error) {
       console.log('error executing instruction', error)

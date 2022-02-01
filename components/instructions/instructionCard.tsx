@@ -3,7 +3,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import {
   AccountMetaData,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
 } from '@solana/spl-governance'
 import {
   getAccountName,
@@ -32,7 +32,7 @@ export default function InstructionCard({
 }: {
   index: number
   proposal: ProgramAccount<Proposal>
-  proposalInstruction: ProgramAccount<ProposalInstruction>
+  proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)

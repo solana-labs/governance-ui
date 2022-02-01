@@ -140,7 +140,12 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await signOffProposal(rpcContext, signatoryRecord)
+        await signOffProposal(
+          rpcContext,
+          realmInfo.realmId,
+          proposal,
+          signatoryRecord
+        )
 
         await fetchProposal(proposal.pubkey)
       }
@@ -167,7 +172,7 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await cancelProposal(rpcContext, proposal)
+        await cancelProposal(rpcContext, realmInfo.realmId, proposal)
 
         await fetchProposal(proposal.pubkey)
       }

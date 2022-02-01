@@ -39,18 +39,27 @@ export default function useGovernanceAssets() {
     )
     return governancesFiltered
   }
-  function canUseGovernanceForInstruction(type: GovernanceAccountType) {
+
+  const getGovernancesByAccountTypes = (types: GovernanceAccountType[]) => {
+    const governancesFiltered = governancesArray.filter((gov) =>
+      types.some((t) => gov.account?.accountType === t)
+    )
+    return governancesFiltered
+  }
+
+  function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
     return (
       realm &&
-      getGovernancesByAccountType(type).some((g) =>
+      getGovernancesByAccountTypes(types).some((g) =>
         ownVoterWeight.canCreateProposal(g.account.config)
       )
     )
   }
   const canMintRealmCommunityToken = () => {
-    const governances = getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    )
+    const governances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
     return !!governances.find(
       (x) =>
         x.account.governedAccount.toBase58() ==
@@ -58,9 +67,10 @@ export default function useGovernanceAssets() {
     )
   }
   const canMintRealmCouncilToken = () => {
-    const governances = getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    )
+    const governances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
 
     return !!governances.find(
       (x) =>
@@ -69,17 +79,20 @@ export default function useGovernanceAssets() {
     )
   }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
-  const canUseTransferInstruction = canUseGovernanceForInstruction(
-    GovernanceAccountType.TokenGovernance
-  )
+  const canUseTransferInstruction = canUseGovernanceForInstruction([
+    GovernanceAccountType.TokenGovernanceV1 ||
+      GovernanceAccountType.TokenGovernanceV2,
+  ])
 
-  const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction(
-    GovernanceAccountType.ProgramGovernance
-  )
+  const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
+    GovernanceAccountType.ProgramGovernanceV1 ||
+      GovernanceAccountType.ProgramGovernanceV2,
+  ])
 
-  const canUseMintInstruction = canUseGovernanceForInstruction(
-    GovernanceAccountType.MintGovernance
-  )
+  const canUseMintInstruction = canUseGovernanceForInstruction([
+    GovernanceAccountType.MintGovernanceV1 ||
+      GovernanceAccountType.MintGovernanceV2,
+  ])
 
   const canUseAnyInstruction =
     realm &&
@@ -90,13 +103,35 @@ export default function useGovernanceAssets() {
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)
   }
-  const tokenGovernances = getGovernancesByAccountType(
-    GovernanceAccountType.TokenGovernance
-  )
+  function prepareTokenGovernances() {
+    const tokenGovernances = getGovernancesByAccountTypes([
+      GovernanceAccountType.TokenGovernanceV1 ||
+        GovernanceAccountType.TokenGovernanceV2,
+    ])
+    const governedTokenAccounts: GovernedTokenAccount[] = []
+    for (const i of tokenGovernances) {
+      const realmTokenAccount = realmTokenAccounts.find(
+        (x) => x.publicKey.toBase58() === i.account.governedAccount.toBase58()
+      )
+      const mint = tokenMints.find(
+        (x) =>
+          realmTokenAccount?.account.mint.toBase58() === x.publicKey.toBase58()
+      )
+      const obj = {
+        governance: i,
+        token: realmTokenAccount,
+        mint,
+        isNft: mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT,
+      }
+      governedTokenAccounts.push(obj)
+    }
+    return governedTokenAccounts
+  }
   async function getMintWithGovernances() {
-    const mintGovernances = getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    )
+    const mintGovernances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1 ||
+        GovernanceAccountType.MintGovernanceV2,
+    ])
     const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
       connection,
@@ -241,6 +276,7 @@ export default function useGovernanceAssets() {
   return {
     governancesArray,
     getGovernancesByAccountType,
+    getGovernancesByAccountTypes,
     availableInstructions,
     getAvailableInstructions,
     governedTokenAccounts,
