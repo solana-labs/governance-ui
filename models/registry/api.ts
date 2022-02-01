@@ -65,7 +65,7 @@ export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export async function getCertifiedRealmInfo(
+export function getCertifiedRealmInfo(
   realmId: string,
   connection: ConnectionContext
 ) {

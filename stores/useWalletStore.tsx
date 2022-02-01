@@ -16,6 +16,7 @@ import {
   getGovernance,
   getGovernanceAccount,
   getGovernanceAccounts,
+  getGovernanceProgramVersion,
   Governance,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
@@ -72,6 +73,7 @@ interface WalletStore extends State {
       [owner: string]: ProgramAccount<TokenOwnerRecord>
     }
     mints: { [pubkey: string]: MintAccount }
+    programVersion: number
   }
   selectedProposal: {
     proposal: ProgramAccount<Proposal> | undefined
@@ -123,6 +125,7 @@ const INITIAL_REALM_STATE = {
   councilTokenOwnerRecords: {},
   loading: true,
   mints: {},
+  programVersion: 1,
 }
 
 const INITIAL_PROPOSAL_STATE = {
@@ -263,6 +266,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection.current
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
+      const programVersion = await getGovernanceProgramVersion(
+        connection,
+        programId!
+      )
       const mintsArray = (
         await Promise.all([
           realm?.account.communityMint
@@ -327,6 +334,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.governances = governancesMap
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
+        s.selectedRealm.programVersion = programVersion
       })
       get().actions.fetchOwnVoteRecords()
       get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()
