@@ -109,8 +109,8 @@ export default function useGovernanceAssets() {
   }
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1 ||
-        GovernanceAccountType.MintGovernanceV2,
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
     ])
     const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
