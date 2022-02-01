@@ -9,6 +9,7 @@ import {
   getAccountName,
   getInstructionDescriptor,
   InstructionDescriptor,
+  WSOL_MINT,
 } from './tools'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from '../../stores/useWalletStore'
@@ -34,7 +35,10 @@ export default function InstructionCard({
   proposal: ProgramAccount<Proposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const {
+    nftsGovernedTokenAccounts,
+    governedTokenAccountsWithoutNfts,
+  } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const tokenRecords = useWalletStore((s) => s.selectedRealm)
   const [descriptor, setDescriptor] = useState<InstructionDescriptor>()
@@ -57,6 +61,9 @@ export default function InstructionCard({
         connection.current,
         sourcePk
       )
+      const isSol = governedTokenAccountsWithoutNfts.find(
+        (x) => x.transferAddress?.toBase58() === sourcePk.toBase58()
+      )?.isSol
       const isNFTAccount = nftsGovernedTokenAccounts.find(
         (x) =>
           x.governance?.pubkey.toBase58() ===
@@ -80,17 +87,30 @@ export default function InstructionCard({
             })
           }
         }
-      } else {
-        const mint = tokenAccount?.account.mint
-        if (mint) {
-          const info = tokenService.getTokenInfo(mint.toBase58())
-          const imgUrl = info?.logoURI ? info.logoURI : ''
-          setTokenImgUrl(imgUrl)
-        }
+        return
       }
+
+      if (isSol) {
+        const info = tokenService.getTokenInfo(WSOL_MINT)
+        const imgUrl = info?.logoURI ? info.logoURI : ''
+        setTokenImgUrl(imgUrl)
+        return
+      }
+      const mint = tokenAccount?.account.mint
+      if (mint) {
+        const info = tokenService.getTokenInfo(mint.toBase58())
+        const imgUrl = info?.logoURI ? info.logoURI : ''
+        setTokenImgUrl(imgUrl)
+      }
+      return
     }
     getAmountImg()
-  }, [proposalInstruction])
+  }, [
+    proposalInstruction,
+    governedTokenAccountsWithoutNfts.length,
+    governedTokenAccountsWithoutNfts.length,
+  ])
+  const isSol = tokenImgUrl.includes(WSOL_MINT)
 
   const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
   return (
@@ -98,7 +118,12 @@ export default function InstructionCard({
       <h3 className="mb-4 flex">
         {`Instruction ${index} `}
         {descriptor?.name && `– ${descriptor.name}`}{' '}
-        {tokenImgUrl && <img className="w-5 h-5 ml-2" src={tokenImgUrl}></img>}
+        {tokenImgUrl && (
+          <img
+            className={`w-5 h-5 ml-2 ${isSol && 'rounded-full'}`}
+            src={tokenImgUrl}
+          ></img>
+        )}
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}
