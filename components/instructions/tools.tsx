@@ -12,10 +12,8 @@ import { GOVERNANCE_INSTRUCTIONS } from './programs/governance'
 import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
-import {
-  SPL_TOKEN_INSTRUCTIONS,
-  SYSTEM_INSTRUCTIONS,
-} from './programs/splToken'
+import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+import { SYSTEM_INSTRUCTIONS } from './programs/system'
 /**
  * Default governance program id instance
  */
