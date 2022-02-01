@@ -15,7 +15,7 @@ import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVot
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export const createTreasuryAccount = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   mint: PublicKey,
   config: GovernanceConfig,
@@ -46,6 +46,7 @@ export const createTreasuryAccount = async (
   const governanceAddress = await withCreateTokenGovernance(
     instructions,
     programId,
+    programVersion,
     realm.pubkey,
     tokenAccount.tokenAccountAddress,
     config,

@@ -100,7 +100,8 @@ const New = () => {
       const governanceType = governance.account.accountType
       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
       switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernance:
+        case GovernanceAccountType.ProgramGovernanceV1:
+        case GovernanceAccountType.ProgramGovernanceV2:
           return instructionsAvailiableAfterProgramGovernance.includes(
             instructionType
           )

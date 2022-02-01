@@ -15,6 +15,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const WithDrawCommunityTokens = () => {
   const { getDeposits } = useDepositStore()
@@ -77,6 +78,7 @@ const WithDrawCommunityTokens = () => {
               await withFinalizeVote(
                 instructions,
                 realmInfo!.programId,
+                getProgramVersionForRealm(realmInfo!),
                 realm!.pubkey,
                 proposal.account.governance,
                 proposal.pubkey,

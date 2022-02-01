@@ -1,4 +1,9 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 
 import { RpcContext } from '@solana/spl-governance'
 import { Proposal } from '@solana/spl-governance'
@@ -8,6 +13,7 @@ import { withCancelProposal } from '@solana/spl-governance'
 
 export const cancelProposal = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  realmPk: PublicKey,
   proposal: ProgramAccount<Proposal> | undefined
 ) => {
   const instructions: TransactionInstruction[] = []
@@ -18,10 +24,11 @@ export const cancelProposal = async (
     instructions,
     programId,
     programVersion,
+    realmPk,
+    proposal!.account.governance,
     proposal!.pubkey,
     proposal!.account.tokenOwnerRecord,
-    governanceAuthority,
-    proposal!.account.governance
+    governanceAuthority
   )
 
   const transaction = new Transaction({ feePayer: walletPubkey })
