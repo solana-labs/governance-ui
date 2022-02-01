@@ -11,9 +11,10 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 export const registerGovernance = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   governanceType: GovernanceType,
   realm: ProgramAccount<Realm>,
   governedAccount: PublicKey,
@@ -40,6 +41,7 @@ export const registerGovernance = async (
       governanceAddress = await withCreateProgramGovernance(
         instructions,
         programId,
+        programVersion,
         realm.pubkey,
         governedAccount,
         config,

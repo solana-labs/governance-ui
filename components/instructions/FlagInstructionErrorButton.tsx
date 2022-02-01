@@ -3,7 +3,7 @@ import { flagInstructionError } from 'actions/flagInstructionError'
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -25,7 +25,7 @@ export function FlagInstructionErrorButton({
   proposalAuthority,
 }: {
   proposal: ProgramAccount<Proposal>
-  proposalInstruction: ProgramAccount<ProposalInstruction>
+  proposalInstruction: ProgramAccount<ProposalTransaction>
   playState: PlayState
   proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined
 }) {

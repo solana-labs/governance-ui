@@ -2,8 +2,9 @@ import {
   getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  SetRealmAuthorityAction,
   VoteThresholdPercentage,
-  VoteWeightSource,
+  VoteTipping,
 } from '@solana/spl-governance'
 
 import { withCreateMintGovernance } from '@solana/spl-governance'
@@ -175,7 +176,7 @@ export const createMultisigRealm = async (
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteWeightSource.Deposit,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   })
@@ -183,6 +184,7 @@ export const createMultisigRealm = async (
   const communityMintGovPk = await withCreateMintGovernance(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     communityMintPk,
     config,
@@ -196,6 +198,7 @@ export const createMultisigRealm = async (
   await withCreateMintGovernance(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     councilMintPk,
     config,
@@ -213,7 +216,8 @@ export const createMultisigRealm = async (
     programVersion,
     realmPk,
     walletPk,
-    communityMintGovPk
+    communityMintGovPk,
+    SetRealmAuthorityAction.SetChecked
   )
 
   try {
