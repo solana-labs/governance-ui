@@ -55,6 +55,10 @@ export default function useGovernanceAssets() {
       )
     )
   }
+  const tokenGovernances = getGovernancesByAccountTypes([
+    GovernanceAccountType.TokenGovernanceV1,
+    GovernanceAccountType.TokenGovernanceV2,
+  ])
   const canMintRealmCommunityToken = () => {
     const governances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
@@ -102,30 +106,6 @@ export default function useGovernanceAssets() {
 
   const getAvailableInstructions = () => {
     return availableInstructions.filter((x) => x.isVisible)
-  }
-  function prepareTokenGovernances() {
-    const tokenGovernances = getGovernancesByAccountTypes([
-      GovernanceAccountType.TokenGovernanceV1 ||
-        GovernanceAccountType.TokenGovernanceV2,
-    ])
-    const governedTokenAccounts: GovernedTokenAccount[] = []
-    for (const i of tokenGovernances) {
-      const realmTokenAccount = realmTokenAccounts.find(
-        (x) => x.publicKey.toBase58() === i.account.governedAccount.toBase58()
-      )
-      const mint = tokenMints.find(
-        (x) =>
-          realmTokenAccount?.account.mint.toBase58() === x.publicKey.toBase58()
-      )
-      const obj = {
-        governance: i,
-        token: realmTokenAccount,
-        mint,
-        isNft: mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT,
-      }
-      governedTokenAccounts.push(obj)
-    }
-    return governedTokenAccounts
   }
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
