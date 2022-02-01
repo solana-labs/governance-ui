@@ -162,15 +162,16 @@ const useDepositStore = create<DepositStore>((set, _get) => ({
           ).data
 
           x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0)
-          x.available = additionalInfoData.withdrawable
+          x.available = additionalInfoData.unlocked
           x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
           return x
         })
         if (
           votingPowerEntry &&
-          !votingPowerEntry.data.votingPowerDepositOnly.isZero()
+          !votingPowerEntry.data.votingPowerUnlockedOnly.isZero()
         ) {
-          votingPowerFromDeposits = votingPowerEntry.data.votingPowerDepositOnly
+          votingPowerFromDeposits =
+            votingPowerEntry.data.votingPowerUnlockedOnly
         }
         if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
           votingPower = votingPowerEntry.data.votingPower

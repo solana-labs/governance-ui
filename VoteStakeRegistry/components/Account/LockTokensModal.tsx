@@ -21,10 +21,7 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import {
-  DepositWithMintAccount,
-  LockupType,
-} from 'VoteStakeRegistry/sdk/accounts'
+import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
   yearsToSecs,
@@ -34,50 +31,15 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
-interface Period {
-  value: number
-  display: string
-  multiplier: number
-}
-interface LockupKind {
-  value: LockupType
-  info: string
-  displayName: string
-}
-interface VestingPeriod {
-  value: number
-  display: string
-  info: string
-}
-const MONTHLY = 'monthly'
-const lockupTypes: LockupKind[] = [
-  {
-    value: 'cliff',
-    displayName: 'Cliff',
-    info:
-      'Tokens are locked for a set timeframe and are released in full at the end of the period. Vote weight increase declines linearly over the period.',
-  },
-  {
-    value: 'constant',
-    displayName: 'Constant',
-    info:
-      'Tokens are locked permanently for a timeframe. At any time a constant lockup can be converted to a cliff lockup with a timeframe greater than or equal to the constant lockup period. Vote weight increase stays constant until the lockup is converted to a cliff type lockup.',
-  },
-  {
-    value: MONTHLY,
-    displayName: 'Vested',
-    info:
-      'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released weekly, monthly or yearly. Vote weight increase declines linearly over the period.',
-  },
-]
+import {
+  LockupKind,
+  lockupTypes,
+  MONTHLY,
+  Period,
+  VestingPeriod,
+  vestingPeriods,
+} from 'VoteStakeRegistry/tools/types'
 
-const vestingPeriods: VestingPeriod[] = [
-  {
-    value: 30,
-    display: 'Monthly',
-    info: 'per month',
-  },
-]
 const YES = 'YES'
 const NO = 'NO'
 
@@ -257,6 +219,7 @@ const LockTokensModal = ({
     await voteRegistryLockDeposit({
       rpcContext,
       mintPk: realm!.account.communityMint!,
+      communityMintPk: realm!.account.communityMint!,
       realmPk: realm!.pubkey!,
       programId: realm!.owner,
       amountFromVoteRegistryDeposit: amountFromDeposit,
@@ -313,6 +276,7 @@ const LockTokensModal = ({
       amountAfterOperation: whatWillBeLeftInsideDeposit,
       lockUpPeriodInDays: lockupPeriod.value,
       sourceDepositIdx: depositToUnlock!.index,
+      communityMintPk: realm!.account.communityMint,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,

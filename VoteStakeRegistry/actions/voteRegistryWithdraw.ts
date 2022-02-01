@@ -12,19 +12,19 @@ import { sendTransaction } from '@utils/send'
 
 export const voteRegistryWithdraw = async ({
   rpcContext,
-  toPubKey,
   mintPk,
   realmPk,
   amount,
   tokenOwnerRecordPubKey,
   depositIndex,
   closeDepositAfterOperation,
+  communityMintPk,
   client,
 }: {
   rpcContext: RpcContext
-  toPubKey: PublicKey
   mintPk: PublicKey
   realmPk: PublicKey
+  communityMintPk: PublicKey
   amount: BN
   tokenOwnerRecordPubKey: PublicKey
   depositIndex: number
@@ -38,13 +38,14 @@ export const voteRegistryWithdraw = async ({
   await withVoteRegistryWithdraw({
     instructions,
     walletPk: wallet!.publicKey!,
-    toPubKey,
     mintPk,
     realmPk,
     amount,
     tokenOwnerRecordPubKey,
     depositIndex,
     closeDepositAfterOperation,
+    communityMintPk,
+    connection,
     client,
   })
 

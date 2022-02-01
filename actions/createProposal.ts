@@ -27,6 +27,7 @@ interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
+  chunkSplitByDefault?: boolean
 }
 
 export const createProposal = async (
@@ -101,6 +102,9 @@ export const createProposal = async (
   )
 
   const insertInstructions: TransactionInstruction[] = []
+  const splitToChunkByDefault = instructionsData.filter(
+    (x) => x.chunkSplitByDefault
+  ).length
 
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
@@ -141,7 +145,7 @@ export const createProposal = async (
   // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
   // This is conservative setting and we might need to revise it if we have more empirical examples or
   // reliable way to determine Tx size
-  if (insertInstructionCount <= 2) {
+  if (insertInstructionCount <= 2 && !splitToChunkByDefault) {
     const transaction = new Transaction()
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed

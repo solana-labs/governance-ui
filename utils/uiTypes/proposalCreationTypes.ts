@@ -9,6 +9,8 @@ import {
   GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
+import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
+import { LockupKind } from 'VoteStakeRegistry/tools/types'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -16,6 +18,7 @@ export interface UiInstruction {
   governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
+  chunkSplitByDefault?: boolean
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
@@ -23,6 +26,23 @@ export interface SplTokenTransferForm {
   governedTokenAccount: GovernedTokenAccount | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
+}
+
+export interface GrantForm {
+  destinationAccount: string
+  amount: number | undefined
+  governedTokenAccount: GovernedTokenAccount | undefined
+  mintInfo: MintInfo | undefined
+  lockupKind: LockupKind
+  startDateUnixSeconds: number
+  periods: number
+  allowClawback: boolean
+}
+
+export interface ClawbackForm {
+  governedTokenAccount: GovernedTokenAccount | undefined
+  voter: Voter | null
+  deposit: DepositWithMintAccount | null
 }
 
 export interface SendTokenCompactViewForm extends SplTokenTransferForm {
@@ -67,6 +87,8 @@ export enum Instructions {
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  Grant,
+  Clawback,
 }
 
 export type createParams = [

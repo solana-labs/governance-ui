@@ -106,7 +106,7 @@ async function prepareMintInstructions(
     if (otherOwners?.length) {
       for (const ownerPk of otherOwners) {
         const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
-          connection,
+          connection.current,
           ownerPk,
           _mintPk
         )
