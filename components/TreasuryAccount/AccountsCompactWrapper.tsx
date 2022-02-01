@@ -6,7 +6,7 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
 import AccountOverview from './AccountOverview'
 import DepositTokens from './DepositTokens'
-import { PlusIcon } from '@heroicons/react/solid'
+import { ArrowsExpandIcon, PlusIcon } from '@heroicons/react/solid'
 import useQueryContext from '@hooks/useQueryContext'
 import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
@@ -45,33 +45,41 @@ const AccountsCompactWrapper = () => {
           <>
             <h3 className="mb-4 flex items-center">
               Treasury
-              <Tooltip
-                contentClassName="ml-auto"
-                content={
-                  !connected
-                    ? 'Connect your wallet to create new account'
-                    : !canCreateGovernance
-                    ? "You don't have enough governance power to create a new treasury account"
-                    : toManyCommunityOutstandingProposalsForUser
-                    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new treasury account.'
-                    : toManyCouncilOutstandingProposalsForUse
-                    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new treasury account.'
-                    : ''
-                }
-              >
-                <div
-                  onClick={goToNewAccountForm}
-                  className={`bg-bkg-2 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 ml-auto ${
-                    !isConnectedWithGovernanceCreationPermission
-                      ? 'cursor-not-allowed pointer-events-none opacity-60'
-                      : 'cursor-pointer'
-                  }`}
+              <div className="ml-auto flex items-center">
+                <ArrowsExpandIcon
+                  onClick={() => {
+                    const url = fmtUrlWithCluster(`/dao/${symbol}/treasury`)
+                    router.push(url)
+                  }}
+                  className="text-fgd-3 flex-shrink-0 h-5 w-5 cursor-pointer mr-2"
+                ></ArrowsExpandIcon>
+                <Tooltip
+                  content={
+                    !connected
+                      ? 'Connect your wallet to create new account'
+                      : !canCreateGovernance
+                      ? "You don't have enough governance power to create a new treasury account"
+                      : toManyCommunityOutstandingProposalsForUser
+                      ? 'You have too many community outstanding proposals. You need to finalize them before creating a new treasury account.'
+                      : toManyCouncilOutstandingProposalsForUse
+                      ? 'You have too many council outstanding proposals. You need to finalize them before creating a new treasury account.'
+                      : ''
+                  }
                 >
-                  <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                    <PlusIcon />
+                  <div
+                    onClick={goToNewAccountForm}
+                    className={`bg-bkg-2 default-transition flex flex-col items-center justify-center rounded-lg hover:bg-bkg-3 ml-auto ${
+                      !isConnectedWithGovernanceCreationPermission
+                        ? 'cursor-not-allowed pointer-events-none opacity-60'
+                        : 'cursor-pointer'
+                    }`}
+                  >
+                    <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                      <PlusIcon />
+                    </div>
                   </div>
-                </div>
-              </Tooltip>
+                </Tooltip>
+              </div>
             </h3>
             <HoldTokensTotalPrice />
             <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
