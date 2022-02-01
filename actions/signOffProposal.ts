@@ -27,9 +27,9 @@ export const signOffProposal = async (
     realmPk,
     proposal.account.governance,
     proposal.pubkey,
-    walletPubkey,
+    signatoryRecord.account.signatory,
     signatoryRecord?.pubkey,
-    walletPubkey
+    undefined
   )
 
   const transaction = new Transaction()
