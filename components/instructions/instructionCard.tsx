@@ -48,11 +48,11 @@ export default function InstructionCard({
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
-      proposalInstruction.account.instruction
+      proposalInstruction.account.getSingleInstruction()
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
-      const sourcePk =
-        proposalInstruction.account.instruction.accounts[0].pubkey
+      const sourcePk = proposalInstruction.account.getSingleInstruction()
+        .accounts[0].pubkey
       const tokenAccount = await tryGetTokenAccount(
         connection.current,
         sourcePk
@@ -102,18 +102,20 @@ export default function InstructionCard({
       </h3>
       <InstructionProgram
         endpoint={connection.endpoint}
-        programId={proposalInstruction.account.instruction.programId}
+        programId={proposalInstruction.account.getSingleInstruction().programId}
       ></InstructionProgram>
       <div className="border-b border-bkg-4 mb-6">
-        {proposalInstruction.account.instruction.accounts.map((am, idx) => (
-          <InstructionAccount
-            endpoint={connection.endpoint}
-            key={idx}
-            index={idx}
-            accountMeta={am}
-            descriptor={descriptor}
-          />
-        ))}
+        {proposalInstruction.account
+          .getSingleInstruction()
+          .accounts.map((am, idx) => (
+            <InstructionAccount
+              endpoint={connection.endpoint}
+              key={idx}
+              index={idx}
+              accountMeta={am}
+              descriptor={descriptor}
+            />
+          ))}
       </div>
       <div className="flex items-center justify-between mb-2">
         <div className="font-bold text-sm">Data</div>
@@ -131,7 +133,7 @@ export default function InstructionCard({
       )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
         <InspectorButton
-          instructionData={proposalInstruction.account.instruction}
+          instructionData={proposalInstruction.account.getSingleInstruction()}
         />
 
         <FlagInstructionErrorButton
