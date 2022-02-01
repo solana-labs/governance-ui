@@ -12,15 +12,17 @@ import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Select from '@components/inputs/Select'
-import { getGovernanceMintSymbols } from '@tools/sdk/uxdProtocol/uxdClient'
 import {
   ProgramAccount,
   serializeInstructionToBase64,
   Governance,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getLPMintInfo } from '@tools/sdk/raydium/helpers'
-import { UXP_USDC_POOL_KEYS } from '@tools/sdk/raydium/poolKeys'
+import {
+  getLiquidityPoolKeysByLabel,
+  getLPMintInfo,
+} from '@tools/sdk/raydium/helpers'
+import { liquidityPoolList } from '@tools/sdk/raydium/poolKeys'
 import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction'
 import BigNumber from 'bignumber.js'
 
@@ -82,17 +84,20 @@ const RemoveLiquidityRaydium = ({
   const [LPDecimals, setLPDecimals] = useState(9)
   useEffect(() => {
     const fetchLpData = async () => {
-      if (!form.governedAccount?.governance.pubkey) return
+      if (!form.governedAccount?.governance.pubkey || !form.liquidityPool)
+        return
+      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool)
+
       const { maxBalance, decimals } = await getLPMintInfo(
         connection,
-        UXP_USDC_POOL_KEYS.lpMint,
+        poolKeys.lpMint,
         form.governedAccount.governance.pubkey
       )
       setMaxLPAmount(maxBalance)
       setLPDecimals(decimals)
     }
     fetchLpData()
-  }, [form.governedAccount?.governance.pubkey])
+  }, [form.governedAccount?.governance.pubkey, form.liquidityPool])
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -114,6 +119,7 @@ const RemoveLiquidityRaydium = ({
     ) {
       const createIx = createRemoveLiquidityInstruction(
         new PublicKey(form.governedAccount.governance.pubkey),
+        form.liquidityPool,
         new BigNumber(form.amountIn).shiftedBy(LPDecimals).toString()
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
@@ -133,20 +139,17 @@ const RemoveLiquidityRaydium = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.baseTokenName) {
+    if (form.liquidityPool) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
-      // We are assuming for now that we only have one Liquidity Pool (UXP/USDC)
       handleSetForm({
-        value: getGovernanceMintSymbols(connection.cluster).filter(
-          (s) => s !== form.baseTokenName
-        )[0],
-        propertyName: 'quoteTokenName',
+        value: form.liquidityPool,
+        propertyName: 'liquidityPool',
       })
     }
-  }, [form.baseTokenName])
+  }, [form.liquidityPool])
 
   useEffect(() => {
     if (form.baseAmountIn) {
@@ -165,8 +168,7 @@ const RemoveLiquidityRaydium = ({
   }, [form])
 
   const schema = yup.object().shape({
-    baseTokenName: yup.string().required('Base Token Name is required'),
-    quoteTokenName: yup.string().required('Quote Token Name is required'),
+    liquidityPool: yup.string().required('Liquidity Pool is required'),
     amountIn: yup
       .number()
       .moreThan(0, 'Amount for LP token should be more than 0')
@@ -191,34 +193,17 @@ const RemoveLiquidityRaydium = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Select
-        label="Base Token Name"
-        value={form.baseTokenName}
+        label="Raydium Liquidity Pool"
+        value={form.liquidityPool}
         placeholder="Please select..."
         onChange={(value) =>
-          handleSetForm({ value, propertyName: 'baseTokenName' })
+          handleSetForm({ value, propertyName: 'liquidityPool' })
         }
-        error={formErrors['baseTokenName']}
+        error={formErrors['liquidityPoolId']}
       >
-        {getGovernanceMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
-
-      <Select
-        label="Quote Token Name"
-        value={form.quoteTokenName}
-        placeholder="Please select..."
-        disabled={true}
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'quoteTokenName' })
-        }
-        error={formErrors['quoteTokenName']}
-      >
-        {getGovernanceMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
+        {liquidityPoolList.map((pool, i) => (
+          <Select.Option key={pool.label + i} value={pool.label}>
+            {pool.label}
           </Select.Option>
         ))}
       </Select>

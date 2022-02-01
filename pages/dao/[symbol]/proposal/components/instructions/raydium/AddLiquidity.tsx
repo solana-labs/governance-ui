@@ -123,8 +123,7 @@ const AddLiquidityRaydium = ({
           ).toString()
         ),
         form.fixedSide,
-        form.governedAccount.governance.pubkey,
-        new PublicKey(wallet.publicKey.toBase58())
+        form.governedAccount.governance.pubkey
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }

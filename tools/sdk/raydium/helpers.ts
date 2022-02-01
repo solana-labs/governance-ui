@@ -10,6 +10,8 @@ import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import { getGovernanceToken } from '../uxdProtocol/uxdClient'
+import { liquidityPoolKeys, liquidityPoolList } from './poolKeys'
+export { liquidityPoolKeys } from './poolKeys'
 
 export const getAmountOut = async (
   poolKeys: LiquidityPoolKeys,
@@ -62,4 +64,27 @@ export const getLPMintInfo = async (
     maxBalance: lpUserBalance.value.uiAmount ?? 0,
     decimals: lpInfo.value.decimals,
   }
+}
+
+export const getLiquidityPoolKeysByAssets = (
+  base: PublicKey,
+  quote: PublicKey
+): LiquidityPoolKeys | undefined => {
+  return liquidityPoolKeys.find(
+    (pk) =>
+      (pk.baseMint.equals(base) && pk.quoteMint.equals(quote)) ||
+      (pk.baseMint.equals(quote) && pk.quoteMint.equals(base))
+  )
+}
+
+export const getLiquidityPoolKeysByLabel = (
+  label: string
+): LiquidityPoolKeys => {
+  const lp = liquidityPoolList.find((lp) => lp.label === label)?.id
+  if (!lp) throw new Error('pool not found for label ' + label)
+
+  const poolKeys = liquidityPoolKeys.find((lpk) => lpk.id.equals(lp))
+  if (!poolKeys) throw new Error('pool not found for id ' + lp.toBase58())
+
+  return poolKeys
 }
