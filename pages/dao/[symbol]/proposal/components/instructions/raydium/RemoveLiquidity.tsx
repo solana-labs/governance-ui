@@ -4,7 +4,10 @@ import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import {
+  RemoveLiquidityRaydiumForm,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
@@ -18,13 +21,11 @@ import {
   Governance,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import {
-  getLiquidityPoolKeysByLabel,
-  getLPMintInfo,
-} from '@tools/sdk/raydium/helpers'
-import { liquidityPoolList } from '@tools/sdk/raydium/poolKeys'
+import { getLPMintInfo } from '@tools/sdk/raydium/helpers'
+import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
 import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction'
 import BigNumber from 'bignumber.js'
+import { jsonInfo2PoolKeys } from '@raydium-io/raydium-sdk'
 
 const RemoveLiquidityRaydium = ({
   index,
@@ -73,8 +74,9 @@ const RemoveLiquidityRaydium = ({
 
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<any>({
+  const [form, setForm] = useState<RemoveLiquidityRaydiumForm>({
     governedAccount: undefined,
+    liquidityPool: '',
     amountIn: 0,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -86,11 +88,11 @@ const RemoveLiquidityRaydium = ({
     const fetchLpData = async () => {
       if (!form.governedAccount?.governance.pubkey || !form.liquidityPool)
         return
-      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool)
+      const poolKeys = liquidityPoolKeysList[form.liquidityPool]
 
       const { maxBalance, decimals } = await getLPMintInfo(
         connection,
-        poolKeys.lpMint,
+        new PublicKey(poolKeys.lpMint),
         form.governedAccount.governance.pubkey
       )
       setMaxLPAmount(maxBalance)
@@ -115,11 +117,12 @@ const RemoveLiquidityRaydium = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
+      form.liquidityPool &&
       wallet?.publicKey
     ) {
       const createIx = createRemoveLiquidityInstruction(
         new PublicKey(form.governedAccount.governance.pubkey),
-        form.liquidityPool,
+        jsonInfo2PoolKeys(liquidityPoolKeysList[form.liquidityPool]),
         new BigNumber(form.amountIn).shiftedBy(LPDecimals).toString()
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
@@ -152,13 +155,13 @@ const RemoveLiquidityRaydium = ({
   }, [form.liquidityPool])
 
   useEffect(() => {
-    if (form.baseAmountIn) {
+    if (form.amountIn) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.baseAmountIn])
+  }, [form.amountIn])
 
   useEffect(() => {
     handleSetInstructions(
@@ -199,11 +202,11 @@ const RemoveLiquidityRaydium = ({
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'liquidityPool' })
         }
-        error={formErrors['liquidityPoolId']}
+        error={formErrors['liquidityPool']}
       >
-        {liquidityPoolList.map((pool, i) => (
-          <Select.Option key={pool.label + i} value={pool.label}>
-            {pool.label}
+        {[...Object.keys(liquidityPoolKeysList)].map((pool, i) => (
+          <Select.Option key={pool + i} value={pool}>
+            {pool}
           </Select.Option>
         ))}
       </Select>

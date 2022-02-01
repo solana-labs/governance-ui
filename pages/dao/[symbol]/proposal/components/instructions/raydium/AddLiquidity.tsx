@@ -27,7 +27,10 @@ import {
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { createAddLiquidityInstruction } from '@tools/sdk/raydium/createAddLiquidityInstruction'
 import { getAmountOut } from '@tools/sdk/raydium/helpers'
-import { UXP_USDC_POOL_KEYS } from '@tools/sdk/raydium/poolKeys'
+import {
+  liquidityPoolList,
+  UXP_USDC_POOL_KEYS,
+} from '@tools/sdk/raydium/poolKeys'
 import { BN } from '@project-serum/anchor'
 
 const AddLiquidityRaydium = ({
@@ -78,6 +81,7 @@ const AddLiquidityRaydium = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AddLiquidityRaydiumForm>({
     governedAccount: undefined,
+    liquidityPool: '',
     tokenAName: '',
     tokenBName: '',
     tokenAAmountIn: 0,
@@ -134,6 +138,7 @@ const AddLiquidityRaydium = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -217,6 +222,22 @@ const AddLiquidityRaydium = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+
+      <Select
+        label="Raydium Liquidity Pool"
+        value={form.liquidityPool}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'liquidityPool' })
+        }
+        error={formErrors['liquidityPoolId']}
+      >
+        {liquidityPoolList.map((pool, i) => (
+          <Select.Option key={pool.label + i} value={pool.label}>
+            {pool.label}
+          </Select.Option>
+        ))}
+      </Select>
       <Select
         label="Token A Name"
         value={form.tokenAName}
