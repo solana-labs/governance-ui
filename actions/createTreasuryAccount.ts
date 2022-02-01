@@ -5,7 +5,12 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { GovernanceConfig, ProgramAccount, Realm } from '@solana/spl-governance'
+import {
+  GovernanceConfig,
+  ProgramAccount,
+  Realm,
+  withCreateNativeTreasury,
+} from '@solana/spl-governance'
 
 import { withCreateTokenGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -13,6 +18,7 @@ import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { DEFAULT_NATIVE_SOL_MINT } from '@components/instructions/tools'
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -56,6 +62,15 @@ export const createTreasuryAccount = async (
     governanceAuthority,
     voterWeight
   )
+
+  if (mint.toBase58() === DEFAULT_NATIVE_SOL_MINT) {
+    await withCreateNativeTreasury(
+      instructions,
+      programId,
+      governanceAddress,
+      walletPubkey
+    )
+  }
 
   const transaction = new Transaction()
   transaction.add(...instructions)

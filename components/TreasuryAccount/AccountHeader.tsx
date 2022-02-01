@@ -22,7 +22,11 @@ const AccountHeader = () => {
     currentAccount && currentAccount.mint?.account
       ? getMintDecimalAmountFromNatural(
           currentAccount.mint?.account,
-          new BN(currentAccount.token!.account.amount)
+          new BN(
+            !currentAccount.isSol
+              ? currentAccount.token!.account.amount
+              : currentAccount.solAccount!.lamports
+          )
         ).toNumber()
       : 0
   const amountFormatted = new BigNumber(amount).toFormat()
