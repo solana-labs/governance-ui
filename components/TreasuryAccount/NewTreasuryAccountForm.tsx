@@ -60,14 +60,14 @@ const NewAccountForm = () => {
     ownVoterWeight,
   } = useRealm()
   const types = [
-    { name: 'Other', value: OTHER, defaultMint: '' },
     {
-      name: 'Native SOL',
+      name: 'SOL Account',
       value: SOL,
       defaultMint: DEFAULT_NATIVE_SOL_MINT,
       hide: realmInfo?.programVersion !== 2,
     },
-    { name: 'NFT', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
+    { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
+    { name: 'Token Account', value: OTHER, defaultMint: '' },
   ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)

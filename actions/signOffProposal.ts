@@ -12,7 +12,7 @@ import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
 
 export const signOffProposal = async (
-  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  { connection, wallet, programId, programVersion }: RpcContext,
   realmPk: PublicKey,
   proposal: ProgramAccount<Proposal>,
   signatoryRecord: ProgramAccount<SignatoryRecord>
@@ -27,9 +27,9 @@ export const signOffProposal = async (
     realmPk,
     proposal.account.governance,
     proposal.pubkey,
-    walletPubkey,
+    signatoryRecord.account.signatory,
     signatoryRecord?.pubkey,
-    walletPubkey
+    undefined
   )
 
   const transaction = new Transaction()

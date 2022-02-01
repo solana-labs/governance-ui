@@ -55,6 +55,10 @@ export default function useGovernanceAssets() {
       )
     )
   }
+  const tokenGovernances = getGovernancesByAccountTypes([
+    GovernanceAccountType.TokenGovernanceV1,
+    GovernanceAccountType.TokenGovernanceV2,
+  ])
   const canMintRealmCommunityToken = () => {
     const governances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
