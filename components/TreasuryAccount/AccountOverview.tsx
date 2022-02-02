@@ -19,6 +19,7 @@ import { ViewState } from './Types'
 import SendTokens from './SendTokens'
 import { ExternalLinkIcon, ArrowsExpandIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
+import ConvertToMsol from './ConvertToMsol'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -42,6 +43,7 @@ const AccountOverview = () => {
   )
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
+  const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
   const {
     setCurrentCompactView,
     resetCompactViewState,
@@ -137,7 +139,7 @@ const AccountOverview = () => {
       <div className="mb-4 flex flex-col">
         <Button
           className={`sm:w-full text-sm ${!isSOL ? 'hidden' : ''}`}
-          onClick={() => {}}
+          onClick={() => setOpenMsolConvertModal(true)}
           disabled={!canUseTransferInstruction}
         >
           <Tooltip
@@ -199,6 +201,17 @@ const AccountOverview = () => {
           isOpen={openCommonSendModal}
         >
           <SendTokens></SendTokens>
+        </Modal>
+      )}
+      {openMsolConvertModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenMsolConvertModal(false)
+          }}
+          isOpen={openMsolConvertModal}
+        >
+          <ConvertToMsol></ConvertToMsol>
         </Modal>
       )}
     </>
