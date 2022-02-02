@@ -68,14 +68,11 @@ export async function tvl(timestamp) {
     if (assetDeposits.length > 0) {
       const info = tokenService.getTokenInfoFromCoingeckoId(coingeckoId)
       const closestVal = findClosestToDate(assetDeposits, date)
-      const startValue = 100
       balances.push({
         liquidity: closestVal.totalDeposits - closestVal.totalBorrows,
         symbol: info?.symbol || mangoId,
         apy: `${(
-          ((startValue * Math.pow(1 + closestVal.depositRate / 365, 365 * 7) -
-            startValue) /
-            100) *
+          (Math.pow(1 + closestVal.depositRate / 100000, 100000) - 1) *
           100
         ).toFixed(2)}%`,
         protocol: 'MANGO',
