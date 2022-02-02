@@ -6,9 +6,20 @@ import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import MangoItem from './strategies/mango/MangoItem'
+import { tvl } from './strategies/mango/tools'
+
+export interface TreasuryStrategy {
+  liquidity: number
+  symbol: string
+  apy: number
+  protocol: string
+  mint: string
+  tokenImgSrc: string
+}
 
 const Treasury = () => {
   const { governedTokenAccounts } = useGovernanceAssets()
+  const [strategies, setStrategies] = useState<TreasuryStrategy[]>([])
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
@@ -18,7 +29,12 @@ const Treasury = () => {
     async function prepTreasuryAccounts() {
       setTreasuryAccounts(governedTokenAccounts)
     }
+    async function getStrategies() {
+      const mango = await tvl(Date.now() / 1000)
+      setStrategies([...mango])
+    }
     prepTreasuryAccounts()
+    getStrategies()
   }, [JSON.stringify(governedTokenAccounts)])
   const { totalPriceFormatted } = useTotalTreasuryPrice()
   return (
@@ -59,7 +75,19 @@ const Treasury = () => {
             <div>Liquidity</div>
             <div>Yield</div>
           </div>
-          <MangoItem></MangoItem>
+          {strategies.map((x) => {
+            if (x.protocol === 'MANGO') {
+              return (
+                <MangoItem
+                  symbol={x.symbol}
+                  liquidity={x.liquidity}
+                  apy={x.apy}
+                  key={x.symbol}
+                  tokenImgSrc={x.tokenImgSrc}
+                ></MangoItem>
+              )
+            }
+          })}
         </div>
       </div>
     </>

@@ -6,7 +6,7 @@ import MangoDepositModal from './MangoDepositModal'
 
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
 
-const MangoItem = () => {
+const MangoItem = ({ liquidity, apy, symbol, tokenImgSrc }) => {
   const info = tokenService.getTokenInfo(MANGO_MINT)
   const [isModalOpen, setIsModalOpen] = useState(false)
   return (
@@ -18,9 +18,11 @@ const MangoItem = () => {
       >
         <ItemName imgSrc={info?.logoURI} name={info?.name}></ItemName>
         <div>Deposit</div>
-        <div>0</div>
-        <div>0</div>
-        <div>0</div>
+        <div className="flex flex-items text-right">
+          0 {symbol} <img src={tokenImgSrc} className="w-5 h-5"></img>
+        </div>
+        <div>{liquidity}</div>
+        <div>{apy}</div>
       </ItemWrapper>
       {isModalOpen && (
         <MangoDepositModal

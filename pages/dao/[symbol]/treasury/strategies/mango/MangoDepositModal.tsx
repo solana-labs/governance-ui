@@ -10,7 +10,7 @@ const MangoDepositModal = ({ onClose, isOpen }) => {
   const info = tokenService.getTokenInfo(MANGO_MINT)
   const strategy = 'Deposit'
   return (
-    <Modal onClose={onClose} isOpen={isOpen}>
+    <Modal sizeClassName="max-w-4xl" onClose={onClose} isOpen={isOpen}>
       <ModalHeader
         logoURI={info?.logoURI}
         protocolName={info?.name}
