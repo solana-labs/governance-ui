@@ -5,13 +5,13 @@ import { GovernedTokenAccount } from '@utils/tokens'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import MangoItem from './strategies/mango/MangoItem'
-import { tvl } from './strategies/mango/tools'
+import MangoItem from './components/strategies/mango/MangoItem'
+import { tvl } from './components/strategies/mango/tools'
 
 export interface TreasuryStrategy {
   liquidity: number
   symbol: string
-  apy: number
+  apy: string
   protocol: string
   mint: string
   tokenImgSrc: string
@@ -37,6 +37,7 @@ const Treasury = () => {
     getStrategies()
   }, [JSON.stringify(governedTokenAccounts)])
   const { totalPriceFormatted } = useTotalTreasuryPrice()
+
   return (
     <>
       <div className="grid grid-cols-12">
@@ -67,11 +68,14 @@ const Treasury = () => {
       </div>
       <div className="grid grid-cols-12 mt-10">
         <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
-          <h1>Strategies</h1>
-          <div className="grid grid-cols-5 px-4">
+          <div className="mb-10">
+            <h1>Strategies</h1>
+          </div>
+          <div className="grid grid-cols-6 px-4">
             <div>Platform</div>
             <div>Strategy</div>
             <div>Your position</div>
+            <div>Token</div>
             <div>Liquidity</div>
             <div>Yield</div>
           </div>

@@ -1,8 +1,8 @@
 import Modal from '@components/Modal'
 import tokenService from '@utils/services/token'
-import ModalHeader from '../../components/ModalHeader'
-import ModalLeftSide from '../../components/ModalLeftSide'
-import ModalRightSide from '../../components/ModalRightSide'
+import ModalHeader from '../../ModalHeader'
+import ModalLeftSide from '../../ModalLeftSide'
+import ModalRightSide from '../../ModalRightSide'
 import MangoDeposit from './MangoDeposit'
 import { MANGO_MINT } from './MangoItem'
 

@@ -1,6 +1,6 @@
 import tokenService from '@utils/services/token'
 import axios from 'axios'
-import { TreasuryStrategy } from '../..'
+import { TreasuryStrategy } from '../../..'
 
 // Precision for our mango group token
 export const tokenPrecision = {
@@ -53,7 +53,7 @@ const coingeckoIds = {
   RAY: 'raydium',
   COPE: 'cope',
   FTT: 'ftx-token',
-  MSOL: 'marinade-staked-sol',
+  MSOL: 'msol',
   BNB: 'binance-coin',
   AVAX: 'avalanche',
   LUNA: 'terra-luna',
@@ -66,13 +66,18 @@ export async function tvl(timestamp) {
   Object.entries(coingeckoIds).map(([mangoId, coingeckoId]) => {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
     if (assetDeposits.length > 0) {
-      console.log(coingeckoId)
       const info = tokenService.getTokenInfoFromCoingeckoId(coingeckoId)
       const closestVal = findClosestToDate(assetDeposits, date)
+      const startValue = 100
       balances.push({
         liquidity: closestVal.totalDeposits - closestVal.totalBorrows,
-        symbol: info?.symbol || '',
-        apy: Math.pow(1 + closestVal.depositRate / 365, 365) - 1,
+        symbol: info?.symbol || mangoId,
+        apy: `${(
+          ((startValue * Math.pow(1 + closestVal.depositRate / 365, 365 * 7) -
+            startValue) /
+            100) *
+          100
+        ).toFixed(2)}%`,
         protocol: 'MANGO',
         mint: info?.address || '',
         tokenImgSrc: info?.logoURI || '',
