@@ -11,7 +11,7 @@ export interface Voter {
 }
 
 export interface votingMint {
-  depositScaledFactor: BN
+  unlockedScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
   lockupSaturationSecs: BN
@@ -28,7 +28,7 @@ export interface Registrar {
   votingMints: votingMint[]
   //there are more fields but no use for them on ui yet
 }
-export interface LockupKind {
+interface LockupKind {
   none: object
   daily: object
   monthly: object

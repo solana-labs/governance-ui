@@ -50,7 +50,7 @@ const validateDoseTokenAccountMatchMint = (
 }
 
 export const tryGetAta = async (
-  connection: ConnectionContext,
+  connection: Connection,
   mint: PublicKey,
   owner: PublicKey
 ) => {
@@ -61,7 +61,7 @@ export const tryGetAta = async (
     mint, // mint
     owner // owner
   )
-  const tokenAccount = await tryGetTokenAccount(connection.current, ata)
+  const tokenAccount = await tryGetTokenAccount(connection, ata)
   return tokenAccount
 }
 
@@ -169,6 +169,7 @@ export const validateBuffer = async (
 export const getTokenTransferSchema = ({ form, connection }) => {
   const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
       .number()
       .typeError('Amount is required')
@@ -236,10 +237,6 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           }
         }
       ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
   })
 }
 

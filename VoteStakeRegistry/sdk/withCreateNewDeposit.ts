@@ -27,6 +27,7 @@ export const withCreateNewDeposit = async ({
   instructions,
   walletPk,
   mintPk,
+  communityMintPk,
   realmPk,
   programId,
   tokenOwnerRecordPk,
@@ -37,6 +38,7 @@ export const withCreateNewDeposit = async ({
   instructions: TransactionInstruction[]
   walletPk: PublicKey
   mintPk: PublicKey
+  communityMintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
   tokenOwnerRecordPk: PublicKey | null
@@ -53,8 +55,8 @@ export const withCreateNewDeposit = async ({
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
-    mintPk,
-    client!.program.programId
+    communityMintPk,
+    clientProgramId
   )
   const { voter, voterBump } = await getVoterPDA(
     registrar,
