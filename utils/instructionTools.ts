@@ -335,7 +335,7 @@ export async function getConvertToMsolInstruction({
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   const prerequisiteInstructions: TransactionInstruction[] = []
-  let serializedInstruction: string = ''
+  let serializedInstruction = ''
 
   if (
     isValid &&
