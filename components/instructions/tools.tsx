@@ -13,6 +13,7 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+import { SYSTEM_INSTRUCTIONS } from './programs/system'
 /**
  * Default governance program id instance
  */
@@ -142,6 +143,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...SYSTEM_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -164,7 +166,6 @@ export async function getInstructionDescriptor(
       instruction.data,
       instruction.accounts
     ))) ?? <>{JSON.stringify(instruction.data)}</>
-
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,
