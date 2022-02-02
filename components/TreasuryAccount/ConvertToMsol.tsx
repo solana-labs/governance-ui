@@ -101,6 +101,7 @@ const ConvertToMsol = () => {
             })
           }
           error={formErrors['destinationAccount']}
+          noMaxWidth={true}
         ></GovernedAccountSelect>
         <Input
           min={mintMinAmount}
