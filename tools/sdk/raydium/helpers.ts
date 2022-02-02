@@ -9,23 +9,20 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { findATAAddrSync } from '@uxdprotocol/uxd-client'
-import { getGovernanceToken } from '../uxdProtocol/uxdClient'
 import { liquidityPoolKeys, liquidityPoolList } from './poolKeys'
-export { liquidityPoolKeys } from './poolKeys'
 
 export const getAmountOut = async (
-  poolKeys: LiquidityPoolKeys,
-  tokenNameIn: string,
+  liquidityPool: string,
   amountIn: number,
-  tokenNameOut: string,
   connection: ConnectionContext
 ) => {
-  const tokenInData = getGovernanceToken(connection.cluster, tokenNameIn)
-  const tokenOutData = getGovernanceToken(connection.cluster, tokenNameOut)
+  const poolKeys = getLiquidityPoolKeysByLabel(liquidityPool)
+  const base = await connection.current.getTokenSupply(poolKeys.baseMint)
+  const quote = await connection.current.getTokenSupply(poolKeys.quoteMint)
   const amountInBN = new BN(
     (
-      Number(amountIn.toFixed(tokenInData.decimals)) *
-      10 ** tokenInData.decimals
+      Number(amountIn.toFixed(base.value.decimals)) *
+      10 ** base.value.decimals
     ).toString()
   )
   const amountOut = Liquidity.computeCurrencyAmountOut({
@@ -35,16 +32,13 @@ export const getAmountOut = async (
       poolKeys,
     }),
     currencyAmountIn: new TokenAmount(
-      new Token(new PublicKey(tokenInData.address), tokenInData.decimals),
+      new Token(poolKeys.baseMint, base.value.decimals),
       amountInBN
     ),
-    currencyOut: new Token(
-      new PublicKey(tokenOutData.address),
-      tokenOutData.decimals
-    ),
+    currencyOut: new Token(poolKeys.quoteMint, quote.value.decimals),
     slippage: new Percent(5, 1000),
   })
-  const currentPrice = amountOut.currentPrice.toFixed(tokenOutData.decimals)
+  const currentPrice = amountOut.currentPrice.toFixed(quote.value.decimals)
 
   return Number(currentPrice) * amountIn
 }

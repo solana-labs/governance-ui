@@ -16,22 +16,19 @@ import { debounce } from '@utils/debounce'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Select from '@components/inputs/Select'
 import {
-  getGovernanceMintSymbols,
-  getGovernanceToken,
-} from '@tools/sdk/uxdProtocol/uxdClient'
-import {
   ProgramAccount,
   serializeInstructionToBase64,
   Governance,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { createAddLiquidityInstruction } from '@tools/sdk/raydium/createAddLiquidityInstruction'
-import { getAmountOut } from '@tools/sdk/raydium/helpers'
 import {
-  liquidityPoolList,
-  UXP_USDC_POOL_KEYS,
-} from '@tools/sdk/raydium/poolKeys'
+  getAmountOut,
+  getLiquidityPoolKeysByLabel,
+} from '@tools/sdk/raydium/helpers'
+import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
 import { BN } from '@project-serum/anchor'
+import BigNumber from 'bignumber.js'
 
 const AddLiquidityRaydium = ({
   index,
@@ -57,14 +54,14 @@ const AddLiquidityRaydium = ({
     async function prepGovernances() {
       const mintWithGovernances = await getMintWithGovernances()
       const matchedGovernances = governancesArray.map((gov) => {
-        const governedTokenAccount = governedTokenAccounts.find(
+        const governedbaseccount = governedTokenAccounts.find(
           (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
         )
         const mintGovernance = mintWithGovernances.find(
           (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
         )
-        if (governedTokenAccount) {
-          return governedTokenAccount as GovernedMultiTypeAccount
+        if (governedbaseccount) {
+          return governedbaseccount as GovernedMultiTypeAccount
         }
         if (mintGovernance) {
           return mintGovernance as GovernedMultiTypeAccount
@@ -82,10 +79,8 @@ const AddLiquidityRaydium = ({
   const [form, setForm] = useState<AddLiquidityRaydiumForm>({
     governedAccount: undefined,
     liquidityPool: '',
-    tokenAName: '',
-    tokenBName: '',
-    tokenAAmountIn: 0,
-    tokenBAmountIn: 0,
+    baseAmountIn: 0,
+    quoteAmountIn: 0,
     fixedSide: 'base',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -108,23 +103,20 @@ const AddLiquidityRaydium = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const tokenA = getGovernanceToken(connection.cluster, form.tokenAName)
-      const tokenB = getGovernanceToken(connection.cluster, form.tokenBName)
-
+      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool)
+      const base = await connection.current.getTokenSupply(poolKeys.baseMint)
+      const quote = await connection.current.getTokenSupply(poolKeys.quoteMint)
       const createIx = createAddLiquidityInstruction(
-        new PublicKey(tokenA.address),
-        new PublicKey(tokenB.address),
+        poolKeys,
         new BN(
-          (
-            Number(Number(form.tokenAAmountIn).toFixed(tokenA.decimals)) *
-            10 ** tokenA.decimals
-          ).toString()
+          new BigNumber(form.baseAmountIn.toString())
+            .shiftedBy(-base.value.decimals.toString())
+            .toString()
         ),
         new BN(
-          (
-            Number(Number(form.tokenBAmountIn).toFixed(tokenB.decimals)) *
-            10 ** tokenB.decimals
-          ).toString()
+          new BigNumber(form.quoteAmountIn.toString())
+            .shiftedBy(-quote.value.decimals.toString())
+            .toString()
         ),
         form.fixedSide,
         form.governedAccount.governance.pubkey
@@ -147,39 +139,28 @@ const AddLiquidityRaydium = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.tokenAName) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-      // We are assuming for now that we only have one Liquidity Pool (UXP/USDC)
-      handleSetForm({
-        value: getGovernanceMintSymbols(connection.cluster).filter(
-          (s) => s !== form.tokenAName
-        )[0],
-        propertyName: 'tokenBName',
-      })
-    }
-  }, [form.tokenAName])
-
-  useEffect(() => {
-    if (form.tokenAAmountIn) {
+    if (form.baseAmountIn) {
       debounce.debounceFcn(async () => {
         handleSetForm({
           value: await getAmountOut(
-            UXP_USDC_POOL_KEYS,
-            form.tokenAName,
-            Number(form.tokenAAmountIn),
-            form.tokenBName,
+            form.liquidityPool,
+            Number(form.baseAmountIn),
             connection
           ),
-          propertyName: 'tokenBAmountIn',
+          propertyName: 'quoteAmountIn',
         })
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.tokenAAmountIn])
+  }, [form.baseAmountIn])
+
+  useEffect(() => {
+    ;(async () => {
+      const { validationErrors } = await isFormValid(schema, form)
+      setFormErrors(validationErrors)
+    })()
+  }, [form.quoteAmountIn])
 
   useEffect(() => {
     handleSetInstructions(
@@ -189,16 +170,15 @@ const AddLiquidityRaydium = ({
   }, [form])
 
   const schema = yup.object().shape({
-    tokenAName: yup.string().required('Token A Name is required'),
-    tokenBName: yup.string().required('Token B Name is required'),
-    tokenAAmountIn: yup
+    liquidityPool: yup.string().required('Liquidity Pool is required'),
+    baseAmountIn: yup
       .number()
-      .moreThan(0, 'Amount for A token should be more than 0')
-      .required('Amount for A token is required'),
-    tokenBAmountIn: yup
+      .moreThan(0, 'Amount for Base token should be more than 0')
+      .required('Amount for Base token is required'),
+    quoteAmountIn: yup
       .number()
-      .moreThan(0, 'Amount for B token should be more than 0')
-      .required('Amount for B token is required'),
+      .moreThan(0, 'Amount for Quote token should be more than 0')
+      .required('Amount for Quote token is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -232,90 +212,61 @@ const AddLiquidityRaydium = ({
         }
         error={formErrors['liquidityPoolId']}
       >
-        {liquidityPoolList.map((pool, i) => (
-          <Select.Option key={pool.label + i} value={pool.label}>
-            {pool.label}
+        {[...Object.keys(liquidityPoolKeysList)].map((pool, i) => (
+          <Select.Option key={pool + i} value={pool}>
+            {pool}
           </Select.Option>
         ))}
       </Select>
-      <Select
-        label="Token A Name"
-        value={form.tokenAName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'tokenAName' })
-        }
-        error={formErrors['baseTokenName']}
-      >
-        {getGovernanceMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
+      {form.liquidityPool ? (
+        <>
+          <Input
+            label="Base Token Amount to deposit"
+            value={form.baseAmountIn}
+            type="number"
+            min={0}
+            max={10 ** 12}
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'baseAmountIn',
+              })
+            }
+            error={formErrors['baseAmountIn']}
+          />
 
-      <Select
-        label="Token B Name"
-        value={form.tokenBName}
-        placeholder="Please select..."
-        disabled={true}
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'tokenBName' })
-        }
-        error={formErrors['tokenBName']}
-      >
-        {getGovernanceMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
-
-      <Input
-        label="Token A Amount to deposit"
-        value={form.tokenAAmountIn}
-        type="number"
-        min={0}
-        max={10 ** 12}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'tokenAAmountIn',
-          })
-        }
-        error={formErrors['tokenAAmountIn']}
-      />
-
-      <Input
-        label="Token B Amount to deposit"
-        value={form.tokenBAmountIn}
-        type="number"
-        min={0}
-        max={10 ** 12}
-        onChange={(evt) =>
-          handleSetForm({
-            value: Number(evt.target.value),
-            propertyName: 'tokenBAmountIn',
-          })
-        }
-        disabled={true}
-        error={formErrors['tokenBAmountIn']}
-      />
-      <Select
-        label="Fixed Side"
-        value={form.fixedSide}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'fixedSide' })
-        }
-        error={formErrors['fixedSide']}
-      >
-        {['base', 'quote'].map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
+          <Input
+            label="Quote Token Amount to deposit"
+            value={form.quoteAmountIn}
+            type="number"
+            min={0}
+            max={10 ** 12}
+            onChange={(evt) =>
+              handleSetForm({
+                value: Number(evt.target.value),
+                propertyName: 'quoteAmountIn',
+              })
+            }
+            disabled={true}
+            error={formErrors['quoteAmountIn']}
+          />
+          <Select
+            label="Fixed Side"
+            value={form.fixedSide}
+            placeholder="Please select..."
+            onChange={(value) =>
+              handleSetForm({ value, propertyName: 'fixedSide' })
+            }
+            error={formErrors['fixedSide']}
+          >
+            {['base', 'quote'].map((value, i) => (
+              <Select.Option key={value + i} value={value}>
+                {value}
+              </Select.Option>
+            ))}
+          </Select>
+        </>
+      ) : null}
     </>
   )
 }

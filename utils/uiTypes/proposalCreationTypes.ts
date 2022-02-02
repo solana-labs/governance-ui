@@ -75,10 +75,8 @@ export interface ProgramAuthorityForm {
 export interface AddLiquidityRaydiumForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   liquidityPool: string
-  tokenAName: string
-  tokenBName: string
-  tokenAAmountIn: number
-  tokenBAmountIn: number
+  baseAmountIn: number
+  quoteAmountIn: number
   fixedSide: AmountSide
 }
 
