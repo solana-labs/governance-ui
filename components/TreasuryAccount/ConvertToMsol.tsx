@@ -77,13 +77,11 @@ const ConvertToMsol = () => {
   }
 
   useEffect(() => {
-    if (currentAccount) {
-      handleSetForm({
-        value: currentAccount,
-        propertyName: 'governedTokenAccount',
-      })
-    }
-  }, [currentAccount, form.destinationAccount]) // GovernedAccountSelect overrides property for one item
+    handleSetForm({
+      value: currentAccount,
+      propertyName: 'governedTokenAccount',
+    })
+  }, [currentAccount])
 
   return (
     <>
