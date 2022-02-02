@@ -44,14 +44,13 @@ export default function useRealm() {
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
       ? realm
-        ? await createUnchartedRealmInfo(realm)
+        ? createUnchartedRealmInfo(realm)
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 
     if (realmInfo && !realmInfo?.programVersion) {
       realmInfo = { ...realmInfo, programVersion: programVersion }
     }
-    console.log(realmInfo)
     if (mounted.current) {
       setRealmInfo(realmInfo)
     }
