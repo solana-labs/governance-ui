@@ -18,9 +18,9 @@ const MangoItem = () => {
       >
         <ItemName imgSrc={info?.logoURI} name={info?.name}></ItemName>
         <div>Deposit</div>
-        <div></div>
-        <div></div>
-        <div></div>
+        <div>0</div>
+        <div>0</div>
+        <div>0</div>
       </ItemWrapper>
       {isModalOpen && (
         <MangoDepositModal
