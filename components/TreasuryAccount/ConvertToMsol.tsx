@@ -1,12 +1,14 @@
 import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { ViewState } from './Types'
 import AccountLabel from './AccountHeader'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
-import { StakingViewForm } from '@utils/uiTypes/proposalCreationTypes'
+import {
+  StakingViewForm,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
@@ -15,15 +17,16 @@ import useRealm from '@hooks/useRealm'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import Button, { SecondaryButton } from '@components/Button'
 import Tooltip from '@components/Tooltip'
+import useWalletStore from 'stores/useWalletStore'
+import { getStakeSchema } from '@utils/validations'
+import { getConvertToMsolInstruction } from '@utils/instructionTools'
 
 const ConvertToMsol = () => {
   const { canChooseWhoVote } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const {
-    setCurrentCompactView,
-    resetCompactViewState,
-  } = useTreasuryAccountStore()
   const { governedTokenAccounts } = useGovernanceAssets()
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -32,7 +35,7 @@ const ConvertToMsol = () => {
 
   const [formErrors, setFormErrors] = useState({})
   const [form, setForm] = useState<StakingViewForm>({
-    destinationAccount: '',
+    destinationAccount: undefined,
     amount: undefined,
     governedTokenAccount: undefined,
     title: '',
@@ -50,29 +53,37 @@ const ConvertToMsol = () => {
   const mintMinAmount = form.governedTokenAccount?.mint
     ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
     : 1
+  const schema = getStakeSchema({ form })
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
 
-  const handleGoBackToMainView = () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
-
-  const handlePropose = () => {
+  const handlePropose = async () => {
     setIsLoading(true)
-    // ToDo: Initiate proposal creation
+    const instruction: UiInstruction = await getConvertToMsolInstruction({
+      schema,
+      form,
+      connection,
+      wallet,
+      setFormErrors,
+    })
+
+    if (instruction.isValid) {
+      // ToDo: Initiate proposal creation here
+    }
     setIsLoading(false)
   }
 
   useEffect(() => {
-    handleSetForm({
-      value: currentAccount,
-      propertyName: 'governedTokenAccount',
-    })
-  }, [currentAccount])
+    if (currentAccount) {
+      handleSetForm({
+        value: currentAccount,
+        propertyName: 'governedTokenAccount',
+      })
+    }
+  }, [currentAccount, form.destinationAccount]) // GovernedAccountSelect overrides property for one item
 
   return (
     <>

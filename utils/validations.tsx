@@ -300,3 +300,48 @@ export const getMintSchema = ({ form, connection }) => {
     mintAccount: yup.object().nullable().required('Mint is required'),
   })
 }
+
+export const getStakeSchema = ({ form }) => {
+  return yup.object().shape({
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test('amount', 'Insufficient funds', async function (val: number) {
+        if (val && val > 9 * 10 ** 6) {
+          return this.createError({
+            message: 'Amount is too large',
+          })
+        }
+        if (val && !form.governedTokenAccount) {
+          return this.createError({
+            message: 'Please pass in a source account to validate the amount',
+          })
+        }
+        if (
+          val &&
+          form.governedTokenAccount &&
+          form.governedTokenAccount?.isSol &&
+          form.governedTokenAccount?.mint &&
+          form.governedTokenAccount?.solAccount
+        ) {
+          const mintValue = getMintNaturalAmountFromDecimal(
+            val,
+            form.governedTokenAccount?.mint.account.decimals
+          )
+          return !!(
+            form.governedTokenAccount.solAccount.owner &&
+            form.governedTokenAccount.solAccount.lamports >= new BN(mintValue)
+          )
+        }
+        return this.createError({ message: 'Amount is required' })
+      }),
+    destinationAccount: yup
+      .object()
+      .nullable()
+      .required('Destination account is required'),
+    governedTokenAccount: yup
+      .object()
+      .nullable()
+      .required('Source account is required'),
+  })
+}

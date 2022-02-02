@@ -51,7 +51,7 @@ export interface SendTokenCompactViewForm extends SplTokenTransferForm {
 }
 
 export interface StakingViewForm {
-  destinationAccount: string
+  destinationAccount: GovernedTokenAccount | undefined
   amount: number | undefined
   governedTokenAccount: GovernedTokenAccount | undefined
   description: string

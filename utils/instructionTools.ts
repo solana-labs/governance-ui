@@ -5,7 +5,7 @@ import {
   TOKEN_PROGRAM_ID,
   u64,
 } from '@solana/spl-token'
-import { WalletAdapter } from '@solana/wallet-adapter-base'
+import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
 import {
   PublicKey,
   SystemProgram,
@@ -314,5 +314,32 @@ export async function getMintInstruction({
     governance: governedMintInfoAccount?.governance,
     prerequisiteInstructions: prerequisiteInstructions,
   }
+  return obj
+}
+
+export async function getConvertToMsolInstruction({
+  schema,
+  form,
+  connection,
+  wallet,
+  setFormErrors,
+}: {
+  schema: any
+  form: any
+  connection: ConnectionContext
+  wallet: SignerWalletAdapter | undefined
+  setFormErrors: any
+}): Promise<UiInstruction> {
+  const isValid = await validateInstruction({ schema, form, setFormErrors })
+  const prerequisiteInstructions: TransactionInstruction[] = []
+  const serializedInstruction: string = ''
+
+  const obj: UiInstruction = {
+    serializedInstruction,
+    isValid,
+    governance: form.governedTokenAccount?.governance,
+    prerequisiteInstructions: prerequisiteInstructions,
+  }
+
   return obj
 }
