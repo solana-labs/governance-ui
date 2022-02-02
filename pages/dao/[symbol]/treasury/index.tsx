@@ -5,6 +5,7 @@ import { GovernedTokenAccount } from '@utils/tokens'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import MangoItem from './strategies/mango/MangoItem'
 
 const Treasury = () => {
   const { governedTokenAccounts } = useGovernanceAssets()
@@ -21,32 +22,47 @@ const Treasury = () => {
   }, [JSON.stringify(governedTokenAccounts)])
   const { totalPriceFormatted } = useTotalTreasuryPrice()
   return (
-    <div className="grid grid-cols-12">
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
-        <div className="border-b border-fgd-4 pb-4 pt-2">
-          <div className="flex items-center">
-            <PreviousRouteBtn /> <h1 className="ml-3">Treasury</h1>
-          </div>
-        </div>
-        {totalPriceFormatted && (
-          <div className="pt-5 mb-5">
-            <div className="mb-3">Total balance</div>
-            <div>
-              <h1>${totalPriceFormatted}</h1>
+    <>
+      <div className="grid grid-cols-12">
+        <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
+          <div className="border-b border-fgd-4 pb-4 pt-2">
+            <div className="flex items-center">
+              <PreviousRouteBtn /> <h1 className="ml-3">Treasury</h1>
             </div>
           </div>
-        )}
-        <div className="flex flex-items flex-wrap">
-          {treasuryAccounts.map((x) => (
-            <TreasuryItem
-              governedAccountTokenAccount={x}
-              governanceNfts={governanceNfts}
-              key={x?.governance?.pubkey.toBase58()}
-            />
-          ))}
+          {totalPriceFormatted && (
+            <div className="pt-5 mb-5">
+              <div className="mb-3">Total balance</div>
+              <div>
+                <h1>${totalPriceFormatted}</h1>
+              </div>
+            </div>
+          )}
+          <div className="flex flex-items flex-wrap">
+            {treasuryAccounts.map((x) => (
+              <TreasuryItem
+                governedAccountTokenAccount={x}
+                governanceNfts={governanceNfts}
+                key={x?.governance?.pubkey.toBase58()}
+              />
+            ))}
+          </div>
         </div>
       </div>
-    </div>
+      <div className="grid grid-cols-12 mt-10">
+        <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
+          <h1>Strategies</h1>
+          <div className="grid grid-cols-5 px-4">
+            <div>Platform</div>
+            <div>Strategy</div>
+            <div>Your position</div>
+            <div>Liquidity</div>
+            <div>Yield</div>
+          </div>
+          <MangoItem></MangoItem>
+        </div>
+      </div>
+    </>
   )
 }
 
