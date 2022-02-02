@@ -10,12 +10,10 @@ import {
 import { VoteRegistryVoterWeight, VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
-import { usePrevious } from './usePrevious'
 
 export default function useRealm() {
   const router = useRouter()
   const { symbol } = router.query
-  const previousSymbol = usePrevious(symbol)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -33,8 +31,6 @@ export default function useRealm() {
     councilTokenOwnerRecords,
     programVersion,
   } = useWalletStore((s) => s.selectedRealm)
-
-  const previousStringifiedRealm = usePrevious(JSON.stringify(realm))
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
   const mounted = useRef(false)
@@ -46,24 +42,20 @@ export default function useRealm() {
     }
   }, [])
   useMemo(async () => {
-    if (
-      previousSymbol !== symbol ||
-      previousStringifiedRealm !== JSON.stringify(realm)
-    ) {
-      let realmInfo = isPublicKey(symbol as string)
-        ? realm
-          ? createUnchartedRealmInfo(realm)
-          : undefined
-        : getCertifiedRealmInfo(symbol as string, connection)
+    let realmInfo = isPublicKey(symbol as string)
+      ? realm
+        ? await createUnchartedRealmInfo(realm)
+        : undefined
+      : getCertifiedRealmInfo(symbol as string, connection)
 
-      if (realmInfo && !realmInfo?.programVersion) {
-        realmInfo = { ...realmInfo, programVersion: programVersion }
-      }
+    if (realmInfo && !realmInfo?.programVersion) {
+      realmInfo = { ...realmInfo, programVersion: programVersion }
     }
+    console.log(realmInfo)
     if (mounted.current) {
       setRealmInfo(realmInfo)
     }
-  }, [symbol, JSON.stringify(realm)])
+  }, [symbol, JSON.stringify(realm), mounted.current])
 
   const realmTokenAccount = useMemo(
     () =>

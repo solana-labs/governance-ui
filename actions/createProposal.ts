@@ -45,7 +45,6 @@ export const createProposal = async (
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
-
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
