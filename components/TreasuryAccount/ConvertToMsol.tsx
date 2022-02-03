@@ -15,18 +15,44 @@ import Textarea from '@components/inputs/Textarea'
 import { precision } from '@utils/formatting'
 import useRealm from '@hooks/useRealm'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import Button, { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import { getStakeSchema } from '@utils/validations'
 import { getConvertToMsolInstruction } from '@utils/instructionTools'
+import { PublicKey } from '@solana/web3.js'
+import {
+  getInstructionDataFromBase64,
+  Governance,
+  ProgramAccount,
+  RpcContext,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { getProgramVersionForRealm } from '@models/registry/api'
+import { createProposal } from 'actions/createProposal'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
+import { notify } from '@utils/notifications'
 
 const ConvertToMsol = () => {
-  const { canChooseWhoVote } = useRealm()
+  const {
+    canChooseWhoVote,
+    realm,
+    realmInfo,
+    ownVoterWeight,
+    mint,
+    councilMint,
+    symbol,
+  } = useRealm()
+  const { client } = useVoteRegistry()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
@@ -66,12 +92,80 @@ const ConvertToMsol = () => {
       schema,
       form,
       connection,
-      wallet,
       setFormErrors,
     })
 
     if (instruction.isValid) {
-      // ToDo: Initiate proposal creation here
+      if (!realm) {
+        setIsLoading(false)
+        throw 'No realm selected'
+      }
+
+      const governance = currentAccount?.governance
+      const rpcContext = new RpcContext(
+        new PublicKey(realm.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
+        connection.current,
+        connection.endpoint
+      )
+      const holdUpTime = governance?.account?.config.minInstructionHoldUpTime
+
+      const instructionData = {
+        data: instruction.serializedInstruction
+          ? getInstructionDataFromBase64(instruction.serializedInstruction)
+          : null,
+        holdUpTime: holdUpTime,
+        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
+      }
+
+      try {
+        // Fetch governance to get up to date proposalCount
+        const selectedGovernance = (await fetchRealmGovernance(
+          currentAccount?.governance?.pubkey
+        )) as ProgramAccount<Governance>
+
+        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+          governance!.account.config
+        )
+
+        const defaultProposalMint = !mint?.supply.isZero()
+          ? realm.account.communityMint
+          : !councilMint?.supply.isZero()
+          ? realm.account.config.councilMint
+          : undefined
+
+        const proposalMint =
+          canChooseWhoVote && voteByCouncil
+            ? realm.account.config.councilMint
+            : defaultProposalMint
+
+        if (!proposalMint) {
+          throw new Error(
+            'There is no suitable governing token for the proposal'
+          )
+        }
+
+        const proposalAddress = await createProposal(
+          rpcContext,
+          realm,
+          selectedGovernance.pubkey,
+          ownTokenRecord.pubkey,
+          form.title ? form.title : '',
+          form.description ? form.description : '',
+          proposalMint,
+          selectedGovernance?.account?.proposalCount,
+          [instructionData],
+          false,
+          client
+        )
+        const url = fmtUrlWithCluster(
+          `/dao/${symbol}/proposal/${proposalAddress}`
+        )
+        router.push(url)
+      } catch (ex) {
+        notify({ type: 'error', message: `${ex}` })
+      }
     }
     setIsLoading(false)
   }

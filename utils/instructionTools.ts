@@ -11,7 +11,12 @@ import {
   SystemProgram,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { BN } from '@project-serum/anchor'
+import { Marinade, MarinadeConfig } from '@marinade.finance/marinade-ts-sdk'
+import {
+  getMintNaturalAmountFromDecimal,
+  parseMintNaturalAmountFromDecimal,
+} from '@tools/sdk/units'
 import type { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
@@ -321,18 +326,47 @@ export async function getConvertToMsolInstruction({
   schema,
   form,
   connection,
-  wallet,
   setFormErrors,
 }: {
   schema: any
   form: any
   connection: ConnectionContext
-  wallet: SignerWalletAdapter | undefined
   setFormErrors: any
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const serializedInstruction: string = ''
+  let serializedInstruction: string = ''
+
+  if (
+    isValid &&
+    form.governedTokenAccount.transferAddress &&
+    form.destinationAccount.governance.pubkey
+  ) {
+    const amount = getMintNaturalAmountFromDecimal(
+      form.amount,
+      form.governedTokenAccount.mint.account.decimals
+    )
+    const originAccount = form.governedTokenAccount.transferAddress
+    const destinationAccount = form.destinationAccount.governance.pubkey
+
+    const config = new MarinadeConfig({
+      connection: connection.current,
+      publicKey: originAccount,
+    })
+    const marinade = new Marinade(config)
+
+    const { transaction } = await marinade.deposit(new BN(amount), {
+      mintToOwnerAddress: destinationAccount,
+    })
+
+    if (transaction.instructions.length === 1) {
+      serializedInstruction = serializeInstructionToBase64(
+        transaction.instructions[0]
+      )
+    } else {
+      throw Error('No mSOL Account can be found for the choosen account.')
+    }
+  }
 
   const obj: UiInstruction = {
     serializedInstruction,
