@@ -21,11 +21,11 @@ const GovernedAccountSelect = ({
 }: {
   onChange
   value
-  error
+  error?
   governedAccounts: GovernedMultiTypeAccount[]
-  shouldBeGoverned
-  governance: ProgramAccount<Governance> | null | undefined
-  label
+  shouldBeGoverned?
+  governance?: ProgramAccount<Governance> | null | undefined
+  label?
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {

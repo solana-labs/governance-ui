@@ -568,19 +568,20 @@
   version "0.2.3"
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
-"@blockworks-foundation/mango-client@^3.2.2":
-  version "3.2.15"
-  resolved "https://registry.npmjs.org/@blockworks-foundation/mango-client/-/mango-client-3.2.15.tgz"
-  integrity sha512-oyTMgQ7t6CjUIfJ26RygLg1eSu4zmMypD9iPWAglzFqJkmrwc0HOrr309ylEeUT1P5PxUxl3E3AaxjnhzLjMRw==
+"@blockworks-foundation/mango-client@^3.3.12":
+  version "3.3.12"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.12.tgz#da69dbc7d89b10a95a6771c7a1a4b452172eef83"
+  integrity sha512-6XIf4ykxO8RuiLAApUk4P+0KerOo7NWAkmXE7CcnuMzulVJ4oRKUVq8r7QPA9lcHIFO0cq237ejzRSxmtYSi6g==
   dependencies:
     "@project-serum/anchor" "^0.16.2"
     "@project-serum/serum" "0.13.55"
     "@project-serum/sol-wallet-adapter" "^0.2.0"
     "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "1.21.0"
+    "@solana/web3.js" "^1.31.0"
     big.js "^6.1.1"
     bn.js "^5.2.0"
     buffer-layout "^1.2.1"
+    cross-fetch "^3.1.5"
     dotenv "^10.0.0"
     yargs "^17.0.1"
 
@@ -1669,7 +1670,7 @@
   integrity sha512-lR0EMP2HC3+Mxwd4YcnZb0smnaDw7Bl2IQWZiTevRH5ZZBZn6VRWn3/92E3qdU4SSImJkA6IDHawOHAnx/qUvQ==
   dependencies:
     buffer "~6.0.3"
-    
+
 "@solana/spl-governance@^0.0.25":
   version "0.0.25"
   resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.25.tgz#f951780fc0560df9fd9a7417bfc4fa76aa3fb2b1"
@@ -1839,26 +1840,6 @@
     "@solana/wallet-adapter-base" "^0.9.1"
     "@solana/web3.js" "^1.20.0"
 
-"@solana/web3.js@1.21.0":
-  version "1.21.0"
-  resolved "https://registry.npmjs.org/@solana/web3.js/-/web3.js-1.21.0.tgz"
-  integrity sha512-x1NXlF92tEjxuTxS0u4n9JV17UKk0Dn2L+qSWGvKOb4iWhzApDj6wicJsrGdSbGdxnZ7eciQ/SNn3zB4ydUllA==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@solana/buffer-layout" "^3.0.0"
-    bn.js "^5.0.0"
-    borsh "^0.4.0"
-    bs58 "^4.0.1"
-    buffer "6.0.1"
-    crypto-hash "^1.2.2"
-    jayson "^3.4.4"
-    js-sha3 "^0.8.0"
-    node-fetch "^2.6.1"
-    rpc-websockets "^7.4.2"
-    secp256k1 "^4.0.2"
-    superstruct "^0.14.2"
-    tweetnacl "^1.0.0"
-
 "@solana/web3.js@^1.12.0", "@solana/web3.js@^1.31.0":
   version "1.31.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.31.0.tgz#7a313d4c1a90b77f27ddbfe845a10d6883e06452"
@@ -1879,7 +1860,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0":
+"@solana/web3.js@^1.17.0", "@solana/web3.js@^1.20.0", "@solana/web3.js@^1.21.0", "@solana/web3.js@^1.22.0":
   version "1.32.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.32.0.tgz#b9821de52d0e773c363516c3dcef9be701295d82"
   integrity sha512-jquZ/VBvM3zXAaTJvdWd9mlP0WiZaZqjji0vw5UAsb5IKIossrLhHtyUqMfo41Qkdwu1aVwf7YWG748i4XIJnw==
@@ -2930,6 +2911,16 @@ bonjour@^3.5.0:
     multicast-dns "^6.0.1"
     multicast-dns-service-types "^1.1.0"
 
+borsh@^0.3.1:
+  version "0.3.1"
+  resolved "https://registry.yarnpkg.com/borsh/-/borsh-0.3.1.tgz#c31c3a149610e37913deada80e89073fb15cf55b"
+  integrity sha512-gJoSTnhwLxN/i2+15Y7uprU8h3CKI+Co4YKZKvrGYUy0FwHWM20x5Sx7eU8Xv4HQqV+7rb4r3P7K1cBIQe3q8A==
+  dependencies:
+    "@types/bn.js" "^4.11.5"
+    bn.js "^5.0.0"
+    bs58 "^4.0.0"
+    text-encoding-utf-8 "^1.0.2"
+
 borsh@^0.4.0:
   version "0.4.0"
   resolved "https://registry.yarnpkg.com/borsh/-/borsh-0.4.0.tgz#9dd6defe741627f1315eac2a73df61421f6ddb9f"
@@ -3684,7 +3675,7 @@ cross-fetch@3.0.6:
   dependencies:
     node-fetch "2.6.1"
 
-cross-fetch@^3.1.4:
+cross-fetch@^3.1.4, cross-fetch@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/cross-fetch/-/cross-fetch-3.1.5.tgz#e1389f44d9e7ba767907f7af8454787952ab534f"
   integrity sha512-lvb1SBsI0Z7GDwmuid+mU3kWVBwTVUbe7S0H52yaaAdQOXq2YktTCZdlAcNKFzE6QtRz0snpw9bNiPeOIkkQvw==
@@ -9586,7 +9577,7 @@ superstruct@^0.14.2:
   resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.14.2.tgz#0dbcdf3d83676588828f1cf5ed35cda02f59025b"
   integrity sha512-nPewA6m9mR3d6k7WkZ8N8zpTWfenFH3q9pA2PkuiZxINr9DKB2+40wEQf0ixn8VaGuJ78AB6iWOtStI+/4FKZQ==
 
-superstruct@^0.15.3:
+superstruct@^0.15.2, superstruct@^0.15.3:
   version "0.15.3"
   resolved "https://registry.yarnpkg.com/superstruct/-/superstruct-0.15.3.tgz#07edfc715259ebfe3b4b2e4cb53e8e45b51674a4"
   integrity sha512-wilec1Rg3FtKuRjRyCt70g5W29YUEuaLnybdVQUI+VQ7m0bw8k7TzrRv5iYmo6IpjLVrwxP5t3RgjAVqhYh4Fg==

@@ -15,6 +15,8 @@ const Select = ({
   componentLabel,
   useDefaultStyle = true,
   noMaxWidth = false,
+  wrapperClassNames = '',
+  mintWidth = '',
 }: {
   value: any | undefined
   onChange: any | undefined
@@ -27,9 +29,14 @@ const Select = ({
   componentLabel?: any | undefined
   useDefaultStyle?: boolean
   noMaxWidth?: boolean
+  wrapperClassNames?: string
+  mintWidth?: string
 }) => {
   return (
-    <div className="mt-6">
+    <div
+      className={`mt-6 ${wrapperClassNames}`}
+      style={{ minWidth: mintWidth }}
+    >
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>

@@ -132,7 +132,7 @@ const CustomBase64 = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedAccounts}
+        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
