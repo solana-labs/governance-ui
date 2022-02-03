@@ -252,22 +252,6 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
             <StyledLabel className="mt-1.5 ml-3">Use test instance</StyledLabel>
           </div>
         </div>
-        <div className="pb-4 pr-10 mr-2 mt-3 ">
-          <Input
-            label="Governance program version"
-            placeholder={1}
-            step="1"
-            min={1}
-            value={form?.programVersion}
-            type="number"
-            error={formErrors['programVersion']}
-            onChange={(evt) =>
-              setForm({
-                programVersion: evt.target.value,
-              })
-            }
-          />
-        </div>
       </div>
     </>
   )
