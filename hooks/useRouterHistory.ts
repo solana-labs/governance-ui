@@ -12,6 +12,7 @@ export default function useRouterHistory() {
   const { symbol } = useRealm()
   const previousPath = usePrevious(router.asPath) as string
   const [history, setHistory] = useState<string[]>([])
+
   useEffect(() => {
     if (router.asPath !== previousPath) {
       const newHistory = [...history, previousPath]
@@ -21,6 +22,7 @@ export default function useRouterHistory() {
       setHistory(newHistory)
     }
   }, [router.asPath])
+
   const getLastRoute = () => {
     if (!history.length) {
       return history[history.length - 1]

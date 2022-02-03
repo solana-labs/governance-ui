@@ -16,11 +16,11 @@ import { sleep } from '@project-serum/common'
 const fetch = require('node-fetch')
 
 export async function getRealms(rpcContext: RpcContext) {
-  return getGovernanceAccountsImpl<Realm>(
+  return getGovernanceAccounts<Realm>(
     rpcContext.programId,
     rpcContext.endpoint,
     Realm,
-    GovernanceAccountType.Realm
+    [GovernanceAccountType.RealmV1, GovernanceAccountType.RealmV2]
   )
 }
 

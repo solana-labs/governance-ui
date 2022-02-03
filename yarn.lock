@@ -585,9 +585,9 @@
     yargs "^17.0.1"
 
 "@blockworks-foundation/voter-stake-registry-client@^0.1.4":
-  version "0.1.5"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.5.tgz#316581555d7607c28e1bd8f9e6818ee985501234"
-  integrity sha512-e6jIYjaWPAYDOJSDt7dwxfyJVLlQ0AY2RQMcYLze2sLwy0iyEvKCed8CmdhNjRrgwZNAuFv+M5t/rKdxtX1Vcw==
+  version "0.1.6"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.6.tgz#43a8b0e01861d4b1b48efdd723c1e8fa034728c0"
+  integrity sha512-xsX83V+OHG/GvLkgsA4hMKdk0VYbh2Z3YSCz9gsLnuM70jMVi9N0bP5X0a44cAP/sOHi1rpBjhd3SnLU1eLG+Q==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
@@ -1669,11 +1669,11 @@
   integrity sha512-lR0EMP2HC3+Mxwd4YcnZb0smnaDw7Bl2IQWZiTevRH5ZZBZn6VRWn3/92E3qdU4SSImJkA6IDHawOHAnx/qUvQ==
   dependencies:
     buffer "~6.0.3"
-
-"@solana/spl-governance@^0.0.19":
-  version "0.0.19"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.19.tgz#56d738db82e7609b3a1779c148863a337d79d2a6"
-  integrity sha512-/HRfTL7zj6ygHb0T4oCf1LOisTF/f6kmCmLtOvcSfRP/owV2fp9FZcWZ0x2VGZY6lEH8ij6mT6vr7ZhC42E7WA==
+    
+"@solana/spl-governance@^0.0.25":
+  version "0.0.25"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.25.tgz#f951780fc0560df9fd9a7417bfc4fa76aa3fb2b1"
+  integrity sha512-gV0l2rLE2Ww+kp+Gmz9KG6i+QCXymezfAYjJxBT+hpXAWCQPNBJUDWnPPxzrfOIgo2JDjEQT49tMQhNan6uhYg==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     bignumber.js "^9.0.1"
@@ -2173,9 +2173,9 @@
   integrity sha512-iiUgKzV9AuaEkZqkOLDIvlQiL6ltuZd9tGcW3gwpnX8JbuiuhFlEGmmFXEXkN50Cvq7Os88IY2v0dkDqXYWVgA==
 
 "@types/node@*":
-  version "17.0.10"
-  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.10.tgz#616f16e9d3a2a3d618136b1be244315d95bd7cab"
-  integrity sha512-S/3xB4KzyFxYGCppyDt68yzBU9ysL88lSdIah4D6cptdcltc4NCPCAMc0+PCpg/lLIyC7IPvj2Z52OJWeIUkog==
+  version "17.0.12"
+  resolved "https://registry.yarnpkg.com/@types/node/-/node-17.0.12.tgz#f7aa331b27f08244888c47b7df126184bc2339c5"
+  integrity sha512-4YpbAsnJXWYK/fpTVFlMIcUIho2AYCi4wg5aNPrG1ng7fn/1/RZfCIpRCiBX+12RVa34RluilnvCqD+g3KiSiA==
 
 "@types/node@10.12.18":
   version "10.12.18"

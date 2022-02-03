@@ -4,7 +4,6 @@ import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
-
 export interface TokenMintMetadata {
   name: string
 }

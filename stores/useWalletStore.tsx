@@ -16,11 +16,12 @@ import {
   getGovernance,
   getGovernanceAccount,
   getGovernanceAccounts,
+  getGovernanceProgramVersion,
   Governance,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   Realm,
   SignatoryRecord,
   TokenOwnerRecord,
@@ -72,12 +73,13 @@ interface WalletStore extends State {
       [owner: string]: ProgramAccount<TokenOwnerRecord>
     }
     mints: { [pubkey: string]: MintAccount }
+    programVersion: number
   }
   selectedProposal: {
     proposal: ProgramAccount<Proposal> | undefined
     governance: ProgramAccount<Governance> | undefined
     realm: ProgramAccount<Realm> | undefined
-    instructions: { [instruction: string]: ProgramAccount<ProposalInstruction> }
+    instructions: { [instruction: string]: ProgramAccount<ProposalTransaction> }
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
     chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
@@ -123,6 +125,7 @@ const INITIAL_REALM_STATE = {
   councilTokenOwnerRecords: {},
   loading: true,
   mints: {},
+  programVersion: 1,
 }
 
 const INITIAL_PROPOSAL_STATE = {
@@ -181,6 +184,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         programId = realmAccountInfo?.owner
       }
       if (realmId && programId) {
+        const programVersion = await getGovernanceProgramVersion(
+          connection.current,
+          programId!
+        )
+        set((s) => {
+          s.selectedRealm.programVersion = programVersion
+        })
         await actions.fetchAllRealms(programId)
         actions.fetchRealm(programId, realmId)
       }
@@ -426,7 +436,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           proposal.account.governance,
           Governance
         ),
-        getGovernanceAccounts(connection, programId, ProposalInstruction, [
+        getGovernanceAccounts(connection, programId, ProposalTransaction, [
           pubkeyFilter(1, proposalPubKey)!,
         ]),
         getVoteRecordsByProposalMapByVoter(
@@ -547,7 +557,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const tokenAccounts: TokenProgramAccount<AccountInfo>[] = []
       const tokenGovernances = selectedRealmGovernances.filter(
         (gov) =>
-          gov.account?.accountType === GovernanceAccountType.TokenGovernance
+          gov.account?.accountType ===
+            GovernanceAccountType.TokenGovernanceV1 ||
+          gov.account?.accountType === GovernanceAccountType.TokenGovernanceV2
       )
       const tokenAccountsInfo = await getMultipleAccountInfoChunked(
         connection,

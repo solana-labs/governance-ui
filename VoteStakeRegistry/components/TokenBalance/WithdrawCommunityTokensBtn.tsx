@@ -15,6 +15,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import { getProgramVersionForRealm } from '@models/registry/api'
 
 const WithDrawCommunityTokens = () => {
   const { getDeposits } = useDepositStore()
@@ -22,9 +23,7 @@ const WithDrawCommunityTokens = () => {
   const {
     realm,
     realmInfo,
-    realmTokenAccount,
     ownTokenRecord,
-
     proposals,
     governances,
     tokenRecords,
@@ -79,6 +78,7 @@ const WithDrawCommunityTokens = () => {
               await withFinalizeVote(
                 instructions,
                 realmInfo!.programId,
+                getProgramVersionForRealm(realmInfo!),
                 realm!.pubkey,
                 proposal.account.governance,
                 proposal.pubkey,
@@ -109,13 +109,14 @@ const WithDrawCommunityTokens = () => {
     await withVoteRegistryWithdraw({
       instructions,
       walletPk: wallet!.publicKey!,
-      toPubKey: realmTokenAccount!.publicKey!,
       mintPk: ownTokenRecord!.account.governingTokenMint,
       realmPk: realm!.pubkey!,
       amount: depositRecord!.amountDepositedNative,
+      communityMintPk: realm!.account.communityMint,
       tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
         .pubkey!,
       depositIndex: depositRecord!.index,
+      connection,
       client: client,
     })
 
