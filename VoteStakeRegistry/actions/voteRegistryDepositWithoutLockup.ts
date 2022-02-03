@@ -16,6 +16,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   fromPk,
   mintPk,
   realmPk,
+  communityMintPk,
   programId,
   amount,
   tokenOwnerRecordPk,
@@ -25,6 +26,7 @@ export const voteRegistryDepositWithoutLockup = async ({
   //from where we deposit our founds
   fromPk: PublicKey
   mintPk: PublicKey
+  communityMintPk: PublicKey
   realmPk: PublicKey
   programId: PublicKey
   amount: BN
@@ -46,6 +48,7 @@ export const voteRegistryDepositWithoutLockup = async ({
     amount,
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
+    communityMintPk,
     lockupKind,
     client,
   })

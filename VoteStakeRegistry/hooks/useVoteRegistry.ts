@@ -29,10 +29,10 @@ export function useVoteRegistry() {
     if (mintCfg) {
       const {
         lockupSaturationSecs,
-        depositScaledFactor,
+        unlockedScaledFactor,
         lockupScaledFactor,
       } = mintCfg
-      const depositScaledFactorNum = depositScaledFactor.toNumber()
+      const depositScaledFactorNum = unlockedScaledFactor.toNumber()
       const lockupScaledFactorNum = lockupScaledFactor.toNumber()
       const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
       //(deposit_scaled_factor + lockup_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor

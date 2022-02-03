@@ -2,7 +2,7 @@ import useProposal from '../../hooks/useProposal'
 import InstructionCard from './instructionCard'
 import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
@@ -15,7 +15,14 @@ import {
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
   const { realmInfo } = useRealm()
+  const mounted = useRef(false)
+  useEffect(() => {
+    mounted.current = true
 
+    return () => {
+      mounted.current = false
+    }
+  }, [])
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
@@ -38,7 +45,9 @@ export function InstructionPanel() {
       )
 
       const timer = setTimeout(() => {
-        rpcContext.connection.getSlot().then(setCurrentSlot)
+        rpcContext.connection
+          .getSlot()
+          .then((resp) => (mounted.current ? setCurrentSlot(resp) : null))
       }, 5000)
 
       return () => {

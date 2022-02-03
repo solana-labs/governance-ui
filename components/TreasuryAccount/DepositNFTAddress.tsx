@@ -66,7 +66,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       owner! // owner
     )
     const ata = ataPk.toBase58()
-    const isExistingAta = await tryGetAta(connection, mintPK, owner)
+    const isExistingAta = await tryGetAta(connection.current, mintPK, owner)
     if (!isExistingAta) {
       try {
         await createATA(

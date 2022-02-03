@@ -11,16 +11,17 @@ import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
 
 export const finalizeVote = async (
-  { connection, wallet, programId }: RpcContext,
+  { connection, wallet, programId, programVersion }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
-  withFinalizeVote(
+  await withFinalizeVote(
     instructions,
     programId,
+    programVersion,
     realm,
     proposal.account.governance,
     proposal.pubkey,

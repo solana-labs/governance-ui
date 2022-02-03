@@ -2,7 +2,7 @@ import {
   AccountMetaData,
   getGovernance,
   getRealm,
-  VoteWeightSource,
+  VoteTipping,
 } from '@solana/spl-governance'
 import {
   SetGovernanceConfigArgs,
@@ -72,8 +72,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
             </p>
             <p>
-              {`voteWeightSource:
-              ${VoteWeightSource[args.config.voteWeightSource]}`}
+              {`voteTipping:
+              ${VoteTipping[args.config.voteTipping]}`}
             </p>
             <p>
               {`proposalCoolOffTime:
