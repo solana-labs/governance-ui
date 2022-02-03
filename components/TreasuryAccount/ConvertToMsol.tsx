@@ -26,7 +26,6 @@ import {
   Governance,
   ProgramAccount,
   RpcContext,
-  serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { createProposal } from 'actions/createProposal'

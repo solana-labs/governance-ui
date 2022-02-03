@@ -5,7 +5,7 @@ import {
   TOKEN_PROGRAM_ID,
   u64,
 } from '@solana/spl-token'
-import { SignerWalletAdapter, WalletAdapter } from '@solana/wallet-adapter-base'
+import { WalletAdapter } from '@solana/wallet-adapter-base'
 import {
   PublicKey,
   SystemProgram,
