@@ -12,7 +12,7 @@ import { sendTransaction } from '@utils/send'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
-export const registerGovernance = async (
+export const registerProgramGovernance = async (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   governanceType: GovernanceType,
   realm: ProgramAccount<Realm>,
@@ -34,6 +34,8 @@ export const registerGovernance = async (
     realm,
     client
   )
+
+  console.log('VERSION', programVersion)
 
   switch (governanceType) {
     case GovernanceType.Program: {
