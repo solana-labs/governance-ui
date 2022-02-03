@@ -17,13 +17,12 @@ import {
   parseMintAccountData,
 } from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from './useRealm'
 
 export default function useGovernanceAssets() {
   const { governances, tokenMints, realmTokenAccounts } = useRealm()
-  const mounted = useRef(false)
   const connection = useWalletStore((s) => s.connection.current)
   const [governedTokenAccounts, setGovernedTokenAccounts] = useState<
     GovernedTokenAccount[]
@@ -246,27 +245,15 @@ export default function useGovernanceAssets() {
         }
         governedTokenAccountsArray.push(obj)
       }
-      if (mounted.current) {
-        setGovernedTokenAccounts(governedTokenAccountsArray)
-      }
+      setGovernedTokenAccounts(governedTokenAccountsArray)
     }
-    if (mounted.current) {
-      prepareTokenGovernances()
-    }
+    prepareTokenGovernances()
   }, [
     JSON.stringify(tokenMints),
     JSON.stringify(realmTokenAccounts),
     JSON.stringify(tokenGovernances),
     JSON.stringify(governances),
-    mounted.current,
   ])
-  useEffect(() => {
-    mounted.current = true
-
-    return () => {
-      mounted.current = false
-    }
-  }, [])
   return {
     governancesArray,
     getGovernancesByAccountType,

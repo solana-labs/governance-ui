@@ -25,6 +25,7 @@ import axios from 'axios'
 import { notify } from './notifications'
 import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
+import { abbreviateAddress } from './formatting'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -282,7 +283,7 @@ export function getTokenAccountLabelInfo(
     const info = tokenService.getTokenInfo(acc!.mint!.publicKey.toBase58())
     imgUrl = info?.logoURI ? info.logoURI : ''
     tokenAccount = acc.token.publicKey.toBase58()
-    tokenName = info?.name ? info.name : ''
+    tokenName = info?.name ? info.name : abbreviateAddress(acc.mint.publicKey)
     tokenAccountName = getAccountName(acc.token.publicKey)
     amount = formatMintNaturalAmountAsDecimal(
       acc.mint!.account,

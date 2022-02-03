@@ -76,6 +76,12 @@ class TokenService {
     )
     return tokenListRecord
   }
+  getTokenInfoFromCoingeckoId(coingeckoId: string) {
+    const tokenListRecord = this._tokenList?.find(
+      (x) => x.extensions?.coingeckoId === coingeckoId
+    )
+    return tokenListRecord
+  }
 }
 
 const tokenService = new TokenService()
