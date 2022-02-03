@@ -1,7 +1,7 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
@@ -22,7 +22,9 @@ export default function RealmsDashboard({
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected, current: wallet } = useWalletStore((s) => s)
 
+  ////////////////////////////////////////////////////////////////////////////////
   /////////////////////////////// Added - Masaya ////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
   const [RNG, setRNG] = useState({
     logo: '',
     nameOfOrg: '',
@@ -38,23 +40,20 @@ export default function RealmsDashboard({
 
   //onMouseEnter, get key of organisation and fill out state
   const getOrganisation = (e: any) => {
-    console.log(e._targetInst.key)
     settingState(e)
   }
 
   //set RNG state in one go
+  //Overall function to set RNG state information
   const settingState = (e: any) => {
     //set RNG logo and nameOfOrg state function
     getOrgInfoJSON(e._targetInst.key)
-    //set rest of RNG state with random numbers
-    setRNG({
-      ...RNG,
-      proposals: randomNumGen(100),
-      governanceTokens: randomNumGen(100),
-      balance: randomNumGen(10000),
-      members: randomNumGen(100),
-    })
   }
+
+  //shows changes to state on console
+  useEffect(() => {
+    console.log(RNG)
+  }, [RNG])
 
   //random number generator function
   const randomNumGen = (x: number) => {
@@ -72,7 +71,7 @@ export default function RealmsDashboard({
       .then((res) => res.json())
       .then((myJson) => {
         //setting RNG logo, nameOfOrg, twitter, and website based on key
-        for (let file of myJson) {
+        for (const file of myJson) {
           if (file.realmId === key) {
             setRNG({
               ...RNG,
@@ -80,13 +79,20 @@ export default function RealmsDashboard({
               nameOfOrg: file.displayName,
               twitter: file.twitter,
               website: file.website,
+              //set rest of RNG state with random numbers
+              proposals: randomNumGen(100),
+              governanceTokens: randomNumGen(100),
+              balance: randomNumGen(10000),
+              members: randomNumGen(100),
             })
           }
         }
       })
   }
 
-  /////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
+  ////////////////////////////////////////////////////////////////////////////////
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
