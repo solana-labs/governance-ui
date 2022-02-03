@@ -1,11 +1,21 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
+
+///////// Added - Masaya /////////
+// interface RNGinfo {
+//   logo: string,
+//   nameOfOrg: string,
+//   proposals: number,
+//   governanceTok: number,
+//   balance: number,
+//   members: number,
+// }
 
 export default function RealmsDashboard({
   realms,
@@ -21,6 +31,34 @@ export default function RealmsDashboard({
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected, current: wallet } = useWalletStore((s) => s)
+
+  ///////// Added - Masaya /////////
+  //Object holding RNG info
+  const [RNG, setRNG] = useState({
+    logo: '',
+    nameOfOrg: '',
+    proposals: 0,
+    governanceTok: 0,
+    balance: 0,
+    members: 0,
+  })
+
+  //functions
+  const randomNumGen = (x: number) => {
+    return Math.floor(Math.random() * x)
+  }
+  const settingState = (e: any) => {
+    setRNG({
+      ...RNG,
+      proposals: randomNumGen(100),
+    })
+  }
+
+  const getOrganisation = (e: any) => {
+    console.log(e.target.value)
+    settingState(e)
+    console.log(RNG)
+  }
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
@@ -83,6 +121,7 @@ export default function RealmsDashboard({
                 onClick={() => goToRealm(realm)}
                 className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
                 key={realm.realmId.toString()}
+                onMouseEnter={(e) => getOrganisation(e)}
               >
                 <div className="pb-5">
                   {realm.ogImage ? (
