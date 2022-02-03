@@ -5,12 +5,13 @@ import {
   Percent,
   TokenAmount,
   Token,
+  jsonInfo2PoolKeys,
 } from '@raydium-io/raydium-sdk'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import BigNumber from 'bignumber.js'
-import { liquidityPoolKeys, liquidityPoolList } from './poolKeys'
+import { liquidityPoolKeysList } from './poolKeys'
 
 export const getAmountOut = async (
   liquidityPool: string,
@@ -62,25 +63,11 @@ export const getLPMintInfo = async (
   }
 }
 
-export const getLiquidityPoolKeysByAssets = (
-  base: PublicKey,
-  quote: PublicKey
-): LiquidityPoolKeys | undefined => {
-  return liquidityPoolKeys.find(
-    (pk) =>
-      (pk.baseMint.equals(base) && pk.quoteMint.equals(quote)) ||
-      (pk.baseMint.equals(quote) && pk.quoteMint.equals(base))
-  )
-}
-
 export const getLiquidityPoolKeysByLabel = (
   label: string
 ): LiquidityPoolKeys => {
-  const lp = liquidityPoolList.find((lp) => lp.label === label)?.id
+  const lp = Object.keys(liquidityPoolKeysList).find((lp) => lp === label)
   if (!lp) throw new Error(`pool not found for label ${label}`)
 
-  const poolKeys = liquidityPoolKeys.find((lpk) => lpk.id.equals(lp))
-  if (!poolKeys) throw new Error(`pool not found for id ${lp.toBase58()}`)
-
-  return poolKeys
+  return jsonInfo2PoolKeys(liquidityPoolKeysList[lp])
 }
