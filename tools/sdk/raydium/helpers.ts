@@ -9,6 +9,7 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
 import { findATAAddrSync } from '@uxdprotocol/uxd-client'
+import BigNumber from 'bignumber.js'
 import { liquidityPoolKeys, liquidityPoolList } from './poolKeys'
 
 export const getAmountOut = async (
@@ -17,13 +18,14 @@ export const getAmountOut = async (
   connection: ConnectionContext
 ) => {
   const poolKeys = getLiquidityPoolKeysByLabel(liquidityPool)
-  const base = await connection.current.getTokenSupply(poolKeys.baseMint)
-  const quote = await connection.current.getTokenSupply(poolKeys.quoteMint)
+  const [base, quote] = await Promise.all([
+    connection.current.getTokenSupply(poolKeys.baseMint),
+    connection.current.getTokenSupply(poolKeys.quoteMint),
+  ])
   const amountInBN = new BN(
-    (
-      Number(amountIn.toFixed(base.value.decimals)) *
-      10 ** base.value.decimals
-    ).toString()
+    new BigNumber(Number(amountIn).toFixed(base.value.decimals))
+      .shiftedBy(base.value.decimals)
+      .toString()
   )
   const amountOut = Liquidity.computeCurrencyAmountOut({
     poolKeys,
@@ -49,10 +51,10 @@ export const getLPMintInfo = async (
   user: PublicKey
 ) => {
   const [lpTokenAccount] = findATAAddrSync(user, lpMint)
-  const lpInfo = await connection.current.getTokenSupply(lpMint)
-  const lpUserBalance = await connection.current.getTokenAccountBalance(
-    lpTokenAccount
-  )
+  const [lpInfo, lpUserBalance] = await Promise.all([
+    connection.current.getTokenSupply(lpMint),
+    connection.current.getTokenAccountBalance(lpTokenAccount),
+  ])
   return {
     lpTokenAccount,
     maxBalance: lpUserBalance.value.uiAmount ?? 0,
@@ -75,10 +77,10 @@ export const getLiquidityPoolKeysByLabel = (
   label: string
 ): LiquidityPoolKeys => {
   const lp = liquidityPoolList.find((lp) => lp.label === label)?.id
-  if (!lp) throw new Error('pool not found for label ' + label)
+  if (!lp) throw new Error(`pool not found for label ${label}`)
 
   const poolKeys = liquidityPoolKeys.find((lpk) => lpk.id.equals(lp))
-  if (!poolKeys) throw new Error('pool not found for id ' + lp.toBase58())
+  if (!poolKeys) throw new Error(`pool not found for id ${lp.toBase58()}`)
 
   return poolKeys
 }

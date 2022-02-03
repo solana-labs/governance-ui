@@ -18,7 +18,7 @@ export const createAddLiquidityInstruction = (
   const [baseTokenAccount] = findATAAddrSync(owner, poolKeys.baseMint)
   const [quoteTokenAccount] = findATAAddrSync(owner, poolKeys.quoteMint)
 
-  const itx = Liquidity.makeAddLiquidityInstruction({
+  return Liquidity.makeAddLiquidityInstruction({
     poolKeys,
     userKeys: {
       baseTokenAccount,
@@ -30,6 +30,4 @@ export const createAddLiquidityInstruction = (
     quoteAmountIn,
     fixedSide,
   })
-
-  return itx
 }

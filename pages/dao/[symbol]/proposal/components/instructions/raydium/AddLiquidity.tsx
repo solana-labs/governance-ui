@@ -54,14 +54,14 @@ const AddLiquidityRaydium = ({
     async function prepGovernances() {
       const mintWithGovernances = await getMintWithGovernances()
       const matchedGovernances = governancesArray.map((gov) => {
-        const governedbaseccount = governedTokenAccounts.find(
+        const governedBaseccount = governedTokenAccounts.find(
           (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
         )
         const mintGovernance = mintWithGovernances.find(
           (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
         )
-        if (governedbaseccount) {
-          return governedbaseccount as GovernedMultiTypeAccount
+        if (governedBaseccount) {
+          return governedBaseccount as GovernedMultiTypeAccount
         }
         if (mintGovernance) {
           return mintGovernance as GovernedMultiTypeAccount
@@ -104,18 +104,21 @@ const AddLiquidityRaydium = ({
       wallet?.publicKey
     ) {
       const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool)
-      const base = await connection.current.getTokenSupply(poolKeys.baseMint)
-      const quote = await connection.current.getTokenSupply(poolKeys.quoteMint)
+      const [base, quote] = await Promise.all([
+        connection.current.getTokenSupply(poolKeys.baseMint),
+        connection.current.getTokenSupply(poolKeys.quoteMint),
+      ])
+
       const createIx = createAddLiquidityInstruction(
         poolKeys,
         new BN(
           new BigNumber(form.baseAmountIn.toString())
-            .shiftedBy(-base.value.decimals.toString())
+            .shiftedBy(base.value.decimals)
             .toString()
         ),
         new BN(
           new BigNumber(form.quoteAmountIn.toString())
-            .shiftedBy(-quote.value.decimals.toString())
+            .shiftedBy(quote.value.decimals)
             .toString()
         ),
         form.fixedSide,
@@ -144,7 +147,7 @@ const AddLiquidityRaydium = ({
         handleSetForm({
           value: await getAmountOut(
             form.liquidityPool,
-            Number(form.baseAmountIn),
+            form.baseAmountIn,
             connection
           ),
           propertyName: 'quoteAmountIn',
@@ -156,10 +159,9 @@ const AddLiquidityRaydium = ({
   }, [form.baseAmountIn])
 
   useEffect(() => {
-    ;(async () => {
-      const { validationErrors } = await isFormValid(schema, form)
+    isFormValid(schema, form).then(({ validationErrors }) => {
       setFormErrors(validationErrors)
-    })()
+    })
   }, [form.quoteAmountIn])
 
   useEffect(() => {
@@ -170,6 +172,10 @@ const AddLiquidityRaydium = ({
   }, [form])
 
   const schema = yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
     liquidityPool: yup.string().required('Liquidity Pool is required'),
     baseAmountIn: yup
       .number()
@@ -179,10 +185,6 @@ const AddLiquidityRaydium = ({
       .number()
       .moreThan(0, 'Amount for Quote token should be more than 0')
       .required('Amount for Quote token is required'),
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
     fixedSide: yup
       .string()
       .equals(['base', 'quote'])
@@ -210,9 +212,9 @@ const AddLiquidityRaydium = ({
         onChange={(value) =>
           handleSetForm({ value, propertyName: 'liquidityPool' })
         }
-        error={formErrors['liquidityPoolId']}
+        error={formErrors['liquidityPool']}
       >
-        {[...Object.keys(liquidityPoolKeysList)].map((pool, i) => (
+        {Object.keys(liquidityPoolKeysList).map((pool, i) => (
           <Select.Option key={pool + i} value={pool}>
             {pool}
           </Select.Option>

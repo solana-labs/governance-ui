@@ -37,7 +37,6 @@ const RemoveLiquidityRaydium = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  // const { getGovernancesByAccountType } = useGovernanceAssets()
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
   >([])
@@ -82,21 +81,22 @@ const RemoveLiquidityRaydium = ({
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
-  const [maxLPAmount, setMaxLPAmount] = useState(0)
-  const [LPDecimals, setLPDecimals] = useState(9)
+  const [lpMintInfo, setLpMintInfo] = useState<{
+    balance: number
+    decimals: number
+  } | null>(null)
   useEffect(() => {
     const fetchLpData = async () => {
       if (!form.governedAccount?.governance.pubkey || !form.liquidityPool)
         return
-      const poolKeys = liquidityPoolKeysList[form.liquidityPool]
+      const { lpMint } = liquidityPoolKeysList[form.liquidityPool]
 
       const { maxBalance, decimals } = await getLPMintInfo(
         connection,
-        new PublicKey(poolKeys.lpMint),
+        new PublicKey(lpMint),
         form.governedAccount.governance.pubkey
       )
-      setMaxLPAmount(maxBalance)
-      setLPDecimals(decimals)
+      setLpMintInfo({ balance: maxBalance, decimals })
     }
     fetchLpData()
   }, [form.governedAccount?.governance.pubkey, form.liquidityPool])
@@ -118,12 +118,13 @@ const RemoveLiquidityRaydium = ({
       programId &&
       form.governedAccount?.governance?.account &&
       form.liquidityPool &&
+      lpMintInfo &&
       wallet?.publicKey
     ) {
       const createIx = createRemoveLiquidityInstruction(
         new PublicKey(form.governedAccount.governance.pubkey),
         jsonInfo2PoolKeys(liquidityPoolKeysList[form.liquidityPool]),
-        new BigNumber(form.amountIn).shiftedBy(LPDecimals).toString()
+        new BigNumber(form.amountIn).shiftedBy(lpMintInfo.decimals).toString()
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -171,15 +172,15 @@ const RemoveLiquidityRaydium = ({
   }, [form])
 
   const schema = yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
     liquidityPool: yup.string().required('Liquidity Pool is required'),
     amountIn: yup
       .number()
       .moreThan(0, 'Amount for LP token should be more than 0')
       .required('Amount for LP token is required'),
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
   })
 
   return (
@@ -204,7 +205,7 @@ const RemoveLiquidityRaydium = ({
         }
         error={formErrors['liquidityPool']}
       >
-        {[...Object.keys(liquidityPoolKeysList)].map((pool, i) => (
+        {Object.keys(liquidityPoolKeysList).map((pool, i) => (
           <Select.Option key={pool + i} value={pool}>
             {pool}
           </Select.Option>
@@ -212,7 +213,9 @@ const RemoveLiquidityRaydium = ({
       </Select>
 
       <Input
-        label={`LP Token Amount to withdraw - max: ${maxLPAmount}`}
+        label={`LP Token Amount to withdraw - max: ${
+          lpMintInfo ? lpMintInfo.balance : '-'
+        }`}
         value={form.amountIn}
         type="number"
         min={0}
