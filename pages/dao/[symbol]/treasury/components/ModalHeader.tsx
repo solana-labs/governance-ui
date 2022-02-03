@@ -1,9 +1,16 @@
-const ModalHeader = ({ logoURI, strategy, protocolName }) => {
+const ModalHeader = ({
+  protocolLogoURI,
+  strategy,
+  protocolName,
+  TokenName,
+}) => {
   return (
     <div className="flex flex-items mb-5">
-      <img src={logoURI} className="w-16 h-16 mr-3"></img>
+      <img src={protocolLogoURI} className="w-16 h-16 mr-3"></img>
       <div className="flex-items">
-        <h1>{strategy}</h1>
+        <h1>
+          {TokenName} {strategy}
+        </h1>
         <h2>{protocolName}</h2>
       </div>
     </div>

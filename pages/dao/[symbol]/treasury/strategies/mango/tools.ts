@@ -1,24 +1,32 @@
 import tokenService from '@utils/services/token'
 import axios from 'axios'
-import { TreasuryStrategy } from '../../..'
+import { TreasuryStrategy } from '../../types/types'
 
-// Precision for our mango group token
-export const tokenPrecision = {
-  BTC: 4,
-  ETH: 3,
-  MNGO: 2,
-  SOL: 2,
-  SRM: 2,
-  RAY: 3,
-  COPE: 2,
-  FTT: 3,
-  ADA: 2,
-  MSOL: 2,
-  BNB: 3,
-  AVAX: 2,
-  USDC: 2,
-  USDT: 2,
+export const mangoTokens = {
+  ETH: 'ethereum',
+  BTC: 'bitcoin',
+  SOL: 'solana',
+  SRM: 'serum',
+  USDC: 'usd-coin',
+  USDT: 'tether',
+  MNGO: 'mango-markets',
+  RAY: 'raydium',
+  COPE: 'cope',
+  FTT: 'ftx-token',
+  MSOL: 'msol',
+  BNB: 'binance-coin',
+  AVAX: 'avalanche',
+  LUNA: 'terra-luna',
 }
+export const MANGO = 'MANGO'
+export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
+
+export const mangoTokensList = Object.keys(mangoTokens).map((x) => {
+  return {
+    name: x,
+    val: x,
+  }
+})
 
 const endpoint =
   'https://mango-stats-v3.herokuapp.com/spot?mangoGroup=mainnet.1'
@@ -42,42 +50,25 @@ function findClosestToDate(values, date) {
   return min
 }
 
-const coingeckoIds = {
-  ETH: 'ethereum',
-  BTC: 'bitcoin',
-  SOL: 'solana',
-  SRM: 'serum',
-  USDC: 'usd-coin',
-  USDT: 'tether',
-  MNGO: 'mango-markets',
-  RAY: 'raydium',
-  COPE: 'cope',
-  FTT: 'ftx-token',
-  MSOL: 'msol',
-  BNB: 'binance-coin',
-  AVAX: 'avalanche',
-  LUNA: 'terra-luna',
-}
-
 export async function tvl(timestamp) {
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
   const date = new Date(timestamp * 1000).getTime()
-  Object.entries(coingeckoIds).map(([mangoId, coingeckoId]) => {
+  Object.entries(mangoTokens).map(([mangoId, mangoTokens]) => {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
     if (assetDeposits.length > 0) {
-      const info = tokenService.getTokenInfoFromCoingeckoId(coingeckoId)
+      const info = tokenService.getTokenInfoFromCoingeckoId(mangoTokens)
       const closestVal = findClosestToDate(assetDeposits, date)
       balances.push({
         liquidity: closestVal.totalDeposits - closestVal.totalBorrows,
         symbol: info?.symbol || mangoId,
         apy: `${(
-          (Math.pow(1 + closestVal.depositRate / 100000, 100000) - 1) *
-          100
+          Math.pow(1 + closestVal.depositRate / 100000, 100000) - 1
         ).toFixed(2)}%`,
-        protocol: 'MANGO',
+        protocol: MANGO,
         mint: info?.address || '',
         tokenImgSrc: info?.logoURI || '',
+        strategy: 'Deposit',
       })
     }
   })

@@ -5,21 +5,11 @@ import { GovernedTokenAccount } from '@utils/tokens'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import MangoItem from './components/strategies/mango/MangoItem'
-import { tvl } from './components/strategies/mango/tools'
-
-export interface TreasuryStrategy {
-  liquidity: number
-  symbol: string
-  apy: string
-  protocol: string
-  mint: string
-  tokenImgSrc: string
-}
+import StrategiesWrapper from './components/StrategiesWrapper'
 
 const Treasury = () => {
   const { governedTokenAccounts } = useGovernanceAssets()
-  const [strategies, setStrategies] = useState<TreasuryStrategy[]>([])
+
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
@@ -29,13 +19,9 @@ const Treasury = () => {
     async function prepTreasuryAccounts() {
       setTreasuryAccounts(governedTokenAccounts)
     }
-    async function getStrategies() {
-      const mango = await tvl(Date.now() / 1000)
-      setStrategies([...mango])
-    }
     prepTreasuryAccounts()
-    getStrategies()
   }, [JSON.stringify(governedTokenAccounts)])
+
   const { totalPriceFormatted } = useTotalTreasuryPrice()
 
   return (
@@ -66,34 +52,7 @@ const Treasury = () => {
           </div>
         </div>
       </div>
-      <div className="grid grid-cols-12 mt-10">
-        <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
-          <div className="mb-10">
-            <h1>Strategies</h1>
-          </div>
-          <div className="grid grid-cols-6 px-4">
-            <div>Platform</div>
-            <div>Strategy</div>
-            <div>Your position</div>
-            <div>Token</div>
-            <div>Liquidity</div>
-            <div>Yield</div>
-          </div>
-          {strategies.map((x) => {
-            if (x.protocol === 'MANGO') {
-              return (
-                <MangoItem
-                  symbol={x.symbol}
-                  liquidity={x.liquidity}
-                  apy={x.apy}
-                  key={x.symbol}
-                  tokenImgSrc={x.tokenImgSrc}
-                ></MangoItem>
-              )
-            }
-          })}
-        </div>
-      </div>
+      <StrategiesWrapper></StrategiesWrapper>
     </>
   )
 }
