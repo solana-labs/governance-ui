@@ -33,7 +33,7 @@ const MangoDepositModal = ({
           <div>DESCRIPTION</div>
         </ModalLeftSide>
         <ModalRightSide>
-          <MangoDeposit></MangoDeposit>
+          <MangoDeposit mint={mint}></MangoDeposit>
         </ModalRightSide>
       </div>
     </Modal>
