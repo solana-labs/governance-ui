@@ -155,6 +155,8 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  Grant,
+  Clawback,
 }
 
 export interface InitializeControllerForm {

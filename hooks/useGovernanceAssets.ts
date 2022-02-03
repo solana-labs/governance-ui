@@ -101,7 +101,10 @@ export default function useGovernanceAssets() {
 
   const canUseUxdInstructions =
     symbol === 'UXP' &&
-    canUseGovernanceForInstruction(GovernanceAccountType.ProgramGovernance)
+    canUseGovernanceForInstruction([
+      GovernanceAccountType.ProgramGovernanceV1,
+      GovernanceAccountType.ProgramGovernanceV2,
+    ])
 
   const canUseAnyInstruction =
     realm &&
