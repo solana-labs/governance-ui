@@ -82,7 +82,7 @@ export default function RealmsDashboard({
               //set rest of RNG state with random numbers
               proposals: randomNumGen(100),
               governanceTokens: randomNumGen(100),
-              balance: randomNumGen(10000),
+              balance: randomNumGen(1000000),
               members: randomNumGen(100),
             })
           }
