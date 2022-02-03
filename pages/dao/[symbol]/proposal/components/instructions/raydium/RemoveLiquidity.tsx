@@ -40,35 +40,10 @@ const RemoveLiquidityRaydium = ({
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
   >([])
-  const {
-    governancesArray,
-    governedTokenAccounts,
-    getMintWithGovernances,
-  } = useGovernanceAssets()
+  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
 
   useEffect(() => {
-    async function prepGovernances() {
-      const mintWithGovernances = await getMintWithGovernances()
-      const matchedGovernances = governancesArray.map((gov) => {
-        const governedTokenAccount = governedTokenAccounts.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        const mintGovernance = mintWithGovernances.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        if (governedTokenAccount) {
-          return governedTokenAccount as GovernedMultiTypeAccount
-        }
-        if (mintGovernance) {
-          return mintGovernance as GovernedMultiTypeAccount
-        }
-        return {
-          governance: gov,
-        }
-      })
-      setGovernedAccounts(matchedGovernances)
-    }
-    prepGovernances()
+    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
   }, [])
 
   const shouldBeGoverned = index !== 0 && governance
