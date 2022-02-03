@@ -48,13 +48,13 @@ export default function useRealm() {
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 
-    if (realmInfo && !realmInfo?.programVersion) {
+    if (realmInfo) {
       realmInfo = { ...realmInfo, programVersion: programVersion }
     }
     if (mounted.current) {
       setRealmInfo(realmInfo)
     }
-  }, [symbol, JSON.stringify(realm), mounted.current])
+  }, [symbol, realm, mounted.current, programVersion])
 
   const realmTokenAccount = useMemo(
     () =>
