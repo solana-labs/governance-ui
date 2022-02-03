@@ -24,11 +24,7 @@ const CustomBase64 = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const {
-    governancesArray,
-    governedTokenAccounts,
-    getMintWithGovernances,
-  } = useGovernanceAssets()
+  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [governedAccounts, setGovernedAccounts] = useState<
     GovernedMultiTypeAccount[]
@@ -44,30 +40,11 @@ const CustomBase64 = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+
   useEffect(() => {
-    async function prepGovernances() {
-      const mintWithGovernances = await getMintWithGovernances()
-      const matchedGovernances = governancesArray.map((gov) => {
-        const governedTokenAccount = governedTokenAccounts.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        const mintGovernance = mintWithGovernances.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        if (governedTokenAccount) {
-          return governedTokenAccount as GovernedMultiTypeAccount
-        }
-        if (mintGovernance) {
-          return mintGovernance as GovernedMultiTypeAccount
-        }
-        return {
-          governance: gov,
-        }
-      })
-      setGovernedAccounts(matchedGovernances)
-    }
-    prepGovernances()
+    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
   }, [])
+
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''

@@ -43,6 +43,7 @@
     "@solana/wallet-adapter-phantom": "^0.7.0",
     "@solana/wallet-adapter-sollet": "^0.8.0",
     "@solana/web3.js": "^1.31.0",
+    "@solendprotocol/solend-sdk": "^0.4.7",
     "@tippyjs/react": "^4.2.5",
     "@uxdprotocol/uxd-client": "4.10.0",
     "axios": "^0.21.1",

@@ -207,7 +207,7 @@ export async function sendSignedTransaction({
   return txid
 }
 
-async function awaitTransactionSignatureConfirmation(
+export async function awaitTransactionSignatureConfirmation(
   txid: TransactionSignature,
   timeout: number,
   connection: Connection

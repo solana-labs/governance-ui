@@ -14,7 +14,6 @@ export function getTimestampFromDays(days: number) {
 
 /// Formats mint amount (natural units) as a decimal string
 export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
-  console.log('mint', mint)
   return mint
     ? getMintDecimalAmount(mint, mintAmount).toFormat()
     : new BigNumber(mintAmount.toString()).toFormat()
