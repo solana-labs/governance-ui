@@ -1,14 +1,14 @@
 import { UserCircleIcon, LogoutIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { abbreviateAddress } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import useMembersListStore from 'stores/useMembersStore'
 import { ViewState } from './types'
 import { useMemo } from 'react'
 import { Member } from '@utils/uiTypes/members'
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
+import useWalletStore from 'stores/useWalletStore'
 
 const MemberItem = ({ item }: { item: Member }) => {
   const { mint, councilMint, realm } = useRealm()
@@ -24,6 +24,8 @@ const MemberItem = ({ item }: { item: Member }) => {
     hasCouncilTokenOutsideRealm,
     hasCommunityTokenOutsideRealm,
   } = item
+  const { connection } = useWalletStore((s) => s)
+
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
     ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
@@ -39,22 +41,49 @@ const MemberItem = ({ item }: { item: Member }) => {
           item.walletAddress,
         ])
       : null
-  const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
 
   async function handleGoToMemberOverview() {
     setCurrentCompactView(ViewState.MemberOverview)
     setCurrentCompactViewMember(item)
   }
+
+  const address = useMemo(
+    () => (
+      <AddressImage
+        dark={true}
+        connection={connection.current}
+        address={walletPublicKey}
+        height="30px"
+        width="30px"
+        placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+      />
+    ),
+    [item.walletAddress]
+  )
+
+  const addressName = useMemo(
+    () => (
+      <DisplayAddress
+        connection={connection.current}
+        address={walletPublicKey}
+        height="12px"
+        width="100px"
+        dark={true}
+      />
+    ),
+    [item.walletAddress]
+  )
+
   return (
     <div
       onClick={handleGoToMemberOverview}
-      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
+      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 pr-0 rounded-lg w-full hover:bg-bkg-3"
     >
       <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
-        <UserCircleIcon className="h-6 text-fgd-3 w-6" />
+        {address}
       </div>
       <div>
-        <div className="text-xs text-th-fgd-1">{walletAddressFormatted}</div>
+        <div className="text-xs text-th-fgd-1 h-5">{addressName}</div>
         <div className="text-fgd-3 text-xs flex flex-col">
           Votes cast: {totalVotes}
         </div>

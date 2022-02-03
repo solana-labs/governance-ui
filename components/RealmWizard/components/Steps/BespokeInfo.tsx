@@ -126,18 +126,6 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                 </div>
               </div>
             </div>
-            <div className="pt-4 pr-10 mr-2">
-              <Input
-                disabled
-                className="border-none py-1 bg-transparent"
-                readOnly
-                label="Governance program version"
-                placeholder={1}
-                value={'V' + (form?.programVersion ?? 1)}
-                error={formErrors['programVersion']}
-                type="text"
-              />
-            </div>
           </div>
         </div>
         <Divider dashed />
