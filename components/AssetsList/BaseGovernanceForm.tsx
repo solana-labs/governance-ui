@@ -112,7 +112,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         label="min instruction hold up time (days)"
         value={form.minInstructionHoldUpTime}
         type="number"
-        min={0}
+        min={0.01}
         name="minInstructionHoldUpTime"
         onBlur={validateMinMax}
         onChange={(evt) =>
@@ -128,7 +128,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         value={form.maxVotingTime}
         name="maxVotingTime"
         type="number"
-        min={1}
+        min={0.01}
         onBlur={validateMinMax}
         onChange={(evt) =>
           handleSetForm({
