@@ -1,21 +1,11 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
-
-///////// Added - Masaya /////////
-// interface RNGinfo {
-//   logo: string,
-//   nameOfOrg: string,
-//   proposals: number,
-//   governanceTok: number,
-//   balance: number,
-//   members: number,
-// }
 
 export default function RealmsDashboard({
   realms,
@@ -32,33 +22,71 @@ export default function RealmsDashboard({
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected, current: wallet } = useWalletStore((s) => s)
 
-  ///////// Added - Masaya /////////
-  //Object holding RNG info
+  /////////////////////////////// Added - Masaya ////////////////////////////////
   const [RNG, setRNG] = useState({
     logo: '',
     nameOfOrg: '',
+    twitter: '',
+    website: '',
     proposals: 0,
-    governanceTok: 0,
+    governanceTokens: 0,
     balance: 0,
     members: 0,
   })
 
   //functions
-  const randomNumGen = (x: number) => {
-    return Math.floor(Math.random() * x)
+
+  //onMouseEnter, get key of organisation and fill out state
+  const getOrganisation = (e: any) => {
+    console.log(e._targetInst.key)
+    settingState(e)
   }
+
+  //set RNG state in one go
   const settingState = (e: any) => {
+    //set RNG logo and nameOfOrg state function
+    getOrgInfoJSON(e._targetInst.key)
+    //set rest of RNG state with random numbers
     setRNG({
       ...RNG,
       proposals: randomNumGen(100),
+      governanceTokens: randomNumGen(100),
+      balance: randomNumGen(10000),
+      members: randomNumGen(100),
     })
   }
 
-  const getOrganisation = (e: any) => {
-    console.log(e.target.value)
-    settingState(e)
-    console.log(RNG)
+  //random number generator function
+  const randomNumGen = (x: number) => {
+    return Math.floor(Math.random() * x)
   }
+
+  const getOrgInfoJSON = (key: string) => {
+    //fetching key data from mainnet-beta.json file
+    fetch('/realms/mainnet-beta.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((myJson) => {
+        //setting RNG logo, nameOfOrg, twitter, and website based on key
+        for (let file of myJson) {
+          if (file.realmId === key) {
+            setRNG({
+              ...RNG,
+              logo: file.ogImage,
+              nameOfOrg: file.displayName,
+              twitter: file.twitter,
+              website: file.website,
+            })
+          }
+        }
+      })
+  }
+
+  /////////////////////////////////////////////////////////////////////////
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
