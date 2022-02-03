@@ -5,7 +5,7 @@ import { GovernedTokenAccount } from '@utils/tokens'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import StrategiesWrapper from './components/StrategiesWrapper'
+//import StrategiesWrapper from './components/StrategiesWrapper'
 
 const Treasury = () => {
   const { governedTokenAccounts } = useGovernanceAssets()
