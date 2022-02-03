@@ -52,7 +52,7 @@ const Treasury = () => {
           </div>
         </div>
       </div>
-      <StrategiesWrapper></StrategiesWrapper>
+      {/* <StrategiesWrapper></StrategiesWrapper> */}
     </>
   )
 }

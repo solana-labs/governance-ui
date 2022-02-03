@@ -54,6 +54,8 @@ export const getTreasuryAccountItemInfo = (
   const logo = governedAccountTokenAccount.isNft
     ? '/img/collectablesIcon.svg'
     : info?.logoURI
+    ? info?.logoURI
+    : ''
   const accountName = governedAccountTokenAccount.token
     ? getAccountName(governedAccountTokenAccount.token?.publicKey)
     : ''
@@ -67,6 +69,10 @@ export const getTreasuryAccountItemInfo = (
     : governedAccountTokenAccount.isSol
     ? 'SOL'
     : info?.symbol
+    ? info?.symbol
+    : governedAccountTokenAccount.mint
+    ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
+    : ''
   const isSol = governedAccountTokenAccount.isSol
   const displayPrice =
     totalPriceFormatted && totalPriceFormatted !== '0'
@@ -74,6 +80,7 @@ export const getTreasuryAccountItemInfo = (
       : ''
 
   return {
+    accountName,
     amountFormatted,
     logo,
     name,
