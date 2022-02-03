@@ -131,7 +131,7 @@ const Grant = ({
           realm!.owner,
           realm!.pubkey,
           destinationAccount,
-          form.governedTokenAccount.mint.publicKey,
+          realm!.account.communityMint,
           wallet!.publicKey!
         )
       }
