@@ -79,6 +79,7 @@ const ConvertToMsol = () => {
   const mintMinAmount = form.governedTokenAccount?.mint
     ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
     : 1
+  const proposalTitle = `Convert ${form.amount} SOL to mSOL`
   const schema = getStakeSchema({ form })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -151,7 +152,7 @@ const ConvertToMsol = () => {
           realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
-          form.title ? form.title : '',
+          form.title ? form.title : proposalTitle,
           form.description ? form.description : '',
           proposalMint,
           selectedGovernance?.account?.proposalCount,
@@ -244,7 +245,7 @@ const ConvertToMsol = () => {
               type="text"
               placeholder={
                 form.amount && form.destinationAccount
-                  ? `Convert ${form.amount} SOL to mSOL`
+                  ? proposalTitle
                   : 'Title of your proposal'
               }
               onChange={(evt) =>
