@@ -1,9 +1,9 @@
 import Input from '@components/inputs/Input'
 import { useState, useEffect } from 'react'
-import MangoItem from '../strategies/mango/MangoItem'
-import { MANGO, mangoTokensList, tvl } from '../strategies/mango/tools'
-import { NameVal, TreasuryStrategy } from '../types/types'
 import SelectFilter from './SelectFilter'
+import MangoItem from './strategies/mango/MangoItem'
+import { MANGO, mangoTokensList, tvl } from './strategies/mango/tools'
+import { NameVal, TreasuryStrategy } from './types/types'
 
 const StrategiesWrapper = () => {
   const tokens: NameVal[] = [

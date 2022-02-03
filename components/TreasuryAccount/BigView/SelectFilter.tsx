@@ -1,5 +1,5 @@
 import Select from '@components/inputs/Select'
-import { NameVal } from '../types/types'
+import { NameVal } from './types/types'
 
 const SelectFilter = ({
   onChange,
