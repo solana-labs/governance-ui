@@ -95,7 +95,7 @@ const StrategiesWrapper = () => {
             return (
               <StrategyItem
                 key={x.handledMint}
-                liquidity={0}
+                liquidity={x.liquidity}
                 protocolSymbol={x.protocolSymbol}
                 apy={x.apy}
                 protocolName={x.protocolName}
@@ -106,7 +106,7 @@ const StrategiesWrapper = () => {
                 strategyName={x.strategyName}
                 currentPosition={x.currentPosition}
                 strategyDescription={x.strategyDescription}
-                handleDeposit={x.handleDeposit}
+                createProposalFcn={x.createProposalFcn}
               ></StrategyItem>
             )
           }

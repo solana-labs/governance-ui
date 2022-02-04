@@ -16,10 +16,10 @@ const DepositModal = ({
   strategyName,
   strategyDescription,
   currentPosition,
-  handleDeposit,
+  createProposalFcn,
 }) => {
   return (
-    <Modal sizeClassName="max-w-7xl" onClose={onClose} isOpen={isOpen}>
+    <Modal sizeClassName="max-w-6xl" onClose={onClose} isOpen={isOpen}>
       <ModalHeader
         protocolLogoURI={protocolLogoSrc}
         protocolName={protocolName}
@@ -38,7 +38,7 @@ const DepositModal = ({
           <Deposit
             handledMint={handledMint}
             currentPosition={currentPosition}
-            depositFcn={handleDeposit}
+            createProposalFcn={createProposalFcn}
           ></Deposit>
         </ModalRightSide>
       </div>

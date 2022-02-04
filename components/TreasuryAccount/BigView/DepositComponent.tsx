@@ -1,31 +1,51 @@
+import { PublicKey } from '@blockworks-foundation/mango-client'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { getProgramVersionForRealm } from '@models/registry/api'
 import { BN } from '@project-serum/anchor'
+import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
   getMintDecimalAmount,
   getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
+import { useRouter } from 'next-router-mock'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
-import useStrategiesStore from 'stores/useStrategiesStore'
-import { HandleDepositFcn } from './types/types'
+import useWalletStore from 'stores/useWalletStore'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { HandleCreateProposalWithStrategy } from './types/types'
 
 const DepositComponent = ({
   handledMint,
   currentPosition,
-  depositFcn,
+  createProposalFcn,
 }: {
   handledMint: string
   currentPosition: BN
-  depositFcn: HandleDepositFcn
+  createProposalFcn: HandleCreateProposalWithStrategy
 }) => {
-  const { getStrategies } = useStrategiesStore()
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const {
+    realmInfo,
+    realm,
+    ownVoterWeight,
+    mint,
+    councilMint,
+    symbol,
+  } = useRealm()
+  const { client } = useVoteRegistry()
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
     (x) => x.mint?.publicKey.toBase58() === handledMint
@@ -68,8 +88,41 @@ const DepositComponent = ({
     setAmount(undefined)
   }, [matchedTreasuryAccount])
   const handleDeposit = async () => {
-    await depositFcn(handledMint, amount)
-    getStrategies()
+    const rpcContext = new RpcContext(
+      new PublicKey(realm!.owner.toString()),
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection.current,
+      connection.endpoint
+    )
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      amount!,
+      matchedTreasuryAccount!.mint!.account.decimals
+    )
+    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+      matchedTreasuryAccount!.governance!.account.config
+    )
+    const defaultProposalMint = !mint?.supply.isZero()
+      ? realm!.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm!.account.config.councilMint
+      : undefined
+    const proposalAddress = await createProposalFcn(
+      rpcContext,
+      handledMint,
+      mintAmount,
+      realm!,
+      matchedTreasuryAccount!.governance!,
+      ownTokenRecord.pubkey,
+      `Deposit 100 tokens to mango protocol strategy`,
+      `Deposit 100 tokens to mango protocol strategy`,
+      defaultProposalMint!,
+      matchedTreasuryAccount!.governance!.account!.proposalCount,
+      false,
+      client
+    )
+    const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
+    router.push(url)
   }
   return (
     <div

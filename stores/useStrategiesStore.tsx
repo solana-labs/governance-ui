@@ -11,7 +11,8 @@ const useAssetsStore = create<StrategiesStore>((set, _get) => ({
   strategies: [],
   getStrategies: async () => {
     const mango = await tvl(Date.now() / 1000)
-    const strategies = [...mango]
+    //add fetch functions for your protocol in promise.all
+    const strategies: TreasuryStrategy[] = [...mango]
     set((s) => {
       s.strategies = strategies
     })

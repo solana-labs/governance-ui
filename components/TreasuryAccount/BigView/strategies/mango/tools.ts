@@ -1,7 +1,12 @@
 import { BN } from '@project-serum/anchor'
+import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import tokenService from '@utils/services/token'
+import { createProposal } from 'actions/createProposal'
 import axios from 'axios'
-import { TreasuryStrategy } from '../../types/types'
+import {
+  HandleCreateProposalWithStrategy,
+  TreasuryStrategy,
+} from '../../types/types'
 
 //Symbol, coingeckoId
 export const tokenList = {
@@ -81,13 +86,58 @@ export async function tvl(timestamp) {
         currentPosition: new BN(0),
         strategyDescription: 'Description',
         isGenericItem: true,
-        handleDeposit: HandleMangoDeposit,
+        createProposalFcn: HandleMangoDeposit,
       })
     }
   })
   return balances
 }
 
-const HandleMangoDeposit = async (mint, amount) => {
-  console.log(mint, amount)
+const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
+  rpcContext,
+  handledMint,
+  amount,
+  realm,
+  governance,
+  tokenOwnerRecord,
+  name,
+  descriptionLink,
+  governingTokenMint,
+  proposalIndex,
+  isDraft,
+  client
+) => {
+  // sample of creating proposal with instruction
+  const instructionData = {
+    //TODO create mango deposit function using amount and mint
+
+    // SAMPLE of serialized instruction that supply proposal
+    //   const transferIx = Token.createTransferInstruction(
+    //     TOKEN_PROGRAM_ID,
+    //     sourceAccount,
+    //     receiverAddress,
+    //     governedTokenAccount.governance!.pubkey,
+    //     [],
+    //     new u64(mintAmount.toString())
+    //   )
+    //   const serializedInstruction = serializeInstructionToBase64(transferIx)
+    //   data: getInstructionDataFromBase64(serializedInstruction),
+    data: getInstructionDataFromBase64(''),
+    holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
+    prerequisiteInstructions: [],
+  }
+  const proposalAddress = await createProposal(
+    rpcContext,
+    realm,
+    governance.pubkey,
+    tokenOwnerRecord,
+    name,
+    descriptionLink,
+    governingTokenMint,
+    proposalIndex,
+    [instructionData],
+    isDraft,
+    client
+  )
+  return proposalAddress
 }
