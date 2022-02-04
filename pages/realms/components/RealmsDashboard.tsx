@@ -7,6 +7,20 @@ import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
 
+//Types for RNG state
+type RNGtypes = {
+  key: string
+  logo: string
+  symbol: string
+  twitter: string
+  website: string
+  proposals: number
+  governanceTokens: number
+  balance: number
+  members: number
+}
+//Stores information for the session, so that the numbers stay consistent
+
 export default function RealmsDashboard({
   realms,
   isLoading,
@@ -22,18 +36,17 @@ export default function RealmsDashboard({
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected, current: wallet } = useWalletStore((s) => s)
 
-  ////////////////////////////////////////////////////////////////////////////////
-  /////////////////////////////// Added - Masaya ////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
-  const [RNG, setRNG] = useState({
+  const [sessionStorage, setSessionStorage] = useState(new Map())
+  const [rNG, setRNG] = useState<RNGtypes>({
+    key: '',
     logo: '',
-    nameOfOrg: '',
+    symbol: '',
     twitter: '',
     website: '',
-    proposals: 0,
-    governanceTokens: 0,
-    balance: 0,
-    members: 0,
+    proposals: 1,
+    governanceTokens: 1,
+    balance: 1,
+    members: 1,
   })
 
   //functions
@@ -52,8 +65,14 @@ export default function RealmsDashboard({
 
   //shows changes to state on console
   useEffect(() => {
-    console.log(RNG)
-  }, [RNG])
+    //if key doesn't exist within sessionStorage, add it in
+    if (!sessionStorage.has(rNG.key)) {
+      console.log('set new set')
+      setSessionStorage(new Map(sessionStorage.set(rNG.key, rNG)))
+    }
+    //logging info on console
+    console.log('Org Data: ', rNG, 'sessionStorage: ', sessionStorage)
+  }, [rNG])
 
   //random number generator function
   const randomNumGen = (x: number) => {
@@ -72,27 +91,43 @@ export default function RealmsDashboard({
       .then((myJson) => {
         //setting RNG logo, nameOfOrg, twitter, and website based on key
         for (const file of myJson) {
-          if (file.realmId === key) {
+          if (sessionStorage.has(file.realmId) && file.realmId === key) {
+            //get information that already exists from sessionStorage, setRNG to existing info
             setRNG({
-              ...RNG,
-              logo: file.ogImage,
-              nameOfOrg: file.displayName,
-              twitter: file.twitter,
-              website: file.website,
+              ...rNG,
+              key: file.realmId,
+              logo: sessionStorage.get(file.realmId).logo,
+              symbol: sessionStorage.get(file.realmId).symbol,
+              twitter: sessionStorage.get(file.realmId).twitter,
+              website: sessionStorage.get(file.realmId).website,
               //set rest of RNG state with random numbers
-              proposals: randomNumGen(100),
-              governanceTokens: randomNumGen(100),
-              balance: randomNumGen(1000000),
-              members: randomNumGen(100),
+              proposals: sessionStorage.get(file.realmId).proposals,
+              governanceTokens: sessionStorage.get(file.realmId)
+                .governanceTokens,
+              balance: sessionStorage.get(file.realmId).balance,
+              members: sessionStorage.get(file.realmId).members,
             })
+          } else {
+            //if it doesn't exists or is new, create new data
+            if (file.realmId === key) {
+              setRNG({
+                ...rNG,
+                key: file.realmId,
+                logo: file.ogImage,
+                symbol: file.symbol,
+                twitter: file.twitter,
+                website: file.website,
+                //set rest of RNG state with random numbers
+                proposals: randomNumGen(100),
+                governanceTokens: randomNumGen(100),
+                balance: randomNumGen(1000000),
+                members: randomNumGen(100),
+              })
+            }
           }
         }
       })
   }
-
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
-  ////////////////////////////////////////////////////////////////////////////////
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
