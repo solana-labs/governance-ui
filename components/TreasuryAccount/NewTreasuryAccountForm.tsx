@@ -21,12 +21,15 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
-import Switch from '@components/Switch'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
+import {
+  DEFAULT_NATIVE_SOL_MINT,
+  DEFAULT_NFT_TREASURY_MINT,
+} from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { TokenInfo } from '@solana/spl-token-registry'
+import Select from '@components/inputs/Select'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
@@ -40,6 +43,11 @@ const defaultFormValues = {
   maxVotingTime: 3,
   voteThreshold: 60,
 }
+
+const SOL = 'SOL'
+const OTHER = 'OTHER'
+const NFT = 'NFT'
+
 const NewAccountForm = () => {
   const router = useRouter()
   const { client } = useVoteRegistry()
@@ -51,6 +59,16 @@ const NewAccountForm = () => {
     symbol,
     ownVoterWeight,
   } = useRealm()
+  const types = [
+    {
+      name: 'SOL Account',
+      value: SOL,
+      defaultMint: DEFAULT_NATIVE_SOL_MINT,
+      hide: realmInfo?.programVersion !== 2,
+    },
+    { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
+    { name: 'Token Account', value: OTHER, defaultMint: '' },
+  ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -62,7 +80,7 @@ const NewAccountForm = () => {
   const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const [isNFT, setIsNFT] = useState(false)
+  const [treasuryType, setTreasuryType] = useState(types[0])
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
@@ -206,10 +224,10 @@ const NewAccountForm = () => {
 
   useEffect(() => {
     handleSetForm({
-      value: isNFT ? DEFAULT_NFT_TREASURY_MINT : '',
+      value: treasuryType.defaultMint,
       propertyName: 'mintAddress',
     })
-  }, [isNFT])
+  }, [treasuryType])
 
   return (
     <div className="space-y-3">
@@ -219,13 +237,23 @@ const NewAccountForm = () => {
           <h1>Create new treasury account</h1>
         </div>
       </div>
-      <div className="text-sm mb-3">
-        <div className="mb-2">NFT Treasury</div>
-        <div className="flex flex-row text-xs items-center">
-          <Switch checked={isNFT} onChange={() => setIsNFT(!isNFT)} />
-        </div>
-      </div>
-      {!isNFT && (
+      <Select
+        label={'Type'}
+        onChange={setTreasuryType}
+        placeholder="Please select..."
+        value={treasuryType.name}
+      >
+        {types
+          .filter((x) => !x.hide)
+          .map((x) => {
+            return (
+              <Select.Option key={x.value} value={x}>
+                {x.name}
+              </Select.Option>
+            )
+          })}
+      </Select>
+      {treasuryType.value === OTHER && (
         <>
           <Input
             label="Mint address"

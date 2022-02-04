@@ -54,6 +54,8 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
 import RefreshObligation from './components/instructions/solend/RefreshObligation'
 import RefreshReserve from './components/instructions/solend/RefreshReserve'
+import Grant from 'VoteStakeRegistry/components/instructions/Grant'
+import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -130,7 +132,8 @@ const New = () => {
       const governanceType = governance.account.accountType
       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
       switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernance:
+        case GovernanceAccountType.ProgramGovernanceV1:
+        case GovernanceAccountType.ProgramGovernanceV2:
           return instructionsAvailiableAfterProgramGovernance.includes(
             instructionType
           )
@@ -230,6 +233,7 @@ const New = () => {
             ? getTimestampFromDays(x.customHoldUpTime)
             : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
+          chunkSplitByDefault: x.chunkSplitByDefault || false,
         }
       })
 
@@ -391,6 +395,10 @@ const New = () => {
             governance={governance}
           ></MakeChangeMaxAccounts>
         )
+      case Instructions.Grant:
+        return <Grant index={idx} governance={governance}></Grant>
+      case Instructions.Clawback:
+        return <Clawback index={idx} governance={governance}></Clawback>
       default:
         null
     }

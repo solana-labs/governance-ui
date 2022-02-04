@@ -25,6 +25,7 @@ export const voteRegistryLockDeposit = async ({
   client,
   tokenOwnerRecordPk,
   tempHolderPk,
+  communityMintPk,
 }: {
   rpcContext: RpcContext
   mintPk: PublicKey
@@ -40,6 +41,7 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   //to deposit from one deposit to another we need to withdraw tokens somewhere first
   tempHolderPk: PublicKey
+  communityMintPk: PublicKey
   client?: VsrClient
 }) => {
   const signers: Keypair[] = []
@@ -67,6 +69,7 @@ export const voteRegistryLockDeposit = async ({
     tokenOwnerRecordPk,
     lockUpPeriodInDays,
     lockupKind,
+    communityMintPk,
     client,
   })
 

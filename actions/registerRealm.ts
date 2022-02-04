@@ -10,8 +10,9 @@ import {
   getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  SetRealmAuthorityAction,
   VoteThresholdPercentage,
-  VoteWeightSource,
+  VoteTipping,
 } from '@solana/spl-governance'
 import { withCreateRealm } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
@@ -106,7 +107,7 @@ async function prepareMintInstructions(
     if (otherOwners?.length) {
       for (const ownerPk of otherOwners) {
         const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
-          connection,
+          connection.current,
           ownerPk,
           _mintPk
         )
@@ -199,7 +200,7 @@ function createGovernanceConfig(
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteWeightSource.Deposit,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   })
@@ -243,6 +244,7 @@ async function prepareGovernanceInstructions(
     const communityMintGovPk = await withCreateMintGovernance(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       communityMintPk,
       config,
@@ -260,7 +262,8 @@ async function prepareGovernanceInstructions(
       programVersion,
       realmPk,
       walletPubkey,
-      communityMintGovPk
+      communityMintGovPk,
+      SetRealmAuthorityAction.SetChecked
     )
   }
 
@@ -269,6 +272,7 @@ async function prepareGovernanceInstructions(
     await withCreateMintGovernance(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       councilMintPk,
       config,

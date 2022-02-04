@@ -20,9 +20,11 @@ const NewProposalBtn = () => {
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
 
+  const governanceItems = Object.values(governances)
+
   const canCreateProposal =
     realm &&
-    Object.values(governances).some((g) =>
+    governanceItems.some((g) =>
       ownVoterWeight.canCreateProposal(g.account.config)
     ) &&
     !toManyCommunityOutstandingProposalsForUser &&
@@ -30,7 +32,9 @@ const NewProposalBtn = () => {
 
   const tooltipContent = !connected
     ? 'Connect your wallet to create new proposal'
-    : !Object.values(governances).some((g) =>
+    : governanceItems.length === 0
+    ? 'There is no governance configuration to create a new proposal'
+    : !governanceItems.some((g) =>
         ownVoterWeight.canCreateProposal(g.account.config)
       )
     ? "You don't have enough governance power to create a new proposal"

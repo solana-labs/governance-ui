@@ -15,9 +15,9 @@ import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { UXD_PROGRAM_INSTRUCTIONS } from './programs/uxdProtocol'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
-import { SYSTEM_PROGRAM_INSTRUCTIONS } from './programs/system'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 
+import { SYSTEM_INSTRUCTIONS } from './programs/system'
 /**
  * Default governance program id instance
  */
@@ -112,7 +112,7 @@ export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
 export const DEFAULT_NATIVE_SOL_MINT =
-  'GSoL95LSRcKYxwVkvAxbYLp47uBn1QtP6pDUZQxp3Mg4'
+  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
@@ -121,6 +121,8 @@ export function getAccountName(accountPk: PublicKey) {
 export const CHAT_PROGRAM_ID = new PublicKey(
   '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
 )
+
+export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 
 export interface AccountDescriptor {
   name: string
@@ -151,8 +153,8 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...RAYDIUM_INSTRUCTIONS,
   ...UXD_PROGRAM_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
-  ...SYSTEM_PROGRAM_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
+  ...SYSTEM_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -181,7 +183,6 @@ export async function getInstructionDescriptor(
       instruction.accounts,
       instruction.programId
     ))) ?? <>{JSON.stringify(instruction.data)}</>
-
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,

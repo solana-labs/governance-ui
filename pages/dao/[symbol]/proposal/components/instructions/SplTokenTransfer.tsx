@@ -24,7 +24,10 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { getTransferInstruction } from '@utils/instructionTools'
+import {
+  getSolTransferInstruction,
+  getTransferInstruction,
+} from '@utils/instructionTools'
 
 const SplTokenTransfer = ({
   index,
@@ -88,15 +91,25 @@ const SplTokenTransfer = ({
     })
   }
   async function getInstruction(): Promise<UiInstruction> {
-    return getTransferInstruction({
-      schema,
-      form,
-      programId,
-      connection,
-      wallet,
-      currentAccount: form.governedTokenAccount || null,
-      setFormErrors,
-    })
+    return !form.governedTokenAccount?.isSol
+      ? getTransferInstruction({
+          schema,
+          form,
+          programId,
+          connection,
+          wallet,
+          currentAccount: form.governedTokenAccount || null,
+          setFormErrors,
+        })
+      : getSolTransferInstruction({
+          schema,
+          form,
+          programId,
+          connection,
+          wallet,
+          currentAccount: form.governedTokenAccount || null,
+          setFormErrors,
+        })
   }
 
   useEffect(() => {
