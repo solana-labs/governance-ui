@@ -184,6 +184,13 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         programId = realmAccountInfo?.owner
       }
       if (realmId && programId) {
+        const programVersion = await getGovernanceProgramVersion(
+          connection.current,
+          programId!
+        )
+        set((s) => {
+          s.selectedRealm.programVersion = programVersion
+        })
         await actions.fetchAllRealms(programId)
         actions.fetchRealm(programId, realmId)
       }
@@ -266,10 +273,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const connection = get().connection.current
       const realms = get().realms
       const realm = realms[realmId.toBase58()]
-      const programVersion = await getGovernanceProgramVersion(
-        connection,
-        programId!
-      )
       const mintsArray = (
         await Promise.all([
           realm?.account.communityMint
@@ -334,7 +337,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.governances = governancesMap
         s.selectedRealm.tokenRecords = tokenRecords
         s.selectedRealm.councilTokenOwnerRecords = councilTokenOwnerRecords
-        s.selectedRealm.programVersion = programVersion
       })
       get().actions.fetchOwnVoteRecords()
       get().actions.fetchTokenAccountAndMintsForSelectedRealmGovernances()

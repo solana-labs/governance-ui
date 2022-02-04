@@ -1,3 +1,4 @@
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { getExplorerUrl } from '@components/explorer/tools'
 import {
   ArrowLeftIcon,
@@ -19,7 +20,6 @@ import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -64,7 +64,6 @@ const MemberOverview = () => {
           member!.walletAddress,
         ])
       : null
-  const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
 
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
@@ -144,7 +143,13 @@ const MemberOverview = () => {
             onClick={handleGoBackToMainView}
             className="h-4 w-4 mr-1 text-primary-light mr-2"
           />
-          {walletAddressFormatted}
+          <DisplayAddress
+            connection={connection.current}
+            address={walletPublicKey}
+            height="12px"
+            width="100px"
+            dark={true}
+          />
           <a
             href={
               walletAddress
@@ -160,7 +165,16 @@ const MemberOverview = () => {
         </>
       </h3>
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
-        <UserCircleIcon className="h-6 text-fgd-3 w-6 mr-2.5" />
+        <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
+          <AddressImage
+            dark={true}
+            connection={connection.current}
+            address={walletPublicKey}
+            height="30px"
+            width="30px"
+            placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+          />
+        </div>
         <div>
           <div className="text-fgd-3 text-xs flex flex-col">
             Votes cast: {totalVotes}

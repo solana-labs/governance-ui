@@ -18,6 +18,8 @@ import DepositNFT from './DepositNFT'
 import { ViewState } from './Types'
 import SendTokens from './SendTokens'
 import { ExternalLinkIcon, ArrowsExpandIcon } from '@heroicons/react/outline'
+import Tooltip from '@components/Tooltip'
+import ConvertToMsol from './ConvertToMsol'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -33,6 +35,7 @@ const AccountOverview = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
+  const isSOL = currentAccount?.isSol
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(
@@ -40,6 +43,7 @@ const AccountOverview = () => {
   )
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
+  const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
   const {
     setCurrentCompactView,
     resetCompactViewState,
@@ -132,6 +136,22 @@ const AccountOverview = () => {
           Send
         </Button>
       </div>
+      <div className="mb-4 flex flex-col">
+        <Button
+          className={`sm:w-full text-sm ${!isSOL ? 'hidden' : ''}`}
+          onClick={() => setOpenMsolConvertModal(true)}
+          disabled={!canUseTransferInstruction}
+        >
+          <Tooltip
+            content={
+              !canUseTransferInstruction &&
+              'You need to be connected to your wallet to have the ability to create a token staking proposal'
+            }
+          >
+            <div>Convert to mSOL</div>
+          </Tooltip>
+        </Button>
+      </div>
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4">
         Recent activity
       </div>
@@ -181,6 +201,17 @@ const AccountOverview = () => {
           isOpen={openCommonSendModal}
         >
           <SendTokens></SendTokens>
+        </Modal>
+      )}
+      {openMsolConvertModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenMsolConvertModal(false)
+          }}
+          isOpen={openMsolConvertModal}
+        >
+          <ConvertToMsol></ConvertToMsol>
         </Modal>
       )}
     </>

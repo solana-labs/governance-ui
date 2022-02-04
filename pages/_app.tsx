@@ -15,6 +15,7 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import ErrorBoundary from '@components/ErrorBoundary'
+import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -99,11 +100,13 @@ function App({ Component, pageProps }) {
       </Head>
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Mango">
-          <NavBar />
-          <Notifications />
-          <PageBodyContainer>
-            <Component {...pageProps} />
-          </PageBodyContainer>
+          <WalletIdentityProvider appName={'Realms'}>
+            <NavBar />
+            <Notifications />
+            <PageBodyContainer>
+              <Component {...pageProps} />
+            </PageBodyContainer>
+          </WalletIdentityProvider>
         </ThemeProvider>
       </ErrorBoundary>
       <Footer />

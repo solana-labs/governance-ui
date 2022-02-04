@@ -123,3 +123,7 @@ button {
 .pointer {
   cursor: pointer;
 }
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}

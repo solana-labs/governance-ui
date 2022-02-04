@@ -50,7 +50,7 @@ const validateDoseTokenAccountMatchMint = (
 }
 
 export const tryGetAta = async (
-  connection: ConnectionContext,
+  connection: Connection,
   mint: PublicKey,
   owner: PublicKey
 ) => {
@@ -61,7 +61,7 @@ export const tryGetAta = async (
     mint, // mint
     owner // owner
   )
-  const tokenAccount = await tryGetTokenAccount(connection.current, ata)
+  const tokenAccount = await tryGetTokenAccount(connection, ata)
   return tokenAccount
 }
 
@@ -169,6 +169,7 @@ export const validateBuffer = async (
 export const getTokenTransferSchema = ({ form, connection }) => {
   const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
       .number()
       .typeError('Amount is required')
@@ -236,10 +237,6 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           }
         }
       ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
   })
 }
 
@@ -301,5 +298,50 @@ export const getMintSchema = ({ form, connection }) => {
         }
       ),
     mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}
+
+export const getStakeSchema = ({ form }) => {
+  return yup.object().shape({
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test('amount', 'Insufficient funds', async function (val: number) {
+        if (val && val > 9 * 10 ** 6) {
+          return this.createError({
+            message: 'Amount is too large',
+          })
+        }
+        if (val && !form.governedTokenAccount) {
+          return this.createError({
+            message: 'Please pass in a source account to validate the amount',
+          })
+        }
+        if (
+          val &&
+          form.governedTokenAccount &&
+          form.governedTokenAccount?.isSol &&
+          form.governedTokenAccount?.mint &&
+          form.governedTokenAccount?.solAccount
+        ) {
+          const mintValue = getMintNaturalAmountFromDecimal(
+            val,
+            form.governedTokenAccount?.mint.account.decimals
+          )
+          return !!(
+            form.governedTokenAccount.solAccount.owner &&
+            form.governedTokenAccount.solAccount.lamports >= new BN(mintValue)
+          )
+        }
+        return this.createError({ message: 'Amount is required' })
+      }),
+    destinationAccount: yup
+      .object()
+      .nullable()
+      .required('Destination account is required'),
+    governedTokenAccount: yup
+      .object()
+      .nullable()
+      .required('Source account is required'),
   })
 }
