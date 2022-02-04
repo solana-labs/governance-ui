@@ -17,7 +17,7 @@ import * as yup from 'yup'
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
 } from './BaseGovernanceForm'
-import { registerGovernance } from 'actions/registerGovernance'
+import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
@@ -102,7 +102,7 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
         }
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
-        await registerGovernance(
+        await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,
           realm,

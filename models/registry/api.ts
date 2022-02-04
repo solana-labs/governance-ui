@@ -53,8 +53,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     programId: new PublicKey(realm.programId),
     realmId: new PublicKey(realm.realmId),
     isCertified: true,
-    // TODO: dynamically resolve the program version
-    programVersion: PROGRAM_VERSION_V1,
+    programVersion: realm.programVersion,
   })) as ReadonlyArray<RealmInfo>
 }
 
