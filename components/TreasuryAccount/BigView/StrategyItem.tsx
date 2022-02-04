@@ -16,7 +16,7 @@ const StrategyItem = ({
   strategyName,
   currentPosition,
   strategyDescription,
-  handleDeposit,
+  createProposalFcn,
 }: TreasuryStrategy) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   return (
@@ -52,7 +52,7 @@ const StrategyItem = ({
           handledTokenName={handledTokenSymbol}
           strategyName={strategyName}
           strategyDescription={strategyDescription}
-          handleDeposit={handleDeposit}
+          createProposalFcn={createProposalFcn}
         ></DepositModal>
       )}
     </>

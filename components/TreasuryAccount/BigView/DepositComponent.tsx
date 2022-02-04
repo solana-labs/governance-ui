@@ -169,7 +169,11 @@ const DepositComponent = ({
           {currentPositionFtm} {tokenInfo?.symbol}
         </span>
       </div>
-      <Button className="w-full mt-5" onClick={handleDeposit}>
+      <Button
+        className="w-full mt-5"
+        onClick={handleDeposit}
+        disabled={!amount}
+      >
         Deposit
       </Button>
     </div>
