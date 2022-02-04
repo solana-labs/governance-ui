@@ -34,7 +34,7 @@ const SetProgramAuthority = ({
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountType } = useGovernanceAssets()
   const governedProgramAccounts = getGovernancesByAccountType(
-    GovernanceAccountType.ProgramGovernance
+    GovernanceAccountType.ProgramGovernanceV1
   ).map((x) => {
     return {
       governance: x,

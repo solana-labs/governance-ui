@@ -38,10 +38,11 @@ const DepositInsuranceToMangoDepository = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountType } = useGovernanceAssets()
-  const governedProgramAccounts = getGovernancesByAccountType(
-    GovernanceAccountType.ProgramGovernance
-  ).map((x) => {
+  const { getGovernancesByAccountTypes } = useGovernanceAssets()
+  const governedProgramAccounts = getGovernancesByAccountTypes([
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
+  ]).map((x) => {
     return {
       governance: x,
     }
