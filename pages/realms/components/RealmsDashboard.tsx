@@ -19,7 +19,6 @@ type RNGtypes = {
   balance: number
   members: number
 }
-//Stores information for the session, so that the numbers stay consistent
 
 export default function RealmsDashboard({
   realms,
@@ -36,6 +35,7 @@ export default function RealmsDashboard({
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected, current: wallet } = useWalletStore((s) => s)
 
+  //Stores information for the session, so that the numbers stay consistent
   const [sessionStorage, setSessionStorage] = useState(new Map())
   const [rNG, setRNG] = useState<RNGtypes>({
     key: '',
