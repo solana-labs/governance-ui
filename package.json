@@ -54,6 +54,7 @@
     "node-fetch": "^2.6.1",
     "rc-slider": "^9.7.2",
     "react": "^17.0.1",
+    "react-card-flip": "^1.1.5",
     "react-dom": "^17.0.1",
     "react-markdown": "^7.0.0",
     "react-portal": "^4.2.1",
