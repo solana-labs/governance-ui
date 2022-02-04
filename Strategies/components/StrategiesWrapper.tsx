@@ -1,6 +1,6 @@
 import Input from '@components/inputs/Input'
 import { useState, useEffect } from 'react'
-import { tokenListFilter, MANGO } from 'Strategies/mango/tools'
+import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { NameVal, TreasuryStrategy } from 'Strategies/types/types'
 import SelectFilter from './SelectFilter'

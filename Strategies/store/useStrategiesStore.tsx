@@ -1,4 +1,4 @@
-import { tvl } from 'Strategies/mango/tools'
+import { tvl } from 'Strategies/protocols/mango/tools'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import create, { State } from 'zustand'
 

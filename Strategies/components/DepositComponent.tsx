@@ -87,6 +87,7 @@ const DepositComponent = ({
   useEffect(() => {
     setAmount(undefined)
   }, [matchedTreasuryAccount])
+
   const handleDeposit = async () => {
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
@@ -124,6 +125,7 @@ const DepositComponent = ({
     const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
     router.push(url)
   }
+
   return (
     <div
       className={`p-6 border-fgd-4 border rounded-md w-4/5 mb-28 ${
