@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   ProposalState,
 } from '@solana/spl-governance'
 import React from 'react'
@@ -31,7 +31,7 @@ export function ExecuteAllInstructionButton({
   proposalInstructions,
 }: {
   proposal: ProgramAccount<Proposal>
-  proposalInstructions: ProgramAccount<ProposalInstruction>[]
+  proposalInstructions: ProgramAccount<ProposalTransaction>[]
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
 }) {
