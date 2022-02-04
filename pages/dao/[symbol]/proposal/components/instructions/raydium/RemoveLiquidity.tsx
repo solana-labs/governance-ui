@@ -5,29 +5,29 @@ import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
+  RemoveLiquidityRaydiumForm,
   UiInstruction,
-  RegisterMangoDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
+import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import GovernedAccountSelect from '../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction'
 import Select from '@components/inputs/Select'
 import {
-  getDepositoryMintSymbols,
-  getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient'
-import {
   ProgramAccount,
-  Governance,
-  GovernanceAccountType,
   serializeInstructionToBase64,
+  Governance,
 } from '@solana/spl-governance'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { getLPMintInfo } from '@tools/sdk/raydium/helpers'
+import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
+import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction'
+import BigNumber from 'bignumber.js'
+import { jsonInfo2PoolKeys } from '@raydium-io/raydium-sdk'
 
-const RegisterMangoDepository = ({
+const RemoveLiquidityRaydium = ({
   index,
   governance,
 }: {
@@ -37,25 +37,45 @@ const RegisterMangoDepository = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountTypes } = useGovernanceAssets()
-  const governedProgramAccounts = getGovernancesByAccountTypes([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
-  ]).map((x) => {
-    return {
-      governance: x,
-    }
-  })
+  const [governedAccounts, setGovernedAccounts] = useState<
+    GovernedMultiTypeAccount[]
+  >([])
+  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
+
+  useEffect(() => {
+    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
+  }, [])
+
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<RegisterMangoDepositoryForm>({
+  const [form, setForm] = useState<RemoveLiquidityRaydiumForm>({
     governedAccount: undefined,
-    programId: programId?.toString(),
-    collateralName: '',
-    insuranceName: '',
+    liquidityPool: '',
+    amountIn: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
+
+  const [lpMintInfo, setLpMintInfo] = useState<{
+    balance: number
+    decimals: number
+  } | null>(null)
+  useEffect(() => {
+    const fetchLpData = async () => {
+      if (!form.governedAccount?.governance.pubkey || !form.liquidityPool)
+        return
+      const { lpMint } = liquidityPoolKeysList[form.liquidityPool]
+
+      const { maxBalance, decimals } = await getLPMintInfo(
+        connection,
+        new PublicKey(lpMint),
+        form.governedAccount.governance.pubkey
+      )
+      setLpMintInfo({ balance: maxBalance, decimals })
+    }
+    fetchLpData()
+  }, [form.governedAccount?.governance.pubkey, form.liquidityPool])
+
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -72,16 +92,14 @@ const RegisterMangoDepository = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
-      form.insuranceName &&
+      form.liquidityPool &&
+      lpMintInfo &&
       wallet?.publicKey
     ) {
-      const createIx = await createRegisterMangoDepositoryInstruction(
-        connection,
-        form.governedAccount?.governance.account.governedAccount,
-        form.governedAccount?.governance.pubkey,
-        new PublicKey(wallet.publicKey.toBase58()),
-        form.collateralName,
-        form.insuranceName
+      const createIx = createRemoveLiquidityInstruction(
+        new PublicKey(form.governedAccount.governance.pubkey),
+        jsonInfo2PoolKeys(liquidityPoolKeysList[form.liquidityPool]),
+        new BigNumber(form.amountIn).shiftedBy(lpMintInfo.decimals).toString()
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -92,7 +110,6 @@ const RegisterMangoDepository = ({
     }
     return obj
   }
-
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -101,22 +118,26 @@ const RegisterMangoDepository = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.collateralName) {
+    if (form.liquidityPool) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
+      handleSetForm({
+        value: form.liquidityPool,
+        propertyName: 'liquidityPool',
+      })
     }
-  }, [form.collateralName])
+  }, [form.liquidityPool])
 
   useEffect(() => {
-    if (form.insuranceName) {
+    if (form.amountIn) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.insuranceName])
+  }, [form.amountIn])
 
   useEffect(() => {
     handleSetInstructions(
@@ -126,19 +147,22 @@ const RegisterMangoDepository = ({
   }, [form])
 
   const schema = yup.object().shape({
-    collateralName: yup.string().required('Valid Collateral name is required'),
-    insuranceName: yup.string().required('Valid Insurance name is required'),
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
+    liquidityPool: yup.string().required('Liquidity Pool is required'),
+    amountIn: yup
+      .number()
+      .moreThan(0, 'Amount for LP token should be more than 0')
+      .required('Amount for LP token is required'),
   })
 
   return (
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
@@ -147,40 +171,40 @@ const RegisterMangoDepository = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-
       <Select
-        label="Collateral Name"
-        value={form.collateralName}
+        label="Raydium Liquidity Pool"
+        value={form.liquidityPool}
         placeholder="Please select..."
         onChange={(value) =>
-          handleSetForm({ value, propertyName: 'collateralName' })
+          handleSetForm({ value, propertyName: 'liquidityPool' })
         }
-        error={formErrors['collateralName']}
+        error={formErrors['liquidityPool']}
       >
-        {getDepositoryMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
+        {Object.keys(liquidityPoolKeysList).map((pool, i) => (
+          <Select.Option key={pool + i} value={pool}>
+            {pool}
           </Select.Option>
         ))}
       </Select>
 
-      <Select
-        label="Insurance Name"
-        value={form.insuranceName}
-        placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'insuranceName' })
+      <Input
+        label={`LP Token Amount to withdraw - max: ${
+          lpMintInfo ? lpMintInfo.balance : '-'
+        }`}
+        value={form.amountIn}
+        type="number"
+        min={0}
+        max={10 ** 12}
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'amountIn',
+          })
         }
-        error={formErrors['insuranceName']}
-      >
-        {getInsuranceMintSymbols(connection.cluster).map((value, i) => (
-          <Select.Option key={value + i} value={value}>
-            {value}
-          </Select.Option>
-        ))}
-      </Select>
+        error={formErrors['amountIn']}
+      />
     </>
   )
 }
 
-export default RegisterMangoDepository
+export default RemoveLiquidityRaydium

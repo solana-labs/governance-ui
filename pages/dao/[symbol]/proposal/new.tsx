@@ -35,12 +35,12 @@ import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
-import InitializeController from './components/instructions/InitializeController'
-import SetRedeemGlobalSupplyCap from './components/instructions/SetRedeemGlobalSupplyCap'
-import RegisterMangoDepository from './components/instructions/RegisterMangoDepository'
-import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/SetMangoDepositoriesRedeemableSoftCap'
-import DepositInsuranceToMangoDepository from './components/instructions/DepositInsuranceToMangoDepository'
-import WithdrawInsuranceFromMangoDepository from './components/instructions/WithdrawInsuranceFromMangoDepository'
+import InitializeController from './components/instructions/UXD/InitializeController'
+import SetRedeemGlobalSupplyCap from './components/instructions/UXD/SetRedeemGlobalSupplyCap'
+import RegisterMangoDepository from './components/instructions/UXD/RegisterMangoDepository'
+import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/UXD/SetMangoDepositoriesRedeemableSoftCap'
+import DepositInsuranceToMangoDepository from './components/instructions/UXD/DepositInsuranceToMangoDepository'
+import WithdrawInsuranceFromMangoDepository from './components/instructions/UXD/WithdrawInsuranceFromMangoDepository'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -56,6 +56,7 @@ import RefreshObligation from './components/instructions/solend/RefreshObligatio
 import RefreshReserve from './components/instructions/solend/RefreshReserve'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import RemoveLiquidityRaydium from './components/instructions/raydium/RemoveLiquidity'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -355,6 +356,8 @@ const New = () => {
         )
       case Instructions.AddLiquidityRaydium:
         return <AddLiquidityRaydium index={idx} governance={governance} />
+      case Instructions.RemoveLiquidityRaydium:
+        return <RemoveLiquidityRaydium index={idx} governance={governance} />
       case Instructions.InitializeController:
         return <InitializeController index={idx} governance={governance} />
       case Instructions.SetRedeemableGlobalSupplyCap:
