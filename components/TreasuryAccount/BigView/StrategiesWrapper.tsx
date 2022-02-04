@@ -7,6 +7,14 @@ import { MANGO, tokenListFilter } from './strategies/mango/tools'
 import { NameVal, TreasuryStrategy } from './types/types'
 
 const StrategiesWrapper = () => {
+  const searchAbleProps = [
+    'liquidity',
+    'apy',
+    'protocolSymbol',
+    'protocolName',
+    'handledTokenSymbol',
+    'strategyName',
+  ]
   const tokens: NameVal[] = [
     { name: 'All tokens', val: null },
     ...tokenListFilter,
@@ -46,9 +54,10 @@ const StrategiesWrapper = () => {
     if (search) {
       filtered = filtered.filter(
         (x) =>
-          Object.values(x).filter((j) =>
-            `${j}`.toLowerCase().includes(search.toLowerCase())
-          ).length
+          Object.values(
+            Object.keys(x).filter((key) => searchAbleProps.includes(key))
+          ).filter((j) => `${j}`.toLowerCase().includes(search.toLowerCase()))
+            .length
       )
     }
     setStrategiesFiltered([...filtered])
