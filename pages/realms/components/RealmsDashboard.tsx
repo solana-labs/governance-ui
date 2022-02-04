@@ -1,11 +1,24 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import Loading from '@components/Loading'
 import useWalletStore from 'stores/useWalletStore'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
+
+//Types for RNG state
+type RNGtypes = {
+  key: string
+  logo: string
+  symbol: string
+  twitter: string
+  website: string
+  proposals: number
+  governanceTokens: number
+  balance: number
+  members: number
+}
 
 export default function RealmsDashboard({
   realms,
@@ -21,6 +34,100 @@ export default function RealmsDashboard({
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const { connected, current: wallet } = useWalletStore((s) => s)
+
+  //Stores information for the session, so that the numbers stay consistent
+  const [sessionStorage, setSessionStorage] = useState(new Map())
+  const [rNG, setRNG] = useState<RNGtypes>({
+    key: '',
+    logo: '',
+    symbol: '',
+    twitter: '',
+    website: '',
+    proposals: 1,
+    governanceTokens: 1,
+    balance: 1,
+    members: 1,
+  })
+
+  //functions
+
+  //onMouseEnter, get key of organisation and fill out state
+  const getOrganisation = (e: any) => {
+    settingState(e)
+  }
+
+  //set RNG state in one go
+  //Overall function to set RNG state information
+  const settingState = (e: any) => {
+    //set RNG logo and nameOfOrg state function
+    getOrgInfoJSON(e._targetInst.key)
+  }
+
+  //shows changes to state on console
+  useEffect(() => {
+    //if key doesn't exist within sessionStorage, add it in
+    if (!sessionStorage.has(rNG.key)) {
+      console.log('set new set')
+      setSessionStorage(new Map(sessionStorage.set(rNG.key, rNG)))
+    }
+    //logging info on console
+    console.log('Org Data: ', rNG, 'sessionStorage: ', sessionStorage)
+  }, [rNG])
+
+  //random number generator function
+  const randomNumGen = (x: number) => {
+    return Math.floor(Math.random() * x)
+  }
+
+  const getOrgInfoJSON = (key: string) => {
+    //fetching key data from mainnet-beta.json file
+    fetch('/realms/mainnet-beta.json', {
+      headers: {
+        'Content-Type': 'application/json',
+        Accept: 'application/json',
+      },
+    })
+      .then((res) => res.json())
+      .then((myJson) => {
+        //setting RNG logo, nameOfOrg, twitter, and website based on key
+        for (const file of myJson) {
+          if (sessionStorage.has(file.realmId) && file.realmId === key) {
+            //get information that already exists from sessionStorage, setRNG to existing info
+            setRNG({
+              ...rNG,
+              key: file.realmId,
+              logo: sessionStorage.get(file.realmId).logo,
+              symbol: sessionStorage.get(file.realmId).symbol,
+              twitter: sessionStorage.get(file.realmId).twitter,
+              website: sessionStorage.get(file.realmId).website,
+              //set rest of RNG state with random numbers
+              proposals: sessionStorage.get(file.realmId).proposals,
+              governanceTokens: sessionStorage.get(file.realmId)
+                .governanceTokens,
+              balance: sessionStorage.get(file.realmId).balance,
+              members: sessionStorage.get(file.realmId).members,
+            })
+          } else {
+            //if it doesn't exists or is new, create new data
+            if (file.realmId === key) {
+              setRNG({
+                ...rNG,
+                key: file.realmId,
+                logo: file.ogImage,
+                symbol: file.symbol,
+                twitter: file.twitter,
+                website: file.website,
+                //set rest of RNG state with random numbers
+                proposals: randomNumGen(100),
+                governanceTokens: randomNumGen(100),
+                balance: randomNumGen(1000000),
+                members: randomNumGen(100),
+              })
+            }
+          }
+        }
+      })
+  }
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
@@ -83,6 +190,7 @@ export default function RealmsDashboard({
                 onClick={() => goToRealm(realm)}
                 className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
                 key={realm.realmId.toString()}
+                onMouseEnter={(e) => getOrganisation(e)}
               >
                 <div className="pb-5">
                   {realm.ogImage ? (
