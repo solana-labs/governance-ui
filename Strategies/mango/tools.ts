@@ -4,9 +4,9 @@ import tokenService from '@utils/services/token'
 import { createProposal } from 'actions/createProposal'
 import axios from 'axios'
 import {
-  HandleCreateProposalWithStrategy,
   TreasuryStrategy,
-} from '../../types/types'
+  HandleCreateProposalWithStrategy,
+} from 'Strategies/types/types'
 
 //Symbol, coingeckoId
 export const tokenList = {

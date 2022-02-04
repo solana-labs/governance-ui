@@ -1,9 +1,9 @@
-import ItemWrapper from '@components/TreasuryAccount/BigView/ItemWrapper'
 import BigNumber from 'bignumber.js'
 import { useState } from 'react'
 import ItemName from './ItemName'
-import { TreasuryStrategy } from './types/types'
 import DepositModal from './DepositModal'
+import { TreasuryStrategy } from 'Strategies/types/types'
+import ItemWrapper from './ItemWrapper'
 
 const StrategyItem = ({
   liquidity,

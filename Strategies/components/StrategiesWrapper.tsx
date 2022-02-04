@@ -1,10 +1,10 @@
 import Input from '@components/inputs/Input'
 import { useState, useEffect } from 'react'
-import useStrategiesStore from 'stores/useStrategiesStore'
+import { tokenListFilter, MANGO } from 'Strategies/mango/tools'
+import useStrategiesStore from 'Strategies/store/useStrategiesStore'
+import { NameVal, TreasuryStrategy } from 'Strategies/types/types'
 import SelectFilter from './SelectFilter'
 import StrategyItem from './StrategyItem'
-import { MANGO, tokenListFilter } from './strategies/mango/tools'
-import { NameVal, TreasuryStrategy } from './types/types'
 
 const StrategiesWrapper = () => {
   const searchAbleProps = [

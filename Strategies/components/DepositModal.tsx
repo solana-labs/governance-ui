@@ -1,8 +1,8 @@
 import Modal from '@components/Modal'
-import ModalHeader from '@components/TreasuryAccount/BigView/ModalHeader'
-import ModalLeftSide from '@components/TreasuryAccount/BigView/ModalLeftSide'
-import ModalRightSide from '@components/TreasuryAccount/BigView/ModalRightSide'
 import Deposit from './DepositComponent'
+import ModalHeader from './ModalHeader'
+import ModalLeftSide from './ModalLeftSide'
+import ModalRightSide from './ModalRightSide'
 
 const DepositModal = ({
   onClose,

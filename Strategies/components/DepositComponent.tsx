@@ -21,8 +21,8 @@ import { useRouter } from 'next-router-mock'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import { HandleCreateProposalWithStrategy } from './types/types'
 
 const DepositComponent = ({
   handledMint,

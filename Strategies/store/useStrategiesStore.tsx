@@ -1,6 +1,6 @@
+import { tvl } from 'Strategies/mango/tools'
+import { TreasuryStrategy } from 'Strategies/types/types'
 import create, { State } from 'zustand'
-import { TreasuryStrategy } from '@components/TreasuryAccount/BigView/types/types'
-import { tvl } from '@components/TreasuryAccount/BigView/strategies/mango/tools'
 
 interface StrategiesStore extends State {
   strategies: TreasuryStrategy[]
