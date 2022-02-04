@@ -13,13 +13,24 @@ import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
+import useStrategiesStore from 'stores/useStrategiesStore'
+import { HandleDepositFcn } from './types/types'
 
-const MangoDeposit = ({ mint }: { mint: string }) => {
+const DepositComponent = ({
+  handledMint,
+  currentPosition,
+  depositFcn,
+}: {
+  handledMint: string
+  currentPosition: BN
+  depositFcn: HandleDepositFcn
+}) => {
+  const { getStrategies } = useStrategiesStore()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
-    (x) => x.mint?.publicKey.toBase58() === mint
+    (x) => x.mint?.publicKey.toBase58() === handledMint
   )
-  const tokenInfo = tokenService.getTokenInfo(mint)
+  const tokenInfo = tokenService.getTokenInfo(handledMint)
   const [matchedTreasuryAccount, setMatchedTreasuryAccount] = useState<
     GovernedTokenAccount | undefined
   >()
@@ -35,6 +46,7 @@ const MangoDeposit = ({ mint }: { mint: string }) => {
     ? getMintDecimalAmount(mintInfo, treasuryAmount)
     : new BigNumber(0)
   const maxAmountFtm = fmtMintAmount(mintInfo, treasuryAmount)
+  const currentPositionFtm = fmtMintAmount(mintInfo, currentPosition)
   const currentPrecision = precision(mintMinAmount)
   const validateAmountOnBlur = () => {
     setAmount(
@@ -55,7 +67,10 @@ const MangoDeposit = ({ mint }: { mint: string }) => {
   useEffect(() => {
     setAmount(undefined)
   }, [matchedTreasuryAccount])
-
+  const handleDeposit = async () => {
+    await depositFcn(handledMint, amount)
+    getStrategies()
+  }
   return (
     <div
       className={`p-6 border-fgd-4 border rounded-md w-4/5 mb-28 ${
@@ -97,11 +112,15 @@ const MangoDeposit = ({ mint }: { mint: string }) => {
       />
       <div className="flex mt-10">
         <span>Your deposits</span>
-        <span className="ml-auto">0 {tokenInfo?.symbol}</span>
+        <span className="ml-auto">
+          {currentPositionFtm} {tokenInfo?.symbol}
+        </span>
       </div>
-      <Button className="w-full mt-5">Deposit</Button>
+      <Button className="w-full mt-5" onClick={handleDeposit}>
+        Deposit
+      </Button>
     </div>
   )
 }
 
-export default MangoDeposit
+export default DepositComponent

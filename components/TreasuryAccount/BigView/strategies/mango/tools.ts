@@ -1,8 +1,10 @@
+import { BN } from '@project-serum/anchor'
 import tokenService from '@utils/services/token'
 import axios from 'axios'
 import { TreasuryStrategy } from '../../types/types'
 
-export const mangoTokens = {
+//Symbol, coingeckoId
+export const tokenList = {
   ETH: 'ethereum',
   BTC: 'bitcoin',
   SOL: 'solana',
@@ -18,10 +20,10 @@ export const mangoTokens = {
   AVAX: 'avalanche',
   LUNA: 'terra-luna',
 }
-export const MANGO = 'MANGO'
+export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
 
-export const mangoTokensList = Object.keys(mangoTokens).map((x) => {
+export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
     val: x,
@@ -50,11 +52,13 @@ function findClosestToDate(values, date) {
   return min
 }
 
+//method to fetch mango strategies
 export async function tvl(timestamp) {
+  const protocolInfo = await tokenService.getTokenInfo(MANGO_MINT)
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
   const date = new Date(timestamp * 1000).getTime()
-  Object.entries(mangoTokens).map(([mangoId, mangoTokens]) => {
+  Object.entries(tokenList).map(([mangoId, mangoTokens]) => {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
     if (assetDeposits.length > 0) {
       const info = tokenService.getTokenInfoFromCoingeckoId(mangoTokens)
@@ -63,16 +67,27 @@ export async function tvl(timestamp) {
         liquidity:
           (closestVal.totalDeposits - closestVal.totalBorrows) *
           closestVal.baseOraclePrice,
-        symbol: info?.symbol || mangoId,
+        handledTokenSymbol: info?.symbol || mangoId,
         apy: `${(
           Math.pow(1 + closestVal.depositRate / 100000, 100000) - 1
         ).toFixed(2)}%`,
-        protocol: MANGO,
-        mint: info?.address || '',
-        tokenImgSrc: info?.logoURI || '',
-        strategy: 'Deposit',
+        protocolName: MANGO,
+        protocolSymbol: protocolInfo?.symbol || '',
+        handledMint: info?.address || '',
+        handledTokenImgSrc: info?.logoURI || '',
+        protocolLogoSrc: protocolInfo?.logoURI || '',
+        strategyName: 'Deposit',
+        //TODO handle getting current position
+        currentPosition: new BN(0),
+        strategyDescription: 'Description',
+        isGenericItem: true,
+        handleDeposit: HandleMangoDeposit,
       })
     }
   })
   return balances
+}
+
+const HandleMangoDeposit = async (mint, amount) => {
+  console.log(mint, amount)
 }
