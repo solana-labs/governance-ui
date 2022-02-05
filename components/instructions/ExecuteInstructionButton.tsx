@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { executeTransaction } from 'actions/executetransaction'
+import { executeTransaction } from 'actions/executeTransaction1'
 import {
   InstructionExecutionStatus,
   Proposal,
