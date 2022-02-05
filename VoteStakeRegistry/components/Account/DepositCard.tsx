@@ -35,7 +35,6 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
 
-  const depositTokenRecord = ownTokenRecord
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
@@ -46,10 +45,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       connection,
       endpoint
     )
-
     await voteRegistryWithdraw({
       rpcContext,
-      mintPk: depositTokenRecord!.account.governingTokenMint,
+      mintPk: depositEntry!.mint.publicKey,
       realmPk: realm!.pubkey!,
       amount: depositEntry.available,
       communityMintPk: realm!.account.communityMint,

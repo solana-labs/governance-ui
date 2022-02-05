@@ -585,27 +585,10 @@
     dotenv "^10.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/mango-client@^3.2.2":
-  version "3.3.5"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.5.tgz#c254924724b06f3d0ead30dafde1e935eb9a4498"
-  integrity sha512-422HGgCjwUCZ8rXBfnr41i7EWtRZ9HGTlFnNlXzXS5jGp0C4bB+CqyMg/VzhesagUH1TtZfdLmqqOY7S5j5EvQ==
-  dependencies:
-    "@project-serum/anchor" "^0.16.2"
-    "@project-serum/serum" "0.13.55"
-    "@project-serum/sol-wallet-adapter" "^0.2.0"
-    "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.31.0"
-    big.js "^6.1.1"
-    bn.js "^5.2.0"
-    buffer-layout "^1.2.1"
-    cross-fetch "^3.1.5"
-    dotenv "^10.0.0"
-    yargs "^17.0.1"
-
-"@blockworks-foundation/voter-stake-registry-client@^0.1.4":
-  version "0.1.6"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.6.tgz#43a8b0e01861d4b1b48efdd723c1e8fa034728c0"
-  integrity sha512-xsX83V+OHG/GvLkgsA4hMKdk0VYbh2Z3YSCz9gsLnuM70jMVi9N0bP5X0a44cAP/sOHi1rpBjhd3SnLU1eLG+Q==
+"@blockworks-foundation/voter-stake-registry-client@^0.1.8":
+  version "0.1.8"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.8.tgz#69c9eb60405c8a0d85479ce46e3b31549ff811e4"
+  integrity sha512-we91zofqZ3vbxVEXWbCyv1wDpNL0a69wfsr7vbEZerjUxrU9Gw3QL860cbO6Yym/LQwKF3Jr2GAjKwmZl6Btpg==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
@@ -1168,6 +1151,15 @@
   resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-6.10.0.tgz#c012c1ecc1a0e53d50e6af381618dca5268461c1"
   integrity sha512-lLseUPEhSFUXYTKj6q7s2O3s2vW2ebgA11vMAlKodXGf5AFw4zUoEbTz9CoFOC9jS6xY4Qr8BmRnxP/odT4Uuw==
 
+"@marinade.finance/marinade-ts-sdk@^2.0.9":
+  version "2.0.9"
+  resolved "https://registry.yarnpkg.com/@marinade.finance/marinade-ts-sdk/-/marinade-ts-sdk-2.0.9.tgz#0268d8776480d613cab43dbec913749242454148"
+  integrity sha512-teXINCXLTfspXzwNKDtfluZ/wvKBQmcQH2j7SNcFAbJzK6NYo3RdYALu4IHIXMwLs9hEs7XZU8AsKKh+HSLPLA==
+  dependencies:
+    "@project-serum/anchor" "^0.18.2"
+    "@solana/spl-token" "^0.1.8"
+    borsh "^0.6.0"
+
 "@metaplex-foundation/mpl-auction@^0.0.2":
   version "0.0.2"
   resolved "https://registry.npmjs.org/@metaplex-foundation/mpl-auction/-/mpl-auction-0.0.2.tgz"
@@ -1465,7 +1457,7 @@
     snake-case "^3.0.4"
     toml "^3.0.0"
 
-"@project-serum/anchor@^0.18.0":
+"@project-serum/anchor@^0.18.0", "@project-serum/anchor@^0.18.2":
   version "0.18.2"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.18.2.tgz#0f13b5c2046446b7c24cf28763eec90febb28485"
   integrity sha512-uyjiN/3Ipp+4hrZRm/hG18HzGLZyvP790LXrCsGO3IWxSl28YRhiGEpKnZycfMW94R7nxdUoE3wY67V+ZHSQBQ==
