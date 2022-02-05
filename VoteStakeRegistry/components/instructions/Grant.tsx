@@ -37,8 +37,6 @@ import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
-import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 
 const Grant = ({
   index,
@@ -54,7 +52,6 @@ const Grant = ({
   const { realm, tokenRecords } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
-  const [grantAuthorities, setGrantAuthorities] = useState<string[]>([])
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState('')
   const [form, setForm] = useState<GrantForm>({
@@ -148,7 +145,6 @@ const Grant = ({
         startTime: form.startDateUnixSeconds,
         lockupKind: form.lockupKind.value,
         allowClawback: form.allowClawback,
-        feePayerPk: wallet!.publicKey!,
         client: client!,
       })
       serializedInstruction = serializeInstructionToBase64(grantIx!)
@@ -219,25 +215,6 @@ const Grant = ({
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.mint?.account)
   }, [form.governedTokenAccount])
-  useEffect(() => {
-    const getGrantMints = async () => {
-      const clientProgramId = client!.program.programId
-      const { registrar } = await getRegistrarPDA(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        clientProgramId
-      )
-      const existingRegistrar = await tryGetRegistrar(registrar, client!)
-      if (existingRegistrar) {
-        setGrantAuthorities(
-          existingRegistrar.votingMints.map((x) => x.grantAuthority.toBase58())
-        )
-      }
-    }
-    if (client) {
-      getGrantMints()
-    }
-  }, [client])
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
@@ -275,9 +252,7 @@ const Grant = ({
       <GovernedAccountSelect
         label="Source account"
         governedAccounts={
-          governedTokenAccountsWithoutNfts.filter((x) =>
-            grantAuthorities.includes(x.governance!.pubkey.toBase58())
-          ) as GovernedMultiTypeAccount[]
+          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
         }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
