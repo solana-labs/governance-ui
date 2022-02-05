@@ -1,4 +1,7 @@
-import { ProgramAccount } from '@solana/spl-governance'
+import {
+  getGovernanceProgramVersion,
+  ProgramAccount,
+} from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import {
   Keypair,
@@ -11,12 +14,19 @@ import { Proposal } from '@solana/spl-governance'
 import { withFinalizeVote } from '@solana/spl-governance'
 
 export const finalizeVote = async (
-  { connection, wallet, programId, programVersion }: RpcContext,
+  { connection, wallet, programId }: RpcContext,
   realm: PublicKey,
   proposal: ProgramAccount<Proposal>
 ) => {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
+
+  // Explicitly request the version before making RPC calls to work around race conditions in resolving
+  // the version for RealmInfo
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId
+  )
 
   await withFinalizeVote(
     instructions,
