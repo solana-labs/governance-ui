@@ -18,6 +18,7 @@ const GovernedAccountSelect = ({
   shouldBeGoverned,
   governance,
   label,
+  noMaxWidth,
 }: {
   onChange
   value
@@ -26,6 +27,7 @@ const GovernedAccountSelect = ({
   shouldBeGoverned?
   governance?: ProgramAccount<Governance> | null | undefined
   label?
+  noMaxWidth?: boolean
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
@@ -123,6 +125,7 @@ const GovernedAccountSelect = ({
       placeholder="Please select..."
       value={value?.governance?.account.governedAccount.toBase58()}
       error={error}
+      noMaxWidth={noMaxWidth}
     >
       {governedAccounts
         .filter((x) =>

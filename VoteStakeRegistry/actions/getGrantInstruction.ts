@@ -26,7 +26,6 @@ export const getGrantInstruction = async ({
   lockupKind,
   allowClawback,
   grantAuthority,
-  feePayerPk,
   client,
 }: {
   fromPk: PublicKey
@@ -41,7 +40,6 @@ export const getGrantInstruction = async ({
   lockupPeriod: number
   lockupKind: LockupType
   startTime: number
-  feePayerPk: PublicKey
   allowClawback: boolean
   client?: VsrClient
 }) => {
@@ -86,9 +84,10 @@ export const getGrantInstruction = async ({
         voterWeightRecord: voterWeightPk,
         vault: voterATAPk,
         depositToken: fromPk,
-        authority: grantAuthority,
-        payer: feePayerPk,
+        tokenAuthority: grantAuthority,
+        grantAuthority: toPk,
         depositMint: grantMintPk,
+        payer: toPk,
         systemProgram: systemProgram,
         tokenProgram: TOKEN_PROGRAM_ID,
         associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
