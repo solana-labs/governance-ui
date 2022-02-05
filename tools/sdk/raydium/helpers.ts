@@ -3,27 +3,30 @@ import {
   Liquidity,
   LiquidityPoolKeys,
   Percent,
-  Token,
   TokenAmount,
+  Token,
+  jsonInfo2PoolKeys,
 } from '@raydium-io/raydium-sdk'
 import { PublicKey } from '@solana/web3.js'
 import { ConnectionContext } from '@utils/connection'
-import { getGovernanceToken } from '../uxdProtocol/uxdClient'
+import { findATAAddrSync } from '@uxdprotocol/uxd-client'
+import BigNumber from 'bignumber.js'
+import { liquidityPoolKeysList } from './poolKeys'
 
 export const getAmountOut = async (
-  poolKeys: LiquidityPoolKeys,
-  tokenNameIn: string,
+  liquidityPool: string,
   amountIn: number,
-  tokenNameOut: string,
   connection: ConnectionContext
 ) => {
-  const tokenInData = getGovernanceToken(connection.cluster, tokenNameIn)
-  const tokenOutData = getGovernanceToken(connection.cluster, tokenNameOut)
+  const poolKeys = getLiquidityPoolKeysByLabel(liquidityPool)
+  const [base, quote] = await Promise.all([
+    connection.current.getTokenSupply(poolKeys.baseMint),
+    connection.current.getTokenSupply(poolKeys.quoteMint),
+  ])
   const amountInBN = new BN(
-    (
-      Number(amountIn.toFixed(tokenInData.decimals)) *
-      10 ** tokenInData.decimals
-    ).toString()
+    new BigNumber(Number(amountIn).toFixed(base.value.decimals))
+      .shiftedBy(base.value.decimals)
+      .toString()
   )
   const amountOut = Liquidity.computeCurrencyAmountOut({
     poolKeys,
@@ -32,16 +35,39 @@ export const getAmountOut = async (
       poolKeys,
     }),
     currencyAmountIn: new TokenAmount(
-      new Token(new PublicKey(tokenInData.address), tokenInData.decimals),
+      new Token(poolKeys.baseMint, base.value.decimals),
       amountInBN
     ),
-    currencyOut: new Token(
-      new PublicKey(tokenOutData.address),
-      tokenOutData.decimals
-    ),
+    currencyOut: new Token(poolKeys.quoteMint, quote.value.decimals),
     slippage: new Percent(5, 1000),
   })
-  const currentPrice = amountOut.currentPrice.toFixed(tokenOutData.decimals)
+  const currentPrice = amountOut.currentPrice.toFixed(quote.value.decimals)
 
   return Number(currentPrice) * amountIn
+}
+
+export const getLPMintInfo = async (
+  connection: ConnectionContext,
+  lpMint: PublicKey,
+  user: PublicKey
+) => {
+  const [lpTokenAccount] = findATAAddrSync(user, lpMint)
+  const [lpInfo, lpUserBalance] = await Promise.all([
+    connection.current.getTokenSupply(lpMint),
+    connection.current.getTokenAccountBalance(lpTokenAccount),
+  ])
+  return {
+    lpTokenAccount,
+    maxBalance: lpUserBalance.value.uiAmount ?? 0,
+    decimals: lpInfo.value.decimals,
+  }
+}
+
+export const getLiquidityPoolKeysByLabel = (
+  label: string
+): LiquidityPoolKeys => {
+  const lp = Object.keys(liquidityPoolKeysList).find((lp) => lp === label)
+  if (!lp) throw new Error(`pool not found for label ${label}`)
+
+  return jsonInfo2PoolKeys(liquidityPoolKeysList[lp])
 }

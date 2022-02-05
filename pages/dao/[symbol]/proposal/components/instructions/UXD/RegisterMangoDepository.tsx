@@ -6,29 +6,35 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  InitializeControllerForm,
+  RegisterMangoDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
-import Input from '@components/inputs/Input'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import { debounce } from '@utils/debounce'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction'
+import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction'
+import Select from '@components/inputs/Select'
+import {
+  getDepositoryMintSymbols,
+  getInsuranceMintSymbols,
+} from '@tools/sdk/uxdProtocol/uxdClient'
 import {
   ProgramAccount,
-  serializeInstructionToBase64,
   Governance,
   GovernanceAccountType,
+  serializeInstructionToBase64,
 } from '@solana/spl-governance'
 
-const InitializeController = ({
+const RegisterMangoDepository = ({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
@@ -42,10 +48,11 @@ const InitializeController = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<InitializeControllerForm>({
+  const [form, setForm] = useState<RegisterMangoDepositoryForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    mintDecimals: 0,
+    collateralName: '',
+    insuranceName: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -65,18 +72,18 @@ const InitializeController = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
-      form.mintDecimals &&
+      form.insuranceName &&
       wallet?.publicKey
     ) {
-      const initializeControllerIx = createInitializeControllerInstruction(
+      const createIx = await createRegisterMangoDepositoryInstruction(
+        connection,
         form.governedAccount?.governance.account.governedAccount,
-        form.mintDecimals,
         form.governedAccount?.governance.pubkey,
-        new PublicKey(wallet.publicKey.toBase58())
+        new PublicKey(wallet.publicKey.toBase58()),
+        form.collateralName,
+        form.insuranceName
       )
-      serializedInstruction = serializeInstructionToBase64(
-        initializeControllerIx
-      )
+      serializedInstruction = serializeInstructionToBase64(createIx)
     }
     const obj: UiInstruction = {
       serializedInstruction,
@@ -85,6 +92,7 @@ const InitializeController = ({
     }
     return obj
   }
+
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -93,17 +101,33 @@ const InitializeController = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
+    if (form.collateralName) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.collateralName])
+
+  useEffect(() => {
+    if (form.insuranceName) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceName])
+
+  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
-    mintDecimals: yup
-      .number()
-      .min(0, 'Mint decimals cannot be less than 0')
-      .max(9, 'Mint decimals cannot be more than 9')
-      .required('Mint Decimals is required'),
+    collateralName: yup.string().required('Valid Collateral name is required'),
+    insuranceName: yup.string().required('Valid Insurance name is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -123,22 +147,40 @@ const InitializeController = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-      <Input
-        label="Mint Decimals"
-        value={form.mintDecimals}
-        type="number"
-        min={0}
-        max={9}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'mintDecimals',
-          })
+
+      <Select
+        label="Collateral Name"
+        value={form.collateralName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'collateralName' })
         }
-        error={formErrors['mintDecimals']}
-      />
+        error={formErrors['collateralName']}
+      >
+        {getDepositoryMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
+
+      <Select
+        label="Insurance Name"
+        value={form.insuranceName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'insuranceName' })
+        }
+        error={formErrors['insuranceName']}
+      >
+        {getInsuranceMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
     </>
   )
 }
 
-export default InitializeController
+export default RegisterMangoDepository

@@ -8,12 +8,12 @@ import {
   UiInstruction,
   DepositInsuranceToMangoDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import createDepositInsuranceToMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createDepositInsuranceToMangoDepositoryInstruction'
 import Select from '@components/inputs/Select'

@@ -6,30 +6,36 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  SetRedeemableGlobalSupplyCapForm,
+  WithdrawInsuranceFromMangoDepositoryForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
-import Input from '@components/inputs/Input'
-import { debounce } from '@utils/debounce'
-import GovernedAccountSelect from '../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createSetRedeemableGlobalSupplyCapInstruction from '@tools/sdk/uxdProtocol/createSetRedeemableGlobalSupplyCapInstruction'
 import {
-  ProgramAccount,
   serializeInstructionToBase64,
   Governance,
   GovernanceAccountType,
+  ProgramAccount,
 } from '@solana/spl-governance'
+import Input from '@components/inputs/Input'
+import { debounce } from '@utils/debounce'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
+import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction'
+import Select from '@components/inputs/Select'
+import {
+  getDepositoryMintSymbols,
+  getInsuranceMintSymbols,
+} from '@tools/sdk/uxdProtocol/uxdClient'
 
-const SetRedeemGlobalSupplyCap = ({
+const WithdrawInsuranceFromMangoDepository = ({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
@@ -43,10 +49,12 @@ const SetRedeemGlobalSupplyCap = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<SetRedeemableGlobalSupplyCapForm>({
+  const [form, setForm] = useState<WithdrawInsuranceFromMangoDepositoryForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    supplyCap: 0,
+    collateralName: '',
+    insuranceName: '',
+    insuranceWithdrawnAmount: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -68,10 +76,13 @@ const SetRedeemGlobalSupplyCap = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const createIx = createSetRedeemableGlobalSupplyCapInstruction(
-        form.governedAccount.governance?.account.governedAccount,
-        form.supplyCap,
-        form.governedAccount?.governance.pubkey
+      const createIx = await createWithdrawInsuranceFromMangoDepositoryInstruction(
+        connection,
+        form.governedAccount?.governance.account.governedAccount,
+        form.governedAccount?.governance.pubkey,
+        form.collateralName,
+        form.insuranceName,
+        form.insuranceWithdrawnAmount
       )
       serializedInstruction = serializeInstructionToBase64(createIx)
     }
@@ -82,7 +93,6 @@ const SetRedeemGlobalSupplyCap = ({
     }
     return obj
   }
-
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -91,13 +101,31 @@ const SetRedeemGlobalSupplyCap = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.supplyCap) {
+    if (form.collateralName) {
       debounce.debounceFcn(async () => {
         const { validationErrors } = await isFormValid(schema, form)
         setFormErrors(validationErrors)
       })
     }
-  }, [form.supplyCap])
+  }, [form.collateralName])
+
+  useEffect(() => {
+    if (form.insuranceName) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceName])
+
+  useEffect(() => {
+    if (form.insuranceWithdrawnAmount) {
+      debounce.debounceFcn(async () => {
+        const { validationErrors } = await isFormValid(schema, form)
+        setFormErrors(validationErrors)
+      })
+    }
+  }, [form.insuranceWithdrawnAmount])
 
   useEffect(() => {
     handleSetInstructions(
@@ -107,10 +135,12 @@ const SetRedeemGlobalSupplyCap = ({
   }, [form])
 
   const schema = yup.object().shape({
-    supplyCap: yup
+    collateralName: yup.string().required('Collateral Name is required'),
+    insuranceName: yup.string().required('Insurance Name is required'),
+    insuranceWithdrawnAmount: yup
       .number()
-      .moreThan(0, 'Redeemable global supply cap should be more than 0')
-      .required('Redeemable global supply cap is required'),
+      .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
+      .required('Insurance Withdrawn amount is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -131,21 +161,53 @@ const SetRedeemGlobalSupplyCap = ({
         governance={governance}
       ></GovernedAccountSelect>
 
+      <Select
+        label="Collateral Name"
+        value={form.collateralName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'collateralName' })
+        }
+        error={formErrors['collateralName']}
+      >
+        {getDepositoryMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
+
+      <Select
+        label="Insurance Name"
+        value={form.insuranceName}
+        placeholder="Please select..."
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'insuranceName' })
+        }
+        error={formErrors['insuranceName']}
+      >
+        {getInsuranceMintSymbols(connection.cluster).map((value, i) => (
+          <Select.Option key={value + i} value={value}>
+            {value}
+          </Select.Option>
+        ))}
+      </Select>
+
       <Input
-        label="Redeem Global Supply Cap"
-        value={form.supplyCap}
+        label="Insurance Withdrawn Amount"
+        value={form.insuranceWithdrawnAmount}
         type="number"
         min={0}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'supplyCap',
+            propertyName: 'insuranceWithdrawnAmount',
           })
         }
-        error={formErrors['supplyCap']}
+        error={formErrors['insuranceWithdrawnAmount']}
       />
     </>
   )
 }
 
-export default SetRedeemGlobalSupplyCap
+export default WithdrawInsuranceFromMangoDepository

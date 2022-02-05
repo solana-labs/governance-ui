@@ -6,16 +6,15 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  SetMangoDepositoriesRedeemableSoftCapForm,
+  InitializeControllerForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
 import Input from '@components/inputs/Input'
-import { debounce } from '@utils/debounce'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction'
+import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction'
 import {
   ProgramAccount,
   serializeInstructionToBase64,
@@ -23,7 +22,7 @@ import {
   GovernanceAccountType,
 } from '@solana/spl-governance'
 
-const SetMangoDepositoriesRedeemableSoftCap = ({
+const InitializeController = ({
   index,
   governance,
 }: {
@@ -43,10 +42,10 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<SetMangoDepositoriesRedeemableSoftCapForm>({
+  const [form, setForm] = useState<InitializeControllerForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    softCap: 0,
+    mintDecimals: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -62,19 +61,22 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-
     if (
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
+      form.mintDecimals &&
       wallet?.publicKey
     ) {
-      const createIx = createSetMangoDepositoriesRedeemableSoftCapInstruction(
-        form.governedAccount.governance?.account.governedAccount,
-        form.softCap,
-        form.governedAccount?.governance.pubkey
+      const initializeControllerIx = createInitializeControllerInstruction(
+        form.governedAccount?.governance.account.governedAccount,
+        form.mintDecimals,
+        form.governedAccount?.governance.pubkey,
+        new PublicKey(wallet.publicKey.toBase58())
       )
-      serializedInstruction = serializeInstructionToBase64(createIx)
+      serializedInstruction = serializeInstructionToBase64(
+        initializeControllerIx
+      )
     }
     const obj: UiInstruction = {
       serializedInstruction,
@@ -83,7 +85,6 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     }
     return obj
   }
-
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -92,26 +93,17 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
   }, [realmInfo?.programId])
 
   useEffect(() => {
-    if (form.softCap) {
-      debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
-    }
-  }, [form.softCap])
-
-  useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
-
   const schema = yup.object().shape({
-    softCap: yup
+    mintDecimals: yup
       .number()
-      .moreThan(0, 'Redeemable soft cap should be more than 0')
-      .required('Redeemable soft cap is required'),
+      .min(0, 'Mint decimals cannot be less than 0')
+      .max(9, 'Mint decimals cannot be more than 9')
+      .required('Mint Decimals is required'),
     governedAccount: yup
       .object()
       .nullable()
@@ -131,22 +123,22 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
-
       <Input
-        label="Redeem Global Supply Cap"
-        value={form.softCap}
+        label="Mint Decimals"
+        value={form.mintDecimals}
         type="number"
         min={0}
+        max={9}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'softCap',
+            propertyName: 'mintDecimals',
           })
         }
-        error={formErrors['softCap']}
+        error={formErrors['mintDecimals']}
       />
     </>
   )
 }
 
-export default SetMangoDepositoriesRedeemableSoftCap
+export default InitializeController
