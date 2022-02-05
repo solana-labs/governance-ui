@@ -21,6 +21,8 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
+import { XIcon } from '@heroicons/react/outline'
+import Tooltip from '@components/Tooltip'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
@@ -70,6 +72,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
   }
+  const handleCloseDeposit = () => {
+    return null
+  }
 
   const lockedTokens = fmtMintAmount(
     deposit.mint.account,
@@ -110,6 +115,17 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               =${formatter.format(price)}
             </span>
           ) : null}
+          {deposit?.available?.isZero() && deposit?.currentlyLocked?.isZero() && (
+            <Tooltip
+              content="Close deposit - used to close unused deposit"
+              contentClassName="ml-auto"
+            >
+              <XIcon
+                onClick={handleCloseDeposit}
+                className="w-5 h-5 text-primary-light cursor-pointer"
+              ></XIcon>
+            </Tooltip>
+          )}
         </h3>
       </div>
       <div
@@ -173,20 +189,18 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             ).toDateString()}
           />
         </div>
-        {
-          <Button
-            disabled={!isConstant && deposit.available.isZero()}
-            style={{ marginTop: 'auto' }}
-            className="w-full"
-            onClick={() =>
-              !isConstant
-                ? handleWithDrawFromDeposit(deposit)
-                : handleStartUnlock()
-            }
-          >
-            {!isConstant ? 'Withdraw' : 'Start Unlock'}
-          </Button>
-        }
+        <Button
+          disabled={!isConstant && deposit.available.isZero()}
+          style={{ marginTop: 'auto' }}
+          className="w-full"
+          onClick={() =>
+            !isConstant
+              ? handleWithDrawFromDeposit(deposit)
+              : handleStartUnlock()
+          }
+        >
+          {!isConstant ? 'Withdraw' : 'Start Unlock'}
+        </Button>
       </div>
       {isUnlockModalOpen && (
         <LockTokensModal
