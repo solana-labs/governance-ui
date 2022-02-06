@@ -26,6 +26,7 @@ import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
 import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction'
 import BigNumber from 'bignumber.js'
 import { jsonInfo2PoolKeys } from '@raydium-io/raydium-sdk'
+import { notify } from '@utils/notifications'
 
 const RemoveLiquidityRaydium = ({
   index,
@@ -65,13 +66,20 @@ const RemoveLiquidityRaydium = ({
       if (!form.governedAccount?.governance.pubkey || !form.liquidityPool)
         return
       const { lpMint } = liquidityPoolKeysList[form.liquidityPool]
-
-      const { maxBalance, decimals } = await getLPMintInfo(
-        connection,
-        new PublicKey(lpMint),
-        form.governedAccount.governance.pubkey
-      )
-      setLpMintInfo({ balance: maxBalance, decimals })
+      try {
+        const { maxBalance, decimals } = await getLPMintInfo(
+          connection,
+          new PublicKey(lpMint),
+          form.governedAccount.governance.pubkey
+        )
+        setLpMintInfo({ balance: maxBalance, decimals })
+      } catch (e) {
+        console.error('could not fetch balance')
+        notify({
+          type: 'error',
+          message: `Error: no ${form.liquidityPool} LP Token Account found for the given Governance`,
+        })
+      }
     }
     fetchLpData()
   }, [form.governedAccount?.governance.pubkey, form.liquidityPool])

@@ -4,7 +4,6 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import {
   GovernedMintInfoAccount,
@@ -116,36 +115,6 @@ export interface CreateAssociatedTokenAccountForm {
   splTokenMintUIName?: SplTokenUIName
 }
 
-export interface CreateSolendObligationAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
-}
-
-export interface InitSolendObligationAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
-}
-
-export interface DepositReserveLiquidityAndObligationCollateralForm {
-  governedAccount?: GovernedMultiTypeAccount
-  uiAmount: string
-  mintName?: SupportedMintName
-}
-
-export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
-  governedAccount?: GovernedMultiTypeAccount
-  uiAmount: string
-  mintName?: SupportedMintName
-}
-
-export interface RefreshObligationForm {
-  governedAccount?: GovernedMultiTypeAccount
-  mintName?: SupportedMintName
-}
-
-export interface RefreshReserveForm {
-  governedAccount?: GovernedMultiTypeAccount
-  mintName?: SupportedMintName
-}
-
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -157,12 +126,6 @@ export enum Instructions {
   RemoveLiquidityRaydium,
   MangoMakeChangeMaxAccounts,
   CreateAssociatedTokenAccount,
-  CreateSolendObligationAccount,
-  InitSolendObligationAccount,
-  DepositReserveLiquidityAndObligationCollateral,
-  WithdrawObligationCollateralAndRedeemReserveLiquidity,
-  RefreshSolendObligation,
-  RefreshSolendReserve,
   Grant,
   Clawback,
 }

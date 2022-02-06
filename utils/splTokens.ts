@@ -1,7 +1,4 @@
 import { PublicKey } from '@solana/web3.js'
-import SolendConfiguration, {
-  SupportedCollateralMintNames as SolendSupportedCollateralMintNames,
-} from '@tools/sdk/solend/configuration'
 
 export type SplTokenInformation = {
   name: string
@@ -9,10 +6,7 @@ export type SplTokenInformation = {
   decimals: number
 }
 
-export type SupportedSplTokenNames =
-  | 'USDC'
-  | 'WSOL'
-  | SolendSupportedCollateralMintNames
+export type SupportedSplTokenNames = 'USDC' | 'WSOL'
 
 export const SPL_TOKENS: {
   [key in SupportedSplTokenNames]: SplTokenInformation
@@ -28,8 +22,6 @@ export const SPL_TOKENS: {
     mint: new PublicKey('So11111111111111111111111111111111111111112'),
     decimals: 9,
   },
-
-  ...SolendConfiguration.getSupportedCollateralMintsInformation(),
 } as const
 
 export type SplTokenUIName = typeof SPL_TOKENS[keyof typeof SPL_TOKENS]['name']
