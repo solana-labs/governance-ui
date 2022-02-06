@@ -6,6 +6,7 @@ import {
 } from '@solana/web3.js'
 import {
   ChatMessageBody,
+  getGovernanceProgramVersion,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
@@ -23,7 +24,7 @@ import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVot
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 
 export async function castVote(
-  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
@@ -36,6 +37,13 @@ export async function castVote(
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
+
+  // Explicitly request the version before making RPC calls to work around race conditions in resolving
+  // the version for RealmInfo
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId
+  )
 
   //will run only if plugin is connected with realm
   const voterWeight = await withUpdateVoterWeightRecord(

@@ -1,25 +1,56 @@
+import { PublicKey } from '@blockworks-foundation/mango-client'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { getProgramVersionForRealm } from '@models/registry/api'
 import { BN } from '@project-serum/anchor'
+import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
   getMintDecimalAmount,
   getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
+import { useRouter } from 'next-router-mock'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
+import useWalletStore from 'stores/useWalletStore'
+import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
+import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 
-const MangoDeposit = ({ mint }: { mint: string }) => {
+const DepositComponent = ({
+  handledMint,
+  currentPosition,
+  createProposalFcn,
+}: {
+  handledMint: string
+  currentPosition: BN
+  createProposalFcn: HandleCreateProposalWithStrategy
+}) => {
+  const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const {
+    realmInfo,
+    realm,
+    ownVoterWeight,
+    mint,
+    councilMint,
+    symbol,
+  } = useRealm()
+  const { client } = useVoteRegistry()
+  const connection = useWalletStore((s) => s.connection)
+  const wallet = useWalletStore((s) => s.current)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
-    (x) => x.mint?.publicKey.toBase58() === mint
+    (x) => x.mint?.publicKey.toBase58() === handledMint
   )
-  const tokenInfo = tokenService.getTokenInfo(mint)
+  const tokenInfo = tokenService.getTokenInfo(handledMint)
   const [matchedTreasuryAccount, setMatchedTreasuryAccount] = useState<
     GovernedTokenAccount | undefined
   >()
@@ -35,6 +66,7 @@ const MangoDeposit = ({ mint }: { mint: string }) => {
     ? getMintDecimalAmount(mintInfo, treasuryAmount)
     : new BigNumber(0)
   const maxAmountFtm = fmtMintAmount(mintInfo, treasuryAmount)
+  const currentPositionFtm = fmtMintAmount(mintInfo, currentPosition)
   const currentPrecision = precision(mintMinAmount)
   const validateAmountOnBlur = () => {
     setAmount(
@@ -55,6 +87,44 @@ const MangoDeposit = ({ mint }: { mint: string }) => {
   useEffect(() => {
     setAmount(undefined)
   }, [matchedTreasuryAccount])
+
+  const handleDeposit = async () => {
+    const rpcContext = new RpcContext(
+      new PublicKey(realm!.owner.toString()),
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection.current,
+      connection.endpoint
+    )
+    const mintAmount = parseMintNaturalAmountFromDecimal(
+      amount!,
+      matchedTreasuryAccount!.mint!.account.decimals
+    )
+    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+      matchedTreasuryAccount!.governance!.account.config
+    )
+    const defaultProposalMint = !mint?.supply.isZero()
+      ? realm!.account.communityMint
+      : !councilMint?.supply.isZero()
+      ? realm!.account.config.councilMint
+      : undefined
+    const proposalAddress = await createProposalFcn(
+      rpcContext,
+      handledMint,
+      mintAmount,
+      realm!,
+      matchedTreasuryAccount!.governance!,
+      ownTokenRecord.pubkey,
+      `Deposit 100 tokens to mango protocol strategy`,
+      `Deposit 100 tokens to mango protocol strategy`,
+      defaultProposalMint!,
+      matchedTreasuryAccount!.governance!.account!.proposalCount,
+      false,
+      client
+    )
+    const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
+    router.push(url)
+  }
 
   return (
     <div
@@ -97,11 +167,19 @@ const MangoDeposit = ({ mint }: { mint: string }) => {
       />
       <div className="flex mt-10">
         <span>Your deposits</span>
-        <span className="ml-auto">0 {tokenInfo?.symbol}</span>
+        <span className="ml-auto">
+          {currentPositionFtm} {tokenInfo?.symbol}
+        </span>
       </div>
-      <Button className="w-full mt-5">Deposit</Button>
+      <Button
+        className="w-full mt-5"
+        onClick={handleDeposit}
+        disabled={!amount}
+      >
+        Deposit
+      </Button>
     </div>
   )
 }
 
-export default MangoDeposit
+export default DepositComponent
