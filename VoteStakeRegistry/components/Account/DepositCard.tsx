@@ -23,6 +23,7 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import { XIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
+import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getDeposits } = useDepositStore()
@@ -72,8 +73,30 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
   }
-  const handleCloseDeposit = () => {
-    return null
+  const handleCloseDeposit = async () => {
+    const rpcContext = new RpcContext(
+      realm!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection,
+      endpoint
+    )
+    await closeDeposit({
+      rpcContext,
+      realmPk: realm!.pubkey!,
+      depositIndex: deposit.index,
+      communityMintPk: realm!.account.communityMint,
+      client,
+    })
+    if (ownTokenRecord) {
+      await getDeposits({
+        realmPk: realm!.pubkey,
+        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        walletPk: wallet!.publicKey!,
+        client: client!,
+        connection,
+      })
+    }
   }
 
   const lockedTokens = fmtMintAmount(
