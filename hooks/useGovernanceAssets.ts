@@ -208,17 +208,6 @@ export default function useGovernanceAssets() {
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
-
-    {
-      id: Instructions.AddLiquidityRaydium,
-      name: 'Raydium: Add To Liquidity Pool',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.RemoveLiquidityRaydium,
-      name: 'Raydium: Remove From Liquidity Pool',
-      isVisible: canUseAnyInstruction,
-    },
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',

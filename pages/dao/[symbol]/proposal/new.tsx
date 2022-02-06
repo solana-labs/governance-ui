@@ -39,7 +39,6 @@ import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMax
 import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import AddLiquidityRaydium from './components/instructions/raydium/AddLiquidity'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import CreateObligationAccount from './components/instructions/solend/CreateObligationAccount'
 import InitObligationAccount from './components/instructions/solend/InitObligationAccount'
@@ -50,7 +49,6 @@ import RefreshObligation from './components/instructions/solend/RefreshObligatio
 import RefreshReserve from './components/instructions/solend/RefreshReserve'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
-import RemoveLiquidityRaydium from './components/instructions/raydium/RemoveLiquidity'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -348,10 +346,6 @@ const New = () => {
             governance={governance}
           />
         )
-      case Instructions.AddLiquidityRaydium:
-        return <AddLiquidityRaydium index={idx} governance={governance} />
-      case Instructions.RemoveLiquidityRaydium:
-        return <RemoveLiquidityRaydium index={idx} governance={governance} />
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:

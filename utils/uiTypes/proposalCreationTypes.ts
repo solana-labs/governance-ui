@@ -1,4 +1,3 @@
-import { AmountSide } from '@raydium-io/raydium-sdk'
 import { Governance, InstructionData } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
@@ -80,20 +79,6 @@ export interface ProgramAuthorityForm {
   destinationAuthority: string
 }
 
-export interface AddLiquidityRaydiumForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
-  liquidityPool: string
-  baseAmountIn: number
-  quoteAmountIn: number
-  fixedSide: AmountSide
-}
-
-export interface RemoveLiquidityRaydiumForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
-  liquidityPool: string
-  amountIn: number
-}
-
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
@@ -153,8 +138,6 @@ export enum Instructions {
   Mint,
   Base64,
   None,
-  AddLiquidityRaydium,
-  RemoveLiquidityRaydium,
   MangoMakeChangeMaxAccounts,
   CreateAssociatedTokenAccount,
   CreateSolendObligationAccount,
