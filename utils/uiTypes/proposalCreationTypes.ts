@@ -155,12 +155,6 @@ export enum Instructions {
   None,
   AddLiquidityRaydium,
   RemoveLiquidityRaydium,
-  InitializeController,
-  SetRedeemableGlobalSupplyCap,
-  SetMangoDepositoriesRedeemableSoftCap,
-  RegisterMangoDepository,
-  DepositInsuranceToMangoDepository,
-  WithdrawInsuranceFromMangoDepository,
   MangoMakeChangeMaxAccounts,
   CreateAssociatedTokenAccount,
   CreateSolendObligationAccount,
@@ -169,58 +163,6 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
-  Grant,
-  Clawback,
-}
-
-export interface InitializeControllerForm {
-  governedAccount: GovernedProgramAccount | undefined
-  mintDecimals: number
-  programId: string | undefined
-}
-
-export interface SetRedeemableGlobalSupplyCapForm {
-  governedAccount: GovernedProgramAccount | undefined
-  supplyCap: number
-  programId: string | undefined
-}
-
-export interface SetMangoDepositoriesRedeemableSoftCapForm {
-  governedAccount: GovernedProgramAccount | undefined
-  softCap: number
-  programId: string | undefined
-}
-
-export interface RegisterMangoDepositoryForm {
-  governedAccount: GovernedProgramAccount | undefined
-  collateralName: string
-  insuranceName: string
-  programId: string | undefined
-}
-
-export interface DepositInsuranceToMangoDepositoryForm {
-  governedAccount: GovernedProgramAccount | undefined
-  collateralName: string
-  insuranceName: string
-  insuranceDepositedAmount: number
-  programId: string | undefined
-}
-
-export interface WithdrawInsuranceFromMangoDepositoryForm {
-  governedAccount: GovernedProgramAccount | undefined
-  collateralName: string
-  insuranceName: string
-  insuranceWithdrawnAmount: number
-  programId: string | undefined
-}
-
-export enum UXDIntructions {
-  InitializeController,
-  SetRedeemableGlobalSupplyCap,
-  SetMangoDepositoriesRedeemableSoftCap,
-  RegisterMangoDepository,
-  DepositInsuranceToMangoDepository,
-  WithdrawInsuranceFromMangoDepository,
   Grant,
   Clawback,
 }

@@ -137,15 +137,6 @@
     "website": "https://strangemood.org"
   },
   {
-    "symbol": "UXD",
-    "displayName": "UXD Protocol DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "GBXLYo4ycRNfzuzYeudu6y2ng4afNeW14WcpM2E4JJSL",
-    "ogImage": "/realms/UXD/img/logo.png",
-    "website": "https://uxd.fi",
-    "twitter": "@UXDProtocol"
-  },
-  {
     "symbol": "GRAPE",
     "displayName": "GRAPE",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",

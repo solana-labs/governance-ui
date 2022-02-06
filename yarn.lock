@@ -568,22 +568,6 @@
   version "0.2.3"
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
-"@blockworks-foundation/mango-client@3.2.15":
-  version "3.2.15"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.2.15.tgz#2b9fdb04068a420af6a8f60c42ca65a53e20a1bc"
-  integrity sha512-oyTMgQ7t6CjUIfJ26RygLg1eSu4zmMypD9iPWAglzFqJkmrwc0HOrr309ylEeUT1P5PxUxl3E3AaxjnhzLjMRw==
-  dependencies:
-    "@project-serum/anchor" "^0.16.2"
-    "@project-serum/serum" "0.13.55"
-    "@project-serum/sol-wallet-adapter" "^0.2.0"
-    "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "1.21.0"
-    big.js "^6.1.1"
-    bn.js "^5.2.0"
-    buffer-layout "^1.2.1"
-    dotenv "^10.0.0"
-    yargs "^17.0.1"
-
 "@blockworks-foundation/mango-client@^3.3.12":
   version "3.3.12"
   resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.12.tgz#da69dbc7d89b10a95a6771c7a1a4b452172eef83"
@@ -1393,26 +1377,6 @@
   resolved "https://registry.npmjs.org/@popperjs/core/-/core-2.9.3.tgz"
   integrity sha512-xDu17cEfh7Kid/d95kB6tZsLOmSWKCZKtprnhVepjsSaCij+lM3mItSJDuuHDMbCWTh8Ejmebwb+KONcCJ0eXQ==
 
-"@project-serum/anchor@0.20.0":
-  version "0.20.0"
-  resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.20.0.tgz#547f5c0ff7e66809fa7118b2e3abd8087b5ec519"
-  integrity sha512-p1KOiqGBIbNsopMrSVoPwgxR1iPffsdjMNCOysahTPL9whX2CLX9HQCdopHjYaGl7+SdHRuXml6Wahk/wUmC8g==
-  dependencies:
-    "@project-serum/borsh" "^0.2.2"
-    "@solana/web3.js" "^1.17.0"
-    base64-js "^1.5.1"
-    bn.js "^5.1.2"
-    bs58 "^4.0.1"
-    buffer-layout "^1.2.2"
-    camelcase "^5.3.1"
-    crypto-hash "^1.3.0"
-    eventemitter3 "^4.0.7"
-    find "^0.3.0"
-    js-sha256 "^0.9.0"
-    pako "^2.0.3"
-    snake-case "^3.0.4"
-    toml "^3.0.0"
-
 "@project-serum/anchor@0.20.1", "@project-serum/anchor@^0.20.1":
   version "0.20.1"
   resolved "https://registry.yarnpkg.com/@project-serum/anchor/-/anchor-0.20.1.tgz#0937807e807e8332aa708cfef4bcb6cbb88b4129"
@@ -1904,26 +1868,6 @@
   dependencies:
     "@solana/wallet-adapter-base" "^0.9.1"
     "@solana/web3.js" "^1.20.0"
-
-"@solana/web3.js@1.21.0":
-  version "1.21.0"
-  resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.21.0.tgz#4f98edea38d4cb3ae4d2ea49a050b0ec09508023"
-  integrity sha512-x1NXlF92tEjxuTxS0u4n9JV17UKk0Dn2L+qSWGvKOb4iWhzApDj6wicJsrGdSbGdxnZ7eciQ/SNn3zB4ydUllA==
-  dependencies:
-    "@babel/runtime" "^7.12.5"
-    "@solana/buffer-layout" "^3.0.0"
-    bn.js "^5.0.0"
-    borsh "^0.4.0"
-    bs58 "^4.0.1"
-    buffer "6.0.1"
-    crypto-hash "^1.2.2"
-    jayson "^3.4.4"
-    js-sha3 "^0.8.0"
-    node-fetch "^2.6.1"
-    rpc-websockets "^7.4.2"
-    secp256k1 "^4.0.2"
-    superstruct "^0.14.2"
-    tweetnacl "^1.0.0"
 
 "@solana/web3.js@^1.12.0", "@solana/web3.js@^1.31.0":
   version "1.31.0"
@@ -2455,15 +2399,6 @@
   dependencies:
     "@typescript-eslint/types" "5.7.0"
     eslint-visitor-keys "^3.0.0"
-
-"@uxdprotocol/uxd-client@4.10.0":
-  version "4.10.0"
-  resolved "https://npm.pkg.github.com/download/@uxdprotocol/uxd-client/4.10.0/9d0a6f2286b67ca56fad70c4269cf96dd758525ffbfb7768f6b952ec9e9794f3#8b3fab7c620a662890dd00a311af3d0b4cbe3434"
-  integrity sha512-GKf/4fUkdbp67mUTB2kVysxL5EnYuwlkzmAV8YstLRdzPSUZfegwN27doPL+u4eXB3PAcidYzJBpvkg2VLdgwQ==
-  dependencies:
-    "@blockworks-foundation/mango-client" "3.2.15"
-    "@project-serum/anchor" "0.20.0"
-    camelcase "^5.3.1"
 
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"

@@ -35,12 +35,6 @@ import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
 import { getTimestampFromDays } from '@tools/sdk/units'
-import InitializeController from './components/instructions/UXD/InitializeController'
-import SetRedeemGlobalSupplyCap from './components/instructions/UXD/SetRedeemGlobalSupplyCap'
-import RegisterMangoDepository from './components/instructions/UXD/RegisterMangoDepository'
-import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/UXD/SetMangoDepositoriesRedeemableSoftCap'
-import DepositInsuranceToMangoDepository from './components/instructions/UXD/DepositInsuranceToMangoDepository'
-import WithdrawInsuranceFromMangoDepository from './components/instructions/UXD/WithdrawInsuranceFromMangoDepository'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
@@ -358,33 +352,6 @@ const New = () => {
         return <AddLiquidityRaydium index={idx} governance={governance} />
       case Instructions.RemoveLiquidityRaydium:
         return <RemoveLiquidityRaydium index={idx} governance={governance} />
-      case Instructions.InitializeController:
-        return <InitializeController index={idx} governance={governance} />
-      case Instructions.SetRedeemableGlobalSupplyCap:
-        return <SetRedeemGlobalSupplyCap index={idx} governance={governance} />
-      case Instructions.SetMangoDepositoriesRedeemableSoftCap:
-        return (
-          <SetMangoDepositoriesRedeemableSoftCap
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.RegisterMangoDepository:
-        return <RegisterMangoDepository index={idx} governance={governance} />
-      case Instructions.DepositInsuranceToMangoDepository:
-        return (
-          <DepositInsuranceToMangoDepository
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.WithdrawInsuranceFromMangoDepository:
-        return (
-          <WithdrawInsuranceFromMangoDepository
-            index={idx}
-            governance={governance}
-          />
-        )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:

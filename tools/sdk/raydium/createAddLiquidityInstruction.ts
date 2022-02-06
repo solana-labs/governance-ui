@@ -5,7 +5,7 @@ import {
   LiquidityPoolKeys,
 } from '@raydium-io/raydium-sdk'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { findATAAddrSync } from '@uxdprotocol/uxd-client'
+import { findATAAddrSync } from '@utils/ataTools'
 
 export const createAddLiquidityInstruction = (
   poolKeys: LiquidityPoolKeys,

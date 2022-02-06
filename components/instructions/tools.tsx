@@ -13,7 +13,6 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
-import { UXD_PROGRAM_INSTRUCTIONS } from './programs/uxdProtocol'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 
@@ -88,11 +87,6 @@ export const ACCOUNT_NAMES = {
 
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
-
-  //UXD DAO
-  '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO USDC Treasury Vault',
-  GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXD DAO UXP Treasury Vault',
-  '39qcqpaiLivyFLBLh4wvPmLrs336BBpXkKYb88i8dSiJ': 'UXD Council Token',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -152,7 +146,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
-  ...UXD_PROGRAM_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,

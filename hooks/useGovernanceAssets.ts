@@ -98,13 +98,6 @@ export default function useGovernanceAssets() {
     GovernanceAccountType.MintGovernanceV2,
   ])
 
-  const canUseUxdInstructions =
-    symbol === 'UXP' &&
-    canUseGovernanceForInstruction([
-      GovernanceAccountType.ProgramGovernanceV1,
-      GovernanceAccountType.ProgramGovernanceV2,
-    ])
-
   const canUseAnyInstruction =
     realm &&
     governancesArray.some((g) =>
@@ -215,36 +208,7 @@ export default function useGovernanceAssets() {
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
-    {
-      id: Instructions.InitializeController,
-      name: 'UXD: Initialize Controller',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.SetRedeemableGlobalSupplyCap,
-      name: 'UXD: Set Redeemable Global Supply Cap',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
-      name: 'UXD: Set Mango Depositories Redeemable Supply Soft Cap',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.RegisterMangoDepository,
-      name: 'UXD: Register Mango Depository',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.DepositInsuranceToMangoDepository,
-      name: 'UXD: Deposit Insurance To Mango Depository',
-      isVisible: canUseUxdInstructions,
-    },
-    {
-      id: Instructions.WithdrawInsuranceFromMangoDepository,
-      name: 'UXD: Withdraw Insurance From Mango Depository',
-      isVisible: canUseUxdInstructions,
-    },
+
     {
       id: Instructions.AddLiquidityRaydium,
       name: 'Raydium: Add To Liquidity Pool',

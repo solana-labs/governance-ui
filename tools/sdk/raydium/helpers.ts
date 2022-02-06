@@ -8,8 +8,8 @@ import {
   jsonInfo2PoolKeys,
 } from '@raydium-io/raydium-sdk'
 import { PublicKey } from '@solana/web3.js'
+import { findATAAddrSync } from '@utils/ataTools'
 import { ConnectionContext } from '@utils/connection'
-import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import BigNumber from 'bignumber.js'
 import { liquidityPoolKeysList } from './poolKeys'
 

@@ -1,7 +1,7 @@
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { withdrawObligationCollateralAndRedeemReserveLiquidity as originalWithdrawFunction } from '@solendprotocol/solend-sdk'
-import { findATAAddrSync } from '@uxdprotocol/uxd-client'
+import { findATAAddrSync } from '@utils/ataTools'
 import SolendConfiguration, { SupportedMintName } from './configuration'
 
 import { deriveObligationAddressFromWalletAndSeed } from './utils'
