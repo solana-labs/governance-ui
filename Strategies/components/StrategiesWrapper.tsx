@@ -1,21 +1,32 @@
 import Input from '@components/inputs/Input'
 import { useState, useEffect } from 'react'
+import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
+import useStrategiesStore from 'Strategies/store/useStrategiesStore'
+import { NameVal, TreasuryStrategy } from 'Strategies/types/types'
 import SelectFilter from './SelectFilter'
-import MangoItem from './strategies/mango/MangoItem'
-import { MANGO, mangoTokensList, tvl } from './strategies/mango/tools'
-import { NameVal, TreasuryStrategy } from './types/types'
+import StrategyItem from './StrategyItem'
 
 const StrategiesWrapper = () => {
+  const searchAbleProps = [
+    'liquidity',
+    'apy',
+    'protocolSymbol',
+    'protocolName',
+    'handledTokenSymbol',
+    'strategyName',
+  ]
   const tokens: NameVal[] = [
     { name: 'All tokens', val: null },
-    ...mangoTokensList,
+    ...tokenListFilter,
   ]
   const platforms: NameVal[] = [
     { name: 'All platforms', val: null },
     { name: MANGO, val: MANGO },
   ]
-  const [strategies, setStrategies] = useState<TreasuryStrategy[]>([])
-  const [strategiesFiltered, setStrategiesFilterd] = useState<
+  const { getStrategies } = useStrategiesStore()
+  const strategies = useStrategiesStore((s) => s.strategies)
+
+  const [strategiesFiltered, setStrategiesFiltered] = useState<
     TreasuryStrategy[]
   >([])
   const [filters, setFilters] = useState({
@@ -27,10 +38,6 @@ const StrategiesWrapper = () => {
     setFilters({ ...filters, [name]: val })
   }
   useEffect(() => {
-    async function getStrategies() {
-      const mango = await tvl(Date.now() / 1000)
-      setStrategies([...mango])
-    }
     getStrategies()
   }, [])
 
@@ -38,21 +45,22 @@ const StrategiesWrapper = () => {
     let filtered = [...strategies]
     const { token, platform, search } = filters
     if (token.val) {
-      filtered = filtered.filter((x) => x.symbol.includes(token.val!))
+      filtered = filtered.filter((x) => x.protocolSymbol.includes(token.val!))
     }
     if (platform.val) {
-      filtered = filtered.filter((x) => x.protocol === platform.val)
+      filtered = filtered.filter((x) => x.protocolName === platform.val)
     }
     //search by any thing
     if (search) {
       filtered = filtered.filter(
         (x) =>
-          Object.values(x).filter((j) =>
-            `${j}`.toLowerCase().includes(search.toLowerCase())
-          ).length
+          Object.values(
+            Object.keys(x).filter((key) => searchAbleProps.includes(key))
+          ).filter((j) => `${j}`.toLowerCase().includes(search.toLowerCase()))
+            .length
       )
     }
-    setStrategiesFilterd([...filtered])
+    setStrategiesFiltered([...filtered])
   }, [filters, strategies])
   return (
     <div className="grid grid-cols-12 mt-10">
@@ -92,20 +100,26 @@ const StrategiesWrapper = () => {
           <div>Yield</div>
         </div>
         {strategiesFiltered.map((x) => {
-          if (x.protocol === MANGO) {
+          if (x.isGenericItem) {
             return (
-              <MangoItem
-                symbol={x.symbol}
+              <StrategyItem
+                key={x.handledMint}
                 liquidity={x.liquidity}
+                protocolSymbol={x.protocolSymbol}
                 apy={x.apy}
-                key={x.symbol}
-                tokenImgSrc={x.tokenImgSrc}
-                strategy={x.strategy}
-                mint={x.mint}
-                protocol={x.protocol}
-              ></MangoItem>
+                protocolName={x.protocolName}
+                handledMint={x.handledMint}
+                handledTokenSymbol={x.handledTokenSymbol}
+                handledTokenImgSrc={x.handledTokenImgSrc}
+                protocolLogoSrc={x.protocolLogoSrc}
+                strategyName={x.strategyName}
+                currentPosition={x.currentPosition}
+                strategyDescription={x.strategyDescription}
+                createProposalFcn={x.createProposalFcn}
+              ></StrategyItem>
             )
           }
+          //Add custom item based on protocol if needed
         })}
       </div>
     </div>

@@ -6,6 +6,7 @@ import {
 } from '@solana/web3.js'
 
 import {
+  getGovernanceProgramVersion,
   GovernanceConfig,
   ProgramAccount,
   Realm,
@@ -21,7 +22,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { DEFAULT_NATIVE_SOL_MINT } from '@components/instructions/tools'
 
 export const createTreasuryAccount = async (
-  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   mint: PublicKey,
   config: GovernanceConfig,
@@ -30,6 +31,13 @@ export const createTreasuryAccount = async (
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
+
+  // Explicitly request the version before making RPC calls to work around race conditions in resolving
+  // the version for RealmInfo
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId
+  )
 
   //will run only if plugin is connected with realm
   const voterWeight = await withUpdateVoterWeightRecord(
