@@ -285,6 +285,7 @@ const ConvertToMsol = () => {
           className="ml-auto"
           disabled={!canUseTransferInstruction || isLoading}
           onClick={handlePropose}
+          isLoading={isLoading}
         >
           <Tooltip content={!canUseTransferInstruction && notConnectedMessage}>
             Propose
