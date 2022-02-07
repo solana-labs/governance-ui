@@ -9,14 +9,8 @@ import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 
 const DepositCommunityTokensBtn = ({ className = '' }) => {
-  const { getDeposits } = useDepositStore()
-  const {
-    realm,
-    realmInfo,
-    realmTokenAccount,
-    tokenRecords,
-    ownTokenRecord,
-  } = useRealm()
+  const { getOwnedDeposits } = useDepositStore()
+  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
   const { client } = useVoteRegistry()
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -53,15 +47,13 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
       client: client,
       communityMintPk: realm.account.communityMint,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
     await fetchWalletTokenAccounts()
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }

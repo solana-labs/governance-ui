@@ -53,7 +53,7 @@ const LockTokensModal = ({
   isOpen: boolean
   depositToUnlock?: DepositWithMintAccount | null
 }) => {
-  const { getDeposits } = useDepositStore()
+  const { getOwnedDeposits } = useDepositStore()
   const {
     ownTokenRecord,
     mint,
@@ -234,7 +234,7 @@ const LockTokensModal = ({
       client: client,
     })
     if (ownTokenRecord) {
-      await getDeposits({
+      await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: ownTokenRecord!.account.governingTokenMint,
         walletPk: wallet!.publicKey!,
@@ -283,7 +283,7 @@ const LockTokensModal = ({
       client: client,
     })
     if (ownTokenRecord) {
-      await getDeposits({
+      await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: ownTokenRecord!.account.governingTokenMint,
         walletPk: wallet!.publicKey!,

@@ -18,7 +18,7 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
 
 const WithDrawCommunityTokens = () => {
-  const { getDeposits } = useDepositStore()
+  const { getOwnedDeposits } = useDepositStore()
   const { client } = useVoteRegistry()
   const {
     realm,
@@ -142,9 +142,9 @@ const WithDrawCommunityTokens = () => {
       }
       await fetchWalletTokenAccounts()
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      await getDeposits({
+      await getOwnedDeposits({
         realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
         client: client!,
         connection,

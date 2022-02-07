@@ -21,7 +21,7 @@ function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
   useRouterHistory()
-  const { getDeposits, resetDepositState } = useDepositStore()
+  const { getOwnedDeposits, resetDepositState } = useDepositStore()
   const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -43,13 +43,12 @@ function App({ Component, pageProps }) {
     if (
       realm?.account.config.useCommunityVoterWeightAddin &&
       realm.pubkey &&
-      ownTokenRecord?.pubkey &&
       wallet?.connected &&
       client
     ) {
-      getDeposits({
+      getOwnedDeposits({
         realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord.account.governingTokenMint,
+        communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
         client: client!,
         connection: connection.current,
