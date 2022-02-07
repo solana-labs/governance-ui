@@ -33,7 +33,7 @@ export const lockupTypes: LockupKind[] = [
     value: MONTHLY,
     displayName: 'Vested',
     info:
-      'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released monthly. Vote weight increase declines linearly over the period.',
+      'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period and vest over time. Vote weight increase declines linearly over the period.',
   },
 ]
 

@@ -45,15 +45,18 @@ const AccountsCompactWrapper = () => {
         return (
           <>
             <h3 className="bg-bkg-2 mb-4 flex items-center">
-              Treasury
+              <div
+                className="cursor-pointer flex items-center hover:text-primary-light"
+                onClick={() => {
+                  const url = fmtUrlWithCluster(`/dao/${symbol}/treasury`)
+                  router.push(url)
+                }}
+              >
+                Treasury
+                <ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 cursor-pointer ml-1"></ArrowsExpandIcon>
+              </div>
+
               <div className="ml-auto flex items-center">
-                <ArrowsExpandIcon
-                  onClick={() => {
-                    const url = fmtUrlWithCluster(`/dao/${symbol}/treasury`)
-                    router.push(url)
-                  }}
-                  className="text-fgd-3 flex-shrink-0 h-5 w-5 cursor-pointer mr-2"
-                ></ArrowsExpandIcon>
                 <Tooltip
                   content={
                     !connected

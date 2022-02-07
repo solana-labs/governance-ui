@@ -39,6 +39,7 @@ import {
   VestingPeriod,
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
+import BigNumber from 'bignumber.js'
 
 const YES = 'YES'
 const NO = 'NO'
@@ -465,12 +466,15 @@ const LockTokensModal = ({
           <div className="flex flex-col text-center mb-6">
             {depositToUnlock ? (
               <h2>
-                This will convert {amount} {tokenName} into a cliff type lockup
-                that unlocks in {daysToYear(lockupPeriod.value)} years.
+                This will convert {new BigNumber(amount!).toFormat()}{' '}
+                {tokenName} into a cliff type lockup that unlocks in{' '}
+                {daysToYear(lockupPeriod.value)} years.
               </h2>
             ) : (
               <h2>
-                Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}{' '}
+                Lock {new BigNumber(amount!).toFormat()} for
+                {lockupType.value === 'constant' ? 'min' : ' '}
+                {daysToYear(lockupPeriod.value)} {tokenName}{' '}
                 {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
               </h2>
             )}

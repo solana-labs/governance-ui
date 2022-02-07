@@ -115,6 +115,7 @@ const DepositComponent = ({
       realm!,
       matchedTreasuryAccount!.governance!,
       ownTokenRecord.pubkey,
+      //TODO title
       `Deposit 100 tokens to mango protocol strategy`,
       `Deposit 100 tokens to mango protocol strategy`,
       defaultProposalMint!,
