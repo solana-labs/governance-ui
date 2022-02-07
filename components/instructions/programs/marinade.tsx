@@ -3,7 +3,7 @@ import { Connection, PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 import { WSOL_MINT } from '../tools'
-import BufferLayout, { struct } from 'buffer-layout'
+import BufferLayout from 'buffer-layout'
 
 export const MARINADE_INSTRUCTIONS = {
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD: {
