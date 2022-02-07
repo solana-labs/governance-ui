@@ -14,6 +14,7 @@ import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
+import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 /**
  * Default governance program id instance
  */
@@ -144,6 +145,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
+  ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -151,14 +153,12 @@ export async function getInstructionDescriptor(
   instruction: InstructionData
 ) {
   let descriptors: any
-
   if (isGovernanceProgram(instruction.programId)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
   } else {
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
-
   const descriptor = descriptors && descriptors[instruction.data[0]]
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(

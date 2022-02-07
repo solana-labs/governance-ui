@@ -35,9 +35,11 @@ const LockPluginTokenBalanceCard = ({
     (!proposal ||
       (proposal.isSome() &&
         proposal.value.governingTokenMint.toBase58() === realmMint?.toBase58()))
+
   const tokenOwnerRecordPk = wallet?.publicKey
-    ? tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey.toBase58()
+    ? tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey?.toBase58()
     : null
+
   const communityDepositVisible =
     // If there is no council then community deposit is the only option to show
     !realm?.account.config.councilMint ||
@@ -49,11 +51,18 @@ const LockPluginTokenBalanceCard = ({
   )
 
   const hasLoaded = mint || councilMint
-
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">
-        <Tooltip content={!connected ? 'Please connect your wallet' : ''}>
+      <h3>
+        <Tooltip
+          content={
+            !connected
+              ? 'Please connect your wallet'
+              : !tokenOwnerRecordPk
+              ? 'Please deposit your tokens at least once to see account view'
+              : ''
+          }
+        >
           <div
             className={!connected ? 'opacity-0.6 pointer-events-none' : ''}
             onClick={() => {
@@ -63,9 +72,9 @@ const LockPluginTokenBalanceCard = ({
               router.push(url)
             }}
           >
-            <div className="cursor-pointer flex items-center hover:text-primary-light">
+            <div className="cursor-pointer flex items-center">
               Account
-              <a className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer">
+              <a className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light">
                 <ArrowsExpandIcon></ArrowsExpandIcon>
               </a>
             </div>
@@ -177,7 +186,7 @@ const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-8">
+      <div className="flex space-x-4 items-center mt-4">
         <VotingPowerBox
           votingPower={votingPower}
           mint={mint}

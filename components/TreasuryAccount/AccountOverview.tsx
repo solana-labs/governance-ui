@@ -93,7 +93,7 @@ const AccountOverview = () => {
           <div className="ml-auto flex flex-row">
             {isNFT && (
               <ArrowsExpandIcon
-                className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer"
+                className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer text-primary-light"
                 onClick={() => {
                   const url = fmtUrlWithCluster(
                     `/dao/${symbol}/gallery/${currentAccount.transferAddress}`

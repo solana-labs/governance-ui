@@ -35,7 +35,7 @@ const NFTSCompactWrapper = () => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <h3 className="mb-4 flex items-center">
         <div
-          className="cursor-pointer flex items-center hover:text-primary-light"
+          className="cursor-pointer flex items-center"
           onClick={() => {
             const url = fmtUrlWithCluster(
               `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
@@ -44,7 +44,7 @@ const NFTSCompactWrapper = () => {
           }}
         >
           Collectables
-          <ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer"></ArrowsExpandIcon>
+          <ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light"></ArrowsExpandIcon>
         </div>
 
         <div
