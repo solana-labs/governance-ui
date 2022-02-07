@@ -41,6 +41,13 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
+import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
+import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
+import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
+import RefreshObligation from './components/instructions/Solend/RefreshObligation'
+import RefreshReserve from './components/instructions/Solend/RefreshReserve'
+import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -54,6 +61,23 @@ const defaultGovernanceCtx: InstructionsContext = {
 export const NewProposalContext = createContext<InstructionsContext>(
   defaultGovernanceCtx
 )
+
+// Takes the first encountered governance account
+function extractGovernanceAccountFromInstructionsData(
+  instructionsData: ComponentInstructionData[]
+): ProgramAccount<Governance> | null {
+  return instructionsData.reduce((tmp, x) => {
+    if (tmp) {
+      return tmp
+    }
+
+    if (x.governedAccount) {
+      return x.governedAccount
+    }
+
+    return tmp
+  }, null)
+}
 
 const New = () => {
   const router = useRouter()
@@ -263,11 +287,13 @@ const New = () => {
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
-    const firstInstruction = instructionsData[0]
-    if (firstInstruction && firstInstruction.governedAccount) {
-      setGovernance(firstInstruction.governedAccount)
-    }
-  }, [instructionsData[0]])
+    const governedAccount = extractGovernanceAccountFromInstructionsData(
+      instructionsData
+    )
+
+    setGovernance(governedAccount)
+  }, [instructionsData])
+
   useEffect(() => {
     //fetch to be up to date with amounts
     fetchTokenAccountsForSelectedRealmGovernances()
@@ -285,6 +311,32 @@ const New = () => {
       case Instructions.ProgramUpgrade:
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+        )
+      case Instructions.CreateAssociatedTokenAccount:
+        return (
+          <CreateAssociatedTokenAccount index={idx} governance={governance} />
+        )
+      case Instructions.CreateSolendObligationAccount:
+        return <CreateObligationAccount index={idx} governance={governance} />
+      case Instructions.InitSolendObligationAccount:
+        return <InitObligationAccount index={idx} governance={governance} />
+      case Instructions.DepositReserveLiquidityAndObligationCollateral:
+        return (
+          <DepositReserveLiquidityAndObligationCollateral
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.RefreshSolendObligation:
+        return <RefreshObligation index={idx} governance={governance} />
+      case Instructions.RefreshSolendReserve:
+        return <RefreshReserve index={idx} />
+      case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
+        return (
+          <WithdrawObligationCollateralAndRedeemReserveLiquidity
+            index={idx}
+            governance={governance}
+          />
         )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>

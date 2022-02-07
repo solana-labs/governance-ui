@@ -13,6 +13,7 @@ import {
   AccountInfoGen,
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
+  GovernedMultiTypeAccount,
   GovernedTokenAccount,
   parseMintAccountData,
 } from '@utils/tokens'
@@ -44,6 +45,32 @@ export default function useGovernanceAssets() {
       types.some((t) => gov.account?.accountType === t)
     )
     return governancesFiltered
+  }
+
+  const getGovernedMultiTypeAccounts = async (): Promise<
+    GovernedMultiTypeAccount[]
+  > => {
+    const mintWithGovernances = await getMintWithGovernances()
+
+    return governancesArray.map((gov) => {
+      const governedTokenAccount = governedTokenAccounts.find(
+        (acc) => acc.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+      )
+      if (governedTokenAccount) {
+        return governedTokenAccount as GovernedMultiTypeAccount
+      }
+
+      const mintGovernance = mintWithGovernances.find(
+        (mint) => mint.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+      )
+      if (mintGovernance) {
+        return mintGovernance as GovernedMultiTypeAccount
+      }
+
+      return {
+        governance: gov,
+      }
+    })
   }
 
   function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
@@ -163,6 +190,41 @@ export default function useGovernanceAssets() {
         realm?.account.config.useCommunityVoterWeightAddin,
     },
     {
+      id: Instructions.CreateAssociatedTokenAccount,
+      name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.CreateSolendObligationAccount,
+      name: 'Solend: Create Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.InitSolendObligationAccount,
+      name: 'Solend: Init Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
+      name: 'Solend: Deposit Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendReserve,
+      name: 'Solend: Refresh Reserve',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendObligation,
+      name: 'Solend: Refresh Obligation',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      name: 'Solend: Withdraw Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,
@@ -258,6 +320,7 @@ export default function useGovernanceAssets() {
     governancesArray,
     getGovernancesByAccountType,
     getGovernancesByAccountTypes,
+    getGovernedMultiTypeAccounts,
     availableInstructions,
     getAvailableInstructions,
     governedTokenAccounts,
