@@ -9,11 +9,9 @@ import {
   AddLiquidityRaydiumForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Select from '@components/inputs/Select'
 import {
   ProgramAccount,
@@ -29,6 +27,7 @@ import {
 import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
 import { BN } from '@project-serum/anchor'
 import BigNumber from 'bignumber.js'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 const AddLiquidityRaydium = ({
   index,
@@ -40,15 +39,8 @@ const AddLiquidityRaydium = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  // const { getGovernancesByAccountType } = useGovernanceAssets()
-  const [governedAccounts, setGovernedAccounts] = useState<
-    GovernedMultiTypeAccount[]
-  >([])
-  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
 
-  useEffect(() => {
-    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
-  }, [])
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<AddLiquidityRaydiumForm>({
@@ -170,7 +162,7 @@ const AddLiquidityRaydium = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedMultiTypeAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

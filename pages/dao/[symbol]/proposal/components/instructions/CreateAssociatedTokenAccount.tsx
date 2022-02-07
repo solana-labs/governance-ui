@@ -9,9 +9,7 @@ import {
   CreateAssociatedTokenAccountForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useWalletStore from 'stores/useWalletStore'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Select from '@components/inputs/Select'
 import {
   ProgramAccount,
@@ -21,6 +19,7 @@ import {
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { createAssociatedTokenAccount } from '@utils/associated'
 import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 const CreateAssociatedTokenAccount = ({
   index,
@@ -32,14 +31,7 @@ const CreateAssociatedTokenAccount = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const [governedAccounts, setGovernedAccounts] = useState<
-    GovernedMultiTypeAccount[]
-  >([])
-  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
-
-  useEffect(() => {
-    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
-  }, [])
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
 
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -136,7 +128,7 @@ const CreateAssociatedTokenAccount = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedMultiTypeAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

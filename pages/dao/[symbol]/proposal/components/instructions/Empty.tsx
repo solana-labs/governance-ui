@@ -5,12 +5,11 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { validateInstruction } from '@utils/instructionTools'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 const Empty = ({
   index,
@@ -19,11 +18,8 @@ const Empty = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
-  const [governedAccounts, setGovernedAccounts] = useState<
-    GovernedMultiTypeAccount[]
-  >([])
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
@@ -33,10 +29,6 @@ const Empty = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-
-  useEffect(() => {
-    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
-  }, [])
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -64,7 +56,7 @@ const Empty = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedMultiTypeAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

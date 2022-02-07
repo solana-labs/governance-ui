@@ -5,16 +5,15 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 const CustomBase64 = ({
   index,
@@ -24,11 +23,8 @@ const CustomBase64 = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
-  const { getGovernedMultiTypeAccounts } = useGovernanceAssets()
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
-  const [governedAccounts, setGovernedAccounts] = useState<
-    GovernedMultiTypeAccount[]
-  >([])
   const [form, setForm] = useState<Base64InstructionForm>({
     governedAccount: undefined,
     base64: '',
@@ -40,10 +36,6 @@ const CustomBase64 = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-
-  useEffect(() => {
-    getGovernedMultiTypeAccounts().then(setGovernedAccounts)
-  }, [])
 
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -109,7 +101,7 @@ const CustomBase64 = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedMultiTypeAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

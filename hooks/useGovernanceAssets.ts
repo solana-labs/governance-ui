@@ -13,7 +13,6 @@ import {
   AccountInfoGen,
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
-  GovernedMultiTypeAccount,
   GovernedTokenAccount,
   parseMintAccountData,
 } from '@utils/tokens'
@@ -153,32 +152,6 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(g.governance?.account?.config)
   )
 
-  const getGovernedMultiTypeAccounts = async (): Promise<
-    GovernedMultiTypeAccount[]
-  > => {
-    const mintWithGovernances = await getMintWithGovernances()
-
-    return governancesArray.map((gov) => {
-      const governedTokenAccount = governedTokenAccounts.find(
-        (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-      )
-      if (governedTokenAccount) {
-        return governedTokenAccount as GovernedMultiTypeAccount
-      }
-
-      const mintGovernance = mintWithGovernances.find(
-        (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-      )
-      if (mintGovernance) {
-        return mintGovernance as GovernedMultiTypeAccount
-      }
-
-      return {
-        governance: gov,
-      }
-    })
-  }
-
   const availableInstructions = [
     {
       id: Instructions.CreateAssociatedTokenAccount,
@@ -312,6 +285,7 @@ export default function useGovernanceAssets() {
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
+
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
           (x) =>
@@ -373,7 +347,6 @@ export default function useGovernanceAssets() {
   ])
   return {
     governancesArray,
-    getGovernedMultiTypeAccounts,
     getGovernancesByAccountType,
     getGovernancesByAccountTypes,
     availableInstructions,
