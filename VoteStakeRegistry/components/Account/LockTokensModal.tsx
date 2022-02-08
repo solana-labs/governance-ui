@@ -468,7 +468,7 @@ const LockTokensModal = ({
               </h2>
             ) : (
               <h2>
-                Lock {amount} {tokenName} for
+                Lock {new BigNumber(amount!).toFormat()} {tokenName} for
                 {lockupType.value == CONSTANT && ' at least '}
                 {daysToYear(lockupPeriod.value)}{' '}
                 {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
