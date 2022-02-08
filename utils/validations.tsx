@@ -177,7 +177,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = governedTokenAccount.isNft
+          const isNft = governedTokenAccount?.isNft
           if (isNft) {
             return true
           }

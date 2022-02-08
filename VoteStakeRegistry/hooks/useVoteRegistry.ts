@@ -5,6 +5,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 
 export function useVoteRegistry() {
   const { realm } = useRealm()
@@ -35,14 +36,14 @@ export function useVoteRegistry() {
       const lockupScaledFactorNum = lockupScaledFactor.toNumber()
       const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
       //(deposit_scaled_factor + lockup_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor
-      const calc =
-        (depositScaledFactorNum +
-          (lockupScaledFactorNum *
-            Math.min(lockupSecs, lockupSaturationSecsNum)) /
-            lockupSaturationSecsNum) /
-        depositScaledFactorNum
+      const calced = calcMultiplier({
+        depositScaledFactor: depositScaledFactorNum,
+        lockupScaledFactor: lockupScaledFactorNum,
+        lockupSaturationSecs: lockupSaturationSecsNum,
+        lockupSecs,
+      })
 
-      return parseFloat(calc.toFixed(2))
+      return parseFloat(calced.toFixed(2))
     }
     return 0
   }
