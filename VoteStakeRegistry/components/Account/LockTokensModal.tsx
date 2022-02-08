@@ -35,6 +35,7 @@ import {
   LockupKind,
   lockupTypes,
   MONTHLY,
+  CONSTANT,
   Period,
   VestingPeriod,
   vestingPeriods,
@@ -349,9 +350,13 @@ const LockTokensModal = ({
               </Tab.List>
             </Tab.Group>
             <div className={`${labelClasses} font-bold`}>
-              {lockupType.value} Lockup
+              {lockupType.displayName} Lockup
             </div>
-            <div className="text-xs">{lockupType.info}</div>
+            {lockupType.info.map((text, index) => (
+              <div key={index} className="text-xs mb-2">
+                {text}
+              </div>
+            ))}
           </>
         )
       case 1:
@@ -361,11 +366,13 @@ const LockTokensModal = ({
       case 2:
         return (
           <div className="mb-6">
-            <div className="text-xs mb-6">
-              To initiate the unlock process you need to convert all, or part of
-              your constant lockup to a cliff lockup with a duration greater
-              than or equal to the constant lockup duration.
-            </div>
+            {lockupType.value == CONSTANT && (
+              <div className="text-xs mb-6">
+                To initiate the unlock process you need to convert all, or part
+                of your constant lockup to a cliff lockup with a duration
+                greater than or equal to the constant lockup duration.
+              </div>
+            )}
             {hasMoreTokensInWallet && !depositToUnlock && (
               <DoYouWantToDepositMoreComponent></DoYouWantToDepositMoreComponent>
             )}
@@ -461,9 +468,9 @@ const LockTokensModal = ({
               </h2>
             ) : (
               <h2>
-                Lock {new BigNumber(amount!).toFormat()} for
-                {lockupType.value === 'constant' ? 'min' : ' '}
-                {daysToYear(lockupPeriod.value)} {tokenName}{' '}
+                Lock {amount} {tokenName} for
+                {lockupType.value == CONSTANT && ' at least '}
+                {daysToYear(lockupPeriod.value)}{' '}
                 {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
               </h2>
             )}

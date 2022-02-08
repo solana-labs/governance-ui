@@ -145,10 +145,10 @@ const AccountOverview = () => {
           <Tooltip
             content={
               !canUseTransferInstruction &&
-              'You need to be connected to your wallet to have the ability to create a token staking proposal'
+              'You need to be connected to your wallet to have the ability to create a staking proposal'
             }
           >
-            <div>Convert to mSOL</div>
+            <div>Stake with Marinade</div>
           </Tooltip>
         </Button>
       </div>

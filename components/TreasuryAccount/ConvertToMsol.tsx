@@ -56,7 +56,7 @@ const ConvertToMsol = () => {
     (s) => s.compact.currentAccount
   )
   const notConnectedMessage =
-    'You need to be connected to your wallet to have the ability to create a token staking proposal'
+    'You need to be connected to your wallet to have the ability to create a staking proposal'
 
   const [formErrors, setFormErrors] = useState({})
   const [form, setForm] = useState<StakingViewForm>({
@@ -285,6 +285,7 @@ const ConvertToMsol = () => {
           className="ml-auto"
           disabled={!canUseTransferInstruction || isLoading}
           onClick={handlePropose}
+          isLoading={isLoading}
         >
           <Tooltip content={!canUseTransferInstruction && notConnectedMessage}>
             Propose
