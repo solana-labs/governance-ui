@@ -1,12 +1,34 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN, Provider, Wallet } from '@project-serum/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
-import { Connection, Keypair } from '@solana/web3.js'
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { tryGetMint } from '@utils/tokens'
 import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
 import { DAYS_PER_MONTH, SECS_PER_DAY } from 'VoteStakeRegistry/tools/dateTools'
+
+interface ClawbackInstruction {
+  depositEntryIndex: number
+}
+interface CreateRegistrarInstruction {
+  registrarBump: number
+}
+interface VotingMintCfgInstruction {
+  idx: number
+  digitShift: number
+  unlockedScaledFactor: BN
+  lockupScaledFactor: BN
+  lockupSaturationSecs: BN
+  grantAuthority: PublicKey
+}
+interface GrantInstruction {
+  periods: number
+  kind: object
+  amount: BN
+  startTs: BN
+  allowClawback: boolean
+}
 
 export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo': {
@@ -33,13 +55,13 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstruction = vsrClient.program.coder.instruction.decode(
+          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
             Buffer.from(data)
-          )
+          )?.data as ClawbackInstruction | null
           const existingVoter = await tryGetVoter(accounts[2].pubkey, vsrClient)
-          const deposit =
-            //@ts-ignore
-            existingVoter?.deposits[decodedInstruction?.data.depositEntryIndex]
+          const deposit = decodedInstructionData
+            ? existingVoter?.deposits[decodedInstructionData.depositEntryIndex]
+            : null
           const existingRegistrar = await tryGetRegistrar(
             accounts[0].pubkey,
             vsrClient
@@ -54,6 +76,87 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
               <div>
                 Clawback amount:{' '}
                 {fmtMintAmount(mint?.account, deposit!.amountDepositedNative)}
+              </div>
+            </div>
+          )
+        } catch (e) {
+          console.log(e)
+          return <div>{JSON.stringify(data)}</div>
+        }
+      },
+    },
+    132: {
+      name: 'Create registrar',
+      accounts: [
+        { name: 'Registrar' },
+        { name: 'Realm' },
+        { name: 'Governance program id' },
+        { name: 'Realm govering token mint' },
+        { name: 'Realm authority' },
+        { name: 'Payer' },
+      ],
+      getDataUI: async (connection: Connection, data: Uint8Array) => {
+        try {
+          const options = Provider.defaultOptions()
+          const provider = new Provider(
+            connection,
+            new Wallet(Keypair.generate()),
+            options
+          )
+          const vsrClient = await VsrClient.connect(provider)
+          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
+            Buffer.from(data)
+          )?.data as CreateRegistrarInstruction | null
+
+          return (
+            <div className="space-y-3">
+              <div>Registrar bump: {decodedInstructionData?.registrarBump}</div>
+            </div>
+          )
+        } catch (e) {
+          console.log(e)
+          return <div>{JSON.stringify(data)}</div>
+        }
+      },
+    },
+    113: {
+      name: 'Create registrar',
+      accounts: [
+        { name: 'Registrar' },
+        { name: 'Realm authority' },
+        { name: 'Mint' },
+      ],
+      getDataUI: async (connection: Connection, data: Uint8Array) => {
+        try {
+          const options = Provider.defaultOptions()
+          const provider = new Provider(
+            connection,
+            new Wallet(Keypair.generate()),
+            options
+          )
+          const vsrClient = await VsrClient.connect(provider)
+          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
+            Buffer.from(data)
+          )?.data as VotingMintCfgInstruction | null
+          return (
+            <div className="space-y-3">
+              <div>Index: {decodedInstructionData?.idx}</div>
+              <div>Digit shifts: {decodedInstructionData?.digitShift}</div>
+              <div>
+                Unlocked scaled factor:{' '}
+                {decodedInstructionData?.unlockedScaledFactor.toNumber()}
+              </div>
+              <div>
+                Lockup scaled factor:{' '}
+                {decodedInstructionData?.lockupScaledFactor.toNumber()}
+              </div>
+              <div>
+                Lockup saturation secs:{' '}
+                {decodedInstructionData?.lockupSaturationSecs.toNumber()}
+              </div>
+              <div>
+                Grant authority:{' '}
+                {decodedInstructionData?.grantAuthority.toBase58()}
               </div>
             </div>
           )
@@ -90,19 +193,19 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstruction = vsrClient.program.coder.instruction.decode(
+          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
             Buffer.from(data)
-          )
+          )?.data as GrantInstruction | null
           const mintPk = accounts[9].pubkey
           const mint = await tryGetMint(connection, mintPk!)
-          // @ts-ignore
-          const lockupKind = Object.keys(decodedInstruction.data.kind)[0]
-          // @ts-ignore
-          const periods = decodedInstruction.data.periods
+          const lockupKind = decodedInstructionData
+            ? Object.keys(decodedInstructionData?.kind)[0]
+            : null
+          const periods = decodedInstructionData?.periods
           const logoUrl = tokenService.getTokenInfo(mintPk.toBase58())?.logoURI
           return (
             <>
-              {decodedInstruction ? (
+              {decodedInstructionData ? (
                 <div className="space-y-3">
                   <div>Grant to: {accounts[8].pubkey.toBase58()}</div>
                   <div>Lock type: {lockupKind}</div>
@@ -110,17 +213,15 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                     Amount:{' '}
                     {fmtMintAmount(
                       mint!.account,
-                      // @ts-ignore
-                      decodedInstruction.data.amount
+                      decodedInstructionData.amount
                     )}
                   </div>
-                  {lockupKind === 'monthly' && (
+                  {lockupKind === 'monthly' && periods && (
                     <div>
                       Vested:{' '}
                       {fmtMintAmount(
                         mint!.account,
-                        // @ts-ignore
-                        decodedInstruction.data.amount.div(new BN(periods))
+                        decodedInstructionData.amount.div(new BN(periods))
                       )}{' '}
                       p/m
                     </div>
@@ -133,23 +234,23 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                   <div>
                     Start date:{' '}
                     {new Date(
-                      // @ts-ignore
-                      decodedInstruction.data.startTs.toNumber() * 1000
+                      decodedInstructionData.startTs.toNumber() * 1000
                     ).toDateString()}
                   </div>
+                  {periods && (
+                    <div>
+                      End date:{' '}
+                      {new Date(
+                        decodedInstructionData.startTs.toNumber() * 1000 +
+                          (lockupKind === 'monthly'
+                            ? periods * DAYS_PER_MONTH * SECS_PER_DAY * 1000
+                            : periods * SECS_PER_DAY * 1000)
+                      ).toDateString()}
+                    </div>
+                  )}
                   <div>
-                    End date:{' '}
-                    {new Date(
-                      //   @ts-ignore
-                      decodedInstruction.data.startTs.toNumber() * 1000 +
-                        (lockupKind === 'monthly'
-                          ? periods * DAYS_PER_MONTH * SECS_PER_DAY * 1000
-                          : periods * SECS_PER_DAY * 1000)
-                    ).toDateString()}
-                  </div>
-                  <div>
-                    Dao can clawback: {/* @ts-ignore */}
-                    {decodedInstruction.data.allowClawback ? 'Yes' : 'No'}
+                    Dao can clawback:
+                    {decodedInstructionData.allowClawback ? 'Yes' : 'No'}
                   </div>
                   <div>Only grantee can execute instruction</div>
                 </div>
