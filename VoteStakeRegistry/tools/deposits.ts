@@ -149,3 +149,22 @@ export const getDeposits = async ({
     votingPowerFromDeposits: new BN(0),
   }
 }
+
+export const calcMultiplier = ({
+  depositScaledFactor,
+  lockupScaledFactor,
+  lockupSecs,
+  lockupSaturationSecs,
+}: {
+  depositScaledFactor: number
+  lockupScaledFactor: number
+  lockupSecs: number
+  lockupSaturationSecs: number
+}) => {
+  const calc =
+    (depositScaledFactor +
+      (lockupScaledFactor * Math.min(lockupSecs, lockupSaturationSecs)) /
+        lockupSaturationSecs) /
+    depositScaledFactor
+  return calc
+}

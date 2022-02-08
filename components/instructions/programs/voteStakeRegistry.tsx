@@ -6,13 +6,16 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { tryGetMint } from '@utils/tokens'
 import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
-import { DAYS_PER_MONTH, SECS_PER_DAY } from 'VoteStakeRegistry/tools/dateTools'
+import {
+  DAYS_PER_MONTH,
+  getFormattedStringFromDays,
+  secsToDays,
+  SECS_PER_DAY,
+} from 'VoteStakeRegistry/tools/dateTools'
+import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
 
 interface ClawbackInstruction {
   depositEntryIndex: number
-}
-interface CreateRegistrarInstruction {
-  registrarBump: number
 }
 interface VotingMintCfgInstruction {
   idx: number
@@ -96,31 +99,11 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         { name: 'Payer' },
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
-        try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
-            connection,
-            new Wallet(Keypair.generate()),
-            options
-          )
-          const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as CreateRegistrarInstruction | null
-
-          return (
-            <div className="space-y-3">
-              <div>Registrar bump: {decodedInstructionData?.registrarBump}</div>
-            </div>
-          )
-        } catch (e) {
-          console.log(e)
-          return <div>{JSON.stringify(data)}</div>
-        }
+        return <div>{JSON.stringify(data)}</div>
       },
     },
     113: {
-      name: 'Create registrar',
+      name: 'Configure voting mint',
       accounts: [
         { name: 'Registrar' },
         { name: 'Realm authority' },
@@ -137,22 +120,48 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
           const vsrClient = await VsrClient.connect(provider)
           const decodedInstructionData = vsrClient.program.coder.instruction.decode(
             Buffer.from(data)
-          )?.data as VotingMintCfgInstruction | null
+          )?.data as VotingMintCfgInstruction
+          const {
+            lockupScaledFactor,
+            lockupSaturationSecs,
+            unlockedScaledFactor,
+          } = decodedInstructionData
           return (
             <div className="space-y-3">
               <div>Index: {decodedInstructionData?.idx}</div>
               <div>Digit shifts: {decodedInstructionData?.digitShift}</div>
               <div>
-                Unlocked scaled factor:{' '}
-                {decodedInstructionData?.unlockedScaledFactor.toNumber()}
+                Unlocked scaled factor raw: {unlockedScaledFactor.toNumber()}
               </div>
               <div>
-                Lockup scaled factor:{' '}
-                {decodedInstructionData?.lockupScaledFactor.toNumber()}
+                Unlocked scaled factor scaled:{' '}
+                {unlockedScaledFactor.toNumber() / 1e9}
               </div>
               <div>
-                Lockup saturation secs:{' '}
-                {decodedInstructionData?.lockupSaturationSecs.toNumber()}
+                Lockup scaled factor raw: {lockupScaledFactor.toNumber()}
+              </div>
+              <div>
+                Lockup scaled factor scaled:{' '}
+                {lockupScaledFactor.toNumber() / 1e9}
+              </div>
+              <div>
+                Lockup saturation secs raw: {lockupSaturationSecs.toNumber()}
+              </div>
+              <div>
+                Max lockup time{' '}
+                {decodedInstructionData &&
+                  getFormattedStringFromDays(
+                    secsToDays(lockupSaturationSecs.toNumber())
+                  )}
+              </div>
+              <div>
+                Max multiplier:{' '}
+                {calcMultiplier({
+                  depositScaledFactor: unlockedScaledFactor.toNumber(),
+                  lockupScaledFactor: lockupScaledFactor.toNumber(),
+                  lockupSaturationSecs: lockupSaturationSecs.toNumber(),
+                  lockupSecs: lockupSaturationSecs.toNumber(),
+                })}
               </div>
               <div>
                 Grant authority:{' '}
