@@ -16,9 +16,10 @@ import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistry
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { notify } from '@utils/notifications'
 
 const WithDrawCommunityTokens = () => {
-  const { getDeposits } = useDepositStore()
+  const { getOwnedDeposits } = useDepositStore()
   const { client } = useVoteRegistry()
   const {
     realm,
@@ -34,7 +35,7 @@ const WithDrawCommunityTokens = () => {
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
 
@@ -70,6 +71,10 @@ const WithDrawCommunityTokens = () => {
               governances[proposal.account.governance.toBase58()]
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
+              notify({
+                type: 'error',
+                message: `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
+              })
               throw new Error(
                 `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`
               )
@@ -140,11 +145,11 @@ const WithDrawCommunityTokens = () => {
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      await getDeposits({
+      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      fetchWalletTokenAccounts()
+      getOwnedDeposits({
         realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
+        communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
         client: client!,
         connection,

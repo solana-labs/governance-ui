@@ -31,6 +31,7 @@ import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
+import { abbreviateAddress } from '@utils/formatting'
 
 const Clawback = ({
   index,
@@ -139,7 +140,7 @@ const Clawback = ({
     }
   }, [client])
   useEffect(() => {
-    const getDepositsInfo = async () => {
+    const getOwnedDepositsInfo = async () => {
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
@@ -168,7 +169,7 @@ const Clawback = ({
       setDeposits(deposits)
     }
     if (form.voter) {
-      getDepositsInfo()
+      getOwnedDepositsInfo()
     } else {
       setDeposits([])
     }
@@ -185,15 +186,16 @@ const Clawback = ({
     deposit: yup.object().nullable().required('Deposit required'),
   })
 
-  const getDepositsLabel = (deposit) => {
+  const getOwnedDepositsLabel = (deposit: DepositWithMintAccount | null) => {
+    const symbol = deposit
+      ? tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())?.symbol ||
+        ''
+      : null
     return deposit
       ? `${fmtMintAmount(
           deposit.mint.account,
           deposit.amountDepositedNative
-        )} ${
-          tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
-            ?.symbol || ''
-        }`
+        )} ${symbol ? symbol : abbreviateAddress(deposit.mint.publicKey)}`
       : null
   }
   return (
@@ -221,7 +223,7 @@ const Clawback = ({
           handleSetForm({ value, propertyName: 'deposit' })
         }}
         placeholder="Please select..."
-        value={getDepositsLabel(form.deposit)}
+        value={getOwnedDepositsLabel(form.deposit)}
         error={formErrors['deposit']}
       >
         {deposits
@@ -229,7 +231,7 @@ const Clawback = ({
           ?.map((x, idx) => {
             return (
               <Select.Option key={idx} value={x}>
-                {getDepositsLabel(x)}
+                {getOwnedDepositsLabel(x)}
               </Select.Option>
             )
           })}

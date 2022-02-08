@@ -40,6 +40,7 @@ import {
   VestingPeriod,
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
+import BigNumber from 'bignumber.js'
 
 const YES = 'YES'
 const NO = 'NO'
@@ -53,15 +54,8 @@ const LockTokensModal = ({
   isOpen: boolean
   depositToUnlock?: DepositWithMintAccount | null
 }) => {
-  const { getDeposits } = useDepositStore()
-  const {
-    ownTokenRecord,
-    mint,
-    realm,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-  } = useRealm()
+  const { getOwnedDeposits } = useDepositStore()
+  const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
   const {
     client,
     calcMintMultiplier,
@@ -233,15 +227,13 @@ const LockTokensModal = ({
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
 
     onClose()
   }
@@ -282,15 +274,13 @@ const LockTokensModal = ({
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
 
     onClose()
   }
@@ -472,8 +462,9 @@ const LockTokensModal = ({
           <div className="flex flex-col text-center mb-6">
             {depositToUnlock ? (
               <h2>
-                This will convert {amount} {tokenName} into a cliff type lockup
-                that unlocks in {daysToYear(lockupPeriod.value)} years.
+                This will convert {new BigNumber(amount!).toFormat()}{' '}
+                {tokenName} into a cliff type lockup that unlocks in{' '}
+                {daysToYear(lockupPeriod.value)} years.
               </h2>
             ) : (
               <h2>

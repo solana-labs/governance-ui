@@ -35,6 +35,7 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
 
 const REALM = () => {
   const {
+    realm,
     realmInfo,
     proposals,
     realmTokenAccount,
@@ -155,7 +156,9 @@ const REALM = () => {
           <TokenBalanceCardWrapper />
           <NFTSCompactWrapper></NFTSCompactWrapper>
           <AccountsCompactWrapper />
-          <MembersCompactWrapper></MembersCompactWrapper>
+          {!realm?.account.config.useCommunityVoterWeightAddin && (
+            <MembersCompactWrapper></MembersCompactWrapper>
+          )}
           <AssetsCompactWrapper></AssetsCompactWrapper>
         </div>
       </div>

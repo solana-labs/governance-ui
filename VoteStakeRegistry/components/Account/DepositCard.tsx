@@ -24,10 +24,11 @@ import {
 import { XIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
+import { abbreviateAddress } from '@utils/formatting'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
-  const { getDeposits } = useDepositStore()
-  const { realm, realmInfo, ownTokenRecord, tokenRecords } = useRealm()
+  const { getOwnedDeposits } = useDepositStore()
+  const { realm, realmInfo, tokenRecords } = useRealm()
   const {
     client,
     calcMintMultiplier,
@@ -60,15 +61,13 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositIndex: depositEntry.index,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
@@ -88,15 +87,13 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       communityMintPk: realm!.account.communityMint,
       client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
   }
 
   const lockedTokens = fmtMintAmount(
@@ -114,7 +111,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     return (
       <div className="flex flex-col w-1/2 p-2">
         <div className="text-xs text-fgd-3">{label}</div>
-        <div>{value}</div>
+        <div className="break-all">{value}</div>
       </div>
     )
   }
@@ -132,7 +129,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
         <h3 className="mb-0 flex flex-items items-center">
           {img && <img className="w-6 h-6 mr-2" src={img}></img>}
-          {lockedTokens}
+          {lockedTokens} {!img && abbreviateAddress(deposit.mint.publicKey)}
           {price ? (
             <span className="text-xs opacity-70 font-light ml-1">
               =${formatter.format(price)}
@@ -198,18 +195,6 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           <CardLabel
             label="Available"
             value={fmtMintAmount(deposit.mint.account, deposit.available)}
-          />
-          <CardLabel
-            label="Lock from"
-            value={new Date(
-              deposit.lockup.startTs.toNumber() * 1000
-            ).toDateString()}
-          />
-          <CardLabel
-            label="Lock to"
-            value={new Date(
-              deposit.lockup.endTs.toNumber() * 1000
-            ).toDateString()}
           />
         </div>
         <Button
