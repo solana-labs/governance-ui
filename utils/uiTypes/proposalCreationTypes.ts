@@ -70,7 +70,7 @@ export interface ProgramUpgradeForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
   bufferAddress: string
-  bufferSpillAddress: string | undefined
+  bufferSpillAddress?: string | undefined
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
