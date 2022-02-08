@@ -65,6 +65,9 @@ const LockTokensModal = ({
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletStore((s) => s.current)
   const deposits = useDepositStore((s) => s.state.deposits)
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
 
   const lockupPeriods: Period[] = [
     {
@@ -222,7 +225,7 @@ const LockTokensModal = ({
       lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
-      tempHolderPk: realmTokenAccount!.publicKey,
+      sourceTokenAccount: realmTokenAccount!.publicKey,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
@@ -234,7 +237,8 @@ const LockTokensModal = ({
       client: client!,
       connection,
     })
-
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     onClose()
   }
 
