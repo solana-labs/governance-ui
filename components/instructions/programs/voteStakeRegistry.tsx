@@ -98,8 +98,8 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         { name: 'Realm authority' },
         { name: 'Payer' },
       ],
-      getDataUI: async (connection: Connection, data: Uint8Array) => {
-        return <div>{JSON.stringify(data)}</div>
+      getDataUI: async () => {
+        return <div></div>
       },
     },
     113: {
@@ -139,14 +139,12 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                 {lockupScaledFactor.toNumber()})
               </div>
               <div>
-                Lockup saturation secs: {lockupSaturationSecs.toNumber()}
-              </div>
-              <div>
                 Max lockup time:{' '}
                 {decodedInstructionData &&
                   getFormattedStringFromDays(
                     secsToDays(lockupSaturationSecs.toNumber())
-                  )}
+                  )}{' '}
+                (secs: {lockupSaturationSecs.toNumber()})
               </div>
               <div>
                 Max multiplier:{' '}
