@@ -121,7 +121,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       }
     }
     handleSetDepos()
-  }, [tokenOwnerRecordWalletPk, ownDeposits])
+  }, [tokenOwnerRecordWalletPk, connected, client, ownDeposits])
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg">
