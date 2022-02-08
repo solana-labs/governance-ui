@@ -54,14 +54,7 @@ const LockTokensModal = ({
   depositToUnlock?: DepositWithMintAccount | null
 }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const {
-    ownTokenRecord,
-    mint,
-    realm,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-  } = useRealm()
+  const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
   const {
     client,
     calcMintMultiplier,
@@ -233,15 +226,13 @@ const LockTokensModal = ({
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getOwnedDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
 
     onClose()
   }
@@ -282,15 +273,13 @@ const LockTokensModal = ({
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getOwnedDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
 
     onClose()
   }

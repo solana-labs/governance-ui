@@ -99,6 +99,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
           const lockupKind = Object.keys(decodedInstruction.data.kind)[0]
           // @ts-ignore
           const periods = decodedInstruction.data.periods
+          const logoUrl = tokenService.getTokenInfo(mintPk.toBase58())?.logoURI
           return (
             <>
               {decodedInstruction ? (
@@ -113,14 +114,11 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                       decodedInstruction.data.amount
                     )}
                   </div>
-                  <div>
-                    <img
-                      className="w-5 h-5"
-                      src={
-                        tokenService.getTokenInfo(mintPk.toBase58())?.logoURI
-                      }
-                    ></img>
-                  </div>
+                  {logoUrl && (
+                    <div>
+                      <img className="w-5 h-5" src={logoUrl}></img>
+                    </div>
+                  )}
                   <div>Lock type: {lockupKind}</div>
                   <div>
                     Start date:{' '}

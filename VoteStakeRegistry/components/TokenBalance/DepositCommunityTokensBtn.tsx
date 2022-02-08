@@ -16,7 +16,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
 
@@ -47,15 +47,15 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
       client: client,
       communityMintPk: realm.account.communityMint,
     })
-    await getOwnedDeposits({
+    getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
       client: client!,
       connection,
     })
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const hasTokensInWallet =

@@ -66,7 +66,6 @@ export const getDeposits = async ({
           } as DepositWithMintAccount)
       )
       .filter((x) => typeof isUsed === 'undefined' || x.isUsed === isUsed)
-
     const usedDeposits = deposits.filter((x) => x.isUsed)
     const isThereAnyUsedDeposits = usedDeposits.length
     if (isThereAnyUsedDeposits) {
@@ -122,7 +121,6 @@ export const getDeposits = async ({
       const votingPowerEntry = events.find(
         (x) => x.name === VOTER_INFO_EVENT_NAME
       )
-
       deposits = deposits.map((x) => {
         const additionalInfoData = depositsInfo.find(
           (info) => info.data.depositEntryIndex === x.index

@@ -34,7 +34,7 @@ const WithDrawCommunityTokens = () => {
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const deposits = useDepositStore((s) => s.state.deposits)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
 
@@ -140,9 +140,9 @@ const WithDrawCommunityTokens = () => {
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      await getOwnedDeposits({
+      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      fetchWalletTokenAccounts()
+      getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
