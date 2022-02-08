@@ -1,5 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { Provider, Wallet } from '@project-serum/anchor'
+import { BN, Provider, Wallet } from '@project-serum/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -105,21 +105,31 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
               {decodedInstruction ? (
                 <div className="space-y-3">
                   <div>Grant to: {accounts[8].pubkey.toBase58()}</div>
-
+                  <div>Lock type: {lockupKind}</div>
                   <div>
-                    Amount:
+                    Amount:{' '}
                     {fmtMintAmount(
                       mint!.account,
                       // @ts-ignore
                       decodedInstruction.data.amount
                     )}
                   </div>
+                  {lockupKind === 'monthly' && (
+                    <div>
+                      Vested:{' '}
+                      {fmtMintAmount(
+                        mint!.account,
+                        // @ts-ignore
+                        decodedInstruction.data.amount.div(new BN(periods))
+                      )}{' '}
+                      p/m
+                    </div>
+                  )}
                   {logoUrl && (
                     <div>
                       <img className="w-5 h-5" src={logoUrl}></img>
                     </div>
                   )}
-                  <div>Lock type: {lockupKind}</div>
                   <div>
                     Start date:{' '}
                     {new Date(

@@ -20,6 +20,7 @@ import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -33,6 +34,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const { client } = useVoteRegistry()
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
+  const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
   const [votingPower, setVotingPower] = useState<BN>(new BN(0))
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
@@ -119,7 +121,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       }
     }
     handleSetDepos()
-  }, [tokenOwnerRecordWalletPk, connected, client])
+  }, [tokenOwnerRecordWalletPk, ownDeposits])
   return (
     <div className="grid grid-cols-12 gap-4">
       <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg">
