@@ -37,6 +37,7 @@ import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { ProgramUpgradeInfo } from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradableLoader/ProgramUpgradeInfo'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -254,22 +255,9 @@ const UpgradeProgram = () => {
           noMaxWidth={true}
           error={formErrors['bufferAddress']}
         />
-        <div className="text-sm mb-3">
-          <div className="mb-2">Upgrade authority</div>
-          <div className="flex flex-row text-xs items-center break-all">
-            <span className="text-fgd-3">
-              {form.governedAccount?.governance?.pubkey.toBase58()}
-            </span>
-            <DuplicateIcon
-              className="ml-4 text-th-fgd-1 w-5 h-5 hover:cursor-pointer text-primary-light"
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  form.governedAccount!.governance!.pubkey.toBase58()
-                )
-              }}
-            ></DuplicateIcon>
-          </div>
-        </div>
+        <ProgramUpgradeInfo
+          governancePk={form.governedAccount?.governance?.pubkey}
+        ></ProgramUpgradeInfo>
         <div
           className={'flex items-center hover:cursor-pointer w-24 mt-3'}
           onClick={() => setShowOptions(!showOptions)}

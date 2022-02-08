@@ -7,7 +7,7 @@ import {
   UiInstruction,
   ProgramUpgradeForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -17,9 +17,10 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
 import { validateBuffer } from '@utils/validations'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { validateInstruction } from '@utils/instructionTools'
+import { ProgramUpgradeInfo } from './ProgramUpgradeInfo'
 
 const ProgramUpgrade = ({
   index,
@@ -152,6 +153,10 @@ const ProgramUpgrade = ({
         }
         error={formErrors['bufferAddress']}
       />
+      <ProgramUpgradeInfo
+        governancePk={form.governedAccount?.governance?.pubkey}
+        cliVisible
+      ></ProgramUpgradeInfo>
     </>
   )
 }
