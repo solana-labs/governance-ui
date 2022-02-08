@@ -14,6 +14,7 @@ import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
+import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 /**
  * Default governance program id instance
  */
@@ -144,6 +145,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...MARINADE_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
 }
 
