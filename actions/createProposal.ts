@@ -6,6 +6,7 @@ import {
 } from '@solana/web3.js'
 
 import {
+  getGovernanceProgramVersion,
   getSignatoryRecordAddress,
   ProgramAccount,
   Realm,
@@ -23,7 +24,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 
-interface InstructionDataWithHoldUpTime {
+export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
@@ -31,7 +32,7 @@ interface InstructionDataWithHoldUpTime {
 }
 
 export const createProposal = async (
-  { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
+  { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
   governance: PublicKey,
   tokenOwnerRecord: PublicKey,
@@ -50,6 +51,13 @@ export const createProposal = async (
   const payer = walletPubkey
   const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
+
+  // Explicitly request the version before making RPC calls to work around race conditions in resolving
+  // the version for RealmInfo
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId
+  )
 
   // V2 Approve/Deny configuration
   const voteType = VoteType.SINGLE_CHOICE

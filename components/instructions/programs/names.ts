@@ -25,6 +25,7 @@ export const PROGRAM_NAMES = {
 
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: 'UXD Protocol Program',
   UXDBdZFw33TgoKPQK2sXDCLfNrdio2gUzLs1yHePfMj: 'UXD IDO Program',
+  MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD: 'Marinade Staking Program',
 
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
