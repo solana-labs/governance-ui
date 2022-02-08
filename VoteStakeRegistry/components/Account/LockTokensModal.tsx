@@ -222,7 +222,7 @@ const LockTokensModal = ({
       lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
-      tempHolderPk: realmTokenAccount!.publicKey,
+      sourceTokenAccount: realmTokenAccount!.publicKey,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,

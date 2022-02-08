@@ -16,8 +16,11 @@ import {
   getVoterPDA,
   unusedMintPk,
   DepositWithMintAccount,
+  LockupType,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import { DAYS_PER_MONTH } from './dateTools'
+import { MONTHLY } from './types'
 
 export const getDeposits = async ({
   isUsed = true,
@@ -167,4 +170,26 @@ export const calcMultiplier = ({
         lockupSaturationSecs) /
     depositScaledFactor
   return calc
+}
+
+export const getPeriod = (
+  lockUpPeriodInDays: number,
+  lockupKind: LockupType
+) => {
+  //in case we do monthly close up we pass months not days.
+  const period =
+    lockupKind !== MONTHLY
+      ? lockUpPeriodInDays
+      : lockUpPeriodInDays / DAYS_PER_MONTH
+  const maxMonthsNumber = 72
+  const daysLimit = 2190
+  //additional prevention of lockup being to high in case of monthly lockup 72 months as 6 years
+  //in case of other types 2190 days as 6 years
+  if (lockupKind === MONTHLY && period > maxMonthsNumber) {
+    throw 'lockup period is to hight'
+  }
+  if (lockupKind !== MONTHLY && period > daysLimit) {
+    throw 'lockup period is to hight'
+  }
+  return period
 }
