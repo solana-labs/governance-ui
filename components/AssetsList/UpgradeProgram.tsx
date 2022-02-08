@@ -2,7 +2,6 @@ import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
   ArrowLeftIcon,
-  DuplicateIcon,
 } from '@heroicons/react/outline'
 import { ViewState } from './types'
 import { PublicKey } from '@solana/web3.js'
