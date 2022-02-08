@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
-import { CommandLineInfo } from '../../ComandLineInfo'
+import CommandLineInfo from '../../ComandLineInfo'
 
-export function ProgramUpgradeInfo({
+export default function ProgramUpgradeInfo({
   governancePk,
   cliVisible = false,
 }: {

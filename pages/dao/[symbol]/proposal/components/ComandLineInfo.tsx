@@ -1,6 +1,10 @@
 import { DuplicateIcon } from '@heroicons/react/outline'
 
-export function CommandLineInfo({ info }: { info: string | undefined }) {
+export default function CommandLineInfo({
+  info,
+}: {
+  info: string | undefined
+}) {
   return (
     <div className="flex flex-row text-xs items-center break-all mb-3">
       <span className="text-fgd-3">{info}</span>

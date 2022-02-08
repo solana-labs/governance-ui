@@ -36,7 +36,7 @@ import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import { ProgramUpgradeInfo } from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
+import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string

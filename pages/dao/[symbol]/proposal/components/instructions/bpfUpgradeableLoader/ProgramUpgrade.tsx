@@ -21,7 +21,7 @@ import { validateAccount, validateBuffer } from '@utils/validations'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { validateInstruction } from '@utils/instructionTools'
-import { ProgramUpgradeInfo } from './ProgramUpgradeInfo'
+import ProgramUpgradeInfo from './ProgramUpgradeInfo'
 
 const ProgramUpgrade = ({
   index,
