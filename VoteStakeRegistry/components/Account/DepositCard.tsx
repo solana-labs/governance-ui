@@ -38,6 +38,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
 
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
@@ -68,6 +71,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       client: client!,
       connection,
     })
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
