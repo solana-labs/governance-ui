@@ -51,7 +51,8 @@ export default function useRealm() {
     if (realmInfo) {
       realmInfo = { ...realmInfo, programVersion: programVersion }
     }
-    if (mounted.current) {
+    // Do not set realm info until the programVersion  is resolved
+    if (mounted.current && programVersion) {
       setRealmInfo(realmInfo)
     }
   }, [symbol, realm, mounted.current, programVersion])

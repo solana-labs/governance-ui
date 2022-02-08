@@ -341,5 +341,18 @@
     "website": "https://uxd.fi",
     "twitter": "@UXDProtocol",
     "ogImage": "/realms/UXP/img/logo.png"
+  },
+  {
+    "symbol": "MonkeVentures",
+    "displayName": "MonkeVentures",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
+  },
+  {
+    "symbol": "PixelBands",
+    "displayName": "PixelBands DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AUYUF7z2aWNHySuWEW43pzSYL6aioKdc1pwCniyNCFBK",
+    "ogImage": "/realms/PixelBands/img/pixel_bands_log.png"
   }
 ]

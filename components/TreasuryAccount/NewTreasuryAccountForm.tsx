@@ -6,7 +6,7 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from '@solana/spl-governance'
+import { PROGRAM_VERSION_V1, RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
@@ -52,6 +52,11 @@ const NewAccountForm = () => {
   const router = useRouter()
   const { client } = useVoteRegistry()
   const { fmtUrlWithCluster } = useQueryContext()
+  const isCurrentVersionHigherThenV1 = () => {
+    return (
+      realmInfo?.programVersion && realmInfo.programVersion > PROGRAM_VERSION_V1
+    )
+  }
   const {
     realmInfo,
     realm,
@@ -59,12 +64,13 @@ const NewAccountForm = () => {
     symbol,
     ownVoterWeight,
   } = useRealm()
+
   const types = [
     {
       name: 'SOL Account',
       value: SOL,
       defaultMint: DEFAULT_NATIVE_SOL_MINT,
-      hide: realmInfo?.programVersion !== 2,
+      hide: !isCurrentVersionHigherThenV1(),
     },
     { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
     { name: 'Token Account', value: OTHER, defaultMint: '' },
@@ -80,7 +86,7 @@ const NewAccountForm = () => {
   const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const [treasuryType, setTreasuryType] = useState(types[0])
+  const [treasuryType, setTreasuryType] = useState(types[2])
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
@@ -228,7 +234,6 @@ const NewAccountForm = () => {
       propertyName: 'mintAddress',
     })
   }, [treasuryType])
-
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
