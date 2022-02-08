@@ -143,7 +143,20 @@ const LockTokensAccount = () => {
         <h1 className="mb-8">Locked Tokens</h1>
         <div className="flex mb-8 flex-wrap">
           {deposits
-            ?.filter((x) => typeof x.lockup.kind.none === 'undefined')
+            //we filter out one deposits that is used to store none locked community tokens
+            ?.filter(
+              (x) =>
+                x.index !==
+                deposits.find(
+                  (depo) =>
+                    typeof depo.lockup.kind.none !== 'undefined' &&
+                    depo.mint.publicKey.toBase58() ===
+                      realm?.account.communityMint.toBase58() &&
+                    depo.isUsed &&
+                    !depo.allowClawback &&
+                    depo.isUsed
+                )?.index
+            )
             ?.map((x, idx) => (
               <DepositCard deposit={x} key={idx}></DepositCard>
             ))}
