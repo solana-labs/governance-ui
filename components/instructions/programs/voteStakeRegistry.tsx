@@ -131,24 +131,18 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
               <div>Index: {decodedInstructionData?.idx}</div>
               <div>Digit shifts: {decodedInstructionData?.digitShift}</div>
               <div>
-                Unlocked scaled factor raw: {unlockedScaledFactor.toNumber()}
+                Unlocked factor: {unlockedScaledFactor.toNumber() / 1e9} (
+                {unlockedScaledFactor.toNumber()})
               </div>
               <div>
-                Unlocked scaled factor scaled:{' '}
-                {unlockedScaledFactor.toNumber() / 1e9}
+                Lockup factor: {lockupScaledFactor.toNumber() / 1e9} (
+                {lockupScaledFactor.toNumber()})
               </div>
               <div>
-                Lockup scaled factor raw: {lockupScaledFactor.toNumber()}
+                Lockup saturation secs: {lockupSaturationSecs.toNumber()}
               </div>
               <div>
-                Lockup scaled factor scaled:{' '}
-                {lockupScaledFactor.toNumber() / 1e9}
-              </div>
-              <div>
-                Lockup saturation secs raw: {lockupSaturationSecs.toNumber()}
-              </div>
-              <div>
-                Max lockup time{' '}
+                Max lockup time:{' '}
                 {decodedInstructionData &&
                   getFormattedStringFromDays(
                     secsToDays(lockupSaturationSecs.toNumber())
