@@ -9,7 +9,7 @@ export function ProgramUpgradeInfo({
   cliVisible?: boolean
 }) {
   return (
-    <div className="text-sm mb-3">
+    <div className="text-sm mb-5">
       <div className="mb-2">Upgrade authority</div>
 
       <CommandLineInfo info={governancePk?.toBase58()}></CommandLineInfo>

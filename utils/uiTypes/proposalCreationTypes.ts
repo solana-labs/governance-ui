@@ -3,6 +3,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { getNameOf } from '@tools/core/script'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
@@ -69,7 +70,10 @@ export interface ProgramUpgradeForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
   bufferAddress: string
+  bufferSpillAddress: string | undefined
 }
+
+export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
