@@ -60,7 +60,7 @@ const Proposal = () => {
 
             <div className="border-b border-fgd-4 py-4">
               <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2">{proposal?.account.name}</h1>
+                <h1 className="mr-2 break-all">{proposal?.account.name}</h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.account}
