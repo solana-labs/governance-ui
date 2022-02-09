@@ -23,7 +23,6 @@ import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
-import { usePrevious } from '@hooks/usePrevious'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -50,7 +49,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-
+  const currentUserOwnTokenRecord = wallet?.publicKey
+    ? tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey.toBase58()
+    : null
   const mainBoxesClasses =
     'bg-bkg-1 px-4 py-4 rounded-md flex flex-col mr-3 mb-3'
   const isNextSameRecord = (x, next) => {
@@ -133,7 +134,10 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     setIsLoading(false)
   }
   useEffect(() => {
-    if (JSON.stringify(ownDeposits) !== JSON.stringify(deposits)) {
+    if (
+      JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
+      tokenOwnerRecordWalletPk === currentUserOwnTokenRecord
+    ) {
       handleGetDeposits()
     }
   }, [JSON.stringify(ownDeposits)])
