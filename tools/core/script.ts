@@ -31,3 +31,7 @@ export function arrayToRecord<T>(
     T
   >
 }
+
+export function getNameOf<T>() {
+  return (name: keyof T) => name
+}

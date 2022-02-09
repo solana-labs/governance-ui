@@ -11,6 +11,7 @@ import { BN } from '@project-serum/anchor'
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
+import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,
@@ -24,7 +25,7 @@ export const voteRegistryLockDeposit = async ({
   sourceDepositIdx,
   client,
   tokenOwnerRecordPk,
-  tempHolderPk,
+  sourceTokenAccount,
   communityMintPk,
 }: {
   rpcContext: RpcContext
@@ -33,14 +34,12 @@ export const voteRegistryLockDeposit = async ({
   programId: PublicKey
   //amount that will be taken from vote registry deposit
   amountFromVoteRegistryDeposit: BN
-  //tokens can be transferred from wallet and deposit together.
   totalTransferAmount: BN
   lockUpPeriodInDays: number
   lockupKind: LockupType
   sourceDepositIdx: number
   tokenOwnerRecordPk: PublicKey | null
-  //to deposit from one deposit to another we need to withdraw tokens somewhere first
-  tempHolderPk: PublicKey
+  sourceTokenAccount: PublicKey
   communityMintPk: PublicKey
   client?: VsrClient
 }) => {
@@ -52,14 +51,15 @@ export const voteRegistryLockDeposit = async ({
   if (!wallet.publicKey) {
     throw 'no wallet connected'
   }
+  const fromWalletTransferAmount = totalTransferAmount.sub(
+    amountFromVoteRegistryDeposit
+  )
   const instructions: TransactionInstruction[] = []
   const {
     depositIdx,
     voter,
     registrar,
     voterATAPk,
-    tokenOwnerRecordPubKey,
-    voterWeightPk,
   } = await withCreateNewDeposit({
     instructions,
     walletPk: rpcContext.walletPubkey,
@@ -73,43 +73,58 @@ export const voteRegistryLockDeposit = async ({
     client,
   })
 
-  //to transfer tokens from one deposit to another we need to withdraw them first to some tokenaccount.
   if (!amountFromVoteRegistryDeposit.isZero()) {
-    const withdrawInstruction = client?.program.instruction.withdraw(
+    const internalTransferUnlockedInstruction = client?.program.instruction.internalTransferUnlocked(
       sourceDepositIdx!,
+      depositIdx,
       amountFromVoteRegistryDeposit,
       {
         accounts: {
           registrar: registrar,
           voter: voter,
           voterAuthority: wallet!.publicKey,
-          tokenOwnerRecord: tokenOwnerRecordPubKey || tokenOwnerRecordPk,
-          voterWeightRecord: voterWeightPk,
-          vault: voterATAPk,
-          destination: tempHolderPk,
-          tokenProgram: TOKEN_PROGRAM_ID,
         },
       }
     )
 
-    instructions.push(withdrawInstruction)
+    instructions.push(internalTransferUnlockedInstruction)
   }
 
-  const depositInstruction = client?.program.instruction.deposit(
-    depositIdx,
-    totalTransferAmount,
-    {
-      accounts: {
-        registrar: registrar,
-        voter: voter,
-        vault: voterATAPk,
-        depositToken: tempHolderPk,
-        depositAuthority: wallet!.publicKey!,
-        tokenProgram: TOKEN_PROGRAM_ID,
-      },
-    }
-  )
-  instructions.push(depositInstruction)
+  if (!fromWalletTransferAmount.isZero() && !fromWalletTransferAmount.isNeg()) {
+    const depositInstruction = client?.program.instruction.deposit(
+      depositIdx,
+      fromWalletTransferAmount,
+      {
+        accounts: {
+          registrar: registrar,
+          voter: voter,
+          vault: voterATAPk,
+          depositToken: sourceTokenAccount,
+          depositAuthority: wallet!.publicKey!,
+          tokenProgram: TOKEN_PROGRAM_ID,
+        },
+      }
+    )
+    instructions.push(depositInstruction)
+  }
+
+  if (!amountFromVoteRegistryDeposit.isZero()) {
+    const period = getPeriod(lockUpPeriodInDays, lockupKind)
+    const resetLockup = client?.program.instruction.resetLockup(
+      depositIdx,
+      { [lockupKind]: {} },
+      period,
+      {
+        accounts: {
+          registrar: registrar,
+          voter: voter,
+          voterAuthority: wallet!.publicKey,
+        },
+      }
+    )
+
+    instructions.push(resetLockup)
+  }
 
   const transaction = new Transaction()
   transaction.add(...instructions)
