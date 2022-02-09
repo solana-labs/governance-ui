@@ -1,11 +1,12 @@
 import Button from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getProgramName } from '@components/instructions/programs/names'
+import Modal from '@components/Modal'
 import Tooltip from '@components/Tooltip'
 import { CogIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-
+import UpgradeProgram from './UpgradeProgram'
 import { PublicKey } from '@solana/web3.js'
 import { getProgramSlot } from '@tools/sdk/bpfUpgradeableLoader/accounts'
 import { abbreviateAddress } from '@utils/formatting'
@@ -20,6 +21,7 @@ const AssetOverview = () => {
   const [slot, setSlot] = useState(0)
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
+  const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
   const name = currentAsset
     ? getProgramName(currentAsset.account.governedAccount)
     : ''
@@ -78,7 +80,7 @@ const AssetOverview = () => {
         <Button
           disabled={!canUseProgramUpgradeInstruction}
           className="sm:w-1/2 text-sm"
-          onClick={() => setCurrentCompactView(ViewState.Upgrade)}
+          onClick={() => setOpenUpgradeModal(true)}
         >
           <Tooltip
             content={
@@ -90,7 +92,17 @@ const AssetOverview = () => {
           </Tooltip>
         </Button>
       </div>
-      <div></div>
+      {openUpgradeModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenUpgradeModal(false)
+          }}
+          isOpen={openUpgradeModal}
+        >
+          <UpgradeProgram></UpgradeProgram>
+        </Modal>
+      )}
     </>
   )
 }

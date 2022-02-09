@@ -1,13 +1,11 @@
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
-  ArrowLeftIcon,
 } from '@heroicons/react/outline'
-import { ViewState } from './types'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
-import Button, { SecondaryButton } from '@components/Button'
+import Button from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import useWalletStore from 'stores/useWalletStore'
@@ -44,6 +42,7 @@ interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
 }
 
 const UpgradeProgram = () => {
+  const { resetCompactViewState } = useAssetsStore()
   const router = useRouter()
   const { client } = useVoteRegistry()
   const connection = useWalletStore((s) => s.connection)
@@ -55,7 +54,6 @@ const UpgradeProgram = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const {
     realmInfo,
     canChooseWhoVote,
@@ -81,10 +79,6 @@ const UpgradeProgram = () => {
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-  }
-  const handleGoBackToMainView = async () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
   }
   const schema = yup.object().shape({
     bufferAddress: yup
@@ -206,6 +200,7 @@ const UpgradeProgram = () => {
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -231,15 +226,7 @@ const UpgradeProgram = () => {
   }, [form.bufferAddress])
   return (
     <>
-      <h3 className="mb-4 flex items-center hover:cursor-pointer">
-        <>
-          <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.AssetOverview)}
-            className="h-4 w-4 mr-1 text-primary-light mr-2"
-          />
-          Upgrade
-        </>
-      </h3>
+      <h3 className="mb-4 flex items-center hover:cursor-pointer">Upgrade</h3>
       <div className="space-y-4">
         <Input
           label="Buffer address"
@@ -310,15 +297,8 @@ const UpgradeProgram = () => {
         )}
       </div>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <SecondaryButton
-          disabled={isLoading}
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
-        >
-          Cancel
-        </SecondaryButton>
         <Button
-          className="sm:w-1/2"
+          className="ml-auto"
           onClick={handlePropose}
           isLoading={isLoading}
         >
