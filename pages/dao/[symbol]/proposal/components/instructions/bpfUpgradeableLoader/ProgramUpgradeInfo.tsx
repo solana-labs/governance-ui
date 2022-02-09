@@ -8,6 +8,10 @@ export default function ProgramUpgradeInfo({
   governancePk: PublicKey | undefined
   cliVisible?: boolean
 }) {
+  if (!governancePk) {
+    return null
+  }
+
   return (
     <div className="text-sm mb-5">
       <div className="mb-2">Upgrade authority</div>
