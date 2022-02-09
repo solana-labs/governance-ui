@@ -1,5 +1,5 @@
-import { Menu } from '@headlessui/react'
-import { useMemo } from 'react'
+import { Menu, Switch } from '@headlessui/react'
+import { useMemo, useState } from 'react'
 import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
@@ -35,6 +35,8 @@ const ConnectWalletButton = (props) => {
   const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
     providerUrl,
   ])
+
+  const [useDevnet, setUseDevnet] = useState(false)
 
   const handleConnectDisconnect = async () => {
     try {
@@ -181,6 +183,16 @@ const ConnectWalletButton = (props) => {
                         <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
                           <BackspaceIcon className="h-4 w-4 mr-2" />
                           <span className="text-sm">Disconnect</span>
+                        </button>
+                      </Menu.Item>
+                      <Menu.Item key={'devnet'} onClick={() => {}}>
+                        <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
+                          <span className="text-sm">Devnet</span>
+                          <Switch
+                            className="LOOKHERE"
+                            checked={useDevnet}
+                            onChange={setUseDevnet}
+                          />
                         </button>
                       </Menu.Item>
                     </>
