@@ -345,5 +345,15 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "AUYUF7z2aWNHySuWEW43pzSYL6aioKdc1pwCniyNCFBK",
     "ogImage": "/realms/PixelBands/img/pixel_bands_log.png"
+  },
+  {
+    "symbol": "MEDIA",
+    "displayName": "Media DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3ZFBoLMRKAU1Th57wvDfmE8PYRZzYZUDNZksNczsrTuU",
+    "website": "https://media.network",
+    "keywords": "Media Network, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, CDN, Web3, dCDN, Content Delivery Network, SPL Tokens, Multi Chain, Protocol, Data",
+    "twitter": "@Media_FDN",
+    "ogImage": "/realms/media/img/media.svg"
   }
 ]
