@@ -4,6 +4,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
+  getMintDecimalAmount,
   getMintDecimalAmountFromNatural,
 } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
@@ -168,10 +169,10 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Schedule"
               value={
                 deposit.vestingRate &&
-                `${fmtMintAmount(
+                `${getMintDecimalAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                )} p/mo`
+                ).toFormat(2)} p/mo`
               }
             />
           )}
