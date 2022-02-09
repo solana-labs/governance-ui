@@ -198,7 +198,6 @@ const ProgramUpgrade = ({
 
       <ProgramUpgradeInfo
         governancePk={form.governedAccount?.governance?.pubkey}
-        cliVisible
       ></ProgramUpgradeInfo>
 
       <Input
