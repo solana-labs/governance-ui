@@ -82,6 +82,15 @@ export interface MangoMakeChangeMaxAccountsForm {
   maxMangoAccounts: number
 }
 
+export interface MangoMakeChangeReferralFeeParams {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroupKey: string | undefined
+  refSurchargeCentibps: number
+  refShareCentibps: number
+  refMngoRequired: number
+}
+
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string
@@ -99,6 +108,7 @@ export enum Instructions {
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  MangoChangeReferralFeeParams,
   Grant,
   Clawback,
 }
