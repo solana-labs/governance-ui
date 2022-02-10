@@ -337,7 +337,9 @@ const Grant = ({
           <div className="pt-2">
             {form.lockupKind.value !== 'monthly'
               ? getFormattedStringFromDays(form.periods)
-              : `${form.periods || 0} months`}
+              : `${
+                  form.periods || 0
+                } months (date converted to whole months only)`}
           </div>
         </div>
       )}
