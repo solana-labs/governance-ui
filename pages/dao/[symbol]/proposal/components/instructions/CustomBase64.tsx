@@ -36,7 +36,6 @@ const CustomBase64 = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''

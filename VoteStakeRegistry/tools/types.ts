@@ -7,7 +7,7 @@ export interface Period {
 }
 export interface LockupKind {
   value: LockupType
-  info: string
+  info: string[]
   displayName: string
 }
 export interface VestingPeriod {
@@ -16,24 +16,34 @@ export interface VestingPeriod {
   info: string
 }
 export const MONTHLY = 'monthly'
+export const CONSTANT = 'constant'
 export const lockupTypes: LockupKind[] = [
   {
     value: 'cliff',
     displayName: 'Cliff',
-    info:
-      'Tokens are locked for a set timeframe and are released in full at the end of the period. Vote weight increase declines linearly over the period.',
+    info: [
+      'Tokens are locked for a fixed duration and are released in full at the end of it.',
+      'Vote weight declines linearly until release.',
+      'Example: You lock 10.000 tokens for two years. They are then unavailable for the next two years. After this time, you can withdraw them again.',
+    ],
   },
   {
-    value: 'constant',
+    value: CONSTANT,
     displayName: 'Constant',
-    info:
-      'Tokens are locked permanently for a timeframe. At any time a constant lockup can be converted to a cliff lockup with a timeframe greater than or equal to the constant lockup period. Vote weight increase stays constant until the lockup is converted to a cliff type lockup.',
+    info: [
+      'Tokens are locked indefinitely. At any time you can start the unlock process which lasts for the initially chosen lockup duration.',
+      'Vote weight stays constant until you start the unlock process, then it declines linearly until release.',
+      'Example: You lock 10.000 tokens with a lockup duration of one year. After two years you decide to start the unlocking process. Another year after that, you can withdraw the tokens.',
+    ],
   },
   {
     value: MONTHLY,
     displayName: 'Vested',
-    info:
-      'Tokens are locked for a given timeframe and released over time at a rate of (number of periods / locked amount) per release period. Tokens can be released monthly. Vote weight increase declines linearly over the period.',
+    info: [
+      'Tokens are locked for a fixed duration and released over time at a rate of (locked amount / number of periods) per vesting period.',
+      'Vote weight declines linearly and with each vesting until release.',
+      'Example: You lock 12.000 tokens for one year with monthly vesting. Every month 1.000 tokens unlock. After the year, all tokens have unlocked.',
+    ],
   },
 ]
 

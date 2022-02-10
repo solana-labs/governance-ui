@@ -6,6 +6,7 @@ import { MintInfo } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
+import { getNameOf } from '@tools/core/script'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
@@ -72,6 +73,7 @@ export interface ProgramUpgradeForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
   bufferAddress: string
+  bufferSpillAddress?: string | undefined
 }
 
 export interface ProgramAuthorityForm {
@@ -93,6 +95,7 @@ export interface RemoveLiquidityRaydiumForm {
   liquidityPool: string
   amountIn: number
 }
+export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined

@@ -6,8 +6,9 @@ import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
   ProgramUpgradeForm,
+  programUpgradeFormNameOf,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -16,10 +17,11 @@ import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/create
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import { debounce } from '@utils/debounce'
-import { validateBuffer } from '@utils/validations'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import { validateAccount, validateBuffer } from '@utils/validations'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { validateInstruction } from '@utils/instructionTools'
+import ProgramUpgradeInfo from './ProgramUpgradeInfo'
 
 const ProgramUpgrade = ({
   index,
@@ -46,6 +48,7 @@ const ProgramUpgrade = ({
     governedAccount: undefined,
     programId: programId?.toString(),
     bufferAddress: '',
+    bufferSpillAddress: wallet?.publicKey?.toBase58(),
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -62,11 +65,15 @@ const ProgramUpgrade = ({
       form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const bufferSpillAddress = form.bufferSpillAddress
+        ? new PublicKey(form.bufferSpillAddress)
+        : wallet.publicKey
+
       const upgradeIx = await createUpgradeInstruction(
         form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.bufferAddress),
         form.governedAccount.governance.pubkey,
-        wallet!.publicKey
+        bufferSpillAddress
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
@@ -79,10 +86,17 @@ const ProgramUpgrade = ({
   }
   useEffect(() => {
     handleSetForm({
-      propertyName: 'programId',
+      propertyName: programUpgradeFormNameOf('programId'),
       value: programId?.toString(),
     })
   }, [realmInfo?.programId])
+
+  useEffect(() => {
+    handleSetForm({
+      propertyName: programUpgradeFormNameOf('bufferSpillAddress'),
+      value: wallet?.publicKey?.toBase58(),
+    })
+  }, [wallet?.publicKey?.toBase58()])
 
   useEffect(() => {
     if (form.bufferAddress) {
@@ -92,12 +106,14 @@ const ProgramUpgrade = ({
       })
     }
   }, [form.bufferAddress])
+
   useEffect(() => {
     handleSetInstructions(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )
   }, [form])
+
   const schema = yup.object().shape({
     bufferAddress: yup
       .string()
@@ -125,6 +141,30 @@ const ProgramUpgrade = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+
+    bufferSpillAddress: yup
+      .string()
+      .test(
+        'bufferSpillAddressTest',
+        'Invalid buffer spill address',
+        async function (val: string) {
+          if (val) {
+            try {
+              await validateAccount(connection, val)
+              return true
+            } catch (ex) {
+              return this.createError({
+                message: `${ex}`,
+              })
+            }
+            return true
+          } else {
+            return this.createError({
+              message: `Buffer spill address is required`,
+            })
+          }
+        }
+      ),
   })
 
   return (
@@ -133,10 +173,13 @@ const ProgramUpgrade = ({
         label="Program"
         governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
+          handleSetForm({
+            value,
+            propertyName: programUpgradeFormNameOf('governedAccount'),
+          })
         }}
         value={form.governedAccount}
-        error={formErrors['governedAccount']}
+        error={formErrors[programUpgradeFormNameOf('governedAccount')]}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
@@ -147,10 +190,27 @@ const ProgramUpgrade = ({
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'bufferAddress',
+            propertyName: programUpgradeFormNameOf('bufferAddress'),
           })
         }
-        error={formErrors['bufferAddress']}
+        error={formErrors[programUpgradeFormNameOf('bufferAddress')]}
+      />
+
+      <ProgramUpgradeInfo
+        governancePk={form.governedAccount?.governance?.pubkey}
+      ></ProgramUpgradeInfo>
+
+      <Input
+        label="Buffer spill address"
+        value={form.bufferSpillAddress}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: programUpgradeFormNameOf('bufferSpillAddress'),
+          })
+        }
+        error={formErrors[programUpgradeFormNameOf('bufferSpillAddress')]}
       />
     </>
   )

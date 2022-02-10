@@ -18,6 +18,7 @@ import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
+import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 /**
  * Default governance program id instance
@@ -159,6 +160,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
+  ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -166,7 +168,6 @@ export async function getInstructionDescriptor(
   instruction: InstructionData
 ) {
   let descriptors: any
-
   if (isGovernanceProgram(instruction.programId)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']

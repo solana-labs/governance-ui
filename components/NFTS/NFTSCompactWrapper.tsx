@@ -34,22 +34,25 @@ const NFTSCompactWrapper = () => {
   return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <h3 className="mb-4 flex items-center">
-        Collectables
-        <ArrowsExpandIcon
+        <div
+          className="cursor-pointer flex items-center"
           onClick={() => {
             const url = fmtUrlWithCluster(
               `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
             )
             router.push(url)
           }}
-          className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer"
-        ></ArrowsExpandIcon>
+        >
+          Collectables
+          <ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light"></ArrowsExpandIcon>
+        </div>
+
         <div
           onClick={() => {
             setCurrentCompactAccount(nftsGovernedTokenAccounts[0], connection)
             setOpenNftDepositModal(true)
           }}
-          className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3 ml-2 cursor-pointer"
+          className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3 ml-auto cursor-pointer"
         >
           <PlusIcon />
         </div>

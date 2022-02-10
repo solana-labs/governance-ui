@@ -35,10 +35,12 @@ import {
   LockupKind,
   lockupTypes,
   MONTHLY,
+  CONSTANT,
   Period,
   VestingPeriod,
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
+import BigNumber from 'bignumber.js'
 
 const YES = 'YES'
 const NO = 'NO'
@@ -52,15 +54,8 @@ const LockTokensModal = ({
   isOpen: boolean
   depositToUnlock?: DepositWithMintAccount | null
 }) => {
-  const { getDeposits } = useDepositStore()
-  const {
-    ownTokenRecord,
-    mint,
-    realm,
-    realmTokenAccount,
-    realmInfo,
-    tokenRecords,
-  } = useRealm()
+  const { getOwnedDeposits } = useDepositStore()
+  const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
   const {
     client,
     calcMintMultiplier,
@@ -70,6 +65,9 @@ const LockTokensModal = ({
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletStore((s) => s.current)
   const deposits = useDepositStore((s) => s.state.deposits)
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
 
   const lockupPeriods: Period[] = [
     {
@@ -227,21 +225,20 @@ const LockTokensModal = ({
       lockUpPeriodInDays: lockupPeriod.value,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
-      tempHolderPk: realmTokenAccount!.publicKey,
+      sourceTokenAccount: realmTokenAccount!.publicKey,
       tokenOwnerRecordPk:
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
-
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     onClose()
   }
 
@@ -281,15 +278,13 @@ const LockTokensModal = ({
         tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey || null,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
 
     onClose()
   }
@@ -359,9 +354,13 @@ const LockTokensModal = ({
               </Tab.List>
             </Tab.Group>
             <div className={`${labelClasses} font-bold`}>
-              {lockupType.value} Lockup
+              {lockupType.displayName} Lockup
             </div>
-            <div className="text-xs">{lockupType.info}</div>
+            {lockupType.info.map((text, index) => (
+              <div key={index} className="text-xs mb-2">
+                {text}
+              </div>
+            ))}
           </>
         )
       case 1:
@@ -371,11 +370,13 @@ const LockTokensModal = ({
       case 2:
         return (
           <div className="mb-6">
-            <div className="text-xs mb-6">
-              To initiate the unlock process you need to convert all, or part of
-              your constant lockup to a cliff lockup with a duration greater
-              than or equal to the constant lockup duration.
-            </div>
+            {lockupType.value == CONSTANT && (
+              <div className="text-xs mb-6">
+                To initiate the unlock process you need to convert all, or part
+                of your constant lockup to a cliff lockup with a duration
+                greater than or equal to the constant lockup duration.
+              </div>
+            )}
             {hasMoreTokensInWallet && !depositToUnlock && (
               <DoYouWantToDepositMoreComponent></DoYouWantToDepositMoreComponent>
             )}
@@ -465,12 +466,15 @@ const LockTokensModal = ({
           <div className="flex flex-col text-center mb-6">
             {depositToUnlock ? (
               <h2>
-                This will convert {amount} {tokenName} into a cliff type lockup
-                that unlocks in {daysToYear(lockupPeriod.value)} years.
+                This will convert {new BigNumber(amount!).toFormat()}{' '}
+                {tokenName} into a cliff type lockup that unlocks in{' '}
+                {daysToYear(lockupPeriod.value)} years.
               </h2>
             ) : (
               <h2>
-                Lock {amount} for {daysToYear(lockupPeriod.value)} {tokenName}{' '}
+                Lock {new BigNumber(amount!).toFormat()} {tokenName} for
+                {lockupType.value == CONSTANT && ' at least '}
+                {daysToYear(lockupPeriod.value)}{' '}
                 {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
               </h2>
             )}

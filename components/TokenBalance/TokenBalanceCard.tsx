@@ -206,6 +206,10 @@ const TokenDeposit = ({
               governances[proposal.account.governance.toBase58()]
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
+              notify({
+                type: 'error',
+                message: `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
+              })
               throw new Error(
                 `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`
               )

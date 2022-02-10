@@ -37,6 +37,8 @@ import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
+import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 
 const Grant = ({
   index,
@@ -54,6 +56,7 @@ const Grant = ({
   const shouldBeGoverned = index !== 0 && governance
   const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
   const [endDate, setEndDate] = useState('')
+  const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
   const [form, setForm] = useState<GrantForm>({
     destinationAccount: '',
     // No default transfer amount
@@ -230,6 +233,25 @@ const Grant = ({
         .min(1, 'End date required'),
     })
   )
+  useEffect(() => {
+    const getGrantMints = async () => {
+      const clientProgramId = client!.program.programId
+      const { registrar } = await getRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        clientProgramId
+      )
+      const existingRegistrar = await tryGetRegistrar(registrar, client!)
+      if (existingRegistrar) {
+        setUseableGrantMints(
+          existingRegistrar.votingMints.map((x) => x.mint.toBase58())
+        )
+      }
+    }
+    if (client) {
+      getGrantMints()
+    }
+  }, [client])
   return (
     <>
       <Select
@@ -252,7 +274,10 @@ const Grant = ({
       <GovernedAccountSelect
         label="Source account"
         governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
+          governedTokenAccountsWithoutNfts.filter(
+            (x) =>
+              x.mint && useableGrantMints.includes(x.mint.publicKey.toBase58())
+          ) as GovernedMultiTypeAccount[]
         }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
