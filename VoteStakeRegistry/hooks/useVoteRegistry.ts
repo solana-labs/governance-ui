@@ -11,10 +11,9 @@ import { usePrevious } from '@hooks/usePrevious'
 export function useVoteRegistry() {
   const { realm } = useRealm()
   const wallet = useWalletStore((s) => s.current)
+  const previousWalletPk = usePrevious(wallet?.publicKey?.toBase58())
   const connection = useWalletStore((s) => s.connection)
-
   const [client, setClient] = useState<VsrClient>()
-  const previousClient: VsrClient = usePrevious(client?.program.programId)
   const [
     communityMintRegistrar,
     setCommunityMintRegistrar,
@@ -65,7 +64,10 @@ export function useVoteRegistry() {
       setClient(vsrClient)
     }
 
-    if (wallet?.connected) {
+    if (
+      wallet?.connected &&
+      wallet.publicKey?.toBase58() !== previousWalletPk
+    ) {
       handleSetClient()
     }
   }, [connection.endpoint, wallet?.connected])
@@ -86,12 +88,7 @@ export function useVoteRegistry() {
         setCommunityMintRegistrar(existingRegistrar)
       }
     }
-    if (
-      realm?.pubkey &&
-      (client?.program.programId !== previousClient?.program.programId ||
-        client.program.provider.wallet.publicKey.toBase58() !==
-          wallet?.publicKey?.toBase58())
-    ) {
+    if (realm) {
       handleSetRegistrar()
     }
   }, [realm?.pubkey, client])
