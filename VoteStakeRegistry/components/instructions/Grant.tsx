@@ -230,7 +230,7 @@ const Grant = ({
       periods: yup
         .number()
         .required('End date required')
-        .min(1, 'End date required'),
+        .min(1, 'End date cannot be prior to start date'),
     })
   )
   useEffect(() => {
@@ -337,7 +337,9 @@ const Grant = ({
           <div className="pt-2">
             {form.lockupKind.value !== 'monthly'
               ? getFormattedStringFromDays(form.periods)
-              : `${form.periods || 0} months`}
+              : `${
+                  form.periods || 0
+                } months (date converted to whole months only)`}
           </div>
         </div>
       )}
