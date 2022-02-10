@@ -131,13 +131,15 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     setIsLoading(false)
   }
   useEffect(() => {
+    console.log('use effect fire !@@@@@@@@@@@@@@@@')
     if (
       JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
       tokenOwnerRecordWalletPk === wallet?.publicKey?.toBase58()
     ) {
+      console.log('use effect fire handle get deposits !@@@@@@@@@@@@@@@@')
       handleGetDeposits()
     }
-  }, [JSON.stringify(ownDeposits)])
+  }, [JSON.stringify(ownDeposits), ownDeposits.length])
   useEffect(() => {
     handleGetDeposits()
   }, [tokenOwnerRecordWalletPk, client])
@@ -152,11 +154,12 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
               <PreviousRouteBtn />
               <span className="ml-4">
                 Account{' '}
-                {tokenOwnerRecordWalletPk !== wallet?.publicKey?.toBase58() && (
-                  <small className="text-sm text-red">
-                    (You are viewing other voter account)
-                  </small>
-                )}
+                {tokenOwnerRecordWalletPk !== wallet?.publicKey?.toBase58() &&
+                  connected && (
+                    <small className="text-sm text-red">
+                      (You are viewing other voter account)
+                    </small>
+                  )}
               </span>
               <div className="ml-auto flex flex-row">
                 <DepositCommunityTokensBtn className="mr-3"></DepositCommunityTokensBtn>

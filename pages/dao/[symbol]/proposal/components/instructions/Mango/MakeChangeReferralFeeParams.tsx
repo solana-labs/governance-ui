@@ -16,9 +16,11 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
 import { makeChangeReferralFeeParamsInstruction } from '@blockworks-foundation/mango-client'
 import { BN } from '@project-serum/anchor'
+import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
+import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
 
 const MakeChangeReferralFeeParams = ({
   index,
@@ -30,6 +32,7 @@ const MakeChangeReferralFeeParams = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
+  const connection = useWalletStore((s) => s.connection)
   const governedProgramAccounts = getGovernancesByAccountTypes([
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
@@ -69,13 +72,21 @@ const MakeChangeReferralFeeParams = ({
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
+      const mint = await tryGetMint(
+        connection.current,
+        new PublicKey(MANGO_MINT)
+      )
+      const refMngoRequiredMintAmount = parseMintNaturalAmountFromDecimal(
+        form.refMngoRequired!,
+        mint!.account.decimals
+      )
       const setMaxMangoAccountsInstr = makeChangeReferralFeeParamsInstruction(
         form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.mangoGroupKey!),
         form.governedAccount.governance.pubkey,
         new BN(form.refSurchargeCentibps),
         new BN(form.refShareCentibps),
-        new BN(form.refMngoRequired)
+        new BN(refMngoRequiredMintAmount)
       )
 
       serializedInstruction = serializeInstructionToBase64(

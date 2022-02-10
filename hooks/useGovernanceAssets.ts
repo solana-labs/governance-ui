@@ -185,7 +185,7 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.MangoChangeReferralFeeParams,
       name: 'Mango - change referral fee params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+      isVisible: canUseProgramUpgradeInstruction,
     },
     {
       id: Instructions.None,
