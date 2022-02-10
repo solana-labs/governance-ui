@@ -131,12 +131,10 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
     setIsLoading(false)
   }
   useEffect(() => {
-    console.log('use effect fire !@@@@@@@@@@@@@@@@')
     if (
       JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
       tokenOwnerRecordWalletPk === wallet?.publicKey?.toBase58()
     ) {
-      console.log('use effect fire handle get deposits !@@@@@@@@@@@@@@@@')
       handleGetDeposits()
     }
   }, [JSON.stringify(ownDeposits), ownDeposits.length])
