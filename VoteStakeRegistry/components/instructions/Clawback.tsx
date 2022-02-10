@@ -227,7 +227,7 @@ const Clawback = ({
         error={formErrors['deposit']}
       >
         {deposits
-          ?.filter((x) => !x.amountDepositedNative.isZero())
+          ?.filter((x) => !x.amountDepositedNative.isZero() && x.allowClawback)
           ?.map((x, idx) => {
             return (
               <Select.Option key={idx} value={x}>
