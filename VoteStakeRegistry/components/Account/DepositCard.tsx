@@ -27,6 +27,7 @@ import Tooltip from '@components/Tooltip'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
+import { sleep } from '@blockworks-foundation/mango-client'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
@@ -78,6 +79,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositIndex: depositEntry.index,
       client: client,
     })
+    //sometimes right after withdraw simulation return old data
+    //sleep just to be sure we have up to date data
+    await sleep(500)
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
