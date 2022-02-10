@@ -88,7 +88,9 @@ export function useVoteRegistry() {
     }
     if (
       realm?.pubkey &&
-      client?.program.programId !== previousClient?.program.programId
+      (client?.program.programId !== previousClient?.program.programId ||
+        client.program.provider.wallet.publicKey.toBase58() !==
+          wallet?.publicKey?.toBase58())
     ) {
       handleSetRegistrar()
     }
