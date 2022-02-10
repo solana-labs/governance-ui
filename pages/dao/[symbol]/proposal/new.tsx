@@ -41,7 +41,6 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
-import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -299,13 +298,6 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
-        )
-      case Instructions.MangoChangeReferralFeeParams:
-        return (
-          <MakeChangeReferralFeeParams
-            index={idx}
-            governance={governance}
-          ></MakeChangeReferralFeeParams>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>
