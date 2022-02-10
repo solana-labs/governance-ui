@@ -230,7 +230,7 @@ const Grant = ({
       periods: yup
         .number()
         .required('End date required')
-        .min(1, 'End date required'),
+        .min(1, 'End date cannot be prior to start date'),
     })
   )
   useEffect(() => {
