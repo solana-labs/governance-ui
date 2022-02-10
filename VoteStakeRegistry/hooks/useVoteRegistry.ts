@@ -88,7 +88,7 @@ export function useVoteRegistry() {
         setCommunityMintRegistrar(existingRegistrar)
       }
     }
-    if (realm) {
+    if (realm && client) {
       handleSetRegistrar()
     }
   }, [realm?.pubkey, client])
