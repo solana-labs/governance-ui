@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
-import { usePrevious } from '@hooks/usePrevious'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 export function useVoteRegistry() {
@@ -11,30 +10,17 @@ export function useVoteRegistry() {
     handleSetClient,
   } = useVoteStakeRegistryClientStore()
   const wallet = useWalletStore((s) => s.current)
-  const previousRealmPk = usePrevious(realm?.pubkey.toBase58())
-  const previousWalletPk = usePrevious(wallet?.publicKey?.toBase58())
   const connection = useWalletStore((s) => s.connection)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const previousClientProgramPk = usePrevious(
-    client?.program.programId.toBase58()
-  )
 
   useEffect(() => {
-    if (
-      wallet?.connected &&
-      wallet.publicKey?.toBase58() !== previousWalletPk
-    ) {
+    if (wallet?.connected) {
       handleSetClient(wallet, connection)
     }
-  }, [connection.endpoint, wallet?.connected])
+  }, [connection.endpoint, wallet?.connected, realm?.pubkey])
 
   useEffect(() => {
-    if (
-      realm &&
-      client &&
-      previousRealmPk !== realm.pubkey.toBase58() &&
-      previousClientProgramPk !== client.program.programId.toBase58()
-    ) {
+    if (realm && client) {
       handleSetRegistrar(client, realm)
     }
   }, [realm?.pubkey, client])
