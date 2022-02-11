@@ -11,7 +11,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
   serializeInstructionToBase64,
-  //serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
@@ -42,7 +41,7 @@ const Clawback = ({
 }) => {
   const { client } = useVoteRegistry()
   const connection = useWalletStore((s) => s.connection)
-  const { realm, tokenRecords } = useRealm()
+  const { realm } = useRealm()
   const {
     governedTokenAccountsWithoutNfts,
     governancesArray,
@@ -83,7 +82,6 @@ const Clawback = ({
         realmPk: realm!.pubkey,
         realmAuthority: realm!.account.authority!,
         voterWalletAddress: voterWalletAddress,
-        tokenOwnerRecord: tokenRecords[voterWalletAddress.toBase58()].pubkey,
         destination: clawbackDestination,
         voterDepositIndex: form.deposit.index,
         grantMintPk: form.deposit.mint.publicKey,

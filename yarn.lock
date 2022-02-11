@@ -585,10 +585,10 @@
     dotenv "^10.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/voter-stake-registry-client@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.8.tgz#69c9eb60405c8a0d85479ce46e3b31549ff811e4"
-  integrity sha512-we91zofqZ3vbxVEXWbCyv1wDpNL0a69wfsr7vbEZerjUxrU9Gw3QL860cbO6Yym/LQwKF3Jr2GAjKwmZl6Btpg==
+"@blockworks-foundation/voter-stake-registry-client@^0.1.10":
+  version "0.1.10"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.10.tgz#f4bf4e26109d306704c8850b43b5a0e68cadbdd4"
+  integrity sha512-TYstHzQUwT8tUBjfscjxAZAQHoHGoz35aUaAOQ0+0HnQkQl4lmAoi7QQV186dA7xGJ7dyRSWPgxoLJZ0QIXxTA==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
