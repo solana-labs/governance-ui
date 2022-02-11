@@ -87,7 +87,6 @@ export const getDeposits = async ({
         (x) => x.name === VOTER_INFO_EVENT_NAME
       )
       deposits = deposits.map((x) => {
-        console.log(x)
         const additionalInfoData = depositsInfo.find(
           (info) => info.data.depositEntryIndex === x.index
         ).data
