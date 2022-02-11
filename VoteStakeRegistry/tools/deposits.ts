@@ -8,12 +8,7 @@ import {
   Realm,
   simulateTransaction,
 } from '@solana/spl-governance'
-import {
-  TransactionInstruction,
-  PublicKey,
-  Transaction,
-  Connection,
-} from '@solana/web3.js'
+import { PublicKey, Transaction, Connection } from '@solana/web3.js'
 import { tryGetMint } from '@utils/tokens'
 import {
   getRegistrarPDA,
@@ -77,40 +72,10 @@ export const getDeposits = async ({
     const usedDeposits = deposits.filter((x) => x.isUsed)
     const isThereAnyUsedDeposits = usedDeposits.length
     if (isThereAnyUsedDeposits) {
-      const instructions: TransactionInstruction[] = []
       // The wallet can be any existing account for the simulation
       // Note: when running a local validator ensure the account is copied from devnet: --clone ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk -ud
       const walletPk = new PublicKey(
         'ENmcpFCpxN1CqyUjuog9yyUVfdXBKF3LVCwLr7grJZpk'
-      )
-      const isThereIndexHigherIndexHigherThen16 =
-        typeof usedDeposits.find((x) => x.index > 15) !== 'undefined'
-
-      instructions.push(
-        client.program.instruction.logVoterInfo(0, {
-          accounts: {
-            registrar,
-            voter,
-          },
-        })
-      )
-      if (isThereIndexHigherIndexHigherThen16) {
-        instructions.push(
-          client.program.instruction.logVoterInfo(16, {
-            accounts: {
-              registrar,
-              voter,
-            },
-          })
-        )
-      }
-
-      const transaction = new Transaction({ feePayer: walletPk })
-      transaction.add(...instructions)
-      const getMoreDepositInfo = await simulateTransaction(
-        connection,
-        transaction,
-        'recent'
       )
       //because we switch wallet in here we can't use rpc from npm module
       //anchor dont allow to switch wallets inside existing client
@@ -120,9 +85,44 @@ export const getDeposits = async ({
         client.program.programId,
         client.program.coder
       )
-      parser.parseLogs(getMoreDepositInfo.value.logs!, (event) => {
+      const isThereIndexHigherThen15 =
+        typeof usedDeposits.find((x) => x.index > 15) !== 'undefined'
+      const transaction = new Transaction({ feePayer: walletPk })
+      transaction.add(
+        client.program.instruction.logVoterInfo(0, {
+          accounts: {
+            registrar,
+            voter,
+          },
+        })
+      )
+      const zeroTo15DepositInfo = await simulateTransaction(
+        connection,
+        transaction,
+        'recent'
+      )
+      parser.parseLogs(zeroTo15DepositInfo.value.logs!, (event) => {
         events.push(event)
       })
+      if (isThereIndexHigherThen15) {
+        const transaction = new Transaction({ feePayer: walletPk })
+        transaction.add(
+          client.program.instruction.logVoterInfo(15, {
+            accounts: {
+              registrar,
+              voter,
+            },
+          })
+        )
+        const sixTeenTo32DepositsInfo = await simulateTransaction(
+          connection,
+          transaction,
+          'recent'
+        )
+        parser.parseLogs(sixTeenTo32DepositsInfo.value.logs!, (event) => {
+          events.push(event)
+        })
+      }
       const DEPOSIT_EVENT_NAME = 'DepositEntryInfo'
       const VOTER_INFO_EVENT_NAME = 'VoterInfo'
       const depositsInfo = events.filter((x) => x.name === DEPOSIT_EVENT_NAME)
@@ -135,7 +135,7 @@ export const getDeposits = async ({
         ).data
 
         x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0)
-        x.available = additionalInfoData.unlocked
+        x.available = additionalInfoData.unlocked || new BN(0)
         x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
         return x
       })
