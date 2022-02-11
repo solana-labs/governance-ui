@@ -123,7 +123,7 @@ export const withCreateNewDeposit = async ({
 
   const firstFreeIdx = existingVoter?.deposits?.findIndex((x) => !x.isUsed) || 0
 
-  if (firstFreeIdx === -1) {
+  if (firstFreeIdx === -1 && createNewDeposit) {
     throw 'User has to much active deposits'
   }
 

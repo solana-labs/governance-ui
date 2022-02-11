@@ -202,6 +202,7 @@ const getDepositsAdditionalInfoEvents = async (
     0,
     usedDeposits.map((x) => x.index)
   )
+
   const numberOfSimulations =
     highestIndex === 0 ? 1 : Math.ceil(highestIndex / maxRange)
 
@@ -224,6 +225,5 @@ const getDepositsAdditionalInfoEvents = async (
       events.push(event)
     })
   }
-  console.log(events)
   return events
 }

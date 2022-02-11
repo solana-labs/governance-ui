@@ -537,7 +537,11 @@ const LockTokensModal = ({
     switch (currentStep) {
       case 2:
         return (
-          <Button className="mb-4" onClick={handleNextStep} disabled={!amount}>
+          <Button
+            className="mb-4"
+            onClick={handleNextStep}
+            disabled={!amount || !maxAmount}
+          >
             {depositToUnlock ? 'Start unlock' : 'Lock Tokens'}
           </Button>
         )
