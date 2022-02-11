@@ -68,7 +68,6 @@ export const getDeposits = async ({
           } as DepositWithMintAccount)
       )
       .filter((x) => typeof isUsed === 'undefined' || x.isUsed === isUsed)
-
     const usedDeposits = deposits.filter((x) => x.isUsed)
     const areThereAnyUsedDeposits = usedDeposits.length
 
@@ -203,7 +202,8 @@ const getDepositsAdditionalInfoEvents = async (
     0,
     usedDeposits.map((x) => x.index)
   )
-  const numberOfSimulations = Math.ceil(highestIndex / maxRange)
+  const numberOfSimulations =
+    highestIndex === 0 ? 1 : Math.ceil(highestIndex / maxRange)
 
   for (let i = 0; i < numberOfSimulations; i++) {
     const transaction = new Transaction({ feePayer: walletPk })
