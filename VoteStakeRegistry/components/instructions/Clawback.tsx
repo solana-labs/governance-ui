@@ -17,7 +17,6 @@ import { validateInstruction } from '@utils/instructionTools'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import * as yup from 'yup'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   Deposit,
   DepositWithMintAccount,
@@ -31,6 +30,7 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
 import { abbreviateAddress } from '@utils/formatting'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const Clawback = ({
   index,
@@ -39,7 +39,7 @@ const Clawback = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const { realm } = useRealm()
   const {

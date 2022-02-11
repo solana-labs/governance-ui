@@ -16,13 +16,13 @@ import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import tokenService from '@utils/services/token'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -34,7 +34,7 @@ const unlockedTypes = ['none']
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const { realm, mint, tokenRecords } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])

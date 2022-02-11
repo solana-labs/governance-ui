@@ -64,7 +64,11 @@ const LockPluginTokenBalanceCard = ({
           }
         >
           <div
-            className={!connected ? 'opacity-0.6 pointer-events-none' : ''}
+            className={
+              !connected || !tokenOwnerRecordPk
+                ? 'opacity-0.6 pointer-events-none'
+                : ''
+            }
             onClick={() => {
               const url = fmtUrlWithCluster(
                 `/dao/${symbol}/account/${tokenOwnerRecordPk}`

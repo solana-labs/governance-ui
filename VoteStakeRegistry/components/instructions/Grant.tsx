@@ -36,9 +36,9 @@ import moment from 'moment'
 import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const Grant = ({
   index,
@@ -47,7 +47,7 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const dateNow = moment().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)

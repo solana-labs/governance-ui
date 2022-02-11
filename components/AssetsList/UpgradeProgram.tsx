@@ -33,8 +33,8 @@ import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/create
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -44,7 +44,7 @@ interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
 const UpgradeProgram = () => {
   const { resetCompactViewState } = useAssetsStore()
   const router = useRouter()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const program = useAssetsStore((s) => s.compact.currentAsset)
