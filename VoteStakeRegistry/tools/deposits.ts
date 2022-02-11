@@ -87,13 +87,14 @@ export const getDeposits = async ({
         (x) => x.name === VOTER_INFO_EVENT_NAME
       )
       deposits = deposits.map((x) => {
+        console.log(x)
         const additionalInfoData = depositsInfo.find(
           (info) => info.data.depositEntryIndex === x.index
         ).data
 
-        x.currentlyLocked = additionalInfoData.locking.amount || new BN(0)
+        x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0)
         x.available = additionalInfoData.unlocked || new BN(0)
-        x.vestingRate = additionalInfoData.locking.vesting?.rate || new BN(0)
+        x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
         return x
       })
       if (
@@ -105,6 +106,7 @@ export const getDeposits = async ({
       if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
         votingPower = votingPowerEntry.data.votingPower
       }
+      return { votingPower, deposits, votingPowerFromDeposits }
     }
   }
   return { votingPower, deposits, votingPowerFromDeposits }
@@ -223,6 +225,6 @@ const getDepositsAdditionalInfoEvents = async (
       events.push(event)
     })
   }
-
+  console.log(events)
   return events
 }
