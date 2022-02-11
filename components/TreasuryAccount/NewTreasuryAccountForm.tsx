@@ -27,9 +27,9 @@ import {
 } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { TokenInfo } from '@solana/spl-token-registry'
 import Select from '@components/inputs/Select'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
@@ -50,7 +50,7 @@ const NFT = 'NFT'
 
 const NewAccountForm = () => {
   const router = useRouter()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { fmtUrlWithCluster } = useQueryContext()
   const isCurrentVersionHigherThenV1 = () => {
     return (

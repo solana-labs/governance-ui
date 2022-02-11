@@ -19,7 +19,7 @@ import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -34,7 +34,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)

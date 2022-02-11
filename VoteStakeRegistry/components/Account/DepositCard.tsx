@@ -9,7 +9,6 @@ import {
 } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithMintAccount,
   LockupType,
@@ -28,15 +27,16 @@ import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import { sleep } from '@blockworks-foundation/mango-client'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
-  const {
-    client,
-    calcMintMultiplier,
-    communityMintRegistrar,
-  } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const communityMintRegistrar = useVoteStakeRegistryClientStore(
+    (s) => s.state.communityMintRegistrar
+  )
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
@@ -203,7 +203,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Vote multiplier"
               value={calcMintMultiplier(
                 deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber(),
-                communityMintRegistrar
+                communityMintRegistrar,
+                realm
               )}
             />
           )}

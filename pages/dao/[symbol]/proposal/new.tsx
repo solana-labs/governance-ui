@@ -39,8 +39,8 @@ import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -57,7 +57,7 @@ export const NewProposalContext = createContext<InstructionsContext>(
 
 const New = () => {
   const router = useRouter()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,

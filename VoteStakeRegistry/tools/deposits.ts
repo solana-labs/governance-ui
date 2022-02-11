@@ -3,7 +3,11 @@ import {
   BN,
   EventParser,
 } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor'
-import { simulateTransaction } from '@solana/spl-governance'
+import {
+  ProgramAccount,
+  Realm,
+  simulateTransaction,
+} from '@solana/spl-governance'
 import {
   TransactionInstruction,
   PublicKey,
@@ -17,6 +21,7 @@ import {
   unusedMintPk,
   DepositWithMintAccount,
   LockupType,
+  Registrar,
 } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetVoter, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { DAYS_PER_MONTH } from './dateTools'
@@ -192,4 +197,35 @@ export const getPeriod = (
     throw 'lockup period is to hight'
   }
   return period
+}
+
+export const calcMintMultiplier = (
+  lockupSecs: number,
+  registrar: Registrar | null,
+  realm: ProgramAccount<Realm> | undefined
+) => {
+  const mintCfgs = registrar?.votingMints
+  const mintCfg = mintCfgs?.find(
+    (x) => x.mint.toBase58() === realm?.account.communityMint.toBase58()
+  )
+  if (mintCfg) {
+    const {
+      lockupSaturationSecs,
+      unlockedScaledFactor,
+      lockupScaledFactor,
+    } = mintCfg
+    const depositScaledFactorNum = unlockedScaledFactor.toNumber()
+    const lockupScaledFactorNum = lockupScaledFactor.toNumber()
+    const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
+    //(deposit_scaled_factor + lockup_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor
+    const calced = calcMultiplier({
+      depositScaledFactor: depositScaledFactorNum,
+      lockupScaledFactor: lockupScaledFactorNum,
+      lockupSaturationSecs: lockupSaturationSecsNum,
+      lockupSecs,
+    })
+
+    return parseFloat(calced.toFixed(2))
+  }
+  return 0
 }
