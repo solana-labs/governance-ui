@@ -43,7 +43,10 @@ const Clawback = ({
   const { client } = useVoteRegistry()
   const connection = useWalletStore((s) => s.connection)
   const { realm, tokenRecords } = useRealm()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const {
+    governedTokenAccountsWithoutNfts,
+    governancesArray,
+  } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [voters, setVoters] = useState<Voter[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
@@ -93,7 +96,9 @@ const Clawback = ({
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governance: form.governedTokenAccount?.governance,
+      governance: governancesArray.find(
+        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
+      ),
       prerequisiteInstructions: prerequisiteInstructions,
       chunkSplitByDefault: true,
     }
@@ -106,7 +111,11 @@ const Clawback = ({
     )
   }, [form])
   useEffect(() => {
-    setGovernedAccount(form.governedTokenAccount?.governance)
+    setGovernedAccount(
+      governancesArray.find(
+        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
+      )
+    )
   }, [form.governedTokenAccount])
   useEffect(() => {
     const getVoters = async () => {
@@ -227,7 +236,7 @@ const Clawback = ({
         error={formErrors['deposit']}
       >
         {deposits
-          ?.filter((x) => !x.amountDepositedNative.isZero())
+          ?.filter((x) => !x.amountDepositedNative.isZero() && x.allowClawback)
           ?.map((x, idx) => {
             return (
               <Select.Option key={idx} value={x}>

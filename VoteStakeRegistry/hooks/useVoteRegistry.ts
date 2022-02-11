@@ -6,13 +6,19 @@ import useRealm from '@hooks/useRealm'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
+import { usePrevious } from '@hooks/usePrevious'
 
 export function useVoteRegistry() {
   const { realm } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
 
+  const previousRealmPk = usePrevious(realm?.pubkey.toBase58())
+  const previousWalletPk = usePrevious(wallet?.publicKey?.toBase58())
+  const connection = useWalletStore((s) => s.connection)
   const [client, setClient] = useState<VsrClient>()
+  const previousClientProgramPk = usePrevious(
+    client?.program.programId.toBase58()
+  )
   const [
     communityMintRegistrar,
     setCommunityMintRegistrar,
@@ -63,7 +69,10 @@ export function useVoteRegistry() {
       setClient(vsrClient)
     }
 
-    if (wallet?.connected) {
+    if (
+      wallet?.connected &&
+      wallet.publicKey?.toBase58() !== previousWalletPk
+    ) {
       handleSetClient()
     }
   }, [connection.endpoint, wallet?.connected])
@@ -84,7 +93,12 @@ export function useVoteRegistry() {
         setCommunityMintRegistrar(existingRegistrar)
       }
     }
-    if (realm?.pubkey && client) {
+    if (
+      realm &&
+      client &&
+      previousRealmPk !== realm.pubkey.toBase58() &&
+      previousClientProgramPk !== client.program.programId.toBase58()
+    ) {
       handleSetRegistrar()
     }
   }, [realm?.pubkey, client])

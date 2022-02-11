@@ -569,9 +569,9 @@
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
 "@blockworks-foundation/mango-client@^3.3.12":
-  version "3.3.12"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.12.tgz#da69dbc7d89b10a95a6771c7a1a4b452172eef83"
-  integrity sha512-6XIf4ykxO8RuiLAApUk4P+0KerOo7NWAkmXE7CcnuMzulVJ4oRKUVq8r7QPA9lcHIFO0cq237ejzRSxmtYSi6g==
+  version "3.3.14"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.14.tgz#22c69fb40eccaa91521e171014ba6c9d1d52b509"
+  integrity sha512-ONWGu0LSjm3qV1GZKhJBAcZta3YHVcdi68yeR8z5bosY4LxZuW7YyA1359efbnseayNMkNXqBuJ7J3XULWTj9w==
   dependencies:
     "@project-serum/anchor" "^0.16.2"
     "@project-serum/serum" "0.13.55"

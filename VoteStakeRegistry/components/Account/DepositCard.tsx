@@ -26,10 +26,12 @@ import { XIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
+import { notify } from '@utils/notifications'
+import { sleep } from '@blockworks-foundation/mango-client'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, tokenRecords } = useRealm()
+  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const {
     client,
     calcMintMultiplier,
@@ -46,6 +48,18 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
+    if (
+      ownTokenRecord!.account!.unrelinquishedVotesCount &&
+      realm!.account.communityMint.toBase58() ===
+        deposit.mint.publicKey.toBase58()
+    ) {
+      notify({
+        type: 'error',
+        message:
+          "You can't withdraw community tokens when you have active proposals",
+      })
+      return
+    }
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -65,6 +79,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositIndex: depositEntry.index,
       client: client,
     })
+    //sometimes right after withdraw simulation return old data
+    //sleep just to be sure we have up to date data
+    await sleep(500)
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
@@ -72,8 +89,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       client: client!,
       connection,
     })
-    fetchWalletTokenAccounts()
-    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await fetchWalletTokenAccounts()
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
