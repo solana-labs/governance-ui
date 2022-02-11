@@ -46,20 +46,19 @@ export const getDeposits = async ({
   const { voter } = await getVoterPDA(registrar, walletPk, clientProgramId)
   const existingVoter = await tryGetVoter(voter, client)
   const existingRegistrar = await tryGetRegistrar(registrar, client)
-  const mintCfgs = existingRegistrar?.votingMints
+  const mintCfgs = existingRegistrar?.votingMints || []
   const mints = {}
-  if (mintCfgs) {
-    for (const i of mintCfgs) {
-      if (i.mint.toBase58() !== unusedMintPk) {
-        const mint = await tryGetMint(connection, i.mint)
-        mints[i.mint.toBase58()] = mint
-      }
+  let votingPower = new BN(0)
+  let votingPowerFromDeposits = new BN(0)
+  let deposits: DepositWithMintAccount[] = []
+  for (const i of mintCfgs) {
+    if (i.mint.toBase58() !== unusedMintPk) {
+      const mint = await tryGetMint(connection, i.mint)
+      mints[i.mint.toBase58()] = mint
     }
   }
   if (existingVoter) {
-    let votingPower = new BN(0)
-    let votingPowerFromDeposits = new BN(0)
-    let deposits = existingVoter.deposits
+    deposits = existingVoter.deposits
       .map(
         (x, idx) =>
           ({
@@ -69,9 +68,11 @@ export const getDeposits = async ({
           } as DepositWithMintAccount)
       )
       .filter((x) => typeof isUsed === 'undefined' || x.isUsed === isUsed)
+
     const usedDeposits = deposits.filter((x) => x.isUsed)
-    const isThereAnyUsedDeposits = usedDeposits.length
-    if (isThereAnyUsedDeposits) {
+    const areThereAnyUsedDeposits = usedDeposits.length
+
+    if (areThereAnyUsedDeposits) {
       const events = await getDepositsAdditionalInfoEvents(
         client,
         usedDeposits,
@@ -105,13 +106,8 @@ export const getDeposits = async ({
         votingPower = votingPowerEntry.data.votingPower
       }
     }
-    return { votingPower, deposits, votingPowerFromDeposits }
   }
-  return {
-    votingPower: new BN(0),
-    deposits: [],
-    votingPowerFromDeposits: new BN(0),
-  }
+  return { votingPower, deposits, votingPowerFromDeposits }
 }
 
 export const calcMultiplier = ({
