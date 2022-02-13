@@ -568,26 +568,10 @@
   version "0.2.3"
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
-"@blockworks-foundation/mango-client@3.2.15":
-  version "3.2.15"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.2.15.tgz#2b9fdb04068a420af6a8f60c42ca65a53e20a1bc"
-  integrity sha512-oyTMgQ7t6CjUIfJ26RygLg1eSu4zmMypD9iPWAglzFqJkmrwc0HOrr309ylEeUT1P5PxUxl3E3AaxjnhzLjMRw==
-  dependencies:
-    "@project-serum/anchor" "^0.16.2"
-    "@project-serum/serum" "0.13.55"
-    "@project-serum/sol-wallet-adapter" "^0.2.0"
-    "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "1.21.0"
-    big.js "^6.1.1"
-    bn.js "^5.2.0"
-    buffer-layout "^1.2.1"
-    dotenv "^10.0.0"
-    yargs "^17.0.1"
-
-"@blockworks-foundation/mango-client@^3.3.12":
-  version "3.3.12"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.12.tgz#da69dbc7d89b10a95a6771c7a1a4b452172eef83"
-  integrity sha512-6XIf4ykxO8RuiLAApUk4P+0KerOo7NWAkmXE7CcnuMzulVJ4oRKUVq8r7QPA9lcHIFO0cq237ejzRSxmtYSi6g==
+"@blockworks-foundation/mango-client@^3.3.15":
+  version "3.3.15"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.15.tgz#f08c849780357a09e727d86964ebc50b472225fa"
+  integrity sha512-66JUf+DtKjoN4o9MAi/YsW0xTpcSHsL+XzaPaQ9XT3Gx6anje1AtXPpeKJmInBcivGRrsXPX+NJxc6O6kyzUag==
   dependencies:
     "@project-serum/anchor" "^0.16.2"
     "@project-serum/serum" "0.13.55"
@@ -601,10 +585,10 @@
     dotenv "^10.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/voter-stake-registry-client@^0.1.8":
-  version "0.1.8"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.8.tgz#69c9eb60405c8a0d85479ce46e3b31549ff811e4"
-  integrity sha512-we91zofqZ3vbxVEXWbCyv1wDpNL0a69wfsr7vbEZerjUxrU9Gw3QL860cbO6Yym/LQwKF3Jr2GAjKwmZl6Btpg==
+"@blockworks-foundation/voter-stake-registry-client@^0.1.11":
+  version "0.1.11"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.1.11.tgz#56928f111d4dda70b0c150b0decc29633c2ec438"
+  integrity sha512-AmZIp3JR65imZofJysDGTMOwOxq2las1Y3UJWt6uWMELz5Ppee5kTVZalzBhLxZC1OU8fj1j4qxMtOafGbKavQ==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"

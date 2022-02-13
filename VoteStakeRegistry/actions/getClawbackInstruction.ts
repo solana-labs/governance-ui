@@ -12,7 +12,6 @@ export const getClawbackInstruction = async ({
   realmPk,
   realmAuthority,
   voterWalletAddress,
-  tokenOwnerRecord,
   destination,
   voterDepositIndex,
   grantMintPk,
@@ -22,7 +21,6 @@ export const getClawbackInstruction = async ({
   realmPk: PublicKey
   realmAuthority: PublicKey
   voterWalletAddress: PublicKey
-  tokenOwnerRecord: PublicKey
   destination: PublicKey
   voterDepositIndex: number
   grantMintPk: PublicKey
@@ -54,7 +52,6 @@ export const getClawbackInstruction = async ({
       registrar,
       realmAuthority,
       voter,
-      tokenOwnerRecord,
       vault: voterATAPk,
       destination,
       tokenProgram: TOKEN_PROGRAM_ID,

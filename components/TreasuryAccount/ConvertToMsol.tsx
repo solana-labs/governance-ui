@@ -29,10 +29,10 @@ import {
 } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { createProposal } from 'actions/createProposal'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const ConvertToMsol = () => {
   const {
@@ -44,7 +44,7 @@ const ConvertToMsol = () => {
     councilMint,
     symbol,
   } = useRealm()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
