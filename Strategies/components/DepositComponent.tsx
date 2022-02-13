@@ -22,7 +22,7 @@ import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/Govern
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const DepositComponent = ({
   handledMint,
@@ -43,7 +43,7 @@ const DepositComponent = ({
     councilMint,
     symbol,
   } = useRealm()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()

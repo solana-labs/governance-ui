@@ -5,13 +5,13 @@ import { BN } from '@project-serum/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const DepositCommunityTokensBtn = ({ className = '' }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)

@@ -9,7 +9,6 @@ import {
 } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithMintAccount,
   LockupType,
@@ -26,15 +25,17 @@ import { XIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
+import { notify } from '@utils/notifications'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, tokenRecords } = useRealm()
-  const {
-    client,
-    calcMintMultiplier,
-    communityMintRegistrar,
-  } = useVoteRegistry()
+  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const communityMintRegistrar = useVoteStakeRegistryClientStore(
+    (s) => s.state.communityMintRegistrar
+  )
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
@@ -46,6 +47,18 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
+    if (
+      ownTokenRecord!.account!.unrelinquishedVotesCount &&
+      realm!.account.communityMint.toBase58() ===
+        deposit.mint.publicKey.toBase58()
+    ) {
+      notify({
+        type: 'error',
+        message:
+          "You can't withdraw community tokens when you have active proposals",
+      })
+      return
+    }
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -72,8 +85,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       client: client!,
       connection,
     })
-    fetchWalletTokenAccounts()
-    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await fetchWalletTokenAccounts()
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
@@ -186,7 +199,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Vote multiplier"
               value={calcMintMultiplier(
                 deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber(),
-                communityMintRegistrar
+                communityMintRegistrar,
+                realm
               )}
             />
           )}

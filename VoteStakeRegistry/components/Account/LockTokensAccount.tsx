@@ -16,13 +16,13 @@ import { PublicKey } from '@solana/web3.js'
 import { MintInfo } from '@solana/spl-token'
 import { BN } from '@project-serum/anchor'
 import tokenService from '@utils/services/token'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useWalletStore from 'stores/useWalletStore'
 import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -34,7 +34,7 @@ const unlockedTypes = ['none']
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const { realm, mint, tokenRecords } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
@@ -49,9 +49,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-  const currentUserOwnTokenRecord = wallet?.publicKey
-    ? tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey.toBase58()
-    : null
   const mainBoxesClasses =
     'bg-bkg-1 px-4 py-4 rounded-md flex flex-col mr-3 mb-3'
   const isNextSameRecord = (x, next) => {
@@ -136,11 +133,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   useEffect(() => {
     if (
       JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
-      tokenOwnerRecordWalletPk === currentUserOwnTokenRecord
+      tokenOwnerRecordWalletPk === wallet?.publicKey?.toBase58()
     ) {
       handleGetDeposits()
     }
-  }, [JSON.stringify(ownDeposits)])
+  }, [JSON.stringify(ownDeposits), ownDeposits.length])
   useEffect(() => {
     handleGetDeposits()
   }, [tokenOwnerRecordWalletPk, client])
@@ -153,7 +150,15 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <>
             <h1 className="flex mb-8 items-center">
               <PreviousRouteBtn />
-              <span className="ml-4">Account</span>
+              <span className="ml-4">
+                Account{' '}
+                {tokenOwnerRecordWalletPk !== wallet?.publicKey?.toBase58() &&
+                  connected && (
+                    <small className="text-sm text-red">
+                      (You are viewing other voter account)
+                    </small>
+                  )}
+              </span>
               <div className="ml-auto flex flex-row">
                 <DepositCommunityTokensBtn className="mr-3"></DepositCommunityTokensBtn>
                 <WithDrawCommunityTokens></WithDrawCommunityTokens>
@@ -216,7 +221,13 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                   })}
                 </div>
                 <h1 className="mb-8">Locked Tokens</h1>
-                <div className="flex mb-8 flex-wrap">
+                <div
+                  className={`flex mb-8 flex-wrap ${
+                    tokenOwnerRecordWalletPk !== wallet?.publicKey?.toBase58()
+                      ? 'opacity-0.8 pointer-events-none'
+                      : ''
+                  }`}
+                >
                   {deposits
                     //we filter out one deposits that is used to store none locked community tokens
                     ?.filter(

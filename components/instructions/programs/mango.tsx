@@ -175,6 +175,21 @@ export const MANGO_INSTRUCTIONS = {
         )
       },
     },
+    61: {
+      name: 'Mango v3: Change Referral Fee Params',
+      accounts: {
+        0: { name: 'Mango Group' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .ChangeReferralFeeParams
+        return <>{displayAllArgs(args)}</>
+      },
+    },
   },
 }
 

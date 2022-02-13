@@ -71,6 +71,8 @@ const VotePanel = () => {
       proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
+    const programId = realmInfo?.programId
+    const realmId = realmInfo?.realmId
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -109,7 +111,7 @@ const VotePanel = () => {
       console.error("Can't relinquish vote", ex)
     }
 
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await fetchRealm(programId, realmId)
   }
 
   const handleShowVoteModal = (vote: YesNoVote) => {

@@ -20,7 +20,6 @@ import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
@@ -41,6 +40,8 @@ import {
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 
 const YES = 'YES'
 const NO = 'NO'
@@ -56,11 +57,10 @@ const LockTokensModal = ({
 }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
-  const {
-    client,
-    calcMintMultiplier,
-    communityMintRegistrar,
-  } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const communityMintRegistrar = useVoteStakeRegistryClientStore(
+    (s) => s.state.communityMintRegistrar
+  )
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const wallet = useWalletStore((s) => s.current)
@@ -73,27 +73,47 @@ const LockTokensModal = ({
     {
       value: yearsToDays(1),
       display: '1y',
-      multiplier: calcMintMultiplier(yearsToSecs(1), communityMintRegistrar),
+      multiplier: calcMintMultiplier(
+        yearsToSecs(1),
+        communityMintRegistrar,
+        realm
+      ),
     },
     {
       value: yearsToDays(2),
       display: '2y',
-      multiplier: calcMintMultiplier(yearsToSecs(2), communityMintRegistrar),
+      multiplier: calcMintMultiplier(
+        yearsToSecs(2),
+        communityMintRegistrar,
+        realm
+      ),
     },
     {
       value: yearsToDays(3),
       display: '3y',
-      multiplier: calcMintMultiplier(yearsToSecs(3), communityMintRegistrar),
+      multiplier: calcMintMultiplier(
+        yearsToSecs(3),
+        communityMintRegistrar,
+        realm
+      ),
     },
     {
       value: yearsToDays(4),
       display: '4y',
-      multiplier: calcMintMultiplier(yearsToSecs(4), communityMintRegistrar),
+      multiplier: calcMintMultiplier(
+        yearsToSecs(4),
+        communityMintRegistrar,
+        realm
+      ),
     },
     {
       value: yearsToDays(5),
       display: '5y',
-      multiplier: calcMintMultiplier(yearsToSecs(5), communityMintRegistrar),
+      multiplier: calcMintMultiplier(
+        yearsToSecs(5),
+        communityMintRegistrar,
+        realm
+      ),
     },
   ].filter((x) =>
     depositToUnlock ? getMinDurationInDays(depositToUnlock) <= x.value : true
@@ -472,7 +492,7 @@ const LockTokensModal = ({
               </h2>
             ) : (
               <h2>
-                Lock {new BigNumber(amount!).toFormat()} {tokenName} for
+                Lock {new BigNumber(amount!).toFormat()} {tokenName} for{' '}
                 {lockupType.value == CONSTANT && ' at least '}
                 {daysToYear(lockupPeriod.value)}{' '}
                 {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
@@ -517,7 +537,11 @@ const LockTokensModal = ({
     switch (currentStep) {
       case 2:
         return (
-          <Button className="mb-4" onClick={handleNextStep} disabled={!amount}>
+          <Button
+            className="mb-4"
+            onClick={handleNextStep}
+            disabled={!amount || !maxAmount}
+          >
             {depositToUnlock ? 'Start unlock' : 'Lock Tokens'}
           </Button>
         )

@@ -1,61 +1,71 @@
 import Link from 'next/link'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
-import useRealm from '@hooks/useRealm'
-
-import useQueryContext from '@hooks/useQueryContext'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import Select from '@components/inputs/Select'
-import React, { createContext, useEffect, useState } from 'react'
-import Button, { LinkButton, SecondaryButton } from '@components/Button'
-import SplTokenTransfer from './components/instructions/SplTokenTransfer'
-import { RpcContext } from '@solana/spl-governance'
-import { createProposal } from 'actions/createProposal'
-import useWalletStore from 'stores/useWalletStore'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
-import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
-import { notify } from 'utils/notifications'
-import * as yup from 'yup'
-import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
+import React, { createContext, useEffect, useState } from 'react'
+import * as yup from 'yup'
+import {
+  ArrowLeftIcon,
+  PlusCircleIcon,
+  XCircleIcon,
+} from '@heroicons/react/outline'
+import {
+  getInstructionDataFromBase64,
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+  RpcContext,
+} from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
+
+import Button, { LinkButton, SecondaryButton } from '@components/Button'
+import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
+import Textarea from '@components/inputs/Textarea'
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { getProgramVersionForRealm } from '@models/registry/api'
+
+import { getTimestampFromDays } from '@tools/sdk/units'
+import { formValidation, isFormValid } from '@utils/formValidation'
 import {
   ComponentInstructionData,
-  UiInstruction,
   Instructions,
   InstructionsContext,
+  UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { ProgramAccount } from '@solana/spl-governance'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+
+import { createProposal } from 'actions/createProposal'
+import useWalletStore from 'stores/useWalletStore'
+import { notify } from 'utils/notifications'
+import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import Grant from 'VoteStakeRegistry/components/instructions/Grant'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
-import Empty from './components/instructions/Empty'
-import Mint from './components/instructions/Mint'
-import CustomBase64 from './components/instructions/CustomBase64'
-import { getTimestampFromDays } from '@tools/sdk/units'
-import InitializeController from './components/instructions/UXD/InitializeController'
-import SetRedeemGlobalSupplyCap from './components/instructions/UXD/SetRedeemGlobalSupplyCap'
-import RegisterMangoDepository from './components/instructions/UXD/RegisterMangoDepository'
-import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/UXD/SetMangoDepositoriesRedeemableSoftCap'
-import DepositInsuranceToMangoDepository from './components/instructions/UXD/DepositInsuranceToMangoDepository'
-import WithdrawInsuranceFromMangoDepository from './components/instructions/UXD/WithdrawInsuranceFromMangoDepository'
-import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
-import VoteBySwitch from './components/VoteBySwitch'
-import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import AddLiquidityRaydium from './components/instructions/raydium/AddLiquidity'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
-import CreateObligationAccount from './components/instructions/solend/CreateObligationAccount'
-import InitObligationAccount from './components/instructions/solend/InitObligationAccount'
-import DepositReserveLiquidityAndObligationCollateral from './components/instructions/solend/DepositReserveLiquidityAndObligationCollateral'
-import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
+import CustomBase64 from './components/instructions/CustomBase64'
+import Empty from './components/instructions/Empty'
+import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
+import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
+import Mint from './components/instructions/Mint'
+import AddLiquidityRaydium from './components/instructions/raydium/AddLiquidity'
+import RemoveLiquidityRaydium from './components/instructions/raydium/RemoveLiquidity'
+import CreateObligationAccount from './components/instructions/solend/CreateObligationAccount'
+import DepositReserveLiquidityAndObligationCollateral from './components/instructions/solend/DepositReserveLiquidityAndObligationCollateral'
+import InitObligationAccount from './components/instructions/solend/InitObligationAccount'
 import RefreshObligation from './components/instructions/solend/RefreshObligation'
 import RefreshReserve from './components/instructions/solend/RefreshReserve'
-import Grant from 'VoteStakeRegistry/components/instructions/Grant'
-import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
-import RemoveLiquidityRaydium from './components/instructions/raydium/RemoveLiquidity'
+import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
+import SplTokenTransfer from './components/instructions/SplTokenTransfer'
+import DepositInsuranceToMangoDepository from './components/instructions/UXD/DepositInsuranceToMangoDepository'
+import InitializeController from './components/instructions/UXD/InitializeController'
+import RegisterMangoDepository from './components/instructions/UXD/RegisterMangoDepository'
+import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/UXD/SetMangoDepositoriesRedeemableSoftCap'
+import SetRedeemGlobalSupplyCap from './components/instructions/UXD/SetRedeemGlobalSupplyCap'
+import WithdrawInsuranceFromMangoDepository from './components/instructions/UXD/WithdrawInsuranceFromMangoDepository'
+import VoteBySwitch from './components/VoteBySwitch'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -89,7 +99,7 @@ function extractGovernanceAccountFromInstructionsData(
 
 const New = () => {
   const router = useRouter()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
@@ -389,6 +399,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
+        )
+      case Instructions.MangoChangeReferralFeeParams:
+        return (
+          <MakeChangeReferralFeeParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeReferralFeeParams>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>

@@ -13,14 +13,14 @@ import { chunks } from '@utils/helpers'
 import { sendTransaction } from '@utils/send'
 import useWalletStore from 'stores/useWalletStore'
 import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistryWithdraw'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const {
     realm,
     realmInfo,
