@@ -97,9 +97,9 @@ export const getDeposits = async ({
       })
       if (
         votingPowerEntry &&
-        !votingPowerEntry.data.votingPowerUnlockedOnly.isZero()
+        !votingPowerEntry.data.votingPowerBaseline.isZero()
       ) {
-        votingPowerFromDeposits = votingPowerEntry.data.votingPowerUnlockedOnly
+        votingPowerFromDeposits = votingPowerEntry.data.votingPowerBaseline
       }
       if (votingPowerEntry && !votingPowerEntry.data.votingPower.isZero()) {
         votingPower = votingPowerEntry.data.votingPower
@@ -112,18 +112,19 @@ export const getDeposits = async ({
 
 export const calcMultiplier = ({
   depositScaledFactor,
-  lockupScaledFactor,
+  maxExtraLockupVoteWeightScaledFactor,
   lockupSecs,
   lockupSaturationSecs,
 }: {
   depositScaledFactor: number
-  lockupScaledFactor: number
+  maxExtraLockupVoteWeightScaledFactor: number
   lockupSecs: number
   lockupSaturationSecs: number
 }) => {
   const calc =
     (depositScaledFactor +
-      (lockupScaledFactor * Math.min(lockupSecs, lockupSaturationSecs)) /
+      (maxExtraLockupVoteWeightScaledFactor *
+        Math.min(lockupSecs, lockupSaturationSecs)) /
         lockupSaturationSecs) /
     depositScaledFactor
   return calc
@@ -163,16 +164,16 @@ export const calcMintMultiplier = (
   if (mintCfg) {
     const {
       lockupSaturationSecs,
-      unlockedScaledFactor,
-      lockupScaledFactor,
+      baselineVoteWeightScaledFactor,
+      maxExtraLockupVoteWeightScaledFactor,
     } = mintCfg
-    const depositScaledFactorNum = unlockedScaledFactor.toNumber()
-    const lockupScaledFactorNum = lockupScaledFactor.toNumber()
+    const depositScaledFactorNum = baselineVoteWeightScaledFactor.toNumber()
+    const maxExtraLockupVoteWeightScaledFactorNum = maxExtraLockupVoteWeightScaledFactor.toNumber()
     const lockupSaturationSecsNum = lockupSaturationSecs.toNumber()
-    //(deposit_scaled_factor + lockup_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor
+    //(deposit_scaled_factor + max_extra_lockup_vote_weight_scaled_factor * min(lockup_secs, lockup_saturation_secs) / lockup_saturation_secs) / deposit_scaled_factor
     const calced = calcMultiplier({
       depositScaledFactor: depositScaledFactorNum,
-      lockupScaledFactor: lockupScaledFactorNum,
+      maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactorNum,
       lockupSaturationSecs: lockupSaturationSecsNum,
       lockupSecs,
     })
