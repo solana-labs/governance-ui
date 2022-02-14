@@ -197,7 +197,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           )}
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
-              label="Next unlock"
+              label="Next vesting"
               value={moment(
                 deposit.nextVestingTimestamp?.toNumber() * 1000
               ).format('DD-MM-YYYY')}
