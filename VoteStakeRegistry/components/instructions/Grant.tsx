@@ -54,7 +54,7 @@ const Grant = ({
   const { realm, tokenRecords } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
-  const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
+  const [startDate, setStartDate] = useState(moment().format('DD-MM-YYYY'))
   const [endDate, setEndDate] = useState('')
   const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
   const [form, setForm] = useState<GrantForm>({

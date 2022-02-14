@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.3.15",
-    "@blockworks-foundation/voter-stake-registry-client": "^0.1.11",
+    "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
     "@cardinal/namespaces-components": "^2.5.0",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
