@@ -144,7 +144,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     ?.logoURI
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
   return (
-    <div className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3 flex flex-col">
+    <div className="border border-bkg-4 rounded-lg flex flex-col">
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
         <h3 className="mb-0 flex flex-items items-center">
           {img && <img className="w-6 h-6 mr-2" src={img}></img>}
