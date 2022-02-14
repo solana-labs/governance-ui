@@ -28,6 +28,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
+import moment from 'moment'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
@@ -192,6 +193,14 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
                   deposit.vestingRate
                 ).toFormat(2)} p/mo`
               }
+            />
+          )}
+          {isVest && deposit.nextVestingTimestamp !== null && (
+            <CardLabel
+              label="Next unlock"
+              value={moment(
+                deposit.nextVestingTimestamp?.toNumber() * 1000
+              ).format('DD-MM-YYYY')}
             />
           )}
           {isRealmCommunityMint && (

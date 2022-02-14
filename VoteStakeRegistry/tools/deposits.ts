@@ -93,6 +93,8 @@ export const getDeposits = async ({
         x.currentlyLocked = additionalInfoData.locking?.amount || new BN(0)
         x.available = additionalInfoData.unlocked || new BN(0)
         x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
+        x.nextVestingTimestamp =
+          additionalInfoData.locking?.vesting?.nextTimestamp || null
         return x
       })
       if (
@@ -226,5 +228,6 @@ const getDepositsAdditionalInfoEvents = async (
       events.push(event)
     })
   }
+  console.log(events, '@@@@')
   return events
 }

@@ -54,6 +54,7 @@ export interface DepositWithMintAccount extends Deposit {
   available: BN
   vestingRate: BN | null
   currentlyLocked: BN
+  nextVestingTimestamp: BN | null
 }
 
 export const unusedMintPk = '11111111111111111111111111111111'
