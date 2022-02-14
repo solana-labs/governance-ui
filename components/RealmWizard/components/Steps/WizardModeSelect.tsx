@@ -53,7 +53,7 @@ const WizardModeSelect: React.FC<{
         >
           <div className="border rounded px-4 py-1.5 hover:bg-bkg-3 pointer mt-10 ">
             <p>
-              <b>Learn More</b>
+              <b>Governance Docs</b>
             </p>
           </div>
         </a>
