@@ -21,8 +21,8 @@ interface ClawbackInstruction {
 interface VotingMintCfgInstruction {
   idx: number
   digitShift: number
-  unlockedScaledFactor: BN
-  lockupScaledFactor: BN
+  baselineVoteWeightScaledFactor: BN
+  maxExtraLockupVoteWeightScaledFactor: BN
   lockupSaturationSecs: BN
   grantAuthority: PublicKey
 }
@@ -123,21 +123,23 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             Buffer.from(data)
           )?.data as VotingMintCfgInstruction
           const {
-            lockupScaledFactor,
+            maxExtraLockupVoteWeightScaledFactor,
             lockupSaturationSecs,
-            unlockedScaledFactor,
+            baselineVoteWeightScaledFactor,
           } = decodedInstructionData
           return (
             <div className="space-y-3">
               <div>Index: {decodedInstructionData?.idx}</div>
               <div>Digit shifts: {decodedInstructionData?.digitShift}</div>
               <div>
-                Unlocked factor: {unlockedScaledFactor.toNumber() / 1e9} (
-                {unlockedScaledFactor.toNumber()})
+                Unlocked factor:{' '}
+                {baselineVoteWeightScaledFactor.toNumber() / 1e9} (
+                {baselineVoteWeightScaledFactor.toNumber()})
               </div>
               <div>
-                Lockup factor: {lockupScaledFactor.toNumber() / 1e9} (
-                {lockupScaledFactor.toNumber()})
+                Lockup factor:{' '}
+                {maxExtraLockupVoteWeightScaledFactor.toNumber() / 1e9} (
+                {maxExtraLockupVoteWeightScaledFactor.toNumber()})
               </div>
               <div>
                 Max lockup time:{' '}
@@ -150,8 +152,8 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
               <div>
                 Max multiplier:{' '}
                 {calcMultiplier({
-                  depositScaledFactor: unlockedScaledFactor.toNumber(),
-                  lockupScaledFactor: lockupScaledFactor.toNumber(),
+                  depositScaledFactor: baselineVoteWeightScaledFactor.toNumber(),
+                  maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactor.toNumber(),
                   lockupSaturationSecs: lockupSaturationSecs.toNumber(),
                   lockupSecs: lockupSaturationSecs.toNumber(),
                 })}
