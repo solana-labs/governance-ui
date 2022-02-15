@@ -1,4 +1,3 @@
-import { QUOTE_INDEX } from '@blockworks-foundation/mango-client'
 import { MangoClient } from '@blockworks-foundation/mango-client'
 import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -22,7 +21,6 @@ export default function useMarket() {
         s.client = client
         s.group = group
         s.info = group.perpMarkets[marketConfig.marketIndex]
-        s.quoteCurrency = group.tokens[QUOTE_INDEX]
       })
 
       const [perpMarket] = await Promise.all([

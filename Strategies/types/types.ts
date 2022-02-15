@@ -33,8 +33,6 @@ export type HandleCreateProposalWithStrategy = (
   realm: ProgramAccount<Realm>,
   treasuaryAccount: GovernedTokenAccount,
   tokenOwnerRecord: PublicKey,
-  name: string,
-  descriptionLink: string,
   governingTokenMint: PublicKey,
   proposalIndex: number,
   isDraft: boolean,

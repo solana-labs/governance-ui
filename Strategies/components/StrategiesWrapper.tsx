@@ -92,7 +92,7 @@ const StrategiesWrapper = () => {
             ></SelectFilter>
           </div>
         </div>
-        <div className="grid grid-col-6 px-4">
+        <div className="grid grid-cols-6 px-4">
           <div>Platform</div>
           <div>Strategy</div>
           <div>Your position</div>

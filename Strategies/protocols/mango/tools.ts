@@ -8,6 +8,7 @@ import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
+import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { createProposal } from 'actions/createProposal'
 import axios from 'axios'
@@ -108,8 +109,6 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   realm,
   matchedTreasury,
   tokenOwnerRecord,
-  name,
-  descriptionLink,
   governingTokenMint,
   proposalIndex,
   isDraft,
@@ -118,17 +117,14 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
 ) => {
   const group = market!.group!
   const groupConfig = market!.groupConfig!
-  const quoteCurrency = market!.quoteCurrency!
+  const rootBank = group.tokens.find(
+    (x) => x.mint.toBase58() === matchedTreasury.mint?.publicKey.toBase58()
+  )?.rootBank
   const accountNumBN = new BN(1)
   const quoteRootBank =
-    group.rootBankAccounts[group.getRootBankIndex(quoteCurrency.rootBank)]
-  const quoteNodeBank =
-    quoteRootBank?.nodeBankAccounts[
-      group.tokens.findIndex(
-        (x) => x.mint.toBase58() === matchedTreasury.mint?.publicKey.toBase58()
-      )
-    ]
-  console.log(quoteRootBank)
+    group.rootBankAccounts[group.getRootBankIndex(rootBank!)]
+  const quoteNodeBank = quoteRootBank?.nodeBankAccounts[0]
+
   const [mangoAccountPk] = await PublicKey.findProgramAddress(
     [
       group.publicKey.toBytes(),
@@ -157,25 +153,41 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     matchedTreasury.transferAddress!,
     new BN(mintAmount)
   )
-  const serializedInstruction = serializeInstructionToBase64(
-    depositMangoAccountIns
-  )
-  const instructionData = {
-    data: getInstructionDataFromBase64(serializedInstruction),
+  const instructionData1 = {
+    data: getInstructionDataFromBase64(
+      serializeInstructionToBase64(createMangoAccountIns)
+    ),
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
-    prerequisiteInstructions: [createMangoAccountIns],
+    prerequisiteInstructions: [],
+    splitToChunkByDefault: true,
   }
+  const instructionData2 = {
+    data: getInstructionDataFromBase64(
+      serializeInstructionToBase64(depositMangoAccountIns)
+    ),
+    holdUpTime: matchedTreasury.governance!.account!.config
+      .minInstructionHoldUpTime,
+    prerequisiteInstructions: [],
+    chunkSplitByDefault: true,
+  }
+  const fmtAmount = fmtMintAmount(
+    matchedTreasury.mint?.account,
+    new BN(mintAmount)
+  )
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
     matchedTreasury.governance!.pubkey,
     tokenOwnerRecord,
-    name,
-    descriptionLink,
+    `Deposit ${fmtAmount} ${
+      tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
+        ?.symbol || 'tokens'
+    } to Mango account`,
+    '',
     governingTokenMint,
     proposalIndex,
-    [instructionData],
+    [instructionData1, instructionData2],
     isDraft,
     client
   )

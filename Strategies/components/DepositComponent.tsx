@@ -17,7 +17,7 @@ import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
-import { useRouter } from 'next-router-mock'
+import { useRouter } from 'next/router'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -117,9 +117,6 @@ const DepositComponent = ({
       realm!,
       matchedTreasuryAccount!,
       ownTokenRecord.pubkey,
-      //TODO title
-      `Deposit 100 tokens to mango protocol strategy`,
-      `Deposit 100 tokens to mango protocol strategy`,
       defaultProposalMint!,
       matchedTreasuryAccount!.governance!.account!.proposalCount,
       false,
