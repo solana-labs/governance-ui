@@ -1,4 +1,5 @@
 import Input from '@components/inputs/Input'
+import tokenService from '@utils/services/token'
 import { useState, useEffect } from 'react'
 import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
@@ -39,7 +40,7 @@ const StrategiesWrapper = () => {
   }
   useEffect(() => {
     getStrategies()
-  }, [])
+  }, [tokenService._tokenList.length])
 
   useEffect(() => {
     let filtered = [...strategies]
@@ -61,7 +62,7 @@ const StrategiesWrapper = () => {
       )
     }
     setStrategiesFiltered([...filtered])
-  }, [filters, strategies])
+  }, [filters, JSON.stringify(strategies)])
   return (
     <div className="grid grid-cols-12 mt-10">
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
@@ -91,7 +92,7 @@ const StrategiesWrapper = () => {
             ></SelectFilter>
           </div>
         </div>
-        <div className="grid grid-cols-6 px-4">
+        <div className="grid grid-col-6 px-4">
           <div>Platform</div>
           <div>Strategy</div>
           <div>Your position</div>

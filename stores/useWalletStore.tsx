@@ -155,8 +155,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {
-      console.log('fetchRealmBySymbol', cluster, symbol)
-
       const actions = get().actions
       let connection = get().connection
       const set = get().set

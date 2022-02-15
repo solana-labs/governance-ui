@@ -1,5 +1,13 @@
-import { BN } from '@project-serum/anchor'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
+import {
+  makeCreateMangoAccountInstruction,
+  makeDepositInstruction,
+  PublicKey,
+  BN,
+} from '@blockworks-foundation/mango-client'
+import {
+  getInstructionDataFromBase64,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
 import tokenService from '@utils/services/token'
 import { createProposal } from 'actions/createProposal'
 import axios from 'axios'
@@ -78,7 +86,7 @@ export async function tvl(timestamp) {
         ).toFixed(2)}%`,
         protocolName: MANGO,
         protocolSymbol: protocolInfo?.symbol || '',
-        handledMint: info?.address || '',
+        handledMint: '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN',
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
@@ -96,40 +104,72 @@ export async function tvl(timestamp) {
 const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   rpcContext,
   handledMint,
-  amount,
+  mintAmount,
   realm,
-  governance,
+  matchedTreasury,
   tokenOwnerRecord,
   name,
   descriptionLink,
   governingTokenMint,
   proposalIndex,
   isDraft,
+  market,
   client
 ) => {
-  // sample of creating proposal with instruction
-  const instructionData = {
-    //TODO create mango deposit function using amount and mint
+  const group = market!.group!
+  const groupConfig = market!.groupConfig!
+  const quoteCurrency = market!.quoteCurrency!
+  const accountNumBN = new BN(1)
+  const quoteRootBank =
+    group.rootBankAccounts[group.getRootBankIndex(quoteCurrency.rootBank)]
+  const quoteNodeBank =
+    quoteRootBank?.nodeBankAccounts[
+      group.tokens.findIndex(
+        (x) => x.mint.toBase58() === matchedTreasury.mint?.publicKey.toBase58()
+      )
+    ]
+  console.log(quoteRootBank)
+  const [mangoAccountPk] = await PublicKey.findProgramAddress(
+    [
+      group.publicKey.toBytes(),
+      matchedTreasury.governance!.pubkey.toBytes(),
+      accountNumBN.toArrayLike(Buffer, 'le', 8),
+    ],
+    groupConfig.mangoProgramId
+  )
 
-    // SAMPLE of serialized instruction that supply proposal
-    //   const transferIx = Token.createTransferInstruction(
-    //     TOKEN_PROGRAM_ID,
-    //     sourceAccount,
-    //     receiverAddress,
-    //     governedTokenAccount.governance!.pubkey,
-    //     [],
-    //     new u64(mintAmount.toString())
-    //   )
-    //   const serializedInstruction = serializeInstructionToBase64(transferIx)
-    //   data: getInstructionDataFromBase64(serializedInstruction),
-    data: getInstructionDataFromBase64(''),
-    holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-    prerequisiteInstructions: [],
+  const createMangoAccountIns = makeCreateMangoAccountInstruction(
+    groupConfig.mangoProgramId,
+    groupConfig.publicKey,
+    mangoAccountPk,
+    matchedTreasury.governance!.pubkey,
+    accountNumBN
+  )
+  const depositMangoAccountIns = makeDepositInstruction(
+    groupConfig.mangoProgramId,
+    groupConfig.publicKey,
+    matchedTreasury.governance!.pubkey,
+    group.mangoCache,
+    mangoAccountPk,
+    quoteRootBank!.publicKey,
+    quoteNodeBank!.publicKey,
+    quoteNodeBank!.vault,
+    matchedTreasury.transferAddress!,
+    new BN(mintAmount)
+  )
+  const serializedInstruction = serializeInstructionToBase64(
+    depositMangoAccountIns
+  )
+  const instructionData = {
+    data: getInstructionDataFromBase64(serializedInstruction),
+    holdUpTime: matchedTreasury.governance!.account!.config
+      .minInstructionHoldUpTime,
+    prerequisiteInstructions: [createMangoAccountIns],
   }
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
-    governance.pubkey,
+    matchedTreasury.governance!.pubkey,
     tokenOwnerRecord,
     name,
     descriptionLink,

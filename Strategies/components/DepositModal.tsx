@@ -19,7 +19,7 @@ const DepositModal = ({
   createProposalFcn,
 }) => {
   return (
-    <Modal sizeClassName="max-w-6xl" onClose={onClose} isOpen={isOpen}>
+    <Modal sizeClassName="max-w-xl" onClose={onClose} isOpen={isOpen}>
       <ModalHeader
         protocolLogoURI={protocolLogoSrc}
         protocolName={protocolName}
