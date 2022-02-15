@@ -51,10 +51,8 @@ const WizardModeSelect: React.FC<{
           target="_blank"
           rel="noopener noreferrer"
         >
-          <div className="border rounded px-4 py-1.5 hover:bg-bkg-3 pointer mt-10 ">
-            <p>
-              <b>Tutorial Docs</b>
-            </p>
+          <div className="border rounded px-3 py-1.5 hover:border-primary-light hover:bg-bkg-3 hover:text-primary-dark transition-all duration-200 pointer mt-10 ">
+            <span className="font-semibold text-sm">Tutorial Docs</span>
           </div>
         </a>
       </div>
