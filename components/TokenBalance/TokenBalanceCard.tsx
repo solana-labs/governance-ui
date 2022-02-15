@@ -24,6 +24,7 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
+import { ExclamationIcon } from '@heroicons/react/outline'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -51,7 +52,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Governance Tokens</h3>
+      <h3 className="mb-4">Governance Tokens </h3>
       {hasLoaded ? (
         <>
           {communityDepositVisible && (
@@ -367,6 +368,12 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
+      {realm?.account.config.useCommunityVoterWeightAddin && (
+        <small className="text-xs mt-3 flex items-center">
+          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+          Please withdraw your tokens and deposit again to get governance power
+        </small>
+      )}
     </>
   )
 }
