@@ -214,7 +214,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               governedTokenAccount?.mint.account.decimals
             )
             return !!(governedTokenAccount?.token?.publicKey &&
-            !governedTokenAccount.isSol
+            !governedTokenAccount.isSolOnly
               ? governedTokenAccount.token.account.amount.gte(mintValue)
               : new BN(governedTokenAccount.solAccount!.lamports).gte(
                   mintValue
@@ -342,7 +342,7 @@ export const getStakeSchema = ({ form }) => {
         if (
           val &&
           form.governedTokenAccount &&
-          form.governedTokenAccount?.isSol &&
+          form.governedTokenAccount?.isSolOnly &&
           form.governedTokenAccount?.mint &&
           form.governedTokenAccount?.solAccount
         ) {

@@ -61,9 +61,9 @@ export default function InstructionCard({
         connection.current,
         sourcePk
       )
-      const isSol = governedTokenAccountsWithoutNfts.find(
+      const isSolOnly = governedTokenAccountsWithoutNfts.find(
         (x) => x.transferAddress?.toBase58() === sourcePk.toBase58()
-      )?.isSol
+      )?.isSolOnly
       const isNFTAccount = nftsGovernedTokenAccounts.find(
         (x) =>
           x.governance?.pubkey.toBase58() ===
@@ -90,7 +90,7 @@ export default function InstructionCard({
         return
       }
 
-      if (isSol) {
+      if (isSolOnly) {
         const info = tokenService.getTokenInfo(WSOL_MINT)
         const imgUrl = info?.logoURI ? info.logoURI : ''
         setTokenImgUrl(imgUrl)
@@ -110,7 +110,7 @@ export default function InstructionCard({
     governedTokenAccountsWithoutNfts.length,
     governedTokenAccountsWithoutNfts.length,
   ])
-  const isSol = tokenImgUrl.includes(WSOL_MINT)
+  const isSolOnly = tokenImgUrl.includes(WSOL_MINT)
 
   const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
   return (
@@ -120,7 +120,7 @@ export default function InstructionCard({
         {descriptor?.name && `– ${descriptor.name}`}{' '}
         {tokenImgUrl && (
           <img
-            className={`w-5 h-5 ml-2 ${isSol && 'rounded-full'}`}
+            className={`w-5 h-5 ml-2 ${isSolOnly && 'rounded-full'}`}
             src={tokenImgUrl}
           ></img>
         )}

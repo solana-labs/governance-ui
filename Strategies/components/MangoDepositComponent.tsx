@@ -1,4 +1,7 @@
-import { PublicKey } from '@blockworks-foundation/mango-client'
+import {
+  MangoAccountLayout,
+  PublicKey,
+} from '@blockworks-foundation/mango-client'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
@@ -7,7 +10,17 @@ import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { BN } from '@project-serum/anchor'
-import { RpcContext } from '@solana/spl-governance'
+import {
+  getNativeTreasuryAddress,
+  RpcContext,
+  withCreateNativeTreasury,
+} from '@solana/spl-governance'
+import {
+  Keypair,
+  SystemProgram,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 import {
   fmtMintAmount,
   getMintDecimalAmount,
@@ -15,6 +28,7 @@ import {
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
+import { sendTransaction } from '@utils/send'
 import tokenService from '@utils/services/token'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
@@ -26,7 +40,7 @@ import useMarket from 'Strategies/hooks/useMarket'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
-const DepositComponent = ({
+const MangoDepositComponent = ({
   handledMint,
   currentPosition,
   createProposalFcn,
@@ -91,6 +105,43 @@ const DepositComponent = ({
   useEffect(() => {
     setAmount(undefined)
   }, [matchedTreasuryAccount])
+  const createNativeSolTreasury = async () => {
+    const instructions: TransactionInstruction[] = []
+    const signers: Keypair[] = []
+    if (!matchedTreasuryAccount?.solAccount) {
+      await withCreateNativeTreasury(
+        instructions,
+        realm!.owner,
+        matchedTreasuryAccount!.governance!.pubkey,
+        wallet!.publicKey!
+      )
+    }
+
+    const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
+      MangoAccountLayout.span
+    )
+    const toAddress = await getNativeTreasuryAddress(
+      realm!.owner,
+      matchedTreasuryAccount!.governance!.pubkey
+    )
+    const transferIx = SystemProgram.transfer({
+      fromPubkey: wallet!.publicKey!,
+      toPubkey: toAddress,
+      lamports: minRentAmount,
+    })
+    instructions.push(transferIx)
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({
+      transaction,
+      wallet,
+      connection: connection.current,
+      signers,
+      sendingMessage: 'Creating treasury account',
+      successMessage: 'Treasury account has been created',
+    })
+  }
   const handleDeposit = async () => {
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
@@ -173,6 +224,9 @@ const DepositComponent = ({
           {currentPositionFtm} {tokenInfo?.symbol}
         </span>
       </div>
+      <Button onClick={createNativeSolTreasury}>
+        Create native sol treasury for governance
+      </Button>
       <Button
         className="w-full mt-5"
         onClick={handleDeposit}
@@ -194,4 +248,4 @@ const DepositComponent = ({
   )
 }
 
-export default DepositComponent
+export default MangoDepositComponent

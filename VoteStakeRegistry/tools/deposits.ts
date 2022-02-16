@@ -228,6 +228,5 @@ const getDepositsAdditionalInfoEvents = async (
       events.push(event)
     })
   }
-  console.log(events, '@@@@')
   return events
 }

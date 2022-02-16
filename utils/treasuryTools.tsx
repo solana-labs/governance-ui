@@ -12,19 +12,28 @@ export const getTreasuryAccountItemInfo = (
   governedAccountTokenAccount: GovernedTokenAccount,
   governanceNfts: { [governance: string]: NFTWithMint[] }
 ) => {
+  const hasSol = governedAccountTokenAccount.solAccount !== null
   const mintAddress =
     governedAccountTokenAccount && governedAccountTokenAccount.token
-      ? governedAccountTokenAccount.isSol
+      ? governedAccountTokenAccount.isSolOnly
         ? WSOL_MINT
         : governedAccountTokenAccount.token.account.mint.toBase58()
       : ''
 
+  const solAmount = hasSol
+    ? governedAccountTokenAccount && governedAccountTokenAccount.mint?.account
+      ? getMintDecimalAmountFromNatural(
+          governedAccountTokenAccount.mint?.account,
+          new BN(governedAccountTokenAccount.solAccount!.lamports)
+        ).toNumber()
+      : 0
+    : null
   const amount =
     governedAccountTokenAccount && governedAccountTokenAccount.mint?.account
       ? getMintDecimalAmountFromNatural(
           governedAccountTokenAccount.mint?.account,
           new BN(
-            governedAccountTokenAccount.isSol
+            governedAccountTokenAccount.isSolOnly
               ? governedAccountTokenAccount.solAccount!.lamports
               : governedAccountTokenAccount.token!.account.amount
           )
@@ -66,14 +75,14 @@ export const getTreasuryAccountItemInfo = (
     : ''
   const symbol = governedAccountTokenAccount.isNft
     ? 'NFTS'
-    : governedAccountTokenAccount.isSol
+    : governedAccountTokenAccount.isSolOnly
     ? 'SOL'
     : info?.symbol
     ? info?.symbol
     : governedAccountTokenAccount.mint
     ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
     : ''
-  const isSol = governedAccountTokenAccount.isSol
+  const isSolOnly = governedAccountTokenAccount.isSolOnly
   const displayPrice =
     totalPriceFormatted && totalPriceFormatted !== '0'
       ? totalPriceFormatted
@@ -87,6 +96,8 @@ export const getTreasuryAccountItemInfo = (
     symbol,
     displayPrice,
     info,
-    isSol,
+    isSolOnly,
+    hasSol,
+    solAmount,
   }
 }

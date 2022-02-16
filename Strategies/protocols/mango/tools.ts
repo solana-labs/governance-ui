@@ -134,6 +134,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     groupConfig.mangoProgramId
   )
 
+  //todo check if has mango account
   const createMangoAccountIns = makeCreateMangoAccountInstruction(
     groupConfig.mangoProgramId,
     groupConfig.publicKey,

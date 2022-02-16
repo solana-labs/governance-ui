@@ -39,7 +39,7 @@ const GovernedAccountSelect = ({
         case GovernanceAccountType.TokenGovernanceV1:
         case GovernanceAccountType.TokenGovernanceV2:
           return getTokenAccountLabelComponent(
-            value.isSol
+            value.isSolOnly
               ? getSolAccountLabel(value)
               : getTokenAccountLabelInfo(value)
           )

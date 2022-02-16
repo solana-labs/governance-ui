@@ -3,6 +3,7 @@ import Deposit from './DepositComponent'
 import ModalHeader from './ModalHeader'
 import ModalLeftSide from './ModalLeftSide'
 import ModalRightSide from './ModalRightSide'
+import MangoDeposit from './MangoDepositComponent'
 
 const DepositModal = ({
   onClose,
@@ -35,11 +36,19 @@ const DepositModal = ({
           <div>{strategyDescription}</div>
         </ModalLeftSide>
         <ModalRightSide>
-          <Deposit
-            handledMint={handledMint}
-            currentPosition={currentPosition}
-            createProposalFcn={createProposalFcn}
-          ></Deposit>
+          {protocolName === 'Mango' ? (
+            <MangoDeposit
+              handledMint={handledMint}
+              currentPosition={currentPosition}
+              createProposalFcn={createProposalFcn}
+            ></MangoDeposit>
+          ) : (
+            <Deposit
+              handledMint={handledMint}
+              currentPosition={currentPosition}
+              createProposalFcn={createProposalFcn}
+            ></Deposit>
+          )}
         </ModalRightSide>
       </div>
     </Modal>

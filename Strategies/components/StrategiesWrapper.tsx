@@ -1,4 +1,5 @@
 import Input from '@components/inputs/Input'
+import Loading from '@components/Loading'
 import tokenService from '@utils/services/token'
 import { useState, useEffect } from 'react'
 import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
@@ -26,7 +27,7 @@ const StrategiesWrapper = () => {
   ]
   const { getStrategies } = useStrategiesStore()
   const strategies = useStrategiesStore((s) => s.strategies)
-
+  const strategiesLoading = useStrategiesStore((s) => s.strategiesLoading)
   const [strategiesFiltered, setStrategiesFiltered] = useState<
     TreasuryStrategy[]
   >([])
@@ -64,10 +65,17 @@ const StrategiesWrapper = () => {
     setStrategiesFiltered([...filtered])
   }, [filters, JSON.stringify(strategies)])
   return (
-    <div className="grid grid-cols-12 mt-10">
+    <div
+      className={`grid grid-cols-12 mt-10 ${
+        strategiesLoading ? 'pointer-event-none' : ''
+      }`}
+    >
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
         <div className="mb-10 flex flex-items">
-          <h1>Strategies</h1>
+          <h1 className="flex items-center">
+            Strategies{' '}
+            {strategiesLoading && <Loading className="ml-3"></Loading>}
+          </h1>
           <div className="ml-auto flex space-x-3">
             <Input
               wrapperClassName="mt-1"

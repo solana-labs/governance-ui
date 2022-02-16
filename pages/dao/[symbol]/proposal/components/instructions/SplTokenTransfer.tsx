@@ -91,7 +91,7 @@ const SplTokenTransfer = ({
     })
   }
   async function getInstruction(): Promise<UiInstruction> {
-    return !form.governedTokenAccount?.isSol
+    return !form.governedTokenAccount?.isSolOnly
       ? getTransferInstruction({
           schema,
           form,

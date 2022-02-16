@@ -35,7 +35,7 @@ const AccountOverview = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
-  const isSOL = currentAccount?.isSol
+  const isSolOnly = currentAccount?.isSolOnly
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(
@@ -138,7 +138,7 @@ const AccountOverview = () => {
       </div>
       <div className="mb-4 flex flex-col">
         <Button
-          className={`sm:w-full text-sm ${!isSOL ? 'hidden' : ''}`}
+          className={`sm:w-full text-sm ${!isSolOnly ? 'hidden' : ''}`}
           onClick={() => setOpenMsolConvertModal(true)}
           disabled={!canUseTransferInstruction}
         >

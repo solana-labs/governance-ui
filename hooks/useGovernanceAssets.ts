@@ -8,7 +8,7 @@ import {
   GovernanceAccountType,
 } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
-import { ParsedAccountData } from '@solana/web3.js'
+import { ParsedAccountData, PublicKey } from '@solana/web3.js'
 import {
   AccountInfoGen,
   getMultipleAccountInfoChunked,
@@ -211,42 +211,39 @@ export default function useGovernanceAssets() {
             x.publicKey.toBase58()
         )
         const isNft = mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
-        const isSol = mint?.publicKey.toBase58() === DEFAULT_NATIVE_SOL_MINT
+        const isSolOnly = mint?.publicKey.toBase58() === DEFAULT_NATIVE_SOL_MINT
         let transferAddress = realmTokenAccount
           ? realmTokenAccount.publicKey
           : null
         let solAccount: null | AccountInfoGen<Buffer | ParsedAccountData> = null
-        if (isNft) {
-          transferAddress = gov.pubkey
-        }
-        if (isSol) {
-          const solAddress = await getNativeTreasuryAddress(
-            realm!.owner,
-            gov.pubkey
-          )
-          transferAddress = solAddress
-          const resp = await connection.getParsedAccountInfo(solAddress)
+        let solAddress: null | PublicKey = null
+        solAddress = await getNativeTreasuryAddress(realm!.owner, gov.pubkey)
+        const resp = await connection.getParsedAccountInfo(solAddress)
+        if (resp.value) {
           const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
             0
           )
-          if (resp.value) {
-            solAccount = resp.value as AccountInfoGen<
-              Buffer | ParsedAccountData
-            >
-            solAccount.lamports =
-              solAccount.lamports !== 0
-                ? solAccount.lamports - mintRentAmount
-                : solAccount.lamports
-          }
+          solAccount = resp.value as AccountInfoGen<Buffer | ParsedAccountData>
+          solAccount.lamports =
+            solAccount.lamports !== 0
+              ? solAccount.lamports - mintRentAmount
+              : solAccount.lamports
+        }
+        if (isNft) {
+          transferAddress = gov.pubkey
+        }
+        if (isSolOnly) {
+          transferAddress = solAddress
         }
         const obj = {
           governance: gov,
           token: realmTokenAccount,
           mint,
           isNft,
-          isSol,
+          isSolOnly,
           transferAddress,
           solAccount,
+          solAddress,
         }
         governedTokenAccountsArray.push(obj)
       }
