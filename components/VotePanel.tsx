@@ -165,7 +165,7 @@ const VotePanel = () => {
   return (
     <>
       {isPanelVisible && (
-        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
           <h2 className="mb-4 text-center">{actionLabel}</h2>
 
           <div className="items-center justify-center flex w-full gap-5">
@@ -187,7 +187,7 @@ const VotePanel = () => {
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
-                      Approve
+                      Vote Yes
                     </Button>
 
                     <Button
@@ -196,7 +196,7 @@ const VotePanel = () => {
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
-                      Deny
+                      Vote No
                     </Button>
                   </div>
                 )}

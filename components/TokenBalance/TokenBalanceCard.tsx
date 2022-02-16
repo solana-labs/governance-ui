@@ -53,7 +53,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Governance Tokens</h3>
       {hasLoaded ? (
-        <>
+        <div className="space-y-4">
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
@@ -62,15 +62,13 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             />
           )}
           {councilDepositVisible && (
-            <div className="mt-4">
-              <TokenDeposit
-                mint={councilMint}
-                tokenType={GoverningTokenType.Council}
-                councilVote={true}
-              />
-            </div>
+            <TokenDeposit
+              mint={councilMint}
+              tokenType={GoverningTokenType.Council}
+              councilVote={true}
+            />
           )}
-        </>
+        </div>
       ) : (
         <>
           <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
@@ -324,10 +322,10 @@ const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-8">
+      <div className="flex space-x-4 items-center">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <h3 className="mb-0">{availableTokens}</h3>
+          <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
         </div>
       </div>
 
@@ -339,7 +337,7 @@ const TokenDeposit = ({
         You have {tokensToShow} tokens available to {canExecuteAction}.
       </p>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
         <Button
           tooltipMessage={depositTooltipContent}
           className="sm:w-1/2"

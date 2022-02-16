@@ -87,7 +87,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const voteString = vote === YesNoVote.Yes ? 'Approve' : 'Deny'
+  const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -117,7 +117,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           className="w-44 flex items-center justify-center"
           onClick={() => submitVote(vote)}
         >
-          {submitting ? <Loading /> : <span>{voteString} Proposal</span>}
+          {submitting ? <Loading /> : <span>Vote {voteString}</span>}
         </Button>
       </div>
     </Modal>
