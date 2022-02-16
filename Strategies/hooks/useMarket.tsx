@@ -4,9 +4,9 @@ import useWalletStore from 'stores/useWalletStore'
 import useMarketStore, { MarketStore } from 'Strategies/store/marketStore'
 
 export default function useMarket() {
-  const market = useMarketStore((state) => state)
-  const { groupConfig, marketConfig, set } = market
   const { connection } = useWalletStore()
+  const market = useMarketStore(connection.cluster)((state) => state)
+  const { groupConfig, marketConfig, set } = market
   useEffect(() => {
     const pageLoad = async () => {
       // fetch market on page load
@@ -44,7 +44,9 @@ export default function useMarket() {
         s.indexPrice = indexPrice
       })
     }
-    pageLoad()
+    if (groupConfig && marketConfig) {
+      pageLoad()
+    }
   }, [groupConfig, marketConfig, set])
 
   return market

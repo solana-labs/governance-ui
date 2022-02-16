@@ -3,9 +3,11 @@ import {
   makeDepositInstruction,
   PublicKey,
   BN,
+  //getMultipleAccounts,
 } from '@blockworks-foundation/mango-client'
 import {
   getInstructionDataFromBase64,
+  getNativeTreasuryAddress,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -36,7 +38,7 @@ export const tokenList = {
 }
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
-
+const accountNumBN = new BN(1)
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
@@ -72,6 +74,22 @@ export async function tvl(timestamp) {
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
   const date = new Date(timestamp * 1000).getTime()
+  //   const group = market!.group!
+  //   const groupConfig = market!.groupConfig!
+  //   const mangoPks: PublicKey[] = []
+  //   for (let i = 0; i < governedTokenAccounts.length; i++) {
+  //     const [mangoAccountPk] = await PublicKey.findProgramAddress(
+  //       [
+  //         group.publicKey.toBytes(),
+  //         governedTokenAccounts[i].governance!.pubkey.toBytes(),
+  //         accountNumBN.toArrayLike(Buffer, 'le', 8),
+  //       ],
+  //       groupConfig.mangoProgramId
+  //     )
+  //     mangoPks.push(mangoAccountPk)
+  //   }
+  //   const accounts = await getMultipleAccounts(connection, mangoPks)
+  //   console.log(accounts, '@@@@@')
   Object.entries(tokenList).map(([mangoId, mangoTokens]) => {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
     if (assetDeposits.length > 0) {
@@ -87,7 +105,7 @@ export async function tvl(timestamp) {
         ).toFixed(2)}%`,
         protocolName: MANGO,
         protocolSymbol: protocolInfo?.symbol || '',
-        handledMint: '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN',
+        handledMint: info?.address || '',
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
@@ -120,7 +138,6 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   const rootBank = group.tokens.find(
     (x) => x.mint.toBase58() === matchedTreasury.mint?.publicKey.toBase58()
   )?.rootBank
-  const accountNumBN = new BN(1)
   const quoteRootBank =
     group.rootBankAccounts[group.getRootBankIndex(rootBank!)]
   const quoteNodeBank = quoteRootBank?.nodeBankAccounts[0]
@@ -135,12 +152,17 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   )
 
   //todo check if has mango account
+  const solAddress = await getNativeTreasuryAddress(
+    realm!.owner,
+    matchedTreasury!.governance!.pubkey
+  )
   const createMangoAccountIns = makeCreateMangoAccountInstruction(
     groupConfig.mangoProgramId,
     groupConfig.publicKey,
     mangoAccountPk,
     matchedTreasury.governance!.pubkey,
-    accountNumBN
+    accountNumBN,
+    solAddress
   )
   const depositMangoAccountIns = makeDepositInstruction(
     groupConfig.mangoProgramId,

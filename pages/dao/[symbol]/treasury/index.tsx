@@ -41,7 +41,7 @@ const Treasury = () => {
               </div>
             </div>
           )}
-          <div className="flex flex-items flex-wrap">
+          <div className="grid grid-cols-5">
             {treasuryAccounts.map((x) => (
               <TreasuryItem
                 governedAccountTokenAccount={x}

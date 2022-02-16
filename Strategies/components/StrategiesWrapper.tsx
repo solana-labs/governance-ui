@@ -2,6 +2,7 @@ import Input from '@components/inputs/Input'
 import Loading from '@components/Loading'
 import tokenService from '@utils/services/token'
 import { useState, useEffect } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { NameVal, TreasuryStrategy } from 'Strategies/types/types'
@@ -27,6 +28,7 @@ const StrategiesWrapper = () => {
   ]
   const { getStrategies } = useStrategiesStore()
   const strategies = useStrategiesStore((s) => s.strategies)
+  const connection = useWalletStore((s) => s.connection)
   const strategiesLoading = useStrategiesStore((s) => s.strategiesLoading)
   const [strategiesFiltered, setStrategiesFiltered] = useState<
     TreasuryStrategy[]
@@ -112,12 +114,16 @@ const StrategiesWrapper = () => {
           if (x.isGenericItem) {
             return (
               <StrategyItem
-                key={x.handledMint}
+                key={x.protocolName + x.handledTokenSymbol}
                 liquidity={x.liquidity}
                 protocolSymbol={x.protocolSymbol}
                 apy={x.apy}
                 protocolName={x.protocolName}
-                handledMint={x.handledMint}
+                handledMint={
+                  connection.cluster === 'devnet'
+                    ? '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
+                    : x.handledMint
+                }
                 handledTokenSymbol={x.handledTokenSymbol}
                 handledTokenImgSrc={x.handledTokenImgSrc}
                 protocolLogoSrc={x.protocolLogoSrc}

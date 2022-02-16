@@ -143,6 +143,7 @@ const MangoDepositComponent = ({
     })
   }
   const handleDeposit = async () => {
+    await createNativeSolTreasury()
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
       getProgramVersionForRealm(realmInfo!),
@@ -224,9 +225,6 @@ const MangoDepositComponent = ({
           {currentPositionFtm} {tokenInfo?.symbol}
         </span>
       </div>
-      <Button onClick={createNativeSolTreasury}>
-        Create native sol treasury for governance
-      </Button>
       <Button
         className="w-full mt-5"
         onClick={handleDeposit}
