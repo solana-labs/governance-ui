@@ -186,7 +186,6 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     mangoAccountPk,
     'processed'
   )
-  console.log(acc, '@@@@@@@')
   const insts: InstructionDataWithHoldUpTime[] = []
   if (!acc) {
     insts.push(instructionData1)
