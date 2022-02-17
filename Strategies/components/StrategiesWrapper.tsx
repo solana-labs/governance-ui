@@ -122,7 +122,11 @@ const StrategiesWrapper = () => {
                 protocolName={x.protocolName}
                 handledMint={
                   connection.cluster === 'devnet'
-                    ? '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
+                    ? x.handledTokenSymbol === 'USDC'
+                      ? '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
+                      : x.handledTokenSymbol === 'MNGO'
+                      ? 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
+                      : x.handledMint
                     : x.handledMint
                 }
                 handledTokenSymbol={x.handledTokenSymbol}
@@ -143,11 +147,7 @@ const StrategiesWrapper = () => {
                 protocolSymbol={x.protocolSymbol}
                 apy={x.apy}
                 protocolName={x.protocolName}
-                handledMint={
-                  connection.cluster === 'devnet'
-                    ? '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
-                    : x.handledMint
-                }
+                handledMint={x.handledMint}
                 handledTokenSymbol={x.handledTokenSymbol}
                 handledTokenImgSrc={x.handledTokenImgSrc}
                 protocolLogoSrc={x.protocolLogoSrc}

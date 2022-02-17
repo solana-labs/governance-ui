@@ -109,6 +109,7 @@ export enum Instructions {
   MangoChangeReferralFeeParams,
   Grant,
   Clawback,
+  RegisterReferrerIdInstruction,
 }
 
 export type createParams = [

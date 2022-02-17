@@ -40,6 +40,7 @@ export const tokenList = {
 }
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
+export const MANGO_MINT_DEVNET = 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
 export const accountNumBN = new BN(1)
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {

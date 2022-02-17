@@ -26,52 +26,58 @@ const MangoItem = ({
 }: TreasuryStrategy) => {
   const market = useMarketStore((s) => s)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [depositedFmtAmount, setDepositedFmtAmount] = useState<string>()
+  const [depositedFmtAmount, setDepositedFmtAmount] = useState<string>('0')
   const connection = useWalletStore((s) => s.connection)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
     (x) => x.mint?.publicKey.toBase58() === handledMint
   )
   useEffect(() => {
-    const getCurrentDeposit = async () => {
-      const group = market!.group!
-      const groupConfig = market!.groupConfig!
-      const depositIndex = group.tokens.findIndex(
-        (x) => x.mint.toBase58() === handledMint
-      )
-      const [mangoAccountPk] = await PublicKey.findProgramAddress(
-        [
-          group.publicKey.toBytes(),
-          filteredTokenGov[0].governance!.pubkey.toBytes(),
-          accountNumBN.toArrayLike(Buffer, 'le', 8),
-        ],
-        groupConfig.mangoProgramId
-      )
-      const dexProgramid = market.group?.dexProgramId
-      const account = await market.client?.getMangoAccount(
-        mangoAccountPk,
-        dexProgramid!
-      )
-      const deposit = account?.deposits[depositIndex]
-      const mintInfo = await tryGetMint(
-        connection.current,
-        new PublicKey(handledMint)
-      )
-      if (mintInfo && !deposit?.isZero()) {
-        setDepositedFmtAmount(
-          account
-            ?.getUiDeposit(
-              market.cache!.rootBankCache[depositIndex],
-              group,
-              depositIndex
-            )
-            .toNumber()
-            .toFixed(0)
+    const getCurrentlyDepositedAmount = async () => {
+      let deposited = 0
+      for (let i = 0; i < filteredTokenGov.length; i++) {
+        const group = market!.group!
+        const groupConfig = market!.groupConfig!
+        const depositIndex = group.tokens.findIndex(
+          (x) => x.mint.toBase58() === handledMint
         )
+        const [mangoAccountPk] = await PublicKey.findProgramAddress(
+          [
+            group.publicKey.toBytes(),
+            filteredTokenGov[i].governance!.pubkey.toBytes(),
+            accountNumBN.toArrayLike(Buffer, 'le', 8),
+          ],
+          groupConfig.mangoProgramId
+        )
+        const dexProgramid = market.group?.dexProgramId
+        try {
+          const account = await market.client?.getMangoAccount(
+            mangoAccountPk,
+            dexProgramid!
+          )
+          const deposit = account?.deposits[depositIndex]
+          const mintInfo = await tryGetMint(
+            connection.current,
+            new PublicKey(handledMint)
+          )
+          if (mintInfo && !deposit?.isZero()) {
+            const currentDepositAmount = account
+              ?.getUiDeposit(
+                market.cache!.rootBankCache[depositIndex],
+                group,
+                depositIndex
+              )
+              .toNumber()
+            deposited += currentDepositAmount ? currentDepositAmount : 0
+          }
+        } catch (e) {
+          console.log(e)
+        }
       }
+      setDepositedFmtAmount(new BigNumber(deposited.toFixed(0)).toFormat())
     }
     if (market.group && filteredTokenGov.length) {
-      getCurrentDeposit()
+      getCurrentlyDepositedAmount()
     }
   }, [market.group?.publicKey.toBase58(), filteredTokenGov.length])
   return (

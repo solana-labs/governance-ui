@@ -114,6 +114,7 @@ const MangoDepositComponent = ({
     const hasSolAccount = await connection.current.getParsedAccountInfo(
       toAddress
     )
+    console.log(hasSolAccount)
     if (!hasSolAccount.value) {
       await withCreateNativeTreasury(
         instructions,
@@ -146,7 +147,7 @@ const MangoDepositComponent = ({
     })
   }
   const handleDeposit = async () => {
-    await createNativeSolTreasury
+    await createNativeSolTreasury()
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
       getProgramVersionForRealm(realmInfo!),
