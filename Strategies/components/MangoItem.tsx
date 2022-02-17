@@ -5,12 +5,12 @@ import DepositModal from './DepositModal'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import ItemWrapper from './ItemWrapper'
 import useWalletStore from 'stores/useWalletStore'
-import useMarket from 'Strategies/hooks/useMarket'
 import { accountNumBN } from 'Strategies/protocols/mango/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@blockworks-foundation/mango-client'
 //import { fmtMintAmount } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
+import useMarketStore from 'Strategies/store/marketStore'
 
 const MangoItem = ({
   liquidity,
@@ -24,7 +24,7 @@ const MangoItem = ({
   strategyDescription,
   createProposalFcn,
 }: TreasuryStrategy) => {
-  const market = useMarket()
+  const market = useMarketStore((s) => s)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [depositedFmtAmount, setDepositedFmtAmount] = useState<string>()
   const connection = useWalletStore((s) => s.connection)
@@ -58,7 +58,16 @@ const MangoItem = ({
         new PublicKey(handledMint)
       )
       if (mintInfo && !deposit?.isZero()) {
-        setDepositedFmtAmount(deposit?.toNumber().toFixed(2))
+        setDepositedFmtAmount(
+          account
+            ?.getUiDeposit(
+              market.cache!.rootBankCache[depositIndex],
+              group,
+              depositIndex
+            )
+            .toNumber()
+            .toFixed(0)
+        )
       }
     }
     if (market.group && filteredTokenGov.length) {

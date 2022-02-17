@@ -36,7 +36,7 @@ import { useRouter } from 'next/router'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import useMarket from 'Strategies/hooks/useMarket'
+import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
@@ -60,7 +60,7 @@ const MangoDepositComponent = ({
     symbol,
   } = useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const market = useMarket()
+  const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
