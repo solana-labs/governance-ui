@@ -8,12 +8,8 @@ import useWalletStore from 'stores/useWalletStore'
 import useMarket from 'Strategies/hooks/useMarket'
 import { accountNumBN } from 'Strategies/protocols/mango/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import {
-  MangoAccount,
-  MangoAccountLayout,
-  PublicKey,
-} from '@blockworks-foundation/mango-client'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { PublicKey } from '@blockworks-foundation/mango-client'
+//import { fmtMintAmount } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 
 const MangoItem = ({
@@ -51,22 +47,18 @@ const MangoItem = ({
         ],
         groupConfig.mangoProgramId
       )
-      const acc = await connection.current.getAccountInfo(
+      const dexProgramid = market.group?.dexProgramId
+      const account = await market.client?.getMangoAccount(
         mangoAccountPk,
-        'processed'
+        dexProgramid!
       )
-      const mangoAccount = new MangoAccount(
-        mangoAccountPk,
-        MangoAccountLayout.decode(acc == null ? undefined : acc.data)
-      )
-      const deposit = mangoAccount.deposits[depositIndex]
+      const deposit = account?.deposits[depositIndex]
       const mintInfo = await tryGetMint(
         connection.current,
         new PublicKey(handledMint)
       )
-      console.log(deposit)
-      if (mintInfo) {
-        setDepositedFmtAmount(fmtMintAmount(mintInfo.account, deposit.data))
+      if (mintInfo && !deposit?.isZero()) {
+        setDepositedFmtAmount(deposit?.toNumber().toFixed(2))
       }
     }
     if (market.group && filteredTokenGov.length) {

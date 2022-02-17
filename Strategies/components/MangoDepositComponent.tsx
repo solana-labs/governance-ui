@@ -46,7 +46,7 @@ const MangoDepositComponent = ({
   createProposalFcn,
 }: {
   handledMint: string
-  currentPosition: BN
+  currentPosition: string
   createProposalFcn: HandleCreateProposalWithStrategy
 }) => {
   const router = useRouter()
@@ -84,7 +84,6 @@ const MangoDepositComponent = ({
     ? getMintDecimalAmount(mintInfo, treasuryAmount)
     : new BigNumber(0)
   const maxAmountFtm = fmtMintAmount(mintInfo, treasuryAmount)
-  const currentPositionFtm = fmtMintAmount(mintInfo, currentPosition)
   const currentPrecision = precision(mintMinAmount)
   const validateAmountOnBlur = () => {
     setAmount(
@@ -226,7 +225,7 @@ const MangoDepositComponent = ({
       <div className="flex mt-10">
         <span>Your deposits</span>
         <span className="ml-auto">
-          {currentPositionFtm} {tokenInfo?.symbol}
+          {currentPosition} {tokenInfo?.symbol}
         </span>
       </div>
       <Button

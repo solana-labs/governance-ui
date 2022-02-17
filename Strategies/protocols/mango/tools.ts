@@ -136,7 +136,6 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     groupConfig.mangoProgramId
   )
 
-  //todo check if has mango account
   const solAddress = await getNativeTreasuryAddress(
     realm!.owner,
     matchedTreasury!.governance!.pubkey
@@ -187,6 +186,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     mangoAccountPk,
     'processed'
   )
+  console.log(acc, '@@@@@@@')
   const insts: InstructionDataWithHoldUpTime[] = []
   if (!acc) {
     insts.push(instructionData1)
