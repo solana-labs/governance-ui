@@ -5,10 +5,11 @@ import {
   MangoGroup,
   PublicKey,
 } from '@blockworks-foundation/mango-client'
-import Button from '@components/Button'
+import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
 import { Tab } from '@headlessui/react'
+import { DuplicateIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -32,6 +33,7 @@ import {
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
+import { notify } from '@utils/notifications'
 import { sendTransaction } from '@utils/send'
 import tokenService from '@utils/services/token'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
@@ -40,7 +42,11 @@ import { useRouter } from 'next/router'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import { accountNumBN } from 'Strategies/protocols/mango/tools'
+import {
+  accountNumBN,
+  MANGO_MINT,
+  MANGO_MINT_DEVNET,
+} from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
@@ -87,6 +93,7 @@ const MangoDepositComponent = ({
   const mintInfo = matchedTreasuryAccount?.mint?.account
   const [amount, setAmount] = useState<number | undefined>()
   const [linkName, setLinkName] = useState('')
+  const [linkGenerated, setLinkGenerated] = useState(false)
   const [isDepositMode, setIsDepositMode] = useState(true)
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const maxAmount = mintInfo
@@ -224,62 +231,77 @@ const MangoDepositComponent = ({
     return { referrerPda: referrerIdRecordPk, encodedReferrerId }
   }
   const handleCreateLink = async () => {
-    const signers = []
-    const programId = market.client!.programId
-    const mangoGroup = market.group
-    const { referrerPda, encodedReferrerId } = await getReferrerPda(
-      mangoGroup!,
-      linkName,
-      programId
-    )
-    const [mangoAccountPk] = await PublicKey.findProgramAddress(
-      [
-        mangoGroup!.publicKey.toBytes(),
-        matchedTreasuryAccount!.governance!.pubkey.toBytes(),
-        accountNumBN.toArrayLike(Buffer, 'le', 8),
-      ],
-      market.groupConfig!.mangoProgramId
-    )
-    const instruction = makeRegisterReferrerIdInstruction(
-      programId,
-      mangoGroup!.publicKey,
-      mangoAccountPk,
-      referrerPda,
-      wallet!.publicKey!,
-      encodedReferrerId
-    )
+    setLinkGenerated(false)
+    try {
+      const signers = []
+      const programId = market.client!.programId
+      const mangoGroup = market.group
+      const { referrerPda, encodedReferrerId } = await getReferrerPda(
+        mangoGroup!,
+        linkName,
+        programId
+      )
+      const [mangoAccountPk] = await PublicKey.findProgramAddress(
+        [
+          mangoGroup!.publicKey.toBytes(),
+          matchedTreasuryAccount!.governance!.pubkey.toBytes(),
+          accountNumBN.toArrayLike(Buffer, 'le', 8),
+        ],
+        market.groupConfig!.mangoProgramId
+      )
+      const instruction = makeRegisterReferrerIdInstruction(
+        programId,
+        mangoGroup!.publicKey,
+        mangoAccountPk,
+        referrerPda,
+        wallet!.publicKey!,
+        encodedReferrerId
+      )
 
-    const transaction = new Transaction()
-    transaction.add(instruction)
-    await sendTransaction({
-      transaction,
-      wallet,
-      connection: connection.current,
-      signers,
-      sendingMessage: 'Creating ref link',
-      successMessage: 'Ref link created',
-    })
+      const transaction = new Transaction()
+      transaction.add(instruction)
+      await sendTransaction({
+        transaction,
+        wallet,
+        connection: connection.current,
+        signers,
+        sendingMessage: 'Creating ref link',
+        successMessage: 'Ref link created',
+      })
+      setLinkGenerated(true)
+    } catch (e) {
+      setLinkGenerated(false)
+      notify({ type: 'error', message: "Can't generate link" })
+    }
   }
+  const link =
+    connection.cluster === 'devnet'
+      ? `http://www.devnet.mango.markets/?ref=${linkName}`
+      : `https://www.mango.markets/?ref=${linkName}`
   return (
     <div className="flex flex-col  w-4/5">
-      <Tab.Group onChange={changeMode}>
-        <Tab.List className="flex">
-          <Tab
-            className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tl-md ${
-              isDepositMode ? 'bg-primary-light text-bkg-2' : ''
-            }`}
-          >
-            Deposit
-          </Tab>
-          <Tab
-            className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tr-md ${
-              !isDepositMode ? 'bg-primary-light text-bkg-2' : ''
-            }`}
-          >
-            Ref link
-          </Tab>
-        </Tab.List>
-      </Tab.Group>
+      {matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
+        (matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
+          MANGO_MINT_DEVNET && (
+          <Tab.Group onChange={changeMode}>
+            <Tab.List className="flex">
+              <Tab
+                className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tl-md ${
+                  isDepositMode ? 'bg-primary-light text-bkg-2' : ''
+                }`}
+              >
+                Deposit
+              </Tab>
+              <Tab
+                className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tr-md ${
+                  !isDepositMode ? 'bg-primary-light text-bkg-2' : ''
+                }`}
+              >
+                Ref link
+              </Tab>
+            </Tab.List>
+          </Tab.Group>
+        ))}
       {!isDepositMode ? (
         <div
           className={`p-6 border-fgd-4 border rounded-b-md mb-28 ${
@@ -315,7 +337,11 @@ const MangoDepositComponent = ({
           <Button
             className="w-full mt-5"
             onClick={handleCreateLink}
-            disabled={currentPosition < minMngoToCreateLink || !connected}
+            disabled={
+              currentPosition < minMngoToCreateLink ||
+              !connected ||
+              !linkName.length
+            }
           >
             <Tooltip
               content={
@@ -329,6 +355,24 @@ const MangoDepositComponent = ({
               Create link
             </Tooltip>
           </Button>
+          {linkGenerated && (
+            <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3">
+              <div>
+                <div className="text-xs text-fgd-3">Link copy and save it</div>
+                <div className="text-xs text-fgd-3">{link}</div>
+              </div>
+              <div className="ml-auto">
+                <LinkButton
+                  className="ml-4 text-th-fgd-1"
+                  onClick={() => {
+                    navigator.clipboard.writeText(link)
+                  }}
+                >
+                  <DuplicateIcon className="w-5 h-5 mt-1" />
+                </LinkButton>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <div
