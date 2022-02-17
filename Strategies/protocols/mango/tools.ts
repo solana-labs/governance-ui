@@ -88,7 +88,8 @@ export async function tvl(timestamp) {
           closestVal.baseOraclePrice,
         handledTokenSymbol: info?.symbol || mangoId,
         apy: `${(
-          Math.pow(1 + closestVal.depositRate / 100000, 100000) - 1
+          (Math.pow(1 + closestVal.depositRate / 128, 128) - 1) *
+          100
         ).toFixed(2)}%`,
         protocolName: MANGO,
         protocolSymbol: protocolInfo?.symbol || '',
