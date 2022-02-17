@@ -16,7 +16,7 @@ const AccountItem = ({
     name,
     symbol,
     displayPrice,
-    isSolOnly,
+    isSol,
   } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
   const {
     setCurrentCompactView,
@@ -36,7 +36,7 @@ const AccountItem = ({
       {logo && (
         <img
           className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-1 ${
-            isSolOnly && 'rounded-full'
+            isSol && 'rounded-full'
           }`}
           src={logo}
         />

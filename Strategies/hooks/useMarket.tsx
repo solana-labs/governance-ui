@@ -5,7 +5,7 @@ import useMarketStore, { MarketStore } from 'Strategies/store/marketStore'
 
 export default function useMarket() {
   const { connection } = useWalletStore()
-  const market = useMarketStore(connection.cluster)((state) => state)
+  const market = useMarketStore((state) => state)
   const { groupConfig, marketConfig, set } = market
   useEffect(() => {
     const pageLoad = async () => {

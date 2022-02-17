@@ -82,7 +82,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   setCurrentCompactAccount: async (account, connection) => {
     let mintAddress =
       account && account.token ? account.token.account.mint.toBase58() : ''
-    if (account.isSolOnly) {
+    if (account.isSol) {
       mintAddress = WSOL_MINT
     }
     const tokenInfo = tokenService.getTokenInfo(mintAddress)

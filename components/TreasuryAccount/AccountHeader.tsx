@@ -23,7 +23,7 @@ const AccountHeader = () => {
       ? getMintDecimalAmountFromNatural(
           currentAccount.mint?.account,
           new BN(
-            !currentAccount.isSolOnly
+            !currentAccount.isSol
               ? currentAccount.token!.account.amount
               : currentAccount.solAccount!.lamports
           )

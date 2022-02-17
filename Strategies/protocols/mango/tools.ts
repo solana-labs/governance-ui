@@ -3,7 +3,6 @@ import {
   makeDepositInstruction,
   PublicKey,
   BN,
-  //getMultipleAccounts,
 } from '@blockworks-foundation/mango-client'
 import {
   getInstructionDataFromBase64,
@@ -12,7 +11,10 @@ import {
 } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
-import { createProposal } from 'actions/createProposal'
+import {
+  createProposal,
+  InstructionDataWithHoldUpTime,
+} from 'actions/createProposal'
 import axios from 'axios'
 import {
   TreasuryStrategy,
@@ -38,7 +40,7 @@ export const tokenList = {
 }
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
-const accountNumBN = new BN(1)
+export const accountNumBN = new BN(1)
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
@@ -74,22 +76,6 @@ export async function tvl(timestamp) {
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
   const date = new Date(timestamp * 1000).getTime()
-  //   const group = market!.group!
-  //   const groupConfig = market!.groupConfig!
-  //   const mangoPks: PublicKey[] = []
-  //   for (let i = 0; i < governedTokenAccounts.length; i++) {
-  //     const [mangoAccountPk] = await PublicKey.findProgramAddress(
-  //       [
-  //         group.publicKey.toBytes(),
-  //         governedTokenAccounts[i].governance!.pubkey.toBytes(),
-  //         accountNumBN.toArrayLike(Buffer, 'le', 8),
-  //       ],
-  //       groupConfig.mangoProgramId
-  //     )
-  //     mangoPks.push(mangoAccountPk)
-  //   }
-  //   const accounts = await getMultipleAccounts(connection, mangoPks)
-  //   console.log(accounts, '@@@@@')
   Object.entries(tokenList).map(([mangoId, mangoTokens]) => {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
     if (assetDeposits.length > 0) {
@@ -109,10 +95,9 @@ export async function tvl(timestamp) {
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
-        //TODO handle getting current position
         currentPosition: new BN(0),
         strategyDescription: 'Description',
-        isGenericItem: true,
+        isGenericItem: false,
         createProposalFcn: HandleMangoDeposit,
       })
     }
@@ -198,6 +183,15 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     matchedTreasury.mint?.account,
     new BN(mintAmount)
   )
+  const acc = await rpcContext.connection.getAccountInfo(
+    mangoAccountPk,
+    'processed'
+  )
+  const insts: InstructionDataWithHoldUpTime[] = []
+  if (!acc) {
+    insts.push(instructionData1)
+  }
+  insts.push(instructionData2)
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
@@ -210,7 +204,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     '',
     governingTokenMint,
     proposalIndex,
-    [instructionData1, instructionData2],
+    insts,
     isDraft,
     client
   )

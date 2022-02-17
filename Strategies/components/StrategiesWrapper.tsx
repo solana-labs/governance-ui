@@ -6,6 +6,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { NameVal, TreasuryStrategy } from 'Strategies/types/types'
+import MangoItem from './MangoItem'
 import SelectFilter from './SelectFilter'
 import StrategyItem from './StrategyItem'
 
@@ -43,7 +44,7 @@ const StrategiesWrapper = () => {
   }
   useEffect(() => {
     getStrategies()
-  }, [tokenService._tokenList.length])
+  }, [tokenService._tokenList])
 
   useEffect(() => {
     let filtered = [...strategies]
@@ -111,6 +112,29 @@ const StrategiesWrapper = () => {
           <div>Yield</div>
         </div>
         {strategiesFiltered.map((x) => {
+          if (x.protocolName === 'Mango') {
+            return (
+              <MangoItem
+                key={x.protocolName + x.handledTokenSymbol}
+                liquidity={x.liquidity}
+                protocolSymbol={x.protocolSymbol}
+                apy={x.apy}
+                protocolName={x.protocolName}
+                handledMint={
+                  connection.cluster === 'devnet'
+                    ? '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
+                    : x.handledMint
+                }
+                handledTokenSymbol={x.handledTokenSymbol}
+                handledTokenImgSrc={x.handledTokenImgSrc}
+                protocolLogoSrc={x.protocolLogoSrc}
+                strategyName={x.strategyName}
+                currentPosition={x.currentPosition}
+                strategyDescription={x.strategyDescription}
+                createProposalFcn={x.createProposalFcn}
+              ></MangoItem>
+            )
+          }
           if (x.isGenericItem) {
             return (
               <StrategyItem

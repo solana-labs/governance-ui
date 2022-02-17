@@ -15,7 +15,7 @@ export const getTreasuryAccountItemInfo = (
   const hasSol = governedAccountTokenAccount.solAccount !== null
   const mintAddress =
     governedAccountTokenAccount && governedAccountTokenAccount.token
-      ? governedAccountTokenAccount.isSolOnly
+      ? governedAccountTokenAccount.isSol
         ? WSOL_MINT
         : governedAccountTokenAccount.token.account.mint.toBase58()
       : ''
@@ -33,7 +33,7 @@ export const getTreasuryAccountItemInfo = (
       ? getMintDecimalAmountFromNatural(
           governedAccountTokenAccount.mint?.account,
           new BN(
-            governedAccountTokenAccount.isSolOnly
+            governedAccountTokenAccount.isSol
               ? governedAccountTokenAccount.solAccount!.lamports
               : governedAccountTokenAccount.token!.account.amount
           )
@@ -75,14 +75,14 @@ export const getTreasuryAccountItemInfo = (
     : ''
   const symbol = governedAccountTokenAccount.isNft
     ? 'NFTS'
-    : governedAccountTokenAccount.isSolOnly
+    : governedAccountTokenAccount.isSol
     ? 'SOL'
     : info?.symbol
     ? info?.symbol
     : governedAccountTokenAccount.mint
     ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
     : ''
-  const isSolOnly = governedAccountTokenAccount.isSolOnly
+  const isSol = governedAccountTokenAccount.isSol
   const displayPrice =
     totalPriceFormatted && totalPriceFormatted !== '0'
       ? totalPriceFormatted
@@ -96,7 +96,7 @@ export const getTreasuryAccountItemInfo = (
     symbol,
     displayPrice,
     info,
-    isSolOnly,
+    isSol,
     hasSol,
     solAmount,
   }

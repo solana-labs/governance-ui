@@ -72,7 +72,7 @@ const SendTokens = () => {
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
   const isNFT = currentAccount?.isNft
-  const isSolOnly = currentAccount?.isSolOnly
+  const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
@@ -168,7 +168,7 @@ const SendTokens = () => {
         nftMint: selectedNftMint,
       })
     }
-    if (isSolOnly) {
+    if (isSol) {
       return getSolTransferInstruction(defaultProps)
     }
     return getTransferInstruction(defaultProps)

@@ -27,21 +27,18 @@ export interface MarketStore extends State {
   quoteRootBank?: RootBank
   set: (x: any) => void
 }
-
-const useMarketStore = (cluster) => {
-  const GROUP = cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
-  const GROUP_CONFIG = Config.ids().getGroupWithName(GROUP)!
-  const DEFAULT_MARKET = 'SOL'
-  const DEFAULT_MARKET_INDEX = getMarketIndexBySymbol(
-    GROUP_CONFIG,
-    DEFAULT_MARKET
-  )
-  const DEFAULT_MARKET_CONFIG = GROUP_CONFIG?.perpMarkets[DEFAULT_MARKET_INDEX]
-  return create<MarketStore>((set, _get) => ({
-    groupConfig: GROUP_CONFIG,
-    marketConfig: DEFAULT_MARKET_CONFIG,
-    set: (fn) => set(produce(fn)),
-  }))
-}
+const GROUP = 'devnet.2'
+const GROUP_CONFIG = Config.ids().getGroupWithName(GROUP)!
+const DEFAULT_MARKET = 'SOL'
+const DEFAULT_MARKET_INDEX = getMarketIndexBySymbol(
+  GROUP_CONFIG,
+  DEFAULT_MARKET
+)
+const DEFAULT_MARKET_CONFIG = GROUP_CONFIG?.perpMarkets[DEFAULT_MARKET_INDEX]
+const useMarketStore = create<MarketStore>((set, _get) => ({
+  groupConfig: GROUP_CONFIG,
+  marketConfig: DEFAULT_MARKET_CONFIG,
+  set: (fn) => set(produce(fn)),
+}))
 
 export default useMarketStore

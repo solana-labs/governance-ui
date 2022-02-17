@@ -108,7 +108,14 @@ const MangoDepositComponent = ({
   const createNativeSolTreasury = async () => {
     const instructions: TransactionInstruction[] = []
     const signers: Keypair[] = []
-    if (!matchedTreasuryAccount?.solAccount) {
+    const toAddress = await getNativeTreasuryAddress(
+      realm!.owner,
+      matchedTreasuryAccount!.governance!.pubkey
+    )
+    const hasSolAccount = await connection.current.getParsedAccountInfo(
+      toAddress
+    )
+    if (!hasSolAccount.value) {
       await withCreateNativeTreasury(
         instructions,
         realm!.owner,
@@ -120,10 +127,7 @@ const MangoDepositComponent = ({
     const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
       MangoAccountLayout.span
     )
-    const toAddress = await getNativeTreasuryAddress(
-      realm!.owner,
-      matchedTreasuryAccount!.governance!.pubkey
-    )
+
     const transferIx = SystemProgram.transfer({
       fromPubkey: wallet!.publicKey!,
       toPubkey: toAddress,
@@ -143,7 +147,7 @@ const MangoDepositComponent = ({
     })
   }
   const handleDeposit = async () => {
-    await createNativeSolTreasury()
+    await createNativeSolTreasury
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
       getProgramVersionForRealm(realmInfo!),

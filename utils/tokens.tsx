@@ -34,10 +34,9 @@ export type GovernedTokenAccount = {
   mint: TokenProgramAccount<MintInfo> | undefined
   governance: ProgramAccount<Governance> | undefined
   isNft: boolean
-  isSolOnly: boolean
+  isSol: boolean
   transferAddress: PublicKey | null
   solAccount: null | AccountInfoGen<Buffer | ParsedAccountData>
-  solAddress: null | PublicKey
 }
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
@@ -51,10 +50,9 @@ export type GovernedMultiTypeAccount = {
   mint?: TokenProgramAccount<MintInfo> | undefined
   governance: ProgramAccount<Governance>
   mintInfo?: MintInfo | undefined
-  isSolOnly?: boolean
+  isSol?: boolean
   transferAddress?: PublicKey | null
   solAccount?: null | AccountInfoGen<Buffer | ParsedAccountData>
-  solAddress?: null | PublicKey
 }
 
 export type TokenProgramAccount<T> = {
