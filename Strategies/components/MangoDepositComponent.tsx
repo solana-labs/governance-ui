@@ -4,6 +4,7 @@ import {
   MangoAccountLayout,
   MangoGroup,
   PublicKey,
+  ReferrerIdRecord,
 } from '@blockworks-foundation/mango-client'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
@@ -91,6 +92,7 @@ const MangoDepositComponent = ({
     ? matchedTreasuryAccount.token.account.amount
     : new BN(0)
   const mintInfo = matchedTreasuryAccount?.mint?.account
+  const [existingLinks, setExistingLinks] = useState<ReferrerIdRecord[]>([])
   const [amount, setAmount] = useState<number | undefined>()
   const [linkName, setLinkName] = useState('')
   const [linkGenerated, setLinkGenerated] = useState(false)
@@ -118,6 +120,34 @@ const MangoDepositComponent = ({
     }
   }, [filteredTokenGov.length])
   useEffect(() => {
+    const getRefLinks = async () => {
+      const client = market.client
+      const [mangoAccountPk] = await PublicKey.findProgramAddress(
+        [
+          market.group!.publicKey.toBytes(),
+          matchedTreasuryAccount!.governance!.pubkey.toBytes(),
+          accountNumBN.toArrayLike(Buffer, 'le', 8),
+        ],
+        market.groupConfig!.mangoProgramId
+      )
+      const dexProgramid = market.group?.dexProgramId
+      const account = await market.client?.getMangoAccount(
+        mangoAccountPk,
+        dexProgramid!
+      )
+      const referrerIds = await client?.getReferrerIdsForMangoAccount(account!)
+      if (referrerIds) {
+        setExistingLinks(referrerIds)
+      }
+    }
+    try {
+      if (matchedTreasuryAccount) {
+        getRefLinks()
+      }
+    } catch (e) {
+      console.log(e)
+    }
+
     setAmount(undefined)
   }, [matchedTreasuryAccount])
   const createNativeSolTreasury = async () => {
@@ -276,8 +306,8 @@ const MangoDepositComponent = ({
   }
   const link =
     connection.cluster === 'devnet'
-      ? `http://www.devnet.mango.markets/?ref=${linkName}`
-      : `https://www.mango.markets/?ref=${linkName}`
+      ? `http://www.devnet.mango.markets/?ref=`
+      : `https://www.trade.mango.markets/?ref=`
   return (
     <div className="flex flex-col  w-4/5">
       {matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
@@ -358,14 +388,17 @@ const MangoDepositComponent = ({
           {linkGenerated && (
             <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3">
               <div>
-                <div className="text-xs text-fgd-3">Link copy and save it</div>
-                <div className="text-xs text-fgd-3">{link}</div>
+                <div className="text-xs text-fgd-3">Link</div>
+                <div className="text-xs text-fgd-3">
+                  {link}
+                  {linkName}
+                </div>
               </div>
               <div className="ml-auto">
                 <LinkButton
                   className="ml-4 text-th-fgd-1"
                   onClick={() => {
-                    navigator.clipboard.writeText(link)
+                    navigator.clipboard.writeText(`${link}${linkName}`)
                   }}
                 >
                   <DuplicateIcon className="w-5 h-5 mt-1" />
@@ -373,6 +406,30 @@ const MangoDepositComponent = ({
               </div>
             </div>
           )}
+          {existingLinks.map((x) => (
+            <div
+              key={x.referrerId}
+              className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3"
+            >
+              <div>
+                <div className="text-xs text-fgd-3">Link</div>
+                <div className="text-xs text-fgd-3">
+                  {link}
+                  {x.referrerId}
+                </div>
+              </div>
+              <div className="ml-auto">
+                <LinkButton
+                  className="ml-4 text-th-fgd-1"
+                  onClick={() => {
+                    navigator.clipboard.writeText(`${link}${x.referrerId}`)
+                  }}
+                >
+                  <DuplicateIcon className="w-5 h-5 mt-1" />
+                </LinkButton>
+              </div>
+            </div>
+          ))}
         </div>
       ) : (
         <div
