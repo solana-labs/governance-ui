@@ -42,7 +42,6 @@ import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
-import MakeRegisterReferrerIdInstruction from './components/instructions/Mango/makeRegisterReferrerIdInstruction'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -307,13 +306,6 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeReferralFeeParams>
-        )
-      case Instructions.RegisterReferrerIdInstruction:
-        return (
-          <MakeRegisterReferrerIdInstruction
-            index={idx}
-            governance={governance}
-          ></MakeRegisterReferrerIdInstruction>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>

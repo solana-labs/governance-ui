@@ -188,11 +188,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
-      id: Instructions.RegisterReferrerIdInstruction,
-      name: 'Mango - Register referrer id',
-      isVisible: canUseTransferInstruction,
-    },
-    {
       id: Instructions.None,
       name: 'None',
       isVisible:
