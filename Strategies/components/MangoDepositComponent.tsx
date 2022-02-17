@@ -1,10 +1,14 @@
 import {
+  INFO_LEN,
+  makeRegisterReferrerIdInstruction,
   MangoAccountLayout,
+  MangoGroup,
   PublicKey,
 } from '@blockworks-foundation/mango-client'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
+import { Tab } from '@headlessui/react'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -36,17 +40,20 @@ import { useRouter } from 'next/router'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import { accountNumBN } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-
+const minMngoToCreateLink = 10000
 const MangoDepositComponent = ({
   handledMint,
+  currentPositionFtm,
   currentPosition,
   createProposalFcn,
 }: {
   handledMint: string
-  currentPosition: string
+  currentPositionFtm: string
+  currentPosition: number
   createProposalFcn: HandleCreateProposalWithStrategy
 }) => {
   const router = useRouter()
@@ -79,6 +86,8 @@ const MangoDepositComponent = ({
     : new BN(0)
   const mintInfo = matchedTreasuryAccount?.mint?.account
   const [amount, setAmount] = useState<number | undefined>()
+  const [linkName, setLinkName] = useState('')
+  const [isDepositMode, setIsDepositMode] = useState(true)
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const maxAmount = mintInfo
     ? getMintDecimalAmount(mintInfo, treasuryAmount)
@@ -114,7 +123,6 @@ const MangoDepositComponent = ({
     const hasSolAccount = await connection.current.getParsedAccountInfo(
       toAddress
     )
-    console.log(hasSolAccount)
     if (!hasSolAccount.value) {
       await withCreateNativeTreasury(
         instructions,
@@ -145,6 +153,9 @@ const MangoDepositComponent = ({
       sendingMessage: 'Creating treasury account',
       successMessage: 'Treasury account has been created',
     })
+  }
+  const changeMode = (val) => {
+    setIsDepositMode(!val)
   }
   const handleDeposit = async () => {
     await createNativeSolTreasury()
@@ -183,69 +194,209 @@ const MangoDepositComponent = ({
     const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
     router.push(url)
   }
+  const getReferrerPda = async (
+    mangoGroup: MangoGroup,
+    referrerId: string,
+    programId: PublicKey
+  ): Promise<{ referrerPda: PublicKey; encodedReferrerId: Buffer }> => {
+    const encoded = Buffer.from(referrerId, 'utf8')
+    if (encoded.length > INFO_LEN) {
+      throw new Error(
+        `info string too long. Must be less than or equal to ${INFO_LEN} bytes`
+      )
+    }
 
+    const encodedReferrerId = Buffer.concat([
+      encoded,
+      Buffer.alloc(INFO_LEN - encoded.length, 0),
+    ])
+
+    // Generate the PDA pubkey
+    const [referrerIdRecordPk] = await PublicKey.findProgramAddress(
+      [
+        mangoGroup.publicKey.toBytes(),
+        new Buffer('ReferrerIdRecord', 'utf-8'),
+        encodedReferrerId,
+      ],
+      programId
+    )
+
+    return { referrerPda: referrerIdRecordPk, encodedReferrerId }
+  }
+  const handleCreateLink = async () => {
+    const signers = []
+    const programId = market.client!.programId
+    const mangoGroup = market.group
+    const { referrerPda, encodedReferrerId } = await getReferrerPda(
+      mangoGroup!,
+      linkName,
+      programId
+    )
+    const [mangoAccountPk] = await PublicKey.findProgramAddress(
+      [
+        mangoGroup!.publicKey.toBytes(),
+        matchedTreasuryAccount!.governance!.pubkey.toBytes(),
+        accountNumBN.toArrayLike(Buffer, 'le', 8),
+      ],
+      market.groupConfig!.mangoProgramId
+    )
+    const instruction = makeRegisterReferrerIdInstruction(
+      programId,
+      mangoGroup!.publicKey,
+      mangoAccountPk,
+      referrerPda,
+      wallet!.publicKey!,
+      encodedReferrerId
+    )
+
+    const transaction = new Transaction()
+    transaction.add(instruction)
+    await sendTransaction({
+      transaction,
+      wallet,
+      connection: connection.current,
+      signers,
+      sendingMessage: 'Creating ref link',
+      successMessage: 'Ref link created',
+    })
+  }
   return (
-    <div
-      className={`p-6 border-fgd-4 border rounded-md w-4/5 mb-28 ${
-        !filteredTokenGov.length && 'opacity-60 pointer-events-none'
-      }`}
-    >
-      <h2 className="mb-12">
-        Deposit
-        {hasMoreThenOneTreasury && (
-          <GovernedAccountSelect
-            governedAccounts={filteredTokenGov as GovernedMultiTypeAccount[]}
-            onChange={(selected) => {
-              setMatchedTreasuryAccount(selected)
-            }}
-            value={matchedTreasuryAccount}
-          ></GovernedAccountSelect>
-        )}
-      </h2>
-      <div className="flex">
-        Asset
-        <div className="ml-auto flex items-center mb-2">
-          <span className="text-fgd-3 text-xs mr-1">Bal:</span> {maxAmountFtm}
-          <div
-            onClick={() => setAmount(maxAmount.toNumber())}
-            className="ml-1 bg-fgd-4 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
+    <div className="flex flex-col  w-4/5">
+      <Tab.Group onChange={changeMode}>
+        <Tab.List className="flex">
+          <Tab
+            className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tl-md ${
+              isDepositMode ? 'bg-primary-light text-bkg-2' : ''
+            }`}
           >
-            Max
-          </div>
-        </div>
-      </div>
-      <Input
-        min={mintMinAmount}
-        placeholder={'Amount'}
-        value={amount}
-        type="number"
-        onChange={(e) => setAmount(e.target.value)}
-        step={mintMinAmount}
-        onBlur={validateAmountOnBlur}
-      />
-      <div className="flex mt-10">
-        <span>Your deposits</span>
-        <span className="ml-auto">
-          {currentPosition} {tokenInfo?.symbol}
-        </span>
-      </div>
-      <Button
-        className="w-full mt-5"
-        onClick={handleDeposit}
-        disabled={!amount || !connected}
-      >
-        <Tooltip
-          content={
-            !canUseTransferInstruction
-              ? 'Please connect wallet with enough voting power to create treasury proposals'
-              : !amount
-              ? 'Please input the amount'
-              : ''
-          }
+            Deposit
+          </Tab>
+          <Tab
+            className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tr-md ${
+              !isDepositMode ? 'bg-primary-light text-bkg-2' : ''
+            }`}
+          >
+            Ref link
+          </Tab>
+        </Tab.List>
+      </Tab.Group>
+      {!isDepositMode ? (
+        <div
+          className={`p-6 border-fgd-4 border rounded-b-md mb-28 ${
+            !filteredTokenGov.length && 'opacity-60 pointer-events-none'
+          }`}
         >
-          Deposit
-        </Tooltip>
-      </Button>
+          <h2 className="mb-12">
+            Create mango referrer link
+            {hasMoreThenOneTreasury && (
+              <GovernedAccountSelect
+                governedAccounts={
+                  filteredTokenGov as GovernedMultiTypeAccount[]
+                }
+                onChange={(selected) => {
+                  setMatchedTreasuryAccount(selected)
+                }}
+                value={matchedTreasuryAccount}
+              ></GovernedAccountSelect>
+            )}
+          </h2>
+          <Input
+            placeholder={'Link name'}
+            value={linkName}
+            type="text"
+            onChange={(e) => setLinkName(e.target.value)}
+          />
+          <div className="flex mt-10">
+            <span>Your deposits</span>
+            <span className="ml-auto">
+              {currentPositionFtm} {tokenInfo?.symbol}
+            </span>
+          </div>
+          <Button
+            className="w-full mt-5"
+            onClick={handleCreateLink}
+            disabled={currentPosition < minMngoToCreateLink || !connected}
+          >
+            <Tooltip
+              content={
+                !connected
+                  ? 'Please connect wallet'
+                  : currentPosition < minMngoToCreateLink
+                  ? 'Please deposit at least 10000 MNGO to create link'
+                  : ''
+              }
+            >
+              Create link
+            </Tooltip>
+          </Button>
+        </div>
+      ) : (
+        <div
+          className={`p-6 border-fgd-4 border rounded-b-md mb-28 ${
+            !filteredTokenGov.length && 'opacity-60 pointer-events-none'
+          }`}
+        >
+          <h2 className="mb-12">
+            Deposit
+            {hasMoreThenOneTreasury && (
+              <GovernedAccountSelect
+                governedAccounts={
+                  filteredTokenGov as GovernedMultiTypeAccount[]
+                }
+                onChange={(selected) => {
+                  setMatchedTreasuryAccount(selected)
+                }}
+                value={matchedTreasuryAccount}
+              ></GovernedAccountSelect>
+            )}
+          </h2>
+          <div className="flex">
+            Asset
+            <div className="ml-auto flex items-center mb-2">
+              <span className="text-fgd-3 text-xs mr-1">Bal:</span>{' '}
+              {maxAmountFtm}
+              <div
+                onClick={() => setAmount(maxAmount.toNumber())}
+                className="ml-1 bg-fgd-4 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
+              >
+                Max
+              </div>
+            </div>
+          </div>
+          <Input
+            min={mintMinAmount}
+            placeholder={'Amount'}
+            value={amount}
+            type="number"
+            onChange={(e) => setAmount(e.target.value)}
+            step={mintMinAmount}
+            onBlur={validateAmountOnBlur}
+          />
+          <div className="flex mt-10">
+            <span>Your deposits</span>
+            <span className="ml-auto">
+              {currentPositionFtm} {tokenInfo?.symbol}
+            </span>
+          </div>
+          <Button
+            className="w-full mt-5"
+            onClick={handleDeposit}
+            disabled={!amount || !connected}
+          >
+            <Tooltip
+              content={
+                !canUseTransferInstruction
+                  ? 'Please connect wallet with enough voting power to create treasury proposals'
+                  : !amount
+                  ? 'Please input the amount'
+                  : ''
+              }
+            >
+              Deposit
+            </Tooltip>
+          </Button>
+        </div>
+      )}
     </div>
   )
 }

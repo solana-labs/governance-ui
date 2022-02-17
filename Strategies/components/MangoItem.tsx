@@ -27,6 +27,7 @@ const MangoItem = ({
   const market = useMarketStore((s) => s)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [depositedFmtAmount, setDepositedFmtAmount] = useState<string>('0')
+  const [depositedAmount, setDepositedAmount] = useState<number>(0)
   const connection = useWalletStore((s) => s.connection)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
@@ -74,6 +75,7 @@ const MangoItem = ({
           console.log(e)
         }
       }
+      setDepositedAmount(deposited)
       setDepositedFmtAmount(new BigNumber(deposited.toFixed(0)).toFormat())
     }
     if (market.group && filteredTokenGov.length) {
@@ -99,7 +101,8 @@ const MangoItem = ({
       </ItemWrapper>
       {isModalOpen && (
         <DepositModal
-          currentPosition={depositedFmtAmount}
+          currentPositionFtm={depositedFmtAmount}
+          currentPosition={depositedAmount}
           apy={apy}
           liquidity={liquidity}
           handledMint={handledMint}

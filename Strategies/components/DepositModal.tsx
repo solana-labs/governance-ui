@@ -17,6 +17,7 @@ const DepositModal = ({
   strategyName,
   strategyDescription,
   currentPosition,
+  currentPositionFtm,
   createProposalFcn,
 }) => {
   return (
@@ -39,6 +40,7 @@ const DepositModal = ({
           {protocolName === 'Mango' ? (
             <MangoDeposit
               handledMint={handledMint}
+              currentPositionFtm={currentPositionFtm}
               currentPosition={currentPosition}
               createProposalFcn={createProposalFcn}
             ></MangoDeposit>
