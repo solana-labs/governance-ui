@@ -8,6 +8,7 @@ import {
 } from '@blockworks-foundation/mango-client'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
+import Loading from '@components/Loading'
 import Tooltip from '@components/Tooltip'
 import { Tab } from '@headlessui/react'
 import { DuplicateIcon } from '@heroicons/react/outline'
@@ -74,6 +75,7 @@ const MangoDepositComponent = ({
     councilMint,
     symbol,
   } = useRealm()
+  const [isDepositing, setIsDepositing] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
@@ -182,49 +184,73 @@ const MangoDepositComponent = ({
       wallet,
       connection: connection.current,
       signers,
-      sendingMessage: 'Creating treasury account',
-      successMessage: 'Treasury account has been created',
+      sendingMessage: 'Depositing sol to create mango account',
+      successMessage: 'Sol deposited',
     })
   }
   const changeMode = (val) => {
     setIsDepositMode(!val)
   }
   const handleDeposit = async () => {
-    await createNativeSolTreasury()
-    const rpcContext = new RpcContext(
-      new PublicKey(realm!.owner.toString()),
-      getProgramVersionForRealm(realmInfo!),
-      wallet!,
-      connection.current,
-      connection.endpoint
-    )
-    const mintAmount = parseMintNaturalAmountFromDecimal(
-      amount!,
-      matchedTreasuryAccount!.mint!.account.decimals
-    )
-    const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-      matchedTreasuryAccount!.governance!.account.config
-    )
-    const defaultProposalMint = !mint?.supply.isZero()
-      ? realm!.account.communityMint
-      : !councilMint?.supply.isZero()
-      ? realm!.account.config.councilMint
-      : undefined
-    const proposalAddress = await createProposalFcn(
-      rpcContext,
-      handledMint,
-      mintAmount,
-      realm!,
-      matchedTreasuryAccount!,
-      ownTokenRecord.pubkey,
-      defaultProposalMint!,
-      matchedTreasuryAccount!.governance!.account!.proposalCount,
-      false,
-      market,
-      client
-    )
-    const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
-    router.push(url)
+    try {
+      setIsDepositing(true)
+      const group = market.group!
+      const groupConfig = market.groupConfig!
+      const [mangoAccountPk] = await PublicKey.findProgramAddress(
+        [
+          group.publicKey.toBytes(),
+          matchedTreasuryAccount!.governance!.pubkey.toBytes(),
+          accountNumBN.toArrayLike(Buffer, 'le', 8),
+        ],
+        groupConfig.mangoProgramId
+      )
+      const acc = await connection.current.getAccountInfo(
+        mangoAccountPk,
+        'processed'
+      )
+      if (!acc) {
+        await createNativeSolTreasury()
+      }
+      const rpcContext = new RpcContext(
+        new PublicKey(realm!.owner.toString()),
+        getProgramVersionForRealm(realmInfo!),
+        wallet!,
+        connection.current,
+        connection.endpoint
+      )
+      const mintAmount = parseMintNaturalAmountFromDecimal(
+        amount!,
+        matchedTreasuryAccount!.mint!.account.decimals
+      )
+      const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
+        matchedTreasuryAccount!.governance!.account.config
+      )
+      const defaultProposalMint = !mint?.supply.isZero()
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
+      const proposalAddress = await createProposalFcn(
+        rpcContext,
+        handledMint,
+        mintAmount,
+        realm!,
+        matchedTreasuryAccount!,
+        ownTokenRecord.pubkey,
+        defaultProposalMint!,
+        matchedTreasuryAccount!.governance!.account!.proposalCount,
+        false,
+        market,
+        client
+      )
+      const url = fmtUrlWithCluster(
+        `/dao/${symbol}/proposal/${proposalAddress}`
+      )
+      router.push(url)
+    } catch (e) {
+      console.log(e)
+    }
+    setIsDepositing(false)
   }
   const getReferrerPda = async (
     mangoGroup: MangoGroup,
@@ -477,7 +503,7 @@ const MangoDepositComponent = ({
           <Button
             className="w-full mt-5"
             onClick={handleDeposit}
-            disabled={!amount || !canUseTransferInstruction}
+            disabled={!amount || !canUseTransferInstruction || isDepositing}
           >
             <Tooltip
               content={
@@ -488,7 +514,7 @@ const MangoDepositComponent = ({
                   : ''
               }
             >
-              Deposit
+              {!isDepositing ? 'Propose deposit' : <Loading></Loading>}
             </Tooltip>
           </Button>
         </div>
