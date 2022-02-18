@@ -331,28 +331,28 @@ const MangoDepositComponent = ({
       : `https://www.trade.mango.markets/?ref=`
   return (
     <div className="flex flex-col  w-4/5">
-      {matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
-        (matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
-          MANGO_MINT_DEVNET && (
-          <Tab.Group onChange={changeMode}>
-            <Tab.List className="flex">
-              <Tab
-                className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tl-md ${
-                  isDepositMode ? 'bg-primary-light text-bkg-2' : ''
-                }`}
-              >
-                Deposit
-              </Tab>
-              <Tab
-                className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tr-md ${
-                  !isDepositMode ? 'bg-primary-light text-bkg-2' : ''
-                }`}
-              >
-                Ref link
-              </Tab>
-            </Tab.List>
-          </Tab.Group>
-        ))}
+      {(matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
+        matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
+          MANGO_MINT_DEVNET) && (
+        <Tab.Group onChange={changeMode}>
+          <Tab.List className="flex">
+            <Tab
+              className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tl-md ${
+                isDepositMode ? 'bg-primary-light text-bkg-2' : ''
+              }`}
+            >
+              Deposit
+            </Tab>
+            <Tab
+              className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tr-md ${
+                !isDepositMode ? 'bg-primary-light text-bkg-2' : ''
+              }`}
+            >
+              Ref link
+            </Tab>
+          </Tab.List>
+        </Tab.Group>
+      )}
       {!isDepositMode ? (
         <div
           className={`p-6 border-fgd-4 border rounded-b-md mb-28 ${
