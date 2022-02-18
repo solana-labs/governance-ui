@@ -22,7 +22,7 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-client": "^3.3.15",
+    "@blockworks-foundation/mango-client": "git+https://github.com/blockworks-foundation/mango-client-v3.git#feature/create-mango-account-props-fix",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
     "@cardinal/namespaces-components": "^2.5.0",
     "@emotion/react": "^11.1.5",
