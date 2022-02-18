@@ -1,20 +1,19 @@
 import VoteResultsBar from './VoteResultsBar'
-import useProposal from '@hooks/useProposal'
 import useProposalVotes from '@hooks/useProposalVotes'
+import { Proposal } from '@solana/spl-governance'
 
 type VoteResultsProps = {
   isListView?: boolean
+  proposal: Proposal
 }
 
-const VoteResults = ({ isListView }: VoteResultsProps) => {
-  const { proposal } = useProposal()
-
+const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
   const {
     yesVoteCount,
     noVoteCount,
     relativeNoVotes,
     relativeYesVotes,
-  } = useProposalVotes(proposal?.account)
+  } = useProposalVotes(proposal)
   return (
     <div className="flex space-x-4 items-center">
       {proposal ? (
