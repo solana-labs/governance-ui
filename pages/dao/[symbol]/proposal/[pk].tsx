@@ -125,7 +125,7 @@ const Proposal = () => {
                   <VoteResultStatus votePassed={votePassed} />
                 </div>
               )}
-              <VoteResults />
+              <VoteResults proposal={proposal.account} />
             </div>
           </div>
         ) : null}
