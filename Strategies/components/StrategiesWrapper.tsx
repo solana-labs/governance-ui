@@ -50,7 +50,9 @@ const StrategiesWrapper = () => {
     let filtered = [...strategies]
     const { token, platform, search } = filters
     if (token.val) {
-      filtered = filtered.filter((x) => x.protocolSymbol.includes(token.val!))
+      filtered = filtered.filter((x) =>
+        x.handledTokenSymbol.includes(token.val!)
+      )
     }
     if (platform.val) {
       filtered = filtered.filter((x) => x.protocolName === platform.val)
@@ -61,8 +63,9 @@ const StrategiesWrapper = () => {
         (x) =>
           Object.values(
             Object.keys(x).filter((key) => searchAbleProps.includes(key))
-          ).filter((j) => `${j}`.toLowerCase().includes(search.toLowerCase()))
-            .length
+          ).filter((j) =>
+            `${x[j]}`.toLowerCase().includes(search.toLowerCase())
+          ).length
       )
     }
     setStrategiesFiltered([...filtered])
