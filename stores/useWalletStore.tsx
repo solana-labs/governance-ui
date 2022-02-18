@@ -28,7 +28,6 @@ import {
   VoteRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { fetchGistFile } from '../utils/github'
 import { getGovernanceChatMessages } from '@solana/spl-governance'
 import { ChatMessage } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
@@ -46,7 +45,6 @@ import {
   getVoteRecordsByVoterMapByProposal,
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
-import { mapEntries } from '@tools/core/script'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 
 interface WalletStore extends State {
@@ -65,7 +63,6 @@ interface WalletStore extends State {
     tokenMints: TokenProgramAccount<MintInfo>[]
     tokenAccounts: TokenProgramAccount<TokenAccount>[]
     proposals: { [proposal: string]: ProgramAccount<Proposal> }
-    proposalDescriptions: { [proposal: string]: string }
     /// Community token records by owner
     tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
     /// Council token records by owner
@@ -83,7 +80,7 @@ interface WalletStore extends State {
     voteRecordsByVoter: { [voter: string]: ProgramAccount<VoteRecord> }
     signatories: { [signatory: string]: ProgramAccount<VoteRecord> }
     chatMessages: { [message: string]: ProgramAccount<ChatMessage> }
-    description?: string
+    descriptionLink?: string
     proposalMint?: MintAccount
     loading: boolean
     tokenType?: GoverningTokenType
@@ -95,22 +92,6 @@ interface WalletStore extends State {
   actions: any
 }
 
-async function mapFromPromisedEntries(
-  xs: any,
-  mapFn: (kv: [string, any]) => Promise<[string, any]>
-) {
-  return Object.fromEntries(await Promise.all(mapEntries(xs, mapFn)))
-}
-
-async function resolveProposalDescription(description: string) {
-  try {
-    const url = new URL(description)
-    return (await fetchGistFile(url.toString())) ?? description
-  } catch {
-    return description
-  }
-}
-
 const INITIAL_REALM_STATE = {
   realm: undefined,
   mint: undefined,
@@ -120,7 +101,6 @@ const INITIAL_REALM_STATE = {
   tokenMints: [],
   tokenAccounts: [],
   proposals: {},
-  proposalDescriptions: {},
   tokenRecords: {},
   councilTokenOwnerRecords: {},
   loading: true,
@@ -136,7 +116,7 @@ const INITIAL_PROPOSAL_STATE = {
   voteRecordsByVoter: {},
   signatories: {},
   chatMessages: {},
-  description: undefined,
+  descriptionLink: undefined,
   proposalMint: undefined,
   loading: true,
   proposalOwner: undefined,
@@ -357,22 +337,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedRealm.proposals = proposals
-      })
-
-      const proposalDescriptions = await mapFromPromisedEntries(
-        proposals,
-        async ([k, v]: [string, ProgramAccount<Proposal>]) => {
-          return [
-            k,
-            await resolveProposalDescription(v.account.descriptionLink),
-          ]
-        }
-      )
-
-      console.log('fetchRealm proposalDescriptions', proposalDescriptions)
-
-      set((s) => {
-        s.selectedRealm.proposalDescriptions = proposalDescriptions
         s.selectedRealm.loading = false
       })
     },
@@ -420,7 +384,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const programId = proposal.owner
 
       const [
-        description,
         governance,
         instructions,
         voteRecordsByVoter,
@@ -428,7 +391,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         chatMessages,
         proposalOwner,
       ] = await Promise.all([
-        resolveProposalDescription(proposal.account.descriptionLink),
         getGovernanceAccount(
           connection,
           proposal.account.governance,
@@ -483,7 +445,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       set((s) => {
         s.selectedProposal.proposal = proposal
-        s.selectedProposal.description = description
+        s.selectedProposal.descriptionLink = proposal.account.descriptionLink
         s.selectedProposal.governance = governance
         s.selectedProposal.realm = realm
         s.selectedProposal.instructions = accountsToPubkeyMap(instructions)
