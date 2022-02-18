@@ -362,5 +362,14 @@
     "programId": "GRNPT8MPw3LYY6RdjsgKeFji5kMiG1fSxnxDjDBu4s73",
     "realmId": "5J2bRTkzoSXWKZMW4o5tyNsT7Zwn9dDkDt6rMz6Ze9u1",
     "ogImage": "/realms/Renpo/img/renpo_logo.png"
+  },
+  {
+    "symbol": "Ikohaus",
+    "displayName": "Ikohaus",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "WBmKxddpbtnVPXXUFCJf5BcC4qfCRZ9wsZSxTZBjdM5",
+    "website": "https://ikohaus.business.site",
+    "twitter": "@Ikohaus",
+    "ogImage": "/realms/Ikohaus/img/Ikohaus_Logo.png"
   }
 ]
