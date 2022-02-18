@@ -131,21 +131,23 @@ const MangoDepositComponent = ({
         market.groupConfig!.mangoProgramId
       )
       const dexProgramid = market.group?.dexProgramId
-      const account = await market.client?.getMangoAccount(
-        mangoAccountPk,
-        dexProgramid!
-      )
-      const referrerIds = await client?.getReferrerIdsForMangoAccount(account!)
-      if (referrerIds) {
-        setExistingLinks(referrerIds)
+      try {
+        const account = await market.client?.getMangoAccount(
+          mangoAccountPk,
+          dexProgramid!
+        )
+        const referrerIds = await client?.getReferrerIdsForMangoAccount(
+          account!
+        )
+        if (referrerIds) {
+          setExistingLinks(referrerIds)
+        }
+      } catch (e) {
+        console.log(e)
       }
     }
-    try {
-      if (matchedTreasuryAccount) {
-        getRefLinks()
-      }
-    } catch (e) {
-      console.log(e)
+    if (matchedTreasuryAccount) {
+      getRefLinks()
     }
 
     setAmount(undefined)

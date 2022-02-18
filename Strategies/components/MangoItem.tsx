@@ -75,7 +75,7 @@ const MangoItem = ({
           console.log(e)
         }
       }
-      setDepositedAmount(deposited)
+      setDepositedAmount(Number(deposited.toFixed(0)))
       setDepositedFmtAmount(new BigNumber(deposited.toFixed(0)).toFormat())
     }
     if (market.group && filteredTokenGov.length) {
