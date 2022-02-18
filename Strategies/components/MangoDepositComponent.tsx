@@ -147,7 +147,7 @@ const MangoDepositComponent = ({
 
     setAmount(undefined)
   }, [matchedTreasuryAccount])
-  const createNativeSolTreasury = async () => {
+  const handleSolPayment = async () => {
     const instructions: TransactionInstruction[] = []
     const signers: Keypair[] = []
     const toAddress = await getNativeTreasuryAddress(
@@ -209,7 +209,7 @@ const MangoDepositComponent = ({
         'processed'
       )
       if (!acc) {
-        await createNativeSolTreasury()
+        await handleSolPayment()
       }
       const rpcContext = new RpcContext(
         new PublicKey(realm!.owner.toString()),
