@@ -477,7 +477,7 @@ const MangoDepositComponent = ({
           <Button
             className="w-full mt-5"
             onClick={handleDeposit}
-            disabled={!amount || !connected}
+            disabled={!amount || !canUseTransferInstruction}
           >
             <Tooltip
               content={
