@@ -80,10 +80,10 @@ export function VoteCountdown({
   return (
     <>
       {isZeroCountdown(countdown) ? (
-        <div className="text-fgd-3">Voting ended</div>
+        <div className="text-fgd-3">The vote has ended</div>
       ) : (
         <div className="flex items-center text-fgd-1">
-          <div className="mr-1 text-fgd-3">Ends in</div>
+          <div className="mr-1 text-fgd-3">Voting ends</div>
           {countdown && countdown.days > 0 && (
             <>
               <div className="bg-bkg-1 px-1 py-0.5 rounded">

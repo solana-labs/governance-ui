@@ -9,6 +9,20 @@ const VoteResultsBar = ({
 }: VoteResultsBarProps) => {
   return (
     <>
+      <div className="flex justify-between">
+        <div className="flex items-center">
+          <p className="font-bold text-fgd-1">
+            <span className="font-normal mr-1 text-xs text-fgd-3">Approve</span>
+            {approveVotePercentage.toFixed(2)}%
+          </p>
+        </div>
+        <div className="flex items-center">
+          <p className="font-bold text-fgd-1">
+            <span className="font-normal mr-1 text-xs text-fgd-3">Deny</span>
+            {denyVotePercentage.toFixed(2)}%
+          </p>
+        </div>
+      </div>
       <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">
         <div
           style={{
