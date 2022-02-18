@@ -5,7 +5,10 @@ import DepositModal from './DepositModal'
 import { TreasuryStrategy } from 'Strategies/types/types'
 import ItemWrapper from './ItemWrapper'
 import useWalletStore from 'stores/useWalletStore'
-import { accountNumBN } from 'Strategies/protocols/mango/tools'
+import {
+  accountNumBN,
+  tryGetMangoAccount,
+} from 'Strategies/protocols/mango/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { PublicKey } from '@blockworks-foundation/mango-client'
 //import { fmtMintAmount } from '@tools/sdk/units'
@@ -50,12 +53,8 @@ const MangoItem = ({
           ],
           groupConfig.mangoProgramId
         )
-        const dexProgramid = market.group?.dexProgramId
-        try {
-          const account = await market.client?.getMangoAccount(
-            mangoAccountPk,
-            dexProgramid!
-          )
+        const account = await tryGetMangoAccount(market, mangoAccountPk)
+        if (account) {
           const deposit = account?.deposits[depositIndex]
           const mintInfo = await tryGetMint(
             connection.current,
@@ -71,8 +70,6 @@ const MangoItem = ({
               .toNumber()
             deposited += currentDepositAmount ? currentDepositAmount : 0
           }
-        } catch (e) {
-          console.log(e)
         }
       }
       setDepositedAmount(Number(deposited.toFixed(0)))

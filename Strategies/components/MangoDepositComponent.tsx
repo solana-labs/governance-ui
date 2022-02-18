@@ -47,6 +47,7 @@ import {
   accountNumBN,
   MANGO_MINT,
   MANGO_MINT_DEVNET,
+  tryGetMangoAccount,
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
@@ -130,20 +131,12 @@ const MangoDepositComponent = ({
         ],
         market.groupConfig!.mangoProgramId
       )
-      const dexProgramid = market.group?.dexProgramId
-      try {
-        const account = await market.client?.getMangoAccount(
-          mangoAccountPk,
-          dexProgramid!
-        )
-        const referrerIds = await client?.getReferrerIdsForMangoAccount(
-          account!
-        )
+      const account = await tryGetMangoAccount(market, mangoAccountPk)
+      if (account) {
+        const referrerIds = await client?.getReferrerIdsForMangoAccount(account)
         if (referrerIds) {
           setExistingLinks(referrerIds)
         }
-      } catch (e) {
-        console.log(e)
       }
     }
     if (matchedTreasuryAccount) {

@@ -16,6 +16,7 @@ import {
   InstructionDataWithHoldUpTime,
 } from 'actions/createProposal'
 import axios from 'axios'
+import { MarketStore } from 'Strategies/store/marketStore'
 import {
   TreasuryStrategy,
   HandleCreateProposalWithStrategy,
@@ -210,4 +211,19 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     client
   )
   return proposalAddress
+}
+
+export const tryGetMangoAccount = async (
+  market: MarketStore,
+  mangoAccountPk: PublicKey
+) => {
+  try {
+    const account = await market.client?.getMangoAccount(
+      mangoAccountPk,
+      market.group.dexProgramid!
+    )
+    return account
+  } catch (e) {
+    return null
+  }
 }
