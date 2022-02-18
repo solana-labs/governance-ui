@@ -9,13 +9,13 @@ import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
 import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactWrapper'
 import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
-import Tooltip from '@components/Tooltip'
 import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
 import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
+import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 
 const compareProposals = (p1: Proposal, p2: Proposal) => {
   const p1Rank = p1.getStateSortRank()
@@ -40,8 +40,6 @@ const REALM = () => {
     proposals,
     realmTokenAccount,
     ownTokenRecord,
-    toManyCommunityOutstandingProposalsForUser,
-    toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const prevStringifyNftsGovernedTokenAccounts = usePrevious(
@@ -121,16 +119,10 @@ const REALM = () => {
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
               <div className="mr-4">
-                <Tooltip
-                  content={
-                    toManyCommunityOutstandingProposalsForUser &&
-                    toManyCouncilOutstandingProposalsForUse
-                      ? 'You have too many outstanding proposals'
-                      : ''
-                  }
-                >
-                  <NewProposalBtn />
-                </Tooltip>
+                <ApproveAllBtn />
+              </div>
+              <div className="mr-4">
+                <NewProposalBtn />
               </div>
 
               <ProposalFilter filters={filters} setFilters={setFilters} />
