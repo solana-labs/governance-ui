@@ -220,7 +220,7 @@ export const tryGetMangoAccount = async (
   try {
     const account = await market.client?.getMangoAccount(
       mangoAccountPk,
-      market.group.dexProgramid!
+      market.group!.dexProgramid!
     )
     return account
   } catch (e) {

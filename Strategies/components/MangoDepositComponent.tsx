@@ -377,7 +377,7 @@ const MangoDepositComponent = ({
                   : ''
               }
             >
-              Create link
+              Create new link
             </Tooltip>
           </Button>
           {linkGenerated && (
