@@ -1680,10 +1680,10 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/spl-governance@^0.0.27":
-  version "0.0.27"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.27.tgz#cee0cae0aa343762d6fd2d02e60793a79b2c1b73"
-  integrity sha512-oHKDJmTXbJAIiw1Edu2aspOWXj3P4wCZz0twdAQsxGHdrjrlFO2xjcWeCeDHBHT3WII0kbDamo6yoIWeXHd8Cw==
+"@solana/spl-governance@^0.0.28":
+  version "0.0.28"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.28.tgz#70bd2e6ab04cc26ef4a525d77068db3f667e242d"
+  integrity sha512-Y/rTdjHnwVmgdN7lNMAugmRu0+nsJh9n84zSuXt2zkGF7vE83xPwdR+ycCFq34ToeNuoAN/eSeHKFtpBT8dtzg==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     bignumber.js "^9.0.1"
