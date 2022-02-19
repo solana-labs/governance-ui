@@ -124,6 +124,28 @@ export const validateDestinationAccAddressWithMint = async (
   return true
 }
 
+export const validateAccount = async (
+  connection: ConnectionContext,
+  val: string
+) => {
+  const accountPk = tryParseKey(val)
+
+  if (!accountPk) {
+    throw 'Provided value is not a valid account address'
+  }
+
+  try {
+    const accountInfo = await connection.current.getAccountInfo(accountPk)
+
+    if (!accountInfo) {
+      throw "account doesn't exist or has no SOLs"
+    }
+  } catch (ex) {
+    console.error("Can't validate account", ex)
+    throw "Can't validate account"
+  }
+}
+
 export const validateBuffer = async (
   connection: ConnectionContext,
   val: string,
@@ -177,7 +199,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = governedTokenAccount.isNft
+          const isNft = governedTokenAccount?.isNft
           if (isNft) {
             return true
           }

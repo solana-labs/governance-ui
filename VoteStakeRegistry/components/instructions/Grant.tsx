@@ -36,7 +36,9 @@ import moment from 'moment'
 import { getFormattedStringFromDays } from 'VoteStakeRegistry/tools/dateTools'
 import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
+import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const Grant = ({
   index,
@@ -45,15 +47,16 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const dateNow = moment().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realm, tokenRecords } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
-  const [startDate, setStartDate] = useState(moment().format('YYYY-MM-DD'))
+  const [startDate, setStartDate] = useState(moment().format('DD-MM-YYYY'))
   const [endDate, setEndDate] = useState('')
+  const [useableGrantMints, setUseableGrantMints] = useState<string[]>([])
   const [form, setForm] = useState<GrantForm>({
     destinationAccount: '',
     // No default transfer amount
@@ -227,9 +230,28 @@ const Grant = ({
       periods: yup
         .number()
         .required('End date required')
-        .min(1, 'End date required'),
+        .min(1, 'End date cannot be prior to start date'),
     })
   )
+  useEffect(() => {
+    const getGrantMints = async () => {
+      const clientProgramId = client!.program.programId
+      const { registrar } = await getRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        clientProgramId
+      )
+      const existingRegistrar = await tryGetRegistrar(registrar, client!)
+      if (existingRegistrar) {
+        setUseableGrantMints(
+          existingRegistrar.votingMints.map((x) => x.mint.toBase58())
+        )
+      }
+    }
+    if (client) {
+      getGrantMints()
+    }
+  }, [client])
   return (
     <>
       <Select
@@ -252,7 +274,10 @@ const Grant = ({
       <GovernedAccountSelect
         label="Source account"
         governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
+          governedTokenAccountsWithoutNfts.filter(
+            (x) =>
+              x.mint && useableGrantMints.includes(x.mint.publicKey.toBase58())
+          ) as GovernedMultiTypeAccount[]
         }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })

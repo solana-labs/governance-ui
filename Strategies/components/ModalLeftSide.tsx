@@ -3,7 +3,7 @@ import BigNumber from 'bignumber.js'
 const ModalLeftSide = ({ strategy, liquidity, projectedYield, children }) => {
   return (
     <div className="flex-items w-1/2">
-      <div className="flex flex-col mb-5 w-1/2">
+      <div className="flex flex-col mb-5 w-2/3">
         <div className="grid grid-cols-3 text-xs mb-1">
           <div>Strategy</div>
           <div>Liquidity</div>
@@ -15,7 +15,6 @@ const ModalLeftSide = ({ strategy, liquidity, projectedYield, children }) => {
           <div className="text-right">{projectedYield}</div>
         </div>
       </div>
-      {/* description */}
       <div>{children}</div>
     </div>
   )

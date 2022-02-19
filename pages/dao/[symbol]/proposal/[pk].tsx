@@ -12,19 +12,20 @@ import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import { option } from 'tools/core/option'
 import useQueryContext from 'hooks/useQueryContext'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { ProposalState } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
+import { resolveProposalDescription } from '@utils/helpers'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realmInfo } = useRealm()
-  const { proposal, description } = useProposal()
-
+  const { proposal, descriptionLink } = useProposal()
+  const [description, setDescription] = useState('')
   const { yesVoteProgress, yesVoteCount, minimumYesVotes } = useProposalVotes(
     proposal?.account
   )
@@ -40,6 +41,16 @@ const Proposal = () => {
       proposal.account.state === ProposalState.Executing ||
       proposal.account.state === ProposalState.SigningOff ||
       proposal.account.state === ProposalState.Succeeded)
+
+  useEffect(() => {
+    const handleResolveDescription = async () => {
+      const description = await resolveProposalDescription(descriptionLink!)
+      setDescription(description)
+    }
+    if (descriptionLink) {
+      handleResolveDescription()
+    }
+  }, [descriptionLink])
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -70,7 +81,7 @@ const Proposal = () => {
 
             <div className="py-4">
               <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2">{proposal?.account.name}</h1>
+                <h1 className="mr-2 break-all">{proposal?.account.name}</h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.account}
@@ -125,7 +136,7 @@ const Proposal = () => {
                   <VoteResultStatus votePassed={votePassed} />
                 </div>
               )}
-              <VoteResults />
+              <VoteResults proposal={proposal.account} />
             </div>
           </div>
         ) : null}

@@ -2,13 +2,19 @@ import { FunctionComponent } from 'react'
 
 interface LoadingProps {
   className?: string
+  w?: string
+  h?: string
 }
 
-const Loading: FunctionComponent<LoadingProps> = ({ className }) => {
+const Loading: FunctionComponent<LoadingProps> = ({
+  className,
+  w = 5,
+  h = 5,
+}) => {
   return (
     <div className="w-full flex justify-center">
       <svg
-        className={`${className} animate-spin h-5 w-5`}
+        className={`${className} animate-spin h-${w} w-${h}`}
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

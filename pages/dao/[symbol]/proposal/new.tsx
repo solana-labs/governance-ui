@@ -29,7 +29,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { ProgramAccount } from '@solana/spl-governance'
 import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import InstructionContentContainer from './components/InstructionContentContainer'
-import ProgramUpgrade from './components/instructions/ProgramUpgrade'
+import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
 import Empty from './components/instructions/Empty'
 import Mint from './components/instructions/Mint'
 import CustomBase64 from './components/instructions/CustomBase64'
@@ -39,8 +39,9 @@ import VoteBySwitch from './components/VoteBySwitch'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -57,7 +58,7 @@ export const NewProposalContext = createContext<InstructionsContext>(
 
 const New = () => {
   const router = useRouter()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
@@ -298,6 +299,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
+        )
+      case Instructions.MangoChangeReferralFeeParams:
+        return (
+          <MakeChangeReferralFeeParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeReferralFeeParams>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>

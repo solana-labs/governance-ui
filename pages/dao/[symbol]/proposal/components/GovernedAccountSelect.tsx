@@ -91,7 +91,10 @@ const GovernedAccountSelect = ({
         <div className="space-y-0.5 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token: <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
+              Token:{' '}
+              {imgUrl && (
+                <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
+              )}
               {tokenName}
             </div>
           )}

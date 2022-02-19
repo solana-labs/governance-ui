@@ -63,6 +63,28 @@ function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
 
 export const MANGO_INSTRUCTIONS = {
   mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68: {
+    2: {
+      name: 'Mango v3: Deposit',
+      accounts: [
+        { name: 'Mango Group' },
+        { name: 'Mango account' },
+        { name: 'Owner' },
+        { name: 'Mango cache' },
+        { name: 'Root bank' },
+        { name: 'Node bank' },
+        { name: 'Token account' },
+        { name: '' },
+        { name: 'Token account owner' },
+      ],
+      getDataUI: async (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0).Deposit
+        return <>{displayAllArgs(args)}</>
+      },
+    },
     4: {
       name: 'Mango v3: Add Spot Market',
       accounts: [
@@ -173,6 +195,39 @@ export const MANGO_INSTRUCTIONS = {
             {displayOptionalDecimalArgument(args, 'mngoPerPeriod')}
           </>
         )
+      },
+    },
+    55: {
+      name: 'Mango v3: Create Mango Account',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Mango Account' },
+        2: { name: 'Owner' },
+        4: { name: 'Payer' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .CreateMangoAccount
+        return <>{displayAllArgs(args)}</>
+      },
+    },
+    61: {
+      name: 'Mango v3: Change Referral Fee Params',
+      accounts: {
+        0: { name: 'Mango Group' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .ChangeReferralFeeParams
+        return <>{displayAllArgs(args)}</>
       },
     },
   },

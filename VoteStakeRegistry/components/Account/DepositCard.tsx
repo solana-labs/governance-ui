@@ -4,11 +4,11 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
 import {
   fmtMintAmount,
+  getMintDecimalAmount,
   getMintDecimalAmountFromNatural,
 } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   DepositWithMintAccount,
   LockupType,
@@ -21,23 +21,45 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
+import { XIcon } from '@heroicons/react/outline'
+import Tooltip from '@components/Tooltip'
+import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
+import { abbreviateAddress } from '@utils/formatting'
+import { notify } from '@utils/notifications'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
+import moment from 'moment'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
-  const { getDeposits } = useDepositStore()
-  const { realm, realmInfo, ownTokenRecord, tokenRecords } = useRealm()
-  const {
-    client,
-    calcMintMultiplier,
-    communityMintRegistrar,
-  } = useVoteRegistry()
+  const { getOwnedDeposits } = useDepositStore()
+  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const communityMintRegistrar = useVoteStakeRegistryClientStore(
+    (s) => s.state.communityMintRegistrar
+  )
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
   const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
+    (s) => s.actions
+  )
 
   const handleWithDrawFromDeposit = async (
     depositEntry: DepositWithMintAccount
   ) => {
+    if (
+      ownTokenRecord!.account!.unrelinquishedVotesCount &&
+      realm!.account.communityMint.toBase58() ===
+        deposit.mint.publicKey.toBase58()
+    ) {
+      notify({
+        type: 'error',
+        message:
+          "You can't withdraw community tokens when you have active proposals",
+      })
+      return
+    }
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -57,18 +79,41 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       depositIndex: depositEntry.index,
       client: client,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord!.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
+    await fetchWalletTokenAccounts()
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
   const handleStartUnlock = () => {
     setIsUnlockModalOpen(true)
+  }
+  const handleCloseDeposit = async () => {
+    const rpcContext = new RpcContext(
+      realm!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
+      connection,
+      endpoint
+    )
+    await closeDeposit({
+      rpcContext,
+      realmPk: realm!.pubkey!,
+      depositIndex: deposit.index,
+      communityMintPk: realm!.account.communityMint,
+      client,
+    })
+    await getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
   }
 
   const lockedTokens = fmtMintAmount(
@@ -86,7 +131,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     return (
       <div className="flex flex-col w-1/2 p-2">
         <div className="text-xs text-fgd-3">{label}</div>
-        <div>{value}</div>
+        <div className="break-all">{value}</div>
       </div>
     )
   }
@@ -100,16 +145,27 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     ?.logoURI
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
   return (
-    <div className="border border-bkg-4 w-80 mr-3 rounded-lg mb-3 flex flex-col">
+    <div className="border border-bkg-4 rounded-lg flex flex-col">
       <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
         <h3 className="mb-0 flex flex-items items-center">
           {img && <img className="w-6 h-6 mr-2" src={img}></img>}
-          {lockedTokens}
+          {lockedTokens} {!img && abbreviateAddress(deposit.mint.publicKey)}
           {price ? (
             <span className="text-xs opacity-70 font-light ml-1">
               =${formatter.format(price)}
             </span>
           ) : null}
+          {deposit?.available?.isZero() && deposit?.currentlyLocked?.isZero() && (
+            <Tooltip
+              content="Close deposit - used to close unused deposit"
+              contentClassName="ml-auto"
+            >
+              <XIcon
+                onClick={handleCloseDeposit}
+                className="w-5 h-5 text-primary-light cursor-pointer"
+              ></XIcon>
+            </Tooltip>
+          )}
         </h3>
       </div>
       <div
@@ -132,11 +188,19 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Schedule"
               value={
                 deposit.vestingRate &&
-                `${fmtMintAmount(
+                `${getMintDecimalAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                )} p/mo`
+                ).toFormat(2)} p/mo`
               }
+            />
+          )}
+          {isVest && deposit.nextVestingTimestamp !== null && (
+            <CardLabel
+              label="Next vesting"
+              value={moment(
+                deposit.nextVestingTimestamp?.toNumber() * 1000
+              ).format('DD-MM-YYYY')}
             />
           )}
           {isRealmCommunityMint && (
@@ -144,7 +208,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Vote multiplier"
               value={calcMintMultiplier(
                 deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber(),
-                communityMintRegistrar
+                communityMintRegistrar,
+                realm
               )}
             />
           )}
@@ -160,33 +225,19 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             label="Available"
             value={fmtMintAmount(deposit.mint.account, deposit.available)}
           />
-          <CardLabel
-            label="Lock from"
-            value={new Date(
-              deposit.lockup.startTs.toNumber() * 1000
-            ).toDateString()}
-          />
-          <CardLabel
-            label="Lock to"
-            value={new Date(
-              deposit.lockup.endTs.toNumber() * 1000
-            ).toDateString()}
-          />
         </div>
-        {
-          <Button
-            disabled={!isConstant && deposit.available.isZero()}
-            style={{ marginTop: 'auto' }}
-            className="w-full"
-            onClick={() =>
-              !isConstant
-                ? handleWithDrawFromDeposit(deposit)
-                : handleStartUnlock()
-            }
-          >
-            {!isConstant ? 'Withdraw' : 'Start Unlock'}
-          </Button>
-        }
+        <Button
+          disabled={!isConstant && deposit.available.isZero()}
+          style={{ marginTop: 'auto' }}
+          className="w-full"
+          onClick={() =>
+            !isConstant
+              ? handleWithDrawFromDeposit(deposit)
+              : handleStartUnlock()
+          }
+        >
+          {!isConstant ? 'Withdraw' : 'Start Unlock'}
+        </Button>
       </div>
       {isUnlockModalOpen && (
         <LockTokensModal
