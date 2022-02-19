@@ -1,28 +1,28 @@
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
-import useProposal from 'hooks/useProposal'
-import ProposalStateBadge from 'components/ProposalStatusBadge'
-import { InstructionPanel } from 'components/instructions/instructionPanel'
-import DiscussionPanel from 'components/chat/DiscussionPanel'
-import VotePanel from 'components/VotePanel'
-import ApprovalQuorum from 'components/ApprovalQuorum'
-import useRealm from 'hooks/useRealm'
-import useProposalVotes from 'hooks/useProposalVotes'
-import VoteResultsBar from 'components/VoteResultsBar'
-import ProposalTimeStatus from 'components/ProposalTimeStatus'
-import { option } from 'tools/core/option'
-import useQueryContext from 'hooks/useQueryContext'
-import React from 'react'
+
 import ProposalActionsPanel from '@components/ProposalActions'
-import { getRealmExplorerHost } from 'tools/routing'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
+
+import ApprovalQuorum from 'components/ApprovalQuorum'
+import DiscussionPanel from 'components/chat/DiscussionPanel'
+import { InstructionPanel } from 'components/instructions/instructionPanel'
+import ProposalStateBadge from 'components/ProposalStatusBadge'
+import ProposalTimeStatus from 'components/ProposalTimeStatus'
+import VotePanel from 'components/VotePanel'
+import VoteResultsBar from 'components/VoteResultsBar'
+import useProposal from 'hooks/useProposal'
+import useProposalVotes from 'hooks/useProposalVotes'
+import useQueryContext from 'hooks/useQueryContext'
+import useRealm from 'hooks/useRealm'
+import { option } from 'tools/core/option'
+import { getRealmExplorerHost } from 'tools/routing'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realmInfo } = useRealm()
   const { proposal, description } = useProposal()
-
   const {
     yesVoteProgress,
     yesVoteCount,

@@ -16,6 +16,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useTransactionSignature from '@hooks/useTransactionSignature'
 
 export enum PlayState {
   Played,
@@ -40,9 +41,10 @@ export function ExecuteInstructionButton({
   const connection = useWalletStore((s) => s.connection)
   const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const connected = useWalletStore((s) => s.connected)
-
   const [currentSlot, setCurrentSlot] = useState(0)
-
+  const { transactionSignature } = useTransactionSignature(
+    proposalInstruction.pubkey
+  )
   const canExecuteAt = proposal?.account.votingCompletedAt
     ? proposal.account.votingCompletedAt.toNumber() + 1
     : 0
@@ -85,14 +87,24 @@ export function ExecuteInstructionButton({
 
     setPlaying(PlayState.Played)
   }
-
   if (
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
   ) {
     return (
       <Tooltip content="instruction executed successfully">
-        <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
+        {transactionSignature ? (
+          <a
+            href={`https://explorer.solana.com/tx/${transactionSignature}`}
+            target="_blank"
+            rel="noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
+          </a>
+        ) : (
+          <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
+        )}
       </Tooltip>
     )
   }

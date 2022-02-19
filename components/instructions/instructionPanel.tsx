@@ -92,17 +92,19 @@ export function InstructionPanel() {
             <Disclosure.Panel
               className={`border border-fgd-4 border-t-0 p-4 md:p-6 pt-0 rounded-b-md`}
             >
-              {proposalInstructions.map((pi, idx) => (
-                <div key={pi.pubkey.toBase58()}>
-                  {proposal && (
-                    <InstructionCard
-                      proposal={proposal}
-                      index={idx + 1}
-                      proposalInstruction={pi}
-                    ></InstructionCard>
-                  )}
-                </div>
-              ))}
+              {proposalInstructions.map((pi, idx) => {
+                return (
+                  <div key={pi.pubkey.toBase58()}>
+                    {proposal && (
+                      <InstructionCard
+                        proposal={proposal}
+                        index={idx + 1}
+                        proposalInstruction={pi}
+                      ></InstructionCard>
+                    )}
+                  </div>
+                )
+              })}
 
               {proposal && (
                 <div className="flex justify-end">

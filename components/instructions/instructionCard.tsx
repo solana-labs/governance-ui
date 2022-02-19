@@ -49,6 +49,7 @@ export default function InstructionCard({
   )
   const [nftImgUrl, setNftImgUrl] = useState('')
   const [tokenImgUrl, setTokenImgUrl] = useState('')
+
   useEffect(() => {
     getInstructionDescriptor(
       connection.current,
