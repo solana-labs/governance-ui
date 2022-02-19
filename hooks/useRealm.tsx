@@ -1,6 +1,6 @@
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useState } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import {
   createUnchartedRealmInfo,
@@ -26,21 +26,12 @@ export default function useRealm() {
     tokenMints,
     tokenAccounts: realmTokenAccounts,
     proposals,
-    proposalDescriptions,
     tokenRecords,
     councilTokenOwnerRecords,
     programVersion,
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-  const mounted = useRef(false)
-  useEffect(() => {
-    mounted.current = true
-
-    return () => {
-      mounted.current = false
-    }
-  }, [])
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
       ? realm
@@ -52,10 +43,10 @@ export default function useRealm() {
       realmInfo = { ...realmInfo, programVersion: programVersion }
     }
     // Do not set realm info until the programVersion  is resolved
-    if (mounted.current && programVersion) {
+    if (programVersion) {
       setRealmInfo(realmInfo)
     }
-  }, [symbol, realm, mounted.current, programVersion])
+  }, [symbol, realm, programVersion])
 
   const realmTokenAccount = useMemo(
     () =>
@@ -125,7 +116,6 @@ export default function useRealm() {
     realmTokenAccounts,
     tokenMints,
     proposals,
-    proposalDescriptions,
     tokenRecords,
     realmTokenAccount,
     ownTokenRecord,

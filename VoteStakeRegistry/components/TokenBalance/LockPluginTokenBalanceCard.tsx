@@ -9,20 +9,24 @@ import { GoverningTokenType } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import { ArrowsExpandIcon } from '@heroicons/react/outline'
-import Link from 'next/link'
 import useQueryContext from '@hooks/useQueryContext'
 import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import VotingPowerBox from './VotingPowerBox'
+import Tooltip from '@components/Tooltip'
+import { useRouter } from 'next/router'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
 }: {
   proposal?: Option<Proposal>
 }) => {
+  const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol } = useRealm()
+  const { councilMint, mint, realm, symbol, tokenRecords } = useRealm()
+  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletStore((s) => s.current)
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -31,6 +35,10 @@ const LockPluginTokenBalanceCard = ({
     (!proposal ||
       (proposal.isSome() &&
         proposal.value.governingTokenMint.toBase58() === realmMint?.toBase58()))
+
+  const tokenOwnerRecordPk = wallet?.publicKey
+    ? tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey?.toBase58()
+    : null
 
   const communityDepositVisible =
     // If there is no council then community deposit is the only option to show
@@ -43,18 +51,39 @@ const LockPluginTokenBalanceCard = ({
   )
 
   const hasLoaded = mint || councilMint
-  const backLink = fmtUrlWithCluster(`/dao/${symbol}/account`)
-    ? fmtUrlWithCluster(`/dao/${symbol}/account`)
-    : ''
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4 flex">
-        Account
-        <Link href={backLink}>
-          <a className="text-fgd-3 flex-shrink-0 h-5 w-5 ml-auto cursor-pointer">
-            <ArrowsExpandIcon></ArrowsExpandIcon>
-          </a>
-        </Link>
+      <h3>
+        <Tooltip
+          content={
+            !connected
+              ? 'Please connect your wallet'
+              : !tokenOwnerRecordPk
+              ? 'Please deposit your tokens at least once to see account view'
+              : ''
+          }
+        >
+          <div
+            className={
+              !connected || !tokenOwnerRecordPk
+                ? 'opacity-0.6 pointer-events-none'
+                : ''
+            }
+            onClick={() => {
+              const url = fmtUrlWithCluster(
+                `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+              )
+              router.push(url)
+            }}
+          >
+            <div className="cursor-pointer flex items-center">
+              Account
+              <a className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light">
+                <ArrowsExpandIcon></ArrowsExpandIcon>
+              </a>
+            </div>
+          </div>
+        </Tooltip>
       </h3>
       {hasLoaded ? (
         <>
@@ -161,7 +190,7 @@ const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-8">
+      <div className="flex space-x-4 items-center mt-4">
         <VotingPowerBox
           votingPower={votingPower}
           mint={mint}

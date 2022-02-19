@@ -26,15 +26,14 @@ const NotificationList = () => {
     }
   }, [notifications, setNotificationStore])
 
-  const reversedNotifications = [...notifications].reverse()
-
   return (
     <div
-      className={`z-20 fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6`}
+      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 z-2000`}
     >
       <div className={`flex flex-col w-full`}>
-        {reversedNotifications.map((n, idx) => (
+        {notifications.map((n, idx) => (
           <Notification
+            idx={idx}
             key={`${n.message}${idx}`}
             type={n.type}
             message={n.message}
@@ -47,14 +46,16 @@ const NotificationList = () => {
   )
 }
 
-const Notification = ({ type, message, description, txid }) => {
+const Notification = ({ type, message, description, txid, idx }) => {
   const [showNotification, setShowNotification] = useState(true)
 
   if (!showNotification) return null
 
   return (
     <div
-      className={`max-w-sm w-full bg-bkg-1 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden`}
+      className={`max-w-sm w-full bg-bkg-1 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden bottom-10 left-10 absolute z-[${
+        idx + 2000
+      }]`}
     >
       <div className={`p-4`}>
         <div className={`flex items-center`}>

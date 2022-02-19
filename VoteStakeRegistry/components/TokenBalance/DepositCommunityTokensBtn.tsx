@@ -5,24 +5,18 @@ import { BN } from '@project-serum/anchor'
 import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const DepositCommunityTokensBtn = ({ className = '' }) => {
-  const { getDeposits } = useDepositStore()
-  const {
-    realm,
-    realmInfo,
-    realmTokenAccount,
-    tokenRecords,
-    ownTokenRecord,
-  } = useRealm()
-  const { client } = useVoteRegistry()
+  const { getOwnedDeposits } = useDepositStore()
+  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
+  const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
 
@@ -53,17 +47,15 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
       client: client,
       communityMintPk: realm.account.communityMint,
     })
-    if (ownTokenRecord) {
-      await getDeposits({
-        realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord.account.governingTokenMint,
-        walletPk: wallet!.publicKey!,
-        client: client!,
-        connection,
-      })
-    }
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    getOwnedDeposits({
+      realmPk: realm!.pubkey,
+      communityMintPk: realm!.account.communityMint,
+      walletPk: wallet!.publicKey!,
+      client: client!,
+      connection,
+    })
+    fetchWalletTokenAccounts()
+    fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
   const hasTokensInWallet =

@@ -22,8 +22,8 @@
     ]
   },
   "dependencies": {
-    "@blockworks-foundation/mango-client": "^3.3.12",
-    "@blockworks-foundation/voter-stake-registry-client": "^0.1.8",
+    "@blockworks-foundation/mango-client": "^3.3.16",
+    "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
     "@cardinal/namespaces-components": "^2.5.0",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
@@ -36,7 +36,7 @@
     "@project-serum/borsh": "^0.2.2",
     "@project-serum/common": "^0.0.1-beta.3",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
-    "@solana/spl-governance": "^0.0.27",
+    "@solana/spl-governance": "^0.0.28",
     "@solana/spl-token": "^0.1.3",
     "@solana/spl-token-registry": "^0.2.1733",
     "@solana/wallet-adapter-base": "^0.7.1",
@@ -87,7 +87,7 @@
     "postcss": "^8.2.12",
     "postcss-preset-env": "^6.7.0",
     "prettier": "^2.0.2",
-    "tailwindcss": "^2.1.2",
+    "tailwindcss": "^2.2.19",
     "twin.macro": "^2.4.0",
     "typescript": "^4.1.3"
   },

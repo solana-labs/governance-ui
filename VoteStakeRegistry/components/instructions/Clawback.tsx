@@ -11,14 +11,12 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   Governance,
   serializeInstructionToBase64,
-  //serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import * as yup from 'yup'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   Deposit,
   DepositWithMintAccount,
@@ -31,6 +29,8 @@ import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
+import { abbreviateAddress } from '@utils/formatting'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const Clawback = ({
   index,
@@ -39,10 +39,13 @@ const Clawback = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
-  const { realm, tokenRecords } = useRealm()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { realm } = useRealm()
+  const {
+    governedTokenAccountsWithoutNfts,
+    governancesArray,
+  } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [voters, setVoters] = useState<Voter[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
@@ -79,7 +82,6 @@ const Clawback = ({
         realmPk: realm!.pubkey,
         realmAuthority: realm!.account.authority!,
         voterWalletAddress: voterWalletAddress,
-        tokenOwnerRecord: tokenRecords[voterWalletAddress.toBase58()].pubkey,
         destination: clawbackDestination,
         voterDepositIndex: form.deposit.index,
         grantMintPk: form.deposit.mint.publicKey,
@@ -92,7 +94,9 @@ const Clawback = ({
     const obj: UiInstruction = {
       serializedInstruction,
       isValid,
-      governance: form.governedTokenAccount?.governance,
+      governance: governancesArray.find(
+        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
+      ),
       prerequisiteInstructions: prerequisiteInstructions,
       chunkSplitByDefault: true,
     }
@@ -105,7 +109,11 @@ const Clawback = ({
     )
   }, [form])
   useEffect(() => {
-    setGovernedAccount(form.governedTokenAccount?.governance)
+    setGovernedAccount(
+      governancesArray.find(
+        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
+      )
+    )
   }, [form.governedTokenAccount])
   useEffect(() => {
     const getVoters = async () => {
@@ -139,7 +147,7 @@ const Clawback = ({
     }
   }, [client])
   useEffect(() => {
-    const getDepositsInfo = async () => {
+    const getOwnedDepositsInfo = async () => {
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
@@ -168,7 +176,7 @@ const Clawback = ({
       setDeposits(deposits)
     }
     if (form.voter) {
-      getDepositsInfo()
+      getOwnedDepositsInfo()
     } else {
       setDeposits([])
     }
@@ -185,15 +193,16 @@ const Clawback = ({
     deposit: yup.object().nullable().required('Deposit required'),
   })
 
-  const getDepositsLabel = (deposit) => {
+  const getOwnedDepositsLabel = (deposit: DepositWithMintAccount | null) => {
+    const symbol = deposit
+      ? tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())?.symbol ||
+        ''
+      : null
     return deposit
       ? `${fmtMintAmount(
           deposit.mint.account,
           deposit.amountDepositedNative
-        )} ${
-          tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
-            ?.symbol || ''
-        }`
+        )} ${symbol ? symbol : abbreviateAddress(deposit.mint.publicKey)}`
       : null
   }
   return (
@@ -221,15 +230,15 @@ const Clawback = ({
           handleSetForm({ value, propertyName: 'deposit' })
         }}
         placeholder="Please select..."
-        value={getDepositsLabel(form.deposit)}
+        value={getOwnedDepositsLabel(form.deposit)}
         error={formErrors['deposit']}
       >
         {deposits
-          ?.filter((x) => !x.amountDepositedNative.isZero())
+          ?.filter((x) => !x.amountDepositedNative.isZero() && x.allowClawback)
           ?.map((x, idx) => {
             return (
               <Select.Option key={idx} value={x}>
-                {getDepositsLabel(x)}
+                {getOwnedDepositsLabel(x)}
               </Select.Option>
             )
           })}

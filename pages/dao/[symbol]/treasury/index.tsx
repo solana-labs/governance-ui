@@ -5,7 +5,7 @@ import { GovernedTokenAccount } from '@utils/tokens'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-//import StrategiesWrapper from 'Strategies/components/StrategiesWrapper'
+import StrategiesWrapper from 'Strategies/components/StrategiesWrapper'
 
 const Treasury = () => {
   const { governedTokenAccounts } = useGovernanceAssets()
@@ -41,7 +41,7 @@ const Treasury = () => {
               </div>
             </div>
           )}
-          <div className="flex flex-items flex-wrap">
+          <div className="grid grid-cols-5">
             {treasuryAccounts.map((x) => (
               <TreasuryItem
                 governedAccountTokenAccount={x}
@@ -52,7 +52,7 @@ const Treasury = () => {
           </div>
         </div>
       </div>
-      {/* <StrategiesWrapper></StrategiesWrapper> */}
+      <StrategiesWrapper></StrategiesWrapper>
     </>
   )
 }

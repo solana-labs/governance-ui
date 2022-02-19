@@ -1,8 +1,12 @@
 import Input from '@components/inputs/Input'
+import Loading from '@components/Loading'
+import tokenService from '@utils/services/token'
 import { useState, useEffect } from 'react'
+import useWalletStore from 'stores/useWalletStore'
 import { MANGO, tokenListFilter } from 'Strategies/protocols/mango/tools'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import { NameVal, TreasuryStrategy } from 'Strategies/types/types'
+import MangoItem from './MangoItem'
 import SelectFilter from './SelectFilter'
 import StrategyItem from './StrategyItem'
 
@@ -25,7 +29,8 @@ const StrategiesWrapper = () => {
   ]
   const { getStrategies } = useStrategiesStore()
   const strategies = useStrategiesStore((s) => s.strategies)
-
+  const connection = useWalletStore((s) => s.connection)
+  const strategiesLoading = useStrategiesStore((s) => s.strategiesLoading)
   const [strategiesFiltered, setStrategiesFiltered] = useState<
     TreasuryStrategy[]
   >([])
@@ -39,13 +44,15 @@ const StrategiesWrapper = () => {
   }
   useEffect(() => {
     getStrategies()
-  }, [])
+  }, [tokenService._tokenList])
 
   useEffect(() => {
     let filtered = [...strategies]
     const { token, platform, search } = filters
     if (token.val) {
-      filtered = filtered.filter((x) => x.protocolSymbol.includes(token.val!))
+      filtered = filtered.filter((x) =>
+        x.handledTokenSymbol.includes(token.val!)
+      )
     }
     if (platform.val) {
       filtered = filtered.filter((x) => x.protocolName === platform.val)
@@ -56,17 +63,25 @@ const StrategiesWrapper = () => {
         (x) =>
           Object.values(
             Object.keys(x).filter((key) => searchAbleProps.includes(key))
-          ).filter((j) => `${j}`.toLowerCase().includes(search.toLowerCase()))
-            .length
+          ).filter((j) =>
+            `${x[j]}`.toLowerCase().includes(search.toLowerCase())
+          ).length
       )
     }
     setStrategiesFiltered([...filtered])
-  }, [filters, strategies])
+  }, [filters, JSON.stringify(strategies)])
   return (
-    <div className="grid grid-cols-12 mt-10">
+    <div
+      className={`grid grid-cols-12 mt-10 ${
+        strategiesLoading ? 'pointer-event-none' : ''
+      }`}
+    >
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
         <div className="mb-10 flex flex-items">
-          <h1>Strategies</h1>
+          <h1 className="flex items-center">
+            Strategies{' '}
+            {strategiesLoading && <Loading className="ml-3"></Loading>}
+          </h1>
           <div className="ml-auto flex space-x-3">
             <Input
               wrapperClassName="mt-1"
@@ -100,10 +115,37 @@ const StrategiesWrapper = () => {
           <div>Yield</div>
         </div>
         {strategiesFiltered.map((x) => {
+          if (x.protocolName === 'Mango') {
+            return (
+              <MangoItem
+                key={x.protocolName + x.handledTokenSymbol}
+                liquidity={x.liquidity}
+                protocolSymbol={x.protocolSymbol}
+                apy={x.apy}
+                protocolName={x.protocolName}
+                handledMint={
+                  connection.cluster === 'devnet'
+                    ? x.handledTokenSymbol === 'USDC'
+                      ? '8FRFC6MoGGkMFQwngccyu69VnYbzykGeez7ignHVAFSN'
+                      : x.handledTokenSymbol === 'MNGO'
+                      ? 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
+                      : x.handledMint
+                    : x.handledMint
+                }
+                handledTokenSymbol={x.handledTokenSymbol}
+                handledTokenImgSrc={x.handledTokenImgSrc}
+                protocolLogoSrc={x.protocolLogoSrc}
+                strategyName={x.strategyName}
+                currentPosition={x.currentPosition}
+                strategyDescription={x.strategyDescription}
+                createProposalFcn={x.createProposalFcn}
+              ></MangoItem>
+            )
+          }
           if (x.isGenericItem) {
             return (
               <StrategyItem
-                key={x.handledMint}
+                key={x.protocolName + x.handledTokenSymbol}
                 liquidity={x.liquidity}
                 protocolSymbol={x.protocolSymbol}
                 apy={x.apy}
