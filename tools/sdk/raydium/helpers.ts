@@ -39,7 +39,7 @@ export const getAmountOut = async (
       amountInBN
     ),
     currencyOut: new Token(poolKeys.quoteMint, quote.value.decimals),
-    slippage: new Percent(5, 1000),
+    slippage: new Percent(10, 1000),
   })
   const currentPrice = amountOut.currentPrice.toFixed(quote.value.decimals)
 
