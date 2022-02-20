@@ -10,6 +10,8 @@ import {
   GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
+import { SupportedMintName } from '@tools/sdk/solend/configuration'
+import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 
@@ -99,6 +101,42 @@ export interface EmptyInstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
 }
 
+export interface CreateAssociatedTokenAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+  splTokenMintUIName?: SplTokenUIName
+}
+
+export interface CreateSolendObligationAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+}
+
+export interface InitSolendObligationAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+}
+
+export interface DepositReserveLiquidityAndObligationCollateralForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+}
+
+export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+  destinationLiquidity?: string
+}
+
+export interface RefreshObligationForm {
+  governedAccount?: GovernedMultiTypeAccount
+  mintName?: SupportedMintName
+}
+
+export interface RefreshReserveForm {
+  governedAccount?: GovernedMultiTypeAccount
+  mintName?: SupportedMintName
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -109,6 +147,13 @@ export enum Instructions {
   MangoChangeReferralFeeParams,
   Grant,
   Clawback,
+  CreateAssociatedTokenAccount,
+  CreateSolendObligationAccount,
+  InitSolendObligationAccount,
+  DepositReserveLiquidityAndObligationCollateral,
+  WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  RefreshSolendObligation,
+  RefreshSolendReserve,
 }
 
 export type createParams = [

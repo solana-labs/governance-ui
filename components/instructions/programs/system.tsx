@@ -4,6 +4,7 @@ import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 import { WSOL_MINT } from '../tools'
 import BufferLayout from 'buffer-layout'
+import { AccountMetaData } from '@solana/spl-governance'
 
 export const SYSTEM_INSTRUCTIONS = {
   '11111111111111111111111111111111': {
@@ -44,6 +45,24 @@ export const SYSTEM_INSTRUCTIONS = {
             )}
           </>
         )
+      },
+    },
+    3: {
+      name: 'System Program - Create Account With Seed',
+      accounts: [
+        'Obligation',
+        'Lending Market Account',
+        'Obligation Owner',
+        'Sysvar: Clock',
+        'Rent Program',
+        'Token Program',
+      ],
+      getDataUI: (
+        _connection: Connection,
+        _data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        return <p>No Instruction data</p>
       },
     },
   },

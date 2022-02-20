@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import {
   DEFAULT_NATIVE_SOL_MINT,
   DEFAULT_NFT_TREASURY_MINT,
@@ -17,8 +18,9 @@ import {
   parseMintAccountData,
 } from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
-import { useEffect, useState } from 'react'
+
 import useWalletStore from 'stores/useWalletStore'
+
 import useRealm from './useRealm'
 
 export default function useGovernanceAssets() {
@@ -49,8 +51,8 @@ export default function useGovernanceAssets() {
   function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
     return (
       realm &&
-      getGovernancesByAccountTypes(types).some((g) =>
-        ownVoterWeight.canCreateProposal(g.account.config)
+      getGovernancesByAccountTypes(types).some((govAcc) =>
+        ownVoterWeight.canCreateProposal(govAcc.account.config)
       )
     )
   }
@@ -63,10 +65,8 @@ export default function useGovernanceAssets() {
       GovernanceAccountType.MintGovernanceV1,
       GovernanceAccountType.MintGovernanceV2,
     ])
-    return !!governances.find(
-      (x) =>
-        x.account.governedAccount.toBase58() ==
-        realm?.account.communityMint.toBase58()
+    return !!governances.find((govAcc) =>
+      realm?.account.communityMint.equals(govAcc.account.governedAccount)
     )
   }
   const canMintRealmCouncilToken = () => {
@@ -99,12 +99,12 @@ export default function useGovernanceAssets() {
 
   const canUseAnyInstruction =
     realm &&
-    governancesArray.some((g) =>
-      ownVoterWeight.canCreateProposal(g.account.config)
+    governancesArray.some((gov) =>
+      ownVoterWeight.canCreateProposal(gov.account.config)
     )
 
   const getAvailableInstructions = () => {
-    return availableInstructions.filter((x) => x.isVisible)
+    return availableInstructions.filter((itx) => itx.isVisible)
   }
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
@@ -136,11 +136,13 @@ export default function useGovernanceAssets() {
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => !x.isNft
   )
-  const nftsGovernedTokenAccounts = governedTokenAccounts.filter((x) => x.isNft)
+  const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
+    (govTokenAcc) => govTokenAcc.isNft
+  )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
-    (g) =>
-      g.governance &&
-      ownVoterWeight.canCreateProposal(g.governance?.account?.config)
+    (acc) =>
+      acc.governance &&
+      ownVoterWeight.canCreateProposal(acc.governance?.account?.config)
   )
   const availableInstructions = [
     {
@@ -161,6 +163,41 @@ export default function useGovernanceAssets() {
       isVisible:
         canUseTokenTransferInstruction &&
         realm?.account.config.useCommunityVoterWeightAddin,
+    },
+    {
+      id: Instructions.CreateAssociatedTokenAccount,
+      name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.CreateSolendObligationAccount,
+      name: 'Solend: Create Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.InitSolendObligationAccount,
+      name: 'Solend: Init Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
+      name: 'Solend: Deposit Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendReserve,
+      name: 'Solend: Refresh Reserve',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendObligation,
+      name: 'Solend: Refresh Obligation',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      name: 'Solend: Withdraw Funds',
+      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.ProgramUpgrade,
@@ -200,6 +237,7 @@ export default function useGovernanceAssets() {
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
+
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
           (x) =>
