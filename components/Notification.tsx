@@ -28,7 +28,7 @@ const NotificationList = () => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 z-20`}
+      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 z-2000`}
     >
       <div className={`flex flex-col w-full`}>
         {notifications.map((n, idx) => (
@@ -54,7 +54,7 @@ const Notification = ({ type, message, description, txid, idx }) => {
   return (
     <div
       className={`max-w-sm w-full bg-bkg-1 shadow-lg rounded-md mt-2 pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden bottom-10 left-10 absolute z-[${
-        idx + 20
+        idx + 2000
       }]`}
     >
       <div className={`p-4`}>

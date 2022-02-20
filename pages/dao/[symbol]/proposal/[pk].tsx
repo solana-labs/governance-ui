@@ -1,9 +1,14 @@
 import Link from 'next/link'
+import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
+import { ProposalState } from '@solana/spl-governance'
 
 import ProposalActionsPanel from '@components/ProposalActions'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
+import VoteResults from '@components/VoteResults'
+import VoteResultStatus from '@components/VoteResultStatus'
+import { resolveProposalDescription } from '@utils/helpers'
 
 import ApprovalQuorum from 'components/ApprovalQuorum'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
@@ -11,7 +16,6 @@ import { InstructionPanel } from 'components/instructions/instructionPanel'
 import ProposalStateBadge from 'components/ProposalStatusBadge'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import VotePanel from 'components/VotePanel'
-import VoteResultsBar from 'components/VoteResultsBar'
 import useProposal from 'hooks/useProposal'
 import useProposalVotes from 'hooks/useProposalVotes'
 import useQueryContext from 'hooks/useQueryContext'
@@ -22,14 +26,33 @@ import { getRealmExplorerHost } from 'tools/routing'
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realmInfo } = useRealm()
-  const { proposal, description } = useProposal()
-  const {
-    yesVoteProgress,
-    yesVoteCount,
-    noVoteCount,
-    relativeNoVotes,
-    relativeYesVotes,
-  } = useProposalVotes(proposal?.account)
+  const { proposal, descriptionLink } = useProposal()
+  const [description, setDescription] = useState('')
+  const { yesVoteProgress, yesVoteCount, minimumYesVotes } = useProposalVotes(
+    proposal?.account
+  )
+
+  const showResults =
+    proposal &&
+    proposal.account.state !== ProposalState.Cancelled &&
+    proposal.account.state !== ProposalState.Draft
+
+  const votePassed =
+    proposal &&
+    (proposal.account.state === ProposalState.Completed ||
+      proposal.account.state === ProposalState.Executing ||
+      proposal.account.state === ProposalState.SigningOff ||
+      proposal.account.state === ProposalState.Succeeded)
+
+  useEffect(() => {
+    const handleResolveDescription = async () => {
+      const description = await resolveProposalDescription(descriptionLink!)
+      setDescription(description)
+    }
+    if (descriptionLink) {
+      handleResolveDescription()
+    }
+  }, [descriptionLink])
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -58,7 +81,7 @@ const Proposal = () => {
               </div>
             </div>
 
-            <div className="border-b border-fgd-4 py-4">
+            <div className="py-4">
               <div className="flex items-center justify-between mb-1">
                 <h1 className="mr-2 break-all">{proposal?.account.name}</h1>
                 <ProposalStateBadge
@@ -67,7 +90,6 @@ const Proposal = () => {
                   open={true}
                 />
               </div>
-              <ProposalTimeStatus proposal={proposal?.account} />
             </div>
 
             {description && (
@@ -92,42 +114,34 @@ const Proposal = () => {
 
       <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCardWrapper proposal={option(proposal?.account)} />
-        <div className="bg-bkg-2 rounded-lg">
-          <div className="p-4 md:p-6">
-            <h3 className="mb-4">Results</h3>
-            <div className="flex space-x-4 items-center">
-              {proposal ? (
-                <div className="bg-bkg-1 flex px-4 py-2 rounded w-full">
-                  <div className="border-r border-fgd-3 w-1/2">
-                    <p className="text-fgd-3 text-xs">Approve</p>
-                    <div className="font-bold text-sm">
-                      {yesVoteCount.toLocaleString()}
-                    </div>
-                  </div>
-                  <div className="pl-4 w-1/2">
-                    <p className="text-fgd-3 text-xs">Deny</p>
-                    <div className="font-bold text-sm">
-                      {noVoteCount.toLocaleString()}
-                    </div>
-                  </div>
+        {showResults ? (
+          <div className="bg-bkg-2 rounded-lg">
+            <div className="p-4 md:p-6">
+              {proposal?.account.state === ProposalState.Voting ? (
+                <div className="flex items-end justify-between mb-4">
+                  <h3 className="mb-0">Voting Now</h3>
+                  <ProposalTimeStatus proposal={proposal?.account} />
                 </div>
               ) : (
-                <>
-                  <div className="animate-pulse bg-bkg-3 h-12 rounded w-full" />
-                </>
+                <h3 className="mb-4">Results</h3>
               )}
+              {proposal?.account.state === ProposalState.Voting ? (
+                <div className="pb-4">
+                  <ApprovalQuorum
+                    yesVotesRequired={minimumYesVotes - yesVoteCount}
+                    progress={yesVoteProgress}
+                    showBg
+                  />
+                </div>
+              ) : (
+                <div className="pb-4">
+                  <VoteResultStatus votePassed={votePassed} />
+                </div>
+              )}
+              <VoteResults proposal={proposal.account} />
             </div>
           </div>
-          <div className="border-t border-fgd-4 p-4 md:p-6 w-full">
-            <div className="pb-4">
-              <VoteResultsBar
-                approveVotePercentage={relativeYesVotes!}
-                denyVotePercentage={relativeNoVotes!}
-              />
-            </div>
-            <ApprovalQuorum progress={yesVoteProgress} />
-          </div>
-        </div>
+        ) : null}
 
         <VotePanel />
         <ProposalActionsPanel />
