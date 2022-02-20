@@ -17,8 +17,10 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { makeChangeMaxMangoAccountsInstruction } from '@blockworks-foundation/mango-client'
-import { BN } from '@project-serum/anchor'
+import {
+  BN,
+  makeChangeMaxMangoAccountsInstruction,
+} from '@blockworks-foundation/mango-client'
 
 const MakeChangeMaxAccounts = ({
   index,

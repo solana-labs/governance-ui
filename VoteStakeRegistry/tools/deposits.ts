@@ -129,7 +129,7 @@ export const calcMultiplier = ({
         Math.min(lockupSecs, lockupSaturationSecs)) /
         lockupSaturationSecs) /
     depositScaledFactor
-  return calc
+  return depositScaledFactor !== 0 ? calc : 0
 }
 
 export const getPeriod = (
@@ -228,6 +228,5 @@ const getDepositsAdditionalInfoEvents = async (
       events.push(event)
     })
   }
-  console.log(events, '@@@@')
   return events
 }
