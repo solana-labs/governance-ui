@@ -10,10 +10,12 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
   obligationOwner,
   liquidityAmount,
   mintName,
+  destinationLiquidity,
 }: {
   obligationOwner: PublicKey
   liquidityAmount: number | BN
   mintName: SupportedMintName
+  destinationLiquidity?: PublicKey
 }) {
   const {
     relatedCollateralMint,
@@ -39,7 +41,6 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
   const sourceCollateral = reserveCollateralSupplySplTokenAccount
   const destinationCollateral = cusdcTokenAccount
   const withdrawReserve = reserve
-  const destinationLiquidity = usdcTokenAccount
 
   return originalWithdrawFunction(
     liquidityAmount,
@@ -49,7 +50,7 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
     obligation,
     SolendConfiguration.lendingMarket,
     SolendConfiguration.lendingMarketAuthority,
-    destinationLiquidity,
+    destinationLiquidity ?? usdcTokenAccount,
     reserveCollateralMint,
     reserveLiquiditySupply,
     obligationOwner,

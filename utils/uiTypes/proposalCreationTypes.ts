@@ -124,6 +124,7 @@ export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
   governedAccount?: GovernedMultiTypeAccount
   uiAmount: string
   mintName?: SupportedMintName
+  destinationLiquidity?: string
 }
 
 export interface RefreshObligationForm {

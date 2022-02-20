@@ -94,6 +94,9 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
           .toString()
       ),
       mintName: form.mintName,
+      ...(form.destinationLiquidity && {
+        destinationLiquidity: new PublicKey(form.destinationLiquidity),
+      }),
     })
 
     return {
@@ -172,6 +175,19 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
           })
         }
         error={formErrors['uiAmount']}
+      />
+
+      <Input
+        label="Destination Account (Optional - default to governance ATA"
+        value={form.destinationLiquidity}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'destinationLiquidity',
+          })
+        }
+        error={formErrors['destinationLiquidity']}
       />
     </>
   )
