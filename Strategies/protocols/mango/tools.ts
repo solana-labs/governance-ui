@@ -117,6 +117,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   tokenOwnerRecord,
   governingTokenMint,
   proposalIndex,
+  prerequisiteInstructions,
   isDraft,
   market,
   client
@@ -169,7 +170,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     ),
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
-    prerequisiteInstructions: [],
+    prerequisiteInstructions: [...prerequisiteInstructions],
     splitToChunkByDefault: true,
   }
   const instructionData2 = {
@@ -203,7 +204,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
       tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
         ?.symbol || 'tokens'
     } to Mango account`,
-    '',
+    'We want to create mango dao owned ref link for Mango markets, for that we need to deposit 10k MNGO to mango account.',
     governingTokenMint,
     proposalIndex,
     insts,

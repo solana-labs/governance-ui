@@ -23,7 +23,6 @@ import {
   withCreateNativeTreasury,
 } from '@solana/spl-governance'
 import {
-  Keypair,
   SystemProgram,
   Transaction,
   TransactionInstruction,
@@ -149,7 +148,6 @@ const MangoDepositComponent = ({
   }, [matchedTreasuryAccount])
   const handleSolPayment = async () => {
     const instructions: TransactionInstruction[] = []
-    const signers: Keypair[] = []
     const toAddress = await getNativeTreasuryAddress(
       realm!.owner,
       matchedTreasuryAccount!.governance!.pubkey
@@ -176,17 +174,7 @@ const MangoDepositComponent = ({
       lamports: minRentAmount,
     })
     instructions.push(transferIx)
-    const transaction = new Transaction()
-    transaction.add(...instructions)
-
-    await sendTransaction({
-      transaction,
-      wallet,
-      connection: connection.current,
-      signers,
-      sendingMessage: 'Depositing sol to create mango account',
-      successMessage: 'Sol deposited',
-    })
+    return instructions
   }
   const changeMode = (val) => {
     setIsDepositMode(!val)
@@ -194,6 +182,7 @@ const MangoDepositComponent = ({
   const handleDeposit = async () => {
     try {
       setIsDepositing(true)
+      const prerequisiteInstructions: TransactionInstruction[] = []
       const group = market.group!
       const groupConfig = market.groupConfig!
       const [mangoAccountPk] = await PublicKey.findProgramAddress(
@@ -209,7 +198,8 @@ const MangoDepositComponent = ({
         'processed'
       )
       if (!acc) {
-        await handleSolPayment()
+        const solAccountInstruction = await handleSolPayment()
+        prerequisiteInstructions.push(...solAccountInstruction)
       }
       const rpcContext = new RpcContext(
         new PublicKey(realm!.owner.toString()),
@@ -239,6 +229,7 @@ const MangoDepositComponent = ({
         ownTokenRecord.pubkey,
         defaultProposalMint!,
         matchedTreasuryAccount!.governance!.account!.proposalCount,
+        prerequisiteInstructions,
         false,
         market,
         client
