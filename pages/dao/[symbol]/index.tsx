@@ -3,7 +3,12 @@ import useRealm from 'hooks/useRealm'
 import React, { useEffect, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
 import ProposalCard from 'components/ProposalCard'
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  Governance,
+  ProgramAccount,
+  Proposal,
+  ProposalState,
+} from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
@@ -17,7 +22,13 @@ import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 
-const compareProposals = (p1: Proposal, p2: Proposal) => {
+const compareProposals = (
+  p1: Proposal,
+  p2: Proposal,
+  governances: {
+    [governance: string]: ProgramAccount<Governance>
+  }
+) => {
   const p1Rank = p1.getStateSortRank()
   const p2Rank = p2.getStateSortRank()
 
@@ -27,10 +38,33 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
     return -1
   }
 
-  const tsCompare = p1.getStateTimestamp() - p2.getStateTimestamp()
+  if (p1.state === ProposalState.Voting && p2.state === ProposalState.Voting) {
+    const p1VotingRank = getVotingStateRank(p1, governances)
+    const p2VotingRank = getVotingStateRank(p2, governances)
 
-  // Show the proposals in voting state expiring earlier at the top
-  return p1.state === ProposalState.Voting ? ~tsCompare : tsCompare
+    if (p1VotingRank > p2VotingRank) {
+      return 1
+    } else if (p1VotingRank < p2VotingRank) {
+      return -1
+    }
+
+    // Show the proposals in voting state expiring earlier at the top
+    return p2.getStateTimestamp() - p1.getStateTimestamp()
+  }
+
+  return p1.getStateTimestamp() - p2.getStateTimestamp()
+}
+
+/// Compares proposals in voting state to distinguish between Voting and Finalizing states
+function getVotingStateRank(
+  proposal: Proposal,
+  governances: {
+    [governance: string]: ProgramAccount<Governance>
+  }
+) {
+  // Show proposals in Voting state before proposals in Finalizing state
+  const governance = governances[proposal.governance.toBase58()].account
+  return proposal.hasVoteTimeEnded(governance) ? 0 : 1
 }
 
 const REALM = () => {
@@ -40,6 +74,7 @@ const REALM = () => {
     proposals,
     realmTokenAccount,
     ownTokenRecord,
+    governances,
   } = useRealm()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const prevStringifyNftsGovernedTokenAccounts = usePrevious(
@@ -55,7 +90,7 @@ const REALM = () => {
   const wallet = useWalletStore((s) => s.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].account, a[1].account)
+    compareProposals(b[1].account, a[1].account, governances)
   )
 
   useEffect(() => {
