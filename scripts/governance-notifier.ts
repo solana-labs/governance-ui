@@ -1,11 +1,16 @@
-import { PublicKey } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { getConnectionContext } from 'utils/connection'
-import { pubkeyFilter } from '@solana/spl-governance'
-import { getAccountTypes, Governance, Proposal } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { getCertifiedRealmInfo } from '../models/registry/api'
-import { getGovernanceAccounts } from './api'
+import {
+  getGovernanceAccounts,
+  Governance,
+  ProgramAccount,
+  Proposal,
+  ProposalState,
+  pubkeyFilter,
+} from '@solana/spl-governance'
+import { getCertifiedRealmInfo } from '@models/registry/api'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
@@ -19,34 +24,25 @@ function errorWrapper() {
 // run every 5 mins, checks if a governance proposal just opened in the last 5 mins
 // and notifies on WEBHOOK_URL
 async function runNotifier() {
-  const nowInSeconds = new Date().getTime() / 1000
-
-  const MAINNET_RPC_NODE =
-    process.env.CLUSTER_URL || 'https://api.mainnet-beta.solana.com'
-  const connectionContext = getConnectionContext('mainnet')
-
   const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
+  const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM_SYMBOL, connectionContext)
 
-  const governances = await getGovernanceAccounts<Governance>(
+  const connection = new Connection(process.env.CLUSTER_URL!)
+  const governances = await getGovernanceAccounts(
+    connection,
     realmInfo!.programId,
-    MAINNET_RPC_NODE,
     Governance,
-    getAccountTypes(Governance),
     [pubkeyFilter(1, realmInfo!.realmId)!]
   )
 
-  const governanceIds = Object.keys(governances).map((k) => new PublicKey(k))
+  const governancesMap = accountsToPubkeyMap(governances)
 
   const proposalsByGovernance = await Promise.all(
-    governanceIds.map((governanceId) => {
-      return getGovernanceAccounts<Proposal>(
-        realmInfo!.programId,
-        MAINNET_RPC_NODE,
-        Proposal,
-        getAccountTypes(Proposal),
-        [pubkeyFilter(1, governanceId)!]
-      )
+    Object.keys(governancesMap).map((governancePk) => {
+      return getGovernanceAccounts(connection, realmInfo!.programId, Proposal, [
+        pubkeyFilter(1, new PublicKey(governancePk))!,
+      ])
     })
   )
 
@@ -54,24 +50,14 @@ async function runNotifier() {
     [proposal: string]: ProgramAccount<Proposal>
   } = Object.assign({}, ...proposalsByGovernance)
 
-  const realmGovernances = Object.fromEntries(
-    Object.entries(governances).filter(([_k, v]) =>
-      v.account.realm.equals(realmInfo!.realmId)
-    )
-  )
-
-  const realmProposals = Object.fromEntries(
-    Object.entries(proposals).filter(([_k, v]) =>
-      Object.keys(realmGovernances).includes(v.account.governance.toBase58())
-    )
-  )
-
   console.log(`- scanning all '${REALM_SYMBOL}' proposals`)
   let countJustOpenedForVoting = 0
+  let countOpenForVotingSinceSomeTime = 0
   let countVotingNotStartedYet = 0
   let countClosed = 0
-  for (const k in realmProposals) {
-    const proposal = realmProposals[k]
+  const nowInSeconds = new Date().getTime() / 1000
+  for (const k in proposals) {
+    const proposal = proposals[k]
 
     if (
       // voting is closed
@@ -110,10 +96,12 @@ async function runNotifier() {
       if (process.env.WEBHOOK_URL) {
         axios.post(process.env.WEBHOOK_URL, { content: msg })
       }
+    } else if (proposal.account.state === ProposalState.Voting) {
+      countOpenForVotingSinceSomeTime++
     }
   }
   console.log(
-    `-- countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}`
+    `-- countOpenForVotingSinceSomeTime: ${countOpenForVotingSinceSomeTime}, countJustOpenedForVoting: ${countJustOpenedForVoting}, countVotingNotStartedYet: ${countVotingNotStartedYet}, countClosed: ${countClosed}`
   )
 }
 
