@@ -21,7 +21,8 @@ function errorWrapper() {
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
-  const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
+  const MAINNET_RPC_NODE =
+    process.env.CLUSTER_URL || 'https://api.mainnet-beta.solana.com'
   const connectionContext = getConnectionContext('mainnet')
 
   const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
