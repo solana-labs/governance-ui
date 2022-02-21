@@ -1,6 +1,6 @@
-import moment from 'moment'
 import React, { useEffect, useState } from 'react'
 import { Governance, Proposal } from '@solana/spl-governance'
+import dayjs from 'dayjs'
 
 interface CountdownState {
   days: number
@@ -38,7 +38,7 @@ export function VoteCountdown({
     }
 
     const getTimeToVoteEnd = () => {
-      const now = moment().unix()
+      const now = dayjs().unix()
 
       let timeToVoteEnd = proposal.isPreVotingState()
         ? governance.config.maxVotingTime

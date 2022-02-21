@@ -1,4 +1,4 @@
-import moment from 'moment'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 
 export const useIsBeyondTimestamp = (timestamp: number | undefined) => {
@@ -12,7 +12,7 @@ export const useIsBeyondTimestamp = (timestamp: number | undefined) => {
     }
 
     const sub = (async () => {
-      const now = moment().unix()
+      const now = dayjs().unix()
 
       if (now > timestamp) {
         setIsBeyondTimestamp(true)
@@ -22,7 +22,7 @@ export const useIsBeyondTimestamp = (timestamp: number | undefined) => {
       setIsBeyondTimestamp(false)
 
       const id = setInterval(() => {
-        const now = moment().unix()
+        const now = dayjs().unix()
         if (now > timestamp) {
           setIsBeyondTimestamp(true)
           clearInterval(id)
