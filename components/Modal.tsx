@@ -1,5 +1,5 @@
-import { Portal } from 'react-portal'
 import { XIcon } from '@heroicons/react/outline'
+import ReactDOM from 'react-dom'
 
 const Modal = ({
   isOpen,
@@ -10,7 +10,8 @@ const Modal = ({
   background = 'bg-bkg-2',
 }) => {
   return (
-    <Portal>
+    isOpen &&
+    ReactDOM.createPortal(
       <div
         className="fixed z-30 inset-0 overflow-y-auto"
         aria-labelledby="modal-title"
@@ -55,8 +56,9 @@ const Modal = ({
             </div>
           ) : null}
         </div>
-      </div>
-    </Portal>
+      </div>,
+      document.body
+    )
   )
 }
 
