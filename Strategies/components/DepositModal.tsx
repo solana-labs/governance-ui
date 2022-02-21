@@ -20,6 +20,7 @@ const DepositModal = ({
   currentPositionFtm,
   createProposalFcn,
 }) => {
+  console.log(strategyDescription)
   return (
     <Modal sizeClassName="max-w-5xl" onClose={onClose} isOpen={isOpen}>
       <ModalHeader
@@ -34,7 +35,7 @@ const DepositModal = ({
           liquidity={liquidity}
           projectedYield={apy}
         >
-          <div>{strategyDescription}</div>
+          {/* <div>{strategyDescription}</div> */}
         </ModalLeftSide>
         <ModalRightSide>
           {protocolName === 'Mango' ? (
