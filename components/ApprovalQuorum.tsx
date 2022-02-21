@@ -22,7 +22,7 @@ const ApprovalProgress = ({
           ? showBg
             ? 'bg-bkg-1 p-3'
             : ''
-          : 'border border-green p-3'
+          : 'border border-fgd-4 flex h-full p-3'
       } rounded-md`}
     >
       <div className="flex items-center">
