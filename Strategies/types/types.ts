@@ -1,7 +1,7 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN } from '@project-serum/anchor'
 import { ProgramAccount, Realm, RpcContext } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { GovernedTokenAccount } from '@utils/tokens'
 import { MarketStore } from 'Strategies/store/marketStore'
 
@@ -35,6 +35,7 @@ export type HandleCreateProposalWithStrategy = (
   tokenOwnerRecord: PublicKey,
   governingTokenMint: PublicKey,
   proposalIndex: number,
+  prerequisiteInstructions: TransactionInstruction[],
   isDraft: boolean,
   market?: MarketStore,
   client?: VsrClient
