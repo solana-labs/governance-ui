@@ -11,11 +11,11 @@ export interface Voter {
 }
 
 export interface votingMint {
-  unlockedScaledFactor: BN
+  baselineVoteWeightScaledFactor: BN
   digitShift: number
   grantAuthority: PublicKey
   lockupSaturationSecs: BN
-  lockupScaledFactor: BN
+  maxExtraLockupVoteWeightScaledFactor: BN
   mint: PublicKey
 }
 
@@ -54,6 +54,7 @@ export interface DepositWithMintAccount extends Deposit {
   available: BN
   vestingRate: BN | null
   currentlyLocked: BN
+  nextVestingTimestamp: BN | null
 }
 
 export const unusedMintPk = '11111111111111111111111111111111'

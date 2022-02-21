@@ -1,7 +1,11 @@
 import {
   AccountMetaData,
   getGovernance,
+  getGovernanceProgramVersion,
+  getGovernanceSchema,
   getRealm,
+  SetRealmAuthorityAction,
+  SetRealmAuthorityArgs,
   VoteTipping,
 } from '@solana/spl-governance'
 import {
@@ -83,6 +87,40 @@ export const GOVERNANCE_INSTRUCTIONS = {
         )
       },
     },
+    21: {
+      name: 'Set Realm Authority',
+      accounts: [
+        { name: 'Realm' },
+        { name: 'Realm Authority' },
+        { name: 'New Realm Authority' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserialize(
+          getGovernanceSchema(programVersion),
+          SetRealmAuthorityArgs,
+          Buffer.from(data)
+        ) as SetRealmAuthorityArgs
+
+        return (
+          <>
+            <p>
+              {`action:
+               ${SetRealmAuthorityAction[args.action!]}`}
+            </p>
+          </>
+        )
+      },
+    },
     22: {
       name: 'Set Realm Config',
       accounts: [{ name: 'Realm' }, { name: 'Realm Authority' }],
@@ -107,10 +145,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
-               ${fmtMintAmount(
-                 communityMint?.account,
-                 args.configArgs.minCommunityTokensToCreateGovernance
-               )}`}
+              ${fmtMintAmount(
+                communityMint?.account,
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}`}
             </p>
             <p>
               {`useCouncilMint:

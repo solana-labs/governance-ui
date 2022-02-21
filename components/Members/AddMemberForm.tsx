@@ -23,11 +23,11 @@ import useQueryContext from 'hooks/useQueryContext'
 import { getMintInstruction } from 'utils/instructionTools'
 import AddMemberIcon from '@components/AddMemberIcon'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
 } from '@heroicons/react/outline'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -41,7 +41,7 @@ const AddMemberForm = ({ close }) => {
   const [formErrors, setFormErrors] = useState({})
 
   const router = useRouter()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
 

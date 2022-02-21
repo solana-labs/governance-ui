@@ -6,11 +6,11 @@ import { Proposal, ProposalState } from '@solana/spl-governance'
 import ApprovalQuorum from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
-import VoteResultsBar from './VoteResultsBar'
 import ProposalTimeStatus from './ProposalTimeStatus'
 
 import useQueryContext from '../hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
+import VoteResults from './VoteResults'
 
 type ProposalCardProps = {
   proposalPk: PublicKey
@@ -30,11 +30,7 @@ const StyledCardWrapper = styled.div`
 const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    yesVoteProgress,
-    relativeNoVotes,
-    relativeYesVotes,
-  } = useProposalVotes(proposal)
+  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
 
   return (
     <div>
@@ -61,16 +57,14 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
             </div>
             {proposal.state === ProposalState.Voting && (
               <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">
-                <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-3 lg:pr-4 w-full lg:w-1/2">
-                  <VoteResultsBar
-                    approveVotePercentage={
-                      relativeYesVotes ? relativeYesVotes : 0
-                    }
-                    denyVotePercentage={relativeNoVotes ? relativeNoVotes : 0}
-                  />
+                <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-4 lg:pr-4 w-full lg:w-1/2">
+                  <VoteResults isListView proposal={proposal} />
                 </div>
                 <div className="lg:pl-4 w-full lg:w-1/2">
-                  <ApprovalQuorum progress={yesVoteProgress} />
+                  <ApprovalQuorum
+                    progress={yesVoteProgress}
+                    yesVotesRequired={yesVotesRequired}
+                  />
                 </div>
               </div>
             )}

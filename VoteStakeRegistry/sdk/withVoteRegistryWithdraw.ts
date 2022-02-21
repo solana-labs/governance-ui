@@ -82,7 +82,7 @@ export const withVoteRegistryWithdraw = async ({
       )
     )
   }
-  console.log({ registrar: registrar.toBase58(), voter: voter.toBase58() })
+
   instructions.push(
     client?.program.instruction.withdraw(depositIndex!, amount, {
       accounts: {

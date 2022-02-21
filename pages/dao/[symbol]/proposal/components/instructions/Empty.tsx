@@ -1,17 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { validateInstruction } from '@utils/instructionTools'
 import {
   EmptyInstructionForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { validateInstruction } from '@utils/instructionTools'
-
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 const Empty = ({
   index,
   governance,
@@ -19,48 +16,17 @@ const Empty = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const {
-    governancesArray,
-    governedTokenAccounts,
-    getMintWithGovernances,
-  } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
-  const [governedAccounts, setGovernedAccounts] = useState<
-    GovernedMultiTypeAccount[]
-  >([])
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const shouldBeGoverned = index !== 0 && governance
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  useEffect(() => {
-    async function prepGovernances() {
-      const mintWithGovernances = await getMintWithGovernances()
-      const matchedGovernances = governancesArray.map((gov) => {
-        const governedTokenAccount = governedTokenAccounts.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        const mintGovernance = mintWithGovernances.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        if (governedTokenAccount) {
-          return governedTokenAccount as GovernedMultiTypeAccount
-        }
-        if (mintGovernance) {
-          return mintGovernance as GovernedMultiTypeAccount
-        }
-        return {
-          governance: gov,
-        }
-      })
-      setGovernedAccounts(matchedGovernances)
-    }
-    prepGovernances()
-  }, [])
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     const obj: UiInstruction = {
@@ -84,19 +50,17 @@ const Empty = ({
       .required('Governed account is required'),
   })
   return (
-    <>
-      <GovernedAccountSelect
-        label="Governance"
-        governedAccounts={governedAccounts as GovernedMultiTypeAccount[]}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
-        }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
-      ></GovernedAccountSelect>
-    </>
+    <GovernedAccountSelect
+      label="Governance"
+      governedAccounts={governedMultiTypeAccounts}
+      onChange={(value) => {
+        handleSetForm({ value, propertyName: 'governedAccount' })
+      }}
+      value={form.governedAccount}
+      error={formErrors['governedAccount']}
+      shouldBeGoverned={shouldBeGoverned}
+      governance={governance}
+    />
   )
 }
 

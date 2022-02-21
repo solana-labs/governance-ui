@@ -29,10 +29,10 @@ import {
 } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { createProposal } from 'actions/createProposal'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const ConvertToMsol = () => {
   const {
@@ -44,7 +44,7 @@ const ConvertToMsol = () => {
     councilMint,
     symbol,
   } = useRealm()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -56,7 +56,7 @@ const ConvertToMsol = () => {
     (s) => s.compact.currentAccount
   )
   const notConnectedMessage =
-    'You need to be connected to your wallet to have the ability to create a token staking proposal'
+    'You need to be connected to your wallet to have the ability to create a staking proposal'
 
   const [formErrors, setFormErrors] = useState({})
   const [form, setForm] = useState<StakingViewForm>({
@@ -285,6 +285,7 @@ const ConvertToMsol = () => {
           className="ml-auto"
           disabled={!canUseTransferInstruction || isLoading}
           onClick={handlePropose}
+          isLoading={isLoading}
         >
           <Tooltip content={!canUseTransferInstruction && notConnectedMessage}>
             Propose

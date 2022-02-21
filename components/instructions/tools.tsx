@@ -14,6 +14,10 @@ import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
+import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
+import { MARINADE_INSTRUCTIONS } from './programs/marinade'
+import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
+import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 /**
  * Default governance program id instance
  */
@@ -92,6 +96,7 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
   ['2j2oe8YXdYJyS7G8CeEW5KARijdjjZkuPy5MnN8gBQqQ', ''],
+  ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
 ])
 
 // Blacklisted proposals which should not be displayed in the UI
@@ -143,7 +148,11 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...MARINADE_INSTRUCTIONS,
+  ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
+  ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -151,7 +160,6 @@ export async function getInstructionDescriptor(
   instruction: InstructionData
 ) {
   let descriptors: any
-
   if (isGovernanceProgram(instruction.programId)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
@@ -159,12 +167,17 @@ export async function getInstructionDescriptor(
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
 
-  const descriptor = descriptors && descriptors[instruction.data[0]]
+  // Make it work for program with one instruction like ATA program
+  // and for the one with multiple instructions
+  const descriptor = !instruction.data.length
+    ? descriptors
+    : descriptors && descriptors[instruction.data[0]]
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,
       instruction.data,
-      instruction.accounts
+      instruction.accounts,
+      instruction.programId
     ))) ?? <>{JSON.stringify(instruction.data)}</>
   return {
     name: descriptor?.name,

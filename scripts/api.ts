@@ -54,8 +54,12 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
         filters
       )),
     }
-    // XXX: sleep to prevent public RPC rate limits
-    await sleep(3_000)
+
+    // note: if we are not using a specific RPC, then most probably we are using a public RPC
+    // sleep to prevent public RPC rate limits
+    if (!process.env.CLUSTER_URL) {
+      await sleep(3_000)
+    }
   }
 
   return accounts

@@ -3,12 +3,15 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { getNameOf } from '@tools/core/script'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
   GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
+import { SupportedMintName } from '@tools/sdk/solend/configuration'
+import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 
@@ -69,7 +72,10 @@ export interface ProgramUpgradeForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
   bufferAddress: string
+  bufferSpillAddress?: string | undefined
 }
+
+export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
@@ -77,7 +83,14 @@ export interface MangoMakeChangeMaxAccountsForm {
   mangoGroupKey: string | undefined
   maxMangoAccounts: number
 }
-
+export interface MangoMakeChangeReferralFeeParams {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroupKey: string | undefined
+  refSurchargeCentibps: number
+  refShareCentibps: number
+  refMngoRequired: number
+}
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string
@@ -88,6 +101,42 @@ export interface EmptyInstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
 }
 
+export interface CreateAssociatedTokenAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+  splTokenMintUIName?: SplTokenUIName
+}
+
+export interface CreateSolendObligationAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+}
+
+export interface InitSolendObligationAccountForm {
+  governedAccount?: GovernedMultiTypeAccount
+}
+
+export interface DepositReserveLiquidityAndObligationCollateralForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+}
+
+export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount: string
+  mintName?: SupportedMintName
+  destinationLiquidity?: string
+}
+
+export interface RefreshObligationForm {
+  governedAccount?: GovernedMultiTypeAccount
+  mintName?: SupportedMintName
+}
+
+export interface RefreshReserveForm {
+  governedAccount?: GovernedMultiTypeAccount
+  mintName?: SupportedMintName
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -95,8 +144,16 @@ export enum Instructions {
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
+  MangoChangeReferralFeeParams,
   Grant,
   Clawback,
+  CreateAssociatedTokenAccount,
+  CreateSolendObligationAccount,
+  InitSolendObligationAccount,
+  DepositReserveLiquidityAndObligationCollateral,
+  WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  RefreshSolendObligation,
+  RefreshSolendReserve,
 }
 
 export type createParams = [

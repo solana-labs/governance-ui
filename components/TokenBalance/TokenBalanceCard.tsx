@@ -24,6 +24,7 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
+import { ExclamationIcon } from '@heroicons/react/outline'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm } = useRealm()
@@ -51,9 +52,9 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Governance Tokens</h3>
+      <h3 className="mb-4">Governance Tokens </h3>
       {hasLoaded ? (
-        <>
+        <div className="space-y-4">
           {communityDepositVisible && (
             <TokenDeposit
               mint={mint}
@@ -62,15 +63,13 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
             />
           )}
           {councilDepositVisible && (
-            <div className="mt-4">
-              <TokenDeposit
-                mint={councilMint}
-                tokenType={GoverningTokenType.Council}
-                councilVote={true}
-              />
-            </div>
+            <TokenDeposit
+              mint={councilMint}
+              tokenType={GoverningTokenType.Council}
+              councilVote={true}
+            />
           )}
-        </>
+        </div>
       ) : (
         <>
           <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
@@ -206,6 +205,10 @@ const TokenDeposit = ({
               governances[proposal.account.governance.toBase58()]
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
+              notify({
+                type: 'error',
+                message: `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`,
+              })
               throw new Error(
                 `Can't withdraw tokens while Proposal ${proposal.account.name} is being voted on. Please withdraw your vote first`
               )
@@ -324,10 +327,10 @@ const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center mt-8">
+      <div className="flex space-x-4 items-center">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
-          <h3 className="mb-0">{availableTokens}</h3>
+          <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
         </div>
       </div>
 
@@ -339,7 +342,7 @@ const TokenDeposit = ({
         You have {tokensToShow} tokens available to {canExecuteAction}.
       </p>
 
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
+      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-6">
         <Button
           tooltipMessage={depositTooltipContent}
           className="sm:w-1/2"
@@ -363,6 +366,12 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
+      {realm?.account.config.useCommunityVoterWeightAddin && (
+        <small className="text-xs mt-3 flex items-center">
+          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+          Please withdraw your tokens and deposit again to get governance power
+        </small>
+      )}
     </>
   )
 }

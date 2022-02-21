@@ -35,7 +35,7 @@ const AccountOverview = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   const isNFT = currentAccount?.isNft
-  const isSOL = currentAccount?.isSol
+  const isSol = currentAccount?.isSol
   const { canUseTransferInstruction } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const recentActivity = useTreasuryAccountStore(
@@ -93,7 +93,7 @@ const AccountOverview = () => {
           <div className="ml-auto flex flex-row">
             {isNFT && (
               <ArrowsExpandIcon
-                className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer"
+                className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4 cursor-pointer text-primary-light"
                 onClick={() => {
                   const url = fmtUrlWithCluster(
                     `/dao/${symbol}/gallery/${currentAccount.transferAddress}`
@@ -138,17 +138,17 @@ const AccountOverview = () => {
       </div>
       <div className="mb-4 flex flex-col">
         <Button
-          className={`sm:w-full text-sm ${!isSOL ? 'hidden' : ''}`}
+          className={`sm:w-full text-sm ${!isSol ? 'hidden' : ''}`}
           onClick={() => setOpenMsolConvertModal(true)}
           disabled={!canUseTransferInstruction}
         >
           <Tooltip
             content={
               !canUseTransferInstruction &&
-              'You need to be connected to your wallet to have the ability to create a token staking proposal'
+              'You need to be connected to your wallet to have the ability to create a staking proposal'
             }
           >
-            <div>Convert to mSOL</div>
+            <div>Stake with Marinade</div>
           </Tooltip>
         </Button>
       </div>

@@ -19,7 +19,7 @@ import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -34,7 +34,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
@@ -46,8 +46,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { fetchRealm } = useWalletStore((s) => s.actions)
 
   const submitVote = async (vote: YesNoVote) => {
+    const programId = realmInfo?.programId
+    const realmId = realmInfo?.realmId
     setSubmitting(true)
-
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -84,10 +85,10 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
     fetchChatMessages(proposal!.pubkey)
     fetchVoteRecords(proposal)
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await fetchRealm(programId, realmId)
   }
 
-  const voteString = vote === YesNoVote.Yes ? 'Approve' : 'Deny'
+  const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -117,7 +118,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           className="w-44 flex items-center justify-center"
           onClick={() => submitVote(vote)}
         >
-          {submitting ? <Loading /> : <span>{voteString} Proposal</span>}
+          {submitting ? <Loading /> : <span>Vote {voteString}</span>}
         </Button>
       </div>
     </Modal>

@@ -1,6 +1,7 @@
 import { PublicKey } from '@blockworks-foundation/mango-client'
 import Button from '@components/Button'
 import Input from '@components/inputs/Input'
+import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -17,12 +18,13 @@ import { precision } from '@utils/formatting'
 import tokenService from '@utils/services/token'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
-import { useRouter } from 'next-router-mock'
+import { useRouter } from 'next/router'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
+import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const DepositComponent = ({
   handledMint,
@@ -43,8 +45,10 @@ const DepositComponent = ({
     councilMint,
     symbol,
   } = useRealm()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
+  const market = useMarketStore((s) => s)
+  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
@@ -54,8 +58,8 @@ const DepositComponent = ({
   const [matchedTreasuryAccount, setMatchedTreasuryAccount] = useState<
     GovernedTokenAccount | undefined
   >()
+  const { canUseTransferInstruction } = useGovernanceAssets()
   const [hasMoreThenOneTreasury, setHasMoreThenOneTreasury] = useState(false)
-  //TODO sol
   const treasuryAmount = matchedTreasuryAccount?.token
     ? matchedTreasuryAccount.token.account.amount
     : new BN(0)
@@ -87,7 +91,6 @@ const DepositComponent = ({
   useEffect(() => {
     setAmount(undefined)
   }, [matchedTreasuryAccount])
-
   const handleDeposit = async () => {
     const rpcContext = new RpcContext(
       new PublicKey(realm!.owner.toString()),
@@ -113,13 +116,13 @@ const DepositComponent = ({
       handledMint,
       mintAmount,
       realm!,
-      matchedTreasuryAccount!.governance!,
+      matchedTreasuryAccount!,
       ownTokenRecord.pubkey,
-      `Deposit 100 tokens to mango protocol strategy`,
-      `Deposit 100 tokens to mango protocol strategy`,
       defaultProposalMint!,
       matchedTreasuryAccount!.governance!.account!.proposalCount,
+      [],
       false,
+      market,
       client
     )
     const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
@@ -174,9 +177,19 @@ const DepositComponent = ({
       <Button
         className="w-full mt-5"
         onClick={handleDeposit}
-        disabled={!amount}
+        disabled={!amount || !connected}
       >
-        Deposit
+        <Tooltip
+          content={
+            !canUseTransferInstruction
+              ? 'Please connect wallet with enough voting power to create treasury proposals'
+              : !amount
+              ? 'Please input the amount'
+              : ''
+          }
+        >
+          Deposit
+        </Tooltip>
       </Button>
     </div>
   )

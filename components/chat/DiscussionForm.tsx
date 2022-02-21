@@ -9,7 +9,7 @@ import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
@@ -21,7 +21,7 @@ const DiscussionForm = () => {
     ownTokenRecord,
     ownCouncilTokenRecord,
   } = useRealm()
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletStore((s) => s.current)

@@ -16,16 +16,20 @@ import useWalletStore from 'stores/useWalletStore'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useMarketStore from 'Strategies/store/marketStore'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
   useRouterHistory()
-  const { getDeposits, resetDepositState } = useDepositStore()
+  useVoteRegistry()
+  const { loadMarket } = useMarketStore()
+  const { getOwnedDeposits, resetDepositState } = useDepositStore()
   const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { client } = useVoteRegistry()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const realmName = realmInfo?.displayName ?? realm?.account?.name
 
   const title = realmName ? `${realmName}` : 'Solana Governance'
@@ -38,18 +42,19 @@ function App({ Component, pageProps }) {
   const faviconUrl = `/realms/${getResourcePathPart(
     faviconSelector as string
   )}/favicon.ico?v=${Date.now()}`
-
+  useEffect(() => {
+    loadMarket(connection, connection.cluster)
+  }, [connection.cluster])
   useEffect(() => {
     if (
       realm?.account.config.useCommunityVoterWeightAddin &&
       realm.pubkey &&
-      ownTokenRecord?.pubkey &&
       wallet?.connected &&
       client
     ) {
-      getDeposits({
+      getOwnedDeposits({
         realmPk: realm!.pubkey,
-        communityMintPk: ownTokenRecord.account.governingTokenMint,
+        communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
         client: client!,
         connection: connection.current,

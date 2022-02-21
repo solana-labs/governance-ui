@@ -1,12 +1,9 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN } from '@project-serum/anchor'
-import {
-  Governance,
-  ProgramAccount,
-  Realm,
-  RpcContext,
-} from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
+import { ProgramAccount, Realm, RpcContext } from '@solana/spl-governance'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { GovernedTokenAccount } from '@utils/tokens'
+import { MarketStore } from 'Strategies/store/marketStore'
 
 export interface TreasuryStrategy {
   //liquidity in $
@@ -34,13 +31,13 @@ export type HandleCreateProposalWithStrategy = (
   handledMint: string,
   mintAmount: number,
   realm: ProgramAccount<Realm>,
-  governance: ProgramAccount<Governance>,
+  treasuaryAccount: GovernedTokenAccount,
   tokenOwnerRecord: PublicKey,
-  name: string,
-  descriptionLink: string,
   governingTokenMint: PublicKey,
   proposalIndex: number,
+  prerequisiteInstructions: TransactionInstruction[],
   isDraft: boolean,
+  market?: MarketStore,
   client?: VsrClient
 ) => Promise<PublicKey>
 

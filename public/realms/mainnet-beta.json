@@ -325,18 +325,51 @@
     "ogImage": "https://governance.meta-collective.digital/realms/META/img/logo.png"
   },
   {
-    "symbol": "UXD",
+    "symbol": "UXP",
     "displayName": "UXDProtocol",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GBXLYo4ycRNfzuzYeudu6y2ng4afNeW14WcpM2E4JJSL",
     "website": "https://uxd.fi",
     "twitter": "@UXDProtocol",
-    "ogImage": "/realms/UXD/img/uxd_logo.png"
+    "ogImage": "/realms/UXP/img/UXP-Black.png"
   },
   {
     "symbol": "MonkeVentures",
     "displayName": "MonkeVentures",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
+  },
+  {
+    "symbol": "PixelBands",
+    "displayName": "PixelBands DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AUYUF7z2aWNHySuWEW43pzSYL6aioKdc1pwCniyNCFBK",
+    "ogImage": "/realms/PixelBands/img/pixel_bands_log.png"
+  },
+  {
+    "symbol": "MEDIA",
+    "displayName": "Media DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3ZFBoLMRKAU1Th57wvDfmE8PYRZzYZUDNZksNczsrTuU",
+    "website": "https://media.network",
+    "keywords": "Media Network, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, CDN, Web3, dCDN, Content Delivery Network, SPL Tokens, Multi Chain, Protocol, Data",
+    "twitter": "@Media_FDN",
+    "ogImage": "https://media.network/images/token/media.svg"
+  },
+  {
+    "symbol": "Renpo",
+    "displayName": "Renpō Dao",
+    "programId": "GRNPT8MPw3LYY6RdjsgKeFji5kMiG1fSxnxDjDBu4s73",
+    "realmId": "5J2bRTkzoSXWKZMW4o5tyNsT7Zwn9dDkDt6rMz6Ze9u1",
+    "ogImage": "/realms/Renpo/img/renpo_logo.png"
+  },
+  {
+    "symbol": "Ikohaus",
+    "displayName": "Ikohaus",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "WBmKxddpbtnVPXXUFCJf5BcC4qfCRZ9wsZSxTZBjdM5",
+    "website": "https://ikohaus.business.site",
+    "twitter": "@Ikohaus",
+    "ogImage": "/realms/Ikohaus/img/Ikohaus_Logo.png"
   }
 ]

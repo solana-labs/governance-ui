@@ -1,8 +1,22 @@
-import { BN } from '@project-serum/anchor'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
+import {
+  makeCreateMangoAccountInstruction,
+  makeDepositInstruction,
+  PublicKey,
+  BN,
+} from '@blockworks-foundation/mango-client'
+import {
+  getInstructionDataFromBase64,
+  getNativeTreasuryAddress,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
-import { createProposal } from 'actions/createProposal'
+import {
+  createProposal,
+  InstructionDataWithHoldUpTime,
+} from 'actions/createProposal'
 import axios from 'axios'
+import { MarketStore } from 'Strategies/store/marketStore'
 import {
   TreasuryStrategy,
   HandleCreateProposalWithStrategy,
@@ -27,7 +41,8 @@ export const tokenList = {
 }
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
-
+export const MANGO_MINT_DEVNET = 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
+export const accountNumBN = new BN(1)
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
@@ -74,7 +89,8 @@ export async function tvl(timestamp) {
           closestVal.baseOraclePrice,
         handledTokenSymbol: info?.symbol || mangoId,
         apy: `${(
-          Math.pow(1 + closestVal.depositRate / 100000, 100000) - 1
+          (Math.pow(1 + closestVal.depositRate / 128, 128) - 1) *
+          100
         ).toFixed(2)}%`,
         protocolName: MANGO,
         protocolSymbol: protocolInfo?.symbol || '',
@@ -82,10 +98,9 @@ export async function tvl(timestamp) {
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
-        //TODO handle getting current position
         currentPosition: new BN(0),
         strategyDescription: 'Description',
-        isGenericItem: true,
+        isGenericItem: false,
         createProposalFcn: HandleMangoDeposit,
       })
     }
@@ -96,48 +111,120 @@ export async function tvl(timestamp) {
 const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   rpcContext,
   handledMint,
-  amount,
+  mintAmount,
   realm,
-  governance,
+  matchedTreasury,
   tokenOwnerRecord,
-  name,
-  descriptionLink,
   governingTokenMint,
   proposalIndex,
+  prerequisiteInstructions,
   isDraft,
+  market,
   client
 ) => {
-  // sample of creating proposal with instruction
-  const instructionData = {
-    //TODO create mango deposit function using amount and mint
+  const group = market!.group!
+  const groupConfig = market!.groupConfig!
+  const rootBank = group.tokens.find(
+    (x) => x.mint.toBase58() === matchedTreasury.mint?.publicKey.toBase58()
+  )?.rootBank
+  const quoteRootBank =
+    group.rootBankAccounts[group.getRootBankIndex(rootBank!)]
+  const quoteNodeBank = quoteRootBank?.nodeBankAccounts[0]
 
-    // SAMPLE of serialized instruction that supply proposal
-    //   const transferIx = Token.createTransferInstruction(
-    //     TOKEN_PROGRAM_ID,
-    //     sourceAccount,
-    //     receiverAddress,
-    //     governedTokenAccount.governance!.pubkey,
-    //     [],
-    //     new u64(mintAmount.toString())
-    //   )
-    //   const serializedInstruction = serializeInstructionToBase64(transferIx)
-    //   data: getInstructionDataFromBase64(serializedInstruction),
-    data: getInstructionDataFromBase64(''),
-    holdUpTime: governance!.account!.config.minInstructionHoldUpTime,
-    prerequisiteInstructions: [],
+  const [mangoAccountPk] = await PublicKey.findProgramAddress(
+    [
+      group.publicKey.toBytes(),
+      matchedTreasury.governance!.pubkey.toBytes(),
+      accountNumBN.toArrayLike(Buffer, 'le', 8),
+    ],
+    groupConfig.mangoProgramId
+  )
+
+  const solAddress = await getNativeTreasuryAddress(
+    realm!.owner,
+    matchedTreasury!.governance!.pubkey
+  )
+  const createMangoAccountIns = makeCreateMangoAccountInstruction(
+    groupConfig.mangoProgramId,
+    groupConfig.publicKey,
+    mangoAccountPk,
+    matchedTreasury.governance!.pubkey,
+    accountNumBN,
+    solAddress
+  )
+  const depositMangoAccountIns = makeDepositInstruction(
+    groupConfig.mangoProgramId,
+    groupConfig.publicKey,
+    matchedTreasury.governance!.pubkey,
+    group.mangoCache,
+    mangoAccountPk,
+    quoteRootBank!.publicKey,
+    quoteNodeBank!.publicKey,
+    quoteNodeBank!.vault,
+    matchedTreasury.transferAddress!,
+    new BN(mintAmount)
+  )
+  const instructionData1 = {
+    data: getInstructionDataFromBase64(
+      serializeInstructionToBase64(createMangoAccountIns)
+    ),
+    holdUpTime: matchedTreasury.governance!.account!.config
+      .minInstructionHoldUpTime,
+    prerequisiteInstructions: [...prerequisiteInstructions],
+    splitToChunkByDefault: true,
   }
+  const instructionData2 = {
+    data: getInstructionDataFromBase64(
+      serializeInstructionToBase64(depositMangoAccountIns)
+    ),
+    holdUpTime: matchedTreasury.governance!.account!.config
+      .minInstructionHoldUpTime,
+    prerequisiteInstructions: [],
+    chunkSplitByDefault: true,
+  }
+  const fmtAmount = fmtMintAmount(
+    matchedTreasury.mint?.account,
+    new BN(mintAmount)
+  )
+  const acc = await rpcContext.connection.getAccountInfo(
+    mangoAccountPk,
+    'processed'
+  )
+  const insts: InstructionDataWithHoldUpTime[] = []
+  if (!acc) {
+    insts.push(instructionData1)
+  }
+  insts.push(instructionData2)
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
-    governance.pubkey,
+    matchedTreasury.governance!.pubkey,
     tokenOwnerRecord,
-    name,
-    descriptionLink,
+    `Deposit ${fmtAmount} ${
+      tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
+        ?.symbol || 'tokens'
+    } to Mango account`,
+    'We want to create mango dao owned ref link for Mango markets, for that we need to deposit 10k MNGO to mango account.',
     governingTokenMint,
     proposalIndex,
-    [instructionData],
+    insts,
     isDraft,
     client
   )
   return proposalAddress
+}
+
+export const tryGetMangoAccount = async (
+  market: MarketStore,
+  mangoAccountPk: PublicKey
+) => {
+  try {
+    const account = await market.client?.getMangoAccount(
+      mangoAccountPk,
+      market.group!.dexProgramId
+    )
+    return account
+  } catch (e) {
+    return null
+  }
 }
