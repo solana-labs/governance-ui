@@ -46,7 +46,7 @@ const ApprovalProgress = ({
                 {
                   maximumFractionDigits: 0,
                 }
-              )} 'Yes' votes required`}</p>
+              )} more Yes vote${yesVotesRequired > 1 ? 's' : ''} required`}</p>
               <p className="font-bold mb-0 text-fgd-1">
                 {progress.toFixed(1)}%
               </p>

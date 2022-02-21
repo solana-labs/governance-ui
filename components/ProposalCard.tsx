@@ -30,9 +30,7 @@ const StyledCardWrapper = styled.div`
 const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { yesVoteProgress, minimumYesVotes, yesVoteCount } = useProposalVotes(
-    proposal
-  )
+  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
 
   return (
     <div>
@@ -65,7 +63,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                 <div className="lg:pl-4 w-full lg:w-1/2">
                   <ApprovalQuorum
                     progress={yesVoteProgress}
-                    yesVotesRequired={minimumYesVotes - yesVoteCount}
+                    yesVotesRequired={yesVotesRequired}
                   />
                 </div>
               </div>
