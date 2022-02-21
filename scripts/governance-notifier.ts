@@ -92,7 +92,7 @@ async function runNotifier() {
         proposal.account.name
       }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
         REALM_SYMBOL
-      )}/proposal/${k}`
+      )}/proposal/${proposal.pubkey.toBase58()}`
 
       console.log(msg)
       if (process.env.WEBHOOK_URL) {
