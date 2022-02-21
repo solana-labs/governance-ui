@@ -204,7 +204,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
       tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
         ?.symbol || 'tokens'
     } to Mango account`,
-    'We want to create mango dao owned ref link for Mango markets, for that we need to deposit 10k MNGO to mango account.',
+    '',
     governingTokenMint,
     proposalIndex,
     insts,

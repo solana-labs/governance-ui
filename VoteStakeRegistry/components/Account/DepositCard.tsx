@@ -28,7 +28,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
-import moment from 'moment'
+import dayjs from 'dayjs'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
@@ -198,7 +198,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
               label="Next vesting"
-              value={moment(
+              value={dayjs(
                 deposit.nextVestingTimestamp?.toNumber() * 1000
               ).format('DD-MM-YYYY')}
             />
