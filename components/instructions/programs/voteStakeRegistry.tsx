@@ -1,6 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { BN, Provider } from '@project-serum/anchor'
-import { Wallet } from '@project-serum/sol-wallet-adapter'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
