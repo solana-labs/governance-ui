@@ -26,7 +26,7 @@ export const PROGRAM_NAMES = {
 
   SysvarRent111111111111111111111111111111111: 'Sysvar: Rent',
   SysvarC1ock11111111111111111111111111111111: 'Sysvar: Clock',
-  '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo': 'Voter Stake Registry',
+  '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo': 'Mango Voter Stake Registry',
   ...GOVERNANCE_PROGRAM_NAMES,
 }
 
