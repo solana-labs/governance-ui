@@ -96,7 +96,9 @@ async function runNotifier() {
       if (process.env.WEBHOOK_URL) {
         axios.post(process.env.WEBHOOK_URL, { content: msg })
       }
-    } else if (proposal.account.state === ProposalState.Voting) {
+    }
+    // note that these could also include those in finalizing state, but this is just for logging
+    else if (proposal.account.state === ProposalState.Voting) {
       countOpenForVotingSinceSomeTime++
     }
   }
