@@ -18,12 +18,14 @@ import ErrorBoundary from '@components/ErrorBoundary'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import useMarketStore from 'Strategies/store/marketStore'
+import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
   useRouterHistory()
   useVoteRegistry()
+  handleGovernanceAssetsStore()
   const { loadMarket } = useMarketStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
   const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()

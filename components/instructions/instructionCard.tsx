@@ -105,11 +105,7 @@ export default function InstructionCard({
       return
     }
     getAmountImg()
-  }, [
-    proposalInstruction,
-    governedTokenAccountsWithoutNfts.length,
-    governedTokenAccountsWithoutNfts.length,
-  ])
+  }, [proposalInstruction, governedTokenAccountsWithoutNfts.length])
   const isSol = tokenImgUrl.includes(WSOL_MINT)
 
   const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
