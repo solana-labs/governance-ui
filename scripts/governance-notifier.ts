@@ -34,6 +34,7 @@ async function runNotifier() {
   const realmInfo = await getCertifiedRealmInfo(REALM_SYMBOL, connectionContext)
 
   const connection = new Connection(process.env.CLUSTER_URL!)
+  console.log(`- getting all governance accounts for ${REALM_SYMBOL}`)
   const governances = await getGovernanceAccounts(
     connection,
     realmInfo!.programId,
@@ -43,6 +44,7 @@ async function runNotifier() {
 
   const governancesMap = accountsToPubkeyMap(governances)
 
+  console.log(`- getting all proposals for all governances`)
   const proposalsByGovernance = await Promise.all(
     Object.keys(governancesMap).map((governancePk) => {
       return getGovernanceAccounts(connection, realmInfo!.programId, Proposal, [
