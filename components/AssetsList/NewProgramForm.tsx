@@ -24,6 +24,8 @@ import { debounce } from '@utils/debounce'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import axios from 'axios'
+
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -149,6 +151,16 @@ const NewProgramForm = () => {
               if (!accountData || !accountData.value) {
                 return this.createError({
                   message: `Account not found`,
+                })
+              }
+
+              const verifiedAnchorProgramCheck = await axios.get(
+                `https://anchor.projectserum.com/api/v0/program/${val}/latest?limit=5`
+              ) // 5 limit is default value in anchor source.
+              if (verifiedAnchorProgramCheck.data[0].verified != 'Verified') {
+                // data[0] is latest build of program
+                return this.createError({
+                  message: `Not Anchor verified`,
                 })
               }
               return true
