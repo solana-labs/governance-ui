@@ -33,7 +33,7 @@ async function runNotifier() {
   const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM_SYMBOL, connectionContext)
 
-  const connection = new Connection(process.env.CLUSTER_URL)
+  const connection = new Connection(process.env.CLUSTER_URL!)
   const governances = await getGovernanceAccounts(
     connection,
     realmInfo!.programId,
