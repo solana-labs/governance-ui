@@ -15,6 +15,11 @@ import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 const fiveMinutesSeconds = 5 * 60
 const toleranceSeconds = 30
 
+if (!process.env.CLUSTER_URL) {
+  console.error('Please set CLUSTER_URL to a rpc node of choice!')
+  process.exit(1)
+}
+
 function errorWrapper() {
   runNotifier().catch((error) => {
     console.error(error)
@@ -28,9 +33,7 @@ async function runNotifier() {
   const connectionContext = getConnectionContext('mainnet')
   const realmInfo = await getCertifiedRealmInfo(REALM_SYMBOL, connectionContext)
 
-  const connection = new Connection(
-    process.env.CLUSTER_URL || 'https://api.mainnet-beta.solana.com'
-  )
+  const connection = new Connection(process.env.CLUSTER_URL)
   const governances = await getGovernanceAccounts(
     connection,
     realmInfo!.programId,
