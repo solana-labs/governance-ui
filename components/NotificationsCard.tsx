@@ -267,7 +267,7 @@ const NotificationsCard = () => {
       try {
         const resp = logInFromDao({
           walletPublicKey: wallet.publicKey.toString(),
-          daoAddress: realm?.pubkey,
+          daoAddress: realm?.pubkey.toBase58() || '',
           timestamp: ticks,
           signature: bufferToBase64(p),
         })
