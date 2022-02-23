@@ -1,5 +1,13 @@
 export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
   BPFLoaderUpgradeab1e11111111111111111111111: {
+    5: {
+      name: 'Close buffer',
+      accounts: [
+        { name: 'Buffer' },
+        { name: 'Sol receiver' },
+        { name: 'Upgrade authority' },
+      ],
+    },
     3: {
       name: 'Program: Upgrade',
       accounts: [

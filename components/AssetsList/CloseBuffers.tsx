@@ -20,13 +20,13 @@ import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
 import useAssetsStore from 'stores/useAssetsStore'
 import * as yup from 'yup'
-import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
 import Loading from '@components/Loading'
 import useCreateProposal from '@hooks/useCreateProposal'
 import CommandLineInfo from 'pages/dao/[symbol]/proposal/components/ComandLineInfo'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
 
 interface CloseBuffersForm {
   governedAccount: GovernedProgramAccount | undefined
@@ -98,50 +98,58 @@ const CloseBuffers = () => {
       .nullable()
       .required('Program governed account is required'),
   })
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstructions(): Promise<UiInstruction[]> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstruction = ''
-    if (
-      isValid &&
-      programId &&
-      form.governedAccount?.governance?.account &&
-      wallet?.publicKey
-    ) {
-      const upgradeIx = await createUpgradeInstruction(
-        form.governedAccount.governance.account.governedAccount,
-        new PublicKey(form.solReceiverAddress),
-        form.governedAccount.governance.pubkey,
-        wallet!.publicKey
-      )
-      serializedInstruction = serializeInstructionToBase64(upgradeIx)
+    const instructions: UiInstruction[] = []
+    for (let i = 0; i < buffers.length; i++) {
+      let serializedInstruction = ''
+      if (
+        isValid &&
+        programId &&
+        form.governedAccount?.governance?.account &&
+        wallet?.publicKey
+      ) {
+        const closeIx = await createCloseBuffer(
+          buffers[i].pubkey,
+          new PublicKey(form.solReceiverAddress),
+          form.governedAccount.governance.pubkey
+        )
+        console.log(closeIx)
+        serializedInstruction = serializeInstructionToBase64(closeIx)
+      }
+      const obj: UiInstruction = {
+        serializedInstruction: serializedInstruction,
+        isValid,
+        governance: form.governedAccount?.governance,
+      }
+      instructions.push(obj)
     }
-    const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
-      isValid,
-      governance: form.governedAccount?.governance,
-    }
-    return obj
+    return instructions
   }
   const handlePropose = async () => {
     setIsLoading(true)
-    const instruction: UiInstruction = await getInstruction()
-    if (instruction.isValid) {
+    const instructions: UiInstruction[] = await getInstructions()
+    console.log(instructions)
+    if (instructions.length && instructions[0].isValid) {
       const governance = form.governedAccount?.governance
       if (!realm) {
         setIsLoading(false)
         throw 'No realm selected'
       }
 
-      const instructionData = new InstructionDataWithHoldUpTime({
-        instruction,
-        governance,
-      })
+      const instructionsData = instructions.map(
+        (x) =>
+          new InstructionDataWithHoldUpTime({
+            instruction: x,
+            governance,
+          })
+      )
       try {
         const proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
           description: form.description ? form.description : '',
           voteByCouncil,
-          instructionsData: [instructionData],
+          instructionsData: instructionsData,
           governance: governance!,
         })
         const url = fmtUrlWithCluster(
@@ -181,6 +189,7 @@ const CloseBuffers = () => {
             ],
           }
         )
+        console.log(buffers)
         setBuffers(buffers)
       } catch (e) {
         notify({ type: 'error', message: "Can't fetch buffers" })
@@ -193,7 +202,9 @@ const CloseBuffers = () => {
   }, [form.governedAccount?.governance?.pubkey.toBase58()])
   return (
     <>
-      <h3 className="mb-4 flex items-center hover:cursor-pointer">Upgrade</h3>
+      <h3 className="mb-4 flex items-center hover:cursor-pointer">
+        Close buffers
+      </h3>
       <div className="space-y-4">
         <Input
           label="Retrieved SOL receiver address"
