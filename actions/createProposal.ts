@@ -7,7 +7,9 @@ import {
 
 import {
   getGovernanceProgramVersion,
+  getInstructionDataFromBase64,
   getSignatoryRecordAddress,
+  Governance,
   ProgramAccount,
   Realm,
   VoteType,
@@ -23,12 +25,34 @@ import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVot
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+}
+
+export class InstructionDataWithHoldUpTime {
+  constructor({
+    instruction,
+    governance,
+  }: {
+    instruction: UiInstruction
+    governance?: ProgramAccount<Governance>
+  }) {
+    this.data = instruction.serializedInstruction
+      ? getInstructionDataFromBase64(instruction.serializedInstruction)
+      : null
+    this.holdUpTime =
+      typeof instruction.customHoldUpTime !== undefined
+        ? instruction.customHoldUpTime
+        : governance?.account?.config.minInstructionHoldUpTime
+
+    this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
+    this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
+  }
 }
 
 export const createProposal = async (

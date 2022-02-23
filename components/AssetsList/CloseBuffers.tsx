@@ -1,6 +1,7 @@
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
+  ExternalLinkIcon,
 } from '@heroicons/react/outline'
 import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
@@ -12,26 +13,20 @@ import useWalletStore from 'stores/useWalletStore'
 import { getValidatedPublickKey } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
-import {
-  getInstructionDataFromBase64,
-  serializeInstructionToBase64,
-} from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
-import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
 import useAssetsStore from 'stores/useAssetsStore'
 import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
 import Loading from '@components/Loading'
+import useCreateProposal from '@hooks/useCreateProposal'
+import CommandLineInfo from 'pages/dao/[symbol]/proposal/components/ComandLineInfo'
+import { getExplorerUrl } from '@components/explorer/tools'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 
 interface CloseBuffersForm {
   governedAccount: GovernedProgramAccount | undefined
@@ -42,9 +37,9 @@ interface CloseBuffersForm {
 }
 
 const CloseBuffers = () => {
+  const { handleCreateProposal } = useCreateProposal()
   const { resetCompactViewState } = useAssetsStore()
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const program = useAssetsStore((s) => s.compact.currentAsset)
@@ -52,16 +47,8 @@ const CloseBuffers = () => {
     governance: program!,
   }
   const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const {
-    realmInfo,
-    canChooseWhoVote,
-    councilMint,
-    realm,
-    ownVoterWeight,
-    mint,
-  } = useRealm()
+  const { realmInfo, canChooseWhoVote, realm } = useRealm()
   const [isBuffersLoading, setIsBuffersLoading] = useState(false)
   const programId: PublicKey | undefined = realmInfo?.programId
   const [buffers, setBuffers] = useState<
@@ -81,7 +68,7 @@ const CloseBuffers = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Upgrade ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
+  const proposalTitle = `Close unused buffers of ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -140,66 +127,23 @@ const CloseBuffers = () => {
     const instruction: UiInstruction = await getInstruction()
     if (instruction.isValid) {
       const governance = form.governedAccount?.governance
-      let proposalAddress: PublicKey | null = null
       if (!realm) {
         setIsLoading(false)
         throw 'No realm selected'
       }
 
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
-      const instructionData = {
-        data: instruction.serializedInstruction
-          ? getInstructionDataFromBase64(instruction.serializedInstruction)
-          : null,
-        holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-      }
+      const instructionData = new InstructionDataWithHoldUpTime({
+        instruction,
+        governance,
+      })
       try {
-        // Fetch governance to get up to date proposalCount
-        const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
-
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-        //Description same as title
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title ? form.title : proposalTitle,
-          form.description ? form.description : '',
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
-          [instructionData],
-          false,
-          client
-        )
+        const proposalAddress = await handleCreateProposal({
+          title: form.title ? form.title : proposalTitle,
+          description: form.description ? form.description : '',
+          voteByCouncil,
+          instructionsData: [instructionData],
+          governance: governance!,
+        })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
@@ -270,19 +214,30 @@ const CloseBuffers = () => {
             <Loading></Loading>
           ) : (
             <>
-              {' '}
               {buffers.map((x) => (
-                <div className="mb-2" key={x.pubkey.toBase58()}>
+                <div
+                  className="mb-2 flex items-center text-xs"
+                  key={x.pubkey.toBase58()}
+                >
                   {x.pubkey.toBase58()}
+                  <a
+                    href={getExplorerUrl(connection.endpoint, x.pubkey)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+                  </a>
                 </div>
               ))}
               {!buffers.length && 'No buffers found'}
             </>
           )}
         </div>
-        <ProgramUpgradeInfo
-          governancePk={form.governedAccount?.governance?.pubkey}
-        ></ProgramUpgradeInfo>
+        <div className="mb-2">Upgrade authority</div>
+        <CommandLineInfo
+          info={form.governedAccount?.governance?.pubkey.toBase58()}
+        ></CommandLineInfo>
         <div
           className={'flex items-center hover:cursor-pointer w-24 mt-3'}
           onClick={() => setShowOptions(!showOptions)}
