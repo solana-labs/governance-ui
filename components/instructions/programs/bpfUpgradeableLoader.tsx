@@ -7,6 +7,9 @@ export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
         { name: 'Sol receiver' },
         { name: 'Upgrade authority' },
       ],
+      getDataUI: () => {
+        return <div></div>
+      },
     },
     3: {
       name: 'Program: Upgrade',

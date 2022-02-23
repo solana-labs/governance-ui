@@ -1,4 +1,4 @@
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getProgramName } from '@components/instructions/programs/names'
 import Modal from '@components/Modal'
@@ -80,20 +80,6 @@ const AssetOverview = () => {
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 justify-center`}
       >
         <Button
-          className="sm:w-1/2 text-sm"
-          onClick={() => setOpenCloseBuffersModal(true)}
-          disabled={!canUseProgramUpgradeInstruction}
-        >
-          <Tooltip
-            content={
-              !canUseProgramUpgradeInstruction &&
-              'You need to have connected wallet with ability to create upgrade proposals'
-            }
-          >
-            <div>Close buffers</div>
-          </Tooltip>
-        </Button>
-        <Button
           disabled={!canUseProgramUpgradeInstruction}
           className="sm:w-1/2 text-sm"
           onClick={() => setOpenUpgradeModal(true)}
@@ -107,6 +93,20 @@ const AssetOverview = () => {
             <div>Upgrade</div>
           </Tooltip>
         </Button>
+        <SecondaryButton
+          className="sm:w-1/2 text-sm"
+          onClick={() => setOpenCloseBuffersModal(true)}
+          disabled={!canUseProgramUpgradeInstruction}
+        >
+          <Tooltip
+            content={
+              !canUseProgramUpgradeInstruction &&
+              'You need to have connected wallet with ability to create upgrade proposals'
+            }
+          >
+            <div>Close buffers</div>
+          </Tooltip>
+        </SecondaryButton>
       </div>
       {openUpgradeModal && (
         <Modal

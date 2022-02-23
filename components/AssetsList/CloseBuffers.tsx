@@ -23,10 +23,10 @@ import * as yup from 'yup'
 import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
 import Loading from '@components/Loading'
 import useCreateProposal from '@hooks/useCreateProposal'
-import CommandLineInfo from 'pages/dao/[symbol]/proposal/components/ComandLineInfo'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
+import { abbreviateAddress } from '@utils/formatting'
 
 interface CloseBuffersForm {
   governedAccount: GovernedProgramAccount | undefined
@@ -68,7 +68,13 @@ const CloseBuffers = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Close unused buffers of ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
+  const proposalTitle = `Close unused buffers of ${
+    form.governedAccount?.governance?.account.governedAccount
+      ? abbreviateAddress(
+          form.governedAccount?.governance?.account.governedAccount
+        )
+      : ''
+  }`
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -245,10 +251,6 @@ const CloseBuffers = () => {
             </>
           )}
         </div>
-        <div className="mb-2">Upgrade authority</div>
-        <CommandLineInfo
-          info={form.governedAccount?.governance?.pubkey.toBase58()}
-        ></CommandLineInfo>
         <div
           className={'flex items-center hover:cursor-pointer w-24 mt-3'}
           onClick={() => setShowOptions(!showOptions)}
@@ -308,7 +310,7 @@ const CloseBuffers = () => {
           isLoading={isLoading}
           disabled={isLoading || !buffers.length}
         >
-          <div>Propose close all</div>
+          <div>Propose close {buffers.length > 1 ? 'buffers' : 'buffer'}</div>
         </Button>
       </div>
     </>
