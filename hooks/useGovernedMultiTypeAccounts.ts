@@ -19,15 +19,15 @@ export default function useGovernedMultiTypeAccounts() {
     const mintWithGovernances = await getMintWithGovernances()
 
     return governancesArray.map((gov) => {
-      const governedTokenAccount = governedTokenAccounts.find(
-        (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+      const governedTokenAccount = governedTokenAccounts.find((tokenAcc) =>
+        tokenAcc.governance?.pubkey.equals(gov.pubkey)
       )
       if (governedTokenAccount) {
         return governedTokenAccount as GovernedMultiTypeAccount
       }
 
-      const mintGovernance = mintWithGovernances.find(
-        (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
+      const mintGovernance = mintWithGovernances.find((mint) =>
+        mint.governance?.pubkey.equals(gov.pubkey)
       )
       if (mintGovernance) {
         return mintGovernance as GovernedMultiTypeAccount

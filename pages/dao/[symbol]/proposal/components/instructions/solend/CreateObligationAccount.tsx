@@ -1,23 +1,25 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
-import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import {
-  UiInstruction,
-  CreateSolendObligationAccountForm,
-} from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../new'
-import useWalletStore from 'stores/useWalletStore'
-import {
+  Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  Governance,
 } from '@solana/spl-governance'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { createObligationAccount } from '@tools/sdk/solend/createObligationAccount'
+import * as yup from 'yup'
+import { PublicKey } from '@solana/web3.js'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
+import { createObligationAccount } from '@tools/sdk/solend/createObligationAccount'
+import { isFormValid } from '@utils/formValidation'
+import {
+  CreateSolendObligationAccountForm,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
+
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import useWalletStore from 'stores/useWalletStore'
+
+import { NewProposalContext } from '../../../new'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 const CreateObligationAccount = ({
   index,
@@ -29,13 +31,12 @@ const CreateObligationAccount = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
     return <>This instruction does not support {connection.cluster}</>
   }
-
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<CreateSolendObligationAccountForm>({})
@@ -87,7 +88,7 @@ const CreateObligationAccount = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [realmInfo?.programId])
+  }, [programId])
 
   useEffect(() => {
     handleSetInstructions(
@@ -107,19 +108,17 @@ const CreateObligationAccount = ({
   })
 
   return (
-    <>
-      <GovernedAccountSelect
-        label="Governance"
-        governedAccounts={governedMultiTypeAccounts}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
-        }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
-      ></GovernedAccountSelect>
-    </>
+    <GovernedAccountSelect
+      label="Governance"
+      governedAccounts={governedMultiTypeAccounts}
+      onChange={(value) => {
+        handleSetForm({ value, propertyName: 'governedAccount' })
+      }}
+      value={form.governedAccount}
+      error={formErrors['governedAccount']}
+      shouldBeGoverned={shouldBeGoverned}
+      governance={governance}
+    />
   )
 }
 

@@ -144,6 +144,7 @@ export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
   governedAccount?: GovernedMultiTypeAccount
   uiAmount: string
   mintName?: SupportedMintName
+  destinationLiquidity?: string
 }
 
 export interface RefreshObligationForm {
@@ -234,6 +235,13 @@ export enum UXDIntructions {
   WithdrawInsuranceFromMangoDepository,
   Grant,
   Clawback,
+  CreateAssociatedTokenAccount,
+  CreateSolendObligationAccount,
+  InitSolendObligationAccount,
+  DepositReserveLiquidityAndObligationCollateral,
+  WithdrawObligationCollateralAndRedeemReserveLiquidity,
+  RefreshSolendObligation,
+  RefreshSolendReserve,
 }
 
 export type createParams = [

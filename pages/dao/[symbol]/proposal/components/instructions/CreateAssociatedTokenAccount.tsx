@@ -1,25 +1,28 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
+
 import {
-  UiInstruction,
-  CreateAssociatedTokenAccountForm,
-} from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
-import useWalletStore from 'stores/useWalletStore'
-import Select from '@components/inputs/Select'
-import {
+  Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  Governance,
 } from '@solana/spl-governance'
-import GovernedAccountSelect from '../GovernedAccountSelect'
-import { createAssociatedTokenAccount } from '@utils/associated'
-import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
+import { PublicKey } from '@solana/web3.js'
+import Select from '@components/inputs/Select'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
+import { createAssociatedTokenAccount } from '@utils/associated'
+import { isFormValid } from '@utils/formValidation'
+import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
+import {
+  CreateAssociatedTokenAccountForm,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
+
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import useWalletStore from 'stores/useWalletStore'
+
+import { NewProposalContext } from '../../new'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 
 const CreateAssociatedTokenAccount = ({
   index,
@@ -79,19 +82,6 @@ const CreateAssociatedTokenAccount = ({
       getSplTokenMintAddressByUIName(form.splTokenMintUIName)
     )
 
-    console.log('infos', {
-      governanceAccount: form.governedAccount.governance.account,
-      governanceOwner: form.governedAccount.governance.owner.toString(),
-      fundingAddress: wallet.publicKey.toString(),
-      walletAddress: form.governedAccount.governance.pubkey.toString(),
-      splTokenMintName: form.splTokenMintUIName,
-      splTokenMintAddress: getSplTokenMintAddressByUIName(
-        form.splTokenMintUIName
-      ).toString(),
-    })
-
-    console.log('tx', tx)
-
     return {
       serializedInstruction: serializeInstructionToBase64(tx),
       isValid: true,
@@ -104,7 +94,7 @@ const CreateAssociatedTokenAccount = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [realmInfo?.programId])
+  }, [programId])
 
   useEffect(() => {
     handleSetInstructions(
@@ -136,7 +126,7 @@ const CreateAssociatedTokenAccount = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
 
       <Select
         label="SPL Token Mint"
@@ -149,12 +139,10 @@ const CreateAssociatedTokenAccount = ({
       >
         {Object.entries(SPL_TOKENS).map(([key, { name, mint }]) => (
           <Select.Option key={key} value={name}>
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div className="flex flex-col">
               <span>{name}</span>
 
-              <span style={{ color: 'grey', fontSize: '0.8em' }}>
-                {mint.toString()}
-              </span>
+              <span className="text-gray-500 text-sm">{mint.toString()}</span>
             </div>
           </Select.Option>
         ))}

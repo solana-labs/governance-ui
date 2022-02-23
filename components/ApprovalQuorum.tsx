@@ -22,7 +22,7 @@ const ApprovalProgress = ({
           ? showBg
             ? 'bg-bkg-1 p-3'
             : ''
-          : 'border border-green p-3'
+          : 'border border-fgd-4 flex h-full p-3'
       } rounded-md`}
     >
       <div className="flex items-center">
@@ -46,7 +46,7 @@ const ApprovalProgress = ({
                 {
                   maximumFractionDigits: 0,
                 }
-              )} 'Yes' votes required`}</p>
+              )} more Yes vote${yesVotesRequired > 1 ? 's' : ''} required`}</p>
               <p className="font-bold mb-0 text-fgd-1">
                 {progress.toFixed(1)}%
               </p>

@@ -1,18 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
+  getInstructionDataFromBase64,
+  Governance,
+  ProgramAccount,
+} from '@solana/spl-governance'
+import Input from '@components/inputs/Input'
+import Textarea from '@components/inputs/Textarea'
+import { validateInstruction } from '@utils/instructionTools'
+import {
   Base64InstructionForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
+
+import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
-import { validateInstruction } from '@utils/instructionTools'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 const CustomBase64 = ({
@@ -108,7 +111,7 @@ const CustomBase64 = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
       <Input
         min={0}
         label="Hold up time (days)"

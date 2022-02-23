@@ -1,5 +1,5 @@
-import { Portal } from 'react-portal'
 import { XIcon } from '@heroicons/react/outline'
+import { Portal } from 'react-portal'
 
 const Modal = ({
   isOpen,

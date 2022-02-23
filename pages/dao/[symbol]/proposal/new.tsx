@@ -15,7 +15,6 @@ import {
   RpcContext,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
@@ -50,21 +49,7 @@ import Empty from './components/instructions/Empty'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
 import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
 import Mint from './components/instructions/Mint'
-import AddLiquidityRaydium from './components/instructions/raydium/AddLiquidity'
-import RemoveLiquidityRaydium from './components/instructions/raydium/RemoveLiquidity'
-import CreateObligationAccount from './components/instructions/solend/CreateObligationAccount'
-import DepositReserveLiquidityAndObligationCollateral from './components/instructions/solend/DepositReserveLiquidityAndObligationCollateral'
-import InitObligationAccount from './components/instructions/solend/InitObligationAccount'
-import RefreshObligation from './components/instructions/solend/RefreshObligation'
-import RefreshReserve from './components/instructions/solend/RefreshReserve'
-import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
-import DepositInsuranceToMangoDepository from './components/instructions/UXD/DepositInsuranceToMangoDepository'
-import InitializeController from './components/instructions/UXD/InitializeController'
-import RegisterMangoDepository from './components/instructions/UXD/RegisterMangoDepository'
-import SetMangoDepositoriesRedeemableSoftCap from './components/instructions/UXD/SetMangoDepositoriesRedeemableSoftCap'
-import SetRedeemGlobalSupplyCap from './components/instructions/UXD/SetRedeemGlobalSupplyCap'
-import WithdrawInsuranceFromMangoDepository from './components/instructions/UXD/WithdrawInsuranceFromMangoDepository'
 import VoteBySwitch from './components/VoteBySwitch'
 
 const schema = yup.object().shape({
@@ -84,17 +69,9 @@ export const NewProposalContext = createContext<InstructionsContext>(
 function extractGovernanceAccountFromInstructionsData(
   instructionsData: ComponentInstructionData[]
 ): ProgramAccount<Governance> | null {
-  return instructionsData.reduce((tmp, x) => {
-    if (tmp) {
-      return tmp
-    }
-
-    if (x.governedAccount) {
-      return x.governedAccount
-    }
-
-    return tmp
-  }, null)
+  return (
+    instructionsData.find((itx) => itx.governedAccount)?.governedAccount ?? null
+  )
 }
 
 const New = () => {
@@ -348,41 +325,10 @@ const New = () => {
       case Instructions.RefreshSolendObligation:
         return <RefreshObligation index={idx} governance={governance} />
       case Instructions.RefreshSolendReserve:
-        return <RefreshReserve index={idx} />
+        return <RefreshReserve index={idx} governance={governance} />
       case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
         return (
           <WithdrawObligationCollateralAndRedeemReserveLiquidity
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.AddLiquidityRaydium:
-        return <AddLiquidityRaydium index={idx} governance={governance} />
-      case Instructions.RemoveLiquidityRaydium:
-        return <RemoveLiquidityRaydium index={idx} governance={governance} />
-      case Instructions.InitializeController:
-        return <InitializeController index={idx} governance={governance} />
-      case Instructions.SetRedeemableGlobalSupplyCap:
-        return <SetRedeemGlobalSupplyCap index={idx} governance={governance} />
-      case Instructions.SetMangoDepositoriesRedeemableSoftCap:
-        return (
-          <SetMangoDepositoriesRedeemableSoftCap
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.RegisterMangoDepository:
-        return <RegisterMangoDepository index={idx} governance={governance} />
-      case Instructions.DepositInsuranceToMangoDepository:
-        return (
-          <DepositInsuranceToMangoDepository
-            index={idx}
-            governance={governance}
-          />
-        )
-      case Instructions.WithdrawInsuranceFromMangoDepository:
-        return (
-          <WithdrawInsuranceFromMangoDepository
             index={idx}
             governance={governance}
           />

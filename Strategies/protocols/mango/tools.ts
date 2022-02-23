@@ -117,6 +117,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   tokenOwnerRecord,
   governingTokenMint,
   proposalIndex,
+  prerequisiteInstructions,
   isDraft,
   market,
   client
@@ -169,7 +170,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     ),
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
-    prerequisiteInstructions: [],
+    prerequisiteInstructions: [...prerequisiteInstructions],
     splitToChunkByDefault: true,
   }
   const instructionData2 = {

@@ -1,3 +1,4 @@
+import { utils } from '@project-serum/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -85,4 +86,19 @@ export async function getATA({
     currentAddress,
     needToCreateAta,
   }
+}
+
+export function findATAAddrSync(
+  wallet: PublicKey,
+  mintAddress: PublicKey
+): [PublicKey, number] {
+  const seeds = [
+    wallet.toBuffer(),
+    TOKEN_PROGRAM_ID.toBuffer(),
+    mintAddress.toBuffer(),
+  ]
+  return utils.publicKey.findProgramAddressSync(
+    seeds,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  )
 }

@@ -30,9 +30,7 @@ const StyledCardWrapper = styled.div`
 const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { yesVoteProgress, minimumYesVotes, yesVoteCount } = useProposalVotes(
-    proposal
-  )
+  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
 
   return (
     <div>
@@ -59,13 +57,13 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
             </div>
             {proposal.state === ProposalState.Voting && (
               <div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">
-                <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-3 lg:pr-4 w-full lg:w-1/2">
+                <div className="pb-3 lg:pb-0 lg:border-r lg:border-fgd-4 lg:pr-4 w-full lg:w-1/2">
                   <VoteResults isListView proposal={proposal} />
                 </div>
                 <div className="lg:pl-4 w-full lg:w-1/2">
                   <ApprovalQuorum
                     progress={yesVoteProgress}
-                    yesVotesRequired={minimumYesVotes - yesVoteCount}
+                    yesVotesRequired={yesVotesRequired}
                   />
                 </div>
               </div>

@@ -28,7 +28,7 @@ const Proposal = () => {
   const { symbol, realmInfo } = useRealm()
   const { proposal, descriptionLink } = useProposal()
   const [description, setDescription] = useState('')
-  const { yesVoteProgress, yesVoteCount, minimumYesVotes } = useProposalVotes(
+  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
     proposal?.account
   )
 
@@ -128,7 +128,7 @@ const Proposal = () => {
               {proposal?.account.state === ProposalState.Voting ? (
                 <div className="pb-4">
                   <ApprovalQuorum
-                    yesVotesRequired={minimumYesVotes - yesVoteCount}
+                    yesVotesRequired={yesVotesRequired}
                     progress={yesVoteProgress}
                     showBg
                   />

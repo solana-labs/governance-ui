@@ -1,28 +1,30 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
+import Input from '@components/inputs/Input'
+import BigNumber from 'bignumber.js'
 import * as yup from 'yup'
+import { BN } from '@project-serum/anchor'
+import {
+  Governance,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
+import Select from '@components/inputs/Select'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
+import SolendConfiguration from '@tools/sdk/solend/configuration'
+import { withdrawObligationCollateralAndRedeemReserveLiquidity } from '@tools/sdk/solend/withdrawObligationCollateralAndRedeemReserveLiquidity'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
   WithdrawObligationCollateralAndRedeemReserveLiquidityForm,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../new'
+
 import useWalletStore from 'stores/useWalletStore'
-import {
-  ProgramAccount,
-  serializeInstructionToBase64,
-  Governance,
-} from '@solana/spl-governance'
+
+import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import SolendConfiguration from '@tools/sdk/solend/configuration'
-import { withdrawObligationCollateralAndRedeemReserveLiquidity } from '@tools/sdk/solend/withdrawObligationCollateralAndRedeemReserveLiquidity'
-import BigNumber from 'bignumber.js'
-import { BN } from '@project-serum/anchor'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   index,
@@ -92,6 +94,9 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
           .toString()
       ),
       mintName: form.mintName,
+      ...(form.destinationLiquidity && {
+        destinationLiquidity: new PublicKey(form.destinationLiquidity),
+      }),
     })
 
     return {
@@ -106,7 +111,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [realmInfo?.programId])
+  }, [programId])
 
   useEffect(() => {
     handleSetInstructions(
@@ -142,7 +147,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
 
       <Select
         label="Token Name"
@@ -170,6 +175,19 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
           })
         }
         error={formErrors['uiAmount']}
+      />
+
+      <Input
+        label="Destination Account (Optional - default to governance ATA"
+        value={form.destinationLiquidity}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'destinationLiquidity',
+          })
+        }
+        error={formErrors['destinationLiquidity']}
       />
     </>
   )

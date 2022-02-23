@@ -20,6 +20,8 @@ import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
 import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
+import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
+import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 /**
  * Default governance program id instance
  */
@@ -41,6 +43,11 @@ export const ACCOUNT_NAMES = {
     'Mango DAO USDC Treasury Vault',
   '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
     'Mango DAO USDC Treasury Governance',
+  '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
+    'Mango DAO Voter Stake Registry Registrar',
+  DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
+  '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
+    'Mango DAO Governance Realm Authority',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
@@ -48,6 +55,9 @@ export const ACCOUNT_NAMES = {
   CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
     'Mango v3 BTC-PERP Incentive Vault',
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
+  MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
+  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
+
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
   '2A7UgheVhmoQqXBAQyG1wCoMpooPuiUf2DK6XFiQTtbG': 'OMH Mint Governance',
 
@@ -159,6 +169,8 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
+  ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
 }
@@ -180,7 +192,6 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]]
-
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,

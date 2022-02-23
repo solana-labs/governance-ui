@@ -6,11 +6,7 @@ type VoteResultStatusProps = {
 
 const VoteResultStatus = ({ votePassed }: VoteResultStatusProps) => {
   return (
-    <div
-      className={`border ${
-        votePassed ? 'border-green' : 'border-red'
-      } flex items-center p-3 rounded-md`}
-    >
+    <div className="border border-fgd-4 flex items-center p-3 rounded-md">
       {votePassed ? (
         <CheckCircleIcon className="h-6 mr-1.5 text-green w-6" />
       ) : (

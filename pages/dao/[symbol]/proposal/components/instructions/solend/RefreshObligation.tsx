@@ -1,25 +1,27 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
-import { isFormValid } from '@utils/formValidation'
 import {
-  UiInstruction,
-  RefreshObligationForm,
-} from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../new'
-import useWalletStore from 'stores/useWalletStore'
-import {
+  Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  Governance,
 } from '@solana/spl-governance'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
+import { PublicKey } from '@solana/web3.js'
 import Select from '@components/inputs/Select'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
 import SolendConfiguration from '@tools/sdk/solend/configuration'
 import { refreshObligation } from '@tools/sdk/solend/refreshObligation'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import { isFormValid } from '@utils/formValidation'
+import {
+  RefreshObligationForm,
+  UiInstruction,
+} from '@utils/uiTypes/proposalCreationTypes'
+
+import useWalletStore from 'stores/useWalletStore'
+
+import { NewProposalContext } from '../../../new'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 const RefreshObligation = ({
   index,
@@ -31,6 +33,7 @@ const RefreshObligation = ({
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
+
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
 
   // Hardcoded gate used to be clear about what cluster is supported for now
@@ -90,7 +93,7 @@ const RefreshObligation = ({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [realmInfo?.programId])
+  }, [programId])
 
   useEffect(() => {
     handleSetInstructions(
@@ -122,7 +125,7 @@ const RefreshObligation = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
 
       <Select
         label="Token Name to refresh obligation for"
