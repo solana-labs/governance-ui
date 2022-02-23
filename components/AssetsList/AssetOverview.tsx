@@ -82,6 +82,7 @@ const AssetOverview = () => {
         <Button
           className="sm:w-1/2 text-sm"
           onClick={() => setOpenCloseBuffersModal(true)}
+          disabled={!canUseProgramUpgradeInstruction}
         >
           <Tooltip
             content={
