@@ -31,7 +31,7 @@ const getValidateAccount = async (
   return account
 }
 
-const getValidatedPublickKey = (val: string) => {
+export const getValidatedPublickKey = (val: string) => {
   const pubKey = tryParseKey(val)
   if (pubKey) {
     return pubKey

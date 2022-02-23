@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react'
 import useAssetsStore from 'stores/useAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
 import { ViewState } from './types'
+import CloseBuffers from './CloseBuffers'
 
 const AssetOverview = () => {
   const currentAsset = useAssetsStore((s) => s.compact.currentAsset)
@@ -22,6 +23,7 @@ const AssetOverview = () => {
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
+  const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
   const name = currentAsset
     ? getProgramName(currentAsset.account.governedAccount)
     : ''
@@ -78,6 +80,19 @@ const AssetOverview = () => {
         className={`flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mb-4 justify-center`}
       >
         <Button
+          className="sm:w-1/2 text-sm"
+          onClick={() => setOpenCloseBuffersModal(true)}
+        >
+          <Tooltip
+            content={
+              !canUseProgramUpgradeInstruction &&
+              'You need to have connected wallet with ability to create upgrade proposals'
+            }
+          >
+            <div>Close buffers</div>
+          </Tooltip>
+        </Button>
+        <Button
           disabled={!canUseProgramUpgradeInstruction}
           className="sm:w-1/2 text-sm"
           onClick={() => setOpenUpgradeModal(true)}
@@ -101,6 +116,17 @@ const AssetOverview = () => {
           isOpen={openUpgradeModal}
         >
           <UpgradeProgram></UpgradeProgram>
+        </Modal>
+      )}
+      {openCloseBuffersModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenCloseBuffersModal(false)
+          }}
+          isOpen={openCloseBuffersModal}
+        >
+          <CloseBuffers></CloseBuffers>
         </Modal>
       )}
     </>
