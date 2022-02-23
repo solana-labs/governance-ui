@@ -306,6 +306,7 @@ const CloseBuffers = () => {
           className="ml-auto"
           onClick={handlePropose}
           isLoading={isLoading}
+          disabled={isLoading || !buffers.length}
         >
           <div>Propose close all</div>
         </Button>
