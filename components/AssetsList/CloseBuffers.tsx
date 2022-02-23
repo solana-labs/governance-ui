@@ -68,7 +68,7 @@ const CloseBuffers = () => {
   const [form, setForm] = useState<CloseBuffersForm>({
     governedAccount: governedAccount,
     programId: programId?.toString(),
-    solReceiverAddress: !solAccounts.length
+    solReceiverAddress: solAccounts.length
       ? solAccounts
           .find(
             (x) =>
