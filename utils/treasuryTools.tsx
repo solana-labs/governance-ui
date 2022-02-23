@@ -69,10 +69,13 @@ export const getTreasuryAccountItemInfo = (
     : governedAccountTokenAccount.isSol
     ? 'SOL'
     : info?.symbol
-    ? info?.symbol
+    ? info.address === WSOL_MINT
+      ? 'WSOL'
+      : info?.symbol
     : governedAccountTokenAccount.mint
     ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
     : ''
+  console.log(info)
   const isSol = governedAccountTokenAccount.isSol
   const displayPrice =
     totalPriceFormatted && totalPriceFormatted !== '0'
