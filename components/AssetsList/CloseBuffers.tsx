@@ -27,6 +27,7 @@ import { getExplorerUrl } from '@components/explorer/tools'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
 import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface CloseBuffersForm {
   governedAccount: GovernedProgramAccount | undefined
@@ -39,6 +40,7 @@ interface CloseBuffersForm {
 const CloseBuffers = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { resetCompactViewState } = useAssetsStore()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -57,10 +59,24 @@ const CloseBuffers = () => {
       account: AccountInfo<Buffer | ParsedAccountData>
     }[]
   >([])
+  const highestLampartsAmountInGovernedTokenAccounts = Math.max(
+    ...governedTokenAccountsWithoutNfts
+      .filter((x) => x.isSol)
+      .map((x) => x.solAccount!.lamports)
+  )
+  const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol)
   const [form, setForm] = useState<CloseBuffersForm>({
     governedAccount: governedAccount,
     programId: programId?.toString(),
-    solReceiverAddress: '',
+    solReceiverAddress: !solAccounts.length
+      ? solAccounts
+          .find(
+            (x) =>
+              x.solAccount?.lamports ===
+              highestLampartsAmountInGovernedTokenAccounts
+          )!
+          .transferAddress!.toBase58()
+      : wallet!.publicKey!.toBase58(),
     description: '',
     title: '',
   })
