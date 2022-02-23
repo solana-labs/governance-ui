@@ -70,7 +70,7 @@ export const getTreasuryAccountItemInfo = (
     ? 'SOL'
     : info?.symbol
     ? info.address === WSOL_MINT
-      ? 'WSOL'
+      ? 'wSOL'
       : info?.symbol
     : governedAccountTokenAccount.mint
     ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
