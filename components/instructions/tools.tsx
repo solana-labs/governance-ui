@@ -20,8 +20,7 @@ import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
 import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
-import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
-import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+
 /**
  * Default governance program id instance
  */
@@ -166,8 +165,6 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...UXD_PROGRAM_INSTRUCTIONS,
-  ...SOLEND_PROGRAM_INSTRUCTIONS,
-  ...ATA_PROGRAM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,
