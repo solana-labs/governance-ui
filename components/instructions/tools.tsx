@@ -14,13 +14,11 @@ import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
 import { UXD_PROGRAM_INSTRUCTIONS } from './programs/uxdProtocol'
-import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
-import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
-
 import { SYSTEM_INSTRUCTIONS } from './programs/system'
 import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
-
+import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
+import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 /**
  * Default governance program id instance
  */
