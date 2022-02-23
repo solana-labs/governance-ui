@@ -14,7 +14,6 @@
     "lint": "eslint . --ext ts --ext tsx --ext js --ext jsx",
     "test": "jest",
     "test-all": "yarn lint && yarn type-check && yarn test",
-    "postinstall": "patch-package",
     "notifier": "ts-node scripts/governance-notifier.ts"
   },
   "lint-staged": {
