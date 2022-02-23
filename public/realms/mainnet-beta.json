@@ -377,5 +377,12 @@
     "displayName": "SenshiDAO",
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
     "realmId": "2ZcZV69pMY5rrPSNSsAP7y7QgQygzAgDYKvVFvf6H9fR"
+  },
+  {
+    "symbol": "DAKU",
+    "displayName": "DAKU DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "9osGkueZJvHdZ8RbcGjgW7usUyBSCKQZSuFrujReXZpx",
+    "ogImage": "/realms/DAKU/img/daku_logo.png"
   }
 ]
