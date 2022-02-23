@@ -79,25 +79,23 @@ class SolendConfiguration implements ASolendConfiguration {
     },
   }
 
-  public get programID(): PublicKey {
-    return new PublicKey('So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo')
-  }
+  public readonly programID = new PublicKey(
+    'So1endDq2YkqhipRh3WViPa8hdiSpxWy6z3Z6tMCpAo'
+  )
 
-  public get lendingMarket(): PublicKey {
-    return new PublicKey('4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY')
-  }
+  public readonly lendingMarket = new PublicKey(
+    '4UpD2fh7xH3VP9QQaXtsS1YY3bxzWhtfpks7FatyKvdY'
+  )
 
-  public get lendingMarketAuthority(): PublicKey {
-    return new PublicKey('DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby')
-  }
+  public readonly lendingMarketAuthority = new PublicKey(
+    'DdZR6zRFiUt4S5mg7AV1uKB2z1f1WzcNYCaTEEWPAuby'
+  )
 
-  public get createObligationConfiguration() {
-    // All of theses numbers are magic numbers we got by looking at Solend documentation & transactions
-    return {
-      lamports: 9938880,
-      space: 1300,
-      seed: this.lendingMarket.toString().slice(0, 32),
-    }
+  // All of theses numbers are magic numbers we got by looking at Solend documentation & transactions
+  public readonly createObligationConfiguration = {
+    lamports: 9938880,
+    space: 1300,
+    seed: this.lendingMarket.toString().slice(0, 32),
   }
 
   public getSupportedCollateralMintsInformation(): SupportedCollateralMintsInformation {
@@ -111,7 +109,9 @@ class SolendConfiguration implements ASolendConfiguration {
   }
 
   public getReserveOfGivenMints(mintNames: SupportedMintName[]): PublicKey[] {
-    return mintNames.map((x) => this.supportedMintsInformation[x].reserve)
+    return mintNames.map(
+      (mintName) => this.supportedMintsInformation[mintName].reserve
+    )
   }
 
   public getSupportedMintNames(): SupportedMintName[] {
@@ -129,7 +129,7 @@ class SolendConfiguration implements ASolendConfiguration {
 
         return tmp
       },
-      void 0
+      undefined
     )
   }
 }

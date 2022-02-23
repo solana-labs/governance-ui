@@ -120,6 +120,7 @@ const DepositComponent = ({
       ownTokenRecord.pubkey,
       defaultProposalMint!,
       matchedTreasuryAccount!.governance!.account!.proposalCount,
+      [],
       false,
       market,
       client

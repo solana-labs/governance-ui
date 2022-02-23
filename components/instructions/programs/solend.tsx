@@ -24,8 +24,8 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
         const mint = accounts[2].pubkey.toString()
 
         return (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex flex-col">
+            <div className="flex justify-between">
               <span>Init obligation for:</span>
               <span>{mint}</span>
             </div>
@@ -51,20 +51,18 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
         const reserveAccounts = accounts.slice(2)
 
         const reserveNames = reserveAccounts.map(
-          (x) =>
-            SolendConfiguration.getTokenNameByReservePublicKey(x.pubkey) ??
-            'unknown'
+          (reserveAcc) =>
+            SolendConfiguration.getTokenNameByReservePublicKey(
+              reserveAcc.pubkey
+            ) ?? 'unknown'
         )
 
         return (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            {reserveNames.map((x, xi) => (
-              <div
-                key={x}
-                style={{ display: 'flex', justifyContent: 'space-between' }}
-              >
-                <span>Reserve #{xi + 1}</span>
-                <span>{x}</span>
+          <div className="flex flex-col">
+            {reserveNames.map((reserveName, reserveNameIdx) => (
+              <div key={reserveName} className="flex justify-between">
+                <span>Reserve #{reserveNameIdx + 1}</span>
+                <span>{reserveName}</span>
               </div>
             ))}
           </div>
@@ -87,7 +85,7 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
           'unknown'
 
         return (
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex justify-between">
             <span>Reserve</span>
             <span>{tokenName}</span>
           </div>
@@ -118,14 +116,9 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
         data: Uint8Array,
         accounts: AccountMetaData[]
       ) => {
-        console.log(
-          'accounts',
-          accounts.map((x) => x.pubkey.toString())
-        )
-
         const dataLayout = struct([u8('instruction'), nu64('liquidityAmount')])
 
-        const args = dataLayout.decode(Buffer.from(data)) as any
+        const { liquidityAmount } = dataLayout.decode(Buffer.from(data)) as any
 
         const reserve = accounts[2]
 
@@ -134,14 +127,14 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
           'unknown'
 
         return (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex flex-col">
+            <div className="flex justify-between">
               <span>Token</span>
               <span>{tokenName}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="flex justify-between">
               <span>Amount</span>
-              <span>{args.liquidityAmount}</span>
+              <span>{liquidityAmount}</span>
             </div>
           </div>
         )
@@ -173,7 +166,7 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       ) => {
         const dataLayout = struct([u8('instruction'), nu64('collateralAmount')])
 
-        const args = dataLayout.decode(Buffer.from(data)) as any
+        const { collateralAmount } = dataLayout.decode(Buffer.from(data)) as any
 
         const reserve = accounts[2]
 
@@ -181,17 +174,15 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
           SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
           'unknown'
 
-        console.log('args', args)
-
         return (
-          <div style={{ display: 'flex', flexDirection: 'column' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+          <div className="flex flex-col">
+            <div className="flex justify-between">
               <span>Token</span>
               <span>{tokenName}</span>
             </div>
-            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+            <div className="flex justify-between">
               <span>Amount</span>
-              <span>{args.collateralAmount}</span>
+              <span>{collateralAmount}</span>
             </div>
           </div>
         )

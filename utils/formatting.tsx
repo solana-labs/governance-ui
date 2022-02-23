@@ -1,6 +1,7 @@
-import { BN } from '@project-serum/anchor'
-import moment from 'moment'
+import BN from 'bn.js'
+import dayjs from 'dayjs'
 import { PublicKey } from '@solana/web3.js'
+const relativeTime = require('dayjs/plugin/relativeTime')
 
 const votePrecision = 10000
 export const calculatePct = (c: BN = new BN(0), total?: BN) => {
@@ -20,7 +21,9 @@ export const calculatePct = (c: BN = new BN(0), total?: BN) => {
 export const fmtTokenAmount = (c: BN = new BN(0), decimals?: number) =>
   c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber()
 
-export const fmtUnixTime = (d: BN) => moment.unix(d.toNumber()).fromNow()
+dayjs.extend(relativeTime)
+//@ts-ignore
+export const fmtUnixTime = (d: BN) => dayjs(d.toNumber() * 1000).fromNow()
 
 export function abbreviateAddress(address: PublicKey, size = 5) {
   const base58 = address.toBase58()

@@ -1,14 +1,12 @@
-import { Proposal, ProposalTransaction } from '@solana/spl-governance'
-
-import { withExecuteTransaction } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { sendSignedTransaction, signTransaction } from '@utils/send'
-
+import {
+  ProgramAccount,
+  Proposal,
+  ProposalTransaction,
+  RpcContext,
+  withExecuteTransaction,
+} from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
-
-// Magic number (?)
-const DEFAULT_TIMEOUT = 31_000
+import { sendSignedTransaction, signTransaction } from '@utils/send'
 
 // Merge instructions within one Transaction, sign it and execute it
 export const executeInstructions = async (
@@ -49,6 +47,5 @@ export const executeInstructions = async (
     connection,
     sendingMessage: 'Executing instruction',
     successMessage: 'Execution finalized',
-    timeout: DEFAULT_TIMEOUT,
   })
 }

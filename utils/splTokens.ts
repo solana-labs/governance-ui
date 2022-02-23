@@ -41,8 +41,9 @@ export function getSplTokenMintAddressByUIName(
     ([_, { name }]) => name === nameToMatch
   )
 
+  // theoretically impossible case
   if (!item) {
-    throw new Error('must be here')
+    throw new Error('Unable to find SPL token mint address by UI name')
   }
 
   const [, { mint }] = item

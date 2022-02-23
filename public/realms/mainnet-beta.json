@@ -137,15 +137,6 @@
     "website": "https://strangemood.org"
   },
   {
-    "symbol": "UXD",
-    "displayName": "UXD Protocol DAO",
-    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-    "realmId": "GBXLYo4ycRNfzuzYeudu6y2ng4afNeW14WcpM2E4JJSL",
-    "ogImage": "/realms/UXD/img/logo.png",
-    "website": "https://uxd.fi",
-    "twitter": "@UXDProtocol"
-  },
-  {
     "symbol": "GRAPE",
     "displayName": "GRAPE",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -340,7 +331,7 @@
     "realmId": "GBXLYo4ycRNfzuzYeudu6y2ng4afNeW14WcpM2E4JJSL",
     "website": "https://uxd.fi",
     "twitter": "@UXDProtocol",
-    "ogImage": "/realms/UXP/img/logo.png"
+    "ogImage": "/realms/UXP/img/UXP-Black.png"
   },
   {
     "symbol": "MonkeVentures",
@@ -380,5 +371,18 @@
     "website": "https://ikohaus.business.site",
     "twitter": "@Ikohaus",
     "ogImage": "/realms/Ikohaus/img/Ikohaus_Logo.png"
+  },
+  {
+    "symbol": "Senshi",
+    "displayName": "SenshiDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "2ZcZV69pMY5rrPSNSsAP7y7QgQygzAgDYKvVFvf6H9fR"
+  },
+  {
+    "symbol": "DAKU",
+    "displayName": "DAKU DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "9osGkueZJvHdZ8RbcGjgW7usUyBSCKQZSuFrujReXZpx",
+    "ogImage": "/realms/DAKU/img/daku_logo.png"
   }
 ]

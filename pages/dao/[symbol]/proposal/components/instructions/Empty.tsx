@@ -1,16 +1,14 @@
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { validateInstruction } from '@utils/instructionTools'
 import {
   EmptyInstructionForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { validateInstruction } from '@utils/instructionTools'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
-
 const Empty = ({
   index,
   governance,
@@ -18,11 +16,11 @@ const Empty = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const shouldBeGoverned = index !== 0 && governance
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
@@ -52,19 +50,17 @@ const Empty = ({
       .required('Governed account is required'),
   })
   return (
-    <>
-      <GovernedAccountSelect
-        label="Governance"
-        governedAccounts={governedMultiTypeAccounts}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
-        }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
-      ></GovernedAccountSelect>
-    </>
+    <GovernedAccountSelect
+      label="Governance"
+      governedAccounts={governedMultiTypeAccounts}
+      onChange={(value) => {
+        handleSetForm({ value, propertyName: 'governedAccount' })
+      }}
+      value={form.governedAccount}
+      error={formErrors['governedAccount']}
+      shouldBeGoverned={shouldBeGoverned}
+      governance={governance}
+    />
   )
 }
 

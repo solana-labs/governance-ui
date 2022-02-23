@@ -1,10 +1,10 @@
+import BufferLayout from 'buffer-layout'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import { tryGetMint } from '@utils/tokens'
 import { WSOL_MINT } from '../tools'
-import BufferLayout from 'buffer-layout'
 
 const SYSTEM_PROGRAM_ID = new PublicKey('11111111111111111111111111111111')
 
@@ -78,7 +78,7 @@ export const SYSTEM_INSTRUCTIONS = {
         )
       },
     },
-    [CREATE_ACCOUNT_WITH_SEED_INSTRUCTION_ID]: {
+    3: {
       name: 'System Program - Create Account With Seed',
       accounts: [
         'Obligation',
@@ -93,11 +93,7 @@ export const SYSTEM_INSTRUCTIONS = {
         _data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        return (
-          <>
-            <p>No data</p>
-          </>
-        )
+        return <p>No Instruction data</p>
       },
     },
   },

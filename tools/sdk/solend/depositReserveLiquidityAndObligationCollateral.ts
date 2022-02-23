@@ -1,12 +1,12 @@
 import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { depositReserveLiquidityAndObligationCollateralInstruction } from '@solendprotocol/solend-sdk'
-import { findATAAddrSync } from '@uxdprotocol/uxd-client'
 import { SupportedMintName } from './configuration'
 
 import SolendConfiguration from './configuration'
 
 import { deriveObligationAddressFromWalletAndSeed } from './utils'
+import { findATAAddrSync } from '@utils/ataTools'
 
 export async function depositReserveLiquidityAndObligationCollateral({
   obligationOwner,

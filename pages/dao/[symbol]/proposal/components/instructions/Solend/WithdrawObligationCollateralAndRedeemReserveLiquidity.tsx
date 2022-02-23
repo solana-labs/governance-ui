@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
+import Input from '@components/inputs/Input'
+import BigNumber from 'bignumber.js'
 import * as yup from 'yup'
-
+import { BN } from '@project-serum/anchor'
 import {
   Governance,
   ProgramAccount,
@@ -10,21 +13,20 @@ import { PublicKey } from '@solana/web3.js'
 import Select from '@components/inputs/Select'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
-import { createAssociatedTokenAccount } from '@utils/associated'
+import SolendConfiguration from '@tools/sdk/solend/configuration'
+import { withdrawObligationCollateralAndRedeemReserveLiquidity } from '@tools/sdk/solend/withdrawObligationCollateralAndRedeemReserveLiquidity'
 import { isFormValid } from '@utils/formValidation'
-import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
 import {
-  CreateAssociatedTokenAccountForm,
   UiInstruction,
+  WithdrawObligationCollateralAndRedeemReserveLiquidityForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import useWalletStore from 'stores/useWalletStore'
 
-import { NewProposalContext } from '../../new'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import { NewProposalContext } from '../../../new'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 
-const CreateAssociatedTokenAccount = ({
+const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   index,
   governance,
 }: {
@@ -36,9 +38,19 @@ const CreateAssociatedTokenAccount = ({
   const { realmInfo } = useRealm()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
 
+  // Hardcoded gate used to be clear about what cluster is supported for now
+  if (connection.cluster !== 'mainnet') {
+    return <>This instruction does not support {connection.cluster}</>
+  }
+
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<CreateAssociatedTokenAccountForm>({})
+  const [
+    form,
+    setForm,
+  ] = useState<WithdrawObligationCollateralAndRedeemReserveLiquidityForm>({
+    uiAmount: '0',
+  })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
 
@@ -61,8 +73,8 @@ const CreateAssociatedTokenAccount = ({
       !isValid ||
       !programId ||
       !form.governedAccount?.governance?.account ||
-      !form.splTokenMintUIName ||
-      !wallet?.publicKey
+      !wallet?.publicKey ||
+      !form.mintName
     ) {
       return {
         serializedInstruction: '',
@@ -71,16 +83,21 @@ const CreateAssociatedTokenAccount = ({
       }
     }
 
-    const [tx] = await createAssociatedTokenAccount(
-      // fundingAddress
-      wallet.publicKey,
-
-      // walletAddress
-      form.governedAccount.governance.pubkey,
-
-      // splTokenMintAddress
-      getSplTokenMintAddressByUIName(form.splTokenMintUIName)
-    )
+    const tx = await withdrawObligationCollateralAndRedeemReserveLiquidity({
+      obligationOwner: form.governedAccount.governance.pubkey,
+      liquidityAmount: new BN(
+        new BigNumber(form.uiAmount)
+          .shiftedBy(
+            SolendConfiguration.getSupportedMintInformation(form.mintName)
+              .decimals
+          )
+          .toString()
+      ),
+      mintName: form.mintName,
+      ...(form.destinationLiquidity && {
+        destinationLiquidity: new PublicKey(form.destinationLiquidity),
+      }),
+    })
 
     return {
       serializedInstruction: serializeInstructionToBase64(tx),
@@ -111,7 +128,11 @@ const CreateAssociatedTokenAccount = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    splTokenMintUIName: yup.string().required('SPL Token Mint is required'),
+    mintName: yup.string().required('Token Name is required'),
+    uiAmount: yup
+      .number()
+      .moreThan(0, 'Amount should be more than 0')
+      .required('Amount is required'),
   })
 
   return (
@@ -129,26 +150,47 @@ const CreateAssociatedTokenAccount = ({
       />
 
       <Select
-        label="SPL Token Mint"
-        value={form.splTokenMintUIName}
+        label="Token Name"
+        value={form.mintName}
         placeholder="Please select..."
-        onChange={(value) =>
-          handleSetForm({ value, propertyName: 'splTokenMintUIName' })
-        }
+        onChange={(value) => handleSetForm({ value, propertyName: 'mintName' })}
         error={formErrors['baseTokenName']}
       >
-        {Object.entries(SPL_TOKENS).map(([key, { name, mint }]) => (
-          <Select.Option key={key} value={name}>
-            <div className="flex flex-col">
-              <span>{name}</span>
-
-              <span className="text-gray-500 text-sm">{mint.toString()}</span>
-            </div>
+        {SolendConfiguration.getSupportedMintNames().map((value) => (
+          <Select.Option key={value} value={value}>
+            {value}
           </Select.Option>
         ))}
       </Select>
+
+      <Input
+        label="Amount to withdraw"
+        value={form.uiAmount}
+        type="string"
+        min="0"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'uiAmount',
+          })
+        }
+        error={formErrors['uiAmount']}
+      />
+
+      <Input
+        label="Destination Account (Optional - default to governance ATA"
+        value={form.destinationLiquidity}
+        type="string"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'destinationLiquidity',
+          })
+        }
+        error={formErrors['destinationLiquidity']}
+      />
     </>
   )
 }
 
-export default CreateAssociatedTokenAccount
+export default WithdrawObligationCollateralAndRedeemReserveLiquidity

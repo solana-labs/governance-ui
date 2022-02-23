@@ -47,11 +47,8 @@ const ApproveAllBtn = () => {
 
   const canApproveProposals = connected && votingProposals.length > 0
 
-  console.log(ownVoteRecordsByProposal)
-
   const approveAll = async () => {
     if (!wallet || !programId || !realm) return
-    console.log(ownVoteRecordsByProposal)
 
     const governanceAuthority = wallet.publicKey!
     const payer = wallet.publicKey!
