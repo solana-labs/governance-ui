@@ -31,6 +31,7 @@
     "@heroicons/react": "^1.0.1",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
     "@nfteyez/sol-rayz": "^0.8.0",
+    "@notifi-network/notifi-react-hooks": "^0.0.3",
     "@project-serum/anchor": "^0.20.1",
     "@project-serum/common": "^0.0.1-beta.3",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
