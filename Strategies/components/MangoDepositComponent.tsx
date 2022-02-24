@@ -388,13 +388,11 @@ const MangoDepositComponent = ({
           >
             <Tooltip
               content={
-                !connected
-                  ? 'Please connect wallet'
+                !canUseTransferInstruction
+                  ? 'Please connect wallet with enough voting power to create treasury proposals'
                   : currentPosition < minMngoToCreateLink
                   ? 'Please deposit at least 10000 MNGO to create link'
-                  : !canUseTransferInstruction
-                  ? "You don't enough voting power to do this"
-                  : !link.length
+                  : !linkName.length
                   ? 'Please type link name'
                   : ''
               }
