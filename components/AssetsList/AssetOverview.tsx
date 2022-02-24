@@ -1,4 +1,4 @@
-import Button from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import { getExplorerUrl } from '@components/explorer/tools'
 import { getProgramName } from '@components/instructions/programs/names'
 import Modal from '@components/Modal'
@@ -14,6 +14,7 @@ import React, { useEffect, useState } from 'react'
 import useAssetsStore from 'stores/useAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
 import { ViewState } from './types'
+import CloseBuffers from './CloseBuffers'
 
 const AssetOverview = () => {
   const currentAsset = useAssetsStore((s) => s.compact.currentAsset)
@@ -22,6 +23,7 @@ const AssetOverview = () => {
   const connection = useWalletStore((s) => s.connection)
   const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
+  const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
   const name = currentAsset
     ? getProgramName(currentAsset.account.governedAccount)
     : ''
@@ -91,6 +93,20 @@ const AssetOverview = () => {
             <div>Upgrade</div>
           </Tooltip>
         </Button>
+        <SecondaryButton
+          className="sm:w-1/2 text-sm"
+          onClick={() => setOpenCloseBuffersModal(true)}
+          disabled={!canUseProgramUpgradeInstruction}
+        >
+          <Tooltip
+            content={
+              !canUseProgramUpgradeInstruction &&
+              'You need to have connected wallet with ability to create upgrade proposals'
+            }
+          >
+            <div>Close Buffers</div>
+          </Tooltip>
+        </SecondaryButton>
       </div>
       {openUpgradeModal && (
         <Modal
@@ -101,6 +117,17 @@ const AssetOverview = () => {
           isOpen={openUpgradeModal}
         >
           <UpgradeProgram></UpgradeProgram>
+        </Modal>
+      )}
+      {openCloseBuffersModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setOpenCloseBuffersModal(false)
+          }}
+          isOpen={openCloseBuffersModal}
+        >
+          <CloseBuffers></CloseBuffers>
         </Modal>
       )}
     </>

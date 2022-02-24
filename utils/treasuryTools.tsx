@@ -64,12 +64,15 @@ export const getTreasuryAccountItemInfo = (
     : accountPublicKey
     ? abbreviateAddress(accountPublicKey as PublicKey)
     : ''
+  //TODO replace with switch
   const symbol = governedAccountTokenAccount.isNft
     ? 'NFTS'
     : governedAccountTokenAccount.isSol
     ? 'SOL'
     : info?.symbol
-    ? info?.symbol
+    ? info.address === WSOL_MINT
+      ? 'wSOL'
+      : info?.symbol
     : governedAccountTokenAccount.mint
     ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
     : ''
