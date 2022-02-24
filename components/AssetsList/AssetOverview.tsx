@@ -104,7 +104,7 @@ const AssetOverview = () => {
               'You need to have connected wallet with ability to create upgrade proposals'
             }
           >
-            <div>Close buffers</div>
+            <div className="uppercase">Close buffers</div>
           </Tooltip>
         </SecondaryButton>
       </div>

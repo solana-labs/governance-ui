@@ -8,7 +8,7 @@ export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
         { name: 'Upgrade authority' },
       ],
       getDataUI: () => {
-        return <div></div>
+        return null
       },
     },
     3: {
@@ -22,6 +22,9 @@ export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
         { name: 'Sysvar: Clock' },
         { name: 'Upgrade Authority' },
       ],
+      getDataUI: () => {
+        return null
+      },
     },
   },
 }

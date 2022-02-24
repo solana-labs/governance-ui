@@ -76,7 +76,9 @@ const CloseBuffers = () => {
               highestLampartsAmountInGovernedTokenAccounts
           )!
           .transferAddress!.toBase58()
-      : wallet!.publicKey!.toBase58(),
+      : wallet?.publicKey?.toBase58()
+      ? wallet?.publicKey?.toBase58()
+      : '',
     description: '',
     title: '',
   })
@@ -84,7 +86,7 @@ const CloseBuffers = () => {
   const [showOptions, setShowOptions] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Close unused buffers of ${
+  const proposalTitle = `Close buffers for program ${
     form.governedAccount?.governance?.account.governedAccount
       ? abbreviateAddress(
           form.governedAccount?.governance?.account.governedAccount
@@ -326,7 +328,9 @@ const CloseBuffers = () => {
           isLoading={isLoading}
           disabled={isLoading || !buffers.length}
         >
-          <div>Propose close {buffers.length > 1 ? 'buffers' : 'buffer'}</div>
+          <div className="uppercase">
+            Propose close {buffers.length > 1 ? 'buffers' : 'buffer'}
+          </div>
         </Button>
       </div>
     </>

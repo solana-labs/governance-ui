@@ -4,7 +4,7 @@ import Input from 'components/inputs/Input'
 import Button, { SecondaryButton } from '@components/Button'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import { precision } from 'utils/formatting'
+import { abbreviateAddress, precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
 import { useEffect, useState } from 'react'
@@ -78,7 +78,11 @@ const AddMemberForm = ({ close }) => {
 
   const currentPrecision = precision(mintMinAmount)
 
-  const proposalTitle = `Add council member ${form.destinationAccount}`
+  const proposalTitle = `Add council member ${
+    form.destinationAccount
+      ? abbreviateAddress(new PublicKey(form.destinationAccount))
+      : ''
+  }`
 
   const setAmount = (event) => {
     const value = event.target.value
