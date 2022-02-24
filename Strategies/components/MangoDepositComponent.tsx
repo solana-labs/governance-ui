@@ -382,7 +382,8 @@ const MangoDepositComponent = ({
             disabled={
               currentPosition < minMngoToCreateLink ||
               !connected ||
-              !linkName.length
+              !linkName.length ||
+              !canUseTransferInstruction
             }
           >
             <Tooltip
@@ -391,6 +392,10 @@ const MangoDepositComponent = ({
                   ? 'Please connect wallet'
                   : currentPosition < minMngoToCreateLink
                   ? 'Please deposit at least 10000 MNGO to create link'
+                  : !canUseTransferInstruction
+                  ? "You don't enough voting power to do this"
+                  : !link.length
+                  ? 'Please type link name'
                   : ''
               }
             >
