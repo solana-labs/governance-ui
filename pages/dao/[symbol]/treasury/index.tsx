@@ -74,7 +74,7 @@ const TreasuryItem = ({ governedAccountTokenAccount, governanceNfts }) => {
         </div>
       </div>
 
-      <div className="flex flex-items space-between mt-5 items-end">
+      <div className="flex flex-items space-between mt-5 items-end mt-auto">
         {displayPrice && <span className="text-xs">${displayPrice}</span>}
         {logo && <img src={logo} className="w-10 h-10 ml-auto"></img>}
       </div>
