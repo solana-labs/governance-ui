@@ -328,9 +328,7 @@ const CloseBuffers = () => {
           isLoading={isLoading}
           disabled={isLoading || !buffers.length}
         >
-          <div className="uppercase">
-            Propose close {buffers.length > 1 ? 'buffers' : 'buffer'}
-          </div>
+          <div>Propose Close {buffers.length > 1 ? 'Buffers' : 'Buffer'}</div>
         </Button>
       </div>
     </>
