@@ -139,7 +139,11 @@ export default function InstructionCard({
           ))}
       </div>
       <div className="flex items-center justify-between mb-2">
-        <div className="font-bold text-sm">Data</div>
+        {descriptor?.dataUI.props ? (
+          <div className="font-bold text-sm">Data</div>
+        ) : (
+          ''
+        )}
       </div>
 
       {nftImgUrl ? (
