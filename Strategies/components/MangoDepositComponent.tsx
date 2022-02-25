@@ -318,8 +318,8 @@ const MangoDepositComponent = ({
   }
   const link =
     connection.cluster === 'devnet'
-      ? `http://www.devnet.mango.markets/?ref=`
-      : `https://www.trade.mango.markets/?ref=`
+      ? `http://devnet.mango.markets/?ref=`
+      : `https://trade.mango.markets/?ref`
   return (
     <div className="flex flex-col  w-4/5">
       {(matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
