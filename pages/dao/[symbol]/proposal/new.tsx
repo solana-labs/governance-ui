@@ -51,12 +51,12 @@ import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeCha
 import Mint from './components/instructions/Mint'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
-import CreateObligationAccount from './components/instructions/solend/CreateObligationAccount'
-import DepositReserveLiquidityAndObligationCollateral from './components/instructions/solend/DepositReserveLiquidityAndObligationCollateral'
-import InitObligationAccount from './components/instructions/solend/InitObligationAccount'
-import RefreshObligation from './components/instructions/solend/RefreshObligation'
-import RefreshReserve from './components/instructions/solend/RefreshReserve'
-import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
+import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
+import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
+import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
+import RefreshObligation from './components/instructions/Solend/RefreshObligation'
+import RefreshReserve from './components/instructions/Solend/RefreshReserve'
+import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
