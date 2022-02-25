@@ -1,6 +1,6 @@
 import React from 'react'
 import useRealm from 'hooks/useRealm'
-import { GlobeAltIcon } from '@heroicons/react/outline'
+import { ArrowsExpandIcon, GlobeAltIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import { TwitterIcon } from './icons'
@@ -10,7 +10,7 @@ import { getRealmExplorerHost } from 'tools/routing'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realmInfo, realmDisplayName } = useRealm()
+  const { realmInfo, realmDisplayName, symbol } = useRealm()
   const { REALM } = process.env
 
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
@@ -28,28 +28,35 @@ const RealmHeader = () => {
           </a>
         </Link>
       ) : null}
-      <div className="border-b border-fgd-4 flex flex-col md:flex-row md:items-center md:justify-between pb-3">
+      <div className="border-b border-fgd-4 flex flex-col md:flex-row md:items-center pb-3  md:justify-between">
         {realmDisplayName ? (
-          <a href={realmUrl} target="_blank" rel="noopener noreferrer">
-            <div className="flex items-center cursor-pointer">
-              <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
-                {realmInfo?.ogImage ? (
-                  <img
-                    className="flex-shrink-0 mb-2 md:mb-0 w-8"
-                    src={realmInfo?.ogImage}
-                  ></img>
-                ) : (
-                  <div className="bg-[rgba(255,255,255,0.1)] h-14 w-14 flex font-bold items-center justify-center rounded-full text-fgd-3">
-                    {realmDisplayName?.charAt(0)}
-                  </div>
-                )}
-                <h1 className="ml-3">{realmDisplayName}</h1>
+          <div className="flex items-center">
+            <a href={realmUrl} target="_blank" rel="noopener noreferrer">
+              <div className="flex items-center cursor-pointer">
+                <div className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
+                  {realmInfo?.ogImage ? (
+                    <img
+                      className="flex-shrink-0 mb-2 md:mb-0 w-8"
+                      src={realmInfo?.ogImage}
+                    ></img>
+                  ) : (
+                    <div className="bg-[rgba(255,255,255,0.1)] h-14 w-14 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                      {realmDisplayName?.charAt(0)}
+                    </div>
+                  )}
+                  <h1 className="ml-3">{realmDisplayName}</h1>
+                </div>
+                <ExternalLinkIcon
+                  className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
+                />
               </div>
-              <ExternalLinkIcon
-                className={`flex-shrink-0 h-4 w-4 ml-2 text-primary-light`}
-              />
-            </div>
-          </a>
+            </a>
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/params`)}>
+              <a className="flex-shrink-0 h-4 w-4 ml-2 cursor-pointer text-primary-light">
+                <ArrowsExpandIcon></ArrowsExpandIcon>
+              </a>
+            </Link>
+          </div>
         ) : (
           <div className="animate-pulse bg-bkg-3 h-10 w-40 rounded-md" />
         )}
