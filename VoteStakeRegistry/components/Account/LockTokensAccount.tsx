@@ -23,6 +23,7 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -32,7 +33,7 @@ interface DepositBox {
 const unlockedTypes = ['none']
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const { realm, mint, tokenRecords } = useRealm()
+  const { realm, mint, tokenRecords, councilMint } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -42,6 +43,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const [votingPowerFromDeposits, setVotingPowerFromDeposits] = useState<BN>(
     new BN(0)
   )
+  const [isOwnerOfDeposits, setIsOwnerOfDeposits] = useState(true)
   const tokenOwnerRecordWalletPk = Object.keys(tokenRecords)?.find(
     (key) => tokenRecords[key]?.pubkey?.toBase58() === tokenOwnerRecordPk
   )
@@ -133,14 +135,35 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   useEffect(() => {
     if (
       JSON.stringify(ownDeposits) !== JSON.stringify(deposits) &&
-      tokenOwnerRecordWalletPk === wallet?.publicKey?.toBase58()
+      isOwnerOfDeposits
     ) {
       handleGetDeposits()
     }
   }, [JSON.stringify(ownDeposits), ownDeposits.length])
   useEffect(() => {
     handleGetDeposits()
-  }, [tokenOwnerRecordWalletPk, client])
+  }, [isOwnerOfDeposits, client])
+  useEffect(() => {
+    const getTokenOwnerRecord = async () => {
+      const defaultMint = !mint?.supply.isZero()
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
+      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+        realm!.owner,
+        realm!.pubkey,
+        defaultMint!,
+        wallet!.publicKey!
+      )
+      setIsOwnerOfDeposits(
+        tokenOwnerRecordAddress.toBase58() === tokenOwnerRecordPk
+      )
+    }
+    if (realm && wallet?.connected) {
+      getTokenOwnerRecord()
+    }
+  }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
   return (
     <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg relative">
       {isLoading && (
@@ -152,12 +175,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         <PreviousRouteBtn />
         <span className="ml-4">
           Account{' '}
-          {tokenOwnerRecordWalletPk !== wallet?.publicKey?.toBase58() &&
-            connected && (
-              <small className="text-sm text-red">
-                (You are viewing other voter account)
-              </small>
-            )}
+          {!isOwnerOfDeposits && connected && (
+            <small className="text-sm text-red">
+              (You are viewing other voter account)
+            </small>
+          )}
         </span>
         <div className="ml-auto flex flex-row">
           <DepositCommunityTokensBtn className="mr-3"></DepositCommunityTokensBtn>
@@ -219,9 +241,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           <h1 className="mb-8">Locked Tokens</h1>
           <div
             className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
-              tokenOwnerRecordWalletPk !== wallet?.publicKey?.toBase58()
-                ? 'opacity-0.8 pointer-events-none'
-                : ''
+              !isOwnerOfDeposits ? 'opacity-0.8 pointer-events-none' : ''
             }`}
           >
             {deposits

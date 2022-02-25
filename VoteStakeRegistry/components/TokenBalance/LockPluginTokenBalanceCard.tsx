@@ -2,7 +2,7 @@ import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import { Proposal } from '@solana/spl-governance'
+import { getTokenOwnerRecordAddress, Proposal } from '@solana/spl-governance'
 import useWalletStore from '../../../stores/useWalletStore'
 import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
@@ -16,6 +16,7 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import VotingPowerBox from './VotingPowerBox'
 import Tooltip from '@components/Tooltip'
 import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
@@ -24,7 +25,8 @@ const LockPluginTokenBalanceCard = ({
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { councilMint, mint, realm, symbol, tokenRecords } = useRealm()
+  const { councilMint, mint, realm, symbol } = useRealm()
+  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
   const isDepositVisible = (
@@ -36,10 +38,6 @@ const LockPluginTokenBalanceCard = ({
       (proposal.isSome() &&
         proposal.value.governingTokenMint.toBase58() === realmMint?.toBase58()))
 
-  const tokenOwnerRecordPk = wallet?.publicKey
-    ? tokenRecords[wallet!.publicKey!.toBase58()]?.pubkey?.toBase58()
-    : null
-
   const communityDepositVisible =
     // If there is no council then community deposit is the only option to show
     !realm?.account.config.councilMint ||
@@ -50,19 +48,31 @@ const LockPluginTokenBalanceCard = ({
     realm?.account.config.councilMint
   )
 
+  useEffect(() => {
+    const getTokenOwnerRecord = async () => {
+      const defaultMint = !mint?.supply.isZero()
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
+      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+        realm!.owner,
+        realm!.pubkey,
+        defaultMint!,
+        wallet!.publicKey!
+      )
+      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
+    }
+    if (realm && wallet?.connected) {
+      getTokenOwnerRecord()
+    }
+  }, [realm?.pubkey.toBase58(), wallet?.connected])
+
   const hasLoaded = mint || councilMint
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3>
-        <Tooltip
-          content={
-            !connected
-              ? 'Please connect your wallet'
-              : !tokenOwnerRecordPk
-              ? 'Please deposit your tokens at least once to see account view'
-              : ''
-          }
-        >
+        <Tooltip content={!connected ? 'Please connect your wallet' : ''}>
           <div
             className={
               !connected || !tokenOwnerRecordPk
