@@ -178,7 +178,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
       />
 
       <Input
-        label="Destination Account (Optional - default to governance ATA"
+        label="Destination Account (Optional - default to governance ATA)"
         value={form.destinationLiquidity}
         type="string"
         onChange={(evt) =>
