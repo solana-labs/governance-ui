@@ -47,6 +47,7 @@ const ConnectWalletButton = (props) => {
     } else {
       router.push(`${window.location.href}?cluster=devnet`)
     }
+    // window.location.reload()
   }
 
   const handleConnectDisconnect = async () => {
@@ -163,7 +164,22 @@ const ConnectWalletButton = (props) => {
                       </button>
                     </Menu.Item>
                   ))}
-
+                  <Menu.Item
+                    key={'devnet'}
+                    onClick={() => {
+                      handleToggleDevnet()
+                    }}
+                  >
+                    <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
+                      <span className="text-sm">Devnet</span>
+                      <Switch
+                        checked={useDevnet}
+                        onChange={() => {
+                          handleToggleDevnet()
+                        }}
+                      />
+                    </button>
+                  </Menu.Item>
                   {current && current.publicKey && (
                     <>
                       <hr
@@ -194,22 +210,6 @@ const ConnectWalletButton = (props) => {
                         <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
                           <BackspaceIcon className="h-4 w-4 mr-2" />
                           <span className="text-sm">Disconnect</span>
-                        </button>
-                      </Menu.Item>
-                      <Menu.Item
-                        key={'devnet'}
-                        onClick={() => {
-                          handleToggleDevnet()
-                        }}
-                      >
-                        <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
-                          <span className="text-sm">Devnet</span>
-                          <Switch
-                            checked={useDevnet}
-                            onChange={() => {
-                              handleToggleDevnet()
-                            }}
-                          />
                         </button>
                       </Menu.Item>
                     </>
