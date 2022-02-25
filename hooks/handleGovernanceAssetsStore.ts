@@ -27,7 +27,7 @@ export default function handleGovernanceAssetsStore() {
     setGovernedTokenAccounts,
   } = useGovernanceAssetsStore()
   useEffect(() => {
-    setGovernancesArray(governances)
+    setGovernancesArray(connection, governances)
   }, [JSON.stringify(governances)])
   useEffect(() => {
     async function prepareTokenGovernances() {

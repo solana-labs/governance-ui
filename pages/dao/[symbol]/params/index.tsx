@@ -1,11 +1,16 @@
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
+import tokenService from '@utils/services/token'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import {
+  getFormattedStringFromDays,
+  SECS_PER_DAY,
+} from 'VoteStakeRegistry/tools/dateTools'
 
 const Params = () => {
-  const { realm, mint } = useRealm()
-  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+  const { realm, mint, councilMint } = useRealm()
+  const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilmint = realmAccount?.config.councilMint
@@ -42,10 +47,11 @@ const Params = () => {
             )}
             <div>
               Min community tokens to create governance:{' '}
-              {fmtMintAmount(
-                mint,
-                realmConfig!.minCommunityTokensToCreateGovernance
-              )}
+              {realmConfig &&
+                fmtMintAmount(
+                  mint,
+                  realmConfig!.minCommunityTokensToCreateGovernance
+                )}
             </div>
             <div>
               Use community voter weight addin:
@@ -59,18 +65,85 @@ const Params = () => {
         </div>
         <div className="pb-5 pl-10 pr-5">
           <h2>Governances</h2>
-          {governancesArray.map((x) => (
-            <div
-              className="mb-3 border border-white border-solid p-5"
-              key={x.pubkey.toBase58()}
-            >
-              <div>{x.pubkey.toBase58()}</div>
-              <div>owner: {x.owner.toBase58()}</div>
-              {realmAccount?.authority?.toBase58() === x.pubkey.toBase58() && (
-                <div>Realm authority</div>
-              )}
-            </div>
-          ))}
+          {governedAccounts.map((x) => {
+            const pubKey = x.pubkey
+            const governanceAccount = x.account
+            const governanceConfig = x.account.config
+            const accounts = x.accounts
+            return (
+              <div
+                className="mb-3 border border-white border-solid p-5"
+                key={pubKey.toBase58()}
+              >
+                <div>{pubKey.toBase58()}</div>
+                <div>owner: {x.owner.toBase58()}</div>
+                {realmAccount?.authority?.toBase58() === pubKey.toBase58() && (
+                  <div>Realm authority</div>
+                )}
+                <div>proposals count: {governanceAccount.proposalCount}</div>
+                <div>
+                  voting proposals count:{' '}
+                  {governanceAccount.votingProposalCount}
+                </div>
+                <div className="p-3">
+                  <h3>Config</h3>
+                  <div>
+                    Max voting time:{' '}
+                    {getFormattedStringFromDays(
+                      governanceConfig.maxVotingTime / SECS_PER_DAY
+                    )}
+                  </div>
+                  {communityMint && (
+                    <div>
+                      Min community tokens to create proposal:{' '}
+                      {fmtMintAmount(
+                        mint,
+                        governanceConfig.minCommunityTokensToCreateProposal
+                      )}
+                    </div>
+                  )}
+                  {councilmint && (
+                    <div>
+                      Min council tokens to create proposal:{' '}
+                      {fmtMintAmount(
+                        councilMint,
+                        governanceConfig.minCouncilTokensToCreateProposal
+                      )}
+                    </div>
+                  )}
+                  <div>
+                    Min instruction holdup time:{' '}
+                    {governanceConfig.minInstructionHoldUpTime}
+                  </div>
+                  <div>
+                    Proposal cool off time:{' '}
+                    {governanceConfig.proposalCoolOffTime}
+                  </div>
+                  <div>
+                    Vote threshold percentage:{' '}
+                    {governanceConfig.voteThresholdPercentage.value}
+                  </div>
+                  <div>Vote tipping: {governanceConfig.voteTipping}</div>
+                </div>
+                <div className="p-3">
+                  <h3>Accounts</h3>
+                  {accounts.map((x) => (
+                    <div key={x.pubkey.toBase58()}>
+                      <div>Pubkey: {x.pubkey.toBase58()}</div>
+                      <div>Amount: {x.account.amount.toNumber()}</div>
+                      <div>
+                        Name:{' '}
+                        {
+                          tokenService.getTokenInfo(x.account.mint.toBase58())
+                            ?.name
+                        }
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )
+          })}
         </div>
       </div>
     </div>
