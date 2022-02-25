@@ -83,7 +83,7 @@ const Proposal = () => {
 
             <div className="py-4">
               <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2 break-all">{proposal?.account.name}</h1>
+                <h1 className="mr-2">{proposal?.account.name}</h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.account}
@@ -126,7 +126,7 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
               )}
               {proposal?.account.state === ProposalState.Voting ? (
-                <div className="pb-4">
+                <div className="pb-3">
                   <ApprovalQuorum
                     yesVotesRequired={yesVotesRequired}
                     progress={yesVoteProgress}
@@ -134,8 +134,12 @@ const Proposal = () => {
                   />
                 </div>
               ) : (
-                <div className="pb-4">
-                  <VoteResultStatus votePassed={votePassed} />
+                <div className="pb-3">
+                  <VoteResultStatus
+                    progress={yesVoteProgress}
+                    votePassed={votePassed}
+                    yesVotesRequired={yesVotesRequired}
+                  />
                 </div>
               )}
               <VoteResults proposal={proposal.account} />
