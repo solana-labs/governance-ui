@@ -4,17 +4,17 @@ import {
   InformationCircleIcon,
 } from '@heroicons/react/outline'
 
-type ApprovalProgressProps = {
+type ApprovalQuorumProps = {
   progress: number
   showBg?: boolean
   yesVotesRequired: number
 }
 
-const ApprovalProgress = ({
+const ApprovalQuorum = ({
   progress,
   showBg,
   yesVotesRequired,
-}: ApprovalProgressProps) => {
+}: ApprovalQuorumProps) => {
   return (
     <div className={`${showBg ? 'bg-bkg-1 p-3' : ''} rounded-md`}>
       <div className="flex items-center">
@@ -43,7 +43,6 @@ const ApprovalProgress = ({
           )}
         </div>
       </div>
-      {/* {progress < 100 ? ( */}
       <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">
         <div
           style={{
@@ -54,9 +53,8 @@ const ApprovalProgress = ({
           } flex rounded`}
         ></div>
       </div>
-      {/* ) : null} */}
     </div>
   )
 }
 
-export default ApprovalProgress
+export default ApprovalQuorum
