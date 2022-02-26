@@ -32,7 +32,7 @@ const ApprovalProgress = ({
               {
                 maximumFractionDigits: 0,
               }
-            )} Yes vote${yesVotesRequired > 1 ? 's' : ''} required`}</p>
+            )} more Yes vote${yesVotesRequired > 1 ? 's' : ''} required`}</p>
           ) : (
             <div className="flex items-center">
               <CheckCircleIcon className="flex-shrink-0 h-5 mr-1.5 text-green w-5" />
