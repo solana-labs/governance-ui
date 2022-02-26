@@ -384,5 +384,14 @@
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
     "realmId": "9osGkueZJvHdZ8RbcGjgW7usUyBSCKQZSuFrujReXZpx",
     "ogImage": "/realms/DAKU/img/daku_logo.png"
+  },
+  {
+    "symbol": "MMCC",
+    "displayName": "MMCC ClubDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6UkNFSiwje4Rs4EB31V4bj8YQYx9viGTxD3WyrM3j5R2",
+    "website": "https://linktr.ee/MeerkatMillionaires",
+    "twitter": "@mmccsolana",
+    "ogImage": "/realms/MMCC/img/MMCC_Logo.png"
   }
 ]
