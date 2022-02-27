@@ -1,26 +1,17 @@
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React from 'react'
-import Loading from '@components/Loading'
-import useWalletStore from 'stores/useWalletStore'
-import Button from '@components/Button'
-import { notify } from '@utils/notifications'
+import React, { useMemo } from 'react'
 
 export default function RealmsDashboard({
   realms,
   isLoading,
-  showNewButton,
-  header = 'Organisations',
 }: {
   realms: readonly RealmInfo[]
   isLoading: boolean
-  showNewButton?: boolean
-  header?: string
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { connected, current: wallet } = useWalletStore((s) => s)
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
@@ -31,54 +22,64 @@ export default function RealmsDashboard({
     router.push(url)
   }
 
-  const handleCreateRealmButtonClick = async () => {
-    if (!connected) {
-      try {
-        if (wallet) await wallet.connect()
-      } catch (error) {
-        const err = error as Error
-        return notify({
-          type: 'error',
-          message: err.message,
-        })
-      }
-    }
-    router.push(fmtUrlWithCluster(`/realms/new`))
-  }
+  const certifiedRealms = useMemo(() => realms.filter((r) => r.isCertified), [
+    realms,
+  ])
 
-  return (
-    <div>
-      {/* Re-instate when there are enough REALMs for this to be useful. Maybe > 25 */}
-      {/* <div className="mb-10 flex">
-            <Input
-              value={search}
-              type="text"
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder={`Search here...`}
-            />
-            <div className="flex flex-row ml-10">
-              <Button className="mr-3" onClick={() => setViewType(COL)}>
-                List
-              </Button>
-              <Button onClick={() => setViewType(ROW)}>Columns</Button>
+  const unchartedRealms = useMemo(() => realms.filter((r) => !r.isCertified), [
+    realms,
+  ])
+
+  return isLoading ? (
+    <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+      <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-lg" />
+    </div>
+  ) : (
+    <>
+      <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {certifiedRealms?.length > 0 ? (
+          certifiedRealms.map((realm: RealmInfo) => (
+            <div
+              onClick={() => goToRealm(realm)}
+              className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
+              key={realm.realmId.toString()}
+            >
+              <div className="pb-5">
+                {realm.ogImage ? (
+                  <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
+                    <img className="w-10" src={realm.ogImage}></img>
+                  </div>
+                ) : (
+                  <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                    {realm.displayName?.charAt(0)}
+                  </div>
+                )}
+              </div>
+              <h3 className="text-center ">
+                {realm.displayName ?? realm.symbol}
+              </h3>
             </div>
-          </div> */}
-      <div className="flex w-full justify-between mb-6">
-        <h1>{header}</h1>
-        {showNewButton && (
-          <Button className="px-10 " onClick={handleCreateRealmButtonClick}>
-            Create DAO
-          </Button>
+          ))
+        ) : (
+          <div className="bg-bkg-2 col-span-5 p-8 rounded-lg text-center">
+            <p>No results</p>
+          </div>
         )}
       </div>
-      <div
-        className={`grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4`}
-      >
-        {isLoading ? (
-          <Loading></Loading>
-        ) : (
-          <>
-            {realms?.map((realm: RealmInfo) => (
+      <div className="pt-12">
+        <h2 className="mb-4">Unchartered DAOs</h2>
+        <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+          {unchartedRealms?.length > 0 ? (
+            unchartedRealms.map((realm: RealmInfo) => (
               <div
                 onClick={() => goToRealm(realm)}
                 className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 rounded-lg hover:bg-bkg-3"
@@ -95,14 +96,18 @@ export default function RealmsDashboard({
                     </div>
                   )}
                 </div>
-                <h3 className="text-center break-all">
+                <h3 className="text-center ">
                   {realm.displayName ?? realm.symbol}
                 </h3>
               </div>
-            ))}
-          </>
-        )}
+            ))
+          ) : (
+            <div className="bg-bkg-2 col-span-5 p-8 rounded-lg text-center">
+              <p>No results</p>
+            </div>
+          )}
+        </div>
       </div>
-    </div>
+    </>
   )
 }
