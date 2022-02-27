@@ -1,5 +1,13 @@
 [
   {
+    "symbol": "Ukraine",
+    "displayName": "Ukraine.SOL",
+    "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
+    "realmId": "5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d",
+    "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
+    "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png"
+  },
+  {
     "symbol": "MNGO",
     "displayName": "Mango DAO",
     "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",

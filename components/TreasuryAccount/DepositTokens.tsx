@@ -23,7 +23,9 @@ const DepositTokens = () => {
         </>
       </h3>
       <AccountLabel></AccountLabel>
-      <DepositLabel currentAccount={currentAccount}></DepositLabel>
+      <DepositLabel
+        transferAddress={currentAccount?.transferAddress}
+      ></DepositLabel>
     </>
   )
 }
