@@ -21,6 +21,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
+import DepositLabel from '@components/TreasuryAccount/DepositLabel'
 
 const compareProposals = (
   p1: Proposal,
@@ -144,10 +145,60 @@ const REALM = () => {
           <RealmHeader />
           <div>
             {realmInfo?.bannerImage ? (
-              <img
-                className="col-span-12 mb-10"
-                src={realmInfo?.bannerImage}
-              ></img>
+              <>
+                <img className="mb-10 h-80" src={realmInfo?.bannerImage}></img>
+                {/* temp. setup for Ukraine.SOL */}
+                {realmInfo.realmId.equals(
+                  new PublicKey('5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d')
+                ) ? (
+                  <div>
+                    <div className="mb-5">
+                      <DepositLabel
+                        abbreviatedAddress={false}
+                        header="SOL Deposits"
+                        transferAddress={
+                          new PublicKey(
+                            '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+                          )
+                        }
+                      ></DepositLabel>
+                    </div>
+                    <div className="mb-5">
+                      <DepositLabel
+                        abbreviatedAddress={false}
+                        header="USDC Deposits"
+                        transferAddress={
+                          new PublicKey(
+                            'ETamthJeZJZ8A3LkWLx7hxRmDNaaAYMC8jC3cmFnoBKm'
+                          )
+                        }
+                      ></DepositLabel>
+                    </div>
+                    <div className="mb-5">
+                      <DepositLabel
+                        abbreviatedAddress={false}
+                        header="NFT Deposits"
+                        transferAddress={
+                          new PublicKey(
+                            'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
+                          )
+                        }
+                      ></DepositLabel>
+                    </div>
+                    <div className="mb-20">
+                      <DepositLabel
+                        abbreviatedAddress={false}
+                        header="SPL Tokens Deposits"
+                        transferAddress={
+                          new PublicKey(
+                            '4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9'
+                          )
+                        }
+                      ></DepositLabel>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : null}
           </div>
           <div className="flex items-center justify-between pb-3">
