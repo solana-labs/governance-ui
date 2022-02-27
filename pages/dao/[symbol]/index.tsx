@@ -174,6 +174,17 @@ const REALM = () => {
                         }
                       ></DepositLabel>
                     </div>
+                    <div className="mb-5">
+                      <DepositLabel
+                        abbreviatedAddress={false}
+                        header="NFT Deposits"
+                        transferAddress={
+                          new PublicKey(
+                            'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
+                          )
+                        }
+                      ></DepositLabel>
+                    </div>
                     <div className="mb-20">
                       <DepositLabel
                         abbreviatedAddress={false}
