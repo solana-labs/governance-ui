@@ -5,6 +5,7 @@ import { HIDDEN_GOVERNANCES } from '@components/instructions/tools'
 import { GovernedTokenAccount, parseTokenAccountData } from '@utils/tokens'
 import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountInfo } from '@solana/spl-token'
+import { TokenAccountLayout } from '@blockworks-foundation/mango-client'
 
 interface GovernedAccount extends ProgramAccount<Governance> {
   accounts: {
@@ -52,6 +53,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     _get().setGovernedAccounts(connection, array)
   },
   setGovernedAccounts: async (connection, governancesArray) => {
+    const tokenAccountOwnerOffset = 32
     const governedAccounts: GovernedAccount[] = governancesArray.map((x) => {
       return {
         ...x,
@@ -61,7 +63,13 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     const tokenAccounts = (
       await Promise.all(
         governancesArray.map((x) =>
-          getParsedAccountsByOwner(connection, TOKEN_PROGRAM_ID, x.pubkey)
+          getProgramAccountsByOwner(
+            connection,
+            TOKEN_PROGRAM_ID,
+            x.pubkey,
+            TokenAccountLayout.span,
+            tokenAccountOwnerOffset
+          )
         )
       )
     )
@@ -93,24 +101,25 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     })
   },
 }))
-
 export default useGovernanceAssetsStore
 
-const getParsedAccountsByOwner = (
+const getProgramAccountsByOwner = (
   connection: Connection,
   programId: PublicKey,
-  owner: PublicKey
+  owner: PublicKey,
+  dataSize: number,
+  offset: number
 ) => {
   return connection.getProgramAccounts(
     programId, // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
     {
       filters: [
         {
-          dataSize: 165, // number of bytes
+          dataSize: dataSize, // number of bytes
         },
         {
           memcmp: {
-            offset: 32, // number of bytes
+            offset: offset, // number of bytes
             bytes: owner.toBase58(), // base58 encoded string
           },
         },

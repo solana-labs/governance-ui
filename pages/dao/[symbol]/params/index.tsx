@@ -13,7 +13,7 @@ const Params = () => {
   const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
-  const councilmint = realmAccount?.config.councilMint
+  const councilmint = realmAccount?.config.councilMint?.toBase58()
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
@@ -133,10 +133,8 @@ const Params = () => {
                       <div>Amount: {x.account.amount.toNumber()}</div>
                       <div>
                         Name:{' '}
-                        {
-                          tokenService.getTokenInfo(x.account.mint.toBase58())
-                            ?.name
-                        }
+                        {tokenService.getTokenInfo(x.account.mint.toBase58())
+                          ?.name || x.account.mint.toBase58()}
                       </div>
                     </div>
                   ))}
