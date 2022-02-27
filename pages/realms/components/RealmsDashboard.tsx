@@ -22,11 +22,11 @@ export default function RealmsDashboard({
     router.push(url)
   }
 
-  const certifiedRealms = useMemo(() => realms.filter((r) => r.isCertified), [
+  const certifiedRealms = useMemo(() => realms?.filter((r) => r.isCertified), [
     realms,
   ])
 
-  const unchartedRealms = useMemo(() => realms.filter((r) => !r.isCertified), [
+  const unchartedRealms = useMemo(() => realms?.filter((r) => !r.isCertified), [
     realms,
   ])
 
