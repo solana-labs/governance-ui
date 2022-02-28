@@ -62,8 +62,10 @@ const Realms = () => {
   const filterDaos = (v) => {
     setSearchString(v)
     if (v.length > 0) {
-      const filtered = realms.filter((r) =>
-        r.displayName?.toLowerCase().includes(v.toLowerCase())
+      const filtered = realms.filter(
+        (r) =>
+          r.displayName?.toLowerCase().includes(v.toLowerCase()) ||
+          r.symbol?.toLowerCase().includes(v.toLowerCase())
       )
       setFilteredRealms(filtered)
     } else {
