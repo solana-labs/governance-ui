@@ -14,7 +14,7 @@ const Params = () => {
   const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
-  const councilmint = realmAccount?.config.councilMint?.toBase58()
+  const councilMintPk = realmAccount?.config.councilMint?.toBase58()
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
@@ -53,8 +53,11 @@ const Params = () => {
               val={communityMint}
             ></DisplayField>
           )}
-          {councilmint && (
-            <DisplayField label="Council mint" val={councilmint}></DisplayField>
+          {councilMintPk && (
+            <DisplayField
+              label="Council mint"
+              val={councilMintPk}
+            ></DisplayField>
           )}
           <div className="py-5">
             <h3>Config</h3>
@@ -138,10 +141,13 @@ const Params = () => {
                         )}
                       ></DisplayField>
                     )}
-                    {councilmint && (
+                    {councilMint && (
                       <DisplayField
                         label="Min council tokens to create proposal"
-                        val={governanceConfig.minCouncilTokensToCreateProposal}
+                        val={fmtMintAmount(
+                          councilMint,
+                          governanceConfig.minCouncilTokensToCreateProposal
+                        )}
                       ></DisplayField>
                     )}
                     <DisplayField
