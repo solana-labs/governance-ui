@@ -32,12 +32,14 @@ const ApprovalProgress = ({
               {
                 maximumFractionDigits: 0,
               }
-            )} Yes vote${yesVotesRequired > 1 ? 's' : ''} required`}</p>
+            )} ${progress > 0 ? 'more' : ''} Yes vote${
+              yesVotesRequired > 1 ? 's' : ''
+            } required`}</p>
           ) : (
             <div className="flex items-center">
               <CheckCircleIcon className="flex-shrink-0 h-5 mr-1.5 text-green w-5" />
               <p className="font-bold mb-0 text-fgd-1">
-                Minimum approval achieved
+                Required approval achieved
               </p>
             </div>
           )}

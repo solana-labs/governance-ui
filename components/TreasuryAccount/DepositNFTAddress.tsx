@@ -148,7 +148,9 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         currentAccount={currentAccount}
         nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
       ></NFTAccountSelect>
-      <DepositLabel currentAccount={currentAccount}></DepositLabel>
+      <DepositLabel
+        transferAddress={currentAccount?.transferAddress}
+      ></DepositLabel>
       <div className="space-y-4 w-full pb-4">
         <div className="text-sm mt-4">
           <div className="flex flex-row text-xs items-center border-t border-fgd-4 default-transition py-4">

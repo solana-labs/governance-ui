@@ -21,6 +21,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
+import DepositLabel from '@components/TreasuryAccount/DepositLabel'
 
 const compareProposals = (
   p1: Proposal,
@@ -144,10 +145,27 @@ const REALM = () => {
           <RealmHeader />
           <div>
             {realmInfo?.bannerImage ? (
-              <img
-                className="col-span-12 mb-10"
-                src={realmInfo?.bannerImage}
-              ></img>
+              <>
+                <img className="mb-10 h-80" src={realmInfo?.bannerImage}></img>
+                {/* temp. setup for Ukraine.SOL */}
+                {realmInfo.realmId.equals(
+                  new PublicKey('5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d')
+                ) ? (
+                  <div>
+                    <div className="mb-10">
+                      <DepositLabel
+                        abbreviatedAddress={false}
+                        header="Wallet Address"
+                        transferAddress={
+                          new PublicKey(
+                            '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+                          )
+                        }
+                      ></DepositLabel>
+                    </div>
+                  </div>
+                ) : null}
+              </>
             ) : null}
           </div>
           <div className="flex items-center justify-between pb-3">
