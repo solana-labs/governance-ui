@@ -1,5 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { Wallet } from '@project-serum/sol-wallet-adapter'
+import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { BN, Provider } from '@project-serum/anchor'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
