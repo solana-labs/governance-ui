@@ -229,7 +229,7 @@ const SendTokens = () => {
         proposalAddress = await createProposal(
           rpcContext,
           realm,
-          currentAccount!.token!.account.owner,
+          selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title ? form.title : proposalTitle,
           form.description ? form.description : '',
