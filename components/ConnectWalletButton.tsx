@@ -19,6 +19,7 @@ import { abbreviateAddress } from '@utils/formatting'
 import { useRouter } from 'next/router'
 import TwitterIcon from './TwitterIcon'
 import Switch from './Switch'
+import useLocalStorageState from '../hooks/useLocalStorageState'
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
@@ -38,16 +39,19 @@ const ConnectWalletButton = (props) => {
     providerUrl,
   ])
 
-  const [useDevnet, setUseDevnet] = useState(false)
-  const router = useRouter()
+  const [useDevnet, setUseDevnet] = useLocalStorageState('false')
   const handleToggleDevnet = () => {
     setUseDevnet(!useDevnet)
     if (useDevnet) {
-      router.push(`${window.location.pathname}`)
+      window.history.pushState({}, 'Test', `${window.location.pathname}`)
     } else {
-      router.push(`${window.location.href}?cluster=devnet`)
+      window.history.pushState(
+        {},
+        'Devnet',
+        `${window.location.href}?cluster=devnet`
+      )
     }
-    // window.location.reload()
+    window.location.reload()
   }
 
   const handleConnectDisconnect = async () => {
@@ -164,12 +168,7 @@ const ConnectWalletButton = (props) => {
                       </button>
                     </Menu.Item>
                   ))}
-                  <Menu.Item
-                    key={'devnet'}
-                    onClick={() => {
-                      handleToggleDevnet()
-                    }}
-                  >
+                  <Menu.Item key={'devnet'}>
                     <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
                       <span className="text-sm">Devnet</span>
                       <Switch
