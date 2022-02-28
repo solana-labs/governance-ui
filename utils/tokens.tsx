@@ -156,6 +156,11 @@ export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
 
+//Just for ukraine dao, it will be replaced with good abstraction
+export const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
+export const ukrainDaoTokenAccountsOwnerAddress =
+  '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+
 export function parseTokenAccountData(
   account: PublicKey,
   data: Buffer

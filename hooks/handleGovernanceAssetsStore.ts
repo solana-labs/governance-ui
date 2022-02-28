@@ -8,7 +8,14 @@ import {
 } from '@solana/spl-governance'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
-import { AccountInfoGen, GovernedTokenAccount } from '@utils/tokens'
+import {
+  AccountInfoGen,
+  GovernedTokenAccount,
+  parseTokenAccountData,
+  tryGetMint,
+  ukrainDaoTokenAccountsOwnerAddress,
+  ukraineDAOGovPk,
+} from '@utils/tokens'
 import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -32,10 +39,6 @@ export default function handleGovernanceAssetsStore() {
   }, [JSON.stringify(governances)])
   useEffect(() => {
     async function prepareTokenGovernances() {
-      //Just for ukraine dao, it will be replaced with good abstraction
-      const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
-      const ukrainDaoTokenAccountsOwnerAddress =
-        '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
@@ -89,17 +92,39 @@ export default function handleGovernanceAssetsStore() {
         governedTokenAccountsArray.push(obj)
       }
       //Just for ukraine dao, it will be replaced with good abstraction
-      if (
-        tokenGovernances.find((x) => x.pubkey.toBase58() === ukraineDAOGovPk)
-      ) {
-        const resp = await getProgramAccountsByOwner(
-          connection,
-          TOKEN_PROGRAM_ID,
-          new PublicKey(ukrainDaoTokenAccountsOwnerAddress),
-          165,
-          32
+      const ukraineGov = tokenGovernances.find(
+        (x) => x.pubkey.toBase58() === ukraineDAOGovPk
+      )
+      if (ukraineGov) {
+        const resp = (
+          await getProgramAccountsByOwner(
+            connection,
+            TOKEN_PROGRAM_ID,
+            new PublicKey(ukrainDaoTokenAccountsOwnerAddress),
+            165,
+            32
+          )
         )
-        console.log(resp)
+          .flatMap((x) => x)
+          .map((x) => {
+            const publicKey = x.pubkey
+            const data = Buffer.from(x.account.data)
+            const account = parseTokenAccountData(publicKey, data)
+            return { publicKey, account }
+          })
+        for (const tokenAcc of resp) {
+          const mint = await tryGetMint(connection, tokenAcc.account.mint)
+          const obj = {
+            governance: ukraineGov,
+            token: tokenAcc,
+            mint,
+            isNft: false,
+            isSol: false,
+            transferAddress: tokenAcc.account.address,
+            solAccount: null,
+          }
+          governedTokenAccountsArray.push(obj)
+        }
       }
       setGovernedTokenAccounts(governedTokenAccountsArray)
     }

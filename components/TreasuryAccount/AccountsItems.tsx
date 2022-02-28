@@ -22,7 +22,7 @@ const AccountsItems = () => {
         return (
           <AccountItem
             governedAccountTokenAccount={accountWithGovernance}
-            key={accountWithGovernance?.governance?.pubkey.toBase58()}
+            key={accountWithGovernance?.token?.publicKey.toBase58()}
           />
         )
       })}
