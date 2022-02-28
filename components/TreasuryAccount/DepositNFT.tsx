@@ -34,12 +34,19 @@ const DepositNFT = ({ onClose }) => {
             onClick={() => setCurrentDepositView(null)}
           />
         )}
-        Deposit NFT to{' '}
+        Deposit NFT to
         {currentAccount
           ? abbreviateAddress(currentAccount!.transferAddress!)
           : ''}
         <a
-          href={currentAccount?.transferAddress?.toBase58()}
+          href={
+            currentAccount?.transferAddress
+              ? getExplorerUrl(
+                  connection.endpoint,
+                  currentAccount!.transferAddress!.toBase58()
+                )
+              : ''
+          }
           target="_blank"
           rel="noopener noreferrer"
           onClick={(e) => e.stopPropagation()}
