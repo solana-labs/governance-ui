@@ -31,8 +31,9 @@ export default function handleGovernanceAssetsStore() {
   }, [JSON.stringify(governances)])
   useEffect(() => {
     async function prepareTokenGovernances() {
+      //Just for ukraine dao, it will be replaced with good abstraction
+      const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
-
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
           (x) =>
@@ -62,6 +63,7 @@ export default function handleGovernanceAssetsStore() {
           const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
             0
           )
+
           if (resp.value) {
             solAccount = resp.value as AccountInfoGen<
               Buffer | ParsedAccountData
@@ -82,6 +84,12 @@ export default function handleGovernanceAssetsStore() {
           solAccount,
         }
         governedTokenAccountsArray.push(obj)
+      }
+      //Just for ukraine dao, it will be replaced with good abstraction
+      if (
+        tokenGovernances.find((x) => x.pubkey.toBase58() === ukraineDAOGovPk)
+      ) {
+        console.log('123')
       }
       setGovernedTokenAccounts(governedTokenAccountsArray)
     }
