@@ -1,8 +1,12 @@
 import create, { State } from 'zustand'
 import { ViewState } from '@components/TreasuryAccount/Types'
-import { getNfts, GovernedTokenAccount } from '@utils/tokens'
+import {
+  getNfts,
+  GovernedTokenAccount,
+  ukrainDaoTokenAccountsOwnerAddress,
+} from '@utils/tokens'
 import tokenService from '@utils/services/token'
-import { ConfirmedSignatureInfo } from '@solana/web3.js'
+import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
@@ -47,6 +51,8 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   governanceNfts: {},
   isLoadingNfts: false,
   getNfts: async (nftsGovernedTokenAccounts, connection) => {
+    //Just for ukraine dao, it will be replaced with good abstraction
+    const ukraineNftsGov = 'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
     set((s) => {
       s.isLoadingNfts = true
     })
@@ -58,6 +64,16 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
         const nfts = acc.governance?.pubkey
           ? await getNfts(connection, acc.governance.pubkey)
           : []
+        //Just for ukraine dao, it will be replaced with good abstraction
+        if (acc.governance?.pubkey.toBase58() === ukraineNftsGov) {
+          const ukrainNfts = acc.governance?.pubkey
+            ? await getNfts(
+                connection,
+                new PublicKey(ukrainDaoTokenAccountsOwnerAddress)
+              )
+            : []
+          realmNfts = [...realmNfts, ...ukrainNfts]
+        }
         realmNfts = [...realmNfts, ...nfts]
         if (governance) {
           governanceNfts[governance] = [...nfts]
