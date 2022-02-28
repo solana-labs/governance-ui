@@ -159,7 +159,9 @@ const SendTokens = () => {
       programId,
       connection,
       wallet,
+      tokenAccountOwner: currentAccount?.governance?.pubkey,
       currentAccount,
+
       setFormErrors,
     }
     if (isNFT) {

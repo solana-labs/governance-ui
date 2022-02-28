@@ -99,7 +99,7 @@ export async function getTransferInstruction({
       TOKEN_PROGRAM_ID,
       sourceAccount,
       receiverAddress,
-      governedTokenAccount.governance!.pubkey,
+      currentAccount!.token!.account.owner,
       [],
       new u64(mintAmount.toString())
     )

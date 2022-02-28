@@ -13,7 +13,7 @@ import {
   GovernedTokenAccount,
   parseTokenAccountData,
   tryGetMint,
-  ukrainDaoTokenAccountsOwnerAddress,
+  ukraineDaoTokenAccountsOwnerAddress,
   ukraineDAOGovPk,
 } from '@utils/tokens'
 import { useEffect } from 'react'
@@ -100,7 +100,7 @@ export default function handleGovernanceAssetsStore() {
           await getProgramAccountsByOwner(
             connection,
             TOKEN_PROGRAM_ID,
-            new PublicKey(ukrainDaoTokenAccountsOwnerAddress),
+            new PublicKey(ukraineDaoTokenAccountsOwnerAddress),
             165,
             32
           )
