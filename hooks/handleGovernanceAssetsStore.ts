@@ -6,7 +6,8 @@ import {
   getNativeTreasuryAddress,
   GovernanceAccountType,
 } from '@solana/spl-governance'
-import { ParsedAccountData } from '@solana/web3.js'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfoGen, GovernedTokenAccount } from '@utils/tokens'
 import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
@@ -33,6 +34,8 @@ export default function handleGovernanceAssetsStore() {
     async function prepareTokenGovernances() {
       //Just for ukraine dao, it will be replaced with good abstraction
       const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
+      const ukrainDaoTokenAccountsOwnerAddress =
+        '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
@@ -89,7 +92,14 @@ export default function handleGovernanceAssetsStore() {
       if (
         tokenGovernances.find((x) => x.pubkey.toBase58() === ukraineDAOGovPk)
       ) {
-        console.log('123')
+        const resp = await getProgramAccountsByOwner(
+          connection,
+          TOKEN_PROGRAM_ID,
+          new PublicKey(ukrainDaoTokenAccountsOwnerAddress),
+          165,
+          32
+        )
+        console.log(resp)
       }
       setGovernedTokenAccounts(governedTokenAccountsArray)
     }
@@ -100,4 +110,29 @@ export default function handleGovernanceAssetsStore() {
     JSON.stringify(tokenGovernances),
     JSON.stringify(governances),
   ])
+}
+
+const getProgramAccountsByOwner = (
+  connection: Connection,
+  programId: PublicKey,
+  owner: PublicKey,
+  dataSize: number,
+  offset: number
+) => {
+  return connection.getProgramAccounts(
+    programId, // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+    {
+      filters: [
+        {
+          dataSize: dataSize, // number of bytes
+        },
+        {
+          memcmp: {
+            offset: offset, // number of bytes
+            bytes: owner.toBase58(), // base58 encoded string
+          },
+        },
+      ],
+    }
+  )
 }
