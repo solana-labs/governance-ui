@@ -1,5 +1,5 @@
 import { Menu } from '@headlessui/react'
-import { useMemo, useState } from 'react'
+import { useMemo } from 'react'
 import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
@@ -16,7 +16,6 @@ import {
 import { BackspaceIcon } from '@heroicons/react/solid'
 import { UserCircleIcon } from '@heroicons/react/outline'
 import { abbreviateAddress } from '@utils/formatting'
-import { useRouter } from 'next/router'
 import TwitterIcon from './TwitterIcon'
 import Switch from './Switch'
 import useLocalStorageState from '../hooks/useLocalStorageState'
@@ -43,7 +42,7 @@ const ConnectWalletButton = (props) => {
   const handleToggleDevnet = () => {
     setUseDevnet(!useDevnet)
     if (useDevnet) {
-      window.history.pushState({}, 'Test', `${window.location.pathname}`)
+      window.history.pushState({}, 'Mainnet', `${window.location.pathname}`)
     } else {
       window.history.pushState(
         {},
