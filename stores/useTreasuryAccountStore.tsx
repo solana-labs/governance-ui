@@ -3,7 +3,7 @@ import { ViewState } from '@components/TreasuryAccount/Types'
 import {
   getNfts,
   GovernedTokenAccount,
-  ukrainDaoTokenAccountsOwnerAddress,
+  ukraineDaoTokenAccountsOwnerAddress,
 } from '@utils/tokens'
 import tokenService from '@utils/services/token'
 import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
@@ -69,7 +69,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
           const ukrainNfts = acc.governance?.pubkey
             ? await getNfts(
                 connection,
-                new PublicKey(ukrainDaoTokenAccountsOwnerAddress)
+                new PublicKey(ukraineDaoTokenAccountsOwnerAddress)
               )
             : []
           realmNfts = [...realmNfts, ...ukrainNfts]
