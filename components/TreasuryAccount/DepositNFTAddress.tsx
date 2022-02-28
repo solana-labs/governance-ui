@@ -25,6 +25,10 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import DepositLabel from './DepositLabel'
 import NFTAccountSelect from './NFTAccountSelect'
 import ImgWithLoader from '@components/ImgWithLoader'
+import {
+  ukraineDAONftGovPk,
+  ukraineDaoTokenAccountsOwnerAddress,
+} from '@utils/tokens'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
@@ -58,7 +62,10 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       throw 'no realm selected'
     }
     const mintPK = new PublicKey(form.mint)
-    const owner = currentAccount!.governance!.pubkey
+    const owner =
+      currentAccount!.governance!.pubkey.toBase58() === ukraineDAONftGovPk
+        ? new PublicKey(ukraineDaoTokenAccountsOwnerAddress)
+        : currentAccount!.governance!.pubkey
     const ataPk = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
       TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID

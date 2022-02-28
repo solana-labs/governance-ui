@@ -40,6 +40,10 @@ export default function handleGovernanceAssetsStore() {
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
+      //Just for ukraine dao, it will be replaced with good abstraction
+      const ukraineGov = tokenGovernances.find(
+        (x) => x.pubkey.toBase58() === ukraineDAOGovPk
+      )
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
           (x) =>
@@ -57,7 +61,9 @@ export default function handleGovernanceAssetsStore() {
           : null
         let solAccount: null | AccountInfoGen<Buffer | ParsedAccountData> = null
         if (isNft) {
-          transferAddress = gov.pubkey
+          transferAddress = ukraineGov
+            ? new PublicKey(ukraineDaoTokenAccountsOwnerAddress)
+            : gov.pubkey
         }
         if (isSol) {
           const solAddress = await getNativeTreasuryAddress(
@@ -91,10 +97,6 @@ export default function handleGovernanceAssetsStore() {
         }
         governedTokenAccountsArray.push(obj)
       }
-      //Just for ukraine dao, it will be replaced with good abstraction
-      const ukraineGov = tokenGovernances.find(
-        (x) => x.pubkey.toBase58() === ukraineDAOGovPk
-      )
       if (ukraineGov) {
         const resp = (
           await getProgramAccountsByOwner(

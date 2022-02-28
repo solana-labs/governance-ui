@@ -13,7 +13,11 @@ import {
 } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { createATA } from '@utils/ataTools'
-import { getTokenAccountsByMint } from '@utils/tokens'
+import {
+  getTokenAccountsByMint,
+  ukraineDAONftGovPk,
+  ukraineDaoTokenAccountsOwnerAddress,
+} from '@utils/tokens'
 import { sendTransaction } from '@utils/send'
 import NFTSelector, { NftSelectorFunctions } from '@components/NFTS/NFTSelector'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -37,7 +41,10 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
     setIsLoading(true)
     setSendingSuccess(false)
     try {
-      const governance = currentAccount!.governance!.pubkey
+      const governance =
+        currentAccount!.governance!.pubkey.toBase58() === ukraineDAONftGovPk
+          ? new PublicKey(ukraineDaoTokenAccountsOwnerAddress)
+          : currentAccount!.governance!.pubkey
       const ConnectedWalletAddress = wallet?.publicKey
       const selectedNft = selectedNfts[0]
       const nftMintPk = new PublicKey(selectedNft.mint)

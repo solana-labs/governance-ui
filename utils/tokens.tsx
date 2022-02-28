@@ -160,6 +160,7 @@ export const BPF_UPGRADE_LOADER_ID = new PublicKey(
 export const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
 export const ukraineDaoTokenAccountsOwnerAddress =
   '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+export const ukraineDAONftGovPk = 'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
 
 export function parseTokenAccountData(
   account: PublicKey,
