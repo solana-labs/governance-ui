@@ -41,6 +41,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
     setIsLoading(true)
     setSendingSuccess(false)
     try {
+      //Just for ukraine dao, it will be replaced with good abstraction
       const governance =
         currentAccount!.governance!.pubkey.toBase58() === ukraineDAONftGovPk
           ? new PublicKey(ukraineDaoTokenAccountsOwnerAddress)

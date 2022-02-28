@@ -62,6 +62,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       throw 'no realm selected'
     }
     const mintPK = new PublicKey(form.mint)
+    //Just for ukraine dao, it will be replaced with good abstraction
     const owner =
       currentAccount!.governance!.pubkey.toBase58() === ukraineDAONftGovPk
         ? new PublicKey(ukraineDaoTokenAccountsOwnerAddress)

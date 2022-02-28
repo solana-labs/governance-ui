@@ -20,14 +20,18 @@ import SendTokens from './SendTokens'
 import { ExternalLinkIcon, ArrowsExpandIcon } from '@heroicons/react/outline'
 import Tooltip from '@components/Tooltip'
 import ConvertToMsol from './ConvertToMsol'
+import { ukraineDAONftGovPk } from '@utils/tokens'
 
 const AccountOverview = () => {
   const router = useRouter()
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  //Just for ukraine dao, it will be replaced with good abstraction
   const nftsCount =
-    currentAccount?.governance && currentAccount.isNft
+    currentAccount?.governance?.pubkey.toBase58() === ukraineDAONftGovPk
+      ? useTreasuryAccountStore((s) => s.allNfts).length
+      : currentAccount?.governance && currentAccount.isNft
       ? useTreasuryAccountStore((s) => s.governanceNfts)[
           currentAccount?.governance?.pubkey.toBase58()
         ]?.length

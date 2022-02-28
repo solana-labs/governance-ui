@@ -1,6 +1,7 @@
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
+import { ukraineDAONftGovPk } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -9,8 +10,11 @@ const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore(
     (s) => s.compact.currentAccount
   )
+  //Just for ukraine dao, it will be replaced with good abstraction
   const nftsCount =
-    currentAccount?.governance && currentAccount.isNft
+    currentAccount?.governance?.pubkey.toBase58() === ukraineDAONftGovPk
+      ? useTreasuryAccountStore((s) => s.allNfts).length
+      : currentAccount?.governance && currentAccount.isNft
       ? useTreasuryAccountStore((s) => s.governanceNfts)[
           currentAccount?.governance?.pubkey.toBase58()
         ]?.length
