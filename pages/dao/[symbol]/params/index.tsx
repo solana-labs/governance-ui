@@ -1,6 +1,7 @@
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { capitalize } from '@utils/helpers'
 import tokenService from '@utils/services/token'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import {
@@ -29,121 +30,166 @@ const Params = () => {
         </div>
         <div>
           <h2>Realm</h2>
-          <div>name: {realmAccount?.name}</div>
-          <div>pubKey: {realm?.pubkey.toBase58()}</div>
-          <div>authority: {realmAccount?.authority?.toBase58()}</div>
-          <div>Owner: {realm?.owner.toBase58()}</div>
-          <div>Voting proposals count: {realmAccount?.votingProposalCount}</div>
-          {communityMint && <div>Community mint: {communityMint}</div>}
-          {councilmint && <div>Council mint: {councilmint}</div>}
-          <div className="py-5 pl-10 pr-5">
+          <DisplayField label="name" val={realmAccount?.name}></DisplayField>
+          <DisplayField
+            label="pubkey"
+            val={realm?.pubkey.toBase58()}
+          ></DisplayField>
+          <DisplayField
+            label="authority"
+            val={realmAccount?.authority?.toBase58()}
+          ></DisplayField>
+          <DisplayField
+            label="owner"
+            val={realm?.owner.toBase58()}
+          ></DisplayField>
+          <DisplayField
+            label="voting proposals count"
+            val={realmAccount?.votingProposalCount}
+          ></DisplayField>
+          {communityMint && (
+            <DisplayField
+              label="Community mint"
+              val={communityMint}
+            ></DisplayField>
+          )}
+          {councilmint && (
+            <DisplayField label="Council mint" val={councilmint}></DisplayField>
+          )}
+          <div className="py-5">
             <h3>Config</h3>
             {communityMintMaxVoteWeightSource && (
-              <div>
-                Community mint max vote weight source:{' '}
-                {communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}
-                %
-              </div>
+              <DisplayField
+                label="Community mint max vote weight source"
+                val={`${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}
+              %`}
+              ></DisplayField>
             )}
-            <div>
-              Min community tokens to create governance:{' '}
-              {realmConfig &&
+            <DisplayField
+              label="Min community tokens to create governance"
+              val={
+                realmConfig &&
                 fmtMintAmount(
                   mint,
                   realmConfig!.minCommunityTokensToCreateGovernance
-                )}
-            </div>
-            <div>
-              Use community voter weight addin:
-              {getYesNoString(realmConfig?.useCommunityVoterWeightAddin)}
-            </div>
-            <div>
-              Use max community voter weight addin:
-              {getYesNoString(realmConfig?.useMaxCommunityVoterWeightAddin)}
-            </div>
+                )
+              }
+            ></DisplayField>
+            <DisplayField
+              label="Use community voter weight addin"
+              val={getYesNoString(realmConfig?.useCommunityVoterWeightAddin)}
+            ></DisplayField>
+            <DisplayField
+              label="Use max community voter weight addin"
+              val={getYesNoString(realmConfig?.useMaxCommunityVoterWeightAddin)}
+            ></DisplayField>
           </div>
         </div>
         <div className="pb-5 pl-10 pr-5">
           <h2>Governances</h2>
-          {governedAccounts.map((x) => {
-            const pubKey = x.pubkey
-            const governanceAccount = x.account
-            const governanceConfig = x.account.config
-            const accounts = x.accounts
-            return (
-              <div
-                className="mb-3 border border-white border-solid p-5"
-                key={pubKey.toBase58()}
-              >
-                <div>{pubKey.toBase58()}</div>
-                <div>owner: {x.owner.toBase58()}</div>
-                {realmAccount?.authority?.toBase58() === pubKey.toBase58() && (
-                  <div>Realm authority</div>
-                )}
-                <div>proposals count: {governanceAccount.proposalCount}</div>
-                <div>
-                  voting proposals count:{' '}
-                  {governanceAccount.votingProposalCount}
-                </div>
-                <div className="p-3">
-                  <h3>Config</h3>
+          <div className="grid grid-cols-12 space-x-4">
+            {governedAccounts.map((x) => {
+              const pubKey = x.pubkey
+              const governanceAccount = x.account
+              const governanceConfig = x.account.config
+              const accounts = x.accounts
+              return (
+                <div
+                  className="border p-5 border-fgd-4 default-transition rounded-lg css-1tv4gvt-StyledCardWrapper elzt7lo0 col-span-6 mb-4"
+                  key={pubKey.toBase58()}
+                >
+                  <DisplayField
+                    label="Pubkey"
+                    val={pubKey.toBase58()}
+                  ></DisplayField>
+                  <DisplayField
+                    label="owner"
+                    val={x.owner.toBase58()}
+                  ></DisplayField>
+                  {realmAccount?.authority?.toBase58() ===
+                    pubKey.toBase58() && (
+                    <DisplayField
+                      label="realm authority"
+                      val={'Yes'}
+                    ></DisplayField>
+                  )}
+                  <DisplayField
+                    label="proposals count"
+                    val={governanceAccount.proposalCount}
+                  ></DisplayField>
+                  <DisplayField
+                    label=" voting proposals count"
+                    val={governanceAccount.votingProposalCount}
+                  ></DisplayField>
                   <div>
-                    Max voting time:{' '}
-                    {getFormattedStringFromDays(
-                      governanceConfig.maxVotingTime / SECS_PER_DAY
+                    <h3>Config</h3>
+                    <DisplayField
+                      label=" Max voting time"
+                      val={getFormattedStringFromDays(
+                        governanceConfig.maxVotingTime / SECS_PER_DAY
+                      )}
+                    ></DisplayField>
+                    {communityMint && (
+                      <DisplayField
+                        label="Min community tokens to create proposal"
+                        val={fmtMintAmount(
+                          mint,
+                          governanceConfig.minCommunityTokensToCreateProposal
+                        )}
+                      ></DisplayField>
                     )}
+                    {councilmint && (
+                      <DisplayField
+                        label="Min council tokens to create proposal"
+                        val={governanceConfig.minCouncilTokensToCreateProposal}
+                      ></DisplayField>
+                    )}
+                    <DisplayField
+                      label="Min instruction holdup time"
+                      val={governanceConfig.minInstructionHoldUpTime}
+                    ></DisplayField>
+                    <DisplayField
+                      label="Proposal cool off time"
+                      val={governanceConfig.proposalCoolOffTime}
+                    ></DisplayField>
+                    <DisplayField
+                      label="Vote threshold percentage"
+                      val={governanceConfig.voteThresholdPercentage.value}
+                    ></DisplayField>
+                    <DisplayField
+                      label="Vote tipping"
+                      val={governanceConfig.voteTipping}
+                    ></DisplayField>
                   </div>
-                  {communityMint && (
-                    <div>
-                      Min community tokens to create proposal:{' '}
-                      {fmtMintAmount(
-                        mint,
-                        governanceConfig.minCommunityTokensToCreateProposal
-                      )}
-                    </div>
-                  )}
-                  {councilmint && (
-                    <div>
-                      Min council tokens to create proposal:{' '}
-                      {fmtMintAmount(
-                        councilMint,
-                        governanceConfig.minCouncilTokensToCreateProposal
-                      )}
-                    </div>
-                  )}
-                  <div>
-                    Min instruction holdup time:{' '}
-                    {governanceConfig.minInstructionHoldUpTime}
-                  </div>
-                  <div>
-                    Proposal cool off time:{' '}
-                    {governanceConfig.proposalCoolOffTime}
-                  </div>
-                  <div>
-                    Vote threshold percentage:{' '}
-                    {governanceConfig.voteThresholdPercentage.value}
-                  </div>
-                  <div>Vote tipping: {governanceConfig.voteTipping}</div>
-                </div>
-                <div className="p-3">
-                  <h3>Accounts</h3>
-                  {accounts.map((x) => (
-                    <div key={x.pubkey.toBase58()}>
-                      <div>Pubkey: {x.pubkey.toBase58()}</div>
-                      <div>Amount: {x.account.amount.toNumber()}</div>
-                      <div>
-                        Name:{' '}
-                        {tokenService.getTokenInfo(x.account.mint.toBase58())
-                          ?.name || x.account.mint.toBase58()}
+                  <div className="p-3">
+                    <h3>Accounts</h3>
+                    {accounts.map((x) => (
+                      <div key={x.pubkey.toBase58()}>
+                        <div>Pubkey: {x.pubkey.toBase58()}</div>
+                        <div>Amount: {x.account.amount.toNumber()}</div>
+                        <div>
+                          Name:{' '}
+                          {tokenService.getTokenInfo(x.account.mint.toBase58())
+                            ?.name || x.account.mint.toBase58()}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )
-          })}
+              )
+            })}
+          </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+const DisplayField = ({ label, val }) => {
+  return (
+    <div className="flex items-center mb-2">
+      <div className="mr-2">{capitalize(label)}:</div>
+      <div className="text-fgd-3 break-all">{val}</div>
     </div>
   )
 }
