@@ -12,7 +12,9 @@ export function useTotalTreasuryPrice() {
   useEffect(() => {
     async function calcTotalTokensPrice() {
       const totalPrice = governedTokenAccountsWithoutNfts
-        .filter((x) => typeof x.mint !== 'undefined')
+        .filter(
+          (x) => typeof x.mint !== 'undefined' && typeof x.token !== 'undefined'
+        )
         .map((x) => {
           return (
             getMintDecimalAmountFromNatural(
