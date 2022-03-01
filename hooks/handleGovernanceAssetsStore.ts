@@ -124,7 +124,9 @@ export default function handleGovernanceAssetsStore() {
             transferAddress: tokenAcc.account.address,
             solAccount: null,
           }
-          governedTokenAccountsArray.push(obj)
+          if (mint?.account.decimals) {
+            governedTokenAccountsArray.push(obj)
+          }
         }
       }
       await tokenService.fetchTokenPrices(
