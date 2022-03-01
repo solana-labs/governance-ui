@@ -152,46 +152,13 @@ const REALM = () => {
                   new PublicKey('5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d')
                 ) ? (
                   <div>
-                    <div className="mb-5">
+                    <div className="mb-10">
                       <DepositLabel
                         abbreviatedAddress={false}
-                        header="SOL Deposits"
+                        header="Wallet Address"
                         transferAddress={
                           new PublicKey(
                             '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
-                          )
-                        }
-                      ></DepositLabel>
-                    </div>
-                    <div className="mb-5">
-                      <DepositLabel
-                        abbreviatedAddress={false}
-                        header="USDC Deposits"
-                        transferAddress={
-                          new PublicKey(
-                            'ETamthJeZJZ8A3LkWLx7hxRmDNaaAYMC8jC3cmFnoBKm'
-                          )
-                        }
-                      ></DepositLabel>
-                    </div>
-                    <div className="mb-5">
-                      <DepositLabel
-                        abbreviatedAddress={false}
-                        header="NFT Deposits"
-                        transferAddress={
-                          new PublicKey(
-                            'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
-                          )
-                        }
-                      ></DepositLabel>
-                    </div>
-                    <div className="mb-20">
-                      <DepositLabel
-                        abbreviatedAddress={false}
-                        header="SPL Tokens Deposits"
-                        transferAddress={
-                          new PublicKey(
-                            '4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9'
                           )
                         }
                       ></DepositLabel>

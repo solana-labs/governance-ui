@@ -160,6 +160,7 @@ const SendTokens = () => {
       connection,
       wallet,
       currentAccount,
+
       setFormErrors,
     }
     if (isNFT) {
