@@ -55,6 +55,10 @@ p {
   @apply break-words leading-normal text-fgd-2 text-sm;
 }
 
+.hero-text {
+  @apply text-2xl font-bold;
+}
+
 button {
   @apply tracking-wide;
 }

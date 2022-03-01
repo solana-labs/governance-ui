@@ -129,9 +129,9 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const isConstant = type === 'constant'
   const CardLabel = ({ label, value }) => {
     return (
-      <div className="flex flex-col w-1/2 p-2">
-        <div className="text-xs text-fgd-3">{label}</div>
-        <div className="break-all">{value}</div>
+      <div className="flex flex-col w-1/2 py-2">
+        <p className="text-xs text-fgd-2">{label}</p>
+        <p className="font-bold text-fgd-1">{value}</p>
       </div>
     )
   }
@@ -145,16 +145,11 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     ?.logoURI
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
   return (
-    <div className="border border-bkg-4 rounded-lg flex flex-col">
-      <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
-        <h3 className="mb-0 flex flex-items items-center">
-          {img && <img className="w-6 h-6 mr-2" src={img}></img>}
+    <div className="border border-fgd-4 rounded-lg flex flex-col">
+      <div className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex items-center">
+        {img && <img className="w-8 h-8 mr-2" src={img}></img>}
+        <h3 className="flex flex-items hero-text items-center mb-0">
           {lockedTokens} {!img && abbreviateAddress(deposit.mint.publicKey)}
-          {price ? (
-            <span className="text-xs opacity-70 font-light ml-1">
-              =${formatter.format(price)}
-            </span>
-          ) : null}
           {deposit?.available?.isZero() && deposit?.currentlyLocked?.isZero() && (
             <Tooltip
               content="Close deposit - used to close unused deposit"
@@ -167,9 +162,14 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             </Tooltip>
           )}
         </h3>
+        {price ? (
+          <div className="flex font-bold items-center text-xs ml-3 rounded-full bg-bkg-3 px-2 py-1">
+            <span className="text-fgd-3">≈</span>${formatter.format(price)}
+          </div>
+        ) : null}
       </div>
       <div
-        className="p-4 pb-6 bg-bkg-1 rounded-lg flex flex-col h-full"
+        className="p-4 rounded-lg flex flex-col h-full"
         style={{ minHeight: '290px' }}
       >
         <div className="flex flex-row flex-wrap">
