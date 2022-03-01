@@ -36,8 +36,10 @@ export default function handleGovernanceAssetsStore() {
     setGovernedTokenAccounts,
   } = useGovernanceAssetsStore()
   useEffect(() => {
-    setGovernancesArray(connection, governances)
-  }, [JSON.stringify(governances)])
+    if (realm) {
+      setGovernancesArray(connection, governances, realm)
+    }
+  }, [JSON.stringify(governances), realm?.pubkey])
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
