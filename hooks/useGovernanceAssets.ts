@@ -197,6 +197,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.HelloContract,
+      name: 'Hello Contract',
+      isVisible: true,
+    },
+    {
       id: Instructions.MangoMakeChangeMaxAccounts,
       name: 'Mango - change max accounts',
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',

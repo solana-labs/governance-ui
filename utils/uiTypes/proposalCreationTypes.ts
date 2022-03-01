@@ -97,6 +97,10 @@ export interface Base64InstructionForm {
   holdUpTime: number
 }
 
+export interface HelloForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
+  name: string
+}
 export interface EmptyInstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
 }
@@ -141,6 +145,7 @@ export enum Instructions {
   Transfer,
   ProgramUpgrade,
   Mint,
+  HelloContract,
   Base64,
   None,
   MangoMakeChangeMaxAccounts,
