@@ -197,9 +197,9 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.HelloContract,
-      name: 'Hello Contract',
-      isVisible: true,
+      id: Instructions.TokrizeContract,
+      name: 'Tokrize',
+      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.MangoMakeChangeMaxAccounts,

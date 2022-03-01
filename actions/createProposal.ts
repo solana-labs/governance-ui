@@ -26,6 +26,7 @@ import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { sign } from 'crypto'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -192,6 +193,7 @@ export const createProposal = async (
       ...insertInstructions
     )
 
+    console.log("Signers", signers);
     await sendTransaction({
       transaction,
       wallet,

@@ -57,7 +57,7 @@ import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
-import HelloContract from './components/instructions/Hello'
+import TokrizeContract from './components/instructions/Tokrize'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -344,9 +344,9 @@ const New = () => {
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
-      case Instructions.HelloContract:
+      case Instructions.TokrizeContract:
         return (
-          <HelloContract index={idx} governance={governance}></HelloContract>
+          <TokrizeContract index={idx} governance={governance}></TokrizeContract>
         )
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
