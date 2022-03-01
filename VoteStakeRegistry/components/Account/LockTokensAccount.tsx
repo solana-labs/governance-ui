@@ -1,5 +1,4 @@
 import Button from '@components/Button'
-// import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useRealm from '@hooks/useRealm'
 import {
   fmtMintAmount,
@@ -21,7 +20,6 @@ import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
-// import Loading from '@components/Loading'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
@@ -39,7 +37,7 @@ interface DepositBox {
 const unlockedTypes = ['none']
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const { realm, mint, tokenRecords, councilMint } = useRealm()
+  const { realm, realmInfo, mint, tokenRecords, councilMint } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -202,9 +200,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         </div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="leading-none mb-0">
-            Account{' '}
+            Your Tokens{' '}
             <span className="font-normal text-fgd-2 text-xs">
-              ({realm?.account?.name})
+              ({realmInfo?.displayName})
             </span>
           </h1>
 
@@ -267,36 +265,38 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                     return (
                       <div key={idx} className={mainBoxesClasses}>
                         <p className="text-fgd-3">
-                          {x.lockUpKind === 'none' ? 'Deposited' : 'Locked'}
+                          {x.lockUpKind === 'none'
+                            ? `${realmInfo?.symbol} Deposited`
+                            : `${realmInfo?.symbol} Locked`}
                         </p>
-                        <div className="flex items-center">
-                          <span className="hero-text">{availableTokens}</span>
+                        <span className="hero-text">
+                          {availableTokens}
                           {price ? (
-                            <div className="flex font-bold items-center text-xs ml-3 rounded-full bg-bkg-3 px-2 py-1">
+                            <span className="font-normal text-xs ml-2">
                               <span className="text-fgd-3">≈</span>$
                               {formatter.format(price)}
-                            </div>
+                            </span>
                           ) : null}
-                        </div>
+                        </span>
                       </div>
                     )
                   })}
                   {reducedDeposits.length === 0 ? (
                     <div className={mainBoxesClasses}>
-                      <p className="text-fgd-3">Deposited</p>
+                      <p className="text-fgd-3">{`${realmInfo?.symbol} Deposited`}</p>
                       <span className="hero-text">0</span>
                     </div>
                   ) : null}
                   {!hasLockedTokens ? (
                     <div className={mainBoxesClasses}>
-                      <p className="text-fgd-3">Locked</p>
+                      <p className="text-fgd-3">{`${realmInfo?.symbol} Locked`}</p>
                       <span className="hero-text">0</span>
                     </div>
                   ) : null}
                 </>
               )}
             </div>
-            <h2 className="mb-4">Locked Tokens</h2>
+            <h2 className="mb-4">Locked Deposits</h2>
             {lockedTokens?.length > 0 ? (
               <div
                 className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${

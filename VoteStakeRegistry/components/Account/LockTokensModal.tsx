@@ -2,7 +2,6 @@ import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Modal from '@components/Modal'
-// import { Tab } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -196,12 +195,6 @@ const LockTokensModal = ({
   const currentPercentOfMaxMultiplier =
     (100 * lockupPeriod.multiplier) / maxMultiplier
 
-  // const handleSetVestingPeriod = (idx: number) => {
-  //   setVestingPeriod(vestingPeriods[idx])
-  // }
-  // const handleSetLockupPeriod = (idx: number) => {
-  //   setLockupPeriod(lockupPeriods[idx])
-  // }
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1)
   }
@@ -311,16 +304,6 @@ const LockTokensModal = ({
 
     onClose()
   }
-  // const baseTabClasses =
-  //   'w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark'
-  // const tabClasses = ({ val, index, currentValue, lastItemIdx }) => {
-  //   return classNames(
-  //     baseTabClasses,
-  //     val === currentValue ? 'bg-primary-light text-bkg-2' : '',
-  //     index === 0 ? 'rounded-l-lg' : '',
-  //     index === lastItemIdx + 1 ? 'rounded-r-lg' : ''
-  //   )
-  // }
   const labelClasses = 'mb-2 text-fgd-2 text-sm'
   const DoYouWantToDepositMoreComponent = () => (
     <div className="pb-4">
@@ -341,28 +324,34 @@ const LockTokensModal = ({
       case 0:
         return (
           <>
-            <div className="flex items-center justify-between">
-              <div className={labelClasses}>Lockup Type</div>
-              <LinkButton
-                className="mb-2"
-                onClick={() => setShowLockupTypeInfo(true)}
-              >
-                About Lockup Types
-              </LinkButton>
-            </div>
+            {!depositToUnlock ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className={labelClasses}>Lockup Type</div>
+                  <LinkButton
+                    className="mb-2"
+                    onClick={() => setShowLockupTypeInfo(true)}
+                  >
+                    About Lockup Types
+                  </LinkButton>
+                </div>
+                <div className="mb-4">
+                  <ButtonGroup
+                    activeValue={lockupType.displayName}
+                    className="h-10"
+                    onChange={(type) =>
+                      setLockupType(
+                        //@ts-ignore
+                        lockupTypes.find((t) => t.displayName === type)
+                      )
+                    }
+                    values={lockupTypes.map((type) => type.displayName)}
+                  />
+                </div>
+              </>
+            ) : null}
             <div className="mb-4">
-              <ButtonGroup
-                activeValue={lockupType.displayName}
-                className="h-10"
-                onChange={(type) =>
-                  //@ts-ignore
-                  setLockupType(lockupTypes.find((t) => t.displayName === type))
-                }
-                values={lockupTypes.map((type) => type.displayName)}
-              />
-            </div>
-            <div className="mb-4">
-              {lockupType.value === CONSTANT && (
+              {depositToUnlock && (
                 <div className="mb-4">
                   <InlineNotification
                     desc="To initiate the unlock process you need to convert all, or part of your constant lockup to a cliff lockup with a duration greater than or equal to the constant lockup duration."
@@ -375,7 +364,7 @@ const LockTokensModal = ({
               )}
               <div className="mb-4">
                 <div className={`${labelClasses} flex justify-between`}>
-                  Amount to Lock{' '}
+                  {depositToUnlock ? 'Amount to Unlock' : 'Amount to Lock'}
                   <LinkButton
                     className="text-primary-light"
                     onClick={() => setAmount(Number(maxAmount))}

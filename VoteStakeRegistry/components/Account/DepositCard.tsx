@@ -2,11 +2,7 @@ import Button from '@components/Button'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { RpcContext } from '@solana/spl-governance'
-import {
-  fmtMintAmount,
-  getMintDecimalAmount,
-  getMintDecimalAmountFromNatural,
-} from '@tools/sdk/units'
+import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
 import {
@@ -21,8 +17,6 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
-import { XIcon } from '@heroicons/react/outline'
-import Tooltip from '@components/Tooltip'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
@@ -135,48 +129,33 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       </div>
     )
   }
-  const price =
-    getMintDecimalAmountFromNatural(
-      deposit.mint.account,
-      deposit.currentlyLocked
-    ).toNumber() *
-    tokenService.getUSDTokenPrice(deposit.mint.publicKey.toBase58())
-  const img = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
-    ?.logoURI
-  const formatter = Intl.NumberFormat('en', { notation: 'compact' })
+  const tokenInfo = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
-      <div className="bg-bkg-1 px-4 py-4 pr-16 rounded-md flex items-center">
-        {img && <img className="w-8 h-8 mr-2" src={img}></img>}
-        <h3 className="flex flex-items hero-text items-center mb-0">
-          {lockedTokens} {!img && abbreviateAddress(deposit.mint.publicKey)}
-          {deposit?.available?.isZero() && deposit?.currentlyLocked?.isZero() && (
-            <Tooltip
-              content="Close deposit - used to close unused deposit"
-              contentClassName="ml-auto"
-            >
-              <XIcon
-                onClick={handleCloseDeposit}
-                className="w-5 h-5 text-primary-light cursor-pointer"
-              ></XIcon>
-            </Tooltip>
-          )}
+      <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">
+        {tokenInfo?.logoURI && (
+          <img className="w-8 h-8 mr-2" src={tokenInfo?.logoURI}></img>
+        )}
+        <h3 className="hero-text mb-0">
+          {lockedTokens}{' '}
+          {!tokenInfo?.logoURI && abbreviateAddress(deposit.mint.publicKey)}
+          <span className="font-normal text-xs text-fgd-3">
+            {tokenInfo?.symbol}
+          </span>
         </h3>
-        {price ? (
-          <div className="flex font-bold items-center text-xs ml-3 rounded-full bg-bkg-3 px-2 py-1">
-            <span className="text-fgd-3">≈</span>${formatter.format(price)}
-          </div>
-        ) : null}
       </div>
       <div
         className="p-4 rounded-lg flex flex-col h-full"
         style={{ minHeight: '290px' }}
       >
         <div className="flex flex-row flex-wrap">
-          <CardLabel label="Type" value={typeName} />
+          <CardLabel
+            label="Lockup Type"
+            value={typeName.charAt(0).toUpperCase() + typeName.slice(1)}
+          />
           {isVest && (
             <CardLabel
-              label="Initial amount"
+              label="Initial Amount"
               value={fmtMintAmount(
                 deposit.mint.account,
                 deposit.amountInitiallyLockedNative
@@ -197,7 +176,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           )}
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
-              label="Next vesting"
+              label="Next Vesting"
               value={dayjs(
                 deposit.nextVestingTimestamp?.toNumber() * 1000
               ).format('DD-MM-YYYY')}
@@ -205,7 +184,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           )}
           {isRealmCommunityMint && (
             <CardLabel
-              label="Vote multiplier"
+              label="Vote Multiplier"
               value={calcMintMultiplier(
                 deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber(),
                 communityMintRegistrar,
@@ -226,18 +205,28 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             value={fmtMintAmount(deposit.mint.account, deposit.available)}
           />
         </div>
-        <Button
-          disabled={!isConstant && deposit.available.isZero()}
-          style={{ marginTop: 'auto' }}
-          className="w-full"
-          onClick={() =>
-            !isConstant
-              ? handleWithDrawFromDeposit(deposit)
-              : handleStartUnlock()
-          }
-        >
-          {!isConstant ? 'Withdraw' : 'Start Unlock'}
-        </Button>
+        {deposit?.available?.isZero() && deposit?.currentlyLocked?.isZero() ? (
+          <Button
+            style={{ marginTop: 'auto' }}
+            className="w-full"
+            onClick={handleCloseDeposit}
+          >
+            Close Deposit
+          </Button>
+        ) : (
+          <Button
+            disabled={!isConstant && deposit.available.isZero()}
+            style={{ marginTop: 'auto' }}
+            className="w-full"
+            onClick={() =>
+              !isConstant
+                ? handleWithDrawFromDeposit(deposit)
+                : handleStartUnlock()
+            }
+          >
+            {!isConstant ? 'Withdraw' : 'Start Unlock'}
+          </Button>
+        )}
       </div>
       {isUnlockModalOpen && (
         <LockTokensModal
