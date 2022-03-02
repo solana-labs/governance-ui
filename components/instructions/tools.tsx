@@ -96,6 +96,14 @@ export const ACCOUNT_NAMES = {
 
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
+
+  // MMCC ClubDAO
+  '92tozWPkbybEjPeiGpNFL8onAnT739cxLRQofGVnrmm6': 'ClubDAO DCF Revenue Vault',
+  A6HXL3WMWT4gB1QvYJfZgDp2ufTfLkWBaX6Theakdf5h:
+    'ClubDAO Main SOL Treasury Vault',
+  '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
+  Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
+    'ClubDAO Main NFT Treasury Vault ',
 }
 
 // Blacklisted governances which should not be displayed in the UI
