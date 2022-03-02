@@ -401,5 +401,14 @@
     "website": "https://linktr.ee/MeerkatMillionaires",
     "twitter": "@mmccsolana",
     "ogImage": "/realms/MMCC/img/MMCC_Logo.png"
+  },
+  {
+    "symbol": "montanaland",
+    "displayName": "Montana Land sDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GURMs9sYzDNPhTJxsuDvFUpoBom8VKFicbjxK57hCj4e",
+    "ogImage": "/realms/MontanaLand/img/logo.png",
+    "website": "https://montanaland.slowdao.xyz/",
+    "twitter": "@montanaland"
   }
 ]
