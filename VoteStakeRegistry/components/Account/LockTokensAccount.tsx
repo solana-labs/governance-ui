@@ -1,11 +1,10 @@
 import Button from '@components/Button'
-import { getMintMetadata } from '@components/instructions/programs/splToken'
 import useRealm from '@hooks/useRealm'
 import {
   fmtMintAmount,
   getMintDecimalAmountFromNatural,
 } from '@tools/sdk/units'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import LockTokensModal from './LockTokensModal'
 import DepositCommunityTokensBtn from '../TokenBalance/DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from '../TokenBalance/WithdrawCommunityTokensBtn'
@@ -21,9 +20,14 @@ import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
-import Loading from '@components/Loading'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
+import InlineNotification from '@components/InlineNotification'
+import {
+  LightningBoltIcon,
+  LinkIcon,
+  LockClosedIcon,
+} from '@heroicons/react/outline'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -33,7 +37,7 @@ interface DepositBox {
 const unlockedTypes = ['none']
 
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
-  const { realm, mint, tokenRecords, councilMint } = useRealm()
+  const { realm, realmInfo, mint, tokenRecords, councilMint } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
@@ -51,8 +55,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const connection = useWalletStore((s) => s.connection.current)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-  const mainBoxesClasses =
-    'bg-bkg-1 px-4 py-4 rounded-md flex flex-col mr-3 mb-3'
+  const mainBoxesClasses = 'bg-bkg-1 col-span-1 p-4 rounded-md'
   const isNextSameRecord = (x, next) => {
     const nextType = Object.keys(next.lockup.kind)[0]
     return (
@@ -164,125 +167,201 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
       getTokenOwnerRecord()
     }
   }, [realm?.pubkey.toBase58(), wallet?.connected, tokenOwnerRecordPk])
-  return (
-    <div className="bg-bkg-2 col-span-12 md:order-first order-last p-4 md:p-6 rounded-lg relative">
-      {isLoading && (
-        <div className="absolute top-0 left-0 w-full h-full flex justify-center items-center">
-          <Loading w="12" h="12"></Loading>
-        </div>
-      )}
-      <h1 className="flex mb-8 items-center">
-        <PreviousRouteBtn />
-        <span className="ml-4">
-          Account{' '}
-          {!isOwnerOfDeposits && connected && (
-            <small className="text-sm text-red">
-              (You are viewing other voter account)
-            </small>
-          )}
-        </span>
-        <div className="ml-auto flex flex-row">
-          <DepositCommunityTokensBtn className="mr-3"></DepositCommunityTokensBtn>
-          <WithDrawCommunityTokens></WithDrawCommunityTokens>
-        </div>
-      </h1>
-      {connected ? (
-        <div>
-          <div className="flex mb-8 flex-wrap">
-            {mint && (
-              <VotingPowerBox
-                votingPower={votingPower}
-                mint={mint}
-                votingPowerFromDeposits={votingPowerFromDeposits}
-                className={mainBoxesClasses}
-                style={{ minWidth: '200px' }}
-              ></VotingPowerBox>
-            )}
-            {reducedDeposits?.map((x, idx) => {
-              const availableTokens = fmtMintAmount(x.mint, x.currentAmount)
-              const price =
-                getMintDecimalAmountFromNatural(
-                  x.mint,
-                  x.currentAmount
-                ).toNumber() *
-                tokenService.getUSDTokenPrice(x.mintPk.toBase58())
-              const tokenName =
-                getMintMetadata(x.mintPk)?.name ||
-                x.mintPk.toBase58() === realm?.account.communityMint.toBase58()
-                  ? realm?.account.name
-                  : ''
 
-              const depositTokenName = `${tokenName}`
-              const formatter = Intl.NumberFormat('en', {
-                notation: 'compact',
-              })
-              return (
-                <div
-                  key={idx}
-                  className={mainBoxesClasses}
-                  style={{ minWidth: '200px' }}
-                >
-                  <p className="text-fgd-3 text-xs">
-                    {depositTokenName}{' '}
-                    {x.lockUpKind === 'none' ? 'Deposited' : 'Locked'}
-                  </p>
-                  <h3 className="mb-0">
-                    {availableTokens}{' '}
-                    {price ? (
-                      <span className="text-xs opacity-70 font-light">
-                        =${formatter.format(price)}
-                      </span>
-                    ) : null}
-                  </h3>
-                </div>
-              )
-            })}
+  const hasLockedTokens = useMemo(() => {
+    return reducedDeposits.find((d) => d.lockUpKind !== 'none')
+  }, [reducedDeposits])
+
+  const lockedTokens = useMemo(() => {
+    return (
+      deposits
+        // we filter out one deposits that is used to store none locked community tokens
+        ?.filter(
+          (x) =>
+            x.index !==
+            deposits.find(
+              (depo) =>
+                typeof depo.lockup.kind.none !== 'undefined' &&
+                depo.mint.publicKey.toBase58() ===
+                  realm?.account.communityMint.toBase58() &&
+                depo.isUsed &&
+                !depo.allowClawback &&
+                depo.isUsed
+            )?.index
+        )
+    )
+  }, [deposits])
+
+  return (
+    <div className="grid grid-cols-12 gap-4">
+      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
+        <div className="mb-4">
+          <PreviousRouteBtn />
+        </div>
+        <div className="flex items-center justify-between mb-4">
+          <h1 className="leading-none mb-0">
+            Your Tokens{' '}
+            <span className="font-normal text-fgd-2 text-xs">
+              ({realmInfo?.displayName})
+            </span>
+          </h1>
+
+          <div className="ml-auto flex flex-row">
+            <DepositCommunityTokensBtn className="mr-3" />
+            <WithDrawCommunityTokens />
           </div>
-          <h1 className="mb-8">Locked Tokens</h1>
-          <div
-            className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
-              !isOwnerOfDeposits ? 'opacity-0.8 pointer-events-none' : ''
-            }`}
-          >
-            {deposits
-              //we filter out one deposits that is used to store none locked community tokens
-              ?.filter(
-                (x) =>
-                  x.index !==
-                  deposits.find(
-                    (depo) =>
-                      typeof depo.lockup.kind.none !== 'undefined' &&
-                      depo.mint.publicKey.toBase58() ===
-                        realm?.account.communityMint.toBase58() &&
-                      depo.isUsed &&
-                      !depo.allowClawback &&
-                      depo.isUsed
-                  )?.index
-              )
-              ?.map((x, idx) => (
-                <DepositCard deposit={x} key={idx}></DepositCard>
-              ))}
-            <div className="flex flex-col items-center justify-center p-8 rounded-lg bg-bkg-4 mb-3">
-              <div className="flex text-center mb-6">
-                Increase your voting power by<br></br> locking your tokens.
-              </div>
-              <Button onClick={() => setIsLockModalOpen(true)}>
-                Lock Tokens
-              </Button>
+        </div>
+        {!isOwnerOfDeposits && connected && (
+          <div className="pb-6">
+            <InlineNotification
+              desc="You do not own this account"
+              type="info"
+            />
+          </div>
+        )}
+        {connected ? (
+          <div>
+            <div className="grid grid-cols-3 grid-flow-row gap-4 pb-8">
+              {isLoading ? (
+                <>
+                  <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
+                  <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
+                  <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
+                </>
+              ) : (
+                <>
+                  <div className="col-span-1">
+                    {mint && (
+                      <VotingPowerBox
+                        votingPower={votingPower}
+                        mint={mint}
+                        votingPowerFromDeposits={votingPowerFromDeposits}
+                        className={mainBoxesClasses}
+                      />
+                    )}
+                  </div>
+                  {reducedDeposits?.map((x, idx) => {
+                    const availableTokens = fmtMintAmount(
+                      x.mint,
+                      x.currentAmount
+                    )
+                    const price =
+                      getMintDecimalAmountFromNatural(
+                        x.mint,
+                        x.currentAmount
+                      ).toNumber() *
+                      tokenService.getUSDTokenPrice(x.mintPk.toBase58())
+                    // const tokenName =
+                    //   getMintMetadata(x.mintPk)?.name ||
+                    //   x.mintPk.toBase58() ===
+                    //     realm?.account.communityMint.toBase58()
+                    //     ? realm?.account.name
+                    //     : ''
+
+                    // const depositTokenName = `${tokenName}`
+                    const formatter = Intl.NumberFormat('en', {
+                      notation: 'compact',
+                    })
+                    return (
+                      <div key={idx} className={mainBoxesClasses}>
+                        <p className="text-fgd-3">
+                          {x.lockUpKind === 'none'
+                            ? `${realmInfo?.symbol} Deposited`
+                            : `${realmInfo?.symbol} Locked`}
+                        </p>
+                        <span className="hero-text">
+                          {availableTokens}
+                          {price ? (
+                            <span className="font-normal text-xs ml-2">
+                              <span className="text-fgd-3">≈</span>$
+                              {formatter.format(price)}
+                            </span>
+                          ) : null}
+                        </span>
+                      </div>
+                    )
+                  })}
+                  {reducedDeposits.length === 0 ? (
+                    <div className={mainBoxesClasses}>
+                      <p className="text-fgd-3">{`${realmInfo?.symbol} Deposited`}</p>
+                      <span className="hero-text">0</span>
+                    </div>
+                  ) : null}
+                  {!hasLockedTokens ? (
+                    <div className={mainBoxesClasses}>
+                      <p className="text-fgd-3">{`${realmInfo?.symbol} Locked`}</p>
+                      <span className="hero-text">0</span>
+                    </div>
+                  ) : null}
+                </>
+              )}
             </div>
+            <h2 className="mb-4">Locked Deposits</h2>
+            {lockedTokens?.length > 0 ? (
+              <div
+                className={`grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-8 ${
+                  !isOwnerOfDeposits ? 'opacity-0.8 pointer-events-none' : ''
+                }`}
+              >
+                {deposits
+                  //we filter out one deposits that is used to store none locked community tokens
+                  ?.filter(
+                    (x) =>
+                      x.index !==
+                      deposits.find(
+                        (depo) =>
+                          typeof depo.lockup.kind.none !== 'undefined' &&
+                          depo.mint.publicKey.toBase58() ===
+                            realm?.account.communityMint.toBase58() &&
+                          depo.isUsed &&
+                          !depo.allowClawback &&
+                          depo.isUsed
+                      )?.index
+                  )
+                  ?.map((x, idx) => (
+                    <DepositCard deposit={x} key={idx}></DepositCard>
+                  ))}
+                <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
+                  <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
+                  <p className="flex text-center pb-6">
+                    Increase your voting power by<br></br> locking your tokens.
+                  </p>
+                  <Button onClick={() => setIsLockModalOpen(true)}>
+                    <div className="flex items-center">
+                      <LockClosedIcon className="h-5 mr-1.5 w-5" />
+                      <span>Lock Tokens</span>
+                    </div>
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg mb-3">
+                <LightningBoltIcon className="h-8 mb-2 text-primary-light w-8" />
+                <p className="flex text-center pb-6">
+                  Increase your voting power by<br></br> locking your tokens.
+                </p>
+                <Button onClick={() => setIsLockModalOpen(true)}>
+                  <div className="flex items-center">
+                    <LockClosedIcon className="h-5 mr-1.5 w-5" />
+                    <span>Lock Tokens</span>
+                  </div>
+                </Button>
+              </div>
+            )}
           </div>
-        </div>
-      ) : (
-        <div className="flex justify-center h-20 items-center">
-          Please connect your wallet
-        </div>
-      )}
-      {isLockModalOpen && (
-        <LockTokensModal
-          isOpen={isLockModalOpen}
-          onClose={() => setIsLockModalOpen(false)}
-        ></LockTokensModal>
-      )}
+        ) : (
+          <div className="border border-fgd-4 flex flex-col items-center justify-center p-6 rounded-lg">
+            <LinkIcon className="h-6 mb-1 text-primary-light w-6" />
+            <span className="text-fgd-1 text-sm">Connect your wallet</span>
+          </div>
+        )}
+        {isLockModalOpen && (
+          <LockTokensModal
+            isOpen={isLockModalOpen}
+            onClose={() => setIsLockModalOpen(false)}
+          ></LockTokensModal>
+        )}
+      </div>
     </div>
   )
 }
