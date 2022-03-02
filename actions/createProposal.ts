@@ -193,7 +193,6 @@ export const createProposal = async (
       ...insertInstructions
     )
 
-    console.log("Signers", signers);
     await sendTransaction({
       transaction,
       wallet,

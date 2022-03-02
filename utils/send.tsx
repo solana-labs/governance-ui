@@ -76,7 +76,7 @@ export async function signTransaction({
   if (signers.length > 0) {
     transaction.partialSign(...signers)
   }
-  console.log("Im signing, Im signing!")
+
   return await wallet.signTransaction(transaction)
 }
 
