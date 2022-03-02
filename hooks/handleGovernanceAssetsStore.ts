@@ -8,6 +8,7 @@ import {
 } from '@solana/spl-governance'
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
+import tokenService from '@utils/services/token'
 import {
   AccountInfoGen,
   GovernedTokenAccount,
@@ -123,9 +124,16 @@ export default function handleGovernanceAssetsStore() {
             transferAddress: tokenAcc.account.address,
             solAccount: null,
           }
-          governedTokenAccountsArray.push(obj)
+          if (mint?.account.decimals) {
+            governedTokenAccountsArray.push(obj)
+          }
         }
       }
+      await tokenService.fetchTokenPrices(
+        governedTokenAccountsArray
+          .filter((x) => x.mint)
+          .map((x) => x.mint!.publicKey.toBase58())
+      )
       setGovernedTokenAccounts(governedTokenAccountsArray)
     }
     prepareTokenGovernances()
