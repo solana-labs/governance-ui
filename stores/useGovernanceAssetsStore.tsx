@@ -90,51 +90,50 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
         accounts: [],
       }
     })
-    try {
-      console.log('start')
-      const lol = await connection.getProgramAccounts(
-        new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
-        {
-          filters: [
-            {
-              dataSize: 82, // number of bytes
-            },
-            {
-              memcmp: {
-                offset: 0, // number of bytes
-                bytes: new PublicKey(
-                  'CDRmpYryZPWdiaMpBXbBpfmEvtuS9dLqpVu1LAkaeRpU'
-                ).toBase58(), // base58 encoded string
-              },
-            },
-          ],
-        }
-      )
-      console.log(lol, '#$@#$@#$@#$@$#')
-    } catch (e) {
-      console.log(e, ' 234234324')
-    }
-    const tokenAccounts = []
-    // const tokenAccounts = (
-    //   await Promise.all(
-    //     governancesArray.map((x) =>
-    //       getAccountsByOwner(
-    //         connection,
-    //         TOKEN_PROGRAM_ID,
-    //         x.pubkey,
-    //         TokenAccountLayout.span,
-    //         tokenAccountOwnerOffset
-    //       )
-    //     )
+    // try {
+    //   console.log('start')
+    //   const lol = await connection.getProgramAccounts(
+    //     new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+    //     {
+    //       filters: [
+    //         {
+    //           dataSize: 82, // number of bytes
+    //         },
+    //         {
+    //           memcmp: {
+    //             offset: 0, // number of bytes
+    //             bytes: new PublicKey(
+    //               'CDRmpYryZPWdiaMpBXbBpfmEvtuS9dLqpVu1LAkaeRpU'
+    //             ).toBase58(), // base58 encoded string
+    //           },
+    //         },
+    //       ],
+    //     }
     //   )
-    // )
-    //   .flatMap((x) => x)
-    //   .map((x) => {
-    //     const publicKey = x.pubkey
-    //     const data = Buffer.from(x.account.data)
-    //     const account = parseTokenAccountData(publicKey, data)
-    //     return { publicKey, account }
-    //   })
+    //   console.log(lol, '#$@#$@#$@#$@$#')
+    // } catch (e) {
+    //   console.log(e, ' 234234324')
+    // }
+    const tokenAccounts = (
+      await Promise.all(
+        governancesArray.map((x) =>
+          getAccountsByOwner(
+            connection,
+            TOKEN_PROGRAM_ID,
+            x.pubkey,
+            TokenAccountLayout.span,
+            tokenAccountOwnerOffset
+          )
+        )
+      )
+    )
+      .flatMap((x) => x)
+      .map((x) => {
+        const publicKey = x.pubkey
+        const data = Buffer.from(x.account.data)
+        const account = parseTokenAccountData(publicKey, data)
+        return { publicKey, account }
+      })
 
     for (const tokenAccount of tokenAccounts) {
       const governance = governedAccounts.find(
