@@ -101,5 +101,6 @@ const getName = (governedAccountTokenAccount: GovernedTokenAccount) => {
   const governanceAccName = governedAccountTokenAccount.governance?.pubkey
     ? getAccountName(governedAccountTokenAccount.governance.pubkey)
     : ''
+
   return tokenAccName || governanceAccName
 }
