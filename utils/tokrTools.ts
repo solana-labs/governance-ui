@@ -26,8 +26,34 @@ import {
       "9e78qsrsE2e5Q97T1biobry8mSot8NorEDJHJnMa5CpN"
   );
   
-  // const daoKey = new PublicKey("CRtSDiPfYHkeecFDUt7cG2sBGJFzkJt24B16HZ4kcCL6");
-/**
+  export class TokrizeArgs {
+    instruction = 0;
+    name: string;
+    symbol: string;
+    uri: string;
+    constructor(fields: { name: string, symbol: string, uri: string } | undefined = undefined) {
+      if (fields) {
+        this.name = fields.name;
+        this.symbol = fields.symbol;
+        this.uri = fields.uri;
+      }
+    }
+  }
+  
+  const TokrizeSchema = new Map([
+    [TokrizeArgs, {
+      kind: 'struct',
+      fields: [
+        ['instruction', 'u8'],
+        ['name', 'string'],
+        ['symbol', 'string'],
+        ['uri', 'string']
+      ]
+    }],
+  ]);
+
+
+  /**
  * Say hello
  * TODO integrate into 
  */
@@ -61,15 +87,15 @@ export async function getTokrInstruction({
     console.log("Mint:", mint.toBase58());
     console.log("!!token program {}", TOKEN_PROGRAM_ID.toBase58());
 
-    console.log(MintArgs);
-
-    const data = borsh.serialize(new MintArgs({
-        name: 'hello',
-        symbol: 'world',
-        uri: 'www.google.com'
-      }));
+    const data = Buffer.from(borsh.serialize(
+        TokrizeSchema,
+        new TokrizeArgs({ 
+          name: form.name,
+          symbol: form.symbol,
+          uri: form.metaDataUri
+        })
+    ));
     
-
 
     const instruction = new TransactionInstruction(
     {

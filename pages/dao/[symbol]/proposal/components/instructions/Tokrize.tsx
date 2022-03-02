@@ -32,7 +32,7 @@ import * as borsh from 'borsh'
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
-import { getTokrInstruction2 } from 'utils/tokrTools'
+import { getTokrInstruction } from 'utils/tokrTools'
 
 const TokrizeContract = ({
   index,
@@ -61,7 +61,7 @@ const TokrizeContract = ({
     setForm({ ...form, [propertyName]: value })
   }
   async function getInstruction(): Promise<UiInstruction> {
-    return getTokrInstruction2({
+    return getTokrInstruction({
       schema,
       form,
       programId,
