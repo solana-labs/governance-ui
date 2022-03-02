@@ -2,21 +2,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 
 import {
-    Keypair,
-    Connection,
     PublicKey,
-    LAMPORTS_PER_SOL,
     SYSVAR_RENT_PUBKEY,
     SystemProgram,
     TransactionInstruction,
-    Transaction,
-    sendAndConfirmTransaction,
   } from '@solana/web3.js';
   import { serializeInstructionToBase64 } from '@solana/spl-governance'
   import { MintLayout, Token, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
   import { WalletAdapter } from '@solana/wallet-adapter-base'
   import type { ConnectionContext } from 'utils/connection'
-  import {MintArgs} from './metaplexSchema';
   import * as borsh from 'borsh';
 
   import {
@@ -37,7 +31,7 @@ import {
  * Say hello
  * TODO integrate into 
  */
-export async function getTokrInstruction2({
+export async function getTokrInstruction({
     schema,
     form,
     programId,
@@ -69,11 +63,11 @@ export async function getTokrInstruction2({
 
     console.log(MintArgs);
 
-    const data = MintArgs.serialize({
+    const data = borsh.serialize(new MintArgs({
         name: 'hello',
         symbol: 'world',
         uri: 'www.google.com'
-      });
+      }));
     
 
 
