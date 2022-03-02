@@ -56,9 +56,9 @@ export const getTreasuryAccountItemInfo = (
     : info?.logoURI
     ? info?.logoURI
     : ''
-  const accountName = governedAccountTokenAccount.token
-    ? getAccountName(governedAccountTokenAccount.token?.publicKey)
-    : ''
+
+  const accountName = getName(governedAccountTokenAccount)
+
   const name = accountName
     ? accountName
     : accountPublicKey
@@ -92,4 +92,14 @@ export const getTreasuryAccountItemInfo = (
     info,
     isSol,
   }
+}
+
+const getName = (governedAccountTokenAccount: GovernedTokenAccount) => {
+  const tokenAccName = governedAccountTokenAccount.token
+    ? getAccountName(governedAccountTokenAccount.token?.publicKey)
+    : ''
+  const governanceAccName = governedAccountTokenAccount.governance?.pubkey
+    ? getAccountName(governedAccountTokenAccount.governance.pubkey)
+    : ''
+  return tokenAccName || governanceAccName
 }
