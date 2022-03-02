@@ -13,7 +13,9 @@ import {
 } from '@components/instructions/tools'
 import {
   AccountInfoGen,
+  getMultipleAccountInfoChunked,
   GovernedTokenAccount,
+  parseMintAccountData,
   parseTokenAccountData,
   TokenProgramAccount,
   tryGetMint,
@@ -22,18 +24,17 @@ import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import { BN, TokenAccountLayout } from '@blockworks-foundation/mango-client'
 import tokenService from '@utils/services/token'
-import { sleep } from '@project-serum/common'
 const tokenAccountOwnerOffset = 32
 interface TokenAccountExtension {
   mint?: TokenProgramAccount<MintInfo> | undefined
-  transferAddress: PublicKey
-  amount: BN
+  transferAddress?: PublicKey
+  amount?: BN
   solAccount?: AccountInfoGen<Buffer | ParsedAccountData>
+  token?: AccountInfo
 }
 
 export interface Account {
   pubkey: PublicKey
-  account: AccountInfo
   type: AccountType
   extensions: TokenAccountExtension
 }
@@ -44,6 +45,7 @@ interface GovernedAccount extends ProgramAccount<Governance> {
 export enum AccountType {
   TOKEN,
   SOL,
+  MINT,
 }
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
@@ -90,30 +92,37 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
         accounts: [],
       }
     })
-    // try {
-    //   console.log('start')
-    //   const lol = await connection.getProgramAccounts(
-    //     new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
-    //     {
-    //       filters: [
-    //         {
-    //           dataSize: 82, // number of bytes
-    //         },
-    //         {
-    //           memcmp: {
-    //             offset: 0, // number of bytes
-    //             bytes: new PublicKey(
-    //               'CDRmpYryZPWdiaMpBXbBpfmEvtuS9dLqpVu1LAkaeRpU'
-    //             ).toBase58(), // base58 encoded string
-    //           },
-    //         },
-    //       ],
-    //     }
-    //   )
-    //   console.log(lol, '#$@#$@#$@#$@$#')
-    // } catch (e) {
-    //   console.log(e, ' 234234324')
-    // }
+    const mintGovernances = getGovernancesByAccountTypes(governancesArray, [
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
+    const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
+      connection,
+      mintGovernances.map((x) => x.account.governedAccount)
+    )
+    mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
+      const mintGovernnace = mintGovernances[index]
+      const governance = governedAccounts.find(
+        (x) => x.pubkey.toBase58() === mintGovernnace.pubkey.toBase58()
+      )
+      if (!mintAccountInfo) {
+        throw new Error(
+          `Missing mintAccountInfo for: ${governance?.pubkey.toBase58()}`
+        )
+      }
+      const data = Buffer.from(mintAccountInfo.data)
+      const parsedMintInfo = parseMintAccountData(data) as MintInfo
+      governance?.accounts.push({
+        type: AccountType.MINT,
+        pubkey: governance.account.governedAccount,
+        extensions: {
+          mint: {
+            publicKey: governance.account.governedAccount,
+            account: parsedMintInfo,
+          },
+        },
+      })
+    })
     const tokenAccounts = (
       await Promise.all(
         governancesArray.map((x) =>
@@ -235,10 +244,10 @@ const getTokenAccountsObj = async (
           : solAccount.lamports
 
       return {
-        ...tokenAccount,
         type: AccountType.SOL,
         pubkey: tokenAccount.publicKey,
         extensions: {
+          token: tokenAccount,
           mint: mint,
           transferAddress: solAddress,
           amount: tokenAccount.account.amount,
@@ -252,10 +261,21 @@ const getTokenAccountsObj = async (
       type: AccountType.TOKEN,
       pubkey: tokenAccount.publicKey,
       extensions: {
+        token: tokenAccount,
         mint: mint,
         transferAddress: tokenAccount.publicKey,
         amount: tokenAccount.account.amount,
       },
     }
   }
+}
+
+const getGovernancesByAccountTypes = (
+  governancesArray: ProgramAccount<Governance>[],
+  types: GovernanceAccountType[]
+) => {
+  const governancesFiltered = governancesArray.filter((gov) =>
+    types.some((t) => gov.account?.accountType === t)
+  )
+  return governancesFiltered
 }

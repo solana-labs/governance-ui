@@ -192,59 +192,110 @@ const Params = () => {
                         >
                           {accounts.map((x) => {
                             const info = getTreasuryAccountItemInfoV2(x)
-                            return (
-                              <div
-                                className="mb-3 border border-fgd-4 p-3 bg-bkg-2"
-                                key={x.pubkey.toBase58()}
-                              >
-                                <DisplayField
-                                  bg={false}
-                                  label="Address"
-                                  val={x.extensions.transferAddress.toBase58()}
-                                ></DisplayField>
-
-                                <DisplayField
-                                  bg={false}
-                                  label="Amount"
-                                  val={info.amountFormatted}
-                                ></DisplayField>
-                                <DisplayField
-                                  bg={false}
-                                  label="Type"
-                                  val={AccountType[x.type]}
-                                ></DisplayField>
-                                <DisplayField
-                                  bg={false}
-                                  label="Name"
-                                  val={info.name}
-                                ></DisplayField>
-
-                                {info.info?.symbol && (
+                            if (
+                              x.type === AccountType.TOKEN ||
+                              x.type === AccountType.SOL
+                            ) {
+                              return (
+                                <div
+                                  className="mb-3 border border-fgd-4 p-3 bg-bkg-2"
+                                  key={x.pubkey.toBase58()}
+                                >
                                   <DisplayField
                                     bg={false}
-                                    label="Symbol"
-                                    val={info.info?.symbol}
+                                    label="Address"
+                                    val={x.extensions?.transferAddress?.toBase58()}
                                   ></DisplayField>
-                                )}
-                                <DisplayField
-                                  label="Mint"
-                                  bg={false}
-                                  val={x.extensions.mint?.publicKey.toBase58()}
-                                ></DisplayField>
-                                {info.logo && (
+
                                   <DisplayField
                                     bg={false}
-                                    label="Token img"
-                                    val={
-                                      <img
-                                        className="w-6"
-                                        src={info.logo}
-                                      ></img>
-                                    }
+                                    label="Amount"
+                                    val={info.amountFormatted}
                                   ></DisplayField>
-                                )}
-                              </div>
-                            )
+                                  <DisplayField
+                                    bg={false}
+                                    label="Type"
+                                    val={AccountType[x.type]}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Name"
+                                    val={info.name}
+                                  ></DisplayField>
+
+                                  {info.info?.symbol && (
+                                    <DisplayField
+                                      bg={false}
+                                      label="Symbol"
+                                      val={info.info?.symbol}
+                                    ></DisplayField>
+                                  )}
+                                  <DisplayField
+                                    label="Mint"
+                                    bg={false}
+                                    val={x.extensions.mint?.publicKey.toBase58()}
+                                  ></DisplayField>
+                                  {info.logo && (
+                                    <DisplayField
+                                      bg={false}
+                                      label="Token img"
+                                      val={
+                                        <img
+                                          className="w-6"
+                                          src={info.logo}
+                                        ></img>
+                                      }
+                                    ></DisplayField>
+                                  )}
+                                </div>
+                              )
+                            }
+                            if (x.type === AccountType.MINT) {
+                              return (
+                                <div
+                                  className="mb-3 border border-fgd-4 p-3 bg-bkg-2"
+                                  key={x.pubkey.toBase58()}
+                                >
+                                  <DisplayField
+                                    bg={false}
+                                    label="Type"
+                                    val={AccountType[x.type]}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Pubkey"
+                                    val={x.extensions.mint?.publicKey.toBase58()}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Decimals"
+                                    val={x.extensions.mint?.account.decimals}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Mint authority"
+                                    val={x.extensions.mint?.account.mintAuthority?.toBase58()}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Supply"
+                                    val={x.extensions.mint?.account.supply.toNumber()}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Is initialized"
+                                    val={getYesNoString(
+                                      x.extensions.mint?.account.isInitialized
+                                    )}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Freeze authority"
+                                    val={x.extensions.mint?.account.freezeAuthority?.toBase58()}
+                                  ></DisplayField>
+                                </div>
+                              )
+                            }
                           })}
                         </div>
                       </div>
