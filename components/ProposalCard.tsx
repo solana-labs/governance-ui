@@ -2,7 +2,11 @@ import styled from '@emotion/styled'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import ProposalStateBadge from './ProposalStatusBadge'
 import Link from 'next/link'
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  GoverningTokenType,
+  Proposal,
+  ProposalState,
+} from '@solana/spl-governance'
 import ApprovalQuorum from './ApprovalQuorum'
 import useRealm from '../hooks/useRealm'
 import useProposalVotes from '../hooks/useProposalVotes'
@@ -11,6 +15,8 @@ import ProposalTimeStatus from './ProposalTimeStatus'
 import useQueryContext from '../hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
 import VoteResults from './VoteResults'
+import useWalletStore from 'stores/useWalletStore'
+import CouncilVoteProgress from './CouncilVoteProgress'
 
 type ProposalCardProps = {
   proposalPk: PublicKey
@@ -30,7 +36,14 @@ const StyledCardWrapper = styled.div`
 const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
+  const {
+    minimumYesVotes,
+    yesVoteProgress,
+    yesVotesRequired,
+  } = useProposalVotes(proposal)
+  const { tokenType } = useWalletStore((s) => s.selectedProposal)
+
+  const isCouncilVote = tokenType === GoverningTokenType.Council
 
   return (
     <div>
@@ -61,10 +74,18 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                   <VoteResults isListView proposal={proposal} />
                 </div>
                 <div className="lg:pl-4 w-full lg:w-1/2">
-                  <ApprovalQuorum
-                    progress={yesVoteProgress}
-                    yesVotesRequired={yesVotesRequired}
-                  />
+                  {!isCouncilVote ? (
+                    <ApprovalQuorum
+                      progress={yesVoteProgress}
+                      yesVotesRequired={yesVotesRequired}
+                    />
+                  ) : (
+                    <CouncilVoteProgress
+                      minimumYesVotes={minimumYesVotes}
+                      progress={yesVoteProgress}
+                      yesVotesRequired={yesVotesRequired}
+                    />
+                  )}
                 </div>
               </div>
             )}

@@ -16,19 +16,26 @@ import React, { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import { ProposalState } from '@solana/spl-governance'
+import { GoverningTokenType, ProposalState } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
+import useWalletStore from 'stores/useWalletStore'
+import CouncilVoteProgress from '@components/CouncilVoteProgress'
 
 const Proposal = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol, realmInfo } = useRealm()
   const { proposal, descriptionLink } = useProposal()
   const [description, setDescription] = useState('')
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
-    proposal?.account
-  )
+  const {
+    minimumYesVotes,
+    yesVoteProgress,
+    yesVotesRequired,
+  } = useProposalVotes(proposal?.account)
+  const { tokenType } = useWalletStore((s) => s.selectedProposal)
+
+  const isCouncilVote = tokenType === GoverningTokenType.Council
 
   const showResults =
     proposal &&
@@ -125,11 +132,20 @@ const Proposal = () => {
               )}
               {proposal?.account.state === ProposalState.Voting ? (
                 <div className="pb-3">
-                  <ApprovalQuorum
-                    yesVotesRequired={yesVotesRequired}
-                    progress={yesVoteProgress}
-                    showBg
-                  />
+                  {!isCouncilVote ? (
+                    <ApprovalQuorum
+                      yesVotesRequired={yesVotesRequired}
+                      progress={yesVoteProgress}
+                      showBg
+                    />
+                  ) : (
+                    <CouncilVoteProgress
+                      minimumYesVotes={minimumYesVotes}
+                      yesVotesRequired={yesVotesRequired}
+                      progress={yesVoteProgress}
+                      showBg
+                    />
+                  )}
                 </div>
               ) : (
                 <div className="pb-3">
