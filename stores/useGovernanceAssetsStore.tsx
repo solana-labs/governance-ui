@@ -2,6 +2,7 @@ import create, { State } from 'zustand'
 import {
   getNativeTreasuryAddress,
   Governance,
+  GovernanceAccountType,
   Realm,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-governance'
@@ -21,6 +22,7 @@ import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import { BN, TokenAccountLayout } from '@blockworks-foundation/mango-client'
 import tokenService from '@utils/services/token'
+import { sleep } from '@project-serum/common'
 const tokenAccountOwnerOffset = 32
 interface TokenAccountExtension {
   mint?: TokenProgramAccount<MintInfo> | undefined
@@ -88,26 +90,51 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
         accounts: [],
       }
     })
-    const tokenAccounts = (
-      await Promise.all(
-        governancesArray.map((x) =>
-          getProgramAccountsByOwner(
-            connection,
-            TOKEN_PROGRAM_ID,
-            x.pubkey,
-            TokenAccountLayout.span,
-            tokenAccountOwnerOffset
-          )
-        )
+    try {
+      console.log('start')
+      const lol = await connection.getProgramAccounts(
+        new PublicKey('TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA'),
+        {
+          filters: [
+            {
+              dataSize: 82, // number of bytes
+            },
+            {
+              memcmp: {
+                offset: 0, // number of bytes
+                bytes: new PublicKey(
+                  'CDRmpYryZPWdiaMpBXbBpfmEvtuS9dLqpVu1LAkaeRpU'
+                ).toBase58(), // base58 encoded string
+              },
+            },
+          ],
+        }
       )
-    )
-      .flatMap((x) => x)
-      .map((x) => {
-        const publicKey = x.pubkey
-        const data = Buffer.from(x.account.data)
-        const account = parseTokenAccountData(publicKey, data)
-        return { publicKey, account }
-      })
+      console.log(lol, '#$@#$@#$@#$@$#')
+    } catch (e) {
+      console.log(e, ' 234234324')
+    }
+    const tokenAccounts = []
+    // const tokenAccounts = (
+    //   await Promise.all(
+    //     governancesArray.map((x) =>
+    //       getAccountsByOwner(
+    //         connection,
+    //         TOKEN_PROGRAM_ID,
+    //         x.pubkey,
+    //         TokenAccountLayout.span,
+    //         tokenAccountOwnerOffset
+    //       )
+    //     )
+    //   )
+    // )
+    //   .flatMap((x) => x)
+    //   .map((x) => {
+    //     const publicKey = x.pubkey
+    //     const data = Buffer.from(x.account.data)
+    //     const account = parseTokenAccountData(publicKey, data)
+    //     return { publicKey, account }
+    //   })
 
     for (const tokenAccount of tokenAccounts) {
       const governance = governedAccounts.find(
@@ -134,7 +161,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
 }))
 export default useGovernanceAssetsStore
 
-const getProgramAccountsByOwner = (
+const getAccountsByOwner = (
   connection: Connection,
   programId: PublicKey,
   owner: PublicKey,
@@ -175,7 +202,7 @@ const getTokenAccountsObj = async (
     const resp = await connection.getParsedAccountInfo(solAddress)
     if (resp.value) {
       const accountsOwnedBySolAccount = (
-        await getProgramAccountsByOwner(
+        await getAccountsByOwner(
           connection,
           TOKEN_PROGRAM_ID,
           solAddress,
