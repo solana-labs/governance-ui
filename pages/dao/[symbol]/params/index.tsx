@@ -296,6 +296,25 @@ const Params = () => {
                                 </div>
                               )
                             }
+                            if (x.type === AccountType.PROGRAM) {
+                              return (
+                                <div
+                                  className="mb-3 border border-fgd-4 p-3 bg-bkg-2"
+                                  key={x.pubkey.toBase58()}
+                                >
+                                  <DisplayField
+                                    bg={false}
+                                    label="Type"
+                                    val={AccountType[x.type]}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Pubkey"
+                                    val={x.pubkey.toBase58()}
+                                  ></DisplayField>
+                                </div>
+                              )
+                            }
                           })}
                         </div>
                       </div>

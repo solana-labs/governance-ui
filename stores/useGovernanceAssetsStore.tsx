@@ -46,6 +46,7 @@ export enum AccountType {
   TOKEN,
   SOL,
   MINT,
+  PROGRAM,
 }
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
@@ -96,6 +97,10 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       GovernanceAccountType.MintGovernanceV1,
       GovernanceAccountType.MintGovernanceV2,
     ])
+    const programGovernances = getGovernancesByAccountTypes(governancesArray, [
+      GovernanceAccountType.ProgramGovernanceV1,
+      GovernanceAccountType.ProgramGovernanceV2,
+    ])
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
       connection,
       mintGovernances.map((x) => x.account.governedAccount)
@@ -121,6 +126,16 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             account: parsedMintInfo,
           },
         },
+      })
+    })
+    programGovernances.forEach((programGov) => {
+      const governance = governedAccounts.find(
+        (x) => x.pubkey.toBase58() === programGov.pubkey.toBase58()
+      )
+      governance?.accounts.push({
+        type: AccountType.PROGRAM,
+        pubkey: governance.account.governedAccount,
+        extensions: {},
       })
     })
     const tokenAccounts = (
