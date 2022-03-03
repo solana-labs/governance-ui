@@ -29,6 +29,9 @@ export interface RealmInfo {
   bannerImage?: string
 
   isCertified: boolean
+
+  // Allow Realm to send email/SMS/Telegram/etc., notifications to governance members
+  enableNotifications?: boolean
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
@@ -40,6 +43,7 @@ interface RealmInfoAsJSON
   extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
   programId: string
   realmId: string
+  enableNotifications?: boolean
 }
 
 // TODO: Once governance program clones registry program and governance
@@ -54,6 +58,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     realmId: new PublicKey(realm.realmId),
     isCertified: true,
     programVersion: realm.programVersion,
+    enableNotifications: realm.enableNotifications,
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -177,5 +182,6 @@ export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
     realmId: realm.pubkey,
     displayName: realm.account.name,
     isCertified: false,
+    enableNotifications: false,
   } as RealmInfo
 }
