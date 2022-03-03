@@ -37,6 +37,7 @@ function App({ Component, pageProps }) {
 	const title = realmName ? `${realmName}` : 'Solana Governance'
 	const description = `Discuss and vote on ${title} proposals.`
 
+
 	// Note: ?v==${Date.now()} is added to the url to force favicon refresh.
 	// Without it browsers would cache the last used and won't change it for different realms
 	// https://stackoverflow.com/questions/2208933/how-do-i-force-a-favicon-refresh

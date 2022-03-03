@@ -124,7 +124,8 @@ const INITIAL_PROPOSAL_STATE = {
 
 const useWalletStore = create<WalletStore>((set, get) => ({
   connected: false,
-  connection: getConnectionContext('mainnet'),
+//   connection: getConnectionContext('mainnet'),
+  connection: getConnectionContext('devnet'),
   current: undefined,
   realms: {},
   ownVoteRecordsByProposal: {},
