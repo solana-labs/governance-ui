@@ -5,125 +5,171 @@
 /* Theme */
 
 :root {
-  --primary-light: theme('colors.sierra-theme.primary.light');
-  --primary-dark: theme('colors.sierra-theme.primary.dark');
-  --secondary-1: theme('colors.sierra-theme["secondary-1"].light');
-  --secondary-1-dark: theme('colors.sierra-theme["secondary-1"].dark');
-  --secondary-2: theme('colors.sierra-theme["secondary-2"].light');
-  --secondary-2-dark: theme('colors.sierra-theme["secondary-2"].dark');
-  --red: theme('colors.sierra-theme.red');
-  --green: theme('colors.sierra-theme.green');
-  --orange: theme('colors.sierra-theme.orange');
-  --blue: theme('colors.sierra-theme.blue');
-  --bkg-1: theme('colors.sierra-theme["bkg-1"]');
-  --bkg-2: theme('colors.sierra-theme["bkg-2"]');
-  --bkg-3: theme('colors.sierra-theme["bkg-3"]');
-  --bkg-4: theme('colors.sierra-theme["bkg-4"]');
-  --fgd-1: theme('colors.sierra-theme["fgd-1"]');
-  --fgd-2: theme('colors.sierra-theme["fgd-2"]');
-  --fgd-3: theme('colors.sierra-theme["fgd-3"]');
-  --fgd-4: theme('colors.sierra-theme["fgd-4"]');
+	--primary-light: theme('colors.tokr-theme.primary.light');
+	--primary-dark: theme('colors.tokr-theme.primary.dark');
+	--secondary-1: theme('colors.tokr-theme["secondary-1"].light');
+	--secondary-1-dark: theme('colors.tokr-theme["secondary-1"].dark');
+	--secondary-2: theme('colors.tokr-theme["secondary-2"].light');
+	--secondary-2-dark: theme('colors.tokr-theme["secondary-2"].dark');
+	--red: theme('colors.tokr-theme.red');
+	--green: theme('colors.tokr-theme.green');
+	--orange: theme('colors.tokr-theme.orange');
+	--blue: theme('colors.tokr-theme.blue');
+	--bkg-1: theme('colors.tokr-theme["bkg-1"]');
+	--bkg-2: theme('colors.tokr-theme["bkg-2"]');
+	--bkg-3: theme('colors.tokr-theme["bkg-3"]');
+	--bkg-4: theme('colors.tokr-theme["bkg-4"]');
+	--fgd-1: theme('colors.tokr-theme["fgd-1"]');
+	--fgd-2: theme('colors.tokr-theme["fgd-2"]');
+	--fgd-3: theme('colors.tokr-theme["fgd-3"]');
+	--fgd-4: theme('colors.tokr-theme["fgd-4"]');
 }
 
 /* base */
 
 * {
-  @apply m-0 p-0;
+	@apply m-0 p-0;
 }
 
 body {
-  @apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
+	@apply bg-bkg-1 text-fgd-1 text-base font-body tracking-wide;
 }
 
 h1 {
-  @apply text-2xl font-bold;
+	@apply text-2xl font-bold;
 }
 
 h2 {
-  @apply text-xl mb-2 font-bold;
+	@apply text-lg mb-2 font-bold;
 }
 
 h3 {
-  @apply text-lg mb-1 font-bold;
-}
-
-h4 {
-  @apply text-sm mb-1 font-bold;
+	@apply text-base mb-1 font-bold;
 }
 
 p {
-  @apply break-words leading-normal text-fgd-2 text-sm;
+	@apply break-words leading-6 text-fgd-2 text-sm;
 }
 
 button {
-  @apply tracking-wide;
+	@apply tracking-wide;
 }
 
 .default-transition {
-  @apply transition-all duration-300;
+	@apply transition-all duration-300;
 }
 
-.markdown > h1 {
-  @apply mb-2 text-lg text-fgd-1;
+.markdown {
+	@apply pt-4;
 }
 
-.markdown > h2 {
-  @apply mb-2 text-lg text-fgd-1;
+.markdown>h1 {
+	@apply mb-2 text-lg text-fgd-1;
 }
 
-.markdown > p {
-  @apply mb-2;
+.markdown>h2 {
+	@apply mb-2 text-lg text-fgd-1;
+}
+
+.markdown>p {
+	@apply mb-2;
 }
 
 .markdown ul {
-  @apply mb-4;
+	@apply mb-4;
 }
 
 .markdown li {
-  @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
+	@apply font-normal mb-2 ml-6 list-disc text-fgd-3;
 }
 
 .markdown pre {
-  @apply whitespace-pre-wrap;
+	@apply whitespace-pre-wrap;
 }
 
 .markdown code {
-  @apply block mb-2 text-sm;
+	@apply block mb-2 text-sm;
 }
 
 :placeholder-shown {
-  @apply font-body;
+	@apply font-body;
 }
 
 /* width */
+/*
 ::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
+*/
 
 /* Track */
 ::-webkit-scrollbar-track {
-  border-radius: 100vh;
-  background: var(--bkg-2);
+	border-radius: 100vh;
+	background: var(--bkg-2);
 }
 
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: var(--bkg-1);
-  border-radius: 100vh;
-  border: 3px solid var(--bkg-2);
+	background: var(--bkg-1);
+	border-radius: 100vh;
+	border: 3px solid var(--bkg-2);
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--bkg-3);
-  cursor: pointer;
+	background: var(--bkg-3);
+	cursor: pointer;
 }
 
 .pointer {
-  cursor: pointer;
+	cursor: pointer;
 }
 
 ::-webkit-calendar-picker-indicator {
-  filter: invert(1);
+	filter: invert(1);
+}
+
+
+/* Tokr Branding */
+.image-on-brand,
+.image-on-brand img {
+	position: relative;
+}
+
+.image-on-brand img {
+	filter: contrast(10) grayscale(1) brightness(2) saturate(0);
+	z-index: 0;
+}
+
+.image-on-brand:before {
+	display: block;
+	content: "";
+	background-color: var(--green);
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	z-index: 1;
+	mix-blend-mode: multiply;
+}
+
+
+.nav-button:hover .nav-button__hover-highlight,
+.nav-button:focus .nav-button__hover-highlight,
+.nav-button\:hover .nav-button__hover-highlight {
+	background-color: var(--green);
+	color: var(--bkg-1);
+}
+
+
+.nav-button:active .nav-button__hover-highlight.nav-button__hover-highlight,
+.nav-button\:active .nav-button__hover-highlight.nav-button__hover-highlight {
+	background-color: lime;
+	color: #000000;
+}
+
+.nav-link {}
+
+.nav-link>span:after {
+	content: ">";
 }

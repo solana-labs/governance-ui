@@ -40,7 +40,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
         )}
       >
         <a>
-          <StyledCardWrapper className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3">
+          <StyledCardWrapper>
             <div className="p-4">
               <div className="flex items-start justify-between">
                 <h3 className="text-fgd-1">{proposal.name}</h3>

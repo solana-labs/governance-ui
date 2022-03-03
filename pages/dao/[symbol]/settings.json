@@ -1,0 +1,28 @@
+{
+	"workbench.iconTheme": "vscode-icons",
+	"workbench.colorTheme": "Material Theme",
+	"files.exclude": {
+		"**/iac/**/*.d.ts": true,
+		"**/iac/**/*.js": true,
+		"**/.classpath": true,
+		"**/.project": true,
+		"**/.settings": true,
+		"**/.factorypath": true
+	},
+	"vsicons.dontShowNewVersionMessage": true,
+	"editor.defaultFormatter": "esbenp.prettier-vscode",
+	"[yml]": {
+		"editor.defaultFormatter": null
+	},
+	"javascript.updateImportsOnFileMove.enabled": "always",
+	"editor.suggestSelection": "first",
+	"workbench.editorAssociations": {
+		"*.ipynb": "jupyter-notebook"
+	},
+	"notebook.cellToolbarLocation": {
+		"default": "right",
+		"jupyter-notebook": "left"
+	},
+	"editor.formatOnSave": true,
+	"explorer.confirmDelete": false
+}

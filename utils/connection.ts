@@ -3,20 +3,21 @@ import { Connection } from '@solana/web3.js'
 import type { EndpointInfo } from '../@types/types'
 
 const ENDPOINTS: EndpointInfo[] = [
-  {
-    name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://ssc-dao.genesysgo.net/',
-  },
+//   {
+//     name: 'mainnet',
+//     url: process.env.MAINNET_RPC || 'https://ssc-dao.genesysgo.net/',
+//   },
   {
     name: 'devnet',
     url:
       process.env.DEVNET_RPC ||
       'https://psytrbhymqlkfrhudd.dev.genesysgo.net:8899',
-  },
-  {
-    name: 'localnet',
-    url: 'http://127.0.0.1:8899',
-  },
+  }
+//   ,
+//   {
+//     name: 'localnet',
+//     url: 'http://127.0.0.1:8899',
+//   },
 ]
 
 console.log('deployed ENDPOINTS:', ENDPOINTS)
