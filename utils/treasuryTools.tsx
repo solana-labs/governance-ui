@@ -101,12 +101,13 @@ export const getTreasuryAccountItemInfoV2 = (account: Account) => {
       ? WSOL_MINT
       : account.extensions.mint?.publicKey.toBase58()
 
-  const amount = account.extensions.amount
-    ? getMintDecimalAmountFromNatural(
-        account.extensions.mint!.account,
-        new BN(account.extensions.amount)
-      ).toNumber()
-    : 0
+  const amount =
+    account.extensions.amount && account.extensions.mint
+      ? getMintDecimalAmountFromNatural(
+          account.extensions.mint.account,
+          new BN(account.extensions.amount)
+        ).toNumber()
+      : 0
 
   const price = tokenService.getUSDTokenPrice(mintAddress!)
   const totalPrice = amount * price
