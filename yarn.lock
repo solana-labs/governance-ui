@@ -1186,6 +1186,14 @@
     "@solana/spl-token" "^0.1.8"
     "@solana/web3.js" "^1.31.0"
 
+"@metaplex/arweave-cost@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@metaplex/arweave-cost/-/arweave-cost-2.0.0.tgz#74d4dbb5b39e89f81fbc1a50220d1837fe0efdfd"
+  integrity sha512-i2FTLtg7Zz9sVJxKHlr3Ek1ibcG4l/we3r5ZQYlCtNFforBj+w6OnyGwdqSaFIkxSyYXqAlo9BY7cc/WEuTccA==
+  dependencies:
+    axios "^0.24.0"
+    debug "^4.3.2"
+
 "@metaplex/js@^4.2.1":
   version "4.11.7"
   resolved "https://registry.yarnpkg.com/@metaplex/js/-/js-4.11.7.tgz#48d00ee7a2bf96aed7432ddb68bb227d02385156"
@@ -2495,6 +2503,13 @@ anymatch@^3.0.3, anymatch@~3.1.1, anymatch@~3.1.2:
     normalize-path "^3.0.0"
     picomatch "^2.0.4"
 
+arconnect@^0.2.8:
+  version "0.2.9"
+  resolved "https://registry.yarnpkg.com/arconnect/-/arconnect-0.2.9.tgz#be07d2281f20d864a91cdcb44e3eed7fccb97f12"
+  integrity sha512-Us49eN/+8l6BrkAPdXnJVPwWlxxUPR7QaBjA0j3OBAcioIFRpwTdoPN9FxtwDGN91lgM6ebOudTXJToRiNizoA==
+  dependencies:
+    arweave "^1.10.13"
+
 arg@^4.1.0:
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/arg/-/arg-4.1.3.tgz#269fc7ad5b8e42cb63c896d5666017261c144089"
@@ -2605,7 +2620,19 @@ array.prototype.flatmap@^1.2.5:
     define-properties "^1.1.3"
     es-abstract "^1.19.0"
 
-asn1.js@^5.2.0:
+arweave@^1.10.13, arweave@^1.10.23:
+  version "1.10.23"
+  resolved "https://registry.yarnpkg.com/arweave/-/arweave-1.10.23.tgz#6edc056026d6c11ec47d817bb2c4f6d8fb8c65e5"
+  integrity sha512-lAeCopS9iNGhmJkUovWqb7R+JEF83LP8f51rG+H98JPI9KQVRJYtM5NmMMU8auDtOzvBPTZ7me1pYn/CfS3VTg==
+  dependencies:
+    arconnect "^0.2.8"
+    asn1.js "^5.4.1"
+    axios "^0.22.0"
+    base64-js "^1.3.1"
+    bignumber.js "^9.0.1"
+    util "^0.12.4"
+
+asn1.js@^5.2.0, asn1.js@^5.4.1:
   version "5.4.1"
   resolved "https://registry.npmjs.org/asn1.js/-/asn1.js-5.4.1.tgz"
   integrity sha512-+I//4cYPccV8LdmBLiX8CYvf9Sp3vQsrqu2QNXRcrbiWvcx/UdlFiqUJJzxRQxgsZmvhXhn4cSKeSmoFjVdupA==
@@ -2699,6 +2726,13 @@ axios@^0.21.1:
   integrity sha512-ut5vewkiu8jjGBdqpM44XxjuCjq9LAKeHVmoVfHVzy8eHgxxq8SbAVQNovDA8mVi05kP0Ea/n/UzcSHcTJQfNg==
   dependencies:
     follow-redirects "^1.14.0"
+
+axios@^0.22.0:
+  version "0.22.0"
+  resolved "https://registry.yarnpkg.com/axios/-/axios-0.22.0.tgz#bf702c41fb50fbca4539589d839a077117b79b25"
+  integrity sha512-Z0U3uhqQeg1oNcihswf4ZD57O3NrR1+ZXhxaROaWpDmsDTx7T2HNBV2ulBtie2hwJptu8UvgnJoK+BIqdzh/1w==
+  dependencies:
+    follow-redirects "^1.14.4"
 
 axios@^0.24.0:
   version "0.24.0"
@@ -10258,7 +10292,7 @@ util-deprecate@^1.0.1, util-deprecate@^1.0.2, util-deprecate@~1.0.1:
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
   integrity sha1-RQ1Nyfpw3nMnYvvS1KKJgUGaDM8=
 
-util@0.12.4, util@^0.12.0:
+util@0.12.4, util@^0.12.0, util@^0.12.4:
   version "0.12.4"
   resolved "https://registry.npmjs.org/util/-/util-0.12.4.tgz"
   integrity sha512-bxZ9qtSlGUWSOy9Qa9Xgk11kSslpuZwaxCg4sNIDj6FLucDab2JxnHwyNTCpHMtK1MjoQiWQ6DiUMZYbSrO+Sw==
