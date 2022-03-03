@@ -21,16 +21,12 @@ import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import dayjs from 'dayjs'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const communityMintRegistrar = useVoteStakeRegistryClientStore(
-    (s) => s.state.communityMintRegistrar
-  )
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
@@ -112,7 +108,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
 
   const lockedTokens = fmtMintAmount(
     deposit.mint.account,
-    deposit.currentlyLocked
+    deposit.currentlyLocked.add(deposit.available)
   )
   const type = Object.keys(deposit.lockup.kind)[0] as LockupType
   const typeName = type !== 'monthly' ? type : 'Vested'
@@ -185,11 +181,10 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           {isRealmCommunityMint && (
             <CardLabel
               label="Vote Multiplier"
-              value={calcMintMultiplier(
-                deposit.lockup.endTs.sub(deposit.lockup.startTs).toNumber(),
-                communityMintRegistrar,
-                realm
-              )}
+              value={(
+                deposit.votingPower.toNumber() /
+                deposit.votingPowerBaseline.toNumber()
+              ).toFixed(2)}
             />
           )}
           <CardLabel
