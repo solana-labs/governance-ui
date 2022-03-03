@@ -106,13 +106,13 @@ const REALM = () => {
 	return (
 		<>
 			<div className="grid grid-cols-12 gap-4">
-				<div className="border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6">
+				<div className="border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last pt-10 pb-8 px-8">
 					<RealmHeader />
-					<div>
+					{/* <div>
 						{realmInfo?.bannerImage ? (
 							<>
 								<img className="mb-10 h-80" src={realmInfo?.bannerImage}></img>
-								{/* temp. setup for Ukraine.SOL */}
+								{ temp. setup for Ukraine.SOL}
 								{realmInfo.realmId.equals(new PublicKey('5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d')) ? (
 									<div>
 										<div className="mb-10">
@@ -122,7 +122,7 @@ const REALM = () => {
 								) : null}
 							</>
 						) : null}
-					</div>
+					</div> */}
 					<div className="flex items-center justify-between pb-3">
 						<h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
 						<div className="flex items-center">

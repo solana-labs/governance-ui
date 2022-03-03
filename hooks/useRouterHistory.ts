@@ -35,7 +35,13 @@ export default function useRouterHistory() {
 		}
 		return ''
 	}
+
+
+	const getPathName = () => router.pathname || "/";
+
+
 	return {
+		getPathName,
 		history,
 		getLastRoute,
 	}

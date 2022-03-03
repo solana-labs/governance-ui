@@ -95,7 +95,7 @@ function App({ Component, pageProps }) {
 					</WalletIdentityProvider>
 				</ThemeProvider>
 			</ErrorBoundary>
-			{/* <Footer /> */}
+			<Footer />
 		</div>
 	)
 }
