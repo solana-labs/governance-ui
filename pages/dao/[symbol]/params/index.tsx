@@ -230,11 +230,13 @@ const Params = () => {
                                       val={info.info?.symbol}
                                     ></DisplayField>
                                   )}
-                                  <DisplayField
-                                    label="Mint"
-                                    bg={false}
-                                    val={x.extensions.mint?.publicKey.toBase58()}
-                                  ></DisplayField>
+                                  {x.type !== AccountType.SOL && (
+                                    <DisplayField
+                                      label="Mint"
+                                      bg={false}
+                                      val={x.extensions.mint?.publicKey.toBase58()}
+                                    ></DisplayField>
+                                  )}
                                   {info.logo && (
                                     <DisplayField
                                       bg={false}
@@ -247,6 +249,25 @@ const Params = () => {
                                       }
                                     ></DisplayField>
                                   )}
+                                </div>
+                              )
+                            }
+                            if (x.type === AccountType.NFT) {
+                              return (
+                                <div
+                                  className="mb-3 border border-fgd-4 p-3 bg-bkg-2"
+                                  key={x.pubkey.toBase58()}
+                                >
+                                  <DisplayField
+                                    bg={false}
+                                    label="Type"
+                                    val={AccountType[x.type]}
+                                  ></DisplayField>
+                                  <DisplayField
+                                    bg={false}
+                                    label="Address"
+                                    val={x.extensions?.transferAddress?.toBase58()}
+                                  ></DisplayField>
                                 </div>
                               )
                             }

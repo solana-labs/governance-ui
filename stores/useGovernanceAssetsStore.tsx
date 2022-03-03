@@ -9,6 +9,7 @@ import {
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   DEFAULT_NATIVE_SOL_MINT,
+  DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
 } from '@components/instructions/tools'
 import {
@@ -21,16 +22,16 @@ import {
   tryGetMint,
 } from '@utils/tokens'
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
-import { AccountInfo, MintInfo } from '@solana/spl-token'
+import { AccountInfo, MintInfo, u64 } from '@solana/spl-token'
 import { BN, TokenAccountLayout } from '@blockworks-foundation/mango-client'
 import tokenService from '@utils/services/token'
 const tokenAccountOwnerOffset = 32
 interface TokenAccountExtension {
   mint?: TokenProgramAccount<MintInfo> | undefined
   transferAddress?: PublicKey
-  amount?: BN
+  amount?: u64
   solAccount?: AccountInfoGen<Buffer | ParsedAccountData>
-  token?: AccountInfo
+  token?: TokenProgramAccount<AccountInfo>
 }
 
 export interface Account {
@@ -47,6 +48,7 @@ export enum AccountType {
   SOL,
   MINT,
   PROGRAM,
+  NFT,
 }
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
@@ -165,11 +167,13 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       )
       const account = await getTokenAccountsObj(
         realm,
-        governance,
+        governance!,
         tokenAccount,
         connection
       )
-      governance?.accounts.push(account)
+      if (account) {
+        governance?.accounts.push(account)
+      }
     }
     await tokenService.fetchTokenPrices(mintAddresses)
     set((s) => {
@@ -210,77 +214,97 @@ const getAccountsByOwner = (
 }
 
 const getTokenAccountsObj = async (
-  realm,
-  governance,
-  tokenAccount,
-  connection
+  realm: ProgramAccount<Realm>,
+  governance: GovernedAccount,
+  tokenAccount: TokenProgramAccount<AccountInfo>,
+  connection: Connection
 ) => {
   const isSol = tokenAccount.account.mint.toBase58() === DEFAULT_NATIVE_SOL_MINT
+  const isNft =
+    tokenAccount.account.mint.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const mint = await tryGetMint(connection, tokenAccount.account.mint)
-  if (isSol) {
-    const solAddress = await getNativeTreasuryAddress(
-      realm.owner,
-      governance!.pubkey
-    )
-    const resp = await connection.getParsedAccountInfo(solAddress)
-    if (resp.value) {
-      const accountsOwnedBySolAccount = (
-        await getAccountsByOwner(
-          connection,
-          TOKEN_PROGRAM_ID,
-          solAddress,
-          TokenAccountLayout.span,
-          tokenAccountOwnerOffset
-        )
-      ).map((x) => {
-        const publicKey = x.pubkey
-        const data = Buffer.from(x.account.data)
-        const account = parseTokenAccountData(publicKey, data)
-        return { publicKey, account }
-      })
-      for (const acc of accountsOwnedBySolAccount) {
-        const account = await getTokenAccountsObj(
-          realm,
-          governance,
-          acc,
-          connection
-        )
-        governance?.accounts.push(account)
-      }
-      const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
-        0
+  if (
+    (mint?.account.supply && mint?.account.supply.cmp(new BN(1)) === 1) ||
+    isNft ||
+    isSol
+  ) {
+    if (isSol) {
+      const solAddress = await getNativeTreasuryAddress(
+        realm.owner,
+        governance!.pubkey
       )
-      const solAccount = resp.value as AccountInfoGen<
-        Buffer | ParsedAccountData
-      >
-      solAccount.lamports =
-        solAccount.lamports !== 0
-          ? solAccount.lamports - mintRentAmount
-          : solAccount.lamports
+      const resp = await connection.getParsedAccountInfo(solAddress)
+      if (resp.value) {
+        const accountsOwnedBySolAccount = (
+          await getAccountsByOwner(
+            connection,
+            TOKEN_PROGRAM_ID,
+            solAddress,
+            TokenAccountLayout.span,
+            tokenAccountOwnerOffset
+          )
+        ).map((x) => {
+          const publicKey = x.pubkey
+          const data = Buffer.from(x.account.data)
+          const account = parseTokenAccountData(publicKey, data)
+          return { publicKey, account }
+        })
+        for (const acc of accountsOwnedBySolAccount) {
+          const account = await getTokenAccountsObj(
+            realm,
+            governance,
+            acc,
+            connection
+          )
+          if (account) {
+            governance.accounts.push(account)
+          }
+        }
+        const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
+          0
+        )
+        const solAccount = resp.value as AccountInfoGen<
+          Buffer | ParsedAccountData
+        >
+        solAccount.lamports =
+          solAccount.lamports !== 0
+            ? solAccount.lamports - mintRentAmount
+            : solAccount.lamports
 
+        return {
+          type: AccountType.SOL,
+          pubkey: tokenAccount.publicKey,
+          extensions: {
+            token: tokenAccount,
+            mint: mint,
+            transferAddress: solAddress,
+            amount: tokenAccount.account.amount,
+            solAccount: solAccount,
+          },
+        }
+      }
+    } else if (isNft) {
       return {
-        type: AccountType.SOL,
+        type: AccountType.NFT,
         pubkey: tokenAccount.publicKey,
         extensions: {
           token: tokenAccount,
           mint: mint,
-          transferAddress: solAddress,
+          transferAddress: tokenAccount.account.owner,
           amount: tokenAccount.account.amount,
-          solAccount: solAccount,
         },
       }
-    }
-  } else {
-    return {
-      ...tokenAccount,
-      type: AccountType.TOKEN,
-      pubkey: tokenAccount.publicKey,
-      extensions: {
-        token: tokenAccount,
-        mint: mint,
-        transferAddress: tokenAccount.publicKey,
-        amount: tokenAccount.account.amount,
-      },
+    } else {
+      return {
+        type: AccountType.TOKEN,
+        pubkey: tokenAccount.publicKey,
+        extensions: {
+          token: tokenAccount,
+          mint: mint,
+          transferAddress: tokenAccount.publicKey,
+          amount: tokenAccount.account.amount,
+        },
+      }
     }
   }
 }
