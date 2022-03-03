@@ -96,6 +96,8 @@ export const getDeposits = async ({
         x.nextVestingTimestamp =
           additionalInfoData.locking?.vesting?.nextTimestamp || null
         x.votingPower = additionalInfoData.votingPower || new BN(0)
+        x.votingPowerBaseline =
+          additionalInfoData.votingPowerBaseline || new BN(0)
         return x
       })
       if (

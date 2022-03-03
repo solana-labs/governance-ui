@@ -108,7 +108,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
 
   const lockedTokens = fmtMintAmount(
     deposit.mint.account,
-    deposit.currentlyLocked
+    deposit.currentlyLocked.add(deposit.available)
   )
   const type = Object.keys(deposit.lockup.kind)[0] as LockupType
   const typeName = type !== 'monthly' ? type : 'Vested'
@@ -183,7 +183,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Vote Multiplier"
               value={(
                 deposit.votingPower.toNumber() /
-                deposit.currentlyLocked.toNumber()
+                deposit.votingPowerBaseline.toNumber()
               ).toFixed(2)}
             />
           )}
