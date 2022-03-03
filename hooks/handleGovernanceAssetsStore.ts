@@ -39,7 +39,6 @@ export default function handleGovernanceAssetsStore() {
   } = useGovernanceAssetsStore()
   useEffect(() => {
     if (realm && route.pathname.includes('/params')) {
-      console.log('SHOOOOOOOT')
       setGovernancesArray(connection, governances, realm)
     }
   }, [JSON.stringify(governances), realm?.pubkey, route.pathname])
