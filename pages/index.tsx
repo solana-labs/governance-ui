@@ -1,10 +1,8 @@
-import { useEffect, useState, useMemo } from 'react'
+import { useEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import useWalletStore from 'stores/useWalletStore'
 import { NavButton } from '@components/Button'
-import { getCertifiedRealmInfos, getUnchartedRealmInfos } from '@models/registry/api'
 import { ConnectWalletSimple } from '@components/ConnectWalletButton'
-import RealmsDashboard from './realms/components/RealmsDashboard'
 
 const NavOption = (props) => {
 	return <>
@@ -27,40 +25,7 @@ const Index = () => {
   }, [])
 
 
-
-  // const { connected, current, providerUrl, provider, handleConnectDisconnect, walletAddressFormatted } = ConnectWalletSimple()
-	// const [isLoadingCertified, setIsLoadingCertified] = useState(true)
-	// const [certifiedRealms, setCertifiedRealms] = useState<ReadonlyArray<RealmInfo>>([])
-
-	// const [unchartedRealms, setUnchartedRealms] = useState<ReadonlyArray<RealmInfo>>([])
-	// const [isLoadingUncharted, setIsLoadingUncharted] = useState(true)
-
 	const { actions, selectedRealm, connection } = useWalletStore((s) => s)
-
-
-	// useMemo(async () => {
-	// 	// console.log('CURRENT CONNECTION IS ')
-	// 	// console.log(connection)
-	// 	if (connection) {
-	// 		const data = await getCertifiedRealmInfos(connection)
-	// 		setCertifiedRealms(data)
-	// 		setIsLoadingCertified(false)
-	// 	}
-	// 	if (selectedRealm.realm) {
-	// 		actions.deselectRealm()
-	// 	}
-	// }, [connection])
-
-	// useMemo(async () => {
-	// 	if (connection) {
-	// 		const data = await getUnchartedRealmInfos(connection)
-	// 		setUnchartedRealms(data)
-	// 		setIsLoadingUncharted(false)
-	// 	}
-	// 	if (selectedRealm.realm) {
-	// 		actions.deselectRealm()
-	// 	}
-	// }, [connection])
 
 	const [connectingWallet, setConnectingWallet] = useState(false);
 	const [connected, setConnected] = useState(false);
@@ -104,9 +69,6 @@ const Index = () => {
 					  <li>
 						  <ConnectWalletSimple setConnected={setConnected} />
 					  </li>
-					  {/* { connected && <li>
-						  <RealmsDashboard realms={certifiedRealms} isLoading={isLoadingCertified} showNewButton></RealmsDashboard>
-					  </li> } */}
 					  <li>
 						  ------------------------------------
 						  <br />
@@ -117,9 +79,6 @@ const Index = () => {
 							  To Cancel
 						  </NavOption>
 					  </li>
-					  {/* <li>
-						  <RealmsDashboard realms={unchartedRealms} isLoading={isLoadingUncharted} header={'Uncharted Organisations'}></RealmsDashboard>
-					  </li> */}
 				  </> : <>
 					  <NavOption selectionkey={2} href="/realms">
 						  Browse DAOs
