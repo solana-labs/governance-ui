@@ -1,5 +1,5 @@
 import { Menu } from '@headlessui/react'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useEffect } from 'react'
 import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
@@ -11,11 +11,166 @@ import { abbreviateAddress } from '@utils/formatting'
 import { useRouter } from 'next/router'
 import TwitterIcon from './TwitterIcon'
 import Switch from './Switch'
+import { NavButton } from './Button'
 
 const StyledWalletProviderLabel = styled.p`
 	font-size: 0.65rem;
 	line-height: 1.5;
 `
+export const ConnectWalletSimple = (props) => {
+	const { connected, current, providerUrl, connection, set: setWalletStore } = useWalletStore((s) => s)
+
+	const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [providerUrl])
+
+	const handleDisconnect = () => current?.disconnect()
+
+	const handleConnect = () => {
+		current?.connect()
+	}
+
+	const handleConnectDisconnect = async () => {
+		try {
+			if (connected) {
+				await handleDisconnect()
+			} else {
+				await handleConnect()
+			}
+		} catch (e) {
+			console.warn('handleConnectDisconnect', e)
+		}
+	}
+
+	useEffect(() => {
+		if (props.setConnected) props.setConnected(connected)
+	}, [connected])
+
+	const { show } = useWalletIdentity()
+
+	const { displayName } = useAddressName(connection.current, current?.publicKey || undefined)
+
+	const walletAddressFormatted = current?.publicKey ? abbreviateAddress(current?.publicKey) : ''
+
+	return (
+		<div>
+			<div>
+				<>
+					{WALLET_PROVIDERS.map(({ name, url, icon }, index) => (
+						<div key={name}>
+							<NavButton
+								selectionkey={index + 1}
+								className={provider?.url === url ? 'nav-button:active' : ''}
+								onClick={() =>
+									setWalletStore((s) => {
+										s.providerUrl = url
+									})
+								}
+							>
+								<span className="h-4 w-4 mr-2 image-on-brand flex items-center">
+									<img src={icon} className="w-full block" />
+								</span>
+								<span className="flex items-center">{name}</span>
+
+								{/* {provider?.url === url ? <CheckCircleIcon className="h-5 ml-2 text-green w-5" /> : null} */}
+							</NavButton>
+						</div>
+					))}
+				</>
+			</div>
+
+			<button disabled={connected} className={`${connected ? 'cursor-default' : 'hover:bg-bkg-3 focus:outline-none'}`} onClick={handleConnectDisconnect} {...props}>
+				<span className="flex font-bold items-center text-fgd-1 text-left text-sm relative">
+					{connected && current?.publicKey && (
+						<span className="w-12 pr-2 flex items-center">
+							<span className="flex items-center">
+								<AddressImage
+									dark={true}
+									connection={connection.current}
+									address={current?.publicKey}
+									height="40px"
+									width="40px"
+									// placeholder={
+									// 	<div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10  w-10 mr-2">
+									// 		<UserCircleIcon className="h-9 text-fgd-3 w-9" />
+									// 	</div>
+									// }
+								/>
+							</span>
+							{/* <span className="h-4 w-4 mr-2 image-on-brand flex items-center">
+								<img src={provider?.icon} className="w-full block" />
+							</span> */}
+						</span>
+					)}
+				</span>
+			</button>
+			{connected && current?.publicKey ? (
+				<div className="">
+					<div className="flex flex-wrap items-center pb-4">SUCCESS!</div>
+					<div className="flex flex-wrap items-center">{provider?.name} Wallet Connected</div>
+					<div className="flex flex-wrap items-center">
+						<span className="h-4 w-4 mr-2 image-on-brand flex items-center">
+							<img src={provider?.icon} className="w-full block" />
+						</span>
+						{connected && current?.publicKey && (
+							<>
+								<DisplayAddress connection={connection.current} address={current?.publicKey} width="100px" height="20px" dark={true} />
+								{walletAddressFormatted}
+							</>
+						)}
+					</div>
+					{/*
+						<div className="py-4">
+							<NavButton selectionkey={"ENTER"} onClick={ e  => {
+								alert("Show me DAOs");
+								e.preventDefault();
+							}} target="_blank">
+								Go to DOA
+							</NavButton>
+						</div>
+						*/}
+				</div>
+			) : (
+				<div className="pt-4 pb-16">
+					<ul>
+						<li>You selected &quot;{provider?.name}&quot; as your wallet...</li>
+						<li className="flex flex-wrap items-center">
+							<span className="flex flex-grow-1 flex items-center mr-4">Connect &quot;{provider?.name}&quot; Wallet:</span>
+							<ul className="flex items-center flex-shink-0">
+								<li className="flex align-center flex-shink-0 mr-4">
+									<NavButton
+										selectionkey="Y"
+										onClick={(e) => {
+											handleConnectDisconnect()
+											e.preventDefault()
+										}}
+									>
+										Yes
+									</NavButton>
+								</li>
+								<li className="flex items-center flex-shink-0">
+									<NavButton
+										selectionkey="N"
+										onClick={(e) => {
+											handleDisconnect()
+											e.preventDefault()
+										}}
+									>
+										No
+									</NavButton>
+								</li>
+							</ul>
+						</li>
+						{/*
+							<li className="flex flex-wrap items-center">
+								Connecting wallet...
+							</li>
+							*/}
+					</ul>
+				</div>
+			)}
+		</div>
+	)
+	//  */
+}
 
 export const ConnectWalletButtonAlternative = (props) => {
 	const { connected, current, providerUrl, connection, set: setWalletStore } = useWalletStore((s) => s)
