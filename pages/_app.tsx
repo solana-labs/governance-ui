@@ -34,7 +34,7 @@ function App({ Component, pageProps }) {
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const realmName = realmInfo?.displayName ?? realm?.account?.name
 
-	const title = realmName ? `${realmName}` : 'Solana Governance'
+	const title = realmName ? `${realmName}` : 'tokr_ Realm'
 	const description = `Discuss and vote on ${title} proposals.`
 
 
