@@ -256,21 +256,34 @@ const New = () => {
 		}
 	}
 
-
 	const [propertyData, setPropertyData] = useState({
 		"name": null,
 		"location": null,
 		"link": null,
 	});
+
 	const handleSetPropertyData = ({ propertyName, value }) => {
 		// setFormErrors({})
 		setPropertyData({ ...propertyData, [propertyName]: value })
 	}
 
+	const [descriptionLink, setDescriptionLink] = useState();
+
+	useEffect(() => {
+		//TODO: remove this when complete
+		console.log("descriptionLink", descriptionLink);
+	}, [descriptionLink]);
+
 	useEffect(() => {
 		//TODO: remove this when complete
 		console.log("propertyData", propertyData);
-	}, [propertyData]);
+
+		setDescriptionLink({
+			...propertyData,
+			"description": form.description
+		});
+
+	}, [propertyData, form.description]);
 
 	return (
 		<div>
