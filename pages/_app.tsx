@@ -10,7 +10,7 @@ import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
 import useRouterHistory from '@hooks/useRouterHistory'
 import Footer from '@components/Footer'
-import { useEffect } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
 import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
@@ -23,7 +23,7 @@ import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 function App({ Component, pageProps }) {
 	useHydrateStore()
 	useWallet()
-	useRouterHistory()
+	const  { history, getLastRoute, getPathName } = useRouterHistory()
 	useVoteRegistry()
 	handleGovernanceAssetsStore()
 	const { loadMarket } = useMarketStore()
@@ -36,6 +36,21 @@ function App({ Component, pageProps }) {
 
 	const title = realmName ? `${realmName}` : 'tokr_ Realm'
 	const description = `Discuss and vote on ${title} proposals.`
+
+	const [pathName, setPathName] = useState('/');
+	const [showNav, setShowNav] = useState(true);
+	useLayoutEffect(() => {
+		console.log('pathName', pathName)
+		console.log('showNav', showNav)
+	}, [pathName])
+
+	useLayoutEffect(() => {
+		setShowNav((getPathName() === '/' || getPathName() === undefined) ? false : true)
+		setPathName(getPathName())
+
+		console.log("\n\n\n\n\n\n\n\n\n\ngetPathName", getPathName())
+		console.log("getPathName", getPathName())
+	}, [history])
 
 
 	// Note: ?v==${Date.now()} is added to the url to force favicon refresh.
@@ -88,8 +103,8 @@ function App({ Component, pageProps }) {
 			<ErrorBoundary>
 				<ThemeProvider defaultTheme="Mango">
 					<WalletIdentityProvider appName={'Realms'}>
-						<NavBar />
-						<Notifications />
+						{showNav && <NavBar />}
+						{showNav && <Notifications />}
 						<PageBodyContainer>
 							<Component {...pageProps} />
 						</PageBodyContainer>
