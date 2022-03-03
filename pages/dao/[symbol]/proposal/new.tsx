@@ -256,6 +256,39 @@ const New = () => {
 		}
 	}
 
+
+	const [propertyData, setPropertyData] = useState({
+		"name": null,
+		"location": null,
+		"link": null,
+	});
+	const handleSetPropertyData = ({ propertyName, value }) => {
+		// setFormErrors({})
+		setPropertyData({ ...propertyData, [propertyName]: value })
+	}
+
+	useEffect(() => {
+		console.log("propertyData", propertyData);
+	}, [propertyData]);
+	// const [propertyData, setPropertyData] = useState([]);
+	// const [propertyName, setPropertyName] = useState("");
+	// const [propertyLocation, setPropertyLocation] = useState("");
+	// const [propertyLink, setPropertyLink] = useState("");
+
+	// useEffect(() => {
+	// 	if (propertyData?.length > 0) console.log(`propertyData`, propertyData)
+	// }, [propertyData]);
+
+	// useEffect(() => {
+
+	// 	// setPropertyData([{
+	// 	// 	"name": propertyName,
+	// 	// 	"address": propertyLocation,
+	// 	// 	"uri": propertyLink
+	// 	// }])
+
+	// }, [propertyData, propertyName, propertyLocation, propertyLink]);
+
 	return (
 		<div>
 			<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
@@ -280,6 +313,54 @@ const New = () => {
 			<div className="grid grid-cols-12 gap-4">
 				<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
 					<>
+						<div className="mt-20 mb-20">
+							<div className="pb-4">
+								<Input
+									label="Name"
+									placeholder="name of property"
+									value={propertyData.name}
+									type="text"
+									// error={formErrors['name']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'name',
+										})
+									}
+								/>
+							</div>
+							<div className="pb-4">
+								<Input
+									label="Location"
+									placeholder="Full address of your property"
+									value={propertyData.location}
+									type="search"
+									// error={formErrors['location']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'location',
+										})
+									}
+								/>
+							</div>
+							<div className="pb-4">
+								<Input
+									label="Link"
+									placeholder="Link to legal docs"
+									value={propertyData.link}
+									type="url"
+									// error={formErrors['link']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'link',
+										})
+									}
+								/>
+							</div>
+						</div>
+
 						<div className="pt-2">
 							<div className="pb-4">
 								<Input
