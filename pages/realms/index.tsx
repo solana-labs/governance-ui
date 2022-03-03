@@ -62,15 +62,11 @@ const Realms = () => {
 
 	return (
 		<div>
-			<div className="flex items-center justify-between mb-6 w-full">
-				<h1 className="mb-0">DAOs</h1>
+			{/* <div className="flex items-center justify-between mb-6 w-full">
 				<div className="flex space-x-4">
 					<Input className="pl-8" value={searchString} type="text" onChange={(e) => filterDaos(e.target.value)} placeholder={`Search DAOs...`} prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />} />
-					<Button className="whitespace-nowrap" onClick={handleCreateRealmButtonClick}>
-						Create DAO
-					</Button>
 				</div>
-			</div>
+			</div> */}
 			<RealmsDashboard realms={filteredRealms} isLoading={isLoadingRealms}></RealmsDashboard>
 		</div>
 	)
