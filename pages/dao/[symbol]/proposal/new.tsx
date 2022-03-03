@@ -268,26 +268,9 @@ const New = () => {
 	}
 
 	useEffect(() => {
+		//TODO: remove this when complete
 		console.log("propertyData", propertyData);
 	}, [propertyData]);
-	// const [propertyData, setPropertyData] = useState([]);
-	// const [propertyName, setPropertyName] = useState("");
-	// const [propertyLocation, setPropertyLocation] = useState("");
-	// const [propertyLink, setPropertyLink] = useState("");
-
-	// useEffect(() => {
-	// 	if (propertyData?.length > 0) console.log(`propertyData`, propertyData)
-	// }, [propertyData]);
-
-	// useEffect(() => {
-
-	// 	// setPropertyData([{
-	// 	// 	"name": propertyName,
-	// 	// 	"address": propertyLocation,
-	// 	// 	"uri": propertyLink
-	// 	// }])
-
-	// }, [propertyData, propertyName, propertyLocation, propertyLink]);
 
 	return (
 		<div>
