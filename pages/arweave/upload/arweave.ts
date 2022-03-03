@@ -18,8 +18,7 @@ async function fetchAssetCostToStore(fileSizes: number[]) {
 	return result.solana * anchor.web3.LAMPORTS_PER_SOL
 }
 
-async function upload(data: FormData, manifest, index) {
-	log.debug(`trying to upload image ${index}: ${manifest.name}`)
+export async function uploadToArweave(data: FormData) {
 	return await (
 		await fetch(ARWEAVE_UPLOAD_ENDPOINT, {
 			method: 'POST',
