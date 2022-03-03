@@ -28,6 +28,7 @@ import {
   LinkIcon,
   LockClosedIcon,
 } from '@heroicons/react/outline'
+import { getMintMetadata } from '@components/instructions/programs/splToken'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -251,14 +252,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                         x.currentAmount
                       ).toNumber() *
                       tokenService.getUSDTokenPrice(x.mintPk.toBase58())
-                    // const tokenName =
-                    //   getMintMetadata(x.mintPk)?.name ||
-                    //   x.mintPk.toBase58() ===
-                    //     realm?.account.communityMint.toBase58()
-                    //     ? realm?.account.name
-                    //     : ''
-
-                    // const depositTokenName = `${tokenName}`
+                    const tokenName =
+                      getMintMetadata(x.mintPk)?.name ||
+                      tokenService.getTokenInfo(x.mintPk.toBase58())?.name
                     const formatter = Intl.NumberFormat('en', {
                       notation: 'compact',
                     })
@@ -267,7 +263,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                         <p className="text-fgd-3">
                           {x.lockUpKind === 'none'
                             ? `${realmInfo?.symbol} Deposited`
-                            : `${realmInfo?.symbol} Locked`}
+                            : `${tokenName} Locked`}
                         </p>
                         <span className="hero-text">
                           {availableTokens}
