@@ -16,7 +16,7 @@ const ApprovalProgress = ({
   yesVotesRequired,
 }: ApprovalProgressProps) => {
   return (
-    <div className={`${showBg ? 'bg-bkg-1 p-3' : ''} rounded-md`}>
+    <div className={`${showBg ? 'bg-bkg-1 p-3' : ''}`}>
       <div className="flex items-center">
         <div className="w-full">
           <div className="flex items-center">

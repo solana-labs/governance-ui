@@ -351,7 +351,7 @@ const ConnectWalletButton = (props) => {
 								height="40px"
 								width="40px"
 								placeholder={
-									<div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10 mr-2">
+									<div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 w-10 mr-2">
 										<UserCircleIcon className="h-9 text-fgd-3 w-9" />
 									</div>
 								}
@@ -385,7 +385,7 @@ const ConnectWalletButton = (props) => {
 							<Menu.Button className={`border border-fgd-4 cursor-pointer default-transition h-12 w-12 py-2 px-2 rounded-r-full hover:bg-bkg-3 focus:outline-none`}>
 								<ChevronDownIcon className={`${open ? 'transform rotate-180' : 'transform rotate-360'} default-transition h-5 m-auto ml-1 text-primary-light w-5`} />
 							</Menu.Button>
-							<Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none rounded-md w-48 z-20">
+							<Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none w-48 z-20">
 								<>
 									{WALLET_PROVIDERS.map(({ name, url, icon }) => (
 										<Menu.Item key={name}>

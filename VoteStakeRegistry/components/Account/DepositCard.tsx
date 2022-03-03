@@ -145,8 +145,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
     ?.logoURI
   const formatter = Intl.NumberFormat('en', { notation: 'compact' })
   return (
-    <div className="border border-bkg-4 rounded-lg flex flex-col">
-      <div className="bg-bkg-4 px-4 py-4 pr-16 rounded-md flex flex-col">
+    <div className="border border-bkg-4 flex flex-col">
+      <div className="bg-bkg-4 px-4 py-4 pr-16 flex flex-col">
         <h3 className="mb-0 flex flex-items items-center">
           {img && <img className="w-6 h-6 mr-2" src={img}></img>}
           {lockedTokens} {!img && abbreviateAddress(deposit.mint.publicKey)}
@@ -169,7 +169,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         </h3>
       </div>
       <div
-        className="p-4 pb-6 bg-bkg-1 rounded-lg flex flex-col h-full"
+        className="p-4 pb-6 bg-bkg-1 flex flex-col h-full"
         style={{ minHeight: '290px' }}
       >
         <div className="flex flex-row flex-wrap">

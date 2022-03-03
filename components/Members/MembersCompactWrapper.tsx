@@ -60,14 +60,14 @@ const MembersCompactWrapper = () => {
                 >
                   <div
                     onClick={() => setOpenAddMemberModal(!openAddMemberModal)}
-                    className={`bg-bkg-2 default-transition 
+                    className={`bg-bkg-2 default-transition
                 flex flex-col items-center justify-center
-                rounded-lg hover:bg-bkg-3 ml-auto 
+                hover:bg-bkg-3 ml-auto
                 hover:cursor-pointer ${
                   addNewMemberTooltip ? 'opacity-60 pointer-events-none' : ''
                 }`}
                   >
-                    <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                    <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3">
                       <PlusIcon />
                     </div>
                   </div>
@@ -75,7 +75,7 @@ const MembersCompactWrapper = () => {
               )}
             </h3>
 
-            <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
+            <div className="bg-bkg-1 mb-3 px-4 py-2 w-full">
               <p className="text-fgd-3 text-xs">Total votes cast</p>
 
               <h3 className="mb-0">{totalVotesCast}</h3>
@@ -107,7 +107,7 @@ const MembersCompactWrapper = () => {
   }, [symbol])
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
+    <div className="bg-bkg-2 p-4 md:p-6">{getCurrentView()}</div>
   )
 }
 

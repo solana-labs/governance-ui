@@ -14,7 +14,7 @@ const LinksCompactWrapper = () => {
       </div>
 
       <a href="https://docs.realms.today/" rel="noreferrer" target="_blank">
-        <div className="bg-bkg-2 w-full p-4 rounded-md flex items-center justify-start gap-x-3">
+        <div className="bg-bkg-2 w-full p-4 flex items-center justify-start gap-x-3">
           <LinkIcon className="w-8 text-primary-light" />
 
           <p>Docs & tutorials</p>
@@ -22,7 +22,7 @@ const LinksCompactWrapper = () => {
       </a>
 
       <a href="https://spl.solana.com/" rel="noreferrer" target="_blank">
-        <div className="bg-bkg-2 mt-4 w-full p-4 rounded-md flex items-center justify-start gap-x-3">
+        <div className="bg-bkg-2 mt-4 w-full p-4 flex items-center justify-start gap-x-3">
           <DocumentIcon className="mr-1 w-8 text-primary-light" />
 
           <p>About SPL</p>

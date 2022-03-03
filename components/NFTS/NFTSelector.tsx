@@ -74,7 +74,7 @@ function NFTSelector(
                 <div
                   onClick={() => handleSelectNft(x)}
                   key={x.mint}
-                  className="bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark relative overflow-hidden"
+                  className="bg-bkg-2 flex items-center justify-center cursor-pointer default-transition border border-transparent hover:border-primary-dark relative overflow-hidden"
                   style={{
                     width: '150px',
                     height: '150px',

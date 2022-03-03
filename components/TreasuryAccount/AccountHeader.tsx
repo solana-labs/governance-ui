@@ -43,7 +43,7 @@ const AccountHeader = () => {
     handleSetTotalPrice()
   }, [currentAccount])
   return (
-    <div className="bg-bkg-1 mb-4 px-4 py-2 rounded-md w-full flex items-center">
+    <div className="bg-bkg-1 mb-4 px-4 py-2 w-full flex items-center">
       {(tokenInfo?.logoURI || isNFT) && (
         <img
           className={`flex-shrink-0 h-5 w-5 mr-2.5 ${!isNFT && 'rounded-full'}`}

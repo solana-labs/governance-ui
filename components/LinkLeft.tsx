@@ -40,7 +40,7 @@ const LinkLeft: FunctionComponent<LinkLeftProps> = ({
 }) => {
   return (
     <StyledButton
-      className={`${className} flex z-10 text-mango-yellow relative rounded-full`}
+      className={`${className} flex z-10 text-mango-yellow relative`}
       {...props}
     >
       {children}

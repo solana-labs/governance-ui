@@ -401,7 +401,7 @@ const MangoDepositComponent = ({
             </Tooltip>
           </Button>
           {linkGenerated && (
-            <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3">
+            <div className="bg-bkg-1 px-4 py-2 w-full break-all flex items-center mt-3">
               <div>
                 <div className="text-xs text-fgd-3">Link</div>
                 <div className="text-xs text-fgd-3">
@@ -424,7 +424,7 @@ const MangoDepositComponent = ({
           {existingLinks.map((x) => (
             <div
               key={x.referrerId}
-              className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3"
+              className="bg-bkg-1 px-4 py-2 w-full break-all flex items-center mt-3"
             >
               <div>
                 <div className="text-xs text-fgd-3">Link</div>
@@ -473,7 +473,7 @@ const MangoDepositComponent = ({
               {maxAmountFtm}
               <div
                 onClick={() => setAmount(maxAmount.toNumber())}
-                className="ml-1 bg-fgd-4 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
+                className="ml-1 bg-fgd-4 px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
               >
                 Max
               </div>

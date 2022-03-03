@@ -77,9 +77,9 @@ const MemberItem = ({ item }: { item: Member }) => {
   return (
     <div
       onClick={handleGoToMemberOverview}
-      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 pr-0 rounded-lg w-full hover:bg-bkg-3"
+      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 pr-0 w-full hover:bg-bkg-3"
     >
-      <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
+      <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 w-8 mr-2">
         {address}
       </div>
       <div>

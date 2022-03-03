@@ -136,7 +136,7 @@ const REALM = () => {
 							<ProposalFilter filters={filters} setFilters={setFilters} />
 						</div>
 					</div>
-					<div className="space-y-3">{filteredProposals.length > 0 ? filteredProposals.map(([k, v]) => <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />) : <div className="bg-bkg-3 px-4 md:px-6 py-4 rounded-lg text-center text-fgd-3">No proposals found</div>}</div>
+					<div className="space-y-3">{filteredProposals.length > 0 ? filteredProposals.map(([k, v]) => <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />) : <div className="bg-bkg-3 px-4 md:px-6 py-4 text-center text-fgd-3">No proposals found</div>}</div>
 				</div>
 				<div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4 border border-fgd-1">
 					<TokenBalanceCardWrapper />

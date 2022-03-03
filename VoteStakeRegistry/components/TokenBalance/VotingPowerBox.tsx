@@ -19,12 +19,12 @@ const VotingPowerBox = ({
     votingPower && mint ? fmtMintAmount(mint, votingPower) : '0'
 
   return (
-    <div className={`bg-bkg-1 rounded-md ${className}`} style={style}>
+    <div className={`bg-bkg-1 ${className}`} style={style}>
       <p className="text-fgd-3 text-xs">Votes</p>
       <h3 className="mb-0 flex items-center">
         {votingPowerFmt}{' '}
         {!votingPowerFromDeposits.isZero() && !votingPower.isZero() && (
-          <div className="text-xs ml-3 font-light rounded-full bg-bkg-3 px-2 py-1">
+          <div className="text-xs ml-3 font-light bg-bkg-3 px-2 py-1">
             {`${(
               votingPower.toNumber() / votingPowerFromDeposits.toNumber()
             ).toFixed(2)}x`}

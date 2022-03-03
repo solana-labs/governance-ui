@@ -164,8 +164,8 @@ const MemberOverview = () => {
           </a>
         </>
       </h3>
-      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
-        <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
+      <div className="bg-bkg-1 px-4 py-2 w-full break-all flex items-center">
+        <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 w-8 mr-2">
           <AddressImage
             dark={true}
             connection={connection.current}
@@ -210,7 +210,7 @@ const MemberOverview = () => {
               `/dao/${symbol}/proposal/${x.proposalPublicKey}`
             )}
             rel="noopener noreferrer"
-            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
+            className="border border-fgd-4 default-transition hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
             key={x.proposalPublicKey}
           >
             <div className="w-full pr-6">

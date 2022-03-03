@@ -196,7 +196,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         )}
       </div>
       {ataAddress && (
-        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mb-4">
+        <div className="bg-bkg-1 px-4 py-2 w-full break-all flex items-center mb-4">
           <div>
             <div className="text-fgd-3 text-xs">
               {abbreviateAddress(new PublicKey(ataAddress))}

@@ -25,8 +25,8 @@ const Switch: FunctionComponent<SwitchProps> = ({
         type="button"
         className={`${
           checked ? 'bg-primary-light' : 'bg-bkg-4'
-        } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent 
-        rounded-full cursor-pointer transition-colors ease-in-out duration-200 
+        } relative inline-flex flex-shrink-0 h-6 w-11 border-2 border-transparent
+        cursor-pointer transition-colors ease-in-out duration-200
         focus:outline-none`}
         role="switch"
         aria-checked={checked}
@@ -37,7 +37,7 @@ const Switch: FunctionComponent<SwitchProps> = ({
           aria-hidden="true"
           className={`${
             checked ? 'translate-x-5' : 'translate-x-0'
-          } pointer-events-none inline-block h-5 w-5 rounded-full bg-white 
+          } pointer-events-none inline-block h-5 w-5 bg-white
           shadow transform ring-0 transition ease-in-out duration-200`}
         ></span>
       </button>

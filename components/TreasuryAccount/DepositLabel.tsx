@@ -14,7 +14,7 @@ const DepositLabel = ({
   transferAddress: PublicKey | undefined | null
 }) => {
   return (
-    <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
+    <div className="bg-bkg-1 px-4 py-2 w-full break-all flex items-center">
       <div>
         <div className="text-xs text-fgd-3">{header}</div>
         <div className="text-xs text-fgd-3">

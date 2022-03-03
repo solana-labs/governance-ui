@@ -76,7 +76,7 @@ const StrategiesWrapper = () => {
         strategiesLoading ? 'pointer-event-none' : ''
       }`}
     >
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
+      <div className="bg-bkg-2 p-4 md:p-6 col-span-12 space-y-3">
         <div className="mb-10 flex flex-items">
           <h1 className="flex items-center">
             Strategies{' '}

@@ -70,7 +70,7 @@ const LockPluginTokenBalanceCard = ({
 
   const hasLoaded = mint || councilMint
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <div className="bg-bkg-2 p-4 md:p-6">
       <h3>
         <Tooltip content={!connected ? 'Please connect your wallet' : ''}>
           <div
@@ -116,8 +116,8 @@ const LockPluginTokenBalanceCard = ({
         </>
       ) : (
         <>
-          <div className="animate-pulse bg-bkg-3 h-12 mb-4 rounded-lg" />
-          <div className="animate-pulse bg-bkg-3 h-10 rounded-lg" />
+          <div className="animate-pulse bg-bkg-3 h-12 mb-4" />
+          <div className="animate-pulse bg-bkg-3 h-10" />
         </>
       )}
     </div>

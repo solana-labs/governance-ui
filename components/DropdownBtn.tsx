@@ -48,7 +48,7 @@ const DropdownBtn = ({
                       } default-transition h-5 m-auto ml-1 text-primary-light w-5`}
                     />
                   </Menu.Button>
-                  <Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none rounded-md w-48 z-20">
+                  <Menu.Items className="absolute bg-bkg-1 border border-fgd-4 p-2 right-0 top-14 shadow-md outline-none w-48 z-20">
                     {filtredOptions.map((x) => (
                       <Menu.Item key={x.label}>
                         <button
