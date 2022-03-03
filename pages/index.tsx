@@ -4,6 +4,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { NavButton } from '@components/Button'
 import { ConnectWalletSimple } from '@components/ConnectWalletButton'
 import useQueryContext from '@hooks/useQueryContext'
+import { notify } from '@utils/notifications'
 
 const NavOption = (props) => {
 	return (
@@ -13,7 +14,7 @@ const NavOption = (props) => {
 					{props.children}
 				</NavButton>
 			</li>
-		</>
+		</> 
 	)
 }
 
@@ -31,7 +32,8 @@ const Index = () => {
 	const { actions, selectedRealm, connection } = useWalletStore((s) => s)
 
 	const [connectingWallet, setConnectingWallet] = useState(false)
-	const [connected, setConnected] = useState(false)
+	const [successfulConnect, setSuccessfulConnect] = useState(false)
+	const { connected, current: wallet } = useWalletStore((s) => s)
 
 	const handleCreateRealmButtonClick = async () => {
 		if (!connected) {
@@ -76,7 +78,7 @@ const Index = () => {
 							<>
 								<li className="pt-4">Connect your wallet, make a selection below:</li>
 								<li>
-									<ConnectWalletSimple setConnected={setConnected} />
+									<ConnectWalletSimple setSuccessfulConnect={setSuccessfulConnect} />
 								</li>
 								{connected && (
 									<>

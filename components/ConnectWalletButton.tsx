@@ -41,7 +41,7 @@ export const ConnectWalletSimple = (props) => {
 	}
 
 	useEffect(() => {
-		if (props.setConnected) props.setConnected(connected)
+		if (props.setSuccessfulConnect) props.setSuccessfulConnect(connected)
 	}, [connected])
 
 	const { show } = useWalletIdentity()
