@@ -22,7 +22,6 @@ import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import DepositLabel from '@components/TreasuryAccount/DepositLabel'
-import MyProposals from './proposal/components/MyProposalsBtn'
 
 const compareProposals = (
   p1: Proposal,
@@ -82,7 +81,6 @@ const REALM = () => {
   const prevStringifyNftsGovernedTokenAccounts = usePrevious(
     JSON.stringify(nftsGovernedTokenAccounts)
   )
-  const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
   const { getNfts } = useTreasuryAccountStore()
   const [filters, setFilters] = useState<ProposalState[]>([])
@@ -173,11 +171,6 @@ const REALM = () => {
           <div className="flex items-center justify-between pb-3">
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
-              {connected && (
-                <div className="mr-4">
-                  <MyProposals></MyProposals>
-                </div>
-              )}
               <div className="mr-4">
                 <ApproveAllBtn />
               </div>

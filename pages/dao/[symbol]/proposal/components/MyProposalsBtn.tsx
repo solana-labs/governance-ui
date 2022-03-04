@@ -18,7 +18,7 @@ import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 
-const MyProposals = () => {
+const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -190,12 +190,7 @@ const MyProposals = () => {
   return (
     <>
       <div>
-        <a
-          className={`cursor-pointer hover:bg-bkg-3 default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
-          onClick={() => setModalIsOpen(true)}
-        >
-          My proposals
-        </a>
+        <Button onClick={() => setModalIsOpen(true)}>My proposals</Button>
       </div>
       {modalIsOpen && (
         <Modal
@@ -282,4 +277,4 @@ const ProposalList = ({
   )
 }
 
-export default MyProposals
+export default MyProposalsBn
