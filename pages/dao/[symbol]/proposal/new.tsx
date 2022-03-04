@@ -111,6 +111,7 @@ const New = () => {
 		ein_letter_from_irs: '',
 		appraisal: '',
 		submitted_by: '',
+		uri: '',
 	})
 
 	const [descriptionLink, setDescriptionLink] = useState()
@@ -310,8 +311,16 @@ const New = () => {
 		//TODO: remove this when complete
 		console.log('propertyData', propertyData)
 
+		// setDescriptionLink({
+		// 	...propertyData,
+		// })
+
 		setDescriptionLink({
-			...propertyData,
+			description: propertyData.description,
+			property_address: propertyData.property_address,
+			sq_ft: propertyData.sq_ft,
+			property_description: propertyData.property_description,
+			uri: propertyData.uri,
 		})
 	}, [propertyData])
 
@@ -338,12 +347,17 @@ const New = () => {
 			</div>
 			<div className="grid grid-cols-12 gap-4">
 				<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
+
+					<p className="pt-8">
+						Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.
+					</p>
+
 					<>
-						<div className="mt-20 mb-20">
-							<div className="space-y-8">
+						<div className="pt-8 mb-20">
+							<div className="space-y-16">
 								<div className="space-y-4">
 									<h3>
-										<span className="text-2l uppercase">Property Information</span>
+										<span className="text-lg">Property Information</span>
 									</h3>
 
 									<div className="xpb-4">
@@ -354,18 +368,24 @@ const New = () => {
 											id="name"
 											name="name"
 											type="text"
+											error={formErrors['title']}
 											// error={propertyDataErrors['name']}
-											onChange={(evt) =>
+											onChange={(evt) => {
 												handleSetPropertyData({
 													value: evt.target.value,
 													propertyName: 'name',
 												})
-											}
+
+												handleSetForm({
+													value: evt.target.value,
+													propertyName: 'title',
+												})
+											}}
 										/>
 									</div>
 
 									<div className="xpb-4">
-										<Input
+										<Textarea
 											label="Description"
 											placeholder="Description"
 											value={propertyData.description}
@@ -385,22 +405,22 @@ const New = () => {
 
 								<div className="space-y-4">
 									<h3>
-										<span className="text-2l uppercase">Parcel Attributes</span>
+										<span className="text-lg">Parcel Attributes</span>
 									</h3>
 
 									<div className="xpb-4">
 										<Input
 											label="Property Address"
 											placeholder="Property Address"
-											value={propertyData.propertyAddress}
-											id="propertyAddress"
-											name="propertyAddress"
+											value={propertyData.property_address}
+											id="property_address"
+											name="property_address"
 											type="text"
-											// error={propertyDataErrors['propertyAddress']}
+											// error={propertyDataErrors['property_address']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'propertyAddress',
+													propertyName: 'property_address',
 												})
 											}
 										/>
@@ -409,19 +429,26 @@ const New = () => {
 									<div className="xpb-4">
 										<Input
 											label="Lat Long"
-											placeholder="Lat Long"
-											value={propertyData.latLong}
-											id="latLong"
-											name="latLong"
+											placeholder="Lat, Long"
+											value={propertyData.lat_long}
+											id="lat_long"
+											name="lat_long"
 											type="text"
-											// error={propertyDataErrors['latLong']}
+											// error={propertyDataErrors['lat_long']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'latLong',
+													propertyName: 'lat_long',
 												})
 											}
 										/>
+
+										<div className="text-xs pt-2">
+											Find Latitude and Longitude of your property:{' '}
+											<a target="_target" href="https://www.latlong.net/convert-address-to-lat-long.html">
+												click here
+											</a>
+										</div>
 									</div>
 
 									<div className="xpb-4">
@@ -445,22 +472,22 @@ const New = () => {
 
 								<div className="space-y-4">
 									<h3>
-										<span className="text-2l uppercase">Public Registries of Parcel Record </span>
+										<span className="text-lg">Public Registries of Parcel Record </span>
 									</h3>
 
 									<div className="xpb-4">
 										<Input
 											label="Land Record Auditor"
 											placeholder="Land Record Auditor"
-											value={propertyData.landRecordAuditor}
-											id="landRecordAuditor"
-											name="landRecordAuditor"
+											value={propertyData.land_record_auditor}
+											id="land_record_auditor"
+											name="land_record_auditor"
 											type="text"
-											// error={propertyDataErrors['landRecordAuditor']}
+											// error={propertyDataErrors['land_record_auditor']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'landRecordAuditor',
+													propertyName: 'land_record_auditor',
 												})
 											}
 										/>
@@ -470,15 +497,15 @@ const New = () => {
 										<Input
 											label="Deed Record Recorder"
 											placeholder="Deed Record Recorder"
-											value={propertyData.deedRecordRecorder}
-											id="deedRecordRecorder"
-											name="deedRecordRecorder"
+											value={propertyData.deed_record_recorder}
+											id="deed_record_recorder"
+											name="deed_record_recorder"
 											type="text"
-											// error={propertyDataErrors['deedRecordRecorder']}
+											// error={propertyDataErrors['deed_record_recorder']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'deedRecordRecorder',
+													propertyName: 'deed_record_recorder',
 												})
 											}
 										/>
@@ -488,33 +515,33 @@ const New = () => {
 										<Input
 											label="Mortgage Record Recorder"
 											placeholder="Mortgage Record Recorder"
-											value={propertyData.mortgageRecordRecorder}
-											id="mortgageRecordRecorder"
-											name="mortgageRecordRecorder"
+											value={propertyData.mortgage_record_recorder}
+											id="mortgage_record_recorder"
+											name="mortgage_record_recorder"
 											type="text"
-											// error={propertyDataErrors['mortgageRecordRecorder']}
+											// error={propertyDataErrors['mortgage_record_recorder']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'mortgageRecordRecorder',
+													propertyName: 'mortgage_record_recorder',
 												})
 											}
 										/>
 									</div>
 
 									<div className="xpb-4">
-										<Input
+										<Textarea
 											label="Legal Description"
 											placeholder="Legal Description"
-											value={propertyData.legalDescription}
-											id="legalDescription"
-											name="legalDescription"
+											value={propertyData.legal_description}
+											id="legal_description"
+											name="legal_description"
 											type="text"
-											// error={propertyDataErrors['legalDescription']}
+											// error={propertyDataErrors['legal_description']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'legalDescription',
+													propertyName: 'legal_description',
 												})
 											}
 										/>
@@ -524,15 +551,15 @@ const New = () => {
 										<Input
 											label="Mortgage Record"
 											placeholder="Mortgage Record"
-											value={propertyData.mortgageRecord}
-											id="mortgageRecord"
-											name="mortgageRecord"
+											value={propertyData.mortgage_record}
+											id="mortgage_record"
+											name="mortgage_record"
 											type="text"
-											// error={propertyDataErrors['mortgageRecord']}
+											// error={propertyDataErrors['mortgage_record']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'mortgageRecord',
+													propertyName: 'mortgage_record',
 												})
 											}
 										/>
@@ -541,21 +568,21 @@ const New = () => {
 
 								<div className="space-y-4">
 									<h3>
-										<span className="text-2l uppercase">Title Attributes</span>
+										<span className="text-lg">Title Attributes</span>
 									</h3>
 									<div className="xpb-4">
 										<Input
 											label="Title Method"
 											placeholder="Title Method"
-											value={propertyData.titleMethod}
-											id="titleMethod"
-											name="titleMethod"
+											value={propertyData.title_method}
+											id="title_method"
+											name="title_method"
 											type="text"
-											// error={propertyDataErrors['titleMethod']}
+											// error={propertyDataErrors['title_method']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'titleMethod',
+													propertyName: 'title_method',
 												})
 											}
 										/>
@@ -565,15 +592,15 @@ const New = () => {
 										<Input
 											label="Title Held By"
 											placeholder="Title Held By"
-											value={propertyData.titleHeldBy}
-											id="titleHeldBy"
-											name="titleHeldBy"
+											value={propertyData.title_held_by}
+											id="title_held_by"
+											name="title_held_by"
 											type="text"
-											// error={propertyDataErrors['titleHeldBy']}
+											// error={propertyDataErrors['title_held_by']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'titleHeldBy',
+													propertyName: 'title_held_by',
 												})
 											}
 										/>
@@ -581,8 +608,8 @@ const New = () => {
 
 									<div className="xpb-4">
 										<Input
-											label="Ein"
-											placeholder="Ein"
+											label="EIN #"
+											placeholder="EIN #"
 											value={propertyData.ein}
 											id="ein"
 											name="ein"
@@ -601,15 +628,15 @@ const New = () => {
 										<Input
 											label="Transfer Restrictions"
 											placeholder="Transfer Restrictions"
-											value={propertyData.transferRestrictions}
-											id="transferRestrictions"
-											name="transferRestrictions"
+											value={propertyData.transfer_restrictions}
+											id="transfer_restrictions"
+											name="transfer_restrictions"
 											type="text"
-											// error={propertyDataErrors['transferRestrictions']}
+											// error={propertyDataErrors['transfer_restrictions']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'transferRestrictions',
+													propertyName: 'transfer_restrictions',
 												})
 											}
 										/>
@@ -618,21 +645,21 @@ const New = () => {
 
 								<div className="space-y-4">
 									<h3>
-										<span className="text-2l uppercase">Property Record</span>
+										<span className="text-lg">Property Record</span>
 									</h3>
 									<div className="xpb-4">
 										<Input
 											label="Marketing Name"
 											placeholder="Marketing Name"
-											value={propertyData.marketingName}
-											id="marketingName"
-											name="marketingName"
+											value={propertyData.marketing_name}
+											id="marketing_name"
+											name="marketing_name"
 											type="text"
-											// error={propertyDataErrors['marketingName']}
+											// error={propertyDataErrors['marketing_name']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'marketingName',
+													propertyName: 'marketing_name',
 												})
 											}
 										/>
@@ -660,33 +687,33 @@ const New = () => {
 										<Input
 											label="Sq Ft"
 											placeholder="Sq Ft"
-											value={propertyData.sqFt}
-											id="sqFt"
-											name="sqFt"
+											value={propertyData.sq_ft}
+											id="sq_ft"
+											name="sq_ft"
 											type="text"
-											// error={propertyDataErrors['sqFt']}
+											// error={propertyDataErrors['sq_ft']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'sqFt',
+													propertyName: 'sq_ft',
 												})
 											}
 										/>
 									</div>
 
 									<div className="xpb-4">
-										<Input
+										<Textarea
 											label="Property Description"
 											placeholder="Property Description"
-											value={propertyData.propertyDescription}
-											id="propertyDescription"
-											name="propertyDescription"
+											value={propertyData.property_description}
+											id="property_description"
+											name="property_description"
 											type="text"
-											// error={propertyDataErrors['propertyDescription']}
+											// error={propertyDataErrors['property_description']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'propertyDescription',
+													propertyName: 'property_description',
 												})
 											}
 										/>
@@ -695,7 +722,7 @@ const New = () => {
 
 								<div className="space-y-4">
 									<h3>
-										<span className="text-2l uppercase">Material Agreements &amp; Documentation</span>
+										<span className="text-lg">Material Agreements &amp; Documentation</span>
 									</h3>
 
 									<div className="xpb-4">
@@ -738,15 +765,15 @@ const New = () => {
 										<Input
 											label="Title Insurance"
 											placeholder="Title Insurance"
-											value={propertyData.titleInsurance}
-											id="titleInsurance"
-											name="titleInsurance"
+											value={propertyData.title_insurance}
+											id="title_insurance"
+											name="title_insurance"
 											type="text"
-											// error={propertyDataErrors['titleInsurance']}
+											// error={propertyDataErrors['title_insurance']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'titleInsurance',
+													propertyName: 'title_insurance',
 												})
 											}
 										/>
@@ -756,15 +783,15 @@ const New = () => {
 										<Input
 											label="Articles Of Organization"
 											placeholder="Articles Of Organization"
-											value={propertyData.articlesOfOrganization}
-											id="articlesOfOrganization"
-											name="articlesOfOrganization"
+											value={propertyData.articles_of_organization}
+											id="articles_of_organization"
+											name="articles_of_organization"
 											type="text"
-											// error={propertyDataErrors['articlesOfOrganization']}
+											// error={propertyDataErrors['articles_of_organization']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'articlesOfOrganization',
+													propertyName: 'articles_of_organization',
 												})
 											}
 										/>
@@ -774,15 +801,15 @@ const New = () => {
 										<Input
 											label="Certificate Of Organization From Secretary Of State"
 											placeholder="Certificate Of Organization From Secretary Of State"
-											value={propertyData.certificateOfOrganizationFromSecretaryOfState}
-											id="certificateOfOrganizationFromSecretaryOfState"
-											name="certificateOfOrganizationFromSecretaryOfState"
+											value={propertyData.certificate_of_organization_from_secretary_of_state}
+											id="certificate_of_organization_from_secretary_of_state"
+											name="certificate_of_organization_from_secretary_of_state"
 											type="text"
-											// error={propertyDataErrors['certificateOfOrganizationFromSecretaryOfState']}
+											// error={propertyDataErrors['certificate_of_organization_from_secretary_of_state']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'certificateOfOrganizationFromSecretaryOfState',
+													propertyName: 'certificate_of_organization_from_secretary_of_state',
 												})
 											}
 										/>
@@ -792,15 +819,15 @@ const New = () => {
 										<Input
 											label="Operating Agreement"
 											placeholder="Operating Agreement"
-											value={propertyData.operatingAgreement}
-											id="operatingAgreement"
-											name="operatingAgreement"
+											value={propertyData.operating_agreement}
+											id="operating_agreement"
+											name="operating_agreement"
 											type="text"
-											// error={propertyDataErrors['operatingAgreement']}
+											// error={propertyDataErrors['operating_agreement']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'operatingAgreement',
+													propertyName: 'operating_agreement',
 												})
 											}
 										/>
@@ -810,15 +837,15 @@ const New = () => {
 										<Input
 											label="Membership Interest Transfer Agreement"
 											placeholder="Membership Interest Transfer Agreement"
-											value={propertyData.membershipInterestTransferAgreement}
-											id="membershipInterestTransferAgreement"
-											name="membershipInterestTransferAgreement"
+											value={propertyData.membership_interest_transfer_agreement}
+											id="membership_interest_transfer_agreement"
+											name="membership_interest_transfer_agreement"
 											type="text"
-											// error={propertyDataErrors['membershipInterestTransferAgreement']}
+											// error={propertyDataErrors['membership_interest_transfer_agreement']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'membershipInterestTransferAgreement',
+													propertyName: 'membership_interest_transfer_agreement',
 												})
 											}
 										/>
@@ -828,15 +855,15 @@ const New = () => {
 										<Input
 											label="Ein Letter From Irs"
 											placeholder="Ein Letter From Irs"
-											value={propertyData.einLetterFromIrs}
-											id="einLetterFromIrs"
-											name="einLetterFromIrs"
+											value={propertyData.ein_letter_from_irs}
+											id="ein_letter_from_irs"
+											name="ein_letter_from_irs"
 											type="text"
-											// error={propertyDataErrors['einLetterFromIrs']}
+											// error={propertyDataErrors['ein_letter_from_irs']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'einLetterFromIrs',
+													propertyName: 'ein_letter_from_irs',
 												})
 											}
 										/>
@@ -861,48 +888,32 @@ const New = () => {
 									</div>
 								</div>
 
-								<div className="space-y-4">
+								<div className="space-y-4 pb-16">
 									<h3>
-										<span className="text-2l uppercase">Submitted By</span>
+										<span className="text-lg">Submitted By</span>
 									</h3>
 									<div className="xpb-4">
 										<Input
-											label="Your Full Legal Name"
-											placeholder="Your Full Legal Name"
-											value={propertyData.submittedBy}
-											id="submittedBy"
-											name="submittedBy"
+											label="Your Legal Name"
+											placeholder="Your Legal Name"
+											value={propertyData.submitted_by}
+											id="submitted_by"
+											name="submitted_by"
 											type="text"
-											// error={propertyDataErrors['submittedBy']}
+											// error={propertyDataErrors['submitted_by']}
 											onChange={(evt) =>
 												handleSetPropertyData({
 													value: evt.target.value,
-													propertyName: 'submittedBy',
+													propertyName: 'submitted_by',
 												})
 											}
 										/>
 									</div>
 								</div>
-
 							</div>
 						</div>
 
 						<div className="pt-2">
-							<div className="pb-4">
-								<Input
-									label="Title"
-									placeholder="Title of your proposal"
-									value={form.title}
-									type="text"
-									error={formErrors['title']}
-									onChange={(evt) =>
-										handleSetForm({
-											value: evt.target.value,
-											propertyName: 'title',
-										})
-									}
-								/>
-							</div>
 							{/* <Textarea
 								className="mb-3"
 								label="Description"

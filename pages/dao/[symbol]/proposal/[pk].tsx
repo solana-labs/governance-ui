@@ -78,22 +78,24 @@ const Proposal = () => {
 						{description && (
 							<div className="pb-2">
 								{descriptionObj ? (
-									descriptionObj.map((x, index) => {
+									descriptionObj.map((item, index) => {
 										return (
 											<div key={'descriptionOutput_' + index} className="pb-8">
-												The Gravity Project in Columbus, Ohio
+												{ item.property_description }
 												<br />
 												<ul className="list-disc list-inside space-y-2 pt-4">
 													<li>
-														<b>Property location:</b> 501 W Broad, Columbus, OH, 43209
+														<b>Property location:</b> { item.property_address }
+													</li>
+													<li>
+														<b>Square Feet:</b> { item.sq_ft }
 													</li>
 													<li>
 														<span className="inline-flex align-center">
-															<b className="inline mr-1">Property Details:</b> <a className="inline" href="https://goog.con"><span className="flex">Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" /></span></a>
+															<b className="inline mr-1">Property Details:</b> <a className="inline" href={ item.uri } target="blank"><span className="flex">Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" /></span></a>
 														</span>
 													</li>
 												</ul>
-
 											</div>
 										)
 									})
