@@ -382,7 +382,7 @@ const SendTokens = () => {
             </Popover.Button>
 
             <Popover.Panel className="absolute z-10 right-4 top-4 w-80">
-              <div className="bg-bkg-1 px-4 py-2 rounded-md text-xs">
+              <div className="bg-bkg-1 px-4 py-2 text-xs">
                 {`In case of empty fields of advanced options, title and description will be
                 combination of amount token symbol and destination account e.g
                 "Pay 10 sol to PF295R1YJ8n1..."`}

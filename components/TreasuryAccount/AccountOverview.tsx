@@ -165,7 +165,7 @@ const AccountOverview = () => {
             }
             target="_blank"
             rel="noopener noreferrer"
-            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
+            className="border border-fgd-4 default-transition hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
             key={activity.signature}
           >
             <div>{activity.signature.substring(0, 12)}...</div>

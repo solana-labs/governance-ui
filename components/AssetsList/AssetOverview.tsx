@@ -70,7 +70,7 @@ const AssetOverview = () => {
           </a>
         </>
       </h3>
-      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex mb-4 items-center">
+      <div className="bg-bkg-1 px-4 py-2 w-full break-all flex mb-4 items-center">
         <CogIcon className="h-6 text-fgd-3 w-6 mr-2.5" />
         <div className="mr-1 text-xs text-fgd-3">
           <span className="text-fgd-1">Last deployed slot:</span> {slot}

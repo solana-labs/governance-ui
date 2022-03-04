@@ -131,7 +131,7 @@ const DepositComponent = ({
 
   return (
     <div
-      className={`p-6 border-fgd-4 border rounded-md w-4/5 mb-28 ${
+      className={`p-6 border-fgd-4 border w-4/5 mb-28 ${
         !filteredTokenGov.length && 'opacity-60 pointer-events-none'
       }`}
     >
@@ -153,7 +153,7 @@ const DepositComponent = ({
           <span className="text-fgd-3 text-xs mr-1">Bal:</span> {maxAmountFtm}
           <div
             onClick={() => setAmount(maxAmount.toNumber())}
-            className="ml-1 bg-fgd-4 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
+            className="ml-1 bg-fgd-4 px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
           >
             Max
           </div>

@@ -50,7 +50,7 @@ const gallery = () => {
   }, [realmNfts.length, JSON.stringify(governanceNfts), governancePk])
   return (
     <div className="grid grid-cols-12">
-      <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12 space-y-3">
+      <div className="bg-bkg-2 p-4 md:p-6 col-span-12 space-y-3">
         <div className="flex flex-row items-center">
           <PreviousRouteBtn />
           <h1 className="ml-3">Collectables</h1>
@@ -115,7 +115,7 @@ const gallery = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <ImgWithLoader
-                  className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
+                  className="bg-bkg-2 cursor-pointer default-transition border border-transparent hover:border-primary-dark"
                   style={{
                     width: '150px',
                     height: '150px',

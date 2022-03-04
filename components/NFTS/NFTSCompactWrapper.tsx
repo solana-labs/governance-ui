@@ -32,7 +32,7 @@ const NFTSCompactWrapper = () => {
     resetCompactViewState,
   } = useTreasuryAccountStore()
   return nftsGovernedTokenAccounts.length ? (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
+    <div className="bg-bkg-2 p-4 md:p-6 transition-all">
       <h3 className="mb-4 flex items-center">
         <div
           className="cursor-pointer flex items-center"
@@ -52,7 +52,7 @@ const NFTSCompactWrapper = () => {
             setCurrentCompactAccount(nftsGovernedTokenAccounts[0], connection)
             setOpenNftDepositModal(true)
           }}
-          className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3 ml-auto cursor-pointer"
+          className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3 ml-auto cursor-pointer"
         >
           <PlusIcon />
         </div>
@@ -64,7 +64,7 @@ const NFTSCompactWrapper = () => {
         {isLoading ? (
           <Loading></Loading>
         ) : realmNfts.length ? (
-          <div className="flex flex-row flex-wrap gap-4  border border-fgd-4 p-3 rounded-lg">
+          <div className="flex flex-row flex-wrap gap-4  border border-fgd-4 p-3">
             {realmNfts.map((x, idx) => (
               <a
                 key={idx}
@@ -74,7 +74,7 @@ const NFTSCompactWrapper = () => {
                 onClick={(e) => e.stopPropagation()}
               >
                 <ImgWithLoader
-                  className="bg-bkg-2 cursor-pointer default-transition rounded-lg border border-transparent hover:border-primary-dark"
+                  className="bg-bkg-2 cursor-pointer default-transition border border-transparent hover:border-primary-dark"
                   style={{
                     width: '60px',
                     height: '60px',

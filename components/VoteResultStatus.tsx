@@ -12,12 +12,12 @@ const VoteResultStatus = ({
   yesVotesRequired,
 }: VoteResultStatusProps) => {
   return votePassed ? (
-    <div className="bg-bkg-1 flex items-center p-3 rounded-md">
+    <div className="bg-bkg-1 flex items-center p-3">
       <CheckCircleIcon className="h-5 mr-1.5 text-green w-5" />
       <h4 className="mb-0">The proposal has passed</h4>
     </div>
   ) : (
-    <div className="bg-bkg-1 p-3 rounded-md">
+    <div className="bg-bkg-1 p-3">
       <div className="flex items-center">
         <XCircleIcon className="h-5 mr-1.5 text-red w-5" />
         <div>

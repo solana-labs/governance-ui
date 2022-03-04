@@ -54,18 +54,18 @@ const AssetsCompactWrapper = () => {
               <Tooltip contentClassName="ml-auto" content={addNewAssetTooltip}>
                 <div
                   onClick={goToNewAssetForm}
-                  className={`bg-bkg-2 default-transition 
+                  className={`bg-bkg-2 default-transition
                 flex flex-col items-center justify-center
-                rounded-lg hover:bg-bkg-3 ml-auto ${
+                hover:bg-bkg-3 ml-auto ${
                   addNewAssetTooltip
                     ? 'cursor-not-allowed pointer-events-none opacity-60'
                     : 'cursor-pointer'
                 }`}
                 >
                   <div
-                    className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
-                font-bold items-center justify-center 
-                rounded-full text-fgd-3"
+                    className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex
+                font-bold items-center justify-center
+                text-fgd-3"
                   >
                     <PlusIcon />
                   </div>
@@ -85,7 +85,7 @@ const AssetsCompactWrapper = () => {
     resetCompactViewState()
   }, [symbol])
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
+    <div className="bg-bkg-2 p-4 md:p-6">{getCurrentView()}</div>
   )
 }
 

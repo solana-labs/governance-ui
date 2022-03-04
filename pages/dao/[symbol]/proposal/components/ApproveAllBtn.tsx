@@ -117,7 +117,7 @@ const ApproveAllBtn = () => {
               !canApproveProposals
                 ? 'cursor-not-allowed pointer-events-none'
                 : 'cursor-pointer hover:bg-bkg-3'
-            } default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
+            } default-transition flex items-center ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
             onClick={approveAll}
           >
             <BadgeCheckIcon className="h-5 mr-1.5 text-primary-light w-5" />

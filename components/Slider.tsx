@@ -11,11 +11,11 @@ type StyledSliderProps = {
 
 const StyledSlider = styled(Slider)<StyledSliderProps>`
   .rc-slider-rail {
-    ${tw`bg-gradient-to-r from-secondary-1-light via-primary-light to-secondary-2-light h-2.5 rounded-full`}
+    ${tw`bg-gradient-to-r from-secondary-1-light via-primary-light to-secondary-2-light h-2.5`}
   }
 
   .rc-slider-track {
-    ${tw`bg-gradient-to-r from-secondary-1-dark via-primary-light to-secondary-2-light h-2.5 rounded-full ring-1 ring-primary-light ring-inset`}
+    ${tw`bg-gradient-to-r from-secondary-1-dark via-primary-light to-secondary-2-light h-2.5 ring-1 ring-primary-light ring-inset`}
 
     ${({ enableTransition }) =>
       enableTransition && tw`transition-all duration-500`}

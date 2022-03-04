@@ -37,7 +37,7 @@ const Comment = ({
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center">
-          <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10">
+          <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 w-10">
             <UserCircleIcon className="h-8 text-fgd-3 w-8" />
           </div>
           <div className="mx-3">
@@ -58,7 +58,7 @@ const Comment = ({
           </div>
         </div>
         {voteRecord && (
-          <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
+          <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2">
             <div className="flex items-center pr-2 text-fgd-1 text-xs">
               {isYesVote(voteRecord) ? (
                 <CheckCircleIcon className="h-5 mr-1 text-green w-5" />

@@ -243,7 +243,7 @@ const CloseBuffers = () => {
           noMaxWidth={true}
           error={formErrors['solReceiverAddress']}
         />
-        <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
+        <div className="bg-bkg-1 mb-3 px-4 py-2 w-full">
           <p className="text-fgd-3 text-xs">Bufffers to close</p>
           {isBuffersLoading ? (
             <Loading></Loading>
