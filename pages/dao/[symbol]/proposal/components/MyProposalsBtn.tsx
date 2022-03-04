@@ -6,6 +6,8 @@ import {
   Proposal,
   ProposalState,
   withCancelProposal,
+  withFinalizeVote,
+  withRelinquishVote,
 } from '@solana/spl-governance'
 import { BadgeCheckIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
@@ -48,14 +50,13 @@ const MyProposals = () => {
   })
   const notfinalized = myProposals.filter((x) => {
     return (
-      x.account.state === ProposalState.Voting &&
-      !x.account.isVoteFinalized() &&
-      ownVoteRecordsByProposal[x.pubkey.toBase58()]
+      x.account.state === ProposalState.Voting && !x.account.isVoteFinalized()
     )
   })
   const unReleased = myProposals.filter(
     (x) =>
-      x.account.state === ProposalState.Succeeded &&
+      (x.account.state === ProposalState.Succeeded ||
+        x.account.state === ProposalState.Completed) &&
       x.account.isVoteFinalized() &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
@@ -115,6 +116,51 @@ const MyProposals = () => {
     }
     cleanSelected(drafts, withInstruction)
   }
+  const releaseAllTokens = () => {
+    const withInstruction = (
+      instructions,
+      proposal: ProgramAccount<Proposal>
+    ) => {
+      const voterTokenRecord =
+        proposal.account.governingTokenMint.toBase58() ===
+        realm?.account.communityMint.toBase58()
+          ? ownTokenRecord
+          : ownCouncilTokenRecord
+      const governanceAuthority = wallet!.publicKey!
+      const beneficiary = wallet!.publicKey!
+
+      return withRelinquishVote(
+        instructions,
+        realm!.owner,
+        proposal.account.governance,
+        proposal.pubkey,
+        voterTokenRecord!.pubkey,
+        proposal.account.governingTokenMint,
+        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
+        governanceAuthority,
+        beneficiary
+      )
+    }
+    cleanSelected(unReleased, withInstruction)
+  }
+  const finalizeAll = () => {
+    const withInstruction = (
+      instructions,
+      proposal: ProgramAccount<Proposal>
+    ) => {
+      return withFinalizeVote(
+        instructions,
+        realm!.owner,
+        realmInfo!.programVersion!,
+        realm!.pubkey!,
+        proposal.account.governance,
+        proposal.pubkey,
+        proposal.account.tokenOwnerRecord,
+        proposal.account.governingTokenMint
+      )
+    }
+    cleanSelected(notfinalized, withInstruction)
+  }
   return (
     <>
       <div>
@@ -139,7 +185,7 @@ const MyProposals = () => {
             <h4>
               Your drafts{' '}
               <Button className="" onClick={cleanDrafts}>
-                Close all
+                Cancel all
               </Button>
             </h4>
             <div className="mb-3">
@@ -147,13 +193,23 @@ const MyProposals = () => {
                 <div key={x.pubkey.toBase58()}>{x.account.name}</div>
               ))}
             </div>
-            <h4>Unfinalized</h4>
+            <h4>
+              Unfinalized{' '}
+              <Button className="" onClick={finalizeAll}>
+                Finalize all
+              </Button>
+            </h4>
             <div className="mb-3">
               {notfinalized.map((x) => (
                 <div key={x.pubkey.toBase58()}>{x.account.name}</div>
               ))}
             </div>
-            <h4>Unreleased tokens</h4>
+            <h4>
+              Unreleased tokens{' '}
+              <Button className="" onClick={releaseAllTokens}>
+                Release all
+              </Button>
+            </h4>
             <div>
               {unReleased.map((x) => (
                 <div key={x.pubkey.toBase58()}>{x.account.name}</div>
