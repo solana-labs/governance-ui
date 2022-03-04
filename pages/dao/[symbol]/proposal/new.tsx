@@ -81,6 +81,16 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
+
+	const [propertyData, setPropertyData] = useState({
+		"name": null,
+		"location": null,
+		"link": null,
+	});
+	const [descriptionLink, setDescriptionLink] = useState();
+
+
+
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
 		if (!governance) {
 			return true
@@ -256,22 +266,22 @@ const New = () => {
 		}
 	}
 
-	const [propertyData, setPropertyData] = useState({
-		"name": null,
-		"location": null,
-		"link": null,
-	});
-
 	const handleSetPropertyData = ({ propertyName, value }) => {
 		// setFormErrors({})
 		setPropertyData({ ...propertyData, [propertyName]: value })
 	}
 
-	const [descriptionLink, setDescriptionLink] = useState();
 
 	useEffect(() => {
 		//TODO: remove this when complete
 		console.log("descriptionLink", descriptionLink);
+		console.log("form", form);
+
+		handleSetForm({
+			value: JSON.stringify(descriptionLink),
+			propertyName: 'description',
+		})
+
 	}, [descriptionLink]);
 
 	useEffect(() => {
@@ -279,11 +289,11 @@ const New = () => {
 		console.log("propertyData", propertyData);
 
 		setDescriptionLink({
-			...propertyData,
-			"description": form.description
+			...propertyData
 		});
 
-	}, [propertyData, form.description]);
+	}, [propertyData]);
+
 
 	return (
 		<div>
@@ -340,6 +350,88 @@ const New = () => {
 									}
 								/>
 							</div>
+
+
+							<div className="pb-4">
+								<Input
+									label="Latitude"
+									placeholder="Full address of your property"
+									value={propertyData.location}
+									type="search"
+									// error={formErrors['location']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'location',
+										})
+									}
+								/>
+							</div>
+							<div className="pb-4">
+								<Input
+									label="Longitude"
+									placeholder="Full address of your property"
+									value={propertyData.location}
+									type="search"
+									// error={formErrors['location']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'location',
+										})
+									}
+								/>
+							</div>
+							<div className="pb-4">
+								<Input
+									label="Acres"
+									placeholder="Full address of your property"
+									value={propertyData.location}
+									type="search"
+									// error={formErrors['location']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'location',
+										})
+									}
+								/>
+							</div>
+							<div className="pb-4">
+								<Input
+									label="Legal Description"
+									placeholder="Full address of your property"
+									value={propertyData.location}
+									type="search"
+									// error={formErrors['location']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'location',
+										})
+									}
+								/>
+							</div>
+
+
+							<div className="pb-4">
+								<Input
+									label="Legal Description"
+									placeholder="Full address of your property"
+									value={propertyData.location}
+									type="search"
+									// error={formErrors['location']}
+									onChange={(evt) =>
+										handleSetPropertyData({
+											value: evt.target.value,
+											propertyName: 'location',
+										})
+									}
+								/>
+							</div>
+
+
+
 							<div className="pb-4">
 								<Input
 									label="Link"
@@ -355,6 +447,8 @@ const New = () => {
 									}
 								/>
 							</div>
+
+
 						</div>
 
 						<div className="pt-2">
@@ -373,18 +467,19 @@ const New = () => {
 									}
 								/>
 							</div>
-							<Textarea
+							{/* <Textarea
 								className="mb-3"
 								label="Description"
 								placeholder="Description of your proposal or use a github gist link (optional)"
-								value={form.description}
+								value={JSON.stringify(descriptionLink)}
+								// value={form.description}
 								onChange={(evt) =>
 									handleSetForm({
 										value: evt.target.value,
 										propertyName: 'description',
 									})
 								}
-							></Textarea>
+							></Textarea> */}
 							{canChooseWhoVote && (
 								<VoteBySwitch
 									checked={voteByCouncil}
