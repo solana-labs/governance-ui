@@ -295,7 +295,6 @@ const TokenDeposit = ({
     : !hasTokensInWallet
     ? "You don't have any governance tokens in your wallet to deposit."
     : ''
-
   const withdrawTooltipContent = !connected
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited
@@ -303,7 +302,7 @@ const TokenDeposit = ({
     : !councilVote &&
       (toManyCouncilOutstandingProposalsForUse ||
         toManyCommunityOutstandingProposalsForUser)
-    ? "You don't have any governance tokens to withdraw."
+    ? 'You have to many outstanding proposals to withdraw.'
     : ''
 
   const availableTokens =

@@ -1,103 +1,85 @@
 import useRealm from '@hooks/useRealm'
 import React, { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import Tooltip from '@components/Tooltip'
 import {
+  ProgramAccount,
+  Proposal,
   ProposalState,
-  Vote,
-  withCastVote,
-  YesNoVote,
+  withCancelProposal,
 } from '@solana/spl-governance'
 import { BadgeCheckIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { sendTransaction } from '@utils/send'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import Modal from '@components/Modal'
-import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import Button from '@components/Button'
 
 const MyProposals = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
-  const { governancesArray } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const { current: connection } = useWalletStore((s) => s.connection)
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
   )
-
-  const { realm, programId, programVersion, tokenRecords } = useWalletStore(
-    (s) => s.selectedRealm
-  )
-
-  const { client } = useVoteStakeRegistryClientStore((s) => s.state)
-  const { proposals } = useRealm()
+  const { realm, programId } = useWalletStore((s) => s.selectedRealm)
+  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const {
+    proposals,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+    realmInfo,
+  } = useRealm()
 
   const myProposals = useMemo(
     () =>
       connected
         ? Object.values(proposals).filter(
-            (p) => !ownVoteRecordsByProposal[p.pubkey.toBase58()]
+            (p) =>
+              p.account.tokenOwnerRecord.toBase58() ===
+                ownTokenRecord?.pubkey.toBase58() ||
+              p.account.tokenOwnerRecord.toBase58() ===
+                ownCouncilTokenRecord?.pubkey.toBase58()
           )
         : [],
     [proposals, ownVoteRecordsByProposal, connected]
   )
-  const drafts = myProposals.filter(
-    (x) => x.account.state === ProposalState.Draft
+  const drafts = myProposals.filter((x) => {
+    return x.account.state === ProposalState.Draft
+  })
+  const notfinalized = myProposals.filter((x) => {
+    return (
+      x.account.state === ProposalState.Voting &&
+      !x.account.isVoteFinalized() &&
+      ownVoteRecordsByProposal[x.pubkey.toBase58()]
+    )
+  })
+  const unReleased = myProposals.filter(
+    (x) =>
+      x.account.state === ProposalState.Succeeded &&
+      x.account.isVoteFinalized() &&
+      !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
-  const notfinalized = connected
-    ? myProposals.filter((x) => {
-        const gov = governancesArray.find(
-          (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58()
-        )
-        const hasVoteTimeExpired = x.account.isVoteFinalized()
-          ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
-          : x.account.votingAt && gov
-          ? x.account.votingAt.toNumber() + gov?.account.config.maxVotingTime
-          : undefined
-        return x.account.state === ProposalState.Voting && hasVoteTimeExpired
-      })
-    : []
+  const createdVoting = myProposals.filter((x) => {
+    return (
+      x.account.state === ProposalState.Voting && !x.account.isVoteFinalized()
+    )
+  })
 
-  const approveAll = async () => {
+  const cleanSelected = async (
+    proposalsArray: ProgramAccount<Proposal>[],
+    withInstruction
+  ) => {
     if (!wallet || !programId || !realm) return
-
-    const governanceAuthority = wallet.publicKey!
-    const payer = wallet.publicKey!
 
     const { blockhash: recentBlockhash } = await connection.getRecentBlockhash()
 
     const transactions = await Promise.all(
-      votingProposals.map(async (proposal) => {
-        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
-
+      proposalsArray.map(async (proposal) => {
         console.log(proposal.pubkey.toBase58(), ownTokenRecord)
 
         const instructions: TransactionInstruction[] = []
 
-        //will run only if plugin is connected with realm
-        const voterWeight = await withUpdateVoterWeightRecord(
-          instructions,
-          wallet.publicKey!,
-          realm,
-          client
-        )
-        await withCastVote(
-          instructions,
-          programId,
-          programVersion,
-          realm.pubkey,
-          proposal.account.governance,
-          proposal.pubkey,
-          proposal.account.tokenOwnerRecord,
-          ownTokenRecord.pubkey,
-          governanceAuthority,
-          proposal.account.governingTokenMint,
-          Vote.fromYesNoVote(YesNoVote.Yes),
-          payer,
-          voterWeight
-        )
+        await withInstruction(instructions, proposal)
 
         const transaction = new Transaction({
           recentBlockhash,
@@ -115,8 +97,24 @@ const MyProposals = () => {
         sendTransaction({ transaction, wallet, connection })
       )
     )
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
+  const cleanDrafts = () => {
+    const withInstruction = (instructions, proposal) => {
+      return withCancelProposal(
+        instructions,
+        realm!.owner!,
+        realmInfo!.programVersion!,
+        realm!.pubkey!,
+        proposal!.account.governance,
+        proposal!.pubkey,
+        proposal!.account.tokenOwnerRecord,
+        wallet!.publicKey!
+      )
+    }
+    cleanSelected(drafts, withInstruction)
+  }
   return (
     <>
       <div>
@@ -138,7 +136,12 @@ const MyProposals = () => {
         >
           <>
             <h3 className="mb-4 flex items-center">Your proposals</h3>
-            <h4>Your drafts</h4>
+            <h4>
+              Your drafts{' '}
+              <Button className="" onClick={cleanDrafts}>
+                Close all
+              </Button>
+            </h4>
             <div className="mb-3">
               {drafts.map((x) => (
                 <div key={x.pubkey.toBase58()}>{x.account.name}</div>
@@ -151,7 +154,17 @@ const MyProposals = () => {
               ))}
             </div>
             <h4>Unreleased tokens</h4>
-            <div></div>
+            <div>
+              {unReleased.map((x) => (
+                <div key={x.pubkey.toBase58()}>{x.account.name}</div>
+              ))}
+            </div>
+            <h4>Created vote in progress</h4>
+            <div>
+              {createdVoting.map((x) => (
+                <div key={x.pubkey.toBase58()}>{x.account.name}</div>
+              ))}
+            </div>
           </>
         </Modal>
       )}
