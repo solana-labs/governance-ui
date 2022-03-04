@@ -34,7 +34,6 @@ const MyProposals = () => {
     ownCouncilTokenRecord,
     realmInfo,
   } = useRealm()
-
   const myProposals = useMemo(
     () =>
       connected
@@ -245,7 +244,7 @@ const ProposalList = ({
   return (
     <>
       {' '}
-      <h4 className="flex items-center">
+      <h4 className="flex items-center mb-3">
         {title} ({proposals.length})
         {btnName && proposals.length !== 0 && (
           <Button small className="ml-auto" onClick={fcn}>
@@ -255,7 +254,10 @@ const ProposalList = ({
       </h4>
       <div className="mb-3 ">
         {proposals.map((x) => (
-          <div className="text-xs" key={x.pubkey.toBase58()}>
+          <div
+            className="text-xs border-fgd-4 border px-3 py-2 mb-3 rounded-lg"
+            key={x.pubkey.toBase58()}
+          >
             {x.account.name}
           </div>
         ))}
