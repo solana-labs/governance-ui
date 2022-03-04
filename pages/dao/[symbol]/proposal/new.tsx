@@ -81,6 +81,175 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
+
+	const [propertyData, setPropertyData] = useState({
+		name: '',
+		description: '',
+		property_address: '',
+		lat_long: '',
+		acres: '',
+		land_record_auditor: '',
+		deed_record_recorder: '',
+		mortgage_record_recorder: '',
+		legal_description: '',
+		mortgage_record: '',
+		title_method: '',
+		title_held_by: '',
+		ein: '',
+		transfer_restrictions: '',
+		marketing_name: '',
+		type: '',
+		sq_ft: '',
+		property_description: '',
+		deed: '',
+		mortgage: '',
+		title_insurance: '',
+		articles_of_organization: '',
+		certificate_of_organization_from_secretary_of_state: '',
+		operating_agreement: '',
+		membership_interest_transfer_agreement: '',
+		ein_letter_from_irs: '',
+		appraisal: '',
+		submitted_by: '',
+		uri: '',
+	})
+
+	const [descriptionLink, setDescriptionLink] = useState()
+	const [metaplexDataObj, setMetaplexDataObj] = useState({
+		name: '',
+		symbol: '',
+		description: '',
+		image: '',
+		attributes: [
+			{
+				trait_type: 'name',
+				value: null,
+			},
+			{
+				trait_type: 'description',
+				value: null,
+			},
+			{
+				trait_type: 'property_address',
+				value: null,
+			},
+			{
+				trait_type: 'lat_long',
+				value: null,
+			},
+			{
+				trait_type: 'acres',
+				value: null,
+			},
+			{
+				trait_type: 'land_record_auditor',
+				value: null,
+			},
+			{
+				trait_type: 'deed_record_recorder',
+				value: null,
+			},
+			{
+				trait_type: 'mortgage_record_recorder',
+				value: null,
+			},
+			{
+				trait_type: 'legal_description',
+				value: null,
+			},
+			{
+				trait_type: 'mortgage_record',
+				value: null,
+			},
+			{
+				trait_type: 'title_method',
+				value: null,
+			},
+			{
+				trait_type: 'title_held_by',
+				value: null,
+			},
+			{
+				trait_type: 'ein',
+				value: null,
+			},
+			{
+				trait_type: 'transfer_restrictions',
+				value: null,
+			},
+			{
+				trait_type: 'marketing_name',
+				value: null,
+			},
+			{
+				trait_type: 'type',
+				value: null,
+			},
+			{
+				trait_type: 'sq_ft',
+				value: null,
+			},
+			{
+				trait_type: 'property_description',
+				value: null,
+			},
+			{
+				trait_type: 'deed',
+				value: null,
+			},
+			{
+				trait_type: 'mortgage',
+				value: null,
+			},
+			{
+				trait_type: 'title_insurance',
+				value: null,
+			},
+			{
+				trait_type: 'articles_of_organization',
+				value: null,
+			},
+			{
+				trait_type: 'certificate_of_organization_from_secretary_of_state',
+				value: null,
+			},
+			{
+				trait_type: 'operating_agreement',
+				value: null,
+			},
+			{
+				trait_type: 'membership_interest_transfer_agreement',
+				value: null,
+			},
+			{
+				trait_type: 'ein_letter_from_irs',
+				value: null,
+			},
+			{
+				trait_type: 'appraisal',
+				value: null,
+			},
+			{
+				trait_type: 'submitted_by',
+				value: null,
+			},
+		],
+		properties: {
+			creators: [
+				{
+					address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc',
+					share: 100,
+				},
+			],
+			files: [
+				{
+					uri: 'https://www.arweave.net/n5rGBhJd1SoTHnBXz36zuUWIy0FC3l4OWQhiBhYQhVM?ext=png',
+					type: 'image/png',
+				},
+			],
+		},
+	})
+
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
 		if (!governance) {
 			return true
@@ -256,12 +425,6 @@ const New = () => {
 		}
 	}
 
-
-	const [propertyData, setPropertyData] = useState({
-		"name": null,
-		"location": null,
-		"link": null,
-	});
 	const handleSetPropertyData = ({ propertyName, value }) => {
 		// setFormErrors({})
 		setPropertyData({ ...propertyData, [propertyName]: value })
@@ -269,8 +432,173 @@ const New = () => {
 
 	useEffect(() => {
 		//TODO: remove this when complete
-		console.log("propertyData", propertyData);
-	}, [propertyData]);
+		console.log('descriptionLink', descriptionLink)
+		console.log('form', form)
+
+		handleSetForm({
+			value: JSON.stringify(descriptionLink),
+			propertyName: 'description',
+		})
+	}, [descriptionLink])
+
+	useEffect(() => {
+		//TODO: remove this when complete
+		console.log('metaplexDataObj', metaplexDataObj)
+	}, [metaplexDataObj])
+
+
+
+	useEffect(() => {
+		//TODO: remove this when complete
+		console.log('propertyData', propertyData)
+
+		// setDescriptionLink({
+		// 	...propertyData,
+		// })
+
+		setDescriptionLink({
+			description: propertyData.description,
+			property_address: propertyData.property_address,
+			sq_ft: propertyData.sq_ft,
+			property_description: propertyData.property_description,
+			uri: propertyData.uri,
+		})
+
+		setMetaplexDataObj({
+			name: propertyData.name,
+			symbol: 'TOKR-g1',
+			description: propertyData.description,
+			image: propertyData.image,
+			attributes: [
+				{
+					trait_type: 'name',
+					value: propertyData.name,
+				},
+				{
+					trait_type: 'description',
+					value: propertyData.description,
+				},
+				{
+					trait_type: 'property_address',
+					value: propertyData.property_address,
+				},
+				{
+					trait_type: 'lat_long',
+					value: propertyData.lat_long,
+				},
+				{
+					trait_type: 'acres',
+					value: propertyData.acres,
+				},
+				{
+					trait_type: 'land_record_auditor',
+					value: propertyData.land_record_auditor,
+				},
+				{
+					trait_type: 'deed_record_recorder',
+					value: propertyData.deed_record_recorder,
+				},
+				{
+					trait_type: 'mortgage_record_recorder',
+					value: propertyData.mortgage_record_recorder,
+				},
+				{
+					trait_type: 'legal_description',
+					value: propertyData.legal_description,
+				},
+				{
+					trait_type: 'mortgage_record',
+					value: propertyData.mortgage_record,
+				},
+				{
+					trait_type: 'title_method',
+					value: propertyData.title_method,
+				},
+				{
+					trait_type: 'title_held_by',
+					value: propertyData.title_held_by,
+				},
+				{
+					trait_type: 'ein',
+					value: propertyData.ein,
+				},
+				{
+					trait_type: 'transfer_restrictions',
+					value: propertyData.transfer_restrictions,
+				},
+				{
+					trait_type: 'marketing_name',
+					value: propertyData.marketing_name,
+				},
+				{
+					trait_type: 'type',
+					value: propertyData.type,
+				},
+				{
+					trait_type: 'sq_ft',
+					value: propertyData.sq_ft,
+				},
+				{
+					trait_type: 'property_description',
+					value: propertyData.property_description,
+				},
+				{
+					trait_type: 'deed',
+					value: propertyData.deed,
+				},
+				{
+					trait_type: 'mortgage',
+					value: propertyData.mortgage,
+				},
+				{
+					trait_type: 'title_insurance',
+					value: propertyData.title_insurance,
+				},
+				{
+					trait_type: 'articles_of_organization',
+					value: propertyData.articles_of_organization,
+				},
+				{
+					trait_type: 'certificate_of_organization_from_secretary_of_state',
+					value: propertyData.certificate_of_organization_from_secretary_of_state,
+				},
+				{
+					trait_type: 'operating_agreement',
+					value: propertyData.operating_agreement,
+				},
+				{
+					trait_type: 'membership_interest_transfer_agreement',
+					value: propertyData.membership_interest_transfer_agreement,
+				},
+				{
+					trait_type: 'ein_letter_from_irs',
+					value: propertyData.ein_letter_from_irs,
+				},
+				{
+					trait_type: 'appraisal',
+					value: propertyData.appraisal,
+				},
+				{
+					trait_type: 'submitted_by',
+					value: propertyData.submitted_by,
+				},
+			],
+			properties: {
+				creators: [
+					{
+						address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc',
+						share: 100,
+					},
+				],
+				files: [
+					{
+						uri: 'https://www.arweave.net/n5rGBhJd1SoTHnBXz36zuUWIy0FC3l4OWQhiBhYQhVM?ext=png',
+						type: 'image/png',
+					},
+				],
+			},
+		})
+	}, [propertyData])
 
 	return (
 		<div>
@@ -295,83 +623,601 @@ const New = () => {
 			</div>
 			<div className="grid grid-cols-12 gap-4">
 				<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
+					<p className="pt-8">Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.</p>
+
 					<>
-						<div className="mt-20 mb-20">
-							<div className="pb-4">
-								<Input
-									label="Name"
-									placeholder="name of property"
-									value={propertyData.name}
-									type="text"
-									// error={formErrors['name']}
-									onChange={(evt) =>
-										handleSetPropertyData({
-											value: evt.target.value,
-											propertyName: 'name',
-										})
-									}
-								/>
-							</div>
-							<div className="pb-4">
-								<Input
-									label="Location"
-									placeholder="Full address of your property"
-									value={propertyData.location}
-									type="search"
-									// error={formErrors['location']}
-									onChange={(evt) =>
-										handleSetPropertyData({
-											value: evt.target.value,
-											propertyName: 'location',
-										})
-									}
-								/>
-							</div>
-							<div className="pb-4">
-								<Input
-									label="Link"
-									placeholder="Link to legal docs"
-									value={propertyData.link}
-									type="url"
-									// error={formErrors['link']}
-									onChange={(evt) =>
-										handleSetPropertyData({
-											value: evt.target.value,
-											propertyName: 'link',
-										})
-									}
-								/>
+						<div className="pt-8 mb-20">
+							<div className="space-y-16">
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Property Information</span>
+									</h3>
+
+									<div className="xpb-4">
+										<Input
+											label="Name"
+											placeholder="Name"
+											value={propertyData.name}
+											id="name"
+											name="name"
+											type="text"
+											error={formErrors['title']}
+											// error={propertyDataErrors['name']}
+											onChange={(evt) => {
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'name',
+												})
+
+												handleSetForm({
+													value: evt.target.value,
+													propertyName: 'title',
+												})
+											}}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Textarea
+											label="Description"
+											placeholder="Description"
+											value={propertyData.description}
+											id="description"
+											name="description"
+											type="text"
+											// error={propertyDataErrors['description']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'description',
+												})
+											}
+										/>
+									</div>
+
+										<div className="xpb-4">
+											<Input
+												label="Image"
+												placeholder="URL to image"
+												value={propertyData.image}
+												id="image"
+												name="image"
+												type="url"
+												// error={propertyDataErrors['description']}
+												onChange={(evt) =>
+													handleSetPropertyData({
+														value: evt.target.value,
+														propertyName: 'image',
+													})
+												}
+											/>
+										</div>
+								</div>
+
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Parcel Attributes</span>
+									</h3>
+
+									<div className="xpb-4">
+										<Input
+											label="Property Address"
+											placeholder="Property Address"
+											value={propertyData.property_address}
+											id="property_address"
+											name="property_address"
+											type="text"
+											// error={propertyDataErrors['property_address']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'property_address',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Lat Long"
+											placeholder="Lat, Long"
+											value={propertyData.lat_long}
+											id="lat_long"
+											name="lat_long"
+											type="text"
+											// error={propertyDataErrors['lat_long']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'lat_long',
+												})
+											}
+										/>
+
+										<div className="text-xs pt-2">
+											Find Latitude and Longitude of your property:{' '}
+											<a target="_target" href="https://www.latlong.net/convert-address-to-lat-long.html">
+												click here
+											</a>
+										</div>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Acres"
+											placeholder="Acres"
+											value={propertyData.acres}
+											id="acres"
+											name="acres"
+											type="text"
+											// error={propertyDataErrors['acres']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'acres',
+												})
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Public Registries of Parcel Record </span>
+									</h3>
+
+									<div className="xpb-4">
+										<Input
+											label="Land Record Auditor"
+											placeholder="Land Record Auditor"
+											value={propertyData.land_record_auditor}
+											id="land_record_auditor"
+											name="land_record_auditor"
+											type="text"
+											// error={propertyDataErrors['land_record_auditor']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'land_record_auditor',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Deed Record Recorder"
+											placeholder="Deed Record Recorder"
+											value={propertyData.deed_record_recorder}
+											id="deed_record_recorder"
+											name="deed_record_recorder"
+											type="text"
+											// error={propertyDataErrors['deed_record_recorder']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'deed_record_recorder',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Mortgage Record Recorder"
+											placeholder="Mortgage Record Recorder"
+											value={propertyData.mortgage_record_recorder}
+											id="mortgage_record_recorder"
+											name="mortgage_record_recorder"
+											type="text"
+											// error={propertyDataErrors['mortgage_record_recorder']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'mortgage_record_recorder',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Textarea
+											label="Legal Description"
+											placeholder="Legal Description"
+											value={propertyData.legal_description}
+											id="legal_description"
+											name="legal_description"
+											type="text"
+											// error={propertyDataErrors['legal_description']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'legal_description',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Mortgage Record"
+											placeholder="Mortgage Record"
+											value={propertyData.mortgage_record}
+											id="mortgage_record"
+											name="mortgage_record"
+											type="text"
+											// error={propertyDataErrors['mortgage_record']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'mortgage_record',
+												})
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Title Attributes</span>
+									</h3>
+									<div className="xpb-4">
+										<Input
+											label="Title Method"
+											placeholder="Title Method"
+											value={propertyData.title_method}
+											id="title_method"
+											name="title_method"
+											type="text"
+											// error={propertyDataErrors['title_method']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'title_method',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Title Held By"
+											placeholder="Title Held By"
+											value={propertyData.title_held_by}
+											id="title_held_by"
+											name="title_held_by"
+											type="text"
+											// error={propertyDataErrors['title_held_by']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'title_held_by',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="EIN #"
+											placeholder="EIN #"
+											value={propertyData.ein}
+											id="ein"
+											name="ein"
+											type="text"
+											// error={propertyDataErrors['ein']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'ein',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Transfer Restrictions"
+											placeholder="Transfer Restrictions"
+											value={propertyData.transfer_restrictions}
+											id="transfer_restrictions"
+											name="transfer_restrictions"
+											type="text"
+											// error={propertyDataErrors['transfer_restrictions']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'transfer_restrictions',
+												})
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Property Record</span>
+									</h3>
+									<div className="xpb-4">
+										<Input
+											label="Marketing Name"
+											placeholder="Marketing Name"
+											value={propertyData.marketing_name}
+											id="marketing_name"
+											name="marketing_name"
+											type="text"
+											// error={propertyDataErrors['marketing_name']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'marketing_name',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Type"
+											placeholder="Type"
+											value={propertyData.type}
+											id="type"
+											name="type"
+											type="text"
+											// error={propertyDataErrors['type']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'type',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Sq Ft"
+											placeholder="Sq Ft"
+											value={propertyData.sq_ft}
+											id="sq_ft"
+											name="sq_ft"
+											type="text"
+											// error={propertyDataErrors['sq_ft']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'sq_ft',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Textarea
+											label="Property Description"
+											placeholder="Property Description"
+											value={propertyData.property_description}
+											id="property_description"
+											name="property_description"
+											type="text"
+											// error={propertyDataErrors['property_description']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'property_description',
+												})
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Material Agreements &amp; Documentation</span>
+									</h3>
+
+									<div className="xpb-4">
+										<Input
+											label="Deed"
+											placeholder="Deed"
+											value={propertyData.deed}
+											id="deed"
+											name="deed"
+											type="text"
+											// error={propertyDataErrors['deed']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'deed',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Mortgage"
+											placeholder="Mortgage"
+											value={propertyData.mortgage}
+											id="mortgage"
+											name="mortgage"
+											type="text"
+											// error={propertyDataErrors['mortgage']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'mortgage',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Title Insurance"
+											placeholder="Title Insurance"
+											value={propertyData.title_insurance}
+											id="title_insurance"
+											name="title_insurance"
+											type="text"
+											// error={propertyDataErrors['title_insurance']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'title_insurance',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Articles Of Organization"
+											placeholder="Articles Of Organization"
+											value={propertyData.articles_of_organization}
+											id="articles_of_organization"
+											name="articles_of_organization"
+											type="text"
+											// error={propertyDataErrors['articles_of_organization']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'articles_of_organization',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Certificate Of Organization From Secretary Of State"
+											placeholder="Certificate Of Organization From Secretary Of State"
+											value={propertyData.certificate_of_organization_from_secretary_of_state}
+											id="certificate_of_organization_from_secretary_of_state"
+											name="certificate_of_organization_from_secretary_of_state"
+											type="text"
+											// error={propertyDataErrors['certificate_of_organization_from_secretary_of_state']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'certificate_of_organization_from_secretary_of_state',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Operating Agreement"
+											placeholder="Operating Agreement"
+											value={propertyData.operating_agreement}
+											id="operating_agreement"
+											name="operating_agreement"
+											type="text"
+											// error={propertyDataErrors['operating_agreement']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'operating_agreement',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Membership Interest Transfer Agreement"
+											placeholder="Membership Interest Transfer Agreement"
+											value={propertyData.membership_interest_transfer_agreement}
+											id="membership_interest_transfer_agreement"
+											name="membership_interest_transfer_agreement"
+											type="text"
+											// error={propertyDataErrors['membership_interest_transfer_agreement']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'membership_interest_transfer_agreement',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Ein Letter From Irs"
+											placeholder="Ein Letter From Irs"
+											value={propertyData.ein_letter_from_irs}
+											id="ein_letter_from_irs"
+											name="ein_letter_from_irs"
+											type="text"
+											// error={propertyDataErrors['ein_letter_from_irs']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'ein_letter_from_irs',
+												})
+											}
+										/>
+									</div>
+
+									<div className="xpb-4">
+										<Input
+											label="Appraisal"
+											placeholder="Appraisal"
+											value={propertyData.appraisal}
+											id="appraisal"
+											name="appraisal"
+											type="text"
+											// error={propertyDataErrors['appraisal']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'appraisal',
+												})
+											}
+										/>
+									</div>
+								</div>
+
+								<div className="space-y-4 pb-16">
+									<h3>
+										<span className="text-lg">Submitted By</span>
+									</h3>
+									<div className="xpb-4">
+										<Input
+											label="Your Legal Name"
+											placeholder="Your Legal Name"
+											value={propertyData.submitted_by}
+											id="submitted_by"
+											name="submitted_by"
+											type="text"
+											// error={propertyDataErrors['submitted_by']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'submitted_by',
+												})
+											}
+										/>
+									</div>
+								</div>
 							</div>
 						</div>
 
 						<div className="pt-2">
-							<div className="pb-4">
-								<Input
-									label="Title"
-									placeholder="Title of your proposal"
-									value={form.title}
-									type="text"
-									error={formErrors['title']}
-									onChange={(evt) =>
-										handleSetForm({
-											value: evt.target.value,
-											propertyName: 'title',
-										})
-									}
-								/>
-							</div>
-							<Textarea
+							{/* <Textarea
 								className="mb-3"
 								label="Description"
 								placeholder="Description of your proposal or use a github gist link (optional)"
-								value={form.description}
+								value={JSON.stringify(descriptionLink)}
+								// value={form.description}
 								onChange={(evt) =>
 									handleSetForm({
 										value: evt.target.value,
 										propertyName: 'description',
 									})
 								}
-							></Textarea>
+							></Textarea> */}
 							{canChooseWhoVote && (
 								<VoteBySwitch
 									checked={voteByCouncil}
