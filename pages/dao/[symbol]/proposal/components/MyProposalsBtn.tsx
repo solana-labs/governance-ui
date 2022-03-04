@@ -9,18 +9,20 @@ import {
   withFinalizeVote,
   withRelinquishVote,
 } from '@solana/spl-governance'
-import { BadgeCheckIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import Modal from '@components/Modal'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import dayjs from 'dayjs'
+import { notify } from '@utils/notifications'
+import Loading from '@components/Loading'
 
 const MyProposals = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
+  const [isLoading, setIsLoading] = useState(false)
   const { governancesArray } = useGovernanceAssets()
   const { current: connection } = useWalletStore((s) => s.connection)
   const ownVoteRecordsByProposal = useWalletStore(
@@ -88,34 +90,41 @@ const MyProposals = () => {
     withInstruction
   ) => {
     if (!wallet || !programId || !realm) return
+    setIsLoading(true)
+    try {
+      const {
+        blockhash: recentBlockhash,
+      } = await connection.getRecentBlockhash()
 
-    const { blockhash: recentBlockhash } = await connection.getRecentBlockhash()
+      const transactions = await Promise.all(
+        proposalsArray.map(async (proposal) => {
+          console.log(proposal.pubkey.toBase58(), ownTokenRecord)
 
-    const transactions = await Promise.all(
-      proposalsArray.map(async (proposal) => {
-        console.log(proposal.pubkey.toBase58(), ownTokenRecord)
+          const instructions: TransactionInstruction[] = []
 
-        const instructions: TransactionInstruction[] = []
+          await withInstruction(instructions, proposal)
 
-        await withInstruction(instructions, proposal)
-
-        const transaction = new Transaction({
-          recentBlockhash,
-          feePayer: wallet.publicKey!,
+          const transaction = new Transaction({
+            recentBlockhash,
+            feePayer: wallet.publicKey!,
+          })
+          transaction.add(...instructions)
+          return transaction
         })
-        transaction.add(...instructions)
-        return transaction
-      })
-    )
-
-    const signedTXs = await wallet.signAllTransactions(transactions)
-
-    await Promise.all(
-      signedTXs.map((transaction) =>
-        sendTransaction({ transaction, wallet, connection })
       )
-    )
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+
+      const signedTXs = await wallet.signAllTransactions(transactions)
+
+      await Promise.all(
+        signedTXs.map((transaction) =>
+          sendTransaction({ transaction, wallet, connection })
+        )
+      )
+      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    } catch (e) {
+      notify({ type: 'error', message: 'Something wnet wrong' })
+    }
+    setIsLoading(false)
   }
 
   const cleanDrafts = () => {
@@ -197,30 +206,36 @@ const MyProposals = () => {
           isOpen={modalIsOpen}
         >
           <>
-            <h3 className="mb-4 flex items-center">Your proposals</h3>
+            <h3 className="mb-4 flex flex-col">
+              Your proposals {isLoading && <Loading w="50px"></Loading>}
+            </h3>
             <ProposalList
               title="Drafts"
               fcn={cleanDrafts}
               btnName="Cancel all"
               proposals={drafts}
+              isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unfinalized"
               fcn={finalizeAll}
               btnName="Finalize all"
               proposals={notfinalized}
+              isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unreleased tokens"
               fcn={releaseAllTokens}
               btnName="Release all"
               proposals={unReleased}
+              isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Created vote in progress"
               fcn={() => null}
               btnName=""
               proposals={createdVoting}
+              isLoading={isLoading}
             ></ProposalList>
           </>
         </Modal>
@@ -234,11 +249,13 @@ const ProposalList = ({
   fcn,
   btnName,
   proposals,
+  isLoading,
 }: {
   title: string
   fcn: () => void
   btnName: string
   proposals: ProgramAccount<Proposal>[]
+  isLoading: boolean
 }) => {
   return (
     <>
@@ -246,7 +263,7 @@ const ProposalList = ({
       <h4 className="flex items-center mb-3">
         {title} ({proposals.length})
         {btnName && proposals.length !== 0 && (
-          <Button small className="ml-auto" onClick={fcn}>
+          <Button small className="ml-auto" onClick={fcn} disabled={isLoading}>
             {btnName}
           </Button>
         )}
