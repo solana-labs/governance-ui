@@ -33,6 +33,7 @@ import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { getTokrInstruction } from 'utils/tokrTools'
+
 const TokrizeContract = ({
   index,
   governance,
