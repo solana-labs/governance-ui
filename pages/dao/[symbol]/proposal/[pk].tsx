@@ -81,20 +81,20 @@ const Proposal = () => {
 									descriptionObj.map((item, index) => {
 										return (
 											<div key={'descriptionOutput_' + index} className="pb-8">
-												{ item.property_description }
+												{ item.description }
 												<br />
 												<ul className="list-disc list-inside space-y-2 pt-4">
-													<li>
+													{ item.property_address && <li>
 														<b>Property location:</b> { item.property_address }
-													</li>
-													<li>
+													</li>}
+													{item.sq_ft && <li>
 														<b>Square Feet:</b> { item.sq_ft }
-													</li>
-													<li>
+													</li>}
+													{ item.uri && <li>
 														<span className="inline-flex align-center">
 															<b className="inline mr-1">Property Details:</b> <a className="inline" href={ item.uri } target="blank"><span className="flex">Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" /></span></a>
 														</span>
-													</li>
+													</li>}
 												</ul>
 											</div>
 										)
