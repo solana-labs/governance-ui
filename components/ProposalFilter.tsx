@@ -4,6 +4,7 @@ import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Disclosure } from '@headlessui/react'
 import Switch from './Switch'
 import { ProposalState } from '@solana/spl-governance'
+import useLocalStorageState from '../hooks/useLocalStorageState'
 
 const initialFilterSettings = {
   [ProposalState.Cancelled]: true,
@@ -26,6 +27,16 @@ const ProposalFilter = ({ filters, setFilters }) => {
     (state, newState) => ({ ...state, ...newState }),
     initialFilterSettings
   )
+  const [storeFilter, setStoreFilter] = useLocalStorageState('')
+
+  useEffect(() => {
+    //local storage
+    //Getting rid of NaN
+    if (filters.includes(NaN)) {
+      filters.shift()
+    }
+    setStoreFilter(`${filters}`)
+  }, [filters])
 
   const handleFilters = (proposalState, checked) => {
     setFilterSettings({ [proposalState]: checked })
@@ -40,8 +51,29 @@ const ProposalFilter = ({ filters, setFilters }) => {
     const initialFilters = Object.keys(initialFilterSettings)
       .filter((x) => !initialFilterSettings[x])
       .map(Number)
-    setFilters([...initialFilters])
+
+    //Checks to see if local storage exists
+    if (!storeFilter && storeFilter !== '') {
+      setStoreFilter('')
+      //start from initialFilters
+      setFilters([...initialFilters])
+    } else if (storeFilter.length >= 0 || storeFilter === '') {
+      filterState()
+    }
   }, [])
+
+  const filterState = () => {
+    //Get filter info from localStorage, turn strings into nums
+    const filterStrArr = storeFilter.split(',').map((str) => parseInt(str))
+    setFilters(filterStrArr)
+    //Change filter switches UI alongside filters data
+    filterStrArr.forEach((proposal) => setFilterSettings({ [proposal]: false }))
+
+    //If [Draft] proposal switch is true, then keep it true (automatically goes false by default)
+    if (!filterStrArr.includes(0)) {
+      setFilterSettings({ [ProposalState.Draft]: true })
+    }
+  }
 
   return (
     <Disclosure as="div" className="relative">
