@@ -14,11 +14,14 @@ import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import Modal from '@components/Modal'
 import Button from '@components/Button'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import dayjs from 'dayjs'
 
 const MyProposals = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
+  const { governancesArray } = useGovernanceAssets()
   const { current: connection } = useWalletStore((s) => s.connection)
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
@@ -49,8 +52,23 @@ const MyProposals = () => {
     return x.account.state === ProposalState.Draft
   })
   const notfinalized = myProposals.filter((x) => {
+    const governance = governancesArray.find(
+      (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58()
+    )
+    const now = dayjs().unix()
+    const timestamp = x
+      ? x.account.isVoteFinalized()
+        ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
+        : x.account.votingAt && governance
+        ? x.account.votingAt.toNumber() +
+          governance.account.config.maxVotingTime
+        : undefined
+      : undefined
     return (
-      x.account.state === ProposalState.Voting && !x.account.isVoteFinalized()
+      x.account.state === ProposalState.Voting &&
+      !x.account.isVoteFinalized() &&
+      timestamp &&
+      now > timestamp
     )
   })
   const unReleased = myProposals.filter(
@@ -182,48 +200,66 @@ const MyProposals = () => {
         >
           <>
             <h3 className="mb-4 flex items-center">Your proposals</h3>
-            <h4>
-              Your drafts{' '}
-              <Button className="" onClick={cleanDrafts}>
-                Cancel all
-              </Button>
-            </h4>
-            <div className="mb-3">
-              {drafts.map((x) => (
-                <div key={x.pubkey.toBase58()}>{x.account.name}</div>
-              ))}
-            </div>
-            <h4>
-              Unfinalized{' '}
-              <Button className="" onClick={finalizeAll}>
-                Finalize all
-              </Button>
-            </h4>
-            <div className="mb-3">
-              {notfinalized.map((x) => (
-                <div key={x.pubkey.toBase58()}>{x.account.name}</div>
-              ))}
-            </div>
-            <h4>
-              Unreleased tokens{' '}
-              <Button className="" onClick={releaseAllTokens}>
-                Release all
-              </Button>
-            </h4>
-            <div>
-              {unReleased.map((x) => (
-                <div key={x.pubkey.toBase58()}>{x.account.name}</div>
-              ))}
-            </div>
-            <h4>Created vote in progress</h4>
-            <div>
-              {createdVoting.map((x) => (
-                <div key={x.pubkey.toBase58()}>{x.account.name}</div>
-              ))}
-            </div>
+            <ProposalList
+              title="Your drafts"
+              fcn={cleanDrafts}
+              btnName="Cancel all"
+              proposals={drafts}
+            ></ProposalList>
+            <ProposalList
+              title="Unfinalized"
+              fcn={finalizeAll}
+              btnName="Finalize all"
+              proposals={notfinalized}
+            ></ProposalList>
+            <ProposalList
+              title="Unreleased tokens"
+              fcn={releaseAllTokens}
+              btnName="Release all"
+              proposals={unReleased}
+            ></ProposalList>
+            <ProposalList
+              title="Created vote in progress"
+              fcn={() => null}
+              btnName=""
+              proposals={createdVoting}
+            ></ProposalList>
           </>
         </Modal>
       )}
+    </>
+  )
+}
+
+const ProposalList = ({
+  title,
+  fcn,
+  btnName,
+  proposals,
+}: {
+  title: string
+  fcn: () => void
+  btnName: string
+  proposals: ProgramAccount<Proposal>[]
+}) => {
+  return (
+    <>
+      {' '}
+      <h4 className="flex items-center">
+        {title} ({proposals.length})
+        {btnName && proposals.length !== 0 && (
+          <Button small className="ml-auto" onClick={fcn}>
+            {btnName}
+          </Button>
+        )}
+      </h4>
+      <div className="mb-3 ">
+        {proposals.map((x) => (
+          <div className="text-xs" key={x.pubkey.toBase58()}>
+            {x.account.name}
+          </div>
+        ))}
+      </div>
     </>
   )
 }
