@@ -8,7 +8,7 @@ import {
     TransactionInstruction,
   } from '@solana/web3.js';
   import { serializeInstructionToBase64 } from '@solana/spl-governance'
-  import { MintLayout, Token, TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
+  import { TOKEN_PROGRAM_ID, ASSOCIATED_TOKEN_PROGRAM_ID } from '@solana/spl-token';
   import { WalletAdapter } from '@solana/wallet-adapter-base'
   import type { ConnectionContext } from 'utils/connection'
   import * as borsh from 'borsh';
@@ -81,18 +81,22 @@ export async function getTokrInstruction({
     const prerequisiteInstructions: TransactionInstruction[] = []
     // Generate a mint
     
-    const mint = (await PublicKey.findProgramAddress([wallet!.publicKey!.toBuffer(), Buffer.from("test2", "utf-8")], TOKR_PROGRAM))[0];
+    const mintKey = await getMintPda(wallet!.publicKey!, String(form.name), String(form.uri));
 
-    console.log("Payer: {}", wallet!.publicKey!.toBase58());
-    console.log("Mint:", mint.toBase58());
-    console.log("!!token program {}", TOKEN_PROGRAM_ID.toBase58());
+    const metadataKey = await getMetadataPda(mintKey);
+
+    const ataKey = await getAtaPda(wallet!.publicKey!, mintKey);
+
+    console.log("Payer:", wallet!.publicKey!.toBase58());
+    console.log("Mint:", mintKey.toBase58());
+    console.log("Ata:", ataKey.toBase58());
 
     const data = Buffer.from(borsh.serialize(
         TokrizeSchema,
         new TokrizeArgs({ 
-          name: form.name,
-          symbol: form.symbol,
-          uri: form.metaDataUri
+          name:  String(form.name),
+          symbol: String(form.symbol),
+          uri: String(form.uri)
         })
     ));
     
@@ -101,10 +105,14 @@ export async function getTokrInstruction({
     {
         keys: [
             {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true}, 
-            {pubkey: mint, isSigner: false, isWritable: true}, 
+            {pubkey: mintKey, isSigner: false, isWritable: true}, 
+            {pubkey: metadataKey, isSigner: false, isWritable: true}, 
+            {pubkey: ataKey, isSigner: false, isWritable: true},
             {pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
+            {pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false},
             {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},
-            {pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false}
+            {pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},
+            {pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false}
         ],
         programId: TOKR_PROGRAM,
         data: data
@@ -120,3 +128,40 @@ export async function getTokrInstruction({
     }
     return obj
 }
+
+// todo try to find better seed and do not use the wallet either.
+export const getMintPda = async function (
+  wallet: PublicKey,
+  name: String,
+  uri: String
+) {
+  return (
+      await PublicKey.findProgramAddress(
+        [wallet.toBuffer(), Buffer.from(name, "utf-8"), Buffer.from(uri, "utf-8")],
+        TOKR_PROGRAM,
+      )
+  )[0];
+};
+
+export const getMetadataPda = async function (
+  mint: PublicKey,
+) {
+  return (
+      await PublicKey.findProgramAddress(
+        [Buffer.from('metadata'), TOKEN_METADATA_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+        TOKEN_METADATA_PROGRAM_ID,
+      )
+  )[0];
+};
+
+export const getAtaPda = async function (
+  wallet: PublicKey,
+  mint: PublicKey,
+) {
+  return (
+      await PublicKey.findProgramAddress(
+          [wallet.toBuffer(), TOKEN_PROGRAM_ID.toBuffer(), mint.toBuffer()],
+          ASSOCIATED_TOKEN_PROGRAM_ID,
+      )
+  )[0];
+};
