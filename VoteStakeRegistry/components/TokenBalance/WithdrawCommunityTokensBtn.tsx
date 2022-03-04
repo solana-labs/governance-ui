@@ -158,7 +158,10 @@ const WithDrawCommunityTokens = () => {
         connection,
       })
     } catch (ex) {
-      console.error("Can't withdraw tokens", ex)
+      console.error(
+        "Can't withdraw tokens, go to my proposals in account view to check outstanding proposals",
+        ex
+      )
     }
     setIsLoading(false)
   }
