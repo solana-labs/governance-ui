@@ -185,7 +185,6 @@ const MyProposals = () => {
           className={`cursor-pointer hover:bg-bkg-3 default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
           onClick={() => setModalIsOpen(true)}
         >
-          <BadgeCheckIcon className="h-5 mr-1.5 text-primary-light w-5" />
           My proposals
         </a>
       </div>
@@ -200,7 +199,7 @@ const MyProposals = () => {
           <>
             <h3 className="mb-4 flex items-center">Your proposals</h3>
             <ProposalList
-              title="Your drafts"
+              title="Drafts"
               fcn={cleanDrafts}
               btnName="Cancel all"
               proposals={drafts}
