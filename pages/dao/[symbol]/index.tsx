@@ -22,6 +22,7 @@ import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import DepositLabel from '@components/TreasuryAccount/DepositLabel'
+import MyProposals from './proposal/components/MyProposalsBtn'
 
 const compareProposals = (
   p1: Proposal,
@@ -171,6 +172,9 @@ const REALM = () => {
           <div className="flex items-center justify-between pb-3">
             <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
             <div className="flex items-center">
+              <div className="mr-4">
+                <MyProposals></MyProposals>
+              </div>
               <div className="mr-4">
                 <ApproveAllBtn />
               </div>
