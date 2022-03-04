@@ -5,35 +5,15 @@ import { sendTransaction } from '@utils/send'
 import { ARWEAVE_PAYMENT_WALLET } from './upload/constants'
 import * as anchor from '@project-serum/anchor'
 import React, { useState } from 'react'
-import { uploadToArweave } from './upload/arweave'
+import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from './upload/arweave'
 import FormData from 'form-data'
 
 const ArweaveIndex = () => {
 	const wallet = useWalletStore((s) => s.current)
 	const connection = useWalletStore((s) => s.connection)
+	const [arWeaveFile, setArWeaveFile] = useState<string>()
 
 	const upload = async () => {
-		const transaction = new Transaction()
-
-		const instructions = [
-			anchor.web3.SystemProgram.transfer({
-				fromPubkey: wallet!.publicKey!,
-				toPubkey: ARWEAVE_PAYMENT_WALLET,
-				lamports: 100000,
-			}),
-		]
-		transaction.add(...instructions)
-
-		const tx = await sendTransaction({
-			connection: connection.current,
-			wallet,
-			transaction,
-			sendingMessage: 'Funding arweave',
-			successMessage: 'Success Funding arweave',
-		})
-		console.log('******')
-		console.log(tx)
-
 		const metadata = {
 			name: 'Gravity',
 			symbol: 'TOKR-g1',
@@ -48,24 +28,42 @@ const ArweaveIndex = () => {
 			],
 			properties: { creators: [{ address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc', share: 100 }], files: [{ uri: 'https://www.arweave.net/n5rGBhJd1SoTHnBXz36zuUWIy0FC3l4OWQhiBhYQhVM?ext=png', type: 'image/png' }] },
 		}
-		// const manifestBuffer = Buffer.from(JSON.stringify(manifest))
 
-		// https://arweave.net/dEmU15DmA8OI1oQNWzO1AD7LUI7K2TrKeTQysUNLJBQ
 		const metadataFile = new File([JSON.stringify(metadata)], 'metadata.json')
+		const storageCost = await fetchAssetCostToStore([metadataFile.size])
 
-		console.log('TX ID')
-		console.log(tx['txid'])
+		const transaction = new Transaction()
+		const instructions = [
+			anchor.web3.SystemProgram.transfer({
+				fromPubkey: wallet!.publicKey!,
+				toPubkey: ARWEAVE_PAYMENT_WALLET,
+				lamports: storageCost,
+			}),
+		]
+		transaction.add(...instructions)
+
+		const tx = await sendTransaction({
+			connection: connection.current,
+			wallet,
+			transaction,
+			sendingMessage: 'Funding arweave',
+			successMessage: 'Success Funding arweave',
+		})
 
 		const data = new FormData()
 		data.append('transaction', tx)
-		data.append('file[]', metadataFile, 'metadata.json')
-
-		console.log('DATA IS ')
-		console.log(data)
+		data.append('file[]', metadataFile)
 
 		const result = await uploadToArweave(data)
-		console.log('RESULT FROM AR WEAVE')
+		const metadataResultFile = result.messages?.find((m) => m.filename === 'manifest.json')
+		console.log('RESULT IS ' + result)
 		console.log(result)
+		if (metadataResultFile?.transactionId) {
+			const link = `https://arweave.net/${metadataResultFile.transactionId}`
+			setArWeaveFile(link)
+		} else {
+			throw new Error(`No transaction ID for upload: ${tx}`)
+		}
 	}
 
 	return (
@@ -75,6 +73,11 @@ const ArweaveIndex = () => {
 				<Button onClick={upload} title={'Upload'}>
 					Upload
 				</Button>
+				{arWeaveFile && (
+					<>
+						<a href={arWeaveFile}>arWeaveFile</a>
+					</>
+				)}
 			</div>
 		</div>
 	)
