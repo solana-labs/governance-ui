@@ -115,6 +115,140 @@ const New = () => {
 	})
 
 	const [descriptionLink, setDescriptionLink] = useState()
+	const [metaplexDataObj, setMetaplexDataObj] = useState({
+		name: '',
+		symbol: '',
+		description: '',
+		image: '',
+		attributes: [
+			{
+				trait_type: 'name',
+				value: null,
+			},
+			{
+				trait_type: 'description',
+				value: null,
+			},
+			{
+				trait_type: 'property_address',
+				value: null,
+			},
+			{
+				trait_type: 'lat_long',
+				value: null,
+			},
+			{
+				trait_type: 'acres',
+				value: null,
+			},
+			{
+				trait_type: 'land_record_auditor',
+				value: null,
+			},
+			{
+				trait_type: 'deed_record_recorder',
+				value: null,
+			},
+			{
+				trait_type: 'mortgage_record_recorder',
+				value: null,
+			},
+			{
+				trait_type: 'legal_description',
+				value: null,
+			},
+			{
+				trait_type: 'mortgage_record',
+				value: null,
+			},
+			{
+				trait_type: 'title_method',
+				value: null,
+			},
+			{
+				trait_type: 'title_held_by',
+				value: null,
+			},
+			{
+				trait_type: 'ein',
+				value: null,
+			},
+			{
+				trait_type: 'transfer_restrictions',
+				value: null,
+			},
+			{
+				trait_type: 'marketing_name',
+				value: null,
+			},
+			{
+				trait_type: 'type',
+				value: null,
+			},
+			{
+				trait_type: 'sq_ft',
+				value: null,
+			},
+			{
+				trait_type: 'property_description',
+				value: null,
+			},
+			{
+				trait_type: 'deed',
+				value: null,
+			},
+			{
+				trait_type: 'mortgage',
+				value: null,
+			},
+			{
+				trait_type: 'title_insurance',
+				value: null,
+			},
+			{
+				trait_type: 'articles_of_organization',
+				value: null,
+			},
+			{
+				trait_type: 'certificate_of_organization_from_secretary_of_state',
+				value: null,
+			},
+			{
+				trait_type: 'operating_agreement',
+				value: null,
+			},
+			{
+				trait_type: 'membership_interest_transfer_agreement',
+				value: null,
+			},
+			{
+				trait_type: 'ein_letter_from_irs',
+				value: null,
+			},
+			{
+				trait_type: 'appraisal',
+				value: null,
+			},
+			{
+				trait_type: 'submitted_by',
+				value: null,
+			},
+		],
+		properties: {
+			creators: [
+				{
+					address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc',
+					share: 100,
+				},
+			],
+			files: [
+				{
+					uri: 'https://www.arweave.net/n5rGBhJd1SoTHnBXz36zuUWIy0FC3l4OWQhiBhYQhVM?ext=png',
+					type: 'image/png',
+				},
+			],
+		},
+	})
 
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
 		if (!governance) {
@@ -309,6 +443,13 @@ const New = () => {
 
 	useEffect(() => {
 		//TODO: remove this when complete
+		console.log('metaplexDataObj', metaplexDataObj)
+	}, [metaplexDataObj])
+
+
+
+	useEffect(() => {
+		//TODO: remove this when complete
 		console.log('propertyData', propertyData)
 
 		// setDescriptionLink({
@@ -321,6 +462,141 @@ const New = () => {
 			sq_ft: propertyData.sq_ft,
 			property_description: propertyData.property_description,
 			uri: propertyData.uri,
+		})
+
+		setMetaplexDataObj({
+			name: propertyData.name,
+			symbol: 'TOKR-g1',
+			description: propertyData.description,
+			image: propertyData.image,
+			attributes: [
+				{
+					trait_type: 'name',
+					value: propertyData.name,
+				},
+				{
+					trait_type: 'description',
+					value: propertyData.description,
+				},
+				{
+					trait_type: 'property_address',
+					value: propertyData.property_address,
+				},
+				{
+					trait_type: 'lat_long',
+					value: propertyData.lat_long,
+				},
+				{
+					trait_type: 'acres',
+					value: propertyData.acres,
+				},
+				{
+					trait_type: 'land_record_auditor',
+					value: propertyData.land_record_auditor,
+				},
+				{
+					trait_type: 'deed_record_recorder',
+					value: propertyData.deed_record_recorder,
+				},
+				{
+					trait_type: 'mortgage_record_recorder',
+					value: propertyData.mortgage_record_recorder,
+				},
+				{
+					trait_type: 'legal_description',
+					value: propertyData.legal_description,
+				},
+				{
+					trait_type: 'mortgage_record',
+					value: propertyData.mortgage_record,
+				},
+				{
+					trait_type: 'title_method',
+					value: propertyData.title_method,
+				},
+				{
+					trait_type: 'title_held_by',
+					value: propertyData.title_held_by,
+				},
+				{
+					trait_type: 'ein',
+					value: propertyData.ein,
+				},
+				{
+					trait_type: 'transfer_restrictions',
+					value: propertyData.transfer_restrictions,
+				},
+				{
+					trait_type: 'marketing_name',
+					value: propertyData.marketing_name,
+				},
+				{
+					trait_type: 'type',
+					value: propertyData.type,
+				},
+				{
+					trait_type: 'sq_ft',
+					value: propertyData.sq_ft,
+				},
+				{
+					trait_type: 'property_description',
+					value: propertyData.property_description,
+				},
+				{
+					trait_type: 'deed',
+					value: propertyData.deed,
+				},
+				{
+					trait_type: 'mortgage',
+					value: propertyData.mortgage,
+				},
+				{
+					trait_type: 'title_insurance',
+					value: propertyData.title_insurance,
+				},
+				{
+					trait_type: 'articles_of_organization',
+					value: propertyData.articles_of_organization,
+				},
+				{
+					trait_type: 'certificate_of_organization_from_secretary_of_state',
+					value: propertyData.certificate_of_organization_from_secretary_of_state,
+				},
+				{
+					trait_type: 'operating_agreement',
+					value: propertyData.operating_agreement,
+				},
+				{
+					trait_type: 'membership_interest_transfer_agreement',
+					value: propertyData.membership_interest_transfer_agreement,
+				},
+				{
+					trait_type: 'ein_letter_from_irs',
+					value: propertyData.ein_letter_from_irs,
+				},
+				{
+					trait_type: 'appraisal',
+					value: propertyData.appraisal,
+				},
+				{
+					trait_type: 'submitted_by',
+					value: propertyData.submitted_by,
+				},
+			],
+			properties: {
+				creators: [
+					{
+						address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc',
+						share: 100,
+					},
+				],
+				files: [
+					{
+						uri: 'https://www.arweave.net/n5rGBhJd1SoTHnBXz36zuUWIy0FC3l4OWQhiBhYQhVM?ext=png',
+						type: 'image/png',
+					},
+				],
+			},
 		})
 	}, [propertyData])
 
@@ -347,10 +623,7 @@ const New = () => {
 			</div>
 			<div className="grid grid-cols-12 gap-4">
 				<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
-
-					<p className="pt-8">
-						Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.
-					</p>
+					<p className="pt-8">Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.</p>
 
 					<>
 						<div className="pt-8 mb-20">
@@ -401,6 +674,24 @@ const New = () => {
 											}
 										/>
 									</div>
+
+										<div className="xpb-4">
+											<Input
+												label="Image"
+												placeholder="URL to image"
+												value={propertyData.image}
+												id="image"
+												name="image"
+												type="url"
+												// error={propertyDataErrors['description']}
+												onChange={(evt) =>
+													handleSetPropertyData({
+														value: evt.target.value,
+														propertyName: 'image',
+													})
+												}
+											/>
+										</div>
 								</div>
 
 								<div className="space-y-4">
