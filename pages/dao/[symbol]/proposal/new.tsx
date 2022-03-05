@@ -43,6 +43,12 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
+import { sendTransaction } from '@utils/send'
+import { ARWEAVE_PAYMENT_WALLET } from '../../../arweave/upload/constants'
+import * as anchor from '@project-serum/anchor'
+import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '../../../arweave/upload/arweave'
+import FormData from 'form-data'
+import { Transaction } from '@solana/web3.js'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -81,6 +87,7 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
+	const [arWeaveLink, setArWeaveLink] = useState<string>()
 
 	const [propertyData, setPropertyData] = useState({
 		name: '',
@@ -114,7 +121,7 @@ const New = () => {
 		uri: '',
 	})
 
-	const [descriptionLink, setDescriptionLink] = useState()
+	const [descriptionLink, setDescriptionLink] = useState({})
 	const [metaplexDataObj, setMetaplexDataObj] = useState({
 		name: '',
 		symbol: '',
@@ -425,6 +432,47 @@ const New = () => {
 		}
 	}
 
+	const upload = async () => {
+		console.log('UPLOAD')
+		console.log(metaplexDataObj)
+
+		const metadataFile = new File([JSON.stringify(metaplexDataObj)], 'metadata.json')
+		const storageCost = await fetchAssetCostToStore([metadataFile.size])
+
+		const transaction = new Transaction()
+		const instructions = [
+			anchor.web3.SystemProgram.transfer({
+				fromPubkey: wallet!.publicKey!,
+				toPubkey: ARWEAVE_PAYMENT_WALLET,
+				lamports: storageCost,
+			}),
+		]
+		transaction.add(...instructions)
+
+		const tx = await sendTransaction({
+			connection: connection.current,
+			wallet,
+			transaction,
+			sendingMessage: 'Funding arweave',
+			successMessage: 'Success Funding arweave',
+		})
+
+		const data = new FormData()
+		data.append('transaction', tx)
+		data.append('file[]', metadataFile)
+
+		const result = await uploadToArweave(data)
+		const metadataResultFile = result.messages?.find((m) => m.filename === 'manifest.json')
+		console.log('RESULT IS ' + result)
+		console.log(result)
+		if (metadataResultFile?.transactionId) {
+			const link = `https://arweave.net/${metadataResultFile.transactionId}`
+			setArWeaveLink(link)
+		} else {
+			throw new Error(`No transaction ID for upload: ${tx}`)
+		}
+	}
+
 	const handleSetPropertyData = ({ propertyName, value }) => {
 		// setFormErrors({})
 		setPropertyData({ ...propertyData, [propertyName]: value })
@@ -446,15 +494,16 @@ const New = () => {
 		console.log('metaplexDataObj', metaplexDataObj)
 	}, [metaplexDataObj])
 
-
+	useEffect(() => {
+		if (arWeaveLink) {
+			const newDescriptionLink = { ...descriptionLink, uri: arWeaveLink }
+			setDescriptionLink(newDescriptionLink)
+		}
+	}, [arWeaveLink])
 
 	useEffect(() => {
 		//TODO: remove this when complete
 		console.log('propertyData', propertyData)
-
-		// setDescriptionLink({
-		// 	...propertyData,
-		// })
 
 		setDescriptionLink({
 			description: propertyData.description,
@@ -583,7 +632,11 @@ const New = () => {
 					value: propertyData.submitted_by,
 				},
 			],
-			properties: {
+		})
+
+		/*
+		// TODO: When tokr dao mints the nft, we wil need to add creator and file information to their arweave upload
+		properties: {
 				creators: [
 					{
 						address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc',
@@ -597,7 +650,7 @@ const New = () => {
 					},
 				],
 			},
-		})
+		*/
 	}, [propertyData])
 
 	return (
@@ -675,23 +728,23 @@ const New = () => {
 										/>
 									</div>
 
-										<div className="xpb-4">
-											<Input
-												label="Image"
-												placeholder="URL to image"
-												value={propertyData.image}
-												id="image"
-												name="image"
-												type="url"
-												// error={propertyDataErrors['description']}
-												onChange={(evt) =>
-													handleSetPropertyData({
-														value: evt.target.value,
-														propertyName: 'image',
-													})
-												}
-											/>
-										</div>
+									<div className="xpb-4">
+										<Input
+											label="Image"
+											placeholder="URL to image"
+											value={propertyData.image}
+											id="image"
+											name="image"
+											type="url"
+											// error={propertyDataErrors['description']}
+											onChange={(evt) =>
+												handleSetPropertyData({
+													value: evt.target.value,
+													propertyName: 'image',
+												})
+											}
+										/>
+									</div>
 								</div>
 
 								<div className="space-y-4">
@@ -1202,6 +1255,9 @@ const New = () => {
 									</div>
 								</div>
 							</div>
+							<Button onClick={upload} title={'Upload'}>
+								<h1>UPLOAD TO ARWEAVE. MUST BE DONE BEFORE ADDING PROPOSAL!!!!</h1>
+							</Button>
 						</div>
 
 						<div className="pt-2">
