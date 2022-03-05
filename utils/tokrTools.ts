@@ -31,25 +31,31 @@ import {
     name: string;
     symbol: string;
     uri: string;
-    constructor(fields: { name: string, symbol: string, uri: string } | undefined = undefined) {
+    mint_bump: number;
+    mint_seed: string;
+    constructor(fields: {name: string, symbol: string, uri: string, mint_bump: number, mint_seed: string} | undefined = undefined) {
       if (fields) {
         this.name = fields.name;
         this.symbol = fields.symbol;
         this.uri = fields.uri;
+        this.mint_bump = fields.mint_bump;
+        this.mint_seed = fields.mint_seed;
       }
     }
   }
   
+  
   const TokrizeSchema = new Map([
     [TokrizeArgs, {
-      kind: 'struct',
+      kind: 'struct', 
       fields: [
         ['instruction', 'u8'],
         ['name', 'string'],
         ['symbol', 'string'],
-        ['uri', 'string']
-      ]
-    }],
+        ['uri', 'string'],
+        ['mint_bump', 'u8'],
+        ['mint_seed', 'string']
+      ]}],
   ]);
 
 
@@ -80,13 +86,17 @@ export async function getTokrInstruction({
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
     // Generate a mint
-    
-    const mintKey = await getMintPda(wallet!.publicKey!, String(form.name), String(form.uri));
+
+    let mintSeed = (Math.random() + 1).toString(36).substring(7);
+    const mintPdaData = await getMintPda(wallet!.publicKey!, mintSeed);
+    const mintKey = mintPdaData[0];
+    const mintBump = mintPdaData[1];
 
     const metadataKey = await getMetadataPda(mintKey);
 
     const ataKey = await getAtaPda(wallet!.publicKey!, mintKey);
 
+    console.log("Token info. Name: {}, Symbol: {}, Uri: {}", form.name, form.symbol, form.uri)
     console.log("Payer:", wallet!.publicKey!.toBase58());
     console.log("Mint:", mintKey.toBase58());
     console.log("Ata:", ataKey.toBase58());
@@ -96,7 +106,9 @@ export async function getTokrInstruction({
         new TokrizeArgs({ 
           name:  String(form.name),
           symbol: String(form.symbol),
-          uri: String(form.uri)
+          uri: String(form.uri),
+          mint_seed: mintSeed,
+          mint_bump: mintBump
         })
     ));
     
@@ -132,15 +144,12 @@ export async function getTokrInstruction({
 // todo try to find better seed and do not use the wallet either.
 export const getMintPda = async function (
   wallet: PublicKey,
-  name: String,
-  uri: String
+  seed: String
 ) {
-  return (
-      await PublicKey.findProgramAddress(
-        [wallet.toBuffer(), Buffer.from(name, "utf-8"), Buffer.from(uri, "utf-8")],
+  return (await PublicKey.findProgramAddress(
+        [Buffer.from(seed), wallet.toBuffer(), TOKR_PROGRAM.toBuffer()],
         TOKR_PROGRAM,
-      )
-  )[0];
+      ));
 };
 
 export const getMetadataPda = async function (
