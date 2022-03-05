@@ -2,10 +2,10 @@ import Button from '../../components/Button'
 import { Transaction } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
 import { sendTransaction } from '@utils/send'
-import { ARWEAVE_PAYMENT_WALLET } from './upload/constants'
+import { ARWEAVE_PAYMENT_WALLET } from './lib/constants'
 import * as anchor from '@project-serum/anchor'
 import React, { useState } from 'react'
-import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from './upload/arweave'
+import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from './lib/arweave'
 import FormData from 'form-data'
 
 const ArweaveIndex = () => {

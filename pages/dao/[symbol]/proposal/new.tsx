@@ -44,9 +44,9 @@ import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
 import { sendTransaction } from '@utils/send'
-import { ARWEAVE_PAYMENT_WALLET } from '../../../arweave/upload/constants'
+import { ARWEAVE_PAYMENT_WALLET } from '../../../../scripts/arweave/lib/constants'
 import * as anchor from '@project-serum/anchor'
-import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '../../../arweave/upload/arweave'
+import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '../../../../scripts/arweave/lib/arweave'
 import FormData from 'form-data'
 import { Transaction } from '@solana/web3.js'
 
@@ -118,6 +118,7 @@ const New = () => {
 		ein_letter_from_irs: '',
 		appraisal: '',
 		submitted_by: '',
+		image: '',
 		uri: '',
 	})
 
@@ -130,131 +131,117 @@ const New = () => {
 		attributes: [
 			{
 				trait_type: 'name',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'description',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'property_address',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'lat_long',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'acres',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'land_record_auditor',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'deed_record_recorder',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'mortgage_record_recorder',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'legal_description',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'mortgage_record',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'title_method',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'title_held_by',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'ein',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'transfer_restrictions',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'marketing_name',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'type',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'sq_ft',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'property_description',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'deed',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'mortgage',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'title_insurance',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'articles_of_organization',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'certificate_of_organization_from_secretary_of_state',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'operating_agreement',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'membership_interest_transfer_agreement',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'ein_letter_from_irs',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'appraisal',
-				value: null,
+				value: '',
 			},
 			{
 				trait_type: 'submitted_by',
-				value: null,
+				value: '',
 			},
 		],
-		properties: {
-			creators: [
-				{
-					address: '331WZS2hBpzKRy5USYQYAddo6iNbN5jUFAkPmPbw7Mqc',
-					share: 100,
-				},
-			],
-			files: [
-				{
-					uri: 'https://www.arweave.net/n5rGBhJd1SoTHnBXz36zuUWIy0FC3l4OWQhiBhYQhVM?ext=png',
-					type: 'image/png',
-				},
-			],
-		},
 	})
 
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
