@@ -16,7 +16,7 @@ import { tryGetMint } from '@utils/tokens'
 import useMarketStore from 'Strategies/store/marketStore'
 
 const MangoItem = ({
-  liquidity,
+  // liquidity,
   apy,
   protocolName,
   handledMint,
@@ -24,7 +24,7 @@ const MangoItem = ({
   handledTokenImgSrc,
   protocolLogoSrc,
   strategyName,
-  strategyDescription,
+  // strategyDescription,
   createProposalFcn,
 }: TreasuryStrategy) => {
   const market = useMarketStore((s) => s)
@@ -93,7 +93,7 @@ const MangoItem = ({
           <img src={handledTokenImgSrc} className="w-5 h-5 mr-3"></img>{' '}
           {handledTokenSymbol}
         </div>
-        <div>${new BigNumber(liquidity).toFormat(0)}</div>
+        {/* <div>${new BigNumber(liquidity).toFormat(0)}</div> */}
         <div>{apy}</div>
       </ItemWrapper>
       {isModalOpen && (
@@ -101,7 +101,7 @@ const MangoItem = ({
           currentPositionFtm={depositedFmtAmount}
           currentPosition={depositedAmount}
           apy={apy}
-          liquidity={liquidity}
+          // liquidity={liquidity}
           handledMint={handledMint}
           onClose={() => {
             setIsModalOpen(false)
@@ -111,7 +111,7 @@ const MangoItem = ({
           protocolLogoSrc={protocolLogoSrc}
           handledTokenName={handledTokenSymbol}
           strategyName={strategyName}
-          strategyDescription={strategyDescription}
+          // strategyDescription={strategyDescription}
           createProposalFcn={createProposalFcn}
         ></DepositModal>
       )}

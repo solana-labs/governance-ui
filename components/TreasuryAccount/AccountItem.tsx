@@ -1,7 +1,5 @@
 import { GovernedTokenAccount } from '@utils/tokens'
-import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { ViewState } from './Types'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 
 const AccountItem = ({
@@ -18,21 +16,9 @@ const AccountItem = ({
     displayPrice,
     isSol,
   } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
-  const {
-    setCurrentCompactView,
-    setCurrentCompactAccount,
-  } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
-  async function handleGoToAccountOverview() {
-    setCurrentCompactView(ViewState.AccountView)
-    setCurrentCompactAccount(governedAccountTokenAccount, connection)
-  }
 
   return (
-    <div
-      onClick={handleGoToAccountOverview}
-      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full hover:bg-bkg-3"
-    >
+    <div className="flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
       {logo && (
         <img
           className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-1 ${
