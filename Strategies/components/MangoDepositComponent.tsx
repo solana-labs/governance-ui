@@ -321,17 +321,17 @@ const MangoDepositComponent = ({
     <div className="">
       {(matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
         matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
-          MANGO_MINT_DEVNET) && (
-        // currentPosition >= minMngoToCreateLink &&
-        <div className="pb-4">
-          <ButtonGroup
-            activeValue={proposalType}
-            className="h-10"
-            onChange={(v) => setProposalType(v)}
-            values={['Deposit', 'Create Referral Link']}
-          />
-        </div>
-      )}
+          MANGO_MINT_DEVNET) &&
+        currentPosition >= minMngoToCreateLink && (
+          <div className="pb-4">
+            <ButtonGroup
+              activeValue={proposalType}
+              className="h-10"
+              onChange={(v) => setProposalType(v)}
+              values={['Deposit', 'Create Referral Link']}
+            />
+          </div>
+        )}
       {proposalType === 'Create Referral Link' ? (
         <div
           className={` ${
