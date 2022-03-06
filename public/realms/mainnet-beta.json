@@ -410,5 +410,12 @@
     "ogImage": "/realms/MontanaLand/img/logo.png",
     "website": "https://montanaland.slowdao.xyz/",
     "twitter": "@montanaland"
+  },
+  {
+    "symbol": "$RIBS",
+    "displayName": "ROYAL LION DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "2ChWrquGfvcECwA3DRDhkGEzidyc7fTZXxJrkzUvjnJE",
+    "ogImage": "/realms/RIBS/img/lion_logo.png"
   }
 ]
