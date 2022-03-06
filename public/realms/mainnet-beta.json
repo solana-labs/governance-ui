@@ -424,5 +424,12 @@
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
     "realmId": "2TTR5PXXHQFTjYedHfYQpEe1GTwwYFuoywawVnSi1RLb",
     "ogImage": "/realms/PANDA/img/PandaDAOlogo.png"
+  },
+  {
+    "symbol": "XPWizards",
+    "displayName": "XPWizardsDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "7FMLXrTxwEUKoyMJdumd8A2nWkgq4bToQq5Uqds8kRsu",
+    "ogImage": "/realms/XPWizards/img/xpwizlogo.png"
   }
 ]
