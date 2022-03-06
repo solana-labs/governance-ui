@@ -138,7 +138,6 @@ const CloseBuffers = () => {
           new PublicKey(form.solReceiverAddress),
           form.governedAccount.governance.pubkey
         )
-        console.log(closeIx)
         serializedInstruction = serializeInstructionToBase64(closeIx)
       }
       const obj: UiInstruction = {
@@ -153,7 +152,6 @@ const CloseBuffers = () => {
   const handlePropose = async () => {
     setIsLoading(true)
     const instructions: UiInstruction[] = await getInstructions()
-    console.log(instructions)
     if (instructions.length && instructions[0].isValid) {
       const governance = form.governedAccount?.governance
       if (!realm) {
@@ -213,7 +211,6 @@ const CloseBuffers = () => {
             ],
           }
         )
-        console.log(buffers)
         setBuffers(buffers)
       } catch (e) {
         notify({ type: 'error', message: "Can't fetch buffers" })

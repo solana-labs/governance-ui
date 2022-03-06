@@ -20,10 +20,10 @@ import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryL
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
-  yearsToSecs,
-  daysToYear,
   daysToMonths,
   getMinDurationInDays,
+  SECS_PER_DAY,
+  getFormattedStringFromDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
@@ -71,64 +71,52 @@ const LockTokensModal = ({
 
   const lockupPeriods: Period[] = [
     {
-      value: yearsToDays(1),
+      defaultValue: yearsToDays(1),
       display: '1y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(1),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(2),
+      defaultValue: yearsToDays(2),
       display: '2y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(2),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(3),
+      defaultValue: yearsToDays(3),
       display: '3y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(3),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(4),
+      defaultValue: yearsToDays(4),
       display: '4y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(4),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(5),
+      defaultValue: yearsToDays(5),
       display: '5y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(5),
-        communityMintRegistrar,
-        realm
-      ),
+    },
+    {
+      defaultValue: 1,
+      display: 'Custom',
     },
   ].filter((x) =>
-    depositToUnlock ? getMinDurationInDays(depositToUnlock) <= x.value : true
+    depositToUnlock
+      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue
+      : true
   )
 
-  const maxMultiplier = lockupPeriods
-    .map((x) => x.multiplier)
+  const maxNonCustomDaysLockup = lockupPeriods
+    .map((x) => x.defaultValue)
     .reduce((prev, current) => {
       return prev > current ? prev : current
     })
+  const maxMultiplier = calcMintMultiplier(
+    maxNonCustomDaysLockup * SECS_PER_DAY,
+    communityMintRegistrar,
+    realm
+  )
+
   const depositRecord = deposits.find(
     (x) =>
       x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
+  const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
   const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(
@@ -146,8 +134,7 @@ const LockTokensModal = ({
     ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
     : '0'
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
-  const hasMoreTokensInWallet =
-    realmTokenAccount?.account.amount.isZero() !== undefined
+  const hasMoreTokensInWallet = !realmTokenAccount?.account.amount.isZero()
   const wantToLockMoreThenDeposited = lockMoreThenDeposited === 'Yes'
   const currentPrecision = precision(mintMinAmount)
   const maxAmountToUnlock = depositToUnlock
@@ -192,8 +179,13 @@ const LockTokensModal = ({
   const tokenName = mint
     ? getMintMetadata(realm?.account.communityMint)?.name || 'tokens'
     : ''
+  const currentMultiplier = calcMintMultiplier(
+    lockupPeriodDays * SECS_PER_DAY,
+    communityMintRegistrar,
+    realm
+  )
   const currentPercentOfMaxMultiplier =
-    (100 * lockupPeriod.multiplier) / maxMultiplier
+    (100 * currentMultiplier) / maxMultiplier
 
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1)
@@ -238,7 +230,7 @@ const LockTokensModal = ({
       programId: realm!.owner,
       amountFromVoteRegistryDeposit: amountFromDeposit,
       totalTransferAmount: totalAmountToLock,
-      lockUpPeriodInDays: lockupPeriod.value,
+      lockUpPeriodInDays: lockupPeriodDays,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
       sourceTokenAccount: realmTokenAccount!.publicKey,
@@ -287,7 +279,7 @@ const LockTokensModal = ({
       programId: realm!.owner,
       transferAmount: totalAmountToUnlock,
       amountAfterOperation: whatWillBeLeftInsideDeposit,
-      lockUpPeriodInDays: lockupPeriod.value,
+      lockUpPeriodInDays: lockupPeriodDays,
       sourceDepositIdx: depositToUnlock!.index,
       communityMintPk: realm!.account.communityMint,
       tokenOwnerRecordPk:
@@ -396,6 +388,22 @@ const LockTokensModal = ({
                   values={lockupPeriods.map((p) => p.display)}
                 />
               </div>
+              {lockupPeriod.defaultValue === 1 && (
+                <>
+                  <div className={`${labelClasses} flex justify-between`}>
+                    Number of days
+                  </div>
+                  <Input
+                    className="mb-4"
+                    min={1}
+                    value={lockupPeriodDays}
+                    type="number"
+                    onChange={(e) => setLockupPeriodDays(e.target.value)}
+                    step={1}
+                  />
+                </>
+              )}
+
               {lockupType.value === MONTHLY && (
                 <div className="mb-4">
                   <div className="flex justify-between mb-1">
@@ -423,7 +431,7 @@ const LockTokensModal = ({
                     <p>Vesting Rate</p>
                     {amount ? (
                       <p className="font-bold mb-0 text-fgd-1">
-                        {(amount / daysToMonths(lockupPeriod.value)).toFixed(2)}{' '}
+                        {(amount / daysToMonths(lockupPeriodDays)).toFixed(2)}{' '}
                         {vestingPeriod.info}
                       </p>
                     ) : (
@@ -444,7 +452,7 @@ const LockTokensModal = ({
                   </Tooltip>
                 ) : null}
                 <span className="font-bold ml-auto text-fgd-1">
-                  {lockupPeriod.multiplier}x
+                  {currentMultiplier}x
                 </span>
               </div>
               <div className="w-full h-2 bg-bkg-1 rounded-lg">
@@ -463,14 +471,13 @@ const LockTokensModal = ({
               <h2>
                 This will convert {new BigNumber(amount!).toFormat()}{' '}
                 {tokenName} into a cliff type lockup that unlocks in{' '}
-                {daysToYear(lockupPeriod.value)} years.
+                {getFormattedStringFromDays(lockupPeriodDays, true)}
               </h2>
             ) : (
               <h2>
                 Lock {new BigNumber(amount!).toFormat()} {tokenName} for{' '}
                 {lockupType.value === CONSTANT && ' at least '}
-                {daysToYear(lockupPeriod.value)}{' '}
-                {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
+                {getFormattedStringFromDays(lockupPeriodDays, true)}
               </h2>
             )}
             {!depositToUnlock && (
@@ -482,17 +489,6 @@ const LockTokensModal = ({
         return 'Unknown step'
     }
   }
-
-  useEffect(() => {
-    if (currentStep === 1) {
-      handleNextStep()
-    }
-  }, [lockMoreThenDeposited])
-  useEffect(() => {
-    if (currentStep === 1 && !hasMoreTokensInWallet) {
-      handleNextStep()
-    }
-  }, [currentStep])
   useEffect(() => {
     if (amount) {
       validateAmountOnBlur()
@@ -506,6 +502,9 @@ const LockTokensModal = ({
       goToStep(0)
     }
   }, [depositToUnlock])
+  useEffect(() => {
+    setLockupPeriodDays(lockupPeriod.defaultValue)
+  }, [lockupPeriod.defaultValue])
   // const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 0
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
@@ -515,7 +514,12 @@ const LockTokensModal = ({
           <Button
             className="mb-4"
             onClick={handleNextStep}
-            disabled={!amount || !maxAmount}
+            disabled={
+              !amount ||
+              !maxAmount ||
+              !lockupPeriodDays ||
+              Number(lockupPeriodDays) === 0
+            }
           >
             {depositToUnlock ? 'Start unlock' : 'Lock Tokens'}
           </Button>
