@@ -30,6 +30,7 @@ import {
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Account from './Account'
+import { abbreviateAddress } from '@utils/formatting'
 interface DepositBox {
   mintPk: PublicKey
   mint: MintInfo
@@ -255,7 +256,8 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                       tokenService.getUSDTokenPrice(x.mintPk.toBase58())
                     const tokenName =
                       getMintMetadata(x.mintPk)?.name ||
-                      tokenService.getTokenInfo(x.mintPk.toBase58())?.name
+                      tokenService.getTokenInfo(x.mintPk.toBase58())?.name ||
+                      abbreviateAddress(x.mintPk)
                     const formatter = Intl.NumberFormat('en', {
                       notation: 'compact',
                     })
