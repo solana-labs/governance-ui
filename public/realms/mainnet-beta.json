@@ -417,5 +417,12 @@
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
     "realmId": "2ChWrquGfvcECwA3DRDhkGEzidyc7fTZXxJrkzUvjnJE",
     "ogImage": "/realms/RIBS/img/lion_logo.png"
+  },
+  {
+    "symbol": "$PANDA",
+    "displayName": "Panda Fraternity DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "2TTR5PXXHQFTjYedHfYQpEe1GTwwYFuoywawVnSi1RLb",
+    "ogImage": "/realms/PANDA/img/PandaDAOlogo.png"
   }
 ]
