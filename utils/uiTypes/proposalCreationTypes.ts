@@ -102,6 +102,7 @@ export interface TokrizeForm {
   name: string
   symbol: string
   metaDataUri: string
+  destinationAddress: string
 }
 export interface EmptyInstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined

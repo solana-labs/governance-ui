@@ -87,17 +87,22 @@ export async function getTokrInstruction({
     const prerequisiteInstructions: TransactionInstruction[] = []
     // Generate a mint
 
+    console.log(String(form.destinationAccount))
+
+    let destinationAccount = new PublicKey(String(form.destinationAccount));
+
     let mintSeed = (Math.random() + 1).toString(36).substring(7);
-    const mintPdaData = await getMintPda(wallet!.publicKey!, mintSeed);
+    const mintPdaData = await getMintPda(destinationAccount, mintSeed);
     const mintKey = mintPdaData[0];
     const mintBump = mintPdaData[1];
 
     const metadataKey = await getMetadataPda(mintKey);
 
-    const ataKey = await getAtaPda(wallet!.publicKey!, mintKey);
+    const ataKey = await getAtaPda(destinationAccount, mintKey);
 
     console.log("Token info. Name: {}, Symbol: {}, Uri: {}", form.name, form.symbol, form.uri)
     console.log("Payer:", wallet!.publicKey!.toBase58());
+    console.log("Destination: ", destinationAccount.toBase58());
     console.log("Mint:", mintKey.toBase58());
     console.log("Ata:", ataKey.toBase58());
 
@@ -117,6 +122,7 @@ export async function getTokrInstruction({
     {
         keys: [
             {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true}, 
+            {pubkey: destinationAccount, isSigner: false, isWritable: true}, 
             {pubkey: mintKey, isSigner: false, isWritable: true}, 
             {pubkey: metadataKey, isSigner: false, isWritable: true}, 
             {pubkey: ataKey, isSigner: false, isWritable: true},

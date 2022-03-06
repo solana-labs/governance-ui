@@ -52,7 +52,8 @@ const TokrizeContract = ({
     governedAccount: undefined,
     name: '',
     symbol: '',
-    metaDataUri: ''
+    metaDataUri: '',
+    destinationAddress: ''
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -152,6 +153,19 @@ const TokrizeContract = ({
         }}
         step={1}
         error={formErrors['metaDataUri']}
+      />
+      <Input
+        label="Destination Address"
+        value={form.destinationAddress}
+        type="string"
+        onChange={(event) => {
+          handleSetForm({
+            value: event.target.value,
+            propertyName: 'destinationAddress',
+          })
+        }}
+        step={1}
+        error={formErrors['destinationAddress']}
       />
     </>
   )
