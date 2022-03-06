@@ -29,6 +29,7 @@ import {
   LockClosedIcon,
 } from '@heroicons/react/outline'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
+import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
 interface DepositBox {
   mintPk: PublicKey
@@ -360,6 +361,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
           ></LockTokensModal>
         )}
       </div>
+      {connected && <Account withHeader={false}></Account>}
     </div>
   )
 }

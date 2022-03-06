@@ -7,7 +7,12 @@ import {
 } from '@solana/web3.js'
 import BN from 'bn.js'
 import useRealm from '@hooks/useRealm'
-import { getProposal, Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  getProposal,
+  getTokenOwnerRecordAddress,
+  Proposal,
+  ProposalState,
+} from '@solana/spl-governance'
 import { getUnrelinquishedVoteRecords } from '@models/api'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import { withRelinquishVote } from '@solana/spl-governance'
@@ -15,7 +20,7 @@ import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
-import Button from '../Button'
+import Button, { LinkButton } from '../Button'
 import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -24,11 +29,18 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import { ExclamationIcon } from '@heroicons/react/outline'
+import { ChevronRightIcon, ExclamationIcon } from '@heroicons/react/outline'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
+import { useEffect, useState } from 'react'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
-  const { councilMint, mint, realm } = useRealm()
-
+  const router = useRouter()
+  const { councilMint, mint, realm, symbol } = useRealm()
+  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletStore((s) => s.current)
+  const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
+  const { fmtUrlWithCluster } = useQueryContext()
   const isDepositVisible = (
     depositMint: MintInfo | undefined,
     realmMint: PublicKey | undefined
@@ -47,12 +59,48 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
     councilMint,
     realm?.account.config.councilMint
   )
-
+  useEffect(() => {
+    const getTokenOwnerRecord = async () => {
+      const defaultMint = !mint?.supply.isZero()
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
+      const tokenOwnerRecordAddress = await getTokenOwnerRecordAddress(
+        realm!.owner,
+        realm!.pubkey,
+        defaultMint!,
+        wallet!.publicKey!
+      )
+      setTokenOwneRecordPk(tokenOwnerRecordAddress.toBase58())
+    }
+    if (realm && wallet?.connected) {
+      getTokenOwnerRecord()
+    }
+  }, [realm?.pubkey.toBase58(), wallet?.connected])
   const hasLoaded = mint || councilMint
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Your Tokens </h3>
+      <h3 className="mb-4 flex">
+        Your Tokens
+        <LinkButton
+          className={`ml-auto flex items-center text-primary-light ${
+            !connected || !tokenOwnerRecordPk
+              ? 'opacity-50 pointer-events-none'
+              : ''
+          }`}
+          onClick={() => {
+            const url = fmtUrlWithCluster(
+              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+            )
+            router.push(url)
+          }}
+        >
+          Manage
+          <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+        </LinkButton>
+      </h3>
       {hasLoaded ? (
         <div className="space-y-4">
           {communityDepositVisible && (
@@ -295,7 +343,6 @@ const TokenDeposit = ({
     : !hasTokensInWallet
     ? "You don't have any governance tokens in your wallet to deposit."
     : ''
-
   const withdrawTooltipContent = !connected
     ? 'Connect your wallet to withdraw'
     : !hasTokensDeposited
@@ -303,7 +350,7 @@ const TokenDeposit = ({
     : !councilVote &&
       (toManyCouncilOutstandingProposalsForUse ||
         toManyCommunityOutstandingProposalsForUser)
-    ? "You don't have any governance tokens to withdraw."
+    ? 'You have to many outstanding proposals to withdraw.'
     : ''
 
   const availableTokens =
