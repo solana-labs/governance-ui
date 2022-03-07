@@ -364,7 +364,11 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         )}
       </div>
       {connected && <Account withHeader={false}></Account>}
-      {realmInfo?.enableNotifications && <div className="col-span-12"><NotificationsCard /></div>}
+      {realmInfo?.enableNotifications && (
+        <div className="col-span-12">
+          <NotificationsCard />
+        </div>
+      )}
     </div>
   )
 }

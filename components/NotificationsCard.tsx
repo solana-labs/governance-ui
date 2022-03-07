@@ -14,8 +14,12 @@ import {
   MessageSigner,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
+import { useRouter } from 'next/router'
+import { EndpointTypes } from '@models/types'
 
 const NotificationsCard = () => {
+  const router = useRouter()
+  const { cluster } = router.query
   const { councilMint, mint, realm } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
   const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false)
@@ -24,6 +28,16 @@ const NotificationsCard = () => {
 
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
+  const endpoint = cluster ? (cluster as EndpointTypes) : 'mainnet'
+  let env = BlockchainEnvironment.MainNetBeta
+  switch (endpoint) {
+    case 'mainnet':
+      break
+    case 'devnet':
+    case 'localnet':
+      env = BlockchainEnvironment.DevNet
+      break
+  }
   const {
     data,
     logIn,
@@ -31,9 +45,9 @@ const NotificationsCard = () => {
     updateAlert,
     fetchData,
   } = useNotifiClient({
-    daoAddress: realm?.pubkey?.toBase58() ?? '',
+    dappAddress: realm?.pubkey?.toBase58() ?? '',
     walletPublicKey: wallet?.publicKey?.toString() ?? '',
-    env: BlockchainEnvironment.MainNetBeta,
+    env,
   })
   const [email, setEmail] = useState<string>(data?.emailAddress ?? '')
   const [phone, setPhone] = useState<string>(data?.phoneNumber ?? '')
