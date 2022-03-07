@@ -88,7 +88,7 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
-	const [arWeaveLink, setArWeaveLink] = useState<string>()
+	const [arWeaveLink, setArWeaveLink] = useState<string>('')
 
 	const [propertyData, setPropertyData] = useState({
 		name: '',
@@ -120,7 +120,7 @@ const New = () => {
 		appraisal: '',
 		submitted_by: '',
 		image: '',
-		uri: '',
+		uri: arWeaveLink || '',
 	})
 
 	const [descriptionLink, setDescriptionLink] = useState({})
@@ -489,16 +489,18 @@ const New = () => {
 		}
 	}, [arWeaveLink])
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		//TODO: remove this when complete
 		console.log('propertyData', propertyData)
 
 		setDescriptionLink({
 			description: propertyData.description,
 			property_address: propertyData.property_address,
+			lat_long: propertyData.lat_long,
 			sq_ft: propertyData.sq_ft,
-			property_description: propertyData.property_description,
-			uri: propertyData.uri,
+			acres: propertyData.acres,
+			uri: arWeaveLink || '',
+			image: propertyData.image
 		})
 
 		setMetaplexDataObj({
@@ -639,7 +641,7 @@ const New = () => {
 				],
 			},
 		*/
-	}, [propertyData]);
+	}, [propertyData, arWeaveLink]);
 
 	useLayoutEffect(() => {
 		if (_prepopulateForDemos) {

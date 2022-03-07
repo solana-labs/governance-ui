@@ -76,6 +76,7 @@ const Proposal = () => {
 							<div className="pb-2">
 								{descriptionObj ? (
 									descriptionObj.map((item, index) => {
+										console.log("descriptionObj", descriptionObj, "item", item)
 										return (
 											<div key={'descriptionOutput_' + index} className="pb-8">
 												{item.description}
@@ -86,9 +87,19 @@ const Proposal = () => {
 															<b>Property location:</b> {item.property_address}
 														</li>
 													)}
+													{item.lat_long && (
+														<li>
+															<b>Coordinates:</b> {item.lat_long}
+														</li>
+													)}
 													{item.sq_ft && (
 														<li>
-															<b>Square Feet:</b> {item.sq_ft}
+															<span><b>Square Feet:</b> {item.sq_ft}</span>
+														</li>
+													)}
+													{item.acres && (
+														<li>
+															<span><b>Acres:</b> {item.acres}</span>
 														</li>
 													)}
 													{item.uri && (
