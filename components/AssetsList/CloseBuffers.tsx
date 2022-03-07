@@ -1,12 +1,9 @@
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-  ExternalLinkIcon,
-} from '@heroicons/react/outline'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
+import { ChevronDownIcon } from '@heroicons/react/solid'
 import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
-import Button from '@components/Button'
+import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import useWalletStore from 'stores/useWalletStore'
@@ -18,7 +15,6 @@ import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
-import useAssetsStore from 'stores/useAssetsStore'
 import * as yup from 'yup'
 import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
 import Loading from '@components/Loading'
@@ -28,6 +24,7 @@ import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 
 interface CloseBuffersForm {
   governedAccount: GovernedProgramAccount | undefined
@@ -37,14 +34,12 @@ interface CloseBuffersForm {
   title: string
 }
 
-const CloseBuffers = () => {
+const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const { resetCompactViewState } = useAssetsStore()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const program = useAssetsStore((s) => s.compact.currentAsset)
   const governedAccount = {
     governance: program!,
   }
@@ -179,7 +174,6 @@ const CloseBuffers = () => {
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
-        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -243,43 +237,41 @@ const CloseBuffers = () => {
           noMaxWidth={true}
           error={formErrors['solReceiverAddress']}
         />
-        <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
-          <p className="text-fgd-3 text-xs">Bufffers to close</p>
+        <div className="border border-fgd-4 mb-4 px-4 py-3 rounded-md w-full">
+          <p className="mb-0.5 text-xs">Bufffers to close</p>
           {isBuffersLoading ? (
-            <Loading></Loading>
+            <Loading />
           ) : (
-            <>
+            <div className="space-y-2">
               {buffers.map((x) => (
-                <div
-                  className="mb-2 flex items-center text-xs"
+                <a
+                  className="default-transition flex items-center text-fgd-1 hover:text-fgd-3 text-xs"
                   key={x.pubkey.toBase58()}
+                  href={getExplorerUrl(connection.endpoint, x.pubkey)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={(e) => e.stopPropagation()}
                 >
                   {x.pubkey.toBase58()}
-                  <a
-                    href={getExplorerUrl(connection.endpoint, x.pubkey)}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-                  </a>
-                </div>
+                  <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 text-primary-light w-4" />
+                </a>
               ))}
               {!buffers.length && 'No buffers found'}
-            </>
+            </div>
           )}
         </div>
-        <div
-          className={'flex items-center hover:cursor-pointer w-24 mt-3'}
+
+        <LinkButton
+          className="flex items-center text-primary-light"
           onClick={() => setShowOptions(!showOptions)}
         >
-          {showOptions ? (
-            <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
-          ) : (
-            <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
-          )}
-          <small className="text-fgd-3">Options</small>
-        </div>
+          {showOptions ? 'Less Options' : 'More Options'}
+          <ChevronDownIcon
+            className={`default-transition h-5 w-5 ml-1 ${
+              showOptions ? 'transform rotate-180' : 'transform rotate-360'
+            }`}
+          />
+        </LinkButton>
         {showOptions && (
           <>
             <Input
@@ -309,28 +301,26 @@ const CloseBuffers = () => {
                   propertyName: 'description',
                 })
               }
-            ></Textarea>
+            />
             {canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
                   setVoteByCouncil(!voteByCouncil)
                 }}
-              ></VoteBySwitch>
+              />
             )}
           </>
         )}
       </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <Button
-          className="ml-auto"
-          onClick={handlePropose}
-          isLoading={isLoading}
-          disabled={isLoading || !buffers.length}
-        >
-          <div>Propose Close {buffers.length > 1 ? 'Buffers' : 'Buffer'}</div>
-        </Button>
-      </div>
+      <Button
+        className="mt-6"
+        onClick={handlePropose}
+        isLoading={isLoading}
+        disabled={isLoading || !buffers.length}
+      >
+        <div>Propose Close {buffers.length > 1 ? 'Buffers' : 'Buffer'}</div>
+      </Button>
     </>
   )
 }
