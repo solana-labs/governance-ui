@@ -40,7 +40,6 @@ const StrategyItem = ({
       {isModalOpen && (
         <DepositModal
           currentPosition={currentPosition}
-          currentPositionFtm={''}
           apy={apy}
           // liquidity={liquidity}
           handledMint={handledMint}
