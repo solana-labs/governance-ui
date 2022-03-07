@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { createContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import { ArrowLeftIcon, PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
+import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { getInstructionDataFromBase64, Governance, GovernanceAccountType, ProgramAccount, RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
@@ -44,6 +44,7 @@ import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
 
+
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
 })
@@ -81,6 +82,7 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
+
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
 		if (!governance) {
 			return true
@@ -215,158 +217,195 @@ const New = () => {
 		fetchTokenAccountsForSelectedRealmGovernances()
 	}, [])
 
-	const getCurrentInstruction = ({ typeId, idx }) => {
-		switch (typeId) {
-			case Instructions.Transfer:
-				return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
-			case Instructions.ProgramUpgrade:
-				return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-			case Instructions.CreateAssociatedTokenAccount:
-				return <CreateAssociatedTokenAccount index={idx} governance={governance} />
-			case Instructions.CreateSolendObligationAccount:
-				return <CreateObligationAccount index={idx} governance={governance} />
-			case Instructions.InitSolendObligationAccount:
-				return <InitObligationAccount index={idx} governance={governance} />
-			case Instructions.DepositReserveLiquidityAndObligationCollateral:
-				return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
-			case Instructions.RefreshSolendObligation:
-				return <RefreshObligation index={idx} governance={governance} />
-			case Instructions.RefreshSolendReserve:
-				return <RefreshReserve index={idx} governance={governance} />
-			case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-				return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
-			case Instructions.Mint:
-				return <Mint index={idx} governance={governance}></Mint>
-			case Instructions.Base64:
-				return <CustomBase64 index={idx} governance={governance}></CustomBase64>
-			case Instructions.TokrizeContract:
-				return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
-			case Instructions.None:
-				return <Empty index={idx} governance={governance}></Empty>
-			case Instructions.MangoMakeChangeMaxAccounts:
-				return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
-			case Instructions.MangoChangeReferralFeeParams:
-				return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
-			case Instructions.Grant:
-				return <Grant index={idx} governance={governance}></Grant>
-			case Instructions.Clawback:
-				return <Clawback index={idx} governance={governance}></Clawback>
-			default:
-				null
-		}
-	}
+	useEffect(() => {
+		console.log("form", form)
+	}, [form])
+
+	// const getCurrentInstruction = ({ typeId, idx }) => {
+	// 	switch (typeId) {
+	// 		case Instructions.Transfer:
+	// 			return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
+	// 		case Instructions.ProgramUpgrade:
+	// 			return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+	// 		case Instructions.CreateAssociatedTokenAccount:
+	// 			return <CreateAssociatedTokenAccount index={idx} governance={governance} />
+	// 		case Instructions.CreateSolendObligationAccount:
+	// 			return <CreateObligationAccount index={idx} governance={governance} />
+	// 		case Instructions.InitSolendObligationAccount:
+	// 			return <InitObligationAccount index={idx} governance={governance} />
+	// 		case Instructions.DepositReserveLiquidityAndObligationCollateral:
+	// 			return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
+	// 		case Instructions.RefreshSolendObligation:
+	// 			return <RefreshObligation index={idx} governance={governance} />
+	// 		case Instructions.RefreshSolendReserve:
+	// 			return <RefreshReserve index={idx} governance={governance} />
+	// 		case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
+	// 			return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
+	// 		case Instructions.Mint:
+	// 			return <Mint index={idx} governance={governance}></Mint>
+	// 		case Instructions.Base64:
+	// 			return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+	// 		case Instructions.TokrizeContract:
+	// 			return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
+	// 		case Instructions.None:
+	// 			return <Empty index={idx} governance={governance}></Empty>
+	// 		case Instructions.MangoMakeChangeMaxAccounts:
+	// 			return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
+	// 		case Instructions.MangoChangeReferralFeeParams:
+	// 			return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
+	// 		case Instructions.Grant:
+	// 			return <Grant index={idx} governance={governance}></Grant>
+	// 		case Instructions.Clawback:
+	// 			return <Clawback index={idx} governance={governance}></Clawback>
+	// 		default:
+	// 			null
+	// 	}
+	// }
+
 
 	return (
-		<div className="grid grid-cols-12 gap-4">
-			<div className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
-				<>
-					<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-						<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-							<ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-							Back
-						</a>
-					</Link>
-					<div className="border-b border-fgd-4 pb-4 pt-2">
-						<div className="flex items-center justify-between">
-							<h1>
-								Proposal to Tokrize {` `}
-								{realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
-							</h1>
-						</div>
-					</div>
-					<div className="pt-2">
-						<div className="pb-4">
-							<Input
-								label="Title"
-								placeholder="Title of your proposal"
-								value={form.title}
-								type="text"
-								error={formErrors['title']}
-								onChange={(evt) =>
-									handleSetForm({
-										value: evt.target.value,
-										propertyName: 'title',
-									})
-								}
-							/>
-						</div>
-						<Textarea
-							className="mb-3"
-							label="Description"
-							placeholder="Description of your proposal or use a github gist link (optional)"
-							value={form.description}
-							onChange={(evt) =>
-								handleSetForm({
-									value: evt.target.value,
-									propertyName: 'description',
-								})
-							}
-						></Textarea>
-						{canChooseWhoVote && (
-							<VoteBySwitch
-								checked={voteByCouncil}
-								onChange={() => {
-									setVoteByCouncil(!voteByCouncil)
-								}}
-							></VoteBySwitch>
-						)}
-						<NewProposalContext.Provider
-							value={{
-								instructionsData,
-								handleSetInstructions,
-								governance,
-								setGovernance,
-							}}
-						>
-							<h2>Instructions</h2>
-							{instructionsData.map((instruction, idx) => {
-								const availableInstructionsForIdx = getAvailableInstructionsForIndex(idx)
-								return (
-									<div key={idx} className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg">
-										<Select className="h-12" disabled={!getAvailableInstructionsForIndex.length} placeholder={`${availableInstructionsForIdx.length ? 'Select instruction' : 'No available instructions'}`} label={`Instruction ${idx + 1}`} onChange={(value) => setInstructionType({ value, idx })} value={instruction.type?.name}>
-											{availableInstructionsForIdx.map((inst) => (
-												<Select.Option key={inst.id} value={inst}>
-													<span>{inst.name}</span>
-												</Select.Option>
-											))}
-										</Select>
-										<div className="flex items-end pt-4">
-											<InstructionContentContainer idx={idx} instructionsData={instructionsData}>
-												{getCurrentInstruction({
-													typeId: instruction.type?.id,
-													idx,
-												})}
-											</InstructionContentContainer>
-											{idx !== 0 && (
-												<LinkButton className="flex font-bold items-center ml-4 text-fgd-1 text-sm" onClick={() => removeInstruction(idx)}>
-													<XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-													Remove
-												</LinkButton>
-											)}
-										</div>
-									</div>
-								)
-							})}
-						</NewProposalContext.Provider>
-						<div className="flex justify-end mt-4 mb-8 px-6">
-							<LinkButton className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}>
-								<PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-								Add instruction
-							</LinkButton>
-						</div>
-						<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-							<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
-								Save draft
-							</SecondaryButton>
-							<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => handleCreate(false)}>
-								Add proposal
-							</Button>
-						</div>
-					</div>
-				</>
+		<div>
+			<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+				<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
+			</Link>
+			<div className="mt-8 ml-4 -mb-5 relative z-10 m-width-full">
+				{/* <a href={realmUrl} target="_blank" rel="noopener noreferrer" className="bg-dark inline-block">
+					<span className="flex items-center cursor-pointer">
+						<span className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
+							<span className="ml-4 pr-8 text-3xl uppercase">{realmDisplayName}</span>
+						</span>
+					</span>
+				</a> */}
+
+				<h1 className="bg-dark inline-block">
+					<span className="ml-4 pr-8 text-xl uppercase">
+						Proposal to Tokenize
+						{realmDisplayName ? ` to ${realmDisplayName}` : ``}
+					</span>
+				</h1>
 			</div>
-			<div className="col-span-12 md:col-span-5 lg:col-span-4">
-				<TokenBalanceCardWrapper />
+			<div className="grid grid-cols-12 gap-4">
+				<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
+					<p className="pt-8">Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.</p>
+
+					<>
+						<div className="pt-8 mb-20">
+							<div className="space-y-16">
+								<div className="space-y-4">
+									<h3>
+										<span className="text-lg">Proposal Information</span>
+									</h3>
+
+									<div className="xpb-4">
+										<Input
+											label="Name"
+											placeholder="Name"
+											value={form.title}
+											id="name"
+											name="name"
+											type="text"
+											error={formErrors['title']}
+											onChange={(evt) => {
+
+												handleSetForm({
+													value: evt.target.value,
+													propertyName: 'title',
+												})
+											}}
+										/>
+									</div>
+
+									<div className="xpb-4 hidden">
+										<Textarea
+											label="Description"
+											placeholder="Description"
+											value={form.description}
+											id="description"
+											name="description"
+											hidden
+											error={formErrors['title']}
+											onChange={(evt) =>
+												handleSetForm({
+													value: evt.target.value,
+													propertyName: 'description',
+												})
+											}
+										/>
+									</div>
+								</div>
+
+							</div>
+						</div>
+
+						<div className="pt-2">
+							{canChooseWhoVote && (
+								<VoteBySwitch
+									checked={voteByCouncil}
+									onChange={() => {
+										setVoteByCouncil(!voteByCouncil)
+									}}
+								></VoteBySwitch>
+							)}
+							<NewProposalContext.Provider
+								value={{
+									instructionsData,
+									handleSetInstructions,
+									governance,
+									setGovernance,
+								}}
+							>
+								<h2>Instructions</h2>
+								<TokrizeContract />
+								{/* <br />
+								{instructionsData.map((instruction, idx) => {
+									const availableInstructionsForIdx = getAvailableInstructionsForIndex(idx)
+									return (
+										<div key={idx} className="mb-3 border border-fgd-4 p-4 md:p-6">
+											<Select className="h-12" disabled={!getAvailableInstructionsForIndex.length} placeholder={`${availableInstructionsForIdx.length ? 'Select instruction' : 'No available instructions'}`} label={`Instruction ${idx + 1}`} onChange={(value) => setInstructionType({ value, idx })} value={instruction.type?.name}>
+												{availableInstructionsForIdx.map((inst) => (
+													<Select.Option key={inst.id} value={inst}>
+														<span>{inst.name}</span>
+													</Select.Option>
+												))}
+											</Select>
+											<div className="flex items-end pt-4">
+												<InstructionContentContainer idx={idx} instructionsData={instructionsData}>
+													{getCurrentInstruction({
+														typeId: instruction.type?.id,
+														idx,
+													})}
+												</InstructionContentContainer>
+												{idx !== 0 && (
+													<LinkButton className="flex font-bold items-center ml-4 text-fgd-1 text-sm" onClick={() => removeInstruction(idx)}>
+														<XCircleIcon className="h-5 mr-1.5 text-red w-5" />
+														Remove
+													</LinkButton>
+												)}
+											</div>
+										</div>
+									)
+								})} */}
+							</NewProposalContext.Provider>
+							{/* <div className="flex justify-end mt-4 mb-8 px-6">
+								<LinkButton className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}>
+									<PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
+									Add instruction
+								</LinkButton>
+							</div> */}
+							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
+									Save draft
+								</SecondaryButton>
+								<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => handleCreate(false)}>
+									Add proposal
+								</Button>
+							</div>
+						</div>
+					</>
+				</div>
+				<div className="col-span-12 md:col-span-5 lg:col-span-4">
+					<TokenBalanceCardWrapper />
+				</div>
 			</div>
 		</div>
 	)
