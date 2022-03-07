@@ -42,15 +42,10 @@ const ConnectWalletButton = (props) => {
   const handleToggleDevnet = () => {
     setUseDevnet(!useDevnet)
     if (useDevnet) {
-      window.history.pushState({}, 'Mainnet', `${window.location.pathname}`)
+      window.location.href = `${window.location.pathname}`
     } else {
-      window.history.pushState(
-        {},
-        'Devnet',
-        `${window.location.href}?cluster=devnet`
-      )
+      window.location.href = `${window.location.href}?cluster=devnet`
     }
-    window.location.reload()
   }
 
   const handleConnectDisconnect = async () => {
