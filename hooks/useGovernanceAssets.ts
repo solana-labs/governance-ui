@@ -192,8 +192,13 @@ export default function useGovernanceAssets() {
       isVisible: canUseMintInstruction,
     },
     {
+      id: Instructions.IDL,
+      name: 'Execute IDL Instruction',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Base64,
-      name: 'Execute Custom Instruction',
+      name: 'Execute Custom Solana Instruction',
       isVisible: canUseAnyInstruction,
     },
     {

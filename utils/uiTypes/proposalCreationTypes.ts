@@ -137,6 +137,15 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
+/**
+ * Form used for Executing IDL Instructions when adding new proposal
+ *
+ * @param programID
+ */
+export interface IDLForm {
+  programID?: any // TODO make type later
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -154,6 +163,7 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  IDL,
 }
 
 export type createParams = [

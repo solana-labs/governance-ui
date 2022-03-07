@@ -56,6 +56,7 @@ import RefreshObligation from './components/instructions/Solend/RefreshObligatio
 import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
+import IDL from './components/instructions/IDL'
 import VoteBySwitch from './components/VoteBySwitch'
 
 const schema = yup.object().shape({
@@ -363,6 +364,8 @@ const New = () => {
         return <Grant index={idx} governance={governance}></Grant>
       case Instructions.Clawback:
         return <Clawback index={idx} governance={governance}></Clawback>
+      case Instructions.IDL:
+        return <IDL index={idx} governance={governance}></IDL>
       default:
         null
     }
