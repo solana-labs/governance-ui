@@ -381,40 +381,40 @@ const New = () => {
 
 	const getCurrentInstruction = ({ typeId, idx }) => {
 		switch (typeId) {
-			case Instructions.Transfer:
-				return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
-			case Instructions.ProgramUpgrade:
-				return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-			case Instructions.CreateAssociatedTokenAccount:
-				return <CreateAssociatedTokenAccount index={idx} governance={governance} />
-			case Instructions.CreateSolendObligationAccount:
-				return <CreateObligationAccount index={idx} governance={governance} />
-			case Instructions.InitSolendObligationAccount:
-				return <InitObligationAccount index={idx} governance={governance} />
-			case Instructions.DepositReserveLiquidityAndObligationCollateral:
-				return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
-			case Instructions.RefreshSolendObligation:
-				return <RefreshObligation index={idx} governance={governance} />
-			case Instructions.RefreshSolendReserve:
-				return <RefreshReserve index={idx} governance={governance} />
-			case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-				return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
-			case Instructions.Mint:
-				return <Mint index={idx} governance={governance}></Mint>
-			case Instructions.Base64:
-				return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+			// case Instructions.Transfer:
+			// 	return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
+			// case Instructions.ProgramUpgrade:
+			// 	return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+			// case Instructions.CreateAssociatedTokenAccount:
+			// 	return <CreateAssociatedTokenAccount index={idx} governance={governance} />
+			// case Instructions.CreateSolendObligationAccount:
+			// 	return <CreateObligationAccount index={idx} governance={governance} />
+			// case Instructions.InitSolendObligationAccount:
+			// 	return <InitObligationAccount index={idx} governance={governance} />
+			// case Instructions.DepositReserveLiquidityAndObligationCollateral:
+			// 	return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
+			// case Instructions.RefreshSolendObligation:
+			// 	return <RefreshObligation index={idx} governance={governance} />
+			// case Instructions.RefreshSolendReserve:
+			// 	return <RefreshReserve index={idx} governance={governance} />
+			// case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
+			// 	return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
+			// case Instructions.Mint:
+			// 	return <Mint index={idx} governance={governance}></Mint>
+			// case Instructions.Base64:
+			// 	return <CustomBase64 index={idx} governance={governance}></CustomBase64>
 			case Instructions.TokrizeContract:
 				return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
-			case Instructions.None:
-				return <Empty index={idx} governance={governance}></Empty>
-			case Instructions.MangoMakeChangeMaxAccounts:
-				return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
-			case Instructions.MangoChangeReferralFeeParams:
-				return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
-			case Instructions.Grant:
-				return <Grant index={idx} governance={governance}></Grant>
-			case Instructions.Clawback:
-				return <Clawback index={idx} governance={governance}></Clawback>
+			// case Instructions.None:
+			// 	return <Empty index={idx} governance={governance}></Empty>
+			// case Instructions.MangoMakeChangeMaxAccounts:
+			// 	return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
+			// case Instructions.MangoChangeReferralFeeParams:
+			// 	return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
+			// case Instructions.Grant:
+			// 	return <Grant index={idx} governance={governance}></Grant>
+			// case Instructions.Clawback:
+			// 	return <Clawback index={idx} governance={governance}></Clawback>
 			default:
 				null
 		}
@@ -441,8 +441,8 @@ const New = () => {
 
 				<h1 className="bg-dark inline-block">
 					<span className="ml-4 pr-8 text-xl uppercase">
-						Add a proposal
-						{realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
+						Tokenize Proposal
+						{realmDisplayName ? ` for ${realmDisplayName}` : ``}{' '}
 					</span>
 				</h1>
 			</div>
@@ -476,8 +476,9 @@ const New = () => {
 										/>
 									</div>
 
-									<div className="xpb-4">
+									<div className="xpb-4 hidden">
 										<Textarea
+											hidden
 											label="Description"
 											placeholder="Description"
 											value={form.description}
@@ -498,19 +499,6 @@ const New = () => {
 						</div>
 
 						<div className="pt-2">
-							{/* <Textarea
-								className="mb-3"
-								label="Description"
-								placeholder="Description of your proposal or use a github gist link (optional)"
-								value={JSON.stringify(descriptionLink)}
-								// value={form.description}
-								onChange={(evt) =>
-									handleSetForm({
-										value: evt.target.value,
-										propertyName: 'description',
-									})
-								}
-							></Textarea> */}
 							{canChooseWhoVote && (
 								<VoteBySwitch
 									checked={voteByCouncil}
@@ -557,12 +545,6 @@ const New = () => {
 									)
 								})}
 							</NewProposalContext.Provider>
-							<div className="flex justify-end mt-4 mb-8 px-6">
-								<LinkButton className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}>
-									<PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-									Add instruction
-								</LinkButton>
-							</div>
 							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
 									Save draft
