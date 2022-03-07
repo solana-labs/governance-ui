@@ -46,20 +46,20 @@ const IDLInstructions = ({
     setForm({ ...form, [propertyName]: value })
     fetchIDL(wallet! as any, testConnection, value)
   }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstruction = ''
-    if (isValid && form.programID && wallet?.publicKey) {
-      serializedInstruction = form.programID
-    }
-    const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
-      isValid,
-      governance: form.governedAccount?.governance,
-      customHoldUpTime: form.holdUpTime,
-    }
-    return obj
-  }
+  // async function getInstruction(): Promise<UiInstruction> {
+  //   const isValid = await validateInstruction({ schema, form, setFormErrors })
+  //   let serializedInstruction = ''
+  //   if (isValid && form.programID && wallet?.publicKey) {
+  //     serializedInstruction = form.programID
+  //   }
+  //   const obj: UiInstruction = {
+  //     serializedInstruction: serializedInstruction,
+  //     isValid,
+  //     governance: form.governedAccount?.governance,
+  //     customHoldUpTime: form.holdUpTime,
+  //   }
+  //   return obj
+  // }
   // useEffect(() => {
   //   handleSetInstructions(
   //     { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -113,7 +113,7 @@ const IDLInstructions = ({
     const fetchedIDL = await anchor.Program.fetchIdl(idl, provider)
 
     console.log('fetchedIDL', fetchedIDL)
-    setProgramInstructions([fetchedIDL!.instructions as Array])
+    // setProgramInstructions([fetchedIDL!.instructions as Array])
     // setProgramInstructions(prevState => [...prevState, fetchedIDL.instructions])
     console.log('programInstructions', programInstructions)
     // return (<h1>fetchedIDL {console.log("reached")}</h1>);
