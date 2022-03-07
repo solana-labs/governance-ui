@@ -85,7 +85,7 @@ export async function getTokrInstruction({
 
     let destinationAccount = new PublicKey(String(form.destinationAddress));
 
-    let mintSeed = (Math.random() + 1).toString(36).substring(2);
+    let mintSeed = (Math.random() + 1).toString(36).substring(2) + (Math.random() + 1).toString(36).substring(2);
     const mintPdaData = await getMintPda(wallet!.publicKey!, mintSeed);
     const mintKey = mintPdaData[0];
     const mintBump = mintPdaData[1];
@@ -114,16 +114,17 @@ export async function getTokrInstruction({
     const instruction = new TransactionInstruction(
     {
         keys: [
-            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true}, 
-            {pubkey: destinationAccount, isSigner: false, isWritable: true}, 
-            {pubkey: mintKey, isSigner: false, isWritable: true}, 
-            {pubkey: metadataKey, isSigner: false, isWritable: true}, 
-            {pubkey: ataKey, isSigner: false, isWritable: true},
-            {pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
-            {pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false},
-            {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},
-            {pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},
-            {pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false}
+            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true},           // payer
+            {pubkey: destinationAccount, isSigner: false, isWritable: true},          // NFT destination        
+            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true},           // NFT creator       
+            {pubkey: mintKey, isSigner: false, isWritable: true},                     // Mint Account to create
+            {pubkey: metadataKey, isSigner: false, isWritable: true},                 // Metadata account to create  
+            {pubkey: ataKey, isSigner: false, isWritable: true},                      // New associated token account for destination
+            {pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},           // SPL token program
+            {pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false},  // Metaplex token program 
+            {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},    // SPL system program
+            {pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},         // SPL rent program
+            {pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false} // SPL ata program
         ],
         programId: TOKR_PROGRAM,
         data: data
