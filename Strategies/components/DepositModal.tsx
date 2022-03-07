@@ -2,6 +2,7 @@ import Modal from '@components/Modal'
 import Deposit from './DepositComponent'
 import ModalHeader from './ModalHeader'
 import MangoDeposit from './MangoDepositComponent'
+import BigNumber from 'bignumber.js'
 
 const DepositModal = ({
   onClose,
@@ -15,9 +16,11 @@ const DepositModal = ({
   strategyName,
   // strategyDescription,
   currentPosition,
-  currentPositionFtm,
   createProposalFcn,
 }) => {
+  const currentPositionFtm = new BigNumber(
+    currentPosition.toNumber().toFixed(0)
+  ).toFormat()
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <ModalHeader

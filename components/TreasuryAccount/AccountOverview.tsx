@@ -23,7 +23,6 @@ import {
 import Tooltip from '@components/Tooltip'
 import ConvertToMsol from './ConvertToMsol'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
-import tokenService from '@utils/services/token'
 import DepositModal from 'Strategies/components/DepositModal'
 import { TreasuryStrategy } from 'Strategies/types/types'
 
@@ -50,8 +49,6 @@ const AccountOverview = () => {
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
   const accountPublicKey = currentAccount?.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
-  const strategiesLoading = useStrategiesStore((s) => s.strategiesLoading)
-  const { getStrategies } = useStrategiesStore()
   const [accountInvestments, setAccountInvestments] = useState<any[]>([])
   const [eligibleInvestments, setEligibleInvestments] = useState<any[]>([])
   const [showStrategies, setShowStrategies] = useState(false)
@@ -60,12 +57,9 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<TreasuryStrategy | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-  useEffect(() => {
-    getStrategies()
-  }, [tokenService._tokenList])
 
   useEffect(() => {
-    if (!strategiesLoading && strategies.length > 0) {
+    if (strategies.length > 0) {
       const activeStrategies = strategies.filter(
         (strat) => !strat.currentPosition.isZero()
       )
@@ -85,7 +79,7 @@ const AccountOverview = () => {
         setEligibleInvestments(eligibleInvestments)
       }
     }
-  }, [currentAccount, strategiesLoading])
+  }, [currentAccount, strategies])
 
   useEffect(() => {
     if (isCopied) {

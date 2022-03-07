@@ -12,11 +12,18 @@ import { CurrencyDollarIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { LinkButton } from '@components/Button'
 import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
+import tokenService from '@utils/services/token'
+import useStrategiesStore from 'Strategies/store/useStrategiesStore'
+import useMarketStore from 'Strategies/store/marketStore'
 
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { getStrategies } = useStrategiesStore()
+  const {
+    governedTokenAccounts,
+    governedTokenAccountsWithoutNfts,
+  } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -37,9 +44,23 @@ const Treasury = () => {
     activeAccount,
     setActiveAccount,
   ] = useState<GovernedTokenAccount | null>(null)
+  const market = useMarketStore((s) => s)
   const { realmInfo } = useRealm()
-  // const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-
+  useEffect(() => {
+    if (
+      tokenService._tokenList.length &&
+      governedTokenAccountsWithoutNfts.filter((x) => x.mint).length
+    ) {
+      getStrategies(
+        market,
+        connection,
+        governedTokenAccountsWithoutNfts.filter((x) => x.mint)
+      )
+    }
+  }, [
+    tokenService._tokenList.length,
+    governedTokenAccountsWithoutNfts.filter((x) => x.mint).length,
+  ])
   useEffect(() => {
     async function prepTreasuryAccounts() {
       setTreasuryAccounts(governedTokenAccounts)
@@ -134,7 +155,6 @@ const Treasury = () => {
           ) : null}
         </div>
       </div>
-      {/* <StrategiesWrapper /> */}
     </>
   )
 }

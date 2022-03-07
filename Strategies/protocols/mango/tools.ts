@@ -10,7 +10,9 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { ConnectionContext } from '@utils/connection'
 import tokenService from '@utils/services/token'
+import { GovernedTokenAccount, tryGetMint } from '@utils/tokens'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -73,15 +75,28 @@ function findClosestToDate(values, date) {
 }
 
 //method to fetch mango strategies
-export async function tvl(timestamp) {
+export async function tvl(
+  timestamp,
+  market: MarketStore,
+  connection: ConnectionContext,
+  governedTokenAccountsWithoutNfts: GovernedTokenAccount[]
+) {
   const protocolInfo = await tokenService.getTokenInfo(MANGO_MINT)
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
   const date = new Date(timestamp * 1000).getTime()
-  Object.entries(tokenList).map(([mangoId, mangoTokens]) => {
+  for (const [mangoId, mangoTokens] of Object.entries(tokenList)) {
     const assetDeposits = stats.data.filter((s) => s.name === mangoId)
+
     if (assetDeposits.length > 0) {
       const info = tokenService.getTokenInfoFromCoingeckoId(mangoTokens)
+      const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
+        (x) => x.mint?.publicKey.toBase58() === info?.address
+      )
+      console.log(filteredTokenGov)
+      const currentPosition = info
+        ? await getPositionForMint(market, connection, filteredTokenGov)
+        : 0
       const closestVal = findClosestToDate(assetDeposits, date)
       balances.push({
         liquidity:
@@ -98,14 +113,59 @@ export async function tvl(timestamp) {
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
-        currentPosition: new BN(0),
+        currentPosition: new BN(currentPosition),
         strategyDescription: 'Description',
         isGenericItem: false,
         createProposalFcn: HandleMangoDeposit,
       })
     }
-  })
+  }
+
   return balances
+}
+
+const getPositionForMint = async (
+  market: MarketStore,
+  connection: ConnectionContext,
+  filteredTokenGov: GovernedTokenAccount[]
+) => {
+  let deposited = 0
+  for (let i = 0; i < filteredTokenGov.length; i++) {
+    const group = market!.group!
+    const groupConfig = market!.groupConfig!
+    const depositIndex = group.tokens.findIndex(
+      (x) =>
+        x.mint.toBase58() === filteredTokenGov[i]!.mint!.publicKey.toBase58()
+    )
+    const [mangoAccountPk] = await PublicKey.findProgramAddress(
+      [
+        group.publicKey.toBytes(),
+        filteredTokenGov[i].governance!.pubkey.toBytes(),
+        accountNumBN.toArrayLike(Buffer, 'le', 8),
+      ],
+      groupConfig.mangoProgramId
+    )
+    const account = await tryGetMangoAccount(market, mangoAccountPk)
+    if (account) {
+      const deposit = account?.deposits[depositIndex]
+      const mintInfo = await tryGetMint(
+        connection.current,
+        new PublicKey(filteredTokenGov[i]!.mint!.publicKey.toBase58())
+      )
+      if (mintInfo && !deposit?.isZero()) {
+        const currentDepositAmount = account
+          ?.getUiDeposit(
+            market.cache!.rootBankCache[depositIndex],
+            group,
+            depositIndex
+          )
+          .toNumber()
+        deposited += currentDepositAmount ? currentDepositAmount : 0
+      }
+    }
+  }
+  console.log(deposited)
+  return deposited
 }
 
 const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
