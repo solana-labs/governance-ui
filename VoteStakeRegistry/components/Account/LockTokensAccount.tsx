@@ -264,9 +264,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                     return (
                       <div key={idx} className={mainBoxesClasses}>
                         <p className="text-fgd-3">
-                          {x.lockUpKind === 'none'
-                            ? `${realmInfo?.symbol} Deposited`
-                            : `${tokenName} Locked`}
+                          {`${tokenName} ${
+                            x.lockUpKind === 'none' ? 'Deposited' : 'Locked'
+                          }`}
                         </p>
                         <span className="hero-text">
                           {availableTokens}
