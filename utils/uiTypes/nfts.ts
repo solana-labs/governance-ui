@@ -11,6 +11,10 @@ export interface NFTData {
   name: string
   description: string
   properties: NFTProperties
+  collection: {
+    family: string
+    name: string
+  }
 }
 export interface NFTWithMint {
   val: NFTData

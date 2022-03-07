@@ -17,6 +17,8 @@ import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { useState } from 'react'
+import Loading from '@components/Loading'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -31,6 +33,7 @@ const WithDrawCommunityTokens = () => {
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
+  const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
   const connection = useWalletStore((s) => s.connection.current)
@@ -45,8 +48,8 @@ const WithDrawCommunityTokens = () => {
       x.lockup.kind.none
   )
   const withdrawAllTokens = async function () {
+    setIsLoading(true)
     const instructions: TransactionInstruction[] = []
-
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience
     if (ownTokenRecord!.account!.unrelinquishedVotesCount > 0) {
       const voteRecords = await getUnrelinquishedVoteRecords(
@@ -145,9 +148,9 @@ const WithDrawCommunityTokens = () => {
               : `Released tokens (${index}/${ixChunks.length - 2})`,
         })
       }
-      fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-      fetchWalletTokenAccounts()
-      getOwnedDeposits({
+      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      await fetchWalletTokenAccounts()
+      await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
@@ -155,8 +158,12 @@ const WithDrawCommunityTokens = () => {
         connection,
       })
     } catch (ex) {
-      console.error("Can't withdraw tokens", ex)
+      console.error(
+        "Can't withdraw tokens, go to my proposals in account view to check outstanding proposals",
+        ex
+      )
     }
+    setIsLoading(false)
   }
   const hasTokensDeposited =
     depositRecord && depositRecord.amountDepositedNative.gt(new BN(0))
@@ -176,11 +183,12 @@ const WithDrawCommunityTokens = () => {
         !connected ||
         !hasTokensDeposited ||
         toManyCommunityOutstandingProposalsForUser ||
-        toManyCouncilOutstandingProposalsForUse
+        toManyCouncilOutstandingProposalsForUse ||
+        isLoading
       }
       onClick={withdrawAllTokens}
     >
-      Withdraw
+      {isLoading ? <Loading></Loading> : 'Withdraw'}
     </Button>
   )
 }
