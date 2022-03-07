@@ -286,7 +286,6 @@ const AccountOverview = () => {
       {proposedInvestment && (
         <DepositModal
           currentPosition={proposedInvestment.currentPosition}
-          currentPositionFtm={''}
           apy={proposedInvestment.apy}
           // liquidity={proposedInvestment.liquidity}
           handledMint={proposedInvestment.handledMint}
