@@ -22,6 +22,9 @@ const TokrizeContract = ({ index, governance }: { index: number; governance: Pro
 	const programId: PublicKey | undefined = realmInfo?.programId
 	const connection = useWalletStore((s) => s.connection)
 	const wallet = useWalletStore((s) => s.current)
+
+	console.log(realmInfo?.realmId)
+	console.log(governance?.account)
 	const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
 	const shouldBeGoverned = index !== 0 && governance
 	const [form, setForm] = useState<TokrizeForm>({
