@@ -56,72 +56,88 @@ const TokrizeSchema = new Map([
  * Say hello
  * TODO integrate into
  */
-export async function getTokrInstruction({ schema, form, programId, connection, wallet, currentAccount, setFormErrors }: { schema: any; form: any; programId: PublicKey | undefined; connection: ConnectionContext; wallet: WalletAdapter | undefined; currentAccount: GovernedTokenAccount | undefined; setFormErrors: any }): Promise<UiInstruction> {
-	const isValid = true // todo: await validateInstruction({ schema, form, setFormErrors })
 
-	console.log('Token info. Name: {}, Symbol: {}, Uri: {}', form.name, form.symbol, form.uri)
+export async function getTokrInstruction({
+    schema,
+    form,
+    programId,
+    connection,
+    wallet,
+    currentAccount,
+    setFormErrors
+    }: {
+    schema: any
+    form: any
+    programId: PublicKey | undefined
+    connection: ConnectionContext
+    wallet: WalletAdapter | undefined
+    currentAccount: GovernedTokenAccount | undefined
+    setFormErrors: any
+    }): Promise<UiInstruction> {
+    const isValid =  true; // todo: await validateInstruction({ schema, form, setFormErrors })
 
-	let serializedInstruction = ''
-	const prerequisiteInstructions: TransactionInstruction[] = []
-	// Generate a mint
 
-	console.log(String(form.destinationAccount))
+    let serializedInstruction = ''
+    const prerequisiteInstructions: TransactionInstruction[] = []
+    // Generate a mint
 
-	let destinationAccount = new PublicKey(String(form.destinationAccount))
+    console.log(`Token info. Name: ${form.name}, Symbol: ${form.symbol}, Uri: ${form.metaDataUri}, Destination: ${form.destinationAddress}`);
 
-	let mintSeed = (Math.random() + 1).toString(36).substring(7)
-	const mintPdaData = await getMintPda(destinationAccount, mintSeed)
-	const mintKey = mintPdaData[0]
-	const mintBump = mintPdaData[1]
+    let destinationAccount = new PublicKey(String(form.destinationAddress));
 
-	const metadataKey = await getMetadataPda(mintKey)
+    let mintSeed = (Math.random() + 1).toString(36).substring(7);
+    const mintPdaData = await getMintPda(destinationAccount, mintSeed);
+    const mintKey = mintPdaData[0];
+    const mintBump = mintPdaData[1];
 
-	const ataKey = await getAtaPda(destinationAccount, mintKey)
+    const metadataKey = await getMetadataPda(mintKey);
 
-	console.log('Token info. Name: {}, Symbol: {}, Uri: {}', form.name, form.symbol, form.uri)
-	console.log('Payer:', wallet!.publicKey!.toBase58())
-	console.log('Destination: ', destinationAccount.toBase58())
-	console.log('Mint:', mintKey.toBase58())
-	console.log('Ata:', ataKey.toBase58())
+    const ataKey = await getAtaPda(destinationAccount, mintKey);
 
-	const data = Buffer.from(
-		borsh.serialize(
-			TokrizeSchema,
-			new TokrizeArgs({
-				name: String(form.name),
-				symbol: String(form.symbol),
-				uri: String(form.uri),
-				mint_seed: mintSeed,
-				mint_bump: mintBump,
-			})
-		)
-	)
+    console.log("Payer:", wallet!.publicKey!.toBase58());
+    console.log("Destination: ", destinationAccount.toBase58());
+    console.log("Mint:", mintKey.toBase58());
+    console.log("Ata:", ataKey.toBase58());
 
-	const instruction = new TransactionInstruction({
-		keys: [
-			{ pubkey: wallet!.publicKey!, isSigner: true, isWritable: true },
-			{ pubkey: destinationAccount, isSigner: false, isWritable: true },
-			{ pubkey: mintKey, isSigner: false, isWritable: true },
-			{ pubkey: metadataKey, isSigner: false, isWritable: true },
-			{ pubkey: ataKey, isSigner: false, isWritable: true },
-			{ pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-			{ pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false },
-			{ pubkey: SystemProgram.programId, isSigner: false, isWritable: false },
-			{ pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false },
-			{ pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false },
-		],
-		programId: TOKR_PROGRAM,
-		data: data,
-	})
-	serializedInstruction = serializeInstructionToBase64(instruction)
+    const data = Buffer.from(borsh.serialize(
+        TokrizeSchema,
+        new TokrizeArgs({ 
+          name:  String(form.name),
+          symbol: String(form.symbol),
+          uri: String(form.metaDataUri),
+          mint_seed: mintSeed,
+          mint_bump: mintBump
+        })
+    ));
+    
 
-	const obj: UiInstruction = {
-		serializedInstruction,
-		isValid,
-		governance: currentAccount?.governance,
-		prerequisiteInstructions: prerequisiteInstructions,
-	}
-	return obj
+    const instruction = new TransactionInstruction(
+    {
+        keys: [
+            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true}, 
+            {pubkey: destinationAccount, isSigner: false, isWritable: true}, 
+            {pubkey: mintKey, isSigner: false, isWritable: true}, 
+            {pubkey: metadataKey, isSigner: false, isWritable: true}, 
+            {pubkey: ataKey, isSigner: false, isWritable: true},
+            {pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},
+            {pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false},
+            {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},
+            {pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},
+            {pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false}
+        ],
+        programId: TOKR_PROGRAM,
+        data: data
+    }
+    );
+    serializedInstruction = serializeInstructionToBase64(instruction)
+
+    const obj: UiInstruction = {
+        serializedInstruction,
+        isValid,
+        governance: currentAccount?.governance,
+        prerequisiteInstructions: prerequisiteInstructions,
+    }
+    return obj
 }
 
 // todo try to find better seed and do not use the wallet either.
