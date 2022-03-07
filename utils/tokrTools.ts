@@ -85,7 +85,7 @@ export async function getTokrInstruction({
 
     let destinationAccount = new PublicKey(String(form.destinationAddress));
 
-    let mintSeed = (Math.random() + 1).toString(36).substring(2);
+    let mintSeed = (Math.random() + 1).toString(36).substring(2) + (Math.random() + 1).toString(36).substring(2);
     const mintPdaData = await getMintPda(wallet!.publicKey!, mintSeed);
     const mintKey = mintPdaData[0];
     const mintBump = mintPdaData[1];
@@ -116,6 +116,7 @@ export async function getTokrInstruction({
         keys: [
             {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true}, 
             {pubkey: destinationAccount, isSigner: false, isWritable: true}, 
+            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true}, 
             {pubkey: mintKey, isSigner: false, isWritable: true}, 
             {pubkey: metadataKey, isSigner: false, isWritable: true}, 
             {pubkey: ataKey, isSigner: false, isWritable: true},
