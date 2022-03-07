@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useState } from 'react'
+import React, { createContext, useEffect, useLayoutEffect, useState } from 'react'
 import * as yup from 'yup'
 import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { getInstructionDataFromBase64, Governance, GovernanceAccountType, ProgramAccount, RpcContext } from '@solana/spl-governance'
@@ -43,7 +43,12 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
-
+import { sendTransaction } from '@utils/send'
+import { ARWEAVE_PAYMENT_WALLET } from '../../../../scripts/arweave/lib/constants'
+import * as anchor from '@project-serum/anchor'
+import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '../../../../scripts/arweave/lib/arweave'
+import FormData from 'form-data'
+import { Transaction } from '@solana/web3.js'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -62,6 +67,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = () => {
+	const _prepopulateForDemos = false;
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -82,6 +88,162 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
+	const [arWeaveLink, setArWeaveLink] = useState<string>('')
+
+	const [propertyData, setPropertyData] = useState({
+		name: '',
+		description: '',
+		property_address: '',
+		lat_long: '',
+		acres: '',
+		land_record_auditor: '',
+		deed_record_recorder: '',
+		mortgage_record_recorder: '',
+		legal_description: '',
+		mortgage_record: '',
+		title_method: '',
+		title_held_by: '',
+		ein: '',
+		transfer_restrictions: '',
+		marketing_name: '',
+		type: '',
+		sq_ft: '',
+		property_description: '',
+		deed: '',
+		mortgage: '',
+		title_insurance: '',
+		articles_of_organization: '',
+		certificate_of_organization_from_secretary_of_state: '',
+		operating_agreement: '',
+		membership_interest_transfer_agreement: '',
+		ein_letter_from_irs: '',
+		appraisal: '',
+		submitted_by: '',
+		image: '',
+		uri: arWeaveLink || '',
+	})
+
+	const [descriptionLink, setDescriptionLink] = useState({})
+	const [metaplexDataObj, setMetaplexDataObj] = useState({
+		name: '',
+		symbol: '',
+		description: '',
+		image: '',
+		attributes: [
+			{
+				trait_type: 'name',
+				value: '',
+			},
+			{
+				trait_type: 'description',
+				value: '',
+			},
+			{
+				trait_type: 'property_address',
+				value: '',
+			},
+			{
+				trait_type: 'lat_long',
+				value: '',
+			},
+			{
+				trait_type: 'acres',
+				value: '',
+			},
+			{
+				trait_type: 'land_record_auditor',
+				value: '',
+			},
+			{
+				trait_type: 'deed_record_recorder',
+				value: '',
+			},
+			{
+				trait_type: 'mortgage_record_recorder',
+				value: '',
+			},
+			{
+				trait_type: 'legal_description',
+				value: '',
+			},
+			{
+				trait_type: 'mortgage_record',
+				value: '',
+			},
+			{
+				trait_type: 'title_method',
+				value: '',
+			},
+			{
+				trait_type: 'title_held_by',
+				value: '',
+			},
+			{
+				trait_type: 'ein',
+				value: '',
+			},
+			{
+				trait_type: 'transfer_restrictions',
+				value: '',
+			},
+			{
+				trait_type: 'marketing_name',
+				value: '',
+			},
+			{
+				trait_type: 'type',
+				value: '',
+			},
+			{
+				trait_type: 'sq_ft',
+				value: '',
+			},
+			{
+				trait_type: 'property_description',
+				value: '',
+			},
+			{
+				trait_type: 'deed',
+				value: '',
+			},
+			{
+				trait_type: 'mortgage',
+				value: '',
+			},
+			{
+				trait_type: 'title_insurance',
+				value: '',
+			},
+			{
+				trait_type: 'articles_of_organization',
+				value: '',
+			},
+			{
+				trait_type: 'certificate_of_organization_from_secretary_of_state',
+				value: '',
+			},
+			{
+				trait_type: 'operating_agreement',
+				value: '',
+			},
+			{
+				trait_type: 'membership_interest_transfer_agreement',
+				value: '',
+			},
+			{
+				trait_type: 'ein_letter_from_irs',
+				value: '',
+			},
+			{
+				trait_type: 'appraisal',
+				value: '',
+			},
+			{
+				trait_type: 'submitted_by',
+				value: '',
+			},
+		],
+	})
 
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
 		if (!governance) {
@@ -217,51 +379,51 @@ const New = () => {
 		fetchTokenAccountsForSelectedRealmGovernances()
 	}, [])
 
-	useEffect(() => {
-		console.log("form", form)
-	}, [form])
+	const getCurrentInstruction = ({ typeId, idx }) => {
+		switch (typeId) {
+			case Instructions.Transfer:
+				return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
+			case Instructions.ProgramUpgrade:
+				return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+			case Instructions.CreateAssociatedTokenAccount:
+				return <CreateAssociatedTokenAccount index={idx} governance={governance} />
+			case Instructions.CreateSolendObligationAccount:
+				return <CreateObligationAccount index={idx} governance={governance} />
+			case Instructions.InitSolendObligationAccount:
+				return <InitObligationAccount index={idx} governance={governance} />
+			case Instructions.DepositReserveLiquidityAndObligationCollateral:
+				return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
+			case Instructions.RefreshSolendObligation:
+				return <RefreshObligation index={idx} governance={governance} />
+			case Instructions.RefreshSolendReserve:
+				return <RefreshReserve index={idx} governance={governance} />
+			case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
+				return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
+			case Instructions.Mint:
+				return <Mint index={idx} governance={governance}></Mint>
+			case Instructions.Base64:
+				return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+			case Instructions.TokrizeContract:
+				return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
+			case Instructions.None:
+				return <Empty index={idx} governance={governance}></Empty>
+			case Instructions.MangoMakeChangeMaxAccounts:
+				return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
+			case Instructions.MangoChangeReferralFeeParams:
+				return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
+			case Instructions.Grant:
+				return <Grant index={idx} governance={governance}></Grant>
+			case Instructions.Clawback:
+				return <Clawback index={idx} governance={governance}></Clawback>
+			default:
+				null
+		}
+	}
 
-	// const getCurrentInstruction = ({ typeId, idx }) => {
-	// 	switch (typeId) {
-	// 		case Instructions.Transfer:
-	// 			return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
-	// 		case Instructions.ProgramUpgrade:
-	// 			return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-	// 		case Instructions.CreateAssociatedTokenAccount:
-	// 			return <CreateAssociatedTokenAccount index={idx} governance={governance} />
-	// 		case Instructions.CreateSolendObligationAccount:
-	// 			return <CreateObligationAccount index={idx} governance={governance} />
-	// 		case Instructions.InitSolendObligationAccount:
-	// 			return <InitObligationAccount index={idx} governance={governance} />
-	// 		case Instructions.DepositReserveLiquidityAndObligationCollateral:
-	// 			return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
-	// 		case Instructions.RefreshSolendObligation:
-	// 			return <RefreshObligation index={idx} governance={governance} />
-	// 		case Instructions.RefreshSolendReserve:
-	// 			return <RefreshReserve index={idx} governance={governance} />
-	// 		case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-	// 			return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
-	// 		case Instructions.Mint:
-	// 			return <Mint index={idx} governance={governance}></Mint>
-	// 		case Instructions.Base64:
-	// 			return <CustomBase64 index={idx} governance={governance}></CustomBase64>
-	// 		case Instructions.TokrizeContract:
-	// 			return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
-	// 		case Instructions.None:
-	// 			return <Empty index={idx} governance={governance}></Empty>
-	// 		case Instructions.MangoMakeChangeMaxAccounts:
-	// 			return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
-	// 		case Instructions.MangoChangeReferralFeeParams:
-	// 			return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
-	// 		case Instructions.Grant:
-	// 			return <Grant index={idx} governance={governance}></Grant>
-	// 		case Instructions.Clawback:
-	// 			return <Clawback index={idx} governance={governance}></Clawback>
-	// 		default:
-	// 			null
-	// 	}
-	// }
-
+	const handleSetPropertyData = ({ propertyName, value }) => {
+		// setFormErrors({})
+		setPropertyData({ ...propertyData, [propertyName]: value })
+	}
 
 	return (
 		<div>
@@ -279,8 +441,8 @@ const New = () => {
 
 				<h1 className="bg-dark inline-block">
 					<span className="ml-4 pr-8 text-xl uppercase">
-						Proposal to Tokenize
-						{realmDisplayName ? ` to ${realmDisplayName}` : ``}
+						Add a proposal
+						{realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
 					</span>
 				</h1>
 			</div>
@@ -293,7 +455,7 @@ const New = () => {
 							<div className="space-y-16">
 								<div className="space-y-4">
 									<h3>
-										<span className="text-lg">Proposal Information</span>
+										<span className="text-lg">Property Information</span>
 									</h3>
 
 									<div className="xpb-4">
@@ -306,7 +468,6 @@ const New = () => {
 											type="text"
 											error={formErrors['title']}
 											onChange={(evt) => {
-
 												handleSetForm({
 													value: evt.target.value,
 													propertyName: 'title',
@@ -315,17 +476,17 @@ const New = () => {
 										/>
 									</div>
 
-									<div className="xpb-4 hidden">
+									<div className="xpb-4">
 										<Textarea
 											label="Description"
 											placeholder="Description"
 											value={form.description}
 											id="description"
 											name="description"
-											hidden
-											error={formErrors['title']}
+											type="text"
+											error={formErrors['description']}
 											onChange={(evt) =>
-												handleSetForm({
+												handleSetPropertyData({
 													value: evt.target.value,
 													propertyName: 'description',
 												})
@@ -333,11 +494,23 @@ const New = () => {
 										/>
 									</div>
 								</div>
-
 							</div>
 						</div>
 
 						<div className="pt-2">
+							{/* <Textarea
+								className="mb-3"
+								label="Description"
+								placeholder="Description of your proposal or use a github gist link (optional)"
+								value={JSON.stringify(descriptionLink)}
+								// value={form.description}
+								onChange={(evt) =>
+									handleSetForm({
+										value: evt.target.value,
+										propertyName: 'description',
+									})
+								}
+							></Textarea> */}
 							{canChooseWhoVote && (
 								<VoteBySwitch
 									checked={voteByCouncil}
@@ -355,8 +528,6 @@ const New = () => {
 								}}
 							>
 								<h2>Instructions</h2>
-								<TokrizeContract />
-								{/* <br />
 								{instructionsData.map((instruction, idx) => {
 									const availableInstructionsForIdx = getAvailableInstructionsForIndex(idx)
 									return (
@@ -384,14 +555,14 @@ const New = () => {
 											</div>
 										</div>
 									)
-								})} */}
+								})}
 							</NewProposalContext.Provider>
-							{/* <div className="flex justify-end mt-4 mb-8 px-6">
+							<div className="flex justify-end mt-4 mb-8 px-6">
 								<LinkButton className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}>
 									<PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
 									Add instruction
 								</LinkButton>
-							</div> */}
+							</div>
 							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
 									Save draft

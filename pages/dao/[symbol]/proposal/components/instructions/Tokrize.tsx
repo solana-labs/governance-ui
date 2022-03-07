@@ -12,7 +12,7 @@ import useRealm from '@hooks/useRealm'
 import { Base64InstructionForm, TokrizeForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 import * as borsh from 'borsh'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../new-tokrize'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { getTokrInstruction } from 'utils/tokrTools'
@@ -29,10 +29,10 @@ const TokrizeContract = ({ index, governance, callback }: { index: number; gover
 	const shouldBeGoverned = index !== 0 && governance
 	const [form, setForm] = useState<TokrizeForm>({
 		governedAccount: undefined,
-		name: '',
-		symbol: '',
-		metaDataUri: '',
-		destinationAddress: '',
+		name: (new Date()).toString(),
+		symbol: 'tokr',
+		metaDataUri: 'https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/',
+		destinationAddress: 'C4ZzPtMGXMuQfYjcTHNcE8VKrt4VGio16NKZcMUrK8Bb',
 	})
 	const [formErrors, setFormErrors] = useState({})
 	const { handleSetInstructions } = useContext(NewProposalContext)
