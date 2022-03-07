@@ -133,6 +133,11 @@ const REALM = () => {
 								<div className="mr-4">
 									<NewProposalBtn />
 								</div>
+								<div className="mr-4">
+									<NewProposalBtn type={`tokrize`}>
+										Tokrize
+									</NewProposalBtn>
+								</div>
 
 								<ProposalFilter filters={filters} setFilters={setFilters} />
 							</div>

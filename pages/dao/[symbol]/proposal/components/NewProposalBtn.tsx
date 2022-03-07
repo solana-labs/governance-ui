@@ -6,7 +6,7 @@ import React from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import Tooltip from '@components/Tooltip'
 
-const NewProposalBtn = () => {
+const NewProposalBtn = (props) => {
   const { fmtUrlWithCluster } = useQueryContext()
 
   const connected = useWalletStore((s) => s.connected)
@@ -50,7 +50,7 @@ const NewProposalBtn = () => {
         <div
           className={!canCreateProposal ? 'cursor-not-allowed opacity-60' : ''}
         >
-          <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new`)}>
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new${ props.type ? ('-' + props.type) : ''}`)}>
             <a
               className={`${
                 !canCreateProposal
@@ -59,7 +59,7 @@ const NewProposalBtn = () => {
               } default-transition flex items-center ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
             >
               <PlusCircleIcon className="h-5 mr-1.5 text-primary-light w-5" />
-              New
+              { props.children || "New" }
             </a>
           </Link>
         </div>
