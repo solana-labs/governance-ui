@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { TerminalIcon } from '@heroicons/react/outline'
+import { ExternalLinkIcon, TerminalIcon } from '@heroicons/react/outline'
 import { ProgramAccount } from '@solana/spl-governance'
 import { Governance } from '@solana/spl-governance'
 import { getProgramName } from '@components/instructions/programs/names'
@@ -13,6 +13,7 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Modal from '@components/Modal'
 import UpgradeProgram from './UpgradeProgram'
 import CloseBuffers from './CloseBuffers'
+import { getExplorerUrl } from '@components/explorer/tools'
 
 const AssetItem = ({
   item,
@@ -52,8 +53,20 @@ const AssetItem = ({
           >
             {name || 'Program'}
           </h3>
-          <div className="text-fgd-3 text-xs flex flex-row break-all">
-            {governedAccount}
+          <div className="text-fgd-3 text-xs flex flex-row break-all items-center">
+            {governedAccount}{' '}
+            <a
+              className="default-transition flex items-center text-fgd-1 hover:text-fgd-3 text-xs"
+              href={getExplorerUrl(
+                connection.endpoint,
+                item?.account.governedAccount
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 text-primary-light w-4" />
+            </a>
           </div>
         </div>
       </div>
