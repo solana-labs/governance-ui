@@ -17,7 +17,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { getTokrInstruction } from 'utils/tokrTools'
 
-const TokrizeContract = ({ index, governance }: { index: number; governance: ProgramAccount<Governance> | null }) => {
+const TokrizeContract = ({ index, governance, callback }: { index: number; governance: ProgramAccount<Governance> | null; callback: any }) => {
 	const { realmInfo } = useRealm()
 	const programId: PublicKey | undefined = realmInfo?.programId
 	const connection = useWalletStore((s) => s.connection)
@@ -73,8 +73,8 @@ const TokrizeContract = ({ index, governance }: { index: number; governance: Pro
 	})
 
 	useEffect(() => {
-		console.log("form (tokrize)", form)
-	}, [form])
+		if(callback) callback(schema)
+	}, [schema])
 
 	return (
 		<>
