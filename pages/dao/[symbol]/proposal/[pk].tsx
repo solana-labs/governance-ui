@@ -26,7 +26,7 @@ const Proposal = () => {
 	const { symbol, realmInfo } = useRealm()
 	const { proposal, descriptionLink } = useProposal()
 	const [description, setDescription] = useState('')
-	const [descriptionObj, setDescriptionObj] = useState()
+	const [descriptionObj, setDescriptionObj] = useState<[any]>()
 	const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal?.account)
 
 	const showResults = proposal && proposal.account.state !== ProposalState.Cancelled && proposal.account.state !== ProposalState.Draft
@@ -55,10 +55,7 @@ const Proposal = () => {
 					<>
 						<div className="flex flex-items justify-between">
 							<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-								<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-									&lt;
-									Back
-								</a>
+								<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
 							</Link>
 
 							<div className="flex items-center">
@@ -81,20 +78,31 @@ const Proposal = () => {
 									descriptionObj.map((item, index) => {
 										return (
 											<div key={'descriptionOutput_' + index} className="pb-8">
-												{ item.description }
+												{item.description}
 												<br />
 												<ul className="list-disc list-inside space-y-2 pt-4">
-													{ item.property_address && <li>
-														<b>Property location:</b> { item.property_address }
-													</li>}
-													{item.sq_ft && <li>
-														<b>Square Feet:</b> { item.sq_ft }
-													</li>}
-													{ item.uri && <li>
-														<span className="inline-flex align-center">
-															<b className="inline mr-1">Property Details:</b> <a className="inline" href={ item.uri } target="blank"><span className="flex">Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" /></span></a>
-														</span>
-													</li>}
+													{item.property_address && (
+														<li>
+															<b>Property location:</b> {item.property_address}
+														</li>
+													)}
+													{item.sq_ft && (
+														<li>
+															<b>Square Feet:</b> {item.sq_ft}
+														</li>
+													)}
+													{item.uri && (
+														<li>
+															<span className="inline-flex align-center">
+																<b className="inline mr-1">Property Details:</b>{' '}
+																<a className="inline" href={item.uri} target="blank">
+																	<span className="flex">
+																		Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+																	</span>
+																</a>
+															</span>
+														</li>
+													)}
 												</ul>
 											</div>
 										)
@@ -103,7 +111,6 @@ const Proposal = () => {
 									<ReactMarkdown className="markdown">{description}</ReactMarkdown>
 								)}
 							</div>
-
 						)}
 
 						<InstructionPanel />
