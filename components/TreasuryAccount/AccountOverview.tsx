@@ -30,11 +30,10 @@ import { TreasuryStrategy } from 'Strategies/types/types'
 const AccountOverview = () => {
   const router = useRouter()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
-      ? useTreasuryAccountStore((s) => s.governanceNfts)[
-          currentAccount?.governance?.pubkey.toBase58()
-        ]?.length
+      ? governanceNfts[currentAccount?.governance?.pubkey.toBase58()]?.length
       : 0
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -61,7 +60,6 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<TreasuryStrategy | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
-
   useEffect(() => {
     getStrategies()
   }, [tokenService._tokenList])
