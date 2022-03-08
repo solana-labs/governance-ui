@@ -82,8 +82,8 @@ export function VoteCountdown({
       {isZeroCountdown(countdown) ? (
         <div className="text-fgd-3">Voting ended</div>
       ) : (
-        <div className="flex items-center text-fgd-1">
-          <div className="mr-1 text-fgd-3">Ends in</div>
+        <div className="flex items-center text-fgd-1 w-40">
+          <div className="mr-1 text-fgd-3">Ends</div>
           {countdown && countdown.days > 0 && (
             <>
               <div className="bg-bkg-1 px-1 py-0.5 rounded">
@@ -100,7 +100,7 @@ export function VoteCountdown({
           {!countdown.days && (
             <>
               <span className="font-bold mx-0.5 text-fgd-3">:</span>
-              <div className="bg-bkg-1 px-1 py-0.5 rounded">
+              <div className="bg-bkg-1 px-1 py-0.5 rounded w-9">
                 {countdown.seconds}s
               </div>
             </>

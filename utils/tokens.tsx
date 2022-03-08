@@ -156,6 +156,11 @@ export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
 
+//Just for ukraine dao, it will be replaced with good abstraction
+export const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
+export const ukraineDaoTokenAccountsOwnerAddress =
+  '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+
 export function parseTokenAccountData(
   account: PublicKey,
   data: Buffer
@@ -399,8 +404,12 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
     const data = Object.keys(nfts).map((key) => nfts[key])
     const arr: NFTWithMint[] = []
     for (let i = 0; i < data.length; i++) {
-      const val = (await axios.get(data[i].data.uri)).data
-      arr.push({ val, mint: data[i].mint })
+      try {
+        const val = (await axios.get(data[i].data.uri)).data
+        arr.push({ val, mint: data[i].mint })
+      } catch (e) {
+        console.log(e)
+      }
     }
     return arr
   } catch (error) {

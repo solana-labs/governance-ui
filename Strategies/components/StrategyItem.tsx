@@ -1,4 +1,4 @@
-import BigNumber from 'bignumber.js'
+// import BigNumber from 'bignumber.js'
 import { useState } from 'react'
 import ItemName from './ItemName'
 import DepositModal from './DepositModal'
@@ -6,7 +6,7 @@ import { TreasuryStrategy } from 'Strategies/types/types'
 import ItemWrapper from './ItemWrapper'
 
 const StrategyItem = ({
-  liquidity,
+  // liquidity,
   apy,
   protocolName,
   handledMint,
@@ -15,7 +15,7 @@ const StrategyItem = ({
   protocolLogoSrc,
   strategyName,
   currentPosition,
-  strategyDescription,
+  // strategyDescription,
   createProposalFcn,
 }: TreasuryStrategy) => {
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -34,15 +34,14 @@ const StrategyItem = ({
           <img src={handledTokenImgSrc} className="w-5 h-5 mr-3"></img>{' '}
           {handledTokenSymbol}
         </div>
-        <div>${new BigNumber(liquidity).toFormat(0)}</div>
+        {/* <div>${new BigNumber(liquidity).toFormat(0)}</div> */}
         <div>{apy}</div>
       </ItemWrapper>
       {isModalOpen && (
         <DepositModal
           currentPosition={currentPosition}
-          currentPositionFtm={''}
           apy={apy}
-          liquidity={liquidity}
+          // liquidity={liquidity}
           handledMint={handledMint}
           onClose={() => {
             setIsModalOpen(false)
@@ -52,7 +51,7 @@ const StrategyItem = ({
           protocolLogoSrc={protocolLogoSrc}
           handledTokenName={handledTokenSymbol}
           strategyName={strategyName}
-          strategyDescription={strategyDescription}
+          // strategyDescription={strategyDescription}
           createProposalFcn={createProposalFcn}
         ></DepositModal>
       )}
