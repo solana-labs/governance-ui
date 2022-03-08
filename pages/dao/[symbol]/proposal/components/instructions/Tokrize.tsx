@@ -17,7 +17,7 @@ import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { getTokrInstruction } from 'utils/tokrTools'
 
-const TokrizeContract = ({ index, governance, callback }: { index: number; governance: ProgramAccount<Governance> | null; callback: any }) => {
+const TokrizeContract = ({ index, governance, propertyDetails, lookupUri }: { index: number; governance: ProgramAccount<Governance> | null; propertyDetails: any; lookupUri: any }) => {
 	const { realmInfo } = useRealm()
 	const programId: PublicKey | undefined = realmInfo?.programId
 	const connection = useWalletStore((s) => s.connection)
@@ -54,6 +54,17 @@ const TokrizeContract = ({ index, governance, callback }: { index: number; gover
 	useEffect(() => {
 		handleSetInstructions({ governedAccount: form.governedAccount?.governance, getInstruction }, index)
 	}, [form])
+
+	useEffect(() => {
+		setForm({
+			governedAccount: undefined,
+			name: propertyDetails?.name,
+			symbol: propertyDetails?.symbol || 'tokr_',
+			metaDataUri: lookupUri || '',
+			destinationAddress: '',
+		})
+	}, [propertyDetails])
+
 	const schema = yup.object().shape({
 		governedAccount: yup.object().nullable().required('Governed account is required'),
 		base64: yup
@@ -76,75 +87,81 @@ const TokrizeContract = ({ index, governance, callback }: { index: number; gover
 	})
 
 	useEffect(() => {
-		if(callback) callback(schema)
-	}, [schema])
+		if (propertyDetails) {
+			console.log('propertyDetails!!!', propertyDetails)
+		}
+	}, [propertyDetails])
 
 	return (
-		<div className="space-y-4">
-			<GovernedAccountSelect
-				label="Governance"
-				governedAccounts={governedMultiTypeAccounts}
-				onChange={(value) => {
-					handleSetForm({ value, propertyName: 'governedAccount' })
-				}}
-				value={form.governedAccount}
-				error={formErrors['governedAccount']}
-				shouldBeGoverned={shouldBeGoverned}
-				governance={governance}
-			/>
-			<Input
-				label="Name"
-				value={form.name}
-				type="string"
-				onChange={(event) => {
-					handleSetForm({
-						value: event.target.value,
-						propertyName: 'name',
-					})
-				}}
-				step={1}
-				error={formErrors['name']}
-			/>
-			<Input
-				label="Symbol"
-				value={form.symbol}
-				type="string"
-				onChange={(event) => {
-					handleSetForm({
-						value: event.target.value,
-						propertyName: 'symbol',
-					})
-				}}
-				step={1}
-				error={formErrors['symbol']}
-			/>
-			<Input
-				label="Metadata Uri"
-				value={form.metaDataUri}
-				type="string"
-				onChange={(event) => {
-					handleSetForm({
-						value: event.target.value,
-						propertyName: 'metaDataUri',
-					})
-				}}
-				step={1}
-				error={formErrors['metaDataUri']}
-			/>
-			<Input
-				label="Destination Address"
-				value={form.destinationAddress}
-				type="string"
-				onChange={(event) => {
-					handleSetForm({
-						value: event.target.value,
-						propertyName: 'destinationAddress',
-					})
-				}}
-				step={1}
-				error={formErrors['destinationAddress']}
-			/>
-		</div>
+		<>
+			<div className="space-y-4">
+				<GovernedAccountSelect
+					label="Governance"
+					governedAccounts={governedMultiTypeAccounts}
+					onChange={(value) => {
+						handleSetForm({ value, propertyName: 'governedAccount' })
+					}}
+					value={form.governedAccount}
+					error={formErrors['governedAccount']}
+					shouldBeGoverned={shouldBeGoverned}
+					governance={governance}
+				/>
+				<Input
+					label="Destination Address"
+					value={form.destinationAddress}
+					type="string"
+					onChange={(event) => {
+						handleSetForm({
+							value: event.target.value,
+							propertyName: 'destinationAddress',
+						})
+					}}
+					step={1}
+					error={formErrors['destinationAddress']}
+				/>
+			</div>
+			<div className="hidden">
+				<Input
+					label="Name"
+					value={form.name}
+					type="hidden"
+					onChange={(event) => {
+						handleSetForm({
+							value: event.target.value,
+							propertyName: 'name',
+						})
+					}}
+					step={1}
+					error={formErrors['name']}
+				/>
+				<Input
+					label="Symbol"
+					value={form.symbol}
+					type="hidden"
+					onChange={(event) => {
+						handleSetForm({
+							value: event.target.value,
+							propertyName: 'symbol',
+						})
+					}}
+					step={1}
+					error={formErrors['symbol']}
+				/>
+				<Input
+					label="Metadata Uri"
+					value={form.metaDataUri}
+					type="hidden"
+					onChange={(event) => {
+						handleSetForm({
+							value: event.target.value,
+							propertyName: 'metaDataUri',
+						})
+					}}
+					step={1}
+					error={formErrors['metaDataUri']}
+				/>
+			</div>
+		</>
 	)
 }
 

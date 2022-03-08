@@ -24,6 +24,7 @@ import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeR
 
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
+import { useLayoutEffect } from 'react'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -33,6 +34,8 @@ const defaultGovernanceCtx: InstructionsContext = {
 	handleSetInstructions: () => null,
 	governance: null,
 	setGovernance: () => null,
+	property: null,
+	setProperty: () => null,
 }
 export const NewProposalContext = createContext<InstructionsContext>(defaultGovernanceCtx)
 
@@ -41,7 +44,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 	return instructionsData.find((itx) => itx.governedAccount)?.governedAccount ?? null
 }
 
-const New = () => {
+const New = (props) => {
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -53,15 +56,20 @@ const New = () => {
 	const connection = useWalletStore((s) => s.connection)
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
+	const [title, setTitle] = useState<string>()
+	const [description, setDescription] = useState<string>()
+	const [lookupUri, setLookupUri] = useState<string>()
+	const [propertyDetails, setPropertyDetails] = useState<any>()
 	const [form, setForm] = useState({
-		title: `White House ${ new Date().getHours() }:${ new Date().getMinutes() }`,
-		description: 'Proposal to mint rNFT for the White House',
+		title: title,
+		description: description,
 	})
+	const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
 	const [formErrors, setFormErrors] = useState({})
 	const [governance, setGovernance] = useState<ProgramAccount<Governance> | null>(null)
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
-	const isLoading = isLoadingSignedProposal || isLoadingDraft
+	const isLoading = isLoadingSignedProposal || isLoadingDraft || isLoadingData
 
 	const [instructionsData, setInstructions] = useState<ComponentInstructionData[]>([{ type: availableInstructions[0] }])
 	const handleSetInstructions = (val: any, index) => {
@@ -70,6 +78,7 @@ const New = () => {
 		setInstructions(newInstructions)
 	}
 	const handleSetForm = ({ propertyName, value }) => {
+		console.log(propertyName, value)
 		setFormErrors({})
 		setForm({ ...form, [propertyName]: value })
 	}
@@ -157,12 +166,32 @@ const New = () => {
 		setGovernance(governedAccount)
 	}, [instructionsData])
 
-
 	useEffect(() => {
 		//fetch to be up to date with amounts
 		fetchTokenAccountsForSelectedRealmGovernances()
 	}, [])
 
+	useEffect(() => {
+		if (title && description) {
+			setForm({
+				title: `Tokenize "${propertyDetails.name}" Proposal`,
+				description: `Proposal for minting the rNFT for ${propertyDetails.name}`,
+			})
+		}
+	}, [title, description])
+
+	useEffect(() => {
+		if (propertyDetails) {
+			console.log(propertyDetails, propertyDetails.name)
+
+			setTitle(`propertyDetails.name`)
+			setDescription(`Proposal for minting the rNFT for ${propertyDetails.name}`)
+			setForm({
+				title: propertyDetails.name,
+				description: `Proposal for minting the rNFT for ${propertyDetails.name}`,
+			})
+		}
+	}, [propertyDetails])
 
 	return (
 		<div>
@@ -170,14 +199,6 @@ const New = () => {
 				<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
 			</Link>
 			<div className="mt-8 ml-4 -mb-5 relative z-10 m-width-full">
-				{/* <a href={realmUrl} target="_blank" rel="noopener noreferrer" className="bg-dark inline-block">
-					<span className="flex items-center cursor-pointer">
-						<span className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
-							<span className="ml-4 pr-8 text-3xl uppercase">{realmDisplayName}</span>
-						</span>
-					</span>
-				</a> */}
-
 				<h1 className="bg-dark inline-block">
 					<span className="ml-4 pr-8 text-xl uppercase">
 						Proposal to Tokenize
@@ -193,18 +214,107 @@ const New = () => {
 						<div className="pt-8 mb-20">
 							<div className="space-y-16">
 								<div className="space-y-4">
-									<h3>
-										<span className="text-lg">Proposal Information</span>
-									</h3>
-
-									<div className="xpb-4">
+									<div>
 										<Input
-											label="Name"
+											label="Url"
+											placeholder="URl"
+											value={form.title}
+											// value="https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/"
+											id="lookup_uri"
+											name="lookup_uri"
+											type="url"
+											onChange={(evt) => {
+												setLookupUri(evt.target.value)
+											}}
+										/>
+
+										<SecondaryButton
+											disabled={isLoading}
+											isLoading={isLoadingDraft}
+											onClick={(e) => {
+												setIsLoadingData(true)
+												fetch(lookupUri, {
+													method: 'GET',
+													Accept: 'application/json',
+												})
+													.then((res) => res.json())
+													.then((res) => {
+														setPropertyDetails(res)
+
+														setIsLoadingData(false)
+														handleTurnOffLoaders()
+														return res
+													})
+													.catch((error) => {
+														alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
+														console.log('error', error)
+													})
+
+												e.preventDefault()
+											}}
+										>
+											Look up!
+										</SecondaryButton>
+									</div>
+
+									{propertyDetails && (
+										<>
+											<h3>
+												<span className="text-lg">{propertyDetails.name}  Information</span>
+											</h3>
+											<div  className="pb-8">
+												{propertyDetails.description}
+												<br />
+												<ul className="list-disc list-inside space-y-2 pt-4">
+													{propertyDetails.property_address && (
+														<li>
+															<b>Property location:</b> {propertyDetails.property_address}
+														</li>
+													)}
+													{propertyDetails.lat_long && (
+														<li>
+															<b>Coordinates:</b> {propertyDetails.lat_long}
+														</li>
+													)}
+													{propertyDetails.sq_ft && (
+														<li>
+															<span>
+																<b>Square Feet:</b> {propertyDetails.sq_ft}
+															</span>
+														</li>
+													)}
+													{propertyDetails.acres && (
+														<li>
+															<span>
+																<b>Acres:</b> {propertyDetails.acres}
+															</span>
+														</li>
+													)}
+													{propertyDetails.uri && (
+														<li>
+															<span className="inline-flex align-center">
+																<b className="inline mr-1">Property Details:</b>{' '}
+																<a className="inline" href={item.uri} target="blank">
+																	<span className="flex">
+																		Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+																	</span>
+																</a>
+															</span>
+														</li>
+													)}
+												</ul>
+											</div>
+										</>
+									)}
+
+									<div className="xpb-4 hidden">
+										<Input
+											label="Property Name"
 											placeholder="Name"
 											value={form.title}
 											id="name"
 											name="name"
-											type="text"
+											type="hidden"
 											error={formErrors['title']}
 											onChange={(evt) => {
 												handleSetForm({
@@ -226,7 +336,7 @@ const New = () => {
 											type="text"
 											error={formErrors['description']}
 											onChange={(evt) =>
-												handleSetPropertyData({
+												handleSetForm({
 													value: evt.target.value,
 													propertyName: 'description',
 												})
@@ -254,7 +364,12 @@ const New = () => {
 									setGovernance,
 								}}
 							>
-								<TokrizeContract index={ 0 } governance={ governance } />
+								<>
+									<h3 className="pt-8 hidden">
+										<span className="text-lg">rNFT Information</span>
+									</h3>
+									<TokrizeContract propertyDetails={propertyDetails} lookupUri={lookupUri} index={0} governance={governance} />
+								</>
 							</NewProposalContext.Provider>
 							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
