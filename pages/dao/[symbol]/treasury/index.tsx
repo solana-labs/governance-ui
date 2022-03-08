@@ -15,6 +15,8 @@ import useQueryContext from '@hooks/useQueryContext'
 import tokenService from '@utils/services/token'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import useMarketStore from 'Strategies/store/marketStore'
+import Select from '@components/inputs/Select'
+import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -36,6 +38,7 @@ const Treasury = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
 
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
@@ -44,6 +47,7 @@ const Treasury = () => {
     activeAccount,
     setActiveAccount,
   ] = useState<GovernedTokenAccount | null>(null)
+  const [accountInfo, setAccountInfo] = useState<any>(null)
   const market = useMarketStore((s) => s)
   const { realmInfo } = useRealm()
   useEffect(() => {
@@ -95,6 +99,13 @@ const Treasury = () => {
     !toManyCommunityOutstandingProposalsForUser &&
     !toManyCouncilOutstandingProposalsForUse
 
+  useEffect(() => {
+    if (activeAccount) {
+      const info = getTreasuryAccountItemInfo(activeAccount, governanceNfts)
+      setAccountInfo(info)
+    }
+  }, [activeAccount])
+
   return (
     <>
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
@@ -103,8 +114,8 @@ const Treasury = () => {
             <div className="mb-4">
               <PreviousRouteBtn />
             </div>
-            <div className="border-b border-fgd-4 flex justify-between pb-4">
-              <div className="flex items-center py-2">
+            <div className="border-b border-fgd-4 flex flex-col md:flex-row justify-between pb-4">
+              <div className="flex items-center mb-2 md:mb-0 py-2">
                 {realmInfo?.ogImage ? (
                   <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
                 ) : null}
@@ -130,11 +141,11 @@ const Treasury = () => {
           </div>
           {treasuryAccounts.length > 0 && treasuryAccounts[0].mint ? (
             <>
-              <div className="col-span-4">
+              <div className="col-span-12 lg:col-span-4">
                 <div className="flex items-center justify-between pb-4 pt-3">
                   <h2 className="mb-0 text-base">Treasury Accounts</h2>
                   <LinkButton
-                    className="flex items-center text-primary-light"
+                    className="flex items-center text-primary-light whitespace-nowrap"
                     disabled={!isConnectedWithGovernanceCreationPermission}
                     onClick={goToNewAccountForm}
                   >
@@ -142,13 +153,49 @@ const Treasury = () => {
                     New Account
                   </LinkButton>
                 </div>
-                <AccountsTabs
-                  activeTab={activeAccount}
-                  onChange={(t) => handleChangeAccountTab(t)}
-                  tabs={treasuryAccounts}
-                />
+                <div className="col-span-12 lg:hidden">
+                  <Select
+                    className="break-all"
+                    onChange={(g) =>
+                      handleChangeAccountTab(
+                        // @ts-ignore
+                        treasuryAccounts.find((acc) => {
+                          const info = getTreasuryAccountItemInfo(
+                            acc,
+                            governanceNfts
+                          )
+                          return info.accountName === g
+                        })
+                      )
+                    }
+                    placeholder="Please select..."
+                    value={accountInfo?.accountName}
+                  >
+                    {treasuryAccounts.map((x) => {
+                      const { name } = getTreasuryAccountItemInfo(
+                        x,
+                        governanceNfts
+                      )
+                      return (
+                        <Select.Option
+                          key={x?.transferAddress?.toBase58()}
+                          value={name}
+                        >
+                          {name}
+                        </Select.Option>
+                      )
+                    })}
+                  </Select>
+                </div>
+                <div className="hidden lg:block">
+                  <AccountsTabs
+                    activeTab={activeAccount}
+                    onChange={(t) => handleChangeAccountTab(t)}
+                    tabs={treasuryAccounts}
+                  />
+                </div>
               </div>
-              <div className="col-span-8">
+              <div className="col-span-12 lg:col-span-8">
                 <AccountOverview />
               </div>
             </>
