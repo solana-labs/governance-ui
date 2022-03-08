@@ -25,12 +25,8 @@ const NFTSCompactWrapper = () => {
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
-    resetCompactViewState()
   }
-  const {
-    setCurrentCompactAccount,
-    resetCompactViewState,
-  } = useTreasuryAccountStore()
+  const { setCurrentAccount } = useTreasuryAccountStore()
   return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <h3 className="mb-4 flex items-center">
@@ -49,7 +45,7 @@ const NFTSCompactWrapper = () => {
 
         <div
           onClick={() => {
-            setCurrentCompactAccount(nftsGovernedTokenAccounts[0], connection)
+            setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
             setOpenNftDepositModal(true)
           }}
           className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center rounded-full text-fgd-3 ml-auto cursor-pointer"

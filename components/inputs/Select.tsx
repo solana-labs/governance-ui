@@ -1,5 +1,5 @@
 import { Listbox } from '@headlessui/react'
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/solid'
+import { ChevronDownIcon } from '@heroicons/react/solid'
 import { StyledLabel, inputClasses } from './styles'
 import ErrorField from './ErrorField'
 
@@ -33,10 +33,7 @@ const Select = ({
   mintWidth?: string
 }) => {
   return (
-    <div
-      className={`mt-6 ${wrapperClassNames}`}
-      style={{ minWidth: mintWidth }}
-    >
+    <div className={`${wrapperClassNames}`} style={{ minWidth: mintWidth }}>
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
@@ -59,15 +56,11 @@ const Select = ({
                     : value
                     ? value
                     : placeholder}
-                  {open ? (
-                    <ChevronUpIcon
-                      className={`flex-shrink-0 h-5 w-5 mr-1 text-primary-light`}
-                    />
-                  ) : (
-                    <ChevronDownIcon
-                      className={`flex-shrink-0 h-5 w-5 mr-1 text-primary-light`}
-                    />
-                  )}
+                  <ChevronDownIcon
+                    className={`default-transition flex-shrink-0 h-5 w-5 mr-1 text-primary-light ${
+                      open ? 'transform rotate-180' : 'transform rotate-360'
+                    }`}
+                  />
                 </div>
               </Listbox.Button>
               {open ? (
