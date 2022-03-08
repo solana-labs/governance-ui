@@ -80,7 +80,7 @@ const TokrizeContract = ({ index, governance, callback }: { index: number; gover
 	}, [schema])
 
 	return (
-		<>
+		<div className="space-y-4">
 			<GovernedAccountSelect
 				label="Governance"
 				governedAccounts={governedMultiTypeAccounts}
@@ -144,7 +144,7 @@ const TokrizeContract = ({ index, governance, callback }: { index: number; gover
 				step={1}
 				error={formErrors['destinationAddress']}
 			/>
-		</>
+		</div>
 	)
 }
 

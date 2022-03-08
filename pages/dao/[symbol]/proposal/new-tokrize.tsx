@@ -391,7 +391,8 @@ const New = () => {
 									setGovernance,
 								}}
 							>
-								<h2>Instructions</h2>
+								<TokrizeContract index={ 0 } governance={ governance } />
+								{/* <h2>Instructions</h2>
 								{instructionsData.map((instruction, idx) => {
 									const availableInstructionsForIdx = getAvailableInstructionsForIndex(idx)
 									return (
@@ -412,16 +413,10 @@ const New = () => {
 														idx,
 													})}
 												</InstructionContentContainer>
-												{/* {idx !== 0 && (
-													<LinkButton className="flex font-bold items-center ml-4 text-fgd-1 text-sm" onClick={() => removeInstruction(idx)}>
-														<XCircleIcon className="h-5 mr-1.5 text-red w-5" />
-														Remove
-													</LinkButton>
-												)} */}
 											</div>
 										</div>
 									)
-								})}
+								})} */}
 							</NewProposalContext.Provider>
 							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
