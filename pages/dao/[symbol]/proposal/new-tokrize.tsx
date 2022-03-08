@@ -1,13 +1,11 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useLayoutEffect, useState } from 'react'
+import React, { createContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
-import { ArrowLeftIcon, PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
-import { getInstructionDataFromBase64, Governance, GovernanceAccountType, ProgramAccount, RpcContext } from '@solana/spl-governance'
+import { getInstructionDataFromBase64, Governance, ProgramAccount, RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import Button, { LinkButton, SecondaryButton } from '@components/Button'
+import Button, { SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import Textarea from '@components/inputs/Textarea'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -17,38 +15,15 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 
 import { getTimestampFromDays } from '@tools/sdk/units'
 import { formValidation, isFormValid } from '@utils/formValidation'
-import { ComponentInstructionData, Instructions, InstructionsContext, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { ComponentInstructionData, InstructionsContext, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
-import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
-import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
-import InstructionContentContainer from './components/InstructionContentContainer'
-import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
-import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
-import CustomBase64 from './components/instructions/CustomBase64'
-import Empty from './components/instructions/Empty'
-import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
-import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
-import Mint from './components/instructions/Mint'
-import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
-import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
-import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
-import RefreshObligation from './components/instructions/Solend/RefreshObligation'
-import RefreshReserve from './components/instructions/Solend/RefreshReserve'
-import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
-import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
-import { sendTransaction } from '@utils/send'
-import { ARWEAVE_PAYMENT_WALLET } from '../../../../scripts/arweave/lib/constants'
-import * as anchor from '@project-serum/anchor'
-import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '../../../../scripts/arweave/lib/arweave'
-import FormData from 'form-data'
-import { Transaction } from '@solana/web3.js'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -67,7 +42,6 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = () => {
-	const _prepopulateForDemos = false;
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -88,66 +62,7 @@ const New = () => {
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
 	const [isLoadingDraft, setIsLoadingDraft] = useState(false)
 	const isLoading = isLoadingSignedProposal || isLoadingDraft
-	const [arWeaveLink, setArWeaveLink] = useState<string>('')
 
-	const [propertyData, setPropertyData] = useState({
-		name: '',
-		description: '',
-		property_address: '',
-		lat_long: '',
-		acres: '',
-		land_record_auditor: '',
-		deed_record_recorder: '',
-		mortgage_record_recorder: '',
-		legal_description: '',
-		mortgage_record: '',
-		title_method: '',
-		title_held_by: '',
-		ein: '',
-		transfer_restrictions: '',
-		marketing_name: '',
-		type: '',
-		sq_ft: '',
-		property_description: '',
-		deed: '',
-		mortgage: '',
-		title_insurance: '',
-		articles_of_organization: '',
-		certificate_of_organization_from_secretary_of_state: '',
-		operating_agreement: '',
-		membership_interest_transfer_agreement: '',
-		ein_letter_from_irs: '',
-		appraisal: '',
-		submitted_by: '',
-		image: '',
-		uri: arWeaveLink || '',
-	})
-
-
-
-	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
-		if (!governance) {
-			return true
-		} else {
-			const governanceType = governance.account.accountType
-			const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
-			switch (governanceType) {
-				case GovernanceAccountType.ProgramGovernanceV1:
-				case GovernanceAccountType.ProgramGovernanceV2:
-					return instructionsAvailiableAfterProgramGovernance.includes(instructionType)
-				default:
-					return true
-			}
-		}
-	}
-
-	const getAvailableInstructionsForIndex = (index) => {
-		if (index === 0) {
-			return availableInstructions
-		} else {
-			return availableInstructions.filter((x) => customInstructionFilterForSelectedGovernance(x.id))
-		}
-	}
 	const [instructionsData, setInstructions] = useState<ComponentInstructionData[]>([{ type: availableInstructions[0] }])
 	const handleSetInstructions = (val: any, index) => {
 		const newInstructions = [...instructionsData]
@@ -158,18 +73,7 @@ const New = () => {
 		setFormErrors({})
 		setForm({ ...form, [propertyName]: value })
 	}
-	const setInstructionType = ({ value, idx }) => {
-		const newInstruction = {
-			type: value,
-		}
-		handleSetInstructions(newInstruction, idx)
-	}
-	const addInstruction = () => {
-		setInstructions([...instructionsData, { type: undefined }])
-	}
-	const removeInstruction = (idx) => {
-		setInstructions([...instructionsData.filter((x, index) => index !== idx)])
-	}
+
 	const handleGetInstructions = async () => {
 		const instructions: UiInstruction[] = []
 		for (const inst of instructionsData) {
@@ -258,47 +162,6 @@ const New = () => {
 		//fetch to be up to date with amounts
 		fetchTokenAccountsForSelectedRealmGovernances()
 	}, [])
-
-	const getCurrentInstruction = ({ typeId, idx }) => {
-		switch (typeId) {
-			case Instructions.Transfer:
-				return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
-			case Instructions.ProgramUpgrade:
-				return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-			case Instructions.CreateAssociatedTokenAccount:
-				return <CreateAssociatedTokenAccount index={idx} governance={governance} />
-			case Instructions.CreateSolendObligationAccount:
-				return <CreateObligationAccount index={idx} governance={governance} />
-			case Instructions.InitSolendObligationAccount:
-				return <InitObligationAccount index={idx} governance={governance} />
-			case Instructions.DepositReserveLiquidityAndObligationCollateral:
-				return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
-			case Instructions.RefreshSolendObligation:
-				return <RefreshObligation index={idx} governance={governance} />
-			case Instructions.RefreshSolendReserve:
-				return <RefreshReserve index={idx} governance={governance} />
-			case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-				return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
-			case Instructions.Mint:
-				return <Mint index={idx} governance={governance}></Mint>
-			case Instructions.Base64:
-				return <CustomBase64 index={idx} governance={governance}></CustomBase64>
-			case Instructions.TokrizeContract:
-				return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
-			case Instructions.None:
-				return <Empty index={idx} governance={governance}></Empty>
-			case Instructions.MangoMakeChangeMaxAccounts:
-				return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
-			case Instructions.MangoChangeReferralFeeParams:
-				return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
-			case Instructions.Grant:
-				return <Grant index={idx} governance={governance}></Grant>
-			case Instructions.Clawback:
-				return <Clawback index={idx} governance={governance}></Clawback>
-			default:
-				null
-		}
-	}
 
 
 	return (
@@ -392,31 +255,6 @@ const New = () => {
 								}}
 							>
 								<TokrizeContract index={ 0 } governance={ governance } />
-								{/* <h2>Instructions</h2>
-								{instructionsData.map((instruction, idx) => {
-									const availableInstructionsForIdx = getAvailableInstructionsForIndex(idx)
-									return (
-										<div key={idx} className="mb-3 border border-fgd-4 p-4 md:p-6">
-											<Select className="h-12" disabled={!getAvailableInstructionsForIndex.length} placeholder={`${availableInstructionsForIdx.length ? 'Select instruction' : 'No available instructions'}`} label={`Instruction ${idx + 1}`} onChange={(value) => setInstructionType({ value, idx })} value={instruction.type?.name}>
-												{availableInstructionsForIdx.map((inst) => {
-													if (inst.name === "Tokrize") {
-														return <Select.Option key={inst.id} value={inst}>
-															<span>{inst.name}</span>
-														</Select.Option>
-													}
-												})}
-											</Select>
-											<div className="flex items-end pt-4">
-												<InstructionContentContainer idx={idx} instructionsData={instructionsData}>
-													{getCurrentInstruction({
-														typeId: instruction.type?.id,
-														idx,
-													})}
-												</InstructionContentContainer>
-											</div>
-										</div>
-									)
-								})} */}
 							</NewProposalContext.Provider>
 							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
