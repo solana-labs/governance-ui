@@ -15,10 +15,10 @@ export function getFormattedStringFromDays(numberOfDays: number) {
   const hours = (numberOfDays - Math.floor(numberOfDays)) * HOURS_PER_DAY
   const hoursInt = Math.floor(hours)
   const minutes = Math.floor((hours - hoursInt) * MINS_PER_HOUR)
-  const yearsDisplay = years > 0 ? years + ' y ' : ''
-  const monthsDisplay = months > 0 ? months + ' m ' : ''
-  const daysDisplay = days > 0 ? days + ' d ' : ''
-  const hoursDisplay = hours > 0 ? ` ${hoursInt} h ${minutes} min` : ''
+  const yearsDisplay = years > 0 ? years + 'y ' : ''
+  const monthsDisplay = months > 0 ? months + 'm ' : ''
+  const daysDisplay = days > 0 ? days + 'd ' : ''
+  const hoursDisplay = hours > 0 ? ` ${hoursInt}h ${minutes}min` : ''
   const text =
     !years && !months && days <= 1
       ? daysDisplay + hoursDisplay

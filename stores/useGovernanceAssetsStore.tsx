@@ -55,6 +55,7 @@ interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
   governedTokenAccounts: GovernedTokenAccount[]
   governedAccounts: GovernedAccount[]
+  loadGovernedAccounts: boolean
   setGovernancesArray: (
     connection: Connection,
     governances: {
@@ -74,6 +75,7 @@ const defaultState = {
   governancesArray: [],
   governedAccounts: [],
   governedTokenAccounts: [],
+  loadGovernedAccounts: true,
 }
 
 const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
@@ -134,6 +136,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     await tokenService.fetchTokenPrices(mintAddresses)
     set((s) => {
       s.governedAccounts = governedAccounts
+      s.loadGovernedAccounts = false
     })
   },
   setGovernedTokenAccounts: (items) => {
