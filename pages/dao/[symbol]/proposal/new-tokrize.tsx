@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { getInstructionDataFromBase64, Governance, ProgramAccount, RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -177,21 +177,19 @@ const New = (props) => {
 	useEffect(() => {
 		if (title && description) {
 			setForm({
-				title: `Tokenize "${propertyDetails.name}" Proposal`,
-				description: `Proposal for minting the rNFT for ${propertyDetails.name}`,
+				title: `"${propertyDetails.name}" rNFT`,
+				description: `rNFT Proposal`,
 			})
 		}
 	}, [title, description])
 
-	useEffect(() => {
+	useCallback(() => {
 		if (propertyDetails) {
-			console.log(propertyDetails, propertyDetails.name)
-
-			setTitle(`propertyDetails.name`)
-			setDescription(`Proposal for minting the rNFT for ${propertyDetails.name}`)
+			setTitle(`"${propertyDetails.name}" rNFT`)
+			setDescription(`rNFT Proposal`)
 			setForm({
-				title: propertyDetails.name,
-				description: `Proposal for minting the rNFT for ${propertyDetails.name}`,
+				title: `"${propertyDetails.name}" rNFT`,
+				description: `rNFT Proposal`,
 			})
 		}
 	}, [propertyDetails])
