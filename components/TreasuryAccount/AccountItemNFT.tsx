@@ -3,7 +3,6 @@ import { GovernedTokenAccount } from '@utils/tokens'
 import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { ViewState } from './Types'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
@@ -17,18 +16,14 @@ const AccountItemNFT = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-  const {
-    setCurrentCompactView,
-    setCurrentCompactAccount,
-  } = useTreasuryAccountStore()
+  const { setCurrentAccount } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount
     ? governedAccountTokenAccount.governance?.pubkey
     : null
   //TODO move to outside component
   async function handleGoToAccountOverview() {
-    setCurrentCompactView(ViewState.AccountView)
-    setCurrentCompactAccount(governedAccountTokenAccount, connection)
+    setCurrentAccount(governedAccountTokenAccount, connection)
   }
   return (
     <div

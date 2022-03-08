@@ -102,6 +102,13 @@ export const ACCOUNT_NAMES = {
   '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO USDC Treasury Vault',
   GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXD DAO UXP Treasury Vault',
   '39qcqpaiLivyFLBLh4wvPmLrs336BBpXkKYb88i8dSiJ': 'UXD Council Token',
+  // MMCC ClubDAO
+  '92tozWPkbybEjPeiGpNFL8onAnT739cxLRQofGVnrmm6': 'ClubDAO DCF Revenue Vault',
+  A6HXL3WMWT4gB1QvYJfZgDp2ufTfLkWBaX6Theakdf5h:
+    'ClubDAO Main SOL Treasury Vault',
+  '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
+  Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
+    'ClubDAO Main NFT Treasury Vault ',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -111,6 +118,7 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
   ['2j2oe8YXdYJyS7G8CeEW5KARijdjjZkuPy5MnN8gBQqQ', ''],
   ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
+  ['4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9', ''],
 ])
 
 // Blacklisted proposals which should not be displayed in the UI

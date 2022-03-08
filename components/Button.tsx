@@ -81,7 +81,7 @@ export const LinkButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border-0 default-transition text-sm underline hover:no-underline hover:opacity-60 focus:outline-none`}
+      className={`${className} border-0 default-transition text-sm disabled:cursor-not-allowed disabled:opacity-60 hover:opacity-60 focus:outline-none`}
       {...props}
     >
       {children}

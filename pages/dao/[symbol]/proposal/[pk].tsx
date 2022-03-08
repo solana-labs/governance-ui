@@ -1,16 +1,17 @@
-import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { ProposalState } from '@solana/spl-governance'
 
+import ApprovalQuorum from '@components/ApprovalQuorum'
+import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import ProposalActionsPanel from '@components/ProposalActions'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import VoteResults from '@components/VoteResults'
 import VoteResultStatus from '@components/VoteResultStatus'
+import useRealm from '@hooks/useRealm'
 import { resolveProposalDescription } from '@utils/helpers'
 
-import ApprovalQuorum from 'components/ApprovalQuorum'
 import DiscussionPanel from 'components/chat/DiscussionPanel'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
 import ProposalStateBadge from 'components/ProposalStatusBadge'
@@ -18,14 +19,11 @@ import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import VotePanel from 'components/VotePanel'
 import useProposal from 'hooks/useProposal'
 import useProposalVotes from 'hooks/useProposalVotes'
-import useQueryContext from 'hooks/useQueryContext'
-import useRealm from 'hooks/useRealm'
 import { option } from 'tools/core/option'
 import { getRealmExplorerHost } from 'tools/routing'
 
 const Proposal = () => {
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realmInfo } = useRealm()
+  const { realmInfo } = useRealm()
   const { proposal, descriptionLink } = useProposal()
   const [description, setDescription] = useState('')
   const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
@@ -60,13 +58,7 @@ const Proposal = () => {
         {proposal ? (
           <>
             <div className="flex flex-items justify-between">
-              <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-                <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-                  <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-                  Back
-                </a>
-              </Link>
-
+              <PreviousRouteBtn />
               <div className="flex items-center">
                 <a
                   href={`https://${getRealmExplorerHost(

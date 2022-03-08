@@ -6,8 +6,18 @@ import {
   getNativeTreasuryAddress,
   GovernanceAccountType,
 } from '@solana/spl-governance'
-import { ParsedAccountData } from '@solana/web3.js'
-import { AccountInfoGen, GovernedTokenAccount } from '@utils/tokens'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
+import tokenService from '@utils/services/token'
+import {
+  AccountInfoGen,
+  GovernedTokenAccount,
+  parseTokenAccountData,
+  tryGetMint,
+  ukraineDaoTokenAccountsOwnerAddress,
+  ukraineDAOGovPk,
+} from '@utils/tokens'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -15,6 +25,7 @@ import useGovernanceAssets from './useGovernanceAssets'
 import useRealm from './useRealm'
 
 export default function handleGovernanceAssetsStore() {
+  const route = useRouter()
   const { governances, tokenMints, realmTokenAccounts, realm } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
@@ -25,14 +36,19 @@ export default function handleGovernanceAssetsStore() {
   const {
     setGovernancesArray,
     setGovernedTokenAccounts,
+    setGovernedAccounts,
   } = useGovernanceAssetsStore()
   useEffect(() => {
-    setGovernancesArray(governances)
-  }, [JSON.stringify(governances)])
+    if (realm) {
+      setGovernancesArray(governances)
+    }
+    if (realm && route.pathname.includes('/params')) {
+      setGovernedAccounts(connection, realm)
+    }
+  }, [JSON.stringify(governances), realm?.pubkey, route.pathname])
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
-
       for (const gov of tokenGovernances) {
         const realmTokenAccount = realmTokenAccounts.find(
           (x) =>
@@ -62,6 +78,7 @@ export default function handleGovernanceAssetsStore() {
           const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
             0
           )
+
           if (resp.value) {
             solAccount = resp.value as AccountInfoGen<
               Buffer | ParsedAccountData
@@ -83,6 +100,48 @@ export default function handleGovernanceAssetsStore() {
         }
         governedTokenAccountsArray.push(obj)
       }
+      //Just for ukraine dao, it will be replaced with good abstraction
+      const ukraineGov = tokenGovernances.find(
+        (x) => x.pubkey.toBase58() === ukraineDAOGovPk
+      )
+      if (ukraineGov) {
+        const resp = (
+          await getProgramAccountsByOwner(
+            connection,
+            TOKEN_PROGRAM_ID,
+            new PublicKey(ukraineDaoTokenAccountsOwnerAddress),
+            165,
+            32
+          )
+        )
+          .flatMap((x) => x)
+          .map((x) => {
+            const publicKey = x.pubkey
+            const data = Buffer.from(x.account.data)
+            const account = parseTokenAccountData(publicKey, data)
+            return { publicKey, account }
+          })
+        for (const tokenAcc of resp) {
+          const mint = await tryGetMint(connection, tokenAcc.account.mint)
+          const obj = {
+            governance: ukraineGov,
+            token: tokenAcc,
+            mint,
+            isNft: false,
+            isSol: false,
+            transferAddress: tokenAcc.account.address,
+            solAccount: null,
+          }
+          if (mint?.account.decimals) {
+            governedTokenAccountsArray.push(obj)
+          }
+        }
+      }
+      await tokenService.fetchTokenPrices(
+        governedTokenAccountsArray
+          .filter((x) => x.mint)
+          .map((x) => x.mint!.publicKey.toBase58())
+      )
       setGovernedTokenAccounts(governedTokenAccountsArray)
     }
     prepareTokenGovernances()
@@ -92,4 +151,29 @@ export default function handleGovernanceAssetsStore() {
     JSON.stringify(tokenGovernances),
     JSON.stringify(governances),
   ])
+}
+
+const getProgramAccountsByOwner = (
+  connection: Connection,
+  programId: PublicKey,
+  owner: PublicKey,
+  dataSize: number,
+  offset: number
+) => {
+  return connection.getProgramAccounts(
+    programId, // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
+    {
+      filters: [
+        {
+          dataSize: dataSize, // number of bytes
+        },
+        {
+          memcmp: {
+            offset: offset, // number of bytes
+            bytes: owner.toBase58(), // base58 encoded string
+          },
+        },
+      ],
+    }
+  )
 }

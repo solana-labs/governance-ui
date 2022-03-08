@@ -1,3 +1,4 @@
+import { WSOL_MINT } from '@components/instructions/tools'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
@@ -18,13 +19,14 @@ export function useTotalTreasuryPrice() {
           return (
             getMintDecimalAmountFromNatural(
               x.mint!.account,
-              new BN(x.token!.account.amount)
+              new BN(x.isSol ? x.solAccount!.lamports : x.token!.account.amount)
             ).toNumber() *
-            tokenService.getUSDTokenPrice(x.token!.account.mint.toBase58())
+            tokenService.getUSDTokenPrice(
+              x.isSol ? WSOL_MINT : x.mint!.publicKey.toBase58()
+            )
           )
         })
         .reduce((acc, val) => acc + val, 0)
-
       setTotalPriceFormatted(
         totalPrice ? new BigNumber(totalPrice).toFormat(0) : ''
       )

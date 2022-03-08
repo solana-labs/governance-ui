@@ -27,7 +27,7 @@ const VoteResultStatus = ({
             {
               maximumFractionDigits: 0,
             }
-          )} Yes votes were needed`}</p>
+          )} more Yes vote${yesVotesRequired > 1 ? 's' : ''} were needed`}</p>
         </div>
       </div>
       <div className="bg-bkg-4 h-2 flex flex-grow mt-2.5 rounded w-full">

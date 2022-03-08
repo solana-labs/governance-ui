@@ -60,7 +60,11 @@ export default function useProposalVotes(proposal?: Proposal) {
   const relativeYesVotes = getRelativeVoteCount(yesVoteCount)
   const relativeNoVotes = getRelativeVoteCount(noVoteCount)
 
-  const yesVotesRequired = Math.max(minimumYesVotes - yesVoteCount, 1)
+  const rawYesVotesRequired = minimumYesVotes - yesVoteCount
+  const yesVotesRequired =
+    proposalMint.decimals == 0
+      ? Math.ceil(rawYesVotesRequired)
+      : rawYesVotesRequired
 
   return {
     voteThresholdPct,

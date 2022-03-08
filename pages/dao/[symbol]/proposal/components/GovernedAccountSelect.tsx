@@ -82,23 +82,21 @@ const GovernedAccountSelect = ({
     tokenAccountName,
     tokenName,
     amount,
-    imgUrl,
   }) {
     return (
       <div className="break-all text-fgd-1 ">
         {tokenAccountName && <div className="mb-0.5">{tokenAccountName}</div>}
-        <div className="mb-2">{tokenAccount}</div>
-        <div className="space-y-0.5 text-xs text-fgd-3">
+        <div className="mb-2 text-fgd-3 text-xs">{tokenAccount}</div>
+        <div className="flex space-x-3 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token:{' '}
-              {imgUrl && (
-                <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
-              )}
-              {tokenName}
+              Token:
+              <span className="ml-1 text-fgd-1">{tokenName}</span>
             </div>
           )}
-          <div>Amount: {amount}</div>
+          <div>
+            Bal:<span className="ml-1 text-fgd-1">{amount}</span>
+          </div>
         </div>
       </div>
     )

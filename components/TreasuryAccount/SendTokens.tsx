@@ -54,10 +54,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const SendTokens = () => {
-  const { resetCompactViewState } = useTreasuryAccountStore()
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const {
     realmInfo,
@@ -70,7 +67,7 @@ const SendTokens = () => {
   } = useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
+  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
@@ -160,6 +157,7 @@ const SendTokens = () => {
       connection,
       wallet,
       currentAccount,
+
       setFormErrors,
     }
     if (isNFT) {
@@ -241,7 +239,6 @@ const SendTokens = () => {
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
-        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })

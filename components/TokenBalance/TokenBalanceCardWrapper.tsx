@@ -3,6 +3,7 @@ import TokenBalanceCard from './TokenBalanceCard'
 import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
 import LockPluginTokenBalanceCard from 'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
+import NftBalanceCard from './NftBalanceCard'
 
 const TokenBalanceCardWrapper = ({
   proposal,
@@ -20,6 +21,12 @@ const TokenBalanceCardWrapper = ({
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
       return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
+    }
+    if (
+      realm?.pubkey.toBase58() ===
+      'HVywtno57PwcgWQzRaf3Pv8RKWWrF1zoqLZGULNC2jGm'
+    ) {
+      return <NftBalanceCard></NftBalanceCard>
     }
     //Default
     return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
