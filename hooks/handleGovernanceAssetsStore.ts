@@ -36,11 +36,14 @@ export default function handleGovernanceAssetsStore() {
   const {
     setGovernancesArray,
     setGovernedTokenAccounts,
+    setGovernedAccounts,
   } = useGovernanceAssetsStore()
   useEffect(() => {
-    //route.pathname.includes('/params')
     if (realm) {
-      setGovernancesArray(connection, governances, realm)
+      setGovernancesArray(governances)
+    }
+    if (realm && route.pathname.includes('/params')) {
+      setGovernedAccounts(connection, realm)
     }
   }, [JSON.stringify(governances), realm?.pubkey, route.pathname])
   useEffect(() => {

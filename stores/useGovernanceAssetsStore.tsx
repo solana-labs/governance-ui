@@ -56,17 +56,12 @@ interface GovernanceAssetsStore extends State {
   governedTokenAccounts: GovernedTokenAccount[]
   governedAccounts: GovernedAccount[]
   loadGovernedAccounts: boolean
-  setGovernancesArray: (
-    connection: Connection,
-    governances: {
-      [governance: string]: ProgramAccount<Governance>
-    },
-    realm: ProgramAccount<Realm>
-  ) => void
+  setGovernancesArray: (governances: {
+    [governance: string]: ProgramAccount<Governance>
+  }) => void
   setGovernedTokenAccounts: (items: GovernedTokenAccount[]) => void
   setGovernedAccounts: (
     connection: Connection,
-    items: ProgramAccount<Governance>[],
     realm: ProgramAccount<Realm>
   ) => void
 }
@@ -80,18 +75,17 @@ const defaultState = {
 
 const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
   ...defaultState,
-  setGovernancesArray: (connection, governances, realm) => {
+  setGovernancesArray: (governances) => {
     const array = Object.keys(governances)
       .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
       .map((key) => governances[key])
     set((s) => {
       s.governancesArray = array
     })
-    _get().setGovernedAccounts(connection, array, realm)
   },
-  setGovernedAccounts: async (connection, governancesArray, realm) => {
+  setGovernedAccounts: async (connection, realm) => {
     const mintAddresses: string[] = []
-
+    const governancesArray = _get().governancesArray
     const governedAccounts: GovernedAccount[] = governancesArray.map((x) => {
       return {
         ...x,
