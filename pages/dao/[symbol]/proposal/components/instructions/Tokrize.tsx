@@ -110,6 +110,7 @@ const TokrizeContract = ({ index, governance, propertyDetails, lookupUri }: { in
 					label="Destination Address"
 					value={form.destinationAddress}
 					type="string"
+					placeholder="DOA Treasury Address"
 					onChange={(event) => {
 						handleSetForm({
 							value: event.target.value,

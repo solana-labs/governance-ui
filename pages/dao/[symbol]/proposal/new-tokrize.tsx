@@ -25,6 +25,9 @@ import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeR
 import VoteBySwitch from './components/VoteBySwitch'
 import TokrizeContract from './components/instructions/Tokrize'
 import { useLayoutEffect } from 'react'
+import { replaceBasePath } from 'next/dist/server/router'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
+import { StyledLabel } from '@components/inputs/styles'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -64,7 +67,7 @@ const New = (props) => {
 		title: title,
 		description: description,
 	})
-	const [isLoadingData, setIsLoadingData] = useState<boolean>(false);
+	const [isLoadingData, setIsLoadingData] = useState<boolean>(false)
 	const [formErrors, setFormErrors] = useState({})
 	const [governance, setGovernance] = useState<ProgramAccount<Governance> | null>(null)
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
@@ -193,6 +196,15 @@ const New = (props) => {
 		}
 	}, [propertyDetails])
 
+	const titleCase = (string) =>
+		string
+			? string
+					.toLowerCase()
+					.split(' ')
+					.map((word) => word.replace(word[0], word[0].toUpperCase()))
+					.join(' ')
+			: false
+
 	return (
 		<div>
 			<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
@@ -215,96 +227,118 @@ const New = (props) => {
 							<div className="space-y-16">
 								<div className="space-y-4">
 									<div>
-										<Input
-											label="Url"
-											placeholder="URl"
-											value={form.title}
-											// value="https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/"
-											id="lookup_uri"
-											name="lookup_uri"
-											type="url"
-											onChange={(evt) => {
-												setLookupUri(evt.target.value)
-											}}
-										/>
+										<label htmlFor="lookup_uri">
+											<StyledLabel>URI Lookup:</StyledLabel>
+										</label>
+										<div className="flex w-full">
+											<div className="flex flex-grow">
+												<Input
+													placeholder="https://...."
+													value={lookupUri}
+													// value="https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/"
+													id="lookup_uri"
+													name="lookup_uri"
+													noMaxWidth
+													type="url"
+													className="w-full"
+													onChange={(evt) => {
+														setLookupUri(evt.target.value)
+													}}
+												/>
+											</div>
+											<div className="flex flex-shrink-0">
+												<SecondaryButton
+													disabled={isLoading}
+													isLoading={isLoadingDraft}
+													className="flex-grow relative z-2 -mx-px"
+													onClick={(e) => {
+														setIsLoadingData(true)
+														fetch(lookupUri, {
+															method: 'GET',
+															Accept: 'application/json',
+														})
+															.then((res) => res.json())
+															.then((res) => {
+																setPropertyDetails(res)
 
-										<SecondaryButton
-											disabled={isLoading}
-											isLoading={isLoadingDraft}
-											onClick={(e) => {
-												setIsLoadingData(true)
-												fetch(lookupUri, {
-													method: 'GET',
-													Accept: 'application/json',
-												})
-													.then((res) => res.json())
-													.then((res) => {
-														setPropertyDetails(res)
+																setIsLoadingData(false)
+																handleTurnOffLoaders()
+																return res
+															})
+															.catch((error) => {
+																alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
+																console.log('error', error)
+															})
 
-														setIsLoadingData(false)
-														handleTurnOffLoaders()
-														return res
-													})
-													.catch((error) => {
-														alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
-														console.log('error', error)
-													})
-
-												e.preventDefault()
-											}}
-										>
-											Look up!
-										</SecondaryButton>
+														e.preventDefault()
+													}}
+												>
+													Get Data
+												</SecondaryButton>
+											</div>
+										</div>
 									</div>
 
 									{propertyDetails && (
-										<>
+										<div className="p-8 border bg-back text-white">
 											<h3>
-												<span className="text-lg">{propertyDetails.name}  Information</span>
+												<span className="text-lg">{propertyDetails.name} Information</span>
+
+												{` `}({propertyDetails.symbol})
 											</h3>
-											<div  className="pb-8">
+											<div className="pb-8">
 												{propertyDetails.description}
 												<br />
-												<ul className="list-disc list-inside space-y-2 pt-4">
+												<ul className="list-disc list-inside space-y-4 pt-4">
 													{propertyDetails.property_address && (
 														<li>
 															<b>Property location:</b> {propertyDetails.property_address}
 														</li>
 													)}
-													{propertyDetails.lat_long && (
-														<li>
-															<b>Coordinates:</b> {propertyDetails.lat_long}
-														</li>
-													)}
-													{propertyDetails.sq_ft && (
-														<li>
-															<span>
-																<b>Square Feet:</b> {propertyDetails.sq_ft}
-															</span>
-														</li>
-													)}
-													{propertyDetails.acres && (
-														<li>
-															<span>
-																<b>Acres:</b> {propertyDetails.acres}
-															</span>
-														</li>
-													)}
-													{propertyDetails.uri && (
-														<li>
-															<span className="inline-flex align-center">
-																<b className="inline mr-1">Property Details:</b>{' '}
-																<a className="inline" href={item.uri} target="blank">
-																	<span className="flex">
-																		Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-																	</span>
-																</a>
-															</span>
-														</li>
-													)}
+													{propertyDetails.attributes?.map((attribute) => {
+														if (attribute.trait_type !== "name" && attribute.trait_type !== "description") {
+															return (
+																<li key={attribute} className="w-full flex">
+																	{attribute.trait_type === 'property_address' || attribute.trait_type === 'lat_long' ? (
+																		<>
+																			<span className="flex align-center flex-grow">
+																				<b className="inline mr-1 flex-shrink-0 text-green">{titleCase(attribute.trait_type?.replaceAll('_', ' '))}:</b>{' '}
+																				<span className="inline mr-1 flex-grow">
+																					<a className="inline" href={`https://www.google.com/maps/search/?api=1&query=${attribute.value.replaceAll(',', '%2C').replaceAll(' ', '+')}`} target="_blank">
+																						<span className="flex">
+																							{attribute.value} <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+																						</span>
+																					</a>
+																				</span>
+																			</span>
+																		</>
+																	) : (
+																		<>
+																			<span className="flex align-center flex-grow">
+																				<b className="inline mr-1 flex-shrink-0  text-green">{titleCase(attribute.trait_type?.replaceAll('_', ' ')).replaceAll("Ein", "EIN").replaceAll("Of", "of").replaceAll("The", "the")}:</b>{' '}
+																				<span className="inline mr-1 flex-grow">
+																					{attribute.value.startsWith('http://') || attribute.value.startsWith('https://') ? (
+																						<>
+																							<a className="inline" href={attribute.value} target="_blank">
+																								<span className="flex">
+																									View <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+																								</span>
+																							</a>
+																						</>
+																					) : (
+																						<>{attribute.value}</>
+																					)}
+																				</span>
+																			</span>
+																		</>
+																	)}
+																</li>
+															)
+														}
+													})}
 												</ul>
 											</div>
-										</>
+										</div>
 									)}
 
 									<div className="xpb-4 hidden">
@@ -376,7 +410,7 @@ const New = (props) => {
 									Save draft
 								</SecondaryButton>
 								<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => handleCreate(false)}>
-									Add proposal
+									Tokenize
 								</Button>
 							</div>
 						</div>
