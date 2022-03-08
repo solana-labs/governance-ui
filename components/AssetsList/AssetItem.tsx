@@ -26,7 +26,7 @@ const AssetItem = ({
   const [slot, setSlot] = useState(0)
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
   const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
-  const [loadSlot, setLoadSlot] = useState(true)
+  const [loadSlot, setLoadSlot] = useState(false)
   const connection = useWalletStore((s) => s.connection)
   const name = item ? getProgramName(item.account.governedAccount) : ''
   const governedAccount = item
@@ -36,9 +36,14 @@ const AssetItem = ({
 
   useEffect(() => {
     const handleSetProgramVersion = async () => {
-      const slot = await getProgramSlot(connection.current, programId)
+      try {
+        setLoadSlot(true)
+        const slot = await getProgramSlot(connection.current, programId)
+        setSlot(slot)
+      } catch (e) {
+        console.log(e)
+      }
       setLoadSlot(false)
-      setSlot(slot)
     }
     handleSetProgramVersion()
   }, [JSON.stringify(item)])
