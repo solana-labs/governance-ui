@@ -4,6 +4,7 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import {
+  AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
