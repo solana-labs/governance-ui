@@ -16,7 +16,7 @@ const Select = ({
   useDefaultStyle = true,
   noMaxWidth = false,
   wrapperClassNames = '',
-  mintWidth = '',
+  minWidth = '',
 }: {
   value: any | undefined
   onChange: any | undefined
@@ -30,10 +30,10 @@ const Select = ({
   useDefaultStyle?: boolean
   noMaxWidth?: boolean
   wrapperClassNames?: string
-  mintWidth?: string
+  minWidth?: string
 }) => {
   return (
-    <div className={`${wrapperClassNames}`} style={{ minWidth: mintWidth }}>
+    <div className={`${wrapperClassNames}`} style={{ minWidth: minWidth }}>
       {label && <StyledLabel>{label}</StyledLabel>}
       <div className={`relative ${className} ${error && 'pb-1'}`}>
         <Listbox value={value} onChange={onChange} disabled={disabled}>
@@ -87,7 +87,7 @@ const Option = ({ value, children, className = '' }) => {
     <Listbox.Option value={value}>
       {({ selected }) => (
         <div
-          className={`default-transition px-2 py-3 hover:bg-bkg-2 hover:cursor-pointer tracking-wider ${
+          className={`default-transition px-2 py-3 hover:bg-bkg-2 hover:cursor-pointer text-fgd-2 tracking-wider ${
             selected && `text-primary-light`
           } ${className}`}
         >

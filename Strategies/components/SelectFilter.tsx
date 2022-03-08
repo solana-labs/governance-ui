@@ -14,8 +14,8 @@ const SelectFilter = ({
 }) => {
   return (
     <Select
-      mintWidth="150px"
-      wrapperClassNames="mt-1"
+      minWidth="150px"
+      wrapperClassNames="mt-6"
       onChange={onChange}
       placeholder={placeholder}
       value={value}
