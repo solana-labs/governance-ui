@@ -6,15 +6,15 @@ import Switch from './Switch'
 import { ProposalState } from '@solana/spl-governance'
 
 const initialFilterSettings = {
-  [ProposalState.Cancelled]: true,
-  [ProposalState.Completed]: true,
-  [ProposalState.Defeated]: true,
   [ProposalState.Draft]: false,
-  [ProposalState.Executing]: true,
-  [ProposalState.ExecutingWithErrors]: true,
   [ProposalState.SigningOff]: true,
-  [ProposalState.Succeeded]: true,
   [ProposalState.Voting]: true,
+  [ProposalState.Succeeded]: true,
+  [ProposalState.Executing]: true,
+  [ProposalState.Completed]: true,
+  [ProposalState.Cancelled]: false,
+  [ProposalState.Defeated]: true,
+  [ProposalState.ExecutingWithErrors]: true,
 }
 
 const StyledAlertCount = styled.span`
@@ -40,9 +40,9 @@ const ProposalFilter = ({ filters, setFilters }) => {
     const initialFilters = Object.keys(initialFilterSettings)
       .filter((x) => !initialFilterSettings[x])
       .map(Number)
+
     setFilters([...initialFilters])
   }, [])
-
   return (
     <Disclosure as="div" className="relative">
       {({ open }) => (
