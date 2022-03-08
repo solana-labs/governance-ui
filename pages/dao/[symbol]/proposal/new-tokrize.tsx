@@ -2,7 +2,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { createContext, useEffect, useLayoutEffect, useState } from 'react'
 import * as yup from 'yup'
-import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
+import { ArrowLeftIcon, PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
 import { getInstructionDataFromBase64, Governance, GovernanceAccountType, ProgramAccount, RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
@@ -80,8 +80,8 @@ const New = () => {
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
 	const [form, setForm] = useState({
-		title: '',
-		description: '',
+		title: `White House ${ new Date().getHours() }:${ new Date().getMinutes() }`,
+		description: 'Proposal to mint rNFT for the White House',
 	})
 	const [formErrors, setFormErrors] = useState({})
 	const [governance, setGovernance] = useState<ProgramAccount<Governance> | null>(null)
@@ -123,127 +123,7 @@ const New = () => {
 		uri: arWeaveLink || '',
 	})
 
-	const [descriptionLink, setDescriptionLink] = useState({})
-	const [metaplexDataObj, setMetaplexDataObj] = useState({
-		name: '',
-		symbol: '',
-		description: '',
-		image: '',
-		attributes: [
-			{
-				trait_type: 'name',
-				value: '',
-			},
-			{
-				trait_type: 'description',
-				value: '',
-			},
-			{
-				trait_type: 'property_address',
-				value: '',
-			},
-			{
-				trait_type: 'lat_long',
-				value: '',
-			},
-			{
-				trait_type: 'acres',
-				value: '',
-			},
-			{
-				trait_type: 'land_record_auditor',
-				value: '',
-			},
-			{
-				trait_type: 'deed_record_recorder',
-				value: '',
-			},
-			{
-				trait_type: 'mortgage_record_recorder',
-				value: '',
-			},
-			{
-				trait_type: 'legal_description',
-				value: '',
-			},
-			{
-				trait_type: 'mortgage_record',
-				value: '',
-			},
-			{
-				trait_type: 'title_method',
-				value: '',
-			},
-			{
-				trait_type: 'title_held_by',
-				value: '',
-			},
-			{
-				trait_type: 'ein',
-				value: '',
-			},
-			{
-				trait_type: 'transfer_restrictions',
-				value: '',
-			},
-			{
-				trait_type: 'marketing_name',
-				value: '',
-			},
-			{
-				trait_type: 'type',
-				value: '',
-			},
-			{
-				trait_type: 'sq_ft',
-				value: '',
-			},
-			{
-				trait_type: 'property_description',
-				value: '',
-			},
-			{
-				trait_type: 'deed',
-				value: '',
-			},
-			{
-				trait_type: 'mortgage',
-				value: '',
-			},
-			{
-				trait_type: 'title_insurance',
-				value: '',
-			},
-			{
-				trait_type: 'articles_of_organization',
-				value: '',
-			},
-			{
-				trait_type: 'certificate_of_organization_from_secretary_of_state',
-				value: '',
-			},
-			{
-				trait_type: 'operating_agreement',
-				value: '',
-			},
-			{
-				trait_type: 'membership_interest_transfer_agreement',
-				value: '',
-			},
-			{
-				trait_type: 'ein_letter_from_irs',
-				value: '',
-			},
-			{
-				trait_type: 'appraisal',
-				value: '',
-			},
-			{
-				trait_type: 'submitted_by',
-				value: '',
-			},
-		],
-	})
+
 
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
 		if (!governance) {
@@ -370,9 +250,9 @@ const New = () => {
 
 	useEffect(() => {
 		const governedAccount = extractGovernanceAccountFromInstructionsData(instructionsData)
-
 		setGovernance(governedAccount)
 	}, [instructionsData])
+
 
 	useEffect(() => {
 		//fetch to be up to date with amounts
@@ -381,49 +261,45 @@ const New = () => {
 
 	const getCurrentInstruction = ({ typeId, idx }) => {
 		switch (typeId) {
-			// case Instructions.Transfer:
-			// 	return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
-			// case Instructions.ProgramUpgrade:
-			// 	return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-			// case Instructions.CreateAssociatedTokenAccount:
-			// 	return <CreateAssociatedTokenAccount index={idx} governance={governance} />
-			// case Instructions.CreateSolendObligationAccount:
-			// 	return <CreateObligationAccount index={idx} governance={governance} />
-			// case Instructions.InitSolendObligationAccount:
-			// 	return <InitObligationAccount index={idx} governance={governance} />
-			// case Instructions.DepositReserveLiquidityAndObligationCollateral:
-			// 	return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
-			// case Instructions.RefreshSolendObligation:
-			// 	return <RefreshObligation index={idx} governance={governance} />
-			// case Instructions.RefreshSolendReserve:
-			// 	return <RefreshReserve index={idx} governance={governance} />
-			// case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-			// 	return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
-			// case Instructions.Mint:
-			// 	return <Mint index={idx} governance={governance}></Mint>
-			// case Instructions.Base64:
-			// 	return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+			case Instructions.Transfer:
+				return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
+			case Instructions.ProgramUpgrade:
+				return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
+			case Instructions.CreateAssociatedTokenAccount:
+				return <CreateAssociatedTokenAccount index={idx} governance={governance} />
+			case Instructions.CreateSolendObligationAccount:
+				return <CreateObligationAccount index={idx} governance={governance} />
+			case Instructions.InitSolendObligationAccount:
+				return <InitObligationAccount index={idx} governance={governance} />
+			case Instructions.DepositReserveLiquidityAndObligationCollateral:
+				return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
+			case Instructions.RefreshSolendObligation:
+				return <RefreshObligation index={idx} governance={governance} />
+			case Instructions.RefreshSolendReserve:
+				return <RefreshReserve index={idx} governance={governance} />
+			case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
+				return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
+			case Instructions.Mint:
+				return <Mint index={idx} governance={governance}></Mint>
+			case Instructions.Base64:
+				return <CustomBase64 index={idx} governance={governance}></CustomBase64>
 			case Instructions.TokrizeContract:
 				return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
-			// case Instructions.None:
-			// 	return <Empty index={idx} governance={governance}></Empty>
-			// case Instructions.MangoMakeChangeMaxAccounts:
-			// 	return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
-			// case Instructions.MangoChangeReferralFeeParams:
-			// 	return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
-			// case Instructions.Grant:
-			// 	return <Grant index={idx} governance={governance}></Grant>
-			// case Instructions.Clawback:
-			// 	return <Clawback index={idx} governance={governance}></Clawback>
+			case Instructions.None:
+				return <Empty index={idx} governance={governance}></Empty>
+			case Instructions.MangoMakeChangeMaxAccounts:
+				return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
+			case Instructions.MangoChangeReferralFeeParams:
+				return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
+			case Instructions.Grant:
+				return <Grant index={idx} governance={governance}></Grant>
+			case Instructions.Clawback:
+				return <Clawback index={idx} governance={governance}></Clawback>
 			default:
 				null
 		}
 	}
 
-	const handleSetPropertyData = ({ propertyName, value }) => {
-		// setFormErrors({})
-		setPropertyData({ ...propertyData, [propertyName]: value })
-	}
 
 	return (
 		<div>
@@ -441,7 +317,7 @@ const New = () => {
 
 				<h1 className="bg-dark inline-block">
 					<span className="ml-4 pr-8 text-xl uppercase">
-						Tokenize Proposal
+						Proposal to Tokenize
 						{realmDisplayName ? ` for ${realmDisplayName}` : ``}{' '}
 					</span>
 				</h1>
@@ -455,7 +331,7 @@ const New = () => {
 							<div className="space-y-16">
 								<div className="space-y-4">
 									<h3>
-										<span className="text-lg">Property Information</span>
+										<span className="text-lg">Proposal Information</span>
 									</h3>
 
 									<div className="xpb-4">
@@ -521,11 +397,13 @@ const New = () => {
 									return (
 										<div key={idx} className="mb-3 border border-fgd-4 p-4 md:p-6">
 											<Select className="h-12" disabled={!getAvailableInstructionsForIndex.length} placeholder={`${availableInstructionsForIdx.length ? 'Select instruction' : 'No available instructions'}`} label={`Instruction ${idx + 1}`} onChange={(value) => setInstructionType({ value, idx })} value={instruction.type?.name}>
-												{availableInstructionsForIdx.map((inst) => (
-													<Select.Option key={inst.id} value={inst}>
-														<span>{inst.name}</span>
-													</Select.Option>
-												))}
+												{availableInstructionsForIdx.map((inst) => {
+													if (inst.name === "Tokrize") {
+														return <Select.Option key={inst.id} value={inst}>
+															<span>{inst.name}</span>
+														</Select.Option>
+													}
+												})}
 											</Select>
 											<div className="flex items-end pt-4">
 												<InstructionContentContainer idx={idx} instructionsData={instructionsData}>
@@ -534,12 +412,12 @@ const New = () => {
 														idx,
 													})}
 												</InstructionContentContainer>
-												{idx !== 0 && (
+												{/* {idx !== 0 && (
 													<LinkButton className="flex font-bold items-center ml-4 text-fgd-1 text-sm" onClick={() => removeInstruction(idx)}>
 														<XCircleIcon className="h-5 mr-1.5 text-red w-5" />
 														Remove
 													</LinkButton>
-												)}
+												)} */}
 											</div>
 										</div>
 									)
