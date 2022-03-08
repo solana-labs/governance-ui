@@ -147,13 +147,18 @@ const EXCLUDED_REALMS = new Map<string, string>([
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
+  const notificationsEnabledMap = new Map<string, boolean>()
 
   const allRealms = (
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
-      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(connection.current, p.programId)
-      )
+      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) => {
+        if (p.enableNotifications) {
+          notificationsEnabledMap[p.realmId.toBase58()] = p.enableNotifications
+        }
+
+        return getRealms(connection.current, p.programId)
+      })
     )
   )
     .flatMap((r) => Object.values(r))
@@ -169,19 +174,27 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
         excludedRealms.has(r.pubkey.toBase58()) ||
         EXCLUDED_REALMS.has(r.pubkey.toBase58())
       )
-        ? createUnchartedRealmInfo(r)
+        ? createUnchartedRealmInfo(
+            r,
+            notificationsEnabledMap.has(r.pubkey.toBase58())
+              ? notificationsEnabledMap[r.pubkey.toBase58()]
+              : false
+          )
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]
 }
 
-export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
+export function createUnchartedRealmInfo(
+  realm: ProgramAccount<Realm>,
+  enableNotifications: boolean
+) {
   return {
     symbol: realm.account.name,
     programId: new PublicKey(realm.owner),
     realmId: realm.pubkey,
     displayName: realm.account.name,
     isCertified: false,
-    enableNotifications: false,
+    enableNotifications,
   } as RealmInfo
 }

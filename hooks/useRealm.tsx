@@ -35,7 +35,9 @@ export default function useRealm() {
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
       ? realm
-        ? createUnchartedRealmInfo(realm)
+        ? // Realm program data needs to contain config options to enable/disable things such as notifications
+          // Currently defaulting to false here for now
+          createUnchartedRealmInfo(realm, false)
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 

@@ -158,7 +158,12 @@ const NotificationsCard = () => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Notifications</h3>
+      <a
+        title="Questions? Click to learn more!"
+        href="https://docs.notifi.network/NotifiIntegrationsFAQ.html"
+      >
+        <h3 className="mb-4">Notifications</h3>
+      </a>
       {hasLoaded ? (
         !connected ? (
           <>
