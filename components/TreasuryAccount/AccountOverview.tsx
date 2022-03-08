@@ -72,12 +72,8 @@ const AccountOverview = () => {
           strat.handledMint === currentAccount?.token?.account.mint.toString()
       )
 
-      if (accountHasInvestments.length > 0) {
-        setAccountInvestments(accountHasInvestments)
-      }
-      if (eligibleInvestments.length > 0) {
-        setEligibleInvestments(eligibleInvestments)
-      }
+      setAccountInvestments(accountHasInvestments)
+      setEligibleInvestments(eligibleInvestments)
     }
   }, [currentAccount, strategies])
 

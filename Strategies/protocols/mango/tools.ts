@@ -93,7 +93,6 @@ export async function tvl(
       const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
         (x) => x.mint?.publicKey.toBase58() === info?.address
       )
-      console.log(filteredTokenGov)
       const currentPosition = info
         ? await getPositionForMint(market, connection, filteredTokenGov)
         : 0
@@ -164,7 +163,6 @@ const getPositionForMint = async (
       }
     }
   }
-  console.log(deposited)
   return deposited
 }
 
