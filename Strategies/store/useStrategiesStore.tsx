@@ -9,7 +9,7 @@ interface StrategiesStore extends State {
   getStrategies: () => void
 }
 
-const useAssetsStore = create<StrategiesStore>((set, _get) => ({
+const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
   strategies: [],
   strategiesLoading: false,
   getStrategies: async () => {
@@ -33,4 +33,4 @@ const useAssetsStore = create<StrategiesStore>((set, _get) => ({
   },
 }))
 
-export default useAssetsStore
+export default useStrategiesStore
