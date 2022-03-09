@@ -78,11 +78,6 @@ function App({ Component, pageProps }) {
     <div className="relative">
       <Head>
         <title>{title}</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap"
-          rel="stylesheet"
-        />
 
         {faviconUrl && <link rel="icon" href={faviconUrl} />}
 
@@ -93,7 +88,6 @@ function App({ Component, pageProps }) {
         )}
 
         <meta name="description" content={description} />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="msapplication-TileColor" content="#ffffff" />
         <meta name="theme-color" content="#ffffff" />
 
