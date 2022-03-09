@@ -467,20 +467,11 @@ const New = () => {
 	}
 
 	useEffect(() => {
-		//TODO: remove this when complete
-		console.log('descriptionLink', descriptionLink)
-		console.log('form', form)
-
 		handleSetForm({
 			value: JSON.stringify(descriptionLink),
 			propertyName: 'description',
 		})
 	}, [descriptionLink])
-
-	useEffect(() => {
-		//TODO: remove this when complete
-		console.log('metaplexDataObj', metaplexDataObj)
-	}, [metaplexDataObj])
 
 	useEffect(() => {
 		if (arWeaveLink) {
@@ -494,13 +485,10 @@ const New = () => {
 		console.log('propertyData', propertyData)
 
 		setDescriptionLink({
-			description: propertyData.description,
-			property_address: propertyData.property_address,
-			lat_long: propertyData.lat_long,
-			sq_ft: propertyData.sq_ft,
-			acres: propertyData.acres,
-			uri: arWeaveLink || '',
-			image: propertyData.image
+			// TODO: maybe a type to render details?
+			description: `Proposal to Request Tokr DAO to mint rNFT`,
+			// description: `Proposal to Purchase ${propertyData.property_address ? `${propertyData.property_address}` : 'Real Estate'}`,
+			uri: arWeaveLink || ''
 		})
 
 		setMetaplexDataObj({
