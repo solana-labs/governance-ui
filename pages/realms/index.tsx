@@ -36,8 +36,8 @@ const Realms = () => {
         getUnchartedRealmInfos(connection),
       ])
       const allRealms = [...certifiedRealms, ...uncharteredRealms]
-      setRealms(allRealms)
-      setFilteredRealms(allRealms)
+      setRealms(sortDaos(allRealms))
+      setFilteredRealms(sortDaos(allRealms))
       setIsLoadingRealms(false)
     }
     if (selectedRealm.realm) {
@@ -59,7 +59,11 @@ const Realms = () => {
     }
     router.push(fmtUrlWithCluster(`/realms/new`))
   }
-
+  const sortDaos = (realmInfoData: RealmInfo[]) => {
+    return realmInfoData.sort((a: RealmInfo, b: RealmInfo) => {
+      return (b.sortRank ?? -0) - (a.sortRank ?? -0)
+    })
+  }
   const filterDaos = (v) => {
     setSearchString(v)
     if (v.length > 0) {

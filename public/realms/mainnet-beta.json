@@ -24,7 +24,8 @@
     "realmId": "7oB84bSuxv9AH1iRdMp5nFLwpQApv8Yo9s1gGmDkHtSP",
     "ogImage": "/realms/SNY/img/synthetify_logo_green.svg",
     "website": "https://synthetify.io/",
-    "twitter": "@synthetify"
+    "twitter": "@synthetify",
+    "sortRank": 2
   },
   {
     "symbol": "SOCEAN",
