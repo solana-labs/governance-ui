@@ -131,7 +131,14 @@ const REALM = () => {
 									<ApproveAllBtn />
 								</div>
 								<div className="mr-4">
-									<NewProposalBtn />
+									<NewProposalBtn>
+									Propose Property
+									</NewProposalBtn>
+								</div>
+								<div className="mr-4">
+									<NewProposalBtn>
+									Request rNFT
+									</NewProposalBtn>
 								</div>
 								<div className="mr-4">
 									<NewProposalBtn type={`tokrize`}>
