@@ -39,17 +39,11 @@ function App({ Component, pageProps }) {
 
 	const [pathName, setPathName] = useState('/');
 	const [showNav, setShowNav] = useState(true);
-	useLayoutEffect(() => {
-		console.log('pathName', pathName)
-		console.log('showNav', showNav)
-	}, [pathName])
+
 
 	useLayoutEffect(() => {
 		setShowNav((getPathName() === '/' || getPathName() === undefined) ? false : true)
 		setPathName(getPathName())
-
-		console.log("\n\n\n\n\n\n\n\n\n\ngetPathName", getPathName())
-		console.log("getPathName", getPathName())
 	}, [history])
 
 
