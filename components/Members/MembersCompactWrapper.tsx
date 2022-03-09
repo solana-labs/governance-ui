@@ -81,7 +81,7 @@ const MembersCompactWrapper = () => {
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
 
-            <div style={{ maxHeight: '350px' }}>
+            <div>
               <MembersItems activeMembers={activeMembers} />
             </div>
 

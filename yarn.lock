@@ -8528,6 +8528,11 @@ react-focus-lock@^2.5.2:
     use-callback-ref "^1.2.5"
     use-sidecar "^1.0.5"
 
+react-headless-pagination@^0.1.0:
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/react-headless-pagination/-/react-headless-pagination-0.1.0.tgz#5a8a7ff68c79466b411dd877b5f16724c472e678"
+  integrity sha512-B+t+9PafVL4M0SYoVwcPelmWvnGzvTijF1BI0iHcq44vXy1brwFi62d8a8GlipIxvvBIYoghmVqTLiFmlElG1A==
+
 react-icons@^4.3.1:
   version "4.3.1"
   resolved "https://registry.yarnpkg.com/react-icons/-/react-icons-4.3.1.tgz#2fa92aebbbc71f43d2db2ed1aed07361124e91ca"
