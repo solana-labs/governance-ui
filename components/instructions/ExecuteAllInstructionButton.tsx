@@ -87,18 +87,6 @@ export function ExecuteAllInstructionButton({
   }
 
   if (
-    proposalInstructions.every(
-      (x) => x.account.executionStatus === InstructionExecutionStatus.Success
-    )
-  ) {
-    return (
-      <Tooltip content="instruction executed successfully">
-        <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
-      </Tooltip>
-    )
-  }
-
-  if (
     ![
       ProposalState.Executing,
       ProposalState.ExecutingWithErrors,
