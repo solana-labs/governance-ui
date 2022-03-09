@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { createContext, useCallback, useEffect, useState } from 'react'
+import React, { createContext, useCallback, useEffect, useMemo, useState } from 'react'
 import * as yup from 'yup'
 import { getInstructionDataFromBase64, Governance, ProgramAccount, RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
@@ -183,7 +183,7 @@ const New = (props) => {
 		}
 	}, [title, description])
 
-	useCallback(() => {
+	useEffect(() => {
 		if (propertyDetails) {
 			setTitle(`"${propertyDetails.name}" rNFT`)
 			setDescription(`rNFT Proposal`)
@@ -224,13 +224,14 @@ const New = (props) => {
 						<div className="pt-8 mb-20">
 							<div className="space-y-16">
 								<div className="space-y-4">
-									<div>
+									<div className={ propertyDetails?.length > 0 ? 'hidden' : null }>
 										<label htmlFor="lookup_uri">
 											<StyledLabel>URI Lookup:</StyledLabel>
 										</label>
 										<div className="flex w-full">
 											<div className="flex flex-grow">
 												<Input
+													disabled={ propertyDetails?.length > 0 }
 													placeholder="https://...."
 													value={lookupUri}
 													// value="https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/"
@@ -246,7 +247,7 @@ const New = (props) => {
 											</div>
 											<div className="flex flex-shrink-0">
 												<SecondaryButton
-													disabled={isLoading}
+													disabled={isLoading || propertyDetails?.length > 0}
 													isLoading={isLoadingDraft}
 													className="flex-grow relative z-2 -mx-px"
 													onClick={(e) => {
