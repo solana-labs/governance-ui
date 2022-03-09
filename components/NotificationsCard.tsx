@@ -9,13 +9,23 @@ import {
   PaperAirplaneIcon,
 } from '@heroicons/react/solid'
 import {
+  Alert,
   BlockchainEnvironment,
+  Filter,
   GqlError,
   MessageSigner,
+  Source,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
 import { useRouter } from 'next/router'
 import { EndpointTypes } from '@models/types'
+
+const firstOrNull = <T,>(arr: ReadonlyArray<T> | null | undefined) => {
+  if (arr !== null && arr !== undefined && arr.length > 0) {
+    return arr[0]
+  }
+  return null
+}
 
 const NotificationsCard = () => {
   const router = useRouter()
@@ -34,30 +44,53 @@ const NotificationsCard = () => {
     case 'mainnet':
       break
     case 'devnet':
-    case 'localnet':
       env = BlockchainEnvironment.DevNet
+      break
+    case 'localnet':
+      env = BlockchainEnvironment.LocalNet
       break
   }
   const {
     data,
     logIn,
     isAuthenticated,
+    createAlert,
     updateAlert,
-    fetchData,
   } = useNotifiClient({
     dappAddress: realm?.pubkey?.toBase58() ?? '',
     walletPublicKey: wallet?.publicKey?.toString() ?? '',
     env,
   })
-  const [email, setEmail] = useState<string>(data?.emailAddress ?? '')
-  const [phone, setPhone] = useState<string>(data?.phoneNumber ?? '')
-  const [telegram, setTelegram] = useState<string>(data?.telegramId ?? '')
+
+  const [alert, setAlert] = useState<Alert | null>(null)
+  const [email, setEmail] = useState<string>('')
+  const [phone, setPhone] = useState<string>('')
+  const [telegram, setTelegram] = useState<string>('')
+  const [source, setSource] = useState<Source | null>(null)
+  const [filter, setFilter] = useState<Filter | null>(null)
 
   useEffect(() => {
     // Update state when server data changes
-    setEmail(data?.emailAddress ?? '')
-    setPhone(data?.phoneNumber ?? '')
-    setTelegram(data?.telegramId ?? '')
+    const alerts = data?.alerts ?? null
+    if (alerts === null || alerts.length < 1) {
+      setAlert(null)
+      setEmail('')
+      setPhone('')
+      setTelegram('')
+    } else {
+      const newAlert = alerts[0]
+      setAlert(newAlert)
+      setEmail(
+        firstOrNull(newAlert.targetGroup.emailTargets)?.emailAddress ?? ''
+      )
+      setPhone(firstOrNull(newAlert.targetGroup.smsTargets)?.phoneNumber ?? '')
+      setTelegram(
+        firstOrNull(newAlert.targetGroup.telegramTargets)?.telegramId ?? ''
+      )
+    }
+
+    setSource(firstOrNull(data?.sources))
+    setFilter(firstOrNull(data?.filters))
   }, [data])
 
   const handleError = (errors: { message: string }[]) => {
@@ -74,27 +107,15 @@ const NotificationsCard = () => {
 
   const handleRefresh = async function () {
     setLoading(true)
+    setErrorMessage('')
     // user is not authenticated
     if (!isAuthenticated() && wallet && wallet.publicKey) {
       try {
-        await logIn(wallet as MessageSigner)
+        await logIn((wallet as unknown) as MessageSigner)
       } catch (e) {
         handleError([e])
       }
       setLoading(false)
-    }
-
-    // Update fields
-    if (connected && isAuthenticated()) {
-      console.log('Refreshing values')
-      try {
-        const { emailAddress, phoneNumber, telegramId } = await fetchData()
-        setEmail(emailAddress ?? '')
-        setPhone(phoneNumber ?? '')
-        setTelegram(telegramId ?? '')
-      } catch (e) {
-        handleError([e])
-      }
     }
     setLoading(false)
   }
@@ -104,7 +125,7 @@ const NotificationsCard = () => {
     // user is not authenticated
     if (!isAuthenticated() && wallet && wallet.publicKey) {
       try {
-        await logIn(wallet as MessageSigner)
+        await logIn((wallet as unknown) as MessageSigner)
       } catch (e) {
         handleError([e])
       }
@@ -112,14 +133,26 @@ const NotificationsCard = () => {
 
     if (connected && isAuthenticated()) {
       console.log('Sending')
-      console.log(email)
+      console.log(alert)
+
       try {
-        await updateAlert({
-          name: `${realm?.account.name} notifications`,
-          emailAddress: email === '' ? null : email,
-          phoneNumber: phone.length < 12 ? null : phone,
-          telegramId: telegram === '' ? null : telegram,
-        })
+        if (alert !== null) {
+          await updateAlert({
+            alertId: alert.id ?? '',
+            emailAddress: email === '' ? null : email,
+            phoneNumber: phone.length < 12 ? null : phone,
+            telegramId: telegram === '' ? null : telegram,
+          })
+        } else {
+          await createAlert({
+            name: `${realm?.account.name} notifications`,
+            emailAddress: email === '' ? null : email,
+            phoneNumber: phone.length < 12 ? null : phone,
+            telegramId: telegram === '' ? null : telegram,
+            sourceId: source?.id ?? '',
+            filterId: filter?.id ?? '',
+          })
+        }
         setUnsavedChanges(false)
       } catch (e) {
         handleError([e])

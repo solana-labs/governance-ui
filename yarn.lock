@@ -1321,18 +1321,24 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@notifi-network/notifi-axios-adapter@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-adapter/-/notifi-axios-adapter-0.1.1.tgz#e258a5ae61768c64f0fadd0500ffcacbcc66b6d3"
-  integrity sha512-aOVUi0tFjObdXVpX1TIItIbuumnBq5EbpP/LLD9v2j+TViF8/JQ4W03BmhdWnEio5X0HLUkKevXKpVHWcpTu8Q==
+"@notifi-network/notifi-axios-adapter@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-adapter/-/notifi-axios-adapter-0.3.0.tgz#5c73de604522ec18c9a4f87c6ccad733ef00c446"
+  integrity sha512-lAmY4GMb1mn44JUmil8jn6qUYuMzQUAsUw4Q6XC0uRJGPdAnrKTx8vghgpN04BTNir7cSsiVs8tqBQPt1QAslg==
 
-"@notifi-network/notifi-react-hooks@^0.1.1":
-  version "0.1.1"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.1.1.tgz#f51eedcdd6b7964b4b1c693b487f11527159affe"
-  integrity sha512-FDSmyeRIMoS642Ym2t0JUOf94UHXzDIWirCQ201Glf54Xs4lvWRf6LFCqSmd0pBcNN0Zpd8ABDtWuBjFOP59IQ==
+"@notifi-network/notifi-core@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.3.0.tgz#0691865a39f20d27254e253feb9125873338f9ab"
+  integrity sha512-ySL8faida7kAkxoPHfJJot6fCucY3dU+sy6ZB1Z3gi+WSKHHfqXRNjOc61KoeAoEARNoS9ksmgSXmepjNErT9A==
+
+"@notifi-network/notifi-react-hooks@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.3.0.tgz#57000b0e42dd68a611afb1a715f944e9d982d722"
+  integrity sha512-g5v5j4OQBOs788HQ298KNUXe4o8GS536IK41EpCXQScaMnZsBIzKagN6tZFk+QLCHXmGjbmcX2vA2EHZWFdAAw==
   dependencies:
-    "@notifi-network/notifi-axios-adapter" "^0.1.1"
+    "@notifi-network/notifi-axios-adapter" "^0.3.0"
     axios "^0.26.0"
+    typedoc-plugin-missing-exports "^0.22.6"
     typescript "^4.5.5"
     use-local-storage-state "^15.0.0"
 
@@ -10059,6 +10065,11 @@ typedarray-to-buffer@^3.1.5:
   resolved "https://registry.npmjs.org/typedarray-to-buffer/-/typedarray-to-buffer-3.1.5.tgz"
   dependencies:
     is-typedarray "^1.0.0"
+
+typedoc-plugin-missing-exports@^0.22.6:
+  version "0.22.6"
+  resolved "https://registry.yarnpkg.com/typedoc-plugin-missing-exports/-/typedoc-plugin-missing-exports-0.22.6.tgz#7467c60f1cd26507124103f0b9bca271d5aa8d71"
+  integrity sha512-1uguGQqa+c5f33nWS3v1mm0uAx4Ii1lw4Kx2zQksmYFKNEWTmrmMXbMNBoBg4wu0p4dFCNC7JIWPoRzpNS6pFA==
 
 typeforce@^1.11.5:
   version "1.18.0"
