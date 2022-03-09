@@ -82,8 +82,10 @@ const Treasury = () => {
   const { totalPriceFormatted } = useTotalTreasuryPrice()
 
   const handleChangeAccountTab = (acc) => {
-    setActiveAccount(acc)
-    setCurrentAccount(acc, connection)
+    if (acc) {
+      setActiveAccount(acc)
+      setCurrentAccount(acc, connection)
+    }
   }
 
   const goToNewAccountForm = () => {
@@ -158,7 +160,6 @@ const Treasury = () => {
                     className="break-all"
                     onChange={(g) =>
                       handleChangeAccountTab(
-                        // @ts-ignore
                         treasuryAccounts.find((acc) => {
                           const info = getTreasuryAccountItemInfo(
                             acc,
