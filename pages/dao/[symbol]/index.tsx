@@ -105,7 +105,7 @@ const REALM = () => {
 
   useEffect(() => {
     if (filters.length > 0) {
-      const proposals = displayedProposals.filter(
+      const proposals = allProposals.filter(
         ([, v]) => !filters.includes(v.account.state)
       )
       setFilteredProposals(proposals)

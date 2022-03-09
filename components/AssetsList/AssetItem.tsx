@@ -26,7 +26,7 @@ const AssetItem = ({
   const [slot, setSlot] = useState(0)
   const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
   const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
-  const [loadSlot, setLoadSlot] = useState(true)
+  const [loadSlot, setLoadSlot] = useState(false)
   const connection = useWalletStore((s) => s.connection)
   const name = item ? getProgramName(item.account.governedAccount) : ''
   const governedAccount = item
@@ -36,9 +36,14 @@ const AssetItem = ({
 
   useEffect(() => {
     const handleSetProgramVersion = async () => {
-      const slot = await getProgramSlot(connection.current, programId)
+      try {
+        setLoadSlot(true)
+        const slot = await getProgramSlot(connection.current, programId)
+        setSlot(slot)
+      } catch (e) {
+        console.log(e)
+      }
       setLoadSlot(false)
-      setSlot(slot)
     }
     handleSetProgramVersion()
   }, [JSON.stringify(item)])
@@ -53,21 +58,19 @@ const AssetItem = ({
           >
             {name || 'Program'}
           </h3>
-          <div className="text-fgd-3 text-xs flex flex-row break-all items-center">
-            {governedAccount}{' '}
-            <a
-              className="default-transition flex items-center text-fgd-1 hover:text-fgd-3 text-xs"
-              href={getExplorerUrl(
-                connection.endpoint,
-                item?.account.governedAccount
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 text-primary-light w-4" />
-            </a>
-          </div>
+          <a
+            className="default-transition flex items-center mt-0.5 text-fgd-3 hover:text-fgd-2 text-xs"
+            href={getExplorerUrl(
+              connection.endpoint,
+              item?.account.governedAccount
+            )}
+            target="_blank"
+            rel="noopener noreferrer"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {governedAccount}
+            <ExternalLinkIcon className="flex-shrink-0 h-3.5 ml-1 text-primary-light w-3.5" />
+          </a>
         </div>
       </div>
       {!panelView && (

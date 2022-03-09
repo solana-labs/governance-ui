@@ -20,7 +20,11 @@ const RealmHeader = () => {
 
   return (
     <div className="pb-4">
-      <div className="flex items-center justify-between mb-2 md:mb-4">
+      <div
+        className={`flex items-center ${
+          isBackNavVisible ? 'justify-between' : 'justify-end'
+        } mb-2 md:mb-4`}
+      >
         {isBackNavVisible ? (
           <Link href={fmtUrlWithCluster('/realms')}>
             <a className="default-transition flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
