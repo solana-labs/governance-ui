@@ -18,6 +18,16 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "SNY",
+    "displayName": "Synthetify",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7oB84bSuxv9AH1iRdMp5nFLwpQApv8Yo9s1gGmDkHtSP",
+    "ogImage": "/realms/SNY/img/synthetify_logo_green.svg",
+    "website": "https://synthetify.io/",
+    "twitter": "@synthetify",
+    "sortRank": 2
+  },
+  {
     "symbol": "SOCEAN",
     "programId": "5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy",
     "realmId": "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK",
