@@ -196,7 +196,6 @@ const New = (props) => {
 	}, [propertyDetails])
 
 	const getPropertyData = () => {
-		console.log('getPropertyData');
 		setIsLoadingData(true)
 		fetch(lookupUri, {
 			method: 'GET',

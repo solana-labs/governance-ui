@@ -20,6 +20,7 @@ import { ProposalState } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
+import PropertyDataOutput from '@components/PropertyDataOutput'
 
 const Proposal = () => {
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -28,13 +29,28 @@ const Proposal = () => {
 	const [description, setDescription] = useState('')
 	const [descriptionObj, setDescriptionObj] = useState<[any]>()
 	const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal?.account)
+	const [propertyDetails, setPropertyDetails] = useState<any>();
 
 	const showResults = proposal && proposal.account.state !== ProposalState.Cancelled && proposal.account.state !== ProposalState.Draft
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
 
 	useLayoutEffect(() => {
-		console.log('descriptionObj', descriptionObj)
+		if (descriptionObj && descriptionObj[0].uri) {
+			fetch(descriptionObj[0].uri, {
+				method: 'GET',
+				Accept: 'application/json',
+			})
+			.then((res) => res.json())
+			.then((res) => {
+				setPropertyDetails(res);
+				return res
+			})
+			.catch((error) => {
+				alert(`Something went wrong. \Please verify the format of the data in ${descriptionObj[0].uri}`)
+				console.log('error', error)
+			})
+		}
 	}, [descriptionObj])
 
 	useLayoutEffect(() => {
@@ -72,57 +88,10 @@ const Proposal = () => {
 							</div>
 						</div>
 
-						{description && (
-							<div className="pb-2">
-								{descriptionObj ? (
-									descriptionObj.map((item, index) => {
-										console.log("descriptionObj", descriptionObj, "item", item)
-										return (
-											<div key={'descriptionOutput_' + index} className="pb-8">
-												{item.description}
-												<br />
-												<ul className="list-disc list-inside space-y-2 pt-4">
-													{item.property_address && (
-														<li>
-															<b>Property location:</b> {item.property_address}
-														</li>
-													)}
-													{item.lat_long && (
-														<li>
-															<b>Coordinates:</b> {item.lat_long}
-														</li>
-													)}
-													{item.sq_ft && (
-														<li>
-															<span><b>Square Feet:</b> {item.sq_ft}</span>
-														</li>
-													)}
-													{item.acres && (
-														<li>
-															<span><b>Acres:</b> {item.acres}</span>
-														</li>
-													)}
-													{item.uri && (
-														<li>
-															<span className="inline-flex align-center">
-																<b className="inline mr-1">Property Details:</b>{' '}
-																<a className="inline" href={item.uri} target="blank">
-																	<span className="flex">
-																		Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-																	</span>
-																</a>
-															</span>
-														</li>
-													)}
-												</ul>
-											</div>
-										)
-									})
-								) : (
-									<ReactMarkdown className="markdown">{description}</ReactMarkdown>
-								)}
-							</div>
-						)}
+						{ propertyDetails && <>
+							<h2 className="mb-4 mt-8">Property Details</h2>
+							<PropertyDataOutput className="p-8 border border-green bg-back text-green" propertyDetails={ propertyDetails } />
+						</> }
 
 						<InstructionPanel />
 						<DiscussionPanel />

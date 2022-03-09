@@ -20,7 +20,7 @@ const PropertyDataOutput = (props) => {
 
 	return (propertyDetails ?
 		<>
-			<div className="p-8 border bg-back text-white">
+			<div className={ props.className ? props.className : `p-8 border bg-back text-white`}>
 				<h3>
 					<span className="text-lg">{propertyDetails.name} Information</span>
 					{` `}({propertyDetails.symbol})
