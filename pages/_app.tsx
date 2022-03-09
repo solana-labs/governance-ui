@@ -19,6 +19,7 @@ import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import tokenService from '@utils/services/token'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -26,6 +27,9 @@ function App({ Component, pageProps }) {
   useRouterHistory()
   useVoteRegistry()
   handleGovernanceAssetsStore()
+  useEffect(() => {
+    tokenService.fetchSolanaTokenList()
+  }, [])
   const { loadMarket } = useMarketStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
   const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()
