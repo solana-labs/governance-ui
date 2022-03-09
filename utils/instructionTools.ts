@@ -190,14 +190,6 @@ export async function getFriktionDepositInstruction({
       )
       depositIx.keys[governedAccountIndex].isSigner = true
 
-      const wsolIndex = depositIx.keys.findIndex(
-        (k) => k.pubkey.toString() === signers[0].publicKey.toString()
-      )
-      depositIx.keys[wsolIndex].isSigner = true
-      Object.values(depositIx.keys).forEach((acctMeta) => {
-        console.log(acctMeta.pubkey.toString() + ', ' + acctMeta.isSigner)
-      })
-
       serializedInstruction = serializeInstructionToBase64(depositIx)
     } catch (e) {
       if (e instanceof Error) {
