@@ -57,6 +57,7 @@ import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
+import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -227,6 +228,8 @@ const New = () => {
             : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
           chunkSplitByDefault: x.chunkSplitByDefault || false,
+          signers: x.signers,
+          shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
         }
       })
 
@@ -317,6 +320,8 @@ const New = () => {
         return (
           <CreateAssociatedTokenAccount index={idx} governance={governance} />
         )
+      case Instructions.DepositIntoVolt:
+        return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
