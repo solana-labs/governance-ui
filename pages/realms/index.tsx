@@ -9,11 +9,12 @@ import {
 import { SearchIcon } from '@heroicons/react/outline'
 import useWalletStore from '../../stores/useWalletStore'
 import useQueryContext from '@hooks/useQueryContext'
-import RealmsDashboard from './components/RealmsDashboard'
 import Button from '@components/Button'
 import { notify } from '@utils/notifications'
 import { useRouter } from 'next/router'
 import Input from '@components/inputs/Input'
+import dynamic from 'next/dynamic'
+const RealmsDashboard = dynamic(() => import('./components/RealmsDashboard'))
 
 const Realms = () => {
   const [realms, setRealms] = useState<ReadonlyArray<RealmInfo>>([])

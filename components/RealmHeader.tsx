@@ -39,7 +39,6 @@ const RealmHeader = () => {
           target="_blank"
           rel="noopener noreferrer"
         >
-          Realms v1
           <ExternalLinkIcon className="flex-shrink-0 h-4 w-4 ml-1" />
         </a>
       </div>
