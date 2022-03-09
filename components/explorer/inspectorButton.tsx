@@ -65,7 +65,7 @@ export default function InspectorButton({
       disabled={!connected && !wasExecuted}
       onClick={() => showInspector()}
     >
-      {!wasExecuted ? 'Inspect' : 'Inspect executed instruction'}
+      {!wasExecuted ? 'Inspect' : 'View transaction'}
     </SecondaryButton>
   )
 }
