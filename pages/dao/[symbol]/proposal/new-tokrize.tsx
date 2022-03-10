@@ -343,9 +343,9 @@ const New = (props) => {
 								</>
 							</NewProposalContext.Provider>
 							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-								<SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
+								{/* <SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
 									Save draft
-								</SecondaryButton>
+								</SecondaryButton> */}
 								<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => handleCreate(false)}>
 									Tokenize
 								</Button>

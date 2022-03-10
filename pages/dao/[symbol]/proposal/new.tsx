@@ -1514,7 +1514,7 @@ const New = () => {
 											submitProposal()
 										}}
 									>
-										Add proposal
+										{proposalType === 1 ? 'Propose Property' : 'Propose rNFT'}
 									</Button>
 								</div>
 							</div>
