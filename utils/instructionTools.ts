@@ -1,6 +1,5 @@
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import {
-  AccountLayout,
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
@@ -10,7 +9,6 @@ import { WalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Account,
   Keypair,
-  LAMPORTS_PER_SOL,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
@@ -134,30 +132,27 @@ export async function getFriktionDepositInstruction({
     let depositTokenAccountKey: PublicKey | null
 
     if (governedTokenAccount.isSol) {
-      const rentBalance = await connection.current.getMinimumBalanceForRentExemption(
-        AccountLayout.span
+      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
+        {
+          connection: connection,
+          receiverAddress: governedTokenAccount.governance.pubkey,
+          mintPK: new PublicKey(WSOL_MINT),
+          wallet,
+        }
       )
-      const newAccount = new Keypair()
-      prerequisiteInstructions.push(
-        SystemProgram.createAccount({
-          fromPubkey: wallet.publicKey as PublicKey,
-          newAccountPubkey: newAccount.publicKey,
-          lamports: rentBalance + amount * LAMPORTS_PER_SOL,
-          space: AccountLayout.span,
-          programId: TOKEN_PROGRAM_ID,
-        })
-      )
-
-      prerequisiteInstructions.push(
-        Token.createInitAccountInstruction(
-          TOKEN_PROGRAM_ID,
-          new PublicKey(WSOL_MINT),
-          newAccount.publicKey,
-          governedTokenAccount.governance.pubkey
+      if (needToCreateAta) {
+        prerequisiteInstructions.push(
+          Token.createAssociatedTokenAccountInstruction(
+            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+            new PublicKey(WSOL_MINT), // mint
+            receiverAddress, // ata
+            governedTokenAccount.governance.pubkey, // owner of token account
+            wallet.publicKey! // fee payer
+          )
         )
-      )
-      signers.push(newAccount)
-      depositTokenAccountKey = newAccount.publicKey
+      }
+      depositTokenAccountKey = receiverAddress
     } else {
       depositTokenAccountKey = governedTokenAccount.transferAddress!
     }
@@ -175,13 +170,22 @@ export async function getFriktionDepositInstruction({
         decimals = underlyingAssetMintInfo.decimals
       }
 
-      const depositIx = await cVoltSDK.deposit(
-        new Decimal(amount),
-        depositTokenAccountKey,
-        receiverAddress,
-        governedTokenAccount.governance.pubkey,
-        decimals
-      )
+      const depositIx = governedTokenAccount.isSol
+        ? await cVoltSDK.depositWithTransfer(
+            new Decimal(amount),
+            depositTokenAccountKey,
+            receiverAddress,
+            governedTokenAccount.transferAddress!,
+            governedTokenAccount.governance.pubkey,
+            decimals
+          )
+        : await cVoltSDK.deposit(
+            new Decimal(amount),
+            depositTokenAccountKey,
+            receiverAddress,
+            governedTokenAccount.governance.pubkey,
+            decimals
+          )
 
       const governedAccountIndex = depositIx.keys.findIndex(
         (k) =>
