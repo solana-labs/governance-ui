@@ -15,7 +15,6 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import DepositLabel from '@components/TreasuryAccount/DepositLabel'
 
 const compareProposals = (
@@ -127,9 +126,6 @@ const REALM = () => {
 						<div className="flex items-center justify-between pb-3">
 							<h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
 							<div className="flex items-center">
-								<div className="mr-4">
-									<ApproveAllBtn />
-								</div>
 								<div className="mr-4">
 									<NewProposalBtn string={`property=true`}>
 										Propose Property
