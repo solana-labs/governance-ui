@@ -7,18 +7,17 @@ const DepositModal = ({
   onClose,
   isOpen,
   handledMint,
-  // liquidity,
   apy,
   protocolName,
   protocolLogoSrc,
   handledTokenName,
   strategyName,
-  // strategyDescription,
   currentPosition,
   createProposalFcn,
+  mangoAccounts,
 }) => {
   const currentPositionFtm = new BigNumber(
-    currentPosition.toNumber().toFixed(0)
+    currentPosition.toFixed(0)
   ).toFormat()
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -32,6 +31,7 @@ const DepositModal = ({
 
       {protocolName === 'Mango' ? (
         <MangoDeposit
+          mangoAccounts={mangoAccounts}
           handledMint={handledMint}
           currentPositionFtm={currentPositionFtm}
           currentPosition={currentPosition}

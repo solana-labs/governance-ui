@@ -14,7 +14,6 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import tokenService from '@utils/services/token'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
-import useMarketStore from 'Strategies/store/marketStore'
 import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 
@@ -48,18 +47,13 @@ const Treasury = () => {
     setActiveAccount,
   ] = useState<GovernedTokenAccount | null>(null)
   const [accountInfo, setAccountInfo] = useState<any>(null)
-  const market = useMarketStore((s) => s)
   const { realmInfo } = useRealm()
   useEffect(() => {
     if (
       tokenService._tokenList.length &&
       governedTokenAccountsWithoutNfts.filter((x) => x.mint).length
     ) {
-      getStrategies(
-        market,
-        connection,
-        governedTokenAccountsWithoutNfts.filter((x) => x.mint)
-      )
+      getStrategies(connection)
     }
   }, [
     tokenService._tokenList.length,

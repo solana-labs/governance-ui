@@ -4,6 +4,7 @@ import {
   PublicKey,
   BN,
   makeSetDelegateInstruction,
+  MangoAccount,
 } from '@blockworks-foundation/mango-client'
 import {
   getInstructionDataFromBase64,
@@ -13,7 +14,6 @@ import {
 import { fmtMintAmount } from '@tools/sdk/units'
 import { ConnectionContext } from '@utils/connection'
 import tokenService from '@utils/services/token'
-import { GovernedTokenAccount } from '@utils/tokens'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -45,7 +45,7 @@ export const tokenList = {
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
 export const MANGO_MINT_DEVNET = 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
-export const accountNumBN = new BN(1)
+export const firstAccNumber = new BN(1)
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
@@ -76,12 +76,7 @@ function findClosestToDate(values, date) {
 }
 
 //method to fetch mango strategies
-export async function tvl(
-  timestamp,
-  market: MarketStore,
-  connection: ConnectionContext,
-  governedTokenAccountsWithoutNfts: GovernedTokenAccount[]
-) {
+export async function tvl(timestamp, connection: ConnectionContext) {
   const protocolInfo = await tokenService.getTokenInfo(MANGO_MINT)
   const balances: TreasuryStrategy[] = []
   const stats = await axios.get(endpoint)
@@ -91,14 +86,11 @@ export async function tvl(
 
     if (assetDeposits.length > 0) {
       const info = tokenService.getTokenInfoFromCoingeckoId(mangoTokens)
-      const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
-        (x) => x.mint?.publicKey.toBase58() === info?.address
-      )
-      const currentPosition = info
-        ? await getPositionForMint(market, filteredTokenGov)
-        : 0
+      const handledMint =
+        (info?.address === MANGO_MINT && connection.cluster === 'devnet'
+          ? MANGO_MINT_DEVNET
+          : info?.address) || ''
       const closestVal = findClosestToDate(assetDeposits, date)
-      const handledMint = info?.address || ''
       balances.push({
         liquidity:
           (closestVal.totalDeposits - closestVal.totalBorrows) *
@@ -110,14 +102,10 @@ export async function tvl(
         ).toFixed(2)}%`,
         protocolName: MANGO,
         protocolSymbol: protocolInfo?.symbol || '',
-        handledMint:
-          handledMint === MANGO_MINT && connection.cluster === 'devnet'
-            ? MANGO_MINT_DEVNET
-            : handledMint,
+        handledMint: handledMint,
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
-        currentPosition: new BN(currentPosition),
         strategyDescription: 'Description',
         isGenericItem: false,
         createProposalFcn: HandleMangoDeposit,
@@ -128,39 +116,33 @@ export async function tvl(
   return balances
 }
 
-const getPositionForMint = async (
-  market: MarketStore,
-  filteredTokenGov: GovernedTokenAccount[]
+export const calculateAllDepositsInMangoAccountsForMint = (
+  accounts: MangoAccount[],
+  mint: PublicKey,
+  market: MarketStore
 ) => {
   let deposited = 0
-  for (let i = 0; i < filteredTokenGov.length; i++) {
-    const group = market!.group!
-    const depositIndex = group.tokens.findIndex(
-      (x) =>
-        x.mint.toBase58() === filteredTokenGov[i]!.mint!.publicKey.toBase58()
-    )
-    const accounts = await tryGetMangoAccountsForOwner(
-      market,
-      filteredTokenGov[i].governance!.pubkey
-    )
-    if (accounts?.length) {
-      const depositsWithAmountHiherThenZero = accounts
-        .map((x) => x.deposits[depositIndex])
-        .filter((x) => !x.isZero())
-      if (depositsWithAmountHiherThenZero.length) {
-        const currentDepositAmount = accounts
-          .map((x) =>
-            x
-              ?.getUiDeposit(
-                market.cache!.rootBankCache[depositIndex],
-                group,
-                depositIndex
-              )
-              .toNumber()
-          )
-          .reduce((prev, next) => (prev += next), 0)
-        deposited += currentDepositAmount ? currentDepositAmount : 0
-      }
+  const group = market!.group!
+  const depositIndex = group.tokens.findIndex(
+    (x) => x.mint.toBase58() === mint.toBase58()
+  )
+  if (accounts?.length) {
+    const depositsWithAmountHiherThenZero = accounts
+      .map((x) => x.deposits[depositIndex])
+      .filter((x) => !x.isZero())
+    if (depositsWithAmountHiherThenZero.length) {
+      const currentDepositAmount = accounts
+        .map((x) =>
+          x
+            ?.getUiDeposit(
+              market.cache!.rootBankCache[depositIndex],
+              group,
+              depositIndex
+            )
+            .toNumber()
+        )
+        .reduce((prev, next) => (prev += next), 0)
+      deposited += currentDepositAmount ? currentDepositAmount : 0
     }
   }
   return deposited
@@ -188,27 +170,25 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   const quoteRootBank =
     group.rootBankAccounts[group.getRootBankIndex(rootBank!)]
   const quoteNodeBank = quoteRootBank?.nodeBankAccounts[0]
-
-  const [mangoAccountPk] = await PublicKey.findProgramAddress(
-    [
-      group.publicKey.toBytes(),
-      matchedTreasury.governance!.pubkey.toBytes(),
-      accountNumBN.toArrayLike(Buffer, 'le', 8),
-    ],
-    groupConfig.mangoProgramId
-  )
+  const nextAccNumb = form.mangoAccounts.length
+    ? new BN(form.mangoAccounts.length + 1)
+    : firstAccNumber
+  const mangoAccountPk =
+    form.mangoAccountPk ||
+    (
+      await PublicKey.findProgramAddress(
+        [
+          group.publicKey.toBytes(),
+          matchedTreasury.governance!.pubkey.toBytes(),
+          nextAccNumb.toArrayLike(Buffer, 'le', 8),
+        ],
+        groupConfig.mangoProgramId
+      )
+    )[0]
 
   const solAddress = await getNativeTreasuryAddress(
     realm!.owner,
     matchedTreasury!.governance!.pubkey
-  )
-  const createMangoAccountIns = makeCreateMangoAccountInstruction(
-    groupConfig.mangoProgramId,
-    groupConfig.publicKey,
-    mangoAccountPk,
-    matchedTreasury.governance!.pubkey,
-    accountNumBN,
-    solAddress
   )
   const depositMangoAccountIns = makeDepositInstruction(
     groupConfig.mangoProgramId,
@@ -221,13 +201,6 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     quoteNodeBank!.vault,
     matchedTreasury.transferAddress!,
     new BN(form.mintAmount)
-  )
-  const delegateMangoAccount = makeSetDelegateInstruction(
-    groupConfig.mangoProgramId,
-    groupConfig.publicKey,
-    mangoAccountPk,
-    matchedTreasury.governance!.pubkey,
-    new PublicKey(form.delegateAddress)
   )
   const depositMangoAccountInsObj = {
     data: getInstructionDataFromBase64(
@@ -242,12 +215,16 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     matchedTreasury.mint?.account,
     new BN(form.mintAmount)
   )
-  const acc = await rpcContext.connection.getAccountInfo(
-    mangoAccountPk,
-    'processed'
-  )
   const insts: InstructionDataWithHoldUpTime[] = []
-  if (!acc) {
+  if (!form.mangoAccountPk) {
+    const createMangoAccountIns = makeCreateMangoAccountInstruction(
+      groupConfig.mangoProgramId,
+      groupConfig.publicKey,
+      mangoAccountPk,
+      matchedTreasury.governance!.pubkey,
+      nextAccNumb,
+      solAddress
+    )
     const instructionData = {
       data: getInstructionDataFromBase64(
         serializeInstructionToBase64(createMangoAccountIns)
@@ -259,7 +236,14 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     }
     insts.push(instructionData)
   }
-  if (form.delegateAddress) {
+  if (form.delegateAddress && form.delegateDeposit) {
+    const delegateMangoAccount = makeSetDelegateInstruction(
+      groupConfig.mangoProgramId,
+      groupConfig.publicKey,
+      mangoAccountPk,
+      matchedTreasury.governance!.pubkey,
+      new PublicKey(form.delegateAddress)
+    )
     const instructionData = {
       data: getInstructionDataFromBase64(
         serializeInstructionToBase64(delegateMangoAccount)

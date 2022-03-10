@@ -1,6 +1,7 @@
 import {
   INFO_LEN,
   makeRegisterReferrerIdInstruction,
+  MangoAccount,
   MangoAccountLayout,
   MangoGroup,
   PublicKey,
@@ -32,7 +33,7 @@ import {
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
-import { precision } from '@utils/formatting'
+import { abbreviateAddress, precision } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import { sendTransaction } from '@utils/send'
 import tokenService from '@utils/services/token'
@@ -43,16 +44,19 @@ import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/Govern
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
-  accountNumBN,
   MANGO_MINT,
   MANGO_MINT_DEVNET,
   tryGetMangoAccount,
 } from 'Strategies/protocols/mango/tools'
-import useMarketStore from 'Strategies/store/marketStore'
+import useMarketStore, { MarketStore } from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import ButtonGroup from '@components/ButtonGroup'
 import Switch from '@components/Switch'
+import Select from '@components/inputs/Select'
+const DEPOSIT = 'Deposit'
+const CREATE_REF_LINK = 'Create Referral Link'
+const DELEGATE_ACCOUNT = 'Delegate'
 
 const minMngoToCreateLink = 10000
 const MangoDepositComponent = ({
@@ -60,11 +64,13 @@ const MangoDepositComponent = ({
   currentPositionFtm,
   currentPosition,
   createProposalFcn,
+  mangoAccounts,
 }: {
   handledMint: string
   currentPositionFtm: string
   currentPosition: number
   createProposalFcn: HandleCreateProposalWithStrategy
+  mangoAccounts: MangoAccount[]
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -77,6 +83,12 @@ const MangoDepositComponent = ({
     symbol,
   } = useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
+  const [
+    selectedMangoAccount,
+    setSelectedMangoAccount,
+  ] = useState<MangoAccount | null>(
+    mangoAccounts.length ? mangoAccounts[0] : null
+  )
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
@@ -128,14 +140,7 @@ const MangoDepositComponent = ({
   useEffect(() => {
     const getRefLinks = async () => {
       const client = market.client
-      const [mangoAccountPk] = await PublicKey.findProgramAddress(
-        [
-          market.group!.publicKey.toBytes(),
-          matchedTreasuryAccount!.governance!.pubkey.toBytes(),
-          accountNumBN.toArrayLike(Buffer, 'le', 8),
-        ],
-        market.groupConfig!.mangoProgramId
-      )
+      const mangoAccountPk = selectedMangoAccount!.publicKey
       const account = await tryGetMangoAccount(market, mangoAccountPk)
       if (account) {
         const referrerIds = await client?.getReferrerIdsForMangoAccount(account)
@@ -144,12 +149,19 @@ const MangoDepositComponent = ({
         }
       }
     }
-    if (matchedTreasuryAccount) {
+    if (selectedMangoAccount) {
       getRefLinks()
+    } else {
+      setExistingLinks([])
     }
-
+    if (selectedMangoAccount === null) {
+      setProposalType(DEPOSIT)
+    }
+    setDelegateDeposit(false)
+    setDelegateAddress('')
+    setLinkName('')
     setAmount(undefined)
-  }, [matchedTreasuryAccount])
+  }, [selectedMangoAccount])
   const handleSolPayment = async () => {
     const instructions: TransactionInstruction[] = []
     const toAddress = await getNativeTreasuryAddress(
@@ -184,21 +196,8 @@ const MangoDepositComponent = ({
     try {
       setIsDepositing(true)
       const prerequisiteInstructions: TransactionInstruction[] = []
-      const group = market.group!
-      const groupConfig = market.groupConfig!
-      const [mangoAccountPk] = await PublicKey.findProgramAddress(
-        [
-          group.publicKey.toBytes(),
-          matchedTreasuryAccount!.governance!.pubkey.toBytes(),
-          accountNumBN.toArrayLike(Buffer, 'le', 8),
-        ],
-        groupConfig.mangoProgramId
-      )
-      const acc = await connection.current.getAccountInfo(
-        mangoAccountPk,
-        'processed'
-      )
-      if (!acc) {
+      const mangoAccountPk = selectedMangoAccount?.publicKey || null
+      if (!mangoAccountPk) {
         const solAccountInstruction = await handleSolPayment()
         prerequisiteInstructions.push(...solAccountInstruction)
       }
@@ -228,6 +227,8 @@ const MangoDepositComponent = ({
           mintAmount,
           delegateDeposit,
           delegateAddress,
+          mangoAccountPk,
+          mangoAccounts,
         },
         realm!,
         matchedTreasuryAccount!,
@@ -288,18 +289,10 @@ const MangoDepositComponent = ({
         linkName,
         programId
       )
-      const [mangoAccountPk] = await PublicKey.findProgramAddress(
-        [
-          mangoGroup!.publicKey.toBytes(),
-          matchedTreasuryAccount!.governance!.pubkey.toBytes(),
-          accountNumBN.toArrayLike(Buffer, 'le', 8),
-        ],
-        market.groupConfig!.mangoProgramId
-      )
       const instruction = makeRegisterReferrerIdInstruction(
         programId,
         mangoGroup!.publicKey,
-        mangoAccountPk,
+        selectedMangoAccount!.publicKey,
         referrerPda,
         wallet!.publicKey!,
         encodedReferrerId
@@ -325,8 +318,45 @@ const MangoDepositComponent = ({
     connection.cluster === 'devnet'
       ? `http://devnet.mango.markets/?ref=`
       : `https://trade.mango.markets/?ref`
+  const group = market!.group!
+  const depositIndex = group.tokens.findIndex(
+    (x) => x.mint.toBase58() === handledMint
+  )
+  const tabs = [
+    { val: DEPOSIT, isVisible: true },
+    { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
+    { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
+  ]
+    .filter((x) => x.isVisible)
+    .map((x) => x.val)
   return (
-    <div className="">
+    <div>
+      <Select
+        className="mb-3"
+        label="Mango account"
+        value={
+          <MangoAccountItem
+            value={selectedMangoAccount}
+            market={market}
+            depositIndex={depositIndex}
+          ></MangoAccountItem>
+        }
+        placeholder="Please select..."
+        onChange={(val) => setSelectedMangoAccount(val)}
+      >
+        {mangoAccounts.map((value) => (
+          <Select.Option key={value.publicKey.toBase58()} value={value}>
+            <MangoAccountItem
+              value={value}
+              market={market}
+              depositIndex={depositIndex}
+            ></MangoAccountItem>
+          </Select.Option>
+        ))}
+        <Select.Option key={null} value={null}>
+          <div>Create new account</div>
+        </Select.Option>
+      </Select>
       {(matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
         matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
           MANGO_MINT_DEVNET) &&
@@ -336,11 +366,40 @@ const MangoDepositComponent = ({
               activeValue={proposalType}
               className="h-10"
               onChange={(v) => setProposalType(v)}
-              values={['Deposit', 'Create Referral Link']}
+              values={tabs}
             />
           </div>
         )}
-      {proposalType === 'Create Referral Link' ? (
+      {proposalType === DELEGATE_ACCOUNT && (
+        <div>
+          <Input
+            label={'Delegate address'}
+            value={delegateAddress}
+            type="text"
+            onChange={(e) => setDelegateAddress(e.target.value)}
+          />
+          <Button
+            className="w-full mt-6"
+            onClick={handleDeposit}
+            disabled={
+              !delegateAddress || !canUseTransferInstruction || isDepositing
+            }
+          >
+            <Tooltip
+              content={
+                !canUseTransferInstruction
+                  ? 'Please connect wallet with enough voting power to create treasury proposals'
+                  : !delegateAddress
+                  ? 'Please input address'
+                  : ''
+              }
+            >
+              {!isDepositing ? 'Propose delegate' : <Loading></Loading>}
+            </Tooltip>
+          </Button>
+        </div>
+      )}
+      {proposalType === CREATE_REF_LINK && (
         <div
           className={` ${
             !filteredTokenGov.length && 'opacity-60 pointer-events-none'
@@ -438,7 +497,9 @@ const MangoDepositComponent = ({
             </div>
           ) : null}
         </div>
-      ) : (
+      )}
+
+      {proposalType === DEPOSIT && (
         <div
           className={`${
             !filteredTokenGov.length && 'opacity-60 pointer-events-none'
@@ -479,24 +540,28 @@ const MangoDepositComponent = ({
             suffix="MNGO"
             onBlur={validateAmountOnBlur}
           />
-          <div className="flex items-center justify-between py-3 text-sm">
-            Delegate deposit
-            <Switch
-              checked={delegateDeposit}
-              onChange={(checked) => setDelegateDeposit(checked)}
-            />
-          </div>
-          {delegateDeposit && (
-            <Input
-              label={'Delegate address'}
-              value={delegateAddress}
-              type="text"
-              onChange={(e) => setDelegateAddress(e.target.value)}
-            />
+          {selectedMangoAccount === null && (
+            <>
+              <div className="flex items-center justify-between py-3 text-sm">
+                Delegate deposit
+                <Switch
+                  checked={delegateDeposit}
+                  onChange={(checked) => setDelegateDeposit(checked)}
+                />
+              </div>
+              {delegateDeposit && (
+                <Input
+                  label={'Delegate address'}
+                  value={delegateAddress}
+                  type="text"
+                  onChange={(e) => setDelegateAddress(e.target.value)}
+                />
+              )}
+            </>
           )}
           <div className="border border-fgd-4 p-4 rounded-md mb-6 mt-4 space-y-1 text-sm">
             <div className="flex justify-between">
-              <span className="text-fgd-3">Current Deposit</span>
+              <span className="text-fgd-3">Current Deposits</span>
               <span className="font-bold text-fgd-1">
                 {currentPositionFtm || 0}{' '}
                 <span className="font-normal text-fgd-3">
@@ -540,3 +605,37 @@ const MangoDepositComponent = ({
 }
 
 export default MangoDepositComponent
+
+const MangoAccountItem = ({
+  value,
+  market,
+  depositIndex,
+}: {
+  value: MangoAccount | null
+  market: MarketStore
+  depositIndex: number
+}) => {
+  const group = market!.group!
+  return value ? (
+    <div className="flex flex-col">
+      <div className="text-xs">{abbreviateAddress(value.publicKey)}</div>
+      <div className="text-xs">
+        Deposit:{' '}
+        {new BigNumber(
+          value
+            .getUiDeposit(
+              market.cache!.rootBankCache[depositIndex],
+              group,
+              depositIndex
+            )
+            .toNumber()
+        ).toFormat()}
+      </div>
+      {value.delegate.toBase58() && (
+        <div>Delegate: {abbreviateAddress(value.delegate)}</div>
+      )}
+    </div>
+  ) : (
+    <div>Create new account</div>
+  )
+}
