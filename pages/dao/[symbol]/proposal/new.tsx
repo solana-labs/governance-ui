@@ -1524,12 +1524,6 @@ const New = () => {
 										)
 									})}
 								</NewProposalContext.Provider>
-								<div className="flex justify-end mt-4 mb-8 px-6">
-									<LinkButton className="flex font-bold items-center text-fgd-1 text-sm" onClick={addInstruction}>
-										<PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-										Add instruction
-									</LinkButton>
-								</div>
 								<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 									{/* <SecondaryButton
 										disabled={isLoading}
