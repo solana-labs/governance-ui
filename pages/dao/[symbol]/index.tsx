@@ -131,13 +131,13 @@ const REALM = () => {
 									<ApproveAllBtn />
 								</div>
 								<div className="mr-4">
-									<NewProposalBtn>
-									Propose Property
+									<NewProposalBtn string={`property=true`}>
+										Propose Property
 									</NewProposalBtn>
 								</div>
 								<div className="mr-4">
 									<NewProposalBtn>
-									Request rNFT
+										Request rNFT
 									</NewProposalBtn>
 								</div>
 								<div className="mr-4">
