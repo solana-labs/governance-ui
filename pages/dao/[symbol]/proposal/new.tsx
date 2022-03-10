@@ -67,7 +67,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = () => {
-	const _prepopulateForDemos = true;
+	const _prepopulateForDemos = false;
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -465,8 +465,6 @@ const New = () => {
 		setSubmittingStep([...submittingStep, `Uploading ${propertyData.name} data...`]);
 		const result = await uploadToArweave(data)
 		const metadataResultFile = result.messages?.find((m) => m.filename === 'manifest.json')
-		console.log('RESULT IS ' + result)
-		console.log(result)
 
 		setSubmittingStep([...submittingStep, `Data uploaded.`]);
 		if (metadataResultFile?.transactionId) {
@@ -483,14 +481,6 @@ const New = () => {
 		// setFormErrors({})
 		setPropertyData({ ...propertyData, [propertyName]: value })
 	}
-
-	useEffect(() => {
-		console.log("\n\n\n\n!!!!\n\nform", form);
-	}, [form])
-
-	useEffect(() => {
-		console.log("\n\n\n\n!!!!\n\ndescriptionLink", descriptionLink);
-	}, [descriptionLink])
 
 	useEffect(() => {
 		setMetaplexDataObj({
@@ -797,25 +787,17 @@ const New = () => {
 		const uploadMetaData = await upload();
 		setSubmittingStep([...submittingStep, "Proposal being created on Solana..."])
 		const proposalDataForSubmit = await setProposalForSubmit(uploadMetaData);
-		console.log("proposalDataForSubmit", proposalDataForSubmit, "formmmmm", form);
 	}
 
 	const submitProposal = async () => {
 		const submit = await prepareProposalSubmit();
-		console.log(form)
 	}
 
 	useEffect(() => {
-		console.log("\n\n\n\n\n!!!!!!\nform", form);
 		if (form.title && form.description) {
 			handleCreate(false);
 		}
 	}, [form])
-
-
-	useEffect(() => {
-		console.log("submittingStep", submittingStep);
-	}, [submittingStep])
 
 
 	return (
