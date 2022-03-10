@@ -175,10 +175,7 @@ const REALM = () => {
 		<>
 			<div>
 				<RealmHeader
-					getRealmDisplayName={(name) => {
-						console.log(name)
-						setRealmName(name)
-					}}
+					getRealmDisplayName={(name) => setRealmName(name)}
 				/>
 				<div className="grid grid-cols-12 gap-4">
 					<div className="border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last pt-10 pb-8 px-8">
@@ -219,7 +216,7 @@ const REALM = () => {
 										<div>
 											<h2 className="text-2xl uppercase">{`Purchase Real Estate Proposal${proposalType1.length > 0 ? 's' : ''}`}</h2>
 											{proposalType1.map(([k, v]) => {
-												return <ProposalCard cta={ <NewProposalBtn hideIcon children="Request rNFT" /> } key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												return <ProposalCard cta={ <NewProposalBtn string={ `uri=${v.account?.meta?.uri?.split('.net/')[1]}` } hideIcon children="Request rNFT" /> } key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 											})}
 										</div>
 									)}

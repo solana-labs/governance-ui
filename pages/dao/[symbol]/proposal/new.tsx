@@ -68,7 +68,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = () => {
-	const _prepopulateForDemos = true
+	const _prepopulateForDemos = false
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
