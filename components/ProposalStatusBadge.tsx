@@ -39,7 +39,7 @@ function getProposalStateStyle(state: ProposalState) {
   }
 }
 
-const ProposalStateBadge = ({ proposalPk, proposal, open }: { proposalPk: PublicKey; proposal: Proposal; open: boolean }) => {
+const ProposalStateBadge = ({ proposalPk, proposal, open, cta }: { proposalPk: PublicKey; proposal: Proposal; open: boolean; cta: any }) => {
 	const governance = useRealmGovernance(proposal.governance)
 
 	const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[proposalPk.toBase58()]
@@ -58,8 +58,10 @@ const ProposalStateBadge = ({ proposalPk, proposal, open }: { proposalPk: Public
 						<div className={`${getProposalStateStyle(proposal.state)} inline-block px-2 py-1 text-xs`}>{statusLabel}</div>
 					</div>
 				</>
-			) : (
-				<div className={`${getProposalStateStyle(proposal.state)} inline-block px-2 py-1 text-xs`}>{statusLabel}</div>
+			) : ( <div className="flex flex-col space-y-4">
+					{ (statusLabel !=='Succeeded: Yes' && cta) && <div className={`${getProposalStateStyle(proposal.state)} inline-block px-2 py-1 text-xs`}>{statusLabel}</div> }
+					{ ((statusLabel ==='Succeeded: Yes') && cta) && cta }
+				</div>
 			)}
 		</>
 	)

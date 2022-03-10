@@ -197,7 +197,7 @@ const REALM = () => {
 							</>
 						) : null}
 					</div> */}
-						<div className="flex items-center justify-between pb-3">
+						<div className="flex items-center justify-between pb-3 hidden">
 							<h4 className="text-fgd-2">{`${tokrProposals.length} proposals`}</h4>
 							<div className="flex items-center">
 								<div className="mr-4">
@@ -219,7 +219,7 @@ const REALM = () => {
 										<div>
 											<h2 className="text-2xl uppercase">{`Purchase Real Estate Proposal${proposalType1.length > 0 ? 's' : ''}`}</h2>
 											{proposalType1.map(([k, v]) => {
-												return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												return <ProposalCard cta={ <NewProposalBtn hideIcon children="Request rNFT" /> } key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 											})}
 										</div>
 									)}
