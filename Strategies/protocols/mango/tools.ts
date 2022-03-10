@@ -3,6 +3,7 @@ import {
   makeDepositInstruction,
   PublicKey,
   BN,
+  makeSetDelegateInstruction,
 } from '@blockworks-foundation/mango-client'
 import {
   getInstructionDataFromBase64,
@@ -12,7 +13,7 @@ import {
 import { fmtMintAmount } from '@tools/sdk/units'
 import { ConnectionContext } from '@utils/connection'
 import tokenService from '@utils/services/token'
-import { GovernedTokenAccount, tryGetMint } from '@utils/tokens'
+import { GovernedTokenAccount } from '@utils/tokens'
 import {
   createProposal,
   InstructionDataWithHoldUpTime,
@@ -94,7 +95,7 @@ export async function tvl(
         (x) => x.mint?.publicKey.toBase58() === info?.address
       )
       const currentPosition = info
-        ? await getPositionForMint(market, connection, filteredTokenGov)
+        ? await getPositionForMint(market, filteredTokenGov)
         : 0
       const closestVal = findClosestToDate(assetDeposits, date)
       const handledMint = info?.address || ''
@@ -129,40 +130,35 @@ export async function tvl(
 
 const getPositionForMint = async (
   market: MarketStore,
-  connection: ConnectionContext,
   filteredTokenGov: GovernedTokenAccount[]
 ) => {
   let deposited = 0
   for (let i = 0; i < filteredTokenGov.length; i++) {
     const group = market!.group!
-    const groupConfig = market!.groupConfig!
     const depositIndex = group.tokens.findIndex(
       (x) =>
         x.mint.toBase58() === filteredTokenGov[i]!.mint!.publicKey.toBase58()
     )
-    const [mangoAccountPk] = await PublicKey.findProgramAddress(
-      [
-        group.publicKey.toBytes(),
-        filteredTokenGov[i].governance!.pubkey.toBytes(),
-        accountNumBN.toArrayLike(Buffer, 'le', 8),
-      ],
-      groupConfig.mangoProgramId
+    const accounts = await tryGetMangoAccountsForOwner(
+      market,
+      filteredTokenGov[i].governance!.pubkey
     )
-    const account = await tryGetMangoAccount(market, mangoAccountPk)
-    if (account) {
-      const deposit = account?.deposits[depositIndex]
-      const mintInfo = await tryGetMint(
-        connection.current,
-        new PublicKey(filteredTokenGov[i]!.mint!.publicKey.toBase58())
-      )
-      if (mintInfo && !deposit?.isZero()) {
-        const currentDepositAmount = account
-          ?.getUiDeposit(
-            market.cache!.rootBankCache[depositIndex],
-            group,
-            depositIndex
+    if (accounts?.length) {
+      const depositsWithAmountHiherThenZero = accounts
+        .map((x) => x.deposits[depositIndex])
+        .filter((x) => !x.isZero())
+      if (depositsWithAmountHiherThenZero.length) {
+        const currentDepositAmount = accounts
+          .map((x) =>
+            x
+              ?.getUiDeposit(
+                market.cache!.rootBankCache[depositIndex],
+                group,
+                depositIndex
+              )
+              .toNumber()
           )
-          .toNumber()
+          .reduce((prev, next) => (prev += next), 0)
         deposited += currentDepositAmount ? currentDepositAmount : 0
       }
     }
@@ -173,7 +169,7 @@ const getPositionForMint = async (
 const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   rpcContext,
   handledMint,
-  mintAmount,
+  form,
   realm,
   matchedTreasury,
   tokenOwnerRecord,
@@ -224,18 +220,16 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     quoteNodeBank!.publicKey,
     quoteNodeBank!.vault,
     matchedTreasury.transferAddress!,
-    new BN(mintAmount)
+    new BN(form.mintAmount)
   )
-  const instructionData1 = {
-    data: getInstructionDataFromBase64(
-      serializeInstructionToBase64(createMangoAccountIns)
-    ),
-    holdUpTime: matchedTreasury.governance!.account!.config
-      .minInstructionHoldUpTime,
-    prerequisiteInstructions: [...prerequisiteInstructions],
-    splitToChunkByDefault: true,
-  }
-  const instructionData2 = {
+  const delegateMangoAccount = makeSetDelegateInstruction(
+    groupConfig.mangoProgramId,
+    groupConfig.publicKey,
+    mangoAccountPk,
+    matchedTreasury.governance!.pubkey,
+    new PublicKey(form.delegateAddress)
+  )
+  const depositMangoAccountInsObj = {
     data: getInstructionDataFromBase64(
       serializeInstructionToBase64(depositMangoAccountIns)
     ),
@@ -246,7 +240,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   }
   const fmtAmount = fmtMintAmount(
     matchedTreasury.mint?.account,
-    new BN(mintAmount)
+    new BN(form.mintAmount)
   )
   const acc = await rpcContext.connection.getAccountInfo(
     mangoAccountPk,
@@ -254,9 +248,30 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   )
   const insts: InstructionDataWithHoldUpTime[] = []
   if (!acc) {
-    insts.push(instructionData1)
+    const instructionData = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(createMangoAccountIns)
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [...prerequisiteInstructions],
+      splitToChunkByDefault: true,
+    }
+    insts.push(instructionData)
   }
-  insts.push(instructionData2)
+  if (form.delegateAddress) {
+    const instructionData = {
+      data: getInstructionDataFromBase64(
+        serializeInstructionToBase64(delegateMangoAccount)
+      ),
+      holdUpTime: matchedTreasury.governance!.account!.config
+        .minInstructionHoldUpTime,
+      prerequisiteInstructions: [],
+      splitToChunkByDefault: true,
+    }
+    insts.push(instructionData)
+  }
+  insts.push(depositMangoAccountInsObj)
   const proposalAddress = await createProposal(
     rpcContext,
     realm,
@@ -286,6 +301,21 @@ export const tryGetMangoAccount = async (
       market.group!.dexProgramId
     )
     return account
+  } catch (e) {
+    return null
+  }
+}
+
+export const tryGetMangoAccountsForOwner = async (
+  market: MarketStore,
+  ownerPk: PublicKey
+) => {
+  try {
+    const accounts = await market.client?.getMangoAccountsForOwner(
+      market.group!,
+      ownerPk
+    )
+    return accounts
   } catch (e) {
     return null
   }

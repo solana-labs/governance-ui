@@ -25,6 +25,7 @@ import ConvertToMsol from './ConvertToMsol'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import DepositModal from 'Strategies/components/DepositModal'
 import { TreasuryStrategy } from 'Strategies/types/types'
+import BigNumber from 'bignumber.js'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -49,8 +50,12 @@ const AccountOverview = () => {
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
   const accountPublicKey = currentAccount?.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
-  const [accountInvestments, setAccountInvestments] = useState<any[]>([])
-  const [eligibleInvestments, setEligibleInvestments] = useState<any[]>([])
+  const [accountInvestments, setAccountInvestments] = useState<
+    TreasuryStrategy[]
+  >([])
+  const [eligibleInvestments, setEligibleInvestments] = useState<
+    TreasuryStrategy[]
+  >([])
   const [showStrategies, setShowStrategies] = useState(false)
   const [
     proposedInvestment,
@@ -340,7 +345,7 @@ const AccountOverview = () => {
 
 interface StrategyCardProps {
   onClick?: () => void
-  strat: any
+  strat: TreasuryStrategy
 }
 
 const StrategyCard = ({ onClick, strat }: StrategyCardProps) => {
@@ -352,6 +357,9 @@ const StrategyCard = ({ onClick, strat }: StrategyCardProps) => {
     handledTokenSymbol,
     apy,
   } = strat
+  const currentPositionFtm = new BigNumber(
+    currentPosition.toNumber()
+  ).toFormat()
   return (
     <div className="border border-fgd-4 flex items-center justify-between mt-2 p-4 rounded-md">
       <div className="flex items-center">
@@ -363,7 +371,7 @@ const StrategyCard = ({ onClick, strat }: StrategyCardProps) => {
         ) : null}
         <div>
           <p className="text-xs">{`${strategyName} ${handledTokenSymbol} on ${protocolName}`}</p>
-          <p className="font-bold text-fgd-1">{`${currentPosition.toNumber()} ${handledTokenSymbol}`}</p>
+          <p className="font-bold text-fgd-1">{`${currentPositionFtm} ${handledTokenSymbol}`}</p>
         </div>
       </div>
       <div className="flex items-center space-x-4">

@@ -29,7 +29,7 @@ export interface TreasuryStrategy {
 export type HandleCreateProposalWithStrategy = (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   handledMint: string,
-  mintAmount: number,
+  form: MNGODepositForm,
   realm: ProgramAccount<Realm>,
   treasuaryAccount: GovernedTokenAccount,
   tokenOwnerRecord: PublicKey,
@@ -44,4 +44,10 @@ export type HandleCreateProposalWithStrategy = (
 export interface NameVal {
   name: string
   val: string | null
+}
+
+export type MNGODepositForm = {
+  mintAmount: number
+  delegateDeposit: boolean
+  delegateAddress: string
 }

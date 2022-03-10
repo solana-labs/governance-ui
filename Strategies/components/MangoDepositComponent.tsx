@@ -52,6 +52,8 @@ import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import ButtonGroup from '@components/ButtonGroup'
+import Switch from '@components/Switch'
+
 const minMngoToCreateLink = 10000
 const MangoDepositComponent = ({
   handledMint,
@@ -96,6 +98,8 @@ const MangoDepositComponent = ({
   const mintInfo = matchedTreasuryAccount?.mint?.account
   const [existingLinks, setExistingLinks] = useState<ReferrerIdRecord[]>([])
   const [amount, setAmount] = useState<number | undefined>()
+  const [delegateDeposit, setDelegateDeposit] = useState(false)
+  const [delegateAddress, setDelegateAddress] = useState('')
   const [linkName, setLinkName] = useState('')
   const [linkGenerated, setLinkGenerated] = useState(false)
   const [proposalType, setProposalType] = useState('Deposit')
@@ -220,7 +224,11 @@ const MangoDepositComponent = ({
       const proposalAddress = await createProposalFcn(
         rpcContext,
         handledMint,
-        mintAmount,
+        {
+          mintAmount,
+          delegateDeposit,
+          delegateAddress,
+        },
         realm!,
         matchedTreasuryAccount!,
         ownTokenRecord.pubkey,
@@ -471,6 +479,21 @@ const MangoDepositComponent = ({
             suffix="MNGO"
             onBlur={validateAmountOnBlur}
           />
+          <div className="flex items-center justify-between py-3 text-sm">
+            Delegate deposit
+            <Switch
+              checked={delegateDeposit}
+              onChange={(checked) => setDelegateDeposit(checked)}
+            />
+          </div>
+          {delegateDeposit && (
+            <Input
+              label={'Delegate address'}
+              value={delegateAddress}
+              type="text"
+              onChange={(e) => setDelegateAddress(e.target.value)}
+            />
+          )}
           <div className="border border-fgd-4 p-4 rounded-md mb-6 mt-4 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-fgd-3">Current Deposit</span>

@@ -1,5 +1,4 @@
 import Modal from '@components/Modal'
-import Deposit from './DepositComponent'
 import ModalHeader from './ModalHeader'
 import MangoDeposit from './MangoDepositComponent'
 import BigNumber from 'bignumber.js'
@@ -38,13 +37,7 @@ const DepositModal = ({
           currentPosition={currentPosition}
           createProposalFcn={createProposalFcn}
         ></MangoDeposit>
-      ) : (
-        <Deposit
-          handledMint={handledMint}
-          currentPosition={currentPosition}
-          createProposalFcn={createProposalFcn}
-        ></Deposit>
-      )}
+      ) : null}
     </Modal>
   )
 }
