@@ -1,29 +1,30 @@
-import React, { useContext, useEffect, useState } from 'react'
+import React, { useContext, /* useEffect, */ useState } from 'react'
 import * as yup from 'yup'
 import {
-  getInstructionDataFromBase64,
+  // getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
 } from '@solana/spl-governance'
-import Input from '@components/inputs/Input'
+// import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
-import { validateInstruction } from '@utils/instructionTools'
+// import { validateInstruction } from '@utils/instructionTools'
 import {
-  Base64InstructionForm,
+  // Base64InstructionForm,
   IDLForm,
-  UiInstruction,
+  // UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
-import GovernedAccountSelect from '../GovernedAccountSelect'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+// import GovernedAccountSelect from '../GovernedAccountSelect'
+// import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import * as anchor from '@project-serum/anchor'
-import { Keypair, Connection, ConfirmOptions } from '@solana/web3.js'
-import { useAnchorWallet } from '@solana/wallet-adapter-react'
-import { NodeWallet } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor/dist/cjs/provider'
+import { IdlInstruction } from '@project-serum/anchor/src/idl'
+import { /* Keypair, */ Connection, ConfirmOptions } from '@solana/web3.js'
+// import { useAnchorWallet } from '@solana/wallet-adapter-react'
+// import { NodeWallet } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor/dist/cjs/provider'
 
 const IDLInstructions = ({
   index,
@@ -39,8 +40,10 @@ const IDLInstructions = ({
     programID: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const [programInstructions, setProgramInstructions] = useState([])
-  // const { handleSetInstructions } = useContext(NewProposalContext)
+  const [programInstructions, setProgramInstructions] = useState<
+    IdlInstruction[]
+  >([])
+  const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -109,20 +112,14 @@ const IDLInstructions = ({
     const provider = new anchor.Provider(connection, anchorWallet, {
       preflightCommitment: 'recent',
     })
-
     const fetchedIDL = await anchor.Program.fetchIdl(idl, provider)
-
-    console.log('fetchedIDL', fetchedIDL)
-    // setProgramInstructions([fetchedIDL!.instructions as Array])
-    // setProgramInstructions(prevState => [...prevState, fetchedIDL.instructions])
-    console.log('programInstructions', programInstructions)
-    // return (<h1>fetchedIDL {console.log("reached")}</h1>);
+    setProgramInstructions(fetchedIDL!.instructions)
   }
 
   return (
     <>
       <Textarea
-        label="Program ID cndy3Z4yapfJBmL3ShUp5exZKqR3z33thTzeNMm2gRZ" // TODO remove candy machine id
+        label="Program ID"
         placeholder="Program ID"
         wrapperClassName="mb-5"
         value={form.programID}
@@ -134,14 +131,18 @@ const IDLInstructions = ({
         }}
         error={formErrors['programID']}
       />
-      {/* {form.programID && (
-      programInstructions.map((x) => {
-        return(
-          <Select.Option key={x.instructions} value={1}>
-                {x.instructions}
-          </Select.Option>
-        )
-      }))}  */}
+      {form.programID && (
+        <Select value={'Program Instructions'} onChange={() => {}}>
+          {form.programID &&
+            programInstructions.map((x) => {
+              return (
+                <Select.Option key={x.name} value={x.name}>
+                  {x.name}
+                </Select.Option>
+              )
+            })}
+        </Select>
+      )}
       {/* TODO make sure programID is valid */}
     </>
   )
