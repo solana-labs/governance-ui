@@ -43,7 +43,7 @@ const NFTSCompactWrapper = () => {
             router.push(url)
           }}
         >
-          Collectables
+          Properties
           <ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light"></ArrowsExpandIcon>
         </div>
 

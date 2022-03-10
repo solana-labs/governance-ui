@@ -214,7 +214,7 @@ const REALM = () => {
 						{ canCreate && <NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green">{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}</NewProposalBtn> }
 
 						{tokrProposals.length > 0 ? (
-							<>type={`tokrize`}
+							<>
 								<div className={`space-y-16${ canCreate ? ' mt-16': ''}`}>
 									{proposalType1.length > 0 && (
 										<div>
@@ -243,7 +243,7 @@ const REALM = () => {
 						<NFTSCompactWrapper></NFTSCompactWrapper>
 						<AccountsCompactWrapper />
 						{!realm?.account.config.useCommunityVoterWeightAddin && <MembersCompactWrapper></MembersCompactWrapper>}
-						<AssetsCompactWrapper></AssetsCompactWrapper>
+						{/* <AssetsCompactWrapper></AssetsCompactWrapper> */}
 					</div>
 				</div>
 			</div>

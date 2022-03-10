@@ -52,7 +52,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6">
-      <h3 className="mb-4">Governance Tokens </h3>
+      {/* <h3 className="mb-4">Governance Tokens </h3>
       {hasLoaded ? (
         <div className="space-y-4">
           {communityDepositVisible && (
@@ -75,7 +75,7 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
           <div className="animate-pulse bg-bkg-3 h-12 mb-4" />
           <div className="animate-pulse bg-bkg-3 h-10" />
         </>
-      )}
+      )} */}
     </div>
   )
 }

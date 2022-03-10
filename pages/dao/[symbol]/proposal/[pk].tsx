@@ -79,7 +79,7 @@ const Proposal = () => {
 		}
 	}, [descriptionLink])
 
-	const [initalLoad, setInitalLoad] = useState<boolean>(true)
+	const [initalLoad, setInitalLoad] = useState<boolean>(false)
 
 	// useEffect(() => {
 	// 	if (1 === 1) setInitalLoad(false)
@@ -113,7 +113,7 @@ const Proposal = () => {
 								</div>
 							</div>
 
-							{description && (
+							{(description && propertyDetails?.name) && (
 								<div className="pb-2">
 									{console.log(propertyDetails)}
 									{ proposalType === 1 ? <>
