@@ -28,6 +28,7 @@
     "@cardinal/namespaces-components": "^2.5.0",
     "@emotion/react": "^11.1.5",
     "@emotion/styled": "^11.3.0",
+    "@friktion-labs/friktion-sdk": "^1.1.13",
     "@headlessui/react": "^1.4.2",
     "@heroicons/react": "^1.0.1",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
