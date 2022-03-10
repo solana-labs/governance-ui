@@ -23,8 +23,10 @@ const MembersCompactWrapper = () => {
   const connected = useWalletStore((s) => s.connected)
   const activeMembersCount = activeMembers.length
   const { resetCompactViewState } = useMembersListStore()
-  const { canUseMintInstruction, canMintRealmCouncilToken } =
-    useGovernanceAssets()
+  const {
+    canUseMintInstruction,
+    canMintRealmCouncilToken,
+  } = useGovernanceAssets()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
     return prev + current.votesCasted

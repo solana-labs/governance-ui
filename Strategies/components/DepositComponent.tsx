@@ -37,8 +37,14 @@ const DepositComponent = ({
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realmInfo, realm, ownVoterWeight, mint, councilMint, symbol } =
-    useRealm()
+  const {
+    realmInfo,
+    realm,
+    ownVoterWeight,
+    mint,
+    councilMint,
+    symbol,
+  } = useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const market = useMarketStore((s) => s)

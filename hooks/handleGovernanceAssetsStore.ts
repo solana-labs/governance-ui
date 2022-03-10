@@ -33,8 +33,11 @@ export default function handleGovernanceAssetsStore() {
     GovernanceAccountType.TokenGovernanceV1,
     GovernanceAccountType.TokenGovernanceV2,
   ])
-  const { setGovernancesArray, setGovernedTokenAccounts, setGovernedAccounts } =
-    useGovernanceAssetsStore()
+  const {
+    setGovernancesArray,
+    setGovernedTokenAccounts,
+    setGovernedAccounts,
+  } = useGovernanceAssetsStore()
   useEffect(() => {
     if (realm) {
       setGovernancesArray(governances)
@@ -72,8 +75,9 @@ export default function handleGovernanceAssetsStore() {
           )
           transferAddress = solAddress
           const resp = await connection.getParsedAccountInfo(solAddress)
-          const mintRentAmount =
-            await connection.getMinimumBalanceForRentExemption(0)
+          const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
+            0
+          )
 
           if (resp.value) {
             solAccount = resp.value as AccountInfoGen<

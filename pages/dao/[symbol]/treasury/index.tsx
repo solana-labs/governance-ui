@@ -22,8 +22,10 @@ const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()
-  const { governedTokenAccounts, governedTokenAccountsWithoutNfts } =
-    useGovernanceAssets()
+  const {
+    governedTokenAccounts,
+    governedTokenAccountsWithoutNfts,
+  } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -41,8 +43,10 @@ const Treasury = () => {
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
-  const [activeAccount, setActiveAccount] =
-    useState<GovernedTokenAccount | null>(null)
+  const [
+    activeAccount,
+    setActiveAccount,
+  ] = useState<GovernedTokenAccount | null>(null)
   const [accountInfo, setAccountInfo] = useState<any>(null)
   const market = useMarketStore((s) => s)
   const { realmInfo } = useRealm()

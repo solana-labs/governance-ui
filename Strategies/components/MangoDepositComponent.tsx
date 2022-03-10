@@ -66,8 +66,14 @@ const MangoDepositComponent = ({
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realmInfo, realm, ownVoterWeight, mint, councilMint, symbol } =
-    useRealm()
+  const {
+    realmInfo,
+    realm,
+    ownVoterWeight,
+    mint,
+    councilMint,
+    symbol,
+  } = useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
@@ -158,10 +164,9 @@ const MangoDepositComponent = ({
       )
     }
 
-    const minRentAmount =
-      await connection.current.getMinimumBalanceForRentExemption(
-        MangoAccountLayout.span
-      )
+    const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
+      MangoAccountLayout.span
+    )
 
     const transferIx = SystemProgram.transfer({
       fromPubkey: wallet!.publicKey!,

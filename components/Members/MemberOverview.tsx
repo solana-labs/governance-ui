@@ -54,17 +54,15 @@ const MemberOverview = () => {
   const totalVotes = votesCasted
   const communityAmount =
     communityVotes && !communityVotes.isZero()
-      ? useMemo(
-          () => fmtMintAmount(mint, communityVotes),
-          [member!.walletAddress]
-        )
+      ? useMemo(() => fmtMintAmount(mint, communityVotes), [
+          member!.walletAddress,
+        ])
       : null
   const councilAmount =
     councilVotes && !councilVotes.isZero()
-      ? useMemo(
-          () => fmtMintAmount(councilMint, councilVotes),
-          [member!.walletAddress]
-        )
+      ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
+          member!.walletAddress,
+        ])
       : null
 
   const handleGoBackToMainView = async () => {

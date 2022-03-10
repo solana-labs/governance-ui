@@ -226,8 +226,8 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     data: getInstructionDataFromBase64(
       serializeInstructionToBase64(createMangoAccountIns)
     ),
-    holdUpTime:
-      matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
+    holdUpTime: matchedTreasury.governance!.account!.config
+      .minInstructionHoldUpTime,
     prerequisiteInstructions: [...prerequisiteInstructions],
     splitToChunkByDefault: true,
   }
@@ -235,8 +235,8 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     data: getInstructionDataFromBase64(
       serializeInstructionToBase64(depositMangoAccountIns)
     ),
-    holdUpTime:
-      matchedTreasury.governance!.account!.config.minInstructionHoldUpTime,
+    holdUpTime: matchedTreasury.governance!.account!.config
+      .minInstructionHoldUpTime,
     prerequisiteInstructions: [],
     chunkSplitByDefault: true,
   }
