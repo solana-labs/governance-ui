@@ -80,6 +80,7 @@ const New = () => {
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
 	const [propertyName, setPropertyName] = useState('')
+	const [proposalType, setProposalType] = useState<Number>(2);
 	const [liteMode, setLiteMode] = useState<boolean>(false)
 	const [form, setForm] = useState({
 		title: propertyName,
@@ -392,7 +393,10 @@ const New = () => {
 	}, [])
 
 	useLayoutEffect(() => {
-		if (router.query?.property) setLiteMode(true)
+		if (router.query?.property)  {
+			setProposalType(1);
+			setLiteMode(true);
+		}
 	}, [router])
 
 	const getCurrentInstruction = ({ typeId, idx }) => {
@@ -801,14 +805,14 @@ const New = () => {
 	const setProposalForSubmit = async (link) => {
 		const descriptionObj = {
 			// TODO: maybe a type to render details?
-			description: `Proposal to Request Tokr DAO to mint rNFT`,
-			type: 2,
+			description: `Proposal to ${ proposalType === 1 ? 'Purchase Real Estate and Begin Syndication' : 'Request Tokr DAO to mint rNFT'}`,
+			type: proposalType,
 			// description: `Proposal to Purchase ${propertyData.property_address ? `${propertyData.property_address}` : 'Real Estate'}`,
 			uri: link,
 		}
 
 		setForm({
-			title: `${propertyName} rNFT Request`,
+			title: `${propertyName} ${ proposalType === 1 ? 'Purchase Request' : 'rNFT Request'}`,
 			description: JSON.stringify(descriptionObj),
 		})
 
@@ -844,7 +848,7 @@ const New = () => {
 								return <li key={`submittingStep_${index}_${step.replaceAll(' ', '_')}`}>{step}</li>
 							})}
 							{proposalUri && (
-								<li>
+								<li className="mt-16 mb-8">
 									<a
 										href={proposalUri}
 										onClick={(e) => {
