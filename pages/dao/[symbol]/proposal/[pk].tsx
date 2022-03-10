@@ -35,7 +35,7 @@ const Proposal = () => {
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
 
-	useLayoutEffect(() => {
+	useEffect(() => {
 		if (descriptionObj && descriptionObj[0].uri) {
 			fetch(descriptionObj[0].uri, {
 				method: 'GET',
@@ -53,16 +53,23 @@ const Proposal = () => {
 		}
 	}, [descriptionObj])
 
-	useLayoutEffect(() => {
+	useEffect(() => {
+		console.log("hi?")
 		const handleResolveDescription = async () => {
-			const description = await resolveProposalDescription(descriptionLink!)
+			const description = await resolveProposalDescription(descriptionLink)
 			setDescription(description)
+			console.log("\n\n\n\n\n !!!\n\ndescription", description);
 		}
 		if (descriptionLink) {
 			handleResolveDescription()
 			if (descriptionLink.charAt(0) === '{') setDescriptionObj([JSON.parse(descriptionLink)])
+			console.log("\n\n\n\n\n !!!\n\ndescription", descriptionLink);
 		}
 	}, [descriptionLink])
+
+	useEffect(() => {
+		console.log("\n\n\n\n\n !!!\n\nproposal", proposal);
+	}, [proposal])
 
 	return (
 		<div className="grid grid-cols-12 gap-4">
@@ -88,10 +95,40 @@ const Proposal = () => {
 							</div>
 						</div>
 
+
+						{description && (
+							<div className="pb-2">
+								{ console.log(propertyDetails) }
+								{ `Proposal to Request Tokr DAO to mint${(propertyDetails && propertyDetails.name) ? ' the "' + propertyDetails.name : '"' } rNFT.` }
+							</div>
+						)}
+
+
 						{ propertyDetails && <>
 							<h2 className="mb-4 mt-8">Property Details</h2>
 							<PropertyDataOutput className="p-8 border border-green bg-back text-green" propertyDetails={ propertyDetails } />
 						</> }
+
+						{ descriptionObj?.map((item, index) => {
+							return (
+								<div key={'descriptionOutput_' + index} className="pb-8">
+									<ul className="list-disc list-inside space-y-2 pt-4">
+										{item.uri && (
+											<li>
+												<span className="inline-flex align-center">
+													<b className="inline mr-1">Property Uri:</b>{' '}
+													<a className="inline" href={item.uri} target="blank">
+														<span className="flex">
+															Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
+														</span>
+													</a>
+												</span>
+											</li>
+										)}
+									</ul>
+								</div>
+							)
+						}) }
 
 						<InstructionPanel />
 						<DiscussionPanel />

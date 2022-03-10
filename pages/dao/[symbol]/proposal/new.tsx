@@ -67,7 +67,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = () => {
-	const _prepopulateForDemos = false;
+	const _prepopulateForDemos = true;
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -79,10 +79,12 @@ const New = () => {
 	const connection = useWalletStore((s) => s.connection)
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
+	const [propertyName, setPropertyName] = useState('')
 	const [form, setForm] = useState({
-		title: '',
+		title: propertyName,
 		description: '',
 	})
+	const [proposalUri, setProposalUri] = useState<string>();
 	const [formErrors, setFormErrors] = useState({})
 	const [governance, setGovernance] = useState<ProgramAccount<Governance> | null>(null)
 	const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
@@ -357,7 +359,10 @@ const New = () => {
 
 				const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
 
-				router.push(url)
+				setSubmittingStep([...submittingStep, `Proposal for ${propertyData.name} has been added to the Tokr Realm`]);
+				setSubmittingStep([...submittingStep, `Congrats! Your ${propertyData.name} Proposal has been successfully created!`]);
+
+				setProposalUri(url);
 			} catch (ex) {
 				setSubmittingStep([...submittingStep, "Uh oh! Something went wrong..."])
 				notify({ type: 'error', message: `${ex}` })
@@ -367,8 +372,6 @@ const New = () => {
 			setFormErrors(validationErrors)
 		}
 		handleTurnOffLoaders()
-		setSubmittingStep([...submittingStep, `Proposal for ${propertyData.name} has been added to the Tokr Realm`]);
-		setSubmittingStep([...submittingStep, `Congrats! Your ${propertyData.name} Proposal has been successfully created!`]);
 
 		setSubmitting(false);
 	}
@@ -429,7 +432,7 @@ const New = () => {
 	}
 
 	const upload = async () => {
-		setSubmittingStep(1);
+		setSubmittingStep([...submittingStep, `Accessing Arweave for file upload...`]);
 
 		const metadataFile = new File([JSON.stringify(metaplexDataObj)], 'metadata.json')
 		const storageCost = await fetchAssetCostToStore([metadataFile.size])
@@ -469,6 +472,8 @@ const New = () => {
 		if (metadataResultFile?.transactionId) {
 			const link = `https://arweave.net/${metadataResultFile.transactionId}`
 			setArWeaveLink(link)
+
+			return link;
 		} else {
 			throw new Error(`No transaction ID for upload: ${tx}`)
 		}
@@ -480,27 +485,14 @@ const New = () => {
 	}
 
 	useEffect(() => {
-		handleSetForm({
-			value: JSON.stringify(descriptionLink),
-			propertyName: 'description',
-		})
+		console.log("\n\n\n\n!!!!\n\nform", form);
+	}, [form])
+
+	useEffect(() => {
+		console.log("\n\n\n\n!!!!\n\ndescriptionLink", descriptionLink);
 	}, [descriptionLink])
 
 	useEffect(() => {
-		if (arWeaveLink) {
-			const newDescriptionLink = { ...descriptionLink, uri: arWeaveLink }
-			setDescriptionLink(newDescriptionLink)
-		}
-	}, [arWeaveLink])
-
-	useLayoutEffect(() => {
-		setDescriptionLink({
-			// TODO: maybe a type to render details?
-			description: `Proposal to Request Tokr DAO to mint rNFT`,
-			// description: `Proposal to Purchase ${propertyData.property_address ? `${propertyData.property_address}` : 'Real Estate'}`,
-			uri: arWeaveLink || ''
-		})
-
 		setMetaplexDataObj({
 			name: propertyData.name,
 			symbol: 'TOKR-g1',
@@ -621,14 +613,14 @@ const New = () => {
 				},
 			],
 		})
-	}, [propertyData, arWeaveLink]);
+	}, [propertyData]);
 
 	useLayoutEffect(() => {
 		if (_prepopulateForDemos) {
 			setMetaplexDataObj({
 				name: 'White House',
 				symbol: 'tokr_',
-				description: 'The White House is the official residence and workplace of the president of the United States. It is located at 1600 Pennsylvania Avenue NW in Washington, D.C., and has been the residence of every U.S. president since John Adams in 1800. The term "White House" is often used as a metonym for the president and his advisers.',
+				description: 'The White House is the official residence and workplace of the president of the United States.',
 				image: 'https://ipfs.io/ipfs/QmPZR8h2CUY8CZW77oLDQ51ctPqZEbZXKVaC5xYQgPPbzX?filename=white-house_photo.png',
 				attributes: [
 					{
@@ -637,7 +629,7 @@ const New = () => {
 					},
 					{
 						trait_type: 'description',
-						value: 'The White House is the official residence and workplace of the president of the United States. It is located at 1600 Pennsylvania Avenue NW in Washington, D.C., and has been the residence of every U.S. president since John Adams in 1800. The term "White House" is often used as a metonym for the president and his advisers.',
+						value: 'The White House is the official residence and workplace of the president of the United States.',
 					},
 					{
 						trait_type: 'property_address',
@@ -701,7 +693,7 @@ const New = () => {
 					},
 					{
 						trait_type: 'property_description',
-						value: 'The White House is the official residence and workplace of the president of the United States. It is located at 1600 Pennsylvania Avenue NW in Washington, D.C., and has been the residence of every U.S. president since John Adams in 1800. The term "White House" is often used as a metonym for the president and his advisers.',
+						value: 'The White House is the official residence and workplace of the president of the United States.',
 					},
 					{
 						trait_type: 'deed',
@@ -748,7 +740,7 @@ const New = () => {
 
 			setPropertyData({
 				name: 'White House',
-				description: 'The White House is the official residence and workplace of the president of the United States. It is located at 1600 Pennsylvania Avenue NW in Washington, D.C., and has been the residence of every U.S. president since John Adams in 1800. The term "White House" is often used as a metonym for the president and his advisers.',
+				description: 'The White House is the official residence and workplace of the president of the United States.',
 				property_address: '1600 Pennsylvania Avenue NW, Washington, DC 20500',
 				lat_long: '38.898819, -77.036690',
 				acres: '18',
@@ -779,31 +771,75 @@ const New = () => {
 				uri: '',
 			})
 		}
-	}, [_prepopulateForDemos])
+	}, [_prepopulateForDemos]);
 
-	const submitProposal = async () => {
+	const setProposalForSubmit = async (link) => {
+		const descriptionObj = {
+			// TODO: maybe a type to render details?
+			description: `Proposal to Request Tokr DAO to mint rNFT`,
+			type: 2,
+			// description: `Proposal to Purchase ${propertyData.property_address ? `${propertyData.property_address}` : 'Real Estate'}`,
+			uri: link
+		};
+
+		setForm({
+			title: `${propertyName} rNFT Request`,
+			description: JSON.stringify(descriptionObj),
+		})
+
+
+		return descriptionObj;
+	};
+
+	const prepareProposalSubmit = async () => {
 		setSubmitting(true);
 		setSubmittingStep([...submittingStep, "Saving data..."])
 		const uploadMetaData = await upload();
 		setSubmittingStep([...submittingStep, "Proposal being created on Solana..."])
-		handleCreate(false);
+		const proposalDataForSubmit = await setProposalForSubmit(uploadMetaData);
+		console.log("proposalDataForSubmit", proposalDataForSubmit, "formmmmm", form);
 	}
 
+	const submitProposal = async () => {
+		const submit = await prepareProposalSubmit();
+		console.log(form)
+	}
+
+	useEffect(() => {
+		console.log("\n\n\n\n\n!!!!!!\nform", form);
+		if (form.title && form.description) {
+			handleCreate(false);
+		}
+	}, [form])
 
 
-	return submitting ? (
+	useEffect(() => {
+		console.log("submittingStep", submittingStep);
+	}, [submittingStep])
+
+
+	return (
 		<>
-			<div className="absolute inset-0 z-10 bg-dark min-h-screen flex items-center justify-center">
-				<ul>
-					<li>Submitting {propertyData.name} Proposal...</li>
-					{(submittingStep && submittingStep.length) && submittingStep.map((step, index) => {
-						return <li key={`submittingStep_${index}`}>{step}</li>
-					})}
-				</ul>
-			</div>
-		</>
-	) : (
-		<>
+			{submitting && (
+				<>
+					<div className="fixed inset-0 z-50 bg-dark min-h-screen flex items-center justify-center">
+						<ul className="w-full text-center">
+							<li>Submitting {propertyData.name} Proposal...</li>
+							{submittingStep.map((step, index) => {
+								return <li key={`submittingStep_${index}_${step.replaceAll(' ',"_")}`}>{step}</li>
+							})}
+							{ proposalUri && <li>
+								<a href={proposalUri} onClick={ e => {
+									router.push(proposalUri)
+									e.preventDefault();
+								}}>
+									View your proposal
+								</a>
+							</li> }
+						</ul>
+					</div>
+				</>
+			)}
 			<div>
 				<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
 					<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
@@ -852,10 +888,7 @@ const New = () => {
 														propertyName: 'name',
 													})
 
-													handleSetForm({
-														value: evt.target.value,
-														propertyName: 'title',
-													})
+													setPropertyName(evt.target.value);
 												}}
 											/>
 										</div>
@@ -1411,19 +1444,6 @@ const New = () => {
 							</div>
 
 							<div className="pt-2">
-								{/* <Textarea
-								className="mb-3"
-								label="Description"
-								placeholder="Description of your proposal or use a github gist link (optional)"
-								value={JSON.stringify(descriptionLink)}
-								// value={form.description}
-								onChange={(evt) =>
-									handleSetForm({
-										value: evt.target.value,
-										propertyName: 'description',
-									})
-								}
-							></Textarea> */}
 								{canChooseWhoVote && (
 									<VoteBySwitch
 										checked={voteByCouncil}
@@ -1487,7 +1507,9 @@ const New = () => {
 									>
 										Save draft
 									</SecondaryButton> */}
-									<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={submitProposal}>
+									<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => {
+										submitProposal();
+									}}>
 										Add proposal
 									</Button>
 								</div>

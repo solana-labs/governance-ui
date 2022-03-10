@@ -87,6 +87,7 @@ const New = (props) => {
 		setForm({ ...form, [propertyName]: value })
 	}
 
+
 	const handleGetInstructions = async () => {
 		const instructions: UiInstruction[] = []
 		for (const inst of instructionsData) {
@@ -243,6 +244,8 @@ const New = (props) => {
 										<div className="flex w-full">
 											<div className="flex flex-grow">
 												<Input
+
+
 													disabled={ propertyDetails ? true : false }
 													placeholder="https://...."
 													value={lookupUri}
