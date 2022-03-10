@@ -20,12 +20,7 @@ const AddWalletModal: React.FC<{
       if (wallet.length) {
         parsedWallets.push(wallet)
         if (!publicKeyValidationTest(wallet)) {
-          errors.push(
-            `Entry ${index + 1} (${wallet.substr(
-              0,
-              8
-            )}...)  is not a valid public key.`
-          )
+          errors.push(`Entry ${index + 1} (${wallet.substr(0, 8)}...)  is not a valid public key.`)
         }
       }
     })
@@ -55,7 +50,7 @@ const AddWalletModal: React.FC<{
             onClose()
           }}
         >
-          <h2>Team members wallets</h2>
+          <h2>Add DOA members' wallets</h2>
           <Textarea
             rows={10}
             placeholder="Public keys separated by coma or line break"

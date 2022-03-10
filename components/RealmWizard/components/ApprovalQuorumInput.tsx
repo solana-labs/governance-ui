@@ -33,7 +33,7 @@ const ApprovalQuorumInput: React.FC<{
       {slider && (
         <AmountSlider
           step={1}
-          value={value ?? 60}
+          value={value ?? 100}
           disabled={false}
           onChange={onChange}
         />

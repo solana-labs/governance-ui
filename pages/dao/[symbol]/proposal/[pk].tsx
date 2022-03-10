@@ -63,6 +63,10 @@ const Proposal = () => {
 
 		if (descriptionObj && descriptionObj[0].type) {
 			setProposalType(descriptionObj[0].type)
+
+			if (descriptionObj[0].type) {
+				setInitalLoad(true);
+			}
 		}
 	}, [descriptionObj])
 
@@ -84,8 +88,6 @@ const Proposal = () => {
 	// useEffect(() => {
 	// 	if (1 === 1) setInitalLoad(false)
 	// }, [])
-
-
 
 
 	return initalLoad ? <Loader /> : (
