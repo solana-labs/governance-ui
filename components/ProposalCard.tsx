@@ -11,6 +11,7 @@ import ProposalTimeStatus from './ProposalTimeStatus'
 import useQueryContext from '../hooks/useQueryContext'
 import { PublicKey } from '@solana/web3.js'
 import VoteResults from './VoteResults'
+import { useEffect, useLayoutEffect } from 'react'
 
 type ProposalCardProps = {
 	proposalPk: PublicKey
@@ -31,6 +32,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
 	const { symbol } = useRealm()
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
+
 
 	return (
 		<div>

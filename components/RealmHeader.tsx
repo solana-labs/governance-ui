@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect, useLayoutEffect } from 'react'
 import useRealm from 'hooks/useRealm'
 import { GlobeAltIcon } from '@heroicons/react/outline'
 import { ArrowLeftIcon } from '@heroicons/react/solid'
@@ -8,7 +8,7 @@ import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 
-const RealmHeader = () => {
+const RealmHeader = (props) => {
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { realmInfo, realmDisplayName } = useRealm()
 	const { REALM } = process.env
@@ -17,6 +17,10 @@ const RealmHeader = () => {
 
 	const explorerHost = getRealmExplorerHost(realmInfo)
 	const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+
+	useEffect(() => {
+		if (props.getRealmDisplayName) props.getRealmDisplayName(realmDisplayName);
+	}, [realmDisplayName])
 
 	return (
 		<>

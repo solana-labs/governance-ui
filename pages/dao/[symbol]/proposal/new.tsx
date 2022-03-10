@@ -49,6 +49,7 @@ import * as anchor from '@project-serum/anchor'
 import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '../../../../scripts/arweave/lib/arweave'
 import FormData from 'form-data'
 import { Transaction } from '@solana/web3.js'
+import Loader from '@components/Loader'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -67,7 +68,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = () => {
-	const _prepopulateForDemos = false
+	const _prepopulateForDemos = true
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -843,9 +844,7 @@ const New = () => {
 	}, [realmDisplayName])
 
 	return initalLoad ? (
-		<>
-			<div className="w-full flex items-center justify-center min-h-screen">Loading...</div>
-		</>
+		<Loader />
 	) : (
 		<>
 			{submitting && (

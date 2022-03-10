@@ -1,6 +1,6 @@
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
 import ProposalCard from 'components/ProposalCard'
 import { Governance, ProgramAccount, Proposal, ProposalState } from '@solana/spl-governance'
@@ -16,6 +16,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import DepositLabel from '@components/TreasuryAccount/DepositLabel'
+import Loader from '@components/Loader'
 
 const compareProposals = (
 	p1: Proposal,
@@ -63,7 +64,8 @@ function getVotingStateRank(
 }
 
 const REALM = () => {
-	const { realm, realmInfo, proposals, realmTokenAccount, ownTokenRecord, governances } = useRealm()
+	const [initalLoad, setInitalLoad] = useState<boolean>(true);
+	const { realm, realmInfo, proposals, realmTokenAccount, ownTokenRecord, governances, realmDisplayName } = useRealm()
 	const { nftsGovernedTokenAccounts } = useGovernanceAssets()
 	const prevStringifyNftsGovernedTokenAccounts = usePrevious(JSON.stringify(nftsGovernedTokenAccounts))
 	const connection = useWalletStore((s) => s.connection.current)
@@ -72,6 +74,7 @@ const REALM = () => {
 	const [displayedProposals, setDisplayedProposals] = useState(Object.entries(proposals))
 	const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
 	const wallet = useWalletStore((s) => s.current)
+	const [realmName, setRealmName] = useState();
 
 	const allProposals = Object.entries(proposals).sort((a, b) => compareProposals(b[1].account, a[1].account, governances))
 
@@ -95,17 +98,47 @@ const REALM = () => {
 			getNfts(nftsGovernedTokenAccounts, connection)
 		}
 	}, [JSON.stringify(nftsGovernedTokenAccounts)])
+
 	// DEBUG print remove
-	console.log('governance page tokenAccount', realmTokenAccount && realmTokenAccount.publicKey.toBase58())
+	// console.log('governance page tokenAccount', realmTokenAccount && realmTokenAccount.publicKey.toBase58())
 
-	console.log('governance page wallet', wallet?.connected && wallet?.publicKey?.toBase58())
+	// console.log('governance page wallet', wallet?.connected && wallet?.publicKey?.toBase58())
 
-	console.log('governance page tokenRecord', wallet?.connected && ownTokenRecord)
+	// console.log('governance page tokenRecord', wallet?.connected && ownTokenRecord)
 
-	return (
+	const [tokrProposals, setTokrProposals] = useState<[any]>([]);
+
+	const tokrProposalsTemp = async () => filteredProposals.filter((proposal) => {
+		const extendedProposalData = proposal[1].account.descriptionLink.charAt(0) === '{' ? JSON.parse(proposal[1].account.descriptionLink) : null;
+		if (extendedProposalData) {
+			const tempObj = Object.assign(proposal[1].account, { meta: extendedProposalData })
+			const tempProposal = extendedProposalData && [proposal[0], tempObj, [extendedProposalData]];
+			return tempProposal;
+		}
+	});
+
+	const start = async () => {
+		const getTokrProposals = await tokrProposalsTemp();
+		setTokrProposals(getTokrProposals);
+		if (realmName || realmDisplayName) setInitalLoad(false);
+	};
+
+	useEffect(() => {
+		if (filteredProposals?.length) {
+			start();
+		} else {
+			if (realmName || realmDisplayName) setInitalLoad(false);
+		}
+	}, [filteredProposals, realmName]);
+
+
+	return ( initalLoad ? <Loader /> :
 		<>
 			<div>
-				<RealmHeader />
+				<RealmHeader getRealmDisplayName={ (name) => {
+					console.log(name);
+					setRealmName(name)
+				 }} />
 				<div className="grid grid-cols-12 gap-4">
 					<div className="border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last pt-10 pb-8 px-8">
 						{/* <div>
@@ -124,28 +157,22 @@ const REALM = () => {
 						) : null}
 					</div> */}
 						<div className="flex items-center justify-between pb-3">
-							<h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
+							<h4 className="text-fgd-2">{`${tokrProposals.length} proposals`}</h4>
 							<div className="flex items-center">
 								<div className="mr-4">
-									<NewProposalBtn string={`property=true`}>
-										Propose Property
-									</NewProposalBtn>
+									<NewProposalBtn string={`property=true`}>Propose Property</NewProposalBtn>
 								</div>
 								<div className="mr-4">
-									<NewProposalBtn>
-										Request rNFT
-									</NewProposalBtn>
+									<NewProposalBtn>Request rNFT</NewProposalBtn>
 								</div>
 								<div className="mr-4">
-									<NewProposalBtn type={`tokrize`}>
-										Tokrize
-									</NewProposalBtn>
+									<NewProposalBtn type={`tokrize`}>Tokrize</NewProposalBtn>
 								</div>
 
 								{/* <ProposalFilter filters={filters} setFilters={setFilters} /> */}
 							</div>
 						</div>
-						<div className="space-y-3">{filteredProposals.length > 0 ? filteredProposals.map(([k, v]) => <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />) : <div className="bg-bkg-3 px-4 md:px-6 py-4 text-center text-fgd-3">No proposals found</div>}</div>
+						<div className="space-y-3">{tokrProposals.length > 0 ? tokrProposals.map(([k, v]) => <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />) : <div className="bg-bkg-3 px-4 md:px-6 py-4 text-center text-fgd-3">No proposals found</div>}</div>
 					</div>
 					<div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4 border border-fgd-1">
 						<TokenBalanceCardWrapper />
