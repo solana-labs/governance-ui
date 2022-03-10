@@ -59,7 +59,7 @@ function getVotingStateRank(
 	}
 ) {
 	// Show proposals in Voting state before proposals in Finalizing state
-	const governance = governances[proposal.governance.toBase58()].account
+	const governance = governances[proposal.governance.toBase58()]?.account
 	return proposal.hasVoteTimeEnded(governance) ? 0 : 1
 }
 
