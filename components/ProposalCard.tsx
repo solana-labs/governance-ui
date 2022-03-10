@@ -16,7 +16,7 @@ import { useEffect, useLayoutEffect } from 'react'
 type ProposalCardProps = {
 	proposalPk: PublicKey
 	proposal: Proposal,
-	cta: any
+	cta: any | undefined | null
 }
 
 const StyledSvg = styled(ChevronRightIcon)``
