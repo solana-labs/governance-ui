@@ -97,6 +97,7 @@ export async function tvl(
         ? await getPositionForMint(market, connection, filteredTokenGov)
         : 0
       const closestVal = findClosestToDate(assetDeposits, date)
+      const handledMint = info?.address || ''
       balances.push({
         liquidity:
           (closestVal.totalDeposits - closestVal.totalBorrows) *
@@ -108,7 +109,10 @@ export async function tvl(
         ).toFixed(2)}%`,
         protocolName: MANGO,
         protocolSymbol: protocolInfo?.symbol || '',
-        handledMint: info?.address || '',
+        handledMint:
+          handledMint === MANGO_MINT && connection.cluster === 'devnet'
+            ? MANGO_MINT_DEVNET
+            : handledMint,
         handledTokenImgSrc: info?.logoURI || '',
         protocolLogoSrc: protocolInfo?.logoURI || '',
         strategyName: 'Deposit',
