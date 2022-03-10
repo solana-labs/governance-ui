@@ -7,15 +7,15 @@ import { ProposalState } from '@solana/spl-governance'
 import useLocalStorageState from '../hooks/useLocalStorageState'
 
 const initialFilterSettings = {
-  [ProposalState.Cancelled]: true,
-  [ProposalState.Completed]: true,
-  [ProposalState.Defeated]: true,
   [ProposalState.Draft]: false,
-  [ProposalState.Executing]: true,
-  [ProposalState.ExecutingWithErrors]: true,
   [ProposalState.SigningOff]: true,
-  [ProposalState.Succeeded]: true,
   [ProposalState.Voting]: true,
+  [ProposalState.Succeeded]: true,
+  [ProposalState.Executing]: true,
+  [ProposalState.Completed]: true,
+  [ProposalState.Cancelled]: false,
+  [ProposalState.Defeated]: true,
+  [ProposalState.ExecutingWithErrors]: true,
 }
 
 const StyledAlertCount = styled.span`
@@ -51,7 +51,6 @@ const ProposalFilter = ({ filters, setFilters }) => {
     const initialFilters = Object.keys(initialFilterSettings)
       .filter((x) => !initialFilterSettings[x])
       .map(Number)
-
     //Checks to see if local storage exists
     if (!storeFilter && storeFilter !== '') {
       setStoreFilter('')

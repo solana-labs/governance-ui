@@ -1,5 +1,6 @@
 import useRealm from '@hooks/useRealm'
 import { useRouter } from 'next/router'
+import Account from 'VoteStakeRegistry/components/Account/Account'
 import LockTokensAccount from 'VoteStakeRegistry/components/Account/LockTokensAccount'
 
 const account = () => {
@@ -15,7 +16,7 @@ const account = () => {
         ></LockTokensAccount>
       )
     }
-    return null
+    return <Account></Account>
   }
   return getAccountView()
 }
