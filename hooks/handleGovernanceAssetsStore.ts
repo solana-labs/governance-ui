@@ -17,6 +17,7 @@ import {
   ukraineDaoTokenAccountsOwnerAddress,
   ukraineDAOGovPk,
 } from '@utils/tokens'
+import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useWalletStore from 'stores/useWalletStore'
@@ -24,6 +25,7 @@ import useGovernanceAssets from './useGovernanceAssets'
 import useRealm from './useRealm'
 
 export default function handleGovernanceAssetsStore() {
+  const route = useRouter()
   const { governances, tokenMints, realmTokenAccounts, realm } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
@@ -31,13 +33,16 @@ export default function handleGovernanceAssetsStore() {
     GovernanceAccountType.TokenGovernanceV1,
     GovernanceAccountType.TokenGovernanceV2,
   ])
-  const {
-    setGovernancesArray,
-    setGovernedTokenAccounts,
-  } = useGovernanceAssetsStore()
+  const { setGovernancesArray, setGovernedTokenAccounts, setGovernedAccounts } =
+    useGovernanceAssetsStore()
   useEffect(() => {
-    setGovernancesArray(governances)
-  }, [JSON.stringify(governances)])
+    if (realm) {
+      setGovernancesArray(governances)
+    }
+    if (realm && route.pathname.includes('/params')) {
+      setGovernedAccounts(connection, realm)
+    }
+  }, [JSON.stringify(governances), realm?.pubkey, route.pathname])
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []
@@ -67,9 +72,8 @@ export default function handleGovernanceAssetsStore() {
           )
           transferAddress = solAddress
           const resp = await connection.getParsedAccountInfo(solAddress)
-          const mintRentAmount = await connection.getMinimumBalanceForRentExemption(
-            0
-          )
+          const mintRentAmount =
+            await connection.getMinimumBalanceForRentExemption(0)
 
           if (resp.value) {
             solAccount = resp.value as AccountInfoGen<

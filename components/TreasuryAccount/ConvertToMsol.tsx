@@ -52,9 +52,7 @@ const ConvertToMsol = () => {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =
     'You need to be connected to your wallet to have the ability to create a staking proposal'
 

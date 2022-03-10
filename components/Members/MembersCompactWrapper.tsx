@@ -23,10 +23,8 @@ const MembersCompactWrapper = () => {
   const connected = useWalletStore((s) => s.connected)
   const activeMembersCount = activeMembers.length
   const { resetCompactViewState } = useMembersListStore()
-  const {
-    canUseMintInstruction,
-    canMintRealmCouncilToken,
-  } = useGovernanceAssets()
+  const { canUseMintInstruction, canMintRealmCouncilToken } =
+    useGovernanceAssets()
   const currentView = useMembersListStore((s) => s.compact.currentView)
   const totalVotesCast = members.reduce((prev, current) => {
     return prev + current.votesCasted
@@ -81,7 +79,7 @@ const MembersCompactWrapper = () => {
               <h3 className="mb-0">{totalVotesCast}</h3>
             </div>
 
-            <div style={{ maxHeight: '350px' }}>
+            <div>
               <MembersItems activeMembers={activeMembers} />
             </div>
 

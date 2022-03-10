@@ -1,5 +1,5 @@
 import { PublicKey } from '@blockworks-foundation/mango-client'
-import Button from '@components/Button'
+import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -37,14 +37,8 @@ const DepositComponent = ({
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realmInfo,
-    realm,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    symbol,
-  } = useRealm()
+  const { realmInfo, realm, ownVoterWeight, mint, councilMint, symbol } =
+    useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const market = useMarketStore((s) => s)
@@ -131,66 +125,80 @@ const DepositComponent = ({
 
   return (
     <div
-      className={`p-6 border-fgd-4 border rounded-md w-4/5 mb-28 ${
+      className={`${
         !filteredTokenGov.length && 'opacity-60 pointer-events-none'
       }`}
     >
-      <h2 className="mb-12">
-        Deposit
-        {hasMoreThenOneTreasury && (
+      {hasMoreThenOneTreasury && (
+        <div className="pb-4">
           <GovernedAccountSelect
+            label="Account"
             governedAccounts={filteredTokenGov as GovernedMultiTypeAccount[]}
             onChange={(selected) => {
               setMatchedTreasuryAccount(selected)
             }}
             value={matchedTreasuryAccount}
-          ></GovernedAccountSelect>
-        )}
-      </h2>
-      <div className="flex">
-        Asset
-        <div className="ml-auto flex items-center mb-2">
-          <span className="text-fgd-3 text-xs mr-1">Bal:</span> {maxAmountFtm}
-          <div
+          />
+        </div>
+      )}
+      <div className="flex mb-1.5 text-sm">
+        Amount
+        <div className="ml-auto flex items-center text-xs">
+          <span className="text-fgd-3 mr-1">Bal:</span> {maxAmountFtm}
+          <LinkButton
             onClick={() => setAmount(maxAmount.toNumber())}
-            className="ml-1 bg-fgd-4 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
+            className="font-bold ml-2 text-primary-light"
           >
             Max
-          </div>
+          </LinkButton>
         </div>
       </div>
       <Input
         min={mintMinAmount}
-        placeholder={'Amount'}
         value={amount}
         type="number"
         onChange={(e) => setAmount(e.target.value)}
         step={mintMinAmount}
+        suffix={tokenInfo?.symbol}
         onBlur={validateAmountOnBlur}
       />
-      <div className="flex mt-10">
-        <span>Your deposits</span>
-        <span className="ml-auto">
-          {currentPositionFtm} {tokenInfo?.symbol}
-        </span>
+      <div className="border border-fgd-4 p-4 rounded-md mb-6 mt-4 space-y-1 text-sm">
+        <div className="flex justify-between">
+          <span className="text-fgd-3">Current Deposit</span>
+          <span className="font-bold text-fgd-1">
+            {currentPositionFtm || 0}{' '}
+            <span className="font-normal text-fgd-3">{tokenInfo?.symbol}</span>
+          </span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-fgd-3">Proposed Deposit</span>
+          <span className="font-bold text-fgd-1">
+            {amount?.toLocaleString() || (
+              <span className="font-normal text-red">Enter an amount</span>
+            )}{' '}
+            <span className="font-normal text-fgd-3">
+              {amount && tokenInfo?.symbol}
+            </span>
+          </span>
+        </div>
       </div>
-      <Button
-        className="w-full mt-5"
-        onClick={handleDeposit}
-        disabled={!amount || !connected}
+      <Tooltip
+        content={
+          !canUseTransferInstruction
+            ? 'Please connect wallet with enough voting power to create treasury proposals'
+            : !amount
+            ? 'Please input the amount'
+            : ''
+        }
       >
-        <Tooltip
-          content={
-            !canUseTransferInstruction
-              ? 'Please connect wallet with enough voting power to create treasury proposals'
-              : !amount
-              ? 'Please input the amount'
-              : ''
-          }
+        <Button
+          className="w-full"
+          onClick={handleDeposit}
+          disabled={!amount || !connected}
         >
-          Deposit
-        </Tooltip>
-      </Button>
+          Propose deposit
+        </Button>
+      </Tooltip>
     </div>
   )
 }

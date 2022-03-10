@@ -10,7 +10,6 @@ import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Loading from '@components/Loading'
 import Tooltip from '@components/Tooltip'
-import { Tab } from '@headlessui/react'
 import { DuplicateIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -52,6 +51,7 @@ import {
 import useMarketStore from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import ButtonGroup from '@components/ButtonGroup'
 const minMngoToCreateLink = 10000
 const MangoDepositComponent = ({
   handledMint,
@@ -66,14 +66,8 @@ const MangoDepositComponent = ({
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    realmInfo,
-    realm,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    symbol,
-  } = useRealm()
+  const { realmInfo, realm, ownVoterWeight, mint, councilMint, symbol } =
+    useRealm()
   const [isDepositing, setIsDepositing] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
@@ -98,7 +92,7 @@ const MangoDepositComponent = ({
   const [amount, setAmount] = useState<number | undefined>()
   const [linkName, setLinkName] = useState('')
   const [linkGenerated, setLinkGenerated] = useState(false)
-  const [isDepositMode, setIsDepositMode] = useState(true)
+  const [proposalType, setProposalType] = useState('Deposit')
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const maxAmount = mintInfo
     ? getMintDecimalAmount(mintInfo, treasuryAmount)
@@ -164,9 +158,10 @@ const MangoDepositComponent = ({
       )
     }
 
-    const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
-      MangoAccountLayout.span
-    )
+    const minRentAmount =
+      await connection.current.getMinimumBalanceForRentExemption(
+        MangoAccountLayout.span
+      )
 
     const transferIx = SystemProgram.transfer({
       fromPubkey: wallet!.publicKey!,
@@ -175,9 +170,6 @@ const MangoDepositComponent = ({
     })
     instructions.push(transferIx)
     return instructions
-  }
-  const changeMode = (val) => {
-    setIsDepositMode(!val)
   }
   const handleDeposit = async () => {
     try {
@@ -321,39 +313,30 @@ const MangoDepositComponent = ({
       ? `http://devnet.mango.markets/?ref=`
       : `https://trade.mango.markets/?ref`
   return (
-    <div className="flex flex-col  w-4/5">
+    <div className="">
       {(matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
         matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
-          MANGO_MINT_DEVNET) && (
-        <Tab.Group onChange={changeMode}>
-          <Tab.List className="flex">
-            <Tab
-              className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tl-md ${
-                isDepositMode ? 'bg-primary-light text-bkg-2' : ''
-              }`}
-            >
-              Deposit
-            </Tab>
-            <Tab
-              className={`w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark rounded-tr-md ${
-                !isDepositMode ? 'bg-primary-light text-bkg-2' : ''
-              }`}
-            >
-              Ref link
-            </Tab>
-          </Tab.List>
-        </Tab.Group>
-      )}
-      {!isDepositMode ? (
+          MANGO_MINT_DEVNET) &&
+        currentPosition >= minMngoToCreateLink && (
+          <div className="pb-4">
+            <ButtonGroup
+              activeValue={proposalType}
+              className="h-10"
+              onChange={(v) => setProposalType(v)}
+              values={['Deposit', 'Create Referral Link']}
+            />
+          </div>
+        )}
+      {proposalType === 'Create Referral Link' ? (
         <div
-          className={`p-6 border-fgd-4 border rounded-b-md mb-28 ${
+          className={` ${
             !filteredTokenGov.length && 'opacity-60 pointer-events-none'
           }`}
         >
-          <h2 className="mb-12">
-            Create mango referrer link
-            {hasMoreThenOneTreasury && (
+          {hasMoreThenOneTreasury && (
+            <div className="pb-4">
               <GovernedAccountSelect
+                label="Account"
                 governedAccounts={
                   filteredTokenGov as GovernedMultiTypeAccount[]
                 }
@@ -361,23 +344,17 @@ const MangoDepositComponent = ({
                   setMatchedTreasuryAccount(selected)
                 }}
                 value={matchedTreasuryAccount}
-              ></GovernedAccountSelect>
-            )}
-          </h2>
+              />
+            </div>
+          )}
           <Input
-            placeholder={'Link name'}
+            label="Referral ID"
             value={linkName}
             type="text"
             onChange={(e) => setLinkName(e.target.value)}
           />
-          <div className="flex mt-10">
-            <span>Your deposits</span>
-            <span className="ml-auto">
-              {currentPositionFtm} {tokenInfo?.symbol}
-            </span>
-          </div>
           <Button
-            className="w-full mt-5"
+            className="w-full mt-6"
             onClick={handleCreateLink}
             disabled={
               currentPosition < minMngoToCreateLink ||
@@ -397,65 +374,67 @@ const MangoDepositComponent = ({
                   : ''
               }
             >
-              Create new link
+              Create Referral Link
             </Tooltip>
           </Button>
-          {linkGenerated && (
-            <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3">
-              <div>
-                <div className="text-xs text-fgd-3">Link</div>
-                <div className="text-xs text-fgd-3">
-                  {link}
-                  {linkName}
+          {linkGenerated || existingLinks.length > 0 ? (
+            <div className="pt-6">
+              {linkGenerated && (
+                <div className="border border-fgd-4 px-4 py-2 rounded-md w-full break-all flex items-center">
+                  <div>
+                    <div className="text-xs text-fgd-1">
+                      {link}
+                      {linkName}
+                    </div>
+                  </div>
+                  <div className="ml-auto">
+                    <LinkButton
+                      className="ml-4 text-primary-light"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${link}${linkName}`)
+                      }}
+                    >
+                      <DuplicateIcon className="w-5 h-5 mt-1" />
+                    </LinkButton>
+                  </div>
                 </div>
-              </div>
-              <div className="ml-auto">
-                <LinkButton
-                  className="ml-4 text-th-fgd-1"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${link}${linkName}`)
-                  }}
+              )}
+              {existingLinks.map((x) => (
+                <div
+                  key={x.referrerId}
+                  className="border border-fgd-4 px-4 py-2 rounded-md w-full break-all flex items-center"
                 >
-                  <DuplicateIcon className="w-5 h-5 mt-1" />
-                </LinkButton>
-              </div>
-            </div>
-          )}
-          {existingLinks.map((x) => (
-            <div
-              key={x.referrerId}
-              className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center mt-3"
-            >
-              <div>
-                <div className="text-xs text-fgd-3">Link</div>
-                <div className="text-xs text-fgd-3">
-                  {link}
-                  {x.referrerId}
+                  <div>
+                    <div className="text-xs text-fgd-1">
+                      {link}
+                      {x.referrerId}
+                    </div>
+                  </div>
+                  <div className="ml-auto">
+                    <LinkButton
+                      className="ml-4 text-primary-light"
+                      onClick={() => {
+                        navigator.clipboard.writeText(`${link}${x.referrerId}`)
+                      }}
+                    >
+                      <DuplicateIcon className="w-5 h-5 mt-1" />
+                    </LinkButton>
+                  </div>
                 </div>
-              </div>
-              <div className="ml-auto">
-                <LinkButton
-                  className="ml-4 text-th-fgd-1"
-                  onClick={() => {
-                    navigator.clipboard.writeText(`${link}${x.referrerId}`)
-                  }}
-                >
-                  <DuplicateIcon className="w-5 h-5 mt-1" />
-                </LinkButton>
-              </div>
+              ))}
             </div>
-          ))}
+          ) : null}
         </div>
       ) : (
         <div
-          className={`p-6 border-fgd-4 border rounded-b-md mb-28 ${
+          className={`${
             !filteredTokenGov.length && 'opacity-60 pointer-events-none'
           }`}
         >
-          <h2 className="mb-12">
-            Deposit
-            {hasMoreThenOneTreasury && (
+          {hasMoreThenOneTreasury && (
+            <div className="pb-4">
               <GovernedAccountSelect
+                label="Account"
                 governedAccounts={
                   filteredTokenGov as GovernedMultiTypeAccount[]
                 }
@@ -463,39 +442,54 @@ const MangoDepositComponent = ({
                   setMatchedTreasuryAccount(selected)
                 }}
                 value={matchedTreasuryAccount}
-              ></GovernedAccountSelect>
-            )}
-          </h2>
-          <div className="flex">
-            Asset
-            <div className="ml-auto flex items-center mb-2">
-              <span className="text-fgd-3 text-xs mr-1">Bal:</span>{' '}
-              {maxAmountFtm}
-              <div
+              />
+            </div>
+          )}
+          <div className="flex mb-1.5 text-sm">
+            Amount
+            <div className="ml-auto flex items-center text-xs">
+              <span className="text-fgd-3 mr-1">Bal:</span> {maxAmountFtm}
+              <LinkButton
                 onClick={() => setAmount(maxAmount.toNumber())}
-                className="ml-1 bg-fgd-4 rounded-md px-2 py-1 text-xs cursor-pointer hover:bg-fgd-3"
+                className="font-bold ml-2 text-primary-light"
               >
                 Max
-              </div>
+              </LinkButton>
             </div>
           </div>
           <Input
             min={mintMinAmount}
-            placeholder={'Amount'}
             value={amount}
             type="number"
             onChange={(e) => setAmount(e.target.value)}
             step={mintMinAmount}
+            suffix="MNGO"
             onBlur={validateAmountOnBlur}
           />
-          <div className="flex mt-10">
-            <span>Your deposits</span>
-            <span className="ml-auto">
-              {currentPositionFtm} {tokenInfo?.symbol}
-            </span>
+          <div className="border border-fgd-4 p-4 rounded-md mb-6 mt-4 space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span className="text-fgd-3">Current Deposit</span>
+              <span className="font-bold text-fgd-1">
+                {currentPositionFtm || 0}{' '}
+                <span className="font-normal text-fgd-3">
+                  {tokenInfo?.symbol}
+                </span>
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-fgd-3">Proposed Deposit</span>
+              <span className="font-bold text-fgd-1">
+                {amount?.toLocaleString() || (
+                  <span className="font-normal text-red">Enter an amount</span>
+                )}{' '}
+                <span className="font-normal text-fgd-3">
+                  {amount && tokenInfo?.symbol}
+                </span>
+              </span>
+            </div>
           </div>
           <Button
-            className="w-full mt-5"
+            className="w-full"
             onClick={handleDeposit}
             disabled={!amount || !canUseTransferInstruction || isDepositing}
           >

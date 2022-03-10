@@ -11,7 +11,9 @@ const AccountsItems = () => {
 
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
+      if (governedTokenAccounts.every((x) => x.mint && x.token)) {
+        setTreasuryAccounts(governedTokenAccounts)
+      }
     }
     prepTreasuryAccounts()
   }, [JSON.stringify(governedTokenAccounts)])
@@ -20,10 +22,12 @@ const AccountsItems = () => {
     <div className="space-y-3">
       {treasuryAccounts.map((accountWithGovernance) => {
         return (
-          <AccountItem
-            governedAccountTokenAccount={accountWithGovernance}
-            key={accountWithGovernance?.token?.publicKey.toBase58()}
-          />
+          accountWithGovernance.transferAddress && (
+            <AccountItem
+              governedAccountTokenAccount={accountWithGovernance}
+              key={accountWithGovernance?.transferAddress?.toBase58()}
+            />
+          )
         )
       })}
     </div>

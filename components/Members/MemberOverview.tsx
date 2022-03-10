@@ -54,15 +54,17 @@ const MemberOverview = () => {
   const totalVotes = votesCasted
   const communityAmount =
     communityVotes && !communityVotes.isZero()
-      ? useMemo(() => fmtMintAmount(mint, communityVotes), [
-          member!.walletAddress,
-        ])
+      ? useMemo(
+          () => fmtMintAmount(mint, communityVotes),
+          [member!.walletAddress]
+        )
       : null
   const councilAmount =
     councilVotes && !councilVotes.isZero()
-      ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
-          member!.walletAddress,
-        ])
+      ? useMemo(
+          () => fmtMintAmount(councilMint, councilVotes),
+          [member!.walletAddress]
+        )
       : null
 
   const handleGoBackToMainView = async () => {
@@ -202,7 +204,6 @@ const MemberOverview = () => {
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">
         Recent votes
       </div>
-      {/* TODO virtual scroll */}
       <div style={{ maxHeight: '350px' }} className="overflow-auto">
         {ownVoteRecords.map((x) => (
           <a

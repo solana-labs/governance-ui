@@ -54,10 +54,7 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const SendTokens = () => {
-  const { resetCompactViewState } = useTreasuryAccountStore()
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const {
     realmInfo,
@@ -70,7 +67,7 @@ const SendTokens = () => {
   } = useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
+  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
@@ -90,10 +87,8 @@ const SendTokens = () => {
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] =
+    useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =
@@ -242,7 +237,6 @@ const SendTokens = () => {
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
-        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
