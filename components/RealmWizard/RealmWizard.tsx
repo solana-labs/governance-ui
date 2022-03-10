@@ -354,7 +354,7 @@ const RealmWizard: React.FC = () => {
 	}, [form])
 
 	return (
-		<div className="relative w-auto" style={ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE && !isLoading ? { maxWidth: 512 } : undefined}>
+		<div className="relative w-full" style={ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE && !isLoading ? { maxWidth: 1800 } : undefined}>
 			<div className="pointer">
 				<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1" onClick={handleBackButtonClick}>
 					<ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
@@ -367,11 +367,11 @@ const RealmWizard: React.FC = () => {
 					<span>{loaderMessage}</span>
 				</div>
 			) : (
-				<div className="min-h-[60vh]">{BoundStepComponent}</div>
+				<div className="min-h-[60vh] w-full flex-grow">{BoundStepComponent}</div>
 			)}
 			{ctl && !(ctl.isModeSelect() || isLoading) && (
 				<>
-					<div className={`flex justify-${ctl.getMode() === RealmWizardMode.BASIC ? 'between' : 'end'} pr-10 mr-3 mt-10`}>
+					<div className={`flex justify-between mt-10`}>
 						{ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
 							<div className="flex justify-left items-center">
 								<Switch
