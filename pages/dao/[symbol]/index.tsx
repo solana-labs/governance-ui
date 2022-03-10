@@ -205,7 +205,7 @@ const REALM = () => {
 									<NewProposalBtn>Request rNFT</NewProposalBtn>
 								</div>
 								<div className="mr-4">
-									<NewProposalBtn type={`tokrize`}>Tokrize</NewProposalBtn>
+									<NewProposalBtn >Tokrize</NewProposalBtn>
 								</div>
 								{/* <ProposalFilter filters={filters} setFilters={setFilters} /> */}
 							</div>
@@ -214,7 +214,7 @@ const REALM = () => {
 						{ canCreate && <NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green">{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}</NewProposalBtn> }
 
 						{tokrProposals.length > 0 ? (
-							<>
+							<>type={`tokrize`}
 								<div className={`space-y-16${ canCreate ? ' mt-16': ''}`}>
 									{proposalType1.length > 0 && (
 										<div>
@@ -228,7 +228,7 @@ const REALM = () => {
 										<div>
 											<h2 className="text-2xl uppercase">{`Request Tokr DAO to mint rNFT Proposal${proposalType2.length > 0 ? 's' : ''}`}</h2>
 											{proposalType2.map(([k, v]) => {
-												return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												return <ProposalCard cta={ <NewProposalBtn string={ `uri=${v.account?.meta?.uri?.split('.net/')[1]}` } hideIcon children="Tokrize" type={`tokrize`} /> } key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 											})}
 										</div>
 									)}

@@ -29,6 +29,7 @@ import { replaceBasePath } from 'next/dist/server/router'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { StyledLabel } from '@components/inputs/styles'
 import PropertyDataOutput, { titleCase } from '../../../../components/PropertyDataOutput';
+import Loader from '@components/Loader'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -49,6 +50,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = (props) => {
+	const [initalLoad, setInitalLoad] = useState<boolean>(true)
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -86,7 +88,6 @@ const New = (props) => {
 		setFormErrors({})
 		setForm({ ...form, [propertyName]: value })
 	}
-
 
 	const handleGetInstructions = async () => {
 		const instructions: UiInstruction[] = []
@@ -196,168 +197,193 @@ const New = (props) => {
 		}
 	}, [propertyDetails])
 
-	const getPropertyData = () => {
-		setIsLoadingData(true)
-		fetch(lookupUri, {
-			method: 'GET',
-			Accept: 'application/json',
-		})
-		.then((res) => res.json())
-		.then((res) => {
-			setPropertyDetails(res)
+	const getPropertyData = (uri) => {
+		const url = uri || lookupUri || null
+		if (url) {
+			setIsLoadingData(true)
+			fetch(url, {
+				method: 'GET',
+				Accept: 'application/json',
+			})
+				.then((res) => res.json())
+				.then((res) => {
+					setPropertyDetails(res)
 
-			setIsLoadingData(false)
-			handleTurnOffLoaders()
-			return res
-		})
-		.catch((error) => {
-			alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
-			console.log('error', error)
-		})
-	};
+					setIsLoadingData(false)
+					setInitalLoad(false);
+					handleTurnOffLoaders()
+					return res
+				})
+				.catch((error) => {
+					alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
+					console.log('error', error)
+					setInitalLoad(false);
+				})
+		}
+	}
 
-	return (
-		<div>
-			<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-				<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
-			</Link>
-			<div className="mt-8 ml-4 -mb-5 relative z-10 m-width-full">
-				<h1 className="bg-dark inline-block">
-					<span className="ml-4 pr-8 text-xl uppercase">
-						Proposal to Tokenize
-						{realmDisplayName ? ` for ${realmDisplayName}` : ``}{' '}
-					</span>
-				</h1>
-			</div>
-			<div className="grid grid-cols-12 gap-4">
-				<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
-					<p className="pt-8">Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.</p>
+	useLayoutEffect(() => {
+		if (router.query?.uri && realmDisplayName) {
+			const url = `https://arweave.net/${router.query?.uri}`
 
-					<>
-						<div className="pt-8 mb-20">
-							<div className="space-y-16">
-								<div className="space-y-4">
-									<div className={ propertyDetails ? 'hidden' : null }>
-										<label htmlFor="lookup_uri">
-											<StyledLabel>URI Lookup:</StyledLabel>
-										</label>
-										<div className="flex w-full">
-											<div className="flex flex-grow">
-												<Input
+			if (router.query?.uri !== undefined) {
+				setInitalLoad(true);
+				setLookupUri(url)
+				getPropertyData(url)
+			}
+		}
+	}, [router, realmDisplayName])
 
+	useEffect(() => {
+		if (realmDisplayName) setInitalLoad(false);
+	}, [realmDisplayName])
 
-													disabled={ propertyDetails ? true : false }
-													placeholder="https://...."
-													value={lookupUri}
-													// value="https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/"
-													id="lookup_uri"
-													name="lookup_uri"
-													noMaxWidth
-													type="url"
-													className="w-full"
-													onChange={(evt) => {
-														setLookupUri(evt.target.value)
-													}}
-												/>
-											</div>
-											<div className="flex flex-shrink-0">
-												<SecondaryButton
-													disabled={(isLoading || propertyDetails) ? true : false}
-													isLoading={isLoading}
-													className="flex-grow relative z-2 -mx-px"
-													onClick={(e) => {
-														getPropertyData();
-														e.preventDefault()
-													}}
-												>
-													Get Data
-												</SecondaryButton>
+	return initalLoad ? (
+		<>
+			<Loader />
+		</>
+	) : (
+		<>
+			<div>
+				<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
+					<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
+				</Link>
+				<div className="mt-8 ml-4 -mb-5 relative z-10 m-width-full">
+					<h1 className="bg-dark inline-block">
+						<span className="ml-4 pr-8 text-xl uppercase">
+							Proposal to Tokenize
+							{realmDisplayName ? ` for ${realmDisplayName}` : ``}{' '}
+						</span>
+					</h1>
+				</div>
+				<div className="grid grid-cols-12 gap-4">
+					<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
+						<p className="pt-8">Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.</p>
+
+						<>
+							<div className="pt-8 mb-20">
+								<div className="space-y-16">
+									<div className="space-y-4">
+										<div className={propertyDetails ? 'hidden' : null}>
+											<label htmlFor="lookup_uri">
+												<StyledLabel>URI Lookup:</StyledLabel>
+											</label>
+											<div className="flex w-full">
+												<div className="flex flex-grow">
+													<Input
+														disabled={propertyDetails ? true : false}
+														placeholder="https://...."
+														value={lookupUri}
+														// value="https://6sr464igo3wfrn4zm4qyoeav43fxuorw22nl6pkqwv4wfekc.arweave.net/9KPPcQZ27Fi3mWchhxAV5s_t6-OjbWmr89ULV5YpFCk/"
+														id="lookup_uri"
+														name="lookup_uri"
+														noMaxWidth
+														type="url"
+														className="w-full"
+														onChange={(evt) => {
+															setLookupUri(evt.target.value)
+														}}
+													/>
+												</div>
+												<div className="flex flex-shrink-0">
+													<SecondaryButton
+														disabled={isLoading || propertyDetails ? true : false}
+														isLoading={isLoading}
+														className="flex-grow relative z-2 -mx-px"
+														onClick={(e) => {
+															getPropertyData()
+															e.preventDefault()
+														}}
+													>
+														Get Data
+													</SecondaryButton>
+												</div>
 											</div>
 										</div>
-									</div>
 
-									{propertyDetails && <PropertyDataOutput propertyDetails={ propertyDetails } /> }
+										{propertyDetails && <PropertyDataOutput propertyDetails={propertyDetails} />}
 
-									<div className="xpb-4 hidden">
-										<Input
-											label="Property Name"
-											placeholder="Name"
-											value={form.title}
-											id="name"
-											name="name"
-											type="hidden"
-											error={formErrors['title']}
-											onChange={(evt) => {
-												handleSetForm({
-													value: evt.target.value,
-													propertyName: 'title',
-												})
-											}}
-										/>
-									</div>
+										<div className="xpb-4 hidden">
+											<Input
+												label="Property Name"
+												placeholder="Name"
+												value={form.title}
+												id="name"
+												name="name"
+												type="hidden"
+												error={formErrors['title']}
+												onChange={(evt) => {
+													handleSetForm({
+														value: evt.target.value,
+														propertyName: 'title',
+													})
+												}}
+											/>
+										</div>
 
-									<div className="xpb-4 hidden">
-										<Textarea
-											hidden
-											label="Description"
-											placeholder="Description"
-											value={form.description}
-											id="description"
-											name="description"
-											type="text"
-											error={formErrors['description']}
-											onChange={(evt) =>
-												handleSetForm({
-													value: evt.target.value,
-													propertyName: 'description',
-												})
-											}
-										/>
+										<div className="xpb-4 hidden">
+											<Textarea
+												hidden
+												label="Description"
+												placeholder="Description"
+												value={form.description}
+												id="description"
+												name="description"
+												type="text"
+												error={formErrors['description']}
+												onChange={(evt) =>
+													handleSetForm({
+														value: evt.target.value,
+														propertyName: 'description',
+													})
+												}
+											/>
+										</div>
 									</div>
 								</div>
 							</div>
-						</div>
 
-						<div className="pt-2">
-							{canChooseWhoVote && (
-								<VoteBySwitch
-									checked={voteByCouncil}
-									onChange={() => {
-										setVoteByCouncil(!voteByCouncil)
+							<div className="pt-2">
+								{canChooseWhoVote && (
+									<VoteBySwitch
+										checked={voteByCouncil}
+										onChange={() => {
+											setVoteByCouncil(!voteByCouncil)
+										}}
+									></VoteBySwitch>
+								)}
+								<NewProposalContext.Provider
+									value={{
+										instructionsData,
+										handleSetInstructions,
+										governance,
+										setGovernance,
 									}}
-								></VoteBySwitch>
-							)}
-							<NewProposalContext.Provider
-								value={{
-									instructionsData,
-									handleSetInstructions,
-									governance,
-									setGovernance,
-								}}
-							>
-								<>
-									<h3 className="pt-8 hidden">
-										<span className="text-lg">rNFT Information</span>
-									</h3>
-									<TokrizeContract propertyDetails={propertyDetails} lookupUri={lookupUri} index={0} governance={governance} />
-								</>
-							</NewProposalContext.Provider>
-							<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
-								{/* <SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
+								>
+									<>
+										<h3 className="pt-8 hidden">
+											<span className="text-lg">rNFT Information</span>
+										</h3>
+										<TokrizeContract propertyDetails={propertyDetails} lookupUri={lookupUri} index={0} governance={governance} />
+									</>
+								</NewProposalContext.Provider>
+								<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+									{/* <SecondaryButton disabled={isLoading} isLoading={isLoadingDraft} onClick={() => handleCreate(true)}>
 									Save draft
 								</SecondaryButton> */}
-								<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => handleCreate(false)}>
-									Tokenize
-								</Button>
+									<Button isLoading={isLoadingSignedProposal} disabled={isLoading} onClick={() => handleCreate(false)}>
+										Tokenize
+									</Button>
+								</div>
 							</div>
-						</div>
-					</>
-				</div>
-				<div className="col-span-12 md:col-span-5 lg:col-span-4">
-					<TokenBalanceCardWrapper />
+						</>
+					</div>
+					<div className="col-span-12 md:col-span-5 lg:col-span-4">
+						<TokenBalanceCardWrapper />
+					</div>
 				</div>
 			</div>
-		</div>
+		</>
 	)
 }
 
