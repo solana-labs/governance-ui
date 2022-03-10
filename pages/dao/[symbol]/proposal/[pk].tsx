@@ -28,6 +28,7 @@ const Proposal = () => {
 	const { proposal, descriptionLink } = useProposal()
 	const [description, setDescription] = useState('')
 	const [descriptionObj, setDescriptionObj] = useState<[any]>()
+	const [proposalType, setProposalType] = useState<any>();
 	const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal?.account)
 	const [propertyDetails, setPropertyDetails] = useState<any>();
 
@@ -35,7 +36,7 @@ const Proposal = () => {
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
 
-	useEffect(() => {
+	useLayoutEffect(() => {
 		if (descriptionObj && descriptionObj[0].uri) {
 			fetch(descriptionObj[0].uri, {
 				method: 'GET',
@@ -51,10 +52,13 @@ const Proposal = () => {
 				console.log('error', error)
 			})
 		}
+
+		if (descriptionObj && descriptionObj[0].type) {
+			setProposalType(descriptionObj[0].type);
+		}
 	}, [descriptionObj])
 
-	useEffect(() => {
-		console.log("hi?")
+	useLayoutEffect(() => {
 		const handleResolveDescription = async () => {
 			const description = await resolveProposalDescription(descriptionLink)
 			setDescription(description)
@@ -67,9 +71,6 @@ const Proposal = () => {
 		}
 	}, [descriptionLink])
 
-	useEffect(() => {
-		console.log("\n\n\n\n\n !!!\n\nproposal", proposal);
-	}, [proposal])
 
 	return (
 		<div className="grid grid-cols-12 gap-4">
@@ -94,7 +95,6 @@ const Proposal = () => {
 								<ProposalStateBadge proposalPk={proposal.pubkey} proposal={proposal.account} open={true} />
 							</div>
 						</div>
-
 
 						{description && (
 							<div className="pb-2">
