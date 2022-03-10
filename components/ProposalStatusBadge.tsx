@@ -39,56 +39,30 @@ function getProposalStateStyle(state: ProposalState) {
   }
 }
 
-const ProposalStateBadge = ({
-  proposalPk,
-  proposal,
-  open,
-}: {
-  proposalPk: PublicKey
-  proposal: Proposal
-  open: boolean
-}) => {
-  const governance = useRealmGovernance(proposal.governance)
+const ProposalStateBadge = ({ proposalPk, proposal, open }: { proposalPk: PublicKey; proposal: Proposal; open: boolean }) => {
+	const governance = useRealmGovernance(proposal.governance)
 
-  const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[
-    proposalPk.toBase58()
-  ]
+	const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[proposalPk.toBase58()]
 
-  let statusLabel = getProposalStateLabel(
-    proposal.state,
-    governance && proposal.getTimeToVoteEnd(governance) < 0
-  )
+	let statusLabel = getProposalStateLabel(proposal.state, governance && proposal.getTimeToVoteEnd(governance) < 0)
 
-  if (ownVoteRecord) {
-    statusLabel =
-      statusLabel + ': ' + (isYesVote(ownVoteRecord.account) ? 'Yes' : 'No')
-  }
+	if (ownVoteRecord) {
+		statusLabel = statusLabel + ': ' + (isYesVote(ownVoteRecord.account) ? 'Yes' : 'No')
+	}
 
-  return (
-    <>
-      {open ? (
-        <>
-          <div className="flex items-center justify-end gap-4">
-            <div
-              className={`${getProposalStateStyle(
-                proposal.state
-              )} inline-block px-2 py-1 text-xs`}
-            >
-              {statusLabel}
-            </div>
-          </div>
-        </>
-      ) : (
-        <div
-          className={`${getProposalStateStyle(
-            proposal.state
-          )} inline-block px-2 py-1 text-xs`}
-        >
-          {statusLabel}
-        </div>
-      )}
-    </>
-  )
+	return (
+		<>
+			{open ? (
+				<>
+					<div className="flex items-center justify-end gap-4">
+						<div className={`${getProposalStateStyle(proposal.state)} inline-block px-2 py-1 text-xs`}>{statusLabel}</div>
+					</div>
+				</>
+			) : (
+				<div className={`${getProposalStateStyle(proposal.state)} inline-block px-2 py-1 text-xs`}>{statusLabel}</div>
+			)}
+		</>
+	)
 }
 
 export default ProposalStateBadge
