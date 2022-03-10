@@ -398,6 +398,34 @@ const New = () => {
 			setProposalType(1)
 			setLiteMode(true)
 		}
+
+		if (router.query?.uri) {
+			setProposalType(2)
+			setLiteMode(false)
+
+			fetch(`https://arweave.net/${router.query?.uri}`, {
+				method: 'GET',
+				Accept: 'application/json',
+			})
+			.then((res) => res.json())
+			.then((res) => {
+
+				const temp = res.attributes.map( (attribute) => {
+					res[attribute.trait_type] = attribute.value;
+				})
+
+				setPropertyData({
+					...res
+				})
+
+
+				return res
+			})
+			.catch((error) => {
+				console.log('error', error)
+			})
+		}
+
 	}, [router])
 
 	const getCurrentInstruction = ({ typeId, idx }) => {

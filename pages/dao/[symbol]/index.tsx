@@ -169,6 +169,10 @@ const REALM = () => {
 		// )
 	}, [tokrProposals])
 
+	useEffect(() => {
+		console.log(proposalType1);
+	}, [proposalType1])
+
 	return initalLoad ? (
 		<Loader />
 	) : (
