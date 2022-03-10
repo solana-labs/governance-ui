@@ -240,7 +240,7 @@ const REALM = () => {
 								</div>
 							</>
 						) : (
-							<>
+							<div className="pt-8">
 								{realmDisplayName} has no proposals
 								{canCreate ? (
 									<>
@@ -253,7 +253,7 @@ const REALM = () => {
 								) : (
 									<>.</>
 								)}
-							</>
+							</div>
 						)}
 
 						{/* {proposalType2.length > 0 && ( */}
