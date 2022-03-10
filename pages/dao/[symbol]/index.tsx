@@ -142,7 +142,7 @@ const REALM = () => {
 									</NewProposalBtn>
 								</div>
 
-								<ProposalFilter filters={filters} setFilters={setFilters} />
+								{/* <ProposalFilter filters={filters} setFilters={setFilters} /> */}
 							</div>
 						</div>
 						<div className="space-y-3">{filteredProposals.length > 0 ? filteredProposals.map(([k, v]) => <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />) : <div className="bg-bkg-3 px-4 md:px-6 py-4 text-center text-fgd-3">No proposals found</div>}</div>
