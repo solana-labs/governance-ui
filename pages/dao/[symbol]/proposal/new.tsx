@@ -80,7 +80,7 @@ const New = () => {
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
 	const [propertyName, setPropertyName] = useState('')
-	const [proposalType, setProposalType] = useState<Number>(2);
+	const [proposalType, setProposalType] = useState<Number>(2)
 	const [liteMode, setLiteMode] = useState<boolean>(false)
 	const [form, setForm] = useState({
 		title: propertyName,
@@ -393,9 +393,9 @@ const New = () => {
 	}, [])
 
 	useLayoutEffect(() => {
-		if (router.query?.property)  {
-			setProposalType(1);
-			setLiteMode(true);
+		if (router.query?.property) {
+			setProposalType(1)
+			setLiteMode(true)
 		}
 	}, [router])
 
@@ -805,14 +805,14 @@ const New = () => {
 	const setProposalForSubmit = async (link) => {
 		const descriptionObj = {
 			// TODO: maybe a type to render details?
-			description: `Proposal to ${ proposalType === 1 ? 'Purchase Real Estate and Begin Syndication' : 'Request Tokr DAO to mint rNFT'}`,
+			description: `Proposal to ${proposalType === 1 ? 'Purchase Real Estate and Begin Syndication' : 'Request Tokr DAO to mint rNFT'}`,
 			type: proposalType,
 			// description: `Proposal to Purchase ${propertyData.property_address ? `${propertyData.property_address}` : 'Real Estate'}`,
 			uri: link,
 		}
 
 		setForm({
-			title: `${propertyName} ${ proposalType === 1 ? 'Purchase Request' : 'rNFT Request'}`,
+			title: `${propertyName} ${proposalType === 1 ? 'Purchase Request' : 'rNFT Request'}`,
 			description: JSON.stringify(descriptionObj),
 		})
 
@@ -837,7 +837,16 @@ const New = () => {
 		}
 	}, [form])
 
-	return (
+	const [initalLoad, setInitalLoad] = useState<boolean>(true)
+	useEffect(() => {
+		if (realmDisplayName) setInitalLoad(false)
+	}, [realmDisplayName])
+
+	return initalLoad ? (
+		<>
+			<div className="w-full flex items-center justify-center min-h-screen">Loading...</div>
+		</>
+	) : (
 		<>
 			{submitting && (
 				<>
@@ -878,10 +887,7 @@ const New = () => {
 				</a> */}
 
 					<h1 className="bg-dark inline-block">
-						<span className="ml-4 pr-8 text-xl uppercase">
-							Add a proposal
-							{realmDisplayName ? ` to ${realmDisplayName}` : ``}{' '}
-						</span>
+						<span className="ml-4 pr-8 text-xl uppercase">{proposalType === 1 ? `Property Proposal ${realmDisplayName ? ` for ${realmDisplayName}` : ''}` : 'rNFT Propsal'}</span>
 					</h1>
 				</div>
 				<div className="grid grid-cols-12 gap-4">
