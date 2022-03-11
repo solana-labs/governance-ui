@@ -58,10 +58,11 @@
 // 	)
 // }
 
+import Loader from '@components/Loader'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
-import React, { useMemo } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 export default function RealmsDashboard({ realms, isLoading }: { realms: readonly RealmInfo[]; isLoading: boolean }) {
 	const router = useRouter()
@@ -76,19 +77,15 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 	const certifiedRealms = useMemo(() => realms?.filter((r) => r.isCertified), [realms])
 	const unchartedRealms = useMemo(() => realms?.filter((r) => !r.isCertified), [realms])
 
-	return isLoading ? (
-		<div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-			<div className="animate-pulse bg-bkg-3 col-span-1 h-44" />
-		</div>
+	const [initalLoad, setInitalLoad] = useState<boolean>(false);
+
+
+	useEffect(() => {
+		setInitalLoad(false);
+	}, [realms])
+
+	return (isLoading || initalLoad)? (
+		<Loader />
 	) : (
 		<div className="space-y-16">
 			<div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
