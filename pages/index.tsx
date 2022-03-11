@@ -83,7 +83,10 @@ const Index = () => {
 								{connected && (
 									<>
 										<li className="pt-8">
-											<NavButton selectionkey="ENTER" href={fmtUrlWithCluster('/realms')}>
+											<NavButton selectionkey="ENTER" onClick={(e) => {
+												router.push(fmtUrlWithCluster(`/realms`))
+												e.preventDefault();
+											}}>
 												Browse DOAs
 											</NavButton>
 										</li>
@@ -113,7 +116,10 @@ const Index = () => {
 							</>
 						) : (
 							<>
-								<NavOption selectionkey={2} href={fmtUrlWithCluster('/realms')}>
+								<NavOption selectionkey={2} href={fmtUrlWithCluster('/realms')} onClick={(e) => {
+									router.push(fmtUrlWithCluster(`/realms`))
+									e.preventDefault();
+								}}>
 									Browse DAOs
 								</NavOption>
 								<NavOption selectionkey={3} href="https://github.com" target="_blank">

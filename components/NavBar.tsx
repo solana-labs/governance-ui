@@ -1,18 +1,23 @@
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
 import { ConnectWalletButtonAlternative } from './ConnectWalletButton'
+import { useRouter } from 'next/router'
 
 const NavBar = () => {
+	const router = useRouter()
 	const { fmtUrlWithCluster } = useQueryContext()
 
 	return (
 		<div className="grid grid-cols-12 mb-3 border border-fgd-1">
 			<div className="col-span-12 xl:col-start-2 xl:col-span-10 flex h-20 items-center justify-between px-4 md:px-8 xl:px-4">
-				<Link href={'/'}>
-					<div className="cursor-pointer flex items-center">
+				<a href="/realms" onClick={e => {
+					router.push(fmtUrlWithCluster(`/realms`))
+					e.preventDefault();
+				}}>
+					<span className="cursor-pointer flex items-center">
 						<h1 className="text-lg">tokr_</h1>
-					</div>
-				</Link>
+					</span>
+				</a>
 				<ul className="flex ite ms-center space-x-4">
 					{/*
 					 <li className="flex items-center">
@@ -24,18 +29,34 @@ const NavBar = () => {
 					</li>
 					*/}
 					<li className="flex items-center">
-						<Link href={fmtUrlWithCluster('/realms')}>
+						<a href="/realms/new" onClick={e => {
+							router.push(fmtUrlWithCluster(`/realms/new`))
+							e.preventDefault();
+						}}>
+							<span className="nav-link flex items-center">
+								<span>Create DAO</span>
+							</span>
+						</a>
+					</li>
+					<li className="flex items-center">
+						<a href="/realms" onClick={e => {
+							router.push(fmtUrlWithCluster(`/realms`))
+							e.preventDefault();
+						}}>
 							<span className="nav-link flex items-center">
 								<span>DAOs</span>
 							</span>
-						</Link>
+						</a>
 					</li>
 					<li className="flex items-center">
-						<Link href="#">
+						<a href="/" onClick={e => {
+							router.push(fmtUrlWithCluster(`/`))
+							e.preventDefault();
+						}}>
 							<span className="nav-link uppercase flex items-center">
 								<span>Docs</span>
 							</span>
-						</Link>
+						</a>
 					</li>
 					<li className="pl-4 flex items-center">
 						<ConnectWalletButtonAlternative />
