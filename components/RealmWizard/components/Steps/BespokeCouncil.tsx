@@ -80,7 +80,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({ setForm, form
 		<>
 			<div className="border-b border-fgd-4 pb-4 pt-8">
 				<div className="flex items-center justify-between">
-					<h1>DOA Members</h1>
+					<h1>DAO Members</h1>
 				</div>
 			</div>
 			{/* <div className="pb-4 pr-10 mr-2">

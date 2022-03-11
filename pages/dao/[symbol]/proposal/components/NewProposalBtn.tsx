@@ -5,6 +5,8 @@ import useRealm from '@hooks/useRealm'
 import React, { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import Tooltip from '@components/Tooltip'
+import { PlusIcon } from '@heroicons/react/solid'
+import { TOKR_DAO } from '@components/instructions/tools'
 
 const NewProposalBtn = (props) => {
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -24,24 +26,38 @@ const NewProposalBtn = (props) => {
 		if (props.canCreateProposal && canCreateProposal) props.canCreateProposal(canCreateProposal);
 	}, [canCreateProposal])
 
-	return ( props.basic ? <>
-		<Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new${props.type ? '-' + props.type : ''}${props.string ? '?' + props.string : ''}`)}>
-			<a className={`${props.className ? props.className : '' }${!canCreateProposal ? ' cursor-not-allowed pointer-events-none' : 'hover:bg-bkg-3'}`}>
-				{props.children || 'New'}
-			</a>
-		</Link>
-	</> :
+	return props.addIcon ? (
 		<>
-			<Tooltip content={tooltipContent}>
-				<div className={!canCreateProposal ? 'cursor-not-allowed opacity-60' : ''}>
-					<Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/new${props.type ? '-' + props.type : ''}${props.string ? '?' + props.string : ''}`)}>
-						<a className={`${!canCreateProposal ? 'cursor-not-allowed pointer-events-none' : 'hover:bg-bkg-3'} default-transition flex items-center ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none${props.linkClasses ? ' ' + props.linkClasses : '' }`}>
-							{ !props.hideIcon && <PlusCircleIcon className="h-5 mr-1.5 text-primary-light w-5" /> }
-							{props.children || 'New'}
-						</a>
+			<Link href={fmtUrlWithCluster(`/dao/${ (props.type === 'tokrize') ? TOKR_DAO : symbol }/proposal/new${props.type ? '-' + props.type : ''}${props.string ? '?' + props.string : ''}`)}>
+				<a className={`${props.className ? props.className : ''}${!canCreateProposal ? ' cursor-not-allowed pointer-events-none' : 'hover:bg-bkg-3'}`} title={props.title}>
+					<span className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3 ml-auto cursor-pointer w-full">
+						<PlusIcon />
+					</span>
+				</a>
+			</Link>
+		</>
+	) : (
+		<>
+			{props.basic ? (
+				<>
+					<Link href={fmtUrlWithCluster(`/dao/${ (props.type === 'tokrize') ? TOKR_DAO : symbol }/proposal/new${props.type ? '-' + props.type : ''}${props.string ? '?' + props.string : ''}`)}>
+						<a className={`${props.className ? props.className : ''}${props.linkClasses ? ' ' + props.linkClasses : ''}${!canCreateProposal ? ' cursor-not-allowed pointer-events-none' : 'hover:bg-bkg-3'}`}>{props.children || 'New'}</a>
 					</Link>
-				</div>
-			</Tooltip>
+				</>
+			) : (
+				<>
+					<Tooltip content={tooltipContent}>
+						<div className={!canCreateProposal ? 'cursor-not-allowed opacity-60' : ''}>
+							<Link href={fmtUrlWithCluster(`/dao/${ (props.type === 'tokrize') ? TOKR_DAO : symbol }/proposal/new${props.type ? '-' + props.type : ''}${props.string ? '?' + props.string : ''}`)}>
+								<a className={`${!canCreateProposal ? 'cursor-not-allowed pointer-events-none' : 'hover:bg-bkg-3'} default-transition flex items-center ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none${props.linkClasses ? ' ' + props.linkClasses : ''}`}>
+									{!props.hideIcon && <PlusCircleIcon className="h-5 mr-1.5 text-primary-light w-5" />}
+									{props.children || 'New'}
+								</a>
+							</Link>
+						</div>
+					</Tooltip>
+				</>
+			)}
 		</>
 	)
 }

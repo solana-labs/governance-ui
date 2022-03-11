@@ -123,7 +123,7 @@ export const ConnectWalletSimple = (props) => {
 								alert("Show me DAOs");
 								e.preventDefault();
 							}} target="_blank">
-								Go to DOA
+								Go to DAO
 							</NavButton>
 						</div>
 						*/}

@@ -19,6 +19,7 @@ import DepositLabel from '@components/TreasuryAccount/DepositLabel'
 import Loader from '@components/Loader'
 import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
+import { buttonStyles } from '@components/Button'
 
 const compareProposals = (
 	p1: Proposal,
@@ -67,7 +68,7 @@ function getVotingStateRank(
 
 const REALM = () => {
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
-	const  { history } = useRouterHistory();
+	const { history } = useRouterHistory()
 
 	const { realm, realmInfo, proposals, realmTokenAccount, ownTokenRecord, governances, realmDisplayName, ownVoterWeight, toManyCommunityOutstandingProposalsForUser, toManyCouncilOutstandingProposalsForUse } = useRealm()
 	const { nftsGovernedTokenAccounts } = useGovernanceAssets()
@@ -84,29 +85,28 @@ const REALM = () => {
 
 	const governanceItems = Object.values(governances)
 	const canCreateProposal = realm && governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)) && !toManyCommunityOutstandingProposalsForUser && !toManyCouncilOutstandingProposalsForUse
-	const [canCreate, setCanCreate] = useState(canCreateProposal);
+	const [canCreate, setCanCreate] = useState(canCreateProposal)
 
-	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
-	const connected = useWalletStore((s) => s.connected);
+	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false)
+	const connected = useWalletStore((s) => s.connected)
 
-	const [canCreateAction, setcanCreateAction] = useState(false);
-
-	useEffect(() => {
-		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)));
-	}, [canCreateProposal, governanceItems, history]);
-
-	useLayoutEffect(() => {
-		setSolanaBrowser(isSolanaBrowser());
-	}, []);
-
-	useLayoutEffect(() => {
-		if (!solanaBrowser) setCanCreate(false);
-	}, [solanaBrowser]);
-
+	const [canCreateAction, setcanCreateAction] = useState(false)
 
 	useEffect(() => {
-		setCanCreate(canCreateProposal);
-	}, [canCreateProposal]);
+		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)))
+	}, [canCreateProposal, governanceItems, history])
+
+	useLayoutEffect(() => {
+		setSolanaBrowser(isSolanaBrowser())
+	}, [])
+
+	useLayoutEffect(() => {
+		if (!solanaBrowser) setCanCreate(false)
+	}, [solanaBrowser])
+
+	useEffect(() => {
+		setCanCreate(canCreateProposal)
+	}, [canCreateProposal])
 
 	useEffect(() => {
 		if (filters.length > 0) {
@@ -160,8 +160,7 @@ const REALM = () => {
 		} else {
 			if (realmName || realmDisplayName) setInitalLoad(false)
 		}
-	}, [filteredProposals, realmName]);
-
+	}, [filteredProposals, realmName])
 
 	const [proposalType0, setProposalType0] = useState<any>([])
 	const [proposalType1, setProposalType1] = useState<any>([])
@@ -198,8 +197,6 @@ const REALM = () => {
 		// )
 	}, [tokrProposals])
 
-
-
 	return initalLoad ? (
 		<Loader />
 	) : (
@@ -223,48 +220,41 @@ const REALM = () => {
 							</>
 						) : null}
 					</div> */}
-						<div className="flex items-center justify-between pb-3 hidden">
-							<h4 className="text-fgd-2">{`${tokrProposals.length} proposals`}</h4>
-							<div className="flex items-center">
-								<div className="mr-4">
-									<NewProposalBtn>Request rNFT</NewProposalBtn>
-								</div>
-								<div className="mr-4">
-									<NewProposalBtn>Tokrize</NewProposalBtn>
-								</div>
-								{/* <ProposalFilter filters={filters} setFilters={setFilters} /> */}
-							</div>
-						</div>
-
-						{canCreate && (
-							<NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green">
-								{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
-							</NewProposalBtn>
-						)}
 
 						{tokrProposals.length > 0 ? (
 							<>
 								<div className={`space-y-16${canCreate ? ' mt-16' : ''}`}>
 									{proposalType1.length > 0 && (
 										<div>
-											<h2 className="text-2xl uppercase">{`Purchase Real Estate Proposal${proposalType1.length > 0 ? 's' : ''}`}</h2>
-											{proposalType1.map(([k, v]) => {
-												return <ProposalCard cta={<NewProposalBtn string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request rNFT" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
-											})}
+											<div>
+												<div className="flex items-center justify-between">
+													<h2 className="text-2xl uppercase">{`Purchase Real Estate Proposal${proposalType1.length > 0 ? 's' : ''}`}</h2>
+													{canCreate && (<div className="flex-shrink-0">
+														<NewProposalBtn string={`property=true`} addIcon title="Propose Another Property">
+															Propose Another Property
+														</NewProposalBtn>
+													</div> ) }
+												</div>
+
+
+												{proposalType1.map(([k, v]) => {
+													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${ buttonStyles }`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												})}
+											</div>
 										</div>
 									)}
 									{proposalType2.length > 0 && (
 										<div>
 											<h2 className="text-2xl uppercase">{`Request Tokr DAO to mint rNFT Proposal${proposalType2.length > 0 ? 's' : ''}`}</h2>
 											{proposalType2.map(([k, v]) => {
-												return <ProposalCard cta={<NewProposalBtn string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${ buttonStyles }`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 											})}
 										</div>
 									)}
 								</div>
 							</>
 						) : (
-							<div className="pt-8">
+							<div className="pb-4">
 								{realmDisplayName} has no proposals
 								{canCreate ? (
 									<>
@@ -280,17 +270,30 @@ const REALM = () => {
 							</div>
 						)}
 
-						{ ((proposalType0?.length === 0 && !solanaBrowser) || (proposalType0?.length === 0 && !canCreateAction)) ? <></> : <div className="mt-16">
-							<h2 className="text-2xl uppercase">{`General DAO Proposals`}</h2>
-							{proposalType0.map(([k, v]) => {
-								return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
-							})}
+						{canCreate && tokrProposals.length === 0 && (
+							<NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-dark hover:text-green">
+								{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
+							</NewProposalBtn>
+						)}
 
-							<p className="pb-8">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
+						{(proposalType0?.length === 0 && !solanaBrowser) || (proposalType0?.length === 0 && !canCreateAction) ? (
+							<></>
+						) : (
+							<div className="mt-16">
+								<h2 className="text-2xl uppercase">{`General DAO Proposals`}</h2>
+								{proposalType0.map(([k, v]) => {
+									return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+								})}
 
-							{ (solanaBrowser && connected) && <NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green">Create General Proposal</NewProposalBtn> }
-						</div> }
+								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
 
+								{solanaBrowser && connected && (
+									<NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-dark hover:text-green">
+										Create General Proposal
+									</NewProposalBtn>
+								)}
+							</div>
+						)}
 					</div>
 					<div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4 border border-fgd-1">
 						<TokenBalanceCardWrapper />

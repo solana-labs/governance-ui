@@ -14,7 +14,7 @@ const NavOption = (props) => {
 					{props.children}
 				</NavButton>
 			</li>
-		</> 
+		</>
 	)
 }
 
@@ -87,7 +87,7 @@ const Index = () => {
 												router.push(fmtUrlWithCluster(`/realms`))
 												e.preventDefault();
 											}}>
-												Browse DOAs
+												Browse DAOs
 											</NavButton>
 										</li>
 										<li className="pb-4">
@@ -95,7 +95,7 @@ const Index = () => {
 												selectionkey={`&nbsp;&nbsp;N&nbsp;&nbsp;`}
 												onClick={ handleCreateRealmButtonClick }
 											>
-												Create DOA
+												Create DAO
 											</NavButton>
 										</li>
 									</>

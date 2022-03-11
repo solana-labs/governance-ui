@@ -110,14 +110,14 @@ const BespokeConfig: React.FC<RealmWizardStepComponentProps> = ({
 		<>
 			<div className="border-b border-fgd-4 pb-4 pt-8">
 				<div className="flex items-center justify-between">
-					<h1>Create a new DOA</h1>
+					<h1>Create a new DAO</h1>
 				</div>
 			</div>
 			<div className="pt-16">
 				<div className="pb-4 pr-10 mr-2">
 					<Input
 						label="Name"
-						placeholder="Name of your DOA"
+						placeholder="Name of your DAO"
 						value={form.name}
 						type="text"
 						error={formErrors['name']}

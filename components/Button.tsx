@@ -2,6 +2,8 @@ import { FunctionComponent } from 'react'
 import Loading from './Loading'
 import Tooltip from './Tooltip'
 
+export const buttonStyles = "border border-primary-light default-transition font-bold text-green text-sm hover:bg-green hover:text-dark focus:outline-none";
+
 interface ButtonProps {
 	className?: string
 	isLoading?: boolean

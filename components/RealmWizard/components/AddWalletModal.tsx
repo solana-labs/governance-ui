@@ -50,7 +50,7 @@ const AddWalletModal: React.FC<{
 						onClose()
 					}}
 				>
-					<h2>Add DOA members' wallets</h2>
+					<h2>Add DAO members' wallets</h2>
 					<Textarea
 						rows={10}
 						placeholder="Public keys separated by coma or line break"

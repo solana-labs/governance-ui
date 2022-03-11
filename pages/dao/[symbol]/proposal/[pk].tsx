@@ -130,32 +130,33 @@ const Proposal = () => {
 							)}
 
 							{propertyDetails && (
-								<>
+								<div>
 									<h2 className="mb-4 mt-8">Property Details</h2>
 									<PropertyDataOutput className="p-8 border border-green bg-back text-green" propertyDetails={propertyDetails} />
-								</>
+									{descriptionObj?.map((item, index) => {
+										return (
+											<div key={'descriptionOutput_' + index} className="relative bg-green text-dark">
+												<ul className="list-disc list-inside pl-8 pr-4 space-y-2 py-2 text-xs">
+													{item.uri && (
+														<li>
+															<span className="inline-flex align-center">
+																<b className="inline mr-1">Property Data:</b>{' '}
+																<a className="inline" href={item.uri} target="blank">
+																	<span className="flex items-start">
+																		Download <ExternalLinkIcon className="flex-shrink-0 h-3 ml-2 mt-0.5 text-dark w-3" />
+																	</span>
+																</a>
+															</span>
+														</li>
+													)}
+												</ul>
+											</div>
+										)
+									})}
+								</div>
 							)}
 
-							{descriptionObj?.map((item, index) => {
-								return (
-									<div key={'descriptionOutput_' + index} className="pb-8">
-										<ul className="list-disc list-inside space-y-2 pt-4">
-											{item.uri && (
-												<li>
-													<span className="inline-flex align-center">
-														<b className="inline mr-1">Property Uri:</b>{' '}
-														<a className="inline" href={item.uri} target="blank">
-															<span className="flex">
-																Download <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-															</span>
-														</a>
-													</span>
-												</li>
-											)}
-										</ul>
-									</div>
-								)
-							})}
+
 
 							<InstructionPanel />
 							<DiscussionPanel solanaBrowser={solanaBrowser} />
