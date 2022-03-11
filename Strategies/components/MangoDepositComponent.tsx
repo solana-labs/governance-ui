@@ -170,7 +170,10 @@ const MangoDepositComponent = ({
     return instructions
   }
   const handleDeposit = async () => {
-    await validateInstruction({ schema, form, setFormErrors })
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    if (!isValid) {
+      return
+    }
     try {
       setIsDepositing(true)
       const prerequisiteInstructions: TransactionInstruction[] = []
@@ -459,7 +462,7 @@ const MangoAccountItem = ({
               depositIndex
             )
             .toNumber()
-        ).toFormat()}
+        ).toFormat(2)}
       </div>
       {value.delegate.toBase58() && (
         <div>Delegate: {abbreviateAddress(value.delegate)}</div>

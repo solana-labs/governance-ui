@@ -18,11 +18,12 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
+import { abbreviateAddress } from '@utils/formatting'
 import { validateInstruction } from '@utils/instructionTools'
 import { notify } from '@utils/notifications'
 import { getValidatedPublickKey } from '@utils/validations'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import { useRouter } from 'next-router-mock'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { MarketStore } from 'Strategies/store/marketStore'
 import * as yup from 'yup'
@@ -50,14 +51,19 @@ const DelegateForm = ({
     delegateAddress: '',
   })
   const [formErrors, setFormErrors] = useState({})
-  const proposalTitle = `Set delegate for MNGO account: ${selectedMangoAccount?.publicKey.toBase58()}`
+  const proposalTitle = `Set delegate for MNGO account: ${abbreviateAddress(
+    selectedMangoAccount?.publicKey
+  )}`
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
 
   const handleProposeDelegate = async () => {
-    await validateInstruction({ schema, form, setFormErrors })
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    if (!isValid) {
+      return
+    }
     setIsLoading(true)
     const delegateMangoAccount = makeSetDelegateInstruction(
       groupConfig.mangoProgramId,
