@@ -11,7 +11,7 @@ import {
 } from '@tools/sdk/units'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
-import { precision } from '@utils/formatting'
+import { abbreviateAddress, precision } from '@utils/formatting'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
@@ -293,7 +293,9 @@ const SendTokens = () => {
   const proposalTitle = isNFT
     ? nftTitle
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
-        form.destinationAccount
+        tryParseKey(form.destinationAccount)
+          ? abbreviateAddress(new PublicKey(form.destinationAccount))
+          : ''
       }`
 
   if (!currentAccount) {

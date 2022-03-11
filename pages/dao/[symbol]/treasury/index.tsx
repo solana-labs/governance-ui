@@ -14,7 +14,6 @@ import { useRouter } from 'next/router'
 import useQueryContext from '@hooks/useQueryContext'
 import tokenService from '@utils/services/token'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
-import useMarketStore from 'Strategies/store/marketStore'
 import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 
@@ -22,10 +21,7 @@ const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()
-  const {
-    governedTokenAccounts,
-    governedTokenAccountsWithoutNfts,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -48,18 +44,13 @@ const Treasury = () => {
     setActiveAccount,
   ] = useState<GovernedTokenAccount | null>(null)
   const [accountInfo, setAccountInfo] = useState<any>(null)
-  const market = useMarketStore((s) => s)
   const { realmInfo } = useRealm()
   useEffect(() => {
     if (
       tokenService._tokenList.length &&
       governedTokenAccountsWithoutNfts.filter((x) => x.mint).length
     ) {
-      getStrategies(
-        market,
-        connection,
-        governedTokenAccountsWithoutNfts.filter((x) => x.mint)
-      )
+      getStrategies(connection)
     }
   }, [
     tokenService._tokenList.length,
@@ -67,10 +58,10 @@ const Treasury = () => {
   ])
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
+      setTreasuryAccounts(governedTokenAccountsWithoutNfts)
     }
     prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccounts)])
+  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
 
   useEffect(() => {
     if (treasuryAccounts.length > 0 && treasuryAccounts[0].mint) {
