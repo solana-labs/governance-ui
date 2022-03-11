@@ -185,6 +185,7 @@ export enum Instructions {
   MangoMakeChangeMaxAccounts,
   MangoChangeReferralFeeParams,
   CreateAssociatedTokenAccount,
+  DepositIntoVolt,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
