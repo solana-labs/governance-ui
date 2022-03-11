@@ -53,4 +53,5 @@ export type MNGODepositForm = {
   mangoAccounts: MangoAccount[]
   title: string
   description: string
+  proposalCount: number
 }

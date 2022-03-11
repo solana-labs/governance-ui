@@ -45,7 +45,6 @@ export const tokenList = {
 export const MANGO = 'Mango'
 export const MANGO_MINT = 'MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac'
 export const MANGO_MINT_DEVNET = 'Bb9bsTQa1bGEtQ5KagGkvSHyuLqDWumFUcRqFusFNJWC'
-export const firstAccNumber = new BN(1)
 export const tokenListFilter = Object.keys(tokenList).map((x) => {
   return {
     name: x,
@@ -174,9 +173,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   const quoteRootBank =
     group.rootBankAccounts[group.getRootBankIndex(rootBank!)]
   const quoteNodeBank = quoteRootBank?.nodeBankAccounts[0]
-  const nextAccNumb = form.mangoAccounts.length
-    ? new BN(form.mangoAccounts.length + 1)
-    : firstAccNumber
+  const nextAccNumb = new BN(form.proposalCount)
   const mangoAccountPk =
     form.mangoAccountPk ||
     (

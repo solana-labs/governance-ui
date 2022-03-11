@@ -64,6 +64,7 @@ const MangoDepositComponent = ({
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const {
+    proposals,
     realmInfo,
     realm,
     ownVoterWeight,
@@ -211,6 +212,7 @@ const MangoDepositComponent = ({
           mintAmount,
           mangoAccountPk,
           mangoAccounts,
+          proposalCount: Object.keys(proposals).length,
         },
         realm!,
         governedTokenAccount!,
