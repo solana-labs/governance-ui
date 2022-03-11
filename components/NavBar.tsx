@@ -34,7 +34,7 @@ const NavBar = props => {
 						</Link>
 					</li>
 					*/}
-					<li className="flex items-center">
+					{ props.web3 === true && <li className="flex items-center">
 						<a href="/realms/new" onClick={e => {
 							router.push(fmtUrlWithCluster(`/realms/new`))
 							e.preventDefault();
@@ -43,7 +43,7 @@ const NavBar = props => {
 								<span>Create DAO</span>
 							</span>
 						</a>
-					</li>
+					</li> }
 					<li className="flex items-center">
 						<a href="/realms" onClick={e => {
 							router.push(fmtUrlWithCluster(`/realms`))

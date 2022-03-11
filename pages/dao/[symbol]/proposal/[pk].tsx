@@ -22,6 +22,7 @@ import VoteResults from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
 import PropertyDataOutput from '@components/PropertyDataOutput'
 import Loader from '@components/Loader'
+import { isSolanaBrowser } from '@utils/browserInfo'
 
 const Proposal = () => {
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -37,8 +38,11 @@ const Proposal = () => {
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
 
+	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
 
-
+	useLayoutEffect(() => {
+		setSolanaBrowser(isSolanaBrowser());
+	}, []);
 
 	useLayoutEffect(() => {
 		if (propertyDetails && proposalType > 0) {
@@ -91,7 +95,9 @@ const Proposal = () => {
 	// }, [])
 
 
-	return initalLoad ? <Loader /> : (
+	return initalLoad ? (
+		<Loader />
+	) : (
 		<>
 			<div className="grid grid-cols-12 gap-4">
 				<div className="bg-bkg-2 p-4 md:p-6 col-span-12 md:col-span-7 lg:col-span-8 space-y-3">
@@ -116,15 +122,10 @@ const Proposal = () => {
 								</div>
 							</div>
 
-							{(description && propertyDetails?.name) && (
+							{description && propertyDetails?.name && (
 								<div className="pb-2">
 									{console.log(propertyDetails)}
-									{ proposalType === 1 ? <>
-										{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${ propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}
-									</> : <>
-										{`Proposal to Request Tokr DAO to mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}
-									</> }
-
+									{proposalType === 1 ? <>{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}</> : <>{`Proposal to Request Tokr DAO to mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}</>}
 								</div>
 							)}
 
@@ -157,7 +158,7 @@ const Proposal = () => {
 							})}
 
 							<InstructionPanel />
-							<DiscussionPanel />
+							<DiscussionPanel solanaBrowser={solanaBrowser} />
 						</>
 					) : (
 						<>

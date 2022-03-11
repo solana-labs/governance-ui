@@ -17,6 +17,8 @@ import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import DepositLabel from '@components/TreasuryAccount/DepositLabel'
 import Loader from '@components/Loader'
+import { isSolanaBrowser } from '@utils/browserInfo'
+import useRouterHistory from '@hooks/useRouterHistory'
 
 const compareProposals = (
 	p1: Proposal,
@@ -65,6 +67,8 @@ function getVotingStateRank(
 
 const REALM = () => {
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
+	const  { history } = useRouterHistory();
+
 	const { realm, realmInfo, proposals, realmTokenAccount, ownTokenRecord, governances, realmDisplayName, ownVoterWeight, toManyCommunityOutstandingProposalsForUser, toManyCouncilOutstandingProposalsForUse } = useRealm()
 	const { nftsGovernedTokenAccounts } = useGovernanceAssets()
 	const prevStringifyNftsGovernedTokenAccounts = usePrevious(JSON.stringify(nftsGovernedTokenAccounts))
@@ -81,6 +85,24 @@ const REALM = () => {
 	const governanceItems = Object.values(governances)
 	const canCreateProposal = realm && governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)) && !toManyCommunityOutstandingProposalsForUser && !toManyCouncilOutstandingProposalsForUse
 	const [canCreate, setCanCreate] = useState(canCreateProposal);
+
+	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
+	const connected = useWalletStore((s) => s.connected);
+
+	const [canCreateAction, setcanCreateAction] = useState(false);
+
+	useEffect(() => {
+		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)));
+	}, [canCreateProposal, governanceItems, history]);
+
+	useLayoutEffect(() => {
+		setSolanaBrowser(isSolanaBrowser());
+	}, []);
+
+	useLayoutEffect(() => {
+		if (!solanaBrowser) setCanCreate(false);
+	}, [solanaBrowser]);
+
 
 	useEffect(() => {
 		setCanCreate(canCreateProposal);
@@ -176,6 +198,8 @@ const REALM = () => {
 		// )
 	}, [tokrProposals])
 
+
+
 	return initalLoad ? (
 		<Loader />
 	) : (
@@ -256,8 +280,7 @@ const REALM = () => {
 							</div>
 						)}
 
-						{/* {proposalType2.length > 0 && ( */}
-						<div className="mt-16">
+						{ ((proposalType0?.length === 0 && !solanaBrowser) || (proposalType0?.length === 0 && !canCreateAction)) ? <></> : <div className="mt-16">
 							<h2 className="text-2xl uppercase">{`General DAO Proposals`}</h2>
 							{proposalType0.map(([k, v]) => {
 								return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
@@ -265,9 +288,9 @@ const REALM = () => {
 
 							<p className="pb-8">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
 
-							<NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green">Create General Proposal</NewProposalBtn>
-						</div>
-						{/* )} */}
+							{ (solanaBrowser && connected) && <NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green">Create General Proposal</NewProposalBtn> }
+						</div> }
+
 					</div>
 					<div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4 border border-fgd-1">
 						<TokenBalanceCardWrapper />
