@@ -19,6 +19,7 @@ import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import { isPhantomBrowser, isSolanaBrowser, web3 } from '@utils/browserInfo'
 
 declare global {
     interface Window {
@@ -53,29 +54,21 @@ function App({ Component, pageProps }) {
 	}, [history])
 
 
-	const [isSolanaBrowser, setIsSolanaBrowser] = useState<boolean>(false);
-	const [isPhantomBrowser, setIsPhantomBrowser] = useState<boolean>(false);
-	const verifySolanaBrowser = () => {
-		if ("solana" in window) {
-			const provider = window?.solana;
-			setIsSolanaBrowser((provider === undefined) ? false : true);
-			if ((provider !== undefined) && provider.isPhantom) {
-				setIsPhantomBrowser(provider.isPhantom);
-				return provider
-			}
-		} else {
-			return false;
-		}
-	}
 
-	useLayoutEffect(verifySolanaBrowser, []);
+	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
+	const [phantomBrowser, setPhantomBrowser] = useState<boolean>(false);
 
 	const globalProps = {
-		isSolanaBrowser: isSolanaBrowser,
-		isPhantomBrowser: isPhantomBrowser,
-		web3: ((isSolanaBrowser || isPhantomBrowser) ? true : false),
+		isSolanaBrowser: solanaBrowser,
+		isPhantomBrowser: phantomBrowser,
+		web3: ((solanaBrowser || phantomBrowser) ? true: false),
 		...pageProps
 	}
+
+	useLayoutEffect(() => {
+		setSolanaBrowser(isSolanaBrowser());
+		setPhantomBrowser(isPhantomBrowser());
+	}, [])
 
 
 	// Note: ?v==${Date.now()} is added to the url to force favicon refresh.
