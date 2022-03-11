@@ -20,6 +20,12 @@ import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeR
 import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 
+declare global {
+    interface Window {
+        solana:any;
+    }
+}
+
 function App({ Component, pageProps }) {
 	useHydrateStore()
 	useWallet()
@@ -45,6 +51,31 @@ function App({ Component, pageProps }) {
 		setShowNav((getPathName() === '/' || getPathName() === undefined) ? false : true)
 		setPathName(getPathName())
 	}, [history])
+
+
+	const [isSolanaBrowser, setIsSolanaBrowser] = useState<boolean>(false);
+	const [isPhantomBrowser, setIsPhantomBrowser] = useState<boolean>(false);
+	const verifySolanaBrowser = () => {
+		if ("solana" in window) {
+			const provider = window?.solana;
+			setIsSolanaBrowser((provider === undefined) ? false : true);
+			if ((provider !== undefined) && provider.isPhantom) {
+				setIsPhantomBrowser(provider.isPhantom);
+				return provider
+			}
+		} else {
+			return false;
+		}
+	}
+
+	useLayoutEffect(verifySolanaBrowser, []);
+
+	const globalProps = {
+		isSolanaBrowser: isSolanaBrowser,
+		isPhantomBrowser: isPhantomBrowser,
+		web3: ((isSolanaBrowser || isPhantomBrowser) ? true : false),
+		...pageProps
+	}
 
 
 	// Note: ?v==${Date.now()} is added to the url to force favicon refresh.
@@ -98,10 +129,10 @@ function App({ Component, pageProps }) {
 			<ErrorBoundary>
 				<ThemeProvider defaultTheme="Mango">
 					<WalletIdentityProvider appName={'Realms'}>
-						{showNav && <NavBar />}
+						{showNav && <NavBar {...globalProps} />}
 						{showNav && <Notifications />}
 						<PageBodyContainer>
-							<Component {...pageProps} />
+							<Component {...globalProps} />
 						</PageBodyContainer>
 					</WalletIdentityProvider>
 				</ThemeProvider>
