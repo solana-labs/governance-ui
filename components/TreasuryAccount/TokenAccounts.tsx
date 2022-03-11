@@ -1,4 +1,4 @@
-import { fmtBnMintDecimals, fmtMintAmount } from '@tools/sdk/units'
+import { fmtBnMintDecimals } from '@tools/sdk/units'
 import React from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import LoadingRows from './LoadingRows'

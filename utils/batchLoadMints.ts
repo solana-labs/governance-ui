@@ -8,9 +8,9 @@ import { AccountInfo, Connection, PublicKey } from '@solana/web3.js'
  * @param chunkSize {Integer} Size of every group
  */
 const chunkArray = <T>(myArray: T[], chunkSize: number) => {
-  var index = 0
-  var arrayLength = myArray.length
-  var tempArray: T[][] = []
+  let index = 0
+  const arrayLength = myArray.length
+  const tempArray: T[][] = []
 
   for (index = 0; index < arrayLength; index += chunkSize) {
     const myChunk = myArray.slice(index, index + chunkSize)
