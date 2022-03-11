@@ -11,7 +11,7 @@ import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
 
 import useWalletStore from '../stores/useWalletStore'
-import Button from './Button'
+import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 
@@ -172,13 +172,14 @@ const VotePanel = () => {
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
-              <Button
+              <SecondaryButton
+                small
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
                 disabled={!isWithdrawEnabled}
               >
                 {isVoting ? 'Withdraw' : 'Release Tokens'}
-              </Button>
+              </SecondaryButton>
             ) : (
               <>
                 {isVoting && (

@@ -29,6 +29,8 @@ export interface RealmInfo {
   bannerImage?: string
 
   isCertified: boolean
+  // 3- featured DAOs  ,2- new DAO with active proposals, 1- DAOs with active proposal,
+  sortRank?: number
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {

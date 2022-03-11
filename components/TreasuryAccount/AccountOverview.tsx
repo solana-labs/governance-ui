@@ -97,8 +97,8 @@ const AccountOverview = () => {
 
   return (
     <>
-      <div className="flex items-center justify-between py-2">
-        <h2>
+      <div className="flex items-center justify-between mb-2 py-2">
+        <h2 className="mb-0">
           {currentAccount?.transferAddress &&
           getAccountName(currentAccount.transferAddress)
             ? getAccountName(currentAccount.transferAddress)
@@ -188,12 +188,12 @@ const AccountOverview = () => {
         ) : null}
       </div>
       <div className="pb-8">
-        <div className="flex items-center justify-between pb-4">
-          <h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="mb-0">
             {showStrategies ? 'Available Investments' : 'Current Investments'}
           </h3>
           <LinkButton
-            className="flex items-center text-primary-light"
+            className="flex items-center text-primary-light whitespace-nowrap"
             onClick={() => setShowStrategies(!showStrategies)}
           >
             {showStrategies ? (
@@ -353,7 +353,7 @@ const StrategyCard = ({ onClick, strat }: StrategyCardProps) => {
     apy,
   } = strat
   return (
-    <div className="border border-fgd-4 flex items-center justify-between mb-2 p-4 rounded-md">
+    <div className="border border-fgd-4 flex items-center justify-between mt-2 p-4 rounded-md">
       <div className="flex items-center">
         {handledTokenImgSrc ? (
           <img

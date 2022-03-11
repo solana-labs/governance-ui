@@ -3,7 +3,7 @@ import { Governance, InstructionData } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { getNameOf } from '@tools/core/script'
@@ -23,11 +23,21 @@ export interface UiInstruction {
   customHoldUpTime?: number
   prerequisiteInstructions?: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  signers?: Keypair[]
+  shouldSplitIntoSeparateTxs?: boolean | undefined
 }
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
   governedTokenAccount: GovernedTokenAccount | undefined
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
+export interface FriktionDepositForm {
+  amount: number | undefined
+  governedTokenAccount: GovernedTokenAccount | undefined
+  voltVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
@@ -236,6 +246,7 @@ export enum UXDIntructions {
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
+  DepositIntoVolt,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,

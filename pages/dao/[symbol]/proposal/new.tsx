@@ -51,6 +51,7 @@ import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeCha
 import Mint from './components/instructions/Mint'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
+import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
 import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
 import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
@@ -227,6 +228,8 @@ const New = () => {
             : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
           chunkSplitByDefault: x.chunkSplitByDefault || false,
+          signers: x.signers,
+          shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
         }
       })
 
@@ -317,6 +320,8 @@ const New = () => {
         return (
           <CreateAssociatedTokenAccount index={idx} governance={governance} />
         )
+      case Instructions.DepositIntoVolt:
+        return <FriktionDeposit index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
