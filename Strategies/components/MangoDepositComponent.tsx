@@ -1,17 +1,12 @@
 import {
-  INFO_LEN,
-  makeRegisterReferrerIdInstruction,
   MangoAccount,
   MangoAccountLayout,
-  MangoGroup,
   PublicKey,
-  ReferrerIdRecord,
 } from '@blockworks-foundation/mango-client'
 import Button, { LinkButton } from '@components/Button'
 import Input from '@components/inputs/Input'
 import Loading from '@components/Loading'
 import Tooltip from '@components/Tooltip'
-import { DuplicateIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
@@ -22,11 +17,7 @@ import {
   RpcContext,
   withCreateNativeTreasury,
 } from '@solana/spl-governance'
-import {
-  SystemProgram,
-  Transaction,
-  TransactionInstruction,
-} from '@solana/web3.js'
+import { SystemProgram, TransactionInstruction } from '@solana/web3.js'
 import {
   fmtMintAmount,
   getMintDecimalAmount,
@@ -34,43 +25,37 @@ import {
   parseMintNaturalAmountFromDecimal,
 } from '@tools/sdk/units'
 import { abbreviateAddress, precision } from '@utils/formatting'
-import { notify } from '@utils/notifications'
-import { sendTransaction } from '@utils/send'
 import tokenService from '@utils/services/token'
-import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
+import { GovernedTokenAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
 import { useRouter } from 'next/router'
-import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  MANGO_MINT,
-  MANGO_MINT_DEVNET,
-  tryGetMangoAccount,
-} from 'Strategies/protocols/mango/tools'
 import useMarketStore, { MarketStore } from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import ButtonGroup from '@components/ButtonGroup'
 import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
+import CreateRefForm from './CreateRefLink'
+import DelegateForm from './Delegate'
+
 const DEPOSIT = 'Deposit'
 const CREATE_REF_LINK = 'Create Referral Link'
 const DELEGATE_ACCOUNT = 'Delegate'
 
-const minMngoToCreateLink = 10000
 const MangoDepositComponent = ({
   handledMint,
   currentPositionFtm,
-  currentPosition,
   createProposalFcn,
   mangoAccounts,
+  governedTokenAccount,
 }: {
   handledMint: string
   currentPositionFtm: string
-  currentPosition: number
   createProposalFcn: HandleCreateProposalWithStrategy
   mangoAccounts: MangoAccount[]
+  governedTokenAccount: GovernedTokenAccount
 }) => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -89,31 +74,20 @@ const MangoDepositComponent = ({
   ] = useState<MangoAccount | null>(
     mangoAccounts.length ? mangoAccounts[0] : null
   )
+
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const filteredTokenGov = governedTokenAccountsWithoutNfts.filter(
-    (x) => x.mint?.publicKey.toBase58() === handledMint
-  )
   const tokenInfo = tokenService.getTokenInfo(handledMint)
-  const [matchedTreasuryAccount, setMatchedTreasuryAccount] = useState<
-    GovernedTokenAccount | undefined
-  >()
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const [hasMoreThenOneTreasury, setHasMoreThenOneTreasury] = useState(false)
-  const treasuryAmount = matchedTreasuryAccount?.token
-    ? matchedTreasuryAccount.token.account.amount
+  const treasuryAmount = governedTokenAccount?.token
+    ? governedTokenAccount.token.account.amount
     : new BN(0)
-  const mintInfo = matchedTreasuryAccount?.mint?.account
-  const [existingLinks, setExistingLinks] = useState<ReferrerIdRecord[]>([])
+  const mintInfo = governedTokenAccount?.mint?.account
   const [amount, setAmount] = useState<number | undefined>()
   const [delegateDeposit, setDelegateDeposit] = useState(false)
   const [delegateAddress, setDelegateAddress] = useState('')
-  const [linkName, setLinkName] = useState('')
-  const [linkGenerated, setLinkGenerated] = useState(false)
   const [proposalType, setProposalType] = useState('Deposit')
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const maxAmount = mintInfo
@@ -121,6 +95,17 @@ const MangoDepositComponent = ({
     : new BigNumber(0)
   const maxAmountFtm = fmtMintAmount(mintInfo, treasuryAmount)
   const currentPrecision = precision(mintMinAmount)
+  const group = market!.group!
+  const depositIndex = group.tokens.findIndex(
+    (x) => x.mint.toBase58() === handledMint
+  )
+  const tabs = [
+    { val: DEPOSIT, isVisible: true },
+    { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
+    { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
+  ]
+    .filter((x) => x.isVisible)
+    .map((x) => x.val)
   const validateAmountOnBlur = () => {
     setAmount(
       parseFloat(
@@ -132,41 +117,18 @@ const MangoDepositComponent = ({
     )
   }
   useEffect(() => {
-    if (filteredTokenGov.length) {
-      setMatchedTreasuryAccount(filteredTokenGov[0])
-      setHasMoreThenOneTreasury(filteredTokenGov.length > 1)
-    }
-  }, [filteredTokenGov.length])
-  useEffect(() => {
-    const getRefLinks = async () => {
-      const client = market.client
-      const mangoAccountPk = selectedMangoAccount!.publicKey
-      const account = await tryGetMangoAccount(market, mangoAccountPk)
-      if (account) {
-        const referrerIds = await client?.getReferrerIdsForMangoAccount(account)
-        if (referrerIds) {
-          setExistingLinks(referrerIds)
-        }
-      }
-    }
-    if (selectedMangoAccount) {
-      getRefLinks()
-    } else {
-      setExistingLinks([])
-    }
     if (selectedMangoAccount === null) {
       setProposalType(DEPOSIT)
     }
     setDelegateDeposit(false)
     setDelegateAddress('')
-    setLinkName('')
     setAmount(undefined)
   }, [selectedMangoAccount])
   const handleSolPayment = async () => {
     const instructions: TransactionInstruction[] = []
     const toAddress = await getNativeTreasuryAddress(
       realm!.owner,
-      matchedTreasuryAccount!.governance!.pubkey
+      governedTokenAccount!.governance!.pubkey
     )
     const hasSolAccount = await connection.current.getParsedAccountInfo(
       toAddress
@@ -175,7 +137,7 @@ const MangoDepositComponent = ({
       await withCreateNativeTreasury(
         instructions,
         realm!.owner,
-        matchedTreasuryAccount!.governance!.pubkey,
+        governedTokenAccount!.governance!.pubkey,
         wallet!.publicKey!
       )
     }
@@ -210,10 +172,10 @@ const MangoDepositComponent = ({
       )
       const mintAmount = parseMintNaturalAmountFromDecimal(
         amount!,
-        matchedTreasuryAccount!.mint!.account.decimals
+        governedTokenAccount!.mint!.account.decimals
       )
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-        matchedTreasuryAccount!.governance!.account.config
+        governedTokenAccount!.governance!.account.config
       )
       const defaultProposalMint = !mint?.supply.isZero()
         ? realm!.account.communityMint
@@ -231,10 +193,10 @@ const MangoDepositComponent = ({
           mangoAccounts,
         },
         realm!,
-        matchedTreasuryAccount!,
+        governedTokenAccount!,
         ownTokenRecord.pubkey,
         defaultProposalMint!,
-        matchedTreasuryAccount!.governance!.account!.proposalCount,
+        governedTokenAccount!.governance!.account!.proposalCount,
         prerequisiteInstructions,
         false,
         market,
@@ -249,86 +211,7 @@ const MangoDepositComponent = ({
     }
     setIsDepositing(false)
   }
-  const getReferrerPda = async (
-    mangoGroup: MangoGroup,
-    referrerId: string,
-    programId: PublicKey
-  ): Promise<{ referrerPda: PublicKey; encodedReferrerId: Buffer }> => {
-    const encoded = Buffer.from(referrerId, 'utf8')
-    if (encoded.length > INFO_LEN) {
-      throw new Error(
-        `info string too long. Must be less than or equal to ${INFO_LEN} bytes`
-      )
-    }
 
-    const encodedReferrerId = Buffer.concat([
-      encoded,
-      Buffer.alloc(INFO_LEN - encoded.length, 0),
-    ])
-
-    // Generate the PDA pubkey
-    const [referrerIdRecordPk] = await PublicKey.findProgramAddress(
-      [
-        mangoGroup.publicKey.toBytes(),
-        new Buffer('ReferrerIdRecord', 'utf-8'),
-        encodedReferrerId,
-      ],
-      programId
-    )
-
-    return { referrerPda: referrerIdRecordPk, encodedReferrerId }
-  }
-  const handleCreateLink = async () => {
-    setLinkGenerated(false)
-    try {
-      const signers = []
-      const programId = market.client!.programId
-      const mangoGroup = market.group
-      const { referrerPda, encodedReferrerId } = await getReferrerPda(
-        mangoGroup!,
-        linkName,
-        programId
-      )
-      const instruction = makeRegisterReferrerIdInstruction(
-        programId,
-        mangoGroup!.publicKey,
-        selectedMangoAccount!.publicKey,
-        referrerPda,
-        wallet!.publicKey!,
-        encodedReferrerId
-      )
-
-      const transaction = new Transaction()
-      transaction.add(instruction)
-      await sendTransaction({
-        transaction,
-        wallet,
-        connection: connection.current,
-        signers,
-        sendingMessage: 'Creating ref link',
-        successMessage: 'Ref link created',
-      })
-      setLinkGenerated(true)
-    } catch (e) {
-      setLinkGenerated(false)
-      notify({ type: 'error', message: "Can't generate link" })
-    }
-  }
-  const link =
-    connection.cluster === 'devnet'
-      ? `http://devnet.mango.markets/?ref=`
-      : `https://trade.mango.markets/?ref`
-  const group = market!.group!
-  const depositIndex = group.tokens.findIndex(
-    (x) => x.mint.toBase58() === handledMint
-  )
-  const tabs = [
-    { val: DEPOSIT, isVisible: true },
-    { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
-    { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
-  ]
-    .filter((x) => x.isVisible)
-    .map((x) => x.val)
   return (
     <div>
       <Select
@@ -357,168 +240,31 @@ const MangoDepositComponent = ({
           <div>Create new account</div>
         </Select.Option>
       </Select>
-      {(matchedTreasuryAccount?.mint?.publicKey.toBase58() === MANGO_MINT ||
-        matchedTreasuryAccount?.mint?.publicKey.toBase58() ===
-          MANGO_MINT_DEVNET) &&
-        currentPosition >= minMngoToCreateLink && (
-          <div className="pb-4">
-            <ButtonGroup
-              activeValue={proposalType}
-              className="h-10"
-              onChange={(v) => setProposalType(v)}
-              values={tabs}
-            />
-          </div>
-        )}
+      <div className="pb-4">
+        <ButtonGroup
+          activeValue={proposalType}
+          className="h-10"
+          onChange={(v) => setProposalType(v)}
+          values={tabs}
+        />
+      </div>
       {proposalType === DELEGATE_ACCOUNT && (
-        <div>
-          <Input
-            label={'Delegate address'}
-            value={delegateAddress}
-            type="text"
-            onChange={(e) => setDelegateAddress(e.target.value)}
-          />
-          <Button
-            className="w-full mt-6"
-            onClick={handleDeposit}
-            disabled={
-              !delegateAddress || !canUseTransferInstruction || isDepositing
-            }
-          >
-            <Tooltip
-              content={
-                !canUseTransferInstruction
-                  ? 'Please connect wallet with enough voting power to create treasury proposals'
-                  : !delegateAddress
-                  ? 'Please input address'
-                  : ''
-              }
-            >
-              {!isDepositing ? 'Propose delegate' : <Loading></Loading>}
-            </Tooltip>
-          </Button>
-        </div>
+        <DelegateForm
+          market={market}
+          governance={governedTokenAccount!.governance!}
+          selectedMangoAccount={selectedMangoAccount!}
+        ></DelegateForm>
       )}
       {proposalType === CREATE_REF_LINK && (
-        <div
-          className={` ${
-            !filteredTokenGov.length && 'opacity-60 pointer-events-none'
-          }`}
-        >
-          {hasMoreThenOneTreasury && (
-            <div className="pb-4">
-              <GovernedAccountSelect
-                label="Account"
-                governedAccounts={
-                  filteredTokenGov as GovernedMultiTypeAccount[]
-                }
-                onChange={(selected) => {
-                  setMatchedTreasuryAccount(selected)
-                }}
-                value={matchedTreasuryAccount}
-              />
-            </div>
-          )}
-          <Input
-            label="Referral ID"
-            value={linkName}
-            type="text"
-            onChange={(e) => setLinkName(e.target.value)}
-          />
-          <Button
-            className="w-full mt-6"
-            onClick={handleCreateLink}
-            disabled={
-              currentPosition < minMngoToCreateLink ||
-              !connected ||
-              !linkName.length ||
-              !canUseTransferInstruction
-            }
-          >
-            <Tooltip
-              content={
-                !canUseTransferInstruction
-                  ? 'Please connect wallet with enough voting power to create treasury proposals'
-                  : currentPosition < minMngoToCreateLink
-                  ? 'Please deposit at least 10000 MNGO to create link'
-                  : !linkName.length
-                  ? 'Please type link name'
-                  : ''
-              }
-            >
-              Create Referral Link
-            </Tooltip>
-          </Button>
-          {linkGenerated || existingLinks.length > 0 ? (
-            <div className="pt-6">
-              {linkGenerated && (
-                <div className="border border-fgd-4 px-4 py-2 rounded-md w-full break-all flex items-center">
-                  <div>
-                    <div className="text-xs text-fgd-1">
-                      {link}
-                      {linkName}
-                    </div>
-                  </div>
-                  <div className="ml-auto">
-                    <LinkButton
-                      className="ml-4 text-primary-light"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`${link}${linkName}`)
-                      }}
-                    >
-                      <DuplicateIcon className="w-5 h-5 mt-1" />
-                    </LinkButton>
-                  </div>
-                </div>
-              )}
-              {existingLinks.map((x) => (
-                <div
-                  key={x.referrerId}
-                  className="border border-fgd-4 px-4 py-2 rounded-md w-full break-all flex items-center"
-                >
-                  <div>
-                    <div className="text-xs text-fgd-1">
-                      {link}
-                      {x.referrerId}
-                    </div>
-                  </div>
-                  <div className="ml-auto">
-                    <LinkButton
-                      className="ml-4 text-primary-light"
-                      onClick={() => {
-                        navigator.clipboard.writeText(`${link}${x.referrerId}`)
-                      }}
-                    >
-                      <DuplicateIcon className="w-5 h-5 mt-1" />
-                    </LinkButton>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : null}
-        </div>
+        <CreateRefForm
+          selectedMangoAccount={selectedMangoAccount!}
+          market={market}
+          mint={new PublicKey(handledMint)}
+        ></CreateRefForm>
       )}
 
       {proposalType === DEPOSIT && (
-        <div
-          className={`${
-            !filteredTokenGov.length && 'opacity-60 pointer-events-none'
-          }`}
-        >
-          {hasMoreThenOneTreasury && (
-            <div className="pb-4">
-              <GovernedAccountSelect
-                label="Account"
-                governedAccounts={
-                  filteredTokenGov as GovernedMultiTypeAccount[]
-                }
-                onChange={(selected) => {
-                  setMatchedTreasuryAccount(selected)
-                }}
-                value={matchedTreasuryAccount}
-              />
-            </div>
-          )}
+        <div>
           <div className="flex mb-1.5 text-sm">
             Amount
             <div className="ml-auto flex items-center text-xs">

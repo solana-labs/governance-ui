@@ -15,6 +15,7 @@ const DepositModal = ({
   currentPosition,
   createProposalFcn,
   mangoAccounts,
+  governedTokenAccount,
 }) => {
   const currentPositionFtm = new BigNumber(
     currentPosition.toFixed(0)
@@ -31,10 +32,10 @@ const DepositModal = ({
 
       {protocolName === 'Mango' ? (
         <MangoDeposit
+          governedTokenAccount={governedTokenAccount}
           mangoAccounts={mangoAccounts}
           handledMint={handledMint}
           currentPositionFtm={currentPositionFtm}
-          currentPosition={currentPosition}
           createProposalFcn={createProposalFcn}
         ></MangoDeposit>
       ) : null}

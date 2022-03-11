@@ -316,6 +316,7 @@ const AccountOverview = () => {
       </div>
       {proposedInvestment && (
         <DepositModal
+          governedTokenAccount={currentAccount}
           mangoAccounts={mngoAccounts}
           currentPosition={currentMangoDeposits}
           apy={proposedInvestment.apy}
