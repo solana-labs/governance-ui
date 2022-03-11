@@ -32,59 +32,67 @@ const NFTSCompactWrapper = () => {
     resetCompactViewState,
   } = useTreasuryAccountStore()
   return nftsGovernedTokenAccounts.length ? (
-		<div className="bg-bkg-2 p-4 md:p-6 transition-all">
-			<h3 className="mb-4 flex items-center">
-				<div
-					className="cursor-pointer flex items-center"
-					onClick={() => {
-						const url = fmtUrlWithCluster(`/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`)
-						router.push(url)
-					}}
-				>
-					Properties
-					<ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light"></ArrowsExpandIcon>
-				</div>
+		<>
+			{realmNfts?.length > 0 ? (
+				<div className="bg-bkg-2 p-4 md:p-6 transition-all">
+					<>
+						<h3 className="mb-4 flex items-center">
+							<div
+								className="cursor-pointer flex items-center"
+								onClick={() => {
+									const url = fmtUrlWithCluster(`/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`)
+									router.push(url)
+								}}
+							>
+								Properties
+								<ArrowsExpandIcon className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light"></ArrowsExpandIcon>
+							</div>
 
-				<div
-					onClick={() => {
-						setCurrentCompactAccount(nftsGovernedTokenAccounts[0], connection)
-						setOpenNftDepositModal(true)
-					}}
-					className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3 ml-auto cursor-pointer"
-				>
-					<PlusIcon />
+							<div
+								onClick={() => {
+									setCurrentCompactAccount(nftsGovernedTokenAccounts[0], connection)
+									setOpenNftDepositModal(true)
+								}}
+								className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3 ml-auto cursor-pointer"
+							>
+								<PlusIcon />
+							</div>
+						</h3>
+						<div className="overflow-y-auto" style={{ maxHeight: '210px', minHeight: '50px' }}>
+							{isLoading ? (
+								<Loading></Loading>
+							) : realmNfts.length ? (
+								<div className="flex flex-row flex-wrap gap-4  border border-fgd-4 p-3">
+									{realmNfts.map((x, idx) => (
+										<a key={idx} href={getExplorerUrl(connection.endpoint, x.mint)} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+											<ImgWithLoader
+												className="bg-bkg-2 cursor-pointer default-transition border border-transparent hover:border-primary-dark"
+												style={{
+													width: '60px',
+													height: '60px',
+												}}
+												src={x.val.image}
+											/>
+										</a>
+									))}
+								</div>
+							) : (
+								<div className="text-fgd-3 flex flex-col items-center">
+									<PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
+								</div>
+							)}
+						</div>
+						{openNftDepositModal && (
+							<Modal sizeClassName="sm:max-w-3xl" onClose={handleCloseModal} isOpen={openNftDepositModal}>
+								<DepositNFT onClose={handleCloseModal}></DepositNFT>
+							</Modal>
+						)}
+					</>
 				</div>
-			</h3>
-			<div className="overflow-y-auto" style={{ maxHeight: '210px', minHeight: '50px' }}>
-				{isLoading ? (
-					<Loading></Loading>
-				) : realmNfts.length ? (
-					<div className="flex flex-row flex-wrap gap-4  border border-fgd-4 p-3">
-						{realmNfts.map((x, idx) => (
-							<a key={idx} href={getExplorerUrl(connection.endpoint, x.mint)} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
-								<ImgWithLoader
-									className="bg-bkg-2 cursor-pointer default-transition border border-transparent hover:border-primary-dark"
-									style={{
-										width: '60px',
-										height: '60px',
-									}}
-									src={x.val.image}
-								/>
-							</a>
-						))}
-					</div>
-				) : (
-					<div className="text-fgd-3 flex flex-col items-center">
-						<PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
-					</div>
-				)}
-			</div>
-			{openNftDepositModal && (
-				<Modal sizeClassName="sm:max-w-3xl" onClose={handleCloseModal} isOpen={openNftDepositModal}>
-					<DepositNFT onClose={handleCloseModal}></DepositNFT>
-				</Modal>
+			) : (
+				<></>
 			)}
-		</div>
+		</>
   ) : null
 }
 
