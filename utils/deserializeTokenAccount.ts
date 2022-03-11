@@ -1,13 +1,14 @@
 import { AccountInfo, PublicKey } from '@solana/web3.js'
 import { AccountLayout } from '@solana/spl-token'
+import { BN } from '@blockworks-foundation/mango-client'
 
 interface TokenAccount {
-  amount: number
+  amount: BN
   closeAuthority: PublicKey
   closeAuthorityOption: number
   delegate: PublicKey
   delegateOption: number
-  delegatedAmount: number
+  delegatedAmount: BN
   isNative: number
   isNativeOption: number
   mint: PublicKey
@@ -24,9 +25,9 @@ export const deserializeSplTokenAccount = (
 ): TokenAccount => {
   const _accountInfo = AccountLayout.decode(accountInfo.data)
   const amountBuffer = Buffer.from(_accountInfo.amount)
-  const amount = amountBuffer.readUIntLE(0, 8)
+  const amount = new BN(amountBuffer, 'hex', 'le')
   const delegatedAmountBuffer = Buffer.from(_accountInfo.delegatedAmount)
-  const delegatedAmount = delegatedAmountBuffer.readUIntLE(0, 8)
+  const delegatedAmount = new BN(delegatedAmountBuffer, 'hex', 'le')
   const isNativeBuffer = Buffer.from(_accountInfo.isNative)
   const isNative = isNativeBuffer.readUIntLE(0, 8)
   return {

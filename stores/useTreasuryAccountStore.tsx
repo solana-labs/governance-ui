@@ -16,11 +16,12 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { MintInfo, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import {
   deserializeSplTokenAccount,
   TokenAccountWithKey,
 } from '@utils/deserializeTokenAccount'
+import batchLoadMints from '@utils/batchLoadMints'
 
 type JankyConnectionType = {
   cluster: Cluster
@@ -31,6 +32,9 @@ type JankyConnectionType = {
 type TokenAccountWithListInfo = TokenAccountWithKey & {
   tokenInfo?: TokenInfo
 }
+type TokenInfoWithMint = TokenAccountWithListInfo & {
+  mintInfo: MintInfo
+}
 
 interface TreasuryAccountStore extends State {
   currentAccount: GovernedTokenAccount | null
@@ -39,7 +43,7 @@ interface TreasuryAccountStore extends State {
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
-  allTokenAccounts: TokenAccountWithListInfo[]
+  allTokenAccounts: TokenInfoWithMint[]
   governanceNfts: {
     [governance: string]: NFTWithMint[]
   }
@@ -94,18 +98,28 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
         }
       })
 
+      // Should we batch load the mint accounts?
+      const mints = tokenAccounts.map((tAcct) => tAcct.mint)
+      const mintInfos = await batchLoadMints(connection.current, mints)
+      const tokenAccountsWithMints: TokenInfoWithMint[] = tokenAccounts.map(
+        (tAcct) => ({
+          ...tAcct,
+          mintInfo: mintInfos[tAcct.mint.toString()],
+        })
+      )
+
       set((s) => {
-        s.allTokenAccounts = tokenAccounts
+        s.allTokenAccounts = tokenAccountsWithMints
         s.isLoadingTokenAccounts = false
       })
     } catch (e) {
+      console.error(e)
       notify({
         type: 'error',
         message: "Unable to fetch account's owned tokens",
       })
     } finally {
       set((s) => {
-        s.allTokenAccounts = []
         s.isLoadingTokenAccounts = false
       })
     }

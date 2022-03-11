@@ -33,6 +33,8 @@ import {
   tryGetMangoAccountsForOwner,
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
+import LoadingRows from './LoadingRows'
+import TokenAccounts from './TokenAccounts'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -272,14 +274,18 @@ const AccountOverview = () => {
           </div>
         )}
       </div>
+      {/* TODO: Only display ATAs if is SOL */}
+      {isSol && (
+        <div className="pb-8">
+          <h3 className="mb-4">Associated Token Accounts</h3>
+          <TokenAccounts />
+        </div>
+      )}
+
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (
-          <div className="space-y-2">
-            <div className="animate-pulse bg-bkg-3 h-12 rounded-md" />
-            <div className="animate-pulse bg-bkg-3 h-12 rounded-md" />
-            <div className="animate-pulse bg-bkg-3 h-12 rounded-md" />
-          </div>
+          <LoadingRows />
         ) : recentActivity.length > 0 ? (
           recentActivity.map((activity) => (
             <a

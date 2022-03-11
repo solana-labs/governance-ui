@@ -12,6 +12,10 @@ export function getTimestampFromDays(days: number) {
   return days * SECONDS_PER_DAY
 }
 
+export function fmtBnMintDecimals(amount: BN, decimals: number) {
+  return new BigNumber(amount.toString()).shiftedBy(-decimals).toFormat()
+}
+
 /// Formats mint amount (natural units) as a decimal string
 export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
   return mint
