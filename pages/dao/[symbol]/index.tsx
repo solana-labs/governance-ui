@@ -114,7 +114,7 @@ const REALM = () => {
 
 	// console.log('governance page tokenRecord', wallet?.connected && ownTokenRecord)
 
-	const [tokrProposals, setTokrProposals] = useState<[any]>([])
+	const [tokrProposals, setTokrProposals] = useState<any>([])
 
 	const tokrProposalsTemp = async () =>
 		filteredProposals.filter((proposal) => {

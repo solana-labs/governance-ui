@@ -39,7 +39,7 @@ function getProposalStateStyle(state: ProposalState) {
   }
 }
 
-const ProposalStateBadge = ({ proposalPk, proposal, open, cta }: { proposalPk: PublicKey; proposal: Proposal; open: boolean; cta: any }) => {
+const ProposalStateBadge = ({ proposalPk, proposal, open, cta }: { proposalPk: PublicKey; proposal: Proposal; open: boolean; cta?: any | undefined }) => {
 	const governance = useRealmGovernance(proposal.governance)
 
 	const ownVoteRecord = useWalletStore((s) => s.ownVoteRecordsByProposal)[proposalPk.toBase58()]

@@ -62,8 +62,8 @@ const New = (props) => {
 	const connection = useWalletStore((s) => s.connection)
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
-	const [title, setTitle] = useState<string>()
-	const [description, setDescription] = useState<string>()
+	const [title, setTitle] = useState<string>('')
+	const [description, setDescription] = useState<string>('')
 	const [lookupUri, setLookupUri] = useState<string>()
 	const [propertyDetails, setPropertyDetails] = useState<any>()
 	const [form, setForm] = useState({
@@ -197,13 +197,12 @@ const New = (props) => {
 		}
 	}, [propertyDetails])
 
-	const getPropertyData = (uri) => {
+	const getPropertyData = (uri?) => {
 		const url = uri || lookupUri || null
 		if (url) {
 			setIsLoadingData(true)
 			fetch(url, {
-				method: 'GET',
-				Accept: 'application/json',
+				method: 'GET'
 			})
 				.then((res) => res.json())
 				.then((res) => {
@@ -264,7 +263,7 @@ const New = (props) => {
 							<div className="pt-8 mb-20">
 								<div className="space-y-16">
 									<div className="space-y-4">
-										<div className={propertyDetails ? 'hidden' : null}>
+										<div className={propertyDetails ? 'hidden' : ''}>
 											<label htmlFor="lookup_uri">
 												<StyledLabel>URI Lookup:</StyledLabel>
 											</label>
@@ -290,10 +289,7 @@ const New = (props) => {
 														disabled={isLoading || propertyDetails ? true : false}
 														isLoading={isLoading}
 														className="flex-grow relative z-2 -mx-px"
-														onClick={(e) => {
-															getPropertyData()
-															e.preventDefault()
-														}}
+														onClick={getPropertyData}
 													>
 														Get Data
 													</SecondaryButton>

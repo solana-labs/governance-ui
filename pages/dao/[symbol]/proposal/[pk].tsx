@@ -27,7 +27,7 @@ const Proposal = () => {
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { symbol, realmInfo } = useRealm()
 	const { proposal, descriptionLink } = useProposal()
-	const [description, setDescription] = useState('')
+	const [description, setDescription] = useState<any>('')
 	const [descriptionObj, setDescriptionObj] = useState<[any]>()
 	const [proposalType, setProposalType] = useState<Number>(0)
 	const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal?.account)
@@ -36,6 +36,9 @@ const Proposal = () => {
 	const showResults = proposal && proposal.account.state !== ProposalState.Cancelled && proposal.account.state !== ProposalState.Draft
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
+
+
+
 
 	useLayoutEffect(() => {
 		if (propertyDetails && proposalType > 0) {
@@ -47,8 +50,7 @@ const Proposal = () => {
 	useLayoutEffect(() => {
 		if (descriptionObj && descriptionObj[0].uri) {
 			fetch(descriptionObj[0].uri, {
-				method: 'GET',
-				Accept: 'application/json',
+				method: 'GET'
 			})
 				.then((res) => res.json())
 				.then((res) => {
@@ -74,7 +76,6 @@ const Proposal = () => {
 		const handleResolveDescription = async () => {
 			const description = await resolveProposalDescription(descriptionLink)
 			setDescription(description)
-			console.log('\n\n\n\n\n !!!\n\ndescription', description)
 		}
 		if (descriptionLink) {
 			handleResolveDescription()

@@ -188,6 +188,6 @@ export interface InstructionsContext {
   handleSetInstructions: (val, index) => void
   governance: ProgramAccount<Governance> | null | undefined
   setGovernance: (val) => void
-  property: any  | null | undefined
-  setProperty: (val) => void
+  property?: any  | null | undefined
+  setProperty?: (val) => void
 }

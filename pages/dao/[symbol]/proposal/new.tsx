@@ -81,7 +81,7 @@ const New = (props) => {
 	const { fetchRealmGovernance, fetchTokenAccountsForSelectedRealmGovernances } = useWalletStore((s) => s.actions)
 	const [voteByCouncil, setVoteByCouncil] = useState(false)
 	const [propertyName, setPropertyName] = useState('')
-	const [proposalType, setProposalType] = useState<Number>(2)
+	const [proposalType, setProposalType] = useState<any>(2)
 	const [liteMode, setLiteMode] = useState<boolean>(false)
 	const [form, setForm] = useState({
 		title: propertyName,
@@ -395,7 +395,8 @@ const New = (props) => {
 
 	useLayoutEffect(() => {
 		if (router.query?.type) {
-			setProposalType(parseInt(router.query?.type))
+			const numberType = parseInt(router.query?.type.toString());
+			setProposalType(numberType)
 		}
 
 		if (router.query?.property) {
@@ -408,8 +409,7 @@ const New = (props) => {
 			setLiteMode(false)
 
 			fetch(`https://arweave.net/${router.query?.uri}`, {
-				method: 'GET',
-				Accept: 'application/json',
+				method: 'GET'
 			})
 			.then((res) => res.json())
 			.then((res) => {
@@ -432,47 +432,6 @@ const New = (props) => {
 
 	}, [router])
 
-
-	const getCurrentInstruction = ({ typeId, idx }) => {
-		switch (typeId) {
-			case Instructions.Transfer:
-				return <SplTokenTransfer index={idx} governance={governance}></SplTokenTransfer>
-			case Instructions.ProgramUpgrade:
-				return <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
-			case Instructions.CreateAssociatedTokenAccount:
-				return <CreateAssociatedTokenAccount index={idx} governance={governance} />
-			case Instructions.CreateSolendObligationAccount:
-				return <CreateObligationAccount index={idx} governance={governance} />
-			case Instructions.InitSolendObligationAccount:
-				return <InitObligationAccount index={idx} governance={governance} />
-			case Instructions.DepositReserveLiquidityAndObligationCollateral:
-				return <DepositReserveLiquidityAndObligationCollateral index={idx} governance={governance} />
-			case Instructions.RefreshSolendObligation:
-				return <RefreshObligation index={idx} governance={governance} />
-			case Instructions.RefreshSolendReserve:
-				return <RefreshReserve index={idx} governance={governance} />
-			case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
-				return <WithdrawObligationCollateralAndRedeemReserveLiquidity index={idx} governance={governance} />
-			case Instructions.Mint:
-				return <Mint index={idx} governance={governance}></Mint>
-			case Instructions.Base64:
-				return <CustomBase64 index={idx} governance={governance}></CustomBase64>
-			case Instructions.TokrizeContract:
-				return <TokrizeContract index={idx} governance={governance}></TokrizeContract>
-			case Instructions.None:
-				return <Empty index={idx} governance={governance}></Empty>
-			case Instructions.MangoMakeChangeMaxAccounts:
-				return <MakeChangeMaxAccounts index={idx} governance={governance}></MakeChangeMaxAccounts>
-			case Instructions.MangoChangeReferralFeeParams:
-				return <MakeChangeReferralFeeParams index={idx} governance={governance}></MakeChangeReferralFeeParams>
-			case Instructions.Grant:
-				return <Grant index={idx} governance={governance}></Grant>
-			case Instructions.Clawback:
-				return <Clawback index={idx} governance={governance}></Clawback>
-			default:
-				null
-		}
-	}
 
 	const upload = async () => {
 		setSubmittingStep([...submittingStep, `Accessing Arweave for file upload...`])
