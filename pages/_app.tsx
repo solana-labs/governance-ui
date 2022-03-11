@@ -54,7 +54,6 @@ function App({ Component, pageProps }) {
 	}, [history])
 
 
-
 	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
 	const [phantomBrowser, setPhantomBrowser] = useState<boolean>(false);
 
