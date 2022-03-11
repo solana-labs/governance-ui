@@ -5,12 +5,33 @@ import {
   ukraineDaoTokenAccountsOwnerAddress,
 } from '@utils/tokens'
 import tokenService from '@utils/services/token'
-import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
+import {
+  AccountInfo,
+  Cluster,
+  ConfirmedSignatureInfo,
+  PublicKey,
+} from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import {
+  deserializeSplTokenAccount,
+  TokenAccountWithKey,
+} from '@utils/deserializeTokenAccount'
+
+type JankyConnectionType = {
+  cluster: Cluster
+  current: Connection
+  endpoint: string
+}
+
+type TokenAccountWithListInfo = TokenAccountWithKey & {
+  tokenInfo?: TokenInfo
+}
+
 interface TreasuryAccountStore extends State {
   currentAccount: GovernedTokenAccount | null
   mintAddress: string
@@ -18,17 +39,20 @@ interface TreasuryAccountStore extends State {
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
+  allTokenAccounts: TokenAccountWithListInfo[]
   governanceNfts: {
     [governance: string]: NFTWithMint[]
   }
   isLoadingNfts: boolean
   isLoadingRecentActivity: boolean
+  isLoadingTokenAccounts: boolean
   setCurrentAccount: (account: GovernedTokenAccount, connection) => void
   handleFetchRecentActivity: (account: GovernedTokenAccount, connection) => void
   getNfts: (
     nftsGovernedTokenAccounts: GovernedTokenAccount[],
     connection: Connection
   ) => void
+  getTokenAccounts: (connection, currentAccount: GovernedTokenAccount) => void
 }
 
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
@@ -37,9 +61,55 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   tokenInfo: null,
   recentActivity: [],
   allNfts: [],
+  allTokenAccounts: [],
   governanceNfts: {},
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
+  isLoadingTokenAccounts: false,
+  getTokenAccounts: async (connection: JankyConnectionType, currentAccount) => {
+    set((s) => {
+      s.isLoadingTokenAccounts = true
+    })
+    // Only run if the account is native sol treasury
+    const owner = currentAccount!.transferAddress
+    if (!owner || !currentAccount.isSol) {
+      return
+    }
+    let accounts: { pubkey: PublicKey; account: AccountInfo<Buffer> }[]
+    try {
+      accounts = (
+        await connection.current.getTokenAccountsByOwner(owner, {
+          programId: TOKEN_PROGRAM_ID,
+        })
+      ).value
+      // deserialize the TokenAccount information
+      const tokenAccounts = accounts.map(({ pubkey, account }) => {
+        const deserializedTokenAccount = deserializeSplTokenAccount(account)
+        return {
+          ...deserializedTokenAccount,
+          key: pubkey,
+          tokenInfo: tokenService.getTokenInfo(
+            deserializedTokenAccount.mint.toString()
+          ),
+        }
+      })
+
+      set((s) => {
+        s.allTokenAccounts = tokenAccounts
+        s.isLoadingTokenAccounts = false
+      })
+    } catch (e) {
+      notify({
+        type: 'error',
+        message: "Unable to fetch account's owned tokens",
+      })
+    } finally {
+      set((s) => {
+        s.allTokenAccounts = []
+        s.isLoadingTokenAccounts = false
+      })
+    }
+  },
   getNfts: async (nftsGovernedTokenAccounts, connection) => {
     //Just for ukraine dao, it will be replaced with good abstraction
     const ukraineNftsGov = 'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
@@ -93,6 +163,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.tokenInfo = mintAddress && tokenInfo ? tokenInfo : null
     })
     _get().handleFetchRecentActivity(account, connection)
+    _get().getTokenAccounts(connection, account)
   },
   handleFetchRecentActivity: async (account, connection) => {
     set((s) => {
