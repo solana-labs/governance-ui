@@ -56,7 +56,7 @@ const Assets = () => {
                 }`}
               >
                 <PlusCircleIcon className="h-5 mr-2 w-5" />
-                New Asset
+                New Program
               </LinkButton>
             </Tooltip>
           </h3>

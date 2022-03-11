@@ -11,7 +11,9 @@ const AccountsItems = () => {
 
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
+      if (governedTokenAccounts.every((x) => x.mint && x.token)) {
+        setTreasuryAccounts(governedTokenAccounts)
+      }
     }
     prepTreasuryAccounts()
   }, [JSON.stringify(governedTokenAccounts)])
