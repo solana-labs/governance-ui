@@ -51,4 +51,6 @@ export type MNGODepositForm = {
   delegateAddress: string
   mangoAccountPk: PublicKey | null
   mangoAccounts: MangoAccount[]
+  title: string
+  description: string
 }

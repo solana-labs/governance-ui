@@ -162,6 +162,10 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   market,
   client
 ) => {
+  const fmtAmount = fmtMintAmount(
+    matchedTreasury.mint?.account,
+    new BN(form.mintAmount)
+  )
   const group = market!.group!
   const groupConfig = market!.groupConfig!
   const rootBank = group.tokens.find(
@@ -190,31 +194,29 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     realm!.owner,
     matchedTreasury!.governance!.pubkey
   )
-  const depositMangoAccountIns = makeDepositInstruction(
-    groupConfig.mangoProgramId,
-    groupConfig.publicKey,
-    matchedTreasury.governance!.pubkey,
-    group.mangoCache,
-    mangoAccountPk,
-    quoteRootBank!.publicKey,
-    quoteNodeBank!.publicKey,
-    quoteNodeBank!.vault,
-    matchedTreasury.transferAddress!,
-    new BN(form.mintAmount)
-  )
+
   const depositMangoAccountInsObj = {
     data: getInstructionDataFromBase64(
-      serializeInstructionToBase64(depositMangoAccountIns)
+      serializeInstructionToBase64(
+        makeDepositInstruction(
+          groupConfig.mangoProgramId,
+          groupConfig.publicKey,
+          matchedTreasury.governance!.pubkey,
+          group.mangoCache,
+          mangoAccountPk,
+          quoteRootBank!.publicKey,
+          quoteNodeBank!.publicKey,
+          quoteNodeBank!.vault,
+          matchedTreasury.transferAddress!,
+          new BN(form.mintAmount)
+        )
+      )
     ),
     holdUpTime: matchedTreasury.governance!.account!.config
       .minInstructionHoldUpTime,
     prerequisiteInstructions: [],
     chunkSplitByDefault: true,
   }
-  const fmtAmount = fmtMintAmount(
-    matchedTreasury.mint?.account,
-    new BN(form.mintAmount)
-  )
   const insts: InstructionDataWithHoldUpTime[] = []
   if (!form.mangoAccountPk) {
     const createMangoAccountIns = makeCreateMangoAccountInstruction(
@@ -261,11 +263,12 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     realm,
     matchedTreasury.governance!.pubkey,
     tokenOwnerRecord,
-    `Deposit ${fmtAmount} ${
-      tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
-        ?.symbol || 'tokens'
-    } to Mango account`,
-    '',
+    form.title ||
+      `Deposit ${fmtAmount} ${
+        tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
+          ?.symbol || 'tokens'
+      } to Mango account`,
+    form.description,
     governingTokenMint,
     proposalIndex,
     insts,

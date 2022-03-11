@@ -39,6 +39,10 @@ import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
 import CreateRefForm from './CreateRefLink'
 import DelegateForm from './Delegate'
+import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
+import { validateInstruction } from '@utils/instructionTools'
+import * as yup from 'yup'
+import { getValidatedPublickKey } from '@utils/validations'
 
 const DEPOSIT = 'Deposit'
 const CREATE_REF_LINK = 'Create Referral Link'
@@ -74,7 +78,7 @@ const MangoDepositComponent = ({
   ] = useState<MangoAccount | null>(
     mangoAccounts.length ? mangoAccounts[0] : null
   )
-
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
@@ -85,9 +89,22 @@ const MangoDepositComponent = ({
     ? governedTokenAccount.token.account.amount
     : new BN(0)
   const mintInfo = governedTokenAccount?.mint?.account
-  const [amount, setAmount] = useState<number | undefined>()
-  const [delegateDeposit, setDelegateDeposit] = useState(false)
-  const [delegateAddress, setDelegateAddress] = useState('')
+  const [form, setForm] = useState({
+    title: '',
+    description: '',
+    delegateAddress: '',
+    delegateDeposit: false,
+    amount: '',
+  })
+  const [formErrors, setFormErrors] = useState({})
+  const proposalTitle = `Deposit ${form.amount} ${
+    tokenService.getTokenInfo(governedTokenAccount.mint!.publicKey.toBase58())
+      ?.symbol || 'tokens'
+  } to Mango account`
+  const handleSetForm = ({ propertyName, value }) => {
+    setFormErrors({})
+    setForm({ ...form, [propertyName]: value })
+  }
   const [proposalType, setProposalType] = useState('Deposit')
   const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
   const maxAmount = mintInfo
@@ -107,22 +124,20 @@ const MangoDepositComponent = ({
     .filter((x) => x.isVisible)
     .map((x) => x.val)
   const validateAmountOnBlur = () => {
-    setAmount(
-      parseFloat(
+    handleSetForm({
+      propertyName: 'amount',
+      value: parseFloat(
         Math.max(
           Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(amount))
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(form.amount))
         ).toFixed(currentPrecision)
-      )
-    )
+      ),
+    })
   }
   useEffect(() => {
     if (selectedMangoAccount === null) {
       setProposalType(DEPOSIT)
     }
-    setDelegateDeposit(false)
-    setDelegateAddress('')
-    setAmount(undefined)
   }, [selectedMangoAccount])
   const handleSolPayment = async () => {
     const instructions: TransactionInstruction[] = []
@@ -155,6 +170,7 @@ const MangoDepositComponent = ({
     return instructions
   }
   const handleDeposit = async () => {
+    await validateInstruction({ schema, form, setFormErrors })
     try {
       setIsDepositing(true)
       const prerequisiteInstructions: TransactionInstruction[] = []
@@ -171,13 +187,15 @@ const MangoDepositComponent = ({
         connection.endpoint
       )
       const mintAmount = parseMintNaturalAmountFromDecimal(
-        amount!,
+        form.amount!,
         governedTokenAccount!.mint!.account.decimals
       )
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
         governedTokenAccount!.governance!.account.config
       )
-      const defaultProposalMint = !mint?.supply.isZero()
+      const defaultProposalMint = voteByCouncil
+        ? realm?.account.config.councilMint
+        : !mint?.supply.isZero()
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
@@ -186,9 +204,8 @@ const MangoDepositComponent = ({
         rpcContext,
         handledMint,
         {
+          ...form,
           mintAmount,
-          delegateDeposit,
-          delegateAddress,
           mangoAccountPk,
           mangoAccounts,
         },
@@ -211,7 +228,34 @@ const MangoDepositComponent = ({
     }
     setIsDepositing(false)
   }
-
+  const schema = yup.object().shape({
+    delegateAddress: yup
+      .string()
+      .test(
+        'accountTests',
+        'Delegate address validation error',
+        function (val: string) {
+          if (!form.delegateDeposit) {
+            return true
+          }
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Delegate address is required`,
+            })
+          }
+        }
+      ),
+    amount: yup.number().required('Amount is required').min(mintMinAmount),
+  })
   return (
     <div>
       <Select
@@ -270,7 +314,12 @@ const MangoDepositComponent = ({
             <div className="ml-auto flex items-center text-xs">
               <span className="text-fgd-3 mr-1">Bal:</span> {maxAmountFtm}
               <LinkButton
-                onClick={() => setAmount(maxAmount.toNumber())}
+                onClick={() =>
+                  handleSetForm({
+                    propertyName: 'amount',
+                    value: maxAmount.toNumber(),
+                  })
+                }
                 className="font-bold ml-2 text-primary-light"
               >
                 Max
@@ -278,10 +327,13 @@ const MangoDepositComponent = ({
             </div>
           </div>
           <Input
+            error={formErrors['amount']}
             min={mintMinAmount}
-            value={amount}
+            value={form.amount}
             type="number"
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={(e) =>
+              handleSetForm({ propertyName: 'amount', value: e.target.value })
+            }
             step={mintMinAmount}
             suffix="MNGO"
             onBlur={validateAmountOnBlur}
@@ -291,20 +343,50 @@ const MangoDepositComponent = ({
               <div className="flex items-center justify-between py-3 text-sm">
                 Delegate deposit
                 <Switch
-                  checked={delegateDeposit}
-                  onChange={(checked) => setDelegateDeposit(checked)}
+                  checked={form.delegateDeposit}
+                  onChange={(checked) =>
+                    handleSetForm({
+                      propertyName: 'delegateDeposit',
+                      value: checked,
+                    })
+                  }
                 />
               </div>
-              {delegateDeposit && (
+              {form.delegateDeposit && (
                 <Input
+                  error={formErrors['delegateAddress']}
                   label={'Delegate address'}
-                  value={delegateAddress}
+                  value={form.delegateAddress}
                   type="text"
-                  onChange={(e) => setDelegateAddress(e.target.value)}
+                  onChange={(e) =>
+                    handleSetForm({
+                      propertyName: 'delegateAddress',
+                      value: e.target.value,
+                    })
+                  }
                 />
               )}
             </>
           )}
+          <AdditionalProposalOptions
+            title={form.title}
+            description={form.description}
+            defaultTitle={proposalTitle}
+            setTitle={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'title',
+              })
+            }
+            setDescription={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'description',
+              })
+            }
+            voteByCouncil={voteByCouncil}
+            setVoteByCouncil={setVoteByCouncil}
+          />
           <div className="border border-fgd-4 p-4 rounded-md mb-6 mt-4 space-y-1 text-sm">
             <div className="flex justify-between">
               <span className="text-fgd-3">Current Deposits</span>
@@ -318,11 +400,11 @@ const MangoDepositComponent = ({
             <div className="flex justify-between">
               <span className="text-fgd-3">Proposed Deposit</span>
               <span className="font-bold text-fgd-1">
-                {amount?.toLocaleString() || (
+                {form.amount?.toLocaleString() || (
                   <span className="font-normal text-red">Enter an amount</span>
                 )}{' '}
                 <span className="font-normal text-fgd-3">
-                  {amount && tokenInfo?.symbol}
+                  {form.amount && tokenInfo?.symbol}
                 </span>
               </span>
             </div>
@@ -330,13 +412,15 @@ const MangoDepositComponent = ({
           <Button
             className="w-full"
             onClick={handleDeposit}
-            disabled={!amount || !canUseTransferInstruction || isDepositing}
+            disabled={
+              !form.amount || !canUseTransferInstruction || isDepositing
+            }
           >
             <Tooltip
               content={
                 !canUseTransferInstruction
                   ? 'Please connect wallet with enough voting power to create treasury proposals'
-                  : !amount
+                  : !form.amount
                   ? 'Please input the amount'
                   : ''
               }

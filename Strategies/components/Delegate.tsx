@@ -79,6 +79,7 @@ const DelegateForm = ({
         description: form.description,
         instructionsData: [instructionData],
         governance: governance!,
+        voteByCouncil,
       })
       const url = fmtUrlWithCluster(
         `/dao/${symbol}/proposal/${proposalAddress}`
