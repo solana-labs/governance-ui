@@ -40,56 +40,52 @@ const AddWalletModal: React.FC<{
   }
 
   return (
-    <>
-      {isOpen && (
-        <Modal
-          sizeClassName="sm:max-w-lg"
-          isOpen={isOpen}
-          onClose={() => {
-            setWalletAddr('')
-            onClose()
-          }}
-        >
-          <h2>Add DOA members' wallets</h2>
-          <Textarea
-            rows={10}
-            placeholder="Public keys separated by coma or line break"
-            value={walletAddr}
-            onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
-              if (hasErrors) setErrors(undefined)
-              setWalletAddr(e.target.value)
-            }}
-          />
-          {!!hasErrors && (
-            <p className="text-red w-full ml-3">
-              {hasErrors.map((error, index) => (
-                <div className="mb-2" key={index}>
-                  {error}
-                  <br />
-                </div>
-              ))}
-            </p>
-          )}
-          <br />
-          <div className="text-right mt-3">
-            <SecondaryButton
-              onClick={() => {
-                onClose()
-              }}
-            >
-              Cancel
-            </SecondaryButton>
-            <Button
-              disabled={!walletAddr.length}
-              className="ml-4"
-              onClick={handleAddWallet}
-            >
-              {getAddMembersText()}
-            </Button>
-          </div>
-        </Modal>
-      )}
-    </>
+		<>
+			{isOpen && (
+				<Modal
+					sizeClassName="sm:max-w-lg"
+					isOpen={isOpen}
+					onClose={() => {
+						setWalletAddr('')
+						onClose()
+					}}
+				>
+					<h2>Add DOA members' wallets</h2>
+					<Textarea
+						rows={10}
+						placeholder="Public keys separated by coma or line break"
+						value={walletAddr}
+						onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => {
+							if (hasErrors) setErrors(undefined)
+							setWalletAddr(e.target.value)
+						}}
+					/>
+					{!!hasErrors && (
+						<p className="text-red w-full ml-3">
+							{hasErrors.map((error, index) => (
+								<div className="mb-2" key={index}>
+									{error}
+									<br />
+								</div>
+							))}
+						</p>
+					)}
+					<br />
+					<div className="text-right mt-3">
+						<SecondaryButton
+							onClick={() => {
+								onClose()
+							}}
+						>
+							Cancel
+						</SecondaryButton>
+						<Button disabled={!walletAddr.length} className="ml-4" onClick={handleAddWallet}>
+							{getAddMembersText()}
+						</Button>
+					</div>
+				</Modal>
+			)}
+		</>
   )
 }
 
