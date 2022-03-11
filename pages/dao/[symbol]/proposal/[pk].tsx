@@ -121,42 +121,43 @@ const Proposal = () => {
 									<ProposalStateBadge proposalPk={proposal.pubkey} proposal={proposal.account} open={true} />
 								</div>
 							</div>
+							{proposalType === 0 ? (
+								<>
+									<div className="p-8 border border-green bg-back text-green">
+										<ReactMarkdown>{propertyDetails?.description}</ReactMarkdown>
+									</div>
+								</>
+							) : (
+								<>
+									{description && propertyDetails?.name && <div className="pb-2">{proposalType === 1 ? <>{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}</> : <>{`Proposal to Request Tokr DAO to certify and mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}</>}</div>}
 
-							{description && propertyDetails?.name && (
-								<div className="pb-2">
-									{console.log(propertyDetails)}
-									{proposalType === 1 ? <>{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}</> : <>{`Proposal to Request Tokr DAO to mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}</>}
-								</div>
-							)}
-
-							{propertyDetails && (
-								<div>
-									<h2 className="mb-4 mt-8">Property Details</h2>
-									<PropertyDataOutput className="p-8 border border-green bg-back text-green" propertyDetails={propertyDetails} />
-									{descriptionObj?.map((item, index) => {
-										return (
-											<div key={'descriptionOutput_' + index} className="relative bg-green text-dark">
-												<ul className="list-disc list-inside pl-8 pr-4 space-y-2 py-2 text-xs">
-													{item.uri && (
-														<li>
-															<span className="inline-flex align-center">
-																<b className="inline mr-1">Property Data:</b>{' '}
-																<a className="inline" href={item.uri} target="blank">
-																	<span className="flex items-start">
-																		Download <ExternalLinkIcon className="flex-shrink-0 h-3 ml-2 mt-0.5 text-dark w-3" />
+									{propertyDetails && (
+										<div>
+											<h2 className="mb-4 mt-8">Property Details</h2>
+											<PropertyDataOutput className="p-8 border border-green bg-back text-green" propertyDetails={propertyDetails} />
+											{descriptionObj?.map((item, index) => {
+												return (
+													<div key={'descriptionOutput_' + index} className="relative bg-green text-dark">
+														<ul className="list-disc list-inside pl-8 pr-4 space-y-2 py-2 text-xs">
+															{item.uri && (
+																<li>
+																	<span className="inline-flex align-center">
+																		<a className="inline" href={item.uri} target="blank">
+																			<span className="flex items-start">
+																				Download <ExternalLinkIcon className="flex-shrink-0 h-3 ml-2 mt-0.5 text-dark w-3" />
+																			</span>
+																		</a>
 																	</span>
-																</a>
-															</span>
-														</li>
-													)}
-												</ul>
-											</div>
-										)
-									})}
-								</div>
+																</li>
+															)}
+														</ul>
+													</div>
+												)
+											})}
+										</div>
+									)}
+								</>
 							)}
-
-
 
 							<InstructionPanel />
 							<DiscussionPanel solanaBrowser={solanaBrowser} />

@@ -22,7 +22,7 @@ function getProposalStateStyle(state: ProposalState) {
     state === ProposalState.Executing ||
     state === ProposalState.SigningOff
   ) {
-    return 'border border-blue text-blue'
+    return 'border border-white text-white'
   } else if (
     state === ProposalState.Completed ||
     state === ProposalState.Succeeded
@@ -33,7 +33,7 @@ function getProposalStateStyle(state: ProposalState) {
     state === ProposalState.Defeated ||
     state === ProposalState.ExecutingWithErrors
   ) {
-    return 'border border-red text-red'
+    return 'border border-wite text-white'
   } else {
     return 'border border-fgd-3 text-fgd-3'
   }

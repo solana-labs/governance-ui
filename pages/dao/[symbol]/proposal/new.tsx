@@ -50,6 +50,7 @@ import { uploadToArweave, fetchAssetCostToStore, estimateManifestSize } from '..
 import FormData from 'form-data'
 import { Transaction } from '@solana/web3.js'
 import Loader from '@components/Loader'
+import { TOKR_DAO } from '@components/instructions/tools'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -395,7 +396,7 @@ const New = (props) => {
 
 	useLayoutEffect(() => {
 		if (router.query?.type) {
-			const numberType = parseInt(router.query?.type.toString());
+			const numberType = parseInt(router.query?.type.toString())
 			setProposalType(numberType)
 		}
 
@@ -409,29 +410,25 @@ const New = (props) => {
 			setLiteMode(false)
 
 			fetch(`https://arweave.net/${router.query?.uri}`, {
-				method: 'GET'
+				method: 'GET',
 			})
-			.then((res) => res.json())
-			.then((res) => {
+				.then((res) => res.json())
+				.then((res) => {
+					const temp = res.attributes.map((attribute) => {
+						res[attribute.trait_type] = attribute.value
+					})
 
-				const temp = res.attributes.map( (attribute) => {
-					res[attribute.trait_type] = attribute.value;
+					setPropertyData({
+						...res,
+					})
+
+					return res
 				})
-
-				setPropertyData({
-					...res
+				.catch((error) => {
+					console.log('error', error)
 				})
-
-
-				return res
-			})
-			.catch((error) => {
-				console.log('error', error)
-			})
 		}
-
 	}, [router])
-
 
 	const upload = async () => {
 		setSubmittingStep([...submittingStep, `Accessing Arweave for file upload...`])
@@ -797,15 +794,14 @@ const New = (props) => {
 
 	const setProposalForSubmit = async (link) => {
 		const descriptionObj = {
-			// TODO: maybe a type to render details?
-			description: (proposalType === 0 ? (propertyName + " Proposal") : `Proposal to ${proposalType === 1 ? 'Purchase Real Estate and Begin Syndication' : 'Request Tokr DAO to mint rNFT'}`),
+			description: proposalType === 0 ? propertyName + ' Proposal' : `Proposal to ${proposalType === 1 ? 'Purchase Real Estate and Begin Syndication' : 'Proposal to Request Tokr DAO to certify property and mint rNFT'}`,
 			type: proposalType,
 			// description: `Proposal to Purchase ${propertyData.property_address ? `${propertyData.property_address}` : 'Real Estate'}`,
 			uri: link,
 		}
 
 		setForm({
-			title: (proposalType === 0 ? propertyName : `${propertyName} ${proposalType === 1 ? 'Purchase Request' : 'rNFT Request'}`),
+			title: proposalType === 0 ? propertyName : `${propertyName} ${proposalType === 1 ? 'Purchase Request' : 'Certification Request'}`,
 			description: JSON.stringify(descriptionObj),
 		})
 
@@ -878,12 +874,16 @@ const New = (props) => {
 				</a> */}
 
 					<h1 className="bg-dark inline-block">
-						<span className="ml-4 pr-8 text-xl uppercase">{proposalType === 1 ? `Property Proposal ${realmDisplayName ? ` for ${realmDisplayName}` : ''}` : 'rNFT Propsal'}</span>
+						<span className="ml-4 pr-8 text-xl uppercase">{proposalType === 0 ? <>{realmDisplayName} Proposal</> : <>{proposalType === 1 ? `Property Proposal ${realmDisplayName ? ` for ${realmDisplayName}` : ''}` : `${propertyData?.name ? `${propertyData.name}` : ' Property'} Certification Propsal`}</>}</span>
 					</h1>
 				</div>
 				<div className="grid grid-cols-12 gap-4">
 					<div className={`border border-fgd-1 bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 space-y-3 ${isLoading ? 'pointer-events-none' : ''}`}>
-						<p className="pt-8">Instruction/Intro here ~ Lorem ipsum dolor sit amet consectetur adipisicing elit. Quisquam libero at sit vitae maxime quod nemo vero eum mollitia quae.</p>
+						<p className="pt-8">
+							{proposalType === 0 && `Proposal for the ${realmDisplayName} to vote on any topic or item.`}
+							{proposalType === 1 && `Proposal for the ${realmDisplayName} to vote on the purchase of Real Estate and begin syndication.`}
+							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
+						</p>
 
 						<>
 							<div className="pt-8 mb-20">
@@ -891,10 +891,6 @@ const New = (props) => {
 									{proposalType === 0 ? (
 										<>
 											<div className="space-y-4">
-												<h3>
-													<span className="text-lg">Property Information</span>
-												</h3>
-
 												<div className="xpb-4">
 													<Input
 														label="Name"
@@ -932,6 +928,9 @@ const New = (props) => {
 															})
 														}
 													/>
+													<div className="text-xs pt-2">
+														Did you know? You can use Markdown!
+													</div>
 												</div>
 											</div>
 										</>
@@ -1553,7 +1552,7 @@ const New = (props) => {
 											submitProposal()
 										}}
 									>
-										{proposalType === 1 ? 'Propose Property' : 'Propose rNFT'}
+										{proposalType === 1 ? 'Propose Property' : 'Propose Certification'}
 									</Button>
 								</div>
 							</div>

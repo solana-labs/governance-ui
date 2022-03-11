@@ -271,7 +271,7 @@ const REALM = () => {
 						)}
 
 						{canCreate && tokrProposals.length === 0 && (
-							<NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-dark hover:text-green">
+							<NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-black hover:text-green">
 								{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
 							</NewProposalBtn>
 						)}
@@ -288,8 +288,8 @@ const REALM = () => {
 								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
 
 								{solanaBrowser && connected && (
-									<NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-dark hover:text-green">
-										Create General Proposal
+									<NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-black hover:text-green">
+										Create a General Proposal
 									</NewProposalBtn>
 								)}
 							</div>
