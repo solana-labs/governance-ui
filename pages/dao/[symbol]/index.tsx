@@ -229,16 +229,17 @@ const REALM = () => {
 											<div>
 												<div className="flex items-center justify-between">
 													<h2 className="text-2xl uppercase">{`Purchase Real Estate Proposal${proposalType1.length > 0 ? 's' : ''}`}</h2>
-													{canCreate && (<div className="flex-shrink-0">
-														<NewProposalBtn string={`property=true`} addIcon title="Propose Another Property">
-															Propose Another Property
-														</NewProposalBtn>
-													</div> ) }
+													{canCreate && (
+														<div className="flex-shrink-0">
+															<NewProposalBtn string={`property=true`} addIcon title="Propose Another Property">
+																Propose Another Property
+															</NewProposalBtn>
+														</div>
+													)}
 												</div>
 
-
 												{proposalType1.map(([k, v]) => {
-													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${ buttonStyles }`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 												})}
 											</div>
 										</div>
@@ -247,7 +248,7 @@ const REALM = () => {
 										<div>
 											<h2 className="text-2xl uppercase">{`Request Tokr DAO to mint rNFT Proposal${proposalType2.length > 0 ? 's' : ''}`}</h2>
 											{proposalType2.map(([k, v]) => {
-												return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${ buttonStyles }`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 											})}
 										</div>
 									)}
@@ -271,7 +272,7 @@ const REALM = () => {
 						)}
 
 						{canCreate && tokrProposals.length === 0 && (
-							<NewProposalBtn string={`property=true`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-black hover:text-green">
+							<NewProposalBtn string={`property=true`} hideIcon basic linkClasses={`text-center text-lg px-4 py-2 inline-flex ${buttonStyles}`}>
 								{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
 							</NewProposalBtn>
 						)}
@@ -280,15 +281,25 @@ const REALM = () => {
 							<></>
 						) : (
 							<div className="mt-16">
-								<h2 className="text-2xl uppercase">{`General DAO Proposals`}</h2>
+								<div className="flex items-center justify-between">
+									<h2 className="text-2xl uppercase">{`General DAO Proposals`}</h2>
+									{canCreate && (
+										<div className="flex-shrink-0">
+											<NewProposalBtn string={`type=0`} addIcon title="Create a General Proposal">
+												Create a General Proposal
+											</NewProposalBtn>
+										</div>
+									)}
+								</div>
+
 								{proposalType0.map(([k, v]) => {
 									return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 								})}
 
 								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
 
-								{solanaBrowser && connected && (
-									<NewProposalBtn string={`type=0`} hideIcon linkClasses="text-center text-lg flex flex-grow items-center justify-center border border-green w-full max-w-xs bg-green text-black hover:text-green">
+								{solanaBrowser && connected && proposalType0?.length === 0 && (
+									<NewProposalBtn string={`type=0`} hideIcon basic linkClasses={`text-center text-lg px-4 py-2 inline-flex ${buttonStyles}`}>
 										Create a General Proposal
 									</NewProposalBtn>
 								)}
