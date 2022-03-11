@@ -207,6 +207,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.ChangePerpMarketParams2,
+      name: 'Mango - Change perp market params 2',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:

@@ -154,6 +154,7 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  ChangePerpMarketParams2,
 }
 
 export type createParams = [

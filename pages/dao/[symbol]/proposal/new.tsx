@@ -57,6 +57,7 @@ import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
+import ChangePerpMarketParams2 from './components/instructions/Mango/ChangePerpMarketParams2'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -351,6 +352,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
+        )
+      case Instructions.ChangePerpMarketParams2:
+        return (
+          <ChangePerpMarketParams2
+            index={idx}
+            governance={governance}
+          ></ChangePerpMarketParams2>
         )
       case Instructions.MangoChangeReferralFeeParams:
         return (
