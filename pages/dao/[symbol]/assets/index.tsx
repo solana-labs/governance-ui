@@ -44,8 +44,8 @@ const Assets = () => {
           <div className="mb-4">
             <PreviousRouteBtn />
           </div>
-          <h3 className="mb-4 flex items-center">
-            Assets
+          <div className="flex items-center justify-between mb-4">
+            <h1 className="mb-0">Assets</h1>
             <Tooltip contentClassName="ml-auto" content={addNewAssetTooltip}>
               <LinkButton
                 onClick={goToNewAssetForm}
@@ -59,7 +59,7 @@ const Assets = () => {
                 New Program
               </LinkButton>
             </Tooltip>
-          </h3>
+          </div>
           <AssetsList />
         </div>
       </div>
