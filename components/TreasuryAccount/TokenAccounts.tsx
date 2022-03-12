@@ -47,6 +47,8 @@ const TokenAccounts: React.FC<{
                   setSendTokenInfo({
                     mintDecimals: tokenAccount.mintInfo.decimals,
                     tokenSource: tokenAccount.key,
+                    tokenInfo: tokenAccount.tokenInfo,
+                    mintBeingTransferred: tokenAccount.mint,
                   })
                 }
                 disabled={!canUseTransferInstruction}

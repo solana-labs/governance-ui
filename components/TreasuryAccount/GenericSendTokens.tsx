@@ -48,15 +48,20 @@ import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { TokenInfo } from '@solana/spl-token-registry'
 
 export type GenericSendTokensProps = {
+  mintBeingTransferred: PublicKey
   mintDecimals: number
   tokenSource: PublicKey
+  tokenInfo?: TokenInfo
 }
 
 const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
+  mintBeingTransferred,
   mintDecimals,
   tokenSource,
+  tokenInfo,
 }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
@@ -71,7 +76,6 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   } = useRealm()
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
@@ -158,6 +162,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
         owner: currentAccount.transferAddress,
         mintDecimals,
         tokenSource,
+        mint: mintBeingTransferred,
       },
 
       setFormErrors,
@@ -299,6 +304,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
           Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
         </>
       </h3>
+      {/* TODO: Change this to be generic for the token accounts */}
       <AccountLabel></AccountLabel>
       <div className="space-y-4 w-full pb-4">
         <Input

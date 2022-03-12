@@ -232,6 +232,8 @@ export async function getGenericTransferInstruction({
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
   requiredStateInfo: {
+    /// The mint that is being transfered
+    mint: PublicKey
     /// The TokenAccount address that will be sending the tokens
     tokenSource: PublicKey
     /// The number of decimals for this token's mint
@@ -250,7 +252,7 @@ export async function getGenericTransferInstruction({
     const sourceAccount = requiredStateInfo.tokenSource
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
-    const mintPK = form.governedTokenAccount.mint.publicKey
+    const mintPK = requiredStateInfo.mint
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
       requiredStateInfo.mintDecimals
@@ -263,6 +265,11 @@ export async function getGenericTransferInstruction({
       mintPK,
       wallet: wallet!,
     })
+    console.log(
+      '*** getGenericTokenInstruction receiverAddress, needToCreateAta',
+      receiverAddress,
+      needToCreateAta
+    )
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
