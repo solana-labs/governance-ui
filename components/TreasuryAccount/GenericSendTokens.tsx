@@ -77,7 +77,6 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const isNFT = currentAccount?.isNft
-  const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
