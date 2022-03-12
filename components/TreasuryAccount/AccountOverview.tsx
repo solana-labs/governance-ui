@@ -279,7 +279,7 @@ const AccountOverview = () => {
           </div>
         )}
       </div>
-      {/* TODO: Only display ATAs if is SOL */}
+      {/* Only display owned token accounts if is SOL */}
       {isSol && (
         <div className="pb-8">
           <h3 className="mb-4">Associated Token Accounts</h3>

@@ -23,7 +23,7 @@ import {
 } from '@utils/deserializeTokenAccount'
 import batchLoadMints from '@utils/batchLoadMints'
 
-type JankyConnectionType = {
+type NewConnectionType = {
   cluster: Cluster
   current: Connection
   endpoint: string
@@ -70,7 +70,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
-  getTokenAccounts: async (connection: JankyConnectionType, currentAccount) => {
+  getTokenAccounts: async (connection: NewConnectionType, currentAccount) => {
     set((s) => {
       s.isLoadingTokenAccounts = true
     })
