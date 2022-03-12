@@ -197,6 +197,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseMintInstruction,
     },
     {
+      id: Instructions.RealmConfig,
+      name: 'Realm Config',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,

@@ -165,6 +165,7 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  RealmConfig,
 }
 
 export type createParams = [
