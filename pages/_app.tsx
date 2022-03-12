@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import { ThemeProvider } from 'next-themes'
 import '../styles/index.css'
 import useWallet from '../hooks/useWallet'
@@ -8,7 +7,7 @@ import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
-import useRouterHistory from '@hooks/useRouterHistory'
+import handleRouterHistory from '@hooks/handleRouterHistory'
 import Footer from '@components/Footer'
 import { useEffect } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
@@ -24,7 +23,7 @@ import tokenService from '@utils/services/token'
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
-  useRouterHistory()
+  handleRouterHistory()
   useVoteRegistry()
   handleGovernanceAssetsStore()
   useEffect(() => {
@@ -39,7 +38,6 @@ function App({ Component, pageProps }) {
   const realmName = realmInfo?.displayName ?? realm?.account?.name
 
   const title = realmName ? `${realmName}` : 'Solana Governance'
-  const description = `Discuss and vote on ${title} proposals.`
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
@@ -74,35 +72,33 @@ function App({ Component, pageProps }) {
     wallet?.connected,
     client,
   ])
+  //remove Do not add <script> tags using next/head warning
+  useEffect(() => {
+    const changeFavicon = (link) => {
+      let $favicon = document.querySelector('link[rel="icon"]')
+      // If a <link rel="icon"> element already exists,
+      // change its href to the given link.
+      if ($favicon !== null) {
+        //@ts-ignore
+        $favicon.href = link
+        // Otherwise, create a new element and append it to <head>.
+      } else {
+        $favicon = document.createElement('link')
+        //@ts-ignore
+        $favicon.rel = 'icon'
+        //@ts-ignore
+        $favicon.href = link
+        document.head.appendChild($favicon)
+      }
+    }
+    changeFavicon(faviconUrl)
+  }, [faviconUrl])
+  useEffect(() => {
+    console.log(title)
+    document.title = title
+  }, [title])
   return (
     <div className="relative">
-      <Head>
-        <title>{title}</title>
-
-        {faviconUrl && <link rel="icon" href={faviconUrl} />}
-
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        {realmInfo?.keywords && (
-          <meta name="keywords" content={realmInfo.keywords} />
-        )}
-
-        <meta name="description" content={description} />
-        <meta name="msapplication-TileColor" content="#ffffff" />
-        <meta name="theme-color" content="#ffffff" />
-
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        {realmInfo?.ogImage && (
-          <meta property="og:image" content={realmInfo.ogImage} />
-        )}
-        <meta name="twitter:card" content="summary" />
-
-        {realmInfo?.twitter && (
-          <meta name="twitter:site" content={realmInfo.twitter} />
-        )}
-      </Head>
       <ErrorBoundary>
         <ThemeProvider defaultTheme="Mango">
           <WalletIdentityProvider appName={'Realms'}>

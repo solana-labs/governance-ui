@@ -9,14 +9,12 @@ import {
   ProposalState,
 } from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
-import RealmHeader from 'components/RealmHeader'
 import { PublicKey } from '@solana/web3.js'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
-import DepositLabel from '@components/TreasuryAccount/DepositLabel'
 import dynamic from 'next/dynamic'
 import Loading from '@components/Loading'
 import PaginationComponent from '@components/Pagination'
@@ -33,6 +31,10 @@ const NFTSCompactWrapper = dynamic(
   () => import('@components/NFTS/NFTSCompactWrapper')
 )
 const ProposalCard = dynamic(() => import('components/ProposalCard'))
+const RealmHeader = dynamic(() => import('components/RealmHeader'))
+const DepositLabel = dynamic(
+  () => import('@components/TreasuryAccount/DepositLabel')
+)
 
 const compareProposals = (
   p1: Proposal,
@@ -171,7 +173,7 @@ const REALM = () => {
             realm ? 'md:col-span-7 md:order-first lg:col-span-8' : ''
           } order-last p-4 md:p-6 rounded-lg`}
         >
-          <RealmHeader />
+          {realm && <RealmHeader />}
           {realm ? (
             <>
               <div>
@@ -251,11 +253,11 @@ const REALM = () => {
           {realm && (
             <>
               <TokenBalanceCardWrapper />
-              <AccountsCompactWrapper />
               <NFTSCompactWrapper />
               {!realm?.account.config.useCommunityVoterWeightAddin && (
                 <MembersCompactWrapper />
               )}
+              <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </>
           )}
