@@ -1,9 +1,16 @@
 import { Proposal } from '@solana/spl-governance'
-import TokenBalanceCard from './TokenBalanceCard'
 import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
-import LockPluginTokenBalanceCard from 'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
-import NftBalanceCard from './NftBalanceCard'
+import dynamic from 'next/dynamic'
+
+const LockPluginTokenBalanceCard = dynamic(
+  () =>
+    import(
+      'VoteStakeRegistry/components/TokenBalance/LockPluginTokenBalanceCard'
+    )
+)
+const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
+const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
 
 const TokenBalanceCardWrapper = ({
   proposal,
