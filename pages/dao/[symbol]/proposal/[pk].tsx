@@ -26,7 +26,7 @@ import { isSolanaBrowser } from '@utils/browserInfo'
 
 const Proposal = () => {
 	const { fmtUrlWithCluster } = useQueryContext()
-	const { symbol, realmInfo } = useRealm()
+	const { symbol, realmInfo, realmDisplayName, governances, ownVoterWeight } = useRealm()
 	const { proposal, descriptionLink } = useProposal()
 	const [description, setDescription] = useState<any>('')
 	const [descriptionObj, setDescriptionObj] = useState<[any]>()
@@ -95,6 +95,12 @@ const Proposal = () => {
 	// }, [])
 
 
+	const [canCreateAction, setcanCreateAction] = useState(false)
+	const governanceItems = Object.values(governances)
+	useEffect(() => {
+		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)))
+	}, [governanceItems, history])
+
 	return initalLoad ? (
 		<Loader />
 	) : (
@@ -130,7 +136,11 @@ const Proposal = () => {
 							) : (
 								<>
 									{description && propertyDetails?.name && <div className="pb-2">{proposalType === 1 ? <>{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}</> : <>{`Proposal to Request Tokr DAO to certify and mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}</>}</div>}
+									{ canCreateAction && <div className="border border-green p-8 text-center">
+										<p className="pb-8">Should the { realmDisplayName ? realmDisplayName : 'DAO'} purchase &quot;{propertyDetails?.name ? propertyDetails?.name : 'property'}&quot;?</p>
 
+										<VotePanel simple className=""/>
+									</div> }
 									{propertyDetails && (
 										<div>
 											<h2 className="mb-4 mt-8">Property Details</h2>

@@ -36,7 +36,7 @@ const ProposalCard = ({ proposalPk, proposal, cta }: ProposalCardProps) => {
 
 
 	return (
-		<div>
+		<div className='border border-green'>
 			<Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalPk.toBase58()}`)}>
 				<a>
 					<StyledCardWrapper>

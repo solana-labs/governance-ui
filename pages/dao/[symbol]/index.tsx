@@ -221,7 +221,7 @@ const REALM = () => {
 						) : null}
 					</div> */}
 
-						{tokrProposals.length > 0 ? (
+						{proposalType1.length > 0 && proposalType2.length > 0 ? (
 							<>
 								<div className={`space-y-16${canCreate ? ' mt-16' : ''}`}>
 									{proposalType1.length > 0 && (
@@ -271,9 +271,9 @@ const REALM = () => {
 							</div>
 						)}
 
-						{canCreate && tokrProposals.length === 0 && (
+						{(canCreate && proposalType1.length === 0) && (
 							<NewProposalBtn string={`property=true`} hideIcon basic linkClasses={`text-center text-lg px-4 py-2 inline-flex ${buttonStyles}`}>
-								{tokrProposals.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
+								{proposalType1.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
 							</NewProposalBtn>
 						)}
 
@@ -292,11 +292,12 @@ const REALM = () => {
 									)}
 								</div>
 
+								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
+
 								{proposalType0.map(([k, v]) => {
 									return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 								})}
 
-								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
 
 								{solanaBrowser && connected && proposalType0?.length === 0 && (
 									<NewProposalBtn string={`type=0`} hideIcon basic linkClasses={`text-center text-lg px-4 py-2 inline-flex ${buttonStyles}`}>
