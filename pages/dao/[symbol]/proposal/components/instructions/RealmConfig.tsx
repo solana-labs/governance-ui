@@ -1,28 +1,38 @@
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
-  getInstructionDataFromBase64,
+  createSetRealmConfig,
   Governance,
   ProgramAccount,
+  PROGRAM_VERSION_V1,
+  serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
 import { validateInstruction } from '@utils/instructionTools'
-import {
-  Base64InstructionForm,
-  UiInstruction,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
-import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import {
   getMintDecimalAmount,
   getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
+import { GovernedTokenAccount } from '@utils/tokens'
+import { PublicKey } from '@solana/web3.js'
+import { precision } from '@utils/formatting'
+import { getValidatedPublickKey } from '@utils/validations'
+import InstructionForm, { InstructionInputType } from './FormCreator'
+
+interface RealmConfigForm {
+  governedAccount: GovernedTokenAccount | undefined
+  minCommunityTokensToCreateGovernance: number
+  communityVoterWeightAddin: string
+  removeCouncil: boolean
+  maxCommunityVoterWeightAddin: string
+}
 
 const RealmConfig = ({
   index,
@@ -31,11 +41,11 @@ const RealmConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, mint } = useRealm()
+  const { realm, mint, realmInfo, councilMint } = useRealm()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<Base64InstructionForm>()
+  const [form, setForm] = useState<RealmConfigForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   async function getInstruction(): Promise<UiInstruction> {
@@ -46,13 +56,32 @@ const RealmConfig = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      serializedInstruction = form!.base64
+      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
+        form!.minCommunityTokensToCreateGovernance!,
+        mint!.decimals!
+      )
+      const instruction = await createSetRealmConfig(
+        realmInfo!.programId,
+        realmInfo!.programVersion!,
+        realm!.pubkey,
+        realm!.account.authority!,
+        form?.removeCouncil ? undefined : realm?.account.config.councilMint,
+        realm!.account.config.communityMintMaxVoteWeightSource,
+        mintAmount,
+        form!.communityVoterWeightAddin
+          ? new PublicKey(form!.communityVoterWeightAddin)
+          : undefined,
+        form?.maxCommunityVoterWeightAddin
+          ? new PublicKey(form.maxCommunityVoterWeightAddin)
+          : undefined,
+        wallet.publicKey
+      )
+      serializedInstruction = serializeInstructionToBase64(instruction)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form!.governedAccount?.governance,
-      customHoldUpTime: form!.holdUpTime,
     }
     return obj
   }
@@ -67,42 +96,66 @@ const RealmConfig = ({
       .object()
       .nullable()
       .required('Governed account is required'),
-    base64: yup
+    minCommunityTokensToCreateGovernance: yup
+      .number()
+      .required('Min community tokens to create governance is required'),
+    communityVoterWeightAddin: yup
       .string()
-      .required('Instruction is required')
-      .test('base64Test', 'Invalid base64', function (val: string) {
-        if (val) {
-          try {
-            getInstructionDataFromBase64(val)
+      .test(
+        'communityVoterWeightAddinTest',
+        'communityVoterWeightAddin validation error',
+        function (val: string) {
+          if (!form?.communityVoterWeightAddin) {
             return true
-          } catch (e) {
-            return false
           }
-        } else {
-          return this.createError({
-            message: `Instruction is required`,
-          })
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `communityVoterWeightAddin is required`,
+            })
+          }
         }
-      }),
+      ),
+    maxCommunityVoterWeightAddin: yup
+      .string()
+      .test(
+        'maxCommunityVoterWeightAddin',
+        'maxCommunityVoterWeightAddin validation error',
+        function (val: string) {
+          if (!form?.maxCommunityVoterWeightAddin) {
+            return true
+          }
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `maxCommunityVoterWeightAddin is required`,
+            })
+          }
+        }
+      ),
   })
-  //   const validateAmountOnBlur = () => {
-  //     const value = form.holdUpTime
-
-  //     handleSetForm({
-  //       value: parseFloat(
-  //         Math.max(
-  //           Number(0),
-  //           Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-  //         ).toFixed()
-  //       ),
-  //       propertyName: 'holdUpTime',
-  //     })
-  //   }
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal = getMintDecimalAmount(
     mint!,
     realm!.account.config.minCommunityTokensToCreateGovernance
   )
+  const currentPrecision = precision(minCommunity)
   const inputs = [
     {
       label: 'Governance',
@@ -126,13 +179,45 @@ const RealmConfig = ({
       min: minCommunity,
       step: minCommunity,
       hide: !mint,
+      validateMinMax: true,
+      precision: currentPrecision,
     },
+    // {
+    //   label: 'Community mint supply factor (max vote weight)',
+    //   initialValue:
+    //     realm!.account.config.communityMintMaxVoteWeightSource.value.toNumber() /
+    //     mint!.supply.toNumber(),
+    //   name: 'communityMintSupplyFactor',
+    //   type: InstructionInputType.INPUT,
+    //   inputType: 'number',
+    //   min: minCommunity,
+    //   step: minCommunity,
+    //   hide: !mint,
+    //   validateMinMax: true,
+    //   precision: currentPrecision,
+    // },
     {
       label: 'Community voter weight addin',
       initialValue: '',
       name: 'communityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',
+      hide: realmInfo?.programVersion === PROGRAM_VERSION_V1,
+    },
+    {
+      label: 'Community max voter weight addin',
+      initialValue: '',
+      name: 'maxCommunityVoterWeightAddin',
+      type: InstructionInputType.INPUT,
+      inputType: 'text',
+      hide: realmInfo?.programVersion === PROGRAM_VERSION_V1,
+    },
+    {
+      label: 'Remove council',
+      initialValue: false,
+      name: 'removeCouncil',
+      type: InstructionInputType.SWITCH,
+      hide: !councilMint,
     },
   ]
   return (
@@ -148,135 +233,3 @@ const RealmConfig = ({
 }
 
 export default RealmConfig
-
-enum InstructionInputType {
-  GOVERNED_ACCOUNT,
-  INPUT,
-  TEXTAREA,
-}
-
-interface InstructionInput {
-  label: string
-  initialValue: any
-  name: string
-  type: InstructionInputType
-  inputType?: string
-  placeholder?: string
-  min?: number
-  step?: number
-  onBlur?: () => void
-  shouldBeGoverned?: false | ProgramAccount<Governance> | null
-  governance?: ProgramAccount<Governance> | null
-  options?: any[]
-  hide?: boolean
-}
-
-const InstructionForm = ({
-  inputs,
-  setFormErrors,
-  setForm,
-  formErrors,
-}: {
-  inputs: InstructionInput[]
-  setFormErrors: React.Dispatch<React.SetStateAction<any>>
-  formErrors
-  setForm: React.Dispatch<React.SetStateAction<any>>
-}) => {
-  const [form, setInnerForm] = useState({
-    ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
-  })
-  const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setInnerForm({ ...form, [propertyName]: value })
-  }
-  useEffect(() => {
-    setForm(form)
-  }, [form])
-  return (
-    <>
-      {inputs
-        .filter((x) => !x.hide)
-        .map((x) => (
-          <InstructionInput
-            key={x.name}
-            input={x}
-            handleSetForm={handleSetForm}
-            formErrors={formErrors}
-            form={form}
-          ></InstructionInput>
-        ))}
-    </>
-  )
-}
-
-const InstructionInput = ({
-  input,
-  handleSetForm,
-  formErrors,
-  form,
-}: {
-  input: InstructionInput
-  handleSetForm: ({
-    propertyName,
-    value,
-  }: {
-    propertyName: string
-    value: any
-  }) => void
-  formErrors
-  form
-}) => {
-  const getComponent = () => {
-    switch (input.type) {
-      case InstructionInputType.GOVERNED_ACCOUNT:
-        return (
-          <GovernedAccountSelect
-            label={input.label}
-            governedAccounts={input.options!}
-            onChange={(value) => {
-              handleSetForm({ value, propertyName: input.name })
-            }}
-            value={form[input.name]}
-            error={formErrors[input.name]}
-            shouldBeGoverned={input.shouldBeGoverned}
-            governance={input.governance}
-          />
-        )
-      case InstructionInputType.INPUT:
-        return (
-          <Input
-            min={input.min}
-            label={input.label}
-            value={form[input.name]}
-            type={input.inputType!}
-            onChange={(event) => {
-              handleSetForm({
-                value: event.target.value,
-                propertyName: input.name,
-              })
-            }}
-            step={input.step}
-            error={formErrors[input.name]}
-            onBlur={input.onBlur}
-          />
-        )
-      case InstructionInputType.TEXTAREA:
-        return (
-          <Textarea
-            label={input.label}
-            placeholder={input.placeholder}
-            wrapperClassName="mb-5"
-            value={form[input.name]}
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: input.name,
-              })
-            }
-            error={formErrors[input.name]}
-          ></Textarea>
-        )
-    }
-  }
-  return getComponent()
-}
