@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  MangoMakeChangeMaxAccountsForm,
+  MangoMakeAddOracleForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -17,12 +17,9 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import {
-  BN,
-  makeChangeMaxMangoAccountsInstruction,
-} from '@blockworks-foundation/mango-client'
+import { makeAddOracleInstruction } from '@blockworks-foundation/mango-client'
 
-const MakeChangeMaxAccounts = ({
+const MakeAddOracle = ({
   index,
   governance,
 }: {
@@ -42,11 +39,11 @@ const MakeChangeMaxAccounts = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoMakeChangeMaxAccountsForm>({
+  const [form, setForm] = useState<MangoMakeAddOracleForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
     mangoGroup: undefined,
-    maxMangoAccounts: 1,
+    oracleAccount: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -69,16 +66,14 @@ const MakeChangeMaxAccounts = ({
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
-      const setMaxMangoAccountsInstr = makeChangeMaxMangoAccountsInstruction(
+      const addOracleIx = makeAddOracleInstruction(
         form.governedAccount.governance.account.governedAccount,
         new PublicKey(form.mangoGroup!),
-        form.governedAccount.governance.pubkey,
-        new BN(form.maxMangoAccounts)
+        new PublicKey(form.oracleAccount!),
+        form.governedAccount.governance.pubkey
       )
 
-      serializedInstruction = serializeInstructionToBase64(
-        setMaxMangoAccountsInstr
-      )
+      serializedInstruction = serializeInstructionToBase64(addOracleIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -110,8 +105,6 @@ const MakeChangeMaxAccounts = ({
 
   return (
     <>
-      {/* if you need more fields add theme to interface MangoMakeChangeMaxAccountsForm
-        then you can add inputs in here */}
       <GovernedAccountSelect
         label="Program"
         governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
@@ -136,20 +129,19 @@ const MakeChangeMaxAccounts = ({
         error={formErrors['mangoGroup']}
       />
       <Input
-        label="Max accounts"
-        value={form.maxMangoAccounts}
-        type="number"
-        min={1}
+        label="Oracle account"
+        value={form.oracleAccount}
+        type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'maxMangoAccounts',
+            propertyName: 'oracleAccount',
           })
         }
-        error={formErrors['maxMangoAccounts']}
+        error={formErrors['oracleAccount']}
       />
     </>
   )
 }
 
-export default MakeChangeMaxAccounts
+export default MakeAddOracle

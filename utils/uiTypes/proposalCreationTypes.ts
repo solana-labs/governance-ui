@@ -87,16 +87,75 @@ export interface ProgramUpgradeForm {
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
+export interface MangoMakeAddOracleForm {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  oracleAccount: string | undefined
+}
+
+export interface MangoMakeAddSpotMarketForm {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  oracleAccount: string | undefined
+  serumAccount: string | undefined
+  maintLeverage: number
+  initLeverage: number
+  liquidationFee: number
+  optUtil: number
+  optRate: number
+  maxRate: number
+}
+
+export interface MangoMakeChangeSpotMarketForm {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  baseSymbol: string | undefined
+  maintLeverage: number
+  initLeverage: number
+  liquidationFee: number
+  optUtil: number
+  optRate: number
+  maxRate: number
+  version: string | undefined
+}
+
+export interface MangoMakeChangePerpMarketForm {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  perpMarket: string | undefined
+  rate: string | undefined
+  maxDepthBps: string | undefined
+  exp: string | undefined
+  mngoPerPeriod: string | undefined
+  makerFee: string | undefined
+  takerFee: string | undefined
+  maintLeverage: string | undefined
+  initLeverage: string | undefined
+  liquidationFee: string | undefined
+  version: string | undefined
+  lmSizeShift: string | undefined
+}
+
+export interface MangoMakeCreatePerpMarketForm {
+  governedAccount: GovernedProgramAccount | undefined
+  programId: string | undefined
+  mangoGroup: string | undefined
+  maxMangoAccounts: number
+}
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
-  mangoGroupKey: string | undefined
+  mangoGroup: string | undefined
   maxMangoAccounts: number
 }
 export interface MangoMakeChangeReferralFeeParams {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
-  mangoGroupKey: string | undefined
+  mangoGroup: string | undefined
   refSurchargeCentibps: number
   refShareCentibps: number
   refMngoRequired: number
@@ -153,8 +212,13 @@ export enum Instructions {
   Mint,
   Base64,
   None,
-  MangoMakeChangeMaxAccounts,
+  MangoAddOracle,
+  MangoAddSpotMarket,
+  MangoChangeMaxAccounts,
+  MangoChangePerpMarket,
   MangoChangeReferralFeeParams,
+  MangoChangeSpotMarket,
+  MangoCreatePerpMarket,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,

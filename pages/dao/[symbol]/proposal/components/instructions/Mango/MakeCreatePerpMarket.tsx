@@ -22,7 +22,7 @@ import {
   makeChangeMaxMangoAccountsInstruction,
 } from '@blockworks-foundation/mango-client'
 
-const MakeChangeMaxAccounts = ({
+const MakeCreatePerpMarket = ({
   index,
   governance,
 }: {
@@ -152,4 +152,4 @@ const MakeChangeMaxAccounts = ({
   )
 }
 
-export default MakeChangeMaxAccounts
+export default MakeCreatePerpMarket
