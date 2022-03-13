@@ -176,7 +176,7 @@ const MakeAddSpotMarket = ({
         nodeBank.account.publicKey,
         baseVault.publicKey,
         rootBank.account.publicKey,
-        form.governedAccount.governance.account.governedAccount,
+        form.governedAccount.governance.pubkey,
         I80F48.fromNumber(form.maintLeverage),
         I80F48.fromNumber(form.initLeverage),
         I80F48.fromNumber(form.liquidationFee),

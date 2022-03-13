@@ -60,6 +60,7 @@ const MakeChangePerpMarket = ({
     liquidationFee: undefined,
     rate: undefined,
     exp: undefined,
+    targetPeriodLength: undefined,
     version: undefined,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -92,7 +93,7 @@ const MakeChangePerpMarket = ({
         groupConfig.mangoProgramId,
         mangoGroup,
         perpMarket,
-        form.governedAccount.governance.account.governedAccount,
+        form.governedAccount.governance.pubkey,
         I80F48.fromOptionalString(form.maintLeverage),
         I80F48.fromOptionalString(form.initLeverage),
         I80F48.fromOptionalString(form.liquidationFee),
@@ -100,7 +101,7 @@ const MakeChangePerpMarket = ({
         I80F48.fromOptionalString(form.takerFee),
         I80F48.fromOptionalString(form.rate),
         I80F48.fromOptionalString(form.maxDepthBps),
-        undefined,
+        optionalBNFromString(form.targetPeriodLength),
         form.mngoPerPeriod
           ? new BN(
               Math.round(
@@ -316,6 +317,19 @@ const MakeChangePerpMarket = ({
           })
         }
         error={formErrors['exp']}
+      />
+
+      <Input
+        label="Target period length in seconds"
+        value={form.targetPeriodLength}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'targetPeriodLength',
+          })
+        }
+        error={formErrors['targetPeriodLength']}
       />
 
       <Input

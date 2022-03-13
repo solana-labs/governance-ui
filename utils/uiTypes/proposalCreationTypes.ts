@@ -127,17 +127,18 @@ export interface MangoMakeChangePerpMarketForm {
   programId: string | undefined
   mangoGroup: string | undefined
   perpMarket: string | undefined
-  rate: string | undefined
-  maxDepthBps: string | undefined
-  exp: string | undefined
   mngoPerPeriod: string | undefined
+  maxDepthBps: string | undefined
+  lmSizeShift: string | undefined
   makerFee: string | undefined
   takerFee: string | undefined
   maintLeverage: string | undefined
   initLeverage: string | undefined
   liquidationFee: string | undefined
+  rate: string | undefined
+  exp: string | undefined
+  targetPeriodLength: string | undefined
   version: string | undefined
-  lmSizeShift: string | undefined
 }
 
 export interface MangoMakeCreatePerpMarketForm {
