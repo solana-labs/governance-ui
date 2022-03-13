@@ -143,6 +143,16 @@ const MakeChangePerpMarket = ({
       .required('Program governed account is required'),
   })
 
+  const recommendedLmSizeShift =
+    form.maxDepthBps &&
+    Math.floor(Math.log2((form.maxDepthBps as any) as number) - 3)
+
+  const recommendedMaintLeverage =
+    form.initLeverage && ((form.initLeverage as any) as number) * 2
+
+  const recommendedLiquidationFee =
+    form.initLeverage && 1 / (((form.initLeverage as any) as number) * 4)
+
   return (
     <>
       {/* if you need more fields add theme to interface MangoMakeChangeMaxAccountsForm
@@ -196,7 +206,7 @@ const MakeChangePerpMarket = ({
         error={formErrors['mngoPerPeriod']}
       />
       <Input
-        label="Max depth bps"
+        label="Max depth contracts"
         value={form.maxDepthBps}
         type="text"
         onChange={(evt) =>
@@ -209,7 +219,7 @@ const MakeChangePerpMarket = ({
       />
 
       <Input
-        label="Liquidity mining size shift"
+        label={`Liquidity mining size shift (recommended: ${recommendedLmSizeShift})`}
         value={form.lmSizeShift}
         type="text"
         onChange={(evt) =>
@@ -244,18 +254,7 @@ const MakeChangePerpMarket = ({
         }
         error={formErrors['takerFee']}
       />
-      <Input
-        label="Maintenance leverage"
-        value={form.maintLeverage}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'maintLeverage',
-          })
-        }
-        error={formErrors['maintLeverage']}
-      />
+
       <Input
         label="Initial leverage"
         value={form.initLeverage}
@@ -269,7 +268,19 @@ const MakeChangePerpMarket = ({
         error={formErrors['initLeverage']}
       />
       <Input
-        label="Liquidation fee"
+        label={`Maintenance leverage (recommended: ${recommendedMaintLeverage}`}
+        value={form.maintLeverage}
+        type="text"
+        onChange={(evt) =>
+          handleSetForm({
+            value: evt.target.value,
+            propertyName: 'maintLeverage',
+          })
+        }
+        error={formErrors['maintLeverage']}
+      />
+      <Input
+        label={`Liquidation fee (recommended: ${recommendedLiquidationFee}`}
         value={form.liquidationFee}
         type="text"
         onChange={(evt) =>
@@ -282,7 +293,7 @@ const MakeChangePerpMarket = ({
       />
 
       <Input
-        label="Rate"
+        label="Rate (reset to 0.03 to prevent slow first block)"
         value={form.rate}
         type="text"
         onChange={(evt) =>
