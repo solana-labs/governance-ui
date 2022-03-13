@@ -59,6 +59,7 @@ import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import RealmConfig from './components/instructions/RealmConfig'
+import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -349,6 +350,13 @@ const New = () => {
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.CreateNftPluginRegistrar:
+        return (
+          <CreateNftPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginRegistrar>
+        )
       case Instructions.RealmConfig:
         return <RealmConfig index={idx} governance={governance}></RealmConfig>
       case Instructions.None:

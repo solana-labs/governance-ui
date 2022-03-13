@@ -202,6 +202,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.CreateNftPluginRegistrar,
+      name: 'Create NFT plugin registrar',
+      isVisibile: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,

@@ -166,6 +166,7 @@ export enum Instructions {
   RefreshSolendObligation,
   RefreshSolendReserve,
   RealmConfig,
+  CreateNftPluginRegistrar,
 }
 
 export type createParams = [

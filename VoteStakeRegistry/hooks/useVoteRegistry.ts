@@ -8,20 +8,27 @@ export function useVoteRegistry() {
   const {
     handleSetRegistrar,
     handleSetClient,
+    handleSetNftClient,
+    handleSetNftRegistrar,
   } = useVoteStakeRegistryClientStore()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const nftClient = useVoteStakeRegistryClientStore((s) => s.state.nftClient)
 
   useEffect(() => {
     if (wallet?.connected) {
       handleSetClient(wallet, connection)
+      handleSetNftClient(wallet, connection)
     }
   }, [connection.endpoint, wallet?.connected, realm?.pubkey])
 
   useEffect(() => {
     if (realm && client) {
       handleSetRegistrar(client, realm)
+    }
+    if (realm && nftClient) {
+      handleSetNftRegistrar(nftClient, realm)
     }
   }, [realm?.pubkey, client])
 }

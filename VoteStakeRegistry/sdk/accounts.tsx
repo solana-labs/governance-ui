@@ -76,6 +76,20 @@ export const getRegistrarPDA = async (
   }
 }
 
+export const getNftRegistrarPDA = async (
+  mint: PublicKey,
+  clientProgramId: PublicKey
+) => {
+  const [registrar, registrarBump] = await PublicKey.findProgramAddress(
+    [Buffer.from('registrar'), mint.toBuffer()],
+    clientProgramId
+  )
+  return {
+    registrar,
+    registrarBump,
+  }
+}
+
 export const getVoterPDA = async (
   registrar: PublicKey,
   walletPk: PublicKey,
