@@ -167,6 +167,7 @@ export enum Instructions {
   RefreshSolendReserve,
   RealmConfig,
   CreateNftPluginRegistrar,
+  CreateNftPluginMaxVoterWeight,
 }
 
 export type createParams = [

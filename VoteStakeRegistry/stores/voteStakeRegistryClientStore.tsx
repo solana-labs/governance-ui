@@ -95,6 +95,7 @@ const useVoteStakeRegistryClientStore = create<useVoteStakeRegistryClientStore>(
     handleSetNftRegistrar: async (client, realm) => {
       const clientProgramId = client!.program.programId
       const { registrar } = await getNftRegistrarPDA(
+        realm!.pubkey,
         realm!.account.communityMint,
         clientProgramId
       )

@@ -207,6 +207,11 @@ export default function useGovernanceAssets() {
       isVisibile: canUseAnyInstruction,
     },
     {
+      id: Instructions.CreateNftPluginMaxVoterWeight,
+      name: 'Create NFT plugin max voter weight',
+      isVisibile: canUseAnyInstruction,
+    },
+    {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,

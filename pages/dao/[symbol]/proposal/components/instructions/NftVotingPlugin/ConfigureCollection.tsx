@@ -4,7 +4,6 @@ import {
   Governance,
   ProgramAccount,
   serializeInstructionToBase64,
-  SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
@@ -15,13 +14,22 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { GovernedTokenAccount } from '@utils/tokens'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-import { getNftRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
+import {
+  getNftMaxVoterWeightRecord,
+  getNftRegistrarPDA,
+} from 'VoteStakeRegistry/sdk/accounts'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, { InstructionInputType } from '../FormCreator'
+import InstructionForm, {
+  InstructionInput,
+  InstructionInputType,
+} from '../FormCreator'
+import { PublicKey } from '@solana/web3.js'
 
 interface CreateNftRegistrarForm {
   governedAccount: GovernedTokenAccount | undefined
-  maxCollections: number
+  weight: number
+  size: number
+  collection: string
 }
 
 const CreateNftPluginRegistrar = ({
@@ -31,7 +39,7 @@ const CreateNftPluginRegistrar = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, realmInfo } = useRealm()
+  const { realm } = useRealm()
   const nftClient = useVoteStakeRegistryClientStore((s) => s.state.nftClient)
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
@@ -52,17 +60,21 @@ const CreateNftPluginRegistrar = ({
         realm!.account.communityMint,
         nftClient!.program.programId
       )
-      const instruction = nftClient!.program.instruction.createRegistrar(
-        form!.maxCollections,
+      const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        nftClient!.program.programId
+      )
+      const instruction = nftClient!.program.instruction.configureCollection(
+        form!.weight,
+        form!.size,
         {
           accounts: {
             registrar,
             realm: realm!.pubkey,
-            governanceProgramId: realmInfo!.programId,
             realmAuthority: realm!.account.authority!,
-            governingTokenMint: realm!.account.communityMint!,
-            payer: wallet.publicKey!,
-            systemProgram: SYSTEM_PROGRAM_ID,
+            collection: new PublicKey(form!.collection),
+            maxVoterWeightRecord: maxVoterWeightRecord,
           },
         }
       )
@@ -87,7 +99,7 @@ const CreateNftPluginRegistrar = ({
       .nullable()
       .required('Governed account is required'),
   })
-  const inputs = [
+  const inputs: InstructionInput[] = [
     {
       label: 'Governance',
       initialValue: null,
@@ -102,13 +114,29 @@ const CreateNftPluginRegistrar = ({
       ),
     },
     {
-      label: 'Max collections',
+      label: 'Collection size',
       initialValue: 1,
-      name: 'maxCollections',
-      type: InstructionInputType.INPUT,
+      name: 'size',
       inputType: 'number',
-      min: 1,
+      type: InstructionInputType.INPUT,
+      min: 0,
       validateMinMax: true,
+    },
+    {
+      label: 'Collection weight',
+      initialValue: 0,
+      name: 'weight',
+      inputType: 'number',
+      type: InstructionInputType.INPUT,
+      min: 0,
+      validateMinMax: true,
+    },
+    {
+      label: 'Collection',
+      initialValue: 0,
+      inputType: 'text',
+      name: 'collection',
+      type: InstructionInputType.INPUT,
     },
   ]
   return (

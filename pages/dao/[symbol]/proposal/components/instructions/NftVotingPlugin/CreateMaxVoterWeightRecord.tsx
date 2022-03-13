@@ -15,16 +15,18 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { GovernedTokenAccount } from '@utils/tokens'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-import { getNftRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
+import { getNftMaxVoterWeightRecord } from 'VoteStakeRegistry/sdk/accounts'
 import { NewProposalContext } from '../../../new'
-import InstructionForm, { InstructionInputType } from '../FormCreator'
+import InstructionForm, {
+  InstructionInput,
+  InstructionInputType,
+} from '../FormCreator'
 
-interface CreateNftRegistrarForm {
+interface CreateNftMaxVoterWeightRecord {
   governedAccount: GovernedTokenAccount | undefined
-  maxCollections: number
 }
 
-const CreateNftPluginRegistrar = ({
+const CreateNftPluginMaxVoterWeightRecord = ({
   index,
   governance,
 }: {
@@ -36,7 +38,7 @@ const CreateNftPluginRegistrar = ({
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<CreateNftRegistrarForm>()
+  const [form, setForm] = useState<CreateNftMaxVoterWeightRecord>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   async function getInstruction(): Promise<UiInstruction> {
@@ -47,20 +49,18 @@ const CreateNftPluginRegistrar = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
-      const { registrar } = await getNftRegistrarPDA(
-        realm!.pubkey,
+      const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+        realm!.pubkey!,
         realm!.account.communityMint,
         nftClient!.program.programId
       )
-      const instruction = nftClient!.program.instruction.createRegistrar(
-        form!.maxCollections,
+      const instruction = nftClient!.program.instruction.createMaxVoterWeightRecord(
         {
           accounts: {
-            registrar,
-            realm: realm!.pubkey,
+            maxVoterWeightRecord,
             governanceProgramId: realmInfo!.programId,
-            realmAuthority: realm!.account.authority!,
-            governingTokenMint: realm!.account.communityMint!,
+            realm: realm!.pubkey,
+            realmGoverningTokenMint: realm!.account.communityMint,
             payer: wallet.publicKey!,
             systemProgram: SYSTEM_PROGRAM_ID,
           },
@@ -87,7 +87,7 @@ const CreateNftPluginRegistrar = ({
       .nullable()
       .required('Governed account is required'),
   })
-  const inputs = [
+  const inputs: InstructionInput[] = [
     {
       label: 'Governance',
       initialValue: null,
@@ -100,15 +100,6 @@ const CreateNftPluginRegistrar = ({
           x.governance.pubkey.toBase58() ===
           realm?.account.authority?.toBase58()
       ),
-    },
-    {
-      label: 'Max collections',
-      initialValue: 1,
-      name: 'maxCollections',
-      type: InstructionInputType.INPUT,
-      inputType: 'number',
-      min: 1,
-      validateMinMax: true,
     },
   ]
   return (
@@ -123,4 +114,4 @@ const CreateNftPluginRegistrar = ({
   )
 }
 
-export default CreateNftPluginRegistrar
+export default CreateNftPluginMaxVoterWeightRecord
