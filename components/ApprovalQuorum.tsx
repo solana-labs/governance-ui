@@ -10,13 +10,9 @@ type ApprovalProgressProps = {
   yesVotesRequired: number
 }
 
-const ApprovalProgress = ({
-  progress,
-  showBg,
-  yesVotesRequired,
-}: ApprovalProgressProps) => {
-  return (
-		<div className={`${showBg ? 'bg-bkg-1 p-3' : ''}`}>
+const ApprovalProgress = ({ progress, showBg, yesVotesRequired }: ApprovalProgressProps) => {
+	return (
+		<div className={`${showBg ? 'bg-bkg-1' : ''}`}>
 			<div className="flex items-center">
 				<div className="w-full">
 					<div className="flex items-center">
@@ -49,7 +45,7 @@ const ApprovalProgress = ({
 			</div>
 			{/* ) : null} */}
 		</div>
-  )
+	)
 }
 
 export default ApprovalProgress

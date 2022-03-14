@@ -7,12 +7,20 @@ type VoteResultsProps = {
 	proposal: Proposal
 }
 
+export const getVotingResults  = ({ proposal }: VoteResultsProps) => {
+	if (!proposal) return {}
+
+	const { yesVoteCount } = useProposalVotes(proposal)
+
+	return { yesVoteCount: yesVoteCount }
+}
+
 const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
 	const { yesVoteCount, noVoteCount, relativeNoVotes, relativeYesVotes } = useProposalVotes(proposal)
 	return (
-		<div className="flex space-x-4 items-center">
+		<div className="flex items-center">
 			{proposal ? (
-				<div className={`${!isListView ? 'bg-bkg-1 p-3' : ''} w-full`}>
+				<div className={`${!isListView ? 'bg-bkg-1' : ''} w-full`}>
 					<div className="flex">
 						<div className="w-1/2">
 							<p>Yes Votes</p>

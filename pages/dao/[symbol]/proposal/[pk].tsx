@@ -18,7 +18,7 @@ import { getRealmExplorerHost } from 'tools/routing'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import { ProposalState } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
-import VoteResults from '@components/VoteResults'
+import VoteResults, { getVotingResults } from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
 import PropertyDataOutput from '@components/PropertyDataOutput'
 import Loader from '@components/Loader'
@@ -103,16 +103,17 @@ const Proposal = () => {
 		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)))
 	}, [governanceItems, history])
 
-	const [delay, setDelay] = useState<number>(2500)
+	const [delay, setDelay] = useState<number>(3000)
 	const [isPolling, setPolling] = useState<boolean>(true)
 	const [pollingCount, setPollingCount] = useState<number>(0)
 
 	useEffect(() => {
 		if (pollingCount >= 6) {
-			setPolling(false)
+			setPolling(false);
+			setInitalLoad(false);
 		} else {
 			const msg = `Something went wrong. Please try to refresh the page.\nIf the issue persists, please contact support@rhove.com`
-			if (pollingCount === 5) {
+			if (pollingCount === 10) {
 				alert(msg)
 			} else {
 				console.log(`Attempt [${pollingCount}]` + msg)
@@ -143,7 +144,7 @@ const Proposal = () => {
 						})
 						.catch((error) => {
 							const msg = `Something went wrong. \Please verify the format of the data in ${descriptionObj && descriptionObj[0].uri} or refresh the page.`
-							if (pollingCount === 5) {
+							if (pollingCount === 10) {
 								alert(msg)
 							} else {
 								console.log(`Attempt [${pollingCount}]` + msg)
@@ -157,6 +158,10 @@ const Proposal = () => {
 		},
 		isPolling ? delay : null
 	)
+
+	useEffect(() => {
+		console.log("votePassed", votePassed);
+	}, [])
 
 	return initalLoad ? (
 		<Loader />
@@ -185,13 +190,21 @@ const Proposal = () => {
 								</div>
 							</div>
 							{proposalType === 0 ? (
-								<>
+								<div>
 									{propertyDetails?.description && (
-										<div className="p-8 border border-green bg-back text-green">
+										<div className="p-8 border border-green bg-back text-green -mb-px">
 											<ReactMarkdown>{propertyDetails?.description}</ReactMarkdown>
 										</div>
 									)}
-								</>
+
+									{canCreateAction && (
+										<div className="border border-green p-8 text-center">
+											<p className="pb-8">Cast Your Vote</p>
+
+											<VotePanel simple className="" />
+										</div>
+									)}
+								</div>
 							) : (
 								<>
 									{description && propertyDetails?.name && <div className="pb-2">{proposalType === 1 ? <>{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}</> : <>{`Proposal to Request Tokr DAO to certify and mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}</>}</div>}
@@ -233,7 +246,7 @@ const Proposal = () => {
 							)}
 
 							<InstructionPanel />
-							<DiscussionPanel solanaBrowser={solanaBrowser} />
+							<DiscussionPanel canCreateAction={canCreateAction} solanaBrowser={solanaBrowser} />
 						</>
 					) : (
 						<>
@@ -244,35 +257,43 @@ const Proposal = () => {
 					)}
 				</div>
 
-				<div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-					<TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+				<div className="col-span-12 md:col-span-5 lg:col-span-4">
+					<div className="pb-4">
+						<TokenBalanceCardWrapper proposal={option(proposal?.account)} />
+					</div>
 					{showResults ? (
-						<div className="bg-bkg-2">
-							<div className="p-4 md:p-6">
-								{proposal?.account.state === ProposalState.Voting ? (
-									<div className="flex items-end justify-between mb-4">
-										<h3 className="mb-0">Voting Now</h3>
-										<ProposalTimeStatus proposal={proposal?.account} />
-									</div>
-								) : (
-									<h3 className="mb-4">Results</h3>
-								)}
-								{proposal?.account.state === ProposalState.Voting ? (
-									<div className="pb-3">
-										<ApprovalQuorum yesVotesRequired={yesVotesRequired} progress={yesVoteProgress} showBg />
-									</div>
-								) : (
-									<div className="pb-3">
-										<VoteResultStatus progress={yesVoteProgress} votePassed={votePassed} yesVotesRequired={yesVotesRequired} />
-									</div>
-								)}
-								<VoteResults proposal={proposal.account} />
+						<div className="pt-14">
+							<div className="border border-green mt-4 pt-4 md:pt-6">
+								<div className="px-4 md:px-6">
+									{proposal?.account.state === ProposalState.Voting ? (
+										<div className="flex items-end justify-between pb-2 border-b border-green">
+											<h3 className="mb-0">Voting Now</h3>
+											<ProposalTimeStatus proposal={proposal?.account} />
+										</div>
+									) : (
+										<h3 className="flex items-end justify-between pb-2 border-b border-green">Results</h3>
+									)}
+									{proposal?.account.state === ProposalState.Voting ? (
+										<div className="pt-6">
+											<ApprovalQuorum yesVotesRequired={yesVotesRequired} progress={yesVoteProgress} showBg />
+										</div>
+									) : (
+										<div className="pt-6">
+											<VoteResultStatus progress={yesVoteProgress} votePassed={votePassed} yesVotesRequired={yesVotesRequired} />
+										</div>
+									)}
+									<VoteResults proposal={proposal.account} />
+								</div>
 							</div>
 						</div>
 					) : null}
 
-					<VotePanel />
-					<ProposalActionsPanel />
+					{ canCreateAction && <><div className="border border-green p-4 md:p-6 -mt-px">
+						<VotePanel />
+					</div>
+					<div className="hidden">
+						<ProposalActionsPanel />
+					</div > </>}
 				</div>
 			</div>
 		</>
