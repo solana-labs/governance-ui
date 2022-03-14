@@ -4,12 +4,12 @@ import {
   InstructionDataWithHoldUpTime,
 } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
 
 export default function useCreateProposal() {
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const {
     realm,

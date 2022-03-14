@@ -30,7 +30,7 @@ import { fmtMintAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
 import { abbreviateAddress } from '@utils/formatting'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const Clawback = ({
   index,
@@ -39,7 +39,7 @@ const Clawback = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const { realm } = useRealm()
   const {

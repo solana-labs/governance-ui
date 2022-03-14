@@ -1,7 +1,7 @@
 import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 export function useVoteRegistry() {
   const { realm } = useRealm()
@@ -10,11 +10,11 @@ export function useVoteRegistry() {
     handleSetClient,
     handleSetNftClient,
     handleSetNftRegistrar,
-  } = useVoteStakeRegistryClientStore()
+  } = useVotePluginsClientStore()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const nftClient = useVoteStakeRegistryClientStore((s) => s.state.nftClient)
+  const client = useVotePluginsClientStore((s) => s.state.client)
+  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
 
   useEffect(() => {
     if (wallet?.connected) {

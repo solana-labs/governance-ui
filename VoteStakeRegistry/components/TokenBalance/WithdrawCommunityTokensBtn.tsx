@@ -16,13 +16,13 @@ import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistry
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useState } from 'react'
 import Loading from '@components/Loading'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const {
     realm,
     realmInfo,

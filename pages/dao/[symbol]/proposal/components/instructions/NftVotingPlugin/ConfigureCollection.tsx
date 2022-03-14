@@ -13,7 +13,7 @@ import useWalletStore from 'stores/useWalletStore'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { GovernedTokenAccount } from '@utils/tokens'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import {
   getNftMaxVoterWeightRecord,
   getNftRegistrarPDA,
@@ -40,7 +40,7 @@ const CreateNftPluginRegistrar = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const { realm } = useRealm()
-  const nftClient = useVoteStakeRegistryClientStore((s) => s.state.nftClient)
+  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance

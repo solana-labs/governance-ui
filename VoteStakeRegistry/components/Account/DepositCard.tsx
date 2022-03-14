@@ -20,13 +20,13 @@ import {
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)

@@ -37,7 +37,7 @@ import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
 
 const Grant = ({
@@ -47,7 +47,7 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const dateNow = dayjs().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)

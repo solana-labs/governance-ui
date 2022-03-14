@@ -12,7 +12,7 @@ import { BadgeCheckIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { sendTransaction } from '@utils/send'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const ApproveAllBtn = () => {
   const wallet = useWalletStore((s) => s.current)
@@ -26,7 +26,7 @@ const ApproveAllBtn = () => {
     (s) => s.selectedRealm
   )
 
-  const { client } = useVoteStakeRegistryClientStore((s) => s.state)
+  const { client } = useVotePluginsClientStore((s) => s.state)
   const { proposals } = useRealm()
 
   const votingProposals = useMemo(

@@ -39,7 +39,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
@@ -86,7 +86,7 @@ function extractGovernanceAccountFromInstructionsData(
 
 const New = () => {
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,

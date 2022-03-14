@@ -51,7 +51,7 @@ import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const SendTokens = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
@@ -65,7 +65,7 @@ const SendTokens = () => {
     councilMint,
     canChooseWhoVote,
   } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = currentAccount?.isNft

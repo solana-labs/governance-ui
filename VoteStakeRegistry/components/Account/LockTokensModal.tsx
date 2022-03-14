@@ -37,7 +37,7 @@ import {
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
 import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
@@ -57,9 +57,9 @@ const LockTokensModal = ({
 }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const communityMintRegistrar = useVoteStakeRegistryClientStore(
-    (s) => s.state.communityMintRegistrar
+  const client = useVotePluginsClientStore((s) => s.state.client)
+  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrar
   )
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
@@ -107,7 +107,7 @@ const LockTokensModal = ({
     })
   const maxMultiplier = calcMintMultiplier(
     maxNonCustomDaysLockup * SECS_PER_DAY,
-    communityMintRegistrar,
+    voteStakeRegistryRegistrar,
     realm
   )
 
@@ -181,7 +181,7 @@ const LockTokensModal = ({
     : ''
   const currentMultiplier = calcMintMultiplier(
     lockupPeriodDays * SECS_PER_DAY,
-    communityMintRegistrar,
+    voteStakeRegistryRegistrar,
     realm
   )
   const currentPercentOfMaxMultiplier =
@@ -496,7 +496,7 @@ const LockTokensModal = ({
   }, [lockMoreThenDeposited])
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
-  }, [communityMintRegistrar])
+  }, [voteStakeRegistryRegistrar])
   useEffect(() => {
     if (depositToUnlock) {
       goToStep(0)

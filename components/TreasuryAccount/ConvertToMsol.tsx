@@ -32,7 +32,7 @@ import { createProposal } from 'actions/createProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const ConvertToMsol = () => {
   const {
@@ -44,7 +44,7 @@ const ConvertToMsol = () => {
     councilMint,
     symbol,
   } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()

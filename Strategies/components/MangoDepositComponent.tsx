@@ -33,7 +33,7 @@ import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useMarketStore, { MarketStore } from 'Strategies/store/marketStore'
 import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import ButtonGroup from '@components/ButtonGroup'
 import Switch from '@components/Switch'
 import Select from '@components/inputs/Select'
@@ -80,7 +80,7 @@ const MangoDepositComponent = ({
     mangoAccounts.length ? mangoAccounts[0] : null
   )
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)

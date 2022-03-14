@@ -13,11 +13,11 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 
-interface useVoteStakeRegistryClientStore extends State {
+interface UseVotePluginsClientStore extends State {
   state: {
     client: VsrClient | undefined
     nftClient: NftVoterClient | undefined
-    communityMintRegistrar: Registrar | null
+    voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
   }
   handleSetClient: (
@@ -41,11 +41,11 @@ interface useVoteStakeRegistryClientStore extends State {
 const defaultState = {
   client: undefined,
   nftClient: undefined,
-  communityMintRegistrar: null,
+  voteStakeRegistryRegistrar: null,
   nftMintRegistrar: null,
 }
-//TODO Create abstracion for diffrent clients
-const useVoteStakeRegistryClientStore = create<useVoteStakeRegistryClientStore>(
+
+const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
   (set, _get) => ({
     state: {
       ...defaultState,
@@ -74,7 +74,7 @@ const useVoteStakeRegistryClientStore = create<useVoteStakeRegistryClientStore>(
       )
       const existingRegistrar = await tryGetRegistrar(registrar, client!)
       set((s) => {
-        s.state.communityMintRegistrar = existingRegistrar
+        s.state.voteStakeRegistryRegistrar = existingRegistrar
       })
     },
     handleSetNftClient: async (wallet, connection) => {
@@ -107,4 +107,4 @@ const useVoteStakeRegistryClientStore = create<useVoteStakeRegistryClientStore>(
   })
 )
 
-export default useVoteStakeRegistryClientStore
+export default useVotePluginsClientStore

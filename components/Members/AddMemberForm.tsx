@@ -27,7 +27,7 @@ import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
 } from '@heroicons/react/outline'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 interface AddMemberForm extends MintForm {
   description: string
@@ -41,7 +41,7 @@ const AddMemberForm = ({ close }) => {
   const [formErrors, setFormErrors] = useState({})
 
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
 
