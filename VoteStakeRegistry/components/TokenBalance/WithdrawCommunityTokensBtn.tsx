@@ -73,6 +73,7 @@ const WithDrawCommunityTokens = () => {
             const governance =
               governances[proposal.account.governance.toBase58()]
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
+              setIsLoading(false)
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               notify({
                 type: 'error',

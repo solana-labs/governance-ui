@@ -17,6 +17,7 @@ import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useTransactionSignature from '@hooks/useTransactionSignature'
+import { notify } from '@utils/notifications'
 
 export enum PlayState {
   Played,
@@ -78,6 +79,7 @@ export function ExecuteInstructionButton({
       await executeTransaction(rpcContext, proposal, proposalInstruction)
       await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
     } catch (error) {
+      notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)
 
       setPlaying(PlayState.Error)

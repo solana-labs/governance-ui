@@ -15,6 +15,7 @@ import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
 import useWalletStore from 'stores/useWalletStore'
+import { notify } from '@utils/notifications'
 
 export enum PlayState {
   Played,
@@ -76,6 +77,7 @@ export function ExecuteAllInstructionButton({
       await executeInstructions(rpcContext, proposal, proposalInstructions)
       await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
     } catch (error) {
+      notify({ type: 'error', message: `error executing instruction ${error}` })
       console.error('error executing instruction', error)
 
       setPlaying(PlayState.Error)
