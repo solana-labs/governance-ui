@@ -3,6 +3,7 @@ import * as yup from 'yup'
 import {
   createSetRealmConfig,
   Governance,
+  MintMaxVoteWeightSource,
   ProgramAccount,
   PROGRAM_VERSION_V1,
   serializeInstructionToBase64,
@@ -25,6 +26,8 @@ import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { getValidatedPublickKey } from '@utils/validations'
 import InstructionForm, { InstructionInputType } from './FormCreator'
+import BigNumber from 'bignumber.js'
+import { BN } from '@blockworks-foundation/mango-client'
 
 interface RealmConfigForm {
   governedAccount: GovernedTokenAccount | undefined
@@ -32,6 +35,21 @@ interface RealmConfigForm {
   communityVoterWeightAddin: string
   removeCouncil: boolean
   maxCommunityVoterWeightAddin: string
+  communityMintSupplyFactor: number
+}
+
+const parseMintSupplyFraction = (fraction: string) => {
+  if (!fraction) {
+    return MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+  }
+
+  const fractionValue = new BigNumber(fraction)
+    .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    .toNumber()
+
+  return new MintMaxVoteWeightSource({
+    value: new BN(fractionValue),
+  })
 }
 
 const RealmConfig = ({
@@ -66,7 +84,7 @@ const RealmConfig = ({
         realm!.pubkey,
         realm!.account.authority!,
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
-        realm!.account.config.communityMintMaxVoteWeightSource,
+        parseMintSupplyFraction(form!.maxCommunityVoterWeightAddin),
         mintAmount,
         form!.communityVoterWeightAddin
           ? new PublicKey(form!.communityVoterWeightAddin)
@@ -156,6 +174,36 @@ const RealmConfig = ({
     realm!.account.config.minCommunityTokensToCreateGovernance
   )
   const currentPrecision = precision(minCommunity)
+  const getMinSupplyFractionStep = () =>
+    new BigNumber(1)
+      .shiftedBy(-1 * MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+      .toNumber()
+
+  const getMintSupplyFraction = () => {
+    const communityMintMaxVoteWeightSource = realm!.account.config
+      .communityMintMaxVoteWeightSource
+
+    return new BigNumber(communityMintMaxVoteWeightSource.value.toString())
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+      .toNumber()
+  }
+  const getSupplyFraction = () => {
+    try {
+      return mint
+        ? getMintDecimalAmount(mint, mint?.supply).toNumber() *
+            Number(form?.communityMintSupplyFactor)
+        : 0
+    } catch (e) {
+      return 0
+    }
+  }
+  const getPercentSupply = () => {
+    try {
+      return `${Number(form?.communityMintSupplyFactor) * 100}%`
+    } catch (e) {
+      return ''
+    }
+  }
   const inputs = [
     {
       label: 'Governance',
@@ -182,20 +230,23 @@ const RealmConfig = ({
       validateMinMax: true,
       precision: currentPrecision,
     },
-    // {
-    //   label: 'Community mint supply factor (max vote weight)',
-    //   initialValue:
-    //     realm!.account.config.communityMintMaxVoteWeightSource.value.toNumber() /
-    //     mint!.supply.toNumber(),
-    //   name: 'communityMintSupplyFactor',
-    //   type: InstructionInputType.INPUT,
-    //   inputType: 'number',
-    //   min: minCommunity,
-    //   step: minCommunity,
-    //   hide: !mint,
-    //   validateMinMax: true,
-    //   precision: currentPrecision,
-    // },
+    {
+      label: 'Community mint supply factor (max vote weight)',
+      initialValue: getMintSupplyFraction(),
+      name: 'communityMintSupplyFactor',
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      min: getMinSupplyFractionStep(),
+      max: 1,
+      hide: !mint,
+      validateMinMax: true,
+      step: getMinSupplyFractionStep(),
+      additionalComponent: (
+        <div>
+          {new BigNumber(getSupplyFraction()).toFormat()} ({getPercentSupply()})
+        </div>
+      ),
+    },
     {
       label: 'Community voter weight addin',
       initialValue: '',

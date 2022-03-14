@@ -4,6 +4,7 @@ import { Switch } from '@headlessui/react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import { useState, useEffect } from 'react'
 import GovernedAccountSelect from '../GovernedAccountSelect'
+import { precision } from '@utils/formatting'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,
@@ -29,6 +30,7 @@ export interface InstructionInput {
   hide?: boolean
   validateMinMax?: boolean
   precision?: number
+  additionalComponent?: JSX.Element
 }
 
 const InstructionForm = ({
@@ -108,7 +110,7 @@ const InstructionInput = ({
       case InstructionInputType.INPUT: {
         const validateAmountOnBlur = () => {
           const value = form[input.name]
-
+          const precisionFromMin = input.min ? precision(input.min) : 1
           handleSetForm({
             value: parseFloat(
               Math.max(
@@ -121,7 +123,13 @@ const InstructionInput = ({
                   ),
                   Number(value)
                 )
-              ).toFixed(input.precision ? input.precision : 0)
+              ).toFixed(
+                input.precision
+                  ? input.precision
+                  : precisionFromMin
+                  ? precisionFromMin
+                  : 0
+              )
             ),
             propertyName: input.name,
           })
@@ -186,7 +194,12 @@ const InstructionInput = ({
         )
     }
   }
-  return getComponent()
+  return (
+    <>
+      {getComponent()}
+      {input.additionalComponent && input.additionalComponent}
+    </>
+  )
 }
 
 export default InstructionForm
