@@ -61,6 +61,7 @@ import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
 import RealmConfig from './components/instructions/RealmConfig'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
+import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -357,6 +358,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></CreateNftPluginRegistrar>
+        )
+      case Instructions.ConfigureNftPluginCollection:
+        return (
+          <ConfigureNftPluginCollection
+            index={idx}
+            governance={governance}
+          ></ConfigureNftPluginCollection>
         )
       case Instructions.CreateNftPluginMaxVoterWeight:
         return (

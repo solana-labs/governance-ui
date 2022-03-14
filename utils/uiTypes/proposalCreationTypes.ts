@@ -168,6 +168,7 @@ export enum Instructions {
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
+  ConfigureNftPluginCollection,
 }
 
 export type createParams = [

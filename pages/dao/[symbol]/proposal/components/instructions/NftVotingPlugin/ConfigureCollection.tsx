@@ -24,6 +24,7 @@ import {
   getNftMaxVoterWeightRecord,
   getNftRegistrarPDA,
 } from 'NftVotePlugin/sdk/accounts'
+import { getValidatedPublickKey } from '@utils/validations'
 
 interface CreateNftRegistrarForm {
   governedAccount: GovernedTokenAccount | undefined
@@ -32,7 +33,7 @@ interface CreateNftRegistrarForm {
   collection: string
 }
 
-const CreateNftPluginRegistrar = ({
+const ConfigureNftPluginCollection = ({
   index,
   governance,
 }: {
@@ -98,6 +99,28 @@ const CreateNftPluginRegistrar = ({
       .object()
       .nullable()
       .required('Governed account is required'),
+    collection: yup
+      .string()
+      .test(
+        'accountTests',
+        'Collection address validation error',
+        function (val: string) {
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Collection address is required`,
+            })
+          }
+        }
+      ),
   })
   const inputs: InstructionInput[] = [
     {
@@ -124,7 +147,7 @@ const CreateNftPluginRegistrar = ({
     },
     {
       label: 'Collection weight',
-      initialValue: 0,
+      initialValue: 1,
       name: 'weight',
       inputType: 'number',
       type: InstructionInputType.INPUT,
@@ -133,7 +156,7 @@ const CreateNftPluginRegistrar = ({
     },
     {
       label: 'Collection',
-      initialValue: 0,
+      initialValue: '',
       inputType: 'text',
       name: 'collection',
       type: InstructionInputType.INPUT,
@@ -151,4 +174,4 @@ const CreateNftPluginRegistrar = ({
   )
 }
 
-export default CreateNftPluginRegistrar
+export default ConfigureNftPluginCollection
