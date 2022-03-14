@@ -24,11 +24,13 @@ import PropertyDataOutput from '@components/PropertyDataOutput'
 import Loader from '@components/Loader'
 import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
+import useInterval from '@hooks/useInterval'
 
 const Proposal = () => {
+	const [initalLoad, setInitalLoad] = useState<boolean>(true)
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { symbol, realmInfo, realmDisplayName, governances, ownVoterWeight } = useRealm()
-	const { history } = useRouterHistory();
+	const { history } = useRouterHistory()
 	const { proposal, descriptionLink } = useProposal()
 	const [description, setDescription] = useState<any>('')
 	const [descriptionObj, setDescriptionObj] = useState<[any]>()
@@ -40,31 +42,36 @@ const Proposal = () => {
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
 
-	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
+	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false)
 
 	useLayoutEffect(() => {
-		setSolanaBrowser(isSolanaBrowser());
-	}, []);
+		setSolanaBrowser(isSolanaBrowser())
+	}, [])
 
 	useLayoutEffect(() => {
-		if (propertyDetails && proposalType > 0) {
-			setInitalLoad(false);
+		if (propertyDetails && proposalType) {
+			setInitalLoad(false)
 		}
-	}, [propertyDetails, proposalType]);
+	}, [propertyDetails, proposalType])
 
+	const getDataObj = async () => {
+		if (!descriptionObj) return false
+		if (descriptionObj && descriptionObj[0].uri) {
+			return fetch(descriptionObj[0].uri, {
+				method: 'GET',
+			}).then((res) => res.json())
+		}
+	}
 
 	useLayoutEffect(() => {
 		if (descriptionObj && descriptionObj[0].uri) {
-			fetch(descriptionObj[0].uri, {
-				method: 'GET'
-			})
-				.then((res) => res.json())
+			getDataObj()
 				.then((res) => {
 					setPropertyDetails(res)
 					return res
 				})
 				.catch((error) => {
-					alert(`Something went wrong. \Please verify the format of the data in ${descriptionObj[0].uri}`)
+					console.log(`Something went wrong. \Please verify the format of the data in ${descriptionObj[0].uri}`)
 					console.log('error', error)
 				})
 		}
@@ -73,7 +80,7 @@ const Proposal = () => {
 			setProposalType(descriptionObj[0].type)
 
 			if (descriptionObj[0].type) {
-				setInitalLoad(true);
+				setInitalLoad(true)
 			}
 		}
 	}, [descriptionObj])
@@ -86,22 +93,75 @@ const Proposal = () => {
 		if (descriptionLink) {
 			handleResolveDescription()
 			if (descriptionLink.charAt(0) === '{') setDescriptionObj([JSON.parse(descriptionLink)])
-			console.log('\n\n\n\n\n !!!\n\ndescription', descriptionLink)
 		}
 	}, [descriptionLink])
 
-	const [initalLoad, setInitalLoad] = useState<boolean>(false)
 
 	// useEffect(() => {
 	// 	if (1 === 1) setInitalLoad(false)
 	// }, [])
-
 
 	const [canCreateAction, setcanCreateAction] = useState(false)
 	const governanceItems = Object.values(governances)
 	useEffect(() => {
 		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)))
 	}, [governanceItems, history])
+
+	const [delay, setDelay] = useState<number>(2500)
+	const [isPolling, setPolling] = useState<boolean>(true)
+	const [pollingCount, setPollingCount] = useState<number>(0)
+
+	useEffect(() => {
+		console.log(pollingCount)
+		if (pollingCount >= 6) {
+			setPolling(false)
+		} else {
+			const msg = `Something went wrong. Please try to refresh the page.\nIf the issue persists, please contact support@rhove.com`
+			if (pollingCount === 5) {
+				alert(msg)
+			} else {
+				console.log(`Attempt [${pollingCount}]` + msg)
+			}
+		}
+	}, [pollingCount])
+
+	useInterval(
+		() => {
+			setInitalLoad(true)
+			if (propertyDetails && typeof propertyDetails === 'object' && propertyDetails?.name) {
+				setPolling(false)
+				setInitalLoad(false)
+			} else {
+				setPollingCount(pollingCount + 1)
+
+				if (descriptionObj && descriptionObj[0].uri) {
+					getDataObj()
+						.then((res) => {
+							console.log(res) ///here
+							setPropertyDetails(res);
+							setPolling(false);
+							setInitalLoad(false);
+							return res
+						})
+						.then((res) => {
+							return res
+						})
+						.catch((error) => {
+							const msg = `Something went wrong. \Please verify the format of the data in ${descriptionObj && descriptionObj[0].uri} or refresh the page.`
+							if (pollingCount === 5) {
+								alert(msg)
+							} else {
+								console.log(`Attempt [${pollingCount}]` + msg)
+							}
+							setPolling(false)
+							setInitalLoad(false)
+							console.log('error', error)
+						})
+				}
+			}
+		},
+		isPolling ? delay : null
+	)
 
 	return initalLoad ? (
 		<Loader />
@@ -131,18 +191,24 @@ const Proposal = () => {
 							</div>
 							{proposalType === 0 ? (
 								<>
-									<div className="p-8 border border-green bg-back text-green">
-										<ReactMarkdown>{propertyDetails?.description}</ReactMarkdown>
-									</div>
+									{propertyDetails?.description && (
+										<div className="p-8 border border-green bg-back text-green">
+											<ReactMarkdown>{propertyDetails?.description}</ReactMarkdown>
+										</div>
+									)}
 								</>
 							) : (
 								<>
 									{description && propertyDetails?.name && <div className="pb-2">{proposalType === 1 ? <>{`Proposal to Purchase Real Estate and Begin Syndication for ${propertyDetails.name}${propertyDetails.property_address ? ` at ${propertyDetails.property_address}` : ''}.`}</> : <>{`Proposal to Request Tokr DAO to certify and mint${propertyDetails && propertyDetails.name ? ' the "' + propertyDetails.name : '"'} rNFT.`}</>}</div>}
-									{ canCreateAction && <div className="border border-green p-8 text-center">
-										<p className="pb-8">Should the { realmDisplayName ? realmDisplayName : 'DAO'} purchase &quot;{propertyDetails?.name ? propertyDetails?.name : 'property'}&quot;?</p>
+									{canCreateAction && (
+										<div className="border border-green p-8 text-center">
+											<p className="pb-8">
+												Should the {realmDisplayName ? realmDisplayName : 'DAO'} purchase &quot;{propertyDetails?.name ? propertyDetails?.name : 'property'}&quot;?
+											</p>
 
-										<VotePanel simple className=""/>
-									</div> }
+											<VotePanel simple className="" />
+										</div>
+									)}
 									{propertyDetails && (
 										<div>
 											<h2 className="mb-4 mt-8">Property Details</h2>
