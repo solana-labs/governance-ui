@@ -40,7 +40,6 @@ export function useVotingPlugins() {
     handleGetRealmConfig()
   }, [realm?.pubkey.toBase58()])
   useEffect(() => {
-    console.log(currentPluginPk?.toBase58(), '#@$@#432324324432')
     if (realm && client) {
       handleSetVsrRegistrar(client, realm)
     }
