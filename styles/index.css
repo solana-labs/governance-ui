@@ -173,3 +173,7 @@ button {
 .nav-link>span:after {
 	content: ">";
 }
+
+.-mt-px-children > * + * {
+	margin-top: -1px;
+}

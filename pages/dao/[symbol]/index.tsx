@@ -237,19 +237,22 @@ const REALM = () => {
 														</div>
 													)}
 												</div>
-
-												{proposalType1.map(([k, v]) => {
-													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
-												})}
+												<div className="-mt-px-children">
+													{proposalType1.map(([k, v]) => {
+														return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+													})}
+												</div>
 											</div>
 										</div>
 									)}
 									{proposalType2.length > 0 && (
 										<div>
 											<h2 className="text-2xl uppercase">{`Request Tokr DAO to mint rNFT Proposal${proposalType2.length > 0 ? 's' : ''}`}</h2>
-											{proposalType2.map(([k, v]) => {
-												return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
-											})}
+											<div className="-mt-px-children">
+												{proposalType2.map(([k, v]) => {
+													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+												})}
+											</div>
 										</div>
 									)}
 								</div>
@@ -271,7 +274,7 @@ const REALM = () => {
 							</div>
 						)}
 
-						{(canCreate && proposalType1.length === 0) && (
+						{canCreate && proposalType1.length === 0 && (
 							<NewProposalBtn string={`property=true`} hideIcon basic linkClasses={`text-center text-lg px-4 py-2 inline-flex ${buttonStyles}`}>
 								{proposalType1.length > 0 ? 'Propose Another Property' : 'Propose Your First Property'}
 							</NewProposalBtn>
@@ -294,10 +297,11 @@ const REALM = () => {
 
 								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
 
-								{proposalType0.map(([k, v]) => {
-									return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
-								})}
-
+								<div className="-mt-px-children">
+									{proposalType0.map(([k, v]) => {
+										return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+									})}
+								</div>
 
 								{solanaBrowser && connected && proposalType0?.length === 0 && (
 									<NewProposalBtn string={`type=0`} hideIcon basic linkClasses={`text-center text-lg px-4 py-2 inline-flex ${buttonStyles}`}>
