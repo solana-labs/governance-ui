@@ -483,39 +483,162 @@ const New = (props) => {
 	}
 
 	useEffect(() => {
-		if (liteMode) {
-			setMetaplexDataObj({
-				name: propertyData.name,
-				symbol: 'TOKR-g1',
-				description: propertyData.description,
-				image: propertyData.image,
-				attributes: [
-					{
-						trait_type: 'name',
-						value: propertyData.name,
-					},
-					{
-						trait_type: 'description',
-						value: propertyData.description,
-					},
-					{
-						trait_type: 'property_address',
-						value: propertyData.property_address,
-					},
-					{
-						trait_type: 'lat_long',
-						value: propertyData.lat_long,
-					},
-					{
-						trait_type: 'acres',
-						value: propertyData.acres,
-					},
-				],
-			})
+		if( proposalType !== 0) {
+			if (proposalType === 2) {
+				setMetaplexDataObj({
+					name: propertyData.name,
+					symbol: 'TOKR-g1',
+					description: propertyData.description,
+					image: propertyData.image,
+					attributes: [
+						{
+							trait_type: 'name',
+							value: propertyData.name,
+						},
+						{
+							trait_type: 'description',
+							value: propertyData.description,
+						},
+						{
+							trait_type: 'property_address',
+							value: propertyData.property_address,
+						},
+						{
+							trait_type: 'lat_long',
+							value: propertyData.lat_long,
+						},
+						{
+							trait_type: 'acres',
+							value: propertyData.acres,
+						},
+					],
+				})
+			} else {
+				setMetaplexDataObj({
+					name: propertyData.name,
+					symbol: 'TOKR-g1',
+					description: propertyData.description,
+					image: propertyData.image,
+					attributes: [
+						{
+							trait_type: 'name',
+							value: propertyData.name,
+						},
+						{
+							trait_type: 'description',
+							value: propertyData.description,
+						},
+						{
+							trait_type: 'property_address',
+							value: propertyData.property_address,
+						},
+						{
+							trait_type: 'lat_long',
+							value: propertyData.lat_long,
+						},
+						{
+							trait_type: 'acres',
+							value: propertyData.acres,
+						},
+						{
+							trait_type: 'land_record_auditor',
+							value: propertyData.land_record_auditor,
+						},
+						{
+							trait_type: 'deed_record_recorder',
+							value: propertyData.deed_record_recorder,
+						},
+						{
+							trait_type: 'mortgage_record_recorder',
+							value: propertyData.mortgage_record_recorder,
+						},
+						{
+							trait_type: 'legal_description',
+							value: propertyData.legal_description,
+						},
+						{
+							trait_type: 'mortgage_record',
+							value: propertyData.mortgage_record,
+						},
+						{
+							trait_type: 'title_method',
+							value: propertyData.title_method,
+						},
+						{
+							trait_type: 'title_held_by',
+							value: propertyData.title_held_by,
+						},
+						{
+							trait_type: 'ein',
+							value: propertyData.ein,
+						},
+						{
+							trait_type: 'transfer_restrictions',
+							value: propertyData.transfer_restrictions,
+						},
+						{
+							trait_type: 'marketing_name',
+							value: propertyData.marketing_name,
+						},
+						{
+							trait_type: 'type',
+							value: propertyData.type,
+						},
+						{
+							trait_type: 'sq_ft',
+							value: propertyData.sq_ft,
+						},
+						{
+							trait_type: 'property_description',
+							value: propertyData.property_description,
+						},
+						{
+							trait_type: 'deed',
+							value: propertyData.deed,
+						},
+						{
+							trait_type: 'mortgage',
+							value: propertyData.mortgage,
+						},
+						{
+							trait_type: 'title_insurance',
+							value: propertyData.title_insurance,
+						},
+						{
+							trait_type: 'articles_of_organization',
+							value: propertyData.articles_of_organization,
+						},
+						{
+							trait_type: 'certificate_of_organization_from_secretary_of_state',
+							value: propertyData.certificate_of_organization_from_secretary_of_state,
+						},
+						{
+							trait_type: 'operating_agreement',
+							value: propertyData.operating_agreement,
+						},
+						{
+							trait_type: 'membership_interest_transfer_agreement',
+							value: propertyData.membership_interest_transfer_agreement,
+						},
+						{
+							trait_type: 'ein_letter_from_irs',
+							value: propertyData.ein_letter_from_irs,
+						},
+						{
+							trait_type: 'appraisal',
+							value: propertyData.appraisal,
+						},
+						{
+							trait_type: 'submitted_by',
+							value: propertyData.submitted_by,
+						},
+					],
+				})
+			}
 		} else {
 			setMetaplexDataObj({
 				name: propertyData.name,
-				symbol: 'TOKR-g1',
+				symbol: 'TOKR',
 				description: propertyData.description,
 				image: propertyData.image,
 				attributes: [
@@ -526,110 +649,6 @@ const New = (props) => {
 					{
 						trait_type: 'description',
 						value: propertyData.description,
-					},
-					{
-						trait_type: 'property_address',
-						value: propertyData.property_address,
-					},
-					{
-						trait_type: 'lat_long',
-						value: propertyData.lat_long,
-					},
-					{
-						trait_type: 'acres',
-						value: propertyData.acres,
-					},
-					{
-						trait_type: 'land_record_auditor',
-						value: propertyData.land_record_auditor,
-					},
-					{
-						trait_type: 'deed_record_recorder',
-						value: propertyData.deed_record_recorder,
-					},
-					{
-						trait_type: 'mortgage_record_recorder',
-						value: propertyData.mortgage_record_recorder,
-					},
-					{
-						trait_type: 'legal_description',
-						value: propertyData.legal_description,
-					},
-					{
-						trait_type: 'mortgage_record',
-						value: propertyData.mortgage_record,
-					},
-					{
-						trait_type: 'title_method',
-						value: propertyData.title_method,
-					},
-					{
-						trait_type: 'title_held_by',
-						value: propertyData.title_held_by,
-					},
-					{
-						trait_type: 'ein',
-						value: propertyData.ein,
-					},
-					{
-						trait_type: 'transfer_restrictions',
-						value: propertyData.transfer_restrictions,
-					},
-					{
-						trait_type: 'marketing_name',
-						value: propertyData.marketing_name,
-					},
-					{
-						trait_type: 'type',
-						value: propertyData.type,
-					},
-					{
-						trait_type: 'sq_ft',
-						value: propertyData.sq_ft,
-					},
-					{
-						trait_type: 'property_description',
-						value: propertyData.property_description,
-					},
-					{
-						trait_type: 'deed',
-						value: propertyData.deed,
-					},
-					{
-						trait_type: 'mortgage',
-						value: propertyData.mortgage,
-					},
-					{
-						trait_type: 'title_insurance',
-						value: propertyData.title_insurance,
-					},
-					{
-						trait_type: 'articles_of_organization',
-						value: propertyData.articles_of_organization,
-					},
-					{
-						trait_type: 'certificate_of_organization_from_secretary_of_state',
-						value: propertyData.certificate_of_organization_from_secretary_of_state,
-					},
-					{
-						trait_type: 'operating_agreement',
-						value: propertyData.operating_agreement,
-					},
-					{
-						trait_type: 'membership_interest_transfer_agreement',
-						value: propertyData.membership_interest_transfer_agreement,
-					},
-					{
-						trait_type: 'ein_letter_from_irs',
-						value: propertyData.ein_letter_from_irs,
-					},
-					{
-						trait_type: 'appraisal',
-						value: propertyData.appraisal,
-					},
-					{
-						trait_type: 'submitted_by',
-						value: propertyData.submitted_by,
 					},
 				],
 			})
