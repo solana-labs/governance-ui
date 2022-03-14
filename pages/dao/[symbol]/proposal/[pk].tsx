@@ -97,10 +97,6 @@ const Proposal = () => {
 	}, [descriptionLink])
 
 
-	// useEffect(() => {
-	// 	if (1 === 1) setInitalLoad(false)
-	// }, [])
-
 	const [canCreateAction, setcanCreateAction] = useState(false)
 	const governanceItems = Object.values(governances)
 	useEffect(() => {
@@ -112,7 +108,6 @@ const Proposal = () => {
 	const [pollingCount, setPollingCount] = useState<number>(0)
 
 	useEffect(() => {
-		console.log(pollingCount)
 		if (pollingCount >= 6) {
 			setPolling(false)
 		} else {
