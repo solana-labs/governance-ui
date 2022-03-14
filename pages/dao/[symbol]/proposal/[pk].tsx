@@ -25,6 +25,7 @@ import Loader from '@components/Loader'
 import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
 import useInterval from '@hooks/useInterval'
+import { checkArDataKey, getArData, setArData } from '@hooks/useLocalStorage'
 
 const Proposal = () => {
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
@@ -54,12 +55,22 @@ const Proposal = () => {
 		}
 	}, [propertyDetails, proposalType])
 
-	const getDataObj = async () => {
+	const getDataObj = async (retry?:boolean) => {
 		if (!descriptionObj) return false
 		if (descriptionObj && descriptionObj[0].uri) {
-			return fetch(descriptionObj[0].uri, {
-				method: 'GET',
-			}).then((res) => res.json())
+			const tempId = descriptionObj[0].uri.split('.net/')[1].toString();
+			if (checkArDataKey(tempId) && !retry) {
+				return getArData(tempId);
+			} else {
+				return fetch(descriptionObj[0].uri, {
+					method: 'GET',
+				}).then((res) => res.json())
+				.then(res => {
+					setArData(tempId, res);
+					console.log("not LOCAL!")
+					return res;
+				})
+			}
 		}
 	}
 
@@ -71,7 +82,7 @@ const Proposal = () => {
 					return res
 				})
 				.catch((error) => {
-					console.log(`Something went wrong. \Please verify the format of the data in ${descriptionObj[0].uri}`)
+					console.log(`Something went wrong.\nPlease verify the format of the data in ${descriptionObj[0].uri}`)
 					console.log('error', error)
 				})
 		}
@@ -131,9 +142,8 @@ const Proposal = () => {
 				setPollingCount(pollingCount + 1)
 
 				if (descriptionObj && descriptionObj[0].uri) {
-					getDataObj()
+					getDataObj(true)
 						.then((res) => {
-							console.log(res) ///here
 							setPropertyDetails(res);
 							setPolling(false);
 							setInitalLoad(false);
