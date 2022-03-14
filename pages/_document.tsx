@@ -1,4 +1,3 @@
-// pages/_document.js
 import { Html, Head, Main, NextScript } from 'next/document'
 
 const Document = () => {
@@ -11,6 +10,12 @@ const Document = () => {
           rel="stylesheet"
         />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <meta name="msapplication-TileColor" content="#ffffff" />
+        <meta name="theme-color" content="#ffffff" />
+
+        <meta property="og:type" content="website" />
+        <meta name="twitter:card" content="summary" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <body>
         <Main />

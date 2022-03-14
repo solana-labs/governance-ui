@@ -215,6 +215,24 @@ export const MANGO_INSTRUCTIONS = {
         return <>{displayAllArgs(args)}</>
       },
     },
+    58: {
+      name: 'Mango v3: Set Delegate to Mango Account',
+      accounts: {
+        0: { name: 'Mango Group' },
+        1: { name: 'Mango Account' },
+        2: { name: 'Owner' },
+        4: { name: 'Delegate' },
+      },
+      getDataUI: (
+        _connection: Connection,
+        data: Uint8Array,
+        _accounts: AccountMetaData[]
+      ) => {
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .SetDelegate
+        return <>{displayAllArgs(args)}</>
+      },
+    },
     61: {
       name: 'Mango v3: Change Referral Fee Params',
       accounts: {

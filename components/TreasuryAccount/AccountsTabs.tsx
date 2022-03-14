@@ -30,7 +30,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
       {tabs.map((x) => {
         const {
           amountFormatted,
-          //   logo,
+          logo,
           name,
           symbol,
           displayPrice,
@@ -46,9 +46,10 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
             }
             `}
           >
-            {/* {logo && <img src={logo} className="w-8 h-8 mr-3"></img>} */}
             <div className="text-left">
-              <h3 className="mb-1 text-sm">{name}</h3>
+              <h3 className="mb-1 text-sm flex">
+                {logo && <img src={logo} className="w-5 h-5 mr-2"></img>} {name}
+              </h3>
               <p className="mb-0 text-fgd-1 text-xs">
                 {amountFormatted} {symbol}
               </p>

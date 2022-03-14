@@ -1,5 +1,5 @@
+import { MangoAccount } from '@blockworks-foundation/mango-client'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { BN } from '@project-serum/anchor'
 import { ProgramAccount, Realm, RpcContext } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { GovernedTokenAccount } from '@utils/tokens'
@@ -16,7 +16,6 @@ export interface TreasuryStrategy {
   handledTokenImgSrc: string
   protocolLogoSrc: string
   strategyName: string
-  currentPosition: BN
   strategyDescription: string
   //if you want to use custom component set this to false and add your custom
   //item and modal to strategywrapper component based on generic components
@@ -29,7 +28,7 @@ export interface TreasuryStrategy {
 export type HandleCreateProposalWithStrategy = (
   { connection, wallet, programId, programVersion, walletPubkey }: RpcContext,
   handledMint: string,
-  mintAmount: number,
+  form: MNGODepositForm,
   realm: ProgramAccount<Realm>,
   treasuaryAccount: GovernedTokenAccount,
   tokenOwnerRecord: PublicKey,
@@ -44,4 +43,15 @@ export type HandleCreateProposalWithStrategy = (
 export interface NameVal {
   name: string
   val: string | null
+}
+
+export type MNGODepositForm = {
+  mintAmount: number
+  delegateDeposit: boolean
+  delegateAddress: string
+  mangoAccountPk: PublicKey | null
+  mangoAccounts: MangoAccount[]
+  title: string
+  description: string
+  proposalCount: number
 }
