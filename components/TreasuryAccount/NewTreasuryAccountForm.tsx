@@ -50,7 +50,9 @@ const NFT = 'NFT'
 
 const NewAccountForm = () => {
   const router = useRouter()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const isCurrentVersionHigherThenV1 = () => {
     return (

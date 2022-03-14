@@ -10,7 +10,6 @@ import {
 } from '@solana/spl-governance'
 import { BadgeCheckIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import { sendTransaction } from '@utils/send'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
@@ -26,7 +25,9 @@ const ApproveAllBtn = () => {
     (s) => s.selectedRealm
   )
 
-  const { client } = useVotePluginsClientStore((s) => s.state)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { proposals } = useRealm()
 
   const votingProposals = useMemo(
@@ -64,11 +65,8 @@ const ApproveAllBtn = () => {
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const voterWeight = await withUpdateVoterWeightRecord(
-          instructions,
-          wallet.publicKey!,
-          realm,
-          client
+        const voterWeight = await client.withUpdateVoterWeightRecord(
+          instructions
         )
         await withCastVote(
           instructions,

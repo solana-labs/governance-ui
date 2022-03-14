@@ -34,7 +34,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)

@@ -80,7 +80,9 @@ const MangoDepositComponent = ({
     mangoAccounts.length ? mangoAccounts[0] : null
   )
   const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const market = useMarketStore((s) => s)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)

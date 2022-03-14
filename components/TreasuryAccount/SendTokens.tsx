@@ -65,7 +65,9 @@ const SendTokens = () => {
     councilMint,
     canChooseWhoVote,
   } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = currentAccount?.isNft

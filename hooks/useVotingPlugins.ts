@@ -32,7 +32,11 @@ export function useVotingPlugins() {
       handleSetNftRegistrar(nftClient, realm)
     }
     if (realm?.account.config.useCommunityVoterWeightAddin) {
-      handleSetCurrentRealmVotingClient(client, realm, wallet?.publicKey)
+      handleSetCurrentRealmVotingClient({
+        client,
+        realm,
+        walletPk: wallet?.publicKey,
+      })
     }
   }, [realm?.pubkey, client, nftClient])
 }

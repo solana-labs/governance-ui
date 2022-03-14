@@ -43,7 +43,9 @@ const UpgradeProgram = ({
   program: ProgramAccount<Governance>
 }) => {
   const router = useRouter()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const governedAccount = {

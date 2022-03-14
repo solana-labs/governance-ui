@@ -14,8 +14,7 @@ import { withPostChatMessage } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '../../utils/send'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
+import { VotingClient } from 'stores/useVotePluginsClientStore'
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -24,7 +23,7 @@ export async function postChatMessage(
   tokeOwnerRecord: PublicKey,
   body: ChatMessageBody,
   replyTo?: PublicKey,
-  client?: VsrClient
+  client?: VotingClient
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -33,12 +32,7 @@ export async function postChatMessage(
   const payer = walletPubkey
 
   //will run only if plugin is connected with realm
-  const voterWeight = await withUpdateVoterWeightRecord(
-    instructions,
-    wallet.publicKey!,
-    realm,
-    client
-  )
+  const voterWeight = await client?.withUpdateVoterWeightRecord(instructions)
 
   await withPostChatMessage(
     instructions,

@@ -15,7 +15,9 @@ const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
   const { ownVoterWeight, realmInfo, realm } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletStore((s) => s.current)
