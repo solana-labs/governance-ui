@@ -51,6 +51,7 @@ import FormData from 'form-data'
 import { Transaction } from '@solana/web3.js'
 import Loader from '@components/Loader'
 import { TOKR_DAO } from '@components/instructions/tools'
+import useRouterHistory from '@hooks/useRouterHistory'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -71,9 +72,10 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 const New = (props) => {
 	const _prepopulateForDemos = false
 	const router = useRouter()
+	const { history } = useRouterHistory();
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
-	const { symbol, realm, realmInfo, realmDisplayName, ownVoterWeight, mint, councilMint, canChooseWhoVote } = useRealm()
+	const { symbol, realm, realmInfo, realmDisplayName, ownVoterWeight, mint, councilMint, canChooseWhoVote, governances} = useRealm()
 
 	const { getAvailableInstructions } = useGovernanceAssets()
 	const availableInstructions = getAvailableInstructions()
@@ -831,6 +833,40 @@ const New = (props) => {
 		if (realmDisplayName) setInitalLoad(false)
 	}, [realmDisplayName])
 
+
+	const [canCreateAction, setcanCreateAction] = useState(false)
+	const governanceItems = Object.values(governances)
+	useEffect(() => {
+		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)))
+	}, [governanceItems, history])
+
+	const [formIsValid, setFormIsValid] = useState<boolean>(false);
+	// const isFormValid = (namespaceSelector: string | undefined | null):boolean => {
+	// 	if (process?.browser && document) {
+	// 		const formInputs = document.querySelectorAll(`${namespaceSelector ? (namespaceSelector + ' ') : ''}.field-validate:not(:valid)`) || [];
+	// 		console.log(formInputs, "am I valid")
+	// 		return ((formInputs.length > 0) ? false : true);
+	// 	} else {
+	// 		return false;
+	// 	}
+	// };
+	const checkFormValidity = ():boolean => {
+		if (!canCreateAction) return false;
+		if (process?.browser && document) {
+			const formInputs = document.querySelectorAll(`.field-validate:not(:valid)`) || [];
+			// console.log('checkFormValidity', formInputs)
+			return ((formInputs.length > 0 || !governance) ? false : true);
+		} else {
+			return false;
+		}
+	};
+
+	useEffect(() => {
+		if (!initalLoad) setFormIsValid(checkFormValidity());
+	}, [propertyData, governance, canCreateAction]);
+
+
+
 	return initalLoad ? (
 		<Loader />
 	) : (
@@ -899,6 +935,9 @@ const New = (props) => {
 														id="name"
 														name="name"
 														type="text"
+														className="field-validate"
+														required
+														max
 														error={formErrors['title']}
 														// error={propertyDataErrors['name']}
 														onChange={(evt) => {
@@ -920,6 +959,8 @@ const New = (props) => {
 														id="description"
 														name="description"
 														type="text"
+														className="field-validate"
+														required
 														// error={propertyDataErrors['description']}
 														onChange={(evt) =>
 															handleSetPropertyData({
@@ -928,9 +969,7 @@ const New = (props) => {
 															})
 														}
 													/>
-													<div className="text-xs pt-2">
-														Did you know? You can use Markdown!
-													</div>
+													<div className="text-xs pt-2">Did you know? You can use Markdown!</div>
 												</div>
 											</div>
 										</>
@@ -1515,7 +1554,7 @@ const New = (props) => {
 								</div>
 							</div>
 
-							<div className="pt-2">
+							<div className={`pt-2${ canCreateAction ? '' : ' opacity-30 grayscale pointer-events-none'}`}>
 								{canChooseWhoVote && (
 									<VoteBySwitch
 										checked={voteByCouncil}
@@ -1534,7 +1573,7 @@ const New = (props) => {
 								>
 									<Empty index={0} governance={governance} />
 								</NewProposalContext.Provider>
-								<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+								<div className={`border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4${formIsValid ? '' : ' opacity-30 grayscale pointer-events-none'}`}>
 									{/* <SecondaryButton
 										disabled={isLoading}
 										isLoading={isLoadingDraft}
@@ -1547,12 +1586,12 @@ const New = (props) => {
 									</SecondaryButton> */}
 									<Button
 										isLoading={isLoadingSignedProposal}
-										disabled={isLoading}
+										disabled={!formIsValid || isLoading}
 										onClick={() => {
 											submitProposal()
 										}}
 									>
-										{proposalType === 1 ? 'Propose Property' : 'Propose Certification'}
+										{proposalType === 0 ? <>Create Proposal</> : <>{proposalType === 1 ? 'Propose Property' : 'Propose Certification'}</>}
 									</Button>
 								</div>
 							</div>

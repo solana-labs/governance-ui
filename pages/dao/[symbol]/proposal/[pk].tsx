@@ -23,10 +23,12 @@ import { resolveProposalDescription } from '@utils/helpers'
 import PropertyDataOutput from '@components/PropertyDataOutput'
 import Loader from '@components/Loader'
 import { isSolanaBrowser } from '@utils/browserInfo'
+import useRouterHistory from '@hooks/useRouterHistory'
 
 const Proposal = () => {
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { symbol, realmInfo, realmDisplayName, governances, ownVoterWeight } = useRealm()
+	const { history } = useRouterHistory();
 	const { proposal, descriptionLink } = useProposal()
 	const [description, setDescription] = useState<any>('')
 	const [descriptionObj, setDescriptionObj] = useState<[any]>()
