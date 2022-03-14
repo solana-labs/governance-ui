@@ -85,6 +85,14 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(gov.account.config)
     )
 
+  const realmAuth =
+    realm &&
+    governancesArray.find(
+      (x) => x.pubkey.toBase58() === realm.account.authority?.toBase58()
+    )
+  const canUseAuthorityInstruction =
+    realmAuth && ownVoterWeight.canCreateProposal(realmAuth?.account.config)
+
   const getAvailableInstructions = () => {
     return availableInstructions.filter((itx) => itx.isVisible)
   }
@@ -199,17 +207,17 @@ export default function useGovernanceAssets() {
     {
       id: Instructions.RealmConfig,
       name: 'Realm Config',
-      isVisible: canUseAnyInstruction,
+      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.CreateNftPluginRegistrar,
       name: 'Create NFT plugin registrar',
-      isVisibile: canUseAnyInstruction,
+      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.CreateNftPluginMaxVoterWeight,
       name: 'Create NFT plugin max voter weight',
-      isVisibile: canUseAnyInstruction,
+      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.Base64,
