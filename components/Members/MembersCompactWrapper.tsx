@@ -47,53 +47,43 @@ const MembersCompactWrapper = () => {
     switch (currentView) {
       case ViewState.MainView:
         return (
-          <>
-            <h3 className="mb-4 flex items-center">
-              Members ({activeMembersCount})
-              {councilMint && (
-                <Tooltip
-                  contentClassName="ml-auto"
-                  content={addNewMemberTooltip}
-                >
-                  <div
-                    onClick={() => setOpenAddMemberModal(!openAddMemberModal)}
-                    className={`bg-bkg-2 default-transition
+			<>
+				<h3 className="mb-4 flex items-center">
+					{activeMembersCount < 2 ? <>Member</> : <>Members ({activeMembersCount})</>}
+					{councilMint && (
+						<Tooltip contentClassName="ml-auto" content={addNewMemberTooltip}>
+							<div
+								onClick={() => setOpenAddMemberModal(!openAddMemberModal)}
+								className={`bg-bkg-2 default-transition
                 flex flex-col items-center justify-center
                 hover:bg-bkg-3 ml-auto
-                hover:cursor-pointer ${
-                  addNewMemberTooltip ? 'opacity-60 pointer-events-none' : ''
-                }`}
-                  >
-                    <div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3">
-                      <PlusIcon />
-                    </div>
-                  </div>
-                </Tooltip>
-              )}
-            </h3>
+                hover:cursor-pointer ${addNewMemberTooltip ? 'opacity-60 pointer-events-none' : ''}`}
+							>
+								<div className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex font-bold items-center justify-center text-fgd-3">
+									<PlusIcon />
+								</div>
+							</div>
+						</Tooltip>
+					)}
+				</h3>
 
-            <div className="bg-bkg-1 mb-3 px-4 py-2 w-full">
-              <p className="text-fgd-3 text-xs">Total votes cast</p>
+				<div className="pt-2" style={{ maxHeight: '350px' }}>
+					<MembersItems activeMembers={activeMembers} />
+				</div>
 
-              <h3 className="mb-0">{totalVotesCast}</h3>
-            </div>
+				<div className="bg-bkg-1 mb-3 px-3 border border-green py-2 w-full flex flex-wrap justify-between">
+					<p className="">Total Votes Cast:</p>
 
-            <div style={{ maxHeight: '350px' }}>
-              <MembersItems activeMembers={activeMembers} />
-            </div>
+					<h3 className="mb-0 flex-shrink">{totalVotesCast}</h3>
+				</div>
 
-            {openAddMemberModal && (
-              <Modal
-                background="bg-bkg-1 md:mt-0 mt-8"
-                sizeClassName="sm:max-w-3xl"
-                onClose={() => setOpenAddMemberModal(false)}
-                isOpen={openAddMemberModal}
-              >
-                <AddMemberForm close={() => setOpenAddMemberModal(false)} />
-              </Modal>
-            )}
-          </>
-        )
+				{openAddMemberModal && (
+					<Modal background="bg-bkg-1 md:mt-0 mt-8" sizeClassName="sm:max-w-3xl" onClose={() => setOpenAddMemberModal(false)} isOpen={openAddMemberModal}>
+						<AddMemberForm close={() => setOpenAddMemberModal(false)} />
+					</Modal>
+				)}
+			</>
+		)
       case ViewState.MemberOverview:
         return <MemberOverview />
     }

@@ -21,11 +21,11 @@ const MembersItems = ({ activeMembers }: { activeMembers: Member[] }) => {
     return hasBothVotes ? 100 : minRowHeight
   }
   function rowRenderer({ key, index, style }) {
-    return (
-      <div key={key} style={style}>
-        <MemberItem item={activeMembers[index]}></MemberItem>
-      </div>
-    )
+		return (
+			<div key={key} style={style}>
+				<MemberItem item={activeMembers[index]}></MemberItem>
+			</div>
+		)
   }
   return (
     <div className="space-y-3">

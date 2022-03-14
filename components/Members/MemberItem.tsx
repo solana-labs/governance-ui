@@ -27,9 +27,7 @@ const MemberItem = ({ item }: { item: Member }) => {
   const { connection } = useWalletStore((s) => s)
 
   const walletPublicKey = tryParsePublicKey(walletAddress)
-  const tokenName = realm
-    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
-    : ''
+  const tokenName = realm ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol : ''
   const totalVotes = votesCasted
   const communityAmount =
     communityVotes && !communityVotes.isZero()
@@ -75,38 +73,28 @@ const MemberItem = ({ item }: { item: Member }) => {
   )
 
   return (
-    <div
-      onClick={handleGoToMemberOverview}
-      className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 pr-0 w-full hover:bg-bkg-3"
-    >
-      <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 w-8 mr-2">
-        {address}
-      </div>
-      <div>
-        <div className="text-xs text-th-fgd-1 h-5">{addressName}</div>
-        <div className="text-fgd-3 text-xs flex flex-col">
-          Votes cast: {totalVotes}
-        </div>
-        <div className="text-fgd-3 text-xs flex flex-col">
-          {(communityAmount || !councilAmount) && (
-            <span className="flex items-center">
-              {tokenName} Votes {communityAmount || 0}
-              {hasCommunityTokenOutsideRealm && (
-                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
-              )}
-            </span>
-          )}
-          {councilAmount && (
-            <span className="flex items-center">
-              Council Votes {councilAmount}{' '}
-              {hasCouncilTokenOutsideRealm && (
-                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
-              )}
-            </span>
-          )}
-        </div>
-      </div>
-    </div>
+		<div onClick={handleGoToMemberOverview} className="cursor-pointer default-transition flex items-start text-fgd-1 border border-fgd-4 p-3 pr-0 w-full hover:bg-bkg-3">
+			{/* <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 w-8 mr-2">{address}</div> */}
+			<div>
+				<div className="text-xs text-th-fgd-1 h-5">{addressName}</div>
+				<div className="flex">
+					<div className="text-fgd-3 text-xs flex flex-col pr-4">Votes Cast: {totalVotes}</div>
+					<div className="text-fgd-3 text-xs flex flex-col">
+						{(communityAmount || !councilAmount) && (
+							<span className="flex items-center">
+								{tokenName} Votes {communityAmount || 0}
+								{hasCommunityTokenOutsideRealm && <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>}
+							</span>
+						)}
+						{councilAmount && (
+							<span className="flex items-center">
+								Council Votes {councilAmount} {hasCouncilTokenOutsideRealm && <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>}
+							</span>
+						)}
+					</div>
+				</div>
+			</div>
+		</div>
   )
 }
 
