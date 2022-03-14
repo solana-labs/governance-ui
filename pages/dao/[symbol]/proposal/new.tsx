@@ -1008,6 +1008,8 @@ const New = (props) => {
 														name="name"
 														type="text"
 														error={formErrors['title']}
+														className="field-validate"
+														required
 														// error={propertyDataErrors['name']}
 														onChange={(evt) => {
 															handleSetPropertyData({
@@ -1028,6 +1030,8 @@ const New = (props) => {
 														id="description"
 														name="description"
 														type="text"
+														className="field-validate"
+														required
 														// error={propertyDataErrors['description']}
 														onChange={(evt) =>
 															handleSetPropertyData({
@@ -1046,6 +1050,8 @@ const New = (props) => {
 														id="image"
 														name="image"
 														type="url"
+														className="field-validate"
+														required
 														// error={propertyDataErrors['description']}
 														onChange={(evt) =>
 															handleSetPropertyData({
@@ -1070,6 +1076,8 @@ const New = (props) => {
 														id="property_address"
 														name="property_address"
 														type="text"
+														className="field-validate"
+														required
 														// error={propertyDataErrors['property_address']}
 														onChange={(evt) =>
 															handleSetPropertyData({
@@ -1088,6 +1096,8 @@ const New = (props) => {
 														id="lat_long"
 														name="lat_long"
 														type="text"
+														className="field-validate"
+														required
 														// error={propertyDataErrors['lat_long']}
 														onChange={(evt) =>
 															handleSetPropertyData({
@@ -1113,6 +1123,8 @@ const New = (props) => {
 														id="acres"
 														name="acres"
 														type="text"
+														className="field-validate"
+														required
 														// error={propertyDataErrors['acres']}
 														onChange={(evt) =>
 															handleSetPropertyData({
@@ -1193,6 +1205,8 @@ const New = (props) => {
 																id="legal_description"
 																name="legal_description"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['legal_description']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1252,6 +1266,8 @@ const New = (props) => {
 																id="title_held_by"
 																name="title_held_by"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['title_held_by']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1270,6 +1286,8 @@ const New = (props) => {
 																id="ein"
 																name="ein"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['ein']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1329,6 +1347,8 @@ const New = (props) => {
 																id="type"
 																name="type"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['type']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1347,6 +1367,8 @@ const New = (props) => {
 																id="sq_ft"
 																name="sq_ft"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['sq_ft']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1389,6 +1411,8 @@ const New = (props) => {
 																id="deed"
 																name="deed"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['deed']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1443,6 +1467,8 @@ const New = (props) => {
 																id="articles_of_organization"
 																name="articles_of_organization"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['articles_of_organization']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1461,6 +1487,8 @@ const New = (props) => {
 																id="certificate_of_organization_from_secretary_of_state"
 																name="certificate_of_organization_from_secretary_of_state"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['certificate_of_organization_from_secretary_of_state']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1479,6 +1507,8 @@ const New = (props) => {
 																id="operating_agreement"
 																name="operating_agreement"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['operating_agreement']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1515,6 +1545,8 @@ const New = (props) => {
 																id="ein_letter_from_irs"
 																name="ein_letter_from_irs"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['ein_letter_from_irs']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1556,6 +1588,8 @@ const New = (props) => {
 																id="submitted_by"
 																name="submitted_by"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['submitted_by']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
