@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
@@ -22,6 +22,11 @@ const DiscussionForm = (props) => {
 	const connection = useWalletStore((s) => s.connection)
 	const { proposal } = useWalletStore((s) => s.selectedProposal)
 	const { fetchChatMessages } = useWalletStore((s) => s.actions)
+	const [canCreateAction, setCanCreateAction] = useState(props.canCreateAction || false)
+
+	useLayoutEffect(() => {
+		if (props.canCreateAction) setCanCreateAction(props.canCreateAction);
+	}, [props.canCreateAction]);
 
 	const submitComment = async () => {
 		setSubmitting(true)
@@ -53,7 +58,7 @@ const DiscussionForm = (props) => {
 
 	return props.solanaBrowser ? (
 		<>
-			<div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
+			{ canCreateAction && <div className="flex flex-col md:flex-row md:items-center md:space-x-4 space-y-4 md:space-y-0">
 				<Input value={comment} type="text" onChange={(e) => setComment(e.target.value)} placeholder="Thoughts?..." />
 
 				<Tooltip contentClassName="flex-shrink-0" content={tooltipContent}>
@@ -61,7 +66,7 @@ const DiscussionForm = (props) => {
 						{submitting ? <Loading /> : <span>Comment</span>}
 					</Button>
 				</Tooltip>
-			</div>
+			</div>}
 		</>
 	) : (
 		<></>
