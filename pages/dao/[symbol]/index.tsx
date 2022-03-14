@@ -311,12 +311,14 @@ const REALM = () => {
 							</div>
 						)}
 					</div>
-					<div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4 border border-fgd-1">
-						<TokenBalanceCardWrapper />
-						<NFTSCompactWrapper></NFTSCompactWrapper>
-						<AccountsCompactWrapper />
-						{!realm?.account.config.useCommunityVoterWeightAddin && <MembersCompactWrapper></MembersCompactWrapper>}
-						{/* <AssetsCompactWrapper></AssetsCompactWrapper> */}
+					<div className="col-span-12 md:col-span-5 lg:col-span-4 border border-fgd-1">
+						<div>
+							{/* <TokenBalanceCardWrapper /> */}
+							<NFTSCompactWrapper></NFTSCompactWrapper>
+							<AccountsCompactWrapper />
+							{!realm?.account.config.useCommunityVoterWeightAddin && <MembersCompactWrapper></MembersCompactWrapper>}
+							{/* <AssetsCompactWrapper></AssetsCompactWrapper> */}
+						</div>
 					</div>
 				</div>
 			</div>

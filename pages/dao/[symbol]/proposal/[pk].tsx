@@ -200,7 +200,6 @@ const Proposal = () => {
 									{canCreateAction && (
 										<div className="border border-green p-8 text-center">
 											<p className="pb-8">Cast Your Vote</p>
-
 											<VotePanel simple className="" />
 										</div>
 									)}
@@ -213,7 +212,6 @@ const Proposal = () => {
 											<p className="pb-8">
 												Should the {realmDisplayName ? realmDisplayName : 'DAO'} purchase &quot;{propertyDetails?.name ? propertyDetails?.name : 'property'}&quot;?
 											</p>
-
 											<VotePanel simple className="" />
 										</div>
 									)}
@@ -288,12 +286,16 @@ const Proposal = () => {
 						</div>
 					) : null}
 
-					{ canCreateAction && <><div className="border border-green p-4 md:p-6 -mt-px">
-						<VotePanel />
-					</div>
-					<div className="hidden">
-						<ProposalActionsPanel />
-					</div > </>}
+					{canCreateAction && (
+						<>
+							<div className="border border-green p-4 md:p-6 -mt-px">
+								<VotePanel />
+							</div>
+							<div className="hidden">
+								<ProposalActionsPanel />
+							</div>{' '}
+						</>
+					)}
 				</div>
 			</div>
 		</>

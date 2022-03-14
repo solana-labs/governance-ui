@@ -12,17 +12,13 @@ const TokenBalanceCardWrapper = ({
   const { realm, ownTokenRecord } = useRealm()
 
   const getTokenBalanceCard = () => {
-    //based on realm config it will provide proper tokenBalanceCardComponent
-    const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
-    if (
-      isLockTokensMode &&
-      (!ownTokenRecord ||
-        ownTokenRecord.account.governingTokenDepositAmount.isZero())
-    ) {
-      return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
-    }
-    //Default
-    return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
+		//based on realm config it will provide proper tokenBalanceCardComponent
+		const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
+		if (isLockTokensMode && (!ownTokenRecord || ownTokenRecord.account.governingTokenDepositAmount.isZero())) {
+			return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
+		}
+		//Default
+		return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
   }
   return getTokenBalanceCard()
 }
