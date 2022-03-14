@@ -44,7 +44,7 @@ const ConvertToMsol = () => {
     councilMint,
     symbol,
   } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()

@@ -26,7 +26,7 @@ import {
 } from 'NftVotePlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
 
-interface CreateNftRegistrarForm {
+interface ConfigureCollectionForm {
   governedAccount: GovernedTokenAccount | undefined
   weight: number
   size: number
@@ -45,7 +45,7 @@ const ConfigureNftPluginCollection = ({
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<CreateNftRegistrarForm>()
+  const [form, setForm] = useState<ConfigureCollectionForm>()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   async function getInstruction(): Promise<UiInstruction> {

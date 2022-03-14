@@ -9,7 +9,7 @@ import useRealm from './useRealm'
 import useRpcContext from './useRpcContext'
 
 export default function useCreateProposal() {
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const {
     realm,

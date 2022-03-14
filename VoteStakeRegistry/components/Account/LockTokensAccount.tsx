@@ -42,7 +42,7 @@ const unlockedTypes = ['none']
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const { realm, realmInfo, mint, tokenRecords, councilMint } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])

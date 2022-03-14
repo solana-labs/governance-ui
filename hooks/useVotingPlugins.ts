@@ -3,32 +3,36 @@ import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
-export function useVoteRegistry() {
+export function useVotingPlugins() {
   const { realm } = useRealm()
   const {
-    handleSetRegistrar,
-    handleSetClient,
+    handleSetVsrRegistrar,
+    handleSetVsrClient,
     handleSetNftClient,
     handleSetNftRegistrar,
+    handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
 
   useEffect(() => {
     if (wallet?.connected) {
-      handleSetClient(wallet, connection)
+      handleSetVsrClient(wallet, connection)
       handleSetNftClient(wallet, connection)
     }
   }, [connection.endpoint, wallet?.connected, realm?.pubkey])
 
   useEffect(() => {
     if (realm && client) {
-      handleSetRegistrar(client, realm)
+      handleSetVsrRegistrar(client, realm)
     }
     if (realm && nftClient) {
       handleSetNftRegistrar(nftClient, realm)
     }
-  }, [realm?.pubkey, client])
+    if (realm?.account.config.useCommunityVoterWeightAddin) {
+      handleSetCurrentRealmVotingClient(client, realm, wallet?.publicKey)
+    }
+  }, [realm?.pubkey, client, nftClient])
 }

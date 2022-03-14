@@ -41,7 +41,7 @@ const AddMemberForm = ({ close }) => {
   const [formErrors, setFormErrors] = useState({})
 
   const router = useRouter()
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
 

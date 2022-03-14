@@ -1,23 +1,97 @@
 import create, { State } from 'zustand'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { NftVoterClient } from '@solana/governance-program-library'
-import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
+import {
+  getRegistrarPDA,
+  getVoterPDA,
+  getVoterWeightPDA,
+  Registrar,
+} from 'VoteStakeRegistry/sdk/accounts'
 import { Provider } from '@project-serum/anchor'
 import { Wallet } from '@project-serum/sol-wallet-adapter'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
-import { ProgramAccount, Realm } from '@solana/spl-governance'
+import {
+  ProgramAccount,
+  Realm,
+  SYSTEM_PROGRAM_ID,
+} from '@solana/spl-governance'
 import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 
+class VotingClient {
+  client: VsrClient | NftVoterClient | undefined
+  realm: ProgramAccount<Realm>
+  walletPk: PublicKey | null | undefined
+  constructor({
+    client,
+    realm,
+    walletPk,
+  }: {
+    client: VsrClient | NftVoterClient | undefined
+    realm: ProgramAccount<Realm>
+    walletPk: PublicKey | null | undefined
+  }) {
+    this.client = client
+    this.realm = realm
+    this.walletPk = walletPk
+  }
+  withPreInstructionActions = async (
+    instructions: TransactionInstruction[]
+  ) => {
+    const client = this.client
+    const realm = this.realm
+    const walletPk = this.walletPk
+    if (typeof this.client === 'undefined') {
+      return
+    }
+    if (this.client instanceof VsrClient) {
+      //if no plugin then we dont do anything
+      if (!realm.account.config.useCommunityVoterWeightAddin) {
+        return
+      }
+      if (!client) {
+        throw 'no vote registry plugin'
+      }
+      const clientProgramId = client!.program.programId
+
+      //TODO support both mints for now only community is supported
+      const { registrar } = await getRegistrarPDA(
+        realm.pubkey,
+        realm.account.communityMint,
+        client!.program.programId
+      )
+      const { voter } = await getVoterPDA(registrar, walletPk!, clientProgramId)
+      const { voterWeightPk } = await getVoterWeightPDA(
+        registrar,
+        walletPk!,
+        clientProgramId
+      )
+
+      instructions.push(
+        client.program.instruction.updateVoterWeightRecord({
+          accounts: {
+            registrar,
+            voter,
+            voterWeightRecord: voterWeightPk,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          },
+        })
+      )
+      return voterWeightPk
+    }
+  }
+}
 interface UseVotePluginsClientStore extends State {
   state: {
-    client: VsrClient | undefined
+    vsrClient: VsrClient | undefined
     nftClient: NftVoterClient | undefined
     voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
+    currentRealmVotingClient: VotingClient | null
   }
-  handleSetClient: (
+  handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
@@ -25,7 +99,7 @@ interface UseVotePluginsClientStore extends State {
     wallet: SignerWalletAdapter | undefined,
     connection: ConnectionContext
   ) => void
-  handleSetRegistrar: (
+  handleSetVsrRegistrar: (
     client: VsrClient,
     realm: ProgramAccount<Realm> | undefined
   ) => void
@@ -33,13 +107,19 @@ interface UseVotePluginsClientStore extends State {
     client: NftVoterClient,
     realm: ProgramAccount<Realm> | undefined
   ) => void
+  handleSetCurrentRealmVotingClient: (
+    client: VsrClient | NftVoterClient | undefined,
+    realm: ProgramAccount<Realm>,
+    walletPk: PublicKey | null | undefined
+  ) => void
 }
 
 const defaultState = {
-  client: undefined,
+  vsrClient: undefined,
   nftClient: undefined,
   voteStakeRegistryRegistrar: null,
   nftMintRegistrar: null,
+  currentRealmVotingClient: null,
 }
 
 const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
@@ -47,7 +127,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
     state: {
       ...defaultState,
     },
-    handleSetClient: async (wallet, connection) => {
+    handleSetVsrClient: async (wallet, connection) => {
       const options = Provider.defaultOptions()
       const provider = new Provider(
         connection.current,
@@ -59,10 +139,10 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
         connection.cluster === 'devnet'
       )
       set((s) => {
-        s.state.client = vsrClient
+        s.state.vsrClient = vsrClient
       })
     },
-    handleSetRegistrar: async (client, realm) => {
+    handleSetVsrRegistrar: async (client, realm) => {
       const clientProgramId = client!.program.programId
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
@@ -99,6 +179,15 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const existingRegistrar = await tryGetNftRegistrar(registrar, client!)
       set((s) => {
         s.state.nftMintRegistrar = existingRegistrar
+      })
+    },
+    handleSetCurrentRealmVotingClient: (client, realm, walletPk) => {
+      set((s) => {
+        s.state.currentRealmVotingClient = new VotingClient({
+          client,
+          realm,
+          walletPk,
+        })
       })
     },
   })

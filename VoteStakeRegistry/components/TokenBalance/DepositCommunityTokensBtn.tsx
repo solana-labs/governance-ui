@@ -14,7 +14,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 const DepositCommunityTokensBtn = ({ className = '' }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)

@@ -87,7 +87,7 @@ function extractGovernanceAccountFromInstructionsData(
 
 const New = () => {
   const router = useRouter()
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,

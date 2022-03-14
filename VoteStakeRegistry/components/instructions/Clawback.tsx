@@ -39,7 +39,7 @@ const Clawback = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection)
   const { realm } = useRealm()
   const {

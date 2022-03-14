@@ -57,7 +57,7 @@ const LockTokensModal = ({
 }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
   )

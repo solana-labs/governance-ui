@@ -43,7 +43,7 @@ const defaultFormValues = {
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const client = useVotePluginsClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const {
     realmInfo,
     realm,

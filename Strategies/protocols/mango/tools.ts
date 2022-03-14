@@ -280,7 +280,7 @@ export const tryGetMangoAccount = async (
   mangoAccountPk: PublicKey
 ) => {
   try {
-    const account = await market.client?.getMangoAccount(
+    const account = await market.vsrClient?.getMangoAccount(
       mangoAccountPk,
       market.group!.dexProgramId
     )
@@ -295,7 +295,7 @@ export const tryGetMangoAccountsForOwner = async (
   ownerPk: PublicKey
 ) => {
   try {
-    const accounts = await market.client?.getMangoAccountsForOwner(
+    const accounts = await market.vsrClient?.getMangoAccountsForOwner(
       market.group!,
       ownerPk
     )

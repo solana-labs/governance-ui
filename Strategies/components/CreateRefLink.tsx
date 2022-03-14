@@ -54,7 +54,7 @@ const CreateRefForm = ({
     setLinkGenerated(false)
     try {
       const signers = []
-      const programId = market.client!.programId
+      const programId = market.vsrClient!.programId
       const mangoGroup = market.group
       const { referrerPda, encodedReferrerId } = await getReferrerPda(
         mangoGroup!,
@@ -117,7 +117,7 @@ const CreateRefForm = ({
   }
   useEffect(() => {
     const getRefLinks = async () => {
-      const client = market.client
+      const client = market.vsrClient
       const mangoAccountPk = selectedMangoAccount!.publicKey
       const account = await tryGetMangoAccount(market, mangoAccountPk)
       if (account) {
