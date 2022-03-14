@@ -14,16 +14,16 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { GovernedTokenAccount } from '@utils/tokens'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import {
-  getNftMaxVoterWeightRecord,
-  getNftRegistrarPDA,
-} from 'VoteStakeRegistry/sdk/accounts'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
 import { PublicKey } from '@solana/web3.js'
+import {
+  getNftMaxVoterWeightRecord,
+  getNftRegistrarPDA,
+} from 'NftVotePlugin/sdk/accounts'
 
 interface CreateNftRegistrarForm {
   governedAccount: GovernedTokenAccount | undefined

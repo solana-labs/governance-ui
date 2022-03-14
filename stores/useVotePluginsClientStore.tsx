@@ -1,17 +1,14 @@
 import create, { State } from 'zustand'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { NftVoterClient } from '@solana/governance-program-library'
-import {
-  getNftRegistrarPDA,
-  getRegistrarPDA,
-  Registrar,
-} from 'VoteStakeRegistry/sdk/accounts'
+import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
 import { Provider } from '@project-serum/anchor'
 import { Wallet } from '@project-serum/sol-wallet-adapter'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
+import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 
 interface UseVotePluginsClientStore extends State {
   state: {

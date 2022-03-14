@@ -15,9 +15,9 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { GovernedTokenAccount } from '@utils/tokens'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getNftRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
+import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 
 interface CreateNftRegistrarForm {
   governedAccount: GovernedTokenAccount | undefined

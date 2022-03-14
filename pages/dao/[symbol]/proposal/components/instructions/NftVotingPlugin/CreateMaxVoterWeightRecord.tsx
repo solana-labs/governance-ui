@@ -15,12 +15,12 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { GovernedTokenAccount } from '@utils/tokens'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getNftMaxVoterWeightRecord } from 'VoteStakeRegistry/sdk/accounts'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../FormCreator'
+import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: GovernedTokenAccount | undefined

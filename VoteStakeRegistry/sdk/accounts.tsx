@@ -76,43 +76,6 @@ export const getRegistrarPDA = async (
   }
 }
 
-export const getNftRegistrarPDA = async (
-  realmPk: PublicKey,
-  mint: PublicKey,
-  clientProgramId: PublicKey
-) => {
-  const [registrar, registrarBump] = await PublicKey.findProgramAddress(
-    [Buffer.from('registrar'), realmPk.toBuffer(), mint.toBuffer()],
-    clientProgramId
-  )
-  return {
-    registrar,
-    registrarBump,
-  }
-}
-
-export const getNftMaxVoterWeightRecord = async (
-  realmPk: PublicKey,
-  mint: PublicKey,
-  clientProgramId: PublicKey
-) => {
-  const [
-    maxVoterWeightRecord,
-    maxVoterWeightRecordBump,
-  ] = await PublicKey.findProgramAddress(
-    [
-      Buffer.from('max-voter-weight-record'),
-      realmPk.toBuffer(),
-      mint.toBuffer(),
-    ],
-    clientProgramId
-  )
-  return {
-    maxVoterWeightRecord,
-    maxVoterWeightRecordBump,
-  }
-}
-
 export const getVoterPDA = async (
   registrar: PublicKey,
   walletPk: PublicKey,
