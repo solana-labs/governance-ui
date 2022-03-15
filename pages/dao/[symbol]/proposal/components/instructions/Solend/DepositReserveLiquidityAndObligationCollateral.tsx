@@ -162,7 +162,7 @@ const DepositReserveLiquidityAndObligationCollateral = ({
       <Input
         label="Amount to deposit"
         value={form.uiAmount}
-        type="string"
+        type="text"
         min="0"
         onChange={(evt) =>
           handleSetForm({

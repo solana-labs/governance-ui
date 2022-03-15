@@ -107,7 +107,11 @@ const TokrizeContract = ({ index, governance, propertyDetails, lookupUri }: { in
 				<Input
 					label="Destination Address"
 					value={form.destinationAddress}
-					type="string"
+					type="text"
+
+					className="field-validate"
+					required
+
 					placeholder="DAO Treasury Address"
 					onChange={(event) => {
 						handleSetForm({

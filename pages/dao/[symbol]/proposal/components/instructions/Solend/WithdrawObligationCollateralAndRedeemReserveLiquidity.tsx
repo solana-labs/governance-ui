@@ -166,7 +166,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
       <Input
         label="Amount to withdraw"
         value={form.uiAmount}
-        type="string"
+        type="text"
         min="0"
         onChange={(evt) =>
           handleSetForm({
@@ -180,7 +180,7 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
       <Input
         label="Destination Account (Optional - default to governance ATA"
         value={form.destinationLiquidity}
-        type="string"
+        type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
