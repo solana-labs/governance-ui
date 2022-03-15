@@ -18,7 +18,7 @@ import tokenService from 'utils/services/token'
 import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
 import {
@@ -48,7 +48,7 @@ const SOL = 'SOL'
 const OTHER = 'OTHER'
 const NFT = 'NFT'
 
-const NewAccountForm = () => {
+const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -82,10 +82,28 @@ const NewAccountForm = () => {
 	const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens() ? ownVoterWeight.councilTokenRecord : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm) ? ownVoterWeight.communityTokenRecord : undefined
 
 	const handleSetForm = ({ propertyName, value }) => {
-		setFormErrors({})
-		setForm({ ...form, [propertyName]: value })
+		if (!rnft) {
+			setFormErrors({})
+			setForm({ ...form, [propertyName]: value })
+		} else {
+			return { propertyName, value }
+		}
 	}
+
+	const rnftDefaults = async () => {
+		console.log("starting!")
+		setForm({
+			mintAddress: DEFAULT_NFT_TREASURY_MINT,
+			minCommunityTokensToCreateProposal: 0,
+			minInstructionHoldUpTime: 0,
+			maxVotingTime: 364,
+			voteThreshold: 1,
+		});
+		console.log("ending")
+	}
+
 	const handleCreate = async () => {
+		if (rnft) await rnftDefaults();
 		try {
 			if (!realm) {
 				throw 'No realm selected'
@@ -117,6 +135,8 @@ const NewAccountForm = () => {
 				setIsLoading(false)
 				fetchRealm(realmInfo!.programId, realmInfo!.realmId)
 				router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
+
+				console.log("DONEZO", form)
 			}
 		} catch (e) {
 			console.error('Create Treasury', e)
@@ -129,6 +149,7 @@ const NewAccountForm = () => {
 			setIsLoading(false)
 		}
 	}
+
 	const handleSetDefaultMintError = () => {
 		const mintError = { mintAddress: 'Invalid mint address' }
 		setFormErrors(mintError)
@@ -172,6 +193,7 @@ const NewAccountForm = () => {
 			}
 		}),
 	})
+
 	useEffect(() => {
 		if (form.mintAddress) {
 			debounce.debounceFcn(async () => {
@@ -201,6 +223,20 @@ const NewAccountForm = () => {
 			propertyName: 'mintAddress',
 		})
 	}, [treasuryType])
+
+	useLayoutEffect(() => {
+		if (rnft === true) {
+			console.log("rnft", rnft)
+			rnftDefaults();
+		}
+	}, [rnft])
+
+
+	useEffect(() => {
+		console.log("\n\n\n\n\n\nFORM data:", form)
+	}, [form])
+
+
 	return (
 		<div className="space-y-3">
 			<PreviousRouteBtn />
@@ -209,48 +245,52 @@ const NewAccountForm = () => {
 					<h1>Create new treasury account</h1>
 				</div>
 			</div>
-			<Select label={'Type'} onChange={setTreasuryType} placeholder="Please select..." value={treasuryType.name}>
-				{types
-					.filter((x) => !x.hide)
-					.map((x) => {
-						return (
-							<Select.Option key={x.value} value={x}>
-								{x.name}
-							</Select.Option>
-						)
-					})}
-			</Select>
-			{treasuryType.value === OTHER && (
+			{!rnft && (
 				<>
-					<Input
-						label="Mint address"
-						value={form.mintAddress}
-						type="text"
-						onChange={(evt) =>
-							handleSetForm({
-								value: evt.target.value,
-								propertyName: 'mintAddress',
-							})
-						}
-						error={formErrors['mintAddress']}
-					/>
-					{tokenInfo ? (
-						<div className="flex items-center">
-							{tokenInfo?.logoURI && <img className="flex-shrink-0 h-6 w-6 mr-2.5" src={tokenInfo.logoURI} />}
-							<div>
-								{tokenInfo.name}
-								<p className="text-fgd-3 text-xs">{tokenInfo?.symbol}</p>
-							</div>
-						</div>
-					) : mint ? (
-						<div>Mint found</div>
-					) : null}
+					<Select label={'Type'} onChange={setTreasuryType} placeholder="Please select..." value={treasuryType.name}>
+						{types
+							.filter((x) => !x.hide)
+							.map((x) => {
+								return (
+									<Select.Option key={x.value} value={x}>
+										{x.name}
+									</Select.Option>
+								)
+							})}
+					</Select>
+					{treasuryType.value === OTHER && (
+						<>
+							<Input
+								label="Mint address"
+								value={form.mintAddress}
+								type="text"
+								onChange={(evt) =>
+									handleSetForm({
+										value: evt.target.value,
+										propertyName: 'mintAddress',
+									})
+								}
+								error={formErrors['mintAddress']}
+							/>
+							{tokenInfo ? (
+								<div className="flex items-center">
+									{tokenInfo?.logoURI && <img className="flex-shrink-0 h-6 w-6 mr-2.5" src={tokenInfo.logoURI} />}
+									<div>
+										{tokenInfo.name}
+										<p className="text-fgd-3 text-xs">{tokenInfo?.symbol}</p>
+									</div>
+								</div>
+							) : mint ? (
+								<div>Mint found</div>
+							) : null}
+						</>
+					)}
+					<BaseGovernanceForm formErrors={formErrors} form={form} setForm={setForm} setFormErrors={setFormErrors}></BaseGovernanceForm>
 				</>
 			)}
-			<BaseGovernanceForm formErrors={formErrors} form={form} setForm={setForm} setFormErrors={setFormErrors}></BaseGovernanceForm>
 			<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 				<Button tooltipMessage={!connected ? 'Please connect your wallet' : ''} disabled={!connected || isLoading} isLoading={isLoading} onClick={handleCreate}>
-					Create
+					{`Create${rnft ? ' rNFT Treasury' : ''}`}
 				</Button>
 			</div>
 		</div>
