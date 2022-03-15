@@ -65,10 +65,8 @@ const Proposal = () => {
 	const getDataObj = async (retry?:boolean) => {
 		if (!descriptionObj) return false
 		if (descriptionObj && descriptionObj[0].uri) {
-			// const tempId = descriptionObj[0].uri.split('.net/')[1].toString();
 			const tempId = encode(deconstructUri(descriptionObj[0].uri), true);
 			if (checkArDataKey(tempId) && !retry) {
-				console.log("LOCAL!")
 				return getArData(tempId);
 			} else {
 				return fetch(descriptionObj[0].uri, {
@@ -76,7 +74,6 @@ const Proposal = () => {
 				}).then((res) => res.json())
 				.then(res => {
 					setArData(tempId, res);
-					console.log("not LOCAL!")
 					return res;
 				})
 			}
@@ -177,32 +174,6 @@ const Proposal = () => {
 		},
 		isPolling ? delay : null
 	)
-
-
-	// const demo = (uri) => {
-	// 	const url = encode(uri);
-	// 	const temp = decode(url);
-	// 	const deconstruct = deconstructUri(uri);
-	// 	console.log(`\n\n\n\n\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-	// 	console.log("uri stuff","\n\nuri",uri,"\n\nurl (encode)",url,"\ntemp (url decode)",temp,"\n\ndeconstructUri", deconstruct,"\nconstructUri", constructUri(deconstruct) );
-	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
-	// }
-
-	// useEffect(() => {
-	// 	setTimeout(() => {
-	// 		console.clear();
-
-	// 		setTimeout(() => {
-	// 			demo("https://d2hcdcila1xoq2.cloudfront.net/genericAssetDirectory/2022-03-15T19:11:50.555109884Z.json")
-	// 			demo("https://arweave.net/KDOGVnM3Hsx8gcPT76ADeiLt59a98lsxlPscNANTnY4")
-	// 		}, 10)
-
-	// 	}, 1500)
-	// }, [proposal?.account])
-
 
 	return initalLoad ? (
 		<Loader />

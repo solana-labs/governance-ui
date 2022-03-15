@@ -26,7 +26,7 @@ export async function fetchAssetCostToStore(fileSizes: number[]) {
 
 export async function uploadToArweave(data: FormData, json?: any) {
 	const controller = new AbortController();
-	const timeoutId = setTimeout(() => controller.abort(), 7500)
+	const timeoutId = setTimeout(() => controller.abort(), 9500)
 
 	try {
 		return await(
