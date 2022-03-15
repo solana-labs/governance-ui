@@ -5,7 +5,10 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getRealmConfig } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 
-const vsrPluginsPks = ['11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc99']
+const vsrPluginsPks = [
+  '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc99',
+  '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc95',
+]
 
 export function useVotingPlugins() {
   const { realm } = useRealm()
