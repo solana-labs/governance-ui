@@ -72,10 +72,10 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 const New = (props) => {
 	const _prepopulateForDemos = false
 	const router = useRouter()
-	const { history } = useRouterHistory();
+	const { history } = useRouterHistory()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
-	const { symbol, realm, realmInfo, realmDisplayName, ownVoterWeight, mint, councilMint, canChooseWhoVote, governances} = useRealm()
+	const { symbol, realm, realmInfo, realmDisplayName, ownVoterWeight, mint, councilMint, canChooseWhoVote, governances } = useRealm()
 
 	const { getAvailableInstructions } = useGovernanceAssets()
 	const availableInstructions = getAvailableInstructions()
@@ -463,13 +463,28 @@ const New = (props) => {
 		data.append('file[]', metadataFile)
 
 		setSubmittingStep([...submittingStep, `Uploading ${propertyData.name} data...`])
-		const result = await uploadToArweave(data)
-		const metadataResultFile = result.messages?.find((m) => m.filename === 'manifest.json')
+
+		// try {
+		// 	console.log("trying....")
+		const result = await uploadToArweave(data, JSON.stringify(metaplexDataObj))
+		// } catch {
+		// 	// TODO: if fails store localstorage version for recovery....
+		// }
+		console.log("result", result);
+
+		const metadataResultFile = result.messages?.find((m) => m.filename === 'manifest.json') || {
+			aws: true,
+			transactionId: result
+		};
+
+		console.log("metadataResultFile", metadataResultFile);
 
 		setSubmittingStep([...submittingStep, `Data uploaded.`])
 		if (metadataResultFile?.transactionId) {
-			const link = `https://arweave.net/${metadataResultFile.transactionId}`
+			const link = metadataResultFile.aws? result : `https://arweave.net/${metadataResultFile.transactionId}`
 			setArWeaveLink(link)
+
+			console.log(link);
 
 			return link
 		} else {
@@ -483,7 +498,7 @@ const New = (props) => {
 	}
 
 	useEffect(() => {
-		if( proposalType !== 0) {
+		if (proposalType !== 0) {
 			if (proposalType === 2) {
 				setMetaplexDataObj({
 					name: propertyData.name,
@@ -852,14 +867,13 @@ const New = (props) => {
 		if (realmDisplayName) setInitalLoad(false)
 	}, [realmDisplayName])
 
-
 	const [canCreateAction, setcanCreateAction] = useState(false)
 	const governanceItems = Object.values(governances)
 	useEffect(() => {
 		setcanCreateAction(governanceItems.some((g) => ownVoterWeight.canCreateProposal(g.account.config)))
 	}, [governanceItems, history])
 
-	const [formIsValid, setFormIsValid] = useState<boolean>(false);
+	const [formIsValid, setFormIsValid] = useState<boolean>(false)
 	// const isFormValid = (namespaceSelector: string | undefined | null):boolean => {
 	// 	if (process?.browser && document) {
 	// 		const formInputs = document.querySelectorAll(`${namespaceSelector ? (namespaceSelector + ' ') : ''}.field-validate:not(:valid)`) || [];
@@ -869,22 +883,20 @@ const New = (props) => {
 	// 		return false;
 	// 	}
 	// };
-	const checkFormValidity = ():boolean => {
-		if (!canCreateAction) return false;
+	const checkFormValidity = (): boolean => {
+		if (!canCreateAction) return false
 		if (process?.browser && document) {
-			const formInputs = document.querySelectorAll(`.field-validate:not(:valid)`) || [];
+			const formInputs = document.querySelectorAll(`.field-validate:not(:valid)`) || []
 			// console.log('checkFormValidity', formInputs)
-			return ((formInputs.length > 0 || !governance) ? false : true);
+			return formInputs.length > 0 || !governance ? false : true
 		} else {
-			return false;
+			return false
 		}
-	};
+	}
 
 	useEffect(() => {
-		if (!initalLoad) setFormIsValid(checkFormValidity());
-	}, [propertyData, governance, canCreateAction]);
-
-
+		if (!initalLoad) setFormIsValid(checkFormValidity())
+	}, [propertyData, governance, canCreateAction])
 
 	return initalLoad ? (
 		<Loader />
@@ -1607,7 +1619,7 @@ const New = (props) => {
 								</div>
 							</div>
 
-							<div className={`pt-2${ canCreateAction ? '' : ' opacity-30 grayscale pointer-events-none'}`}>
+							<div className={`pt-2${canCreateAction ? '' : ' opacity-30 grayscale pointer-events-none'}`}>
 								{canChooseWhoVote && (
 									<VoteBySwitch
 										checked={voteByCouncil}

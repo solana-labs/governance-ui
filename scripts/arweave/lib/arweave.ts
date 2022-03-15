@@ -23,14 +23,44 @@ export async function fetchAssetCostToStore(fileSizes: number[]) {
 	return result.solana * anchor.web3.LAMPORTS_PER_SOL * 20
 }
 
-export async function uploadToArweave(data: FormData) {
-	return await (
-		await fetch(ARWEAVE_UPLOAD_ENDPOINT, {
-			method: 'POST',
-			// @ts-ignore
-			body: data,
-		})
-	).json()
+
+export async function uploadToArweave(data: FormData, json?: any) {
+	const controller = new AbortController();
+	const timeoutId = setTimeout(() => controller.abort(), 7500)
+
+	try {
+		return await(
+			await fetch(ARWEAVE_UPLOAD_ENDPOINT, {
+				method: 'POST',
+				signal: controller.signal,
+				// @ts-ignore
+				body: data,
+			})
+		).json()
+	} catch {
+		var myHeaders = new Headers();
+		myHeaders.append("Authorization", "Basic b2xpdmU6Z3RCZnJvNW4zaVJhUGg=");
+		var requestOptions = {
+			method: 'GET',
+			headers: myHeaders,
+			redirect: 'follow'
+		};
+
+		return await(
+			await fetch('https://api.p2-test.rhove.com/social/asset-upload-link?extension=.json', requestOptions)
+			.then((response) => response.json())
+			.then((result) => {
+				const presignedUrl = result?.pre_signed_url;
+				const cdnUrl = result?.cdn_url;
+
+				return fetch(result.pre_signed_url, {
+					method: "PUT",
+					body: json
+				})
+				.then(() => cdnUrl);
+			})
+		)
+	}
 }
 
 export function estimateManifestSize(filenames: string[]) {
