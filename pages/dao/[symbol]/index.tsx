@@ -254,10 +254,10 @@ const REALM = () => {
             <>
               <TokenBalanceCardWrapper />
               <NFTSCompactWrapper />
+              <AccountsCompactWrapper />
               {!realm?.account.config.useCommunityVoterWeightAddin && (
                 <MembersCompactWrapper />
               )}
-              <AccountsCompactWrapper />
               <AssetsCompactWrapper />
             </>
           )}

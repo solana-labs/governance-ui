@@ -21,7 +21,7 @@ const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const { governedTokenAccounts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -48,20 +48,20 @@ const Treasury = () => {
   useEffect(() => {
     if (
       tokenService._tokenList.length &&
-      governedTokenAccountsWithoutNfts.filter((x) => x.mint).length
+      governedTokenAccounts.filter((x) => x.mint).length
     ) {
       getStrategies(connection)
     }
   }, [
     tokenService._tokenList.length,
-    governedTokenAccountsWithoutNfts.filter((x) => x.mint).length,
+    governedTokenAccounts.filter((x) => x.mint).length,
   ])
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccountsWithoutNfts)
+      setTreasuryAccounts(governedTokenAccounts)
     }
     prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
+  }, [JSON.stringify(governedTokenAccounts)])
 
   useEffect(() => {
     if (treasuryAccounts.length > 0 && treasuryAccounts[0].mint) {

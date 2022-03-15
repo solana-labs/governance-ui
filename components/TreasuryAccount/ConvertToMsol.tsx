@@ -175,7 +175,7 @@ const ConvertToMsol = () => {
       value: currentAccount,
       propertyName: 'governedTokenAccount',
     })
-  }, [currentAccount])
+  }, [currentAccount, form.destinationAccount])
 
   return (
     <>
