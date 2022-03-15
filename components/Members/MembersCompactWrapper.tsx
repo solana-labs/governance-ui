@@ -67,11 +67,11 @@ const MembersCompactWrapper = () => {
 					)}
 				</h3>
 
-				<div className="pt-2" style={{ maxHeight: '350px' }}>
+				<div className="pt-2 border-b border-green" style={{ maxHeight: '350px' }}>
 					<MembersItems activeMembers={activeMembers} />
 				</div>
 
-				<div className="bg-bkg-1 mb-3 px-3 border border-green py-2 w-full flex flex-wrap justify-between">
+				<div className="mt-4 bg-bkg-1 mb-3 px-3 border border-green py-2 w-full flex flex-wrap justify-between">
 					<p className="">Total Votes Cast:</p>
 
 					<h3 className="mb-0 flex-shrink">{totalVotesCast}</h3>

@@ -215,7 +215,7 @@ const Proposal = () => {
 
 									{canCreateAction && (
 										<div className="border border-green p-8 text-center">
-											{ isVoting && <p className="pb-8">Cast Your Vote</p> }
+											{isVoting && <p className="pb-8">Cast Your Vote</p>}
 											<VotePanel simple className="" />
 										</div>
 									)}
@@ -305,7 +305,7 @@ const Proposal = () => {
 					{canCreateAction && (
 						<>
 							<div className="border border-green p-4 md:p-6 -mt-px">
-								<VotePanel className={!isVoting === true ? 'text-center' : ''} isVoting={ isVoting ? true : false } />
+								<VotePanel className={!isVoting === true ? 'text-center' : ''} isVoting={isVoting ? true : false} />
 							</div>
 							<div className="hidden">
 								<ProposalActionsPanel />
