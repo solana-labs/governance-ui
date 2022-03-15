@@ -10,13 +10,13 @@ import {
   withRelinquishVote,
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
 import Modal from '@components/Modal'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
+import { sendSignedTransaction } from '@utils/sendTransactions'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -96,28 +96,31 @@ const MyProposalsBn = () => {
         blockhash: recentBlockhash,
       } = await connection.getRecentBlockhash()
 
-      const transactions = await Promise.all(
-        proposalsArray.map(async (proposal) => {
-          console.log(proposal.pubkey.toBase58(), ownTokenRecord)
+      const transactions: Transaction[] = []
+      for (let i = 0; i < proposalsArray.length; i++) {
+        const proposal = proposalsArray[i]
+        console.log(proposal.pubkey.toBase58(), ownTokenRecord)
 
-          const instructions: TransactionInstruction[] = []
+        const instructions: TransactionInstruction[] = []
 
-          await withInstruction(instructions, proposal)
+        await withInstruction(instructions, proposal)
 
-          const transaction = new Transaction({
-            recentBlockhash,
-            feePayer: wallet.publicKey!,
-          })
-          transaction.add(...instructions)
-          return transaction
+        const transaction = new Transaction({
+          recentBlockhash,
+          feePayer: wallet.publicKey!,
         })
-      )
-
+        transaction.add(...instructions)
+        transaction.recentBlockhash = recentBlockhash
+        transaction.setSigners(
+          // fee payed by the wallet owner
+          wallet.publicKey!
+        )
+        transactions.push(transaction)
+      }
       const signedTXs = await wallet.signAllTransactions(transactions)
-
       await Promise.all(
         signedTXs.map((transaction) =>
-          sendTransaction({ transaction, wallet, connection })
+          sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
       await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
