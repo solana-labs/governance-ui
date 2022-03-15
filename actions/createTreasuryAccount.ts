@@ -39,7 +39,10 @@ export const createTreasuryAccount = async (
   )
 
   //will run only if plugin is connected with realm
-  const voterWeight = await client?.withUpdateVoterWeightRecord(instructions)
+  const voterWeight = await client?.withUpdateVoterWeightRecord(
+    instructions,
+    'CreateGovernance'
+  )
 
   const tokenAccount = await withCreateSplTokenAccount(
     connection,

@@ -70,8 +70,11 @@ const ApproveAllBtn = () => {
 
         //will run only if plugin is connected with realm
         const voterWeight = await client.withUpdateVoterWeightRecord(
-          instructions
+          instructions,
+          'CastVote'
         )
+        await client?.withCastPluginVote(instructions, proposal.pubkey)
+
         await withCastVote(
           instructions,
           realmInfo!.programId,

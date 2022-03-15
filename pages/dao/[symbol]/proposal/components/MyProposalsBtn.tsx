@@ -17,6 +17,7 @@ import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import { sendSignedTransaction } from '@utils/sendTransactions'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -30,6 +31,9 @@ const MyProposalsBn = () => {
   )
   const { realm, programId } = useWalletStore((s) => s.selectedRealm)
   const { fetchRealm } = useWalletStore((s) => s.actions)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const {
     proposals,
     ownTokenRecord,
@@ -146,7 +150,7 @@ const MyProposalsBn = () => {
     cleanSelected(drafts, withInstruction)
   }
   const releaseAllTokens = () => {
-    const withInstruction = (
+    const withInstruction = async (
       instructions,
       proposal: ProgramAccount<Proposal>
     ) => {
@@ -157,7 +161,7 @@ const MyProposalsBn = () => {
           : ownCouncilTokenRecord
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
-
+      await client.withRelinquishVote(instructions, proposal.pubkey)
       return withRelinquishVote(
         instructions,
         realm!.owner,

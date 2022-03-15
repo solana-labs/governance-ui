@@ -14,10 +14,14 @@ import useWalletStore from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<YesNoVote | null>(null)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const {
     governance,
     proposal,
@@ -105,7 +109,8 @@ const VotePanel = () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
         ownVoteRecord!.pubkey,
-        instructions
+        instructions,
+        client
       )
     } catch (ex) {
       console.error("Can't relinquish vote", ex)

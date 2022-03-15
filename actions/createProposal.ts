@@ -96,7 +96,10 @@ export const createProposal = async (
   const useDenyOption = true
 
   //will run only if plugin is connected with realm
-  const voterWeight = await client?.withUpdateVoterWeightRecord(instructions)
+  const voterWeight = await client?.withUpdateVoterWeightRecord(
+    instructions,
+    'CreateProposal'
+  )
 
   const proposalAddress = await withCreateProposal(
     instructions,

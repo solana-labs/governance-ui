@@ -17,9 +17,18 @@ import {
   Realm,
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
-import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
+import {
+  getNftRegistrarPDA,
+  getNftVoterWeightRecord,
+} from 'NftVotePlugin/sdk/accounts'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 
+type updateVoterWeightRecordTypes =
+  | 'CastVote'
+  | 'CommentProposal'
+  | 'CreateGovernance'
+  | 'CreateProposal'
+  | 'SignOffProposal'
 interface VotingClientProps {
   client: VsrClient | NftVoterClient | undefined
   realm: ProgramAccount<Realm> | undefined
@@ -36,29 +45,24 @@ export class VotingClient {
     this.walletPk = walletPk
   }
   withUpdateVoterWeightRecord = async (
-    instructions: TransactionInstruction[]
+    instructions: TransactionInstruction[],
+    type: updateVoterWeightRecordTypes
   ) => {
-    const client = this.client
     const realm = this.realm
     const walletPk = this.walletPk
-    if (typeof this.client === 'undefined') {
+    if (
+      !realm!.account.config.useCommunityVoterWeightAddin ||
+      typeof this.client === 'undefined'
+    ) {
       return
     }
     if (this.client instanceof VsrClient) {
-      //if no plugin then we dont do anything
-      if (!realm!.account.config.useCommunityVoterWeightAddin) {
-        return
-      }
-      if (!client) {
-        throw 'no vote registry plugin'
-      }
-      const clientProgramId = client!.program.programId
+      const clientProgramId = this.client!.program.programId
 
-      //TODO support both mints for now only community is supported
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        client!.program.programId
+        this.client!.program.programId
       )
       const { voter } = await getVoterPDA(registrar, walletPk!, clientProgramId)
       const { voterWeightPk } = await getVoterWeightPDA(
@@ -68,7 +72,7 @@ export class VotingClient {
       )
 
       instructions.push(
-        client.program.instruction.updateVoterWeightRecord({
+        this.client!.program.instruction.updateVoterWeightRecord({
           accounts: {
             registrar,
             voter,
@@ -80,45 +84,104 @@ export class VotingClient {
       return voterWeightPk
     }
     if (this.client instanceof NftVoterClient) {
-      const client = this.client
-      const realm = this.realm
-      const walletPk = this.walletPk
-      if (typeof this.client === 'undefined') {
-        return
-      }
-      if (this.client instanceof VsrClient) {
-        //if no plugin then we dont do anything
-        if (!realm!.account.config.useCommunityVoterWeightAddin) {
-          return
-        }
-        if (!client) {
-          throw 'no vote registry plugin'
-        }
-        const clientProgramId = client!.program.programId
+      const clientProgramId = this.client!.program.programId
 
-        //TODO support both mints for now only community is supported
-        const { registrar } = await getNftRegistrarPDA(
-          realm!.pubkey,
-          realm!.account.communityMint,
-          client!.program.programId
-        )
-        const { voterWeightPk } = await getVoterWeightPDA(
-          registrar,
-          walletPk!,
-          clientProgramId
-        )
+      const { registrar } = await getNftRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        this.client!.program.programId
+      )
+      const { voterWeightPk } = await getNftVoterWeightRecord(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        walletPk!,
+        clientProgramId
+      )
 
-        instructions.push(
-          client.program.instruction.updateVoterWeightRecord('CastVote', {
+      instructions.push(
+        this.client.program.instruction.updateVoterWeightRecord(
+          { [type]: {} },
+          {
             accounts: {
               registrar,
               voterWeightRecord: voterWeightPk,
             },
-          })
+          }
         )
-        return voterWeightPk
-      }
+      )
+      return voterWeightPk
     }
+  }
+  withCastPluginVote = async (instructions, proposalPk: PublicKey) => {
+    const realm = this.realm
+    const walletPk = this.walletPk!
+    if (
+      !realm!.account.config.useCommunityVoterWeightAddin ||
+      typeof this.client === 'undefined'
+    ) {
+      return
+    }
+    if (this.client instanceof NftVoterClient) {
+      const clientProgramId = this.client!.program.programId
+      const { registrar } = await getNftRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        this.client!.program.programId
+      )
+      const { voterWeightPk } = await getNftVoterWeightRecord(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        walletPk!,
+        clientProgramId
+      )
+      instructions.push(
+        this.client.program.instruction.castNftVote(proposalPk, {
+          accounts: {
+            registrar,
+            voterWeightRecord: voterWeightPk,
+            governingTokenOwner: walletPk,
+            payer: walletPk,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          },
+        })
+      )
+    }
+  }
+  withRelinquishVote = async (instructions, proposalPk: PublicKey) => {
+    const realm = this.realm
+    const walletPk = this.walletPk!
+    console.log(walletPk, instructions, proposalPk)
+    if (!realm!.account.config.useCommunityVoterWeightAddin) {
+      return
+    }
+    if (typeof this.client === 'undefined') {
+      return
+    }
+    // if (this.client instanceof NftVoterClient) {
+    //   const clientProgramId = this.client!.program.programId
+    //   const { registrar } = await getNftRegistrarPDA(
+    //     realm!.pubkey,
+    //     realm!.account.communityMint,
+    //     this.client!.program.programId
+    //   )
+    //   const { voterWeightPk } = await getNftVoterWeightRecord(
+    //     realm!.pubkey,
+    //     realm!.account.communityMint,
+    //     walletPk!,
+    //     clientProgramId
+    //   )
+    //   instructions.push(
+    //     this.client.program.instruction.relinquishNftVote(proposalPk, {
+    //       accounts: {
+    //         registrar,
+    //         voterWeightRecord: voterWeightPk,
+    //         governingTokenOwner: walletPk,
+    //         payer: walletPk,
+    //         systemProgram: SYSTEM_PROGRAM_ID,
+    //       },
+    //     })
+    //   )
+    // }
   }
 }
 interface UseVotePluginsClientStore extends State {

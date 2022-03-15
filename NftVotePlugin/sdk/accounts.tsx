@@ -38,3 +38,27 @@ export const getNftMaxVoterWeightRecord = async (
     maxVoterWeightRecordBump,
   }
 }
+
+export const getNftVoterWeightRecord = async (
+  realmPk: PublicKey,
+  mint: PublicKey,
+  walletPk: PublicKey,
+  clientProgramId: PublicKey
+) => {
+  const [
+    voterWeightPk,
+    voterWeightRecordBump,
+  ] = await PublicKey.findProgramAddress(
+    [
+      Buffer.from('voter-weight-record'),
+      realmPk.toBuffer(),
+      mint.toBuffer(),
+      walletPk.toBuffer(),
+    ],
+    clientProgramId
+  )
+  return {
+    voterWeightPk,
+    voterWeightRecordBump,
+  }
+}
