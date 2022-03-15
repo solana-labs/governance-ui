@@ -30,7 +30,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { StyledLabel } from '@components/inputs/styles'
 import PropertyDataOutput, { titleCase } from '../../../../components/PropertyDataOutput';
 import Loader from '@components/Loader'
-import { constructUri } from '@hooks/useUri'
+import { constructUri } from '@utils/resolveUri'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),

@@ -20,7 +20,7 @@ import Loader from '@components/Loader'
 import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
 import { buttonStyles } from '@components/Button'
-import { deconstructUri, encode } from '@hooks/useUri'
+import { deconstructUri, encode } from '@utils/resolveUri'
 
 const compareProposals = (
 	p1: Proposal,

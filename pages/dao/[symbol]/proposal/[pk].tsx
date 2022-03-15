@@ -28,7 +28,7 @@ import useInterval from '@hooks/useInterval'
 import { checkArDataKey, getArData, setArData } from '@hooks/useLocalStorage'
 import useWalletStore from 'stores/useWalletStore'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
-import { constructUri, decode, deconstructUri, encode } from '@hooks/useUri'
+import { constructUri, decode, deconstructUri, encode } from '@utils/resolveUri'
 
 const Proposal = () => {
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
