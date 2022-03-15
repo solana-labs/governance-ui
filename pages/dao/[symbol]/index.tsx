@@ -168,6 +168,10 @@ const REALM = () => {
 	// const [proposalType3, setProposalType3] = useState<any>([])
 	// const [proposalType4, setProposalType4] = useState<any>([])
 
+	useEffect(() => {
+		console.log("proposalType1", proposalType1);
+	}, [proposalType1]);
+
 	useLayoutEffect(() => {
 		setProposalType0(
 			tokrProposals.filter((proposal) => {
@@ -185,6 +189,8 @@ const REALM = () => {
 				if (proposal[1].account?.meta?.type === 2) return proposal
 			})
 		)
+
+		console.log("tokrProposals", tokrProposals);
 		// setProposalType3(
 		// 	tokrProposals.filter((proposal) => {
 		// 		if (proposal[1].account?.meta?.type === 3) return proposal
@@ -221,7 +227,7 @@ const REALM = () => {
 						) : null}
 					</div> */}
 
-						{proposalType1.length > 0 && proposalType2.length > 0 ? (
+						{proposalType1.length > 0 || proposalType2.length > 0 ? (
 							<>
 								<div className={`space-y-16${canCreate ? ' mt-16' : ''}`}>
 									{proposalType1.length > 0 && (
