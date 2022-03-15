@@ -28,6 +28,7 @@ import useInterval from '@hooks/useInterval'
 import { checkArDataKey, getArData, setArData } from '@hooks/useLocalStorage'
 import useWalletStore from 'stores/useWalletStore'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
+import { constructUri, decode, deconstructUri, encode } from '@hooks/useUri'
 
 const Proposal = () => {
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
@@ -64,8 +65,10 @@ const Proposal = () => {
 	const getDataObj = async (retry?:boolean) => {
 		if (!descriptionObj) return false
 		if (descriptionObj && descriptionObj[0].uri) {
-			const tempId = descriptionObj[0].uri.split('.net/')[1].toString();
+			// const tempId = descriptionObj[0].uri.split('.net/')[1].toString();
+			const tempId = encode(deconstructUri(descriptionObj[0].uri), true);
 			if (checkArDataKey(tempId) && !retry) {
+				console.log("LOCAL!")
 				return getArData(tempId);
 			} else {
 				return fetch(descriptionObj[0].uri, {
@@ -175,9 +178,31 @@ const Proposal = () => {
 		isPolling ? delay : null
 	)
 
-	useEffect(() => {
-		console.log("votePassed", votePassed);
-	}, [])
+
+	// const demo = (uri) => {
+	// 	const url = encode(uri);
+	// 	const temp = decode(url);
+	// 	const deconstruct = deconstructUri(uri);
+	// 	console.log(`\n\n\n\n\n\n\n!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+	// 	console.log("uri stuff","\n\nuri",uri,"\n\nurl (encode)",url,"\ntemp (url decode)",temp,"\n\ndeconstructUri", deconstruct,"\nconstructUri", constructUri(deconstruct) );
+	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+	// 	console.log(`!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!`);
+	// }
+
+	// useEffect(() => {
+	// 	setTimeout(() => {
+	// 		console.clear();
+
+	// 		setTimeout(() => {
+	// 			demo("https://d2hcdcila1xoq2.cloudfront.net/genericAssetDirectory/2022-03-15T19:11:50.555109884Z.json")
+	// 			demo("https://arweave.net/KDOGVnM3Hsx8gcPT76ADeiLt59a98lsxlPscNANTnY4")
+	// 		}, 10)
+
+	// 	}, 1500)
+	// }, [proposal?.account])
+
 
 	return initalLoad ? (
 		<Loader />
@@ -219,6 +244,26 @@ const Proposal = () => {
 											<VotePanel simple className="" />
 										</div>
 									)}
+
+									{descriptionObj?.map((item, index) => {
+										return (
+											<div key={'descriptionOutput_' + index} className="relative bg-green text-dark">
+												<ul className="list-disc list-inside pl-8 pr-4 space-y-2 py-2 text-xs">
+													{item.uri && (
+														<li>
+															<span className="inline-flex align-center">
+																<a className="inline" href={item.uri} target="blank">
+																	<span className="flex items-start">
+																		Download <ExternalLinkIcon className="flex-shrink-0 h-3 ml-2 mt-0.5 text-dark w-3" />
+																	</span>
+																</a>
+															</span>
+														</li>
+													)}
+												</ul>
+											</div>
+										)
+									})}
 								</div>
 							) : (
 								<>

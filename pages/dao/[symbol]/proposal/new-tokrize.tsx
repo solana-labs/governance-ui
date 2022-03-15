@@ -30,6 +30,7 @@ import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { StyledLabel } from '@components/inputs/styles'
 import PropertyDataOutput, { titleCase } from '../../../../components/PropertyDataOutput';
 import Loader from '@components/Loader'
+import { constructUri } from '@hooks/useUri'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -204,26 +205,27 @@ const New = (props) => {
 			fetch(url, {
 				method: 'GET'
 			})
-				.then((res) => res.json())
-				.then((res) => {
-					setPropertyDetails(res)
+			.then((res) => res.json())
+			.then((res) => {
+				setPropertyDetails(res)
 
-					setIsLoadingData(false)
-					setInitalLoad(false);
-					handleTurnOffLoaders()
-					return res
-				})
-				.catch((error) => {
-					alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
-					console.log('error', error)
-					setInitalLoad(false);
-				})
+				setIsLoadingData(false)
+				setInitalLoad(false);
+				handleTurnOffLoaders()
+				return res
+			})
+			.catch((error) => {
+				alert(`Something went wrong. \Please verify the format of the data in ${lookupUri}`)
+				console.log('error', error)
+				setInitalLoad(false);
+			})
 		}
 	}
 
 	useLayoutEffect(() => {
 		if (router.query?.uri && realmDisplayName) {
-			const url = `https://arweave.net/${router.query?.uri}`
+			const url = constructUri(router.query?.uri.toString(), true);
+			// const url = `https://arweave.net/${router.query?.uri}`
 
 			if (router.query?.uri !== undefined) {
 				setInitalLoad(true);

@@ -20,6 +20,7 @@ import Loader from '@components/Loader'
 import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
 import { buttonStyles } from '@components/Button'
+import { deconstructUri, encode } from '@hooks/useUri'
 
 const compareProposals = (
 	p1: Proposal,
@@ -245,7 +246,7 @@ const REALM = () => {
 												</div>
 												<div className="-mt-px-children">
 													{proposalType1.map(([k, v]) => {
-														return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+														return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${ v.account?.meta?.uri ? encode(deconstructUri(v.account?.meta?.uri)) : ''}`} hideIcon children="Request Certification" />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 													})}
 												</div>
 											</div>
@@ -256,7 +257,7 @@ const REALM = () => {
 											<h2 className="text-2xl uppercase">{`Request Tokr DAO to mint rNFT Proposal${proposalType2.length > 0 ? 's' : ''}`}</h2>
 											<div className="-mt-px-children">
 												{proposalType2.map(([k, v]) => {
-													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${v.account?.meta?.uri?.split('.net/')[1]}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+													return <ProposalCard cta={<NewProposalBtn linkClasses={`inline-flex text-xs py-1 px-2 ${buttonStyles}`} basic string={`uri=${ v.account?.meta?.uri ? encode(deconstructUri(v.account?.meta?.uri)) : ''}`} hideIcon children="Tokrize" type={`tokrize`} />} key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
 												})}
 											</div>
 										</div>

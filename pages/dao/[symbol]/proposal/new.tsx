@@ -52,6 +52,7 @@ import { Transaction } from '@solana/web3.js'
 import Loader from '@components/Loader'
 import { TOKR_DAO } from '@components/instructions/tools'
 import useRouterHistory from '@hooks/useRouterHistory'
+import { constructUri } from '@hooks/useUri'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -411,7 +412,10 @@ const New = (props) => {
 			setProposalType(2)
 			setLiteMode(false)
 
-			fetch(`https://arweave.net/${router.query?.uri}`, {
+			const url = constructUri(router.query?.uri.toString(), true);
+			console.log("\n\n\n\n\n\n\n\n\n\n\n\n\nurl", url)
+
+			fetch(url, {
 				method: 'GET',
 			})
 				.then((res) => res.json())
@@ -1057,7 +1061,7 @@ const New = (props) => {
 												<div className="xpb-4">
 													<Input
 														label="Image"
-														placeholder="URL to image"
+														placeholder="https://"
 														value={propertyData.image}
 														id="image"
 														name="image"
@@ -1158,11 +1162,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Land Record Auditor"
-																placeholder="Land Record Auditor"
+																placeholder="https://"
 																value={propertyData.land_record_auditor}
 																id="land_record_auditor"
 																name="land_record_auditor"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['land_record_auditor']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1176,11 +1180,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Deed Record Recorder"
-																placeholder="Deed Record Recorder"
+																placeholder="https://"
 																value={propertyData.deed_record_recorder}
 																id="deed_record_recorder"
 																name="deed_record_recorder"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['deed_record_recorder']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1194,11 +1198,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Mortgage Record Recorder"
-																placeholder="Mortgage Record Recorder"
+																placeholder="https://"
 																value={propertyData.mortgage_record_recorder}
 																id="mortgage_record_recorder"
 																name="mortgage_record_recorder"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['mortgage_record_recorder']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1212,11 +1216,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Textarea
 																label="Legal Description"
-																placeholder="Legal Description"
+																placeholder="https://"
 																value={propertyData.legal_description}
 																id="legal_description"
 																name="legal_description"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['legal_description']}
@@ -1232,11 +1236,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Mortgage Record"
-																placeholder="Mortgage Record"
+																placeholder="https://"
 																value={propertyData.mortgage_record}
 																id="mortgage_record"
 																name="mortgage_record"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['mortgage_record']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1292,7 +1296,7 @@ const New = (props) => {
 
 														<div className="xpb-4">
 															<Input
-																label="EIN #"
+																label="EIN Number"
 																placeholder="EIN #"
 																value={propertyData.ein}
 																id="ein"
@@ -1418,11 +1422,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Deed"
-																placeholder="Deed"
+																placeholder="https://"
 																value={propertyData.deed}
 																id="deed"
 																name="deed"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['deed']}
@@ -1438,11 +1442,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Mortgage"
-																placeholder="Mortgage"
+																placeholder="https://"
 																value={propertyData.mortgage}
 																id="mortgage"
 																name="mortgage"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['mortgage']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1456,11 +1460,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Title Insurance"
-																placeholder="Title Insurance"
+																placeholder="https://"
 																value={propertyData.title_insurance}
 																id="title_insurance"
 																name="title_insurance"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['title_insurance']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1474,11 +1478,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Articles Of Organization"
-																placeholder="Articles Of Organization"
+																placeholder="https://"
 																value={propertyData.articles_of_organization}
 																id="articles_of_organization"
 																name="articles_of_organization"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['articles_of_organization']}
@@ -1494,11 +1498,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Certificate Of Organization From Secretary Of State"
-																placeholder="Certificate Of Organization From Secretary Of State"
+																placeholder="https://"
 																value={propertyData.certificate_of_organization_from_secretary_of_state}
 																id="certificate_of_organization_from_secretary_of_state"
 																name="certificate_of_organization_from_secretary_of_state"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['certificate_of_organization_from_secretary_of_state']}
@@ -1514,11 +1518,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Operating Agreement"
-																placeholder="Operating Agreement"
+																placeholder="https://"
 																value={propertyData.operating_agreement}
 																id="operating_agreement"
 																name="operating_agreement"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['operating_agreement']}
@@ -1534,11 +1538,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Membership Interest Transfer Agreement"
-																placeholder="Membership Interest Transfer Agreement"
+																placeholder="https://"
 																value={propertyData.membership_interest_transfer_agreement}
 																id="membership_interest_transfer_agreement"
 																name="membership_interest_transfer_agreement"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['membership_interest_transfer_agreement']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1551,12 +1555,12 @@ const New = (props) => {
 
 														<div className="xpb-4">
 															<Input
-																label="Ein Letter From Irs"
-																placeholder="Ein Letter From Irs"
+																label="EIN Letter from IRS"
+																placeholder="https://"
 																value={propertyData.ein_letter_from_irs}
 																id="ein_letter_from_irs"
 																name="ein_letter_from_irs"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['ein_letter_from_irs']}
@@ -1572,11 +1576,11 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Input
 																label="Appraisal"
-																placeholder="Appraisal"
+																placeholder="https://"
 																value={propertyData.appraisal}
 																id="appraisal"
 																name="appraisal"
-																type="text"
+																type="url"
 																// error={propertyDataErrors['appraisal']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
