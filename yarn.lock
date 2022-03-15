@@ -1205,6 +1205,15 @@
     "@solana/spl-token" "^0.1.8"
     "@solana/web3.js" "^1.31.0"
 
+"@metaplex-foundation/mpl-token-metadata@^1.2.5":
+  version "1.2.5"
+  resolved "https://registry.yarnpkg.com/@metaplex-foundation/mpl-token-metadata/-/mpl-token-metadata-1.2.5.tgz#1a927b1c7d30cd634a1e4782022712a02f6865c2"
+  integrity sha512-pxRG53JsTSwXpiJJMHNulJhH8kO3hHztQ3QxslUoKw2hBYKXsg9TGsiHgNIhN2MPZGBJ2pDeK6kNGv0sd54HhA==
+  dependencies:
+    "@metaplex-foundation/mpl-core" "^0.0.2"
+    "@solana/spl-token" "^0.1.8"
+    "@solana/web3.js" "^1.31.0"
+
 "@metaplex-foundation/mpl-token-vault@^0.0.2":
   version "0.0.2"
   resolved "https://registry.npmjs.org/@metaplex-foundation/mpl-token-vault/-/mpl-token-vault-0.0.2.tgz"
@@ -1302,10 +1311,10 @@
   resolved "https://registry.yarnpkg.com/@next/swc-win32-x64-msvc/-/swc-win32-x64-msvc-12.1.0.tgz#d27e7e76c87a460a4da99c5bfdb1618dcd6cd064"
   integrity sha512-aBvcbMwuanDH4EMrL2TthNJy+4nP59Bimn8egqv6GHMVj0a44cU6Au4PjOhLNqEh9l+IpRGBqMTzec94UdC5xg==
 
-"@nfteyez/sol-rayz@^0.8.0":
-  version "0.8.0"
-  resolved "https://registry.npmjs.org/@nfteyez/sol-rayz/-/sol-rayz-0.8.0.tgz"
-  integrity sha512-mnbVotAc0fkpi+iVME3TKqlqkGpQtDe4F1V/0Mj4MEm1PcDmcYLlmpihK5z7jaST2G7IvgROHu+oOcgatcNgvQ==
+"@nfteyez/sol-rayz@^0.10.2":
+  version "0.10.2"
+  resolved "https://registry.yarnpkg.com/@nfteyez/sol-rayz/-/sol-rayz-0.10.2.tgz#a059b8e8b9cb0956ea0c5a4ca51f5dc12819a3b2"
+  integrity sha512-4lj4WEVZHPHIkyfazcUQIBbjw/jl3SknSseccTmJSFh9IMsy7SoFa5jPYH1OallwZBbGmcJSnslwMv2hgZml6A==
   dependencies:
     "@solana/spl-name-service" "^0.1.3"
     borsh "^0.6.0"

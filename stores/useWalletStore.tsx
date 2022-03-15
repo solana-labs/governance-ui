@@ -17,12 +17,14 @@ import {
   getGovernanceAccount,
   getGovernanceAccounts,
   getGovernanceProgramVersion,
+  getRealmConfig,
   Governance,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   ProposalTransaction,
   Realm,
+  RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
   VoteRecord,
@@ -56,6 +58,7 @@ interface WalletStore extends State {
   realms: { [realm: string]: ProgramAccount<Realm> }
   selectedRealm: {
     realm?: ProgramAccount<Realm>
+    config?: ProgramAccount<RealmConfigAccount>
     mint?: MintAccount
     programId?: PublicKey
     councilMint?: MintAccount
@@ -106,6 +109,7 @@ const INITIAL_REALM_STATE = {
   loading: true,
   mints: {},
   programVersion: 1,
+  config: undefined,
 }
 
 const INITIAL_PROPOSAL_STATE = {
@@ -277,6 +281,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         governances,
         tokenRecords,
         councilTokenOwnerRecords,
+        config,
       ] = await Promise.all([
         getGovernanceAccounts(connection, programId, Governance, [
           pubkeyFilter(1, realmId)!,
@@ -295,6 +300,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           realmId,
           realmCouncilMintPk
         ),
+        getRealmConfig(connection, realm!.pubkey!),
       ])
 
       const governancesMap = accountsToPubkeyMap(governances)
@@ -308,6 +314,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
 
       set((s) => {
+        s.selectedRealm.config = config
         s.selectedRealm.realm = realm
         s.selectedRealm.mint = realmMint
         s.selectedRealm.programId = programId

@@ -29,6 +29,7 @@ export default function useRealm() {
     tokenRecords,
     councilTokenOwnerRecords,
     programVersion,
+    config,
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
@@ -127,5 +128,6 @@ export default function useRealm() {
     councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
+    config,
   }
 }

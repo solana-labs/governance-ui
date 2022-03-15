@@ -12,7 +12,7 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
-
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
 }
@@ -24,14 +24,14 @@ function NFTSelector(
     nftWidth = '150px',
     nftHeight = '150px',
     selectable = true,
-    familyName = '',
+    collectionPk = '',
   }: {
     ownerPk: PublicKey
     onNftSelect: (nfts: NFTWithMint[]) => void
     nftWidth?: string
     nftHeight?: string
     selectable?: boolean
-    familyName?: string
+    collectionPk?: string
   },
   ref: React.Ref<NftSelectorFunctions>
 ) {
@@ -50,12 +50,23 @@ function NFTSelector(
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
-    const nfts = await getNfts(connection.current, ownerPk)
+    let nfts = await getNfts(connection.current, ownerPk)
+    const resp = await Promise.all(nfts.map((x) => getIsFromCollection(x.mint)))
+    nfts = nfts.filter((x) => resp.includes(x.mint))
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
     }
     setNfts(nfts)
     setIsLoading(false)
+  }
+  const getIsFromCollection = async (mint: string) => {
+    const metadataAccount = await Metadata.getPDA(mint)
+    const metadat = await Metadata.load(connection.current, metadataAccount)
+    return (
+      metadat.data.collection?.key === collectionPk &&
+      metadat.data.collection.verified &&
+      mint
+    )
   }
   useImperativeHandle(ref, () => ({
     handleGetNfts,
@@ -78,33 +89,26 @@ function NFTSelector(
         {!isLoading ? (
           nfts.length ? (
             <div className="flex flex-row flex-wrap gap-4 mb-4">
-              {nfts
-                .filter(
-                  (x) => !familyName || x.val.collection.family === familyName
-                )
-                .map((x) => (
-                  <div
-                    onClick={() => (selectable ? handleSelectNft(x) : null)}
-                    key={x.mint}
-                    className={`bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent ${
-                      selectable ? 'hover:border-primary-dark' : ''
-                    } relative overflow-hidden`}
-                    style={{
-                      width: nftWidth,
-                      height: nftHeight,
-                    }}
-                  >
-                    {selectedNfts.find(
-                      (selectedNfts) => selectedNfts.mint === x.mint
-                    ) && (
-                      <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
-                    )}
-                    <ImgWithLoader
-                      style={{ width: '150px' }}
-                      src={x.val.image}
-                    />
-                  </div>
-                ))}
+              {nfts.map((x) => (
+                <div
+                  onClick={() => (selectable ? handleSelectNft(x) : null)}
+                  key={x.mint}
+                  className={`bg-bkg-2 flex items-center justify-center cursor-pointer default-transition rounded-lg border border-transparent ${
+                    selectable ? 'hover:border-primary-dark' : ''
+                  } relative overflow-hidden`}
+                  style={{
+                    width: nftWidth,
+                    height: nftHeight,
+                  }}
+                >
+                  {selectedNfts.find(
+                    (selectedNfts) => selectedNfts.mint === x.mint
+                  ) && (
+                    <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
+                  )}
+                  <ImgWithLoader style={{ width: '150px' }} src={x.val.image} />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="text-fgd-3 flex flex-col items-center">

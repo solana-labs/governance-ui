@@ -230,7 +230,7 @@ const TokenDeposit = ({
 
   const depositAllTokens = async () =>
     await depositTokens(depositTokenAccount!.account.amount)
-  console.log(depositTokenRecord?.account.governingTokenOwner.toBase58())
+
   const withdrawAllTokens = async function () {
     const instructions: TransactionInstruction[] = []
     // If there are unrelinquished votes for the voter then let's release them in the same instruction as convenience

@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { getRealmConfig } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
 
-const vsrPluginsPks = [
+export const vsrPluginsPks: string[] = [
   '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc99',
   '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc95',
+  '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc9H',
 ]
 
+export const nftPluginsPks: string[] = []
+
 export function useVotingPlugins() {
-  const { realm } = useRealm()
+  const { realm, config } = useRealm()
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
@@ -23,25 +24,14 @@ export function useVotingPlugins() {
   const connection = useWalletStore((s) => s.connection)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
-  const [currentPluginPk, setCurrentPluginPk] = useState<PublicKey | null>(null)
-
+  const currentPluginPk = config?.account?.communityVoterWeightAddin
   useEffect(() => {
     if (wallet?.connected) {
       handleSetVsrClient(wallet, connection)
       handleSetNftClient(wallet, connection)
     }
   }, [connection.endpoint, wallet?.connected, realm?.pubkey.toBase58()])
-  useEffect(() => {
-    const handleGetRealmConfig = async () => {
-      if (realm?.account.config.useCommunityVoterWeightAddin) {
-        const config = await getRealmConfig(connection.current, realm!.pubkey!)
-        setCurrentPluginPk(config?.account?.communityVoterWeightAddin || null)
-      } else {
-        setCurrentPluginPk(null)
-      }
-    }
-    handleGetRealmConfig()
-  }, [realm?.pubkey.toBase58()])
+
   useEffect(() => {
     if (realm && client) {
       handleSetVsrRegistrar(client, realm)
@@ -56,7 +46,7 @@ export function useVotingPlugins() {
         walletPk: wallet?.publicKey,
       })
     }
-    if (!currentPluginPk) {
+    if (currentPluginPk && nftPluginsPks.includes(currentPluginPk.toBase58())) {
       handleSetCurrentRealmVotingClient({
         client: undefined,
         realm: undefined,

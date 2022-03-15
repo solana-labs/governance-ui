@@ -1,9 +1,14 @@
 import NFTSelector from '@components/NFTS/NFTSelector'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
 const NftBalanceCard = () => {
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
+  const nftMintRegistrar = useVotePluginsClientStore(
+    (s) => s.state.nftMintRegistrar
+  )
+  console.log(nftMintRegistrar)
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Your NFTS </h3>
@@ -19,7 +24,7 @@ const NftBalanceCard = () => {
             nftHeight="50px"
             nftWidth="50px"
             selectable={false}
-            familyName="UNQ Club"
+            collectionPk={''}
           ></NFTSelector>
         )}
       </div>
