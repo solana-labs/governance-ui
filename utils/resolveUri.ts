@@ -1,11 +1,7 @@
 import he from 'he';
 
-// const he = (X) => X;
-
 export const decode = (string:string, lite?:boolean) => (he.decode(string.replaceAll('Tokr_',';').replaceAll('_RHOVE_','&#'), { 'encodeEverything': lite ? false: true })).toString();
 export const encode = (string:string, lite?:boolean) => he.encode(string, { 'encodeEverything': lite ? false: true }).replaceAll(';','Tokr_').replaceAll('&#','_RHOVE_').toString();
-// export const decode = (string:string, lite?:boolean) => (deconstructUri(string.replaceAll('Tokr_',';').replaceAll('_RHOVE_','&#'))).toString();
-// export const encode = (string:string, lite?:boolean) => encodeURI(string).replaceAll(';','Tokr_').replaceAll('&#','_RHOVE_').toString();
 
 export const isUriArweave = (uri):string => uri.includes('arweave.net') || false;
 
