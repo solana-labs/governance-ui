@@ -79,6 +79,46 @@ export class VotingClient {
       )
       return voterWeightPk
     }
+    if (this.client instanceof NftVoterClient) {
+      const client = this.client
+      const realm = this.realm
+      const walletPk = this.walletPk
+      if (typeof this.client === 'undefined') {
+        return
+      }
+      if (this.client instanceof VsrClient) {
+        //if no plugin then we dont do anything
+        if (!realm!.account.config.useCommunityVoterWeightAddin) {
+          return
+        }
+        if (!client) {
+          throw 'no vote registry plugin'
+        }
+        const clientProgramId = client!.program.programId
+
+        //TODO support both mints for now only community is supported
+        const { registrar } = await getNftRegistrarPDA(
+          realm!.pubkey,
+          realm!.account.communityMint,
+          client!.program.programId
+        )
+        const { voterWeightPk } = await getVoterWeightPDA(
+          registrar,
+          walletPk!,
+          clientProgramId
+        )
+
+        instructions.push(
+          client.program.instruction.updateVoterWeightRecord('CastVote', {
+            accounts: {
+              registrar,
+              voterWeightRecord: voterWeightPk,
+            },
+          })
+        )
+        return voterWeightPk
+      }
+    }
   }
 }
 interface UseVotePluginsClientStore extends State {
