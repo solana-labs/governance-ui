@@ -16,7 +16,6 @@ import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import dynamic from 'next/dynamic'
-import Loading from '@components/Loading'
 import PaginationComponent from '@components/Pagination'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
@@ -168,14 +167,12 @@ const REALM = () => {
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
-        <div
-          className={`bg-bkg-2 col-span-12 ${
-            realm ? 'md:col-span-7 md:order-first lg:col-span-8' : ''
-          } order-last p-4 md:p-6 rounded-lg`}
-        >
-          {realm && <RealmHeader />}
-          {realm ? (
-            <>
+        {realm ? (
+          <>
+            <div
+              className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg`}
+            >
+              {realm && <RealmHeader />}
               <div>
                 {realmInfo?.bannerImage ? (
                   <>
@@ -242,16 +239,8 @@ const REALM = () => {
                   </div>
                 )}
               </div>
-            </>
-          ) : (
-            <div className="flex items-center">
-              <Loading className="w-10 h-10"></Loading>
             </div>
-          )}
-        </div>
-        <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-          {realm && (
-            <>
+            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
               <TokenBalanceCardWrapper />
               <NFTSCompactWrapper />
               <AccountsCompactWrapper />
@@ -259,9 +248,20 @@ const REALM = () => {
                 <MembersCompactWrapper />
               )}
               <AssetsCompactWrapper />
-            </>
-          )}
-        </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={`col-span-12 md:col-span-7 lg:col-span-8`}>
+              <div className="animate-pulse bg-bkg-3 h-full rounded-lg w-full" />
+            </div>
+            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+            </div>
+          </>
+        )}
       </div>
     </>
   )
