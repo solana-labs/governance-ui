@@ -36,19 +36,22 @@ const ProposalCard = ({ proposalPk, proposal, cta }: ProposalCardProps) => {
 
 
 	return (
-		<div className='border border-green'>
+		<div className="border border-green">
 			<Link href={fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalPk.toBase58()}`)}>
 				<a>
 					<StyledCardWrapper>
-						<div className="p-4">
-							<div className="flex items-start justify-between">
-								<h3 className="text-fgd-1">{proposal.name}</h3>
-								<div className="flex items-center pl-4 pt-1">
-									<ProposalStateBadge cta={ cta } proposalPk={proposalPk} proposal={proposal} open={false} />
-									<StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" />
+						<div className="p-4 flex items-center justify-between">
+							<div className="flex-grow">
+								<div className="flex items-start justify-between">
+									<h3 className="text-fgd-1">{proposal.name}</h3>
+									<div className="flex items-center pl-4 pt-1">
+										<ProposalStateBadge cta={cta} proposalPk={proposalPk} proposal={proposal} open={false} />
+										{/* <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" /> */}
+									</div>
 								</div>
+								<ProposalTimeStatus proposal={proposal} />
 							</div>
-							<ProposalTimeStatus proposal={proposal} />
+							<span className="default-transition h-6 ml-2 text-primary-light w-6 flex-shrink-0">&gt;</span>
 						</div>
 						{/* {proposal.state === ProposalState.Voting && (
 							<div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">

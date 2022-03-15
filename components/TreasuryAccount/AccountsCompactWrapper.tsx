@@ -44,7 +44,7 @@ const AccountsCompactWrapper = () => {
       case ViewState.MainView:
         return (
 			<>
-				<h3 className="bg-bkg-2  flex items-center">
+				<h3 className="bg-bkg-2  flex items-center pb-5">
 					<div
 						className="cursor-pointer flex items-center"
 						onClick={() => {

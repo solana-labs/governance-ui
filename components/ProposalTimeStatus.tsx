@@ -11,19 +11,7 @@ const ProposalTimeStatus = ({ proposal }: ProposalTimeStatusProps) => {
   const { governances } = useRealm()
   const governance = governances[proposal?.governance.toBase58()]?.account
 
-  return proposal && governance ? (
-    <div className="flex items-center text-fgd-3 text-sm">
-      {proposal.votingCompletedAt ? (
-        `${ProposalState[proposal.state]} ${fmtUnixTime(
-          proposal.votingCompletedAt
-        )}`
-      ) : proposal.votingAt ? (
-        <VoteCountdown proposal={proposal} governance={governance} />
-      ) : (
-        `Drafted ${fmtUnixTime(proposal.draftAt)}`
-      )}
-    </div>
-  ) : null
+  return proposal && governance ? <div className="flex items-center text-fgd-3 text-sm">{proposal.votingCompletedAt ? `${ProposalState[proposal.state]} ${fmtUnixTime(proposal.votingCompletedAt)}` : proposal.votingAt ? <VoteCountdown proposal={proposal} governance={governance} /> : `Drafted ${fmtUnixTime(proposal.draftAt)}`}</div> : null
 }
 
 export default ProposalTimeStatus

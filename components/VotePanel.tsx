@@ -87,13 +87,17 @@ const VotePanel = (props) => {
 		<>
 			{isPanelVisible && (
 				<div className={props.simple ? '' : `bg-bkg-2 p-4 md:p-6 space-y-4` + props.className ? ' ' + props.className : ''}>
-					{ !props.simple && <h3 className="mb-4 text-center">{actionLabel}</h3> }
-
-					<div  className={props.simple ? '' : `items-center justify-center flex w-full gap-5` + props.childClasses ? ' ' + props.childClasses : ''}>
+					{!props.simple && props.isVoting !== false && <h3 className="mb-4 text-center">{actionLabel}</h3>}
+					{props.isVoting === false ? `You voted ${ownVoteRecord?.account?.vote?.approveChoices?.length ? 'YES' : 'NO'}` : ''}
+					<div className={props.simple ? '' : `items-center justify-center flex w-full gap-5` + props.childClasses ? ' ' + props.childClasses : ''}>
 						{isVoteCast && connected ? (
-							<Button tooltipMessage={withdrawTooltipContent} onClick={() => submitRelinquishVote()} disabled={!isWithdrawEnabled}>
-								{isVoting ? 'Withdraw' : 'Release Tokens'}
-							</Button>
+							<>
+								{props.isVoting !== false && (
+									<Button tooltipMessage={withdrawTooltipContent} onClick={() => submitRelinquishVote()} disabled={!isWithdrawEnabled}>
+										{isVoting ? 'Withdraw' : 'Release Tokens'}
+									</Button>
+								)}
+							</>
 						) : (
 							<>
 								{isVoting && (

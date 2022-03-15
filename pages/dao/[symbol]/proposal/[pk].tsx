@@ -26,11 +26,14 @@ import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
 import useInterval from '@hooks/useInterval'
 import { checkArDataKey, getArData, setArData } from '@hooks/useLocalStorage'
+import useWalletStore from 'stores/useWalletStore'
+import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 
 const Proposal = () => {
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
 	const { fmtUrlWithCluster } = useQueryContext()
-	const { symbol, realmInfo, realmDisplayName, governances, ownVoterWeight } = useRealm()
+	const { governance } = useWalletStore((s) => s.selectedProposal)
+	const { symbol, realmInfo, realmDisplayName, governances, ownVoterWeight  } = useRealm()
 	const { history } = useRouterHistory()
 	const { proposal, descriptionLink } = useProposal()
 	const [description, setDescription] = useState<any>('')
@@ -42,6 +45,9 @@ const Proposal = () => {
 	const showResults = proposal && proposal.account.state !== ProposalState.Cancelled && proposal.account.state !== ProposalState.Draft
 
 	const votePassed = proposal && (proposal.account.state === ProposalState.Completed || proposal.account.state === ProposalState.Executing || proposal.account.state === ProposalState.SigningOff || proposal.account.state === ProposalState.Succeeded)
+
+	const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!);
+	const isVoting = proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
 
 	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false)
 
@@ -209,7 +215,7 @@ const Proposal = () => {
 
 									{canCreateAction && (
 										<div className="border border-green p-8 text-center">
-											<p className="pb-8">Cast Your Vote</p>
+											{ isVoting && <p className="pb-8">Cast Your Vote</p> }
 											<VotePanel simple className="" />
 										</div>
 									)}
@@ -299,7 +305,7 @@ const Proposal = () => {
 					{canCreateAction && (
 						<>
 							<div className="border border-green p-4 md:p-6 -mt-px">
-								<VotePanel />
+								<VotePanel className={!isVoting === true ? 'text-center' : ''} isVoting={ isVoting ? true : false } />
 							</div>
 							<div className="hidden">
 								<ProposalActionsPanel />
