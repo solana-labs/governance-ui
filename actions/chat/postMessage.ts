@@ -32,7 +32,10 @@ export async function postChatMessage(
   const payer = walletPubkey
 
   //will run only if plugin is connected with realm
-  const voterWeight = await client?.withUpdateVoterWeightRecord(instructions)
+  const voterWeight = await client?.withUpdateVoterWeightRecord(
+    instructions,
+    'CommentProposal'
+  )
 
   await withPostChatMessage(
     instructions,
