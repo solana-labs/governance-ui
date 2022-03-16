@@ -54,7 +54,7 @@ function App({ Component, pageProps }) {
 	}, [history])
 
 
-	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false);
+	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false)
 	const [phantomBrowser, setPhantomBrowser] = useState<boolean>(false);
 
 	const globalProps = {
@@ -135,6 +135,7 @@ function App({ Component, pageProps }) {
 				<meta name="twitter:card" content="summary" />
 
 				{realmInfo?.twitter && <meta name="twitter:site" content={realmInfo.twitter} />}
+
 			</Head>
 			<ErrorBoundary>
 				<ThemeProvider defaultTheme="Mango">
