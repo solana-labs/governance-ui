@@ -51,9 +51,13 @@ const Index = () => {
 	}
 
 	return (
-		<a href="/realms" onClick={ () => {
-			router.push(fmtUrlWithCluster(`/realms`))
-		}} className="flex w-full h-full items-center justify-center">
+		<a
+			href="/realms"
+			onClick={() => {
+				router.push(fmtUrlWithCluster(`/realms`))
+			}}
+			className="flex w-full h-full items-center justify-center"
+		>
 			<div className="flex flex-col justify-center items-center min-h-screen">
 				<div className="pt-8 w-full flex flex-col items-center pb-8">
 					<div>************************************</div>
@@ -61,6 +65,9 @@ const Index = () => {
 					<div className="py-2">Tokenize Real Estate v0.1.0 Beta</div>
 					<div className="pb-4">Open Source Software</div>
 					<div>************************************</div>
+				</div>
+				<div>
+					&lt; ENTER &gt;
 				</div>
 			</div>
 		</a>
@@ -70,19 +77,3 @@ const Index = () => {
 }
 
 export default Index
-
-// import { useEffect } from 'react'
-// import { useRouter } from 'next/router'
-// const Index = () => {
-// 	const router = useRouter()
-
-// 	useEffect(() => {
-// 		const { REALM } = process.env
-// 		const mainUrl = REALM ? `/dao/${REALM}` : '/realms'
-// 		router.replace(mainUrl)
-// 	}, [])
-
-// 	return null
-// }
-
-// export default Index
