@@ -216,7 +216,7 @@ const New = () => {
           shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
         }
       })
-
+      console.log(governance, '#@$@#$##@$')
       try {
         // Fetch governance to get up to date proposalCount
         selectedGovernance = (await fetchRealmGovernance(

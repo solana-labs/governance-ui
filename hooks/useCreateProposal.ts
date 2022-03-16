@@ -39,6 +39,7 @@ export default function useCreateProposal() {
     const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
       governance!.account.config
     )
+
     const defaultProposalMint = !mint?.supply.isZero()
       ? realm!.account.communityMint
       : !councilMint?.supply.isZero()

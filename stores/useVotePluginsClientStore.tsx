@@ -116,7 +116,7 @@ export class VotingClient {
           isWritable: false,
         })
       }
-      console.log(remainingAccounts.map((x) => x.pubkey.toBase58()))
+
       instructions.push(
         this.client.program.instruction.updateVoterWeightRecord(
           { [type]: {} },
@@ -254,6 +254,7 @@ export class VotingClient {
       walletPk!,
       clientProgramId
     )
+
     try {
       isExisting = await client.program.account.voterWeightRecord.fetch(
         voterWeightPk

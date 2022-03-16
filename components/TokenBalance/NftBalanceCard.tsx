@@ -1,4 +1,9 @@
+import Button from '@components/Button'
 import NFTSelector from '@components/NFTS/NFTSelector'
+import useRealm from '@hooks/useRealm'
+import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
+import { Transaction, TransactionInstruction } from '@solana/web3.js'
+import { sendTransaction } from '@utils/send'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -8,12 +13,41 @@ const NftBalanceCard = () => {
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
+  const connection = useWalletStore((s) => s.connection)
+  const { tokenRecords, realm } = useRealm()
+  const { fetchRealm } = useWalletStore((s) => s.actions)
   const usedCollectionsPks =
     nftMintRegistrar?.collectionConfigs.map((x) => x.collection.toBase58()) ||
     []
+  const ownTokenRecord = wallet?.publicKey
+    ? tokenRecords[wallet.publicKey!.toBase58()]
+    : null
+  const handleRegister = async () => {
+    const instructions: TransactionInstruction[] = []
+    await withCreateTokenOwnerRecord(
+      instructions,
+      realm!.owner!,
+      realm!.pubkey,
+      wallet!.publicKey!,
+      realm!.account.communityMint,
+      wallet!.publicKey!
+    )
+    const transaction = new Transaction()
+    transaction.add(...instructions)
+
+    await sendTransaction({
+      transaction: transaction,
+      wallet,
+      connection: connection.current,
+      signers: [],
+      sendingMessage: `Registering`,
+      successMessage: `Registered`,
+    })
+    await fetchRealm(realm?.owner, realm?.pubkey)
+  }
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4">Your NFTS </h3>
+      <h3 className="mb-4">Your NFTS</h3>
       <div className="space-y-4">
         {!connected ? (
           <div className="text-xs bg-bkg-3 p-3">Please connect your wallet</div>
@@ -30,6 +64,11 @@ const NftBalanceCard = () => {
           ></NFTSelector>
         )}
       </div>
+      {connected && !ownTokenRecord && (
+        <Button className="w-full" onClick={handleRegister}>
+          Register
+        </Button>
+      )}
     </div>
   )
 }
