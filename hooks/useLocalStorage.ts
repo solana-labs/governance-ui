@@ -12,3 +12,9 @@ export const setArData = (keyName:string, value:string) => {
 		return value;
 	}
 }
+
+export const getData = (keyName:string) => convertToJson(localStorage.getItem(keyName));
+
+export const removeData = (keyName:string) => localStorage.removeItem(keyName);
+
+export const storeData = (keyName:string, value:any) => localStorage.setItem(keyName, JSON.stringify(value));

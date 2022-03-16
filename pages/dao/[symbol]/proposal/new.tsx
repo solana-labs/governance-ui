@@ -53,6 +53,8 @@ import Loader from '@components/Loader'
 import { TOKR_DAO } from '@components/instructions/tools'
 import useRouterHistory from '@hooks/useRouterHistory'
 import { constructUri } from '@utils/resolveUri'
+import { route } from 'next/dist/server/router'
+import { getData, removeData, storeData } from '@hooks/useLocalStorage'
 
 const schema = yup.object().shape({
 	title: yup.string().required('Title is required'),
@@ -71,9 +73,9 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = (props) => {
-	const _prepopulateForDemos = true
+	const _prepopulateForDemos = false
 	const router = useRouter()
-	const { history } = useRouterHistory()
+	const { history, getPathName } = useRouterHistory()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { symbol, realm, realmInfo, realmDisplayName, ownVoterWeight, mint, councilMint, canChooseWhoVote, governances } = useRealm()
@@ -865,6 +867,12 @@ const New = (props) => {
 		}
 	}, [form])
 
+	useEffect(() => {
+		if (router?.query?.type && realmInfo && (propertyData && propertyData?.name)) {
+			storeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? "_" + router?.query?.type : ''}`, JSON.stringify(propertyData))
+		}
+	}, [propertyData, router, realmInfo])
+
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
 	useEffect(() => {
 		if (realmDisplayName) setInitalLoad(false)
@@ -900,6 +908,19 @@ const New = (props) => {
 	useEffect(() => {
 		if (!initalLoad) setFormIsValid(checkFormValidity())
 	}, [propertyData, governance, canCreateAction])
+
+
+	const [loadedLS, setLoadedLS] = useState<boolean>(false)
+	useEffect(() => {
+		if (router?.query?.type && realmInfo && (initalLoad === false)) {
+			const temp = getData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? "_" + router?.query?.type : ''}`);
+			if (JSON.parse(temp)?.name) {
+				setPropertyData(JSON.parse(temp));
+				setLoadedLS(true);
+			}
+		}
+	}, [router, realmInfo, initalLoad])
+
 
 	return initalLoad ? (
 		<Loader />
@@ -955,6 +976,47 @@ const New = (props) => {
 							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
 						</p>
 
+
+					{( loadedLS && (router?.query?.type && realmInfo)) && <p className="mt-16 py-4 border-t border-b border-green">
+						We restored your past entry. Want to start fresh? <a href="#" onClick={e => {
+							setLoadedLS(false);
+							setPropertyData({
+								name: '',
+								description: '',
+								property_address: '',
+								lat_long: '',
+								acres: '',
+								land_record_auditor: '',
+								deed_record_recorder: '',
+								mortgage_record_recorder: '',
+								legal_description: '',
+								mortgage_record: '',
+								title_method: '',
+								title_held_by: '',
+								ein: '',
+								transfer_restrictions: '',
+								marketing_name: '',
+								type: '',
+								sq_ft: '',
+								property_description: '',
+								deed: '',
+								mortgage: '',
+								title_insurance: '',
+								articles_of_organization: '',
+								certificate_of_organization_from_secretary_of_state: '',
+								operating_agreement: '',
+								membership_interest_transfer_agreement: '',
+								ein_letter_from_irs: '',
+								appraisal: '',
+								submitted_by: '',
+								image: '',
+								uri: arWeaveLink || '',
+							})
+							removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? "_" + router?.query?.type : ''}`);
+							e.preventDefault();
+						}}>Click here.</a>
+					</p>}
+
 						<>
 							<div className="pt-8 mb-20">
 								<div className="space-y-16">
@@ -965,7 +1027,7 @@ const New = (props) => {
 													<Input
 														label="Name"
 														placeholder="Name"
-														value={propertyData.name}
+														value={propertyData?.name}
 														id="name"
 														name="name"
 														type="text"
@@ -989,7 +1051,7 @@ const New = (props) => {
 													<Textarea
 														label="Description"
 														placeholder="Description"
-														value={propertyData.description}
+														value={propertyData?.description}
 														id="description"
 														name="description"
 														type="text"
@@ -1018,7 +1080,7 @@ const New = (props) => {
 													<Input
 														label="Name"
 														placeholder="Name"
-														value={propertyData.name}
+														value={propertyData?.name}
 														id="name"
 														name="name"
 														type="text"
@@ -1041,7 +1103,7 @@ const New = (props) => {
 													<Textarea
 														label="Description"
 														placeholder="Description"
-														value={propertyData.description}
+														value={propertyData?.description}
 														id="description"
 														name="description"
 														type="text"
@@ -1061,7 +1123,7 @@ const New = (props) => {
 													<Input
 														label="Image"
 														placeholder="https://"
-														value={propertyData.image}
+														value={propertyData?.image}
 														id="image"
 														name="image"
 														type="url"
@@ -1087,7 +1149,7 @@ const New = (props) => {
 													<Input
 														label="Property Address"
 														placeholder="Property Address"
-														value={propertyData.property_address}
+														value={propertyData?.property_address}
 														id="property_address"
 														name="property_address"
 														type="text"
@@ -1107,7 +1169,7 @@ const New = (props) => {
 													<Input
 														label="Lat Long"
 														placeholder="Lat, Long"
-														value={propertyData.lat_long}
+														value={propertyData?.lat_long}
 														id="lat_long"
 														name="lat_long"
 														type="text"
@@ -1134,7 +1196,7 @@ const New = (props) => {
 													<Input
 														label="Acres"
 														placeholder="Acres"
-														value={propertyData.acres}
+														value={propertyData?.acres}
 														id="acres"
 														name="acres"
 														type="text"
@@ -1162,7 +1224,7 @@ const New = (props) => {
 															<Input
 																label="Land Record Auditor"
 																placeholder="https://"
-																value={propertyData.land_record_auditor}
+																value={propertyData?.land_record_auditor}
 																id="land_record_auditor"
 																name="land_record_auditor"
 																type="url"
@@ -1180,7 +1242,7 @@ const New = (props) => {
 															<Input
 																label="Deed Record Recorder"
 																placeholder="https://"
-																value={propertyData.deed_record_recorder}
+																value={propertyData?.deed_record_recorder}
 																id="deed_record_recorder"
 																name="deed_record_recorder"
 																type="url"
@@ -1198,7 +1260,7 @@ const New = (props) => {
 															<Input
 																label="Mortgage Record Recorder"
 																placeholder="https://"
-																value={propertyData.mortgage_record_recorder}
+																value={propertyData?.mortgage_record_recorder}
 																id="mortgage_record_recorder"
 																name="mortgage_record_recorder"
 																type="url"
@@ -1216,7 +1278,7 @@ const New = (props) => {
 															<Textarea
 																label="Legal Description"
 																placeholder="https://"
-																value={propertyData.legal_description}
+																value={propertyData?.legal_description}
 																id="legal_description"
 																name="legal_description"
 																type="url"
@@ -1236,7 +1298,7 @@ const New = (props) => {
 															<Input
 																label="Mortgage Record"
 																placeholder="https://"
-																value={propertyData.mortgage_record}
+																value={propertyData?.mortgage_record}
 																id="mortgage_record"
 																name="mortgage_record"
 																type="url"
@@ -1259,7 +1321,7 @@ const New = (props) => {
 															<Input
 																label="Title Method"
 																placeholder="Title Method"
-																value={propertyData.title_method}
+																value={propertyData?.title_method}
 																id="title_method"
 																name="title_method"
 																type="text"
@@ -1277,7 +1339,7 @@ const New = (props) => {
 															<Input
 																label="Title Held By"
 																placeholder="Title Held By"
-																value={propertyData.title_held_by}
+																value={propertyData?.title_held_by}
 																id="title_held_by"
 																name="title_held_by"
 																type="text"
@@ -1297,7 +1359,7 @@ const New = (props) => {
 															<Input
 																label="EIN Number"
 																placeholder="EIN #"
-																value={propertyData.ein}
+																value={propertyData?.ein}
 																id="ein"
 																name="ein"
 																type="text"
@@ -1317,7 +1379,7 @@ const New = (props) => {
 															<Input
 																label="Transfer Restrictions"
 																placeholder="Transfer Restrictions"
-																value={propertyData.transfer_restrictions}
+																value={propertyData?.transfer_restrictions}
 																id="transfer_restrictions"
 																name="transfer_restrictions"
 																type="text"
@@ -1340,7 +1402,7 @@ const New = (props) => {
 															<Input
 																label="Marketing Name"
 																placeholder="Marketing Name"
-																value={propertyData.marketing_name}
+																value={propertyData?.marketing_name}
 																id="marketing_name"
 																name="marketing_name"
 																type="text"
@@ -1358,7 +1420,7 @@ const New = (props) => {
 															<Input
 																label="Type"
 																placeholder="Type"
-																value={propertyData.type}
+																value={propertyData?.type}
 																id="type"
 																name="type"
 																type="text"
@@ -1378,7 +1440,7 @@ const New = (props) => {
 															<Input
 																label="Sq Ft"
 																placeholder="Sq Ft"
-																value={propertyData.sq_ft}
+																value={propertyData?.sq_ft}
 																id="sq_ft"
 																name="sq_ft"
 																type="text"
@@ -1398,7 +1460,7 @@ const New = (props) => {
 															<Textarea
 																label="Property Description"
 																placeholder="Property Description"
-																value={propertyData.property_description}
+																value={propertyData?.property_description}
 																id="property_description"
 																name="property_description"
 																type="text"
@@ -1422,7 +1484,7 @@ const New = (props) => {
 															<Input
 																label="Deed"
 																placeholder="https://"
-																value={propertyData.deed}
+																value={propertyData?.deed}
 																id="deed"
 																name="deed"
 																type="url"
@@ -1442,7 +1504,7 @@ const New = (props) => {
 															<Input
 																label="Mortgage"
 																placeholder="https://"
-																value={propertyData.mortgage}
+																value={propertyData?.mortgage}
 																id="mortgage"
 																name="mortgage"
 																type="url"
@@ -1460,7 +1522,7 @@ const New = (props) => {
 															<Input
 																label="Title Insurance"
 																placeholder="https://"
-																value={propertyData.title_insurance}
+																value={propertyData?.title_insurance}
 																id="title_insurance"
 																name="title_insurance"
 																type="url"
@@ -1478,7 +1540,7 @@ const New = (props) => {
 															<Input
 																label="Articles Of Organization"
 																placeholder="https://"
-																value={propertyData.articles_of_organization}
+																value={propertyData?.articles_of_organization}
 																id="articles_of_organization"
 																name="articles_of_organization"
 																type="url"
@@ -1498,7 +1560,7 @@ const New = (props) => {
 															<Input
 																label="Certificate Of Organization From Secretary Of State"
 																placeholder="https://"
-																value={propertyData.certificate_of_organization_from_secretary_of_state}
+																value={propertyData?.certificate_of_organization_from_secretary_of_state}
 																id="certificate_of_organization_from_secretary_of_state"
 																name="certificate_of_organization_from_secretary_of_state"
 																type="url"
@@ -1518,7 +1580,7 @@ const New = (props) => {
 															<Input
 																label="Operating Agreement"
 																placeholder="https://"
-																value={propertyData.operating_agreement}
+																value={propertyData?.operating_agreement}
 																id="operating_agreement"
 																name="operating_agreement"
 																type="url"
@@ -1538,7 +1600,7 @@ const New = (props) => {
 															<Input
 																label="Membership Interest Transfer Agreement"
 																placeholder="https://"
-																value={propertyData.membership_interest_transfer_agreement}
+																value={propertyData?.membership_interest_transfer_agreement}
 																id="membership_interest_transfer_agreement"
 																name="membership_interest_transfer_agreement"
 																type="url"
@@ -1556,7 +1618,7 @@ const New = (props) => {
 															<Input
 																label="EIN Letter from IRS"
 																placeholder="https://"
-																value={propertyData.ein_letter_from_irs}
+																value={propertyData?.ein_letter_from_irs}
 																id="ein_letter_from_irs"
 																name="ein_letter_from_irs"
 																type="url"
@@ -1576,7 +1638,7 @@ const New = (props) => {
 															<Input
 																label="Appraisal"
 																placeholder="https://"
-																value={propertyData.appraisal}
+																value={propertyData?.appraisal}
 																id="appraisal"
 																name="appraisal"
 																type="url"
@@ -1599,7 +1661,7 @@ const New = (props) => {
 															<Input
 																label="Your Legal Name"
 																placeholder="Your Legal Name"
-																value={propertyData.submitted_by}
+																value={propertyData?.submitted_by}
 																id="submitted_by"
 																name="submitted_by"
 																type="text"
