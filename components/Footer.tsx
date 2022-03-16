@@ -12,7 +12,7 @@ const Footer = () => {
 //   if (REALM) return null
 //   else
     return (
-		<div className="border-t py-6 border-green">
+		<div className="border-t py-6 border-green overflow-hidden">
 			<div className="-my-2 -mx-6">
 				<ul className="flex justify-center flex-wrap">
 					<li className="py-2 px-6 flex-shrink-0">
