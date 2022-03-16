@@ -1,27 +1,24 @@
-import {
-  DEFAULT_NFT_TREASURY_MINT,
-  HIDDEN_GOVERNANCES,
-} from '@components/instructions/tools'
 import { GovernanceAccountType } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import {
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
-  GovernedTokenAccount,
   parseMintAccountData,
 } from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+
 import useWalletStore from 'stores/useWalletStore'
+
 import useRealm from './useRealm'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 
 export default function useGovernanceAssets() {
-  const { governances, tokenMints, realmTokenAccounts } = useRealm()
+  const { ownVoterWeight, realm, symbol, governances } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
-
-  const { ownVoterWeight, realm, symbol } = useRealm()
-  const governancesArray = Object.keys(governances)
-    .filter((gpk) => !HIDDEN_GOVERNANCES.has(gpk))
-    .map((key) => governances[key])
+  const governedTokenAccounts = useGovernanceAssetsStore(
+    (s) => s.governedTokenAccounts
+  )
+  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
@@ -29,28 +26,36 @@ export default function useGovernanceAssets() {
     )
     return governancesFiltered
   }
-  function canUseGovernanceForInstruction(type: GovernanceAccountType) {
+
+  const getGovernancesByAccountTypes = (types: GovernanceAccountType[]) => {
+    const governancesFiltered = governancesArray.filter((gov) =>
+      types.some((t) => gov.account?.accountType === t)
+    )
+    return governancesFiltered
+  }
+
+  function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
     return (
       realm &&
-      getGovernancesByAccountType(type).some((g) =>
-        ownVoterWeight.canCreateProposal(g.account.config)
+      getGovernancesByAccountTypes(types).some((govAcc) =>
+        ownVoterWeight.canCreateProposal(govAcc.account.config)
       )
     )
   }
   const canMintRealmCommunityToken = () => {
-    const governances = getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    )
-    return !!governances.find(
-      (x) =>
-        x.account.governedAccount.toBase58() ==
-        realm?.account.communityMint.toBase58()
+    const governances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
+    return !!governances.find((govAcc) =>
+      realm?.account.communityMint.equals(govAcc.account.governedAccount)
     )
   }
   const canMintRealmCouncilToken = () => {
-    const governances = getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    )
+    const governances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
 
     return !!governances.find(
       (x) =>
@@ -59,54 +64,35 @@ export default function useGovernanceAssets() {
     )
   }
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
-  const canUseTransferInstruction = canUseGovernanceForInstruction(
-    GovernanceAccountType.TokenGovernance
-  )
+  const canUseTransferInstruction = canUseGovernanceForInstruction([
+    GovernanceAccountType.TokenGovernanceV1,
+    GovernanceAccountType.TokenGovernanceV2,
+  ])
 
-  const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction(
-    GovernanceAccountType.ProgramGovernance
-  )
+  const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
+  ])
 
-  const canUseMintInstruction = canUseGovernanceForInstruction(
-    GovernanceAccountType.MintGovernance
-  )
+  const canUseMintInstruction = canUseGovernanceForInstruction([
+    GovernanceAccountType.MintGovernanceV1,
+    GovernanceAccountType.MintGovernanceV2,
+  ])
 
   const canUseAnyInstruction =
     realm &&
-    governancesArray.some((g) =>
-      ownVoterWeight.canCreateProposal(g.account.config)
+    governancesArray.some((gov) =>
+      ownVoterWeight.canCreateProposal(gov.account.config)
     )
 
   const getAvailableInstructions = () => {
-    return availableInstructions.filter((x) => x.isVisible)
-  }
-  function prepareTokenGovernances() {
-    const tokenGovernances = getGovernancesByAccountType(
-      GovernanceAccountType.TokenGovernance
-    )
-    const governedTokenAccounts: GovernedTokenAccount[] = []
-    for (const i of tokenGovernances) {
-      const realmTokenAccount = realmTokenAccounts.find(
-        (x) => x.publicKey.toBase58() === i.account.governedAccount.toBase58()
-      )
-      const mint = tokenMints.find(
-        (x) =>
-          realmTokenAccount?.account.mint.toBase58() === x.publicKey.toBase58()
-      )
-      const obj = {
-        governance: i,
-        token: realmTokenAccount,
-        mint,
-        isNft: mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT,
-      }
-      governedTokenAccounts.push(obj)
-    }
-    return governedTokenAccounts
+    return availableInstructions.filter((itx) => itx.isVisible)
   }
   async function getMintWithGovernances() {
-    const mintGovernances = getGovernancesByAccountType(
-      GovernanceAccountType.MintGovernance
-    )
+    const mintGovernances = getGovernancesByAccountTypes([
+      GovernanceAccountType.MintGovernanceV1,
+      GovernanceAccountType.MintGovernanceV2,
+    ])
     const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
       connection,
@@ -129,24 +115,76 @@ export default function useGovernanceAssets() {
     })
     return governedMintInfoAccounts
   }
-  const governedTokenAccounts = prepareTokenGovernances()
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
-    (x) => x.mint?.publicKey.toBase58() !== DEFAULT_NFT_TREASURY_MINT
+    (x) => !x.isNft
   )
   const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (x) => x.mint?.publicKey.toBase58() === DEFAULT_NFT_TREASURY_MINT
+    (govTokenAcc) => govTokenAcc.isNft
   )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
-    (g) =>
-      g.governance &&
-      ownVoterWeight.canCreateProposal(g.governance?.account?.config)
+    (acc) =>
+      acc.governance &&
+      ownVoterWeight.canCreateProposal(acc.governance?.account?.config)
   )
-
   const availableInstructions = [
     {
       id: Instructions.Transfer,
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
+    },
+    {
+      id: Instructions.Grant,
+      name: 'Grant',
+      isVisible:
+        canUseTokenTransferInstruction &&
+        realm?.account.config.useCommunityVoterWeightAddin,
+    },
+    {
+      id: Instructions.Clawback,
+      name: 'Clawback',
+      isVisible:
+        canUseTokenTransferInstruction &&
+        realm?.account.config.useCommunityVoterWeightAddin,
+    },
+    {
+      id: Instructions.CreateAssociatedTokenAccount,
+      name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositIntoVolt,
+      name: 'Friktion: Deposit into Volt',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.CreateSolendObligationAccount,
+      name: 'Solend: Create Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.InitSolendObligationAccount,
+      name: 'Solend: Init Obligation Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
+      name: 'Solend: Deposit Funds',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendReserve,
+      name: 'Solend: Refresh Reserve',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.RefreshSolendObligation,
+      name: 'Solend: Refresh Obligation',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      name: 'Solend: Withdraw Funds',
+      isVisible: canUseAnyInstruction,
     },
     {
       id: Instructions.ProgramUpgrade,
@@ -169,6 +207,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
+      id: Instructions.MangoChangeReferralFeeParams,
+      name: 'Mango - change referral fee params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
@@ -182,6 +225,7 @@ export default function useGovernanceAssets() {
   return {
     governancesArray,
     getGovernancesByAccountType,
+    getGovernancesByAccountTypes,
     availableInstructions,
     getAvailableInstructions,
     governedTokenAccounts,

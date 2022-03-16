@@ -17,12 +17,13 @@ import * as yup from 'yup'
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
 } from './BaseGovernanceForm'
-import { registerGovernance } from 'actions/registerGovernance'
+import { registerProgramGovernance } from 'actions/registerProgramGovernance'
 import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -42,6 +43,7 @@ const defaultFormValues = {
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const {
     realmInfo,
     realm,
@@ -100,14 +102,15 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
         }
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
-        await registerGovernance(
+        await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,
-          realm.pubkey,
+          realm,
           new PublicKey(form.programId),
           governanceConfig,
           form.transferAuthority,
-          tokenOwnerRecord!.pubkey
+          tokenOwnerRecord!.pubkey,
+          client
         )
         setIsLoading(false)
         fetchRealm(realmInfo!.programId, realmInfo!.realmId)

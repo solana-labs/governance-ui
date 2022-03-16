@@ -40,15 +40,23 @@ h1 {
 }
 
 h2 {
-  @apply text-lg mb-2 font-bold;
+  @apply text-xl mb-2 font-bold;
 }
 
 h3 {
-  @apply text-base mb-1 font-bold;
+  @apply text-lg mb-1 font-bold;
+}
+
+h4 {
+  @apply text-sm mb-1 font-bold;
 }
 
 p {
-  @apply break-words leading-6 text-fgd-2 text-sm;
+  @apply break-words leading-normal text-fgd-2 text-sm;
+}
+
+.hero-text {
+  @apply text-2xl font-bold;
 }
 
 button {
@@ -57,10 +65,6 @@ button {
 
 .default-transition {
   @apply transition-all duration-300;
-}
-
-.markdown {
-  @apply pt-4;
 }
 
 .markdown > h1 {
@@ -122,4 +126,8 @@ button {
 
 .pointer {
   cursor: pointer;
+}
+
+::-webkit-calendar-picker-indicator {
+  filter: invert(1);
 }

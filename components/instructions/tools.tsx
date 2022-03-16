@@ -13,6 +13,11 @@ import { MANGO_INSTRUCTIONS } from './programs/mango'
 import { getProgramName, isGovernanceProgram } from './programs/names'
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium'
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken'
+import { SYSTEM_INSTRUCTIONS } from './programs/system'
+import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
+import { MARINADE_INSTRUCTIONS } from './programs/marinade'
+import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
+import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 /**
  * Default governance program id instance
  */
@@ -34,6 +39,11 @@ export const ACCOUNT_NAMES = {
     'Mango DAO USDC Treasury Vault',
   '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
     'Mango DAO USDC Treasury Governance',
+  '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
+    'Mango DAO Voter Stake Registry Registrar',
+  DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
+  '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
+    'Mango DAO Governance Realm Authority',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
@@ -41,6 +51,9 @@ export const ACCOUNT_NAMES = {
   CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
     'Mango v3 BTC-PERP Incentive Vault',
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
+  MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
+  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
+
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
   '2A7UgheVhmoQqXBAQyG1wCoMpooPuiUf2DK6XFiQTtbG': 'OMH Mint Governance',
 
@@ -83,23 +96,47 @@ export const ACCOUNT_NAMES = {
 
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
+
+  // MMCC ClubDAO
+  '92tozWPkbybEjPeiGpNFL8onAnT739cxLRQofGVnrmm6': 'ClubDAO DCF Revenue Vault',
+  A6HXL3WMWT4gB1QvYJfZgDp2ufTfLkWBaX6Theakdf5h:
+    'ClubDAO Main SOL Treasury Vault',
+  '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
+  Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
+    'ClubDAO Main NFT Treasury Vault ',
 }
 
 // Blacklisted governances which should not be displayed in the UI
 // TODO: Add this to on-chain metadata to Governance account
 export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['HfWc8M6Df5wtLg8xg5vti4QKAo9KG4nL5gKQ8B2sjfYC', ''],
+  ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
+  ['2j2oe8YXdYJyS7G8CeEW5KARijdjjZkuPy5MnN8gBQqQ', ''],
+  ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
+  ['4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9', ''],
+])
+
+// Blacklisted proposals which should not be displayed in the UI
+// TODO: Add this to on-chain metadata to Proposal account
+export const HIDDEN_PROPOSALS = new Map<string, string>([
+  ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
 ])
 
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
 export const DEFAULT_NATIVE_SOL_MINT =
-  'GSoL95LSRcKYxwVkvAxbYLp47uBn1QtP6pDUZQxp3Mg4'
+  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
+
+export const CHAT_PROGRAM_ID = new PublicKey(
+  '7fjWgipzcHFP3c5TMMWumFHNAL5Eme1gFqqRGnNPbbfG'
+)
+
+export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 
 export interface AccountDescriptor {
   name: string
@@ -128,6 +165,11 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...BPF_UPGRADEABLE_LOADER_INSTRUCTIONS,
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
+  ...MARINADE_INSTRUCTIONS,
+  ...SOLEND_PROGRAM_INSTRUCTIONS,
+  ...ATA_PROGRAM_INSTRUCTIONS,
+  ...SYSTEM_INSTRUCTIONS,
+  ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
@@ -135,7 +177,6 @@ export async function getInstructionDescriptor(
   instruction: InstructionData
 ) {
   let descriptors: any
-
   if (isGovernanceProgram(instruction.programId)) {
     descriptors =
       GOVERNANCE_INSTRUCTIONS['GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw']
@@ -143,14 +184,18 @@ export async function getInstructionDescriptor(
     descriptors = INSTRUCTION_DESCRIPTORS[instruction.programId.toBase58()]
   }
 
-  const descriptor = descriptors && descriptors[instruction.data[0]]
+  // Make it work for program with one instruction like ATA program
+  // and for the one with multiple instructions
+  const descriptor = !instruction.data.length
+    ? descriptors
+    : descriptors && descriptors[instruction.data[0]]
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,
       instruction.data,
-      instruction.accounts
+      instruction.accounts,
+      instruction.programId
     ))) ?? <>{JSON.stringify(instruction.data)}</>
-
   return {
     name: descriptor?.name,
     accounts: descriptor?.accounts,

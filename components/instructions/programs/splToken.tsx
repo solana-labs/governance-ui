@@ -3,7 +3,7 @@ import { AccountMetaData } from '@solana/spl-governance'
 import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
 import BN from 'bn.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-
+import tokenService from '@utils/services/token'
 export interface TokenMintMetadata {
   name: string
 }
@@ -15,13 +15,19 @@ export const MINT_METADATA = {
   '5oVNBeEEQvYi1cX3ir8Dx5n1P7pdxydbGF2X4TxVusJm': { name: 'SOCN' },
   SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt: { name: 'SRM' },
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: { name: 'OMH' },
+  UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M: { name: 'UXP' },
 }
 
 export function getMintMetadata(
   tokenMintPk: PublicKey | undefined
 ): TokenMintMetadata {
-  // TODO: Fetch token mint metadata from the chain
-  return tokenMintPk ? MINT_METADATA[tokenMintPk.toBase58()] : undefined
+  const tokenMintAddress = tokenMintPk ? tokenMintPk.toBase58() : ''
+  const tokenInfo = tokenMintAddress
+    ? tokenService.getTokenInfo(tokenMintAddress)
+    : null
+  return tokenInfo
+    ? { name: tokenInfo.symbol }
+    : MINT_METADATA[tokenMintAddress]
 }
 
 export const SPL_TOKEN_INSTRUCTIONS = {

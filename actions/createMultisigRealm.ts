@@ -2,8 +2,9 @@ import {
   getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  SetRealmAuthorityAction,
   VoteThresholdPercentage,
-  VoteWeightSource,
+  VoteTipping,
 } from '@solana/spl-governance'
 
 import { withCreateMintGovernance } from '@solana/spl-governance'
@@ -22,7 +23,7 @@ import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreate
 import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
 import { withMintTo } from '@tools/sdk/splToken/withMintTo'
 import {
-  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
 } from '@tools/sdk/units'
 import {
@@ -116,11 +117,9 @@ export const createMultisigRealm = async (
   const realmSigners: Keypair[] = []
 
   // Convert to mint natural amount
-  const minCommunityTokensToCreateAsMintValue = new BN(
-    getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreate,
-      communityMintDecimals
-    )
+  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
+    minCommunityTokensToCreate,
+    communityMintDecimals
   )
 
   const realmPk = await withCreateRealm(
@@ -177,16 +176,15 @@ export const createMultisigRealm = async (
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteWeightSource.Deposit,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   })
 
-  const {
-    governanceAddress: communityMintGovPk,
-  } = await withCreateMintGovernance(
+  const communityMintGovPk = await withCreateMintGovernance(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     communityMintPk,
     config,
@@ -200,6 +198,7 @@ export const createMultisigRealm = async (
   await withCreateMintGovernance(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     councilMintPk,
     config,
@@ -214,9 +213,11 @@ export const createMultisigRealm = async (
   withSetRealmAuthority(
     realmInstructions,
     programId,
+    programVersion,
     realmPk,
     walletPk,
-    communityMintGovPk
+    communityMintGovPk,
+    SetRealmAuthorityAction.SetChecked
   )
 
   try {

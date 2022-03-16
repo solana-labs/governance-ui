@@ -25,7 +25,12 @@ export interface RealmInfo {
   // og:image
   ogImage?: string
 
+  // banner mage
+  bannerImage?: string
+
   isCertified: boolean
+  // 3- featured DAOs  ,2- new DAO with active proposals, 1- DAOs with active proposal,
+  sortRank?: number
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
@@ -50,8 +55,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     programId: new PublicKey(realm.programId),
     realmId: new PublicKey(realm.realmId),
     isCertified: true,
-    // TODO: dynamically resolve the program version
-    programVersion: PROGRAM_VERSION_V1,
+    programVersion: realm.programVersion,
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -62,7 +66,7 @@ export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
   return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
 }
 
-export async function getCertifiedRealmInfo(
+export function getCertifiedRealmInfo(
   realmId: string,
   connection: ConnectionContext
 ) {
@@ -132,6 +136,9 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['AMRC14FwwWkT5TG2ibXdLTUnVrnd2N4YsTifzCeRR22X', ''], // Chicken Tribe test
   ['oW5X5C9wrnchcd4oucv8RG7t1uQLRKyevgy3GPMDTst', ''], // Succeed.Finance test
   ['3BHrYe5SV2VqHqpEyxYYLbNeNGEnKBjYG4kt6pF5Xu5K', ''], // Woof DAO test
+  ['9Xe5qW76XPhyohKaz8joecybGnKrgT4N6JNEuM5ZZwa9', ''], // 1SOL test
+  ['2mDwFhax7XcudkVzoV85pxo3B5aRqCt3diavVydjkBJC', ''], // 1SOL test
+  ['DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k', ''], // UXDProtocolDAO test
 ])
 
 // Returns all known realms from all known spl-gov instances which are not certified
@@ -142,7 +149,7 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
       arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(connection.endpoint, p.programId)
+        getRealms(connection.current, p.programId)
       )
     )
   )

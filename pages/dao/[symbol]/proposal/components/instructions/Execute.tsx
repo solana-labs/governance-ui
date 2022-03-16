@@ -5,15 +5,15 @@ import useRealm from 'hooks/useRealm'
 import Button, { SecondaryButton } from '@components/Button'
 import { notify } from 'utils/notifications'
 import Modal from '@components/Modal'
-import { executeInstruction } from 'actions/executeInstruction'
-import { ProposalInstruction } from '@solana/spl-governance'
+import { executeTransaction } from 'actions/executeTransaction'
+import { ProposalTransaction } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 
 type ExecuteInstructionProps = {
   onClose: () => void
   isOpen: boolean
-  instruction: ProgramAccount<ProposalInstruction> | any
+  instruction: ProgramAccount<ProposalTransaction> | any
 }
 
 const ExecuteInstruction = ({
@@ -37,7 +37,7 @@ const ExecuteInstruction = ({
           connection.endpoint
         )
 
-        await executeInstruction(rpcContext, proposal, instruction)
+        await executeTransaction(rpcContext, proposal, instruction)
 
         onClose()
       }

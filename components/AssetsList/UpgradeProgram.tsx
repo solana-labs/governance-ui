@@ -1,14 +1,8 @@
-import {
-  ArrowCircleDownIcon,
-  ArrowCircleUpIcon,
-  ArrowLeftIcon,
-  DuplicateIcon,
-} from '@heroicons/react/outline'
-import { ViewState } from './types'
+import { ChevronDownIcon } from '@heroicons/react/solid'
 import { PublicKey } from '@solana/web3.js'
 import useRealm from 'hooks/useRealm'
 import Input from 'components/inputs/Input'
-import Button, { SecondaryButton } from '@components/Button'
+import Button, { LinkButton } from '@components/Button'
 import Textarea from 'components/inputs/Textarea'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import useWalletStore from 'stores/useWalletStore'
@@ -23,37 +17,41 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
-import useAssetsStore from 'stores/useAssetsStore'
 import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { getProgramName } from '@components/instructions/programs/names'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
   title: string
 }
 
-const UpgradeProgram = () => {
+const UpgradeProgram = ({
+  program,
+}: {
+  program: ProgramAccount<Governance>
+}) => {
   const router = useRouter()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const program = useAssetsStore((s) => s.compact.currentAsset)
   const governedAccount = {
     governance: program!,
   }
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { setCurrentCompactView, resetCompactViewState } = useAssetsStore()
   const {
     realmInfo,
     canChooseWhoVote,
@@ -75,14 +73,11 @@ const UpgradeProgram = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const proposalTitle = `Upgrade ${form.governedAccount?.governance?.account.governedAccount.toBase58()}`
+  const name = program ? getProgramName(program.account.governedAccount) : ''
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-  }
-  const handleGoBackToMainView = async () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
   }
   const schema = yup.object().shape({
     bufferAddress: yup
@@ -190,7 +185,7 @@ const UpgradeProgram = () => {
         //Description same as title
         proposalAddress = await createProposal(
           rpcContext,
-          realm.pubkey,
+          realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title ? form.title : proposalTitle,
@@ -198,7 +193,8 @@ const UpgradeProgram = () => {
           proposalMint,
           selectedGovernance?.account?.proposalCount,
           [instructionData],
-          false
+          false,
+          client
         )
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
@@ -228,15 +224,7 @@ const UpgradeProgram = () => {
   }, [form.bufferAddress])
   return (
     <>
-      <h3 className="mb-4 flex items-center hover:cursor-pointer">
-        <>
-          <ArrowLeftIcon
-            onClick={() => setCurrentCompactView(ViewState.AssetOverview)}
-            className="h-4 w-4 mr-1 text-primary-light mr-2"
-          />
-          Upgrade
-        </>
-      </h3>
+      <h3 className="mb-4">Upgrade {name}</h3>
       <div className="space-y-4">
         <Input
           label="Buffer address"
@@ -251,33 +239,20 @@ const UpgradeProgram = () => {
           noMaxWidth={true}
           error={formErrors['bufferAddress']}
         />
-        <div className="text-sm mb-3">
-          <div className="mb-2">Upgrade authority</div>
-          <div className="flex flex-row text-xs items-center break-all">
-            <span className="text-fgd-3">
-              {form.governedAccount?.governance?.pubkey.toBase58()}
-            </span>
-            <DuplicateIcon
-              className="ml-4 text-th-fgd-1 w-5 h-5 hover:cursor-pointer text-primary-light"
-              onClick={() => {
-                navigator.clipboard.writeText(
-                  form.governedAccount!.governance!.pubkey.toBase58()
-                )
-              }}
-            ></DuplicateIcon>
-          </div>
-        </div>
-        <div
-          className={'flex items-center hover:cursor-pointer w-24 mt-3'}
+        <ProgramUpgradeInfo
+          governancePk={form.governedAccount?.governance?.pubkey}
+        />
+        <LinkButton
+          className="flex items-center text-primary-light"
           onClick={() => setShowOptions(!showOptions)}
         >
-          {showOptions ? (
-            <ArrowCircleUpIcon className="h-4 w-4 mr-1 text-primary-light" />
-          ) : (
-            <ArrowCircleDownIcon className="h-4 w-4 mr-1 text-primary-light" />
-          )}
-          <small className="text-fgd-3">Options</small>
-        </div>
+          {showOptions ? 'Less Options' : 'More Options'}
+          <ChevronDownIcon
+            className={`default-transition h-5 w-5 ml-1 ${
+              showOptions ? 'transform rotate-180' : 'transform rotate-360'
+            }`}
+          />
+        </LinkButton>
         {showOptions && (
           <>
             <Input
@@ -307,34 +282,21 @@ const UpgradeProgram = () => {
                   propertyName: 'description',
                 })
               }
-            ></Textarea>
+            />
             {canChooseWhoVote && (
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
                   setVoteByCouncil(!voteByCouncil)
                 }}
-              ></VoteBySwitch>
+              />
             )}
           </>
         )}
       </div>
-      <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
-        <SecondaryButton
-          disabled={isLoading}
-          className="sm:w-1/2 text-th-fgd-1"
-          onClick={handleGoBackToMainView}
-        >
-          Cancel
-        </SecondaryButton>
-        <Button
-          className="sm:w-1/2"
-          onClick={handlePropose}
-          isLoading={isLoading}
-        >
-          <div>Propose</div>
-        </Button>
-      </div>
+      <Button className="mt-6" onClick={handlePropose} isLoading={isLoading}>
+        <div>Propose Upgrade</div>
+      </Button>
     </>
   )
 }

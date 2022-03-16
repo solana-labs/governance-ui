@@ -7,11 +7,11 @@ import { PublicKey } from '@solana/web3.js'
 import {
   //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
-  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
-import { precision } from '@utils/formatting'
+import { abbreviateAddress, precision } from '@utils/formatting'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
@@ -20,7 +20,7 @@ import {
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import { BN } from '@project-serum/anchor'
+
 import { getTokenTransferSchema } from '@utils/validations'
 import {
   ArrowCircleDownIcon,
@@ -43,6 +43,7 @@ import AccountLabel from './AccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
+  getSolTransferInstruction,
   getTransferInstruction,
   getTransferNftInstruction,
 } from '@utils/instructionTools'
@@ -50,12 +51,10 @@ import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 
 const SendTokens = () => {
-  const { resetCompactViewState } = useTreasuryAccountStore()
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const {
     realmInfo,
@@ -66,10 +65,11 @@ const SendTokens = () => {
     councilMint,
     canChooseWhoVote,
   } = useRealm()
-
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const { canUseTransferInstruction } = useGovernanceAssets()
-  const tokenInfo = useTreasuryAccountStore((s) => s.compact.tokenInfo)
+  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const isNFT = currentAccount?.isNft
+  const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const router = useRouter()
@@ -157,14 +157,19 @@ const SendTokens = () => {
       connection,
       wallet,
       currentAccount,
+
       setFormErrors,
     }
-    return isNFT
-      ? getTransferNftInstruction({
-          ...defaultProps,
-          nftMint: selectedNftMint,
-        })
-      : getTransferInstruction(defaultProps)
+    if (isNFT) {
+      return getTransferNftInstruction({
+        ...defaultProps,
+        nftMint: selectedNftMint,
+      })
+    }
+    if (isSol) {
+      return getSolTransferInstruction(defaultProps)
+    }
+    return getTransferInstruction(defaultProps)
   }
   const handlePropose = async () => {
     setIsLoading(true)
@@ -220,7 +225,7 @@ const SendTokens = () => {
         //Description same as title
         proposalAddress = await createProposal(
           rpcContext,
-          realm.pubkey,
+          realm,
           selectedGovernance.pubkey,
           ownTokenRecord.pubkey,
           form.title ? form.title : proposalTitle,
@@ -228,12 +233,12 @@ const SendTokens = () => {
           proposalMint,
           selectedGovernance?.account?.proposalCount,
           [instructionData],
-          false
+          false,
+          client
         )
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
-        resetCompactViewState()
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -242,15 +247,13 @@ const SendTokens = () => {
     setIsLoading(false)
   }
   const IsAmountNotHigherThenBalance = () => {
-    const mintValue = getMintNaturalAmountFromDecimal(
+    const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
       form.governedTokenAccount!.mint!.account.decimals
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount?.token?.account?.amount?.gte(
-        new BN(mintValue)
-      )
+      gte = form.governedTokenAccount?.token?.account?.amount?.gte(mintValue)
     } catch (e) {
       //silent fail
     }
@@ -290,7 +293,9 @@ const SendTokens = () => {
   const proposalTitle = isNFT
     ? nftTitle
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
-        form.destinationAccount
+        tryParseKey(form.destinationAccount)
+          ? abbreviateAddress(new PublicKey(form.destinationAccount))
+          : ''
       }`
 
   if (!currentAccount) {

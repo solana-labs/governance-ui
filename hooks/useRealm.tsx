@@ -1,12 +1,13 @@
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import {
   createUnchartedRealmInfo,
   getCertifiedRealmInfo,
   RealmInfo,
 } from '../models/registry/api'
-import { VoterWeight } from '../models/voteWeights'
+import { VoteRegistryVoterWeight, VoterWeight } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
 
@@ -25,20 +26,27 @@ export default function useRealm() {
     tokenMints,
     tokenAccounts: realmTokenAccounts,
     proposals,
-    proposalDescriptions,
     tokenRecords,
     councilTokenOwnerRecords,
+    programVersion,
   } = useWalletStore((s) => s.selectedRealm)
+  const votingPower = useDepositStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-
   useMemo(async () => {
-    const realmInfo = isPublicKey(symbol as string)
+    let realmInfo = isPublicKey(symbol as string)
       ? realm
         ? createUnchartedRealmInfo(realm)
         : undefined
-      : await getCertifiedRealmInfo(symbol as string, connection)
-    setRealmInfo(realmInfo)
-  }, [symbol, realm])
+      : getCertifiedRealmInfo(symbol as string, connection)
+
+    if (realmInfo) {
+      realmInfo = { ...realmInfo, programVersion: programVersion }
+    }
+    // Do not set realm info until the programVersion  is resolved
+    if (programVersion) {
+      setRealmInfo(realmInfo)
+    }
+  }, [symbol, realm, programVersion])
 
   const realmTokenAccount = useMemo(
     () =>
@@ -94,6 +102,10 @@ export default function useRealm() {
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
 
+  //TODO change when more plugins implemented
+  const ownVoterWeight = realm?.account.config.useCommunityVoterWeightAddin
+    ? new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+    : new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
   return {
     realm,
     realmInfo,
@@ -104,13 +116,12 @@ export default function useRealm() {
     realmTokenAccounts,
     tokenMints,
     proposals,
-    proposalDescriptions,
     tokenRecords,
     realmTokenAccount,
     ownTokenRecord,
     councilTokenAccount,
     ownCouncilTokenRecord,
-    ownVoterWeight: new VoterWeight(ownTokenRecord, ownCouncilTokenRecord),
+    ownVoterWeight,
     realmDisplayName: realmInfo?.displayName ?? realm?.account?.name,
     canChooseWhoVote,
     councilTokenOwnerRecords,

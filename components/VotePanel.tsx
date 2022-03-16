@@ -11,7 +11,7 @@ import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
 
 import useWalletStore from '../stores/useWalletStore'
-import Button from './Button'
+import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 
@@ -24,7 +24,13 @@ const VotePanel = () => {
     voteRecordsByVoter,
     tokenType,
   } = useWalletStore((s) => s.selectedProposal)
-  const { ownTokenRecord, ownCouncilTokenRecord, realm, realmInfo } = useRealm()
+  const {
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+    realm,
+    realmInfo,
+    ownVoterWeight,
+  } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -48,7 +54,9 @@ const VotePanel = () => {
     isVoting &&
     !isVoteCast &&
     voterTokenRecord &&
-    !voterTokenRecord.account.governingTokenDepositAmount.isZero()
+    ownVoterWeight.hasMinAmountToVote(
+      voterTokenRecord.account.governingTokenMint
+    )
 
   const isWithdrawEnabled =
     connected &&
@@ -63,6 +71,8 @@ const VotePanel = () => {
       proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
+    const programId = realmInfo?.programId
+    const realmId = realmInfo?.realmId
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -80,6 +90,7 @@ const VotePanel = () => {
         await withFinalizeVote(
           instructions,
           realmInfo!.programId,
+          getProgramVersionForRealm(realmInfo!),
           realm!.pubkey,
           proposal.account.governance,
           proposal.pubkey,
@@ -100,7 +111,7 @@ const VotePanel = () => {
       console.error("Can't relinquish vote", ex)
     }
 
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+    await fetchRealm(programId, realmId)
   }
 
   const handleShowVoteModal = (vote: YesNoVote) => {
@@ -132,7 +143,9 @@ const VotePanel = () => {
     : !isVoting && isVoteCast
     ? 'Proposal is not in a voting state anymore.'
     : !voterTokenRecord ||
-      voterTokenRecord.account.governingTokenDepositAmount.isZero()
+      !ownVoterWeight.hasMinAmountToVote(
+        voterTokenRecord.account.governingTokenMint
+      )
     ? 'You don’t have governance power to vote in this realm'
     : ''
 
@@ -154,18 +167,19 @@ const VotePanel = () => {
   return (
     <>
       {isPanelVisible && (
-        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-6">
-          <h2 className="mb-4 text-center">{actionLabel}</h2>
+        <div className="bg-bkg-2 p-4 md:p-6 rounded-lg space-y-4">
+          <h3 className="mb-4 text-center">{actionLabel}</h3>
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
-              <Button
+              <SecondaryButton
+                small
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
                 disabled={!isWithdrawEnabled}
               >
                 {isVoting ? 'Withdraw' : 'Release Tokens'}
-              </Button>
+              </SecondaryButton>
             ) : (
               <>
                 {isVoting && (
@@ -176,7 +190,7 @@ const VotePanel = () => {
                       onClick={() => handleShowVoteModal(YesNoVote.Yes)}
                       disabled={!isVoteEnabled}
                     >
-                      Approve
+                      Vote Yes
                     </Button>
 
                     <Button
@@ -185,7 +199,7 @@ const VotePanel = () => {
                       onClick={() => handleShowVoteModal(YesNoVote.No)}
                       disabled={!isVoteEnabled}
                     >
-                      Deny
+                      Vote No
                     </Button>
                   </div>
                 )}

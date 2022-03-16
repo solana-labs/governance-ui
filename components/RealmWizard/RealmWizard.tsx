@@ -37,8 +37,8 @@ import { CreateFormSchema } from './validators/createRealmValidator'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import { registerRealm } from 'actions/registerRealm'
 import {
+  getGovernanceProgramVersion,
   MintMaxVoteWeightSource,
-  PROGRAM_VERSION_V1,
 } from '@solana/spl-governance'
 import Switch from '@components/Switch'
 import { BN } from '@project-serum/anchor'
@@ -120,10 +120,21 @@ const RealmWizard: React.FC = () => {
       ? DEFAULT_TEST_GOVERNANCE_PROGRAM_ID
       : DEFAULT_GOVERNANCE_PROGRAM_ID
 
+    const governanceProgramId = new PublicKey(programId)
+    const programVersion = await getGovernanceProgramVersion(
+      connection.current,
+      governanceProgramId
+    )
+
+    console.log('CREATE REALM Program', {
+      governanceProgramId: governanceProgramId.toBase58(),
+      programVersion,
+    })
+
     const results = await createMultisigRealm(
       connection.current,
-      new PublicKey(programId),
-      PROGRAM_VERSION_V1,
+      governanceProgramId,
+      programVersion,
       form.name,
       form.yesThreshold,
       form.teamWallets.map((w) => new PublicKey(w)),
@@ -171,16 +182,28 @@ const RealmWizard: React.FC = () => {
       CreateFormSchema,
       form
     )
+
     if (isValid) {
       try {
+        const governanceProgramId = new PublicKey(form.governanceProgramId!)
+        const programVersion = await getGovernanceProgramVersion(
+          connection.current,
+          governanceProgramId
+        )
+
+        console.log('CREATE REALM Program', {
+          governanceProgramId: governanceProgramId.toBase58(),
+          programVersion,
+        })
+
         const realmAddress = await registerRealm(
           {
             connection,
             wallet: wallet!,
             walletPubkey: wallet!.publicKey!,
           },
-          new PublicKey(form.governanceProgramId!),
-          form.programVersion ?? PROGRAM_VERSION_V1,
+          governanceProgramId,
+          programVersion,
           form.name!,
           form.communityMintId
             ? new PublicKey(form.communityMintId)

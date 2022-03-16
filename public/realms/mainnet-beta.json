@@ -1,5 +1,13 @@
 [
   {
+    "symbol": "Ukraine",
+    "displayName": "Ukraine.SOL",
+    "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
+    "realmId": "5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d",
+    "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
+    "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png"
+  },
+  {
     "symbol": "MNGO",
     "displayName": "Mango DAO",
     "programId": "GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J",
@@ -8,6 +16,16 @@
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+  },
+  {
+    "symbol": "SNY",
+    "displayName": "Synthetify",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7oB84bSuxv9AH1iRdMp5nFLwpQApv8Yo9s1gGmDkHtSP",
+    "ogImage": "/realms/SNY/img/synthetify_logo_green.svg",
+    "website": "https://synthetify.io/",
+    "twitter": "@synthetify",
+    "sortRank": 2
   },
   {
     "symbol": "SOCEAN",
@@ -257,5 +275,190 @@
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "AvfMYqHjddR93zvmZXcQGUTkRu3GJYppTU93iKhMUWRF",
     "ogImage": "/realms/KiwiDAO/img/kiwi_logo.png"
+  },
+  {
+    "symbol": "FIDA",
+    "displayName": "Bonfida DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6NzVDMfEBJvkFDnjPx53K7mLGW3yQdSjLhsamS8go4cn",
+    "website": "https://bonfida.org",
+    "keywords": "Bonfida, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@bonfida",
+    "ogImage": "https://bonfida.org/static/media/fida.b16d451b.svg"
+  },
+  {
+    "symbol": "N&F",
+    "displayName": "Nick & Family",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "BuquUQDYsCBPxUsGXxWx7k9bS93kVXyPrb1wyw47fegs",
+    "website": "https://www.gofundme.com/f/support-nicks-fight-with-cancer?utm_campaign=p_cp+share-sheet&utm_medium=copy_link_all&utm_source=customer",
+    "twitter": "@NShaw89",
+    "ogImage": "/realms/N&F/img/Nick.png",
+    "bannerImage": "/realms/N&F/img/Nick-banner.jpeg"
+  },
+  {
+    "symbol": "LeDAO",
+    "displayName": "Le DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "CGSwgi67ZKcv7dwXewSQbzD89CncB9Vmhb8adgsWNJMJ",
+    "twitter": "@ledao_solana",
+    "ogImage": "/realms/LeDao/img/leDao-logo.png"
+  },
+  {
+    "symbol": "1SOL",
+    "displayName": "1Sol DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "26yUdUTWSfpwpNMshahupbXoQKi2NkaTECSyE45VMutU",
+    "website": "https://1sol.io",
+    "twitter": "@1solProtocol",
+    "ogImage": "/realms/1SolDAO/img/1SolDAO-logo.svg"
+  },
+  {
+    "symbol": "NFT4CauseDAO",
+    "displayName": "NFT 4 Cause DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "HB9Csze8DQ54skiMzw6VvAS9oeZ2i3zTDgWuJhQMCQab",
+    "website": "https://www.nft4cause.app",
+    "twitter": "@NFT4cause",
+    "ogImage": "/realms/NFT4CauseDAO/img/logo.png"
+  },
+  {
+    "symbol": "Bears",
+    "displayName": "Bears Reloaded",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "8x3bs2CUu7FZCw9zoTz29eBNwKjfJiCHjWz4T53NWLbJ"
+  },
+  {
+    "symbol": "SlattsDAO",
+    "displayName": "SlattsDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "8uhFgGgDWF23pNDS17a6TemzrjSrFhKN1skGXTjjRszj"
+  },
+  {
+    "symbol": "metaCOLLECTIVE",
+    "displayName": "metaCOLLECTIVE",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "EPB9JbK5NiHoHkrRmpo9v4oJ2bKSVjfA731jeBModC1e",
+    "website": "https://meta-collective.digital",
+    "twitter": "@_metaCOLLECTIVE",
+    "ogImage": "https://governance.meta-collective.digital/realms/META/img/logo.png"
+  },
+  {
+    "symbol": "UXP",
+    "displayName": "UXDProtocol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GBXLYo4ycRNfzuzYeudu6y2ng4afNeW14WcpM2E4JJSL",
+    "website": "https://uxd.fi",
+    "twitter": "@UXDProtocol",
+    "ogImage": "/realms/UXP/img/UXP-Black.png"
+  },
+  {
+    "symbol": "MonkeVentures",
+    "displayName": "MonkeVentures",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "97jKDX5Uxh5xSPbmmfhiFodHEajSVdKkknTzzgf8GBAr"
+  },
+  {
+    "symbol": "PixelBands",
+    "displayName": "PixelBands DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "AUYUF7z2aWNHySuWEW43pzSYL6aioKdc1pwCniyNCFBK",
+    "ogImage": "/realms/PixelBands/img/pixel_bands_log.png"
+  },
+  {
+    "symbol": "MEDIA",
+    "displayName": "Media DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "3ZFBoLMRKAU1Th57wvDfmE8PYRZzYZUDNZksNczsrTuU",
+    "website": "https://media.network",
+    "keywords": "Media Network, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, CDN, Web3, dCDN, Content Delivery Network, SPL Tokens, Multi Chain, Protocol, Data",
+    "twitter": "@Media_FDN",
+    "ogImage": "https://media.network/images/token/media.svg"
+  },
+  {
+    "symbol": "Renpo",
+    "displayName": "Renpō Dao",
+    "programId": "GRNPT8MPw3LYY6RdjsgKeFji5kMiG1fSxnxDjDBu4s73",
+    "realmId": "5J2bRTkzoSXWKZMW4o5tyNsT7Zwn9dDkDt6rMz6Ze9u1",
+    "ogImage": "/realms/Renpo/img/renpo_logo.png"
+  },
+  {
+    "symbol": "Ikohaus",
+    "displayName": "Ikohaus",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "WBmKxddpbtnVPXXUFCJf5BcC4qfCRZ9wsZSxTZBjdM5",
+    "website": "https://ikohaus.business.site",
+    "twitter": "@Ikohaus",
+    "ogImage": "/realms/Ikohaus/img/Ikohaus_Logo.png"
+  },
+  {
+    "symbol": "Senshi",
+    "displayName": "SenshiDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "2ZcZV69pMY5rrPSNSsAP7y7QgQygzAgDYKvVFvf6H9fR"
+  },
+  {
+    "symbol": "DAKU",
+    "displayName": "DAKU DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "9osGkueZJvHdZ8RbcGjgW7usUyBSCKQZSuFrujReXZpx",
+    "ogImage": "/realms/DAKU/img/daku_logo.png"
+  },
+  {
+    "symbol": "MMCC",
+    "displayName": "MMCC ClubDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6UkNFSiwje4Rs4EB31V4bj8YQYx9viGTxD3WyrM3j5R2",
+    "website": "https://linktr.ee/MeerkatMillionaires",
+    "twitter": "@mmccsolana",
+    "ogImage": "/realms/MMCC/img/MMCC_Logo.png"
+  },
+  {
+    "symbol": "montanaland",
+    "displayName": "Montana Land sDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "GURMs9sYzDNPhTJxsuDvFUpoBom8VKFicbjxK57hCj4e",
+    "ogImage": "/realms/MontanaLand/img/logo.png",
+    "website": "https://montanaland.slowdao.xyz/",
+    "twitter": "@montanaland"
+  },
+  {
+    "symbol": "$RIBS",
+    "displayName": "ROYAL LION DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "2ChWrquGfvcECwA3DRDhkGEzidyc7fTZXxJrkzUvjnJE",
+    "ogImage": "/realms/RIBS/img/lion_logo.png"
+  },
+  {
+    "symbol": "$PANDA",
+    "displayName": "Panda Fraternity DAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "2TTR5PXXHQFTjYedHfYQpEe1GTwwYFuoywawVnSi1RLb",
+    "ogImage": "/realms/PANDA/img/PandaDAOlogo.png"
+  },
+  {
+    "symbol": "XPWizards",
+    "displayName": "XPWizardsDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "7FMLXrTxwEUKoyMJdumd8A2nWkgq4bToQq5Uqds8kRsu",
+    "ogImage": "/realms/XPWizards/img/xpwizlogo.png"
+  },
+  {
+    "symbol": "BT",
+    "displayName": "Blue Terra DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DMTkorwRhKbPGioE5kr1BHDBEcwFSUepyuz66ro3MQXU",
+    "website": "https://blueterra.land",
+    "twitter": "@BlueTerraNFT",
+    "ogImage": "/realms/blueterra/img/logo.png"
+  },
+  {
+    "symbol": "Alpha Illuminati DAO",
+    "displayName": "Alpha Illuminati",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9u3s1APW4JDxt4a2p666rYYoa3UErcT12fvNKWNFqaj7",
+    "ogImage": "https://media.discordapp.net/attachments/933224453326909490/952347955157950504/alpha-illuminati-logo.png",
+    "website": "https://www.alphailluminati.xyz",
+    "twitter": "@illuminatialpha"
   }
 ]

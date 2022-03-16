@@ -1,8 +1,12 @@
 import {
   AccountMetaData,
   getGovernance,
+  getGovernanceProgramVersion,
+  getGovernanceSchema,
   getRealm,
-  VoteWeightSource,
+  SetRealmAuthorityAction,
+  SetRealmAuthorityArgs,
+  VoteTipping,
 } from '@solana/spl-governance'
 import {
   SetGovernanceConfigArgs,
@@ -72,12 +76,46 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
             </p>
             <p>
-              {`voteWeightSource:
-              ${VoteWeightSource[args.config.voteWeightSource]}`}
+              {`voteTipping:
+              ${VoteTipping[args.config.voteTipping]}`}
             </p>
             <p>
               {`proposalCoolOffTime:
               ${getDaysFromTimestamp(args.config.proposalCoolOffTime)} days(s)`}
+            </p>
+          </>
+        )
+      },
+    },
+    21: {
+      name: 'Set Realm Authority',
+      accounts: [
+        { name: 'Realm' },
+        { name: 'Realm Authority' },
+        { name: 'New Realm Authority' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserialize(
+          getGovernanceSchema(programVersion),
+          SetRealmAuthorityArgs,
+          Buffer.from(data)
+        ) as SetRealmAuthorityArgs
+
+        return (
+          <>
+            <p>
+              {`action:
+               ${SetRealmAuthorityAction[args.action!]}`}
             </p>
           </>
         )
@@ -107,10 +145,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
-               ${fmtMintAmount(
-                 communityMint?.account,
-                 args.configArgs.minCommunityTokensToCreateGovernance
-               )}`}
+              ${fmtMintAmount(
+                communityMint?.account,
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}`}
             </p>
             <p>
               {`useCouncilMint:

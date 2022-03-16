@@ -10,8 +10,9 @@ import {
   getTokenOwnerRecordAddress,
   GovernanceConfig,
   MintMaxVoteWeightSource,
+  SetRealmAuthorityAction,
   VoteThresholdPercentage,
-  VoteWeightSource,
+  VoteTipping,
 } from '@solana/spl-governance'
 import { withCreateRealm } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
@@ -31,7 +32,7 @@ import {
 } from '@solana/wallet-adapter-base'
 import { withDepositGoverningTokens } from '@solana/spl-governance'
 import {
-  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
 } from '@tools/sdk/units'
 import { withCreateMintGovernance } from '@solana/spl-governance'
@@ -106,7 +107,7 @@ async function prepareMintInstructions(
     if (otherOwners?.length) {
       for (const ownerPk of otherOwners) {
         const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
-          connection,
+          connection.current,
           ownerPk,
           _mintPk
         )
@@ -174,21 +175,19 @@ async function prepareMintInstructions(
  * @param yesVoteThreshold
  * @returns
  */
-function mountGovernanceConfig(
+function createGovernanceConfig(
   yesVoteThreshold = 60,
   tokenDecimals?: number,
   minCommunityTokensToCreateGovernance?: string
 ): GovernanceConfig {
   console.debug('mounting governance config')
 
-  const minCommunityTokensToCreateAsMintValue = new BN(
-    getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance &&
-        +minCommunityTokensToCreateGovernance > 0
-        ? +minCommunityTokensToCreateGovernance
-        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-      tokenDecimals ?? COMMUNITY_MINT_DECIMALS
-    )
+  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
+    minCommunityTokensToCreateGovernance &&
+      +minCommunityTokensToCreateGovernance > 0
+      ? +minCommunityTokensToCreateGovernance
+      : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+    tokenDecimals ?? COMMUNITY_MINT_DECIMALS
   )
 
   // Put community and council mints under the realm governance with default config
@@ -201,7 +200,7 @@ function mountGovernanceConfig(
     minInstructionHoldUpTime: 0,
     // max voting time 3 days
     maxVotingTime: getTimestampFromDays(3),
-    voteWeightSource: VoteWeightSource.Deposit,
+    voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
   })
@@ -226,6 +225,7 @@ async function prepareGovernanceInstructions(
   yesVoteThreshold: number,
   minCommunityTokensToCreateGovernance: string,
   programId: PublicKey,
+  programVersion: number,
   realmPk: PublicKey,
   tokenOwnerRecordPk: PublicKey,
   realmInstructions: TransactionInstruction[],
@@ -233,7 +233,7 @@ async function prepareGovernanceInstructions(
 ) {
   console.debug('Preparing governance instructions')
 
-  const config = mountGovernanceConfig(
+  const config = createGovernanceConfig(
     yesVoteThreshold,
     communityTokenDecimals,
     minCommunityTokensToCreateGovernance
@@ -241,11 +241,10 @@ async function prepareGovernanceInstructions(
 
   if (transferAuthority) {
     console.debug('transfer community mint authority')
-    const {
-      governanceAddress: communityMintGovPk,
-    } = await withCreateMintGovernance(
+    const communityMintGovPk = await withCreateMintGovernance(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       communityMintPk,
       config,
@@ -260,9 +259,11 @@ async function prepareGovernanceInstructions(
     withSetRealmAuthority(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       walletPubkey,
-      communityMintGovPk
+      communityMintGovPk,
+      SetRealmAuthorityAction.SetChecked
     )
   }
 
@@ -271,6 +272,7 @@ async function prepareGovernanceInstructions(
     await withCreateMintGovernance(
       realmInstructions,
       programId,
+      programVersion,
       realmPk,
       councilMintPk,
       config,
@@ -410,14 +412,12 @@ export async function registerRealm(
 
   if (!communityMintPk) throw new Error('Invalid community mint public key.')
 
-  const _minCommunityTokensToCreateGovernance = new BN(
-    getMintNaturalAmountFromDecimal(
-      minCommunityTokensToCreateGovernance &&
-        +minCommunityTokensToCreateGovernance > 0
-        ? +minCommunityTokensToCreateGovernance
-        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-      communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
-    )
+  const _minCommunityTokensToCreateGovernance = getMintNaturalAmountFromDecimalAsBN(
+    minCommunityTokensToCreateGovernance &&
+      +minCommunityTokensToCreateGovernance > 0
+      ? +minCommunityTokensToCreateGovernance
+      : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+    communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
   )
 
   const realmAddress = await withCreateRealm(
@@ -477,6 +477,7 @@ export async function registerRealm(
       yesVoteThreshold,
       minCommunityTokensToCreateGovernance,
       programId,
+      programVersion,
       realmAddress,
       tokenOwnerRecordPk,
       realmInstructions,

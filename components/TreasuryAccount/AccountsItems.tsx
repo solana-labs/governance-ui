@@ -1,45 +1,34 @@
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { GovernedTokenAccount } from '@utils/tokens'
 import React, { useEffect, useState } from 'react'
 import AccountItem from './AccountItem'
-import AccountItemNFT from './AccountItemNFT'
 
 const AccountsItems = () => {
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
 
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
+      if (governedTokenAccountsWithoutNfts.every((x) => x.mint && x.token)) {
+        setTreasuryAccounts(governedTokenAccountsWithoutNfts)
+      }
     }
     prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccounts)])
+  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
+
   return (
     <div className="space-y-3">
       {treasuryAccounts.map((accountWithGovernance) => {
-        //TODO if more non generic types of account item make more granular components inside accountItem
-        if (
-          accountWithGovernance.mint?.publicKey.toBase58() ===
-          DEFAULT_NFT_TREASURY_MINT
-        ) {
-          return (
-            <AccountItemNFT
-              border={true}
-              governedAccountTokenAccount={accountWithGovernance}
-              key={accountWithGovernance?.governance?.pubkey.toBase58()}
-            />
-          )
-        } else {
-          return (
+        return (
+          accountWithGovernance.transferAddress && (
             <AccountItem
               governedAccountTokenAccount={accountWithGovernance}
-              key={accountWithGovernance?.governance?.pubkey.toBase58()}
+              key={accountWithGovernance?.transferAddress?.toBase58()}
             />
           )
-        }
+        )
       })}
     </div>
   )

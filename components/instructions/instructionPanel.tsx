@@ -2,16 +2,27 @@ import useProposal from '../../hooks/useProposal'
 import InstructionCard from './instructionCard'
 import { Disclosure } from '@headlessui/react'
 import { ChevronDownIcon } from '@heroicons/react/solid'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import {
+  ExecuteAllInstructionButton,
+  PlayState,
+} from './ExecuteAllInstructionButton'
 
 export function InstructionPanel() {
   const { instructions, proposal } = useProposal()
   const { realmInfo } = useRealm()
+  const mounted = useRef(false)
+  useEffect(() => {
+    mounted.current = true
 
+    return () => {
+      mounted.current = false
+    }
+  }, [])
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
 
@@ -34,7 +45,9 @@ export function InstructionPanel() {
       )
 
       const timer = setTimeout(() => {
-        rpcContext.connection.getSlot().then(setCurrentSlot)
+        rpcContext.connection
+          .getSlot()
+          .then((resp) => (mounted.current ? setCurrentSlot(resp) : null))
       }, 5000)
 
       return () => {
@@ -46,6 +59,16 @@ export function InstructionPanel() {
   if (Object.values(instructions).length === 0) {
     return null
   }
+
+  const proposalInstructions = Object.values(instructions).sort(
+    (i1, i2) => i1.account.instructionIndex - i2.account.instructionIndex
+  )
+
+  const [playing, setPlaying] = useState(
+    proposalInstructions.every((x) => x.account.executedAt)
+      ? PlayState.Played
+      : PlayState.Unplayed
+  )
 
   return (
     <div>
@@ -69,22 +92,28 @@ export function InstructionPanel() {
             <Disclosure.Panel
               className={`border border-fgd-4 border-t-0 p-4 md:p-6 pt-0 rounded-b-md`}
             >
-              {Object.values(instructions)
-                .sort(
-                  (i1, i2) =>
-                    i1.account.instructionIndex - i2.account.instructionIndex
-                )
-                .map((pi, idx) => (
-                  <div key={pi.pubkey.toBase58()}>
-                    {proposal && (
-                      <InstructionCard
-                        proposal={proposal}
-                        index={idx + 1}
-                        proposalInstruction={pi}
-                      ></InstructionCard>
-                    )}
-                  </div>
-                ))}
+              {proposalInstructions.map((pi, idx) => (
+                <div key={pi.pubkey.toBase58()}>
+                  {proposal && (
+                    <InstructionCard
+                      proposal={proposal}
+                      index={idx + 1}
+                      proposalInstruction={pi}
+                    />
+                  )}
+                </div>
+              ))}
+
+              {proposal && proposalInstructions.length > 1 && (
+                <div className="flex justify-end">
+                  <ExecuteAllInstructionButton
+                    proposal={proposal}
+                    proposalInstructions={proposalInstructions}
+                    playing={playing}
+                    setPlaying={setPlaying}
+                  />
+                </div>
+              )}
             </Disclosure.Panel>
           </>
         )}

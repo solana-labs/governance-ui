@@ -27,9 +27,8 @@ const ProposalActionsPanel = () => {
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
-  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const connection = useWalletStore((s) => s.connection)
-
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   const canFinalizeVote =
@@ -100,7 +99,7 @@ const ProposalActionsPanel = () => {
     ? 'Connect your wallet to finalize this proposal'
     : !hasVoteTimeExpired
     ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
-    : proposal?.account.state === ProposalState.Voting
+    : proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
   const handleFinalizeVote = async () => {
@@ -115,8 +114,7 @@ const ProposalActionsPanel = () => {
         )
 
         await finalizeVote(rpcContext, governance?.account.realm, proposal)
-
-        await fetchProposal(proposal.pubkey)
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       }
     } catch (error) {
       notify({
@@ -140,9 +138,14 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await signOffProposal(rpcContext, signatoryRecord)
+        await signOffProposal(
+          rpcContext,
+          realmInfo.realmId,
+          proposal,
+          signatoryRecord
+        )
 
-        await fetchProposal(proposal.pubkey)
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       }
     } catch (error) {
       notify({
@@ -167,9 +170,9 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await cancelProposal(rpcContext, proposal)
+        await cancelProposal(rpcContext, realmInfo.realmId, proposal)
 
-        await fetchProposal(proposal.pubkey)
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
       }
     } catch (error) {
       notify({

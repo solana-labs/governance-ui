@@ -1,3 +1,4 @@
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
 import { getExplorerUrl } from '@components/explorer/tools'
 import {
   ArrowLeftIcon,
@@ -9,20 +10,21 @@ import {
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import { getVoteRecordsByVoterMapByProposal } from '@models/api'
 import { isYesVote } from '@models/voteRecords'
-import { VoteRecord } from '@solana/spl-governance'
+import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
 import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
 import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
 
 import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
 import useMembersListStore from 'stores/useMembersStore'
-import useWalletStore, { getVoteRecordsByProposal } from 'stores/useWalletStore'
+import useWalletStore from 'stores/useWalletStore'
 import { ViewState, WalletTokenRecordWithProposal } from './types'
 
 const MemberOverview = () => {
@@ -46,9 +48,9 @@ const MemberOverview = () => {
     hasCouncilTokenOutsideRealm,
   } = member!
   const walletPublicKey = tryParsePublicKey(walletAddress)
-  const tokenName = tokenService.tokenList.find(
-    (x) => x.address === realm?.account.communityMint.toBase58()
-  )?.symbol
+  const tokenName = realm
+    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
+    : ''
   const totalVotes = votesCasted
   const communityAmount =
     communityVotes && !communityVotes.isZero()
@@ -62,7 +64,6 @@ const MemberOverview = () => {
           member!.walletAddress,
         ])
       : null
-  const walletAddressFormatted = abbreviateAddress(walletPublicKey as PublicKey)
 
   const handleGoBackToMainView = async () => {
     setCurrentCompactView(ViewState.MainView)
@@ -73,18 +74,19 @@ const MemberOverview = () => {
     let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
       const results = await Promise.all([
-        getVoteRecordsByProposal(
+        getVoteRecordsByVoterMapByProposal(
+          connection.current,
           selectedRealm!.programId!,
-          connection.endpoint,
           new PublicKey(member!.walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
-          connection!.endpoint,
+          connection!.current,
+          GOVERNANCE_CHAT_PROGRAM_ID,
           new PublicKey(member!.walletAddress)
         ),
       ])
       voteRecords = results[0]
-      chatMessages = results[1]
+      chatMessages = accountsToPubkeyMap(results[1])
     } catch (e) {
       notify({
         message: 'Unable to fetch vote records for selected wallet address',
@@ -141,7 +143,13 @@ const MemberOverview = () => {
             onClick={handleGoBackToMainView}
             className="h-4 w-4 mr-1 text-primary-light mr-2"
           />
-          {walletAddressFormatted}
+          <DisplayAddress
+            connection={connection.current}
+            address={walletPublicKey}
+            height="12px"
+            width="100px"
+            dark={true}
+          />
           <a
             href={
               walletAddress
@@ -157,7 +165,16 @@ const MemberOverview = () => {
         </>
       </h3>
       <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex items-center">
-        <UserCircleIcon className="h-6 text-fgd-3 w-6 mr-2.5" />
+        <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 rounded-full w-8 mr-2">
+          <AddressImage
+            dark={true}
+            connection={connection.current}
+            address={walletPublicKey}
+            height="30px"
+            width="30px"
+            placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+          />
+        </div>
         <div>
           <div className="text-fgd-3 text-xs flex flex-col">
             Votes cast: {totalVotes}
@@ -185,7 +202,6 @@ const MemberOverview = () => {
       <div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">
         Recent votes
       </div>
-      {/* TODO virtual scroll */}
       <div style={{ maxHeight: '350px' }} className="overflow-auto">
         {ownVoteRecords.map((x) => (
           <a

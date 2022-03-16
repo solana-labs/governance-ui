@@ -47,12 +47,29 @@ export function parseMintNaturalAmountFromDecimal(
   return getMintNaturalAmountFromDecimal(floatAmount, mintDecimals)
 }
 
+export function parseMintNaturalAmountFromDecimalAsBN(
+  decimalAmount: string | number,
+  mintDecimals: number
+) {
+  return new BN(
+    parseMintNaturalAmountFromDecimal(decimalAmount, mintDecimals).toString()
+  )
+}
+
 // Converts amount in decimals to mint amount (natural units)
 export function getMintNaturalAmountFromDecimal(
   decimalAmount: number,
   decimals: number
 ) {
   return new BigNumber(decimalAmount).shiftedBy(decimals).toNumber()
+}
+
+// Converts amount in decimals to mint amount (natural units)
+export function getMintNaturalAmountFromDecimalAsBN(
+  decimalAmount: number,
+  decimals: number
+) {
+  return new BN(new BigNumber(decimalAmount).shiftedBy(decimals).toString())
 }
 
 // Calculates mint min amount as decimal

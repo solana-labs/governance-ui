@@ -17,8 +17,10 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { makeChangeMaxMangoAccountsInstruction } from '@blockworks-foundation/mango-client'
-import { BN } from '@project-serum/anchor'
+import {
+  BN,
+  makeChangeMaxMangoAccountsInstruction,
+} from '@blockworks-foundation/mango-client'
 
 const MakeChangeMaxAccounts = ({
   index,
@@ -29,10 +31,11 @@ const MakeChangeMaxAccounts = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountType } = useGovernanceAssets()
-  const governedProgramAccounts = getGovernancesByAccountType(
-    GovernanceAccountType.ProgramGovernance
-  ).map((x) => {
+  const { getGovernancesByAccountTypes } = useGovernanceAssets()
+  const governedProgramAccounts = getGovernancesByAccountTypes([
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
+  ]).map((x) => {
     return {
       governance: x,
     }

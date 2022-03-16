@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
-import { executeInstruction } from 'actions/executeInstruction'
+import { executeTransaction } from 'actions/executeTransaction'
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   ProposalState,
 } from '@solana/spl-governance'
 import React from 'react'
@@ -16,6 +16,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { notify } from '@utils/notifications'
 
 export enum PlayState {
   Played,
@@ -31,7 +32,7 @@ export function ExecuteInstructionButton({
   proposalInstruction,
 }: {
   proposal: ProgramAccount<Proposal>
-  proposalInstruction: ProgramAccount<ProposalInstruction>
+  proposalInstruction: ProgramAccount<ProposalTransaction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
 }) {
@@ -73,9 +74,10 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
-      await executeInstruction(rpcContext, proposal, proposalInstruction)
+      await executeTransaction(rpcContext, proposal, proposalInstruction)
       await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
     } catch (error) {
+      notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)
 
       setPlaying(PlayState.Error)

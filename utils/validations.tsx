@@ -2,10 +2,13 @@ import { PublicKey } from '@solana/web3.js'
 import { ProgramBufferAccount } from '@tools/validators/accounts/upgradeable-program'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
-import { tryGetTokenAccount } from './tokens'
+import { GovernedTokenAccount, tryGetTokenAccount } from './tokens'
 import * as yup from 'yup'
-import { getMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { BN } from '@project-serum/anchor'
+import {
+  getMintNaturalAmountFromDecimal,
+  getMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
+
 import type { ConnectionContext } from 'utils/connection'
 import {
   AccountInfo,
@@ -14,6 +17,7 @@ import {
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
+import { BN } from '@project-serum/anchor'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -27,7 +31,7 @@ const getValidateAccount = async (
   return account
 }
 
-const getValidatedPublickKey = (val: string) => {
+export const getValidatedPublickKey = (val: string) => {
   const pubKey = tryParseKey(val)
   if (pubKey) {
     return pubKey
@@ -46,7 +50,7 @@ const validateDoseTokenAccountMatchMint = (
 }
 
 export const tryGetAta = async (
-  connection: ConnectionContext,
+  connection: Connection,
   mint: PublicKey,
   owner: PublicKey
 ) => {
@@ -57,7 +61,7 @@ export const tryGetAta = async (
     mint, // mint
     owner // owner
   )
-  const tokenAccount = await tryGetTokenAccount(connection.current, ata)
+  const tokenAccount = await tryGetTokenAccount(connection, ata)
   return tokenAccount
 }
 
@@ -101,7 +105,7 @@ export const validateDestinationAccAddress = async (
 }
 
 export const validateDestinationAccAddressWithMint = async (
-  connection,
+  connection: ConnectionContext,
   val: any,
   mintPubKey: PublicKey
 ) => {
@@ -120,8 +124,30 @@ export const validateDestinationAccAddressWithMint = async (
   return true
 }
 
+export const validateAccount = async (
+  connection: ConnectionContext,
+  val: string
+) => {
+  const accountPk = tryParseKey(val)
+
+  if (!accountPk) {
+    throw 'Provided value is not a valid account address'
+  }
+
+  try {
+    const accountInfo = await connection.current.getAccountInfo(accountPk)
+
+    if (!accountInfo) {
+      throw "account doesn't exist or has no SOLs"
+    }
+  } catch (ex) {
+    console.error("Can't validate account", ex)
+    throw "Can't validate account"
+  }
+}
+
 export const validateBuffer = async (
-  connection,
+  connection: ConnectionContext,
   val: string,
   governedAccount?: PublicKey
 ) => {
@@ -130,7 +156,7 @@ export const validateBuffer = async (
     throw 'Program governed account not selected'
   }
   if (pubKey) {
-    await connection.current.getProgramAccountInfo(pubKey).then((data) => {
+    await connection.current.getParsedAccountInfo(pubKey).then((data) => {
       if (!data || !data.value) {
         throw "account doesn't exist or has no SOLs"
       }
@@ -162,8 +188,10 @@ export const validateBuffer = async (
   }
 }
 
-export const getTokenTransferSchema = ({ form, connection }) => {
+export const getFriktionDepositSchema = ({ form }) => {
+  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
       .number()
       .typeError('Amount is required')
@@ -171,7 +199,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = form.governedTokenAccount.isNft
+          const isNft = governedTokenAccount?.isNft
           if (isNft) {
             return true
           }
@@ -180,21 +208,57 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               message: `Please select source account to validate the amount`,
             })
           }
-          if (
-            val &&
-            form.governedTokenAccount &&
-            form.governedTokenAccount?.mint
-          ) {
-            const mintValue = getMintNaturalAmountFromDecimal(
+          if (val && governedTokenAccount && governedTokenAccount?.mint) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
-              form.governedTokenAccount?.mint.account.decimals
+              governedTokenAccount?.mint.account.decimals
             )
-            return !!(
-              form.governedTokenAccount?.token?.publicKey &&
-              form.governedTokenAccount.token.account.amount.gte(
-                new BN(mintValue)
-              )
+            return !!(governedTokenAccount?.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.token.account.amount.gte(mintValue)
+              : new BN(governedTokenAccount.solAccount!.lamports).gte(
+                  mintValue
+                ))
+          }
+          return this.createError({
+            message: `Amount is required`,
+          })
+        }
+      ),
+  })
+}
+
+export const getTokenTransferSchema = ({ form, connection }) => {
+  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test(
+        'amount',
+        'Transfer amount must be less than the source account available amount',
+        async function (val: number) {
+          const isNft = governedTokenAccount?.isNft
+          if (isNft) {
+            return true
+          }
+          if (val && !form.governedTokenAccount) {
+            return this.createError({
+              message: `Please select source account to validate the amount`,
+            })
+          }
+          if (val && governedTokenAccount && governedTokenAccount?.mint) {
+            const mintValue = getMintNaturalAmountFromDecimalAsBN(
+              val,
+              governedTokenAccount?.mint.account.decimals
             )
+            return !!(governedTokenAccount?.token?.publicKey &&
+            !governedTokenAccount.isSol
+              ? governedTokenAccount.token.account.amount.gte(mintValue)
+              : new BN(governedTokenAccount.solAccount!.lamports).gte(
+                  mintValue
+                ))
           }
           return this.createError({
             message: `Amount is required`,
@@ -210,8 +274,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           if (val) {
             try {
               if (
-                form.governedTokenAccount?.token?.account.address.toBase58() ==
-                val
+                governedTokenAccount?.token?.account.address.toBase58() == val
               ) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
@@ -220,7 +283,7 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               await validateDestinationAccAddress(
                 connection,
                 val,
-                form.governedTokenAccount?.token?.account.address
+                governedTokenAccount?.token?.account.address
               )
               return true
             } catch (e) {
@@ -236,10 +299,6 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           }
         }
       ),
-    governedTokenAccount: yup
-      .object()
-      .nullable()
-      .required('Source account is required'),
   })
 }
 
@@ -301,5 +360,50 @@ export const getMintSchema = ({ form, connection }) => {
         }
       ),
     mintAccount: yup.object().nullable().required('Mint is required'),
+  })
+}
+
+export const getStakeSchema = ({ form }) => {
+  return yup.object().shape({
+    amount: yup
+      .number()
+      .typeError('Amount is required')
+      .test('amount', 'Insufficient funds', async function (val: number) {
+        if (val && val > 9 * 10 ** 6) {
+          return this.createError({
+            message: 'Amount is too large',
+          })
+        }
+        if (val && !form.governedTokenAccount) {
+          return this.createError({
+            message: 'Please pass in a source account to validate the amount',
+          })
+        }
+        if (
+          val &&
+          form.governedTokenAccount &&
+          form.governedTokenAccount?.isSol &&
+          form.governedTokenAccount?.mint &&
+          form.governedTokenAccount?.solAccount
+        ) {
+          const mintValue = getMintNaturalAmountFromDecimal(
+            val,
+            form.governedTokenAccount?.mint.account.decimals
+          )
+          return !!(
+            form.governedTokenAccount.solAccount.owner &&
+            form.governedTokenAccount.solAccount.lamports >= new BN(mintValue)
+          )
+        }
+        return this.createError({ message: 'Amount is required' })
+      }),
+    destinationAccount: yup
+      .object()
+      .nullable()
+      .required('Destination account is required'),
+    governedTokenAccount: yup
+      .object()
+      .nullable()
+      .required('Source account is required'),
   })
 }

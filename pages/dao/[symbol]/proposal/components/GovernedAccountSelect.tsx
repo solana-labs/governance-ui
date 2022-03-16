@@ -3,6 +3,7 @@ import { Governance, GovernanceAccountType } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   getMintAccountLabelInfo,
+  getSolAccountLabel,
   getTokenAccountLabelInfo,
   GovernedMultiTypeAccount,
 } from '@utils/tokens'
@@ -17,24 +18,33 @@ const GovernedAccountSelect = ({
   shouldBeGoverned,
   governance,
   label,
+  noMaxWidth,
 }: {
   onChange
   value
-  error
+  error?
   governedAccounts: GovernedMultiTypeAccount[]
-  shouldBeGoverned
-  governance: ProgramAccount<Governance> | null | undefined
-  label
+  shouldBeGoverned?
+  governance?: ProgramAccount<Governance> | null | undefined
+  label?
+  noMaxWidth?: boolean
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
       const accountType = value.governance.account.accountType
       switch (accountType) {
-        case GovernanceAccountType.MintGovernance:
+        case GovernanceAccountType.MintGovernanceV1:
+        case GovernanceAccountType.MintGovernanceV2:
           return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
-        case GovernanceAccountType.TokenGovernance:
-          return getTokenAccountLabelComponent(getTokenAccountLabelInfo(value))
-        case GovernanceAccountType.ProgramGovernance:
+        case GovernanceAccountType.TokenGovernanceV1:
+        case GovernanceAccountType.TokenGovernanceV2:
+          return getTokenAccountLabelComponent(
+            value.isSol
+              ? getSolAccountLabel(value)
+              : getTokenAccountLabelInfo(value)
+          )
+        case GovernanceAccountType.ProgramGovernanceV1:
+        case GovernanceAccountType.ProgramGovernanceV2:
           return getProgramAccountLabel(value.governance)
         default:
           return value.governance.account.governedAccount.toBase58()
@@ -72,20 +82,21 @@ const GovernedAccountSelect = ({
     tokenAccountName,
     tokenName,
     amount,
-    imgUrl,
   }) {
     return (
       <div className="break-all text-fgd-1 ">
         {tokenAccountName && <div className="mb-0.5">{tokenAccountName}</div>}
-        <div className="mb-2">{tokenAccount}</div>
-        <div className="space-y-0.5 text-xs text-fgd-3">
+        <div className="mb-2 text-fgd-3 text-xs">{tokenAccount}</div>
+        <div className="flex space-x-3 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token: <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
-              {tokenName}
+              Token:
+              <span className="ml-1 text-fgd-1">{tokenName}</span>
             </div>
           )}
-          <div>Amount: {amount}</div>
+          <div>
+            Bal:<span className="ml-1 text-fgd-1">{amount}</span>
+          </div>
         </div>
       </div>
     )
@@ -115,6 +126,7 @@ const GovernedAccountSelect = ({
       placeholder="Please select..."
       value={value?.governance?.account.governedAccount.toBase58()}
       error={error}
+      noMaxWidth={noMaxWidth}
     >
       {governedAccounts
         .filter((x) =>

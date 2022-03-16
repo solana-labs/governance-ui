@@ -26,9 +26,7 @@ import DepositLabel from './DepositLabel'
 import NFTAccountSelect from './NFTAccountSelect'
 import ImgWithLoader from '@components/ImgWithLoader'
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
 
   const wallet = useWalletStore((s) => s.current)
   const { realm } = useRealm()
@@ -43,7 +41,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   const [imgUrl, setImgUrl] = useState('')
   const [ataAddress, setAtaAddress] = useState('')
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { setCurrentCompactAccount } = useTreasuryAccountStore()
+  const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -66,7 +64,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       owner! // owner
     )
     const ata = ataPk.toBase58()
-    const isExistingAta = await tryGetAta(connection, mintPK, owner)
+    const isExistingAta = await tryGetAta(connection.current, mintPK, owner)
     if (!isExistingAta) {
       try {
         await createATA(
@@ -144,11 +142,13 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
   return (
     <>
       <NFTAccountSelect
-        onChange={(value) => setCurrentCompactAccount(value, connection)}
+        onChange={(value) => setCurrentAccount(value, connection)}
         currentAccount={currentAccount}
         nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
       ></NFTAccountSelect>
-      <DepositLabel currentAccount={currentAccount}></DepositLabel>
+      <DepositLabel
+        transferAddress={currentAccount?.transferAddress}
+      ></DepositLabel>
       <div className="space-y-4 w-full pb-4">
         <div className="text-sm mt-4">
           <div className="flex flex-row text-xs items-center border-t border-fgd-4 default-transition py-4">
