@@ -41,8 +41,8 @@ function App({ Component, pageProps }) {
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const realmName = realmInfo?.displayName ?? realm?.account?.name
 
-	const title = realmName ? `${realmName}` : 'tokr_ Realm'
-	const description = `Discuss and vote on ${title} proposals.`
+	const title = realmName ? `${realmName} || tokr_` : 'tokr_'
+	const description = `A protocol for financing real world assets on the Solana blockchain. Discuss and vote on ${title} proposals.`
 
 	const [pathName, setPathName] = useState('/');
 	const [showNav, setShowNav] = useState(true);
@@ -129,7 +129,9 @@ function App({ Component, pageProps }) {
 				<meta property="og:type" content="website" />
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={description} />
-				{realmInfo?.ogImage && <meta property="og:image" content={realmInfo.ogImage} />}
+				{/* {realmInfo?.ogImage && <meta property="og:image" content={realmInfo.ogImage} />} */}
+
+				<meta property="og:image" content="/images/tokr.png" />
 				<meta name="twitter:card" content="summary" />
 
 				{realmInfo?.twitter && <meta name="twitter:site" content={realmInfo.twitter} />}
