@@ -26,6 +26,7 @@ import { getGovernanceProgramVersion, MintMaxVoteWeightSource } from '@solana/sp
 import Switch from '@components/Switch'
 import { BN } from '@project-serum/anchor'
 import BigNumber from 'bignumber.js'
+import NewRnft from 'pages/dao/[symbol]/treasury/new-rnft'
 
 enum LoaderMessage {
 	CREATING_ARTIFACTS = 'Creating the DAO artifacts..',
@@ -60,6 +61,10 @@ const RealmWizard: React.FC = () => {
 	const [currentStep, setCurrentStep] = useState<RealmWizardStep>(RealmWizardStep.SELECT_MODE)
 	const [realmAddress] = useState('')
 	const [loaderMessage] = useState<LoaderMessage>(LoaderMessage.DEPLOYING_REALM)
+
+	const [addTreasury, setAddTreasury] = useState<boolean>(false)
+	const [realmId, setRealmId] = useState<any>()
+
 
 	/**
 	 * Handles and set the form data
@@ -118,7 +123,9 @@ const RealmWizard: React.FC = () => {
 		)
 
 		if (results) {
-			router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
+			setAddTreasury(true)
+			setRealmId(results.realmPk.toBase58());
+			// router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
 			return
 		}
 
@@ -182,7 +189,10 @@ const RealmWizard: React.FC = () => {
 					form.councilMint ? form.councilMint.account.decimals : undefined,
 					getTeamWallets()
 				)
-				router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+				setAddTreasury(true);
+				setRealmId(realmAddress.toBase58());
+				// router.push(fmtUrlWithCluster(`/dao/${realmAddress.toBase58()}`))
+				// router.push(fmtUrlWithCluster(`/dao/${results.realmPk.toBase58()}`))
 			} catch (error) {
 				notify({
 					type: 'error',
@@ -351,70 +361,81 @@ const RealmWizard: React.FC = () => {
 	useEffect(() => {
 		// Return shouldFireCreate to the base state
 		if (Object.values(formErrors).length) setFormErrors({})
+		console.log(form)
 	}, [form])
 
 	return (
-		<div className="relative w-full" style={ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE && !isLoading ? { maxWidth: 1800 } : undefined}>
-			<div className="pointer">
-				<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1" onClick={handleBackButtonClick}>
-					<ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-					Back
-				</a>
-			</div>
-			{isLoading ? (
-				<div className="text-center">
-					<Loading />
-					<span>{loaderMessage}</span>
-				</div>
-			) : (
-				<div className="min-h-[60vh] w-full flex-grow">{BoundStepComponent}</div>
-			)}
-			{ctl && !(ctl.isModeSelect() || isLoading) && (
+		<>
+			{addTreasury ? (
 				<>
-					<div className={`flex justify-between mt-10`}>
-						{ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
-							<div className="flex justify-left items-center">
-								<Switch
-									className="mt-2 mb-2"
-									checked={testRealmCheck}
-									onChange={(check) => {
-										setTestRealmCheck(check)
-									}}
-								/>
-								<Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
-									<StyledLabel className="mt-1.5 ml-3">Create a test DAO</StyledLabel>
-								</Tooltip>
+					<NewRnft realmName={form?.name} intake={ true } realmId={ realmId } />
+				</>
+			) : (
+				<>
+					<div className="relative w-full" style={ctl && ctl.getCurrentStep() !== RealmWizardStep.SELECT_MODE && !isLoading ? { maxWidth: 1800 } : undefined}>
+						<div className="pointer">
+							<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1" onClick={handleBackButtonClick}>
+								<ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
+								Back
+							</a>
+						</div>
+						{isLoading ? (
+							<div className="text-center">
+								<Loading />
+								<span>{loaderMessage}</span>
 							</div>
-						)}
-						{!ctl.isFirstStep() ? (
-							<Button
-								onClick={() => {
-									handleStepSelection(StepDirection.PREV)
-								}}
-								className="px-10 mr-5"
-								style={{ minWidth: '142px' }}
-							>
-								Previous
-							</Button>
 						) : (
-							<p>&nbsp;</p>
+							<div className="min-h-[60vh] w-full flex-grow">{BoundStepComponent}</div>
 						)}
+						{ctl && !(ctl.isModeSelect() || isLoading) && (
+							<>
+								<div className={`flex justify-between mt-10`}>
+									{ctl.getMode() === RealmWizardMode.BASIC && ctl.isLastStep() && (
+										<div className="flex justify-left items-center">
+											<Switch
+												className="mt-2 mb-2"
+												checked={testRealmCheck}
+												onChange={(check) => {
+													setTestRealmCheck(check)
+												}}
+											/>
+											<Tooltip content="If checked, the realm will NOT be created under the main Governance Instance">
+												<StyledLabel className="mt-1.5 ml-3">Create a test DAO</StyledLabel>
+											</Tooltip>
+										</div>
+									)}
+									{!ctl.isFirstStep() ? (
+										<Button
+											onClick={() => {
+												handleStepSelection(StepDirection.PREV)
+											}}
+											className="px-10 mr-5"
+											style={{ minWidth: '142px' }}
+										>
+											Previous
+										</Button>
+									) : (
+										<p>&nbsp;</p>
+									)}
 
-						<Button
-							onClick={() => {
-								if (ctl.isLastStep()) handleCreateRealm()
-								else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
-							}}
-							disabled={isCreateButtonDisabled()}
-							className={ctl.isLastStep() ? 'px-5' : 'px-10'}
-							style={{ minWidth: '142px' }}
-						>
-							{ctl.isLastStep() ? 'Create DAO' : 'Next'}
-						</Button>
+									<Button
+										onClick={() => {
+											if (ctl.isLastStep()) handleCreateRealm()
+											else if (onClickNext()) handleStepSelection(StepDirection.NEXT)
+										}}
+										disabled={isCreateButtonDisabled()}
+										className={ctl.isLastStep() ? 'px-5' : 'px-10'}
+										style={{ minWidth: '142px' }}
+									>
+										{ctl.isLastStep() ? 'Create DAO' : 'Next'}
+									</Button>
+								</div>
+							</>
+						)}
 					</div>
 				</>
 			)}
-		</div>
+		</>
 	)
 }
 

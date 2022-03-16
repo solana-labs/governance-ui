@@ -48,7 +48,7 @@ const SOL = 'SOL'
 const OTHER = 'OTHER'
 const NFT = 'NFT'
 
-const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
+const NewAccountForm = ({ rnft, children, title }: { rnft?: boolean | undefined, children?:any, title?:string }) => {
 	const router = useRouter()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
 	const { fmtUrlWithCluster } = useQueryContext()
@@ -91,7 +91,6 @@ const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 	}
 
 	const rnftDefaults = async () => {
-		console.log("starting!")
 		setForm({
 			mintAddress: DEFAULT_NFT_TREASURY_MINT,
 			minCommunityTokensToCreateProposal: 0,
@@ -99,7 +98,6 @@ const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 			maxVotingTime: 364,
 			voteThreshold: 1,
 		});
-		console.log("ending")
 	}
 
 	const handleCreate = async () => {
@@ -135,8 +133,6 @@ const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 				setIsLoading(false)
 				fetchRealm(realmInfo!.programId, realmInfo!.realmId)
 				router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
-
-				console.log("DONEZO", form)
 			}
 		} catch (e) {
 			console.error('Create Treasury', e)
@@ -226,7 +222,6 @@ const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 
 	useLayoutEffect(() => {
 		if (rnft === true) {
-			console.log("rnft", rnft)
 			rnftDefaults();
 		}
 	}, [rnft])
@@ -242,7 +237,7 @@ const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 			<PreviousRouteBtn />
 			<div className="border-b border-fgd-4 pb-4 pt-2">
 				<div className="flex items-center justify-between">
-					<h1>Create new treasury account</h1>
+					<h1>{ title || `Create new treasury account`}</h1>
 				</div>
 			</div>
 			{!rnft && (
@@ -288,6 +283,7 @@ const NewAccountForm = ({ rnft }: { rnft?: boolean | undefined }) => {
 					<BaseGovernanceForm formErrors={formErrors} form={form} setForm={setForm} setFormErrors={setFormErrors}></BaseGovernanceForm>
 				</>
 			)}
+			{ children }
 			<div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
 				<Button tooltipMessage={!connected ? 'Please connect your wallet' : ''} disabled={!connected || isLoading} isLoading={isLoading} onClick={handleCreate}>
 					{`Create${rnft ? ' rNFT Treasury' : ''}`}
