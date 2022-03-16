@@ -141,6 +141,7 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 
   hasMinCommunityWeight(minCommunityWeight: BN) {
+    console.log(!minCommunityWeight)
     return true
   }
   hasMinCouncilWeight() {
@@ -148,15 +149,18 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 
   canCreateProposal(config: GovernanceConfig) {
+    console.log(!config)
     return true
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
+    console.log(!realm)
     return true
   }
   canCreateGovernanceUsingCouncilTokens() {
     return false
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
+    console.log(!realm)
     return true
   }
   hasMinAmountToVote(mintPk: PublicKey) {
@@ -176,6 +180,7 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
+    console.log(!config)
     // Prefer community token owner record as proposal owner
     return this.communityTokenRecord!
     throw new Error('Not enough vote weight to create proposal')
