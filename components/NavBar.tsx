@@ -14,7 +14,7 @@ const NavBar = props => {
 				<span className="text-black">tokr_ Realms</span> requires a Web3 crypto wallet
 			</a>
 		</> }
-		<div className="grid grid-cols-12 mb-3 border border-fgd-1">
+		<div className="grid grid-cols-12 mb-3 border-b border-green">
 			<div className="col-span-12 xl:col-start-2 xl:col-span-10 flex h-20 items-center justify-between px-4 md:px-8 xl:px-4">
 				<a href="/realms" onClick={e => {
 					router.push(fmtUrlWithCluster(`/realms`))
