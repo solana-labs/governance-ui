@@ -61,6 +61,7 @@
 import Loader from '@components/Loader'
 import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
+import { route } from 'next/dist/server/router'
 import { useRouter } from 'next/router'
 import React, { useEffect, useMemo, useState } from 'react'
 
@@ -87,10 +88,13 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 		<Loader />
 	) : (
 		<div className="space-y-16">
-			<div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+			<div className="flex flex-wrap items-center justify-center">
 				{certifiedRealms?.length > 0 &&
 					certifiedRealms.map((realm: RealmInfo) => (
-						<div onClick={() => goToRealm(realm)} className="bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3" key={realm.realmId.toString()}>
+						<div onClick={(e) =>  {
+							goToRealm(realm);
+							e.preventDefault()
+						}} className="flex-shrink-0 w-full lg:max-w-xs border border-dark hover:border-green bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3" key={realm.realmId.toString()}>
 							<div className="pb-5">
 								{realm.ogImage ? (
 									<div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex items-center justify-center">
@@ -103,14 +107,25 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 							<h3 className="text-center ">{realm.displayName ?? realm.symbol}</h3>
 						</div>
 					))}
+
+				<a href="/realms/new" onClick={(e) => {
+					route.push('/realms/new')
+					e.preventDefault();
+				}} className="flex-shrink-0 w-full lg:max-w-xs border border-dark  hover:border-green bg-bkg-2 hover:bg-green text-white hover:text-dark cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3">
+					<div className="pb-5">
+						<div className="bg-[rgba(0,0,0,0.2)] h-16 w-16 flex font-bold items-center justify-center">NEW</div>
+					</div>
+					<h3 className="text-center">Create DAO</h3>
+				</a>
+
+				<>
+				</>
 			</div>
 
 			{unchartedRealms?.length > 0 && (
 				<div className="border-t border-t-green pt-16">
 					<h2>
-						<span className="text-lg">
-							Additional DAOs
-						</span>
+						<span className="text-lg">Additional DAOs</span>
 					</h2>
 					<ul className="-mt-px-children">
 						{unchartedRealms.map((realm: RealmInfo) => (
