@@ -326,7 +326,7 @@ const Proposal = () => {
 							<div className="border border-green mt-4 py-4 md:py-6">
 								<div className="px-4 md:px-6">
 									{proposal?.account.state === ProposalState.Voting ? (
-										<div className="flex items-end justify-between pb-2 border-b border-green">
+										<div className="flex flex-col pb-2 border-b border-green">
 											<h3 className="mb-0">Voting Now</h3>
 											<ProposalTimeStatus proposal={proposal?.account} />
 										</div>

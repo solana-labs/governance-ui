@@ -235,7 +235,7 @@ const AddMemberForm = ({ close }) => {
   return (
     <>
       <div className="flex justify-start items-center gap-x-3">
-        <AddMemberIcon className="w-8 mb-2" />
+        {/* <AddMemberIcon className="w-8 mb-2" /> */}
 
         <h2 className="text-xl">Add new member to {realmInfo?.displayName}</h2>
       </div>
@@ -346,7 +346,7 @@ const AddMemberForm = ({ close }) => {
           className="w-44 flex justify-center items-center"
           onClick={() => handlePropose()}
         >
-          Add proposal
+          Create Proposal to Add Member
         </Button>
       </div>
     </>

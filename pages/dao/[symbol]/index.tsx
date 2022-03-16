@@ -21,6 +21,7 @@ import { isSolanaBrowser } from '@utils/browserInfo'
 import useRouterHistory from '@hooks/useRouterHistory'
 import { buttonStyles } from '@components/Button'
 import { deconstructUri, encode } from '@utils/resolveUri'
+import { route } from 'next/dist/server/router'
 
 const compareProposals = (
 	p1: Proposal,
@@ -172,6 +173,12 @@ const REALM = () => {
 			if (realmName || realmDisplayName) setInitalLoad(false)
 		}
 	}, [filteredProposals, realmName])
+
+	useLayoutEffect(() => {
+		if (filteredProposals?.length) {
+			start()
+		}
+	}, [route])
 
 	const [proposalType0, setProposalType0] = useState<any>([])
 	const [proposalType1, setProposalType1] = useState<any>([])
