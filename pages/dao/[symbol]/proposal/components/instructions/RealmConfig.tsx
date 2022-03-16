@@ -72,7 +72,8 @@ const RealmConfig = ({
     if (
       isValid &&
       form!.governedAccount?.governance?.account &&
-      wallet?.publicKey
+      wallet?.publicKey &&
+      realm
     ) {
       const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
         form!.minCommunityTokensToCreateGovernance!,
@@ -81,8 +82,8 @@ const RealmConfig = ({
       const instruction = await createSetRealmConfig(
         realmInfo!.programId,
         realmInfo!.programVersion!,
-        realm!.pubkey,
-        realm!.account.authority!,
+        realm.pubkey,
+        realm.account.authority!,
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
         parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
         mintAmount,
@@ -235,7 +236,7 @@ const RealmConfig = ({
     },
     {
       label: 'Community mint supply factor (max vote weight)',
-      initialValue: getMintSupplyFraction(),
+      initialValue: realm ? getMintSupplyFraction() : 0,
       name: 'communityMintSupplyFactor',
       type: InstructionInputType.INPUT,
       inputType: 'number',

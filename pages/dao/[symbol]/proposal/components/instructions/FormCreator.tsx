@@ -34,7 +34,7 @@ export interface InstructionInput {
 }
 
 const InstructionForm = ({
-  inputs,
+  inputs = [],
   setFormErrors,
   setForm,
   formErrors,
