@@ -166,7 +166,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
                 `${getMintDecimalAmount(
                   deposit.mint.account,
                   deposit.vestingRate
-                ).toFormat(2)} p/mo`
+                ).toFormat(2)}p/mo`
               }
             />
           )}
