@@ -58,6 +58,11 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
+import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
+import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
+import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
+import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
+import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -350,12 +355,30 @@ const New = () => {
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
-      case Instructions.MangoMakeChangeMaxAccounts:
+      case Instructions.MangoAddOracle:
+        return (
+          <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
+        )
+      case Instructions.MangoAddSpotMarket:
+        return (
+          <MakeAddSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeAddSpotMarket>
+        )
+      case Instructions.MangoChangeMaxAccounts:
         return (
           <MakeChangeMaxAccounts
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
+        )
+      case Instructions.MangoChangePerpMarket:
+        return (
+          <MakeChangePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeChangePerpMarket>
         )
       case Instructions.MangoChangeReferralFeeParams:
         return (
@@ -363,6 +386,20 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeChangeReferralFeeParams>
+        )
+      case Instructions.MangoChangeSpotMarket:
+        return (
+          <MakeChangeSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeChangeSpotMarket>
+        )
+      case Instructions.MangoCreatePerpMarket:
+        return (
+          <MakeCreatePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeCreatePerpMarket>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>
