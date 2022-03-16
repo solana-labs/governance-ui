@@ -32,7 +32,7 @@ const AccountsCompactWrapper = () => {
         </div>
         <HoldTokensTotalPrice />
         <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
-          {governedTokenAccounts.length && <AccountsItems />}
+          {governedTokenAccounts.length > 0 && <AccountsItems />}
         </div>
       </>
     </div>

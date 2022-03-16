@@ -12,7 +12,6 @@ import {
   Governance,
   GovernanceAccountType,
   ProgramAccount,
-  RpcContext,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
@@ -23,8 +22,6 @@ import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWr
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { getProgramVersionForRealm } from '@models/registry/api'
-
 import { getTimestampFromDays } from '@tools/sdk/units'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import {
@@ -33,14 +30,10 @@ import {
   InstructionsContext,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-
-import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
@@ -63,6 +56,7 @@ import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
+import useCreateProposal from '@hooks/useCreateProposal'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -88,23 +82,12 @@ function extractGovernanceAccountFromInstructionsData(
 
 const New = () => {
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    symbol,
-    realm,
-    realmInfo,
-    realmDisplayName,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    canChooseWhoVote,
-  } = useRealm()
+  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
 
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
   const {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernances,
@@ -215,14 +198,6 @@ const New = () => {
         handleTurnOffLoaders()
         throw Error('No governance selected')
       }
-
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
       const instructionsData = instructions.map((x) => {
         return {
           data: x.serializedInstruction
@@ -244,39 +219,14 @@ const New = () => {
           governance.pubkey
         )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance.account.config
-        )
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title,
-          form.description,
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
+        proposalAddress = await handleCreateProposal({
+          title: form.title,
+          description: form.description,
+          governance: selectedGovernance,
           instructionsData,
+          voteByCouncil,
           isDraft,
-          client
-        )
+        })
 
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
