@@ -109,7 +109,7 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 					))}
 
 				<a href="/realms/new" onClick={(e) => {
-					route.push('/realms/new')
+					router.push('/realms/new')
 					e.preventDefault();
 				}} className="flex-shrink-0 w-full lg:max-w-xs border border-dark  hover:border-green bg-bkg-2 hover:bg-green text-white hover:text-dark cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3">
 					<div className="pb-5">
