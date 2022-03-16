@@ -41,17 +41,19 @@ const ProposalCard = ({ proposalPk, proposal, cta }: ProposalCardProps) => {
 				<a>
 					<StyledCardWrapper>
 						<div className="p-4 flex items-center justify-between">
-							<div className="flex-grow">
-								<div className="flex items-start justify-between">
-									<h3 className="text-fgd-1">{proposal.name}</h3>
-									<div className="flex items-center pl-4 pt-1">
+							<div className="flex-grow flex">
+								<div className="flex-grow flex items-center justify-between">
+									<div className="flex flex-col">
+										<h3 className="text-fgd-1">{proposal.name}</h3>
+										<ProposalTimeStatus proposal={proposal} />
+									</div>
+									<div className="flex-shrink-0 flex items-center px-4 pt-1">
 										<ProposalStateBadge cta={cta} proposalPk={proposalPk} proposal={proposal} open={false} />
 										{/* <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" /> */}
 									</div>
 								</div>
-								<ProposalTimeStatus proposal={proposal} />
 							</div>
-							<span className="default-transition h-6 ml-2 text-primary-light w-6 flex-shrink-0">&gt;</span>
+							<span className="default-transition h-6 ml-2 text-primary-light w-6 flex-shrink-0 flex items-center">&gt;</span>
 						</div>
 						{/* {proposal.state === ProposalState.Voting && (
 							<div className="border-t border-fgd-4 flex flex-col lg:flex-row mt-2 p-4">
