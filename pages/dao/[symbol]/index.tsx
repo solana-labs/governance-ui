@@ -138,6 +138,7 @@ const REALM = () => {
 	// console.log('governance page tokenRecord', wallet?.connected && ownTokenRecord)
 
 	const [tokrProposals, setTokrProposals] = useState<any>([])
+	const [proposalTypeNA, setProposalTypeNA] = useState<any>([])
 
 	const tokrProposalsTemp = async () =>
 		filteredProposals.filter((proposal) => {
@@ -149,9 +150,18 @@ const REALM = () => {
 			}
 		})
 
+	const otherProposalsTemp = async () =>
+		filteredProposals.filter((proposal) => {
+			if ( proposal[1].account.descriptionLink.charAt(0) !== '{' ) {
+				return proposal
+			}
+		})
+
 	const start = async () => {
 		const getTokrProposals = await tokrProposalsTemp()
 		setTokrProposals(getTokrProposals)
+		const getOtherProposals = await otherProposalsTemp()
+		setProposalTypeNA(getOtherProposals)
 		if (realmName || realmDisplayName) setInitalLoad(false)
 	}
 
@@ -169,9 +179,9 @@ const REALM = () => {
 	// const [proposalType3, setProposalType3] = useState<any>([])
 	// const [proposalType4, setProposalType4] = useState<any>([])
 
-	useEffect(() => {
-		console.log("proposalType1", proposalType1);
-	}, [proposalType1]);
+	// useEffect(() => {
+	// 	console.log("proposalTypeNA", proposalTypeNA);
+	// }, [proposalTypeNA]);
 
 	useLayoutEffect(() => {
 		setProposalType0(
@@ -191,7 +201,13 @@ const REALM = () => {
 			})
 		)
 
-		console.log("tokrProposals", tokrProposals);
+		// setProposalTypeNA(filteredProposals);
+
+		// tokrProposals.filter((proposal) => {
+		// 	if (proposal[1].account?.meta?.type === 0) return proposal
+		// })
+
+		// console.log("tokrProposals", tokrProposals);
 		// setProposalType3(
 		// 	tokrProposals.filter((proposal) => {
 		// 		if (proposal[1].account?.meta?.type === 3) return proposal
@@ -292,7 +308,7 @@ const REALM = () => {
 						) : (
 							<div className="mt-16">
 								<div className="flex items-center justify-between">
-									<h2 className="text-2xl uppercase">{`General DAO Proposals`}</h2>
+									<h2 className="text-2xl uppercase">{`General Proposals`}</h2>
 									{canCreate && (
 										<div className="flex-shrink-0">
 											<NewProposalBtn string={`type=0`} addIcon title="Create a General Proposal">
@@ -317,6 +333,25 @@ const REALM = () => {
 								)}
 							</div>
 						)}
+
+						{ proposalTypeNA?.length === 0 ? (
+							<></>
+						) : (
+							<div className="mt-16">
+								<div className="flex items-center justify-between">
+									<h2 className="text-2xl uppercase">DAO Proposals</h2>
+								</div>
+
+								<p className="pb-4">Other types of proposals for the {realmDisplayName} DAO.</p>
+
+								<div className="-mt-px-children">
+									{proposalTypeNA.map(([k, v]) => {
+										return <ProposalCard key={k} proposalPk={new PublicKey(k)} proposal={v.account} />
+									})}
+								</div>
+							</div>
+						)}
+
 					</div>
 					<div className="col-span-12 md:col-span-5 lg:col-span-4 border border-green">
 						<div>
