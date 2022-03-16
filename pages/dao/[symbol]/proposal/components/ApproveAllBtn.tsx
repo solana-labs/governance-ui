@@ -1,20 +1,20 @@
 import useRealm from '@hooks/useRealm'
 import React, { useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
-import Tooltip from '@components/Tooltip'
 import {
   ProposalState,
   Vote,
   withCastVote,
   YesNoVote,
 } from '@solana/spl-governance'
-import { BadgeCheckIcon } from '@heroicons/react/outline'
+import { CheckCircleIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { sendSignedTransaction } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
+import { LinkButton } from '@components/Button'
 
 const ApproveAllBtn = () => {
   const wallet = useWalletStore((s) => s.current)
@@ -37,12 +37,6 @@ const ApproveAllBtn = () => {
       ),
     [proposals, ownVoteRecordsByProposal]
   )
-
-  const tooltipContent = !connected
-    ? 'Connect your wallet to approve proposals'
-    : votingProposals.length === 0
-    ? 'There is no proposals to vote on'
-    : ''
 
   const canApproveProposals = connected && votingProposals.length > 0
 
@@ -116,33 +110,19 @@ const ApproveAllBtn = () => {
     setIsLoading(false)
   }
 
-  return (
-    <>
-      <Tooltip content={tooltipContent}>
-        <div
-          className={
-            !canApproveProposals ? 'cursor-not-allowed opacity-60' : ''
-          }
-        >
-          {isLoading ? (
-            <Loading></Loading>
-          ) : (
-            <a
-              className={`${
-                !canApproveProposals
-                  ? 'cursor-not-allowed pointer-events-none'
-                  : 'cursor-pointer hover:bg-bkg-3'
-              } default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
-              onClick={approveAll}
-            >
-              <BadgeCheckIcon className="h-5 mr-1.5 text-primary-light w-5" />
-              Approve All
-            </a>
-          )}
-        </div>
-      </Tooltip>
-    </>
-  )
+  return canApproveProposals ? (
+    isLoading ? (
+      <Loading />
+    ) : (
+      <LinkButton
+        className={`default-transition flex items-center text-primary-light text-sm hover:text-primary-dark hover:opacity-100`}
+        onClick={approveAll}
+      >
+        <CheckCircleIcon className="h-5 mr-1 w-5" />
+        Approve All
+      </LinkButton>
+    )
+  ) : null
 }
 
 export default ApproveAllBtn
