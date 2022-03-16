@@ -7,7 +7,7 @@ import { precision } from '@utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import {
-  FriktionDepositForm,
+  FriktionWithdrawForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
@@ -16,11 +16,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFriktionDepositInstruction } from '@utils/instructions/Friktion'
+import { getFriktionWithdrawInstruction } from '@utils/instructions/Friktion'
 import Select from '@components/inputs/Select'
 import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
 
-const FriktionDeposit = ({
+const FriktionWithdraw = ({
   index,
   governance,
 }: {
@@ -33,7 +33,7 @@ const FriktionDeposit = ({
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<FriktionDepositForm>({
+  const [form, setForm] = useState<FriktionWithdrawForm>({
     amount: undefined,
     governedTokenAccount: undefined,
     voltVaultId: '',
@@ -82,7 +82,7 @@ const FriktionDeposit = ({
   }
 
   async function getInstruction(): Promise<UiInstruction> {
-    return getFriktionDepositInstruction({
+    return getFriktionWithdrawInstruction({
       schema,
       form,
       amount: form.amount ?? 0,
@@ -183,4 +183,4 @@ const FriktionDeposit = ({
   )
 }
 
-export default FriktionDeposit
+export default FriktionWithdraw
