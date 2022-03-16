@@ -29,8 +29,10 @@ import { checkArDataKey, getArData, setArData } from '@hooks/useLocalStorage'
 import useWalletStore from 'stores/useWalletStore'
 import { useHasVoteTimeExpired } from '@hooks/useHasVoteTimeExpired'
 import { constructUri, decode, deconstructUri, encode } from '@utils/resolveUri'
+import router, { useRouter } from 'next/router'
 
 const Proposal = () => {
+	const router = useRouter();
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
 	const { fmtUrlWithCluster } = useQueryContext()
 	const { governance } = useWalletStore((s) => s.selectedProposal)
@@ -42,6 +44,14 @@ const Proposal = () => {
 	const [proposalType, setProposalType] = useState<Number>(0)
 	const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal?.account)
 	const [propertyDetails, setPropertyDetails] = useState<any>()
+	const [intake, setIntake] = useState<boolean>(false);
+
+	useLayoutEffect(() => {
+		if (router.query?.initial) {
+			setIntake(true)
+		}
+	}, [router])
+
 
 	const showResults = proposal && proposal.account.state !== ProposalState.Cancelled && proposal.account.state !== ProposalState.Draft
 
@@ -108,17 +118,20 @@ const Proposal = () => {
 			const description = await resolveProposalDescription(descriptionLink)
 			setDescription(description)
 
-			setInitalLoad(false);
-			setGenericProposal(true);
+			if (!intake) {
+				setInitalLoad(false);
+				setGenericProposal(true);
+			}
 		}
 		if (descriptionLink) {
 			handleResolveDescription()
 			if (descriptionLink.charAt(0) === '{') {
 				setDescriptionObj([JSON.parse(descriptionLink)])
 			} else {
-
-				setInitalLoad(false);
-				setGenericProposal(true);
+				if (!intake) {
+					setInitalLoad(false);
+					setGenericProposal(true);
+				}
 			}
 		}
 	}, [descriptionLink])

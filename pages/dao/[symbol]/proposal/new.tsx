@@ -71,7 +71,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = (props) => {
-	const _prepopulateForDemos = false
+	const _prepopulateForDemos = true
 	const router = useRouter()
 	const { history } = useRouterHistory()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
@@ -364,7 +364,7 @@ const New = (props) => {
 
 				proposalAddress = await createProposal(rpcContext, realm, selectedGovernance.pubkey, ownTokenRecord.pubkey, form.title, form.description, proposalMint, selectedGovernance?.account?.proposalCount, instructionsData, isDraft, client)
 
-				const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
+				const url = fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}?initial=true`)
 
 				setSubmittingStep([...submittingStep, `Proposal for ${propertyData.name} has been added to the Tokr Realm`])
 				setSubmittingStep([...submittingStep, `Congrats! Your ${propertyData.name} Proposal has been successfully created!`])
@@ -934,7 +934,7 @@ const New = (props) => {
 				<Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
 					<a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">&lt; Back</a>
 				</Link>
-				<div className="mt-8 ml-4 -mb-5 relative z-10 m-width-full">
+				<div className="mt-8 ml-4 -mb-3 relative z-10 m-width-full">
 					{/* <a href={realmUrl} target="_blank" rel="noopener noreferrer" className="bg-dark inline-block">
 					<span className="flex items-center cursor-pointer">
 						<span className="flex flex-col md:flex-row items-center pb-3 md:pb-0">
@@ -944,7 +944,7 @@ const New = (props) => {
 				</a> */}
 
 					<h1 className="bg-dark inline-block">
-						<span className="ml-4 pr-8 text-xl uppercase">{proposalType === 0 ? <>{realmDisplayName} Proposal</> : <>{proposalType === 1 ? `Property Proposal ${realmDisplayName ? ` for ${realmDisplayName}` : ''}` : `${propertyData?.name ? `${propertyData.name}` : ' Property'} Certification Propsal`}</>}</span>
+						<span className="ml-4 pr-8 text-sm uppercase">{proposalType === 0 ? <>{realmDisplayName} Proposal</> : <>{proposalType === 1 ? `Property Proposal ${realmDisplayName ? ` for ${realmDisplayName}` : ''}` : `${propertyData?.name ? `${propertyData.name}` : ' Property'} Certification Propsal`}</>}</span>
 					</h1>
 				</div>
 				<div className="grid grid-cols-12 gap-4">
