@@ -87,7 +87,7 @@ const VotePanel = (props) => {
 		<>
 			{isPanelVisible && (
 				<div className={props.simple ? '' : `bg-bkg-2 p-4 md:p-6 space-y-4` + props.className ? ' ' + props.className : ''}>
-					{!props.simple && props.isVoting !== false && <h3 className="mb-4 text-center">{actionLabel}</h3>}
+					{(!props.hideVote && isVoting ) && <> {!props.simple && props.isVoting !== false && <h3 className="mb-4 text-center">{actionLabel}</h3>} </>}
 					{props.isVoting === false ? `You voted ${ownVoteRecord?.account?.vote?.approveChoices?.length ? 'YES' : 'NO'}` : ''}
 					<div className={props.simple ? '' : `items-center justify-center flex w-full gap-5` + props.childClasses ? ' ' + props.childClasses : ''}>
 						{isVoteCast && connected ? (
@@ -101,15 +101,19 @@ const VotePanel = (props) => {
 						) : (
 							<>
 								{isVoting && (
-									<div className="w-full flex justify-between items-center gap-5">
-										<Button tooltipMessage={voteTooltipContent} className="w-1/2" onClick={() => handleShowVoteModal(YesNoVote.Yes)} disabled={!isVoteEnabled}>
-											Vote Yes
-										</Button>
+									<>
+										{!props.hideVote && (
+											<div className="w-full flex justify-between items-center gap-5">
+												<Button tooltipMessage={voteTooltipContent} className="w-1/2" onClick={() => handleShowVoteModal(YesNoVote.Yes)} disabled={!isVoteEnabled}>
+													Vote Yes
+												</Button>
 
-										<Button tooltipMessage={voteTooltipContent} className="w-1/2" onClick={() => handleShowVoteModal(YesNoVote.No)} disabled={!isVoteEnabled}>
-											Vote No
-										</Button>
-									</div>
+												<Button tooltipMessage={voteTooltipContent} className="w-1/2" onClick={() => handleShowVoteModal(YesNoVote.No)} disabled={!isVoteEnabled}>
+													Vote No
+												</Button>
+											</div>
+										)}
+									</>
 								)}
 							</>
 						)}

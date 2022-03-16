@@ -351,7 +351,7 @@ const Proposal = () => {
 					{canCreateAction && (
 						<>
 							<div className="border border-green p-4 md:p-6 -mt-px">
-								<VotePanel className={!isVoting === true ? 'text-center' : ''} isVoting={isVoting ? true : false} />
+								<VotePanel hideVote={true} className={!isVoting === true ? 'text-center' : ''} isVoting={isVoting ? true : false} />
 							</div>
 							<div className="hidden">
 								<ProposalActionsPanel />

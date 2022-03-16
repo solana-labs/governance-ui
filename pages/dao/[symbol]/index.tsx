@@ -253,7 +253,7 @@ const REALM = () => {
 
 						{proposalType1.length > 0 || proposalType2.length > 0 ? (
 							<>
-								<div className={`space-y-16${canCreate ? ' mt-16' : ''}`}>
+								<div className={`space-y-16${canCreate ? ' mt-2' : ''}`}>
 									{proposalType1.length > 0 && (
 										<div>
 											<div>
