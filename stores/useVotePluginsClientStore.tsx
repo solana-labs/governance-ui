@@ -51,7 +51,7 @@ export class VotingClient {
     const realm = this.realm
     const walletPk = this.walletPk
     if (
-      !realm!.account.config.useCommunityVoterWeightAddin ||
+      !realm?.account.config.useCommunityVoterWeightAddin ||
       typeof this.client === 'undefined'
     ) {
       return
@@ -116,7 +116,7 @@ export class VotingClient {
     const realm = this.realm
     const walletPk = this.walletPk!
     if (
-      !realm!.account.config.useCommunityVoterWeightAddin ||
+      !realm?.account.config.useCommunityVoterWeightAddin ||
       typeof this.client === 'undefined'
     ) {
       return
@@ -146,6 +146,42 @@ export class VotingClient {
         })
       )
     }
+  }
+  withRelinquishVote = async (instructions, proposalPk: PublicKey) => {
+    const realm = this.realm
+    const walletPk = this.walletPk!
+    console.log(walletPk, instructions, proposalPk)
+    if (
+      !realm?.account.config.useCommunityVoterWeightAddin ||
+      typeof this.client === 'undefined'
+    ) {
+      return
+    }
+    // if (this.client instanceof NftVoterClient) {
+    //   const clientProgramId = this.client!.program.programId
+    //   const { registrar } = await getNftRegistrarPDA(
+    //     realm!.pubkey,
+    //     realm!.account.communityMint,
+    //     this.client!.program.programId
+    //   )
+    // const { voterWeightPk } = await this._withHandleNftVoterWeight(
+    //     realm!,
+    //     walletPk,
+    //     clientProgramId,
+    //     instructions
+    //   )
+    //   instructions.push(
+    //     this.client.program.instruction.relinquishNftVote(proposalPk, {
+    //       accounts: {
+    //         registrar,
+    //         voterWeightRecord: voterWeightPk,
+    //         governingTokenOwner: walletPk,
+    //         payer: walletPk,
+    //         systemProgram: SYSTEM_PROGRAM_ID,
+    //       },
+    //     })
+    //   )
+    // }
   }
   _withHandleNftVoterWeight = async (
     realm: ProgramAccount<Realm>,
@@ -190,42 +226,6 @@ export class VotingClient {
     }
 
     return { voterWeightPk, voterWeightRecordBump }
-  }
-  withRelinquishVote = async (instructions, proposalPk: PublicKey) => {
-    const realm = this.realm
-    const walletPk = this.walletPk!
-    console.log(walletPk, instructions, proposalPk)
-    if (!realm!.account.config.useCommunityVoterWeightAddin) {
-      return
-    }
-    if (typeof this.client === 'undefined') {
-      return
-    }
-    // if (this.client instanceof NftVoterClient) {
-    //   const clientProgramId = this.client!.program.programId
-    //   const { registrar } = await getNftRegistrarPDA(
-    //     realm!.pubkey,
-    //     realm!.account.communityMint,
-    //     this.client!.program.programId
-    //   )
-    // const { voterWeightPk } = await this._withHandleNftVoterWeight(
-    //     realm!,
-    //     walletPk,
-    //     clientProgramId,
-    //     instructions
-    //   )
-    //   instructions.push(
-    //     this.client.program.instruction.relinquishNftVote(proposalPk, {
-    //       accounts: {
-    //         registrar,
-    //         voterWeightRecord: voterWeightPk,
-    //         governingTokenOwner: walletPk,
-    //         payer: walletPk,
-    //         systemProgram: SYSTEM_PROGRAM_ID,
-    //       },
-    //     })
-    //   )
-    // }
   }
 }
 interface UseVotePluginsClientStore extends State {

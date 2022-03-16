@@ -22,7 +22,7 @@ export function useVotingPlugins() {
   } = useVotePluginsClientStore()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const currentPluginPk = config?.account?.communityVoterWeightAddin
   useEffect(() => {
@@ -33,25 +33,29 @@ export function useVotingPlugins() {
   }, [connection.endpoint, wallet?.connected, realm?.pubkey.toBase58()])
 
   useEffect(() => {
-    if (realm && client) {
-      handleSetVsrRegistrar(client, realm)
-    }
-    if (realm && nftClient) {
-      handleSetNftRegistrar(nftClient, realm)
-    }
-    if (currentPluginPk && vsrPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (
+      vsrClient &&
+      currentPluginPk &&
+      vsrPluginsPks.includes(currentPluginPk.toBase58())
+    ) {
+      handleSetVsrRegistrar(vsrClient, realm)
       handleSetCurrentRealmVotingClient({
-        client,
+        client: vsrClient,
         realm,
         walletPk: wallet?.publicKey,
       })
     }
-    if (currentPluginPk && nftPluginsPks.includes(currentPluginPk.toBase58())) {
+    if (
+      nftClient &&
+      currentPluginPk &&
+      nftPluginsPks.includes(currentPluginPk.toBase58())
+    ) {
+      handleSetNftRegistrar(nftClient!, realm)
       handleSetCurrentRealmVotingClient({
-        client: undefined,
-        realm: undefined,
-        walletPk: undefined,
+        client: nftClient,
+        realm,
+        walletPk: wallet?.publicKey,
       })
     }
-  }, [currentPluginPk, client, nftClient])
+  }, [currentPluginPk, vsrClient, nftClient])
 }
