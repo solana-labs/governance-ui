@@ -19,7 +19,7 @@ export const calculatePct = (c: BN, total?: BN) => {
 }
 
 export const fmtTokenAmount = (c: BN, decimals?: number) =>
-  c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber() || 0
+  c?.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber() || 0
 
 dayjs.extend(relativeTime)
 //@ts-ignore

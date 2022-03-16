@@ -40,7 +40,7 @@ export class VotingClient {
   client: VsrClient | NftVoterClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
-  currentVoterNftsAccounts: Metadata[]
+  currentVoterNftsAccounts: { metadata: Metadata; tokenAddress: PublicKey }[]
   constructor({ client, realm, walletPk }: VotingClientProps) {
     this.client = client
     this.realm = realm
@@ -106,26 +106,17 @@ export class VotingClient {
       }[] = []
       for (const nft of this.currentVoterNftsAccounts) {
         remainingAccounts.push({
-          pubkey: new PublicKey(nft.data.mint),
+          pubkey: nft.tokenAddress,
           isSigner: false,
           isWritable: false,
         })
-        const [metadataPk] = await PublicKey.findProgramAddress(
-          [
-            nft.pubkey.toBuffer(),
-            new PublicKey(
-              'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s'
-            ).toBuffer(),
-            new PublicKey(nft.data.mint).toBuffer(),
-          ],
-          clientProgramId
-        )
         remainingAccounts.push({
-          pubkey: metadataPk,
+          pubkey: nft.metadata.pubkey,
           isSigner: false,
           isWritable: false,
         })
       }
+      console.log(remainingAccounts.map((x) => x.pubkey.toBase58()))
       instructions.push(
         this.client.program.instruction.updateVoterWeightRecord(
           { [type]: {} },
@@ -170,12 +161,12 @@ export class VotingClient {
       }[] = []
       for (const nft of this.currentVoterNftsAccounts) {
         remainingAccounts.push({
-          pubkey: new PublicKey(nft.data.mint),
+          pubkey: nft.tokenAddress,
           isSigner: false,
           isWritable: false,
         })
         remainingAccounts.push({
-          pubkey: nft.pubkey,
+          pubkey: nft.metadata.pubkey,
           isSigner: false,
           isWritable: false,
         })
@@ -183,7 +174,7 @@ export class VotingClient {
           [
             Buffer.from('nft-vote-record'),
             proposalPk.toBuffer(),
-            new PublicKey(nft.data.mint).toBuffer(),
+            new PublicKey(nft.metadata.data.mint).toBuffer(),
           ],
           clientProgramId
         )

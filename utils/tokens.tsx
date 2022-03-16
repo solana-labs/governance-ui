@@ -406,7 +406,15 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
     for (let i = 0; i < data.length; i++) {
       try {
         const val = (await axios.get(data[i].data.uri)).data
-        arr.push({ val, mint: data[i].mint })
+        const tokenAccounts = await getTokenAccountsByMint(
+          connection,
+          data[i].mint
+        )
+        arr.push({
+          val,
+          mint: data[i].mint,
+          tokenAddress: tokenAccounts[1].publicKey.toBase58(),
+        })
       } catch (e) {
         console.log(e)
       }

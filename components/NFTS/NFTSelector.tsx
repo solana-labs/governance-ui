@@ -57,14 +57,14 @@ function NFTSelector(
     let nfts = await getNfts(connection.current, ownerPk)
     if (collectionsPks.length) {
       const resp = (
-        await Promise.all(nfts.map((x) => getIsFromCollection(x.mint)))
-      ).filter((x) => x instanceof Metadata) as Metadata[]
-      nfts = nfts.filter((x) => resp.find((j) => j.data.mint === x.mint))
-      const voterNfts: Metadata[] = []
-      for (const nft of resp) {
-        voterNfts.push(nft)
-      }
-      client._setCurrentVoterNfts(voterNfts)
+        await Promise.all(
+          nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
+        )
+      ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
+      nfts = nfts.filter((x) =>
+        resp.find((j) => j.tokenAddress.toBase58() === x.tokenAddress)
+      )
+      client._setCurrentVoterNfts(resp)
     }
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
@@ -72,14 +72,18 @@ function NFTSelector(
     setNfts(nfts)
     setIsLoading(false)
   }
-  const getIsFromCollection = async (mint: string) => {
+  const getIsFromCollection = async (mint: string, tokenAddress: string) => {
     const metadataAccount = await Metadata.getPDA(mint)
     const metadata = await Metadata.load(connection.current, metadataAccount)
     return (
-      metadata.data.collection?.key &&
-      collectionsPks.includes(metadata.data.collection?.key) &&
-      metadata.data.collection.verified &&
-      metadata
+      !!(
+        metadata.data.collection?.key &&
+        collectionsPks.includes(metadata.data.collection?.key) &&
+        metadata.data.collection.verified
+      ) && {
+        tokenAddress: new PublicKey(tokenAddress),
+        metadata: metadata as Metadata,
+      }
     )
   }
   useImperativeHandle(ref, () => ({

@@ -100,7 +100,7 @@ export const createProposal = async (
     instructions,
     'createProposal'
   )
-  console.log(voterWeight?.toBase58(), '@#$@#$$@#$')
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,
