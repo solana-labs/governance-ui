@@ -413,7 +413,9 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
         arr.push({
           val,
           mint: data[i].mint,
-          tokenAddress: tokenAccounts[1].publicKey.toBase58(),
+          tokenAddress: tokenAccounts
+            .find((x) => x.account.owner.toBase58() === ownerPk.toBase58())!
+            .publicKey.toBase58(),
         })
       } catch (e) {
         console.log(e)

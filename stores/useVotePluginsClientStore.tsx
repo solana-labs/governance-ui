@@ -116,10 +116,7 @@ export class VotingClient {
           isWritable: false,
         })
       }
-      console.log({
-        registrar: registrar.toBase58(),
-        voterWeightPk: voterWeightPk.toBase58(),
-      })
+
       instructions.push(
         this.client.program.instruction.updateVoterWeightRecord(
           { [type]: {} },
