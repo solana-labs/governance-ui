@@ -155,8 +155,53 @@ export default function useGovernanceAssets() {
         realm?.account.config.useCommunityVoterWeightAddin,
     },
     {
+      id: Instructions.MangoChangePerpMarket,
+      name: 'Mango: Change Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeSpotMarket,
+      name: 'Mango: Change Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeReferralFeeParams,
+      name: 'Mango: Change Referral Fee Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeMaxAccounts,
+      name: 'Mango: Change Max Accounts',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoAddOracle,
+      name: 'Mango: Add Oracle',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoAddSpotMarket,
+      name: 'Mango: Add Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoCreatePerpMarket,
+      name: 'Mango: Create Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.Mint,
+      name: 'Mint Tokens',
+      isVisible: canUseMintInstruction,
+    },
+    {
       id: Instructions.CreateAssociatedTokenAccount,
       name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.Base64,
+      name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -200,11 +245,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
-      id: Instructions.Mint,
-      name: 'Mint Tokens',
-      isVisible: canUseMintInstruction,
-    },
-    {
       id: Instructions.RealmConfig,
       name: 'Realm Config',
       isVisible: canUseAuthorityInstruction,
@@ -223,21 +263,6 @@ export default function useGovernanceAssets() {
       id: Instructions.CreateNftPluginMaxVoterWeight,
       name: 'Create NFT plugin max voter weight',
       isVisible: canUseAuthorityInstruction,
-    },
-    {
-      id: Instructions.Base64,
-      name: 'Execute Custom Instruction',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MangoMakeChangeMaxAccounts,
-      name: 'Mango - change max accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeReferralFeeParams,
-      name: 'Mango - change referral fee params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.None,

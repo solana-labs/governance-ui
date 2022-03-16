@@ -112,7 +112,7 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
         label="min instruction hold up time (days)"
         value={form.minInstructionHoldUpTime}
         type="number"
-        min={0.01}
+        min={0}
         name="minInstructionHoldUpTime"
         onBlur={validateMinMax}
         onChange={(evt) =>

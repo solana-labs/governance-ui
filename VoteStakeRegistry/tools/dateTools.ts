@@ -22,12 +22,11 @@ export function getFormattedStringFromDays(
   const monthSuffix = months > 1 ? 'months' : 'month'
   const daysSuffix = days > 1 ? 'days' : 'day'
   const yearsDisplay =
-    years > 0 ? years + ` ${fullFormat ? yearSuffix : 'y'} ` : ''
+    years > 0 ? years + `${fullFormat ? yearSuffix : 'y'} ` : ''
   const monthsDisplay =
-    months > 0 ? months + ` ${fullFormat ? monthSuffix : 'm'} ` : ''
-  const daysDisplay =
-    days > 0 ? days + ` ${fullFormat ? daysSuffix : 'd'} ` : ''
-  const hoursDisplay = hours > 0 ? ` ${hoursInt} h ${minutes} min` : ''
+    months > 0 ? months + `${fullFormat ? monthSuffix : 'm'} ` : ''
+  const daysDisplay = days > 0 ? days + `${fullFormat ? daysSuffix : 'd'} ` : ''
+  const hoursDisplay = hours > 0 ? `${hoursInt}h ${minutes}min` : ''
   const text =
     !years && !months && days <= 1
       ? daysDisplay + hoursDisplay

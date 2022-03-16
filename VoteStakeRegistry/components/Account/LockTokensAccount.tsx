@@ -203,7 +203,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         </div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="leading-none mb-0">
-            Your Tokens{' '}
+            Your Account{' '}
             <span className="font-normal text-fgd-2 text-xs">
               ({realmInfo?.displayName})
             </span>
@@ -224,7 +224,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         )}
         {connected ? (
           <div>
-            <div className="grid grid-cols-3 grid-flow-row gap-4 pb-8">
+            <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
               {isLoading ? (
                 <>
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
