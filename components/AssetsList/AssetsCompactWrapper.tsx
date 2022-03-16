@@ -9,6 +9,7 @@ import AssetOverview from './AssetOverview'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import useWalletStore from 'stores/useWalletStore'
+import { rem } from '@utils/funStuff'
 const NEW_PROGRAM_VIEW = `/program/new`
 
 const AssetsCompactWrapper = () => {
@@ -72,7 +73,7 @@ const AssetsCompactWrapper = () => {
                 </div>
               </Tooltip>
             </h3>
-            <div style={{ maxHeight: '350px' }}>
+            <div style={{ maxHeight: rem(350) }}>
               <MembersItems></MembersItems>
             </div>
           </>

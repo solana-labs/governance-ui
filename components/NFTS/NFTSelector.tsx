@@ -12,6 +12,7 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
+import { rem } from '@utils/funStuff'
 
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
@@ -64,7 +65,7 @@ function NFTSelector(
   return (
     <>
       <div
-        style={{ maxHeight: '350px', minHeight: '100px' }}
+        style={{ maxHeight: rem(350), minHeight: rem(100) }}
         className="overflow-y-auto"
       >
         {!isLoading ? (

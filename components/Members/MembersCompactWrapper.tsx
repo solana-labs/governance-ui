@@ -11,6 +11,7 @@ import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import Modal from '@components/Modal'
 import AddMemberForm from './AddMemberForm'
+import { rem } from '@utils/funStuff'
 
 const MembersCompactWrapper = () => {
   const {
@@ -67,7 +68,7 @@ const MembersCompactWrapper = () => {
 					)}
 				</h3>
 
-				<div className="pt-2 border-b border-green" style={{ maxHeight: '350px' }}>
+				<div className="pt-2 border-b border-green" style={{ maxHeight: rem(350) }}>
 					<MembersItems activeMembers={activeMembers} />
 				</div>
 

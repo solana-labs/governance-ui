@@ -13,6 +13,7 @@ import { PublicKey } from '@solana/web3.js'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { rem } from '@utils/funStuff'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
 import React, { useEffect, useMemo, useState } from 'react'
@@ -123,7 +124,7 @@ const MemberOverview = () => {
 			</div>
 			<div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">Recent votes</div>
 			{/* TODO virtual scroll */}
-			<div style={{ maxHeight: '350px' }} className="overflow-auto">
+			<div style={{ maxHeight: rem(350) }} className="overflow-auto">
 				{ownVoteRecords.map((x) => (
 					<a href={fmtUrlWithCluster(`/dao/${symbol}/proposal/${x.proposalPublicKey}`)} rel="noopener noreferrer" className="border border-fgd-4 default-transition hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex" key={x.proposalPublicKey}>
 						<div className="w-full pr-6">

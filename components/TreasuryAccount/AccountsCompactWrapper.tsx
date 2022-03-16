@@ -12,6 +12,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { useRouter } from 'next/router'
 import Tooltip from '@components/Tooltip'
 import { ArrowsExpandIcon } from '@heroicons/react/outline'
+import { rem } from '@utils/funStuff'
 
 const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -67,7 +68,7 @@ const AccountsCompactWrapper = () => {
 					</div>
 				</h3>
 				<HoldTokensTotalPrice />
-				<div style={{ maxHeight: '350px' }} className="overflow-y-auto">
+				<div style={{ maxHeight: rem(350) }} className="overflow-y-auto">
 					<AccountsItems />
 				</div>
 			</>

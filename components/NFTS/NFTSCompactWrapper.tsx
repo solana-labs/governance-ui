@@ -9,6 +9,7 @@ import { PlusIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
+import { rem } from '@utils/funStuff'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -58,7 +59,7 @@ const NFTSCompactWrapper = () => {
 								<PlusIcon />
 							</div>
 						</h3>
-						<div className="overflow-y-auto" style={{ maxHeight: '210px', minHeight: '50px' }}>
+						<div className="overflow-y-auto" style={{ maxHeight: rem(210), minHeight: rem(50) }}>
 							{isLoading ? (
 								<Loading></Loading>
 							) : realmNfts.length ? (

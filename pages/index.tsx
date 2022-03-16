@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useState } from 'react'
 import { useRouter } from 'next/router'
 import useWalletStore from 'stores/useWalletStore'
 import { NavButton } from '@components/Button'
@@ -50,6 +50,10 @@ const Index = () => {
 		router.push(fmtUrlWithCluster(`/realms/new`))
 	}
 
+	useLayoutEffect(() => {
+		document?.querySelector("html")?.classList.add('u-fs-4')
+	},[])
+
 	return (
 		<a
 			href="/realms"
@@ -65,6 +69,11 @@ const Index = () => {
 					<div className="py-2">Tokenize Real Estate v0.1.0 Beta</div>
 					<div className="pb-4">Open Source Software</div>
 					<div>************************************</div>
+				</div>
+				<div className="pb-8">
+					<p>
+						A protocol for financing real world assets on the Solana blockchain
+					</p>
 				</div>
 				<div>
 					&lt; ENTER &gt;
