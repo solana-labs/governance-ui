@@ -84,7 +84,7 @@ const RealmConfig = ({
         realm!.pubkey,
         realm!.account.authority!,
         form?.removeCouncil ? undefined : realm?.account.config.councilMint,
-        parseMintSupplyFraction(form!.maxCommunityVoterWeightAddin),
+        parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
         mintAmount,
         form!.communityVoterWeightAddin
           ? new PublicKey(form!.communityVoterWeightAddin)
