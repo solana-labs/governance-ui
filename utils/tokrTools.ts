@@ -13,7 +13,7 @@ import { UiInstruction } from './uiTypes/proposalCreationTypes'
 
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
 
-const TOKR_PROGRAM = new PublicKey('9e78qsrsE2e5Q97T1biobry8mSot8NorEDJHJnMa5CpN')
+const TOKR_PROGRAM = new PublicKey('Gwhqz24L34S9YUFqHKuNYnNd2wyWBEDUyf1w2aa62ciR')
 
 export class TokrizeArgs {
 	instruction = 0
@@ -101,7 +101,7 @@ export async function getTokrInstruction({
 
     const data = Buffer.from(borsh.serialize(
         TokrizeSchema,
-        new TokrizeArgs({ 
+        new TokrizeArgs({
           name:  String(form.name),
           symbol: String(form.symbol),
           uri: String(form.metaDataUri),
@@ -109,19 +109,19 @@ export async function getTokrInstruction({
           mint_bump: mintBump
         })
     ));
-    
+
 
     const instruction = new TransactionInstruction(
     {
         keys: [
             {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true},           // payer
-            {pubkey: destinationAccount, isSigner: false, isWritable: true},          // NFT destination        
-            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true},           // NFT creator       
+            {pubkey: destinationAccount, isSigner: false, isWritable: true},          // NFT destination
+            {pubkey: wallet!.publicKey!, isSigner: true, isWritable: true},           // NFT creator
             {pubkey: mintKey, isSigner: false, isWritable: true},                     // Mint Account to create
-            {pubkey: metadataKey, isSigner: false, isWritable: true},                 // Metadata account to create  
+            {pubkey: metadataKey, isSigner: false, isWritable: true},                 // Metadata account to create
             {pubkey: ataKey, isSigner: false, isWritable: true},                      // New associated token account for destination
             {pubkey: TOKEN_PROGRAM_ID, isSigner: false, isWritable: false},           // SPL token program
-            {pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false},  // Metaplex token program 
+            {pubkey: TOKEN_METADATA_PROGRAM_ID, isSigner: false, isWritable: false},  // Metaplex token program
             {pubkey: SystemProgram.programId, isSigner: false, isWritable: false},    // SPL system program
             {pubkey: SYSVAR_RENT_PUBKEY, isSigner: false, isWritable: false},         // SPL rent program
             {pubkey: ASSOCIATED_TOKEN_PROGRAM_ID, isSigner: false, isWritable: false} // SPL ata program
