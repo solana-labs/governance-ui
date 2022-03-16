@@ -169,10 +169,13 @@ const RealmConfig = ({
       ),
   })
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
-  const minCommunityTokensToCreateProposal = getMintDecimalAmount(
-    mint!,
-    realm!.account.config.minCommunityTokensToCreateGovernance
-  )
+  const minCommunityTokensToCreateProposal =
+    realm && mint
+      ? getMintDecimalAmount(
+          mint,
+          realm.account.config.minCommunityTokensToCreateGovernance
+        )
+      : new BigNumber(0)
   const currentPrecision = precision(minCommunity)
   const getMinSupplyFractionStep = () =>
     new BigNumber(1)
