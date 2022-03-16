@@ -1,3 +1,4 @@
+import { BN } from '@blockworks-foundation/mango-client'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
 import { useMemo, useState } from 'react'
@@ -7,9 +8,14 @@ import {
   getCertifiedRealmInfo,
   RealmInfo,
 } from '../models/registry/api'
-import { VoteRegistryVoterWeight, VoterWeight } from '../models/voteWeights'
+import {
+  VoteNftWeight,
+  VoteRegistryVoterWeight,
+  VoterWeight,
+} from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
+import { nftPluginsPks, vsrPluginsPks } from './useVotingPlugins'
 
 export default function useRealm() {
   const router = useRouter()
@@ -103,10 +109,16 @@ export default function useRealm() {
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
 
-  //TODO change when more plugins implemented
-  const ownVoterWeight = realm?.account.config.useCommunityVoterWeightAddin
-    ? new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+  const currentPluginPk = config?.account?.communityVoterWeightAddin
+
+  const ownVoterWeight = currentPluginPk
+    ? vsrPluginsPks.includes(currentPluginPk.toBase58())
+      ? new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+      : nftPluginsPks.includes(currentPluginPk.toBase58())
+      ? new VoteNftWeight(ownTokenRecord, new BN(0))
+      : new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
     : new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
+
   return {
     realm,
     realmInfo,

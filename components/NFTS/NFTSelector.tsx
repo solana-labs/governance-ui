@@ -24,14 +24,14 @@ function NFTSelector(
     nftWidth = '150px',
     nftHeight = '150px',
     selectable = true,
-    collectionPk = '',
+    collectionsPks = [],
   }: {
     ownerPk: PublicKey
     onNftSelect: (nfts: NFTWithMint[]) => void
     nftWidth?: string
     nftHeight?: string
     selectable?: boolean
-    collectionPk?: string
+    collectionsPks?: string[]
   },
   ref: React.Ref<NftSelectorFunctions>
 ) {
@@ -63,7 +63,8 @@ function NFTSelector(
     const metadataAccount = await Metadata.getPDA(mint)
     const metadat = await Metadata.load(connection.current, metadataAccount)
     return (
-      metadat.data.collection?.key === collectionPk &&
+      metadat.data.collection?.key &&
+      collectionsPks.includes(metadat.data.collection?.key) &&
       metadat.data.collection.verified &&
       mint
     )

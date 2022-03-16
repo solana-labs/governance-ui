@@ -8,7 +8,9 @@ const NftBalanceCard = () => {
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
-  console.log(nftMintRegistrar)
+  const usedCollectionsPks =
+    nftMintRegistrar?.collectionConfigs.map((x) => x.collection.toBase58()) ||
+    []
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Your NFTS </h3>
@@ -24,7 +26,7 @@ const NftBalanceCard = () => {
             nftHeight="50px"
             nftWidth="50px"
             selectable={false}
-            collectionPk={''}
+            collectionsPks={usedCollectionsPks}
           ></NFTSelector>
         )}
       </div>

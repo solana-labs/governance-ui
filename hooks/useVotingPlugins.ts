@@ -4,9 +4,7 @@ import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 export const vsrPluginsPks: string[] = [
-  '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc99',
-  '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc95',
-  '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc9H',
+  '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
 
 export const nftPluginsPks: string[] = [
