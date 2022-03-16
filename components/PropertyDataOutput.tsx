@@ -14,7 +14,6 @@ const PropertyDataOutput = (props) => {
 	const [propertyDetails, setPropertyDetails] = useState<any>()
 
 	useLayoutEffect(() => {
-		console.log("what?");
 		if (props.propertyDetails) setPropertyDetails(props.propertyDetails)
 	}, [props.propertyDetails])
 

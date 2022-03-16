@@ -102,14 +102,24 @@ const Proposal = () => {
 		}
 	}, [descriptionObj])
 
+	const [genericProposal, setGenericProposal] = useState<boolean>(false);
 	useLayoutEffect(() => {
 		const handleResolveDescription = async () => {
 			const description = await resolveProposalDescription(descriptionLink)
 			setDescription(description)
+
+			setInitalLoad(false);
+			setGenericProposal(true);
 		}
 		if (descriptionLink) {
 			handleResolveDescription()
-			if (descriptionLink.charAt(0) === '{') setDescriptionObj([JSON.parse(descriptionLink)])
+			if (descriptionLink.charAt(0) === '{') {
+				setDescriptionObj([JSON.parse(descriptionLink)])
+			} else {
+
+				setInitalLoad(false);
+				setGenericProposal(true);
+			}
 		}
 	}, [descriptionLink])
 
@@ -140,35 +150,42 @@ const Proposal = () => {
 
 	useInterval(
 		() => {
-			setInitalLoad(true)
-			if (propertyDetails && typeof propertyDetails === 'object' && propertyDetails?.name) {
+			if (genericProposal) {
 				setPolling(false)
 				setInitalLoad(false)
+				return false;
 			} else {
-				setPollingCount(pollingCount + 1)
 
-				if (descriptionObj && descriptionObj[0].uri) {
-					getDataObj(true)
-						.then((res) => {
-							setPropertyDetails(res);
-							setPolling(false);
-							setInitalLoad(false);
-							return res
-						})
-						.then((res) => {
-							return res
-						})
-						.catch((error) => {
-							const msg = `Something went wrong. \Please verify the format of the data in ${descriptionObj && descriptionObj[0].uri} or refresh the page.`
-							if (pollingCount === 10) {
-								alert(msg)
-							} else {
-								console.log(`Attempt [${pollingCount}]` + msg)
-							}
-							setPolling(false)
-							setInitalLoad(false)
-							console.log('error', error)
-						})
+				setInitalLoad(true)
+				if (propertyDetails && typeof propertyDetails === 'object' && propertyDetails?.name) {
+					setPolling(false)
+					setInitalLoad(false)
+				} else {
+					setPollingCount(pollingCount + 1)
+
+					if (descriptionObj && descriptionObj[0].uri) {
+						getDataObj(true)
+							.then((res) => {
+								setPropertyDetails(res);
+								setPolling(false);
+								setInitalLoad(false);
+								return res
+							})
+							.then((res) => {
+								return res
+							})
+							.catch((error) => {
+								const msg = `Something went wrong. \Please verify the format of the data in ${descriptionObj && descriptionObj[0].uri} or refresh the page.`
+								if (pollingCount === 10) {
+									alert(msg)
+								} else {
+									console.log(`Attempt [${pollingCount}]` + msg)
+								}
+								setPolling(false)
+								setInitalLoad(false)
+								console.log('error', error)
+							})
+					}
 				}
 			}
 		},
