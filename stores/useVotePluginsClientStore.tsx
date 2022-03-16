@@ -91,11 +91,11 @@ export class VotingClient {
         realm!.account.communityMint,
         this.client!.program.programId
       )
-      const { voterWeightPk } = await getNftVoterWeightRecord(
-        realm!.pubkey,
-        realm!.account.communityMint,
+      const { voterWeightPk } = await this._withHandleNftVoterWeight(
+        realm!,
         walletPk!,
-        clientProgramId
+        clientProgramId,
+        instructions
       )
 
       instructions.push(
@@ -128,11 +128,11 @@ export class VotingClient {
         realm!.account.communityMint,
         this.client!.program.programId
       )
-      const { voterWeightPk } = await getNftVoterWeightRecord(
-        realm!.pubkey,
-        realm!.account.communityMint,
-        walletPk!,
-        clientProgramId
+      const { voterWeightPk } = await this._withHandleNftVoterWeight(
+        realm!,
+        walletPk,
+        clientProgramId,
+        instructions
       )
       instructions.push(
         this.client.program.instruction.castNftVote(proposalPk, {
@@ -146,6 +146,50 @@ export class VotingClient {
         })
       )
     }
+  }
+  _withHandleNftVoterWeight = async (
+    realm: ProgramAccount<Realm>,
+    walletPk: PublicKey,
+    clientProgramId: PublicKey,
+    instructions
+  ) => {
+    if (this.client instanceof NftVoterClient === false) {
+      throw 'Method only allowed for nft voter client'
+    }
+    let isExisting: any = undefined
+    const client = this.client as NftVoterClient
+    const {
+      voterWeightPk,
+      voterWeightRecordBump,
+    } = await getNftVoterWeightRecord(
+      realm!.pubkey,
+      realm!.account.communityMint,
+      walletPk!,
+      clientProgramId
+    )
+    try {
+      isExisting = await client.program.account.voterWeightRecord.fetch(
+        voterWeightPk
+      )
+    } catch (e) {
+      console.log('No voter, creating voter', e)
+    }
+    if (!isExisting) {
+      instructions.push(
+        client.program.instruction.createVoterWeightRecord(walletPk, {
+          accounts: {
+            voterWeightRecord: voterWeightPk,
+            governanceProgramId: realm.owner,
+            realm: realm.pubkey,
+            realmGoverningTokenMint: realm.account.communityMint,
+            payer: walletPk,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          },
+        })
+      )
+    }
+
+    return { voterWeightPk, voterWeightRecordBump }
   }
   withRelinquishVote = async (instructions, proposalPk: PublicKey) => {
     const realm = this.realm
@@ -164,11 +208,11 @@ export class VotingClient {
     //     realm!.account.communityMint,
     //     this.client!.program.programId
     //   )
-    //   const { voterWeightPk } = await getNftVoterWeightRecord(
-    //     realm!.pubkey,
-    //     realm!.account.communityMint,
-    //     walletPk!,
-    //     clientProgramId
+    // const { voterWeightPk } = await this._withHandleNftVoterWeight(
+    //     realm!,
+    //     walletPk,
+    //     clientProgramId,
+    //     instructions
     //   )
     //   instructions.push(
     //     this.client.program.instruction.relinquishNftVote(proposalPk, {

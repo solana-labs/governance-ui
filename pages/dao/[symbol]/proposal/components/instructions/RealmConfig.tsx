@@ -59,7 +59,7 @@ const RealmConfig = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm, mint, realmInfo, councilMint } = useRealm()
+  const { realm, mint, realmInfo, councilMint, config } = useRealm()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
@@ -249,7 +249,8 @@ const RealmConfig = ({
     },
     {
       label: 'Community voter weight addin',
-      initialValue: '',
+      initialValue:
+        config?.account?.communityVoterWeightAddin?.toBase58() || '',
       name: 'communityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',
@@ -257,7 +258,8 @@ const RealmConfig = ({
     },
     {
       label: 'Community max voter weight addin',
-      initialValue: '',
+      initialValue:
+        config?.account?.maxCommunityVoterWeightAddin?.toBase58() || '',
       name: 'maxCommunityVoterWeightAddin',
       type: InstructionInputType.INPUT,
       inputType: 'text',

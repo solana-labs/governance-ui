@@ -138,7 +138,7 @@ const ConfigureNftPluginCollection = ({
     },
     {
       label: 'Collection size',
-      initialValue: 1,
+      initialValue: 0,
       name: 'size',
       inputType: 'number',
       type: InstructionInputType.INPUT,
