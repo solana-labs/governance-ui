@@ -10,19 +10,19 @@ const AccountsItems = () => {
   >([])
 
   useEffect(() => {
-    async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
-    }
-    prepTreasuryAccounts()
+		async function prepTreasuryAccounts() {
+			setTreasuryAccounts(governedTokenAccounts)
+		}
+		prepTreasuryAccounts()
   }, [JSON.stringify(governedTokenAccounts)])
 
   return (
     <div className="space-y-3">
-      {treasuryAccounts.map((accountWithGovernance) => {
+      {treasuryAccounts.map((accountWithGovernance, index) => {
         return (
           <AccountItem
             governedAccountTokenAccount={accountWithGovernance}
-            key={accountWithGovernance?.token?.publicKey.toBase58()}
+            key={accountWithGovernance?.token?.publicKey.toBase58() + "_" + index}
           />
         )
       })}
