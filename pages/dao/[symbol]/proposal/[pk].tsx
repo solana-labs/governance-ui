@@ -245,26 +245,6 @@ const Proposal = () => {
 											<VotePanel simple className="" />
 										</div>
 									)}
-
-									{descriptionObj?.map((item, index) => {
-										return (
-											<div key={'descriptionOutput_' + index} className="relative bg-green text-dark">
-												<ul className="list-disc list-inside pl-8 pr-4 space-y-2 py-2 text-xs">
-													{item.uri && (
-														<li>
-															<span className="inline-flex align-center">
-																<a className="inline" href={item.uri} target="blank">
-																	<span className="flex items-start">
-																		Download <ExternalLinkIcon className="flex-shrink-0 h-3 ml-2 mt-0.5 text-dark w-3" />
-																	</span>
-																</a>
-															</span>
-														</li>
-													)}
-												</ul>
-											</div>
-										)
-									})}
 								</div>
 							) : (
 								<>
