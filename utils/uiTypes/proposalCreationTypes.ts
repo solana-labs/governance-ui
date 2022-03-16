@@ -145,7 +145,22 @@ export interface MangoMakeCreatePerpMarketForm {
   governedAccount: GovernedProgramAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
-  maxMangoAccounts: number
+  oracleAccount: string | undefined
+  baseDecimals: number
+  baseLotSize: number
+  quoteLotSize: number
+  mngoPerPeriod: number
+  maxDepthBps: number
+  lmSizeShift: number
+  makerFee: number
+  takerFee: number
+  maintLeverage: number
+  initLeverage: number
+  liquidationFee: number
+  rate: number
+  exp: number
+  targetPeriodLength: number
+  version: number
 }
 export interface MangoMakeChangeMaxAccountsForm {
   governedAccount: GovernedProgramAccount | undefined
