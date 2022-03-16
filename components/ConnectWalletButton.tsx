@@ -16,7 +16,6 @@ import {
 import { BackspaceIcon } from '@heroicons/react/solid'
 import { UserCircleIcon } from '@heroicons/react/outline'
 import { abbreviateAddress } from '@utils/formatting'
-import { useRouter } from 'next/router'
 import TwitterIcon from './TwitterIcon'
 import Switch from './Switch'
 
