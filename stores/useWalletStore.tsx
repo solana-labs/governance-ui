@@ -17,7 +17,6 @@ import {
   getGovernanceAccount,
   getGovernanceAccounts,
   getGovernanceProgramVersion,
-  getRealmConfig,
   Governance,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
@@ -27,6 +26,7 @@ import {
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
+  tryGetRealmConfig,
   VoteRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -300,9 +300,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           realmId,
           realmCouncilMintPk
         ),
-        getRealmConfig(connection, realm!.pubkey!),
+        tryGetRealmConfig(connection, realmId),
       ])
-
+      console.log(programId.toBase58(), '#@$#@$#@$')
       const governancesMap = accountsToPubkeyMap(governances)
 
       console.log('fetchRealm mint', realmMint)

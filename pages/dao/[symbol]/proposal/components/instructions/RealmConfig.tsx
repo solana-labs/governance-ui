@@ -270,7 +270,7 @@ const RealmConfig = ({
       initialValue: false,
       name: 'removeCouncil',
       type: InstructionInputType.SWITCH,
-      hide: !councilMint,
+      hide: typeof councilMint === 'undefined',
     },
   ]
   return (

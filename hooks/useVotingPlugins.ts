@@ -9,7 +9,9 @@ export const vsrPluginsPks: string[] = [
   '11111111FdN3kLpJtMtdLync3ERGTM15wsHGvjc9H',
 ]
 
-export const nftPluginsPks: string[] = []
+export const nftPluginsPks: string[] = [
+  'FDfF7jzJDCEkFWNi3is487k8rFPJxFkU821t2pQ1vDr1',
+]
 
 export function useVotingPlugins() {
   const { realm, config } = useRealm()
@@ -24,7 +26,8 @@ export function useVotingPlugins() {
   const connection = useWalletStore((s) => s.connection)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
-  const currentPluginPk = config?.account?.communityVoterWeightAddin
+  const currentPluginPk = config?.account.communityVoterWeightAddin
+
   useEffect(() => {
     if (wallet?.connected) {
       handleSetVsrClient(wallet, connection)
