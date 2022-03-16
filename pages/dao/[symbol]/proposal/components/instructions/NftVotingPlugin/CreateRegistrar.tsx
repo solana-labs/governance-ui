@@ -52,6 +52,7 @@ const CreateNftPluginRegistrar = ({
         realm!.account.communityMint,
         nftClient!.program.programId
       )
+
       const instruction = nftClient!.program.instruction.createRegistrar(
         form!.maxCollections,
         {
@@ -103,12 +104,13 @@ const CreateNftPluginRegistrar = ({
     },
     {
       label: 'Max collections',
-      initialValue: 1,
+      initialValue: 10,
       name: 'maxCollections',
       type: InstructionInputType.INPUT,
       inputType: 'number',
       min: 1,
       validateMinMax: true,
+      hide: true,
     },
   ]
   return (

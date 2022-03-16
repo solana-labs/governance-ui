@@ -98,9 +98,9 @@ export const createProposal = async (
   //will run only if plugin is connected with realm
   const voterWeight = await client?.withUpdateVoterWeightRecord(
     instructions,
-    'CreateProposal'
+    'createProposal'
   )
-
+  console.log(voterWeight?.toBase58(), '@#$@#$$@#$')
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,

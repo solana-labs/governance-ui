@@ -41,7 +41,7 @@ export const registerProgramGovernance = async (
   //will run only if plugin is connected with realm
   const voterWeight = await client?.withUpdateVoterWeightRecord(
     instructions,
-    'CreateGovernance'
+    'createGovernance'
   )
 
   console.log('VERSION', programVersion)

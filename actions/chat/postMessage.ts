@@ -34,7 +34,7 @@ export async function postChatMessage(
   //will run only if plugin is connected with realm
   const voterWeight = await client?.withUpdateVoterWeightRecord(
     instructions,
-    'CommentProposal'
+    'commentProposal'
   )
 
   await withPostChatMessage(

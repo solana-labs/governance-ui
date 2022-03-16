@@ -301,10 +301,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         ),
         tryGetRealmConfig(connection, programId, realmId),
       ])
-      console.log(
-        config.account.communityVoterWeightAddin?.toBase58(),
-        '#@$#@$@#$#$@'
-      )
+
       const governancesMap = accountsToPubkeyMap(governances)
 
       console.log('fetchRealm mint', realmMint)
@@ -586,6 +583,15 @@ async function tryGetRealmConfig(
   programId: PublicKey,
   realmPk: PublicKey
 ) {
-  const realmConfigPk = await getRealmConfigAddress(programId, realmPk)
-  return getGovernanceAccount(connection, realmConfigPk, RealmConfigAccount)
+  try {
+    const realmConfigPk = await getRealmConfigAddress(programId, realmPk)
+    const resp = await getGovernanceAccount(
+      connection,
+      realmConfigPk,
+      RealmConfigAccount
+    )
+    return resp
+  } catch (e) {
+    return null
+  }
 }

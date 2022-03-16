@@ -22,13 +22,14 @@ import {
   getNftVoterWeightRecord,
 } from 'NftVotePlugin/sdk/accounts'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 
 type updateVoterWeightRecordTypes =
-  | 'CastVote'
-  | 'CommentProposal'
-  | 'CreateGovernance'
-  | 'CreateProposal'
-  | 'SignOffProposal'
+  | 'castVote'
+  | 'commentProposal'
+  | 'createGovernance'
+  | 'createProposal'
+  | 'signOffProposal'
 interface VotingClientProps {
   client: VsrClient | NftVoterClient | undefined
   realm: ProgramAccount<Realm> | undefined
@@ -39,10 +40,12 @@ export class VotingClient {
   client: VsrClient | NftVoterClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
+  currentVoterNftsAccounts: Metadata[]
   constructor({ client, realm, walletPk }: VotingClientProps) {
     this.client = client
     this.realm = realm
     this.walletPk = walletPk
+    this.currentVoterNftsAccounts = []
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
@@ -70,7 +73,6 @@ export class VotingClient {
         walletPk!,
         clientProgramId
       )
-
       instructions.push(
         this.client!.program.instruction.updateVoterWeightRecord({
           accounts: {
@@ -97,7 +99,33 @@ export class VotingClient {
         clientProgramId,
         instructions
       )
-
+      const remainingAccounts: {
+        pubkey: PublicKey
+        isSigner: boolean
+        isWritable: boolean
+      }[] = []
+      for (const nft of this.currentVoterNftsAccounts) {
+        remainingAccounts.push({
+          pubkey: new PublicKey(nft.data.mint),
+          isSigner: false,
+          isWritable: false,
+        })
+        const [metadataPk] = await PublicKey.findProgramAddress(
+          [
+            nft.pubkey.toBuffer(),
+            new PublicKey(
+              'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s'
+            ).toBuffer(),
+            new PublicKey(nft.data.mint).toBuffer(),
+          ],
+          clientProgramId
+        )
+        remainingAccounts.push({
+          pubkey: metadataPk,
+          isSigner: false,
+          isWritable: false,
+        })
+      }
       instructions.push(
         this.client.program.instruction.updateVoterWeightRecord(
           { [type]: {} },
@@ -106,6 +134,7 @@ export class VotingClient {
               registrar,
               voterWeightRecord: voterWeightPk,
             },
+            remainingAccounts: remainingAccounts,
           }
         )
       )
@@ -134,6 +163,36 @@ export class VotingClient {
         clientProgramId,
         instructions
       )
+      const remainingAccounts: {
+        pubkey: PublicKey
+        isSigner: boolean
+        isWritable: boolean
+      }[] = []
+      for (const nft of this.currentVoterNftsAccounts) {
+        remainingAccounts.push({
+          pubkey: new PublicKey(nft.data.mint),
+          isSigner: false,
+          isWritable: false,
+        })
+        remainingAccounts.push({
+          pubkey: nft.pubkey,
+          isSigner: false,
+          isWritable: false,
+        })
+        const [nftVoteRecord] = await PublicKey.findProgramAddress(
+          [
+            Buffer.from('nft-vote-record'),
+            proposalPk.toBuffer(),
+            new PublicKey(nft.data.mint).toBuffer(),
+          ],
+          clientProgramId
+        )
+        remainingAccounts.push({
+          pubkey: nftVoteRecord,
+          isSigner: false,
+          isWritable: false,
+        })
+      }
       instructions.push(
         this.client.program.instruction.castNftVote(proposalPk, {
           accounts: {
@@ -143,6 +202,7 @@ export class VotingClient {
             payer: walletPk,
             systemProgram: SYSTEM_PROGRAM_ID,
           },
+          remainingAccounts: remainingAccounts,
         })
       )
     }
@@ -226,6 +286,9 @@ export class VotingClient {
     }
 
     return { voterWeightPk, voterWeightRecordBump }
+  }
+  _setCurrentVoterNfts = (nfts: any[]) => {
+    this.currentVoterNftsAccounts = nfts
   }
 }
 interface UseVotePluginsClientStore extends State {

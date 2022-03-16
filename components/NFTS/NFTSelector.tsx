@@ -13,6 +13,7 @@ import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
 }
@@ -37,6 +38,9 @@ function NFTSelector(
 ) {
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
@@ -51,8 +55,17 @@ function NFTSelector(
   const handleGetNfts = async () => {
     setIsLoading(true)
     let nfts = await getNfts(connection.current, ownerPk)
-    const resp = await Promise.all(nfts.map((x) => getIsFromCollection(x.mint)))
-    nfts = nfts.filter((x) => resp.includes(x.mint))
+    if (collectionsPks.length) {
+      const resp = (
+        await Promise.all(nfts.map((x) => getIsFromCollection(x.mint)))
+      ).filter((x) => x instanceof Metadata) as Metadata[]
+      nfts = nfts.filter((x) => resp.find((j) => j.data.mint === x.mint))
+      const voterNfts: Metadata[] = []
+      for (const nft of resp) {
+        voterNfts.push(nft)
+      }
+      client._setCurrentVoterNfts(voterNfts)
+    }
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
     }
@@ -61,12 +74,12 @@ function NFTSelector(
   }
   const getIsFromCollection = async (mint: string) => {
     const metadataAccount = await Metadata.getPDA(mint)
-    const metadat = await Metadata.load(connection.current, metadataAccount)
+    const metadata = await Metadata.load(connection.current, metadataAccount)
     return (
-      metadat.data.collection?.key &&
-      collectionsPks.includes(metadat.data.collection?.key) &&
-      metadat.data.collection.verified &&
-      mint
+      metadata.data.collection?.key &&
+      collectionsPks.includes(metadata.data.collection?.key) &&
+      metadata.data.collection.verified &&
+      metadata
     )
   }
   useImperativeHandle(ref, () => ({
@@ -78,6 +91,11 @@ function NFTSelector(
       handleGetNfts()
     }
   }, [ownerPk])
+  useEffect(() => {
+    if (collectionsPks) {
+      handleGetNfts()
+    }
+  }, [collectionsPks.length])
   useEffect(() => {
     onNftSelect(selectedNfts)
   }, [selectedNfts])
