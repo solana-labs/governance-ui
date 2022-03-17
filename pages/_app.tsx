@@ -94,6 +94,11 @@ function App({ Component, pageProps }) {
 		}
 	}, [realm?.pubkey.toBase58(), ownTokenRecord?.pubkey.toBase58(), wallet?.connected, client])
 
+	useLayoutEffect(() => {
+		setSolanaBrowser(isSolanaBrowser())
+		setPhantomBrowser(isPhantomBrowser())
+	}, [router])
+
 	useEffect(() => {
 		setSolanaBrowser(isSolanaBrowser())
 		setPhantomBrowser(isPhantomBrowser())
