@@ -124,19 +124,19 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 
 			{unchartedRealms?.length > 0 && (
 				<div className="border-t border-t-green pt-16">
-					<h2>
+					<h2 className="sticky top-4">
 						<span className="text-lg">Additional DAOs</span>
 					</h2>
 					<ul className="-mt-px-children">
 						{unchartedRealms.map((realm: RealmInfo) => (
-							<li>
+							<li className="sticky top-11">
 								<a
 									href={`/dao/${realm.realmId.toString()}`}
 									onClick={(e) => {
 										goToRealm(realm)
 										e.preventDefault()
 									}}
-									className="block border border-green cursor-pointer default-transition px-4 py-2 hover:bg-bkg-3"
+									className="block border border-green bg-dark cursor-pointer default-transition px-4 py-2 hover:bg-bkg-3"
 									key={realm.realmId.toString()}
 								>
 									<span className="flex items-center justify-between">
