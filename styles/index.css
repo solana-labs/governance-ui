@@ -341,3 +341,9 @@ button {
 :root {
 	font-size: clamp(calc((var(--min-font-size) / var(--base-font-size)) * 1rem), calc(((var(--min-font-size) / var(--max-width-constraint)) * 100) * 1vw), calc((var(--max-font-size) / var(--base-font-size)) * 1rem));
 }
+
+
+.text-legal {
+	font-size: var(--fs, .5rem);
+	line-height: var(--lh, 1.5);
+}
