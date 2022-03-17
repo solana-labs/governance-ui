@@ -88,23 +88,23 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 		<Loader />
 	) : (
 		<div className="space-y-16">
-			<div className="flex flex-wrap items-center justify-center">
+			<div className="flex flex-wrap justify-center">
 				{certifiedRealms?.length > 0 &&
 					certifiedRealms.map((realm: RealmInfo) => (
 						<div onClick={(e) =>  {
 							goToRealm(realm);
 							e.preventDefault()
-						}} className="flex-shrink-0 w-full lg:max-w-xs border border-dark hover:border-green bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3" key={realm.realmId.toString()}>
-							<div className="pb-5">
+						}} className="flex flex-shrink-0 w-full lg:max-w-xs border border-dark hover:border-green bg-bkg-2 cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3" key={realm.realmId.toString()}>
+							<div className="pb-5 flex">
 								{realm.ogImage ? (
-									<div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex items-center justify-center">
-										<img className="w-10" src={realm.ogImage}></img>
+									<div className="lg:max-w-xs">
+										<img className="w-full" src={realm.ogImage}></img>
 									</div>
 								) : (
-									<div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center text-fgd-3">{realm.displayName?.charAt(0)}</div>
+									<div className="lg:max-w-xs bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center text-fgd-3">{realm.displayName?.charAt(0)}</div>
 								)}
 							</div>
-							<h3 className="text-center ">{realm.displayName ?? realm.symbol}</h3>
+							<h3 className="text-center mt-auto">{realm.displayName ?? realm.symbol}</h3>
 						</div>
 					))}
 
@@ -112,10 +112,10 @@ export default function RealmsDashboard({ realms, isLoading }: { realms: readonl
 					router.push('/realms/new')
 					e.preventDefault();
 				}} className="flex-shrink-0 w-full lg:max-w-xs border border-dark  hover:border-green bg-bkg-2 hover:bg-green text-white hover:text-dark cursor-pointer default-transition flex flex-col items-center p-8 hover:bg-bkg-3">
-					<div className="pb-5">
-						<div className="bg-[rgba(0,0,0,0.2)] h-16 w-16 flex font-bold items-center justify-center">NEW</div>
+					<div className="pb-5 flex my-auto">
+						<div className="mt-12 lg:max-w-xs bg-[rgba(0,0,0,0.2)] h-16 w-16 flex font-bold items-center justify-center">NEW</div>
 					</div>
-					<h3 className="text-center">Create DAO</h3>
+					<h3 className="text-center mt-auto">Create DAO</h3>
 				</a>
 
 				<>
