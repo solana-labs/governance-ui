@@ -88,7 +88,7 @@ export async function getTokrInstruction({
     let destinationAccount = new PublicKey(String(form.destinationAddress));
 
     let mintSeed = (Math.random() + 1).toString(36).substring(2) + (Math.random() + 1).toString(36).substring(2);
-    const mintPdaData = await getMintPda(wallet!.publicKey!, mintSeed);
+    const mintPdaData = await getMintPda(wallet!.publicKey!, mintSeed, destinationAccount);
     const mintKey = mintPdaData[0];
     const mintBump = mintPdaData[1];
 
@@ -144,8 +144,8 @@ export async function getTokrInstruction({
 }
 
 // todo try to find better seed and do not use the wallet either.
-export const getMintPda = async function (wallet: PublicKey, seed: String) {
-	return await PublicKey.findProgramAddress([Buffer.from(seed), wallet.toBuffer(), TOKR_PROGRAM.toBuffer()], TOKR_PROGRAM)
+export const getMintPda = async function (wallet: PublicKey, seed: String, destination: PublicKey) {
+	return await PublicKey.findProgramAddress([Buffer.from(seed), wallet.toBuffer(), destination.toBuffer()], TOKR_PROGRAM)
 }
 
 export const getMetadataPda = async function (mint: PublicKey) {
