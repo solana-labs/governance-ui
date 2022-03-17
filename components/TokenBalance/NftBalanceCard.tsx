@@ -72,7 +72,7 @@ const NftBalanceCard = () => {
     })
     await fetchRealm(realm?.owner, realm?.pubkey)
   }
-  useEffect(() => {}, [])
+
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <h3 className="mb-4">Your NFTS</h3>
