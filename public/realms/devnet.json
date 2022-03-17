@@ -1,16 +1,16 @@
 [
 	{
-		"symbol": "ALkNW35wP58efK1k4xpaa9GdbZJSuFraBJqjjzNqoncr",
+		"symbol": "8ev7GiaQBzdNzGi9NRNhZYoNdKxdMVg2WHLHE9KQx77c",
 		"displayName": "Tokr",
 		"programId": "ToKriDd3YyUxPjbDamXpAZKQMAFMGjhzbgGiGjGbCxt",
-		"realmId": "ALkNW35wP58efK1k4xpaa9GdbZJSuFraBJqjjzNqoncr",
+		"realmId": "8ev7GiaQBzdNzGi9NRNhZYoNdKxdMVg2WHLHE9KQx77c",
 		"ogImage": "/images/tokr_icon_lt.png"
 	},
 	{
-		"symbol": "989uN3os9kHbBSFvGEufdmLrQM4k94AoiyWoBU5WkKJt",
+		"symbol": "9QjdYZcDKvEGEtvd3BkSxixxG3N6TtLb9F1TufyviaXc",
 		"displayName": "Solana Beach Club",
 		"programId": "ToKriDd3YyUxPjbDamXpAZKQMAFMGjhzbgGiGjGbCxt",
-		"realmId": "989uN3os9kHbBSFvGEufdmLrQM4k94AoiyWoBU5WkKJt",
+		"realmId": "9QjdYZcDKvEGEtvd3BkSxixxG3N6TtLb9F1TufyviaXc",
 		"ogImage": "/images/solana_beach_icon.png"
 	}
 ]
