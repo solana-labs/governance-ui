@@ -325,7 +325,7 @@ const REALM = () => {
 									)}
 								</div>
 
-								<p className="pb-4">General proposals for the {realmDisplayName} DAO to discuss and vote.</p>
+								<p className="pb-4">General proposals for {realmDisplayName} to discuss and vote.</p>
 
 								<div className="-mt-px-children">
 									{proposalType0.map(([k, v]) => {
@@ -349,7 +349,7 @@ const REALM = () => {
 									<h2 className="text-2xl uppercase">DAO Proposals</h2>
 								</div>
 
-								<p className="pb-4">Other types of proposals for the {realmDisplayName} DAO.</p>
+								<p className="pb-4">Other types of proposals for {realmDisplayName}.</p>
 
 								<div className="-mt-px-children">
 									{proposalTypeNA.map(([k, v]) => {

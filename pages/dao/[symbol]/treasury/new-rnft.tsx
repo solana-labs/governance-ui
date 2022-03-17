@@ -30,7 +30,7 @@ const NewRnft = (props) => {
 						Now that you succesfully created <a className="hover:underline" href={`/dao/${realm?.pubkey.toBase58()}`} onClick={e => {
 							router.push(fmtUrlWithCluster(`/dao/${realm?.pubkey.toBase58()}`))
 							e.preventDefault();
-						}}>{realmDisplayName ? realmDisplayName : 'your' }</a>{` `} DAO.{` `} <br />
+						}}>{realmDisplayName ? `${realmDisplayName}.` : 'your DAO.' }</a> <br />
 					</> : ''}
 					You will have to create {realmDisplayName ? realmDisplayName + ' ' : `your DAO's ` } rNFT Treasury Account. This Treasury Account will be used to store all certified {props.realmName ? props.realmName + ' ' : ' '} properties that you submit via Tokr.
 				</p>
