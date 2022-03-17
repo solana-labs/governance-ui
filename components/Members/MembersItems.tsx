@@ -19,11 +19,16 @@ const MembersItems = ({ activeMembers }: { activeMembers: Member[] }) => {
 		return hasBothVotes ? 100 : minRowHeight
 	}
 
+	const getRowHeight2 = ({ index }) => {
+		return  minRowHeight
+	}
+
 	const reStyle = (style) => {
 		const tempHeight = style.height;
 		style.height = rem(tempHeight);
 		const tempTop = style.top;
 		style.top = rem(tempTop)
+
 		return style;
 	}
 	function rowRenderer({ key, index, style }) {
@@ -33,10 +38,13 @@ const MembersItems = ({ activeMembers }: { activeMembers: Member[] }) => {
 			</div>
 		)
 	}
-	return (
-		<div className="space-y-3">
-			<AutoSizer disableHeight>{({ width }) => <List width={width} height={listHeight} rowCount={activeMembers.length} rowHeight={getRowHeight} rowRenderer={rowRenderer} />}</AutoSizer>
-		</div>
-	)
+	return ( <div className="space-y-3">
+			{ activeMembers.map((member, index) => {
+				return <div key={`member_${index}`} >
+				<MemberItem item={activeMembers[index]}></MemberItem>
+			</div>
+			} ) }
+	</div> )
+
 }
 export default MembersItems

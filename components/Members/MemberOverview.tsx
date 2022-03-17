@@ -91,16 +91,16 @@ const MemberOverview = () => {
 			<h3 className="mb-4 flex items-center hover:cursor-pointer">
 				<>
 					<ArrowLeftIcon onClick={handleGoBackToMainView} className="h-4 w-4 mr-1 text-primary-light mr-2" />
-					<DisplayAddress connection={connection.current} address={walletPublicKey} height="12px" width="100px" dark={true} />
+					<DisplayAddress connection={connection.current} address={walletPublicKey} height={rem(12)} width={rem(100)} dark={true} />
 					<a href={walletAddress ? getExplorerUrl(connection.endpoint, walletAddress) : ''} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
 						<ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
 					</a>
 				</>
 			</h3>
 			<div className="bg-bkg-1 px-4 py-2 w-full break-all flex items-center">
-				<div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 w-8 mr-2">
+				{/* <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-8 w-8 mr-2">
 					<AddressImage dark={true} connection={connection.current} address={walletPublicKey} height="30px" width="30px" placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />} />
-				</div>
+				</div> */}
 				<div className="flex w-full">
 					<div className="flex-grow">
 						<div className="text-fgd-3 text-xs flex flex-col">Votes Cast: {totalVotes}</div>
