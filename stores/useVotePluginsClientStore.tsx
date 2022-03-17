@@ -255,27 +255,27 @@ export class VotingClient {
       clientProgramId
     )
 
-    try {
-      isExisting = await client.program.account.voterWeightRecord.fetch(
-        voterWeightPk
-      )
-    } catch (e) {
-      console.log('No voter, creating voter', e)
-    }
-    if (!isExisting) {
-      instructions.push(
-        client.program.instruction.createVoterWeightRecord(walletPk, {
-          accounts: {
-            voterWeightRecord: voterWeightPk,
-            governanceProgramId: realm.owner,
-            realm: realm.pubkey,
-            realmGoverningTokenMint: realm.account.communityMint,
-            payer: walletPk,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-        })
-      )
-    }
+    // try {
+    //   isExisting = await client.program.account.voterWeightRecord.fetch(
+    //     voterWeightPk
+    //   )
+    // } catch (e) {
+    //   console.log('No voter, creating voter', e)
+    // }
+    // if (!isExisting) {
+    //   instructions.push(
+    //     client.program.instruction.createVoterWeightRecord(walletPk, {
+    //       accounts: {
+    //         voterWeightRecord: voterWeightPk,
+    //         governanceProgramId: realm.owner,
+    //         realm: realm.pubkey,
+    //         realmGoverningTokenMint: realm.account.communityMint,
+    //         payer: walletPk,
+    //         systemProgram: SYSTEM_PROGRAM_ID,
+    //       },
+    //     })
+    //   )
+    // }
 
     return { voterWeightPk, voterWeightRecordBump }
   }
