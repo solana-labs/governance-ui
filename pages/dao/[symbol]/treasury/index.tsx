@@ -35,7 +35,6 @@ const Treasury = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
@@ -58,7 +57,9 @@ const Treasury = () => {
   ])
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
+      if (governedTokenAccounts.every((x) => x.transferAddress)) {
+        setTreasuryAccounts(governedTokenAccounts)
+      }
     }
     prepTreasuryAccounts()
   }, [JSON.stringify(governedTokenAccounts)])
@@ -68,7 +69,7 @@ const Treasury = () => {
       setActiveAccount(treasuryAccounts[0])
       setCurrentAccount(treasuryAccounts[0], connection)
     }
-  }, [treasuryAccounts])
+  }, [JSON.stringify(treasuryAccounts)])
 
   const { totalPriceFormatted } = useTotalTreasuryPrice()
 
