@@ -633,10 +633,6 @@ const New = (props) => {
 		}
 	}, [propertyData])
 
-	useEffect(() => {
-		console.log("\n\n\n\n\n\nmetaplexDataObj", metaplexDataObj, JSON.stringify(metaplexDataObj))
-	},[metaplexDataObj])
-
 	useLayoutEffect(() => {
 		if (_prepopulateForDemos) {
 			setPropertyData({
@@ -938,7 +934,7 @@ const New = (props) => {
 							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
 						</p>
 
-						{loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo && (
+						{(!_prepopulateForDemos && (loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo)) && (
 							<p className="mt-16 py-4 border-t border-b border-green">
 								We restored your past entry. Want to start fresh?{' '}
 								<a
@@ -956,10 +952,8 @@ const New = (props) => {
 											title_held_by: '',
 											ein_number: '',
 											transfer_restrictions: '',
-											marketing_name: '',
 											type: '',
 											sq_ft: '',
-											property_legal_description: '',
 											tax_parcel_numbers: '',
 											deed: '',
 											title_insurance: '',
