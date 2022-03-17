@@ -21,13 +21,15 @@ import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
 /**
  * Default governance program id instance
  */
-export const DEFAULT_GOVERNANCE_PROGRAM_ID = 'A46hUedKdttuKKU3bCA4c1pX47X7TjVGDUH7gJUhoPRZ'
-// export const TOKR_DAO = '6oQgdREFwoabzyLZoF3UrwCRyKa1EHmZ1qihXezUbKAR'
-export const TOKR_DAO = '4YWe67bC9B4YWy6MCqMDBSe2xekFGSMVeqEzCx3Ziebd'
+// export const DEFAULT_GOVERNANCE_PROGRAM_ID = 'ToKriDd3YyUxPjbDamXpAZKQMAFMGjhzbgGiGjGbCxt' // MAINNET+DEVNET (new)
+export const DEFAULT_GOVERNANCE_PROGRAM_ID = 'A46hUedKdttuKKU3bCA4c1pX47X7TjVGDUH7gJUhoPRZ' // scrappy DEVNET
 /**
  * Default TEST governance program id instance
  */
-export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID = 'ToKriDd3YyUxPjbDamXpAZKQMAFMGjhzbgGiGjGbCxt'
+// export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID = 'ToKriDd3YyUxPjbDamXpAZKQMAFMGjhzbgGiGjGbCxt' // MAINNET+DEVNET (new)
+export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID = 'A46hUedKdttuKKU3bCA4c1pX47X7TjVGDUH7gJUhoPRZ' // scrappy DEVNET
+
+export const TOKR_DAO = '4YWe67bC9B4YWy6MCqMDBSe2xekFGSMVeqEzCx3Ziebd' // Kmack Test DAO 1
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
