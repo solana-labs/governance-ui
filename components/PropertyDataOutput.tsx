@@ -55,7 +55,7 @@ const PropertyDataOutput = (props) => {
 												<span className="flex align-center flex-grow">
 													<b className="inline mr-1 flex-shrink-0  text-green">{titleCase(attribute.trait_type?.replaceAll('_', ' ')).replaceAll('Ein', 'EIN').replaceAll('Of', 'of').replaceAll('The', 'the')}:</b>{' '}
 													<span className="inline mr-1 flex-grow">
-														{attribute.value.startsWith('http://') || attribute.value.startsWith('https://') ? (
+														{attribute.value?.startsWith('http://') || attribute.value?.startsWith('https://') ? (
 															<>
 																<a className="inline" href={attribute.value} target="_blank">
 																	<span className="flex">
