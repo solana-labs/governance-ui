@@ -6,14 +6,12 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { useRouter } from 'next/router'
 import React from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
-import { LinkButton } from '@components/Button'
+import Link from 'next/link'
 
 const NFTSCompactWrapper = () => {
-  const router = useRouter()
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
@@ -24,18 +22,18 @@ const NFTSCompactWrapper = () => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between pb-4">
         <h3 className="mb-0">NFTs</h3>
-        <LinkButton
-          className={`flex items-center text-primary-light`}
-          onClick={() => {
-            const url = fmtUrlWithCluster(
-              `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
-            )
-            router.push(url)
-          }}
+        <Link
+          href={fmtUrlWithCluster(
+            `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
+          )}
         >
-          View
-          <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
-        </LinkButton>
+          <a
+            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3`}
+          >
+            View
+            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+          </a>
+        </Link>
       </div>
       <div
         className="overflow-y-auto"
