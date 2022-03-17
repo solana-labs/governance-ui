@@ -104,7 +104,8 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      for (const nft of this.currentVoterNftsAccounts) {
+      for (let i = 0; i < this.currentVoterNftsAccounts.length; i++) {
+        const nft = this.currentVoterNftsAccounts[i]
         remainingAccounts.push({
           pubkey: nft.tokenAddress,
           isSigner: false,
@@ -159,7 +160,8 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      for (const nft of this.currentVoterNftsAccounts) {
+      for (let i = 0; i < this.currentVoterNftsAccounts.length; i++) {
+        const nft = this.currentVoterNftsAccounts[i]
         remainingAccounts.push({
           pubkey: nft.tokenAddress,
           isSigner: false,

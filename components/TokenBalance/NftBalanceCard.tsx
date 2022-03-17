@@ -1,15 +1,23 @@
 import Button from '@components/Button'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import useRealm from '@hooks/useRealm'
-import { withCreateTokenOwnerRecord } from '@solana/spl-governance'
+import { NftVoterClient } from '@solana/governance-program-library'
+import {
+  SYSTEM_PROGRAM_ID,
+  withCreateTokenOwnerRecord,
+} from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
+import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
 const NftBalanceCard = () => {
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
@@ -24,6 +32,27 @@ const NftBalanceCard = () => {
     : null
   const handleRegister = async () => {
     const instructions: TransactionInstruction[] = []
+    const { voterWeightPk } = await getNftVoterWeightRecord(
+      realm!.pubkey,
+      realm!.account.communityMint,
+      wallet!.publicKey!,
+      client.client!.program.programId
+    )
+    instructions.push(
+      (client.client as NftVoterClient).program.instruction.createVoterWeightRecord(
+        wallet!.publicKey!,
+        {
+          accounts: {
+            voterWeightRecord: voterWeightPk,
+            governanceProgramId: realm!.owner,
+            realm: realm!.pubkey,
+            realmGoverningTokenMint: realm!.account.communityMint,
+            payer: wallet!.publicKey!,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          },
+        }
+      )
+    )
     await withCreateTokenOwnerRecord(
       instructions,
       realm!.owner!,
