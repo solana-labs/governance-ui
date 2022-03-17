@@ -21,6 +21,7 @@ import { Vote } from '@solana/spl-governance'
 import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 import { VotingClient } from 'stores/useVotePluginsClientStore'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -52,22 +53,24 @@ export async function castVote(
 
   await votingPlugin?.withCastPluginVote(instructions, proposal.pubkey)
 
-  await withCastVote(
-    instructions,
-    programId,
-    programVersion,
-    realm.pubkey,
-    proposal.account.governance,
-    proposal.pubkey,
-    proposal.account.tokenOwnerRecord,
-    tokeOwnerRecord,
-    governanceAuthority,
-    proposal.account.governingTokenMint,
-    Vote.fromYesNoVote(yesNoVote),
-    payer,
-    plugin?.maxVoterWeightRecord,
-    plugin?.maxVoterWeightRecord
-  )
+  if (votingPlugin?.client instanceof NftVoterClient === false) {
+    await withCastVote(
+      instructions,
+      programId,
+      programVersion,
+      realm.pubkey,
+      proposal.account.governance,
+      proposal.pubkey,
+      proposal.account.tokenOwnerRecord,
+      tokeOwnerRecord,
+      governanceAuthority,
+      proposal.account.governingTokenMint,
+      Vote.fromYesNoVote(yesNoVote),
+      payer,
+      plugin?.maxVoterWeightRecord,
+      plugin?.maxVoterWeightRecord
+    )
+  }
 
   if (message) {
     await withPostChatMessage(
