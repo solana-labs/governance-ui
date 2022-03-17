@@ -12,8 +12,6 @@ import { PublicKey } from '@solana/web3.js'
 import Loading from '@components/Loading'
 import { getNfts } from '@utils/tokens'
 import ImgWithLoader from '@components/ImgWithLoader'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 export interface NftSelectorFunctions {
   handleGetNfts: () => void
 }
@@ -25,22 +23,20 @@ function NFTSelector(
     nftWidth = '150px',
     nftHeight = '150px',
     selectable = true,
-    collectionsPks = [],
+    predefinedNfts,
   }: {
     ownerPk: PublicKey
     onNftSelect: (nfts: NFTWithMint[]) => void
     nftWidth?: string
     nftHeight?: string
     selectable?: boolean
-    collectionsPks?: string[]
+    predefinedNfts?: NFTWithMint[]
   },
   ref: React.Ref<NftSelectorFunctions>
 ) {
+  const isPredefinedMode = typeof predefinedNfts !== 'undefined'
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
   const connection = useWalletStore((s) => s.connection)
   const [isLoading, setIsLoading] = useState(false)
   const handleSelectNft = (nft: NFTWithMint) => {
@@ -54,55 +50,33 @@ function NFTSelector(
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
-    let nfts = await getNfts(connection.current, ownerPk)
-    if (collectionsPks.length) {
-      const resp = (
-        await Promise.all(
-          nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
-        )
-      ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
-      nfts = nfts.filter((x) =>
-        resp.find((j) => j.tokenAddress.toBase58() === x.tokenAddress)
-      )
-      client._setCurrentVoterNfts(resp)
-    }
+    const nfts = await getNfts(connection.current, ownerPk)
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
     }
     setNfts(nfts)
     setIsLoading(false)
   }
-  const getIsFromCollection = async (mint: string, tokenAddress: string) => {
-    const metadataAccount = await Metadata.getPDA(mint)
-    const metadata = await Metadata.load(connection.current, metadataAccount)
-    return (
-      !!(
-        metadata.data.collection?.key &&
-        collectionsPks.includes(metadata.data.collection?.key) &&
-        metadata.data.collection.verified
-      ) && {
-        tokenAddress: new PublicKey(tokenAddress),
-        metadata: metadata as Metadata,
-      }
-    )
-  }
   useImperativeHandle(ref, () => ({
     handleGetNfts,
   }))
 
   useEffect(() => {
-    if (ownerPk) {
+    if (ownerPk && !isPredefinedMode) {
       handleGetNfts()
     }
   }, [ownerPk])
   useEffect(() => {
-    if (collectionsPks) {
-      handleGetNfts()
+    if (!isPredefinedMode) {
+      onNftSelect(selectedNfts)
     }
-  }, [collectionsPks.length])
-  useEffect(() => {
-    onNftSelect(selectedNfts)
   }, [selectedNfts])
+  useEffect(() => {
+    console.log(predefinedNfts)
+    if (predefinedNfts && isPredefinedMode) {
+      setNfts(predefinedNfts)
+    }
+  }, [predefinedNfts?.length])
   return (
     <>
       <div

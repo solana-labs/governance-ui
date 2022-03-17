@@ -23,6 +23,7 @@ import {
 } from 'NftVotePlugin/sdk/accounts'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
 
 type updateVoterWeightRecordTypes =
   | 'castVote'
@@ -41,11 +42,13 @@ export class VotingClient {
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   currentVoterNftsAccounts: { metadata: Metadata; tokenAddress: PublicKey }[]
+  votingNfts: NFTWithMint[]
   constructor({ client, realm, walletPk }: VotingClientProps) {
     this.client = client
     this.realm = realm
     this.walletPk = walletPk
     this.currentVoterNftsAccounts = []
+    this.votingNfts = []
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
@@ -281,8 +284,12 @@ export class VotingClient {
 
     return { voterWeightPk, voterWeightRecordBump }
   }
-  _setCurrentVoterNfts = (nfts: any[]) => {
+  _setCurrentVoterNftsAccounts = (nfts: any[]) => {
     this.currentVoterNftsAccounts = nfts
+  }
+  _setCurrentVoterNfts = (nfts: NFTWithMint[]) => {
+    console.log(nfts, '@#($*&@#(*$&(@#$()@#*$')
+    this.votingNfts = nfts
   }
 }
 interface UseVotePluginsClientStore extends State {
