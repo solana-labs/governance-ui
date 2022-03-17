@@ -20,6 +20,7 @@ import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeR
 import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import { isPhantomBrowser, isSolanaBrowser, web3 } from '@utils/browserInfo'
+import router, { useRouter } from 'next/router'
 
 declare global {
     interface Window {
@@ -30,6 +31,7 @@ declare global {
 function App({ Component, pageProps }) {
 	useHydrateStore()
 	useWallet()
+	const router = useRouter();
 	const  { history, getLastRoute, getPathName } = useRouterHistory()
 	useVoteRegistry()
 	handleGovernanceAssetsStore()
@@ -78,6 +80,7 @@ function App({ Component, pageProps }) {
 	useEffect(() => {
 		loadMarket(connection, connection.cluster)
 	}, [connection.cluster])
+
 	useEffect(() => {
 		if (realm?.account.config.useCommunityVoterWeightAddin && realm.pubkey && wallet?.connected && client) {
 			getOwnedDeposits({
@@ -91,6 +94,13 @@ function App({ Component, pageProps }) {
 			resetDepositState()
 		}
 	}, [realm?.pubkey.toBase58(), ownTokenRecord?.pubkey.toBase58(), wallet?.connected, client])
+
+	useEffect(() => {
+		setSolanaBrowser(isSolanaBrowser());
+		setPhantomBrowser(isPhantomBrowser());
+	}, [router])
+
+
 	return (
 		<div className="relative">
 			<Head>
