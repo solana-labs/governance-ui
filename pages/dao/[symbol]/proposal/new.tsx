@@ -778,7 +778,7 @@ const New = (props) => {
 							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
 						</p>
 
-						{loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo && (
+						{/* {loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo && (
 							<p className="mt-16 py-4 border-t border-b border-green">
 								We restored your past entry. Want to start fresh?{' '}
 								<a
@@ -821,7 +821,7 @@ const New = (props) => {
 									Click here.
 								</a>
 							</p>
-						)}
+						)} */}
 
 						<>
 							<div className="pt-8 mb-20">
