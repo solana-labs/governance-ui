@@ -104,23 +104,22 @@ const New = (props) => {
 	const [submittingStep, setSubmittingStep] = useState<any>([])
 
 	const [propertyData, setPropertyData] = useState({
-		symbol: 'TOKR',
+		symbol: 'rNFT',
 		name: '',
-		description: '',
 		property_address: '',
+		description: '',
+		image: '',
 		lat_long: '',
+		sq_ft: '',
 		acres: '',
-		title_method: 'Sole Ownership',
+		type: '',
+		tax_parcel_numbers: '',
 		title_held_by: '',
 		ein_number: '',
+		title_method: 'Sole Ownership',
 		transfer_restrictions: '',
-		marketing_name: '',
-		type: '',
-		sq_ft: '',
-		property_legal_description: '',
-		tax_parcel_numbers: '',
-		deed: '',
 		title_insurance: '',
+		deed: '',
 		purchase_contract: '',
 		mortgage: '',
 		lao_articles_of_organization_from_secretary_of_state: '',
@@ -130,94 +129,109 @@ const New = (props) => {
 		assignment_of_membership_interests_agreement: '',
 		submitted_by_authorized_representative: '',
 		legal: `Buyer and Seller hereby acknowledge and agree that each have become a party to the Assignment of Membership Interests by purchasing or selling this rNFT, which Assignment of Membership Interests is linked in the rNFT metadata and is effective as of the date and time of the transfer of the rNFT. Buyer and Seller hereby acknowledge and agree that, by signing the smart contract to transfer this rNFT for the consideration documented on the blockchain, each are effectuating the transfer of the Membership Interest described in the Assignment of Membership Interest from Seller to Buyer upon the terms and subject to the conditions contained therein. \nThe Current Owner, Tokr DAO, and any Tokr affiliates or contributors to the open source software and systems involved in the Tokr Protocol and the minting of this rNFT hereby disclaim any representation or warranty relating to the sufficiency or adequacy of the title to the real estate owned by the entity specified in the rNFT metadata, and, by purchasing this rNFT, you hereby acknowledge that you are not relying on any such representations or warranties. Linked in the metadata is a copy of the Owner's Title Insurance Policy that was obtained at the time of acquisition (or subsequently as amended in the metadata, if applicable). The metadata and documentation submitted as part of rNFT certification and verification process is intended to make data collection easier to assist you in conducting your own due diligence. It is strongly encouraged that you conduct your own research and additional due diligence as it relates to the sufficiency and adequacy of the title to such real estate prior to acquiring this rNFT, which may include obtaining a title insurance policy. Any validations or certifications made by the Current Owner or Tokr DAO and any affiliates or contributors relating to the rNFT do not relate to the title of such real estate.`,
-		image: '',
 		uri: arWeaveLink || '',
 	})
 
 	const [descriptionLink, setDescriptionLink] = useState({})
 	const [metaplexDataObj, setMetaplexDataObj] = useState({
 		name: '',
-		symbol: 'TOKR',
+		symbol: 'rNFT',
 		description: '',
 		image: '',
 		attributes: [
 			{
 				trait_type: 'name',
 				value: '',
-			},{
-				trait_type: 'description',
-				value: '',
-			}, {
+			},
+			{
 				trait_type: 'property_address',
 				value: '',
-			}, {
+			},
+			{
+				trait_type: 'description',
+				value: '',
+			},
+			{
 				trait_type: 'lat_long',
 				value: '',
-			}, {
-				trait_type: 'acres',
-				value: '',
-			}, {
-				trait_type: 'title_method',
-				value: '',
-			}, {
-				trait_type: 'title_held_by',
-				value: '',
-			}, {
-				trait_type: 'ein_number',
-				value: '',
-			}, {
-				trait_type: 'transfer_restrictions',
-				value: '',
-			}, 	{
-				trait_type: 'marketing_name',
-				value: '',
-			}, {
-				trait_type: 'type',
-				value: '',
-			}, {
+			},
+			{
 				trait_type: 'sq_ft',
 				value: '',
-			}, {
-				trait_type: 'property_legal_description',
+			},
+			{
+				trait_type: 'acres',
 				value: '',
-			}, {
+			},
+			{
+				trait_type: 'type',
+				value: '',
+			},
+			{
 				trait_type: 'tax_parcel_numbers',
 				value: '',
-			}, {
-				trait_type: 'deed',
+			},
+			{
+				trait_type: 'title_held_by',
 				value: '',
-			}, 	{
+			},
+			{
+				trait_type: 'ein_number',
+				value: '',
+			},
+			{
+				trait_type: 'title_method',
+				value: '',
+			},
+			{
+				trait_type: 'transfer_restrictions',
+				value: '',
+			},
+			{
 				trait_type: 'title_insurance',
 				value: '',
-			}, {
+			},
+			{
+				trait_type: 'deed',
+				value: '',
+			},
+			{
 				trait_type: 'purchase_contract',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'mortgage',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'lao_articles_of_organization_from_secretary_of_state',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'spv_articles_of_organization_from_secretary_of_state',
 				value: '',
-			}, 	{
+			},
+			{
 				trait_type: 'spv_operating_agreement',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'ein_letter_from_irs',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'assignment_of_membership_interests_agreement',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'submitted_by_authorized_representative',
 				value: '',
-			}, {
+			},
+			{
 				trait_type: 'legal',
 				value: `Buyer and Seller hereby acknowledge and agree that each have become a party to the Assignment of Membership Interests by purchasing or selling this rNFT, which Assignment of Membership Interests is linked in the rNFT metadata and is effective as of the date and time of the transfer of the rNFT. Buyer and Seller hereby acknowledge and agree that, by signing the smart contract to transfer this rNFT for the consideration documented on the blockchain, each are effectuating the transfer of the Membership Interest described in the Assignment of Membership Interest from Seller to Buyer upon the terms and subject to the conditions contained therein. \nThe Current Owner, Tokr DAO, and any Tokr affiliates or contributors to the open source software and systems involved in the Tokr Protocol and the minting of this rNFT hereby disclaim any representation or warranty relating to the sufficiency or adequacy of the title to the real estate owned by the entity specified in the rNFT metadata, and, by purchasing this rNFT, you hereby acknowledge that you are not relying on any such representations or warranties. Linked in the metadata is a copy of the Owner's Title Insurance Policy that was obtained at the time of acquisition (or subsequently as amended in the metadata, if applicable). The metadata and documentation submitted as part of rNFT certification and verification process is intended to make data collection easier to assist you in conducting your own due diligence. It is strongly encouraged that you conduct your own research and additional due diligence as it relates to the sufficiency and adequacy of the title to such real estate prior to acquiring this rNFT, which may include obtaining a title insurance policy. Any validations or certifications made by the Current Owner or Tokr DAO and any affiliates or contributors relating to the rNFT do not relate to the title of such real estate.`,
-			}
-		]
+			},
+		],
 	})
 
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
@@ -471,7 +485,7 @@ const New = (props) => {
 			if (proposalType === 1) {
 				setMetaplexDataObj({
 					name: propertyData.name,
-					symbol: 'TOKR-g1',
+					symbol: 'rNFT',
 					description: propertyData.description,
 					image: propertyData.image,
 					attributes: [
@@ -500,27 +514,33 @@ const New = (props) => {
 			} else {
 				setMetaplexDataObj({
 					name: propertyData.name,
-					symbol: 'TOKR-g1',
+					symbol: 'rNFT',
 					description: propertyData.description,
 					image: propertyData.image,
 					attributes: [ {
 							"trait_type": "name",
 							"value": propertyData.name
 						}, {
-							"trait_type": "description",
-							"value": propertyData.description
-						}, {
 							"trait_type": "property_address",
 							"value": propertyData.property_address
+						}, {
+							"trait_type": "description",
+							"value": propertyData.description
 						}, 	{
 							"trait_type": "lat_long",
 							"value": propertyData.lat_long
+						}, {
+							"trait_type": "sq_ft",
+							"value": propertyData.sq_ft
 						}, 	{
 							"trait_type": "acres",
 							"value": propertyData.acres
 						}, {
-							"trait_type": "title_method",
-							"value": propertyData.title_method
+							"trait_type": "type",
+							"value": propertyData.type
+						}, {
+							"trait_type": "tax_parcel_numbers",
+							"value": propertyData.tax_parcel_numbers
 						}, {
 							"trait_type": "title_held_by",
 							"value": propertyData.title_held_by
@@ -528,30 +548,18 @@ const New = (props) => {
 							"trait_type": "ein_number",
 							"value": propertyData.ein_number
 						}, {
+							"trait_type": "title_method",
+							"value": propertyData.title_method
+						}, {
 							"trait_type": "transfer_restrictions",
 							"value": propertyData.transfer_restrictions
 						}, {
-							"trait_type": "marketing_name",
-							"value": propertyData.marketing_name
-						}, {
-							"trait_type": "type",
-							"value": propertyData.type
-						}, {
-							"trait_type": "sq_ft",
-							"value": propertyData.sq_ft
-						}, 	{
-							"trait_type": "property_legal_description",
-							"value": propertyData.property_legal_description
-						}, {
-							"trait_type": "tax_parcel_numbers",
-							"value": propertyData.tax_parcel_numbers
+							"trait_type": "title_insurance",
+							"value": propertyData.title_insurance
 						}, 	{
 							"trait_type": "deed",
 							"value": propertyData.deed
-						}, {
-							"trait_type": "title_insurance",
-							"value": propertyData.title_insurance
-						}, {
+						},, {
 							"trait_type": "purchase_contract",
 							"value": propertyData.purchase_contract
 						}, {
