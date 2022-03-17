@@ -21,18 +21,20 @@ import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import { isPhantomBrowser, isSolanaBrowser, web3 } from '@utils/browserInfo'
 import router, { useRouter } from 'next/router'
+import packageJson from '../package.json'
 
 declare global {
-    interface Window {
-        solana:any;
-    }
+	interface Window {
+		solana: any
+	}
 }
 
 function App({ Component, pageProps }) {
+	console.log('LOADING VERSION ', packageJson.version)
 	useHydrateStore()
 	useWallet()
-	const router = useRouter();
-	const  { history, getLastRoute, getPathName } = useRouterHistory()
+	const router = useRouter()
+	const { history, getLastRoute, getPathName } = useRouterHistory()
 	useVoteRegistry()
 	handleGovernanceAssetsStore()
 	const { loadMarket } = useMarketStore()
@@ -46,31 +48,28 @@ function App({ Component, pageProps }) {
 	const title = realmName ? `${realmName} || tokr_` : 'tokr_'
 	const description = `A protocol for financing real world assets on the Solana blockchain. Discuss and vote on ${title} proposals.`
 
-	const [pathName, setPathName] = useState('/');
-	const [showNav, setShowNav] = useState(true);
-
+	const [pathName, setPathName] = useState('/')
+	const [showNav, setShowNav] = useState(true)
 
 	useLayoutEffect(() => {
-		setShowNav((getPathName() === '/' || getPathName() === undefined) ? false : true)
+		setShowNav(getPathName() === '/' || getPathName() === undefined ? false : true)
 		setPathName(getPathName())
 	}, [history])
 
-
 	const [solanaBrowser, setSolanaBrowser] = useState<boolean>(false)
-	const [phantomBrowser, setPhantomBrowser] = useState<boolean>(false);
+	const [phantomBrowser, setPhantomBrowser] = useState<boolean>(false)
 
 	const globalProps = {
 		isSolanaBrowser: solanaBrowser,
 		isPhantomBrowser: phantomBrowser,
-		web3: ((solanaBrowser || phantomBrowser) ? true: false),
-		...pageProps
+		web3: solanaBrowser || phantomBrowser ? true : false,
+		...pageProps,
 	}
 
 	useLayoutEffect(() => {
-		setSolanaBrowser(isSolanaBrowser());
-		setPhantomBrowser(isPhantomBrowser());
+		setSolanaBrowser(isSolanaBrowser())
+		setPhantomBrowser(isPhantomBrowser())
 	}, [])
-
 
 	// Note: ?v==${Date.now()} is added to the url to force favicon refresh.
 	// Without it browsers would cache the last used and won't change it for different realms
@@ -96,10 +95,9 @@ function App({ Component, pageProps }) {
 	}, [realm?.pubkey.toBase58(), ownTokenRecord?.pubkey.toBase58(), wallet?.connected, client])
 
 	useEffect(() => {
-		setSolanaBrowser(isSolanaBrowser());
-		setPhantomBrowser(isPhantomBrowser());
+		setSolanaBrowser(isSolanaBrowser())
+		setPhantomBrowser(isPhantomBrowser())
 	}, [router])
-
 
 	return (
 		<div className="relative">
@@ -108,21 +106,21 @@ function App({ Component, pageProps }) {
 				<link rel="preconnect" href="https://fonts.gstatic.com" />
 				<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap" rel="stylesheet" />
 
-				<link rel="apple-touch-icon" sizes="57x57" href="/images/apple-icon-57x57.png"/>
-				<link rel="apple-touch-icon" sizes="60x60" href="/images/apple-icon-60x60.png"/>
-				<link rel="apple-touch-icon" sizes="72x72" href="/images/apple-icon-72x72.png"/>
-				<link rel="apple-touch-icon" sizes="76x76" href="/images/apple-icon-76x76.png"/>
-				<link rel="apple-touch-icon" sizes="114x114" href="/images/apple-icon-114x114.png"/>
-				<link rel="apple-touch-icon" sizes="120x120" href="/images/apple-icon-120x120.png"/>
-				<link rel="apple-touch-icon" sizes="144x144" href="/images/apple-icon-144x144.png"/>
-				<link rel="apple-touch-icon" sizes="152x152" href="/images/apple-icon-152x152.png"/>
-				<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-icon-180x180.png"/>
-				<link rel="icon" type="image/png" sizes="192x192"  href="/images/android-icon-192x192.png"/>
-				<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png"/>
-				<link rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png"/>
-				<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png"/>
-				<meta name="msapplication-TileColor" content="#282828"/>
-				<meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png"/>
+				<link rel="apple-touch-icon" sizes="57x57" href="/images/apple-icon-57x57.png" />
+				<link rel="apple-touch-icon" sizes="60x60" href="/images/apple-icon-60x60.png" />
+				<link rel="apple-touch-icon" sizes="72x72" href="/images/apple-icon-72x72.png" />
+				<link rel="apple-touch-icon" sizes="76x76" href="/images/apple-icon-76x76.png" />
+				<link rel="apple-touch-icon" sizes="114x114" href="/images/apple-icon-114x114.png" />
+				<link rel="apple-touch-icon" sizes="120x120" href="/images/apple-icon-120x120.png" />
+				<link rel="apple-touch-icon" sizes="144x144" href="/images/apple-icon-144x144.png" />
+				<link rel="apple-touch-icon" sizes="152x152" href="/images/apple-icon-152x152.png" />
+				<link rel="apple-touch-icon" sizes="180x180" href="/images/apple-icon-180x180.png" />
+				<link rel="icon" type="image/png" sizes="192x192" href="/images/android-icon-192x192.png" />
+				<link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png" />
+				<link rel="icon" type="image/png" sizes="96x96" href="/images/favicon-96x96.png" />
+				<link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png" />
+				<meta name="msapplication-TileColor" content="#282828" />
+				<meta name="msapplication-TileImage" content="/images/ms-icon-144x144.png" />
 				<meta name="theme-color" content="#282828" />
 
 				{/* {faviconUrl && <link rel="icon" href={faviconUrl} />} */}
@@ -145,7 +143,6 @@ function App({ Component, pageProps }) {
 				<meta name="twitter:card" content="summary" />
 
 				{realmInfo?.twitter && <meta name="twitter:site" content={realmInfo.twitter} />}
-
 			</Head>
 			<ErrorBoundary>
 				<ThemeProvider defaultTheme="Mango">
