@@ -13,7 +13,7 @@ import { UiInstruction } from './uiTypes/proposalCreationTypes'
 
 const TOKEN_METADATA_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s')
 
-const TOKR_PROGRAM = new PublicKey('9e78qsrsE2e5Q97T1biobry8mSot8NorEDJHJnMa5CpN')
+const TOKR_PROGRAM = new PublicKey('Tokr9wmF3VjWEqQAafPfFNhSTava68UJszr5wxnSuwK')
 
 
 
