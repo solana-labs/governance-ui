@@ -398,7 +398,7 @@ export const deserializeMint = (data: Buffer) => {
 export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
   try {
     const nfts = await getParsedNftAccountsByOwner({
-      publicAddress: ownerPk,
+      publicAddress: ownerPk.toBase58(),
       connection: connection,
     })
     const data = Object.keys(nfts).map((key) => nfts[key])
