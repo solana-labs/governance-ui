@@ -238,13 +238,13 @@ export class VotingClient {
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey,
     clientProgramId: PublicKey,
-    instructions
+    _instructions
   ) => {
     if (this.client instanceof NftVoterClient === false) {
       throw 'Method only allowed for nft voter client'
     }
-    let isExisting: any = undefined
-    const client = this.client as NftVoterClient
+    // let isExisting: any = undefined
+    // const client = this.client as NftVoterClient
     const {
       voterWeightPk,
       voterWeightRecordBump,
