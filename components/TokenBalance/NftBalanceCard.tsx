@@ -9,7 +9,6 @@ import {
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
-import { useEffect } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
