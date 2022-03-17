@@ -117,6 +117,7 @@ const New = (props) => {
 		ein_number: '',
 		title_method: 'Sole Ownership',
 		transfer_restrictions: '',
+		title_insured_by: '',
 		title_insurance: '',
 		deed: '',
 		purchase_contract: '',
@@ -184,6 +185,10 @@ const New = (props) => {
 			},
 			{
 				trait_type: 'transfer_restrictions',
+				value: '',
+			},
+			{
+				trait_type: 'title_insured_by',
 				value: '',
 			},
 			{
@@ -565,6 +570,10 @@ const New = (props) => {
 							value: propertyData.transfer_restrictions,
 						},
 						{
+							trait_type: 'title_insured_by',
+							value: propertyData.title_insured_by,
+						},
+						{
 							trait_type: 'title_insurance',
 							value: propertyData.title_insurance,
 						},
@@ -769,7 +778,7 @@ const New = (props) => {
 							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
 						</p>
 
-						{((loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo)) && (
+						{loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo && (
 							<p className="mt-16 py-4 border-t border-b border-green">
 								We restored your past entry. Want to start fresh?{' '}
 								<a
@@ -791,6 +800,7 @@ const New = (props) => {
 											sq_ft: '',
 											tax_parcel_numbers: '',
 											deed: '',
+											title_insured_by: '',
 											title_insurance: '',
 											purchase_contract: '',
 											mortgage: '',
@@ -1171,12 +1181,38 @@ const New = (props) => {
 
 														<div className="xpb-4">
 															<Input
-																label="Title Insurance"
-																placeholder="Title Insuranced By"
+																label="Title Insured By"
+																// placeholder=""
+																value={propertyData.title_insured_by}
+																id="title_insured_by"
+																name="title_insured_by"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['title_insured_by']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'title_insured_by',
+																	})
+																}
+															/>
+														</div>
+													</div>
+
+													<div className="space-y-4">
+														<h3>
+															<span className="text-lg">Documentation</span>
+														</h3>
+
+														<div className="xpb-4">
+															<Input
+																label="Title Insurance Policy"
+																placeholder="https://"
 																value={propertyData.title_insurance}
 																id="title_insurance"
 																name="title_insurance"
-																type="text"
+																type="url"
 																className="field-validate"
 																required
 																// error={propertyDataErrors['title_insurance']}
@@ -1188,12 +1224,7 @@ const New = (props) => {
 																}
 															/>
 														</div>
-													</div>
 
-													<div className="space-y-4">
-														<h3>
-															<span className="text-lg">Documentation</span>
-														</h3>
 														<div className="xpb-4">
 															<Input
 																label="Deed"
