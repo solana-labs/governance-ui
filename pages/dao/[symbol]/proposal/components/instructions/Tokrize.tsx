@@ -84,12 +84,6 @@ const TokrizeContract = ({ index, governance, propertyDetails, lookupUri }: { in
 			}),
 	})
 
-	useEffect(() => {
-		if (propertyDetails) {
-			console.log('propertyDetails!!!', propertyDetails)
-		}
-	}, [propertyDetails])
-
 	return (
 		<>
 			<div className="space-y-4">
