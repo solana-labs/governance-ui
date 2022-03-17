@@ -143,7 +143,8 @@ export interface RefreshReserveForm {
  * @param programID
  */
 export interface IDLForm {
-  programID?: any // TODO make type later
+  programID?: string
+  selectedInstruction?: string
 }
 
 export enum Instructions {

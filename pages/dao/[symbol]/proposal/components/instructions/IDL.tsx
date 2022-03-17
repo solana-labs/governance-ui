@@ -1,5 +1,5 @@
-import React, { useContext, /* useEffect, */ useState } from 'react'
-import * as yup from 'yup'
+import React, { /* useContext, useEffect, */ useState } from 'react'
+// import * as yup from 'yup'
 import {
   // getInstructionDataFromBase64,
   Governance,
@@ -17,7 +17,7 @@ import {
 
 import useWalletStore from 'stores/useWalletStore'
 
-import { NewProposalContext } from '../../new'
+// import { NewProposalContext } from '../../new'
 // import GovernedAccountSelect from '../GovernedAccountSelect'
 // import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import * as anchor from '@project-serum/anchor'
@@ -33,21 +33,25 @@ const IDLInstructions = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  console.log(index, governance)
   const wallet = useWalletStore((s) => s.current)
   // const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   // const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<IDLForm>({
     programID: '',
+    selectedInstruction: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const [programInstructions, setProgramInstructions] = useState<
     IdlInstruction[]
   >([])
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  // const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
-    fetchIDL(wallet! as any, testConnection, value)
+    {
+      !form.programID && fetchIDL(wallet! as any, testConnection, value)
+    } // TODO test to see if it breaks on 2nd IDL input and then switch instructions
   }
   // async function getInstruction(): Promise<UiInstruction> {
   //   const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -69,31 +73,31 @@ const IDLInstructions = ({
   //     index
   //   )
   // }, [form])
-  const schema = yup.object().shape({
-    programID: yup.string().required('Program ID is required'),
-    // .test('base64Test', 'Invalid base64', function (val: string) { // TODO
-    //   if (val) {
-    //     try {
-    //       getInstructionDataFromBase64(val)
-    //       return true
-    //     } catch (e) {
-    //       return false
-    //     }
-    //   } else {
-    //     return this.createError({
-    //       message: `Instruction is required`,
-    //     })
-    //   }
-    // }),
-  })
-  const validateAmountOnBlur = () => {
-    const value = form.programID
+  // const schema = yup.object().shape({
+  //   programID: yup.string().required('Program ID is required'),
+  // .test('base64Test', 'Invalid base64', function (val: string) {
+  //   if (val) {
+  //     try {
+  //       getInstructionDataFromBase64(val)
+  //       return true
+  //     } catch (e) {
+  //       return false
+  //     }
+  //   } else {
+  //     return this.createError({
+  //       message: `Instruction is required`,
+  //     })
+  //   }
+  // }),
+  // })
+  // const validateAmountOnBlur = () => {
+  //   const value = form.programID
 
-    handleSetForm({
-      value: value,
-      propertyName: 'holdUpTime',
-    })
-  }
+  //   handleSetForm({
+  //     value: value,
+  //     propertyName: 'holdUpTime',
+  //   })
+  // }
 
   const opts = {
     preflightCommitment: 'processed' as ConfirmOptions,
@@ -114,6 +118,8 @@ const IDLInstructions = ({
     })
     const fetchedIDL = await anchor.Program.fetchIdl(idl, provider)
     setProgramInstructions(fetchedIDL!.instructions)
+    console.log('fetchedIDL', fetchedIDL!.instructions)
+    // console.log("test", fetchedIDL!.instructions.filter((obj) => {return obj.name === "mintNft"}))
   }
 
   return (
@@ -132,17 +138,50 @@ const IDLInstructions = ({
         error={formErrors['programID']}
       />
       {form.programID && (
-        <Select value={'Program Instructions'} onChange={() => {}}>
-          {form.programID &&
-            programInstructions.map((x) => {
-              return (
-                <Select.Option key={x.name} value={x.name}>
-                  {x.name}
-                </Select.Option>
-              )
-            })}
+        <Select
+          label="Program Instructions"
+          placeholder="Select Program Instructions"
+          value={form.selectedInstruction}
+          onChange={(value) => {
+            handleSetForm({ value: value, propertyName: 'selectedInstruction' })
+          }}
+        >
+          {programInstructions.map((x) => {
+            return (
+              <Select.Option key={x.name} value={x.name}>
+                {x.name}
+              </Select.Option>
+            )
+          })}
         </Select>
       )}
+      {form.selectedInstruction &&
+        programInstructions
+          .filter((obj) => {
+            return obj.name === form.selectedInstruction
+          })
+          .map((account) => {
+            console.log('account', account)
+            return account.accounts.map((actualaccount, idx) => {
+              return (
+                <Select
+                  key={idx}
+                  label={actualaccount.name}
+                  placeholder={'wallet/program id'}
+                  value={''}
+                  onChange={() => {}}
+                ></Select>
+              )
+            })
+
+            //   return (
+            //     <Select label={account.name} placeholder={account.name} value={"test"} onChange={() => {}}>
+
+            //       {console.log(account)}
+            //     </Select>
+
+            //   )
+          })}
       {/* TODO make sure programID is valid */}
     </>
   )
