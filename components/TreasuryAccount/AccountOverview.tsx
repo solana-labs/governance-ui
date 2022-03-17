@@ -100,6 +100,8 @@ const AccountOverview = () => {
         setAccountInvestments(
           eligibleInvestments.filter((x) => x.protocolName === MANGO)
         )
+      } else {
+        setAccountInvestments([])
       }
     }
     if (eligibleInvestments.filter((x) => x.protocolName === MANGO).length) {
