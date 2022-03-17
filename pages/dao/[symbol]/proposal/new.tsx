@@ -709,8 +709,8 @@ const New = (props) => {
 			if (JSON.parse(temp)?.name) {
 				setPropertyData(JSON.parse(temp));
 				setLoadedLS(true);
+				setPropertyName(JSON.parse(temp)?.name)
 			}
-			console.log(proposalType)
 		}
 	}, [router, realmInfo, initalLoad, proposalType])
 
