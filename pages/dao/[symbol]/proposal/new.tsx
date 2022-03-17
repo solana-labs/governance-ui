@@ -110,7 +110,7 @@ const New = (props) => {
 		property_address: '',
 		lat_long: '',
 		acres: '',
-		title_method: '',
+		title_method: 'Sole Ownership',
 		title_held_by: '',
 		ein_number: '',
 		transfer_restrictions: '',
@@ -585,7 +585,7 @@ const New = (props) => {
 		} else {
 			setMetaplexDataObj({
 				name: propertyData.name,
-				symbol: 'TOKR',
+				symbol: propertyData.symbol,
 				description: propertyData.description,
 				image: propertyData.image,
 				attributes: [
@@ -1077,7 +1077,7 @@ const New = (props) => {
 											image: '',
 											uri: arWeaveLink || '',
 										})
-										removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? '_' + router?.query?.type : ( (proposalType === 1 || proposalType === 2) ? '_' + proposalType : '')}`)
+										removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? '_' + router?.query?.type : proposalType === 1 || proposalType === 2 ? '_' + proposalType : ''}`)
 										e.preventDefault()
 									}}
 								>
@@ -1142,15 +1142,21 @@ const New = (props) => {
 										<>
 											<>
 												<>
-													<div className="u-offset-2-sm u-offset-4-sm o-flex-1">
-														<div className="pb-4">
+													<div className="space-y-4">
+														<h3>
+															<span className="text-lg">Property Information</span>
+														</h3>
+
+														<div className="pb-4 hidden">
 															<Input
 																label="Symbol"
 																placeholder="Symbol"
 																value={propertyData.symbol}
 																id="symbol"
 																name="symbol"
-																type="text"
+																type="hidden"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['symbol']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1161,10 +1167,10 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Name"
-																placeholder="Name"
+																label="Property Name"
+																placeholder="Name representing the property"
 																value={propertyData?.name}
 																id="name"
 																name="name"
@@ -1185,9 +1191,28 @@ const New = (props) => {
 														</div>
 
 														<div className="xpb-4">
+															<Input
+																label="Property Address"
+																placeholder="Enter full address of property"
+																value={propertyData.property_address}
+																id="property_address"
+																name="property_address"
+																type="search"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['property_address']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'property_address',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="xpb-4">
 															<Textarea
-																label="Description"
-																placeholder="Description"
+																label="Property Description"
 																value={propertyData?.description}
 																id="description"
 																name="description"
@@ -1205,34 +1230,34 @@ const New = (props) => {
 															<div className="text-xs pt-2 pb-4">Did you know? You can use Markdown!</div>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Property Address"
-																placeholder="Property Address"
-																value={propertyData.property_address}
-																id="property_address"
-																name="property_address"
-																type="text"
-																// error={propertyDataErrors['property_address']}
+																label="Image"
+																placeholder="https://..."
+																value={propertyData?.image}
+																id="image"
+																name="image"
+																type="url"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['description']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'property_address',
+																		propertyName: 'image',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Lat Long"
-																placeholder="Lat, Long"
+																label="Coordinates"
+																placeholder="Latitude, Longitude"
 																value={propertyData?.lat_long}
 																id="lat_long"
 																name="lat_long"
 																type="text"
-																className="field-validate"
-																required
 																// error={propertyDataErrors['lat_long']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1250,140 +1275,16 @@ const New = (props) => {
 															</div>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Acres"
-																placeholder="Acres"
-																value={propertyData.acres}
-																id="acres"
-																name="acres"
-																type="text"
-																// error={propertyDataErrors['acres']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'acres',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Title Method"
-																placeholder="Title Method"
-																value={propertyData.title_method}
-																id="title_method"
-																name="title_method"
-																type="text"
-																// error={propertyDataErrors['title_method']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'title_method',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Title Held By"
-																placeholder="Title Held By"
-																value={propertyData.title_held_by}
-																id="title_held_by"
-																name="title_held_by"
-																type="text"
-																// error={propertyDataErrors['title_held_by']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'title_held_by',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Ein Number"
-																placeholder="Ein Number"
-																value={propertyData.ein_number}
-																id="ein_number"
-																name="ein_number"
-																type="text"
-																// error={propertyDataErrors['ein_number']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'ein_number',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Transfer Restrictions"
-																placeholder="Transfer Restrictions"
-																value={propertyData.transfer_restrictions}
-																id="transfer_restrictions"
-																name="transfer_restrictions"
-																type="text"
-																// error={propertyDataErrors['transfer_restrictions']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'transfer_restrictions',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Marketing Name"
-																placeholder="Marketing Name"
-																value={propertyData.marketing_name}
-																id="marketing_name"
-																name="marketing_name"
-																type="text"
-																// error={propertyDataErrors['marketing_name']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'marketing_name',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Type"
-																placeholder="Type"
-																value={propertyData.type}
-																id="type"
-																name="type"
-																type="text"
-																// error={propertyDataErrors['type']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'type',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="pb-4">
-															<Input
-																label="Sq Ft"
-																placeholder="Sq Ft"
+																label="Square Feet"
+																placeholder="#"
 																value={propertyData.sq_ft}
 																id="sq_ft"
 																name="sq_ft"
-																type="text"
+																type="tel"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['sq_ft']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1394,32 +1295,56 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Property Legal Description"
-																placeholder="Property Legal Description"
-																value={propertyData.property_legal_description}
-																id="property_legal_description"
-																name="property_legal_description"
-																type="text"
-																// error={propertyDataErrors['property_legal_description']}
+																label="Acres"
+																placeholder="#"
+																value={propertyData.acres}
+																id="acres"
+																name="acres"
+																type="tel"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['acres']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'property_legal_description',
+																		propertyName: 'acres',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
+															<Input
+																label="Type"
+																placeholder="e.g. Lot, Commercial, Multi-Family, Single-Family, Other"
+																value={propertyData.type}
+																id="type"
+																name="type"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['type']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'type',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="xpb-4">
 															<Input
 																label="Tax Parcel Numbers"
-																placeholder="Tax Parcel Numbers"
+																placeholder="(Located in your Deed or Title Insurance Docs)"
 																value={propertyData.tax_parcel_numbers}
 																id="tax_parcel_numbers"
 																name="tax_parcel_numbers"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['tax_parcel_numbers']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1430,32 +1355,105 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+													</div>
+
+													<div className="space-y-4">
+														<h3>
+															<span className="text-lg">Title Attributes</span>
+														</h3>
+
+														<div className="xpb-4">
 															<Input
-																label="Deed"
-																placeholder="Deed"
-																value={propertyData.deed}
-																id="deed"
-																name="deed"
+																label="Title Held By"
+																placeholder="The SPV LLC"
+																value={propertyData.title_held_by}
+																id="title_held_by"
+																name="title_held_by"
 																type="text"
-																// error={propertyDataErrors['deed']}
+																className="field-validate"
+																required
+																// error={propertyDataErrors['title_held_by']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'deed',
+																		propertyName: 'title_held_by',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="pb-4">
+
+														<div className="xpb-4">
+															<Input
+																label="EIN Number"
+																placeholder="EIN of the SPV LLC"
+																value={propertyData.ein_number}
+																id="ein_number"
+																name="ein_number"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['ein_number']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'ein_number',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="xpb-4">
+															<Input
+																label="Title Method"
+																placeholder="e.g. Sole Ownership"
+																value={propertyData.title_method}
+																id="title_method"
+																name="title_method"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['title_method']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'title_method',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="xpb-4">
+															<Input
+																label="Transfer Restrictions"
+																placeholder="Transfer Restrictions"
+																value={propertyData.transfer_restrictions}
+																id="transfer_restrictions"
+																name="transfer_restrictions"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['transfer_restrictions']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'transfer_restrictions',
+																	})
+																}
+															/>
+														</div>
+
+
+														<div className="xpb-4">
 															<Input
 																label="Title Insurance"
-																placeholder="Title Insurance"
+																placeholder="Title Insuranced By"
 																value={propertyData.title_insurance}
 																id="title_insurance"
 																name="title_insurance"
 																type="text"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['title_insurance']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1466,14 +1464,43 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+													</div>
+
+													<div className="space-y-4">
+														<h3>
+															<span className="text-lg">Documentation</span>
+														</h3>
+														<div className="xpb-4">
+															<Input
+																label="Deed"
+																placeholder="https://...."
+																value={propertyData.deed}
+																id="deed"
+																name="deed"
+																type="url"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['deed']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'deed',
+																	})
+																}
+															/>
+														</div>
+
+
+														<div className="xpb-4">
 															<Input
 																label="Purchase Contract"
-																placeholder="Purchase Contract"
+																placeholder="https://...."
 																value={propertyData.purchase_contract}
 																id="purchase_contract"
 																name="purchase_contract"
-																type="text"
+																type="url"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['purchase_contract']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1484,10 +1511,10 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
 																label="Mortgage"
-																placeholder="Mortgage"
+																placeholder="https://...."
 																value={propertyData.mortgage}
 																id="mortgage"
 																name="mortgage"
@@ -1502,14 +1529,16 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Lao Articles Of Organization From Secretary Of State"
-																placeholder="Lao Articles Of Organization From Secretary Of State"
+																label="LAO Articles Of Organization From Secretary Of State"
+																placeholder="https://...."
 																value={propertyData.lao_articles_of_organization_from_secretary_of_state}
 																id="lao_articles_of_organization_from_secretary_of_state"
 																name="lao_articles_of_organization_from_secretary_of_state"
-																type="text"
+																type="url"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['lao_articles_of_organization_from_secretary_of_state']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1520,14 +1549,16 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Spv Articles Of Organization From Secretary Of State"
-																placeholder="Spv Articles Of Organization From Secretary Of State"
+																label="SPV Articles Of Organization From Secretary Of State"
+																placeholder="https://...."
 																value={propertyData.spv_articles_of_organization_from_secretary_of_state}
 																id="spv_articles_of_organization_from_secretary_of_state"
 																name="spv_articles_of_organization_from_secretary_of_state"
-																type="text"
+																type="url"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['spv_articles_of_organization_from_secretary_of_state']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1538,14 +1569,16 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Spv Operating Agreement"
-																placeholder="Spv Operating Agreement"
+																label="SPV Operating Agreement"
+																placeholder="https://...."
 																value={propertyData.spv_operating_agreement}
 																id="spv_operating_agreement"
 																name="spv_operating_agreement"
-																type="text"
+																type="url"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['spv_operating_agreement']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1556,14 +1589,16 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
-																label="Ein Letter From Irs"
-																placeholder="Ein Letter From Irs"
+																label="EIN Letter from IRS"
+																placeholder="https://...."
 																value={propertyData.ein_letter_from_irs}
 																id="ein_letter_from_irs"
 																name="ein_letter_from_irs"
-																type="text"
+																type="url"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['ein_letter_from_irs']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1574,14 +1609,16 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="pb-4">
+														<div className="xpb-4">
 															<Input
 																label="Assignment Of Membership Interests Agreement"
-																placeholder="Assignment Of Membership Interests Agreement"
+																placeholder="https://...."
 																value={propertyData.assignment_of_membership_interests_agreement}
 																id="assignment_of_membership_interests_agreement"
 																name="assignment_of_membership_interests_agreement"
-																type="text"
+																type="url"
+																className="field-validate"
+																required
 																// error={propertyDataErrors['assignment_of_membership_interests_agreement']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1591,33 +1628,45 @@ const New = (props) => {
 																}
 															/>
 														</div>
+													</div>
 
-														<div className="pb-4">
-															<Input
-																label="Submitted By Authorized Representative"
-																placeholder="Submitted By Authorized Representative"
-																value={propertyData.submitted_by_authorized_representative}
-																id="submitted_by_authorized_representative"
-																name="submitted_by_authorized_representative"
-																type="text"
-																// error={propertyDataErrors['submitted_by_authorized_representative']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'submitted_by_authorized_representative',
-																	})
-																}
-															/>
+													{/* <span className="text-lg">Public Registries of Parcel Record </span>
+
+													<span className="text-lg">Material Agreements &amp; Documentation</span> */}
+													<div className="u-offset-2-sm u-offset-4-sm o-flex-1">
+														<div className="space-y-4 pb-16">
+															<h3>
+																<span className="text-lg">Submitted By</span>
+															</h3>
+															<div className="xpb-4">
+																<Input
+																	label="Authorized Representative Name"
+																	placeholder="Legal Full Name"
+																	value={propertyData.submitted_by_authorized_representative}
+																	id="submitted_by_authorized_representative"
+																	name="submitted_by_authorized_representative"
+																	type="text"
+																	className="field-validate"
+																	required
+																	// error={propertyDataErrors['submitted_by_authorized_representative']}
+																	onChange={(evt) =>
+																		handleSetPropertyData({
+																			value: evt.target.value,
+																			propertyName: 'submitted_by_authorized_representative',
+																		})
+																	}
+																/>
+															</div>
 														</div>
 
-														<div className="pb-4">
+														<div className="pb-4 hidden">
 															<Input
 																label="Legal"
 																placeholder="Legal"
 																value={propertyData.legal}
 																id="legal"
 																name="legal"
-																type="text"
+																type="hidden"
 																// error={propertyDataErrors['legal']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1774,7 +1823,6 @@ const New = (props) => {
 															/>
 														</div>
 													</div>
-
 													{!liteMode && (
 														<>
 															<div className="space-y-4">
