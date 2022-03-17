@@ -55,10 +55,7 @@ const NavBar = props => {
 						</a>
 					</li>
 					<li className="flex items-center">
-						<a href="/" onClick={e => {
-							router.push(fmtUrlWithCluster(`/`))
-							e.preventDefault();
-						}}>
+						<a href="https://tokr.gitbook.io/tokr-main-docs/" target="_blank">
 							<span className="nav-link uppercase flex items-center">
 								<span>Docs</span>
 							</span>

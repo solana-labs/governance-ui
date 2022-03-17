@@ -21,13 +21,8 @@ const Footer = () => {
 						</a>
 					</li>
 					<li className="py-2 px-6 flex-shrink-0">
-						<a href="/realms" target="_blank">
+						<a href="https://tokr.gitbook.io/tokr-main-docs/" target="_blank">
 							<span className="whitespace-nowrap">[ Read docs ]</span>
-						</a>
-					</li>
-					<li className="py-2 px-6 flex-shrink-0">
-						<a href="/realms" target="_blank">
-							<span className="whitespace-nowrap">[ White paper ]</span>
 						</a>
 					</li>
 					<li className="py-2 px-6 flex-shrink-0">
