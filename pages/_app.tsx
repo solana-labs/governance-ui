@@ -55,8 +55,10 @@ function App({ Component, pageProps }) {
     faviconSelector as string
   )}/favicon.ico?v=${Date.now()}`
   useEffect(() => {
-    loadMarket(connection, connection.cluster)
-  }, [connection.cluster])
+    if (realm?.pubkey) {
+      loadMarket(connection, connection.cluster)
+    }
+  }, [connection.cluster, realm?.pubkey.toBase58()])
   useEffect(() => {
     if (
       realm?.account.config.useCommunityVoterWeightAddin &&
@@ -107,11 +109,12 @@ function App({ Component, pageProps }) {
   useEffect(() => {
     if (
       prevStringifyNftsGovernedTokenAccounts !==
-      JSON.stringify(nftsGovernedTokenAccounts)
+        JSON.stringify(nftsGovernedTokenAccounts) &&
+      realm?.pubkey
     ) {
       getNfts(nftsGovernedTokenAccounts, connection.current)
     }
-  }, [JSON.stringify(nftsGovernedTokenAccounts)])
+  }, [JSON.stringify(nftsGovernedTokenAccounts), realm?.pubkey.toBase58()])
   return (
     <div className="relative">
       <ErrorBoundary>
