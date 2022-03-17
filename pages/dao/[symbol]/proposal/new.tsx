@@ -73,7 +73,7 @@ function extractGovernanceAccountFromInstructionsData(instructionsData: Componen
 }
 
 const New = (props) => {
-	const _prepopulateForDemos = false
+	const _prepopulateForDemos = true
 	const router = useRouter()
 	const { history, getPathName } = useRouterHistory()
 	const client = useVoteStakeRegistryClientStore((s) => s.state.client)
@@ -517,77 +517,100 @@ const New = (props) => {
 					symbol: 'rNFT',
 					description: propertyData.description,
 					image: propertyData.image,
-					attributes: [ {
-							"trait_type": "name",
-							"value": propertyData.name
-						}, {
-							"trait_type": "property_address",
-							"value": propertyData.property_address
-						}, {
-							"trait_type": "description",
-							"value": propertyData.description
-						}, 	{
-							"trait_type": "lat_long",
-							"value": propertyData.lat_long
-						}, {
-							"trait_type": "sq_ft",
-							"value": propertyData.sq_ft
-						}, 	{
-							"trait_type": "acres",
-							"value": propertyData.acres
-						}, {
-							"trait_type": "type",
-							"value": propertyData.type
-						}, {
-							"trait_type": "tax_parcel_numbers",
-							"value": propertyData.tax_parcel_numbers
-						}, {
-							"trait_type": "title_held_by",
-							"value": propertyData.title_held_by
-						}, 	{
-							"trait_type": "ein_number",
-							"value": propertyData.ein_number
-						}, {
-							"trait_type": "title_method",
-							"value": propertyData.title_method
-						}, {
-							"trait_type": "transfer_restrictions",
-							"value": propertyData.transfer_restrictions
-						}, {
-							"trait_type": "title_insurance",
-							"value": propertyData.title_insurance
-						}, 	{
-							"trait_type": "deed",
-							"value": propertyData.deed
-						},, {
-							"trait_type": "purchase_contract",
-							"value": propertyData.purchase_contract
-						}, {
-							"trait_type": "mortgage",
-							"value": propertyData.mortgage
-						}, {
-							"trait_type": "lao_articles_of_organization_from_secretary_of_state",
-							"value": propertyData.lao_articles_of_organization_from_secretary_of_state
-						}, 	{
-							"trait_type": "spv_articles_of_organization_from_secretary_of_state",
-							"value": propertyData.spv_articles_of_organization_from_secretary_of_state
-						}, {
-							"trait_type": "spv_operating_agreement",
-							"value": propertyData.spv_operating_agreement
-						}, {
-							"trait_type": "ein_letter_from_irs",
-							"value": propertyData.ein_letter_from_irs
-						}, {
-							"trait_type": "assignment_of_membership_interests_agreement",
-							"value": propertyData.assignment_of_membership_interests_agreement
-						}, 	{
-							"trait_type": "submitted_by_authorized_representative",
-							"value": propertyData.submitted_by_authorized_representative
-						}, {
-							"trait_type": "legal",
-							"value": propertyData.legal
-						}
-					]
+					attributes: [
+						{
+							trait_type: 'name',
+							value: propertyData.name,
+						},
+						{
+							trait_type: 'property_address',
+							value: propertyData.property_address,
+						},
+						{
+							trait_type: 'description',
+							value: propertyData.description,
+						},
+						{
+							trait_type: 'lat_long',
+							value: propertyData.lat_long,
+						},
+						{
+							trait_type: 'sq_ft',
+							value: propertyData.sq_ft,
+						},
+						{
+							trait_type: 'acres',
+							value: propertyData.acres,
+						},
+						{
+							trait_type: 'type',
+							value: propertyData.type,
+						},
+						{
+							trait_type: 'tax_parcel_numbers',
+							value: propertyData.tax_parcel_numbers,
+						},
+						{
+							trait_type: 'title_held_by',
+							value: propertyData.title_held_by,
+						},
+						{
+							trait_type: 'ein_number',
+							value: propertyData.ein_number,
+						},
+						{
+							trait_type: 'title_method',
+							value: propertyData.title_method,
+						},
+						{
+							trait_type: 'transfer_restrictions',
+							value: propertyData.transfer_restrictions,
+						},
+						{
+							trait_type: 'title_insurance',
+							value: propertyData.title_insurance,
+						},
+						{
+							trait_type: 'deed',
+							value: propertyData.deed,
+						},
+						{
+							trait_type: 'purchase_contract',
+							value: propertyData.purchase_contract,
+						},
+						{
+							trait_type: 'mortgage',
+							value: propertyData.mortgage,
+						},
+						{
+							trait_type: 'lao_articles_of_organization_from_secretary_of_state',
+							value: propertyData.lao_articles_of_organization_from_secretary_of_state,
+						},
+						{
+							trait_type: 'spv_articles_of_organization_from_secretary_of_state',
+							value: propertyData.spv_articles_of_organization_from_secretary_of_state,
+						},
+						{
+							trait_type: 'spv_operating_agreement',
+							value: propertyData.spv_operating_agreement,
+						},
+						{
+							trait_type: 'ein_letter_from_irs',
+							value: propertyData.ein_letter_from_irs,
+						},
+						{
+							trait_type: 'assignment_of_membership_interests_agreement',
+							value: propertyData.assignment_of_membership_interests_agreement,
+						},
+						{
+							trait_type: 'submitted_by_authorized_representative',
+							value: propertyData.submitted_by_authorized_representative,
+						},
+						{
+							trait_type: 'legal',
+							value: propertyData.legal,
+						},
+					],
 				})
 			}
 		} else {
@@ -610,141 +633,39 @@ const New = (props) => {
 		}
 	}, [propertyData])
 
+	useEffect(() => {
+		console.log("\n\n\n\n\n\nmetaplexDataObj", metaplexDataObj, JSON.stringify(metaplexDataObj))
+	},[metaplexDataObj])
+
 	useLayoutEffect(() => {
 		if (_prepopulateForDemos) {
-			setMetaplexDataObj({
-				"name": "0 High St",
-				"symbol": "TOKR-0HighSt",
-				"description": "0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio. More particularly, the lot is described as follows - Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division.",
-				"image": "https://rhove.box.com/s/9kbrmqbb53z5oq8q31qba3yykanii4tn",
-				"attributes": [
-					{
-						"trait_type": "name",
-						"value": "0 High St"
-					},
-					{
-						"trait_type": "description",
-						"value": "0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio."
-					},
-					{
-						"trait_type": "property_address",
-						"value": "0 High Street, Brinkhaven, Ohio 43006"
-					},
-					{
-						"trait_type": "lat_long",
-						"value": "40.4687361, -82.1924952"
-					},
-					{
-						"trait_type": "acres",
-						"value": "0.2"
-					},
-					{
-						"trait_type": "title_method",
-						"value": "Sole ownership"
-					},
-					{
-						"trait_type": "title_held_by",
-						"value": "Real Fake Lot LLC, an Ohio limited liability company"
-					},
-					{
-						"trait_type": "ein_number",
-						"value": "881082701"
-					},
-					{
-						"trait_type": "transfer_restrictions",
-						"value": "None"
-					},
-					{
-						"trait_type": "marketing_name",
-						"value": "0 High"
-					},
-					{
-						"trait_type": "type",
-						"value": "Lot"
-					},
-					{
-						"trait_type": "sq_ft",
-						"value": "8,712"
-					},
-					{
-						"trait_type": "property_legal_description",
-						"value": "Situated in the Village of Brinkhaven, County of Knox and State of Ohio and being more particularly described as follows: Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division."
-					},
-					{
-						"trait_type": "tax_parcel_numbers",
-						"value": "62-00106.000 and 62-00107.000."
-					},
-					{
-						"trait_type": "deed",
-						"value": "https://rhove.box.com/s/f8xjhbi9zgb3euvc2r8k681jzxflxn4e"
-					},
-					{
-						"trait_type": "title_insurance",
-						"value": "https://rhove.box.com/s/vn33yggvf5dkt3umzwu8ophh702ssjah"
-					},
-					{
-						"trait_type": "purchase_contract",
-						"value": "https://rhove.box.com/s/9sjxoazw7kmmq3e9s1oj8a1anz8cnmv5"
-					},
-					{
-						"trait_type": "mortgage",
-						"value": "n/a"
-					},
-					{
-						"trait_type": "lao_articles_of_organization_from secretary_of_state",
-						"value": "https://rhove.box.com/s/8mqd9cdacoyvld0o4jaq1la70bx70wg8"
-					},
-					{
-						"trait_type": "spv_articles_of_organization_from_secretary_of_state",
-						"value": "https://rhove.box.com/s/ofy7hgb9swljt8wn2d3hdm2es26rorat"
-					},
-					{
-						"trait_type": "spv_operating_agreement",
-						"value": "https://rhove.box.com/s/8zngttfljzhixs4e7zqyp64a4ubre7i5"
-					},
-					{
-						"trait_type": "ein_letter_from_irs",
-						"value": "https://rhove.box.com/s/idt0iolz1m3getgpljupj0dbbhsgvyxv"
-					},
-					{
-						"trait_type": "assignment_of_membership_interests_agreement",
-						"value": "https://rhove.box.com/s/rw3eg3zen69pslyjlpn4cblpa8q02ymv"
-					},
-					{
-						"trait_type": "submitted_by_authorized_representative",
-						"value": "Calvin Cooper"
-					}
-				]
-			})
 			setPropertyData({
-				symbol: 'TOKR-0HighSt',
+				symbol: 'rNFT',
 				name: '0 High St',
-				description: '0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio.',
 				property_address: '0 High Street, Brinkhaven, Ohio 43006',
+				description: '0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio. More particularly, the lot is described as follows - Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division.',
+				image: 'https://ipfs.io/ipfs/QmUkk3iu9JwEwoM3VTZQqc5NQnwa2JGZSBXZmkGt3XDNN3?filename=0-HIGH-St.jpg',
 				lat_long: '40.4687361, -82.1924952',
+				sq_ft: '8712',
 				acres: '0.2',
-				title_method: 'Sole ownership',
+				type: 'Lot',
+				tax_parcel_numbers: '881082701',
 				title_held_by: 'Real Fake Lot LLC, an Ohio limited liability company',
 				ein_number: '881082701',
+				title_method: 'Sole Ownership',
 				transfer_restrictions: 'None',
-				marketing_name: '0 High',
-				type: 'Lot',
-				sq_ft: '8,712',
-				property_legal_description: 'Situated in the Village of Brinkhaven, County of Knox and State of Ohio and being more particularly described as follows: Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division.',
-				tax_parcel_numbers: '62-00106.000 and 62-00107.000.',
-				deed: 'https://rhove.box.com/s/f8xjhbi9zgb3euvc2r8k681jzxflxn4e',
-				title_insurance: 'https://rhove.box.com/s/vn33yggvf5dkt3umzwu8ophh702ssjah',
-				purchase_contract: 'https://rhove.box.com/s/9sjxoazw7kmmq3e9s1oj8a1anz8cnmv5',
+				title_insurance: 'https://ipfs.io/ipfs/QmYW883tTUNdv1PRgdRjPkL3Q7bEcX2XnuXm6METXnLpyf?filename=0-High-St-Title-Insurance-Pro-Forma-Owner-Policy-Schedules-Endorsements.pdf',
+				deed: 'https://ipfs.io/ipfs/QmdbJJAL6STiJj11YdmFGnXAUv2ddrruoU5S1Cr2yoEhMd?filename=0-High-St-Deed-Signed.pdf',
+				purchase_contract: 'https://ipfs.io/ipfs/QmTmHrmEP9WetSFLQKUwmrNC8UE34NVG9cD5SDP9votxAk?filename=0-High-St-Purchase-Contract.pdf',
 				mortgage: 'N/A',
-				lao_articles_of_organization_from_secretary_of_state: 'https://rhove.box.com/s/8mqd9cdacoyvld0o4jaq1la70bx70wg8',
-				spv_articles_of_organization_from_secretary_of_state: 'https://rhove.box.com/s/ofy7hgb9swljt8wn2d3hdm2es26rorat',
-				spv_operating_agreement: 'https://rhove.box.com/s/8zngttfljzhixs4e7zqyp64a4ubre7i5',
-				ein_letter_from_irs: 'https://rhove.box.com/s/idt0iolz1m3getgpljupj0dbbhsgvyxv',
-				assignment_of_membership_interests_agreement: 'https://rhove.box.com/s/rw3eg3zen69pslyjlpn4cblpa8q02ymv',
+				lao_articles_of_organization_from_secretary_of_state: 'https://ipfs.io/ipfs/QmR6oY1UWRJNKwfJ4Lq1ozRD6CFUvfdpw3DCo3cQxZciYz?filename=0-High-St-LAO-Articles-of-Organization.pdff',
+				spv_articles_of_organization_from_secretary_of_state: 'https://ipfs.io/ipfs/QmP77GkQTNecw6Xx6CitafNDKA8Fj97tiJoGayhp673gdD?filename=0-High-St-SPV-Articles-of-Organization.pdf',
+				spv_operating_agreement: 'https://ipfs.io/ipfs/QmSsbYQyVQLjQSDwGFhrtsJMA6VPAViMgSbXqLWfiJfLZK?filename=0-High-St-Operating-Agreement-REAL-FAKE-LOT-LLC.pdf',
+				ein_letter_from_irs: 'https://ipfs.io/ipfs/QmdTvxs5dvSvAwhLZqgnopWJyrkVezChNpYT5c4T27RqZM?filename=0-High-St-EIN-Real-Fake-Lot-LLC.pdf',
+				assignment_of_membership_interests_agreement: 'https://ipfs.io/ipfs/QmXWbQD18wtkUAZayxdyx6Pmrcx8gjrLM9Tpas58JY94SV?filename=0-High-St-Assignment-of-Membership-Interests-Agreement-Real-Fake-Lot.pdf',
 				submitted_by_authorized_representative: 'Calvin Cooper',
 				legal: `Buyer and Seller hereby acknowledge and agree that each have become a party to the Assignment of Membership Interests by purchasing or selling this rNFT, which Assignment of Membership Interests is linked in the rNFT metadata and is effective as of the date and time of the transfer of the rNFT. Buyer and Seller hereby acknowledge and agree that, by signing the smart contract to transfer this rNFT for the consideration documented on the blockchain, each are effectuating the transfer of the Membership Interest described in the Assignment of Membership Interest from Seller to Buyer upon the terms and subject to the conditions contained therein. \nThe Current Owner, Tokr DAO, and any Tokr affiliates or contributors to the open source software and systems involved in the Tokr Protocol and the minting of this rNFT hereby disclaim any representation or warranty relating to the sufficiency or adequacy of the title to the real estate owned by the entity specified in the rNFT metadata, and, by purchasing this rNFT, you hereby acknowledge that you are not relying on any such representations or warranties. Linked in the metadata is a copy of the Owner's Title Insurance Policy that was obtained at the time of acquisition (or subsequently as amended in the metadata, if applicable). The metadata and documentation submitted as part of rNFT certification and verification process is intended to make data collection easier to assist you in conducting your own due diligence. It is strongly encouraged that you conduct your own research and additional due diligence as it relates to the sufficiency and adequacy of the title to such real estate prior to acquiring this rNFT, which may include obtaining a title insurance policy. Any validations or certifications made by the Current Owner or Tokr DAO and any affiliates or contributors relating to the rNFT do not relate to the title of such real estate.`,
-				image: '',
-				uri: '',
+				uri: arWeaveLink || '',
 			})
 			// setMetaplexDataObj({
 			// 	name: 'White House',
