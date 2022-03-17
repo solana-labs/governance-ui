@@ -1277,7 +1277,6 @@ const New = (props) => {
 														<div className="xpb-4">
 															<Textarea
 																label="Legal Description"
-																placeholder="https://"
 																value={propertyData?.legal_description}
 																id="legal_description"
 																name="legal_description"
