@@ -76,7 +76,7 @@ function NFTSelector(
     if (predefinedNfts && isPredefinedMode) {
       setNfts(predefinedNfts)
     }
-  }, [predefinedNfts?.length])
+  }, [predefinedNfts])
   return (
     <>
       <div

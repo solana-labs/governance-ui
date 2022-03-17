@@ -45,13 +45,16 @@ export async function castVote(
     programId
   )
 
-  //will run only if any plugin is connected with realm
-  const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
-    instructions,
-    'castVote'
-  )
+  //   //will run only if any plugin is connected with realm
+  //   const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
+  //     instructions,
+  //     'castVote'
+  //   )
 
-  await votingPlugin?.withCastPluginVote(instructions, proposal.pubkey)
+  const plugin = await votingPlugin?.withCastPluginVote(
+    instructions,
+    proposal.pubkey
+  )
 
   if (votingPlugin?.client instanceof NftVoterClient === false) {
     await withCastVote(
@@ -67,7 +70,7 @@ export async function castVote(
       proposal.account.governingTokenMint,
       Vote.fromYesNoVote(yesNoVote),
       payer,
-      plugin?.maxVoterWeightRecord,
+      plugin?.voterWeightPk,
       plugin?.maxVoterWeightRecord
     )
   }

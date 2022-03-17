@@ -8,7 +8,9 @@ import {
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
+import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
+import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
@@ -18,6 +20,7 @@ const NftBalanceCard = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const votingNfts = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient.votingNfts
   )
@@ -71,6 +74,14 @@ const NftBalanceCard = () => {
     })
     await fetchRealm(realm?.owner, realm?.pubkey)
   }
+  useEffect(() => {
+    console.log(votingNfts, '@#$#@$#@$$#')
+    if (votingNfts) {
+      setNfts(votingNfts)
+    } else {
+      setNfts([])
+    }
+  }, [votingNfts, wallet?.connected])
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
@@ -87,7 +98,7 @@ const NftBalanceCard = () => {
             nftHeight="50px"
             nftWidth="50px"
             selectable={false}
-            predefinedNfts={votingNfts}
+            predefinedNfts={nfts}
           ></NFTSelector>
         )}
       </div>

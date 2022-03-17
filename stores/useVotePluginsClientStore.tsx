@@ -156,7 +156,10 @@ export class VotingClient {
         realm!.account.communityMint,
         this.client!.program.programId
       )
-      const { voterWeightPk } = await this._withHandleNftVoterWeight(
+      const {
+        voterWeightPk,
+        maxVoterWeightRecord,
+      } = await this._withHandleNftVoterWeight(
         realm!,
         walletPk,
         clientProgramId,
@@ -205,6 +208,7 @@ export class VotingClient {
           remainingAccounts: remainingAccounts,
         })
       )
+      return { voterWeightPk, maxVoterWeightRecord }
     }
   }
   withRelinquishVote = async (instructions, proposalPk: PublicKey) => {
