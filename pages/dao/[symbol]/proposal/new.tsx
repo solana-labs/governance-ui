@@ -1005,7 +1005,7 @@ const New = (props) => {
 														value={propertyData.sq_ft}
 														id="sq_ft"
 														name="sq_ft"
-														type="tel"
+														type="text"
 														className="field-validate"
 														required
 														// error={propertyDataErrors['sq_ft']}
