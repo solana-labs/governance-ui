@@ -104,7 +104,7 @@ const New = (props) => {
 	const [submittingStep, setSubmittingStep] = useState<any>([])
 
 	const [propertyData, setPropertyData] = useState({
-		symbol: '',
+		symbol: 'TOKR',
 		name: '',
 		description: '',
 		property_address: '',
@@ -137,7 +137,7 @@ const New = (props) => {
 	const [descriptionLink, setDescriptionLink] = useState({})
 	const [metaplexDataObj, setMetaplexDataObj] = useState({
 		name: '',
-		symbol: '',
+		symbol: 'TOKR',
 		description: '',
 		image: '',
 		attributes: [
@@ -929,10 +929,11 @@ const New = (props) => {
 	}, [form])
 
 	useEffect(() => {
-		if (router?.query?.type && realmInfo && (propertyData && propertyData?.name)) {
-			storeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? "_" + router?.query?.type : ''}`, JSON.stringify(propertyData))
+		if ((router?.query?.type || proposalType === 1 || proposalType === 2) && realmInfo && (propertyData && propertyData?.name)) {
+			const typeId = router?.query?.type || proposalType;
+			storeData(`${realmInfo?.realmId.toBase58()}${typeId ? "_" + typeId : ''}`, JSON.stringify(propertyData))
 		}
-	}, [propertyData, router, realmInfo])
+	}, [propertyData, router, realmInfo, proposalType])
 
 	const [initalLoad, setInitalLoad] = useState<boolean>(true)
 	useEffect(() => {
@@ -973,14 +974,16 @@ const New = (props) => {
 
 	const [loadedLS, setLoadedLS] = useState<boolean>(false)
 	useEffect(() => {
-		if (router?.query?.type && realmInfo && (initalLoad === false)) {
-			const temp = getData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? "_" + router?.query?.type : ''}`);
+		if (((router?.query?.type || proposalType === 1 || proposalType === 2) && (realmInfo && (initalLoad === false)))) {
+			const typeId = router?.query?.type || proposalType;
+			const temp = getData(`${realmInfo?.realmId.toBase58()}${typeId ? "_" + typeId : ''}`);
 			if (JSON.parse(temp)?.name) {
 				setPropertyData(JSON.parse(temp));
 				setLoadedLS(true);
 			}
+			console.log(proposalType)
 		}
-	}, [router, realmInfo, initalLoad])
+	}, [router, realmInfo, initalLoad, proposalType])
 
 
 	return initalLoad ? (
@@ -1037,7 +1040,7 @@ const New = (props) => {
 							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
 						</p>
 
-						{loadedLS && router?.query?.type && realmInfo && (
+						{loadedLS && (router?.query?.type || proposalType === 2 || proposalType === 1) && realmInfo && (
 							<p className="mt-16 py-4 border-t border-b border-green">
 								We restored your past entry. Want to start fresh?{' '}
 								<a
@@ -1074,7 +1077,7 @@ const New = (props) => {
 											image: '',
 											uri: arWeaveLink || '',
 										})
-										removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? '_' + router?.query?.type : ''}`)
+										removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? '_' + router?.query?.type : ( (proposalType === 1 || proposalType === 2) ? '_' + proposalType : '')}`)
 										e.preventDefault()
 									}}
 								>
@@ -1162,17 +1165,22 @@ const New = (props) => {
 															<Input
 																label="Name"
 																placeholder="Name"
-																value={propertyData.name}
+																value={propertyData?.name}
 																id="name"
 																name="name"
 																type="text"
+																error={formErrors['title']}
+																className="field-validate"
+																required
 																// error={propertyDataErrors['name']}
-																onChange={(evt) =>
+																onChange={(evt) => {
 																	handleSetPropertyData({
 																		value: evt.target.value,
 																		propertyName: 'name',
 																	})
-																}
+
+																	setPropertyName(evt.target.value)
+																}}
 															/>
 														</div>
 
