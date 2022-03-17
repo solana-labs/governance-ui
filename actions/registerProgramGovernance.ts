@@ -39,7 +39,7 @@ export const registerProgramGovernance = async (
   )
 
   //will run only if plugin is connected with realm
-  const voterWeight = await client?.withUpdateVoterWeightRecord(
+  const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     'createGovernance'
   )
@@ -60,7 +60,7 @@ export const registerProgramGovernance = async (
         tokenOwnerRecord,
         walletPubkey,
         governanceAuthority,
-        voterWeight
+        plugin?.voterWeightPk
       )
       break
     }

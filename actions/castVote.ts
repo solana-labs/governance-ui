@@ -45,10 +45,11 @@ export async function castVote(
   )
 
   //will run only if any plugin is connected with realm
-  const voterWeight = await votingPlugin?.withUpdateVoterWeightRecord(
+  const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
     instructions,
     'castVote'
   )
+
   await votingPlugin?.withCastPluginVote(instructions, proposal.pubkey)
 
   await withCastVote(
@@ -64,7 +65,8 @@ export async function castVote(
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
     payer,
-    voterWeight
+    plugin?.maxVoterWeightRecord,
+    plugin?.maxVoterWeightRecord
   )
 
   if (message) {
@@ -81,7 +83,7 @@ export async function castVote(
       payer,
       undefined,
       message,
-      voterWeight
+      plugin?.voterWeightPk
     )
   }
 

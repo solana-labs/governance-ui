@@ -32,7 +32,7 @@ export async function postChatMessage(
   const payer = walletPubkey
 
   //will run only if plugin is connected with realm
-  const voterWeight = await client?.withUpdateVoterWeightRecord(
+  const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     'commentProposal'
   )
@@ -50,7 +50,7 @@ export async function postChatMessage(
     payer,
     replyTo,
     body,
-    voterWeight
+    plugin?.voterWeightPk
   )
 
   const transaction = new Transaction()

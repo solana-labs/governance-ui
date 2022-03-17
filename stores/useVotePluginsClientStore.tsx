@@ -18,6 +18,7 @@ import {
   SYSTEM_PROGRAM_ID,
 } from '@solana/spl-governance'
 import {
+  getNftMaxVoterWeightRecord,
   getNftRegistrarPDA,
   getNftVoterWeightRecord,
 } from 'NftVotePlugin/sdk/accounts'
@@ -86,7 +87,7 @@ export class VotingClient {
           },
         })
       )
-      return voterWeightPk
+      return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
     if (this.client instanceof NftVoterClient) {
       const clientProgramId = this.client!.program.programId
@@ -96,7 +97,10 @@ export class VotingClient {
         realm!.account.communityMint,
         this.client!.program.programId
       )
-      const { voterWeightPk } = await this._withHandleNftVoterWeight(
+      const {
+        voterWeightPk,
+        maxVoterWeightRecord,
+      } = await this._withHandleNftVoterWeight(
         realm!,
         walletPk!,
         clientProgramId,
@@ -133,7 +137,7 @@ export class VotingClient {
           }
         )
       )
-      return voterWeightPk
+      return { voterWeightPk, maxVoterWeightRecord }
     }
   }
   withCastPluginVote = async (instructions, proposalPk: PublicKey) => {
@@ -260,6 +264,15 @@ export class VotingClient {
       clientProgramId
     )
 
+    const {
+      maxVoterWeightRecord,
+      maxVoterWeightRecordBump,
+    } = await getNftMaxVoterWeightRecord(
+      realm!.pubkey,
+      realm!.account.communityMint,
+      clientProgramId
+    )
+
     // try {
     //   isExisting = await client.program.account.voterWeightRecord.fetch(
     //     voterWeightPk
@@ -282,7 +295,12 @@ export class VotingClient {
     //   )
     // }
 
-    return { voterWeightPk, voterWeightRecordBump }
+    return {
+      voterWeightPk,
+      voterWeightRecordBump,
+      maxVoterWeightRecord,
+      maxVoterWeightRecordBump,
+    }
   }
   _setCurrentVoterNftsAccounts = (nfts: any[]) => {
     this.currentVoterNftsAccounts = nfts

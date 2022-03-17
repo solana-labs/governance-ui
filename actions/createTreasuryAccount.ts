@@ -39,7 +39,7 @@ export const createTreasuryAccount = async (
   )
 
   //will run only if plugin is connected with realm
-  const voterWeight = await client?.withUpdateVoterWeightRecord(
+  const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
     'createGovernance'
   )
@@ -66,7 +66,7 @@ export const createTreasuryAccount = async (
     tokenOwnerRecord,
     walletPubkey,
     governanceAuthority,
-    voterWeight
+    plugin?.voterWeightPk
   )
 
   if (mint.toBase58() === DEFAULT_NATIVE_SOL_MINT) {

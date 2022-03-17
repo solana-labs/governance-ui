@@ -69,7 +69,7 @@ const ApproveAllBtn = () => {
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const voterWeight = await client.withUpdateVoterWeightRecord(
+        const plugin = await client.withUpdateVoterWeightRecord(
           instructions,
           'castVote'
         )
@@ -88,7 +88,8 @@ const ApproveAllBtn = () => {
           proposal.account.governingTokenMint,
           Vote.fromYesNoVote(YesNoVote.Yes),
           payer,
-          voterWeight
+          plugin?.voterWeightPk,
+          plugin?.maxVoterWeightRecord
         )
 
         const transaction = new Transaction()
