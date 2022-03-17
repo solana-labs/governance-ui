@@ -14,6 +14,7 @@ import { sendSignedTransaction } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 const ApproveAllBtn = () => {
   const wallet = useWalletStore((s) => s.current)
@@ -74,23 +75,24 @@ const ApproveAllBtn = () => {
           'castVote'
         )
         await client?.withCastPluginVote(instructions, proposal.pubkey)
-
-        await withCastVote(
-          instructions,
-          realmInfo!.programId,
-          realmInfo!.programVersion!,
-          realm.pubkey,
-          proposal.account.governance,
-          proposal.pubkey,
-          proposal.account.tokenOwnerRecord,
-          ownTokenRecord.pubkey,
-          governanceAuthority,
-          proposal.account.governingTokenMint,
-          Vote.fromYesNoVote(YesNoVote.Yes),
-          payer,
-          plugin?.voterWeightPk,
-          plugin?.maxVoterWeightRecord
-        )
+        if (client.client instanceof NftVoterClient === false) {
+          await withCastVote(
+            instructions,
+            realmInfo!.programId,
+            realmInfo!.programVersion!,
+            realm.pubkey,
+            proposal.account.governance,
+            proposal.pubkey,
+            proposal.account.tokenOwnerRecord,
+            ownTokenRecord.pubkey,
+            governanceAuthority,
+            proposal.account.governingTokenMint,
+            Vote.fromYesNoVote(YesNoVote.Yes),
+            payer,
+            plugin?.voterWeightPk,
+            plugin?.maxVoterWeightRecord
+          )
+        }
 
         const transaction = new Transaction()
         transaction.add(...instructions)
