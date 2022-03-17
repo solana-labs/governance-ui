@@ -104,34 +104,32 @@ const New = (props) => {
 	const [submittingStep, setSubmittingStep] = useState<any>([])
 
 	const [propertyData, setPropertyData] = useState({
+		symbol: '',
 		name: '',
 		description: '',
 		property_address: '',
 		lat_long: '',
 		acres: '',
-		land_record_auditor: '',
-		deed_record_recorder: '',
-		mortgage_record_recorder: '',
-		legal_description: '',
-		mortgage_record: '',
 		title_method: '',
 		title_held_by: '',
-		ein: '',
+		ein_number: '',
 		transfer_restrictions: '',
 		marketing_name: '',
 		type: '',
 		sq_ft: '',
-		property_description: '',
+		property_legal_description: '',
+		tax_parcel_numbers: '',
 		deed: '',
-		mortgage: '',
 		title_insurance: '',
-		articles_of_organization: '',
-		certificate_of_organization_from_secretary_of_state: '',
-		operating_agreement: '',
-		membership_interest_transfer_agreement: '',
+		purchase_contract: '',
+		mortgage: '',
+		lao_articles_of_organization_from_secretary_of_state: '',
+		spv_articles_of_organization_from_secretary_of_state: '',
+		spv_operating_agreement: '',
 		ein_letter_from_irs: '',
-		appraisal: '',
-		submitted_by: '',
+		assignment_of_membership_interests_agreement: '',
+		submitted_by_authorized_representative: '',
+		legal: `Buyer and Seller hereby acknowledge and agree that each have become a party to the Assignment of Membership Interests by purchasing or selling this rNFT, which Assignment of Membership Interests is linked in the rNFT metadata and is effective as of the date and time of the transfer of the rNFT. Buyer and Seller hereby acknowledge and agree that, by signing the smart contract to transfer this rNFT for the consideration documented on the blockchain, each are effectuating the transfer of the Membership Interest described in the Assignment of Membership Interest from Seller to Buyer upon the terms and subject to the conditions contained therein. \nThe Current Owner, Tokr DAO, and any Tokr affiliates or contributors to the open source software and systems involved in the Tokr Protocol and the minting of this rNFT hereby disclaim any representation or warranty relating to the sufficiency or adequacy of the title to the real estate owned by the entity specified in the rNFT metadata, and, by purchasing this rNFT, you hereby acknowledge that you are not relying on any such representations or warranties. Linked in the metadata is a copy of the Owner's Title Insurance Policy that was obtained at the time of acquisition (or subsequently as amended in the metadata, if applicable). The metadata and documentation submitted as part of rNFT certification and verification process is intended to make data collection easier to assist you in conducting your own due diligence. It is strongly encouraged that you conduct your own research and additional due diligence as it relates to the sufficiency and adequacy of the title to such real estate prior to acquiring this rNFT, which may include obtaining a title insurance policy. Any validations or certifications made by the Current Owner or Tokr DAO and any affiliates or contributors relating to the rNFT do not relate to the title of such real estate.`,
 		image: '',
 		uri: arWeaveLink || '',
 	})
@@ -146,116 +144,80 @@ const New = (props) => {
 			{
 				trait_type: 'name',
 				value: '',
-			},
-			{
+			},{
 				trait_type: 'description',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'property_address',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'lat_long',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'acres',
 				value: '',
-			},
-			{
-				trait_type: 'land_record_auditor',
-				value: '',
-			},
-			{
-				trait_type: 'deed_record_recorder',
-				value: '',
-			},
-			{
-				trait_type: 'mortgage_record_recorder',
-				value: '',
-			},
-			{
-				trait_type: 'legal_description',
-				value: '',
-			},
-			{
-				trait_type: 'mortgage_record',
-				value: '',
-			},
-			{
+			}, {
 				trait_type: 'title_method',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'title_held_by',
 				value: '',
-			},
-			{
-				trait_type: 'ein',
+			}, {
+				trait_type: 'ein_number',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'transfer_restrictions',
 				value: '',
-			},
-			{
+			}, 	{
 				trait_type: 'marketing_name',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'type',
 				value: '',
-			},
-			{
+			}, {
 				trait_type: 'sq_ft',
 				value: '',
-			},
-			{
-				trait_type: 'property_description',
+			}, {
+				trait_type: 'property_legal_description',
 				value: '',
-			},
-			{
+			}, {
+				trait_type: 'tax_parcel_numbers',
+				value: '',
+			}, {
 				trait_type: 'deed',
 				value: '',
-			},
-			{
-				trait_type: 'mortgage',
-				value: '',
-			},
-			{
+			}, 	{
 				trait_type: 'title_insurance',
 				value: '',
-			},
-			{
-				trait_type: 'articles_of_organization',
+			}, {
+				trait_type: 'purchase_contract',
 				value: '',
-			},
-			{
-				trait_type: 'certificate_of_organization_from_secretary_of_state',
+			}, {
+				trait_type: 'mortgage',
 				value: '',
-			},
-			{
-				trait_type: 'operating_agreement',
+			}, {
+				trait_type: 'lao_articles_of_organization_from_secretary_of_state',
 				value: '',
-			},
-			{
-				trait_type: 'membership_interest_transfer_agreement',
+			}, {
+				trait_type: 'spv_articles_of_organization_from_secretary_of_state',
 				value: '',
-			},
-			{
+			}, 	{
+				trait_type: 'spv_operating_agreement',
+				value: '',
+			}, {
 				trait_type: 'ein_letter_from_irs',
 				value: '',
-			},
-			{
-				trait_type: 'appraisal',
+			}, {
+				trait_type: 'assignment_of_membership_interests_agreement',
 				value: '',
-			},
-			{
-				trait_type: 'submitted_by',
+			}, {
+				trait_type: 'submitted_by_authorized_representative',
 				value: '',
-			},
-		],
+			}, {
+				trait_type: 'legal',
+				value: `Buyer and Seller hereby acknowledge and agree that each have become a party to the Assignment of Membership Interests by purchasing or selling this rNFT, which Assignment of Membership Interests is linked in the rNFT metadata and is effective as of the date and time of the transfer of the rNFT. Buyer and Seller hereby acknowledge and agree that, by signing the smart contract to transfer this rNFT for the consideration documented on the blockchain, each are effectuating the transfer of the Membership Interest described in the Assignment of Membership Interest from Seller to Buyer upon the terms and subject to the conditions contained therein. \nThe Current Owner, Tokr DAO, and any Tokr affiliates or contributors to the open source software and systems involved in the Tokr Protocol and the minting of this rNFT hereby disclaim any representation or warranty relating to the sufficiency or adequacy of the title to the real estate owned by the entity specified in the rNFT metadata, and, by purchasing this rNFT, you hereby acknowledge that you are not relying on any such representations or warranties. Linked in the metadata is a copy of the Owner's Title Insurance Policy that was obtained at the time of acquisition (or subsequently as amended in the metadata, if applicable). The metadata and documentation submitted as part of rNFT certification and verification process is intended to make data collection easier to assist you in conducting your own due diligence. It is strongly encouraged that you conduct your own research and additional due diligence as it relates to the sufficiency and adequacy of the title to such real estate prior to acquiring this rNFT, which may include obtaining a title insurance policy. Any validations or certifications made by the Current Owner or Tokr DAO and any affiliates or contributors relating to the rNFT do not relate to the title of such real estate.`,
+			}
+		]
 	})
 
 	const customInstructionFilterForSelectedGovernance = (instructionType: Instructions) => {
@@ -414,26 +376,28 @@ const New = (props) => {
 			setProposalType(2)
 			setLiteMode(false)
 
+
 			const url = constructUri(router.query?.uri.toString(), true);
-
-			fetch(url, {
-				method: 'GET',
-			})
-			.then((res) => res.json())
-			.then((res) => {
-				const temp = res.attributes.map((attribute) => {
-					res[attribute.trait_type] = attribute.value
+			if (_prepopulateForDemos !== true) {
+				fetch(url, {
+					method: 'GET',
 				})
+					.then((res) => res.json())
+					.then((res) => {
+						const temp = res.attributes.map((attribute) => {
+							res[attribute.trait_type] = attribute.value
+						})
 
-				setPropertyData({
-					...res,
-				})
+						setPropertyData({
+							...res,
+						})
 
-				return res
-			})
-			.catch((error) => {
-				console.log('error', error)
-			})
+						return res
+					})
+					.catch((error) => {
+						console.log('error', error)
+					})
+			}
 		}
 	}, [router])
 
@@ -504,7 +468,7 @@ const New = (props) => {
 
 	useEffect(() => {
 		if (proposalType !== 0) {
-			if (proposalType === 2) {
+			if (proposalType === 1) {
 				setMetaplexDataObj({
 					name: propertyData.name,
 					symbol: 'TOKR-g1',
@@ -539,120 +503,83 @@ const New = (props) => {
 					symbol: 'TOKR-g1',
 					description: propertyData.description,
 					image: propertyData.image,
-					attributes: [
-						{
-							trait_type: 'name',
-							value: propertyData.name,
-						},
-						{
-							trait_type: 'description',
-							value: propertyData.description,
-						},
-						{
-							trait_type: 'property_address',
-							value: propertyData.property_address,
-						},
-						{
-							trait_type: 'lat_long',
-							value: propertyData.lat_long,
-						},
-						{
-							trait_type: 'acres',
-							value: propertyData.acres,
-						},
-						{
-							trait_type: 'land_record_auditor',
-							value: propertyData.land_record_auditor,
-						},
-						{
-							trait_type: 'deed_record_recorder',
-							value: propertyData.deed_record_recorder,
-						},
-						{
-							trait_type: 'mortgage_record_recorder',
-							value: propertyData.mortgage_record_recorder,
-						},
-						{
-							trait_type: 'legal_description',
-							value: propertyData.legal_description,
-						},
-						{
-							trait_type: 'mortgage_record',
-							value: propertyData.mortgage_record,
-						},
-						{
-							trait_type: 'title_method',
-							value: propertyData.title_method,
-						},
-						{
-							trait_type: 'title_held_by',
-							value: propertyData.title_held_by,
-						},
-						{
-							trait_type: 'ein',
-							value: propertyData.ein,
-						},
-						{
-							trait_type: 'transfer_restrictions',
-							value: propertyData.transfer_restrictions,
-						},
-						{
-							trait_type: 'marketing_name',
-							value: propertyData.marketing_name,
-						},
-						{
-							trait_type: 'type',
-							value: propertyData.type,
-						},
-						{
-							trait_type: 'sq_ft',
-							value: propertyData.sq_ft,
-						},
-						{
-							trait_type: 'property_description',
-							value: propertyData.property_description,
-						},
-						{
-							trait_type: 'deed',
-							value: propertyData.deed,
-						},
-						{
-							trait_type: 'mortgage',
-							value: propertyData.mortgage,
-						},
-						{
-							trait_type: 'title_insurance',
-							value: propertyData.title_insurance,
-						},
-						{
-							trait_type: 'articles_of_organization',
-							value: propertyData.articles_of_organization,
-						},
-						{
-							trait_type: 'certificate_of_organization_from_secretary_of_state',
-							value: propertyData.certificate_of_organization_from_secretary_of_state,
-						},
-						{
-							trait_type: 'operating_agreement',
-							value: propertyData.operating_agreement,
-						},
-						{
-							trait_type: 'membership_interest_transfer_agreement',
-							value: propertyData.membership_interest_transfer_agreement,
-						},
-						{
-							trait_type: 'ein_letter_from_irs',
-							value: propertyData.ein_letter_from_irs,
-						},
-						{
-							trait_type: 'appraisal',
-							value: propertyData.appraisal,
-						},
-						{
-							trait_type: 'submitted_by',
-							value: propertyData.submitted_by,
-						},
-					],
+					attributes: [ {
+							"trait_type": "name",
+							"value": propertyData.name
+						}, {
+							"trait_type": "description",
+							"value": propertyData.description
+						}, {
+							"trait_type": "property_address",
+							"value": propertyData.property_address
+						}, 	{
+							"trait_type": "lat_long",
+							"value": propertyData.lat_long
+						}, 	{
+							"trait_type": "acres",
+							"value": propertyData.acres
+						}, {
+							"trait_type": "title_method",
+							"value": propertyData.title_method
+						}, {
+							"trait_type": "title_held_by",
+							"value": propertyData.title_held_by
+						}, 	{
+							"trait_type": "ein_number",
+							"value": propertyData.ein_number
+						}, {
+							"trait_type": "transfer_restrictions",
+							"value": propertyData.transfer_restrictions
+						}, {
+							"trait_type": "marketing_name",
+							"value": propertyData.marketing_name
+						}, {
+							"trait_type": "type",
+							"value": propertyData.type
+						}, {
+							"trait_type": "sq_ft",
+							"value": propertyData.sq_ft
+						}, 	{
+							"trait_type": "property_legal_description",
+							"value": propertyData.property_legal_description
+						}, {
+							"trait_type": "tax_parcel_numbers",
+							"value": propertyData.tax_parcel_numbers
+						}, 	{
+							"trait_type": "deed",
+							"value": propertyData.deed
+						}, {
+							"trait_type": "title_insurance",
+							"value": propertyData.title_insurance
+						}, {
+							"trait_type": "purchase_contract",
+							"value": propertyData.purchase_contract
+						}, {
+							"trait_type": "mortgage",
+							"value": propertyData.mortgage
+						}, {
+							"trait_type": "lao_articles_of_organization_from_secretary_of_state",
+							"value": propertyData.lao_articles_of_organization_from_secretary_of_state
+						}, 	{
+							"trait_type": "spv_articles_of_organization_from_secretary_of_state",
+							"value": propertyData.spv_articles_of_organization_from_secretary_of_state
+						}, {
+							"trait_type": "spv_operating_agreement",
+							"value": propertyData.spv_operating_agreement
+						}, {
+							"trait_type": "ein_letter_from_irs",
+							"value": propertyData.ein_letter_from_irs
+						}, {
+							"trait_type": "assignment_of_membership_interests_agreement",
+							"value": propertyData.assignment_of_membership_interests_agreement
+						}, 	{
+							"trait_type": "submitted_by_authorized_representative",
+							"value": propertyData.submitted_by_authorized_representative
+						}, {
+							"trait_type": "legal",
+							"value": propertyData.legal
+						}
+					]
 				})
 			}
 		} else {
@@ -678,158 +605,292 @@ const New = (props) => {
 	useLayoutEffect(() => {
 		if (_prepopulateForDemos) {
 			setMetaplexDataObj({
-				name: 'White House',
-				symbol: 'tokr_',
-				description: 'The White House is the official residence and workplace of the president of the United States.',
-				image: 'https://ipfs.io/ipfs/QmPZR8h2CUY8CZW77oLDQ51ctPqZEbZXKVaC5xYQgPPbzX?filename=white-house_photo.png',
-				attributes: [
+				"name": "0 High St",
+				"symbol": "TOKR-0HighSt",
+				"description": "0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio. More particularly, the lot is described as follows - Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division.",
+				"image": "https://rhove.box.com/s/9kbrmqbb53z5oq8q31qba3yykanii4tn",
+				"attributes": [
 					{
-						trait_type: 'name',
-						value: 'White House',
+						"trait_type": "name",
+						"value": "0 High St"
 					},
 					{
-						trait_type: 'description',
-						value: 'The White House is the official residence and workplace of the president of the United States.',
+						"trait_type": "description",
+						"value": "0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio."
 					},
 					{
-						trait_type: 'property_address',
-						value: '1600 Pennsylvania Avenue NW, Washington, DC 20500',
+						"trait_type": "property_address",
+						"value": "0 High Street, Brinkhaven, Ohio 43006"
 					},
 					{
-						trait_type: 'lat_long',
-						value: '38.898819, -77.036690',
+						"trait_type": "lat_long",
+						"value": "40.4687361, -82.1924952"
 					},
 					{
-						trait_type: 'acres',
-						value: '18',
+						"trait_type": "acres",
+						"value": "0.2"
 					},
 					{
-						trait_type: 'land_record_auditor',
-						value: 'lorem ipsum',
+						"trait_type": "title_method",
+						"value": "Sole ownership"
 					},
 					{
-						trait_type: 'deed_record_recorder',
-						value: 'lorem ipsum',
+						"trait_type": "title_held_by",
+						"value": "Real Fake Lot LLC, an Ohio limited liability company"
 					},
 					{
-						trait_type: 'mortgage_record_recorder',
-						value: 'lorem ipsum',
+						"trait_type": "ein_number",
+						"value": "881082701"
 					},
 					{
-						trait_type: 'legal_description',
-						value: 'Legal description of the White House pulled from official record',
+						"trait_type": "transfer_restrictions",
+						"value": "None"
 					},
 					{
-						trait_type: 'mortgage_record',
-						value: 'lorem ipsum',
+						"trait_type": "marketing_name",
+						"value": "0 High"
 					},
 					{
-						trait_type: 'title_method',
-						value: 'Sole ownership',
+						"trait_type": "type",
+						"value": "Lot"
 					},
 					{
-						trait_type: 'title_held_by',
-						value: 'The People',
+						"trait_type": "sq_ft",
+						"value": "8,712"
 					},
 					{
-						trait_type: 'ein',
-						value: '123445555',
+						"trait_type": "property_legal_description",
+						"value": "Situated in the Village of Brinkhaven, County of Knox and State of Ohio and being more particularly described as follows: Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division."
 					},
 					{
-						trait_type: 'transfer_restrictions',
-						value: 'None',
+						"trait_type": "tax_parcel_numbers",
+						"value": "62-00106.000 and 62-00107.000."
 					},
 					{
-						trait_type: 'marketing_name',
-						value: 'White House',
+						"trait_type": "deed",
+						"value": "https://rhove.box.com/s/f8xjhbi9zgb3euvc2r8k681jzxflxn4e"
 					},
 					{
-						trait_type: 'type',
-						value: 'Building',
+						"trait_type": "title_insurance",
+						"value": "https://rhove.box.com/s/vn33yggvf5dkt3umzwu8ophh702ssjah"
 					},
 					{
-						trait_type: 'sq_ft',
-						value: '54,900',
+						"trait_type": "purchase_contract",
+						"value": "https://rhove.box.com/s/9sjxoazw7kmmq3e9s1oj8a1anz8cnmv5"
 					},
 					{
-						trait_type: 'property_description',
-						value: 'The White House is the official residence and workplace of the president of the United States.',
+						"trait_type": "mortgage",
+						"value": "n/a"
 					},
 					{
-						trait_type: 'deed',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+						"trait_type": "lao_articles_of_organization_from secretary_of_state",
+						"value": "https://rhove.box.com/s/8mqd9cdacoyvld0o4jaq1la70bx70wg8"
 					},
 					{
-						trait_type: 'mortgage',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+						"trait_type": "spv_articles_of_organization_from_secretary_of_state",
+						"value": "https://rhove.box.com/s/ofy7hgb9swljt8wn2d3hdm2es26rorat"
 					},
 					{
-						trait_type: 'title_insurance',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+						"trait_type": "spv_operating_agreement",
+						"value": "https://rhove.box.com/s/8zngttfljzhixs4e7zqyp64a4ubre7i5"
 					},
 					{
-						trait_type: 'articles_of_organization',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+						"trait_type": "ein_letter_from_irs",
+						"value": "https://rhove.box.com/s/idt0iolz1m3getgpljupj0dbbhsgvyxv"
 					},
 					{
-						trait_type: 'certificate_of_organization_from_secretary_of_state',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+						"trait_type": "assignment_of_membership_interests_agreement",
+						"value": "https://rhove.box.com/s/rw3eg3zen69pslyjlpn4cblpa8q02ymv"
 					},
 					{
-						trait_type: 'operating_agreement',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-					},
-					{
-						trait_type: 'membership_interest_transfer_agreement',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-					},
-					{
-						trait_type: 'ein_letter_from_irs',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-					},
-					{
-						trait_type: 'appraisal',
-						value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-					},
-					{
-						trait_type: 'submitted_by',
-						value: 'John Adams',
-					},
-				],
+						"trait_type": "submitted_by_authorized_representative",
+						"value": "Calvin Cooper"
+					}
+				]
 			})
-
 			setPropertyData({
-				name: 'White House',
-				description: 'The White House is the official residence and workplace of the president of the United States.',
-				property_address: '1600 Pennsylvania Avenue NW, Washington, DC 20500',
-				lat_long: '38.898819, -77.036690',
-				acres: '18',
-				land_record_auditor: 'lorem ipsum',
-				deed_record_recorder: 'lorem ipsum',
-				mortgage_record_recorder: 'lorem ipsum',
-				legal_description: 'Legal description of the White House pulled from official record',
-				mortgage_record: 'lorem ipsum',
+				symbol: 'TOKR-0HighSt',
+				name: '0 High St',
+				description: '0 High St is the first property Tokrized on the Solana Blockchain. This lot is composed of two parcels of land located in Brinkhaven, OH. This is a vacant lot situated in the Village of Brinkhaven, County of Knox in the State of Ohio.',
+				property_address: '0 High Street, Brinkhaven, Ohio 43006',
+				lat_long: '40.4687361, -82.1924952',
+				acres: '0.2',
 				title_method: 'Sole ownership',
-				title_held_by: 'The People',
-				ein: '123445555',
+				title_held_by: 'Real Fake Lot LLC, an Ohio limited liability company',
+				ein_number: '881082701',
 				transfer_restrictions: 'None',
-				marketing_name: 'White House',
-				type: 'Building',
-				sq_ft: '59,900',
-				property_description: 'The White House is the official residence and workplace of the president of the United States. It is located at 1600 Pennsylvania Avenue NW in Washington, D.C., and has been the residence of every U.S. president since John Adams in 1800. The term "White House" is often used as a metonym for the president and his advisers.',
-				deed: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				mortgage: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				title_insurance: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				articles_of_organization: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				certificate_of_organization_from_secretary_of_state: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				operating_agreement: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				membership_interest_transfer_agreement: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				ein_letter_from_irs: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				appraisal: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
-				submitted_by: 'John Adams',
-				image: 'https://ipfs.io/ipfs/QmPZR8h2CUY8CZW77oLDQ51ctPqZEbZXKVaC5xYQgPPbzX?filename=white-house_photo.png',
+				marketing_name: '0 High',
+				type: 'Lot',
+				sq_ft: '8,712',
+				property_legal_description: 'Situated in the Village of Brinkhaven, County of Knox and State of Ohio and being more particularly described as follows: Beginning at a point on the East line of High Street in the Village of Gann, now Brinkhaven. Being Lots Nos. 7 & 8 of the L. Gardner Sub-Division.',
+				tax_parcel_numbers: '62-00106.000 and 62-00107.000.',
+				deed: 'https://rhove.box.com/s/f8xjhbi9zgb3euvc2r8k681jzxflxn4e',
+				title_insurance: 'https://rhove.box.com/s/vn33yggvf5dkt3umzwu8ophh702ssjah',
+				purchase_contract: 'https://rhove.box.com/s/9sjxoazw7kmmq3e9s1oj8a1anz8cnmv5',
+				mortgage: 'N/A',
+				lao_articles_of_organization_from_secretary_of_state: 'https://rhove.box.com/s/8mqd9cdacoyvld0o4jaq1la70bx70wg8',
+				spv_articles_of_organization_from_secretary_of_state: 'https://rhove.box.com/s/ofy7hgb9swljt8wn2d3hdm2es26rorat',
+				spv_operating_agreement: 'https://rhove.box.com/s/8zngttfljzhixs4e7zqyp64a4ubre7i5',
+				ein_letter_from_irs: 'https://rhove.box.com/s/idt0iolz1m3getgpljupj0dbbhsgvyxv',
+				assignment_of_membership_interests_agreement: 'https://rhove.box.com/s/rw3eg3zen69pslyjlpn4cblpa8q02ymv',
+				submitted_by_authorized_representative: 'Calvin Cooper',
+				legal: `Buyer and Seller hereby acknowledge and agree that each have become a party to the Assignment of Membership Interests by purchasing or selling this rNFT, which Assignment of Membership Interests is linked in the rNFT metadata and is effective as of the date and time of the transfer of the rNFT. Buyer and Seller hereby acknowledge and agree that, by signing the smart contract to transfer this rNFT for the consideration documented on the blockchain, each are effectuating the transfer of the Membership Interest described in the Assignment of Membership Interest from Seller to Buyer upon the terms and subject to the conditions contained therein. \nThe Current Owner, Tokr DAO, and any Tokr affiliates or contributors to the open source software and systems involved in the Tokr Protocol and the minting of this rNFT hereby disclaim any representation or warranty relating to the sufficiency or adequacy of the title to the real estate owned by the entity specified in the rNFT metadata, and, by purchasing this rNFT, you hereby acknowledge that you are not relying on any such representations or warranties. Linked in the metadata is a copy of the Owner's Title Insurance Policy that was obtained at the time of acquisition (or subsequently as amended in the metadata, if applicable). The metadata and documentation submitted as part of rNFT certification and verification process is intended to make data collection easier to assist you in conducting your own due diligence. It is strongly encouraged that you conduct your own research and additional due diligence as it relates to the sufficiency and adequacy of the title to such real estate prior to acquiring this rNFT, which may include obtaining a title insurance policy. Any validations or certifications made by the Current Owner or Tokr DAO and any affiliates or contributors relating to the rNFT do not relate to the title of such real estate.`,
+				image: '',
 				uri: '',
 			})
+			// setMetaplexDataObj({
+			// 	name: 'White House',
+			// 	symbol: 'tokr_',
+			// 	description: 'The White House is the official residence and workplace of the president of the United States.',
+			// 	image: 'https://ipfs.io/ipfs/QmPZR8h2CUY8CZW77oLDQ51ctPqZEbZXKVaC5xYQgPPbzX?filename=white-house_photo.png',
+			// 	attributes: [
+			// 		{
+			// 			trait_type: 'name',
+			// 			value: 'White House',
+			// 		},
+			// 		{
+			// 			trait_type: 'description',
+			// 			value: 'The White House is the official residence and workplace of the president of the United States.',
+			// 		},
+			// 		{
+			// 			trait_type: 'property_address',
+			// 			value: '1600 Pennsylvania Avenue NW, Washington, DC 20500',
+			// 		},
+			// 		{
+			// 			trait_type: 'lat_long',
+			// 			value: '38.898819, -77.036690',
+			// 		},
+			// 		{
+			// 			trait_type: 'acres',
+			// 			value: '18',
+			// 		},
+			// 		{
+			// 			trait_type: 'land_record_auditor',
+			// 			value: 'lorem ipsum',
+			// 		},
+			// 		{
+			// 			trait_type: 'deed_record_recorder',
+			// 			value: 'lorem ipsum',
+			// 		},
+			// 		{
+			// 			trait_type: 'mortgage_record_recorder',
+			// 			value: 'lorem ipsum',
+			// 		},
+			// 		{
+			// 			trait_type: 'legal_description',
+			// 			value: 'Legal description of the White House pulled from official record',
+			// 		},
+			// 		{
+			// 			trait_type: 'mortgage_record',
+			// 			value: 'lorem ipsum',
+			// 		},
+			// 		{
+			// 			trait_type: 'title_method',
+			// 			value: 'Sole ownership',
+			// 		},
+			// 		{
+			// 			trait_type: 'title_held_by',
+			// 			value: 'The People',
+			// 		},
+			// 		{
+			// 			trait_type: 'ein',
+			// 			value: '123445555',
+			// 		},
+			// 		{
+			// 			trait_type: 'transfer_restrictions',
+			// 			value: 'None',
+			// 		},
+			// 		{
+			// 			trait_type: 'marketing_name',
+			// 			value: 'White House',
+			// 		},
+			// 		{
+			// 			trait_type: 'type',
+			// 			value: 'Building',
+			// 		},
+			// 		{
+			// 			trait_type: 'sq_ft',
+			// 			value: '54,900',
+			// 		},
+			// 		{
+			// 			trait_type: 'property_description',
+			// 			value: 'The White House is the official residence and workplace of the president of the United States.',
+			// 		},
+			// 		{
+			// 			trait_type: 'deed',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'mortgage',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'title_insurance',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'articles_of_organization',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'certificate_of_organization_from_secretary_of_state',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'operating_agreement',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'membership_interest_transfer_agreement',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'ein_letter_from_irs',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'appraisal',
+			// 			value: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 		},
+			// 		{
+			// 			trait_type: 'submitted_by',
+			// 			value: 'John Adams',
+			// 		},
+			// 	],
+			// })
+
+			// setPropertyData({
+			// 	name: 'White House',
+			// 	description: 'The White House is the official residence and workplace of the president of the United States.',
+			// 	property_address: '1600 Pennsylvania Avenue NW, Washington, DC 20500',
+			// 	lat_long: '38.898819, -77.036690',
+			// 	acres: '18',
+			// 	land_record_auditor: 'lorem ipsum',
+			// 	deed_record_recorder: 'lorem ipsum',
+			// 	mortgage_record_recorder: 'lorem ipsum',
+			// 	legal_description: 'Legal description of the White House pulled from official record',
+			// 	mortgage_record: 'lorem ipsum',
+			// 	title_method: 'Sole ownership',
+			// 	title_held_by: 'The People',
+			// 	ein: '123445555',
+			// 	transfer_restrictions: 'None',
+			// 	marketing_name: 'White House',
+			// 	type: 'Building',
+			// 	sq_ft: '59,900',
+			// 	property_description: 'The White House is the official residence and workplace of the president of the United States. It is located at 1600 Pennsylvania Avenue NW in Washington, D.C., and has been the residence of every U.S. president since John Adams in 1800. The term "White House" is often used as a metonym for the president and his advisers.',
+			// 	deed: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	mortgage: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	title_insurance: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	articles_of_organization: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	certificate_of_organization_from_secretary_of_state: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	operating_agreement: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	membership_interest_transfer_agreement: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	ein_letter_from_irs: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	appraisal: 'https://ipfs.io/ipfs/QmaHoFcUyHdd1ZE55gtqeJAKqif7k53sLusyaaPzXA6n8N?filename=tokr_screenshot_1.png',
+			// 	submitted_by: 'John Adams',
+			// 	image: 'https://ipfs.io/ipfs/QmPZR8h2CUY8CZW77oLDQ51ctPqZEbZXKVaC5xYQgPPbzX?filename=white-house_photo.png',
+			// 	uri: '',
+			// })
 		}
 	}, [_prepopulateForDemos])
 
@@ -976,46 +1037,51 @@ const New = (props) => {
 							{proposalType === 2 && <span dangerouslySetInnerHTML={{ __html: `Proposal for the ${realmDisplayName} to vote on the request for the <a href="/dao/${TOKR_DAO}" class="hover:underline">Tokr DAO</a> to certify ${propertyData?.name ? `<span class="font-bold">${propertyData.name}</span> (property) ` : ' a property '} and mint the rNFT.` }} />}
 						</p>
 
-
-					{( loadedLS && (router?.query?.type && realmInfo)) && <p className="mt-16 py-4 border-t border-b border-green">
-						We restored your past entry. Want to start fresh? <a href="#" onClick={e => {
-							setLoadedLS(false);
-							setPropertyData({
-								name: '',
-								description: '',
-								property_address: '',
-								lat_long: '',
-								acres: '',
-								land_record_auditor: '',
-								deed_record_recorder: '',
-								mortgage_record_recorder: '',
-								legal_description: '',
-								mortgage_record: '',
-								title_method: '',
-								title_held_by: '',
-								ein: '',
-								transfer_restrictions: '',
-								marketing_name: '',
-								type: '',
-								sq_ft: '',
-								property_description: '',
-								deed: '',
-								mortgage: '',
-								title_insurance: '',
-								articles_of_organization: '',
-								certificate_of_organization_from_secretary_of_state: '',
-								operating_agreement: '',
-								membership_interest_transfer_agreement: '',
-								ein_letter_from_irs: '',
-								appraisal: '',
-								submitted_by: '',
-								image: '',
-								uri: arWeaveLink || '',
-							})
-							removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? "_" + router?.query?.type : ''}`);
-							e.preventDefault();
-						}}>Click here.</a>
-					</p>}
+						{loadedLS && router?.query?.type && realmInfo && (
+							<p className="mt-16 py-4 border-t border-b border-green">
+								We restored your past entry. Want to start fresh?{' '}
+								<a
+									href="#"
+									onClick={(e) => {
+										setLoadedLS(false)
+										setPropertyData({
+											symbol: '',
+											name: '',
+											description: '',
+											property_address: '',
+											lat_long: '',
+											acres: '',
+											title_method: '',
+											title_held_by: '',
+											ein_number: '',
+											transfer_restrictions: '',
+											marketing_name: '',
+											type: '',
+											sq_ft: '',
+											property_legal_description: '',
+											tax_parcel_numbers: '',
+											deed: '',
+											title_insurance: '',
+											purchase_contract: '',
+											mortgage: '',
+											lao_articles_of_organization_from_secretary_of_state: '',
+											spv_articles_of_organization_from_secretary_of_state: '',
+											spv_operating_agreement: '',
+											ein_letter_from_irs: '',
+											assignment_of_membership_interests_agreement: '',
+											submitted_by_authorized_representative: '',
+											legal: '',
+											image: '',
+											uri: arWeaveLink || '',
+										})
+										removeData(`${realmInfo?.realmId.toBase58()}${router?.query?.type ? '_' + router?.query?.type : ''}`)
+										e.preventDefault()
+									}}
+								>
+									Click here.
+								</a>
+							</p>
+						)}
 
 						<>
 							<div className="pt-8 mb-20">
@@ -1071,204 +1137,40 @@ const New = (props) => {
 										</>
 									) : (
 										<>
-											<div className="space-y-4">
-												<h3>
-													<span className="text-lg">Property Information</span>
-												</h3>
-
-												<div className="xpb-4">
-													<Input
-														label="Name"
-														placeholder="Name"
-														value={propertyData?.name}
-														id="name"
-														name="name"
-														type="text"
-														error={formErrors['title']}
-														className="field-validate"
-														required
-														// error={propertyDataErrors['name']}
-														onChange={(evt) => {
-															handleSetPropertyData({
-																value: evt.target.value,
-																propertyName: 'name',
-															})
-
-															setPropertyName(evt.target.value)
-														}}
-													/>
-												</div>
-
-												<div className="xpb-4">
-													<Textarea
-														label="Description"
-														placeholder="Description"
-														value={propertyData?.description}
-														id="description"
-														name="description"
-														type="text"
-														className="field-validate"
-														required
-														// error={propertyDataErrors['description']}
-														onChange={(evt) =>
-															handleSetPropertyData({
-																value: evt.target.value,
-																propertyName: 'description',
-															})
-														}
-													/>
-												</div>
-
-												<div className="xpb-4">
-													<Input
-														label="Image"
-														placeholder="https://"
-														value={propertyData?.image}
-														id="image"
-														name="image"
-														type="url"
-														className="field-validate"
-														required
-														// error={propertyDataErrors['description']}
-														onChange={(evt) =>
-															handleSetPropertyData({
-																value: evt.target.value,
-																propertyName: 'image',
-															})
-														}
-													/>
-												</div>
-											</div>
-
-											<div className="space-y-4">
-												<h3>
-													<span className="text-lg">Parcel Attributes</span>
-												</h3>
-
-												<div className="xpb-4">
-													<Input
-														label="Property Address"
-														placeholder="Property Address"
-														value={propertyData?.property_address}
-														id="property_address"
-														name="property_address"
-														type="text"
-														className="field-validate"
-														required
-														// error={propertyDataErrors['property_address']}
-														onChange={(evt) =>
-															handleSetPropertyData({
-																value: evt.target.value,
-																propertyName: 'property_address',
-															})
-														}
-													/>
-												</div>
-
-												<div className="xpb-4">
-													<Input
-														label="Lat Long"
-														placeholder="Lat, Long"
-														value={propertyData?.lat_long}
-														id="lat_long"
-														name="lat_long"
-														type="text"
-														className="field-validate"
-														required
-														// error={propertyDataErrors['lat_long']}
-														onChange={(evt) =>
-															handleSetPropertyData({
-																value: evt.target.value,
-																propertyName: 'lat_long',
-															})
-														}
-													/>
-
-													<div className="text-xs pt-2">
-														Find Latitude and Longitude of your property:{' '}
-														<a target="_target" href="https://www.latlong.net/convert-address-to-lat-long.html">
-															click here
-														</a>
-													</div>
-												</div>
-
-												<div className="xpb-4">
-													<Input
-														label="Acres"
-														placeholder="Acres"
-														value={propertyData?.acres}
-														id="acres"
-														name="acres"
-														type="text"
-														className="field-validate"
-														required
-														// error={propertyDataErrors['acres']}
-														onChange={(evt) =>
-															handleSetPropertyData({
-																value: evt.target.value,
-																propertyName: 'acres',
-															})
-														}
-													/>
-												</div>
-											</div>
-
-											{!liteMode && (
+											<>
 												<>
-													<div className="space-y-4">
-														<h3>
-															<span className="text-lg">Public Registries of Parcel Record </span>
-														</h3>
-
-														<div className="xpb-4">
+													<div className="u-offset-2-sm u-offset-4-sm o-flex-1">
+														<div className="pb-4">
 															<Input
-																label="Land Record Auditor"
-																placeholder="https://"
-																value={propertyData?.land_record_auditor}
-																id="land_record_auditor"
-																name="land_record_auditor"
-																type="url"
-																// error={propertyDataErrors['land_record_auditor']}
+																label="Symbol"
+																placeholder="Symbol"
+																value={propertyData.symbol}
+																id="symbol"
+																name="symbol"
+																type="text"
+																// error={propertyDataErrors['symbol']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'land_record_auditor',
+																		propertyName: 'symbol',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Deed Record Recorder"
-																placeholder="https://"
-																value={propertyData?.deed_record_recorder}
-																id="deed_record_recorder"
-																name="deed_record_recorder"
-																type="url"
-																// error={propertyDataErrors['deed_record_recorder']}
+																label="Name"
+																placeholder="Name"
+																value={propertyData.name}
+																id="name"
+																name="name"
+																type="text"
+																// error={propertyDataErrors['name']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'deed_record_recorder',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="xpb-4">
-															<Input
-																label="Mortgage Record Recorder"
-																placeholder="https://"
-																value={propertyData?.mortgage_record_recorder}
-																id="mortgage_record_recorder"
-																name="mortgage_record_recorder"
-																type="url"
-																// error={propertyDataErrors['mortgage_record_recorder']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'mortgage_record_recorder',
+																		propertyName: 'name',
 																	})
 																}
 															/>
@@ -1276,51 +1178,93 @@ const New = (props) => {
 
 														<div className="xpb-4">
 															<Textarea
-																label="Legal Description"
-																value={propertyData?.legal_description}
-																id="legal_description"
-																name="legal_description"
-																type="url"
+																label="Description"
+																placeholder="Description"
+																value={propertyData?.description}
+																id="description"
+																name="description"
+																type="text"
 																className="field-validate"
 																required
-																// error={propertyDataErrors['legal_description']}
+																// error={propertyDataErrors['description']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'legal_description',
+																		propertyName: 'description',
 																	})
 																}
 															/>
+															<div className="text-xs pt-2 pb-4">Did you know? You can use Markdown!</div>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Mortgage Record"
-																placeholder="https://"
-																value={propertyData?.mortgage_record}
-																id="mortgage_record"
-																name="mortgage_record"
-																type="url"
-																// error={propertyDataErrors['mortgage_record']}
+																label="Property Address"
+																placeholder="Property Address"
+																value={propertyData.property_address}
+																id="property_address"
+																name="property_address"
+																type="text"
+																// error={propertyDataErrors['property_address']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'mortgage_record',
+																		propertyName: 'property_address',
 																	})
 																}
 															/>
 														</div>
-													</div>
 
-													<div className="space-y-4">
-														<h3>
-															<span className="text-lg">Title Attributes</span>
-														</h3>
-														<div className="xpb-4">
+														<div className="pb-4">
+															<Input
+																label="Lat Long"
+																placeholder="Lat, Long"
+																value={propertyData?.lat_long}
+																id="lat_long"
+																name="lat_long"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['lat_long']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'lat_long',
+																	})
+																}
+															/>
+
+															<div className="text-xs pt-2 pb-4">
+																Find Latitude and Longitude of your property:{' '}
+																<a target="_target" href="https://www.latlong.net/convert-address-to-lat-long.html">
+																	click here
+																</a>
+															</div>
+														</div>
+
+														<div className="pb-4">
+															<Input
+																label="Acres"
+																placeholder="Acres"
+																value={propertyData.acres}
+																id="acres"
+																name="acres"
+																type="text"
+																// error={propertyDataErrors['acres']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'acres',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="pb-4">
 															<Input
 																label="Title Method"
 																placeholder="Title Method"
-																value={propertyData?.title_method}
+																value={propertyData.title_method}
 																id="title_method"
 																name="title_method"
 																type="text"
@@ -1334,16 +1278,14 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Title Held By"
 																placeholder="Title Held By"
-																value={propertyData?.title_held_by}
+																value={propertyData.title_held_by}
 																id="title_held_by"
 																name="title_held_by"
 																type="text"
-																className="field-validate"
-																required
 																// error={propertyDataErrors['title_held_by']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1354,31 +1296,29 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="EIN Number"
-																placeholder="EIN #"
-																value={propertyData?.ein}
-																id="ein"
-																name="ein"
+																label="Ein Number"
+																placeholder="Ein Number"
+																value={propertyData.ein_number}
+																id="ein_number"
+																name="ein_number"
 																type="text"
-																className="field-validate"
-																required
-																// error={propertyDataErrors['ein']}
+																// error={propertyDataErrors['ein_number']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'ein',
+																		propertyName: 'ein_number',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Transfer Restrictions"
 																placeholder="Transfer Restrictions"
-																value={propertyData?.transfer_restrictions}
+																value={propertyData.transfer_restrictions}
 																id="transfer_restrictions"
 																name="transfer_restrictions"
 																type="text"
@@ -1391,17 +1331,12 @@ const New = (props) => {
 																}
 															/>
 														</div>
-													</div>
 
-													<div className="space-y-4">
-														<h3>
-															<span className="text-lg">Property Record</span>
-														</h3>
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Marketing Name"
 																placeholder="Marketing Name"
-																value={propertyData?.marketing_name}
+																value={propertyData.marketing_name}
 																id="marketing_name"
 																name="marketing_name"
 																type="text"
@@ -1415,16 +1350,14 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Type"
 																placeholder="Type"
-																value={propertyData?.type}
+																value={propertyData.type}
 																id="type"
 																name="type"
 																type="text"
-																className="field-validate"
-																required
 																// error={propertyDataErrors['type']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1435,16 +1368,14 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Sq Ft"
 																placeholder="Sq Ft"
-																value={propertyData?.sq_ft}
+																value={propertyData.sq_ft}
 																id="sq_ft"
 																name="sq_ft"
 																type="text"
-																className="field-validate"
-																required
 																// error={propertyDataErrors['sq_ft']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1455,40 +1386,50 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
-															<Textarea
-																label="Property Description"
-																placeholder="Property Description"
-																value={propertyData?.property_description}
-																id="property_description"
-																name="property_description"
+														<div className="pb-4">
+															<Input
+																label="Property Legal Description"
+																placeholder="Property Legal Description"
+																value={propertyData.property_legal_description}
+																id="property_legal_description"
+																name="property_legal_description"
 																type="text"
-																// error={propertyDataErrors['property_description']}
+																// error={propertyDataErrors['property_legal_description']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'property_description',
+																		propertyName: 'property_legal_description',
 																	})
 																}
 															/>
 														</div>
-													</div>
 
-													<div className="space-y-4">
-														<h3>
-															<span className="text-lg">Material Agreements &amp; Documentation</span>
-														</h3>
+														<div className="pb-4">
+															<Input
+																label="Tax Parcel Numbers"
+																placeholder="Tax Parcel Numbers"
+																value={propertyData.tax_parcel_numbers}
+																id="tax_parcel_numbers"
+																name="tax_parcel_numbers"
+																type="text"
+																// error={propertyDataErrors['tax_parcel_numbers']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'tax_parcel_numbers',
+																	})
+																}
+															/>
+														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Deed"
-																placeholder="https://"
-																value={propertyData?.deed}
+																placeholder="Deed"
+																value={propertyData.deed}
 																id="deed"
 																name="deed"
-																type="url"
-																className="field-validate"
-																required
+																type="text"
 																// error={propertyDataErrors['deed']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1499,32 +1440,14 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
-															<Input
-																label="Mortgage"
-																placeholder="https://"
-																value={propertyData?.mortgage}
-																id="mortgage"
-																name="mortgage"
-																type="url"
-																// error={propertyDataErrors['mortgage']}
-																onChange={(evt) =>
-																	handleSetPropertyData({
-																		value: evt.target.value,
-																		propertyName: 'mortgage',
-																	})
-																}
-															/>
-														</div>
-
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
 																label="Title Insurance"
-																placeholder="https://"
-																value={propertyData?.title_insurance}
+																placeholder="Title Insurance"
+																value={propertyData.title_insurance}
 																id="title_insurance"
 																name="title_insurance"
-																type="url"
+																type="text"
 																// error={propertyDataErrors['title_insurance']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1535,94 +1458,104 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Articles Of Organization"
-																placeholder="https://"
-																value={propertyData?.articles_of_organization}
-																id="articles_of_organization"
-																name="articles_of_organization"
-																type="url"
-																className="field-validate"
-																required
-																// error={propertyDataErrors['articles_of_organization']}
+																label="Purchase Contract"
+																placeholder="Purchase Contract"
+																value={propertyData.purchase_contract}
+																id="purchase_contract"
+																name="purchase_contract"
+																type="text"
+																// error={propertyDataErrors['purchase_contract']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'articles_of_organization',
+																		propertyName: 'purchase_contract',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Certificate Of Organization From Secretary Of State"
-																placeholder="https://"
-																value={propertyData?.certificate_of_organization_from_secretary_of_state}
-																id="certificate_of_organization_from_secretary_of_state"
-																name="certificate_of_organization_from_secretary_of_state"
-																type="url"
-																className="field-validate"
-																required
-																// error={propertyDataErrors['certificate_of_organization_from_secretary_of_state']}
+																label="Mortgage"
+																placeholder="Mortgage"
+																value={propertyData.mortgage}
+																id="mortgage"
+																name="mortgage"
+																type="text"
+																// error={propertyDataErrors['mortgage']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'certificate_of_organization_from_secretary_of_state',
+																		propertyName: 'mortgage',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Operating Agreement"
-																placeholder="https://"
-																value={propertyData?.operating_agreement}
-																id="operating_agreement"
-																name="operating_agreement"
-																type="url"
-																className="field-validate"
-																required
-																// error={propertyDataErrors['operating_agreement']}
+																label="Lao Articles Of Organization From Secretary Of State"
+																placeholder="Lao Articles Of Organization From Secretary Of State"
+																value={propertyData.lao_articles_of_organization_from_secretary_of_state}
+																id="lao_articles_of_organization_from_secretary_of_state"
+																name="lao_articles_of_organization_from_secretary_of_state"
+																type="text"
+																// error={propertyDataErrors['lao_articles_of_organization_from_secretary_of_state']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'operating_agreement',
+																		propertyName: 'lao_articles_of_organization_from_secretary_of_state',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Membership Interest Transfer Agreement"
-																placeholder="https://"
-																value={propertyData?.membership_interest_transfer_agreement}
-																id="membership_interest_transfer_agreement"
-																name="membership_interest_transfer_agreement"
-																type="url"
-																// error={propertyDataErrors['membership_interest_transfer_agreement']}
+																label="Spv Articles Of Organization From Secretary Of State"
+																placeholder="Spv Articles Of Organization From Secretary Of State"
+																value={propertyData.spv_articles_of_organization_from_secretary_of_state}
+																id="spv_articles_of_organization_from_secretary_of_state"
+																name="spv_articles_of_organization_from_secretary_of_state"
+																type="text"
+																// error={propertyDataErrors['spv_articles_of_organization_from_secretary_of_state']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'membership_interest_transfer_agreement',
+																		propertyName: 'spv_articles_of_organization_from_secretary_of_state',
 																	})
 																}
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="EIN Letter from IRS"
-																placeholder="https://"
-																value={propertyData?.ein_letter_from_irs}
+																label="Spv Operating Agreement"
+																placeholder="Spv Operating Agreement"
+																value={propertyData.spv_operating_agreement}
+																id="spv_operating_agreement"
+																name="spv_operating_agreement"
+																type="text"
+																// error={propertyDataErrors['spv_operating_agreement']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'spv_operating_agreement',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="pb-4">
+															<Input
+																label="Ein Letter From Irs"
+																placeholder="Ein Letter From Irs"
+																value={propertyData.ein_letter_from_irs}
 																id="ein_letter_from_irs"
 																name="ein_letter_from_irs"
-																type="url"
-																className="field-validate"
-																required
+																type="text"
 																// error={propertyDataErrors['ein_letter_from_irs']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
@@ -1633,51 +1566,675 @@ const New = (props) => {
 															/>
 														</div>
 
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Appraisal"
-																placeholder="https://"
-																value={propertyData?.appraisal}
-																id="appraisal"
-																name="appraisal"
-																type="url"
-																// error={propertyDataErrors['appraisal']}
+																label="Assignment Of Membership Interests Agreement"
+																placeholder="Assignment Of Membership Interests Agreement"
+																value={propertyData.assignment_of_membership_interests_agreement}
+																id="assignment_of_membership_interests_agreement"
+																name="assignment_of_membership_interests_agreement"
+																type="text"
+																// error={propertyDataErrors['assignment_of_membership_interests_agreement']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'appraisal',
+																		propertyName: 'assignment_of_membership_interests_agreement',
 																	})
 																}
 															/>
 														</div>
-													</div>
 
-													<div className="space-y-4 pb-16">
-														<h3>
-															<span className="text-lg">Submitted By</span>
-														</h3>
-														<div className="xpb-4">
+														<div className="pb-4">
 															<Input
-																label="Your Legal Name"
-																placeholder="Your Legal Name"
-																value={propertyData?.submitted_by}
-																id="submitted_by"
-																name="submitted_by"
+																label="Submitted By Authorized Representative"
+																placeholder="Submitted By Authorized Representative"
+																value={propertyData.submitted_by_authorized_representative}
+																id="submitted_by_authorized_representative"
+																name="submitted_by_authorized_representative"
 																type="text"
-																className="field-validate"
-																required
-																// error={propertyDataErrors['submitted_by']}
+																// error={propertyDataErrors['submitted_by_authorized_representative']}
 																onChange={(evt) =>
 																	handleSetPropertyData({
 																		value: evt.target.value,
-																		propertyName: 'submitted_by',
+																		propertyName: 'submitted_by_authorized_representative',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="pb-4">
+															<Input
+																label="Legal"
+																placeholder="Legal"
+																value={propertyData.legal}
+																id="legal"
+																name="legal"
+																type="text"
+																// error={propertyDataErrors['legal']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'legal',
 																	})
 																}
 															/>
 														</div>
 													</div>
 												</>
+											</>
+											{/* start old */}
+											{propertyData?.name === '1' && (
+												<>
+													<div className="space-y-4">
+														<h3>
+															<span className="text-lg">Property Information</span>
+														</h3>
+
+														<div className="xpb-4">
+															<Input
+																label="Name"
+																placeholder="Name"
+																value={propertyData?.name}
+																id="name"
+																name="name"
+																type="text"
+																error={formErrors['title']}
+																className="field-validate"
+																required
+																// error={propertyDataErrors['name']}
+																onChange={(evt) => {
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'name',
+																	})
+
+																	setPropertyName(evt.target.value)
+																}}
+															/>
+														</div>
+
+														<div className="xpb-4">
+															<Textarea
+																label="Description"
+																placeholder="Description"
+																value={propertyData?.description}
+																id="description"
+																name="description"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['description']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'description',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="xpb-4">
+															<Input
+																label="Image"
+																placeholder="https://"
+																value={propertyData?.image}
+																id="image"
+																name="image"
+																type="url"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['description']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'image',
+																	})
+																}
+															/>
+														</div>
+													</div>
+
+													<div className="space-y-4">
+														<h3>
+															<span className="text-lg">Parcel Attributes</span>
+														</h3>
+
+														<div className="xpb-4">
+															<Input
+																label="Property Address"
+																placeholder="Property Address"
+																value={propertyData?.property_address}
+																id="property_address"
+																name="property_address"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['property_address']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'property_address',
+																	})
+																}
+															/>
+														</div>
+
+														<div className="xpb-4">
+															<Input
+																label="Lat Long"
+																placeholder="Lat, Long"
+																value={propertyData?.lat_long}
+																id="lat_long"
+																name="lat_long"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['lat_long']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'lat_long',
+																	})
+																}
+															/>
+
+															<div className="text-xs pt-2">
+																Find Latitude and Longitude of your property:{' '}
+																<a target="_target" href="https://www.latlong.net/convert-address-to-lat-long.html">
+																	click here
+																</a>
+															</div>
+														</div>
+
+														<div className="xpb-4">
+															<Input
+																label="Acres"
+																placeholder="Acres"
+																value={propertyData?.acres}
+																id="acres"
+																name="acres"
+																type="text"
+																className="field-validate"
+																required
+																// error={propertyDataErrors['acres']}
+																onChange={(evt) =>
+																	handleSetPropertyData({
+																		value: evt.target.value,
+																		propertyName: 'acres',
+																	})
+																}
+															/>
+														</div>
+													</div>
+
+													{!liteMode && (
+														<>
+															<div className="space-y-4">
+																<h3>
+																	<span className="text-lg">Public Registries of Parcel Record </span>
+																</h3>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Land Record Auditor"
+																		placeholder="https://"
+																		value={propertyData?.land_record_auditor}
+																		id="land_record_auditor"
+																		name="land_record_auditor"
+																		type="url"
+																		// error={propertyDataErrors['land_record_auditor']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'land_record_auditor',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Deed Record Recorder"
+																		placeholder="https://"
+																		value={propertyData?.deed_record_recorder}
+																		id="deed_record_recorder"
+																		name="deed_record_recorder"
+																		type="url"
+																		// error={propertyDataErrors['deed_record_recorder']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'deed_record_recorder',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Mortgage Record Recorder"
+																		placeholder="https://"
+																		value={propertyData?.mortgage_record_recorder}
+																		id="mortgage_record_recorder"
+																		name="mortgage_record_recorder"
+																		type="url"
+																		// error={propertyDataErrors['mortgage_record_recorder']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'mortgage_record_recorder',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Textarea
+																		label="Legal Description"
+																		value={propertyData?.legal_description}
+																		id="legal_description"
+																		name="legal_description"
+																		type="url"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['legal_description']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'legal_description',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Mortgage Record"
+																		placeholder="https://"
+																		value={propertyData?.mortgage_record}
+																		id="mortgage_record"
+																		name="mortgage_record"
+																		type="url"
+																		// error={propertyDataErrors['mortgage_record']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'mortgage_record',
+																			})
+																		}
+																	/>
+																</div>
+															</div>
+
+															<div className="space-y-4">
+																<h3>
+																	<span className="text-lg">Title Attributes</span>
+																</h3>
+																<div className="xpb-4">
+																	<Input
+																		label="Title Method"
+																		placeholder="Title Method"
+																		value={propertyData?.title_method}
+																		id="title_method"
+																		name="title_method"
+																		type="text"
+																		// error={propertyDataErrors['title_method']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'title_method',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Title Held By"
+																		placeholder="Title Held By"
+																		value={propertyData?.title_held_by}
+																		id="title_held_by"
+																		name="title_held_by"
+																		type="text"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['title_held_by']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'title_held_by',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="EIN Number"
+																		placeholder="EIN #"
+																		value={propertyData?.ein}
+																		id="ein"
+																		name="ein"
+																		type="text"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['ein']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'ein',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Transfer Restrictions"
+																		placeholder="Transfer Restrictions"
+																		value={propertyData?.transfer_restrictions}
+																		id="transfer_restrictions"
+																		name="transfer_restrictions"
+																		type="text"
+																		// error={propertyDataErrors['transfer_restrictions']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'transfer_restrictions',
+																			})
+																		}
+																	/>
+																</div>
+															</div>
+
+															<div className="space-y-4">
+																<h3>
+																	<span className="text-lg">Property Record</span>
+																</h3>
+																<div className="xpb-4">
+																	<Input
+																		label="Marketing Name"
+																		placeholder="Marketing Name"
+																		value={propertyData?.marketing_name}
+																		id="marketing_name"
+																		name="marketing_name"
+																		type="text"
+																		// error={propertyDataErrors['marketing_name']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'marketing_name',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Type"
+																		placeholder="Type"
+																		value={propertyData?.type}
+																		id="type"
+																		name="type"
+																		type="text"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['type']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'type',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Sq Ft"
+																		placeholder="Sq Ft"
+																		value={propertyData?.sq_ft}
+																		id="sq_ft"
+																		name="sq_ft"
+																		type="text"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['sq_ft']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'sq_ft',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Textarea
+																		label="Property Description"
+																		placeholder="Property Description"
+																		value={propertyData?.property_description}
+																		id="property_description"
+																		name="property_description"
+																		type="text"
+																		// error={propertyDataErrors['property_description']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'property_description',
+																			})
+																		}
+																	/>
+																</div>
+															</div>
+
+															<div className="space-y-4">
+																<h3>
+																	<span className="text-lg">Material Agreements &amp; Documentation</span>
+																</h3>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Deed"
+																		placeholder="https://"
+																		value={propertyData?.deed}
+																		id="deed"
+																		name="deed"
+																		type="url"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['deed']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'deed',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Mortgage"
+																		placeholder="https://"
+																		value={propertyData?.mortgage}
+																		id="mortgage"
+																		name="mortgage"
+																		type="url"
+																		// error={propertyDataErrors['mortgage']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'mortgage',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Title Insurance"
+																		placeholder="https://"
+																		value={propertyData?.title_insurance}
+																		id="title_insurance"
+																		name="title_insurance"
+																		type="url"
+																		// error={propertyDataErrors['title_insurance']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'title_insurance',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Articles Of Organization"
+																		placeholder="https://"
+																		value={propertyData?.articles_of_organization}
+																		id="articles_of_organization"
+																		name="articles_of_organization"
+																		type="url"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['articles_of_organization']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'articles_of_organization',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Certificate Of Organization From Secretary Of State"
+																		placeholder="https://"
+																		value={propertyData?.certificate_of_organization_from_secretary_of_state}
+																		id="certificate_of_organization_from_secretary_of_state"
+																		name="certificate_of_organization_from_secretary_of_state"
+																		type="url"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['certificate_of_organization_from_secretary_of_state']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'certificate_of_organization_from_secretary_of_state',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Operating Agreement"
+																		placeholder="https://"
+																		value={propertyData?.operating_agreement}
+																		id="operating_agreement"
+																		name="operating_agreement"
+																		type="url"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['operating_agreement']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'operating_agreement',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Membership Interest Transfer Agreement"
+																		placeholder="https://"
+																		value={propertyData?.membership_interest_transfer_agreement}
+																		id="membership_interest_transfer_agreement"
+																		name="membership_interest_transfer_agreement"
+																		type="url"
+																		// error={propertyDataErrors['membership_interest_transfer_agreement']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'membership_interest_transfer_agreement',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="EIN Letter from IRS"
+																		placeholder="https://"
+																		value={propertyData?.ein_letter_from_irs}
+																		id="ein_letter_from_irs"
+																		name="ein_letter_from_irs"
+																		type="url"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['ein_letter_from_irs']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'ein_letter_from_irs',
+																			})
+																		}
+																	/>
+																</div>
+
+																<div className="xpb-4">
+																	<Input
+																		label="Appraisal"
+																		placeholder="https://"
+																		value={propertyData?.appraisal}
+																		id="appraisal"
+																		name="appraisal"
+																		type="url"
+																		// error={propertyDataErrors['appraisal']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'appraisal',
+																			})
+																		}
+																	/>
+																</div>
+															</div>
+
+															<div className="space-y-4 pb-16">
+																<h3>
+																	<span className="text-lg">Submitted By</span>
+																</h3>
+																<div className="xpb-4">
+																	<Input
+																		label="Your Legal Name"
+																		placeholder="Your Legal Name"
+																		value={propertyData?.submitted_by}
+																		id="submitted_by"
+																		name="submitted_by"
+																		type="text"
+																		className="field-validate"
+																		required
+																		// error={propertyDataErrors['submitted_by']}
+																		onChange={(evt) =>
+																			handleSetPropertyData({
+																				value: evt.target.value,
+																				propertyName: 'submitted_by',
+																			})
+																		}
+																	/>
+																</div>
+															</div>
+														</>
+													)}
+												</>
 											)}
+											{/* end old */}
 										</>
 									)}
 								</div>
