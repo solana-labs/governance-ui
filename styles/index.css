@@ -174,7 +174,7 @@ button {
 	content: ">";
 }
 
-.-mt-px-children > * + * {
+.-mt-px-children>*+* {
 	margin-top: -1px;
 }
 
@@ -185,10 +185,14 @@ button {
 */
 
 :root {
-	--base-font-size: 16; /* // "root" font size (typically 16px) */
-	--max-width-constraint: 1280;  /* // major breakpoint/max-width of your design */
-	--min-font-size: 16; /* // Default smallest size (typically you don't want to go below 16) */
-	--max-font-size: 50; /* // Default largest size */
+	--base-font-size: 16;
+	/* // "root" font size (typically 16px) */
+	--max-width-constraint: 1280;
+	/* // major breakpoint/max-width of your design */
+	--min-font-size: 16;
+	/* // Default smallest size (typically you don't want to go below 16) */
+	--max-font-size: 50;
+	/* // Default largest size */
 
 	/* // Update the following to align to your project's needs: */
 	--fs-0: 200;
@@ -212,6 +216,7 @@ button {
 	--fs-6: 12;
 	--fs-6-mobile: 6;
 }
+
 /*
 [class*='u-scalable-fs-'] {
 	font-size: clamp(calc((var(--min-font-size) / var(--base-font-size)) * 1rem), calc((((var(--max-font-size) - var(--min-font-size)) / var(--max-width-constraint)) * 100) * 1vw), calc((var(--max-font-size) / var(--base-font-size)) * 1rem));
@@ -346,4 +351,9 @@ button {
 .text-legal {
 	font-size: var(--fs, .5rem);
 	line-height: var(--lh, 1.5);
+}
+
+.ascii {
+	/* font-family: monospace; */
+	/* white-space: pre; */
 }
