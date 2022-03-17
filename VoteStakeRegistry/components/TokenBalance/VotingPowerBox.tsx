@@ -1,6 +1,6 @@
 import { BN } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 import { LightningBoltIcon } from '@heroicons/react/solid'
 import Tooltip from '@components/Tooltip'
 
