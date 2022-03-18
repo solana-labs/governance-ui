@@ -1,4 +1,7 @@
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
+import {
+  ArrowCircleLeftIcon,
+  ArrowCircleRightIcon,
+} from '@heroicons/react/outline'
 import React from 'react'
 import { Pagination } from 'react-headless-pagination'
 
@@ -19,25 +22,23 @@ const PaginationComponent = ({ totalPages = 5, onPageChange }) => {
           totalPages={totalPages}
           edgePageCount={2}
           middlePagesSiblingCount={2}
-          className=""
           truncableText="..."
-          truncableClassName=""
         >
           <div className="flex flex-wrap pt-3 text-xs">
-            <Pagination.PrevButton className="">
-              <ArrowLeftIcon className="w-4 h-4 text-primary-light"></ArrowLeftIcon>
+            <Pagination.PrevButton className="default-transition text-primary-light hover:text-primary-dark">
+              <ArrowCircleLeftIcon className="w-6 h-6" />
             </Pagination.PrevButton>
 
             <div className="flex items-center justify-center flex-grow">
               <Pagination.PageButton
-                activeClassName="opacity-60"
+                activeClassName="bg-bkg-4 font-bold rounded-full text-fgd-2"
                 inactiveClassName=""
-                className="text-primary-light mx-1 hover:opacity-60 cursor-pointer"
+                className="default-transition flex font-normal items-center justify-center mx-0.5 text-fgd-3 text-sm w-6 h-6 cursor-pointer hover:text-fgd-2"
               />
             </div>
 
-            <Pagination.NextButton className="">
-              <ArrowRightIcon className="w-4 h-4 text-primary-light"></ArrowRightIcon>
+            <Pagination.NextButton className="default-transition text-primary-light hover:text-primary-dark">
+              <ArrowCircleRightIcon className="w-6 h-6" />
             </Pagination.NextButton>
           </div>
         </Pagination>
