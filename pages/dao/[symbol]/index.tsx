@@ -10,9 +10,6 @@ import {
 } from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import { PublicKey } from '@solana/web3.js'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import dynamic from 'next/dynamic'
@@ -92,12 +89,6 @@ const REALM = () => {
     governances,
   } = useRealm()
   const proposalsPerPage = 20
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
-    JSON.stringify(nftsGovernedTokenAccounts)
-  )
-  const connection = useWalletStore((s) => s.connection.current)
-  const { getNfts } = useTreasuryAccountStore()
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
@@ -135,14 +126,6 @@ const REALM = () => {
     setFilteredProposals(proposals)
   }, [proposals])
 
-  useEffect(() => {
-    if (
-      prevStringifyNftsGovernedTokenAccounts !==
-      JSON.stringify(nftsGovernedTokenAccounts)
-    ) {
-      getNfts(nftsGovernedTokenAccounts, connection)
-    }
-  }, [JSON.stringify(nftsGovernedTokenAccounts)])
   // DEBUG print remove
   console.log(
     'governance page tokenAccount',

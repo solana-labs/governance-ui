@@ -19,6 +19,9 @@ import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeR
 import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
 import tokenService from '@utils/services/token'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { usePrevious } from '@hooks/usePrevious'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
@@ -30,13 +33,18 @@ function App({ Component, pageProps }) {
     tokenService.fetchSolanaTokenList()
   }, [])
   const { loadMarket } = useMarketStore()
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+
+  const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
   const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const realmName = realmInfo?.displayName ?? realm?.account?.name
-
+  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
+    JSON.stringify(nftsGovernedTokenAccounts)
+  )
   const title = realmName ? `${realmName}` : 'Solana Governance'
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
@@ -47,8 +55,10 @@ function App({ Component, pageProps }) {
     faviconSelector as string
   )}/favicon.ico?v=${Date.now()}`
   useEffect(() => {
-    loadMarket(connection, connection.cluster)
-  }, [connection.cluster])
+    if (realm?.pubkey) {
+      loadMarket(connection, connection.cluster)
+    }
+  }, [connection.cluster, realm?.pubkey.toBase58()])
   useEffect(() => {
     if (
       realm?.account.config.useCommunityVoterWeightAddin &&
@@ -94,9 +104,17 @@ function App({ Component, pageProps }) {
     changeFavicon(faviconUrl)
   }, [faviconUrl])
   useEffect(() => {
-    console.log(title)
     document.title = title
   }, [title])
+  useEffect(() => {
+    if (
+      prevStringifyNftsGovernedTokenAccounts !==
+        JSON.stringify(nftsGovernedTokenAccounts) &&
+      realm?.pubkey
+    ) {
+      getNfts(nftsGovernedTokenAccounts, connection.current)
+    }
+  }, [JSON.stringify(nftsGovernedTokenAccounts), realm?.pubkey.toBase58()])
   return (
     <div className="relative">
       <ErrorBoundary>
