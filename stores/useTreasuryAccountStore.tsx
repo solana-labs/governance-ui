@@ -32,14 +32,14 @@ type NewConnectionType = {
 type TokenAccountWithListInfo = TokenAccountWithKey & {
   tokenInfo?: TokenInfo
 }
-type TokenInfoWithMint = TokenAccountWithListInfo & {
+export type TokenInfoWithMint = TokenAccountWithListInfo & {
   mintInfo: MintInfo
 }
 
 interface TreasuryAccountStore extends State {
   currentAccount: GovernedTokenAccount | null
   mintAddress: string
-  tokenInfo: TokenInfo | null
+  tokenInfo?: TokenInfo
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
@@ -62,7 +62,7 @@ interface TreasuryAccountStore extends State {
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   currentAccount: null,
   mintAddress: '',
-  tokenInfo: null,
+  tokenInfo: undefined,
   recentActivity: [],
   allNfts: [],
   allTokenAccounts: [],
@@ -174,7 +174,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     set((s) => {
       s.currentAccount = account
       s.mintAddress = mintAddress
-      s.tokenInfo = mintAddress && tokenInfo ? tokenInfo : null
+      s.tokenInfo = mintAddress && tokenInfo ? tokenInfo : undefined
     })
     _get().handleFetchRecentActivity(account, connection)
     _get().getTokenAccounts(connection, account)

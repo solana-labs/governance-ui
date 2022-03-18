@@ -5,6 +5,8 @@ import useRealm from '@hooks/useRealm'
 import { AccountInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import {
+  fmtTokenInfoWithMint,
+  getMintDecimalAmountFromNatural,
   //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimalAsBN,
@@ -18,7 +20,9 @@ import {
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 import React, { useEffect, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import useTreasuryAccountStore, {
+  TokenInfoWithMint,
+} from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 
 import { getTokenTransferSchema } from '@utils/validations'
@@ -38,8 +42,7 @@ import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import Textarea from '@components/inputs/Textarea'
-// import { Popover } from '@headlessui/react'
-import AccountLabel from './AccountHeader'
+import AccountLabel from './BaseAccountHeader'
 import Tooltip from '@components/Tooltip'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { getGenericTransferInstruction } from '@utils/instructionTools'
@@ -48,21 +51,22 @@ import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-import { TokenInfo } from '@solana/spl-token-registry'
+import useTotalTokenValue from '@hooks/useTotalTokenValue'
 
 export type GenericSendTokensProps = {
   mintBeingTransferred: PublicKey
   mintDecimals: number
   tokenSource: PublicKey
-  tokenInfo?: TokenInfo
+  tokenAccount: TokenInfoWithMint
 }
 
 const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   mintBeingTransferred,
   mintDecimals,
   tokenSource,
-  tokenInfo,
+  tokenAccount,
 }) => {
+  const tokenInfo = tokenAccount.tokenInfo
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -90,6 +94,13 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     mintInfo: undefined,
     title: '',
     description: '',
+  })
+  const totalPrice = useTotalTokenValue({
+    amount: getMintDecimalAmountFromNatural(
+      tokenAccount.mintInfo,
+      tokenAccount.amount
+    ).toNumber(),
+    mintAddress: tokenAccount.mint.toString(),
   })
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
@@ -303,8 +314,13 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
           Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
         </>
       </h3>
-      {/* TODO: Change this to be generic for the token accounts */}
-      <AccountLabel></AccountLabel>
+
+      <AccountLabel
+        isNFT={false}
+        tokenInfo={tokenInfo}
+        amountFormatted={fmtTokenInfoWithMint(tokenAccount)}
+        totalPrice={totalPrice}
+      />
       <div className="space-y-4 w-full pb-4">
         <Input
           label="Destination account"
