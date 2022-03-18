@@ -459,5 +459,15 @@
     "ogImage": "/realms/SNY/img/synthetify_logo_green.svg",
     "website": "https://synthetify.io/",
     "twitter": "@synthetify"
+  },
+  {
+    "symbol": "WONDER",
+    "displayName": "Wonder",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6cxM3jY1p4WAncb356Gv9bteRv8fSxaRKPK6JQVDqbkJ",
+    "ogImage": "/realms/wonder/img/logo.png",
+    "website": "https://wonderprotocol.org",
+    "twitter": "@wonderprotocol",
+    "keywords": "Wonder, Wonder Protocol, Create-To-Own, DAO, Governance, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto"
   }
 ]
