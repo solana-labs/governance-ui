@@ -107,7 +107,7 @@ const AccountOverview = () => {
     if (eligibleInvestments.filter((x) => x.protocolName === MANGO).length) {
       handleGetMangoAccounts()
     }
-  }, [eligibleInvestments])
+  }, [JSON.stringify(eligibleInvestments)])
 
   useEffect(() => {
     if (isCopied) {
