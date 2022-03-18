@@ -1,8 +1,7 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { NftVoterClient } from '@solana/governance-program-library'
 import { getNfts } from '@utils/tokens'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
@@ -23,8 +22,12 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
+  //force rerender for nft clients.
+  const [updates, setUpdates] = useState(0)
+
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
+  const connected = useWalletStore((s) => s.connected)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const currentClient = useVotePluginsClientStore(
@@ -34,25 +37,30 @@ export function useVotingPlugins() {
   const nftMintRegistrar = useVotePluginsClientStore(
     (s) => s.state.nftMintRegistrar
   )
-  const usedCollectionsPks =
+  const usedCollectionsPks: string[] =
     nftMintRegistrar?.collectionConfigs.map((x) => x.collection.toBase58()) ||
     []
+
   const handleGetNfts = async () => {
-    let nfts = await getNfts(connection.current, wallet!.publicKey!)
-    console.log(nfts, '@#$@#$#$@$@#$')
-    if (usedCollectionsPks.length) {
-      const resp = (
-        await Promise.all(
-          nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
-        )
-      ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
-      nfts = nfts.filter((x) =>
-        resp.find((j) => j.tokenAddress.toBase58() === x.tokenAddress)
+    const nfts = await getNfts(connection.current, wallet!.publicKey!)
+    const votingNfts = (
+      await Promise.all(
+        nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
       )
-      currentClient._setCurrentVoterNftsAccounts(resp)
-    }
-    currentClient._setCurrentVoterNfts(nfts)
+    ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
+    const nftsWithMeta = votingNfts.map((x) => {
+      const nft = nfts.find(
+        (nft) => nft.tokenAddress === x.tokenAddress.toBase58()
+      )
+      return {
+        ...nft!,
+        metadata: x.metadata,
+      }
+    })
+    currentClient._setCurrentVoterNfts(nftsWithMeta)
+    setUpdates(updates + 1)
   }
+
   const getIsFromCollection = async (mint: string, tokenAddress: string) => {
     const metadataAccount = await Metadata.getPDA(mint)
     const metadata = await Metadata.load(connection.current, metadataAccount)
@@ -68,11 +76,11 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    if (wallet?.connected) {
+    if (connected) {
       handleSetVsrClient(wallet, connection)
       handleSetNftClient(wallet, connection)
     }
-  }, [connection.endpoint, wallet?.connected, realm?.pubkey.toBase58()])
+  }, [connection.endpoint, connected, realm?.pubkey.toBase58()])
 
   useEffect(() => {
     if (
@@ -99,13 +107,13 @@ export function useVotingPlugins() {
         walletPk: wallet?.publicKey,
       })
     }
-  }, [currentPluginPk, vsrClient, nftClient])
+  }, [currentPluginPk, vsrClient, nftClient, connected])
   useEffect(() => {
-    if (currentClient.client instanceof NftVoterClient && wallet?.connected) {
+    if (usedCollectionsPks.length && connected) {
       handleGetNfts()
     } else {
       currentClient?._setCurrentVoterNfts([])
-      currentClient?._setCurrentVoterNftsAccounts([])
+      setUpdates(updates + 1)
     }
-  }, [wallet?.connected, currentClient])
+  }, [JSON.stringify(usedCollectionsPks), currentClient.client])
 }

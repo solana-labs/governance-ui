@@ -24,6 +24,7 @@ const NftBalanceCard = () => {
   const votingNfts = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient.votingNfts
   )
+  console.log(votingNfts, '#@$#@$@#$@#$@#$')
   const connection = useWalletStore((s) => s.connection)
   const { tokenRecords, realm } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)
@@ -75,13 +76,12 @@ const NftBalanceCard = () => {
     await fetchRealm(realm?.owner, realm?.pubkey)
   }
   useEffect(() => {
-    console.log(votingNfts, '@#$#@$#@$$#')
     if (votingNfts) {
       setNfts(votingNfts)
     } else {
       setNfts([])
     }
-  }, [votingNfts, wallet?.connected])
+  }, [votingNfts])
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">

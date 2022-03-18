@@ -64,11 +64,10 @@ const ApproveAllBtn = () => {
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const plugin = await client.withUpdateVoterWeightRecord(
+        const plugin = await client?.withCastPluginVote(
           instructions,
-          'castVote'
+          proposal.pubkey
         )
-        await client?.withCastPluginVote(instructions, proposal.pubkey)
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(
             instructions,

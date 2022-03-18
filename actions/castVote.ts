@@ -45,12 +45,7 @@ export async function castVote(
     programId
   )
 
-  //   //will run only if any plugin is connected with realm
-  //   const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
-  //     instructions,
-  //     'castVote'
-  //   )
-
+  //will run only if any plugin is connected with realm
   const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
     proposal.pubkey
