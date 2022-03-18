@@ -316,7 +316,8 @@
     "symbol": "Bears",
     "displayName": "Bears Reloaded",
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
-    "realmId": "8x3bs2CUu7FZCw9zoTz29eBNwKjfJiCHjWz4T53NWLbJ"
+    "realmId": "8x3bs2CUu7FZCw9zoTz29eBNwKjfJiCHjWz4T53NWLbJ",
+    "ogImage": "/realms/Bears/img/bearlogo.png"
   },
   {
     "symbol": "SlattsDAO",
