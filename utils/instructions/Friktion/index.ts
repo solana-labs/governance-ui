@@ -26,6 +26,7 @@ import { getATA } from '../../ataTools'
 import { GovernedTokenAccount } from '../../tokens'
 import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { validateInstruction } from '@utils/instructionTools'
+import BN from 'bn.js'
 
 export async function getFriktionDepositInstruction({
   schema,
@@ -233,7 +234,7 @@ export async function getFriktionWithdrawInstruction({
   const prerequisiteInstructions: TransactionInstruction[] = []
   const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   const voltVaultId = new PublicKey(form.voltVaultId as string)
-
+  const depositTokenMint = new PublicKey(form.depositTokenMint as string)
   const signers: Keypair[] = []
   if (
     isValid &&
@@ -259,111 +260,138 @@ export async function getFriktionWithdrawInstruction({
     const voltVault = cVoltSDK.voltVault
     const vaultMint = cVoltSDK.voltVault.vaultMint
 
-    //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-    const { currentAddress: receiverAddress, needToCreateAta } = await getATA({
-      connection: connection,
-      receiverAddress: governedTokenAccount.governance.pubkey,
-      mintPK: vaultMint,
-      wallet,
-    })
-    //we push this createATA instruction to transactions to create right before creating proposal
-    //we don't want to create ata only when instruction is serialized
-    if (needToCreateAta) {
-      prerequisiteInstructions.push(
-        Token.createAssociatedTokenAccountInstruction(
-          ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-          TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-          vaultMint, // mint
-          receiverAddress, // ata
-          governedTokenAccount.governance.pubkey, // owner of token account
-          wallet.publicKey! // fee payer
-        )
-      )
-    }
-
-    let pendingDepositInfo
     try {
-      pendingDepositInfo = await cVoltSDK.getPendingDepositForUser()
-    } catch (err) {
-      pendingDepositInfo = null
-    }
+      let depositTokenDest: PublicKey | null
 
-    if (
-      pendingDepositInfo &&
-      pendingDepositInfo.roundNumber.lt(voltVault.roundNumber) &&
-      pendingDepositInfo?.numUnderlyingDeposited?.gtn(0)
-    ) {
-      prerequisiteInstructions.push(
-        await cVoltSDK.claimPending(receiverAddress)
-      )
-    }
-
-    let depositTokenAccountKey: PublicKey | null
-
-    if (governedTokenAccount.isSol) {
-      const { currentAddress: receiverAddress, needToCreateAta } = await getATA(
-        {
+      if (governedTokenAccount.isSol) {
+        const {
+          currentAddress: receiverAddress,
+          needToCreateAta,
+        } = await getATA({
           connection: connection,
           receiverAddress: governedTokenAccount.governance.pubkey,
           mintPK: new PublicKey(WSOL_MINT),
           wallet,
+        })
+        if (needToCreateAta) {
+          prerequisiteInstructions.push(
+            Token.createAssociatedTokenAccountInstruction(
+              ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
+              TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
+              new PublicKey(WSOL_MINT), // mint
+              receiverAddress, // ata
+              governedTokenAccount.governance.pubkey, // owner of token account
+              wallet.publicKey! // fee payer
+            )
+          )
         }
-      )
+        depositTokenDest = receiverAddress
+      } else {
+        depositTokenDest = governedTokenAccount.transferAddress!
+      }
+
+      //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
+      const {
+        currentAddress: vaultTokenAccount,
+        needToCreateAta,
+      } = await getATA({
+        connection: connection,
+        receiverAddress: governedTokenAccount.governance.pubkey,
+        mintPK: vaultMint,
+        wallet,
+      })
+      //we push this createATA instruction to transactions to create right before creating proposal
+      //we don't want to create ata only when instruction is serialized
       if (needToCreateAta) {
         prerequisiteInstructions.push(
           Token.createAssociatedTokenAccountInstruction(
             ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
             TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            new PublicKey(WSOL_MINT), // mint
-            receiverAddress, // ata
+            vaultMint, // mint
+            vaultTokenAccount, // ata
             governedTokenAccount.governance.pubkey, // owner of token account
             wallet.publicKey! // fee payer
           )
         )
       }
-      depositTokenAccountKey = receiverAddress
-    } else {
-      depositTokenAccountKey = governedTokenAccount.transferAddress!
-    }
 
-    try {
-      let decimals = 9
-
-      if (!governedTokenAccount.isSol) {
-        const underlyingAssetMintInfo = await new Token(
-          connection.current,
-          governedTokenAccount.mint.publicKey,
-          TOKEN_PROGRAM_ID,
-          (null as unknown) as Account
-        ).getMintInfo()
-        decimals = underlyingAssetMintInfo.decimals
+      let pendingDepositInfo
+      try {
+        const key = (
+          await VoltSDK.findPendingDepositInfoAddress(
+            voltVaultId,
+            governedTokenAccount.governance.pubkey,
+            cVoltSDK.sdk.programs.Volt.programId
+          )
+        )[0]
+        const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
+          key
+        )
+        pendingDepositInfo = {
+          ...acct,
+          key: key,
+        } as PendingDepositWithKey
+      } catch (err) {
+        pendingDepositInfo = null
       }
 
-      const depositIx = governedTokenAccount.isSol
-        ? await cVoltSDK.depositWithTransfer(
-            new Decimal(amount),
-            depositTokenAccountKey,
-            receiverAddress,
-            governedTokenAccount.transferAddress!,
-            governedTokenAccount.governance.pubkey,
-            decimals
-          )
-        : await cVoltSDK.deposit(
-            new Decimal(amount),
-            depositTokenAccountKey,
-            receiverAddress,
-            governedTokenAccount.governance.pubkey,
-            decimals
-          )
+      if (
+        pendingDepositInfo &&
+        pendingDepositInfo.roundNumber.lt(voltVault.roundNumber) &&
+        pendingDepositInfo?.numUnderlyingDeposited?.gtn(0)
+      ) {
+        prerequisiteInstructions.push(
+          await cVoltSDK.claimPending(vaultTokenAccount)
+        )
+      }
 
-      const governedAccountIndex = depositIx.keys.findIndex(
+      let pendingWithdrawalInfo
+
+      try {
+        const key = (
+          await VoltSDK.findPendingWithdrawalInfoAddress(
+            voltVaultId,
+            governedTokenAccount.governance.pubkey,
+            cVoltSDK.sdk.programs.Volt.programId
+          )
+        )[0]
+        const acct = await this.sdk.programs.Volt.account.pendingWithdrawal.fetch(
+          key
+        )
+        pendingWithdrawalInfo = {
+          ...acct,
+          key: key,
+        }
+      } catch (err) {
+        pendingWithdrawalInfo = null
+      }
+      if (
+        pendingWithdrawalInfo &&
+        pendingWithdrawalInfo.roundNumber.lt(voltVault.roundNumber) &&
+        pendingWithdrawalInfo?.numVoltRedeemed?.gtn(0)
+      ) {
+        prerequisiteInstructions.push(
+          await cVoltSDK.claimPendingWithdrawal(depositTokenDest)
+        )
+      }
+
+      const withdrawIx = await cVoltSDK.withdrawHumanAmount(
+        new BN(amount),
+        depositTokenMint,
+        vaultTokenAccount,
+        null,
+        depositTokenDest,
+        governedTokenAccount.governance.pubkey
+      )
+
+      const governedAccountIndex = withdrawIx.keys.findIndex(
         (k) =>
           k.pubkey.toString() ===
           governedTokenAccount.governance?.pubkey.toString()
       )
-      depositIx.keys[governedAccountIndex].isSigner = true
+      withdrawIx.keys[governedAccountIndex].isSigner = true
 
-      serializedInstruction = serializeInstructionToBase64(depositIx)
+      serializedInstruction = serializeInstructionToBase64(withdrawIx)
     } catch (e) {
       if (e instanceof Error) {
         throw new Error('Error: ' + e.message)

@@ -863,10 +863,10 @@
     dotenv-expand "^6.0.1"
     yargs "^17.0.1"
 
-"@friktion-labs/friktion-sdk@^1.1.13":
-  version "1.1.13"
-  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.13.tgz#59ba9c6ee268568f39964b5ae1e33ba76c0024fe"
-  integrity sha512-xmLTCqUPwdCrI3bFXCkcSgLWe/faPG5CefOx1XzSbndw3qrE8GvMD9MU/PwJ4va9s4bOClvPKR10szM6DKp54A==
+"@friktion-labs/friktion-sdk@^1.1.24":
+  version "1.1.24"
+  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.24.tgz#fcf16db321b6b75e17299b8fe478fe8c3ba7caf2"
+  integrity sha512-NEpdvc5SADuJLwtgTWK6g+3cpuWKRnCK1RRFBwpwNR6qnN6JhO+3EcLuzwyKQzIchAy+Cu78GuV+X7W187oKIw==
   dependencies:
     "@friktion-labs/entropy-client" "^1.0.0"
     "@oclif/command" "^1.8.16"
