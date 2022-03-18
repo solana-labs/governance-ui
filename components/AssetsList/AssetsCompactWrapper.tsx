@@ -4,19 +4,12 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
 import useQueryContext from '@hooks/useQueryContext'
 import Link from 'next/link'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernanceAccountType } from '@solana/spl-governance'
 
 const AssetsCompactWrapper = () => {
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { getGovernancesByAccountTypes } = useGovernanceAssets()
-  const programGovernances = getGovernancesByAccountTypes([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
-  ])
 
-  return programGovernances.length > 0 ? (
+  return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <div className="flex items-center justify-between pb-4">
         <h3 className="mb-0">Assets</h3>
@@ -33,7 +26,7 @@ const AssetsCompactWrapper = () => {
         <AssetsList panelView />
       </div>
     </div>
-  ) : null
+  )
 }
 
 export default AssetsCompactWrapper

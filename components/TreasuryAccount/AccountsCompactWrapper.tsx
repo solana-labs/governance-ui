@@ -12,7 +12,7 @@ const AccountsCompactWrapper = () => {
   const { symbol } = useRealm()
   const { governedTokenAccounts } = useGovernanceAssets()
 
-  return governedTokenAccounts.length > 0 ? (
+  return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between pb-4">
         <h3 className="mb-0">Treasury</h3>
@@ -27,10 +27,12 @@ const AccountsCompactWrapper = () => {
       </div>
       <HoldTokensTotalPrice />
       <div style={{ maxHeight: '350px' }} className="overflow-y-auto">
-        <AccountsItems />
+        {governedTokenAccounts.every((x) => x.transferAddress) && (
+          <AccountsItems />
+        )}
       </div>
     </div>
-  ) : null
+  )
 }
 
 export default AccountsCompactWrapper
