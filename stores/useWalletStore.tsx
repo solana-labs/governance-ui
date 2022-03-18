@@ -578,7 +578,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
 export default useWalletStore
 
-async function tryGetRealmConfig(
+export async function tryGetRealmConfig(
   connection: Connection,
   programId: PublicKey,
   realmPk: PublicKey
