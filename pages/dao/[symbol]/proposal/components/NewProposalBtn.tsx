@@ -55,10 +55,10 @@ const NewProposalBtn = () => {
               className={`${
                 !canCreateProposal
                   ? 'cursor-not-allowed pointer-events-none'
-                  : 'hover:bg-bkg-3'
-              } default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
+                  : ''
+              } flex items-center cursor-pointer text-primary-light hover:text-primary-dark text-sm`}
             >
-              <PlusCircleIcon className="h-5 mr-1.5 text-primary-light w-5" />
+              <PlusCircleIcon className="h-5 mr-1 w-5" />
               New
             </a>
           </Link>

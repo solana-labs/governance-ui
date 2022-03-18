@@ -10,13 +10,12 @@ import {
 } from '@solana/spl-governance'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
 import { PublicKey } from '@solana/web3.js'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { usePrevious } from '@hooks/usePrevious'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import dynamic from 'next/dynamic'
 import PaginationComponent from '@components/Pagination'
+import Tabs from '@components/Tabs'
+import AboutRealm from '@components/AboutRealm'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
@@ -90,12 +89,6 @@ const REALM = () => {
     governances,
   } = useRealm()
   const proposalsPerPage = 20
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
-    JSON.stringify(nftsGovernedTokenAccounts)
-  )
-  const connection = useWalletStore((s) => s.connection.current)
-  const { getNfts } = useTreasuryAccountStore()
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
@@ -104,6 +97,7 @@ const REALM = () => {
     [string, ProgramAccount<Proposal>][]
   >([])
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
+  const [activeTab, setActiveTab] = useState('Proposals')
   const wallet = useWalletStore((s) => s.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
@@ -132,14 +126,6 @@ const REALM = () => {
     setFilteredProposals(proposals)
   }, [proposals])
 
-  useEffect(() => {
-    if (
-      prevStringifyNftsGovernedTokenAccounts !==
-      JSON.stringify(nftsGovernedTokenAccounts)
-    ) {
-      getNfts(nftsGovernedTokenAccounts, connection)
-    }
-  }, [JSON.stringify(nftsGovernedTokenAccounts)])
   // DEBUG print remove
   console.log(
     'governance page tokenAccount',
@@ -164,80 +150,92 @@ const REALM = () => {
       (page + 1) * proposalsPerPage
     )
   }
+
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
         {realm ? (
           <>
             <div
-              className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg`}
+              className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last rounded-lg`}
             >
               {realm && <RealmHeader />}
-              <div>
-                {realmInfo?.bannerImage ? (
-                  <>
-                    <img
-                      className="mb-10 h-80"
-                      src={realmInfo?.bannerImage}
-                    ></img>
-                    {/* temp. setup for Ukraine.SOL */}
-                    {realmInfo.realmId.equals(
-                      new PublicKey(
-                        '5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d'
-                      )
-                    ) ? (
-                      <div>
-                        <div className="mb-10">
-                          <DepositLabel
-                            abbreviatedAddress={false}
-                            header="Wallet Address"
-                            transferAddress={
-                              new PublicKey(
-                                '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
-                              )
-                            }
-                          ></DepositLabel>
+              <div className="p-4 md:p-6 ">
+                <div>
+                  {realmInfo?.bannerImage ? (
+                    <>
+                      <img
+                        className="mb-10 h-80"
+                        src={realmInfo?.bannerImage}
+                      ></img>
+                      {/* temp. setup for Ukraine.SOL */}
+                      {realmInfo.realmId.equals(
+                        new PublicKey(
+                          '5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d'
+                        )
+                      ) ? (
+                        <div>
+                          <div className="mb-10">
+                            <DepositLabel
+                              abbreviatedAddress={false}
+                              header="Wallet Address"
+                              transferAddress={
+                                new PublicKey(
+                                  '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+                                )
+                              }
+                            ></DepositLabel>
+                          </div>
                         </div>
-                      </div>
-                    ) : null}
-                  </>
-                ) : null}
-              </div>
-              <div className="flex items-center justify-between pb-3">
-                <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
-                <div className="flex items-center">
-                  <div className="mr-4">
-                    <ApproveAllBtn />
-                  </div>
-                  <div className="mr-4">
-                    <NewProposalBtn />
-                  </div>
-
-                  <ProposalFilter filters={filters} setFilters={setFilters} />
+                      ) : null}
+                    </>
+                  ) : null}
                 </div>
-              </div>
-              <div className="space-y-3">
-                {filteredProposals.length > 0 ? (
+
+                <Tabs
+                  activeTab={activeTab}
+                  onChange={(t) => setActiveTab(t)}
+                  tabs={['Proposals', 'About']}
+                />
+                {activeTab === 'Proposals' && (
                   <>
-                    {paginatedProposals.map(([k, v]) => (
-                      <ProposalCard
-                        key={k}
-                        proposalPk={new PublicKey(k)}
-                        proposal={v.account}
-                      />
-                    ))}
-                    <PaginationComponent
-                      totalPages={Math.ceil(
-                        filteredProposals.length / proposalsPerPage
+                    <div className="flex items-center justify-between pb-3">
+                      <h4 className="font-normal mb-0 text-fgd-2">{`${filteredProposals.length} Proposals`}</h4>
+                      <div className="flex items-center space-x-4">
+                        <ApproveAllBtn />
+                        <NewProposalBtn />
+                        <ProposalFilter
+                          filters={filters}
+                          setFilters={setFilters}
+                        />
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {filteredProposals.length > 0 ? (
+                        <>
+                          {paginatedProposals.map(([k, v]) => (
+                            <ProposalCard
+                              key={k}
+                              proposalPk={new PublicKey(k)}
+                              proposal={v.account}
+                            />
+                          ))}
+                          <PaginationComponent
+                            totalPages={Math.ceil(
+                              filteredProposals.length / proposalsPerPage
+                            )}
+                            onPageChange={onProposalPageChange}
+                          ></PaginationComponent>
+                        </>
+                      ) : (
+                        <div className="bg-bkg-3 px-4 md:px-6 py-4 rounded-lg text-center text-fgd-3">
+                          No proposals found
+                        </div>
                       )}
-                      onPageChange={onProposalPageChange}
-                    ></PaginationComponent>
+                    </div>
                   </>
-                ) : (
-                  <div className="bg-bkg-3 px-4 md:px-6 py-4 rounded-lg text-center text-fgd-3">
-                    No proposals found
-                  </div>
                 )}
+                {activeTab === 'About' && <AboutRealm />}
               </div>
             </div>
             <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
