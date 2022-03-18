@@ -40,11 +40,13 @@ export default function useCreateProposal() {
       governance!.account.config
     )
 
-    const defaultProposalMint = !mint?.supply.isZero()
-      ? realm!.account.communityMint
-      : !councilMint?.supply.isZero()
-      ? realm!.account.config.councilMint
-      : undefined
+    const defaultProposalMint =
+      !mint?.supply.isZero() ||
+      realm?.account.config.useMaxCommunityVoterWeightAddin
+        ? realm!.account.communityMint
+        : !councilMint?.supply.isZero()
+        ? realm!.account.config.councilMint
+        : undefined
 
     const proposalMint =
       canChooseWhoVote && voteByCouncil

@@ -24,7 +24,6 @@ const NftBalanceCard = () => {
   const votingNfts = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient.votingNfts
   )
-  console.log(votingNfts, '#@$#@$@#$@#$@#$')
   const connection = useWalletStore((s) => s.connection)
   const { tokenRecords, realm } = useRealm()
   const { fetchRealm } = useWalletStore((s) => s.actions)

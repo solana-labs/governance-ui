@@ -72,7 +72,6 @@ function NFTSelector(
     }
   }, [selectedNfts])
   useEffect(() => {
-    console.log(predefinedNfts)
     if (predefinedNfts && isPredefinedMode) {
       setNfts(predefinedNfts)
     }
