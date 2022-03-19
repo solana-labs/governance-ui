@@ -254,7 +254,9 @@ export async function getFriktionWithdrawInstruction({
     const cVoltSDK = new ConnectedVoltSDK(
       connection.current,
       wallet.publicKey as PublicKey,
-      await sdk.loadVoltByKey(voltVaultId)
+      await sdk.loadVoltByKey(voltVaultId),
+      undefined,
+      governedTokenAccount.governance.pubkey
     )
 
     const voltVault = cVoltSDK.voltVault
