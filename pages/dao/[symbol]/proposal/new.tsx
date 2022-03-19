@@ -51,6 +51,7 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
+import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
@@ -277,6 +278,8 @@ const New = () => {
         )
       case Instructions.DepositIntoVolt:
         return <FriktionDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromVolt:
+        return <FriktionWithdraw index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
