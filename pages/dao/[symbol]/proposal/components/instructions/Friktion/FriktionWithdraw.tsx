@@ -122,7 +122,7 @@ const FriktionWithdraw = ({
     setGovernedAccount(form.governedTokenAccount?.governance)
     setMintInfo(form.governedTokenAccount?.mint?.account)
   }, [form.governedTokenAccount])
-  const schema = getFriktionWithdrawSchema({ form })
+  const schema = getFriktionWithdrawSchema()
 
   return (
     <>
