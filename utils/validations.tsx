@@ -199,10 +199,6 @@ export const getFriktionDepositSchema = ({ form }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = governedTokenAccount?.isNft
-          if (isNft) {
-            return true
-          }
           if (val && !form.governedTokenAccount) {
             return this.createError({
               message: `Please select source account to validate the amount`,
@@ -229,7 +225,6 @@ export const getFriktionDepositSchema = ({ form }) => {
 }
 
 export const getFriktionWithdrawSchema = ({ form }) => {
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
@@ -239,26 +234,10 @@ export const getFriktionWithdrawSchema = ({ form }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = governedTokenAccount?.isNft
-          if (isNft) {
-            return true
-          }
           if (val && !form.governedTokenAccount) {
             return this.createError({
               message: `Please select source account to validate the amount`,
             })
-          }
-          if (val && governedTokenAccount && governedTokenAccount?.mint) {
-            const mintValue = getMintNaturalAmountFromDecimalAsBN(
-              val,
-              governedTokenAccount?.mint.account.decimals
-            )
-            return !!(governedTokenAccount?.token?.publicKey &&
-            !governedTokenAccount.isSol
-              ? governedTokenAccount.token.account.amount.gte(mintValue)
-              : new BN(governedTokenAccount.solAccount!.lamports).gte(
-                  mintValue
-                ))
           }
           return this.createError({
             message: `Amount is required`,
