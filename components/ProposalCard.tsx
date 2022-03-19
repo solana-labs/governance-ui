@@ -50,7 +50,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
                     proposal={proposal}
                     open={false}
                   />
-                  <StyledSvg className="default-transition h-6 ml-2 text-primary-light w-6" />
+                  <StyledSvg className="default-transition h-6 ml-2 text-fgd-2 w-6" />
                 </div>
               </div>
               <ProposalTimeStatus proposal={proposal} />
