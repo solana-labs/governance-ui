@@ -471,6 +471,16 @@
     "twitter": "@wonderprotocol",
     "keywords": "Wonder, Wonder Protocol, Create-To-Own, DAO, Governance, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto"
   },
+  }
+    "symbol": "UNDER",
+    "displayName": "Underscore DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Gh7DAjGoxRkFP3HXw2v1AfH6pyeGWRtXCudodFHLawDT",
+    "website": "https://underscoredao.com",
+    "keywords": "Underscore DAO, infrastructure, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@underscoredao",
+    "ogImage": "/realms/UNDER/logo.png"
+  },
   {
     "symbol": "NEOFAIRIES",
     "displayName": "Neo Fairies",
