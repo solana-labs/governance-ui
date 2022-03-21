@@ -1,10 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getNfts } from '@utils/tokens'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
@@ -22,8 +23,7 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  //force rerender for nft clients.
-  const [updates, setUpdates] = useState(0)
+  const { setVotingNfts } = useNftPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -57,8 +57,7 @@ export function useVotingPlugins() {
         metadata: x.metadata,
       }
     })
-    currentClient._setCurrentVoterNfts(nftsWithMeta)
-    setUpdates(updates + 1)
+    setVotingNfts(nftsWithMeta, currentClient)
   }
 
   const getIsFromCollection = async (mint: string, tokenAddress: string) => {
@@ -112,8 +111,7 @@ export function useVotingPlugins() {
     if (usedCollectionsPks.length && connected) {
       handleGetNfts()
     } else {
-      currentClient?._setCurrentVoterNfts([])
-      setUpdates(updates + 1)
+      setVotingNfts([], currentClient)
     }
   }, [JSON.stringify(usedCollectionsPks), currentClient.client])
 }
