@@ -1757,7 +1757,7 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@project-serum/sol-wallet-adapter@^0.2.0":
+"@project-serum/sol-wallet-adapter@0.2.0", "@project-serum/sol-wallet-adapter@^0.2.0":
   version "0.2.0"
   resolved "https://registry.npmjs.org/@project-serum/sol-wallet-adapter/-/sol-wallet-adapter-0.2.0.tgz"
   dependencies:
@@ -2112,6 +2112,14 @@
     "@solana/web3.js" "^1.20.0"
     eventemitter3 "^4.0.0"
 
+"@solana/wallet-adapter-base@^0.9.4":
+  version "0.9.5"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-base/-/wallet-adapter-base-0.9.5.tgz#6780dd096d30f0e1ffc9c7869029ec37b2a2fc9e"
+  integrity sha512-KCrSB2s8lA38Bd+aPvHlwPEHZU1owD6LSCikjumUaR3HCcpv+V1lxgQX+tdNaDyEVTKlAYNd0uJU+yQfQlkiOA==
+  dependencies:
+    "@solana/web3.js" "^1.36.0"
+    eventemitter3 "^4.0.0"
+
 "@solana/wallet-adapter-clover@^0.4.2":
   version "0.4.2"
   resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-clover/-/wallet-adapter-clover-0.4.2.tgz#9e803d615d125cbb684cd7cdbdbcb9c5245313dd"
@@ -2168,6 +2176,15 @@
   dependencies:
     "@solana/wallet-adapter-base" "^0.9.1"
     "@solana/web3.js" "^1.20.0"
+
+"@solana/wallet-adapter-solflare@^0.6.6":
+  version "0.6.6"
+  resolved "https://registry.yarnpkg.com/@solana/wallet-adapter-solflare/-/wallet-adapter-solflare-0.6.6.tgz#70ffd87db78e65bd7f53910996f8c50c032a0b54"
+  integrity sha512-4H4FbRpvUeCGQ9HevLpCc9hCtwjRL4pf7kk/4QoGdu+jLbXo1doKTiT8sY1svksNS8JWrcr0kn7SpePmiy7xhg==
+  dependencies:
+    "@solana/wallet-adapter-base" "^0.9.4"
+    "@solana/web3.js" "^1.20.0"
+    "@solflare-wallet/sdk" "^1.0.11"
 
 "@solana/wallet-adapter-sollet@^0.10.3":
   version "0.10.3"
@@ -2251,7 +2268,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.29.2":
+"@solana/web3.js@^1.29.2", "@solana/web3.js@^1.36.0":
   version "1.36.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.36.0.tgz#79d7d5217b49b80139f4de68953adc5b9a9a264f"
   integrity sha512-RNT1451iRR7TyW7EJKMCrH/0OXawIe4zVm0DWQASwXlR/u1jmW6FrmH0lujIh7cGTlfOVbH+2ZU9AVUPLBFzwA==
@@ -2306,6 +2323,16 @@
     buffer "^6.0.3"
     buffer-layout "^1.2.0"
     isomorphic-fetch "^3.0.0"
+
+"@solflare-wallet/sdk@^1.0.11":
+  version "1.0.11"
+  resolved "https://registry.yarnpkg.com/@solflare-wallet/sdk/-/sdk-1.0.11.tgz#2eaf3d5935f96dc4286ae356c4c83f6866947ff2"
+  integrity sha512-zm+snfxpxfEvPytz0CdPn+LSMLrtYIl8qDjC2jhey4hWTkkZmumgKMKfNb9w6cpHtGgWiQkxSP2KI48xuKmuxw==
+  dependencies:
+    "@project-serum/sol-wallet-adapter" "0.2.0"
+    bs58 "^4.0.1"
+    eventemitter3 "^4.0.7"
+    uuid "^8.3.2"
 
 "@switchboard-xyz/switchboard-api@^0.2.150", "@switchboard-xyz/switchboard-api@^0.2.61":
   version "0.2.179"
