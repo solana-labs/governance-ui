@@ -171,229 +171,241 @@ const Params = () => {
                   <Tabs
                     activeTab={activeTab}
                     onChange={(t) => setActiveTab(t)}
-                    tabs={['Params', 'Accounts']}
+                    tabs={['Params', 'Accounts', 'Tracking']}
                   />
                 ) : null}
-                {activeTab === 'Params' ? (
-                  <>
-                    {realmAccount?.authority?.toBase58() ===
-                      activeGovernance.pubkey.toBase58() && (
-                      <DisplayField
-                        label="Realm Authority"
-                        padding
-                        val={'Yes'}
-                      />
-                    )}
-                    <DisplayField
-                      label="Proposals Count"
-                      padding
-                      val={activeGovernance.account.proposalCount}
-                    />
-                    <DisplayField
-                      label="Voting Proposals Count"
-                      padding
-                      val={activeGovernance.account.votingProposalCount}
-                    />
-                    <DisplayField
-                      label="Max Voting Time"
-                      padding
-                      val={getFormattedStringFromDays(
-                        activeGovernance.account.config.maxVotingTime /
-                          SECS_PER_DAY
-                      )}
-                    />
-                    {communityMint && (
-                      <DisplayField
-                        label="Min community tokens to create a proposal"
-                        padding
-                        val={fmtMintAmount(
-                          mint,
-                          activeGovernance.account.config
-                            .minCommunityTokensToCreateProposal
+                {(() => {
+                  if (activeTab === 'Params') {
+                    return (
+                      <>
+                        {realmAccount?.authority?.toBase58() ===
+                          activeGovernance.pubkey.toBase58() && (
+                          <DisplayField
+                            label="Realm Authority"
+                            padding
+                            val={'Yes'}
+                          />
                         )}
-                      />
-                    )}
-                    {councilMint && (
-                      <DisplayField
-                        label="Min council tokens to create a proposal"
-                        padding
-                        val={fmtMintAmount(
-                          councilMint,
-                          activeGovernance.account.config
-                            .minCouncilTokensToCreateProposal
+                        <DisplayField
+                          label="Max Voting Time"
+                          padding
+                          val={getFormattedStringFromDays(
+                            activeGovernance.account.config.maxVotingTime /
+                              SECS_PER_DAY
+                          )}
+                        />
+                        {communityMint && (
+                          <DisplayField
+                            label="Min community tokens to create a proposal"
+                            padding
+                            val={fmtMintAmount(
+                              mint,
+                              activeGovernance.account.config
+                                .minCommunityTokensToCreateProposal
+                            )}
+                          />
                         )}
-                      />
-                    )}
-                    <DisplayField
-                      label="Min Instruction Holdup Time"
-                      padding
-                      val={
-                        activeGovernance.account.config.minInstructionHoldUpTime
-                      }
-                    />
+                        {councilMint && (
+                          <DisplayField
+                            label="Min council tokens to create a proposal"
+                            padding
+                            val={fmtMintAmount(
+                              councilMint,
+                              activeGovernance.account.config
+                                .minCouncilTokensToCreateProposal
+                            )}
+                          />
+                        )}
+                        <DisplayField
+                          label="Min Instruction Holdup Time"
+                          padding
+                          val={
+                            activeGovernance.account.config
+                              .minInstructionHoldUpTime
+                          }
+                        />
 
-                    {/*HIDDEN, NOT USED RIGHT NOW*/}
-                    {/* <DisplayField
+                        {/*HIDDEN, NOT USED RIGHT NOW*/}
+                        {/* <DisplayField
                       label="Proposal Cool-off Time"
                       padding
                       val={activeGovernance.account.config.proposalCoolOffTime}
                     /> */}
-                    <DisplayField
-                      label="Vote Threshold Percentage"
-                      padding
-                      val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
-                    />
-                    <DisplayField
-                      label="Vote Tipping"
-                      padding
-                      val={activeGovernance.account.config.voteTipping}
-                    />
-                  </>
-                ) : (
-                  <div className="space-y-3">
-                    {activeGovernance.accounts.map((x) => {
-                      const info = getTreasuryAccountItemInfoV2(x)
-                      if (
-                        x.type === AccountType.TOKEN ||
-                        x.type === AccountType.SOL
-                      ) {
-                        return (
-                          <div
-                            className="bg-bkg-1 p-4 pb-2 rounded-md"
-                            key={x.pubkey.toBase58()}
-                          >
-                            <DisplayField
-                              bg={false}
-                              label="Name"
-                              val={info.name}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Address"
-                              val={x.extensions?.transferAddress?.toBase58()}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Balance"
-                              val={
-                                <div className="flex items-center">
-                                  {info.logo && (
-                                    <img
-                                      className="h-4 mr-1 w-4"
-                                      src={info.logo}
-                                    />
-                                  )}
-                                  <span>{`${info.amountFormatted} ${
-                                    info.info?.symbol && info.info?.symbol
-                                  }`}</span>
-                                </div>
-                              }
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Type"
-                              val={AccountType[x.type]}
-                            />
-                            {x.type !== AccountType.SOL && (
-                              <DisplayField
-                                label="Mint"
-                                bg={false}
-                                val={x.extensions.mint?.publicKey.toBase58()}
-                              />
-                            )}
-                          </div>
-                        )
-                      }
+                        <DisplayField
+                          label="Vote Threshold Percentage"
+                          padding
+                          val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
+                        />
+                        <DisplayField
+                          label="Vote Tipping"
+                          padding
+                          val={activeGovernance.account.config.voteTipping}
+                        />
+                      </>
+                    )
+                  } else if (activeTab === 'Accounts') {
+                    return (
+                      <div className="space-y-3">
+                        {activeGovernance.accounts.map((x) => {
+                          const info = getTreasuryAccountItemInfoV2(x)
+                          if (
+                            x.type === AccountType.TOKEN ||
+                            x.type === AccountType.SOL
+                          ) {
+                            return (
+                              <div
+                                className="bg-bkg-1 p-4 pb-2 rounded-md"
+                                key={x.pubkey.toBase58()}
+                              >
+                                <DisplayField
+                                  bg={false}
+                                  label="Name"
+                                  val={info.name}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Address"
+                                  val={x.extensions?.transferAddress?.toBase58()}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Balance"
+                                  val={
+                                    <div className="flex items-center">
+                                      {info.logo && (
+                                        <img
+                                          className="h-4 mr-1 w-4"
+                                          src={info.logo}
+                                        />
+                                      )}
+                                      <span>{`${info.amountFormatted} ${
+                                        info.info?.symbol && info.info?.symbol
+                                      }`}</span>
+                                    </div>
+                                  }
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Type"
+                                  val={AccountType[x.type]}
+                                />
+                                {x.type !== AccountType.SOL && (
+                                  <DisplayField
+                                    label="Mint"
+                                    bg={false}
+                                    val={x.extensions.mint?.publicKey.toBase58()}
+                                  />
+                                )}
+                              </div>
+                            )
+                          }
 
-                      if (x.type === AccountType.NFT) {
-                        return (
-                          <div
-                            className="bg-bkg-1 p-4 pb-2 rounded-md"
-                            key={x.pubkey.toBase58()}
-                          >
-                            <DisplayField
-                              bg={false}
-                              label="Type"
-                              val={AccountType[x.type]}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Address"
-                              val={x.extensions?.transferAddress?.toBase58()}
-                            />
-                          </div>
-                        )
-                      }
-                      if (x.type === AccountType.MINT) {
-                        return (
-                          <div
-                            className="bg-bkg-1 p-4 pb-2 rounded-md"
-                            key={x.pubkey.toBase58()}
-                          >
-                            <DisplayField
-                              bg={false}
-                              label="Type"
-                              val={AccountType[x.type]}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Pubkey"
-                              val={x.extensions.mint?.publicKey.toBase58()}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Decimals"
-                              val={x.extensions.mint?.account.decimals}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Mint Authority"
-                              val={x.extensions.mint?.account.mintAuthority?.toBase58()}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Supply"
-                              val={x.extensions.mint?.account.supply.toNumber()}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Is Initialized"
-                              val={getYesNoString(
-                                x.extensions.mint?.account.isInitialized
-                              )}
-                            />
-                            {x.extensions.mint?.account.freezeAuthority ? (
-                              <DisplayField
-                                bg={false}
-                                label="Freeze Authority"
-                                val={x.extensions.mint?.account.freezeAuthority?.toBase58()}
-                              />
-                            ) : null}
-                          </div>
-                        )
-                      }
-                      if (x.type === AccountType.PROGRAM) {
-                        return (
-                          <div
-                            className="bg-bkg-1 p-4 pb-2 rounded-md"
-                            key={x.pubkey.toBase58()}
-                          >
-                            <DisplayField
-                              bg={false}
-                              label="Type"
-                              val={AccountType[x.type]}
-                            />
-                            <DisplayField
-                              bg={false}
-                              label="Pubkey"
-                              val={x.pubkey.toBase58()}
-                            />
-                          </div>
-                        )
-                      }
-                    })}
-                  </div>
-                )}
+                          if (x.type === AccountType.NFT) {
+                            return (
+                              <div
+                                className="bg-bkg-1 p-4 pb-2 rounded-md"
+                                key={x.pubkey.toBase58()}
+                              >
+                                <DisplayField
+                                  bg={false}
+                                  label="Type"
+                                  val={AccountType[x.type]}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Address"
+                                  val={x.extensions?.transferAddress?.toBase58()}
+                                />
+                              </div>
+                            )
+                          }
+                          if (x.type === AccountType.MINT) {
+                            return (
+                              <div
+                                className="bg-bkg-1 p-4 pb-2 rounded-md"
+                                key={x.pubkey.toBase58()}
+                              >
+                                <DisplayField
+                                  bg={false}
+                                  label="Type"
+                                  val={AccountType[x.type]}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Pubkey"
+                                  val={x.extensions.mint?.publicKey.toBase58()}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Decimals"
+                                  val={x.extensions.mint?.account.decimals}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Mint Authority"
+                                  val={x.extensions.mint?.account.mintAuthority?.toBase58()}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Supply"
+                                  val={x.extensions.mint?.account.supply.toNumber()}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Is Initialized"
+                                  val={getYesNoString(
+                                    x.extensions.mint?.account.isInitialized
+                                  )}
+                                />
+                                {x.extensions.mint?.account.freezeAuthority ? (
+                                  <DisplayField
+                                    bg={false}
+                                    label="Freeze Authority"
+                                    val={x.extensions.mint?.account.freezeAuthority?.toBase58()}
+                                  />
+                                ) : null}
+                              </div>
+                            )
+                          }
+                          if (x.type === AccountType.PROGRAM) {
+                            return (
+                              <div
+                                className="bg-bkg-1 p-4 pb-2 rounded-md"
+                                key={x.pubkey.toBase58()}
+                              >
+                                <DisplayField
+                                  bg={false}
+                                  label="Type"
+                                  val={AccountType[x.type]}
+                                />
+                                <DisplayField
+                                  bg={false}
+                                  label="Pubkey"
+                                  val={x.pubkey.toBase58()}
+                                />
+                              </div>
+                            )
+                          }
+                        })}
+                      </div>
+                    )
+                  } else if (activeTab === 'Tracking') {
+                    return (
+                      <>
+                        <DisplayField
+                          label="Proposals Count"
+                          padding
+                          val={activeGovernance.account.proposalCount}
+                        />
+                        <DisplayField
+                          label="Voting Proposals Count"
+                          padding
+                          val={activeGovernance.account.votingProposalCount}
+                        />
+                      </>
+                    )
+                  }
+                })()}
               </div>
             ) : null}
           </div>
