@@ -82,29 +82,41 @@ export function useVotingPlugins() {
   }, [connection.endpoint, connected])
 
   useEffect(() => {
-    if (
-      vsrClient &&
-      currentPluginPk &&
-      vsrPluginsPks.includes(currentPluginPk.toBase58())
-    ) {
-      handleSetVsrRegistrar(vsrClient, realm)
-      handleSetCurrentRealmVotingClient({
-        client: vsrClient,
-        realm,
-        walletPk: wallet?.publicKey,
-      })
+    const handleVsrPlugin = () => {
+      if (
+        vsrClient &&
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetVsrRegistrar(vsrClient, realm)
+        handleSetCurrentRealmVotingClient({
+          client: vsrClient,
+          realm,
+          walletPk: wallet?.publicKey,
+        })
+      }
+    }
+    const handleNftplugin = () => {
+      if (
+        nftClient &&
+        currentPluginPk &&
+        nftPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetNftRegistrar(nftClient!, realm)
+        handleSetCurrentRealmVotingClient({
+          client: nftClient,
+          realm,
+          walletPk: wallet?.publicKey,
+        })
+      }
     }
     if (
-      nftClient &&
-      currentPluginPk &&
-      nftPluginsPks.includes(currentPluginPk.toBase58())
+      !currentClient ||
+      currentClient.realm?.pubkey.toBase58() !== realm?.pubkey.toBase58() ||
+      currentClient.walletPk?.toBase58() !== wallet?.publicKey?.toBase58()
     ) {
-      handleSetNftRegistrar(nftClient!, realm)
-      handleSetCurrentRealmVotingClient({
-        client: nftClient,
-        realm,
-        walletPk: wallet?.publicKey,
-      })
+      handleNftplugin()
+      handleVsrPlugin()
     }
   }, [
     currentPluginPk?.toBase58(),
