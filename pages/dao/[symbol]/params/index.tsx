@@ -231,11 +231,13 @@ const Params = () => {
                         activeGovernance.account.config.minInstructionHoldUpTime
                       }
                     />
-                    <DisplayField
+
+                    {/*HIDDEN, NOT USED RIGHT NOW*/}
+                    {/* <DisplayField
                       label="Proposal Cool-off Time"
                       padding
                       val={activeGovernance.account.config.proposalCoolOffTime}
-                    />
+                    /> */}
                     <DisplayField
                       label="Vote Threshold Percentage"
                       padding
