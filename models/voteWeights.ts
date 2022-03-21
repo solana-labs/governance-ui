@@ -128,7 +128,7 @@ export class VoteNftWeight implements VoterWeightInterface {
 
   // Checks if the voter has any voting weight
   hasAnyWeight() {
-    return true
+    return !this.votingPower.isZero()
   }
 
   // Returns first available tokenRecord
@@ -141,23 +141,31 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 
   hasMinCommunityWeight(minCommunityWeight: BN) {
-    return true
+    return (
+      this.communityTokenRecord && this.votingPower.cmp(minCommunityWeight) >= 0
+    )
   }
   hasMinCouncilWeight() {
     return false
   }
 
   canCreateProposal(config: GovernanceConfig) {
-    return true
+    console.log(config.minCommunityTokensToCreateProposal.toNumber())
+    return this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {
-    return true
+    return this.hasMinCommunityWeight(
+      realm.account.config.minCommunityTokensToCreateGovernance
+    )
   }
   canCreateGovernanceUsingCouncilTokens() {
     return false
   }
   canCreateGovernance(realm: ProgramAccount<Realm>) {
-    return true
+    return (
+      this.canCreateGovernanceUsingCommunityTokens(realm) ||
+      this.canCreateGovernanceUsingCouncilTokens()
+    )
   }
   hasMinAmountToVote(mintPk: PublicKey) {
     const isCommunity =
@@ -166,7 +174,6 @@ export class VoteNftWeight implements VoterWeightInterface {
     const isCouncil =
       this.councilTokenRecord?.account.governingTokenMint.toBase58() ===
       mintPk.toBase58()
-    return true
     if (isCouncil) {
       return false
     }
@@ -177,7 +184,9 @@ export class VoteNftWeight implements VoterWeightInterface {
 
   getTokenRecordToCreateProposal(config: GovernanceConfig) {
     // Prefer community token owner record as proposal owner
-    return this.communityTokenRecord!
+    if (this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)) {
+      return this.communityTokenRecord!
+    }
     throw new Error('Not enough vote weight to create proposal')
   }
 }

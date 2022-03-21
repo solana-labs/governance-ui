@@ -15,7 +15,7 @@ export const nftPluginsPks: string[] = [
 ]
 
 export function useVotingPlugins() {
-  const { realm, config } = useRealm()
+  const { realm, config, mint } = useRealm()
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
@@ -57,7 +57,7 @@ export function useVotingPlugins() {
         metadata: x.metadata,
       }
     })
-    setVotingNfts(nftsWithMeta, currentClient)
+    setVotingNfts(nftsWithMeta, currentClient, mint)
   }
 
   const getIsFromCollection = async (mint: string, tokenAddress: string) => {
@@ -130,7 +130,11 @@ export function useVotingPlugins() {
     if (usedCollectionsPks.length && connected) {
       handleGetNfts()
     } else {
-      setVotingNfts([], currentClient)
+      setVotingNfts([], currentClient, mint)
     }
-  }, [JSON.stringify(usedCollectionsPks), currentPluginPk?.toBase58()])
+  }, [
+    JSON.stringify(usedCollectionsPks),
+    currentPluginPk?.toBase58(),
+    connected,
+  ])
 }

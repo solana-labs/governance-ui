@@ -261,6 +261,24 @@ export class VotingClient {
     //   )
     // }
   }
+  getMaxVoterWeight = async () => {
+    if (this.noClient) {
+      return
+    }
+    const clientProgramId = this.client!.program.programId
+    const realm = this.realm!
+    if (this.client instanceof NftVoterClient) {
+      const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        clientProgramId
+      )
+      const existingMaxVoterWeightRecord = await this.client.program.account.maxVoterWeightRecord.fetch(
+        maxVoterWeightRecord
+      )
+      return { existingMaxVoterWeightRecord }
+    }
+  }
   _withHandleNftVoterWeight = async (
     realm: ProgramAccount<Realm>,
     walletPk: PublicKey,
