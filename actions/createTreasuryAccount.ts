@@ -18,7 +18,7 @@ import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
 import { DEFAULT_NATIVE_SOL_MINT } from '@components/instructions/tools'
-import { VotingClient } from 'stores/useVotePluginsClientStore'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

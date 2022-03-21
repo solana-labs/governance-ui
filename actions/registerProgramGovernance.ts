@@ -14,7 +14,7 @@ import { GovernanceConfig } from '@solana/spl-governance'
 import { withCreateProgramGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
-import { VotingClient } from 'stores/useVotePluginsClientStore'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export const registerProgramGovernance = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

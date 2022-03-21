@@ -24,7 +24,7 @@ import { withSignOffProposal } from '@solana/spl-governance'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import { VotingClient } from 'stores/useVotePluginsClientStore'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -100,7 +100,7 @@ export const createProposal = async (
     instructions,
     'createProposal'
   )
-
+  console.log(client)
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,

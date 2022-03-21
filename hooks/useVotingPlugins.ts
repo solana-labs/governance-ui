@@ -1,11 +1,11 @@
 import { useEffect } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import useRealm from '@hooks/useRealm'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getNfts } from '@utils/tokens'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
@@ -79,7 +79,7 @@ export function useVotingPlugins() {
       handleSetVsrClient(wallet, connection)
       handleSetNftClient(wallet, connection)
     }
-  }, [connection.endpoint, connected, realm?.pubkey.toBase58()])
+  }, [connection.endpoint, connected])
 
   useEffect(() => {
     if (
@@ -106,12 +106,19 @@ export function useVotingPlugins() {
         walletPk: wallet?.publicKey,
       })
     }
-  }, [currentPluginPk, vsrClient, nftClient, connected])
+  }, [
+    currentPluginPk?.toBase58(),
+    vsrClient?.program.programId.toBase58(),
+    nftClient?.program.programId.toBase58(),
+    realm?.pubkey.toBase58(),
+    connection.endpoint,
+    connected,
+  ])
   useEffect(() => {
     if (usedCollectionsPks.length && connected) {
       handleGetNfts()
     } else {
       setVotingNfts([], currentClient)
     }
-  }, [JSON.stringify(usedCollectionsPks), currentClient.client])
+  }, [JSON.stringify(usedCollectionsPks), currentPluginPk?.toBase58()])
 }

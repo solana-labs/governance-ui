@@ -202,7 +202,7 @@ export class VotingClient {
         remainingAccounts.push(
           new AccountData(nft.tokenAddress),
           new AccountData(nft.metadata.pubkey),
-          new AccountData(nftVoteRecord)
+          new AccountData(nftVoteRecord, false, true)
         )
       }
       instructions.push(

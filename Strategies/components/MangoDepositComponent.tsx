@@ -206,6 +206,7 @@ const MangoDepositComponent = ({
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
         : undefined
+
       const proposalAddress = await createProposalFcn(
         rpcContext,
         handledMint,

@@ -10,7 +10,7 @@ import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 import { withRelinquishVote } from '@solana/spl-governance'
-import { VotingClient } from 'stores/useVotePluginsClientStore'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,

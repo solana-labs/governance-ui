@@ -14,7 +14,7 @@ import { withPostChatMessage } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '../../utils/send'
-import { VotingClient } from 'stores/useVotePluginsClientStore'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,

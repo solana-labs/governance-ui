@@ -20,39 +20,24 @@ import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import { getStakeSchema } from '@utils/validations'
 import { getConvertToMsolInstruction } from '@utils/instructionTools'
-import { PublicKey } from '@solana/web3.js'
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
-  RpcContext,
 } from '@solana/spl-governance'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { createProposal } from 'actions/createProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useCreateProposal from '@hooks/useCreateProposal'
 
 const ConvertToMsol = () => {
-  const {
-    canChooseWhoVote,
-    realm,
-    realmInfo,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    symbol,
-  } = useRealm()
-  const client = useVotePluginsClientStore(
-    (s) => s.state.currentRealmVotingClient
-  )
+  const { canChooseWhoVote, realm, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
   const router = useRouter()
+  const { handleCreateProposal } = useCreateProposal()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =
@@ -102,13 +87,6 @@ const ConvertToMsol = () => {
       }
 
       const governance = currentAccount?.governance
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
       const holdUpTime = governance?.account?.config.minInstructionHoldUpTime
 
       const instructionData = {
@@ -125,40 +103,14 @@ const ConvertToMsol = () => {
           currentAccount?.governance?.pubkey
         )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-
-        const proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title ? form.title : proposalTitle,
-          form.description ? form.description : '',
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
-          [instructionData],
-          false,
-          client
-        )
+        const proposalAddress = await handleCreateProposal({
+          title: form.title ? form.title : proposalTitle,
+          description: form.description ? form.description : '',
+          governance: selectedGovernance,
+          instructionsData: [instructionData],
+          voteByCouncil,
+          isDraft: false,
+        })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
