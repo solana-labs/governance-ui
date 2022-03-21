@@ -176,11 +176,6 @@ const Params = () => {
                 ) : null}
                 {activeTab === 'Params' ? (
                   <>
-                    {/* <DisplayField
-                      label="owner"
-                      padding
-                      val={activeGovernance.owner.toBase58()}
-                    /> */}
                     {realmAccount?.authority?.toBase58() ===
                       activeGovernance.pubkey.toBase58() && (
                       <DisplayField
