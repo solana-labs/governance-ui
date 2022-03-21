@@ -291,7 +291,11 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     }
   }, [form.destinationAccount])
 
-  const schema = getTokenTransferSchema({ form, connection })
+  const schema = getTokenTransferSchema({
+    form,
+    connection,
+    tokenAmount: tokenAccount.amount,
+  })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   const nftName = selectedNfts[0]?.val?.name
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
