@@ -334,10 +334,14 @@ const LockTokensModal = ({
                     onChange={(type) =>
                       setLockupType(
                         //@ts-ignore
-                        lockupTypes.find((t) => t.displayName === type)
+                        lockupTypes
+                          .filter((x) => x.value !== MONTHLY)
+                          .find((t) => t.displayName === type)
                       )
                     }
-                    values={lockupTypes.map((type) => type.displayName)}
+                    values={lockupTypes
+                      .filter((x) => x.value !== MONTHLY)
+                      .map((type) => type.displayName)}
                   />
                 </div>
               </>
