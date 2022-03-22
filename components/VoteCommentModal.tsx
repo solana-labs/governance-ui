@@ -43,7 +43,6 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const { realm, realmInfo } = useRealm()
   const { refetchProposals } = useWalletStore((s) => s.actions)
 
@@ -74,6 +73,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         msg,
         client
       )
+      await refetchProposals()
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex)
@@ -84,8 +84,6 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     }
 
     fetchChatMessages(proposal!.pubkey)
-    fetchVoteRecords(proposal)
-    await refetchProposals()
   }
 
   const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
