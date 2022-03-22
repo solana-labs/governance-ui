@@ -15,7 +15,6 @@ const Document = () => {
 
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
       </Head>
       <body>
         <Main />

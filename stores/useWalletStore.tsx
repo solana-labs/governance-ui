@@ -148,7 +148,6 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         })
         connection = get().connection
       }
-
       let programId: PublicKey | undefined
       let realmId = tryParsePublicKey(symbol)
       if (!realmId) {

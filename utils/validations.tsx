@@ -199,10 +199,6 @@ export const getFriktionDepositSchema = ({ form }) => {
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = governedTokenAccount?.isNft
-          if (isNft) {
-            return true
-          }
           if (val && !form.governedTokenAccount) {
             return this.createError({
               message: `Please select source account to validate the amount`,
@@ -225,6 +221,13 @@ export const getFriktionDepositSchema = ({ form }) => {
           })
         }
       ),
+  })
+}
+
+export const getFriktionWithdrawSchema = () => {
+  return yup.object().shape({
+    governedTokenAccount: yup.object().required('Source account is required'),
+    amount: yup.number().typeError('Amount is required'),
   })
 }
 

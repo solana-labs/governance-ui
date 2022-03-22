@@ -45,7 +45,7 @@ const MakeChangeMaxAccounts = ({
   const [form, setForm] = useState<MangoMakeChangeMaxAccountsForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    mangoGroupKey: undefined,
+    mangoGroup: undefined,
     maxMangoAccounts: 1,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -71,7 +71,7 @@ const MakeChangeMaxAccounts = ({
       //Mango instruction call and serialize
       const setMaxMangoAccountsInstr = makeChangeMaxMangoAccountsInstruction(
         form.governedAccount.governance.account.governedAccount,
-        new PublicKey(form.mangoGroupKey!),
+        new PublicKey(form.mangoGroup!),
         form.governedAccount.governance.pubkey,
         new BN(form.maxMangoAccounts)
       )
@@ -124,16 +124,16 @@ const MakeChangeMaxAccounts = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Mango group key"
-        value={form.mangoGroupKey}
+        label="Mango group"
+        value={form.mangoGroup}
         type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'mangoGroupKey',
+            propertyName: 'mangoGroup',
           })
         }
-        error={formErrors['mangoGroupKey']}
+        error={formErrors['mangoGroup']}
       />
       <Input
         label="Max accounts"

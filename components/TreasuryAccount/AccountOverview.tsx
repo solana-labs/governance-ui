@@ -88,13 +88,9 @@ const AccountOverview = () => {
       )
       setEligibleInvestments(eligibleInvestments)
     }
-  }, [currentAccount, strategies, mngoAccounts])
+  }, [currentAccount, strategies])
   useEffect(() => {
     const handleGetMangoAccounts = async () => {
-      const accounts = await tryGetMangoAccountsForOwner(
-        market,
-        currentAccount!.governance!.pubkey
-      )
       const currentAccountMint = currentAccount?.token?.account.mint
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
         mngoAccounts,
@@ -102,17 +98,31 @@ const AccountOverview = () => {
         market
       )
       setCurrentMangoDeposits(currentPositions)
-      setMngoAccounts(accounts ? accounts : [])
+
       if (currentPositions > 0) {
         setAccountInvestments(
           eligibleInvestments.filter((x) => x.protocolName === MANGO)
         )
+      } else {
+        setAccountInvestments([])
       }
     }
     if (eligibleInvestments.filter((x) => x.protocolName === MANGO).length) {
       handleGetMangoAccounts()
     }
-  }, [eligibleInvestments])
+  }, [eligibleInvestments, currentAccount, mngoAccounts])
+  useEffect(() => {
+    const getMangoAcccounts = async () => {
+      const accounts = await tryGetMangoAccountsForOwner(
+        market,
+        currentAccount!.governance!.pubkey
+      )
+      setMngoAccounts(accounts ? accounts : [])
+    }
+    if (currentAccount) {
+      getMangoAcccounts()
+    }
+  }, [currentAccount, eligibleInvestments, market])
 
   useEffect(() => {
     if (isCopied) {

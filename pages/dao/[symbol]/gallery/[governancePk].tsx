@@ -20,7 +20,6 @@ import { LinkButton } from '@components/Button'
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
-  const { getNfts } = useTreasuryAccountStore()
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
@@ -38,15 +37,6 @@ const gallery = () => {
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
   }
-  useEffect(() => {
-    if (governancePk) {
-      getNfts(nftsGovernedTokenAccounts, connection.current)
-    }
-  }, [
-    governancePk,
-    connection.endpoint,
-    JSON.stringify(nftsGovernedTokenAccounts),
-  ])
   useEffect(() => {
     const governedNfts = governanceNfts[governancePk as string]
     if (fetchAllNftsForRealm) {
