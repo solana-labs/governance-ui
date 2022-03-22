@@ -16,6 +16,7 @@ import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -44,7 +45,8 @@ const VotePanel = () => {
   const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
-
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const ownVoteRecord =
     wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
@@ -101,7 +103,8 @@ const VotePanel = () => {
           proposal.account.governance,
           proposal.pubkey,
           proposal.account.tokenOwnerRecord,
-          proposal.account.governingTokenMint
+          proposal.account.governingTokenMint,
+          maxVoterWeight
         )
       }
 

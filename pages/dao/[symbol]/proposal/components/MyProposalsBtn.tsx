@@ -18,6 +18,7 @@ import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
 import { sendSignedTransaction } from '@utils/sendTransactions'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -29,6 +30,8 @@ const MyProposalsBn = () => {
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
   )
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const { realm, programId } = useWalletStore((s) => s.selectedRealm)
   const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
@@ -188,7 +191,8 @@ const MyProposalsBn = () => {
         proposal.account.governance,
         proposal.pubkey,
         proposal.account.tokenOwnerRecord,
-        proposal.account.governingTokenMint
+        proposal.account.governingTokenMint,
+        maxVoterWeight
       )
     }
     cleanSelected(notfinalized, withInstruction)

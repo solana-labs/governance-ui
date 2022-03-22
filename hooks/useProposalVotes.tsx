@@ -1,11 +1,12 @@
 import { Proposal } from '@solana/spl-governance'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { getProposalMaxVoteWeight } from '../models/voteWeights'
 import { calculatePct, fmtTokenAmount } from '../utils/formatting'
 import useRealm from './useRealm'
 
 export default function useProposalVotes(proposal?: Proposal) {
   const { realm, mint, councilMint, governances } = useRealm()
-
+  const maxVoteRecord = useNftPluginStore((s) => s.state.maxVoteRecord)
   const governance =
     proposal && governances[proposal.governance?.toBase58()]?.account
 
@@ -31,12 +32,10 @@ export default function useProposalVotes(proposal?: Proposal) {
     (proposal.isVoteFinalized() && proposal.voteThresholdPercentage?.value) ||
     governance.config.voteThresholdPercentage.value
 
-  const maxVoteWeight = getProposalMaxVoteWeight(
-    realm.account,
-    proposal,
-    proposalMint
-  )
-
+  const maxVoteWeight = maxVoteRecord
+    ? maxVoteRecord.account.maxVoterWeight
+    : getProposalMaxVoteWeight(realm.account, proposal, proposalMint)
+  console.log(maxVoteRecord?.account.maxVoterWeight)
   const minimumYesVotes =
     fmtTokenAmount(maxVoteWeight, proposalMint.decimals) *
     (voteThresholdPct / 100)

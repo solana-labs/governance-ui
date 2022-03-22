@@ -6,6 +6,8 @@ import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { PublicKey } from '@solana/web3.js'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getMaxVoterWeightRecord } from '@solana/spl-governance'
+import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
@@ -23,7 +25,7 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const { setVotingNfts } = useNftPluginStore()
+  const { setVotingNfts, setMaxVoterWeight } = useNftPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -59,7 +61,23 @@ export function useVotingPlugins() {
     })
     setVotingNfts(nftsWithMeta, currentClient, mint)
   }
-
+  const handleMaxVoterWeight = async () => {
+    const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+      realm!.pubkey,
+      realm!.account.communityMint,
+      currentClient.client!.program.programId
+    )
+    try {
+      const existingMaxVoterRecord = await getMaxVoterWeightRecord(
+        connection.current,
+        maxVoterWeightRecord
+      )
+      setMaxVoterWeight(existingMaxVoterRecord)
+    } catch (e) {
+      console.log(e)
+      setMaxVoterWeight(null)
+    }
+  }
   const getIsFromCollection = async (mint: string, tokenAddress: string) => {
     const metadataAccount = await Metadata.getPDA(mint)
     const metadata = await Metadata.load(connection.current, metadataAccount)
@@ -129,8 +147,10 @@ export function useVotingPlugins() {
   useEffect(() => {
     if (usedCollectionsPks.length && connected) {
       handleGetNfts()
+      handleMaxVoterWeight()
     } else {
       setVotingNfts([], currentClient, mint)
+      setMaxVoterWeight(null)
     }
   }, [
     JSON.stringify(usedCollectionsPks),

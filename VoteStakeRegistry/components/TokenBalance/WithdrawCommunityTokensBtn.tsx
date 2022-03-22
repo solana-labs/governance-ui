@@ -19,6 +19,7 @@ import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useState } from 'react'
 import Loading from '@components/Loading'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
@@ -41,7 +42,8 @@ const WithDrawCommunityTokens = () => {
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
-
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const depositRecord = deposits.find(
     (x) =>
       x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
@@ -90,7 +92,8 @@ const WithDrawCommunityTokens = () => {
                 proposal.account.governance,
                 proposal.pubkey,
                 proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint
+                proposal.account.governingTokenMint,
+                maxVoterWeight
               )
             }
           }

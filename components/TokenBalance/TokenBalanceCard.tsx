@@ -35,6 +35,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -147,6 +148,8 @@ const TokenDeposit = ({
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const {
     realm,
     realmInfo,
@@ -274,7 +277,8 @@ const TokenDeposit = ({
                 proposal.account.governance,
                 proposal.pubkey,
                 proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint
+                proposal.account.governingTokenMint,
+                maxVoterWeight
               )
             }
           }

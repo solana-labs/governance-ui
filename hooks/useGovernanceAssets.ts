@@ -11,13 +11,15 @@ import useWalletStore from 'stores/useWalletStore'
 
 import useRealm from './useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances } = useRealm()
+  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
@@ -145,14 +147,16 @@ export default function useGovernanceAssets() {
       name: 'Grant',
       isVisible:
         canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
     {
       id: Instructions.Clawback,
       name: 'Clawback',
       isVisible:
         canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
     {
       id: Instructions.MangoChangePerpMarket,
