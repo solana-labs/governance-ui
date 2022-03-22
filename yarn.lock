@@ -2033,18 +2033,18 @@
   dependencies:
     buffer "~6.0.3"
 
-"@solana/governance-program-library@^0.10.0":
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/@solana/governance-program-library/-/governance-program-library-0.10.0.tgz#17473fb416eecf5ea79e7d4fde07bb2334c88f46"
-  integrity sha512-exefAbvAGszG18/wRhhkBM7/U0Fh/q9yRd0qJ3O2hGkQJ5R/Y8oO4fmg/H8XxMhGILrHm+hwauLq4r3aJ+za3w==
+"@solana/governance-program-library@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@solana/governance-program-library/-/governance-program-library-0.11.0.tgz#a8e2796df4f7a883310a42efd8728dfd97cf3723"
+  integrity sha512-ACmgK9S+cBblW/z9NGWEFMGnd2k+nxX3d6i3zrp0IEyDoPeKIG6TH3t3A5LtlHnWEiR6PAgcinUQFGuQuD39Xw==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
 
-"@solana/spl-governance@^0.0.30":
-  version "0.0.30"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.30.tgz#d4d962f062d359f2f71912943897b825f110aff8"
-  integrity sha512-pe1fz3ct+xhJS+v3PTm7bdYp6fumU3PvXIfEkt9eOqIg+yC2DmUc4aQo8ISUwomCtH11CmO5secT3wkhTFMJcA==
+"@solana/spl-governance@^0.0.33":
+  version "0.0.33"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.33.tgz#fabf08ae6f4e3f6d4bb9278b067d3818b5cb0223"
+  integrity sha512-B4mSRbomcbNFJ1vTb7iro6uzQTbZJ8RKhTdG2Kfe7DKA4Ahg/Eb3e9tWyBKdII7et2jLysR5g9Z71XfArwCX3Q==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     bignumber.js "^9.0.1"
