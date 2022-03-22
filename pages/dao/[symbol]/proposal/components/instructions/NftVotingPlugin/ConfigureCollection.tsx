@@ -25,6 +25,7 @@ import {
   getNftRegistrarPDA,
 } from 'NftVotePlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 
 interface ConfigureCollectionForm {
   governedAccount: GovernedTokenAccount | undefined
@@ -40,7 +41,7 @@ const ConfigureNftPluginCollection = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const { realm } = useRealm()
+  const { realm, mint } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const wallet = useWalletStore((s) => s.current)
@@ -56,6 +57,10 @@ const ConfigureNftPluginCollection = ({
       form!.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
+      const weight = getMintNaturalAmountFromDecimalAsBN(
+        form!.weight,
+        mint!.decimals
+      )
       const { registrar } = await getNftRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
@@ -67,7 +72,7 @@ const ConfigureNftPluginCollection = ({
         nftClient!.program.programId
       )
       const instruction = nftClient!.program.instruction.configureCollection(
-        form!.weight,
+        weight,
         form!.size,
         {
           accounts: {

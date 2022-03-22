@@ -14,7 +14,7 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ProgramAccount } from '@solana/spl-governance'
+import { MintMaxVoteWeightSource, ProgramAccount } from '@solana/spl-governance'
 import { Governance } from '@solana/spl-governance'
 import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
@@ -26,6 +26,7 @@ import { notify } from './notifications'
 import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
+import BigNumber from 'bignumber.js'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -429,4 +430,18 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
     })
   }
   return []
+}
+
+export const parseMintSupplyFraction = (fraction: string) => {
+  if (!fraction) {
+    return MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+  }
+
+  const fractionValue = new BigNumber(fraction)
+    .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    .toNumber()
+
+  return new MintMaxVoteWeightSource({
+    value: new BN(fractionValue),
+  })
 }

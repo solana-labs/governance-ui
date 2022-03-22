@@ -49,7 +49,6 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
     })
   },
   setMaxVoterWeight: (maxVoterRecord) => {
-    console.log(maxVoterRecord, '@@@@@@@@@ use nft')
     set((s) => {
       s.state.maxVoteRecord = maxVoterRecord
     })

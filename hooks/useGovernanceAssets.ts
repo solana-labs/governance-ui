@@ -294,5 +294,6 @@ export default function useGovernanceAssets() {
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
     nftsGovernedTokenAccounts,
+    canUseAuthorityInstruction,
   }
 }

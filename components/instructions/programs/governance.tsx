@@ -4,8 +4,11 @@ import {
   getGovernanceProgramVersion,
   getGovernanceSchema,
   getRealm,
+  ProgramAccount,
+  RealmConfigAccount,
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
+  tryGetRealmConfig,
   VoteTipping,
 } from '@solana/spl-governance'
 import {
@@ -16,7 +19,6 @@ import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'
-import { tryGetRealmConfig } from 'stores/useWalletStore'
 
 import { tryGetMint } from '../../../utils/tokens'
 
@@ -141,11 +143,16 @@ export const GOVERNANCE_INSTRUCTIONS = {
           connection,
           realm.account.communityMint
         )
-        const config = await tryGetRealmConfig(
-          connection,
-          realm.owner,
-          realm.pubkey
-        )
+        let config: ProgramAccount<RealmConfigAccount> | null = null
+        try {
+          config = await tryGetRealmConfig(
+            connection,
+            realm.owner,
+            realm.pubkey
+          )
+        } catch (e) {
+          console.log(e)
+        }
 
         return (
           <>

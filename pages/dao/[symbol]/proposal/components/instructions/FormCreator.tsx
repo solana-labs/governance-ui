@@ -1,10 +1,10 @@
 import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
-import { Switch } from '@headlessui/react'
 import { ProgramAccount, Governance } from '@solana/spl-governance'
 import { useState, useEffect } from 'react'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { precision } from '@utils/formatting'
+import Switch from '@components/Switch'
 
 export enum InstructionInputType {
   GOVERNED_ACCOUNT,

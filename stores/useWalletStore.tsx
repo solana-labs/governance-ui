@@ -1,6 +1,6 @@
 import create, { State } from 'zustand'
 import produce from 'immer'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import {
   TokenProgramAccount,
   TokenAccount,
@@ -17,7 +17,6 @@ import {
   getGovernanceAccount,
   getGovernanceAccounts,
   getGovernanceProgramVersion,
-  getRealmConfigAddress,
   Governance,
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
@@ -27,6 +26,7 @@ import {
   RealmConfigAccount,
   SignatoryRecord,
   TokenOwnerRecord,
+  tryGetRealmConfig,
   VoteRecord,
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -270,6 +270,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           mintsArray.map((m) => [m!.publicKey.toBase58(), m!.account])
         )
       })
+
       const realmMints = get().selectedRealm.mints
       const realmMintPk = realm.account.communityMint
       const realmMint = realmMints[realmMintPk.toBase58()]
@@ -299,7 +300,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           realmId,
           realmCouncilMintPk
         ),
-        tryGetRealmConfig(connection, programId, realmId),
+        getRealmConfig(connection, programId, realmId),
       ])
 
       const governancesMap = accountsToPubkeyMap(governances)
@@ -607,19 +608,9 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
 export default useWalletStore
 
-export async function tryGetRealmConfig(
-  connection: Connection,
-  programId: PublicKey,
-  realmPk: PublicKey
-) {
+const getRealmConfig = async (connection, programId, realmId) => {
   try {
-    const realmConfigPk = await getRealmConfigAddress(programId, realmPk)
-    const resp = await getGovernanceAccount(
-      connection,
-      realmConfigPk,
-      RealmConfigAccount
-    )
-    return resp
+    return await tryGetRealmConfig(connection, programId, realmId)
   } catch (e) {
     return null
   }

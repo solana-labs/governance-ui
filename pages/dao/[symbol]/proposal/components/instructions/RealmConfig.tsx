@@ -1,5 +1,4 @@
 import React, { useContext, useEffect, useState } from 'react'
-import * as yup from 'yup'
 import {
   createSetRealmConfig,
   Governance,
@@ -21,35 +20,23 @@ import {
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
-import { GovernedTokenAccount } from '@utils/tokens'
+import {
+  GovernedMultiTypeAccount,
+  parseMintSupplyFraction,
+} from '@utils/tokens'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
-import { getValidatedPublickKey } from '@utils/validations'
+import { getRealmCfgSchema } from '@utils/validations'
 import InstructionForm, { InstructionInputType } from './FormCreator'
 import BigNumber from 'bignumber.js'
-import { BN } from '@blockworks-foundation/mango-client'
 
-interface RealmConfigForm {
-  governedAccount: GovernedTokenAccount | undefined
+export interface RealmConfigForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
   minCommunityTokensToCreateGovernance: number
   communityVoterWeightAddin: string
   removeCouncil: boolean
   maxCommunityVoterWeightAddin: string
   communityMintSupplyFactor: number
-}
-
-const parseMintSupplyFraction = (fraction: string) => {
-  if (!fraction) {
-    return MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
-  }
-
-  const fractionValue = new BigNumber(fraction)
-    .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
-    .toNumber()
-
-  return new MintMaxVoteWeightSource({
-    value: new BN(fractionValue),
-  })
 }
 
 const RealmConfig = ({
@@ -110,65 +97,7 @@ const RealmConfig = ({
       index
     )
   }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Governed account is required'),
-    minCommunityTokensToCreateGovernance: yup
-      .number()
-      .required('Min community tokens to create governance is required'),
-    communityVoterWeightAddin: yup
-      .string()
-      .test(
-        'communityVoterWeightAddinTest',
-        'communityVoterWeightAddin validation error',
-        function (val: string) {
-          if (!form?.communityVoterWeightAddin) {
-            return true
-          }
-          if (val) {
-            try {
-              return !!getValidatedPublickKey(val)
-            } catch (e) {
-              console.log(e)
-              return this.createError({
-                message: `${e}`,
-              })
-            }
-          } else {
-            return this.createError({
-              message: `communityVoterWeightAddin is required`,
-            })
-          }
-        }
-      ),
-    maxCommunityVoterWeightAddin: yup
-      .string()
-      .test(
-        'maxCommunityVoterWeightAddin',
-        'maxCommunityVoterWeightAddin validation error',
-        function (val: string) {
-          if (!form?.maxCommunityVoterWeightAddin) {
-            return true
-          }
-          if (val) {
-            try {
-              return !!getValidatedPublickKey(val)
-            } catch (e) {
-              console.log(e)
-              return this.createError({
-                message: `${e}`,
-              })
-            }
-          } else {
-            return this.createError({
-              message: `maxCommunityVoterWeightAddin is required`,
-            })
-          }
-        }
-      ),
-  })
+  const schema = getRealmCfgSchema({ form })
 
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal =
@@ -210,6 +139,7 @@ const RealmConfig = ({
       return ''
     }
   }
+  //TODO make component
   const inputs = [
     {
       label: 'Governance',

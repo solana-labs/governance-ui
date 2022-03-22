@@ -2,7 +2,12 @@ import { useEffect, useState } from 'react'
 import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
+import {
+  fmtMintAmount,
+  getMintDecimalAmount,
+  getMintMinAmountAsDecimal,
+  parseMintNaturalAmountFromDecimalAsBN,
+} from '@tools/sdk/units'
 import { capitalize } from '@utils/helpers'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import useGovernanceAssetsStore, {
@@ -14,33 +19,323 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
+import Button from '@components/Button'
+import Modal from '@components/Modal'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import Input from '@components/inputs/Input'
+import VoteBySwitch from '../proposal/components/VoteBySwitch'
+import Textarea from '@components/inputs/Textarea'
+import InstructionForm, {
+  InstructionInputType,
+} from '../proposal/components/instructions/FormCreator'
+import {
+  createSetRealmConfig,
+  MintMaxVoteWeightSource,
+  PROGRAM_VERSION_V1,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { precision } from '@utils/formatting'
+import BigNumber from 'bignumber.js'
+import { RealmConfigForm } from '../proposal/components/instructions/RealmConfig'
+import { validateInstruction } from '@utils/instructionTools'
+import { getRealmCfgSchema } from '@utils/validations'
+import useWalletStore from 'stores/useWalletStore'
+import { PublicKey } from '@solana/web3.js'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { parseMintSupplyFraction } from '@utils/tokens'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useCreateProposal from '@hooks/useCreateProposal'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import useQueryContext from '@hooks/useQueryContext'
+import { useRouter } from 'next/router'
+import { notify } from '@utils/notifications'
+
+interface RealmConfigProposal extends RealmConfigForm {
+  title: string
+  description: string
+}
 
 const Params = () => {
-  const { realm, mint, councilMint } = useRealm()
+  const router = useRouter()
+  const {
+    realm,
+    mint,
+    councilMint,
+    canChooseWhoVote,
+    config,
+    realmInfo,
+    symbol,
+  } = useRealm()
+  const { fmtUrlWithCluster } = useQueryContext()
+  const wallet = useWalletStore((s) => s.current)
+  const { handleCreateProposal } = useCreateProposal()
+  const { canUseAuthorityInstruction } = useGovernanceAssets()
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
+  const defaultCfgTitle = 'Change realm config'
+  const realmAuthorityGovernance = governedMultiTypeAccounts.find(
+    (x) =>
+      x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
+  )
+  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
+  const [formErrors, setFormErrors] = useState({})
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [form, setForm] = useState<RealmConfigProposal>()
+  const handleSetForm = ({ propertyName, value }) => {
+    setFormErrors({})
+    setForm({ ...form!, [propertyName]: value })
+  }
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilMintPk = realmAccount?.config.councilMint?.toBase58()
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
+  const openProposalModal = () => {
+    setIsProposalModalOpen(true)
+  }
+  const closeProposalModal = () => {
+    setIsProposalModalOpen(false)
+  }
   const getYesNoString = (val) => {
     return val ? ' Yes' : ' No'
   }
+  const schema = getRealmCfgSchema({ form })
+  const handleCreate = async () => {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    let serializedInstruction = ''
+    if (
+      isValid &&
+      form!.governedAccount?.governance?.account &&
+      wallet?.publicKey &&
+      realm
+    ) {
+      const governance = form!.governedAccount.governance
+      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
+        form!.minCommunityTokensToCreateGovernance!,
+        mint!.decimals!
+      )
+      const instruction = await createSetRealmConfig(
+        realmInfo!.programId,
+        realmInfo!.programVersion!,
+        realm.pubkey,
+        realm.account.authority!,
+        form?.removeCouncil ? undefined : realm?.account.config.councilMint,
+        parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
+        mintAmount,
+        form!.communityVoterWeightAddin
+          ? new PublicKey(form!.communityVoterWeightAddin)
+          : undefined,
+        form?.maxCommunityVoterWeightAddin
+          ? new PublicKey(form.maxCommunityVoterWeightAddin)
+          : undefined,
+        wallet.publicKey
+      )
+      serializedInstruction = serializeInstructionToBase64(instruction)
+      const obj: UiInstruction = {
+        serializedInstruction: serializedInstruction,
+        isValid,
+        governance,
+      }
+      const instructionData = new InstructionDataWithHoldUpTime({
+        instruction: obj,
+        governance,
+      })
+      try {
+        const proposalAddress = await handleCreateProposal({
+          title: form!.title ? form!.title : defaultCfgTitle,
+          description: form!.description ? form!.description : '',
+          voteByCouncil,
+          instructionsData: [instructionData],
+          governance: governance!,
+        })
+        const url = fmtUrlWithCluster(
+          `/dao/${symbol}/proposal/${proposalAddress}`
+        )
+        router.push(url)
+      } catch (ex) {
+        notify({ type: 'error', message: `${ex}` })
+      }
+    }
+  }
+  const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
+  const minCommunityTokensToCreateProposal =
+    realm && mint
+      ? getMintDecimalAmount(
+          mint,
+          realm.account.config.minCommunityTokensToCreateGovernance
+        )
+      : new BigNumber(0)
 
+  const currentPrecision = precision(minCommunity)
+  const getMinSupplyFractionStep = () =>
+    new BigNumber(1)
+      .shiftedBy(-1 * MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+      .toNumber()
+
+  const getMintSupplyFraction = () => {
+    const communityMintMaxVoteWeightSource = realm!.account.config
+      .communityMintMaxVoteWeightSource
+
+    return new BigNumber(communityMintMaxVoteWeightSource.value.toString())
+      .shiftedBy(-MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+      .toNumber()
+  }
+  const getSupplyFraction = () => {
+    try {
+      return mint
+        ? getMintDecimalAmount(mint, mint?.supply).toNumber() *
+            Number(form?.communityMintSupplyFactor)
+        : 0
+    } catch (e) {
+      return 0
+    }
+  }
+  const getPercentSupply = () => {
+    try {
+      return `${Number(form?.communityMintSupplyFactor) * 100}%`
+    } catch (e) {
+      return ''
+    }
+  }
   useEffect(() => {
     if (governedAccounts.length > 0) {
       setActiveGovernance(governedAccounts[0])
     }
   }, [governedAccounts])
-
+  //TODO make component
+  const inputs = [
+    {
+      label: 'Governance',
+      name: 'governedAccount',
+      type: InstructionInputType.GOVERNED_ACCOUNT,
+      hide: true,
+      initialValue: realmAuthorityGovernance,
+      options: governedMultiTypeAccounts.filter(
+        (x) =>
+          x.governance.pubkey.toBase58() ===
+          realm?.account.authority?.toBase58()
+      ),
+    },
+    {
+      label: 'Min community tokens to create governance',
+      initialValue: minCommunityTokensToCreateProposal,
+      name: 'minCommunityTokensToCreateGovernance',
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      min: minCommunity,
+      step: minCommunity,
+      hide: !mint,
+      validateMinMax: true,
+      precision: currentPrecision,
+    },
+    {
+      label: 'Community mint supply factor (max vote weight)',
+      initialValue: realm ? getMintSupplyFraction() : 0,
+      name: 'communityMintSupplyFactor',
+      type: InstructionInputType.INPUT,
+      inputType: 'number',
+      min: getMinSupplyFractionStep(),
+      max: 1,
+      hide: !mint,
+      validateMinMax: true,
+      step: getMinSupplyFractionStep(),
+      additionalComponent: (
+        <div>
+          {new BigNumber(getSupplyFraction()).toFormat()} ({getPercentSupply()})
+        </div>
+      ),
+    },
+    {
+      label: 'Community voter weight addin',
+      initialValue:
+        config?.account?.communityVoterWeightAddin?.toBase58() || '',
+      name: 'communityVoterWeightAddin',
+      type: InstructionInputType.INPUT,
+      inputType: 'text',
+      hide: realmInfo?.programVersion === PROGRAM_VERSION_V1,
+    },
+    {
+      label: 'Community max voter weight addin',
+      initialValue:
+        config?.account?.maxCommunityVoterWeightAddin?.toBase58() || '',
+      name: 'maxCommunityVoterWeightAddin',
+      type: InstructionInputType.INPUT,
+      inputType: 'text',
+      hide: realmInfo?.programVersion === PROGRAM_VERSION_V1,
+    },
+    {
+      label: 'Remove council',
+      initialValue: false,
+      name: 'removeCouncil',
+      type: InstructionInputType.SWITCH,
+      hide: typeof councilMint === 'undefined',
+    },
+  ]
   return (
     <div className="grid grid-cols-12 gap-4">
+      {isProposalModalOpen && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={closeProposalModal}
+          isOpen={isProposalModalOpen}
+        >
+          <div className="space-y-4 w-full">
+            <h3 className="mb-4 flex flex-col">Change Realm Config</h3>
+            <div className="pt-2">
+              <div className="pb-4">
+                <Input
+                  label="Title"
+                  placeholder={defaultCfgTitle}
+                  value={form?.title}
+                  type="text"
+                  error={formErrors['title']}
+                  onChange={(evt) =>
+                    handleSetForm({
+                      value: evt.target.value,
+                      propertyName: 'title',
+                    })
+                  }
+                />
+              </div>
+              <Textarea
+                className="mb-3"
+                label="Description"
+                placeholder="Description of your proposal or use a github gist link (optional)"
+                value={form?.description}
+                onChange={(evt) =>
+                  handleSetForm({
+                    value: evt.target.value,
+                    propertyName: 'description',
+                  })
+                }
+              ></Textarea>
+              {canChooseWhoVote && (
+                <VoteBySwitch
+                  checked={voteByCouncil}
+                  onChange={() => {
+                    setVoteByCouncil(!voteByCouncil)
+                  }}
+                ></VoteBySwitch>
+              )}
+            </div>
+            <InstructionForm
+              setForm={setForm}
+              inputs={inputs}
+              setFormErrors={setFormErrors}
+              formErrors={formErrors}
+            ></InstructionForm>
+          </div>
+          <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
+            <Button onClick={() => handleCreate()}>Add proposal</Button>
+          </div>
+        </Modal>
+      )}
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
         <div className="mb-4">
           <PreviousRouteBtn />
@@ -86,7 +381,14 @@ const Params = () => {
                 )}
               </div>
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
-                <h2>Config</h2>
+                <h2 className="flex items-center">
+                  Config{' '}
+                  {realmAuthorityGovernance && canUseAuthorityInstruction && (
+                    <Button onClick={openProposalModal} className="ml-auto">
+                      Change
+                    </Button>
+                  )}
+                </h2>
                 {communityMintMaxVoteWeightSource && (
                   <DisplayField
                     padding
