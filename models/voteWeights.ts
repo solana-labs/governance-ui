@@ -150,7 +150,6 @@ export class VoteNftWeight implements VoterWeightInterface {
   }
 
   canCreateProposal(config: GovernanceConfig) {
-    console.log(config.minCommunityTokensToCreateProposal.toNumber())
     return this.hasMinCommunityWeight(config.minCommunityTokensToCreateProposal)
   }
   canCreateGovernanceUsingCommunityTokens(realm: ProgramAccount<Realm>) {

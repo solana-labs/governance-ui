@@ -100,7 +100,7 @@ export const createProposal = async (
     instructions,
     'createProposal'
   )
-  console.log(client)
+
   const proposalAddress = await withCreateProposal(
     instructions,
     programId,

@@ -45,11 +45,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
   const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const { realm, realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { refetchProposals } = useWalletStore((s) => s.actions)
 
   const submitVote = async (vote: YesNoVote) => {
-    const programId = realmInfo?.programId
-    const realmId = realmInfo?.realmId
     setSubmitting(true)
     const rpcContext = new RpcContext(
       proposal!.owner,
@@ -87,7 +85,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
 
     fetchChatMessages(proposal!.pubkey)
     fetchVoteRecords(proposal)
-    await fetchRealm(programId, realmId)
+    await refetchProposals()
   }
 
   const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'

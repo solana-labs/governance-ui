@@ -15,6 +15,7 @@ import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { useRouter } from 'next/router'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
@@ -22,6 +23,8 @@ const VotePanel = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const router = useRouter()
+  const { pk } = router.query
   const {
     governance,
     proposal,
@@ -38,7 +41,8 @@ const VotePanel = () => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
 
   const ownVoteRecord =
@@ -75,8 +79,6 @@ const VotePanel = () => {
       proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
-    const programId = realmInfo?.programId
-    const realmId = realmInfo?.realmId
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -112,11 +114,13 @@ const VotePanel = () => {
         instructions,
         client
       )
+      await refetchProposals()
+      if (pk) {
+        fetchProposal(pk)
+      }
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }
-
-    await fetchRealm(programId, realmId)
   }
 
   const handleShowVoteModal = (vote: YesNoVote) => {

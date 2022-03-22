@@ -28,7 +28,7 @@ const ProposalActionsPanel = () => {
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   const canFinalizeVote =
@@ -114,7 +114,7 @@ const ProposalActionsPanel = () => {
         )
 
         await finalizeVote(rpcContext, governance?.account.realm, proposal)
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await refetchProposals()
       }
     } catch (error) {
       notify({
@@ -145,7 +145,7 @@ const ProposalActionsPanel = () => {
           signatoryRecord
         )
 
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await refetchProposals()
       }
     } catch (error) {
       notify({
@@ -172,7 +172,7 @@ const ProposalActionsPanel = () => {
 
         await cancelProposal(rpcContext, realmInfo.realmId, proposal)
 
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await refetchProposals()
       }
     } catch (error) {
       notify({

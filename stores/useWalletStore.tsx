@@ -347,6 +347,35 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       })
     },
 
+    async refetchProposals() {
+      const set = get().set
+      const connection = get().connection.current
+      const realmId = get().selectedRealm.realm?.pubkey
+      const programId = get().selectedRealm.programId
+      const governances = await getGovernanceAccounts(
+        connection,
+        programId!,
+        Governance,
+        [pubkeyFilter(1, realmId)!]
+      )
+      const proposalsByGovernance = await Promise.all(
+        governances.map((g) =>
+          getGovernanceAccounts(connection, programId!, Proposal, [
+            pubkeyFilter(1, g.pubkey)!,
+          ])
+        )
+      )
+      const proposals = accountsToPubkeyMap(
+        proposalsByGovernance
+          .flatMap((p) => p)
+          .filter((p) => !HIDDEN_PROPOSALS.has(p.pubkey.toBase58()))
+      )
+
+      console.log('fetchRealm proposals', proposals)
+      await set((s) => {
+        s.selectedRealm.proposals = proposals
+      })
+    },
     // Fetches and updates governance for the selected realm
     async fetchRealmGovernance(governancePk: PublicKey) {
       const connection = get().connection.current

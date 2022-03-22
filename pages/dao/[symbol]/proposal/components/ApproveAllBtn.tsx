@@ -29,7 +29,7 @@ const ApproveAllBtn = () => {
   )
   const { proposals, realmInfo, realm, tokenRecords } = useRealm()
   const [isLoading, setIsLoading] = useState(false)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const votingProposals = useMemo(
     () =>
       Object.values(proposals).filter(
@@ -58,8 +58,6 @@ const ApproveAllBtn = () => {
       for (let i = 0; i < votingProposals.length; i++) {
         const proposal = votingProposals[i]
         const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
-
-        console.log(proposal.pubkey.toBase58(), ownTokenRecord)
 
         const instructions: TransactionInstruction[] = []
 
@@ -102,7 +100,7 @@ const ApproveAllBtn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await fetchRealm(realmInfo!.programId!, realm.pubkey)
+      await refetchProposals()
       notify({
         message: 'Successfully voted on all proposals',
         type: 'success',

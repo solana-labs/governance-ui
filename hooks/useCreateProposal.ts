@@ -12,7 +12,9 @@ export default function useCreateProposal() {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
+  const { fetchRealmGovernance, refetchProposals } = useWalletStore(
+    (s) => s.actions
+  )
   const {
     realm,
     ownVoterWeight,
@@ -61,7 +63,7 @@ export default function useCreateProposal() {
     const selectedGovernance = (await fetchRealmGovernance(
       governance?.pubkey
     )) as ProgramAccount<Governance>
-    return await createProposal(
+    const proposalAddress = await createProposal(
       rpcContext,
       realm!,
       selectedGovernance.pubkey,
@@ -74,6 +76,8 @@ export default function useCreateProposal() {
       isDraft,
       client
     )
+    refetchProposals()
+    return proposalAddress
   }
   return { handleCreateProposal }
 }

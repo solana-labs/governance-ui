@@ -30,7 +30,7 @@ const MyProposalsBn = () => {
     (s) => s.ownVoteRecordsByProposal
   )
   const { realm, programId } = useWalletStore((s) => s.selectedRealm)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { refetchProposals } = useWalletStore((s) => s.actions)
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -103,7 +103,6 @@ const MyProposalsBn = () => {
       const transactions: Transaction[] = []
       for (let i = 0; i < proposalsArray.length; i++) {
         const proposal = proposalsArray[i]
-        console.log(proposal.pubkey.toBase58(), ownTokenRecord)
 
         const instructions: TransactionInstruction[] = []
 
@@ -127,7 +126,7 @@ const MyProposalsBn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      await refetchProposals()
     } catch (e) {
       notify({ type: 'error', message: 'Something wnet wrong' })
     }

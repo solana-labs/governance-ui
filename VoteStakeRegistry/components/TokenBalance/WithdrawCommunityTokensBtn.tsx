@@ -58,8 +58,6 @@ const WithDrawCommunityTokens = () => {
         ownTokenRecord!.account!.governingTokenOwner
       )
 
-      console.log('Vote Records', voteRecords)
-
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()]
         if (!proposal) {
