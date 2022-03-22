@@ -55,6 +55,7 @@ import RealmConfig from './components/instructions/RealmConfig'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
+import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
 import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
@@ -281,6 +282,8 @@ const New = () => {
         )
       case Instructions.DepositIntoVolt:
         return <FriktionDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromVolt:
+        return <FriktionWithdraw index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:

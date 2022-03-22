@@ -214,6 +214,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.WithdrawFromVolt,
+      name: 'Friktion: Withdraw from Volt',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.CreateSolendObligationAccount,
       name: 'Solend: Create Obligation Account',
       isVisible: canUseAnyInstruction,

@@ -242,13 +242,13 @@
     "twitter": "@WoofSolana"
   },
   {
-    "symbol": "PonziLabs",
-    "displayName": "PonziLabs",
+    "symbol": "GoblinGold",
+    "displayName": "GoblinGold",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "GQW5LBignZKHxhP7SN4rRNT13LYucK3D6Eq983UzufjZ",
-    "ogImage": "/realms/PonziLabs/img/logo.png",
-    "website": "https://app.ponzilabs.com/",
-    "twitter": "@ponzilabs"
+    "ogImage": "/realms/GoblinGold/img/logo.png",
+    "website": "https://app.goblin.gold/",
+    "twitter": "@goblingold_fi"
   },
   {
     "symbol": "DAINV",
@@ -316,7 +316,8 @@
     "symbol": "Bears",
     "displayName": "Bears Reloaded",
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
-    "realmId": "8x3bs2CUu7FZCw9zoTz29eBNwKjfJiCHjWz4T53NWLbJ"
+    "realmId": "8x3bs2CUu7FZCw9zoTz29eBNwKjfJiCHjWz4T53NWLbJ",
+    "ogImage": "/realms/Bears/img/bearlogo.png"
   },
   {
     "symbol": "SlattsDAO",
@@ -459,5 +460,35 @@
     "ogImage": "/realms/SNY/img/synthetify_logo_green.svg",
     "website": "https://synthetify.io/",
     "twitter": "@synthetify"
+  },
+  {
+    "symbol": "WONDER",
+    "displayName": "Wonder",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "6cxM3jY1p4WAncb356Gv9bteRv8fSxaRKPK6JQVDqbkJ",
+    "ogImage": "/realms/wonder/img/logo.png",
+    "website": "https://wonderprotocol.org",
+    "twitter": "@wonderprotocol",
+    "keywords": "Wonder, Wonder Protocol, Create-To-Own, DAO, Governance, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto"
+  },
+  {
+    "symbol": "UNDER",
+    "displayName": "Underscore DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Gh7DAjGoxRkFP3HXw2v1AfH6pyeGWRtXCudodFHLawDT",
+    "website": "https://underscoredao.com",
+    "keywords": "Underscore DAO, infrastructure, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@underscoredao",
+    "ogImage": "/realms/UNDER/logo.png"
+  },
+  {
+    "symbol": "NEOFAIRIES",
+    "displayName": "Neo Fairies",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd",
+    "website": "https://neofairies.com",
+    "twitter": "@neofairies",
+    "keywords": "Neo Fairies, Fairies, Fairy, Fantasy, Punk, Create-To-Own, DAO, Governance, Decentralized Entertainment, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto",
+    "ogImage": "/realms/NeoFairies/img/logo.png"
   }
 ]

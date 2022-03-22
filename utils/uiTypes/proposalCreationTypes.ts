@@ -41,6 +41,15 @@ export interface FriktionDepositForm {
   mintInfo: MintInfo | undefined
 }
 
+export interface FriktionWithdrawForm {
+  amount: number | undefined
+  governedTokenAccount: GovernedTokenAccount | undefined
+  voltVaultId: string
+  depositTokenMint: string | undefined
+  programId: string | undefined
+  mintInfo: MintInfo | undefined
+}
+
 export interface GrantForm {
   destinationAccount: string
   amount: number | undefined
@@ -239,6 +248,7 @@ export enum Instructions {
   Clawback,
   CreateAssociatedTokenAccount,
   DepositIntoVolt,
+  WithdrawFromVolt,
   CreateSolendObligationAccount,
   InitSolendObligationAccount,
   DepositReserveLiquidityAndObligationCollateral,
