@@ -84,6 +84,7 @@ const MyProposalsBn = () => {
       (x.account.state === ProposalState.Succeeded ||
         x.account.state === ProposalState.Completed) &&
       x.account.isVoteFinalized() &&
+      ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
   const createdVoting = myProposals.filter((x) => {
@@ -181,10 +182,7 @@ const MyProposalsBn = () => {
         beneficiary
       )
     }
-    cleanSelected(
-      unReleased.filter((x) => ownVoteRecordsByProposal[x.pubkey.toBase58()]),
-      withInstruction
-    )
+    cleanSelected(unReleased, withInstruction)
   }
   const finalizeAll = () => {
     const withInstruction = (
