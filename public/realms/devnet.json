@@ -124,5 +124,14 @@
     "ogImage": "https://media.discordapp.net/attachments/933224453326909490/952347955157950504/alpha-illuminati-logo.png",
     "website": "https://www.alphailluminati.xyz",
     "twitter": "@illuminatialpha"
+  },
+  {
+    "symbol": "FORE",
+    "displayName": "Foresight DAO",
+    "programId": "DHrfeiGybZDrU2HSX5eGahSXSa4u9ECZJPigNHeDuGT3",
+    "realmId": "HymmUoabLo1sB8nTENxSFz1bAmobMJyGQoXqyXZ9FySB",
+    "ogImage": "https://www.foresight.exchange/logo.png",
+    "website": "https://www.foresight.exchange/",
+    "twitter": "@foresightmkt"
   }
 ]
