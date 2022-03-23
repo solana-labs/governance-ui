@@ -354,6 +354,13 @@ const New = () => {
             governance={governance}
           ></MakeCreatePerpMarket>
         )
+      case Instructions.ForesightDoThing:
+        return (
+          <MakeChangeReferralFeeParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeReferralFeeParams>
+        )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>
       case Instructions.Clawback:
