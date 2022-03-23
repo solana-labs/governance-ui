@@ -19,7 +19,8 @@ import {
 } from '@utils/tokens'
 import { PublicKey } from '@solana/web3.js'
 import { getRealmCfgSchema } from '@utils/validations'
-import RealmConfigFormComponent from '../forms/RealmConfigForm'
+import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 export interface RealmConfigForm {
   governedAccount: GovernedMultiTypeAccount | undefined
@@ -39,8 +40,12 @@ const RealmConfig = ({
 }) => {
   const { realm, mint, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const governedAccount = governedMultiTypeAccounts.find(
+    (x) => x.governance.pubkey.toBase58() === governance?.pubkey.toBase58()
+  )
   const shouldBeGoverned = index !== 0 && governance
-  const [form, setForm] = useState<RealmConfigForm>()
+  const [form, setForm] = useState<any>({})
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
   async function getInstruction(): Promise<UiInstruction> {
@@ -91,14 +96,16 @@ const RealmConfig = ({
 
   return (
     <>
-      <RealmConfigFormComponent
-        setForm={setForm}
-        setFormErrors={setFormErrors}
-        formErrors={formErrors}
-        shouldBeGoverned={shouldBeGoverned}
-        governedAccount={governance}
-        form={form}
-      ></RealmConfigFormComponent>
+      {governance && (
+        <RealmConfigFormComponent
+          setForm={setForm}
+          setFormErrors={setFormErrors}
+          formErrors={formErrors}
+          shouldBeGoverned={!!shouldBeGoverned}
+          governedAccount={governedAccount || null}
+          form={form}
+        ></RealmConfigFormComponent>
+      )}
     </>
   )
 }

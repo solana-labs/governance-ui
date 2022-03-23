@@ -81,7 +81,7 @@ const Params = () => {
           closeProposalModal={closeRealmProposalModal}
         ></RealmConfigModal>
       )}
-      {isGovernanceProposalModalOpen && (
+      {isGovernanceProposalModalOpen && activeGovernance && (
         <GovernanceConfigModal
           governance={activeGovernance}
           isProposalModalOpen={isGovernanceProposalModalOpen}

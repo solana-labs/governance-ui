@@ -71,7 +71,7 @@ const InstructionForm = ({
             input={x}
             handleSetForm={handleSetForm}
             formErrors={formErrors}
-            form={form}
+            form={form || {}}
           ></InstructionInput>
         ))}
     </>

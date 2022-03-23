@@ -49,7 +49,7 @@ const GovernanceConfigModal = ({
 }) => {
   const router = useRouter()
   const { realm, canChooseWhoVote, symbol, mint } = useRealm()
-  const { config } = governance.account
+  const config = governance?.account.config
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const { handleCreateProposal } = useCreateProposal()
@@ -63,15 +63,15 @@ const GovernanceConfigModal = ({
     minCommunityTokensToCreateProposal: mint
       ? getMintDecimalAmountFromNatural(
           mint,
-          config.minCommunityTokensToCreateProposal
+          config?.minCommunityTokensToCreateProposal
         ).toNumber()
       : 0,
     minInstructionHoldUpTime: getDaysFromTimestamp(
-      config.minInstructionHoldUpTime
+      config?.minInstructionHoldUpTime
     ),
-    maxVotingTime: getDaysFromTimestamp(config.maxVotingTime),
-    voteThreshold: config.voteThresholdPercentage.value,
-    voteTipping: config.voteTipping,
+    maxVotingTime: getDaysFromTimestamp(config?.maxVotingTime),
+    voteThreshold: config?.voteThresholdPercentage.value,
+    voteTipping: config?.voteTipping,
   })
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -80,7 +80,6 @@ const GovernanceConfigModal = ({
   const schema = yup.object().shape({})
   const handleCreate = async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    console.log(formErrors)
     let serializedInstruction = ''
     if (isValid && governance?.account && wallet?.publicKey && realm) {
       setCreatingProposal(true)
@@ -95,7 +94,7 @@ const GovernanceConfigModal = ({
       const governanceConfig = getGovernanceConfig(governanceConfigValues)
       const instruction = await createSetGovernanceConfig(
         realm.owner,
-        governance.pubkey,
+        governance?.pubkey,
         governanceConfig
       )
       serializedInstruction = serializeInstructionToBase64(instruction)
@@ -134,7 +133,8 @@ const GovernanceConfigModal = ({
     >
       <div className="space-y-4 w-full">
         <h3 className="mb-4 flex flex-col">
-          Change Governance Config: {abbreviateAddress(governance.pubkey)}
+          Change Governance Config:{' '}
+          {governance && abbreviateAddress(governance.pubkey)}
         </h3>
         <Input
           label="Title"

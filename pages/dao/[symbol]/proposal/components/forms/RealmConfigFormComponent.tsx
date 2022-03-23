@@ -9,8 +9,10 @@ import {
   getMintMinAmountAsDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
-import InstructionForm, {
+import {
+  InstructionInput,
   InstructionInputType,
 } from '../instructions/FormCreator'
 
@@ -18,12 +20,19 @@ const RealmConfigFormComponent = ({
   setForm,
   setFormErrors,
   formErrors,
-  governedAccount,
+  governedAccount = null,
   shouldBeGoverned,
-  form,
+  form = {},
   hideGovSelector = false,
+}: {
+  setForm: React.Dispatch<React.SetStateAction<any>>
+  setFormErrors: React.Dispatch<React.SetStateAction<any>>
+  formErrors: any
+  governedAccount: GovernedMultiTypeAccount | null
+  shouldBeGoverned: boolean
+  form: any
+  hideGovSelector?: boolean
 }) => {
-  console.log(governedAccount)
   const { realm, mint, realmInfo, councilMint, config } = useRealm()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
@@ -66,18 +75,20 @@ const RealmConfigFormComponent = ({
       return ''
     }
   }
-  const inputs = [
+  const inputs: InstructionInput[] = [
     {
       label: 'Governance',
-      initialValue: governedMultiTypeAccounts.find(
-        (x) =>
-          x.governance.pubkey.toBase58() ===
-          governedAccount.governance.pubkey.toBase58()
-      ),
+      initialValue: governedMultiTypeAccounts
+        ? governedMultiTypeAccounts.find(
+            (x) =>
+              x.governance.pubkey.toBase58() ===
+              governedAccount?.governance?.pubkey.toBase58()
+          ) || null
+        : null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
-      shouldBeGoverned: shouldBeGoverned,
-      governance: governedAccount,
+      shouldBeGoverned: shouldBeGoverned as any,
+      governance: governedAccount?.governance,
       options: governedMultiTypeAccounts.filter(
         (x) =>
           x.governance.pubkey.toBase58() ===
@@ -140,16 +151,7 @@ const RealmConfigFormComponent = ({
       hide: typeof councilMint === 'undefined',
     },
   ]
-  return (
-    <>
-      <InstructionForm
-        setForm={setForm}
-        inputs={inputs}
-        setFormErrors={setFormErrors}
-        formErrors={formErrors}
-      ></InstructionForm>
-    </>
-  )
+  return <>{console.log(inputs, setForm, setFormErrors, formErrors)}</>
 }
 
 export default RealmConfigFormComponent

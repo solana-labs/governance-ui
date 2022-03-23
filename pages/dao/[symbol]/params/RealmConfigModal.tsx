@@ -23,7 +23,7 @@ import { useState } from 'react'
 import Button from '@components/Button'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { RealmConfigForm } from '../proposal/components/instructions/RealmConfig'
-import RealmConfigFormComponent from '../proposal/components/forms/RealmConfigForm'
+import RealmConfigFormComponent from '../proposal/components/forms/RealmConfigFormComponent'
 import { abbreviateAddress } from '@utils/formatting'
 
 interface RealmConfigProposal extends RealmConfigForm {
