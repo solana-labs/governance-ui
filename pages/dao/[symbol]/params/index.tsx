@@ -14,6 +14,7 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
+import { VoteTipping } from '@solana/spl-governance'
 
 const Params = () => {
   const { realm, mint, councilMint } = useRealm()
@@ -239,7 +240,11 @@ const Params = () => {
                         <DisplayField
                           label="Vote Tipping"
                           padding
-                          val={activeGovernance.account.config.voteTipping}
+                          val={
+                            VoteTipping[
+                              activeGovernance.account.config.voteTipping
+                            ]
+                          }
                         />
                       </>
                     )
