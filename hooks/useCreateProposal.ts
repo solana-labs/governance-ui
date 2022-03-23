@@ -76,7 +76,7 @@ export default function useCreateProposal() {
       isDraft,
       client
     )
-    refetchProposals()
+    await refetchProposals()
     return proposalAddress
   }
   return { handleCreateProposal }

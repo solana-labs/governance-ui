@@ -1,18 +1,17 @@
-import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import Modal from '@components/Modal'
 import Input from '@components/inputs/Input'
 import VoteBySwitch from '../proposal/components/VoteBySwitch'
 import Textarea from '@components/inputs/Textarea'
 import {
-  createSetRealmConfig,
+  createSetGovernanceConfig,
+  Governance,
+  ProgramAccount,
   serializeInstructionToBase64,
+  VoteTipping,
 } from '@solana/spl-governance'
 import { validateInstruction } from '@utils/instructionTools'
-import { getRealmCfgSchema } from '@utils/validations'
 import useWalletStore from 'stores/useWalletStore'
-import { PublicKey } from '@solana/web3.js'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
-import { parseMintSupplyFraction } from '@utils/tokens'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 import useQueryContext from '@hooks/useQueryContext'
@@ -21,68 +20,83 @@ import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
 import { useState } from 'react'
 import Button from '@components/Button'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
-import { RealmConfigForm } from '../proposal/components/instructions/RealmConfig'
-import RealmConfigFormComponent from '../proposal/components/forms/RealmConfigForm'
+import BaseGovernanceForm, {
+  BaseGovernanceFormFields,
+} from '@components/AssetsList/BaseGovernanceForm'
+import { getGovernanceConfig } from '@utils/GovernanceTools'
+import {
+  getDaysFromTimestamp,
+  getMintDecimalAmountFromNatural,
+} from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
+import Select from '@components/inputs/Select'
+import * as yup from 'yup'
 
-interface RealmConfigProposal extends RealmConfigForm {
+interface GovernanceConfigForm extends BaseGovernanceFormFields {
   title: string
   description: string
+  voteTipping: VoteTipping
 }
 
-const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
+const GovernanceConfigModal = ({
+  closeProposalModal,
+  isProposalModalOpen,
+  governance,
+}: {
+  closeProposalModal: () => void
+  isProposalModalOpen: boolean
+  governance: ProgramAccount<Governance>
+}) => {
   const router = useRouter()
-  const { realm, mint, canChooseWhoVote, realmInfo, symbol } = useRealm()
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-
-  const realmAuthorityGovernance = governedMultiTypeAccounts.find(
-    (x) =>
-      x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
-  )
+  const { realm, canChooseWhoVote, symbol, mint } = useRealm()
+  const { config } = governance.account
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
   const { handleCreateProposal } = useCreateProposal()
-  const defaultCfgTitle = 'Change realm config'
+  const defaultCfgTitle = 'Change governance config'
   const [formErrors, setFormErrors] = useState({})
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [creatingProposal, setCreatingProposal] = useState(false)
-  const [form, setForm] = useState<RealmConfigProposal>()
+  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  const [form, setForm] = useState<GovernanceConfigForm>({
+    title: '',
+    description: '',
+    minCommunityTokensToCreateProposal: mint
+      ? getMintDecimalAmountFromNatural(
+          mint,
+          config.minCommunityTokensToCreateProposal
+        ).toNumber()
+      : 0,
+    minInstructionHoldUpTime: getDaysFromTimestamp(
+      config.minInstructionHoldUpTime
+    ),
+    maxVotingTime: getDaysFromTimestamp(config.maxVotingTime),
+    voteThreshold: config.voteThresholdPercentage.value,
+    voteTipping: config.voteTipping,
+  })
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form!, [propertyName]: value })
   }
-  const schema = getRealmCfgSchema({ form })
+  const schema = yup.object().shape({})
   const handleCreate = async () => {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
+    console.log(formErrors)
     let serializedInstruction = ''
-    if (
-      isValid &&
-      form!.governedAccount?.governance?.account &&
-      wallet?.publicKey &&
-      realm
-    ) {
+    if (isValid && governance?.account && wallet?.publicKey && realm) {
       setCreatingProposal(true)
-      const governance = form!.governedAccount.governance
-      const mintAmount = parseMintNaturalAmountFromDecimalAsBN(
-        form!.minCommunityTokensToCreateGovernance!,
-        mint!.decimals!
-      )
-      const instruction = await createSetRealmConfig(
-        realmInfo!.programId,
-        realmInfo!.programVersion!,
-        realm.pubkey,
-        realm.account.authority!,
-        form?.removeCouncil ? undefined : realm?.account.config.councilMint,
-        parseMintSupplyFraction(form!.communityMintSupplyFactor.toString()),
-        mintAmount,
-        form!.communityVoterWeightAddin
-          ? new PublicKey(form!.communityVoterWeightAddin)
-          : undefined,
-        form?.maxCommunityVoterWeightAddin
-          ? new PublicKey(form.maxCommunityVoterWeightAddin)
-          : undefined,
-        wallet.publicKey
+      const governanceConfigValues = {
+        minTokensToCreateProposal: form!.minCommunityTokensToCreateProposal,
+        minInstructionHoldUpTime: form!.minInstructionHoldUpTime,
+        maxVotingTime: form!.maxVotingTime,
+        voteThresholdPercentage: form!.voteThreshold,
+        mintDecimals: mint!.decimals,
+        voteTipping: form.voteTipping,
+      }
+      const governanceConfig = getGovernanceConfig(governanceConfigValues)
+      const instruction = await createSetGovernanceConfig(
+        realm.owner,
+        governance.pubkey,
+        governanceConfig
       )
       serializedInstruction = serializeInstructionToBase64(instruction)
       const obj: UiInstruction = {
@@ -120,9 +134,7 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
     >
       <div className="space-y-4 w-full">
         <h3 className="mb-4 flex flex-col">
-          Change Realm Config:{' '}
-          {realmAuthorityGovernance &&
-            abbreviateAddress(realmAuthorityGovernance!.governance.pubkey)}
+          Change Governance Config: {abbreviateAddress(governance.pubkey)}
         </h3>
         <Input
           label="Title"
@@ -138,7 +150,6 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
           }
         />
         <Textarea
-          className="mb-3"
           label="Description"
           placeholder="Description of your proposal or use a github gist link (optional)"
           value={form?.description}
@@ -157,22 +168,34 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
             }}
           ></VoteBySwitch>
         )}
-        {realmAuthorityGovernance && (
-          <RealmConfigFormComponent
-            hideGovSelector={true}
-            setForm={setForm}
-            setFormErrors={setFormErrors}
-            formErrors={formErrors}
-            shouldBeGoverned={false}
-            governedAccount={realmAuthorityGovernance}
-            form={form}
-          ></RealmConfigFormComponent>
-        )}
+        <BaseGovernanceForm
+          formErrors={formErrors}
+          form={form}
+          setForm={setForm}
+          setFormErrors={setFormErrors}
+        ></BaseGovernanceForm>
+        <Select
+          value={VoteTipping[form.voteTipping as any]}
+          onChange={(selected) =>
+            handleSetForm({
+              value: selected,
+              propertyName: 'voteTipping',
+            })
+          }
+        >
+          {Object.keys(VoteTipping)
+            .filter((vt) => typeof VoteTipping[vt as any] === 'string')
+            .map((vt) => (
+              <Select.Option key={vt} value={vt}>
+                {VoteTipping[vt as any]}{' '}
+              </Select.Option>
+            ))}
+        </Select>
       </div>
       <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">
         <Button
-          disabled={creatingProposal}
           isLoading={creatingProposal}
+          disabled={creatingProposal}
           onClick={() => handleCreate()}
         >
           Add proposal
@@ -182,4 +205,4 @@ const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
   )
 }
 
-export default RealmConfigModal
+export default GovernanceConfigModal

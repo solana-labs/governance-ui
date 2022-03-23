@@ -8,6 +8,7 @@ import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getMaxVoterWeightRecord } from '@solana/spl-governance'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
+import { notify } from '@utils/notifications'
 export const vsrPluginsPks: string[] = [
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo',
 ]
@@ -25,7 +26,11 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const { setVotingNfts, setMaxVoterWeight } = useNftPluginStore()
+  const {
+    setVotingNfts,
+    setMaxVoterWeight,
+    setIsLoadingNfts,
+  } = useNftPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -44,22 +49,32 @@ export function useVotingPlugins() {
     []
 
   const handleGetNfts = async () => {
-    const nfts = await getNfts(connection.current, wallet!.publicKey!)
-    const votingNfts = (
-      await Promise.all(
-        nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
-      )
-    ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
-    const nftsWithMeta = votingNfts.map((x) => {
-      const nft = nfts.find(
-        (nft) => nft.tokenAddress === x.tokenAddress.toBase58()
-      )
-      return {
-        ...nft!,
-        metadata: x.metadata,
-      }
-    })
-    setVotingNfts(nftsWithMeta, currentClient, mint)
+    setIsLoadingNfts(true)
+    try {
+      const nfts = await getNfts(connection.current, wallet!.publicKey!)
+      const votingNfts = (
+        await Promise.all(
+          nfts.map((x) => getIsFromCollection(x.mint, x.tokenAddress))
+        )
+      ).filter((x) => x) as { metadata: Metadata; tokenAddress: PublicKey }[]
+      const nftsWithMeta = votingNfts.map((x) => {
+        const nft = nfts.find(
+          (nft) => nft.tokenAddress === x.tokenAddress.toBase58()
+        )
+        return {
+          ...nft!,
+          metadata: x.metadata,
+        }
+      })
+      setVotingNfts(nftsWithMeta, currentClient, mint)
+    } catch (e) {
+      console.log(e)
+      notify({
+        message: "Something went wrong can't fetch nfts",
+        type: 'error',
+      })
+    }
+    setIsLoadingNfts(false)
   }
   const handleMaxVoterWeight = async () => {
     const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(

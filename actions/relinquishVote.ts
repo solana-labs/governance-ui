@@ -24,7 +24,7 @@ export const relinquishVote = async (
 
   const governanceAuthority = walletPubkey
   const beneficiary = walletPubkey
-  await plugin.withRelinquishVote(instructions, proposal.pubkey)
+  await plugin.withRelinquishVote(instructions, proposal, voteRecord)
   withRelinquishVote(
     instructions,
     programId,

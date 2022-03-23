@@ -19,9 +19,11 @@ import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 import RealmConfigModal from './RealmConfigModal'
+import GovernanceConfigModal from './GovernanceConfigModal'
+import { VoteTipping } from '@solana/spl-governance'
 
 const Params = () => {
-  const { realm, mint, councilMint } = useRealm()
+  const { realm, mint, councilMint, ownVoterWeight } = useRealm()
 
   const { canUseAuthorityInstruction } = useGovernanceAssets()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
@@ -34,7 +36,13 @@ const Params = () => {
     (x) =>
       x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
-  const [isProposalModalOpen, setIsProposalModalOpen] = useState(false)
+  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
+    false
+  )
+  const [
+    isGovernanceProposalModalOpen,
+    setIsGovernanceProposalModalOpen,
+  ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
 
@@ -44,11 +52,17 @@ const Params = () => {
   const communityMintMaxVoteWeightSource =
     realmAccount?.config.communityMintMaxVoteWeightSource
   const realmConfig = realmAccount?.config
-  const openProposalModal = () => {
-    setIsProposalModalOpen(true)
+  const openRealmProposalModal = () => {
+    setIsRealmProposalModalOpen(true)
   }
-  const closeProposalModal = () => {
-    setIsProposalModalOpen(false)
+  const closeRealmProposalModal = () => {
+    setIsRealmProposalModalOpen(false)
+  }
+  const openGovernanceProposalModal = () => {
+    setIsGovernanceProposalModalOpen(true)
+  }
+  const closeGovernanceProposalModal = () => {
+    setIsGovernanceProposalModalOpen(false)
   }
   const getYesNoString = (val) => {
     return val ? ' Yes' : ' No'
@@ -61,11 +75,18 @@ const Params = () => {
   }, [governedAccounts])
   return (
     <div className="grid grid-cols-12 gap-4">
-      {isProposalModalOpen && (
+      {isRealmProposalModalOpen && (
         <RealmConfigModal
-          isProposalModalOpen={isProposalModalOpen}
-          closeProposalModal={closeProposalModal}
+          isProposalModalOpen={isRealmProposalModalOpen}
+          closeProposalModal={closeRealmProposalModal}
         ></RealmConfigModal>
+      )}
+      {isGovernanceProposalModalOpen && (
+        <GovernanceConfigModal
+          governance={activeGovernance}
+          isProposalModalOpen={isGovernanceProposalModalOpen}
+          closeProposalModal={closeGovernanceProposalModal}
+        ></GovernanceConfigModal>
       )}
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
         <div className="mb-4">
@@ -112,14 +133,7 @@ const Params = () => {
                 )}
               </div>
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
-                <h2 className="flex items-center">
-                  Config{' '}
-                  {realmAuthorityGovernance && canUseAuthorityInstruction && (
-                    <Button onClick={openProposalModal} className="ml-auto">
-                      Change
-                    </Button>
-                  )}
-                </h2>
+                <h2 className="flex items-center">Config </h2>
                 {communityMintMaxVoteWeightSource && (
                   <DisplayField
                     padding
@@ -152,6 +166,20 @@ const Params = () => {
                     realmConfig?.useMaxCommunityVoterWeightAddin
                   )}
                 />
+                <div className="flex">
+                  {realmAuthorityGovernance && (
+                    <Button
+                      disabled={!canUseAuthorityInstruction}
+                      tooltipMessage={
+                        'Please connect wallet with enough voting power to create realm config proposals'
+                      }
+                      onClick={openRealmProposalModal}
+                      className="ml-auto"
+                    >
+                      Change config
+                    </Button>
+                  )}
+                </div>
               </div>
             </>
           ) : (
@@ -282,8 +310,28 @@ const Params = () => {
                     <DisplayField
                       label="Vote Tipping"
                       padding
-                      val={activeGovernance.account.config.voteTipping}
+                      val={
+                        VoteTipping[
+                          activeGovernance.account.config.voteTipping as any
+                        ]
+                      }
                     />
+                    <div className="flex">
+                      <Button
+                        disabled={
+                          !ownVoterWeight.canCreateProposal(
+                            activeGovernance.account.config
+                          )
+                        }
+                        tooltipMessage={
+                          'Please connect wallet with enough voting power to create governance config proposals'
+                        }
+                        onClick={openGovernanceProposalModal}
+                        className="ml-auto"
+                      >
+                        Change config
+                      </Button>
+                    </div>
                   </>
                 ) : (
                   <div className="space-y-3">

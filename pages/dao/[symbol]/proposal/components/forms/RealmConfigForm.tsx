@@ -18,10 +18,12 @@ const RealmConfigFormComponent = ({
   setForm,
   setFormErrors,
   formErrors,
-  governance,
+  governedAccount,
   shouldBeGoverned,
   form,
+  hideGovSelector = false,
 }) => {
+  console.log(governedAccount)
   const { realm, mint, realmInfo, councilMint, config } = useRealm()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
@@ -67,16 +69,21 @@ const RealmConfigFormComponent = ({
   const inputs = [
     {
       label: 'Governance',
-      initialValue: null,
+      initialValue: governedMultiTypeAccounts.find(
+        (x) =>
+          x.governance.pubkey.toBase58() ===
+          governedAccount.governance.pubkey.toBase58()
+      ),
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,
-      governance: governance,
+      governance: governedAccount,
       options: governedMultiTypeAccounts.filter(
         (x) =>
           x.governance.pubkey.toBase58() ===
           realm?.account.authority?.toBase58()
       ),
+      hide: hideGovSelector,
     },
     {
       label: 'Min community tokens to create governance',

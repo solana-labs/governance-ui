@@ -96,7 +96,7 @@ const RealmConfig = ({
         setFormErrors={setFormErrors}
         formErrors={formErrors}
         shouldBeGoverned={shouldBeGoverned}
-        governance={governance}
+        governedAccount={governance}
         form={form}
       ></RealmConfigFormComponent>
     </>

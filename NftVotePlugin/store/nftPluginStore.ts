@@ -10,6 +10,7 @@ interface nftPluginStore extends State {
     votingNfts: NFTWithMeta[]
     votingPower: BN
     maxVoteRecord: ProgramAccount<MaxVoterWeightRecord> | null
+    isLoadingNfts: boolean
   }
   setVotingNfts: (
     nfts: NFTWithMeta[],
@@ -20,17 +21,24 @@ interface nftPluginStore extends State {
   setMaxVoterWeight: (
     maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
   ) => void
+  setIsLoadingNfts: (val: boolean) => void
 }
 
 const defaultState = {
   votingNfts: [],
   votingPower: new BN(0),
   maxVoteRecord: null,
+  isLoadingNfts: false,
 }
 
 const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
   state: {
     ...defaultState,
+  },
+  setIsLoadingNfts: (val) => {
+    set((s) => {
+      s.state.isLoadingNfts = val
+    })
   },
   setVotingNfts: (nfts, votingClient, mint) => {
     votingClient._setCurrentVoterNfts(nfts)

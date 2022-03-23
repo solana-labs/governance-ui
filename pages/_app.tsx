@@ -12,7 +12,7 @@ import Footer from '@components/Footer'
 import { useEffect } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
-import { useVotingPlugins } from '@hooks/useVotingPlugins'
+import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -37,7 +37,7 @@ function App({ Component, pageProps }) {
 
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-  const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()
+  const { realm, realmInfo, symbol, ownTokenRecord, config } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
@@ -61,7 +61,11 @@ function App({ Component, pageProps }) {
   }, [connection.cluster, realm?.pubkey.toBase58()])
   useEffect(() => {
     if (
-      realm?.account.config.useCommunityVoterWeightAddin &&
+      realm &&
+      config?.account.communityVoterWeightAddin &&
+      vsrPluginsPks.includes(
+        config.account.communityVoterWeightAddin.toBase58()
+      ) &&
       realm.pubkey &&
       wallet?.connected &&
       client
