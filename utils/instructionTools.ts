@@ -265,11 +265,7 @@ export async function getGenericTransferInstruction({
       mintPK,
       wallet: wallet!,
     })
-    console.log(
-      '*** getGenericTokenInstruction receiverAddress, needToCreateAta',
-      receiverAddress,
-      needToCreateAta
-    )
+
     //we push this createATA instruction to transactions to create right before creating proposal
     //we don't want to create ata only when instruction is serialized
     if (needToCreateAta) {
