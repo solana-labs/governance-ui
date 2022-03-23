@@ -255,6 +255,7 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  ForesightDoThing,
 }
 
 export type createParams = [
