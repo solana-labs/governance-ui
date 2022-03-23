@@ -19,7 +19,7 @@ import Tooltip from './Tooltip'
 import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -34,20 +34,19 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const { realm, realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { refetchProposals } = useWalletStore((s) => s.actions)
 
   const submitVote = async (vote: YesNoVote) => {
-    const programId = realmInfo?.programId
-    const realmId = realmInfo?.realmId
     setSubmitting(true)
     const rpcContext = new RpcContext(
       proposal!.owner,
@@ -74,6 +73,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         msg,
         client
       )
+      await refetchProposals()
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex)
@@ -84,8 +84,6 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     }
 
     fetchChatMessages(proposal!.pubkey)
-    fetchVoteRecords(proposal)
-    await fetchRealm(programId, realmId)
   }
 
   const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'

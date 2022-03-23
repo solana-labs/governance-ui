@@ -9,11 +9,11 @@ import {
 } from '@solana/spl-governance'
 import { CheckCircleIcon } from '@heroicons/react/outline'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { sendSignedTransaction } from '@utils/sendTransactions'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { NftVoterClient } from '@solana/governance-program-library'
 import { LinkButton } from '@components/Button'
 
 const ApproveAllBtn = () => {
@@ -24,10 +24,12 @@ const ApproveAllBtn = () => {
     (s) => s.ownVoteRecordsByProposal
   )
 
-  const { client } = useVoteStakeRegistryClientStore((s) => s.state)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { proposals, realmInfo, realm, tokenRecords } = useRealm()
   const [isLoading, setIsLoading] = useState(false)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const votingProposals = useMemo(
     () =>
       Object.values(proposals).filter(
@@ -57,32 +59,31 @@ const ApproveAllBtn = () => {
         const proposal = votingProposals[i]
         const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
 
-        console.log(proposal.pubkey.toBase58(), ownTokenRecord)
-
         const instructions: TransactionInstruction[] = []
 
         //will run only if plugin is connected with realm
-        const voterWeight = await withUpdateVoterWeightRecord(
+        const plugin = await client?.withCastPluginVote(
           instructions,
-          wallet.publicKey!,
-          realm,
-          client
+          proposal.pubkey
         )
-        await withCastVote(
-          instructions,
-          realmInfo!.programId,
-          realmInfo!.programVersion!,
-          realm.pubkey,
-          proposal.account.governance,
-          proposal.pubkey,
-          proposal.account.tokenOwnerRecord,
-          ownTokenRecord.pubkey,
-          governanceAuthority,
-          proposal.account.governingTokenMint,
-          Vote.fromYesNoVote(YesNoVote.Yes),
-          payer,
-          voterWeight
-        )
+        if (client.client instanceof NftVoterClient === false) {
+          await withCastVote(
+            instructions,
+            realmInfo!.programId,
+            realmInfo!.programVersion!,
+            realm.pubkey,
+            proposal.account.governance,
+            proposal.pubkey,
+            proposal.account.tokenOwnerRecord,
+            ownTokenRecord.pubkey,
+            governanceAuthority,
+            proposal.account.governingTokenMint,
+            Vote.fromYesNoVote(YesNoVote.Yes),
+            payer,
+            plugin?.voterWeightPk,
+            plugin?.maxVoterWeightRecord
+          )
+        }
 
         const transaction = new Transaction()
         transaction.add(...instructions)
@@ -99,7 +100,7 @@ const ApproveAllBtn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await fetchRealm(realmInfo!.programId!, realm.pubkey)
+      await refetchProposals()
       notify({
         message: 'Successfully voted on all proposals',
         type: 'success',

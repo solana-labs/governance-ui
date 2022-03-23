@@ -11,13 +11,15 @@ import useWalletStore from 'stores/useWalletStore'
 
 import useRealm from './useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances } = useRealm()
+  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
@@ -85,6 +87,14 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(gov.account.config)
     )
 
+  const realmAuth =
+    realm &&
+    governancesArray.find(
+      (x) => x.pubkey.toBase58() === realm.account.authority?.toBase58()
+    )
+  const canUseAuthorityInstruction =
+    realmAuth && ownVoterWeight.canCreateProposal(realmAuth?.account.config)
+
   const getAvailableInstructions = () => {
     return availableInstructions.filter((itx) => itx.isVisible)
   }
@@ -137,19 +147,16 @@ export default function useGovernanceAssets() {
       name: 'Grant',
       isVisible:
         canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
     {
       id: Instructions.Clawback,
       name: 'Clawback',
       isVisible:
         canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
-    },
-    {
-      id: Instructions.ProgramUpgrade,
-      name: 'Upgrade Program',
-      isVisible: canUseProgramUpgradeInstruction,
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
     {
       id: Instructions.MangoChangePerpMarket,
@@ -242,6 +249,26 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.ProgramUpgrade,
+      name: 'Upgrade Program',
+      isVisible: canUseProgramUpgradeInstruction,
+    },
+    {
+      id: Instructions.CreateNftPluginRegistrar,
+      name: 'Create NFT plugin registrar',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.ConfigureNftPluginCollection,
+      name: 'Configure NFT plugin collection',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CreateNftPluginMaxVoterWeight,
+      name: 'Create NFT plugin max voter weight',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:
@@ -267,5 +294,6 @@ export default function useGovernanceAssets() {
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
     nftsGovernedTokenAccounts,
+    canUseAuthorityInstruction,
   }
 }

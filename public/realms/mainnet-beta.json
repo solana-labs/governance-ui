@@ -480,5 +480,15 @@
     "keywords": "Underscore DAO, infrastructure, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@underscoredao",
     "ogImage": "/realms/UNDER/logo.png"
-  }    
+  },
+  {
+    "symbol": "NEOFAIRIES",
+    "displayName": "Neo Fairies",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9PmmctkHPN5Br8V4gmjNuUdccrD7TtzfJ7U8mcpoBGXd",
+    "website": "https://neofairies.com",
+    "twitter": "@neofairies",
+    "keywords": "Neo Fairies, Fairies, Fairy, Fantasy, Punk, Create-To-Own, DAO, Governance, Decentralized Entertainment, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto",
+    "ogImage": "/realms/NeoFairies/img/logo.png"
+  }
 ]

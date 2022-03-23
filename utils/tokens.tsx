@@ -14,7 +14,7 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ProgramAccount } from '@solana/spl-governance'
+import { MintMaxVoteWeightSource, ProgramAccount } from '@solana/spl-governance'
 import { Governance } from '@solana/spl-governance'
 import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
@@ -26,6 +26,7 @@ import { notify } from './notifications'
 import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
+import BigNumber from 'bignumber.js'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
@@ -406,7 +407,17 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
     for (let i = 0; i < data.length; i++) {
       try {
         const val = (await axios.get(data[i].data.uri)).data
-        arr.push({ val, mint: data[i].mint })
+        const tokenAccounts = await getTokenAccountsByMint(
+          connection,
+          data[i].mint
+        )
+        arr.push({
+          val,
+          mint: data[i].mint,
+          tokenAddress: tokenAccounts
+            .find((x) => x.account.owner.toBase58() === ownerPk.toBase58())!
+            .publicKey.toBase58(),
+        })
       } catch (e) {
         console.log(e)
       }
@@ -419,4 +430,18 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
     })
   }
   return []
+}
+
+export const parseMintSupplyFraction = (fraction: string) => {
+  if (!fraction) {
+    return MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+  }
+
+  const fractionValue = new BigNumber(fraction)
+    .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    .toNumber()
+
+  return new MintMaxVoteWeightSource({
+    value: new BN(fractionValue),
+  })
 }

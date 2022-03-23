@@ -10,19 +10,21 @@ import { RpcContext } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 import { withRelinquishVote } from '@solana/spl-governance'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   proposal: ProgramAccount<Proposal>,
   tokenOwnerRecord: PublicKey,
   voteRecord: PublicKey,
-  instructions: TransactionInstruction[] = []
+  instructions: TransactionInstruction[] = [],
+  plugin: VotingClient
 ) => {
   const signers: Keypair[] = []
 
   const governanceAuthority = walletPubkey
   const beneficiary = walletPubkey
-
+  await plugin.withRelinquishVote(instructions, proposal, voteRecord)
   withRelinquishVote(
     instructions,
     programId,

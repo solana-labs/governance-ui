@@ -16,10 +16,8 @@ import {
   getInstructionDataFromBase64,
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
-import { createProposal } from 'actions/createProposal'
 import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
@@ -27,10 +25,9 @@ import * as yup from 'yup'
 import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
-import { getProgramVersionForRealm } from '@models/registry/api'
 import ProgramUpgradeInfo from 'pages/dao/[symbol]/proposal/components/instructions/bpfUpgradeableLoader/ProgramUpgradeInfo'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import { getProgramName } from '@components/instructions/programs/names'
+import useCreateProposal from '@hooks/useCreateProposal'
 
 interface UpgradeProgramCompactForm extends ProgramUpgradeForm {
   description: string
@@ -43,23 +40,16 @@ const UpgradeProgram = ({
   program: ProgramAccount<Governance>
 }) => {
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const governedAccount = {
     governance: program!,
   }
+  const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const {
-    realmInfo,
-    canChooseWhoVote,
-    councilMint,
-    realm,
-    ownVoterWeight,
-    mint,
-  } = useRealm()
+  const { realmInfo, canChooseWhoVote, realm } = useRealm()
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: governedAccount,
@@ -142,13 +132,6 @@ const UpgradeProgram = ({
         throw 'No realm selected'
       }
 
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
       const instructionData = {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
@@ -162,40 +145,14 @@ const UpgradeProgram = ({
           governance?.pubkey
         )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-        //Description same as title
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title ? form.title : proposalTitle,
-          form.description ? form.description : '',
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
-          [instructionData],
-          false,
-          client
-        )
+        proposalAddress = await handleCreateProposal({
+          title: form.title ? form.title : proposalTitle,
+          description: form.description ? form.description : '',
+          governance: selectedGovernance,
+          instructionsData: [instructionData],
+          voteByCouncil,
+          isDraft: false,
+        })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )

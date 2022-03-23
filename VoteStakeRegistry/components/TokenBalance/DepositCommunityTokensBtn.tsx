@@ -9,12 +9,12 @@ import { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const DepositCommunityTokensBtn = ({ className = '' }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [isLoading, setIsLoading] = useState(false)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)

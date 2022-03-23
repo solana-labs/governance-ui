@@ -38,7 +38,7 @@ export function ExecuteAllInstructionButton({
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -75,7 +75,7 @@ export function ExecuteAllInstructionButton({
 
     try {
       await executeInstructions(rpcContext, proposal, proposalInstructions)
-      await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
+      await refetchProposals()
     } catch (error) {
       notify({ type: 'error', message: `error executing instruction ${error}` })
       console.error('error executing instruction', error)
