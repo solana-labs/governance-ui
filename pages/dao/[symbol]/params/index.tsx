@@ -234,7 +234,7 @@ const Params = () => {
                   <Tabs
                     activeTab={activeTab}
                     onChange={(t) => setActiveTab(t)}
-                    tabs={['Params', 'Accounts', 'Statistics']}
+                    tabs={['Params', 'Accounts', 'Tracking']}
                   />
                 ) : null}
                 {(() => {
@@ -254,6 +254,16 @@ const Params = () => {
                             val={'Yes'}
                           />
                         )}
+                        <DisplayField
+                          label="Proposals Count"
+                          padding
+                          val={activeGovernance.account.proposalCount}
+                        />
+                        <DisplayField
+                          label="Voting Proposals Count"
+                          padding
+                          val={activeGovernance.account.votingProposalCount}
+                        />
                         <DisplayField
                           label="Max Voting Time"
                           padding
@@ -476,7 +486,7 @@ const Params = () => {
                         })}
                       </div>
                     )
-                  } else if (activeTab === 'Statistics') {
+                  } else if (activeTab === 'Tracking') {
                     return (
                       <>
                         <DisplayField
