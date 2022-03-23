@@ -255,6 +255,10 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  RealmConfig,
+  CreateNftPluginRegistrar,
+  CreateNftPluginMaxVoterWeight,
+  ConfigureNftPluginCollection,
 }
 
 export type createParams = [

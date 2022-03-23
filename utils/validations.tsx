@@ -410,3 +410,65 @@ export const getStakeSchema = ({ form }) => {
       .required('Source account is required'),
   })
 }
+
+export const getRealmCfgSchema = ({ form }) => {
+  return yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Governed account is required'),
+    minCommunityTokensToCreateGovernance: yup
+      .number()
+      .required('Min community tokens to create governance is required'),
+    communityVoterWeightAddin: yup
+      .string()
+      .test(
+        'communityVoterWeightAddinTest',
+        'communityVoterWeightAddin validation error',
+        function (val: string) {
+          if (!form?.communityVoterWeightAddin) {
+            return true
+          }
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `communityVoterWeightAddin is required`,
+            })
+          }
+        }
+      ),
+    maxCommunityVoterWeightAddin: yup
+      .string()
+      .test(
+        'maxCommunityVoterWeightAddin',
+        'maxCommunityVoterWeightAddin validation error',
+        function (val: string) {
+          if (!form?.maxCommunityVoterWeightAddin) {
+            return true
+          }
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `maxCommunityVoterWeightAddin is required`,
+            })
+          }
+        }
+      ),
+  })
+}

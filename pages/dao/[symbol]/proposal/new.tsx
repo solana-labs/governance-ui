@@ -51,6 +51,9 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
+import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
+import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
+import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
 import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
 import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
 import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
@@ -306,6 +309,27 @@ const New = () => {
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.CreateNftPluginRegistrar:
+        return (
+          <CreateNftPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginRegistrar>
+        )
+      case Instructions.ConfigureNftPluginCollection:
+        return (
+          <ConfigureNftPluginCollection
+            index={idx}
+            governance={governance}
+          ></ConfigureNftPluginCollection>
+        )
+      case Instructions.CreateNftPluginMaxVoterWeight:
+        return (
+          <CreateNftPluginMaxVoterWeightRecord
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginMaxVoterWeightRecord>
+        )
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
       case Instructions.MangoAddOracle:

@@ -17,9 +17,8 @@ import { withCreateTokenGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { DEFAULT_NATIVE_SOL_MINT } from '@components/instructions/tools'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -27,7 +26,7 @@ export const createTreasuryAccount = async (
   mint: PublicKey,
   config: GovernanceConfig,
   tokenOwnerRecord: PublicKey,
-  client?: VsrClient
+  client?: VotingClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
@@ -40,11 +39,9 @@ export const createTreasuryAccount = async (
   )
 
   //will run only if plugin is connected with realm
-  const voterWeight = await withUpdateVoterWeightRecord(
+  const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    wallet.publicKey!,
-    realm,
-    client
+    'createGovernance'
   )
 
   const tokenAccount = await withCreateSplTokenAccount(
@@ -69,7 +66,7 @@ export const createTreasuryAccount = async (
     tokenOwnerRecord,
     walletPubkey,
     governanceAuthority,
-    voterWeight
+    plugin?.voterWeightPk
   )
 
   if (mint.toBase58() === DEFAULT_NATIVE_SOL_MINT) {

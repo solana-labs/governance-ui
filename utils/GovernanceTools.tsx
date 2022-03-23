@@ -1,6 +1,7 @@
 import {
   GovernanceConfig,
   VoteThresholdPercentage,
+  VoteTipping,
 } from '@solana/spl-governance'
 import { BN } from '@project-serum/anchor'
 import {
@@ -15,6 +16,7 @@ export interface GovernanceConfigValues {
   maxVotingTime: number
   voteThresholdPercentage: number
   mintDecimals: number
+  voteTipping?: VoteTipping
 }
 
 // Parses min tokens to create (proposal or governance)
@@ -48,5 +50,6 @@ export function getGovernanceConfig(values: GovernanceConfigValues) {
     // Council tokens are rare and possession of any amount of council tokens should be sufficient to be allowed to create proposals
     // If it turns to be a wrong assumption then it should be exposed in the UI
     minCouncilTokensToCreateProposal: new BN(1),
+    voteTipping: values.voteTipping || 0,
   })
 }
