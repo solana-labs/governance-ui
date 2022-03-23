@@ -49,9 +49,10 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
     const votingPower = nfts
       .map(
         (x) =>
-          nftMintRegistrar?.collectionConfigs.find(
-            (j) => j.collection.toBase58() === x.metadata.data.collection?.key
-          ).weight
+          nftMintRegistrar?.collectionConfigs?.find(
+            (j) =>
+              j.collection?.toBase58() === x.metadata?.data?.collection?.key
+          )?.weight || new BN(0)
       )
       .reduce((prev, next) => prev.add(next), new BN(0))
     set((s) => {
