@@ -131,6 +131,7 @@ const MyProposalsBn = () => {
       )
       await refetchProposals()
     } catch (e) {
+      console.log(e)
       notify({ type: 'error', message: 'Something wnet wrong' })
     }
     setIsLoading(false)
@@ -180,7 +181,10 @@ const MyProposalsBn = () => {
         beneficiary
       )
     }
-    cleanSelected(unReleased, withInstruction)
+    cleanSelected(
+      unReleased.filter((x) => ownVoteRecordsByProposal[x.pubkey.toBase58()]),
+      withInstruction
+    )
   }
   const finalizeAll = () => {
     const withInstruction = (
