@@ -255,16 +255,6 @@ const Params = () => {
                           />
                         )}
                         <DisplayField
-                          label="Proposals Count"
-                          padding
-                          val={activeGovernance.account.proposalCount}
-                        />
-                        <DisplayField
-                          label="Voting Proposals Count"
-                          padding
-                          val={activeGovernance.account.votingProposalCount}
-                        />
-                        <DisplayField
                           label="Max Voting Time"
                           padding
                           val={getFormattedStringFromDays(
