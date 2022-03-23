@@ -11,7 +11,7 @@ import {
 import { precision } from '@utils/formatting'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
-import {
+import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../instructions/FormCreator'
@@ -151,7 +151,18 @@ const RealmConfigFormComponent = ({
       hide: typeof councilMint === 'undefined',
     },
   ]
-  return <>{console.log(inputs, setForm, setFormErrors, formErrors)}</>
+  return (
+    <>
+      {form && (
+        <InstructionForm
+          setForm={setForm}
+          inputs={inputs}
+          setFormErrors={setFormErrors}
+          formErrors={formErrors}
+        ></InstructionForm>
+      )}
+    </>
+  )
 }
 
 export default RealmConfigFormComponent
