@@ -87,13 +87,7 @@ const RealmConfigFormComponent = ({
   const inputs: InstructionInput[] = [
     {
       label: 'Governance',
-      initialValue: governedMultiTypeAccounts
-        ? governedMultiTypeAccounts.find(
-            (x) =>
-              x.governance.pubkey.toBase58() ===
-              governedAccount?.governance?.pubkey.toBase58()
-          ) || null
-        : null,
+      initialValue: governedAccount,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,

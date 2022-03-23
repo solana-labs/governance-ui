@@ -96,106 +96,111 @@ const InstructionInput = ({
   form
 }) => {
   const getComponent = () => {
-    switch (input.type) {
-      case InstructionInputType.GOVERNED_ACCOUNT:
-        return (
-          <GovernedAccountSelect
-            label={input.label}
-            governedAccounts={input.options!}
-            onChange={(value) => {
-              handleSetForm({ value, propertyName: input.name })
-            }}
-            value={form[input.name]}
-            error={formErrors[input.name]}
-            shouldBeGoverned={input.shouldBeGoverned}
-            governance={input.governance}
-          />
-        )
-      case InstructionInputType.INPUT: {
-        const validateAmountOnBlur = () => {
-          const value = form[input.name]
-          const precisionFromMin = input.min ? precision(input.min) : 1
-          handleSetForm({
-            value: parseFloat(
-              Math.max(
-                Number(input.min ? input.min : 0),
-                Math.min(
-                  Number(
-                    typeof input.max !== 'undefined'
-                      ? input.max
-                      : Number.MAX_SAFE_INTEGER
-                  ),
-                  Number(value)
+    try {
+      switch (input.type) {
+        case InstructionInputType.GOVERNED_ACCOUNT:
+          return (
+            <GovernedAccountSelect
+              label={input.label}
+              governedAccounts={input.options!}
+              onChange={(value) => {
+                handleSetForm({ value, propertyName: input.name })
+              }}
+              value={form[input.name]}
+              error={formErrors[input.name]}
+              shouldBeGoverned={input.shouldBeGoverned}
+              governance={input.governance}
+            />
+          )
+        case InstructionInputType.INPUT: {
+          const validateAmountOnBlur = () => {
+            const value = form[input.name]
+            const precisionFromMin = input.min ? precision(input.min) : 1
+            handleSetForm({
+              value: parseFloat(
+                Math.max(
+                  Number(input.min ? input.min : 0),
+                  Math.min(
+                    Number(
+                      typeof input.max !== 'undefined'
+                        ? input.max
+                        : Number.MAX_SAFE_INTEGER
+                    ),
+                    Number(value)
+                  )
+                ).toFixed(
+                  input.precision
+                    ? input.precision
+                    : precisionFromMin
+                    ? precisionFromMin
+                    : 0
                 )
-              ).toFixed(
-                input.precision
-                  ? input.precision
-                  : precisionFromMin
-                  ? precisionFromMin
-                  : 0
-              )
-            ),
-            propertyName: input.name,
-          })
+              ),
+              propertyName: input.name,
+            })
+          }
+          return (
+            <Input
+              min={input.min}
+              label={input.label}
+              value={form[input.name]}
+              type={input.inputType!}
+              onChange={(event) => {
+                handleSetForm({
+                  value: event.target.value,
+                  propertyName: input.name,
+                })
+              }}
+              step={input.step}
+              error={formErrors[input.name]}
+              onBlur={
+                input.onBlur
+                  ? input.onBlur
+                  : input.validateMinMax
+                  ? validateAmountOnBlur
+                  : null
+              }
+            />
+          )
         }
-        return (
-          <Input
-            min={input.min}
-            label={input.label}
-            value={form[input.name]}
-            type={input.inputType!}
-            onChange={(event) => {
-              handleSetForm({
-                value: event.target.value,
-                propertyName: input.name,
-              })
-            }}
-            step={input.step}
-            error={formErrors[input.name]}
-            onBlur={
-              input.onBlur
-                ? input.onBlur
-                : input.validateMinMax
-                ? validateAmountOnBlur
-                : null
-            }
-          />
-        )
-      }
 
-      case InstructionInputType.TEXTAREA:
-        return (
-          <Textarea
-            label={input.label}
-            placeholder={input.placeholder}
-            wrapperClassName="mb-5"
-            value={form[input.name]}
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: input.name,
-              })
-            }
-            error={formErrors[input.name]}
-          ></Textarea>
-        )
-      case InstructionInputType.SWITCH:
-        return (
-          <div className="text-sm mb-3">
-            <div className="mb-2">{input.label}</div>
-            <div className="flex flex-row text-xs items-center">
-              <Switch
-                checked={form[input.name]}
-                onChange={(checked) =>
-                  handleSetForm({
-                    value: checked,
-                    propertyName: input.name,
-                  })
-                }
-              />
+        case InstructionInputType.TEXTAREA:
+          return (
+            <Textarea
+              label={input.label}
+              placeholder={input.placeholder}
+              wrapperClassName="mb-5"
+              value={form[input.name]}
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: input.name,
+                })
+              }
+              error={formErrors[input.name]}
+            ></Textarea>
+          )
+        case InstructionInputType.SWITCH:
+          return (
+            <div className="text-sm mb-3">
+              <div className="mb-2">{input.label}</div>
+              <div className="flex flex-row text-xs items-center">
+                <Switch
+                  checked={form[input.name]}
+                  onChange={(checked) =>
+                    handleSetForm({
+                      value: checked,
+                      propertyName: input.name,
+                    })
+                  }
+                />
+              </div>
             </div>
-          </div>
-        )
+          )
+      }
+    } catch (e) {
+      console.log(e, '@@@@@@@@@@@@@@@@@@')
+      return null
     }
   }
   return (
