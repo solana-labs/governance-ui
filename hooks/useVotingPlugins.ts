@@ -18,7 +18,7 @@ export const nftPluginsPks: string[] = [
 ]
 
 export function useVotingPlugins() {
-  const { realm, config, mint } = useRealm()
+  const { realm, config } = useRealm()
   const {
     handleSetVsrRegistrar,
     handleSetVsrClient,
@@ -66,7 +66,7 @@ export function useVotingPlugins() {
           metadata: x.metadata,
         }
       })
-      setVotingNfts(nftsWithMeta, currentClient, mint)
+      setVotingNfts(nftsWithMeta, currentClient, nftMintRegistrar)
     } catch (e) {
       console.log(e)
       notify({
@@ -164,7 +164,7 @@ export function useVotingPlugins() {
       handleGetNfts()
       handleMaxVoterWeight()
     } else {
-      setVotingNfts([], currentClient, mint)
+      setVotingNfts([], currentClient, nftMintRegistrar)
       setMaxVoterWeight(null)
     }
   }, [

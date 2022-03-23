@@ -1,7 +1,5 @@
 import { BN } from '@project-serum/anchor'
 import { MaxVoterWeightRecord, ProgramAccount } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
-import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
 import { NFTWithMeta, VotingClient } from '@utils/uiTypes/VotePlugin'
 import create, { State } from 'zustand'
 
@@ -15,9 +13,9 @@ interface nftPluginStore extends State {
   setVotingNfts: (
     nfts: NFTWithMeta[],
     votingClient: VotingClient,
-    realm: MintInfo | undefined
+    nftMintRegistrar: any
   ) => void
-  setVotingPower: (nfts: NFTWithMeta[], mint: MintInfo | undefined) => void
+  setVotingPower: (nfts: NFTWithMeta[], nftMintRegistrar: any) => void
   setMaxVoterWeight: (
     maxVoterRecord: ProgramAccount<MaxVoterWeightRecord> | null
   ) => void
@@ -40,20 +38,24 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
       s.state.isLoadingNfts = val
     })
   },
-  setVotingNfts: (nfts, votingClient, mint) => {
+  setVotingNfts: (nfts, votingClient, nftMintRegistrar) => {
     votingClient._setCurrentVoterNfts(nfts)
     set((s) => {
       s.state.votingNfts = nfts
     })
-    _get().setVotingPower(nfts, mint)
+    _get().setVotingPower(nfts, nftMintRegistrar)
   },
-  setVotingPower: (nfts, mint) => {
-    const mintAmount =
-      mint && nfts.length
-        ? parseMintNaturalAmountFromDecimalAsBN(mint!.decimals, nfts.length)
-        : new BN(0)
+  setVotingPower: (nfts, nftMintRegistrar) => {
+    const votingPower = nfts
+      .map(
+        (x) =>
+          nftMintRegistrar?.collectionConfigs.find(
+            (j) => j.collection.toBase58() === x.metadata.data.collection?.key
+          ).weight
+      )
+      .reduce((prev, next) => prev.add(next), new BN(0))
     set((s) => {
-      s.state.votingPower = mintAmount
+      s.state.votingPower = votingPower
     })
   },
   setMaxVoterWeight: (maxVoterRecord) => {
