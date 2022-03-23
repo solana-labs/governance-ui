@@ -51,7 +51,6 @@ import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
 import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
-import RealmConfig from './components/instructions/RealmConfig'
 import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
 import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
 import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
@@ -331,8 +330,6 @@ const New = () => {
             governance={governance}
           ></CreateNftPluginMaxVoterWeightRecord>
         )
-      case Instructions.RealmConfig:
-        return <RealmConfig index={idx} governance={governance}></RealmConfig>
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
       case Instructions.MangoAddOracle:

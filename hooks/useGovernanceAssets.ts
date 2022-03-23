@@ -254,11 +254,6 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
-      id: Instructions.RealmConfig,
-      name: 'Realm Config',
-      isVisible: canUseAuthorityInstruction,
-    },
-    {
       id: Instructions.CreateNftPluginRegistrar,
       name: 'Create NFT plugin registrar',
       isVisible: canUseAuthorityInstruction,

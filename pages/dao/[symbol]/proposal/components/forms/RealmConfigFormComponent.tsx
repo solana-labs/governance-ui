@@ -16,6 +16,15 @@ import InstructionForm, {
   InstructionInputType,
 } from '../instructions/FormCreator'
 
+export interface RealmConfigForm {
+  governedAccount: GovernedMultiTypeAccount | undefined
+  minCommunityTokensToCreateGovernance: number
+  communityVoterWeightAddin: string
+  removeCouncil: boolean
+  maxCommunityVoterWeightAddin: string
+  communityMintSupplyFactor: number
+}
+
 const RealmConfigFormComponent = ({
   setForm,
   setFormErrors,
