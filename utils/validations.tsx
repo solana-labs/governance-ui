@@ -264,7 +264,7 @@ export const getTokenTransferSchema = ({
           if (val && governedTokenAccount && governedTokenAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
-              mintDecimals
+              typeof mintDecimals !== 'undefined'
                 ? mintDecimals
                 : governedTokenAccount?.mint.account.decimals
             )

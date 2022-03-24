@@ -13,7 +13,7 @@ import {
 } from '@tools/sdk/units'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { debounce } from '@utils/debounce'
-import { precision } from '@utils/formatting'
+import { abbreviateAddress, precision } from '@utils/formatting'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
@@ -246,7 +246,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
       setDestinationAccount(null)
     }
   }, [form.destinationAccount])
-
+  console.log(tokenAccount)
   const schema = getTokenTransferSchema({
     form,
     connection,
@@ -261,7 +261,9 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   const proposalTitle = isNFT
     ? nftTitle
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
-        form.destinationAccount
+        tryParseKey(form.destinationAccount)
+          ? abbreviateAddress(new PublicKey(form.destinationAccount))
+          : ''
       }`
 
   if (!currentAccount) {
