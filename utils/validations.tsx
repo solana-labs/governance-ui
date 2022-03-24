@@ -231,7 +231,15 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
-export const getTokenTransferSchema = ({ form, connection }) => {
+export const getTokenTransferSchema = ({
+  form,
+  connection,
+  tokenAmount,
+}: {
+  form: any
+  connection: ConnectionContext
+  tokenAmount?: BN
+}) => {
   const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),
@@ -256,6 +264,9 @@ export const getTokenTransferSchema = ({ form, connection }) => {
               val,
               governedTokenAccount?.mint.account.decimals
             )
+            if (tokenAmount) {
+              return tokenAmount.gte(mintValue)
+            }
             return !!(governedTokenAccount?.token?.publicKey &&
             !governedTokenAccount.isSol
               ? governedTokenAccount.token.account.amount.gte(mintValue)
