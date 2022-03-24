@@ -1,5 +1,5 @@
 import useRealm from 'hooks/useRealm'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
 import {
   Governance,
@@ -80,6 +80,7 @@ function getVotingStateRank(
 }
 
 const REALM = () => {
+  const pagination = useRef<{ setPage: (val) => void }>(null)
   const { realm, realmInfo, proposals, governances } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
@@ -98,6 +99,7 @@ const REALM = () => {
   )
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0))
+    pagination?.current?.setPage(0)
   }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
@@ -213,6 +215,7 @@ const REALM = () => {
                             />
                           ))}
                           <PaginationComponent
+                            ref={pagination}
                             totalPages={Math.ceil(
                               filteredProposals.length / proposalsPerPage
                             )}

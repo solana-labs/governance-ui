@@ -2,10 +2,13 @@ import {
   ArrowCircleLeftIcon,
   ArrowCircleRightIcon,
 } from '@heroicons/react/outline'
-import React from 'react'
+import React, { forwardRef, useImperativeHandle } from 'react'
 import { Pagination } from 'react-headless-pagination'
 
-const PaginationComponent = ({ totalPages = 5, onPageChange }) => {
+const PaginationComponent = ({ totalPages = 5, onPageChange }, ref) => {
+  useImperativeHandle(ref, () => ({
+    setPage,
+  }))
   const [page, setPage] = React.useState<number>(0)
 
   const handlePageChange = (page: number) => {
@@ -47,4 +50,4 @@ const PaginationComponent = ({ totalPages = 5, onPageChange }) => {
   )
 }
 
-export default PaginationComponent
+export default forwardRef(PaginationComponent)
