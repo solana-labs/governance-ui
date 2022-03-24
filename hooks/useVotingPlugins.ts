@@ -164,7 +164,7 @@ export function useVotingPlugins() {
     connected,
   ])
   useEffect(() => {
-    if (usedCollectionsPks.length) {
+    if (usedCollectionsPks.length && realm) {
       if (connected) {
         handleGetNfts()
       }
