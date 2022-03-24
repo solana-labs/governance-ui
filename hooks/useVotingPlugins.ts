@@ -14,7 +14,8 @@ export const vsrPluginsPks: string[] = [
 ]
 
 export const nftPluginsPks: string[] = [
-  'FDfF7jzJDCEkFWNi3is487k8rFPJxFkU821t2pQ1vDr1',
+  'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
+  'FDfF7jzJDCEkFWNi3is487k8rFPJxFkU821t2pQ1vDr1', // TODO: Remove after tested on devnet
 ]
 
 export function useVotingPlugins() {
