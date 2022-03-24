@@ -18,6 +18,16 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "PSY",
+    "displayName": "Psy Finance",
+    "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
+    "realmId": "FiG6YoqWnVzUmxFNukcRVXZC51HvLr6mts8nxcm7ScR8",
+    "website": "https://psyoptions.io",
+    "keywords": "PsyOptions, PsyFi, PsyFinance, REALM, Governance, Serum, SRM, DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, Tokens, Options, Vaults",
+    "twitter": "@PsyOptions",
+    "ogImage": "https://user-images.githubusercontent.com/32071703/149460918-3694084f-2a37-4c95-93d3-b5aaf078d444.png"
+  },
+  {
     "symbol": "SOCEAN",
     "programId": "5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy",
     "realmId": "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK",
