@@ -5,7 +5,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ProgramAuthorityForm,
+  SetProgramAuthorityForm,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -42,7 +42,7 @@ const SetProgramAuthority = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<ProgramAuthorityForm>({
+  const [form, setForm] = useState<SetProgramAuthorityForm>({
     governedAccount: undefined,
     accountId: programId?.toString(),
     destinationAuthority: '',

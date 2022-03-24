@@ -647,6 +647,11 @@
     "@solana/spl-token" "^0.1.8"
     typescript "^4.5.4"
 
+"@colors/colors@^1.5.0":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@colors/colors/-/colors-1.5.0.tgz#bb504579c1cae923e6576a4f5da43d25f97bdbd9"
+  integrity sha512-ooWCrlZP11i8GImSjTHYHLkvFDP48nS4+204nGb1RiX/WXYHmJA2III9/e2DWVabCESdW7hBAEzHRqUn9OUVvQ==
+
 "@cspotcode/source-map-consumer@0.8.0":
   version "0.8.0"
   resolved "https://registry.yarnpkg.com/@cspotcode/source-map-consumer/-/source-map-consumer-0.8.0.tgz#33bf4b7b39c178821606f669bbc447a6a629786b"
@@ -1870,15 +1875,18 @@
     assert "^2.0.0"
     buffer "^6.0.1"
 
-"@raydium-io/raydium-sdk@^1.0.1-beta.26":
-  version "1.0.1-beta.26"
-  resolved "https://registry.yarnpkg.com/@raydium-io/raydium-sdk/-/raydium-sdk-1.0.1-beta.26.tgz#acbc63089713eb6606709aa6db0f49d1ed50b7ea"
-  integrity sha512-p+nY3gX+iroCfLSu198+Wzc65Ls5ygmGNQK0Liy5+F2A0X+kEKvhikM9QXZvAWmxGAh72iPbRGLpWEAw+GsCww==
+"@raydium-io/raydium-sdk@^1.0.1-beta.34":
+  version "1.0.1-beta.46"
+  resolved "https://registry.yarnpkg.com/@raydium-io/raydium-sdk/-/raydium-sdk-1.0.1-beta.46.tgz#9464fc0065d2da33246372174b8f53e62310e4d8"
+  integrity sha512-gndrKr+JfBP8pA6Gt1zrHeUDef3EdsOIenuuWUg6yyIVdcFmoj8ZwU+tmMOtz965sHt1SxDZT/81ej4FphtM1w==
   dependencies:
+    "@colors/colors" "^1.5.0"
     "@solana/buffer-layout" "^3.0.0"
     "@solana/spl-token" "^0.1.8"
     big.js "^6.1.1"
     decimal.js-light "^2.5.1"
+    fecha "^4.2.1"
+    lodash "^4.17.21"
     toformat "^2.0.0"
 
 "@reach/dialog@^0.16.2":
@@ -2318,7 +2326,7 @@
     superstruct "^0.14.2"
     tweetnacl "^1.0.0"
 
-"@solana/web3.js@^1.29.2":
+"@solana/web3.js@^1.29.2", "@solana/web3.js@^1.34.0":
   version "1.36.0"
   resolved "https://registry.yarnpkg.com/@solana/web3.js/-/web3.js-1.36.0.tgz#79d7d5217b49b80139f4de68953adc5b9a9a264f"
   integrity sha512-RNT1451iRR7TyW7EJKMCrH/0OXawIe4zVm0DWQASwXlR/u1jmW6FrmH0lujIh7cGTlfOVbH+2ZU9AVUPLBFzwA==
@@ -5459,6 +5467,11 @@ fb-watchman@^2.0.0:
   resolved "https://registry.npmjs.org/fb-watchman/-/fb-watchman-2.0.1.tgz"
   dependencies:
     bser "2.1.1"
+
+fecha@^4.2.1:
+  version "4.2.1"
+  resolved "https://registry.yarnpkg.com/fecha/-/fecha-4.2.1.tgz#0a83ad8f86ef62a091e22bb5a039cd03d23eecce"
+  integrity sha512-MMMQ0ludy/nBs1/o0zVOiKTpG7qMbonKUzjJgQFEuvq6INZ1OraKPRAWkBq5vlKLOUMpmNYG1JoN3oDPUQ9m3Q==
 
 figures@^3.2.0:
   version "3.2.0"

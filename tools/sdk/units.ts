@@ -155,3 +155,13 @@ export function getMintSupplyFractionAsDecimalPercentage(
     .dividedBy(new BigNumber(mint.supply.toString()))
     .toNumber()
 }
+
+export function uiAmountToNativeBN(
+  uiAmount: number | string,
+  decimals: number
+): BN {
+  const amount = typeof uiAmount === 'number' ? uiAmount.toString() : uiAmount
+  return new BN(
+    new BigNumber(amount).shiftedBy(decimals).integerValue().toString()
+  )
+}

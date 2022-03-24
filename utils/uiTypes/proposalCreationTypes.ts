@@ -1,11 +1,8 @@
-import { AmountSide } from '@raydium-io/raydium-sdk'
 import { Governance, InstructionData } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
-import { SupportedMintName } from '@tools/sdk/solend/configuration'
-import { SplTokenUIName } from '@utils/splTokens'
 import { getNameOf } from '@tools/core/script'
 import {
   GovernedMintInfoAccount,
@@ -13,8 +10,11 @@ import {
   GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
+import { SupportedMintName } from '@tools/sdk/solend/configuration'
+import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
+import { AmountSide } from '@raydium-io/raydium-sdk'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -86,49 +86,21 @@ export interface ProgramUpgradeForm {
   bufferSpillAddress?: string | undefined
 }
 
-export interface ProgramAuthorityForm {
+export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
+
+export interface SetProgramAuthorityForm {
   governedAccount: GovernedProgramAccount | GovernedTokenAccount | undefined
   accountId: string | undefined
   destinationAuthority: string
 }
-
-export interface AddLiquidityRaydiumForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
-  liquidityPool: string
-  baseAmountIn: number
-  quoteAmountIn: number
-  fixedSide: AmountSide
-}
-
-export interface RemoveLiquidityRaydiumForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
-  liquidityPool: string
-  amountIn: number
-}
-export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
-
-export interface MangoMakeChangeMaxAccountsForm {
-  governedAccount: GovernedProgramAccount | undefined
-  programId: string | undefined
-  mangoGroupKey: string | undefined
-  maxMangoAccounts: number
-}
-export interface MangoMakeChangeReferralFeeParams {
-  governedAccount: GovernedProgramAccount | undefined
-  programId: string | undefined
-  mangoGroupKey: string | undefined
-  refSurchargeCentibps: number
-  refShareCentibps: number
-  refMngoRequired: number
-}
 export interface Base64InstructionForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount?: GovernedMultiTypeAccount
   base64: string
   holdUpTime: number
 }
 
 export interface EmptyInstructionForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount?: GovernedMultiTypeAccount
 }
 
 export interface CreateAssociatedTokenAccountForm {
@@ -146,13 +118,13 @@ export interface InitSolendObligationAccountForm {
 
 export interface DepositReserveLiquidityAndObligationCollateralForm {
   governedAccount?: GovernedMultiTypeAccount
-  uiAmount: string
+  uiAmount: number
   mintName?: SupportedMintName
 }
 
 export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
   governedAccount?: GovernedMultiTypeAccount
-  uiAmount: string
+  uiAmount: number
   mintName?: SupportedMintName
   destinationLiquidity?: string
 }
@@ -167,33 +139,19 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
-export enum Instructions {
-  Transfer,
-  ProgramUpgrade,
-  SetProgramAuthority,
-  Mint,
-  Base64,
-  None,
-  AddLiquidityRaydium,
-  RemoveLiquidityRaydium,
-  InitializeController,
-  SetRedeemableGlobalSupplyCap,
-  SetMangoDepositoriesRedeemableSoftCap,
-  RegisterMangoDepository,
-  DepositInsuranceToMangoDepository,
-  WithdrawInsuranceFromMangoDepository,
-  MangoMakeChangeMaxAccounts,
-  MangoChangeReferralFeeParams,
-  CreateAssociatedTokenAccount,
-  DepositIntoVolt,
-  CreateSolendObligationAccount,
-  InitSolendObligationAccount,
-  DepositReserveLiquidityAndObligationCollateral,
-  WithdrawObligationCollateralAndRedeemReserveLiquidity,
-  RefreshSolendObligation,
-  RefreshSolendReserve,
-  Grant,
-  Clawback,
+export interface AddLiquidityRaydiumForm {
+  governedAccount?: GovernedMultiTypeAccount
+  liquidityPool?: string
+  baseAmountIn?: number
+  quoteAmountIn?: number
+  fixedSide: AmountSide
+  slippage: number
+}
+
+export interface RemoveLiquidityRaydiumForm {
+  governedAccount?: GovernedMultiTypeAccount
+  liquidityPool: string
+  amountIn: number
 }
 
 export interface InitializeControllerForm {
@@ -237,23 +195,31 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
   programId: string | undefined
 }
 
-export enum UXDIntructions {
-  InitializeController,
-  SetRedeemableGlobalSupplyCap,
-  SetMangoDepositoriesRedeemableSoftCap,
-  RegisterMangoDepository,
-  DepositInsuranceToMangoDepository,
-  WithdrawInsuranceFromMangoDepository,
+export enum Instructions {
+  Transfer,
+  ProgramUpgrade,
+  SetProgramAuthority,
+  Mint,
+  Base64,
+  None,
   Grant,
   Clawback,
   CreateAssociatedTokenAccount,
-  DepositIntoVolt,
-  CreateSolendObligationAccount,
-  InitSolendObligationAccount,
-  DepositReserveLiquidityAndObligationCollateral,
-  WithdrawObligationCollateralAndRedeemReserveLiquidity,
-  RefreshSolendObligation,
-  RefreshSolendReserve,
+  FriktionDepositIntoVolt,
+  RaydiumAddLiquidity,
+  RaydiumRemoveLiquidity,
+  SolendCreateObligationAccount,
+  SolendInitObligationAccount,
+  SolendDepositReserveLiquidityAndObligationCollateral,
+  SolendWithdrawObligationCollateralAndRedeemReserveLiquidity,
+  SolendRefreshObligation,
+  SolendRefreshReserve,
+  UXDInitializeController,
+  UXDSetRedeemableGlobalSupplyCap,
+  UXDSetMangoDepositoriesRedeemableSoftCap,
+  UXDRegisterMangoDepository,
+  UXDDepositInsuranceToMangoDepository,
+  UXDWithdrawInsuranceFromMangoDepository,
 }
 
 export type createParams = [
@@ -271,13 +237,13 @@ export type createParams = [
 ]
 
 export interface ComponentInstructionData {
-  governedAccount?: ProgramAccount<Governance> | undefined
+  governedAccount?: ProgramAccount<Governance>
   getInstruction?: () => Promise<UiInstruction>
   type: any
 }
 export interface InstructionsContext {
   instructionsData: ComponentInstructionData[]
   handleSetInstructions: (val, index) => void
-  governance: ProgramAccount<Governance> | null | undefined
+  governance?: ProgramAccount<Governance> | null
   setGovernance: (val) => void
 }

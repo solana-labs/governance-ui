@@ -138,77 +138,73 @@ export default function useGovernanceAssets() {
 
   const availableInstructions = [
     {
-      id: Instructions.CreateAssociatedTokenAccount,
-      name: 'Create Associated Token Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.CreateSolendObligationAccount,
+      id: Instructions.SolendCreateObligationAccount,
       name: 'Solend: Create Obligation Account',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.InitSolendObligationAccount,
+      id: Instructions.SolendInitObligationAccount,
       name: 'Solend: Init Obligation Account',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
+      id: Instructions.SolendDepositReserveLiquidityAndObligationCollateral,
       name: 'Solend: Deposit Funds',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.RefreshSolendReserve,
+      id: Instructions.SolendRefreshReserve,
       name: 'Solend: Refresh Reserve',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.RefreshSolendObligation,
+      id: Instructions.SolendRefreshObligation,
       name: 'Solend: Refresh Obligation',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
+      id:
+        Instructions.SolendWithdrawObligationCollateralAndRedeemReserveLiquidity,
       name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.InitializeController,
+      id: Instructions.UXDInitializeController,
       name: 'UXD: Initialize Controller',
       isVisible: canUseUxdInstructions,
     },
     {
-      id: Instructions.SetRedeemableGlobalSupplyCap,
+      id: Instructions.UXDSetRedeemableGlobalSupplyCap,
       name: 'UXD: Set Redeemable Global Supply Cap',
       isVisible: canUseUxdInstructions,
     },
     {
-      id: Instructions.SetMangoDepositoriesRedeemableSoftCap,
+      id: Instructions.UXDSetMangoDepositoriesRedeemableSoftCap,
       name: 'UXD: Set Mango Depositories Redeemable Supply Soft Cap',
       isVisible: canUseUxdInstructions,
     },
     {
-      id: Instructions.RegisterMangoDepository,
+      id: Instructions.UXDRegisterMangoDepository,
       name: 'UXD: Register Mango Depository',
       isVisible: canUseUxdInstructions,
     },
     {
-      id: Instructions.DepositInsuranceToMangoDepository,
+      id: Instructions.UXDDepositInsuranceToMangoDepository,
       name: 'UXD: Deposit Insurance To Mango Depository',
       isVisible: canUseUxdInstructions,
     },
     {
-      id: Instructions.WithdrawInsuranceFromMangoDepository,
+      id: Instructions.UXDWithdrawInsuranceFromMangoDepository,
       name: 'UXD: Withdraw Insurance From Mango Depository',
       isVisible: canUseUxdInstructions,
     },
     {
-      id: Instructions.AddLiquidityRaydium,
+      id: Instructions.RaydiumAddLiquidity,
       name: 'Raydium: Add To Liquidity Pool',
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.RemoveLiquidityRaydium,
+      id: Instructions.RaydiumRemoveLiquidity,
       name: 'Raydium: Remove From Liquidity Pool',
       isVisible: canUseAnyInstruction,
     },
@@ -237,38 +233,8 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
-      id: Instructions.DepositIntoVolt,
+      id: Instructions.FriktionDepositIntoVolt,
       name: 'Friktion: Deposit into Volt',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.CreateSolendObligationAccount,
-      name: 'Solend: Create Obligation Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.InitSolendObligationAccount,
-      name: 'Solend: Init Obligation Account',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.DepositReserveLiquidityAndObligationCollateral,
-      name: 'Solend: Deposit Funds',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.RefreshSolendReserve,
-      name: 'Solend: Refresh Reserve',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.RefreshSolendObligation,
-      name: 'Solend: Refresh Obligation',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity,
-      name: 'Solend: Withdraw Funds',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -290,16 +256,6 @@ export default function useGovernanceAssets() {
       id: Instructions.Base64,
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.MangoMakeChangeMaxAccounts,
-      name: 'Mango - change max accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
-    },
-    {
-      id: Instructions.MangoChangeReferralFeeParams,
-      name: 'Mango - change referral fee params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
     },
     {
       id: Instructions.None,

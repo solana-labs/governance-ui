@@ -11,3 +11,5 @@ export async function deriveObligationAddressFromWalletAndSeed(
     SolendConfiguration.programID
   )
 }
+
+export const SOLEND_MINT_NAME_OPTIONS = SolendConfiguration.getSupportedMintNames()

@@ -1,12 +1,12 @@
 import { BN } from '@project-serum/anchor'
 import { Liquidity, LiquidityPoolKeys } from '@raydium-io/raydium-sdk'
 import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { findATAAddrSync } from '@uxdprotocol/uxd-client'
+import { findATAAddrSync } from '@utils/ataTools'
 
 export const createRemoveLiquidityInstruction = (
   owner: PublicKey,
   poolKeys: LiquidityPoolKeys,
-  amountIn: string
+  amountIn: BN
 ): TransactionInstruction => {
   const [lpTokenAccount] = findATAAddrSync(owner, poolKeys.lpMint)
   const [baseTokenAccount] = findATAAddrSync(owner, poolKeys.baseMint)
@@ -20,7 +20,7 @@ export const createRemoveLiquidityInstruction = (
       lpTokenAccount,
       owner,
     },
-    amountIn: new BN(amountIn),
+    amountIn,
   })
 
   return itx
