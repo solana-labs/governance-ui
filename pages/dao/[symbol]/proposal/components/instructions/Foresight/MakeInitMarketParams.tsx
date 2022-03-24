@@ -19,11 +19,7 @@ import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
 import { Program } from '@project-serum/anchor'
 import { FORESIGHT_MINT_DEVNET } from 'Strategies/protocols/foresight/tools'
-import {
-  governance as foresightGov,
-  types,
-  IDL,
-} from '@foresight-tmp/foresight-sdk'
+import { governance as foresightGov, IDL } from '@foresight-tmp/foresight-sdk'
 import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 
 const MakeInitMarketParams = ({
@@ -68,10 +64,6 @@ const MakeInitMarketParams = ({
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
       //Mango instruction call and serialize
-      const mint = await tryGetMint(
-        connection.current,
-        new PublicKey(FORESIGHT_MINT_DEVNET)
-      )
       const program: PredictionMarketProgram = new Program(
         IDL,
         'DHrfeiGybZDrU2HSX5eGahSXSa4u9ECZJPigNHeDuGT3'
