@@ -1,17 +1,19 @@
 import React from 'react'
 import useRealm from 'hooks/useRealm'
-import { CogIcon } from '@heroicons/react/outline'
+import { CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon, BadgeCheckIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 import Tooltip from './Tooltip'
+import useMembers from './Members/useMembers'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realmInfo, realmDisplayName, symbol } = useRealm()
+  const { realm, realmInfo, realmDisplayName, symbol } = useRealm()
   const { REALM } = process.env
+  const { activeMembers } = useMembers()
 
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
@@ -62,6 +64,14 @@ const RealmHeader = () => {
           <div className="animate-pulse bg-bkg-3 h-10 w-40 rounded-md" />
         )}
         <div className="flex items-center space-x-4">
+          {!realm?.account.config.useCommunityVoterWeightAddin && (
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
+              <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
+                <UsersIcon className="flex-shrink-0 h-5 mr-1 w-5" />
+                Members ({activeMembers.length})
+              </a>
+            </Link>
+          )}
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/params`)}>
             <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
               <CogIcon className="flex-shrink-0 h-5 mr-1 w-5" />

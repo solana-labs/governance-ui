@@ -19,9 +19,6 @@ import AboutRealm from '@components/AboutRealm'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
-const MembersCompactWrapper = dynamic(
-  () => import('@components/Members/MembersCompactWrapper')
-)
 const AssetsCompactWrapper = dynamic(
   () => import('@components/AssetsList/AssetsCompactWrapper')
 )
@@ -242,9 +239,6 @@ const REALM = () => {
               <TokenBalanceCardWrapper />
               <NFTSCompactWrapper />
               <AccountsCompactWrapper />
-              {!realm?.account.config.useCommunityVoterWeightAddin && (
-                <MembersCompactWrapper />
-              )}
               <AssetsCompactWrapper />
             </div>
           </>
