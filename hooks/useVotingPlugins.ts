@@ -81,13 +81,14 @@ export function useVotingPlugins() {
     const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
       realm!.pubkey,
       realm!.account.communityMint,
-      currentClient.client!.program.programId
+      nftClient!.program.programId
     )
     try {
       const existingMaxVoterRecord = await getMaxVoterWeightRecord(
         connection.current,
         maxVoterWeightRecord
       )
+      console.log(existingMaxVoterRecord)
       setMaxVoterWeight(existingMaxVoterRecord)
     } catch (e) {
       console.log(e)
@@ -109,11 +110,9 @@ export function useVotingPlugins() {
     )
   }
   useEffect(() => {
-    if (connected) {
-      handleSetVsrClient(wallet, connection)
-      handleSetNftClient(wallet, connection)
-    }
-  }, [connection.endpoint, connected])
+    handleSetVsrClient(wallet, connection)
+    handleSetNftClient(wallet, connection)
+  }, [connection.endpoint])
 
   useEffect(() => {
     const handleVsrPlugin = () => {
@@ -123,11 +122,13 @@ export function useVotingPlugins() {
         vsrPluginsPks.includes(currentPluginPk.toBase58())
       ) {
         handleSetVsrRegistrar(vsrClient, realm)
-        handleSetCurrentRealmVotingClient({
-          client: vsrClient,
-          realm,
-          walletPk: wallet?.publicKey,
-        })
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: vsrClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
       }
     }
     const handleNftplugin = () => {
@@ -137,11 +138,13 @@ export function useVotingPlugins() {
         nftPluginsPks.includes(currentPluginPk.toBase58())
       ) {
         handleSetNftRegistrar(nftClient!, realm)
-        handleSetCurrentRealmVotingClient({
-          client: nftClient,
-          realm,
-          walletPk: wallet?.publicKey,
-        })
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: nftClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
       }
     }
     if (
@@ -161,8 +164,11 @@ export function useVotingPlugins() {
     connected,
   ])
   useEffect(() => {
-    if (usedCollectionsPks.length && connected) {
-      handleGetNfts()
+    if (usedCollectionsPks.length && realm) {
+      if (connected) {
+        handleGetNfts()
+      }
+
       handleMaxVoterWeight()
     } else {
       setVotingNfts([], currentClient, nftMintRegistrar)

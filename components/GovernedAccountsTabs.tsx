@@ -1,4 +1,6 @@
+import { abbreviateAddress } from '@utils/formatting'
 import { FunctionComponent } from 'react'
+import { getAccountName } from './instructions/tools'
 
 interface GovernedAccountsTabsProps {
   activeTab: any
@@ -27,6 +29,7 @@ const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
       {tabs.map((x) => {
         const pubKey = x.pubkey
         const activePubKey = activeTab?.pubkey
+        const name = getAccountName(pubKey)
         return (
           <button
             key={pubKey}
@@ -39,7 +42,10 @@ const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
             `}
           >
             <div className="text-left">
-              <span className="break-all text-sm">{pubKey.toBase58()}</span>
+              <div className="text-xs text-fgd-3">{name}</div>
+              <span className="break-all text-xs">
+                {abbreviateAddress(pubKey)}
+              </span>
               {/* <p className="mb-0 text-fgd-1 text-xs">
                 {amountFormatted} {symbol}
               </p>

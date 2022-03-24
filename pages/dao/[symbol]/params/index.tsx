@@ -21,6 +21,8 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import RealmConfigModal from './RealmConfigModal'
 import GovernanceConfigModal from './GovernanceConfigModal'
 import { VoteTipping } from '@solana/spl-governance'
+import { tryParsePublicKey } from '@tools/core/pubkey'
+import { getAccountName } from '@components/instructions/tools'
 
 const Params = () => {
   const { realm, mint, councilMint, ownVoterWeight } = useRealm()
@@ -490,6 +492,8 @@ const Params = () => {
 }
 
 const DisplayField = ({ label, val, padding = false, bg = false }) => {
+  const pubkey = tryParsePublicKey(val)
+  const name = pubkey ? getAccountName(pubkey) : ''
   return (
     <div
       className={`flex flex-col mb-2 ${bg ? 'bg-bkg-1' : ''} ${
@@ -497,7 +501,16 @@ const DisplayField = ({ label, val, padding = false, bg = false }) => {
       }`}
     >
       <div className="text-xs text-fgd-3">{capitalize(label)}</div>
-      <div className="text-sm break-all">{val}</div>
+      <div className="text-sm break-all">
+        {pubkey && name ? (
+          <>
+            <div className="text-xs">{name}</div>
+            <div>{val}</div>
+          </>
+        ) : (
+          <div>{val}</div>
+        )}
+      </div>
     </div>
   )
 }
