@@ -185,6 +185,12 @@ export interface MangoMakeChangeReferralFeeParams {
   refShareCentibps: number
   refMngoRequired: number
 }
+
+export interface ForesightMakeInitMarketParams {
+  governedAccount: GovernedProgramAccount | undefined
+  marketListId: string
+  marketId: number
+}
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string

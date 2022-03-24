@@ -242,6 +242,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.ForesightDoThing,
+      name: 'Foresight: Do Thing',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:

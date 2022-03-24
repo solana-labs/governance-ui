@@ -5,8 +5,8 @@ import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
-  MangoMakeChangeReferralFeeParams,
   UiInstruction,
+  ForesightMakeInitMarketParams,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -17,12 +17,16 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
-import { makeChangeReferralFeeParamsInstruction } from '@blockworks-foundation/mango-client'
-import { BN } from '@project-serum/anchor'
-import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
-import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
+import { Program } from '@project-serum/anchor'
+import { FORESIGHT_MINT_DEVNET } from 'Strategies/protocols/foresight/tools'
+import {
+  governance as foresightGov,
+  types,
+  IDL,
+} from '@foresight-tmp/foresight-sdk'
+import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 
-const MakeChangeReferralFeeParams = ({
+const MakeInitMarketParams = ({
   index,
   governance,
 }: {
@@ -43,13 +47,10 @@ const MakeChangeReferralFeeParams = ({
   })
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<MangoMakeChangeReferralFeeParams>({
+  const [form, setForm] = useState<ForesightMakeInitMarketParams>({
     governedAccount: undefined,
-    programId: programId?.toString(),
-    mangoGroup: undefined,
-    refSurchargeCentibps: 0,
-    refShareCentibps: 0,
-    refMngoRequired: 0,
+    marketListId: '',
+    marketId: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -65,33 +66,23 @@ const MakeChangeReferralFeeParams = ({
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
-    if (
-      isValid &&
-      programId &&
-      form.governedAccount?.governance?.account &&
-      wallet?.publicKey
-    ) {
+    if (isValid && programId && wallet?.publicKey) {
       //Mango instruction call and serialize
       const mint = await tryGetMint(
         connection.current,
-        new PublicKey(MANGO_MINT)
+        new PublicKey(FORESIGHT_MINT_DEVNET)
       )
-      const refMngoRequiredMintAmount = parseMintNaturalAmountFromDecimal(
-        form.refMngoRequired!,
-        mint!.account.decimals
+      const program: PredictionMarketProgram = new Program(
+        IDL,
+        'DHrfeiGybZDrU2HSX5eGahSXSa4u9ECZJPigNHeDuGT3'
       )
-      const setMaxMangoAccountsInstr = makeChangeReferralFeeParamsInstruction(
-        form.governedAccount.governance.account.governedAccount,
-        new PublicKey(form.mangoGroup!),
-        form.governedAccount.governance.pubkey,
-        new BN(form.refSurchargeCentibps),
-        new BN(form.refShareCentibps),
-        new BN(refMngoRequiredMintAmount)
+      const { ix: initMarketIx } = await foresightGov.genInitMarketIx(
+        Buffer.from(form.marketListId.padEnd(20)),
+        Uint8Array.from([form.marketId]),
+        program
       )
 
-      serializedInstruction = serializeInstructionToBase64(
-        setMaxMangoAccountsInstr
-      )
+      serializedInstruction = serializeInstructionToBase64(initMarketIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -118,10 +109,8 @@ const MakeChangeReferralFeeParams = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    mangoGroup: yup.string().required(),
-    refShareCentibps: yup.number().required(),
-    refMngoRequired: yup.number().required(),
-    refSurchargeCentibps: yup.number().required(),
+    marketId: yup.number().required(),
+    marketListId: yup.string().required(),
   })
 
   return (
@@ -138,58 +127,32 @@ const MakeChangeReferralFeeParams = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Mango group"
-        value={form.mangoGroup}
+        label="Market ID"
+        value={form.marketId}
         type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'mangoGroup',
+            propertyName: 'marketId',
           })
         }
-        error={formErrors['mangoGroup']}
+        error={formErrors['marketId']}
       />
       <Input
-        label="Ref surcharge centi bps"
-        value={form.refSurchargeCentibps}
+        label="Market List ID"
+        value={form.marketListId}
         type="number"
         min={0}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'refSurchargeCentibps',
+            propertyName: 'marketListId',
           })
         }
-        error={formErrors['refSurchargeCentibps']}
-      />
-      <Input
-        label="Ref share centi bps"
-        value={form.refShareCentibps}
-        type="number"
-        min={0}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'refShareCentibps',
-          })
-        }
-        error={formErrors['refShareCentibps']}
-      />
-      <Input
-        label="Ref mango required"
-        value={form.refMngoRequired}
-        type="number"
-        min={0}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'refMngoRequired',
-          })
-        }
-        error={formErrors['refMngoRequired']}
+        error={formErrors['marketListID']}
       />
     </>
   )
 }
 
-export default MakeChangeReferralFeeParams
+export default MakeInitMarketParams
