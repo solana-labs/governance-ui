@@ -16,9 +16,8 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { Program } from '@project-serum/anchor'
-import { FORESIGHT_MINT_DEVNET } from 'Strategies/protocols/foresight/tools'
 import { governance as foresightGov, IDL } from '@foresight-tmp/foresight-sdk'
 import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 
@@ -32,7 +31,6 @@ const MakeInitMarketParams = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { getGovernancesByAccountTypes } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
   const governedProgramAccounts = getGovernancesByAccountTypes([
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
