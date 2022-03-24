@@ -1,4 +1,3 @@
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
 import React, { useEffect, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
@@ -16,6 +15,7 @@ import dynamic from 'next/dynamic'
 import PaginationComponent from '@components/Pagination'
 import Tabs from '@components/Tabs'
 import AboutRealm from '@components/AboutRealm'
+import Input from '@components/inputs/Input'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
@@ -80,14 +80,7 @@ function getVotingStateRank(
 }
 
 const REALM = () => {
-  const {
-    realm,
-    realmInfo,
-    proposals,
-    realmTokenAccount,
-    ownTokenRecord,
-    governances,
-  } = useRealm()
+  const { realm, realmInfo, proposals, governances } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
@@ -96,26 +89,31 @@ const REALM = () => {
   const [paginatedProposals, setPaginatedProposals] = useState<
     [string, ProgramAccount<Proposal>][]
   >([])
+  const [proposalSearch, setProposalSearch] = useState('')
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const [activeTab, setActiveTab] = useState('Proposals')
-  const wallet = useWalletStore((s) => s.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
     compareProposals(b[1].account, a[1].account, governances)
   )
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0))
-  }, [filteredProposals])
+  }, [JSON.stringify(filteredProposals)])
+
   useEffect(() => {
-    if (filters.length > 0) {
-      const proposals = allProposals.filter(
-        ([, v]) => !filters.includes(v.account.state)
+    let proposals =
+      filters.length > 0
+        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
+        : allProposals
+    if (proposalSearch) {
+      proposals = proposals.filter(([, v]) =>
+        v.account.name
+          .toLowerCase()
+          .includes(proposalSearch.toLocaleLowerCase())
       )
-      setFilteredProposals(proposals)
-    } else {
-      setFilteredProposals(allProposals)
     }
-  }, [filters])
+    setFilteredProposals(proposals)
+  }, [filters, proposalSearch])
 
   useEffect(() => {
     const proposals =
@@ -124,23 +122,8 @@ const REALM = () => {
         : allProposals
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
-  }, [proposals])
+  }, [JSON.stringify(proposals)])
 
-  // DEBUG print remove
-  console.log(
-    'governance page tokenAccount',
-    realmTokenAccount && realmTokenAccount.publicKey.toBase58()
-  )
-
-  console.log(
-    'governance page wallet',
-    wallet?.connected && wallet?.publicKey?.toBase58()
-  )
-
-  console.log(
-    'governance page tokenRecord',
-    wallet?.connected && ownTokenRecord
-  )
   const onProposalPageChange = (page) => {
     setPaginatedProposals(paginateProposals(page))
   }
@@ -201,6 +184,15 @@ const REALM = () => {
                   <>
                     <div className="flex items-center justify-between pb-3">
                       <h4 className="font-normal mb-0 text-fgd-2">{`${filteredProposals.length} Proposals`}</h4>
+                      <Input
+                        className="w-44 ml-3"
+                        type="text"
+                        placeholder="Search"
+                        value={proposalSearch}
+                        onChange={(e) => {
+                          setProposalSearch(e.target.value)
+                        }}
+                      ></Input>
                       <div className="flex items-center space-x-4">
                         <ApproveAllBtn />
                         <NewProposalBtn />
