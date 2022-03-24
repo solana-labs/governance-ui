@@ -36,7 +36,6 @@ export async function castVote(
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
-
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await getGovernanceProgramVersion(
@@ -49,7 +48,6 @@ export async function castVote(
     instructions,
     proposal.pubkey
   )
-
   await withCastVote(
     instructions,
     programId,

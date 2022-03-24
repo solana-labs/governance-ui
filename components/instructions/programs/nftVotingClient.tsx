@@ -1,7 +1,10 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { Provider } from '@project-serum/anchor'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { AccountMetaData, getRealm } from '@solana/spl-governance'
 import { Connection, Keypair } from '@solana/web3.js'
+import { fmtTokenAmount } from '@utils/formatting'
+import { tryGetMint } from '@utils/tokens'
 
 export const NFT_VOTER_INSTRUCTIONS = {
   GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw: {
@@ -49,7 +52,11 @@ export const NFT_VOTER_INSTRUCTIONS = {
         { name: 'Collection' },
         { name: 'Max voter weight record' },
       ],
-      getDataUI: async (connection: Connection, data: Uint8Array) => {
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
         try {
           const options = Provider.defaultOptions()
           const provider = new Provider(
@@ -57,14 +64,22 @@ export const NFT_VOTER_INSTRUCTIONS = {
             new Wallet(Keypair.generate()),
             options
           )
+          const realm = await getRealm(connection, accounts[1].pubkey)
+          const mint = await tryGetMint(connection, realm.account.communityMint)
           const nftClient = await NftVoterClient.connect(provider)
           const decodedInstructionData = nftClient.program.coder.instruction.decode(
             Buffer.from(data)
           )?.data as any
+          const weight = fmtTokenAmount(
+            decodedInstructionData.weight,
+            mint?.account.decimals
+          )
           return (
             <div className="space-y-3">
               <div>Size: {decodedInstructionData.size}</div>
-              <div>Weight: {decodedInstructionData.weight.toNumber()}</div>
+              <div>
+                Weight: {weight} ({decodedInstructionData.weight.toNumber()})
+              </div>
             </div>
           )
         } catch (e) {
