@@ -234,7 +234,7 @@ const Params = () => {
                   <Tabs
                     activeTab={activeTab}
                     onChange={(t) => setActiveTab(t)}
-                    tabs={['Params', 'Accounts', 'Tracking']}
+                    tabs={['Params', 'Accounts', 'Statistics']}
                   />
                 ) : null}
                 {(() => {
@@ -476,7 +476,7 @@ const Params = () => {
                         })}
                       </div>
                     )
-                  } else if (activeTab === 'Tracking') {
+                  } else if (activeTab === 'Statistics') {
                     return (
                       <>
                         <DisplayField
