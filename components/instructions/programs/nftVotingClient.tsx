@@ -4,7 +4,7 @@ import { NftVoterClient } from '@solana/governance-program-library'
 import { Connection, Keypair } from '@solana/web3.js'
 
 export const NFT_VOTER_INSTRUCTIONS = {
-  FDfF7jzJDCEkFWNi3is487k8rFPJxFkU821t2pQ1vDr1: {
+  GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw: {
     132: {
       name: 'Create registrar',
       accounts: [
@@ -61,8 +61,12 @@ export const NFT_VOTER_INSTRUCTIONS = {
           const decodedInstructionData = nftClient.program.coder.instruction.decode(
             Buffer.from(data)
           )?.data as any
-          console.log(decodedInstructionData)
-          return <div className="space-y-3"></div>
+          return (
+            <div className="space-y-3">
+              <div>Size: {decodedInstructionData.size}</div>
+              <div>Weight: {decodedInstructionData.weight.toNumber()}</div>
+            </div>
+          )
         } catch (e) {
           console.log(e)
           return <div>{JSON.stringify(data)}</div>
