@@ -35,6 +35,7 @@ export const relinquishVote = async (
     governanceAuthority,
     beneficiary
   )
+
   await plugin.withRelinquishVote(instructions, proposal, voteRecord)
 
   const transaction = new Transaction()
