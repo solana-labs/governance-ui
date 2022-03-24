@@ -186,18 +186,18 @@ const REALM = () => {
                   <>
                     <div className="flex items-center justify-between pb-3">
                       <h4 className="font-normal mb-0 text-fgd-2">{`${filteredProposals.length} Proposals`}</h4>
-                      <Input
-                        className="w-44 ml-3"
-                        type="text"
-                        placeholder="Search"
-                        value={proposalSearch}
-                        onChange={(e) => {
-                          setProposalSearch(e.target.value)
-                        }}
-                      ></Input>
                       <div className="flex items-center space-x-4">
                         <ApproveAllBtn />
                         <NewProposalBtn />
+                        <Input
+                          className="w-44 ml-3"
+                          type="text"
+                          placeholder="Search"
+                          value={proposalSearch}
+                          onChange={(e) => {
+                            setProposalSearch(e.target.value)
+                          }}
+                        ></Input>
                         <ProposalFilter
                           filters={filters}
                           setFilters={setFilters}

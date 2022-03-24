@@ -48,7 +48,6 @@ export function useVotingPlugins() {
   const usedCollectionsPks: string[] =
     nftMintRegistrar?.collectionConfigs.map((x) => x.collection.toBase58()) ||
     []
-
   const handleGetNfts = async () => {
     setIsLoadingNfts(true)
     try {
@@ -88,7 +87,6 @@ export function useVotingPlugins() {
         connection.current,
         maxVoterWeightRecord
       )
-      console.log(existingMaxVoterRecord)
       setMaxVoterWeight(existingMaxVoterRecord)
     } catch (e) {
       console.log(e)
@@ -164,7 +162,11 @@ export function useVotingPlugins() {
     connected,
   ])
   useEffect(() => {
-    if (usedCollectionsPks.length && realm) {
+    if (
+      usedCollectionsPks.length &&
+      realm &&
+      currentClient.walletPk?.toBase58()
+    ) {
       if (connected) {
         handleGetNfts()
       }
@@ -178,5 +180,7 @@ export function useVotingPlugins() {
     JSON.stringify(usedCollectionsPks),
     currentPluginPk?.toBase58(),
     connected,
+    realm?.pubkey.toBase58(),
+    currentClient.walletPk?.toBase58(),
   ])
 }
