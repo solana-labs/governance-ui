@@ -235,10 +235,12 @@ export const getTokenTransferSchema = ({
   form,
   connection,
   tokenAmount,
+  mintDecimals,
 }: {
   form: any
   connection: ConnectionContext
   tokenAmount?: BN
+  mintDecimals?: number
 }) => {
   const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
@@ -262,7 +264,9 @@ export const getTokenTransferSchema = ({
           if (val && governedTokenAccount && governedTokenAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
-              governedTokenAccount?.mint.account.decimals
+              mintDecimals
+                ? mintDecimals
+                : governedTokenAccount?.mint.account.decimals
             )
             if (tokenAmount) {
               return tokenAmount.gte(mintValue)

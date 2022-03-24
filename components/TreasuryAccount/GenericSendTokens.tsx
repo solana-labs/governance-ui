@@ -35,10 +35,8 @@ import tokenService from '@utils/services/token'
 import BigNumber from 'bignumber.js'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@solana/spl-governance'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { createProposal } from 'actions/createProposal'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import Textarea from '@components/inputs/Textarea'
@@ -49,9 +47,8 @@ import { getGenericTransferInstruction } from '@utils/instructionTools'
 import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
 import useTotalTokenValue from '@hooks/useTotalTokenValue'
+import useCreateProposal from '@hooks/useCreateProposal'
 
 export type GenericSendTokensProps = {
   mintBeingTransferred: PublicKey
@@ -69,16 +66,8 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   const tokenInfo = tokenAccount.tokenInfo
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
-  const {
-    realmInfo,
-    symbol,
-    realm,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    canChooseWhoVote,
-  } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const { realmInfo, symbol, realm, canChooseWhoVote } = useRealm()
+  const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const isNFT = currentAccount?.isNft
   const { fmtUrlWithCluster } = useQueryContext()
@@ -188,14 +177,6 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
         setIsLoading(false)
         throw 'No realm selected'
       }
-
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
       const instructionData = {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
@@ -209,43 +190,18 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
           governance?.pubkey
         )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-        //Description same as title
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title ? form.title : proposalTitle,
-          form.description ? form.description : '',
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
-          [instructionData],
-          false,
-          client
-        )
+        proposalAddress = await handleCreateProposal({
+          title: form.title ? form.title : proposalTitle,
+          description: form.description ? form.description : '',
+          governance: selectedGovernance,
+          instructionsData: [instructionData],
+          voteByCouncil,
+          isDraft: false,
+        })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
+
         router.push(url)
       } catch (ex) {
         notify({ type: 'error', message: `${ex}` })
@@ -295,6 +251,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     form,
     connection,
     tokenAmount: tokenAccount.amount,
+    mintDecimals: tokenAccount.mintInfo.decimals,
   })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   const nftName = selectedNfts[0]?.val?.name
