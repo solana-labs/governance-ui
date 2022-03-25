@@ -490,5 +490,13 @@
     "twitter": "@neofairies",
     "keywords": "Neo Fairies, Fairies, Fairy, Fantasy, Punk, Create-To-Own, DAO, Governance, Decentralized Entertainment, Decentralised Entertainment, DeEnt, UOC, User-Owned Content, UGC, IP, Intellectual Property, Creative Development, NFT, Tokens, Crypto",
     "ogImage": "/realms/NeoFairies/img/logo.png"
+  },
+  {
+    "symbol": "$RRDG",
+    "displayName": "RadRugsDAO",
+    "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
+    "realmId": "12Q9JeKazwCbMDwiK4Hq9eGgCJJaE37Kt79AUpWwUPqP",
+    "website": "https://www.radrugs.io",
+    "ogImage": "/realms/RadRugsDAO/img/RadRugsDAO.png"
   }
 ]
