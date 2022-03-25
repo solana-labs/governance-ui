@@ -264,6 +264,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.RealmConfig,
+      name: 'Realm config',
+      isVisible: canUseAuthorityInstruction,
+    },
+    {
       id: Instructions.CreateNftPluginMaxVoterWeight,
       name: 'Create NFT plugin max voter weight',
       isVisible: canUseAuthorityInstruction,

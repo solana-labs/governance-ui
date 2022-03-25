@@ -61,6 +61,7 @@ import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
+import RealmConfig from './components/instructions/RealmConfig'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -378,6 +379,8 @@ const New = () => {
             governance={governance}
           ></MakeCreatePerpMarket>
         )
+      case Instructions.RealmConfig:
+        return <RealmConfig index={idx} governance={governance}></RealmConfig>
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>
       case Instructions.Clawback:
