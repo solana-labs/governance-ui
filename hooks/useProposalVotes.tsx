@@ -40,10 +40,10 @@ export default function useProposalVotes(proposal?: Proposal) {
       : getProposalMaxVoteWeight(realm.account, proposal, proposalMint)
 
   const minimumYesVotes =
-    !maxVoteRecord && !isCommunityVote
-      ? fmtTokenAmount(maxVoteWeight, proposalMint.decimals) *
+    maxVoteRecord && isCommunityVote
+      ? fmtTokenAmount(maxVoteWeight, proposalMint.decimals)
+      : fmtTokenAmount(maxVoteWeight, proposalMint.decimals) *
         (voteThresholdPct / 100)
-      : fmtTokenAmount(maxVoteWeight, proposalMint.decimals)
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100
