@@ -97,7 +97,8 @@ export default function useRealm() {
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
-    !mint?.supply.isZero() &&
+    (!mint?.supply.isZero() ||
+      realm.account.config.useCommunityVoterWeightAddin) &&
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
@@ -159,7 +160,11 @@ const getVoterWeight = (
       return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
     }
     if (nftPluginsPks.includes(currentPluginPk.toBase58())) {
-      return new VoteNftWeight(ownTokenRecord, nftVotingPower)
+      return new VoteNftWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        nftVotingPower
+      )
     }
   }
   return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)

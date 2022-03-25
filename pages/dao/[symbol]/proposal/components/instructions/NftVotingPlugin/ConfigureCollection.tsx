@@ -147,7 +147,7 @@ const ConfigureNftPluginCollection = ({
       name: 'size',
       inputType: 'number',
       type: InstructionInputType.INPUT,
-      min: 0,
+      min: 1,
       validateMinMax: true,
     },
     {

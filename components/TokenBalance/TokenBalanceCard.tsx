@@ -36,6 +36,7 @@ import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -161,6 +162,7 @@ const TokenDeposit = ({
     governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
+    config,
   } = useRealm()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
@@ -425,12 +427,16 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
-      {realm?.account.config.useCommunityVoterWeightAddin && (
-        <small className="text-xs mt-3 flex items-center">
-          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-          Please withdraw your tokens and deposit again to get governance power
-        </small>
-      )}
+      {config?.account.communityVoterWeightAddin &&
+        vsrPluginsPks.includes(
+          config?.account.communityVoterWeightAddin.toBase58()
+        ) && (
+          <small className="text-xs mt-3 flex items-center">
+            <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+            Please withdraw your tokens and deposit again to get governance
+            power
+          </small>
+        )}
     </>
   )
 }

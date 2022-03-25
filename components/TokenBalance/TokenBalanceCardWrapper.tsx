@@ -18,9 +18,13 @@ const TokenBalanceCardWrapper = ({
 }: {
   proposal?: Option<Proposal>
 }) => {
-  const { ownTokenRecord, config } = useRealm()
+  const {
+    ownTokenRecord,
+    config,
+    ownCouncilTokenRecord,
+    councilTokenAccount,
+  } = useRealm()
   const currentPluginPk = config?.account?.communityVoterWeightAddin
-
   const getTokenBalanceCard = () => {
     //based on realm config it will provide proper tokenBalanceCardComponent
     const isLockTokensMode =
@@ -39,7 +43,15 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return <NftBalanceCard></NftBalanceCard>
+      return (
+        <>
+          <NftBalanceCard></NftBalanceCard>
+          {(!ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero() ||
+            !councilTokenAccount?.account.amount.isZero()) && (
+            <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
+          )}
+        </>
+      )
     }
     //Default
     return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
