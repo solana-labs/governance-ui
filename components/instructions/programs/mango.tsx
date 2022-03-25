@@ -1,6 +1,11 @@
-import { Connection } from '@solana/web3.js'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { AccountMetaData } from '@solana/spl-governance'
-import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
+import {
+  Config,
+  MangoClient,
+  MangoInstructionLayout,
+} from '@blockworks-foundation/mango-client'
+import dayjs from 'dayjs'
 
 function displayInstructionArgument(decodedArgs, argName) {
   return (
@@ -182,15 +187,95 @@ export const MANGO_INSTRUCTIONS = {
         0: { name: 'Mango Group' },
         1: { name: 'Perp Market' },
       },
-      getDataUI: (
+      getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
+        programId: PublicKey,
+        cluster: string
       ) => {
+        const GROUP = cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
+        const groupConfig = Config.ids().getGroupWithName(GROUP)!
+        const marketConfig = groupConfig!.perpMarkets.find(
+          (x) => x.publicKey.toBase58() === _accounts[1].pubkey.toBase58()
+        )!
+        const client = new MangoClient(_connection, groupConfig.mangoProgramId)
+        const group = await client.getMangoGroup(groupConfig.publicKey)
+
+        const [perpMarket] = await Promise.all([
+          group.loadPerpMarket(
+            _connection,
+            marketConfig.marketIndex,
+            marketConfig.baseDecimals,
+            marketConfig.quoteDecimals
+          ),
+          group.loadRootBanks(_connection),
+        ])
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
           .ChangePerpMarketParams2
+        const progress =
+          1 -
+          perpMarket.liquidityMiningInfo.mngoLeft.toNumber() /
+            args.mngoPerPeriod.toNumber()
+        const start = perpMarket.liquidityMiningInfo.periodStart.toNumber()
+        const now = Date.now() / 1000
+        const elapsed = now - start
+        const est = start + elapsed / progress
+        const maxDepthUi =
+          (args.maxDepthBps.toNumber() * perpMarket.baseLotSize.toNumber()) /
+          Math.pow(10, perpMarket.baseDecimals)
         return (
           <>
+            <>
+              <div>
+                <p className="mb-0">Depth rewarded</p>
+                <div className="font-bold">
+                  {maxDepthUi.toLocaleString() + ' '}
+                  <span className="text-xs font-normal text-th-fgd-3">
+                    {marketConfig.baseSymbol}
+                  </span>
+                </div>
+              </div>
+              <div className="col-span- py-3">
+                <p className="mb-0">Target period length</p>
+                <div className="font-bold">
+                  {(
+                    perpMarket.liquidityMiningInfo.targetPeriodLength.toNumber() /
+                    60
+                  ).toFixed()}{' '}
+                  minutes
+                </div>
+              </div>
+              <div className="col-span-1 py-3">
+                <p className="mb-0">MNGO per period</p>
+                <div className="font-bold">
+                  {(args.mngoPerPeriod.toNumber() / Math.pow(10, 6)).toFixed(2)}
+                </div>
+              </div>
+              <div className="col-span-1 py-3">
+                <p className="mb-0">MNGO left in period</p>
+                <div className="font-bold">
+                  {(
+                    perpMarket.liquidityMiningInfo.mngoLeft.toNumber() /
+                    Math.pow(10, 6)
+                  ).toFixed(2)}
+                </div>
+              </div>
+
+              <div className="col-span-1 py-3">
+                <p className="mb-0">Est period end</p>
+                <div className="font-bold">
+                  {dayjs(est * 1000).format('DD MMM YYYY')}
+                </div>
+                <div className="text-xs text-th-fgd-3">
+                  {dayjs(est * 1000).format('h:mma')}
+                </div>
+              </div>
+              <div className="col-span-1 py-3">
+                <p className="mb-0">Period progress</p>
+                <div className="font-bold">{(progress * 100).toFixed(2)}%</div>
+              </div>
+            </>
             {displayAllArgs(args, ['mngoPerPeriod'])}
             {displayOptionalDecimalArgument(args, 'mngoPerPeriod')}
           </>

@@ -51,7 +51,7 @@ export default function InstructionCard({
   const [tokenImgUrl, setTokenImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
-      connection.current,
+      connection,
       proposalInstruction.account.getSingleInstruction()
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
