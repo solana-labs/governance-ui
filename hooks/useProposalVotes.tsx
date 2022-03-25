@@ -15,7 +15,6 @@ export default function useProposalVotes(proposal?: Proposal) {
     realm?.account.communityMint.toBase58()
       ? mint
       : councilMint
-
   // TODO: optimize using memo
   if (!realm || !proposal || !governance || !proposalMint)
     return {
@@ -28,18 +27,22 @@ export default function useProposalVotes(proposal?: Proposal) {
       yesVotesRequired: 0,
     }
 
+  const isCommunityVote =
+    proposal?.governingTokenMint.toBase58() ===
+    realm?.account.communityMint.toBase58()
+  const isPluginCommunityVoting = maxVoteRecord && isCommunityVote
   const voteThresholdPct =
     (proposal.isVoteFinalized() && proposal.voteThresholdPercentage?.value) ||
     governance.config.voteThresholdPercentage.value
 
-  const maxVoteWeight = maxVoteRecord
+  const maxVoteWeight = isPluginCommunityVoting
     ? maxVoteRecord.account.maxVoterWeight
     : getProposalMaxVoteWeight(realm.account, proposal, proposalMint)
 
-  const minimumYesVotes = !maxVoteRecord
-    ? fmtTokenAmount(maxVoteWeight, proposalMint.decimals) *
+  const minimumYesVotes = isPluginCommunityVoting
+    ? fmtTokenAmount(maxVoteWeight, proposalMint.decimals)
+    : fmtTokenAmount(maxVoteWeight, proposalMint.decimals) *
       (voteThresholdPct / 100)
-    : fmtTokenAmount(maxVoteWeight, proposalMint.decimals)
 
   const yesVotePct = calculatePct(proposal.getYesVoteCount(), maxVoteWeight)
   const yesVoteProgress = (yesVotePct / voteThresholdPct) * 100

@@ -137,7 +137,9 @@ const VotePanel = () => {
 
   const actionLabel =
     !isVoteCast || !connected
-      ? 'Cast your vote'
+      ? `Cast your ${
+          tokenType === GoverningTokenType.Community ? 'community' : 'council'
+        } vote`
       : isVoting
       ? 'Withdraw your vote'
       : 'Release your tokens'

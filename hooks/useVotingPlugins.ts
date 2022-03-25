@@ -15,7 +15,6 @@ export const vsrPluginsPks: string[] = [
 
 export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
-  'FDfF7jzJDCEkFWNi3is487k8rFPJxFkU821t2pQ1vDr1', // TODO: Remove after tested on devnet
 ]
 
 export function useVotingPlugins() {
@@ -162,12 +161,8 @@ export function useVotingPlugins() {
     connected,
   ])
   useEffect(() => {
-    if (
-      usedCollectionsPks.length &&
-      realm &&
-      currentClient.walletPk?.toBase58()
-    ) {
-      if (connected) {
+    if (usedCollectionsPks.length && realm) {
+      if (connected && currentClient.walletPk?.toBase58()) {
         handleGetNfts()
       }
 

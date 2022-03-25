@@ -18,6 +18,7 @@ import {
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
+import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -446,7 +447,14 @@ export const getRealmCfgSchema = ({ form }) => {
           }
           if (val) {
             try {
-              return !!getValidatedPublickKey(val)
+              getValidatedPublickKey(val)
+              if ([...nftPluginsPks, ...vsrPluginsPks].includes(val)) {
+                return true
+              } else {
+                return this.createError({
+                  message: `Provided pubkey is not a known plugin pubkey`,
+                })
+              }
             } catch (e) {
               console.log(e)
               return this.createError({
@@ -471,7 +479,14 @@ export const getRealmCfgSchema = ({ form }) => {
           }
           if (val) {
             try {
-              return !!getValidatedPublickKey(val)
+              getValidatedPublickKey(val)
+              if ([...nftPluginsPks].includes(val)) {
+                return true
+              } else {
+                return this.createError({
+                  message: `Provided pubkey is not a known plugin pubkey`,
+                })
+              }
             } catch (e) {
               console.log(e)
               return this.createError({

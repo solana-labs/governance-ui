@@ -18,6 +18,7 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+import { ConnectionContext } from '@utils/connection'
 import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 /**
  * Default governance program id instance
@@ -177,7 +178,7 @@ export const INSTRUCTION_DESCRIPTORS = {
 }
 
 export async function getInstructionDescriptor(
-  connection: Connection,
+  connection: ConnectionContext,
   instruction: InstructionData
 ) {
   let descriptors: any
@@ -195,10 +196,11 @@ export async function getInstructionDescriptor(
     : descriptors && descriptors[instruction.data[0]]
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
-      connection,
+      connection.current,
       instruction.data,
       instruction.accounts,
-      instruction.programId
+      instruction.programId,
+      connection.cluster
     ))) ?? <>{JSON.stringify(instruction.data)}</>
   return {
     name: descriptor?.name,
