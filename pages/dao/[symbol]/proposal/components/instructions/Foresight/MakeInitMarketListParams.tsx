@@ -48,7 +48,6 @@ const MakeInitMarketListParams = ({
     setFormErrors(validationErrors)
     return isValid
   }
-  const connection = useWalletStore((s) => s.connection).current
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
