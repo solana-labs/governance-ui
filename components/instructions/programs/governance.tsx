@@ -59,7 +59,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
-              )}`}
+              )}`}{' '}
+              ({args.config.minCommunityTokensToCreateProposal.toNumber()})
             </p>
             <p>
               {`minCouncilTokensToCreateProposal:
@@ -161,7 +162,9 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${fmtMintAmount(
                 communityMint?.account,
                 args.configArgs.minCommunityTokensToCreateGovernance
-              )}`}
+              )}`}{' '}
+              ({args.configArgs.minCommunityTokensToCreateGovernance.toNumber()}
+              )
             </p>
             <p>
               {`useCouncilMint:
@@ -169,7 +172,10 @@ export const GOVERNANCE_INSTRUCTIONS = {
             </p>
             <p>
               {`communityMintMaxVoteWeightSource:
-               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+              (
+              {args.configArgs.communityMintMaxVoteWeightSource.value.toNumber()}
+              )
             </p>
             <p>
               {`useCommunityVoterWeightAddin:
