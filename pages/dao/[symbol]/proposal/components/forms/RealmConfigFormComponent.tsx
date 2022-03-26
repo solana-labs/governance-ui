@@ -158,6 +158,7 @@ const RealmConfigFormComponent = ({
     <>
       {form && (
         <InstructionForm
+          outerForm={form}
           setForm={setForm}
           inputs={inputs}
           setFormErrors={setFormErrors}
