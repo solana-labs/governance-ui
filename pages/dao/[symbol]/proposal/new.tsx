@@ -58,6 +58,8 @@ import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket
 import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
+import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
+import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -354,12 +356,19 @@ const New = () => {
             governance={governance}
           ></MakeCreatePerpMarket>
         )
-      case Instructions.ForesightDoThing:
+      case Instructions.ForesightInitMarket:
         return (
-          <MakeChangeReferralFeeParams
+          <MakeInitMarketParams
             index={idx}
             governance={governance}
-          ></MakeChangeReferralFeeParams>
+          ></MakeInitMarketParams>
+        )
+      case Instructions.ForesightInitMarketList:
+        return (
+          <MakeInitMarketListParams
+            index={idx}
+            governance={governance}
+          ></MakeInitMarketListParams>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>

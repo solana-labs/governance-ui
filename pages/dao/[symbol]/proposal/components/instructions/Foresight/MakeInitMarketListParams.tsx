@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ForesightMakeInitMarketParams,
+  ForesightMakeInitMarketListParams,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
@@ -21,7 +21,7 @@ import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { Wallet } from '@project-serum/anchor/src/provider'
 
-const MakeInitMarketParams = ({
+const MakeInitMarketListParams = ({
   index,
   governance,
 }: {
@@ -33,10 +33,9 @@ const MakeInitMarketParams = ({
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<ForesightMakeInitMarketParams>({
+  const [form, setForm] = useState<ForesightMakeInitMarketListParams>({
     governedAccount: undefined,
     marketListId: '',
-    marketId: 0,
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -49,6 +48,7 @@ const MakeInitMarketParams = ({
     setFormErrors(validationErrors)
     return isValid
   }
+  const connection = useWalletStore((s) => s.connection).current
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
@@ -56,16 +56,15 @@ const MakeInitMarketParams = ({
       const program: PredictionMarketProgram = new Program(
         IDL,
         'DHrfeiGybZDrU2HSX5eGahSXSa4u9ECZJPigNHeDuGT3',
-        new Provider({} as Connection, {} as Wallet, {} as ConfirmOptions)
+        new Provider(connection, {} as Wallet, { commitment: 'finalized' })
       )
-      const { ix: initMarketIx } = await foresightGov.genInitMarketIx(
+      const { ix: initMarketListIx } = await foresightGov.genInitMarketListIx(
         Buffer.from(form.marketListId.padEnd(20)),
-        Uint8Array.from([form.marketId]),
         program,
         new PublicKey('9r1fxNbhQrd5ov8HSufrcYMqDhxphWuTjPfHdr1SDJ7L')
       )
 
-      serializedInstruction = serializeInstructionToBase64(initMarketIx)
+      serializedInstruction = serializeInstructionToBase64(initMarketListIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -92,7 +91,6 @@ const MakeInitMarketParams = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    marketId: yup.number().required(),
     marketListId: yup.string().required(),
   })
 
@@ -110,18 +108,6 @@ const MakeInitMarketParams = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Market ID"
-        value={form.marketId}
-        type="number"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'marketId',
-          })
-        }
-        error={formErrors['marketId']}
-      />
-      <Input
         label="Market List ID"
         value={form.marketListId}
         type="text"
@@ -138,4 +124,4 @@ const MakeInitMarketParams = ({
   )
 }
 
-export default MakeInitMarketParams
+export default MakeInitMarketListParams

@@ -191,6 +191,11 @@ export interface ForesightMakeInitMarketParams {
   marketListId: string
   marketId: number
 }
+
+export interface ForesightMakeInitMarketListParams {
+  governedAccount: GovernedProgramAccount | undefined
+  marketListId: string
+}
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string
@@ -261,7 +266,8 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
-  ForesightDoThing,
+  ForesightInitMarket,
+  ForesightInitMarketList,
 }
 
 export type createParams = [
