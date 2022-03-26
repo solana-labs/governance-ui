@@ -16,6 +16,7 @@ import PaginationComponent from '@components/Pagination'
 import Tabs from '@components/Tabs'
 import AboutRealm from '@components/AboutRealm'
 import Input from '@components/inputs/Input'
+import { SearchIcon } from '@heroicons/react/outline'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
@@ -184,20 +185,29 @@ const REALM = () => {
                 />
                 {activeTab === 'Proposals' && (
                   <>
-                    <div className="flex items-center justify-between pb-3">
-                      <h4 className="font-normal mb-0 text-fgd-2">{`${filteredProposals.length} Proposals`}</h4>
-                      <div className="flex items-center space-x-4">
-                        <ApproveAllBtn />
-                        <NewProposalBtn />
+                    <div className="flex flex-col-reverse lg:flex-row lg:items-center lg:justify-between pb-3 lg:space-x-4">
+                      <div className="flex items-center justify-between space-x-3 w-full">
+                        <h4 className="font-normal mb-0 text-fgd-2">{`${
+                          filteredProposals.length
+                        } Proposal${
+                          filteredProposals.length === 1 ? '' : 's'
+                        }`}</h4>
+                        <div className="flex space-x-4">
+                          <ApproveAllBtn />
+                          <NewProposalBtn />
+                        </div>
+                      </div>
+                      <div className="flex items-center pb-4 lg:pb-0 space-x-3">
                         <Input
-                          className="w-44 ml-3"
+                          className="pl-8 w-full lg:w-44"
                           type="text"
-                          placeholder="Search"
+                          placeholder="Search Proposals"
                           value={proposalSearch}
                           onChange={(e) => {
                             setProposalSearch(e.target.value)
                           }}
-                        ></Input>
+                          prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />}
+                        />
                         <ProposalFilter
                           filters={filters}
                           setFilters={setFilters}
