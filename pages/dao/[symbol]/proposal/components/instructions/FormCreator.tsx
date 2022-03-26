@@ -44,10 +44,6 @@ const InstructionForm = ({
   formErrors
   setForm: React.Dispatch<React.SetStateAction<any>>
 }) => {
-  const initialValues = {
-    ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
-  }
-
   const [form, setInnerForm] = useState({})
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
@@ -60,7 +56,7 @@ const InstructionForm = ({
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
-  }, [JSON.stringify(initialValues)])
+  }, [])
   return (
     <>
       {inputs
