@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
+import { ConfirmOptions, Connection, PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
@@ -56,7 +56,7 @@ const MakeInitMarketListParams = ({
       const program: PredictionMarketProgram = new Program(
         IDL,
         'DHrfeiGybZDrU2HSX5eGahSXSa4u9ECZJPigNHeDuGT3',
-        new Provider(connection, {} as Wallet, { commitment: 'finalized' })
+        new Provider({} as Connection, {} as Wallet, {} as ConfirmOptions)
       )
       const { ix: initMarketListIx } = await foresightGov.genInitMarketListIx(
         Buffer.from(form.marketListId.padEnd(20)),
