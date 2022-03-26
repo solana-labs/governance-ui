@@ -116,6 +116,7 @@ const CreateNftPluginRegistrar = ({
   return (
     <>
       <InstructionForm
+        outerForm={form}
         setForm={setForm}
         inputs={inputs}
         setFormErrors={setFormErrors}

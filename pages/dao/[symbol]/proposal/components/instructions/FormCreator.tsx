@@ -38,16 +38,18 @@ const InstructionForm = ({
   setFormErrors,
   setForm,
   formErrors,
+  outerForm,
 }: {
   inputs: InstructionInput[]
   setFormErrors: React.Dispatch<React.SetStateAction<any>>
   formErrors
   setForm: React.Dispatch<React.SetStateAction<any>>
+  outerForm: any
 }) => {
   const [form, setInnerForm] = useState({})
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
-    setInnerForm({ ...form, [propertyName]: value })
+    setInnerForm({ ...outerForm, [propertyName]: value })
   }
   useEffect(() => {
     setForm(form)
