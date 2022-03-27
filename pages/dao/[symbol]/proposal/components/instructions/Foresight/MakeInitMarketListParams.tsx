@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
-import { ConfirmOptions, Connection, PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
@@ -15,11 +15,11 @@ import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { Program, Provider } from '@project-serum/anchor'
-import { governance as foresightGov, IDL } from '@foresight-tmp/foresight-sdk'
-import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
+import {
+  governance as foresightGov,
+  consts as foresightConsts,
+} from '@foresight-tmp/foresight-sdk'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
-import { Wallet } from '@project-serum/anchor/src/provider'
 
 const MakeInitMarketListParams = ({
   index,
@@ -52,11 +52,7 @@ const MakeInitMarketListParams = ({
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
-      const program: PredictionMarketProgram = new Program(
-        IDL,
-        'DHrfeiGybZDrU2HSX5eGahSXSa4u9ECZJPigNHeDuGT3',
-        new Provider({} as Connection, {} as Wallet, {} as ConfirmOptions)
-      )
+      const program = foresightGov.readonlyProgram(foresightConsts.DEVNET_PID)
       const { ix: initMarketListIx } = await foresightGov.genInitMarketListIx(
         Buffer.from(form.marketListId.padEnd(20)),
         program,

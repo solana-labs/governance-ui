@@ -60,6 +60,7 @@ import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerp
 import useCreateProposal from '@hooks/useCreateProposal'
 import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMarketParams'
 import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
+import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -369,6 +370,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeInitMarketListParams>
+        )
+      case Instructions.ForesightInitCategory:
+        return (
+          <MakeInitCategoryParams
+            index={idx}
+            governance={governance}
+          ></MakeInitCategoryParams>
         )
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>

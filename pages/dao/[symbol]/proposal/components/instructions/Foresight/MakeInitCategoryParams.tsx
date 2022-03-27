@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ForesightMakeInitMarketParams,
+  ForesightMakeInitCategoryParams,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
@@ -21,7 +21,7 @@ import {
 } from '@foresight-tmp/foresight-sdk'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
-const MakeInitMarketParams = ({
+const MakeInitCategoryParams = ({
   index,
   governance,
 }: {
@@ -33,10 +33,9 @@ const MakeInitMarketParams = ({
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<ForesightMakeInitMarketParams>({
+  const [form, setForm] = useState<ForesightMakeInitCategoryParams>({
     governedAccount: undefined,
-    marketListId: '',
-    marketId: 0,
+    categoryId: '',
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
@@ -54,14 +53,13 @@ const MakeInitMarketParams = ({
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
       const program = foresightGov.readonlyProgram(foresightConsts.DEVNET_PID)
-      const { ix: initMarketIx } = await foresightGov.genInitMarketIx(
-        Buffer.from(form.marketListId.padEnd(20)),
-        Uint8Array.from([form.marketId]),
+      const { ix: initCategoryIx } = await foresightGov.genInitCategoryIx(
+        Buffer.from(form.categoryId.padEnd(20)),
         program,
         new PublicKey('9r1fxNbhQrd5ov8HSufrcYMqDhxphWuTjPfHdr1SDJ7L')
       )
 
-      serializedInstruction = serializeInstructionToBase64(initMarketIx)
+      serializedInstruction = serializeInstructionToBase64(initCategoryIx)
     }
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
@@ -88,8 +86,7 @@ const MakeInitMarketParams = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    marketId: yup.number().required(),
-    marketListId: yup.string().required(),
+    categoryId: yup.string().required(),
   })
 
   return (
@@ -106,32 +103,20 @@ const MakeInitMarketParams = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Market ID"
-        value={form.marketId}
-        type="number"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'marketId',
-          })
-        }
-        error={formErrors['marketId']}
-      />
-      <Input
-        label="Market List ID"
-        value={form.marketListId}
+        label="Category ID"
+        value={form.categoryId}
         type="text"
         min={0}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'marketListId',
+            propertyName: 'categoryId',
           })
         }
-        error={formErrors['marketListID']}
+        error={formErrors['categoryIdd']}
       />
     </>
   )
 }
 
-export default MakeInitMarketParams
+export default MakeInitCategoryParams
