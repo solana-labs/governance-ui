@@ -8,10 +8,6 @@ import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import useGovernanceAssetsStore, {
   AccountType,
 } from 'stores/useGovernanceAssetsStore'
-import {
-  getFormattedStringFromDays,
-  SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
 import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
 import Button from '@components/Button'
@@ -20,12 +16,13 @@ import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 import RealmConfigModal from './RealmConfigModal'
 import GovernanceConfigModal from './GovernanceConfigModal'
-import { VoteTipping } from '@solana/spl-governance'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 
+import ParamsView from './components/ParamsView'
+
 const Params = () => {
-  const { realm, mint, councilMint, ownVoterWeight } = useRealm()
+  const { realm, mint } = useRealm()
 
   const { canUseAuthorityInstruction } = useGovernanceAssets()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
@@ -234,108 +231,16 @@ const Params = () => {
                   <Tabs
                     activeTab={activeTab}
                     onChange={(t) => setActiveTab(t)}
-                    tabs={['Params', 'Accounts']}
+                    tabs={['Params', 'Accounts', 'Statistics']}
                   />
                 ) : null}
-                {activeTab === 'Params' ? (
-                  <>
-                    <DisplayField
-                      label="owner"
-                      padding
-                      val={activeGovernance.owner.toBase58()}
-                    />
-                    {realmAccount?.authority?.toBase58() ===
-                      activeGovernance.pubkey.toBase58() && (
-                      <DisplayField
-                        label="Realm Authority"
-                        padding
-                        val={'Yes'}
-                      />
-                    )}
-                    <DisplayField
-                      label="Proposals Count"
-                      padding
-                      val={activeGovernance.account.proposalCount}
-                    />
-                    <DisplayField
-                      label="Voting Proposals Count"
-                      padding
-                      val={activeGovernance.account.votingProposalCount}
-                    />
-                    <DisplayField
-                      label="Max Voting Time"
-                      padding
-                      val={getFormattedStringFromDays(
-                        activeGovernance.account.config.maxVotingTime /
-                          SECS_PER_DAY
-                      )}
-                    />
-                    {communityMint && (
-                      <DisplayField
-                        label="Min community tokens to create a proposal"
-                        padding
-                        val={fmtMintAmount(
-                          mint,
-                          activeGovernance.account.config
-                            .minCommunityTokensToCreateProposal
-                        )}
-                      />
-                    )}
-                    {councilMint && (
-                      <DisplayField
-                        label="Min council tokens to create a proposal"
-                        padding
-                        val={fmtMintAmount(
-                          councilMint,
-                          activeGovernance.account.config
-                            .minCouncilTokensToCreateProposal
-                        )}
-                      />
-                    )}
-                    <DisplayField
-                      label="Min Instruction Holdup Time"
-                      padding
-                      val={
-                        activeGovernance.account.config.minInstructionHoldUpTime
-                      }
-                    />
-                    <DisplayField
-                      label="Proposal Cool-off Time"
-                      padding
-                      val={activeGovernance.account.config.proposalCoolOffTime}
-                    />
-                    <DisplayField
-                      label="Vote Threshold Percentage"
-                      padding
-                      val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
-                    />
-                    <DisplayField
-                      label="Vote Tipping"
-                      padding
-                      val={
-                        VoteTipping[
-                          activeGovernance.account.config.voteTipping as any
-                        ]
-                      }
-                    />
-                    <div className="flex">
-                      <Button
-                        disabled={
-                          !ownVoterWeight.canCreateProposal(
-                            activeGovernance.account.config
-                          )
-                        }
-                        tooltipMessage={
-                          'Please connect wallet with enough voting power to create governance config proposals'
-                        }
-                        onClick={openGovernanceProposalModal}
-                        className="ml-auto"
-                      >
-                        Change config
-                      </Button>
-                    </div>
-                  </>
-                ) : (
+                {activeTab === 'Params' && (
+                  <ParamsView
+                    activeGovernance={activeGovernance}
+                    openGovernanceProposalModal={openGovernanceProposalModal}
+                  />
+                )}
+                {activeTab === 'Accounts' && (
                   <div className="space-y-3">
                     {activeGovernance.accounts.map((x) => {
                       const info = getTreasuryAccountItemInfoV2(x)
