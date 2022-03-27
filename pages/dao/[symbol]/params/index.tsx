@@ -18,6 +18,7 @@ import { getAccountName } from '@components/instructions/tools'
 
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
+import StatsView from './components/StatsView'
 
 const Params = () => {
   const { realm, mint } = useRealm()
@@ -243,6 +244,9 @@ const Params = () => {
                     activeGovernance={activeGovernance}
                     getYesNoString={getYesNoString}
                   />
+                )}
+                {activeTab === 'Statistics' && (
+                  <StatsView activeGovernance={activeGovernance} />
                 )}
               </div>
             ) : null}

@@ -3,8 +3,21 @@ import { capitalize } from '@utils/helpers'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 
-const StatsView = () => {
-  return <div>StatsView</div>
+const StatsView = ({ activeGovernance }) => {
+  return (
+    <>
+      <DisplayField
+        label="Proposals Count"
+        padding
+        val={activeGovernance.account.proposalCount}
+      />
+      <DisplayField
+        label="Voting Proposals Count"
+        padding
+        val={activeGovernance.account.votingProposalCount}
+      />
+    </>
+  )
 }
 
 const DisplayField = ({ label, val, padding = false, bg = false }) => {
