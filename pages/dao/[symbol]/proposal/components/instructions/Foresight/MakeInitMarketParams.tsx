@@ -19,7 +19,7 @@ import {
   governance as foresightGov,
   consts as foresightConsts,
 } from '@foresight-tmp/foresight-sdk'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const MakeInitMarketParams = ({
   index,
@@ -30,7 +30,7 @@ const MakeInitMarketParams = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ForesightMakeInitMarketParams>({
@@ -96,7 +96,9 @@ const MakeInitMarketParams = ({
     <>
       <GovernedAccountSelect
         label="Program"
-        governedAccounts={governedMultiTypeAccounts}
+        governedAccounts={
+          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
+        }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
