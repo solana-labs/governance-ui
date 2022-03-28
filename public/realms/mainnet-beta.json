@@ -5,7 +5,19 @@
     "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
     "realmId": "5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d",
     "bannerImage": "/realms/Ukraine/img/Flag_of_Ukraine.svg",
-    "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png"
+    "ogImage": "/realms/Ukraine/img/Ukraine_Logo.png",
+    "sharedWalletId": "66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV"
+  },
+  {
+    "symbol": "UkraineUnchained",
+    "displayName": "#Unchain_Ukraine",
+    "programId": "gUAedF544JeE6NYbQakQvribHykUNgaPJqcgf3UQVnY",
+    "realmId": "HbdBjuyRtxJd4zCMCsvg64ajtxqk4vWogf8FtQpZcs54",
+    "bannerImage": "/realms/UkraineUnchained/img/ukraine_unchained_banner.jpeg",
+    "ogImage": "/realms/UkraineUnchained/img/ukraine_unchained.png",
+    "website": "https://unchain.fund",
+    "twitter": "@Unchainfund",
+    "sharedWalletId": "BnBe9uwucnLWpKqzgtvGU2aURRXezcqEVCoL8L6CeDgF"
   },
   {
     "symbol": "MNGO",
