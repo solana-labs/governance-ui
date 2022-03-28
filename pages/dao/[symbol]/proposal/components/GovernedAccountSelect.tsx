@@ -138,6 +138,7 @@ const GovernedAccountSelect = ({
         .map((acc) => {
           return (
             <Select.Option
+              className="border-red"
               key={acc.governance?.account.governedAccount.toBase58()}
               value={acc}
             >
