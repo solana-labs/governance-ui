@@ -83,6 +83,10 @@ button {
   @apply mb-4;
 }
 
+.markdown a {
+  @apply text-fgd-2 transition-all duration-300 underline hover:text-fgd-3 hover:no-underline;
+}
+
 .markdown li {
   @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
 }
