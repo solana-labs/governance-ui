@@ -23,15 +23,17 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
     ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
     : ''
 
-  const renderAddressName = (walletAddress) => (
-    <DisplayAddress
-      connection={connection.current}
-      address={walletAddress}
-      height="12px"
-      width="100px"
-      dark={true}
-    />
-  )
+  const renderAddressName = (walletAddress) => {
+    return (
+      <DisplayAddress
+        connection={connection.current}
+        address={walletAddress}
+        height="12px"
+        width="100px"
+        dark={true}
+      />
+    )
+  }
   const renderAddressImage = (walletAddress) => (
     <AddressImage
       dark={true}

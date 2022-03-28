@@ -27,7 +27,7 @@ import { WalletTokenRecordWithProposal } from './types'
 import useMembers from '@components/Members/useMembers'
 import PaginationComponent from '@components/Pagination'
 
-const MemberOverview = ({ member }: { member?: Member }) => {
+const MemberOverview = ({ member }: { member: Member }) => {
   const { realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
@@ -40,23 +40,27 @@ const MemberOverview = ({ member }: { member?: Member }) => {
   const [recentVotes, setRecentVotes] = useState<
     WalletTokenRecordWithProposal[]
   >([])
-  const { walletAddress, councilVotes, communityVotes, votesCasted } = member!
+  const { walletAddress, councilVotes, communityVotes, votesCasted } = member
+
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
     ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
     : ''
-  const communityAmount =
-    communityVotes && !communityVotes.isZero()
-      ? useMemo(() => fmtMintAmount(mint, communityVotes), [
-          member!.walletAddress,
-        ])
-      : null
-  const councilAmount =
-    councilVotes && !councilVotes.isZero()
-      ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
-          member!.walletAddress,
-        ])
-      : null
+  const communityAmount = useMemo(
+    () =>
+      communityVotes && communityVotes && !communityVotes.isZero()
+        ? fmtMintAmount(mint, communityVotes)
+        : '',
+    [walletAddress]
+  )
+
+  const councilAmount = useMemo(
+    () =>
+      councilVotes && councilVotes && !councilVotes.isZero()
+        ? fmtMintAmount(councilMint, councilVotes)
+        : '',
+    [walletAddress]
+  )
 
   const getVoteRecordsAndChatMsgs = async () => {
     let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
@@ -66,12 +70,12 @@ const MemberOverview = ({ member }: { member?: Member }) => {
         getVoteRecordsByVoterMapByProposal(
           connection.current,
           selectedRealm!.programId!,
-          new PublicKey(member!.walletAddress)
+          new PublicKey(walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
           connection!.current,
           GOVERNANCE_CHAT_PROGRAM_ID,
-          new PublicKey(member!.walletAddress)
+          new PublicKey(walletAddress)
         ),
       ])
       voteRecords = results[0]
@@ -134,7 +138,11 @@ const MemberOverview = ({ member }: { member?: Member }) => {
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
-  }, [activeMembers])
+  }, [JSON.stringify(activeMembers)])
+
+  useEffect(() => {
+    setRecentVotes(paginateVotes(0))
+  }, [JSON.stringify(ownVoteRecords)])
 
   const perPage = 8
   const totalPages = Math.ceil(ownVoteRecords.length / perPage)
@@ -144,10 +152,6 @@ const MemberOverview = ({ member }: { member?: Member }) => {
   const paginateVotes = (page) => {
     return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
   }
-
-  useEffect(() => {
-    setRecentVotes(paginateVotes(0))
-  }, [ownVoteRecords])
 
   return (
     <>
@@ -198,18 +202,20 @@ const MemberOverview = ({ member }: { member?: Member }) => {
           <div className="flex">
             <p>
               Yes Votes:{' '}
-              {ownVoteRecords.filter((v) => isYesVote(v.account)).length}
+              {ownVoteRecords.filter((v) => isYesVote(v.account))?.length}
             </p>
             <span className="px-2 text-fgd-4">|</span>
             <p>
               No Votes:{' '}
-              {ownVoteRecords.filter((v) => !isYesVote(v.account)).length}
+              {ownVoteRecords.filter((v) => !isYesVote(v.account))?.length}
             </p>
           </div>
         </div>
       </div>
       <div className="pt-4">
-        <h3 className="mb-3 text-base">{ownVoteRecords.length} Recent Votes</h3>
+        <h3 className="mb-3 text-base">
+          {ownVoteRecords?.length} Recent Votes
+        </h3>
         {recentVotes.map((x) => (
           <a
             href={fmtUrlWithCluster(
@@ -233,7 +239,7 @@ const MemberOverview = ({ member }: { member?: Member }) => {
                 </p>
               )}
             </div>
-            {x.chatMessages.length > 0 ? (
+            {x.chatMessages?.length > 0 ? (
               <>
                 {x.chatMessages.map((msg, index) => (
                   <div
