@@ -18,6 +18,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+  "symbol": "POOR",
+  "displayName": "PoorDao (Famous Fox Edition)",
+  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "realmId": "12gEDQvesi9qSMoXcY1LSHxGqArUXZ2HemihyEShpoWf",
+  "website": "https://famousfoxes.com",
+  "twitter": "@PoorDao_FFF",
+  "ogImage": "/realms/Ukraine/img/archer.png"
+  },
+  {
     "symbol": "SOCEAN",
     "programId": "5hAykmD4YGcQ7Am3N7nC9kyELq6CThAkU82nhNKDJiCy",
     "realmId": "759qyfKDMMuo9v36tW7fbGanL63mZFPNbhU7zjPrkuGK",
