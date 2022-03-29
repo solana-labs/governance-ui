@@ -9,6 +9,7 @@ import {
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
 const Empty = ({
   index,
   governance,
@@ -19,6 +20,7 @@ const Empty = ({
   const [form, setForm] = useState<EmptyInstructionForm>({
     governedAccount: undefined,
   })
+  const { ownVoterWeight } = useRealm()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
   const [formErrors, setFormErrors] = useState({})
@@ -52,7 +54,9 @@ const Empty = ({
   return (
     <GovernedAccountSelect
       label="Governance"
-      governedAccounts={governedMultiTypeAccounts}
+      governedAccounts={governedMultiTypeAccounts.filter((x) =>
+        ownVoterWeight.canCreateProposal(x.governance.account.config)
+      )}
       onChange={(value) => {
         handleSetForm({ value, propertyName: 'governedAccount' })
       }}

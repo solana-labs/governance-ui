@@ -5,6 +5,7 @@ import { UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import tokenService from '@utils/services/token'
 import { fmtMintAmount } from '@tools/sdk/units'
+import { PublicKey } from '@solana/web3.js'
 
 interface MembersTabsProps {
   activeTab: any
@@ -27,7 +28,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
     return (
       <DisplayAddress
         connection={connection.current}
-        address={walletAddress}
+        address={new PublicKey(walletAddress)}
         height="12px"
         width="100px"
         dark={true}
@@ -38,7 +39,7 @@ const MembersTabs: FunctionComponent<MembersTabsProps> = ({
     <AddressImage
       dark={true}
       connection={connection.current}
-      address={walletAddress}
+      address={new PublicKey(walletAddress)}
       height="32px"
       width="32px"
       placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
