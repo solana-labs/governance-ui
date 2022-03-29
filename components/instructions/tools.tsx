@@ -107,7 +107,8 @@ export const ACCOUNT_NAMES = {
     'ClubDAO Main SOL Treasury Vault',
   '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
   Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
-    'ClubDAO Main NFT Treasury Vault ',
+    'ClubDAO Main NFT Treasury Vault',
+  Cb4uLreZRcb7kbu6gbsGJp2xjnU5K25MDZbvFknBFyqU: 'ClubDAO NMBC Royalties Vault',
 }
 
 // Blacklisted governances which should not be displayed in the UI
