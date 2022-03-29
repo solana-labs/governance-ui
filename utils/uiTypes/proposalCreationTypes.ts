@@ -285,6 +285,7 @@ export enum Instructions {
   ForesightInitMarket,
   ForesightInitMarketList,
   ForesightInitCategory,
+  ForesightResolveMarket,
 }
 
 export type createParams = [
