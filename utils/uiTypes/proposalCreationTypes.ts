@@ -186,20 +186,31 @@ export interface MangoMakeChangeReferralFeeParams {
   refMngoRequired: number
 }
 
-export interface ForesightMakeInitMarketParams {
+interface ForesightHasGovernedAccount {
   governedAccount: GovernedProgramAccount | undefined
+}
+
+export interface ForesightMakeInitMarketParams
+  extends ForesightHasGovernedAccount {
   marketListId: string
   marketId: number
 }
 
-export interface ForesightMakeInitMarketListParams {
-  governedAccount: GovernedProgramAccount | undefined
+export interface ForesightMakeInitMarketListParams
+  extends ForesightHasGovernedAccount {
   marketListId: string
 }
 
-export interface ForesightMakeInitCategoryParams {
-  governedAccount: GovernedProgramAccount | undefined
+export interface ForesightMakeInitCategoryParams
+  extends ForesightHasGovernedAccount {
   categoryId: string
+}
+
+export interface ForesightMakeResolveMarketParams
+  extends ForesightHasGovernedAccount {
+  marketListId: string
+  marketId: number
+  winner: number
 }
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
