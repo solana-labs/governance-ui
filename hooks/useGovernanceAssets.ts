@@ -10,7 +10,9 @@ import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import useWalletStore from 'stores/useWalletStore'
 
 import useRealm from './useRealm'
-import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import useGovernanceAssetsStore, {
+  AccountType,
+} from 'stores/useGovernanceAssetsStore'
 import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
@@ -19,6 +21,7 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  console.log(governedTokenAccounts)
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
@@ -126,15 +129,21 @@ export default function useGovernanceAssets() {
     return governedMintInfoAccounts
   }
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
-    (x) => !x.isNft
+    (x) => x.type !== AccountType.NFT
   )
   const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (govTokenAcc) => govTokenAcc.isNft
+    (govTokenAcc) => govTokenAcc.type === AccountType.NFT
   )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
-    (acc) =>
-      acc.governance &&
-      ownVoterWeight.canCreateProposal(acc.governance?.account?.config)
+    (acc) => {
+      const governance = governancesArray.find(
+        (x) => acc.governancePubkey.toBase58() === x.pubkey.toBase58()
+      )
+      return (
+        governance &&
+        ownVoterWeight.canCreateProposal(governance?.account?.config)
+      )
+    }
   )
   const availableInstructions = [
     {

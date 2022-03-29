@@ -15,7 +15,6 @@ import {
 import {
   AccountInfoGen,
   getMultipleAccountInfoChunked,
-  GovernedTokenAccount,
   parseMintAccountData,
   parseTokenAccountData,
   TokenProgramAccount,
@@ -29,7 +28,7 @@ import tokenService from '@utils/services/token'
 import { ConnectionContext } from '@utils/connection'
 import axios from 'axios'
 const tokenAccountOwnerOffset = 32
-interface TokenAccountExtension {
+interface AccountExtension {
   mint?: TokenProgramAccount<MintInfo> | undefined
   transferAddress?: PublicKey
   amount?: u64
@@ -38,9 +37,10 @@ interface TokenAccountExtension {
 }
 
 export interface Account {
+  governancePubkey: PublicKey
   pubkey: PublicKey
   type: AccountType
-  extensions: TokenAccountExtension
+  extensions: AccountExtension
 }
 interface GovernedAccount extends ProgramAccount<Governance> {
   accounts: Account[]
@@ -55,13 +55,12 @@ export enum AccountType {
 }
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
-  governedTokenAccounts: GovernedTokenAccount[]
+  governedTokenAccounts: Account[]
   governedAccounts: GovernedAccount[]
   loadGovernedAccounts: boolean
   setGovernancesArray: (governances: {
     [governance: string]: ProgramAccount<Governance>
   }) => void
-  setGovernedTokenAccounts: (items: GovernedTokenAccount[]) => void
   setGovernedAccounts: (
     connection: ConnectionContext,
     realm: ProgramAccount<Realm>
@@ -143,7 +142,6 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       ]),
     })
     const tokenAccountsJson = getProgramAccounts.data
-    console.log(tokenAccountsJson)
     const tokenAccounts = tokenAccountsJson
       .flatMap((x) => x.result)
       .map((x) => {
@@ -162,11 +160,14 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     set((s) => {
       s.governedAccounts = governedAccounts
       s.loadGovernedAccounts = false
-    })
-  },
-  setGovernedTokenAccounts: (items) => {
-    set((s) => {
-      s.governedTokenAccounts = items
+      s.governedTokenAccounts = governedAccounts
+        .flatMap((x) => x.accounts)
+        .filter(
+          (x) =>
+            x.type === AccountType.TOKEN ||
+            x.type === AccountType.SOL ||
+            x.type === AccountType.NFT
+        )
     })
   },
   //TODO refresh governance, refresh account methods
@@ -224,9 +225,9 @@ const getTokenAccountsObj = async (
     }
   }
   if (isNft) {
-    return new AccountTypeNFT(tokenAccount, mint!)
+    return new AccountTypeNFT(tokenAccount, mint!, governance)
   }
-  return new AccountTypeToken(tokenAccount, mint!)
+  return new AccountTypeToken(tokenAccount, mint!, governance)
 }
 
 const withTokenAccounts = async (
@@ -348,18 +349,27 @@ const getSolAccount = async (
         ? solAccount.lamports - mintRentAmount
         : solAccount.lamports
 
-    return new AccountTypeSol(tokenAccount, mint!, solAddress, solAccount)
+    return new AccountTypeSol(
+      tokenAccount,
+      mint!,
+      solAddress,
+      solAccount,
+      governance
+    )
   }
 }
 
 class AccountTypeToken implements Account {
+  governancePubkey: PublicKey
   type: AccountType
-  extensions: TokenAccountExtension
+  extensions: AccountExtension
   pubkey: PublicKey
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
-    mint: TokenProgramAccount<MintInfo>
+    mint: TokenProgramAccount<MintInfo>,
+    governance: GovernedAccount
   ) {
+    this.governancePubkey = governance.pubkey
     this.pubkey = tokenAccount.publicKey
     this.type = AccountType.TOKEN
     this.extensions = {
@@ -372,10 +382,12 @@ class AccountTypeToken implements Account {
 }
 
 class AccountTypeProgram implements Account {
+  governancePubkey: PublicKey
   type: AccountType
-  extensions: TokenAccountExtension
+  extensions: AccountExtension
   pubkey: PublicKey
   constructor(governance: GovernedAccount) {
+    this.governancePubkey = governance.pubkey
     this.pubkey = governance.account.governedAccount
     this.type = AccountType.PROGRAM
     this.extensions = {}
@@ -383,10 +395,12 @@ class AccountTypeProgram implements Account {
 }
 
 class AccountTypeMint implements Account {
+  governancePubkey: PublicKey
   type: AccountType
-  extensions: TokenAccountExtension
+  extensions: AccountExtension
   pubkey: PublicKey
   constructor(governance: GovernedAccount, account: MintInfo) {
+    this.governancePubkey = governance.pubkey
     this.pubkey = governance.account.governedAccount
     this.type = AccountType.MINT
     this.extensions = {
@@ -399,13 +413,16 @@ class AccountTypeMint implements Account {
 }
 
 class AccountTypeNFT implements Account {
+  governancePubkey: PublicKey
   type: AccountType
-  extensions: TokenAccountExtension
+  extensions: AccountExtension
   pubkey: PublicKey
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
-    mint: TokenProgramAccount<MintInfo>
+    mint: TokenProgramAccount<MintInfo>,
+    governance: GovernedAccount
   ) {
+    this.governancePubkey = governance.pubkey
     this.pubkey = tokenAccount.publicKey
     this.type = AccountType.NFT
     this.extensions = {
@@ -418,15 +435,18 @@ class AccountTypeNFT implements Account {
 }
 
 class AccountTypeSol implements Account {
+  governancePubkey: PublicKey
   type: AccountType
-  extensions: TokenAccountExtension
+  extensions: AccountExtension
   pubkey: PublicKey
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
     solAddress: PublicKey,
-    solAccount: AccountInfoGen<Buffer | ParsedAccountData>
+    solAccount: AccountInfoGen<Buffer | ParsedAccountData>,
+    governance: GovernedAccount
   ) {
+    this.governancePubkey = governance.pubkey
     this.type = AccountType.SOL
     this.pubkey = tokenAccount.publicKey
     this.extensions = {

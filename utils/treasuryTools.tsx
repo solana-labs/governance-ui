@@ -6,34 +6,34 @@ import BigNumber from 'bignumber.js'
 import { Account, AccountType } from 'stores/useGovernanceAssetsStore'
 import { abbreviateAddress } from './formatting'
 import tokenService from './services/token'
-import { GovernedTokenAccount } from './tokens'
 import { NFTWithMint } from './uiTypes/nfts'
 
 export const getTreasuryAccountItemInfo = (
-  governedAccountTokenAccount: GovernedTokenAccount,
+  governedAccountTokenAccount: Account,
   governanceNfts: { [governance: string]: NFTWithMint[] }
 ) => {
   const mintAddress =
-    governedAccountTokenAccount && governedAccountTokenAccount.token
-      ? governedAccountTokenAccount.isSol
+    governedAccountTokenAccount && governedAccountTokenAccount.extensions.token
+      ? governedAccountTokenAccount.type === AccountType.SOL
         ? WSOL_MINT
-        : governedAccountTokenAccount.token.account.mint.toBase58()
+        : governedAccountTokenAccount.extensions.token!.account.mint.toBase58()
       : ''
 
   const amount =
-    governedAccountTokenAccount && governedAccountTokenAccount.mint?.account
+    governedAccountTokenAccount &&
+    governedAccountTokenAccount.extensions.mint?.account
       ? getMintDecimalAmountFromNatural(
-          governedAccountTokenAccount.mint?.account,
+          governedAccountTokenAccount.extensions.mint?.account,
           new BN(
-            governedAccountTokenAccount.isSol
-              ? governedAccountTokenAccount.solAccount!.lamports
-              : governedAccountTokenAccount.token!.account.amount
+            governedAccountTokenAccount.type === AccountType.SOL
+              ? governedAccountTokenAccount.extensions.solAccount!.lamports
+              : governedAccountTokenAccount.extensions.token!.account.amount
           )
         ).toNumber()
       : 0
 
   const accountPublicKey = governedAccountTokenAccount
-    ? governedAccountTokenAccount.transferAddress
+    ? governedAccountTokenAccount.extensions.transferAddress
     : null
 
   const price = tokenService.getUSDTokenPrice(mintAddress)
@@ -44,19 +44,21 @@ export const getTreasuryAccountItemInfo = (
 
   const info = tokenService.getTokenInfo(mintAddress)
 
-  const amountFormatted = governedAccountTokenAccount.isNft
-    ? governedAccountTokenAccount.governance
-      ? governanceNfts[
-          governedAccountTokenAccount.governance?.pubkey.toBase58()
-        ]?.length
-      : '0'
-    : new BigNumber(amount).toFormat()
+  const amountFormatted =
+    governedAccountTokenAccount.type === AccountType.NFT
+      ? governedAccountTokenAccount.governancePubkey
+        ? governanceNfts[
+            governedAccountTokenAccount.governancePubkey.toBase58()
+          ]?.length
+        : '0'
+      : new BigNumber(amount).toFormat()
 
-  const logo = governedAccountTokenAccount.isNft
-    ? '/img/collectablesIcon.svg'
-    : info?.logoURI
-    ? info?.logoURI
-    : ''
+  const logo =
+    governedAccountTokenAccount.type === AccountType.NFT
+      ? '/img/collectablesIcon.svg'
+      : info?.logoURI
+      ? info?.logoURI
+      : ''
 
   const accountName = getName(governedAccountTokenAccount)
 
@@ -66,18 +68,19 @@ export const getTreasuryAccountItemInfo = (
     ? abbreviateAddress(accountPublicKey as PublicKey)
     : ''
   //TODO replace with switch
-  const symbol = governedAccountTokenAccount.isNft
-    ? 'NFTS'
-    : governedAccountTokenAccount.isSol
-    ? 'SOL'
-    : info?.symbol
-    ? info.address === WSOL_MINT
-      ? 'wSOL'
+  const symbol =
+    governedAccountTokenAccount.type === AccountType.NFT
+      ? 'NFTS'
+      : governedAccountTokenAccount.type === AccountType.SOL
+      ? 'SOL'
       : info?.symbol
-    : governedAccountTokenAccount.mint
-    ? abbreviateAddress(governedAccountTokenAccount.mint.publicKey)
-    : ''
-  const isSol = governedAccountTokenAccount.isSol
+      ? info.address === WSOL_MINT
+        ? 'wSOL'
+        : info?.symbol
+      : governedAccountTokenAccount.extensions.mint
+      ? abbreviateAddress(governedAccountTokenAccount.extensions.mint.publicKey)
+      : ''
+  const isSol = governedAccountTokenAccount.type === AccountType.SOL
   const displayPrice =
     totalPriceFormatted && totalPriceFormatted !== '0'
       ? totalPriceFormatted
@@ -141,12 +144,12 @@ export const getTreasuryAccountItemInfoV2 = (account: Account) => {
     info,
   }
 }
-const getName = (governedAccountTokenAccount: GovernedTokenAccount) => {
-  const tokenAccName = governedAccountTokenAccount.token
-    ? getAccountName(governedAccountTokenAccount.token?.publicKey)
+const getName = (governedAccountTokenAccount: Account) => {
+  const tokenAccName = governedAccountTokenAccount.extensions.token
+    ? getAccountName(governedAccountTokenAccount.extensions.token?.publicKey)
     : ''
-  const governanceAccName = governedAccountTokenAccount.governance?.pubkey
-    ? getAccountName(governedAccountTokenAccount.governance.pubkey)
+  const governanceAccName = governedAccountTokenAccount.governancePubkey
+    ? getAccountName(governedAccountTokenAccount.governancePubkey)
     : ''
 
   return tokenAccName || governanceAccName
