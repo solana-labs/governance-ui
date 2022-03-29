@@ -18,6 +18,7 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 /**
  * Default governance program id instance
  */
@@ -53,7 +54,7 @@ export const ACCOUNT_NAMES = {
   '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
   H7uqouPsJkeEiLpCEoC1qYVVquDrZan6ZfdPK2gS44zm: 'FORE Token Mint',
-  '9r1fxNbhQrd5ov8HSufrcYMqDhxphWuTjPfHdr1SDJ7L': 'Foresight Devnet Governance',
+  [foresightGov.DEVNET_TREASURY.toBase58()]: 'Foresight Devnet Governance',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
