@@ -53,11 +53,13 @@ const MakeInitCategoryParams = ({
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
-      const program = foresightGov.readonlyProgram(foresightConsts.DEVNET_PID)
+      const program = foresightGov.readonlyProgram(
+        new PublicKey(foresightConsts.DEVNET_PID)
+      )
       const { ix: initCategoryIx } = await foresightGov.genInitCategoryIx(
         Buffer.from(form.categoryId.padEnd(20)),
         program,
-        new PublicKey('9r1fxNbhQrd5ov8HSufrcYMqDhxphWuTjPfHdr1SDJ7L')
+        foresightGov.DEVNET_TREASURY
       )
 
       serializedInstruction = serializeInstructionToBase64(initCategoryIx)

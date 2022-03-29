@@ -53,7 +53,9 @@ const MakeInitMarketListParams = ({
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
-      const program = foresightGov.readonlyProgram(foresightConsts.DEVNET_PID)
+      const program = foresightGov.readonlyProgram(
+        new PublicKey(foresightConsts.DEVNET_PID)
+      )
       const { ix: initMarketListIx } = await foresightGov.genInitMarketListIx(
         Buffer.from(form.marketListId.padEnd(20)),
         program,

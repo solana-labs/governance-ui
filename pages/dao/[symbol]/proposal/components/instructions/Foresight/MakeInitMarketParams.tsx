@@ -54,12 +54,14 @@ const MakeInitMarketParams = ({
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
-      const program = foresightGov.readonlyProgram(foresightConsts.DEVNET_PID)
+      const program = foresightGov.readonlyProgram(
+        new PublicKey(foresightConsts.DEVNET_PID)
+      )
       const { ix: initMarketIx } = await foresightGov.genInitMarketIx(
         Buffer.from(form.marketListId.padEnd(20)),
         Uint8Array.from([form.marketId]),
         program,
-        new PublicKey('9r1fxNbhQrd5ov8HSufrcYMqDhxphWuTjPfHdr1SDJ7L')
+        foresightGov.DEVNET_TREASURY
       )
 
       serializedInstruction = serializeInstructionToBase64(initMarketIx)
