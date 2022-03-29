@@ -26,6 +26,8 @@ import { AccountInfo, MintInfo, u64 } from '@solana/spl-token'
 import { AccountInfo as AccountInfoGeneric } from '@solana/web3.js'
 import { BN, TokenAccountLayout } from '@blockworks-foundation/mango-client'
 import tokenService from '@utils/services/token'
+import { ConnectionContext } from '@utils/connection'
+import axios from 'axios'
 const tokenAccountOwnerOffset = 32
 interface TokenAccountExtension {
   mint?: TokenProgramAccount<MintInfo> | undefined
@@ -61,7 +63,7 @@ interface GovernanceAssetsStore extends State {
   }) => void
   setGovernedTokenAccounts: (items: GovernedTokenAccount[]) => void
   setGovernedAccounts: (
-    connection: Connection,
+    connection: ConnectionContext,
     realm: ProgramAccount<Realm>
   ) => void
 }
@@ -101,32 +103,61 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       GovernanceAccountType.ProgramGovernanceV2,
     ])
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
-      connection,
+      connection.current,
       mintGovernances.map((x) => x.account.governedAccount)
     )
     withMintAccounts(governedAccounts, mintGovernances, mintGovernancesMintInfo)
     withProgramAccounts(programGovernances, governedAccounts)
-    const tokenAccounts = (
-      await Promise.all(
-        governancesArray.map((x) =>
-          getAccountsByOwner(
-            connection,
-            TOKEN_PROGRAM_ID,
-            x.pubkey,
-            TokenAccountLayout.span,
-            tokenAccountOwnerOffset
-          )
-        )
-      )
-    )
-      .flatMap((x) => x)
+    const getProgramAccounts = await axios.request({
+      url: connection.endpoint,
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      data: JSON.stringify([
+        ...governancesArray.map((x) => {
+          return {
+            jsonrpc: '2.0',
+            id: 1,
+            method: 'getProgramAccounts',
+            params: [
+              TOKEN_PROGRAM_ID.toBase58(),
+              {
+                commitment: connection.current.commitment,
+                encoding: 'base64',
+                filters: [
+                  {
+                    dataSize: TokenAccountLayout.span, // number of bytes
+                  },
+                  {
+                    memcmp: {
+                      offset: tokenAccountOwnerOffset, // number of bytes
+                      bytes: x.pubkey.toBase58(), // base58 encoded string
+                    },
+                  },
+                ],
+              },
+            ],
+          }
+        }),
+      ]),
+    })
+    const tokenAccountsJson = getProgramAccounts.data
+    console.log(tokenAccountsJson)
+    const tokenAccounts = tokenAccountsJson
+      .flatMap((x) => x.result)
       .map((x) => {
-        const publicKey = x.pubkey
-        const data = Buffer.from(x.account.data)
+        const publicKey = new PublicKey(x.pubkey)
+        const data = Buffer.from(x.account.data[0], 'base64')
         const account = parseTokenAccountData(publicKey, data)
         return { publicKey, account }
       })
-    await withTokenAccounts(tokenAccounts, governedAccounts, realm, connection)
+    await withTokenAccounts(
+      tokenAccounts,
+      governedAccounts,
+      realm,
+      connection.current
+    )
     await tokenService.fetchTokenPrices(mintAddresses)
     set((s) => {
       s.governedAccounts = governedAccounts
