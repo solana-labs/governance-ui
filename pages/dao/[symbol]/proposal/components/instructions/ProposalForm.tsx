@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
-
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import SelectedInstruction from './SelectedInstruction'
@@ -30,19 +28,10 @@ const ProposalForm = ({
       {![
         Instructions.Transfer,
         Instructions.Mint,
-        Instructions.ProgramUpgrade,
-        Instructions.SetProgramAuthority,
         Instructions.Base64,
         Instructions.Clawback,
         Instructions.Grant,
-        Instructions.None,
         Instructions.FriktionDepositIntoVolt,
-        Instructions.UXDInitializeController,
-        Instructions.UXDSetRedeemableGlobalSupplyCap,
-        Instructions.UXDSetMangoDepositoriesRedeemableSoftCap,
-        Instructions.UXDRegisterMangoDepository,
-        Instructions.UXDDepositInsuranceToMangoDepository,
-        Instructions.UXDWithdrawInsuranceFromMangoDepository,
       ].includes(itxType) && (
         <GovernedAccountSelect
           label="Governance"

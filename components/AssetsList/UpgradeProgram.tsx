@@ -63,7 +63,6 @@ const UpgradeProgram = ({
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<UpgradeProgramCompactForm>({
     governedAccount: governedAccount,
-    programId: programId?.toString(),
     bufferAddress: '',
     description: '',
     title: '',
@@ -114,7 +113,8 @@ const UpgradeProgram = ({
       isValid &&
       programId &&
       form.governedAccount?.governance?.account &&
-      wallet?.publicKey
+      wallet?.publicKey &&
+      form.bufferAddress
     ) {
       const upgradeIx = await createUpgradeInstruction(
         form.governedAccount.governance.account.governedAccount,

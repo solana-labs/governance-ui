@@ -60,17 +60,15 @@ const RaydiumAddLiquidityToPool = ({
       slippage: yup.number().required('Slippage value is required'),
     }),
     buildInstruction: async function () {
-      if (!form.liquidityPool || !form.baseAmountIn || !form.quoteAmountIn)
-        throw new Error('missing field in instruction form')
-      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool)
+      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool!)
       const [base, quote] = await Promise.all([
         connection.current.getTokenSupply(poolKeys.baseMint),
         connection.current.getTokenSupply(poolKeys.quoteMint),
       ])
       return createAddLiquidityInstruction(
         poolKeys,
-        uiAmountToNativeBN(form.baseAmountIn, base.value.decimals),
-        uiAmountToNativeBN(form.quoteAmountIn, quote.value.decimals),
+        uiAmountToNativeBN(form.baseAmountIn!, base.value.decimals),
+        uiAmountToNativeBN(form.quoteAmountIn!, quote.value.decimals),
         form.fixedSide,
         form.governedAccount!.governance.pubkey
       )

@@ -7,7 +7,6 @@ import { getNameOf } from '@tools/core/script'
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
-  GovernedProgramAccount,
   GovernedTokenAccount,
 } from '@utils/tokens'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
@@ -80,18 +79,16 @@ export interface MintForm {
 }
 
 export interface ProgramUpgradeForm {
-  governedAccount: GovernedProgramAccount | undefined
-  programId: string | undefined
-  bufferAddress: string
-  bufferSpillAddress?: string | undefined
+  governedAccount: GovernedMultiTypeAccount | undefined
+  bufferAddress?: string
+  bufferSpillAddress?: string
 }
 
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface SetProgramAuthorityForm {
-  governedAccount: GovernedProgramAccount | GovernedTokenAccount | undefined
-  accountId: string | undefined
-  destinationAuthority: string
+  governedAccount: GovernedMultiTypeAccount | undefined
+  destinationAuthority?: string
 }
 export interface Base64InstructionForm {
   governedAccount?: GovernedMultiTypeAccount
@@ -155,44 +152,38 @@ export interface RemoveLiquidityRaydiumForm {
 }
 
 export interface InitializeControllerForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: GovernedMultiTypeAccount | undefined
   mintDecimals: number
-  programId: string | undefined
 }
 
 export interface SetRedeemableGlobalSupplyCapForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: GovernedMultiTypeAccount | undefined
   supplyCap: number
-  programId: string | undefined
 }
 
 export interface SetMangoDepositoriesRedeemableSoftCapForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: GovernedMultiTypeAccount | undefined
   softCap: number
-  programId: string | undefined
 }
 
 export interface RegisterMangoDepositoryForm {
-  governedAccount: GovernedProgramAccount | undefined
-  collateralName: string
-  insuranceName: string
-  programId: string | undefined
+  governedAccount: GovernedMultiTypeAccount | undefined
+  collateralName?: string
+  insuranceName?: string
 }
 
 export interface DepositInsuranceToMangoDepositoryForm {
-  governedAccount: GovernedProgramAccount | undefined
-  collateralName: string
-  insuranceName: string
+  governedAccount: GovernedMultiTypeAccount | undefined
+  collateralName?: string
+  insuranceName?: string
   insuranceDepositedAmount: number
-  programId: string | undefined
 }
 
 export interface WithdrawInsuranceFromMangoDepositoryForm {
-  governedAccount: GovernedProgramAccount | undefined
-  collateralName: string
-  insuranceName: string
+  governedAccount: GovernedMultiTypeAccount | undefined
+  collateralName?: string
+  insuranceName?: string
   insuranceWithdrawnAmount: number
-  programId: string | undefined
 }
 
 export enum Instructions {

@@ -54,8 +54,8 @@ const RaydiumRemoveLiquidityFromPool = ({
         .required('Amount for LP token is required'),
     }),
     buildInstruction: async function () {
-      if (!form.liquidityPool || !lpMintInfo) {
-        throw new Error('missing field in instruction form')
+      if (!lpMintInfo) {
+        throw new Error('missing parameter Liquidity Pool Mint Info')
       }
 
       return createRemoveLiquidityInstruction(

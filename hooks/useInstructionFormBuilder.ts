@@ -51,7 +51,7 @@ function useInstructionFormBuilder<
     if (
       !wallet?.publicKey ||
       !form.governedAccount?.governance?.account ||
-      !buildInstruction ||
+      //!buildInstruction ||
       !(await validateForm())
     ) {
       return {
@@ -63,9 +63,9 @@ function useInstructionFormBuilder<
 
     try {
       return {
-        serializedInstruction: serializeInstructionToBase64(
-          await buildInstruction()
-        ),
+        serializedInstruction: buildInstruction
+          ? serializeInstructionToBase64(await buildInstruction())
+          : '',
         isValid: true,
         governance: form.governedAccount?.governance,
       }

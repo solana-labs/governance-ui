@@ -33,18 +33,15 @@ const CreateAssociatedTokenAccount = ({
       splTokenMintUIName: yup.string().required('SPL Token Mint is required'),
     }),
     buildInstruction: async function () {
-      if (!form.splTokenMintUIName || !wallet?.publicKey)
-        throw new Error('invalid form, missing splTokenMintUiName field')
-
       const [tx] = await createAssociatedTokenAccount(
         // fundingAddress
-        wallet.publicKey,
+        wallet!.publicKey!,
 
         // walletAddress
         governedAccount!.governance.pubkey,
 
         // splTokenMintAddress
-        getSplTokenMintAddressByUIName(form.splTokenMintUIName)
+        getSplTokenMintAddressByUIName(form.splTokenMintUIName!)
       )
       return tx
     },

@@ -42,16 +42,14 @@ const DepositReserveLiquidityAndObligationCollateral = ({
           .required('Amount is required'),
       }),
       buildInstruction: async function () {
-        if (!form.mintName)
-          throw new Error('invalid form, missing mintName field')
         return depositReserveLiquidityAndObligationCollateral({
           obligationOwner: governedAccount!.governance.pubkey,
           liquidityAmount: uiAmountToNativeBN(
             form.uiAmount,
-            SolendConfiguration.getSupportedMintInformation(form.mintName)
+            SolendConfiguration.getSupportedMintInformation(form.mintName!)
               .decimals
           ),
-          mintName: form.mintName,
+          mintName: form.mintName!,
         })
       },
     }

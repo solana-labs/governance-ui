@@ -34,10 +34,8 @@ const RefreshReserve = ({
       mintName: yup.string().required('Token Name is required'),
     }),
     buildInstruction: async function () {
-      if (!form.mintName)
-        throw new Error('invalid form, missing mintName field')
       return refreshReserve({
-        mintName: form.mintName,
+        mintName: form.mintName!,
       })
     },
   })

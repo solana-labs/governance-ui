@@ -34,11 +34,9 @@ const RefreshObligation = ({
       mintName: yup.string().required('Token Name is required'),
     }),
     buildInstruction: async function () {
-      if (!form.mintName)
-        throw new Error('invalid form, missing mintName field')
       return refreshObligation({
         obligationOwner: governedAccount!.governance.pubkey,
-        mintNames: [form.mintName],
+        mintNames: [form.mintName!],
       })
     },
   })

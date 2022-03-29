@@ -40,9 +40,11 @@ const SelectedInstruction = ({
     case Instructions.Transfer:
       return <SplTokenTransfer index={index} governance={governance} />
     case Instructions.ProgramUpgrade:
-      return <ProgramUpgrade index={index} governance={governance} />
+      return <ProgramUpgrade index={index} governedAccount={governedAccount} />
     case Instructions.SetProgramAuthority:
-      return <SetProgramAuthority index={index} governance={governance} />
+      return (
+        <SetProgramAuthority index={index} governedAccount={governedAccount} />
+      )
     case Instructions.CreateAssociatedTokenAccount:
       return (
         <CreateAssociatedTokenAccount
@@ -104,35 +106,45 @@ const SelectedInstruction = ({
         />
       )
     case Instructions.UXDInitializeController:
-      return <UXDInitializeController index={index} governance={governance} />
+      return (
+        <UXDInitializeController
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
     case Instructions.UXDSetRedeemableGlobalSupplyCap:
       return (
         <UXDSetRedeemableGlobalSupplyCap
           index={index}
-          governance={governance}
+          governedAccount={governedAccount}
         />
       )
     case Instructions.UXDSetMangoDepositoriesRedeemableSoftCap:
       return (
         <UXDSetMangoDepositoriesRedeemableSoftCap
           index={index}
-          governance={governance}
+          governedAccount={governedAccount}
         />
       )
     case Instructions.UXDRegisterMangoDepository:
-      return <UXDRegisterMangoDeposiory index={index} governance={governance} />
+      return (
+        <UXDRegisterMangoDeposiory
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
     case Instructions.UXDDepositInsuranceToMangoDepository:
       return (
         <UXDDepositInsuranceToMangoDepository
           index={index}
-          governance={governance}
+          governedAccount={governedAccount}
         />
       )
     case Instructions.UXDWithdrawInsuranceFromMangoDepository:
       return (
         <UXDWithdrawInsuranceFromMangoDepository
           index={index}
-          governance={governance}
+          governedAccount={governedAccount}
         />
       )
     case Instructions.Mint:
@@ -140,7 +152,7 @@ const SelectedInstruction = ({
     case Instructions.Base64:
       return <CustomBase64 index={index} governance={governance} />
     case Instructions.None:
-      return <Empty index={index} governance={governance} />
+      return <Empty index={index} governedAccount={governedAccount} />
     case Instructions.Grant:
       return <Grant index={index} governance={governance} />
     case Instructions.Clawback:
