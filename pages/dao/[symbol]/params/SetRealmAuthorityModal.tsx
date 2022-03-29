@@ -23,7 +23,7 @@ const SetRealmAuthorityModal = ({
   const { realmInfo, realm } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { fetchRealm, fetchAllRealms } = useWalletStore((s) => s.actions)
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const [account, setAccount] = useState<GovernedMultiTypeAccount | null>(null)
   const [settingAuthority, setSettingAuthority] = useState(false)
@@ -49,6 +49,7 @@ const SetRealmAuthorityModal = ({
       sendingMessage: `Setting authority`,
       successMessage: `Authority set`,
     })
+    await fetchAllRealms(realmInfo!.programId)
     await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
     setSettingAuthority(false)
     closeModal()
