@@ -8,6 +8,7 @@ import {
   UiInstruction,
   ForesightMakeInitMarketParams,
 } from '@utils/uiTypes/proposalCreationTypes'
+import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
