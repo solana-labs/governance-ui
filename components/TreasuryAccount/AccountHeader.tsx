@@ -32,7 +32,7 @@ const AccountHeader = () => {
     <BaseAccountHeader
       isNFT={isNFT}
       tokenInfo={tokenInfo}
-      amountFormatted={isNFT ? nftsCount.toString() : amountFormatted}
+      amountFormatted={isNFT ? nftsCount?.toString() : amountFormatted}
       totalPrice={totalPrice}
     ></BaseAccountHeader>
   )
