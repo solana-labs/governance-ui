@@ -4,11 +4,7 @@ import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
-import {
-  GovernedMintInfoAccount,
-  GovernedMultiTypeAccount,
-  GovernedProgramAccount,
-} from '@utils/tokens'
+import { GovernedMintInfoAccount, GovernedProgramAccount } from '@utils/tokens'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
@@ -186,48 +182,48 @@ export interface MangoMakeChangeReferralFeeParams {
   refMngoRequired: number
 }
 export interface Base64InstructionForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount: AssetAccount | undefined
   base64: string
   holdUpTime: number
 }
 
 export interface EmptyInstructionForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount: AssetAccount | undefined
 }
 
 export interface CreateAssociatedTokenAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   splTokenMintUIName?: SplTokenUIName
 }
 
 export interface CreateSolendObligationAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
 }
 
 export interface InitSolendObligationAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
 }
 
 export interface DepositReserveLiquidityAndObligationCollateralForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   uiAmount: string
   mintName?: SupportedMintName
 }
 
 export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   uiAmount: string
   mintName?: SupportedMintName
   destinationLiquidity?: string
 }
 
 export interface RefreshObligationForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   mintName?: SupportedMintName
 }
 
 export interface RefreshReserveForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   mintName?: SupportedMintName
 }
 

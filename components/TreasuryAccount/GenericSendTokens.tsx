@@ -103,9 +103,9 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const mintMinAmount = form.governedTokenAccount?.mint
+  const mintMinAmount = form.governedTokenAccount?.extensions.mint
     ? getMintMinAmountAsDecimal(
-        form.governedTokenAccount.extensions.mint.account
+        form.governedTokenAccount.extensions!.mint!.account
       )
     : 1
   const currentPrecision = precision(mintMinAmount)
@@ -137,7 +137,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
 
   const calcTransactionDolarAmount = (amount) => {
     const price = tokenService.getUSDTokenPrice(
-      currentAccount!.mint!.publicKey.toBase58()
+      currentAccount!.extensions!.mint!.publicKey.toBase58()
     )
     const totalPrice = amount * price
     const totalPriceFormatted =
@@ -149,7 +149,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     if (!currentAccount?.governance) {
       throw new Error('No governance on currentAccount')
     }
-    if (!currentAccount?.transferAddress) {
+    if (!currentAccount?.extensions.transferAddress) {
       throw new Error('No transferAddress on currentAccount')
     }
     return getGenericTransferInstruction({
@@ -160,7 +160,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
       wallet,
       requiredStateInfo: {
         governance: currentAccount.governance,
-        owner: currentAccount.transferAddress,
+        owner: currentAccount.extensions.transferAddress,
         mintDecimals,
         tokenSource,
         mint: mintBeingTransferred,
@@ -214,17 +214,17 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   const IsAmountNotHigherThenBalance = () => {
     const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
-      form.governedTokenAccount!.mint!.account.decimals
+      form.governedTokenAccount!.extensions.mint!.account.decimals
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount.extensions.token?.account?.amount?.gte(
+      gte = form.governedTokenAccount?.extensions.token?.account?.amount?.gte(
         mintValue
       )
     } catch (e) {
       //silent fail
     }
-    return form.governedTokenAccount.extensions.token?.publicKey && gte
+    return form.governedTokenAccount?.extensions.token?.publicKey && gte
   }
 
   useEffect(() => {

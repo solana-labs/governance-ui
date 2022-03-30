@@ -162,13 +162,15 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
   client
 ) => {
   const fmtAmount = fmtMintAmount(
-    matchedTreasury.mint?.account,
+    matchedTreasury.extensions.mint?.account,
     new BN(form.mintAmount)
   )
   const group = market!.group!
   const groupConfig = market!.groupConfig!
   const rootBank = group.tokens.find(
-    (x) => x.mint.toBase58() === matchedTreasury.mint?.publicKey.toBase58()
+    (x) =>
+      x.mint.toBase58() ===
+      matchedTreasury.extensions.mint?.publicKey.toBase58()
   )?.rootBank
   const quoteRootBank =
     group.rootBankAccounts[group.getRootBankIndex(rootBank!)]
@@ -204,7 +206,7 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
           quoteRootBank!.publicKey,
           quoteNodeBank!.publicKey,
           quoteNodeBank!.vault,
-          matchedTreasury.transferAddress!,
+          matchedTreasury.extensions.transferAddress!,
           new BN(form.mintAmount)
         )
       )
@@ -262,8 +264,9 @@ const HandleMangoDeposit: HandleCreateProposalWithStrategy = async (
     tokenOwnerRecord,
     form.title ||
       `Deposit ${fmtAmount} ${
-        tokenService.getTokenInfo(matchedTreasury.mint!.publicKey.toBase58())
-          ?.symbol || 'tokens'
+        tokenService.getTokenInfo(
+          matchedTreasury.extensions.mint!.publicKey.toBase58()
+        )?.symbol || 'tokens'
       } to Mango account`,
     form.description,
     governingTokenMint,

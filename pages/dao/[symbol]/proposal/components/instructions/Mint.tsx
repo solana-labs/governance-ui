@@ -7,12 +7,7 @@ import { PublicKey } from '@solana/web3.js'
 import { precision } from 'utils/formatting'
 import { tryParseKey } from 'tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  GovernedMintInfoAccount,
-  GovernedMultiTypeAccount,
-  TokenProgramAccount,
-  tryGetTokenAccount,
-} from '@utils/tokens'
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
 import { debounce } from 'utils/debounce'
@@ -23,6 +18,7 @@ import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
+import { AccountType } from 'stores/useGovernanceAssetsStore'
 const Mint = ({
   index,
   governance,
@@ -32,7 +28,10 @@ const Mint = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const { realmInfo } = useRealm()
-  const { getMintWithGovernances } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
+  const mintGovernancesWithMintInfo = assetAccounts.filter(
+    (x) => x.type === AccountType.MINT
+  )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MintForm>({
@@ -51,10 +50,6 @@ const Mint = ({
     setDestinationAccount,
   ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
-  const [
-    mintGovernancesWithMintInfo,
-    setMintGovernancesWithMintInfo,
-  ] = useState<GovernedMintInfoAccount[]>([])
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(form.mintAccount.mintInfo)
     : 1
@@ -126,13 +121,6 @@ const Mint = ({
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
   }, [form.mintAccount])
-  useEffect(() => {
-    async function getMintWithGovernancesFcn() {
-      const resp = await getMintWithGovernances()
-      setMintGovernancesWithMintInfo(resp)
-    }
-    getMintWithGovernancesFcn()
-  }, [])
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
@@ -142,9 +130,7 @@ const Mint = ({
     <>
       <GovernedAccountSelect
         label="Mint"
-        governedAccounts={
-          mintGovernancesWithMintInfo as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={mintGovernancesWithMintInfo}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'mintAccount' })
         }}

@@ -116,19 +116,6 @@ const SendTokens = () => {
       propertyName: 'amount',
     })
   }
-  //   const setMaxAmount = () => {
-  //     const amount =
-  //       currentAccount && currentAccount.mint?.account
-  //         ? getMintDecimalAmountFromNatural(
-  //             currentAccount.mint?.account,
-  //             new BN(currentAccount.token!.account.amount)
-  //           ).toNumber()
-  //         : 0
-  //     handleSetForm({
-  //       value: amount,
-  //       propertyName: 'amount',
-  //     })
-  //   }
   const calcTransactionDolarAmount = (amount) => {
     const price = tokenService.getUSDTokenPrice(
       currentAccount!.extensions.mint!.publicKey.toBase58()

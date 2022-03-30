@@ -374,10 +374,7 @@ const Params = () => {
                       )
                       .map((x) => {
                         const info = getTreasuryAccountItemInfoV2(x)
-                        if (
-                          x.type === AccountType.TOKEN ||
-                          x.type === AccountType.SOL
-                        ) {
+                        if (x.isToken || x.isSol) {
                           return (
                             <div
                               className="bg-bkg-1 p-4 pb-2 rounded-md"

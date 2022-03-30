@@ -1,24 +1,15 @@
 import { GovernanceAccountType } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
-import {
-  getMultipleAccountInfoChunked,
-  GovernedMintInfoAccount,
-  parseMintAccountData,
-} from '@utils/tokens'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
-
-import useWalletStore from 'stores/useWalletStore'
-
 import useRealm from './useRealm'
 import useGovernanceAssetsStore, {
   AccountType,
+  AssetAccount,
 } from 'stores/useGovernanceAssetsStore'
 import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
   const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
-  const connection = useWalletStore((s) => s.connection.current)
-  const governedTokenAccounts = useGovernanceAssetsStore(
+  const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
   const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
@@ -101,33 +92,6 @@ export default function useGovernanceAssets() {
 
   const getAvailableInstructions = () => {
     return availableInstructions.filter((itx) => itx.isVisible)
-  }
-  async function getMintWithGovernances() {
-    const mintGovernances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
-    const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
-    const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
-      connection,
-      mintGovernances.map((x) => x.account.governedAccount)
-    )
-    mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
-      const governance = mintGovernances[index]
-      if (!mintAccountInfo) {
-        throw new Error(
-          `Missing mintAccountInfo for: ${governance.pubkey.toBase58()}`
-        )
-      }
-      const data = Buffer.from(mintAccountInfo.data)
-      const parsedMintInfo = parseMintAccountData(data) as MintInfo
-      const obj = {
-        governance,
-        mintInfo: parsedMintInfo,
-      }
-      governedMintInfoAccounts.push(obj)
-    })
-    return governedMintInfoAccounts
   }
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
     (x) => x.type !== AccountType.NFT
@@ -301,7 +265,6 @@ export default function useGovernanceAssets() {
     availableInstructions,
     getAvailableInstructions,
     governedTokenAccounts,
-    getMintWithGovernances,
     canUseTransferInstruction,
     canUseMintInstruction,
     canMintRealmCommunityToken,
