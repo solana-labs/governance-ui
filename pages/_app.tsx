@@ -122,7 +122,7 @@ function App({ Component, pageProps }) {
   return (
     <div className="relative">
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Mango">
+        <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />
