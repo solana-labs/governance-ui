@@ -318,7 +318,10 @@ export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
     tokenAccount =
       acc.transferAddress?.toBase58() || acc.token.publicKey.toBase58()
     tokenName = 'SOL'
-    tokenAccountName = getAccountName(acc.token.publicKey)
+
+    tokenAccountName = acc.transferAddress
+      ? getAccountName(acc.transferAddress)
+      : ''
     amount = formatMintNaturalAmountAsDecimal(
       acc.mint!.account,
       new BN(acc.solAccount!.lamports)
