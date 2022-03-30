@@ -2,9 +2,10 @@ import { Connection } from '@solana/web3.js'
 import { struct, u8, u48 } from 'buffer-layout'
 import { AccountMetaData } from '@solana/spl-governance'
 import { u128, u64 } from '@project-serum/borsh'
-import BigNumber from 'bignumber.js'
 import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient'
 import { UXD_DECIMALS } from '@uxdprotocol/uxd-client'
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units'
+import { BN } from '@project-serum/anchor'
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
@@ -72,11 +73,10 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         const args = dataLayout.decode(Buffer.from(data)) as any
         return (
           <>
-            <p>{`Redeemable Global Supply Cap: ${new BigNumber(
-              args.redeemableGlobalSupplyCap.toString()
-            )
-              .shiftedBy(-UXD_DECIMALS)
-              .toFormat()}`}</p>
+            <p>{`Redeemable Global Supply Cap: ${nativeAmountToFormattedUiAmount(
+              new BN(args.redeemableGlobalSupplyCap.toString()),
+              UXD_DECIMALS
+            )}`}</p>
           </>
         )
       },
@@ -104,11 +104,10 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         console.log('args', args)
         return (
           <>
-            <p>{`Redeemable Supply Soft Cap: ${new BigNumber(
-              args.softCap.toString()
-            )
-              .shiftedBy(-UXD_DECIMALS)
-              .toFormat()}`}</p>
+            <p>{`Redeemable Supply Soft Cap: ${nativeAmountToFormattedUiAmount(
+              new BN(args.softCap.toString()),
+              UXD_DECIMALS
+            )}`}</p>
           </>
         )
       },
@@ -203,11 +202,10 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         console.log('args', args)
         return (
           <>
-            <p>{`Insurance Amount to deposit: ${new BigNumber(
-              args.insuranceAmount.toString()
-            )
-              .shiftedBy(-INSURANCE_MINTS.mainnet.USDC.decimals)
-              .toFormat()}`}</p>
+            <p>{`Insurance Amount to deposit: ${nativeAmountToFormattedUiAmount(
+              new BN(args.insuranceAmount.toString()),
+              INSURANCE_MINTS.mainnet.USDC.decimals
+            )}`}</p>
           </>
         )
       },

@@ -23,6 +23,16 @@ export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
 export function getMintDecimalAmount(mint: MintInfo, mintAmount: BN) {
   return new BigNumber(mintAmount.toString()).shiftedBy(-mint.decimals)
 }
+
+export function nativeAmountToFormattedUiAmount(
+  nativeAmount: BN,
+  decimals: number
+) {
+  return Number(
+    new BigNumber(nativeAmount.toString()).shiftedBy(-decimals).toString()
+  ).toLocaleString()
+}
+
 export function getBigNumberAmount(amount: BN | number) {
   return typeof amount === 'number'
     ? new BigNumber(amount)

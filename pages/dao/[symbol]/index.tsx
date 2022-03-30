@@ -18,6 +18,7 @@ import ApproveAllBtn from './proposal/components/ApproveAllBtn'
 import dynamic from 'next/dynamic'
 import Loading from '@components/Loading'
 import PaginationComponent from '@components/Pagination'
+import HotWallet from '@components/HotWallet/HotWallet'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
@@ -253,11 +254,17 @@ const REALM = () => {
           {realm && (
             <>
               <TokenBalanceCardWrapper />
+
+              <HotWallet />
+
               <NFTSCompactWrapper />
+
               {!realm?.account.config.useCommunityVoterWeightAddin && (
                 <MembersCompactWrapper />
               )}
+
               <AccountsCompactWrapper />
+
               <AssetsCompactWrapper />
             </>
           )}
