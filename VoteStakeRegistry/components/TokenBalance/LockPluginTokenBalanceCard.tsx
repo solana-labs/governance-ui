@@ -13,18 +13,16 @@ import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import VotingPowerBox from './VotingPowerBox'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import InlineNotification from '@components/InlineNotification'
-import { LinkButton } from '@components/Button'
+import Link from 'next/link'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
 }: {
   proposal?: Option<Proposal>
 }) => {
-  const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
@@ -73,23 +71,23 @@ const LockPluginTokenBalanceCard = ({
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
       <div className="flex items-center justify-between">
-        <h3 className="mb-0">Your Tokens</h3>
-        <LinkButton
-          className={`flex items-center text-primary-light ${
-            !connected || !tokenOwnerRecordPk
-              ? 'opacity-50 pointer-events-none'
-              : ''
-          }`}
-          onClick={() => {
-            const url = fmtUrlWithCluster(
-              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-            )
-            router.push(url)
-          }}
+        <h3 className="mb-0">Your Account</h3>
+        <Link
+          href={fmtUrlWithCluster(
+            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+          )}
         >
-          Manage
-          <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
-        </LinkButton>
+          <a
+            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+              !connected || !tokenOwnerRecordPk
+                ? 'opacity-50 pointer-events-none'
+                : ''
+            }`}
+          >
+            View
+            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+          </a>
+        </Link>
       </div>
       {hasLoaded ? (
         <>

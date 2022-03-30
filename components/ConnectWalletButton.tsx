@@ -1,5 +1,5 @@
 import { Menu } from '@headlessui/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
@@ -16,7 +16,6 @@ import {
 import { BackspaceIcon } from '@heroicons/react/solid'
 import { UserCircleIcon } from '@heroicons/react/outline'
 import { abbreviateAddress } from '@utils/formatting'
-import { useRouter } from 'next/router'
 import TwitterIcon from './TwitterIcon'
 import Switch from './Switch'
 
@@ -39,15 +38,17 @@ const ConnectWalletButton = (props) => {
   ])
 
   const [useDevnet, setUseDevnet] = useState(false)
-  const router = useRouter()
   const handleToggleDevnet = () => {
     setUseDevnet(!useDevnet)
     if (useDevnet) {
-      router.push(`${window.location.pathname}`)
+      window.location.replace(`${window.location.pathname}`)
     } else {
-      router.push(`${window.location.href}?cluster=devnet`)
+      window.location.replace(`${window.location.href}?cluster=devnet`)
     }
   }
+  useEffect(() => {
+    setUseDevnet(connection.cluster === 'devnet')
+  }, [connection.cluster])
 
   const handleConnectDisconnect = async () => {
     try {
@@ -74,7 +75,7 @@ const ConnectWalletButton = (props) => {
 
   return (
     <div className="flex">
-      <button
+      <div
         disabled={connected}
         className={`bg-transparent border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
           connected ? 'cursor-default' : 'hover:bg-bkg-3 focus:outline-none'
@@ -127,7 +128,7 @@ const ConnectWalletButton = (props) => {
             )}
           </div>
         </div>
-      </button>
+      </div>
 
       <div className="relative ">
         <Menu>

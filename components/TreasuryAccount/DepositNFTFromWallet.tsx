@@ -21,10 +21,8 @@ import NFTAccountSelect from './NFTAccountSelect'
 
 const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
   const nftSelectorRef = useRef<NftSelectorFunctions>(null)
-  const { setCurrentCompactAccount } = useTreasuryAccountStore()
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const { setCurrentAccount } = useTreasuryAccountStore()
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const { getNfts } = useTreasuryAccountStore()
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const wallet = useWalletStore((s) => s.current)
@@ -100,14 +98,14 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
 
   useEffect(() => {
     if (sendingSuccess) {
-      setCurrentCompactAccount(currentAccount!, connection)
+      setCurrentAccount(currentAccount!, connection)
     }
   }, [connected, sendingSuccess])
 
   return (
     <>
       <NFTAccountSelect
-        onChange={(value) => setCurrentCompactAccount(value, connection)}
+        onChange={(value) => setCurrentAccount(value, connection)}
         currentAccount={currentAccount}
         nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
       ></NFTAccountSelect>

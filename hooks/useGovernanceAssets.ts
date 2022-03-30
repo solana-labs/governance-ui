@@ -11,13 +11,15 @@ import useWalletStore from 'stores/useWalletStore'
 
 import useRealm from './useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances } = useRealm()
+  const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
   const connection = useWalletStore((s) => s.connection.current)
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
@@ -85,6 +87,14 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(gov.account.config)
     )
 
+  const realmAuth =
+    realm &&
+    governancesArray.find(
+      (x) => x.pubkey.toBase58() === realm.account.authority?.toBase58()
+    )
+  const canUseAuthorityInstruction =
+    realmAuth && ownVoterWeight.canCreateProposal(realmAuth?.account.config)
+
   const getAvailableInstructions = () => {
     return availableInstructions.filter((itx) => itx.isVisible)
   }
@@ -137,18 +147,75 @@ export default function useGovernanceAssets() {
       name: 'Grant',
       isVisible:
         canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58()),
     },
     {
       id: Instructions.Clawback,
       name: 'Clawback',
       isVisible:
         canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
+        currentPluginPk &&
+        vsrPluginsPks.includes(currentPluginPk.toBase58()),
+    },
+    {
+      id: Instructions.MangoChangePerpMarket,
+      name: 'Mango: Change Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeSpotMarket,
+      name: 'Mango: Change Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeReferralFeeParams,
+      name: 'Mango: Change Referral Fee Params',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoChangeMaxAccounts,
+      name: 'Mango: Change Max Accounts',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoAddOracle,
+      name: 'Mango: Add Oracle',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoAddSpotMarket,
+      name: 'Mango: Add Spot Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.MangoCreatePerpMarket,
+      name: 'Mango: Create Perp Market',
+      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+    },
+    {
+      id: Instructions.Mint,
+      name: 'Mint Tokens',
+      isVisible: canUseMintInstruction,
     },
     {
       id: Instructions.CreateAssociatedTokenAccount,
       name: 'Create Associated Token Account',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.Base64,
+      name: 'Execute Custom Instruction',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.DepositIntoVolt,
+      name: 'Friktion: Deposit into Volt',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.WithdrawFromVolt,
+      name: 'Friktion: Withdraw from Volt',
       isVisible: canUseAnyInstruction,
     },
     {
@@ -187,24 +254,24 @@ export default function useGovernanceAssets() {
       isVisible: canUseProgramUpgradeInstruction,
     },
     {
-      id: Instructions.Mint,
-      name: 'Mint Tokens',
-      isVisible: canUseMintInstruction,
+      id: Instructions.CreateNftPluginRegistrar,
+      name: 'Create NFT plugin registrar',
+      isVisible: canUseAuthorityInstruction,
     },
     {
-      id: Instructions.Base64,
-      name: 'Execute Custom Instruction',
-      isVisible: canUseAnyInstruction,
+      id: Instructions.ConfigureNftPluginCollection,
+      name: 'Configure NFT plugin collection',
+      isVisible: canUseAuthorityInstruction,
     },
     {
-      id: Instructions.MangoMakeChangeMaxAccounts,
-      name: 'Mango - change max accounts',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+      id: Instructions.RealmConfig,
+      name: 'Realm config',
+      isVisible: canUseAuthorityInstruction,
     },
     {
-      id: Instructions.MangoChangeReferralFeeParams,
-      name: 'Mango - change referral fee params',
-      isVisible: canUseProgramUpgradeInstruction && symbol === 'MNGO',
+      id: Instructions.CreateNftPluginMaxVoterWeight,
+      name: 'Create NFT plugin max voter weight',
+      isVisible: canUseAuthorityInstruction,
     },
     {
       id: Instructions.None,
@@ -232,5 +299,6 @@ export default function useGovernanceAssets() {
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
     nftsGovernedTokenAccounts,
+    canUseAuthorityInstruction,
   }
 }

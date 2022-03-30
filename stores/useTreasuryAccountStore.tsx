@@ -1,55 +1,129 @@
 import create, { State } from 'zustand'
-import { ViewState } from '@components/TreasuryAccount/Types'
 import {
   getNfts,
   GovernedTokenAccount,
   ukraineDaoTokenAccountsOwnerAddress,
 } from '@utils/tokens'
 import tokenService from '@utils/services/token'
-import { ConfirmedSignatureInfo, PublicKey } from '@solana/web3.js'
+import {
+  AccountInfo,
+  Cluster,
+  ConfirmedSignatureInfo,
+  PublicKey,
+} from '@solana/web3.js'
 import { notify } from '@utils/notifications'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import { Connection } from '@solana/web3.js'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { WSOL_MINT } from '@components/instructions/tools'
+import { MintInfo, TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import {
+  deserializeSplTokenAccount,
+  TokenAccountWithKey,
+} from '@utils/deserializeTokenAccount'
+import batchLoadMints from '@utils/batchLoadMints'
+
+type NewConnectionType = {
+  cluster: Cluster
+  current: Connection
+  endpoint: string
+}
+
+type TokenAccountWithListInfo = TokenAccountWithKey & {
+  tokenInfo?: TokenInfo
+}
+export type TokenInfoWithMint = TokenAccountWithListInfo & {
+  mintInfo: MintInfo
+}
+
 interface TreasuryAccountStore extends State {
-  compact: {
-    currentView: ViewState
-    currentAccount: GovernedTokenAccount | null
-    mintAddress: string
-    tokenInfo: TokenInfo | null
-    recentActivity: ConfirmedSignatureInfo[]
-  }
+  currentAccount: GovernedTokenAccount | null
+  mintAddress: string
+  tokenInfo?: TokenInfo
+  recentActivity: ConfirmedSignatureInfo[]
+
   allNfts: NFTWithMint[]
+  allTokenAccounts: TokenInfoWithMint[]
   governanceNfts: {
     [governance: string]: NFTWithMint[]
   }
   isLoadingNfts: boolean
-  setCurrentCompactView: (viewState: ViewState) => void
-  setCurrentCompactAccount: (account: GovernedTokenAccount, connection) => void
-  resetCompactViewState: () => void
+  isLoadingRecentActivity: boolean
+  isLoadingTokenAccounts: boolean
+  setCurrentAccount: (account: GovernedTokenAccount, connection) => void
   handleFetchRecentActivity: (account: GovernedTokenAccount, connection) => void
   getNfts: (
     nftsGovernedTokenAccounts: GovernedTokenAccount[],
     connection: Connection
   ) => void
-}
-
-const compactDefaultState = {
-  currentView: ViewState.MainView,
-  currentAccount: null,
-  mintAddress: '',
-  tokenInfo: null,
-  recentActivity: [],
+  getTokenAccounts: (connection, currentAccount: GovernedTokenAccount) => void
 }
 
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
-  compact: {
-    ...compactDefaultState,
-  },
+  currentAccount: null,
+  mintAddress: '',
+  tokenInfo: undefined,
+  recentActivity: [],
   allNfts: [],
+  allTokenAccounts: [],
   governanceNfts: {},
   isLoadingNfts: false,
+  isLoadingRecentActivity: false,
+  isLoadingTokenAccounts: false,
+  getTokenAccounts: async (connection: NewConnectionType, currentAccount) => {
+    set((s) => {
+      s.isLoadingTokenAccounts = true
+    })
+    // Only run if the account is native sol treasury
+    const owner = currentAccount!.transferAddress
+    if (!owner || !currentAccount.isSol) {
+      return
+    }
+    let accounts: { pubkey: PublicKey; account: AccountInfo<Buffer> }[]
+    try {
+      accounts = (
+        await connection.current.getTokenAccountsByOwner(owner, {
+          programId: TOKEN_PROGRAM_ID,
+        })
+      ).value
+      // deserialize the TokenAccount information
+      const tokenAccounts = accounts.map(({ pubkey, account }) => {
+        const deserializedTokenAccount = deserializeSplTokenAccount(account)
+        return {
+          ...deserializedTokenAccount,
+          key: pubkey,
+          tokenInfo: tokenService.getTokenInfo(
+            deserializedTokenAccount.mint.toString()
+          ),
+        }
+      })
+
+      // Should we batch load the mint accounts?
+      const mints = tokenAccounts.map((tAcct) => tAcct.mint)
+      const mintInfos = await batchLoadMints(connection.current, mints)
+      const tokenAccountsWithMints: TokenInfoWithMint[] = tokenAccounts.map(
+        (tAcct) => ({
+          ...tAcct,
+          mintInfo: mintInfos[tAcct.mint.toString()],
+        })
+      )
+
+      set((s) => {
+        s.allTokenAccounts = tokenAccountsWithMints
+        s.isLoadingTokenAccounts = false
+      })
+    } catch (e) {
+      console.error(e)
+      notify({
+        type: 'error',
+        message: "Unable to fetch account's owned tokens",
+      })
+    } finally {
+      set((s) => {
+        s.isLoadingTokenAccounts = false
+      })
+    }
+  },
   getNfts: async (nftsGovernedTokenAccounts, connection) => {
     //Just for ukraine dao, it will be replaced with good abstraction
     const ukraineNftsGov = 'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
@@ -90,12 +164,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.isLoadingNfts = false
     })
   },
-  setCurrentCompactView: (viewState) => {
-    set((s) => {
-      s.compact.currentView = viewState
-    })
-  },
-  setCurrentCompactAccount: async (account, connection) => {
+  setCurrentAccount: async (account, connection) => {
     let mintAddress =
       account && account.token ? account.token.account.mint.toBase58() : ''
     if (account.isSol) {
@@ -103,13 +172,17 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     }
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
     set((s) => {
-      s.compact.currentAccount = account
-      s.compact.mintAddress = mintAddress
-      s.compact.tokenInfo = mintAddress && tokenInfo ? tokenInfo : null
+      s.currentAccount = account
+      s.mintAddress = mintAddress
+      s.tokenInfo = mintAddress && tokenInfo ? tokenInfo : undefined
     })
     _get().handleFetchRecentActivity(account, connection)
+    _get().getTokenAccounts(connection, account)
   },
   handleFetchRecentActivity: async (account, connection) => {
+    set((s) => {
+      s.isLoadingRecentActivity = true
+    })
     let recentActivity = []
     const isNFT = account.isNft
     const address = isNFT
@@ -130,12 +203,8 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       })
     }
     set((s) => {
-      s.compact.recentActivity = recentActivity
-    })
-  },
-  resetCompactViewState: () => {
-    set((s) => {
-      s.compact = { ...compactDefaultState }
+      s.recentActivity = recentActivity
+      s.isLoadingRecentActivity = false
     })
   },
 }))

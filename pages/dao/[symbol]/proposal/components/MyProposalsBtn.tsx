@@ -10,13 +10,15 @@ import {
   withRelinquishVote,
 } from '@solana/spl-governance'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
 import Modal from '@components/Modal'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import dayjs from 'dayjs'
 import { notify } from '@utils/notifications'
 import Loading from '@components/Loading'
+import { sendSignedTransaction } from '@utils/sendTransactions'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -28,8 +30,13 @@ const MyProposalsBn = () => {
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
   )
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const { realm, programId } = useWalletStore((s) => s.selectedRealm)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { refetchProposals } = useWalletStore((s) => s.actions)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const {
     proposals,
     ownTokenRecord,
@@ -77,6 +84,7 @@ const MyProposalsBn = () => {
       (x.account.state === ProposalState.Succeeded ||
         x.account.state === ProposalState.Completed) &&
       x.account.isVoteFinalized() &&
+      ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
   const createdVoting = myProposals.filter((x) => {
@@ -96,32 +104,35 @@ const MyProposalsBn = () => {
         blockhash: recentBlockhash,
       } = await connection.getRecentBlockhash()
 
-      const transactions = await Promise.all(
-        proposalsArray.map(async (proposal) => {
-          console.log(proposal.pubkey.toBase58(), ownTokenRecord)
+      const transactions: Transaction[] = []
+      for (let i = 0; i < proposalsArray.length; i++) {
+        const proposal = proposalsArray[i]
 
-          const instructions: TransactionInstruction[] = []
+        const instructions: TransactionInstruction[] = []
 
-          await withInstruction(instructions, proposal)
+        await withInstruction(instructions, proposal)
 
-          const transaction = new Transaction({
-            recentBlockhash,
-            feePayer: wallet.publicKey!,
-          })
-          transaction.add(...instructions)
-          return transaction
+        const transaction = new Transaction({
+          recentBlockhash,
+          feePayer: wallet.publicKey!,
         })
-      )
-
+        transaction.add(...instructions)
+        transaction.recentBlockhash = recentBlockhash
+        transaction.setSigners(
+          // fee payed by the wallet owner
+          wallet.publicKey!
+        )
+        transactions.push(transaction)
+      }
       const signedTXs = await wallet.signAllTransactions(transactions)
-
       await Promise.all(
         signedTXs.map((transaction) =>
-          sendTransaction({ transaction, wallet, connection })
+          sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      await refetchProposals()
     } catch (e) {
+      console.log(e)
       notify({ type: 'error', message: 'Something wnet wrong' })
     }
     setIsLoading(false)
@@ -143,7 +154,7 @@ const MyProposalsBn = () => {
     cleanSelected(drafts, withInstruction)
   }
   const releaseAllTokens = () => {
-    const withInstruction = (
+    const withInstruction = async (
       instructions,
       proposal: ProgramAccount<Proposal>
     ) => {
@@ -154,8 +165,7 @@ const MyProposalsBn = () => {
           : ownCouncilTokenRecord
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
-
-      return withRelinquishVote(
+      const inst = withRelinquishVote(
         instructions,
         realm!.owner,
         proposal.account.governance,
@@ -166,6 +176,12 @@ const MyProposalsBn = () => {
         governanceAuthority,
         beneficiary
       )
+      await client.withRelinquishVote(
+        instructions,
+        proposal,
+        ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey
+      )
+      return inst
     }
     cleanSelected(unReleased, withInstruction)
   }
@@ -182,7 +198,8 @@ const MyProposalsBn = () => {
         proposal.account.governance,
         proposal.pubkey,
         proposal.account.tokenOwnerRecord,
-        proposal.account.governingTokenMint
+        proposal.account.governingTokenMint,
+        maxVoterWeight
       )
     }
     cleanSelected(notfinalized, withInstruction)

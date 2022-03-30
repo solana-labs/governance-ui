@@ -6,15 +6,15 @@ import Switch from './Switch'
 import { ProposalState } from '@solana/spl-governance'
 
 const initialFilterSettings = {
-  [ProposalState.Cancelled]: true,
-  [ProposalState.Completed]: true,
-  [ProposalState.Defeated]: true,
   [ProposalState.Draft]: false,
-  [ProposalState.Executing]: true,
-  [ProposalState.ExecutingWithErrors]: true,
   [ProposalState.SigningOff]: true,
-  [ProposalState.Succeeded]: true,
   [ProposalState.Voting]: true,
+  [ProposalState.Succeeded]: true,
+  [ProposalState.Executing]: true,
+  [ProposalState.Completed]: true,
+  [ProposalState.Cancelled]: false,
+  [ProposalState.Defeated]: true,
+  [ProposalState.ExecutingWithErrors]: true,
 }
 
 const StyledAlertCount = styled.span`
@@ -40,15 +40,15 @@ const ProposalFilter = ({ filters, setFilters }) => {
     const initialFilters = Object.keys(initialFilterSettings)
       .filter((x) => !initialFilterSettings[x])
       .map(Number)
+
     setFilters([...initialFilters])
   }, [])
-
   return (
     <Disclosure as="div" className="relative">
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`default-transition font-normal pl-3 pr-2 py-2.5 ring-1 ring-fgd-3 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
+            className={`bg-bkg-4 default-transition font-normal h-10 pl-3 pr-2 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
           >
             {filters.length > 0 ? (
               <div className="absolute -top-3 -right-1.5 z-20">

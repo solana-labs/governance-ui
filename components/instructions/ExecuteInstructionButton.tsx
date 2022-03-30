@@ -16,6 +16,7 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import { notify } from '@utils/notifications'
 
 export enum PlayState {
   Played,
@@ -38,7 +39,7 @@ export function ExecuteInstructionButton({
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -74,8 +75,9 @@ export function ExecuteInstructionButton({
 
     try {
       await executeTransaction(rpcContext, proposal, proposalInstruction)
-      await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
+      await refetchProposals()
     } catch (error) {
+      notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)
 
       setPlaying(PlayState.Error)

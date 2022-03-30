@@ -20,7 +20,7 @@ import { getDeposits } from 'VoteStakeRegistry/tools/deposits'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { getTokenOwnerRecordAddress } from '@solana/spl-governance'
 import InlineNotification from '@components/InlineNotification'
 import {
@@ -44,7 +44,7 @@ const unlockedTypes = ['none']
 const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
   const { realm, realmInfo, mint, tokenRecords, councilMint } = useRealm()
   const [isLockModalOpen, setIsLockModalOpen] = useState(false)
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const [reducedDeposits, setReducedDeposits] = useState<DepositBox[]>([])
   const ownDeposits = useDepositStore((s) => s.state.deposits)
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
@@ -205,7 +205,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         </div>
         <div className="flex items-center justify-between mb-4">
           <h1 className="leading-none mb-0">
-            Your Tokens{' '}
+            Your Account{' '}
             <span className="font-normal text-fgd-2 text-xs">
               ({realmInfo?.displayName})
             </span>
@@ -226,7 +226,7 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         )}
         {connected ? (
           <div>
-            <div className="grid grid-cols-3 grid-flow-row gap-4 pb-8">
+            <div className="grid md:grid-cols-3 grid-flow-row gap-4 pb-8">
               {isLoading ? (
                 <>
                   <div className="animate-pulse bg-bkg-3 col-span-1 h-44 rounded-md" />
@@ -266,9 +266,9 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
                     return (
                       <div key={idx} className={mainBoxesClasses}>
                         <p className="text-fgd-3">
-                          {x.lockUpKind === 'none'
-                            ? `${realmInfo?.symbol} Deposited`
-                            : `${tokenName} Locked`}
+                          {`${tokenName} ${
+                            x.lockUpKind === 'none' ? 'Deposited' : 'Locked'
+                          }`}
                         </p>
                         <span className="hero-text">
                           {availableTokens}

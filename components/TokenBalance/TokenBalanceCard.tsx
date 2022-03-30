@@ -20,7 +20,7 @@ import { withWithdrawGoverningTokens } from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
 import { sendTransaction } from '@utils/send'
 import { approveTokenTransfer } from '@utils/tokens'
-import Button, { LinkButton } from '../Button'
+import Button from '../Button'
 import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -29,13 +29,16 @@ import { withFinalizeVote } from '@solana/spl-governance'
 import { chunks } from '@utils/helpers'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import { ChevronRightIcon, ExclamationIcon } from '@heroicons/react/outline'
+import { ChevronRightIcon } from '@heroicons/react/solid'
+import { ExclamationIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import Link from 'next/link'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
-  const router = useRouter()
   const { councilMint, mint, realm, symbol } = useRealm()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
@@ -82,25 +85,25 @@ const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3 className="mb-4 flex">
-        Your Tokens
-        <LinkButton
-          className={`ml-auto flex items-center text-primary-light ${
-            !connected || !tokenOwnerRecordPk
-              ? 'opacity-50 pointer-events-none'
-              : ''
-          }`}
-          onClick={() => {
-            const url = fmtUrlWithCluster(
-              `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-            )
-            router.push(url)
-          }}
+      <div className="flex items-center justify-between">
+        <h3 className="mb-0">Your Account</h3>
+        <Link
+          href={fmtUrlWithCluster(
+            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+          )}
         >
-          Manage
-          <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
-        </LinkButton>
-      </h3>
+          <a
+            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
+              !connected || !tokenOwnerRecordPk
+                ? 'opacity-50 pointer-events-none'
+                : ''
+            }`}
+          >
+            View
+            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+          </a>
+        </Link>
+      </div>
       {hasLoaded ? (
         <div className="space-y-4">
           {communityDepositVisible && (
@@ -143,6 +146,11 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const {
     realm,
     realmInfo,
@@ -154,6 +162,7 @@ const TokenDeposit = ({
     governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
+    config,
   } = useRealm()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
@@ -270,12 +279,12 @@ const TokenDeposit = ({
                 proposal.account.governance,
                 proposal.pubkey,
                 proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint
+                proposal.account.governingTokenMint,
+                maxVoterWeight
               )
             }
           }
         }
-
         // Note: We might hit single transaction limits here (accounts and size) if user has too many unrelinquished votes
         // It's not going to be an issue for now due to the limited number of proposals so I'm leaving it for now
         // As a temp. work around I'm leaving the 'Release Tokens' button on finalized Proposal to make it possible to release the tokens from one Proposal at a time
@@ -289,6 +298,11 @@ const TokenDeposit = ({
           voteRecord.pubkey,
           depositTokenRecord!.account.governingTokenOwner,
           wallet!.publicKey!
+        )
+        await client.withRelinquishVote(
+          instructions,
+          proposal,
+          voteRecord.pubkey
         )
       }
     }
@@ -374,7 +388,7 @@ const TokenDeposit = ({
 
   return (
     <>
-      <div className="flex space-x-4 items-center">
+      <div className="flex space-x-4 items-center mt-4">
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full">
           <p className="text-fgd-3 text-xs">{depositTokenName} Votes</p>
           <p className="font-bold mb-0 text-fgd-1 text-xl">{availableTokens}</p>
@@ -413,12 +427,16 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
-      {realm?.account.config.useCommunityVoterWeightAddin && (
-        <small className="text-xs mt-3 flex items-center">
-          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-          Please withdraw your tokens and deposit again to get governance power
-        </small>
-      )}
+      {config?.account.communityVoterWeightAddin &&
+        vsrPluginsPks.includes(
+          config?.account.communityVoterWeightAddin.toBase58()
+        ) && (
+          <small className="text-xs mt-3 flex items-center">
+            <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+            Please withdraw your tokens and deposit again to get governance
+            power
+          </small>
+        )}
     </>
   )
 }

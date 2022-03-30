@@ -116,6 +116,14 @@
     "displayName": "PRDAO-demo2",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "DYme6LFumrVj5E4xiTgeWrPx2SAvqiWFHdDjZUBJxQkN"
+  },
+  {
+    "symbol": "Alpha Illuminati DAO",
+    "displayName": "Alpha Illuminati",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9u3s1APW4JDxt4a2p666rYYoa3UErcT12fvNKWNFqaj7",
+    "ogImage": "https://media.discordapp.net/attachments/933224453326909490/952347955157950504/alpha-illuminati-logo.png",
+    "website": "https://www.alphailluminati.xyz",
+    "twitter": "@illuminatialpha"
   }
- 
 ]

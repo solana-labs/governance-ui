@@ -46,7 +46,7 @@ const MakeChangeReferralFeeParams = ({
   const [form, setForm] = useState<MangoMakeChangeReferralFeeParams>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    mangoGroupKey: undefined,
+    mangoGroup: undefined,
     refSurchargeCentibps: 0,
     refShareCentibps: 0,
     refMngoRequired: 0,
@@ -82,7 +82,7 @@ const MakeChangeReferralFeeParams = ({
       )
       const setMaxMangoAccountsInstr = makeChangeReferralFeeParamsInstruction(
         form.governedAccount.governance.account.governedAccount,
-        new PublicKey(form.mangoGroupKey!),
+        new PublicKey(form.mangoGroup!),
         form.governedAccount.governance.pubkey,
         new BN(form.refSurchargeCentibps),
         new BN(form.refShareCentibps),
@@ -118,7 +118,7 @@ const MakeChangeReferralFeeParams = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
-    mangoGroupKey: yup.string().required(),
+    mangoGroup: yup.string().required(),
     refShareCentibps: yup.number().required(),
     refMngoRequired: yup.number().required(),
     refSurchargeCentibps: yup.number().required(),
@@ -138,16 +138,16 @@ const MakeChangeReferralFeeParams = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Mango group key"
-        value={form.mangoGroupKey}
+        label="Mango group"
+        value={form.mangoGroup}
         type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'mangoGroupKey',
+            propertyName: 'mangoGroup',
           })
         }
-        error={formErrors['mangoGroupKey']}
+        error={formErrors['mangoGroup']}
       />
       <Input
         label="Ref surcharge centi bps"

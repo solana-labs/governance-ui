@@ -51,7 +51,7 @@ export default function InstructionCard({
   const [tokenImgUrl, setTokenImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
-      connection.current,
+      connection,
       proposalInstruction.account.getSingleInstruction()
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
@@ -157,9 +157,7 @@ export default function InstructionCard({
         <InstructionData descriptor={descriptor}></InstructionData>
       )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
-        <InspectorButton
-          instructionData={proposalInstruction.account.getSingleInstruction()}
-        />
+        <InspectorButton proposalInstruction={proposalInstruction} />
 
         <FlagInstructionErrorButton
           playState={playing}

@@ -19,4 +19,5 @@ export interface NFTData {
 export interface NFTWithMint {
   val: NFTData
   mint: string
+  tokenAddress: string
 }

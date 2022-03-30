@@ -95,7 +95,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         { name: 'Registrar' },
         { name: 'Realm' },
         { name: 'Governance program id' },
-        { name: 'Realm govering token mint' },
+        { name: 'Realm governing token mint' },
         { name: 'Realm authority' },
         { name: 'Payer' },
       ],

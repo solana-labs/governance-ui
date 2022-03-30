@@ -21,17 +21,18 @@ import { withInsertTransaction } from '@solana/spl-governance'
 import { InstructionData } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
 import { withSignOffProposal } from '@solana/spl-governance'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
   holdUpTime: number | undefined
   prerequisiteInstructions: TransactionInstruction[]
   chunkSplitByDefault?: boolean
+  signers?: Keypair[]
+  shouldSplitIntoSeparateTxs?: boolean | undefined
 }
 
 export class InstructionDataWithHoldUpTime {
@@ -66,15 +67,21 @@ export const createProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
-  client?: VsrClient
+  client?: VotingClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
-  const signers: Keypair[] = []
+
   const governanceAuthority = walletPubkey
   const signatory = walletPubkey
   const payer = walletPubkey
   const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
   const prerequisiteInstructions: TransactionInstruction[] = []
+
+  // sum up signers
+  const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
+  const shouldSplitIntoSeparateTxs: boolean = instructionsData
+    .flatMap((x) => x.shouldSplitIntoSeparateTxs)
+    .some((x) => x)
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
@@ -89,11 +96,9 @@ export const createProposal = async (
   const useDenyOption = true
 
   //will run only if plugin is connected with realm
-  const voterWeight = await withUpdateVoterWeightRecord(
+  const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    wallet.publicKey!,
-    realm,
-    client
+    'createProposal'
   )
 
   const proposalAddress = await withCreateProposal(
@@ -112,7 +117,7 @@ export const createProposal = async (
     options,
     useDenyOption,
     payer,
-    voterWeight
+    plugin?.voterWeightPk
   )
 
   await withAddSignatory(
@@ -178,10 +183,34 @@ export const createProposal = async (
     )
   }
 
-  // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
-  // This is conservative setting and we might need to revise it if we have more empirical examples or
-  // reliable way to determine Tx size
-  if (insertInstructionCount <= 2 && !splitToChunkByDefault) {
+  if (shouldSplitIntoSeparateTxs) {
+    const transaction1 = new Transaction()
+    const transaction2 = new Transaction()
+
+    transaction1.add(...prerequisiteInstructions, ...instructions)
+    transaction2.add(...insertInstructions)
+
+    await sendTransaction({
+      transaction: transaction1,
+      wallet,
+      connection,
+      signers,
+      sendingMessage: `creating ${notificationTitle}`,
+      successMessage: `${notificationTitle} created`,
+    })
+
+    await sendTransaction({
+      transaction: transaction2,
+      wallet,
+      connection,
+      signers: undefined,
+      sendingMessage: `inserting into ${notificationTitle}`,
+      successMessage: `inserted into ${notificationTitle}`,
+    })
+  } else if (insertInstructionCount <= 2 && !splitToChunkByDefault) {
+    // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
+    // This is conservative setting and we might need to revise it if we have more empirical examples or
+    // reliable way to determine Tx size
     const transaction = new Transaction()
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed

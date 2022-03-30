@@ -4,26 +4,30 @@ import React, { useEffect, useState } from 'react'
 import AccountItem from './AccountItem'
 
 const AccountsItems = () => {
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
   >([])
 
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccounts)
+      if (governedTokenAccountsWithoutNfts.every((x) => x.mint && x.token)) {
+        setTreasuryAccounts(governedTokenAccountsWithoutNfts)
+      }
     }
     prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccounts)])
+  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
 
   return (
     <div className="space-y-3">
       {treasuryAccounts.map((accountWithGovernance) => {
         return (
-          <AccountItem
-            governedAccountTokenAccount={accountWithGovernance}
-            key={accountWithGovernance?.token?.publicKey.toBase58()}
-          />
+          accountWithGovernance.transferAddress && (
+            <AccountItem
+              governedAccountTokenAccount={accountWithGovernance}
+              key={accountWithGovernance?.transferAddress?.toBase58()}
+            />
+          )
         )
       })}
     </div>

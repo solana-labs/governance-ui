@@ -16,13 +16,14 @@ import { withVoteRegistryWithdraw } from 'VoteStakeRegistry/sdk/withVoteRegistry
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useState } from 'react'
 import Loading from '@components/Loading'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const WithDrawCommunityTokens = () => {
   const { getOwnedDeposits } = useDepositStore()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const {
     realm,
     realmInfo,
@@ -41,7 +42,8 @@ const WithDrawCommunityTokens = () => {
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
     (s) => s.actions
   )
-
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const depositRecord = deposits.find(
     (x) =>
       x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
@@ -58,8 +60,6 @@ const WithDrawCommunityTokens = () => {
         ownTokenRecord!.account!.governingTokenOwner
       )
 
-      console.log('Vote Records', voteRecords)
-
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()]
         if (!proposal) {
@@ -73,6 +73,7 @@ const WithDrawCommunityTokens = () => {
             const governance =
               governances[proposal.account.governance.toBase58()]
             if (proposal.account.getTimeToVoteEnd(governance.account) > 0) {
+              setIsLoading(false)
               // Note: It's technically possible to withdraw the vote here but I think it would be confusing and people would end up unconsciously withdrawing their votes
               notify({
                 type: 'error',
@@ -91,7 +92,8 @@ const WithDrawCommunityTokens = () => {
                 proposal.account.governance,
                 proposal.pubkey,
                 proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint
+                proposal.account.governingTokenMint,
+                maxVoterWeight
               )
             }
           }

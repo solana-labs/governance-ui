@@ -1,6 +1,6 @@
 import { BN } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 import { LightningBoltIcon } from '@heroicons/react/solid'
 import Tooltip from '@components/Tooltip'
 
@@ -18,7 +18,9 @@ const VotingPowerBox = ({
   style?: any
 }) => {
   const votingPowerFmt =
-    votingPower && mint ? fmtMintAmount(mint, votingPower) : '0'
+    votingPower && mint
+      ? getMintDecimalAmount(mint, votingPower).toFormat(0)
+      : '0'
 
   return (
     <div className={`bg-bkg-1 rounded-md ${className}`} style={style}>

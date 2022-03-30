@@ -28,10 +28,17 @@ export interface RealmInfo {
   // banner mage
   bannerImage?: string
 
-  isCertified: boolean
-
   // Allow Realm to send email/SMS/Telegram/etc., notifications to governance members
   enableNotifications?: boolean
+
+  isCertified: boolean
+
+  // 3- featured DAOs  ,2- new DAO with active proposals, 1- DAOs with active proposal,
+  sortRank?: number
+
+  // The default shared wallet of the DAO displayed on the home page
+  // It's used for crowdfunding DAOs like  Ukraine.SOL or #Unchain_Ukraine
+  sharedWalletId?: PublicKey
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
@@ -40,10 +47,14 @@ export function getProgramVersionForRealm(realmInfo: RealmInfo) {
 }
 
 interface RealmInfoAsJSON
-  extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
+  extends Omit<
+    RealmInfo,
+    'programId' | 'realmId' | 'isCertified' | 'sharedWalletId'
+  > {
+  enableNotifications?: boolean
   programId: string
   realmId: string
-  enableNotifications?: boolean
+  sharedWalletId?: string
 }
 
 // TODO: Once governance program clones registry program and governance
@@ -56,6 +67,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     ...realm,
     programId: new PublicKey(realm.programId),
     realmId: new PublicKey(realm.realmId),
+    sharedWalletId: realm.sharedWalletId && new PublicKey(realm.sharedWalletId),
     isCertified: true,
     programVersion: realm.programVersion,
     enableNotifications: realm.enableNotifications,
