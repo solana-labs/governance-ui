@@ -128,7 +128,7 @@ export const calculateAllDepositsInMangoAccountsForMint = (
   if (accounts?.length) {
     const depositsWithAmountHiherThenZero = accounts
       .map((x) => x.deposits[depositIndex])
-      .filter((x) => !x.isZero())
+      .filter((x) => !x?.isZero())
     if (depositsWithAmountHiherThenZero.length) {
       const currentDepositAmount = accounts
         .map((x) =>
