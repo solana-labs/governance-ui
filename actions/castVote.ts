@@ -66,6 +66,10 @@ export async function castVote(
   )
 
   if (message) {
+    const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
+      instructions,
+      'commentProposal'
+    )
     await withPostChatMessage(
       instructions,
       signers,
