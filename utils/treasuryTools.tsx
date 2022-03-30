@@ -3,13 +3,13 @@ import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
-import { Account, AccountType } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount, AccountType } from 'stores/useGovernanceAssetsStore'
 import { abbreviateAddress } from './formatting'
 import tokenService from './services/token'
 import { NFTWithMint } from './uiTypes/nfts'
 
 export const getTreasuryAccountItemInfo = (
-  governedAccountTokenAccount: Account,
+  governedAccountTokenAccount: AssetAccount,
   governanceNfts: { [governance: string]: NFTWithMint[] }
 ) => {
   const mintAddress =
@@ -46,9 +46,9 @@ export const getTreasuryAccountItemInfo = (
 
   const amountFormatted =
     governedAccountTokenAccount.type === AccountType.NFT
-      ? governedAccountTokenAccount.governancePubkey
+      ? governedAccountTokenAccount.governance.pubkey
         ? governanceNfts[
-            governedAccountTokenAccount.governancePubkey.toBase58()
+            governedAccountTokenAccount.governance.pubkey.toBase58()
           ]?.length
         : '0'
       : new BigNumber(amount).toFormat()
@@ -98,7 +98,7 @@ export const getTreasuryAccountItemInfo = (
   }
 }
 
-export const getTreasuryAccountItemInfoV2 = (account: Account) => {
+export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
   const mintAddress =
     account.type === AccountType.SOL
       ? WSOL_MINT
@@ -144,12 +144,12 @@ export const getTreasuryAccountItemInfoV2 = (account: Account) => {
     info,
   }
 }
-const getName = (governedAccountTokenAccount: Account) => {
+const getName = (governedAccountTokenAccount: AssetAccount) => {
   const tokenAccName = governedAccountTokenAccount.extensions.token
     ? getAccountName(governedAccountTokenAccount.extensions.token?.publicKey)
     : ''
-  const governanceAccName = governedAccountTokenAccount.governancePubkey
-    ? getAccountName(governedAccountTokenAccount.governancePubkey)
+  const governanceAccName = governedAccountTokenAccount.governance.pubkey
+    ? getAccountName(governedAccountTokenAccount.governance.pubkey)
     : ''
 
   return tokenAccName || governanceAccName

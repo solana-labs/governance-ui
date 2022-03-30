@@ -36,14 +36,14 @@ interface AccountExtension {
   token?: TokenProgramAccount<AccountInfo>
 }
 
-export interface Account {
-  governancePubkey: PublicKey
+export interface AssetAccount {
+  governance: ProgramAccount<Governance>
   pubkey: PublicKey
   type: AccountType
   extensions: AccountExtension
-}
-interface GovernedAccount extends ProgramAccount<Governance> {
-  accounts: Account[]
+  isSol?: boolean
+  isNft?: boolean
+  isToken?: boolean
 }
 
 export enum AccountType {
@@ -55,8 +55,8 @@ export enum AccountType {
 }
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
-  governedTokenAccounts: Account[]
-  governedAccounts: GovernedAccount[]
+  governedTokenAccounts: AssetAccount[]
+  assetAccounts: AssetAccount[]
   loadGovernedAccounts: boolean
   setGovernancesArray: (governances: {
     [governance: string]: ProgramAccount<Governance>
@@ -69,7 +69,7 @@ interface GovernanceAssetsStore extends State {
 
 const defaultState = {
   governancesArray: [],
-  governedAccounts: [],
+  assetAccounts: [],
   governedTokenAccounts: [],
   loadGovernedAccounts: true,
 }
@@ -85,14 +85,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     })
   },
   setGovernedAccounts: async (connection, realm) => {
-    const mintAddresses: string[] = []
     const governancesArray = _get().governancesArray
-    const governedAccounts: GovernedAccount[] = governancesArray.map((x) => {
-      return {
-        ...x,
-        accounts: [],
-      }
-    })
     const mintGovernances = getGovernancesByAccountTypes(governancesArray, [
       GovernanceAccountType.MintGovernanceV1,
       GovernanceAccountType.MintGovernanceV2,
@@ -105,9 +98,12 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       connection.current,
       mintGovernances.map((x) => x.account.governedAccount)
     )
-    withMintAccounts(governedAccounts, mintGovernances, mintGovernancesMintInfo)
-    withProgramAccounts(programGovernances, governedAccounts)
-    const getProgramAccounts = await axios.request({
+    const mintAccounts = getMintAccounts(
+      mintGovernances,
+      mintGovernancesMintInfo
+    )
+    const programAccounts = getProgramAssetAccounts(programGovernances)
+    const getOwnedTokenAccounts = await axios.request({
       url: connection.endpoint,
       method: 'POST',
       headers: {
@@ -141,7 +137,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
         }),
       ]),
     })
-    const tokenAccountsJson = getProgramAccounts.data
+    const tokenAccountsJson = getOwnedTokenAccounts.data
     const tokenAccounts = tokenAccountsJson
       .flatMap((x) => x.result)
       .map((x) => {
@@ -150,24 +146,27 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
         const account = parseTokenAccountData(publicKey, data)
         return { publicKey, account }
       })
-    await withTokenAccounts(
+    const tokenAssetAccounts = await getTokenAssetAccounts(
       tokenAccounts,
-      governedAccounts,
+      governancesArray,
       realm,
       connection.current
     )
-    await tokenService.fetchTokenPrices(mintAddresses)
+    const governedTokenAccounts = tokenAssetAccounts
+    await tokenService.fetchTokenPrices(
+      governedTokenAccounts
+        .filter((x) => x.extensions.mint?.publicKey)
+        .map((x) => x.extensions.mint!.publicKey.toBase58())
+    )
     set((s) => {
-      s.governedAccounts = governedAccounts
+      s.governancesArray = governancesArray
       s.loadGovernedAccounts = false
-      s.governedTokenAccounts = governedAccounts
-        .flatMap((x) => x.accounts)
-        .filter(
-          (x) =>
-            x.type === AccountType.TOKEN ||
-            x.type === AccountType.SOL ||
-            x.type === AccountType.NFT
-        )
+      s.governedTokenAccounts = governedTokenAccounts
+      s.assetAccounts = [
+        ...mintAccounts,
+        ...programAccounts,
+        ...governedTokenAccounts,
+      ]
     })
   },
   //TODO refresh governance, refresh account methods
@@ -201,9 +200,10 @@ const getAccountsByOwner = (
 
 const getTokenAccountsObj = async (
   realm: ProgramAccount<Realm>,
-  governance: GovernedAccount,
+  governance: ProgramAccount<Governance>,
   tokenAccount: TokenProgramAccount<AccountInfo>,
-  connection: Connection
+  connection: Connection,
+  accounts: AssetAccount[]
 ) => {
   const isSol = tokenAccount.account.mint.toBase58() === DEFAULT_NATIVE_SOL_MINT
   const isNft =
@@ -220,7 +220,8 @@ const getTokenAccountsObj = async (
         governance,
         connection,
         tokenAccount,
-        mint!
+        mint!,
+        accounts
       )
     }
   }
@@ -230,68 +231,67 @@ const getTokenAccountsObj = async (
   return new AccountTypeToken(tokenAccount, mint!, governance)
 }
 
-const withTokenAccounts = async (
+const getTokenAssetAccounts = async (
   tokenAccounts: {
     publicKey: PublicKey
     account: AccountInfo
   }[],
-  governedAccounts: GovernedAccount[],
+  governances: ProgramAccount<Governance>[],
   realm: ProgramAccount<Realm>,
   connection: Connection
 ) => {
+  const accounts: AssetAccount[] = []
   for (const tokenAccount of tokenAccounts) {
-    const governance = governedAccounts.find(
+    const governance = governances.find(
       (x) => x.pubkey.toBase58() === tokenAccount.account.owner.toBase58()
     )
     const account = await getTokenAccountsObj(
       realm,
       governance!,
       tokenAccount,
-      connection
+      connection,
+      accounts
     )
     if (account) {
-      governance?.accounts.push(account)
+      accounts.push(account)
     }
   }
+  return accounts
 }
 
-const withMintAccounts = (
-  governedAccounts: GovernedAccount[],
+const getMintAccounts = (
   mintGovernances: ProgramAccount<Governance>[],
   mintGovernancesMintInfo: (AccountInfoGeneric<Buffer> | null)[]
 ) => {
+  const accounts: AccountTypeMint[] = []
   mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
     const mintGovernnace = mintGovernances[index]
-    const governance = governedAccounts.find(
-      (x) => x.pubkey.toBase58() === mintGovernnace.pubkey.toBase58()
-    )
     if (!mintAccountInfo) {
       throw new Error(
-        `Missing mintAccountInfo for: ${governance?.pubkey.toBase58()}`
+        `Missing mintAccountInfo for: ${mintGovernnace?.pubkey.toBase58()}`
       )
     }
     const data = Buffer.from(mintAccountInfo.data)
     const parsedMintInfo = parseMintAccountData(data) as MintInfo
-    const account = new AccountTypeMint(governance!, parsedMintInfo)
+    const account = new AccountTypeMint(mintGovernnace!, parsedMintInfo)
     if (account) {
-      governance?.accounts.push(account)
+      accounts.push(account)
     }
   })
+  return accounts
 }
 
-const withProgramAccounts = (
-  programGovernances: ProgramAccount<Governance>[],
-  governedAccounts: GovernedAccount[]
+const getProgramAssetAccounts = (
+  programGovernances: ProgramAccount<Governance>[]
 ) => {
+  const accounts: AccountTypeProgram[] = []
   programGovernances.forEach((programGov) => {
-    const governance = governedAccounts.find(
-      (x) => x.pubkey.toBase58() === programGov.pubkey.toBase58()
-    )
-    const account = new AccountTypeProgram(governance!)
+    const account = new AccountTypeProgram(programGov!)
     if (account) {
-      governance?.accounts.push(account)
+      accounts.push(account)
     }
   })
+  return accounts
 }
 
 const getGovernancesByAccountTypes = (
@@ -306,10 +306,11 @@ const getGovernancesByAccountTypes = (
 
 const getSolAccount = async (
   realm: ProgramAccount<Realm>,
-  governance: GovernedAccount,
+  governance: ProgramAccount<Governance>,
   connection: Connection,
   tokenAccount: TokenProgramAccount<AccountInfo>,
-  mint: TokenProgramAccount<MintInfo>
+  mint: TokenProgramAccount<MintInfo>,
+  accounts: AssetAccount[]
 ) => {
   const solAddress = await getNativeTreasuryAddress(
     realm.owner,
@@ -336,10 +337,11 @@ const getSolAccount = async (
         realm,
         governance,
         acc,
-        connection
+        connection,
+        accounts
       )
       if (account) {
-        governance.accounts.push(account)
+        accounts.push(account)
       }
     }
     const mintRentAmount = await connection.getMinimumBalanceForRentExemption(0)
@@ -359,17 +361,18 @@ const getSolAccount = async (
   }
 }
 
-class AccountTypeToken implements Account {
-  governancePubkey: PublicKey
+class AccountTypeToken implements AssetAccount {
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
+  isToken: boolean
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
-    governance: GovernedAccount
+    governance: ProgramAccount<Governance>
   ) {
-    this.governancePubkey = governance.pubkey
+    this.governance = governance
     this.pubkey = tokenAccount.publicKey
     this.type = AccountType.TOKEN
     this.extensions = {
@@ -378,29 +381,30 @@ class AccountTypeToken implements Account {
       transferAddress: tokenAccount!.publicKey!,
       amount: tokenAccount!.account.amount,
     }
+    this.isToken = true
   }
 }
 
-class AccountTypeProgram implements Account {
-  governancePubkey: PublicKey
+class AccountTypeProgram implements AssetAccount {
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(governance: GovernedAccount) {
-    this.governancePubkey = governance.pubkey
+  constructor(governance: ProgramAccount<Governance>) {
+    this.governance = governance
     this.pubkey = governance.account.governedAccount
     this.type = AccountType.PROGRAM
     this.extensions = {}
   }
 }
 
-class AccountTypeMint implements Account {
-  governancePubkey: PublicKey
+class AccountTypeMint implements AssetAccount {
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
-  constructor(governance: GovernedAccount, account: MintInfo) {
-    this.governancePubkey = governance.pubkey
+  constructor(governance: ProgramAccount<Governance>, account: MintInfo) {
+    this.governance = governance
     this.pubkey = governance.account.governedAccount
     this.type = AccountType.MINT
     this.extensions = {
@@ -412,17 +416,18 @@ class AccountTypeMint implements Account {
   }
 }
 
-class AccountTypeNFT implements Account {
-  governancePubkey: PublicKey
+class AccountTypeNFT implements AssetAccount {
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
+  isNft: boolean
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
-    governance: GovernedAccount
+    governance: ProgramAccount<Governance>
   ) {
-    this.governancePubkey = governance.pubkey
+    this.governance = governance
     this.pubkey = tokenAccount.publicKey
     this.type = AccountType.NFT
     this.extensions = {
@@ -431,22 +436,24 @@ class AccountTypeNFT implements Account {
       transferAddress: tokenAccount.account.owner,
       amount: tokenAccount.account.amount,
     }
+    this.isNft = true
   }
 }
 
-class AccountTypeSol implements Account {
-  governancePubkey: PublicKey
+class AccountTypeSol implements AssetAccount {
+  governance: ProgramAccount<Governance>
   type: AccountType
   extensions: AccountExtension
   pubkey: PublicKey
+  isSol: boolean
   constructor(
     tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
     solAddress: PublicKey,
     solAccount: AccountInfoGen<Buffer | ParsedAccountData>,
-    governance: GovernedAccount
+    governance: ProgramAccount<Governance>
   ) {
-    this.governancePubkey = governance.pubkey
+    this.governance = governance
     this.type = AccountType.SOL
     this.pubkey = tokenAccount.publicKey
     this.extensions = {
@@ -456,5 +463,6 @@ class AccountTypeSol implements Account {
       amount: tokenAccount.account.amount,
       solAccount: solAccount,
     }
+    this.isSol = true
   }
 }

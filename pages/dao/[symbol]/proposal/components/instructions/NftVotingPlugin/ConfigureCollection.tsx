@@ -12,7 +12,6 @@ import useWalletStore from 'stores/useWalletStore'
 
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
-import { GovernedTokenAccount } from '@utils/tokens'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
@@ -26,9 +25,10 @@ import {
 } from 'NftVotePlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 interface ConfigureCollectionForm {
-  governedAccount: GovernedTokenAccount | undefined
+  governedAccount: AssetAccount | undefined
   weight: number
   size: number
   collection: string
@@ -54,7 +54,7 @@ const ConfigureNftPluginCollection = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      form!.governedAccount?.governance?.account &&
+      form!.governedAccount?.governance.pubkey &&
       wallet?.publicKey
     ) {
       const weight = getMintNaturalAmountFromDecimalAsBN(

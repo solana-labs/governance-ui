@@ -1,9 +1,5 @@
 import create, { State } from 'zustand'
-import {
-  getNfts,
-  GovernedTokenAccount,
-  ukraineDaoTokenAccountsOwnerAddress,
-} from '@utils/tokens'
+import { getNfts, ukraineDaoTokenAccountsOwnerAddress } from '@utils/tokens'
 import tokenService from '@utils/services/token'
 import {
   AccountInfo,
@@ -22,6 +18,7 @@ import {
   TokenAccountWithKey,
 } from '@utils/deserializeTokenAccount'
 import batchLoadMints from '@utils/batchLoadMints'
+import { AssetAccount, AccountType } from './useGovernanceAssetsStore'
 
 type NewConnectionType = {
   cluster: Cluster
@@ -37,7 +34,7 @@ export type TokenInfoWithMint = TokenAccountWithListInfo & {
 }
 
 interface TreasuryAccountStore extends State {
-  currentAccount: GovernedTokenAccount | null
+  currentAccount: AssetAccount | null
   mintAddress: string
   tokenInfo?: TokenInfo
   recentActivity: ConfirmedSignatureInfo[]
@@ -50,13 +47,13 @@ interface TreasuryAccountStore extends State {
   isLoadingNfts: boolean
   isLoadingRecentActivity: boolean
   isLoadingTokenAccounts: boolean
-  setCurrentAccount: (account: GovernedTokenAccount, connection) => void
-  handleFetchRecentActivity: (account: GovernedTokenAccount, connection) => void
+  setCurrentAccount: (account: AssetAccount, connection) => void
+  handleFetchRecentActivity: (account: AssetAccount, connection) => void
   getNfts: (
-    nftsGovernedTokenAccounts: GovernedTokenAccount[],
+    nftsGovernedTokenAccounts: AssetAccount[],
     connection: Connection
   ) => void
-  getTokenAccounts: (connection, currentAccount: GovernedTokenAccount) => void
+  getTokenAccounts: (connection, currentAccount: AssetAccount) => void
 }
 
 const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
@@ -75,8 +72,8 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.isLoadingTokenAccounts = true
     })
     // Only run if the account is native sol treasury
-    const owner = currentAccount!.transferAddress
-    if (!owner || !currentAccount.isSol) {
+    const owner = currentAccount!.extensions.transferAddress
+    if (!owner || currentAccount.type !== AccountType.SOL) {
       return
     }
     let accounts: { pubkey: PublicKey; account: AccountInfo<Buffer> }[]
@@ -133,14 +130,14 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     let realmNfts: NFTWithMint[] = []
     const governanceNfts = {}
     for (const acc of nftsGovernedTokenAccounts) {
-      const governance = acc.governance?.pubkey.toBase58()
+      const governance = acc.governance.pubkey.toBase58()
       try {
-        const nfts = acc.governance?.pubkey
+        const nfts = acc.governance.pubkey
           ? await getNfts(connection, acc.governance.pubkey)
           : []
         //Just for ukraine dao, it will be replaced with good abstraction
-        if (acc.governance?.pubkey.toBase58() === ukraineNftsGov) {
-          const ukrainNfts = acc.governance?.pubkey
+        if (acc.governance.pubkey.toBase58() === ukraineNftsGov) {
+          const ukrainNfts = acc.governance.pubkey
             ? await getNfts(
                 connection,
                 new PublicKey(ukraineDaoTokenAccountsOwnerAddress)
@@ -166,8 +163,10 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   },
   setCurrentAccount: async (account, connection) => {
     let mintAddress =
-      account && account.token ? account.token.account.mint.toBase58() : ''
-    if (account.isSol) {
+      account && account.extensions.token
+        ? account.extensions.token.account.mint.toBase58()
+        : ''
+    if (account.type === AccountType.SOL) {
       mintAddress = WSOL_MINT
     }
     const tokenInfo = tokenService.getTokenInfo(mintAddress)
@@ -184,10 +183,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.isLoadingRecentActivity = true
     })
     let recentActivity = []
-    const isNFT = account.isNft
-    const address = isNFT
-      ? account!.governance!.pubkey
-      : account!.governance!.account.governedAccount
+    const address = account.extensions.transferAddress
     try {
       recentActivity = await connection.current.getConfirmedSignaturesForAddress2(
         address,

@@ -1,11 +1,11 @@
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-import { Account } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 const AccountItem = ({
   governedAccountTokenAccount,
 }: {
-  governedAccountTokenAccount: Account
+  governedAccountTokenAccount: AssetAccount
 }) => {
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const {

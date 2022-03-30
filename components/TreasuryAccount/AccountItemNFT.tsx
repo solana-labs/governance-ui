@@ -1,15 +1,15 @@
 import { PublicKey } from '@solana/web3.js'
-import { GovernedTokenAccount } from '@utils/tokens'
 import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
   onClick,
   border = false,
 }: {
-  governedAccountTokenAccount: GovernedTokenAccount
+  governedAccountTokenAccount: AssetAccount
   className?: string
   onClick?: () => void
   border?: boolean
@@ -19,7 +19,7 @@ const AccountItemNFT = ({
   const { setCurrentAccount } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount
-    ? governedAccountTokenAccount.governance?.pubkey
+    ? governedAccountTokenAccount.governance.pubkey
     : null
   //TODO move to outside component
   async function handleGoToAccountOverview() {
@@ -47,7 +47,7 @@ const AccountItemNFT = ({
         <div className="text-fgd-3 text-xs flex flex-col">
           {governedAccountTokenAccount.governance
             ? governanceNfts[
-                governedAccountTokenAccount.governance?.pubkey.toBase58()
+                governedAccountTokenAccount.governance.pubkey.toBase58()
               ]?.length
             : 0}{' '}
           NFTS

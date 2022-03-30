@@ -137,7 +137,7 @@ export default function useGovernanceAssets() {
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
     (acc) => {
       const governance = governancesArray.find(
-        (x) => acc.governancePubkey.toBase58() === x.pubkey.toBase58()
+        (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
       )
       return (
         governance &&
