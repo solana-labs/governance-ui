@@ -4,7 +4,7 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 interface AccountsTabsProps {
-  activeTab: AssetAccount
+  activeTab: AssetAccount | null
   onChange: (x) => void
   tabs: Array<AssetAccount>
 }
