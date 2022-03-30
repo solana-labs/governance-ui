@@ -3,7 +3,6 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './AccountHeader'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import {
   StakingViewForm,
@@ -29,6 +28,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 const ConvertToMsol = () => {
   const { canChooseWhoVote, realm, symbol } = useRealm()
@@ -57,11 +57,13 @@ const ConvertToMsol = () => {
 
   const mSolTokenAccounts = governedTokenAccounts.filter(
     (acc) =>
-      acc.mint?.publicKey.toString() ===
+      acc.extensions.mint?.publicKey.toString() ===
       'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So'
   )
-  const mintMinAmount = form.governedTokenAccount?.mint
-    ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
+  const mintMinAmount = form.governedTokenAccount?.extensions?.mint
+    ? getMintMinAmountAsDecimal(
+        form.governedTokenAccount.extensions.mint.account
+      )
     : 1
   const proposalTitle = `Convert ${form.amount} SOL to mSOL`
   const schema = getStakeSchema({ form })
@@ -136,7 +138,7 @@ const ConvertToMsol = () => {
       <div className="space-y-4 w-full pb-4">
         <GovernedAccountSelect
           label="mSOL Treasury account"
-          governedAccounts={mSolTokenAccounts as GovernedMultiTypeAccount[]}
+          governedAccounts={mSolTokenAccounts as AssetAccount[]}
           shouldBeGoverned={false}
           governance={currentAccount?.governance}
           value={form.destinationAccount}

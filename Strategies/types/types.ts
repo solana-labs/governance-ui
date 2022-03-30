@@ -1,8 +1,8 @@
 import { MangoAccount } from '@blockworks-foundation/mango-client'
 import { ProgramAccount, Realm, RpcContext } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { GovernedTokenAccount } from '@utils/tokens'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 import { MarketStore } from 'Strategies/store/marketStore'
 
 export interface TreasuryStrategy {
@@ -30,7 +30,7 @@ export type HandleCreateProposalWithStrategy = (
   handledMint: string,
   form: MNGODepositForm,
   realm: ProgramAccount<Realm>,
-  treasuaryAccount: GovernedTokenAccount,
+  treasuaryAccount: AssetAccount,
   tokenOwnerRecord: PublicKey,
   governingTokenMint: PublicKey,
   proposalIndex: number,

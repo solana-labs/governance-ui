@@ -21,6 +21,7 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
 
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
@@ -309,5 +310,6 @@ export default function useGovernanceAssets() {
     governedTokenAccountsWithoutNfts,
     nftsGovernedTokenAccounts,
     canUseAuthorityInstruction,
+    assetAccounts,
   }
 }

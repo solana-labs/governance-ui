@@ -13,14 +13,14 @@ import useWalletStore from 'stores/useWalletStore'
 
 import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
-import { GovernedTokenAccount } from '@utils/tokens'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
 import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 interface CreateNftRegistrarForm {
-  governedAccount: GovernedTokenAccount | undefined
+  governedAccount: AssetAccount | undefined
   maxCollections: number
 }
 

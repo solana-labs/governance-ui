@@ -13,16 +13,22 @@ export function useTotalTreasuryPrice() {
     async function calcTotalTokensPrice() {
       const totalPrice = governedTokenAccountsWithoutNfts
         .filter(
-          (x) => typeof x.mint !== 'undefined' && typeof x.token !== 'undefined'
+          (x) =>
+            typeof x.extensions.mint !== 'undefined' &&
+            typeof x.extensions.token !== 'undefined'
         )
         .map((x) => {
           return (
             getMintDecimalAmountFromNatural(
-              x.mint!.account,
-              new BN(x.isSol ? x.solAccount!.lamports : x.token!.account.amount)
+              x.extensions.mint!.account,
+              new BN(
+                x.isSol
+                  ? x.extensions.solAccount!.lamports
+                  : x.extensions.token!.account.amount
+              )
             ).toNumber() *
             tokenService.getUSDTokenPrice(
-              x.isSol ? WSOL_MINT : x.mint!.publicKey.toBase58()
+              x.isSol ? WSOL_MINT : x.extensions.mint!.publicKey.toBase58()
             )
           )
         })

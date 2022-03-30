@@ -104,7 +104,9 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
   const mintMinAmount = form.governedTokenAccount?.mint
-    ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
+    ? getMintMinAmountAsDecimal(
+        form.governedTokenAccount.extensions.mint.account
+      )
     : 1
   const currentPrecision = precision(mintMinAmount)
 
@@ -216,11 +218,13 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount?.token?.account?.amount?.gte(mintValue)
+      gte = form.governedTokenAccount.extensions.token?.account?.amount?.gte(
+        mintValue
+      )
     } catch (e) {
       //silent fail
     }
-    return form.governedTokenAccount?.token?.publicKey && gte
+    return form.governedTokenAccount.extensions.token?.publicKey && gte
   }
 
   useEffect(() => {

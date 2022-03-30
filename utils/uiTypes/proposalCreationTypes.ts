@@ -8,12 +8,12 @@ import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
   GovernedProgramAccount,
-  GovernedTokenAccount,
 } from '@utils/tokens'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -28,14 +28,14 @@ export interface UiInstruction {
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
 
 export interface FriktionDepositForm {
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
@@ -43,7 +43,7 @@ export interface FriktionDepositForm {
 
 export interface FriktionWithdrawForm {
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
   depositTokenMint: string | undefined
   programId: string | undefined
@@ -53,7 +53,7 @@ export interface FriktionWithdrawForm {
 export interface GrantForm {
   destinationAccount: string
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
   lockupKind: LockupKind
   startDateUnixSeconds: number
@@ -62,7 +62,7 @@ export interface GrantForm {
 }
 
 export interface ClawbackForm {
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   voter: Voter | null
   deposit: DepositWithMintAccount | null
 }
@@ -73,9 +73,9 @@ export interface SendTokenCompactViewForm extends SplTokenTransferForm {
 }
 
 export interface StakingViewForm {
-  destinationAccount: GovernedTokenAccount | undefined
+  destinationAccount: AssetAccount | undefined
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   description: string
   title: string
 }

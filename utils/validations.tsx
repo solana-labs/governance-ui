@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { ProgramBufferAccount } from '@tools/validators/accounts/upgradeable-program'
 import { tryParseKey } from '@tools/validators/pubkey'
 import { create } from 'superstruct'
-import { GovernedTokenAccount, tryGetTokenAccount } from './tokens'
+import { tryGetTokenAccount } from './tokens'
 import * as yup from 'yup'
 import {
   getMintNaturalAmountFromDecimal,
@@ -19,6 +19,7 @@ import {
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
 import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -190,7 +191,7 @@ export const validateBuffer = async (
 }
 
 export const getFriktionDepositSchema = ({ form }) => {
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
@@ -205,17 +206,23 @@ export const getFriktionDepositSchema = ({ form }) => {
               message: `Please select source account to validate the amount`,
             })
           }
-          if (val && governedTokenAccount && governedTokenAccount?.mint) {
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount.extensions.mint
+          ) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
-              governedTokenAccount?.mint.account.decimals
+              governedTokenAccount?.extensions.mint.account.decimals
             )
-            return !!(governedTokenAccount?.token?.publicKey &&
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
             !governedTokenAccount.isSol
-              ? governedTokenAccount.token.account.amount.gte(mintValue)
-              : new BN(governedTokenAccount.solAccount!.lamports).gte(
+              ? governedTokenAccount.extensions.token.account.amount.gte(
                   mintValue
-                ))
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -243,7 +250,7 @@ export const getTokenTransferSchema = ({
   tokenAmount?: BN
   mintDecimals?: number
 }) => {
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),
     amount: yup
@@ -262,22 +269,28 @@ export const getTokenTransferSchema = ({
               message: `Please select source account to validate the amount`,
             })
           }
-          if (val && governedTokenAccount && governedTokenAccount?.mint) {
+          if (
+            val &&
+            governedTokenAccount &&
+            governedTokenAccount?.extensions.mint
+          ) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
               typeof mintDecimals !== 'undefined'
                 ? mintDecimals
-                : governedTokenAccount?.mint.account.decimals
+                : governedTokenAccount?.extensions.mint.account.decimals
             )
             if (tokenAmount) {
               return tokenAmount.gte(mintValue)
             }
-            return !!(governedTokenAccount?.token?.publicKey &&
+            return !!(governedTokenAccount?.extensions.token?.publicKey &&
             !governedTokenAccount.isSol
-              ? governedTokenAccount.token.account.amount.gte(mintValue)
-              : new BN(governedTokenAccount.solAccount!.lamports).gte(
+              ? governedTokenAccount.extensions.token.account.amount.gte(
                   mintValue
-                ))
+                )
+              : new BN(
+                  governedTokenAccount.extensions.solAccount!.lamports
+                ).gte(mintValue))
           }
           return this.createError({
             message: `Amount is required`,
@@ -293,7 +306,8 @@ export const getTokenTransferSchema = ({
           if (val) {
             try {
               if (
-                governedTokenAccount?.token?.account.address.toBase58() == val
+                governedTokenAccount?.extensions.token?.account.address.toBase58() ==
+                val
               ) {
                 return this.createError({
                   message: `Destination account address can't be same as source account`,
@@ -302,7 +316,7 @@ export const getTokenTransferSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                governedTokenAccount?.token?.account.address
+                governedTokenAccount?.extensions.token?.account.address
               )
               return true
             } catch (e) {

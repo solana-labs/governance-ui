@@ -85,8 +85,10 @@ const SendTokens = () => {
   const destinationAccountName =
     destinationAccount?.publicKey &&
     getAccountName(destinationAccount?.account.address)
-  const mintMinAmount = form.governedTokenAccount?.mint
-    ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
+  const mintMinAmount = form.governedTokenAccount?.extensions?.mint
+    ? getMintMinAmountAsDecimal(
+        form.governedTokenAccount.extensions.mint.account
+      )
     : 1
   const currentPrecision = precision(mintMinAmount)
 
@@ -129,7 +131,7 @@ const SendTokens = () => {
   //   }
   const calcTransactionDolarAmount = (amount) => {
     const price = tokenService.getUSDTokenPrice(
-      currentAccount!.mint!.publicKey.toBase58()
+      currentAccount!.extensions.mint!.publicKey.toBase58()
     )
     const totalPrice = amount * price
     const totalPriceFormatted =
@@ -202,15 +204,17 @@ const SendTokens = () => {
   const IsAmountNotHigherThenBalance = () => {
     const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
-      form.governedTokenAccount!.mint!.account.decimals
+      form.governedTokenAccount!.extensions.mint!.account.decimals
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount?.token?.account?.amount?.gte(mintValue)
+      gte = form.governedTokenAccount!.extensions.token?.account?.amount?.gte(
+        mintValue
+      )
     } catch (e) {
       //silent fail
     }
-    return form.governedTokenAccount?.token?.publicKey && gte
+    return form.governedTokenAccount!.extensions.token?.publicKey && gte
   }
 
   useEffect(() => {

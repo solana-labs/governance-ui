@@ -4,7 +4,6 @@ import {
   PublicKey,
   TransactionInstruction,
   Commitment,
-  ParsedAccountData,
 } from '@solana/web3.js'
 import {
   AccountInfo,
@@ -27,33 +26,16 @@ import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
-export type GovernedTokenAccount = {
-  token: TokenProgramAccount<AccountInfo> | undefined
-  mint: TokenProgramAccount<MintInfo> | undefined
-  governance: ProgramAccount<Governance> | undefined
-  isNft: boolean
-  isSol: boolean
-  transferAddress: PublicKey | null
-  solAccount: null | AccountInfoGen<Buffer | ParsedAccountData>
-}
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
   governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedProgramAccount = {
   governance: ProgramAccount<Governance> | undefined
-}
-export type GovernedMultiTypeAccount = {
-  token?: TokenProgramAccount<AccountInfo> | undefined
-  mint?: TokenProgramAccount<MintInfo> | undefined
-  governance: ProgramAccount<Governance>
-  mintInfo?: MintInfo | undefined
-  isSol?: boolean
-  transferAddress?: PublicKey | null
-  solAccount?: null | AccountInfoGen<Buffer | ParsedAccountData>
 }
 
 export type TokenProgramAccount<T> = {
@@ -276,24 +258,26 @@ export async function getMultipleAccountInfoChunked(
 }
 
 //TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
-export function getTokenAccountLabelInfo(
-  acc: GovernedMultiTypeAccount | undefined
-) {
+export function getTokenAccountLabelInfo(acc: AssetAccount | undefined) {
   let tokenAccount = ''
   let tokenName = ''
   let tokenAccountName = ''
   let amount = ''
   let imgUrl = ''
 
-  if (acc?.token && acc.mint) {
-    const info = tokenService.getTokenInfo(acc!.mint!.publicKey.toBase58())
+  if (acc?.extensions.token && acc.extensions.mint) {
+    const info = tokenService.getTokenInfo(
+      acc.extensions!.mint!.publicKey.toBase58()
+    )
     imgUrl = info?.logoURI ? info.logoURI : ''
-    tokenAccount = acc.token.publicKey.toBase58()
-    tokenName = info?.name ? info.name : abbreviateAddress(acc.mint.publicKey)
-    tokenAccountName = getAccountName(acc.token.publicKey)
+    tokenAccount = acc.extensions.token.publicKey.toBase58()
+    tokenName = info?.name
+      ? info.name
+      : abbreviateAddress(acc.extensions.mint.publicKey)
+    tokenAccountName = getAccountName(acc.extensions.token.publicKey)
     amount = formatMintNaturalAmountAsDecimal(
-      acc.mint!.account,
-      acc.token?.account.amount
+      acc.extensions.mint!.account,
+      acc.extensions.token?.account.amount
     )
   }
   return {
@@ -305,26 +289,27 @@ export function getTokenAccountLabelInfo(
   }
 }
 
-export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
+export function getSolAccountLabel(acc: AssetAccount | undefined) {
   let tokenAccount = ''
   let tokenName = ''
   let tokenAccountName = ''
   let amount = ''
   let imgUrl = ''
 
-  if (acc?.token && acc.mint) {
+  if (acc?.extensions.token && acc.extensions.mint) {
     const info = tokenService.getTokenInfo(WSOL_MINT)
     imgUrl = info?.logoURI ? info.logoURI : ''
     tokenAccount =
-      acc.transferAddress?.toBase58() || acc.token.publicKey.toBase58()
+      acc.extensions.transferAddress?.toBase58() ||
+      acc.extensions.token.publicKey.toBase58()
     tokenName = 'SOL'
 
-    tokenAccountName = acc.transferAddress
-      ? getAccountName(acc.transferAddress)
+    tokenAccountName = acc.extensions.transferAddress
+      ? getAccountName(acc.extensions.transferAddress)
       : ''
     amount = formatMintNaturalAmountAsDecimal(
-      acc.mint!.account,
-      new BN(acc.solAccount!.lamports)
+      acc.extensions.mint!.account,
+      new BN(acc.extensions.solAccount!.lamports)
     )
   }
   return {
@@ -336,15 +321,13 @@ export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
   }
 }
 
-export function getMintAccountLabelInfo(
-  acc: GovernedMultiTypeAccount | undefined
-) {
+export function getMintAccountLabelInfo(acc: AssetAccount | undefined) {
   let account = ''
   let tokenName = ''
   let mintAccountName = ''
   let amount = ''
   let imgUrl = ''
-  if (acc?.mintInfo && acc.governance) {
+  if (acc?.extensions.mint && acc.governance) {
     const info = tokenService.getTokenInfo(
       acc.governance.account.governedAccount.toBase58()
     )
@@ -353,8 +336,8 @@ export function getMintAccountLabelInfo(
     tokenName = info?.name ? info.name : ''
     mintAccountName = getAccountName(acc.governance.account.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
-      acc.mintInfo,
-      acc?.mintInfo.supply
+      acc.extensions.mint.account,
+      acc?.extensions.mint.account.supply
     )
   }
   return {

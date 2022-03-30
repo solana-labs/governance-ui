@@ -61,7 +61,7 @@ const AccountOverview = () => {
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
   const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
-  const accountPublicKey = currentAccount?.transferAddress
+  const accountPublicKey = currentAccount?.extensions.transferAddress
   const strategies = useStrategiesStore((s) => s.strategies)
   const [accountInvestments, setAccountInvestments] = useState<
     TreasuryStrategy[]
@@ -84,14 +84,15 @@ const AccountOverview = () => {
     if (strategies.length > 0) {
       const eligibleInvestments = strategies.filter(
         (strat) =>
-          strat.handledMint === currentAccount?.token?.account.mint.toString()
+          strat.handledMint ===
+          currentAccount?.extensions.token?.account.mint.toString()
       )
       setEligibleInvestments(eligibleInvestments)
     }
   }, [currentAccount, strategies])
   useEffect(() => {
     const handleGetMangoAccounts = async () => {
-      const currentAccountMint = currentAccount?.token?.account.mint
+      const currentAccountMint = currentAccount?.extensions.token?.account.mint
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
         mngoAccounts,
         currentAccountMint!,
@@ -146,9 +147,9 @@ const AccountOverview = () => {
     <>
       <div className="flex items-center justify-between mb-2 py-2">
         <h2 className="mb-0">
-          {currentAccount?.transferAddress &&
-          getAccountName(currentAccount.transferAddress)
-            ? getAccountName(currentAccount.transferAddress)
+          {currentAccount?.extensions.transferAddress &&
+          getAccountName(currentAccount.extensions.transferAddress)
+            ? getAccountName(currentAccount.extensions.transferAddress)
             : accountPublicKey &&
               abbreviateAddress(accountPublicKey as PublicKey)}
         </h2>
@@ -158,7 +159,7 @@ const AccountOverview = () => {
               className="cursor-pointer default-transition text-primary-light hover:text-primary-dark"
               onClick={() => {
                 const url = fmtUrlWithCluster(
-                  `/dao/${symbol}/gallery/${currentAccount.transferAddress}`
+                  `/dao/${symbol}/gallery/${currentAccount.extensions.transferAddress}`
                 )
                 router.push(url)
               }}
@@ -197,7 +198,9 @@ const AccountOverview = () => {
             onClick={() =>
               isNFT
                 ? setOpenNftDepositModal(true)
-                : handleCopyAddress(currentAccount?.transferAddress!.toBase58())
+                : handleCopyAddress(
+                    currentAccount?.extensions.transferAddress!.toBase58()
+                  )
             }
           >
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
