@@ -1342,22 +1342,30 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@notifi-network/notifi-axios-adapter@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-adapter/-/notifi-axios-adapter-0.3.0.tgz#5c73de604522ec18c9a4f87c6ccad733ef00c446"
-  integrity sha512-lAmY4GMb1mn44JUmil8jn6qUYuMzQUAsUw4Q6XC0uRJGPdAnrKTx8vghgpN04BTNir7cSsiVs8tqBQPt1QAslg==
-
-"@notifi-network/notifi-core@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.3.0.tgz#0691865a39f20d27254e253feb9125873338f9ab"
-  integrity sha512-ySL8faida7kAkxoPHfJJot6fCucY3dU+sy6ZB1Z3gi+WSKHHfqXRNjOc61KoeAoEARNoS9ksmgSXmepjNErT9A==
-
-"@notifi-network/notifi-react-hooks@^0.3.0":
-  version "0.3.0"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.3.0.tgz#57000b0e42dd68a611afb1a715f944e9d982d722"
-  integrity sha512-g5v5j4OQBOs788HQ298KNUXe4o8GS536IK41EpCXQScaMnZsBIzKagN6tZFk+QLCHXmGjbmcX2vA2EHZWFdAAw==
+"@notifi-network/notifi-axios-adapter@^0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-adapter/-/notifi-axios-adapter-0.10.1.tgz#c0ebbfb52b74c59c1ea7dd208c1700371ca48952"
+  integrity sha512-1ewQncoSGNBEYJ80QR+qBKYXE5TSpWRePRtQNF2T2SiInWSwaPKo88/iSRWgxmN83hiw2aKenqmj7E8n5Gm0qw==
   dependencies:
-    "@notifi-network/notifi-axios-adapter" "^0.3.0"
+    "@notifi-network/notifi-axios-utils" "^0.10.0"
+
+"@notifi-network/notifi-axios-utils@^0.10.0":
+  version "0.10.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-utils/-/notifi-axios-utils-0.10.0.tgz#4f18dbc49f4f2d9908d0745187e68d7b1dc267fc"
+  integrity sha512-RH49Q3UVlflpKwN6lJQZMMO2vax7q5EC8PILrUydTmMQyColsPGDIROpgUBnxxJ+g7I3uf+sCKG9H/+YLsLOLg==
+
+"@notifi-network/notifi-core@^0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.10.1.tgz#b3cf25b2bc816732311655f7fff94cd0aa700d7d"
+  integrity sha512-l+lQz3Q+YmoNI4n7jckx7MO75NS/1ZwgLgQOIVazZSI6XvlgnEFDxB855zk62YQfGuy56kK9H5NCD1YAg2NXyg==
+
+"@notifi-network/notifi-react-hooks@^0.10.1":
+  version "0.10.1"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.10.1.tgz#bd7280d18937209c53891fac62e4349206dfbe47"
+  integrity sha512-K4fkJ+igWRXPGsst+3Ls44qZ5pPA7AobFCAYeVEzvBc5Jh7166jhiRNzFQiIQSfJuvukPh6KLVSVyH/KU4XC2w==
+  dependencies:
+    "@notifi-network/notifi-axios-adapter" "^0.10.1"
+    "@notifi-network/notifi-axios-utils" "^0.10.0"
     axios "^0.26.0"
     typedoc-plugin-missing-exports "^0.22.6"
     typescript "^4.5.5"

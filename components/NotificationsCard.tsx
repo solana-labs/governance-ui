@@ -9,20 +9,19 @@ import {
   PaperAirplaneIcon,
 } from '@heroicons/react/solid'
 import {
-  Alert,
   BlockchainEnvironment,
-  Filter,
   GqlError,
   MessageSigner,
-  Source,
   useNotifiClient,
 } from '@notifi-network/notifi-react-hooks'
 import { useRouter } from 'next/router'
 import { EndpointTypes } from '@models/types'
 
-const firstOrNull = <T,>(arr: ReadonlyArray<T> | null | undefined) => {
-  if (arr !== null && arr !== undefined && arr.length > 0) {
-    return arr[0]
+const firstOrNull = <T,>(
+  arr: ReadonlyArray<T> | null | undefined
+): T | null => {
+  if (arr !== null && arr !== undefined) {
+    return arr[0] ?? null
   }
   return null
 }
@@ -53,6 +52,7 @@ const NotificationsCard = () => {
   const {
     data,
     logIn,
+    fetchData,
     isAuthenticated,
     createAlert,
     updateAlert,
@@ -62,35 +62,16 @@ const NotificationsCard = () => {
     env,
   })
 
-  const [alert, setAlert] = useState<Alert | null>(null)
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
   const [telegram, setTelegram] = useState<string>('')
-  const [source, setSource] = useState<Source | null>(null)
-  const [filter, setFilter] = useState<Filter | null>(null)
 
   useEffect(() => {
     // Update state when server data changes
-    const alerts = data?.alerts ?? null
-    if (alerts === null || alerts.length < 1) {
-      setAlert(null)
-      setEmail('')
-      setPhone('')
-      setTelegram('')
-    } else {
-      const newAlert = alerts[0]
-      setAlert(newAlert)
-      setEmail(
-        firstOrNull(newAlert.targetGroup.emailTargets)?.emailAddress ?? ''
-      )
-      setPhone(firstOrNull(newAlert.targetGroup.smsTargets)?.phoneNumber ?? '')
-      setTelegram(
-        firstOrNull(newAlert.targetGroup.telegramTargets)?.telegramId ?? ''
-      )
-    }
-
-    setSource(firstOrNull(data?.sources))
-    setFilter(firstOrNull(data?.filters))
+    const targetGroup = firstOrNull(data?.targetGroups)
+    setEmail(firstOrNull(targetGroup?.emailTargets)?.emailAddress ?? '')
+    setPhone(firstOrNull(targetGroup?.smsTargets)?.phoneNumber ?? '')
+    setTelegram(firstOrNull(targetGroup?.telegramTargets)?.telegramId ?? '')
   }, [data])
 
   const handleError = (errors: { message: string }[]) => {
@@ -122,19 +103,22 @@ const NotificationsCard = () => {
 
   const handleSave = async function () {
     setLoading(true)
+
+    let localData = data
     // user is not authenticated
     if (!isAuthenticated() && wallet && wallet.publicKey) {
       try {
         await logIn((wallet as unknown) as MessageSigner)
+        localData = await fetchData()
       } catch (e) {
         handleError([e])
       }
     }
 
+    const alert = firstOrNull(localData?.alerts)
+    const source = firstOrNull(localData?.sources)
+    const filter = firstOrNull(localData?.filters)
     if (connected && isAuthenticated()) {
-      console.log('Sending')
-      console.log(alert)
-
       try {
         if (alert !== null) {
           await updateAlert({
