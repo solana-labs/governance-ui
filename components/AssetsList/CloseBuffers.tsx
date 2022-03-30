@@ -57,7 +57,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const highestLampartsAmountInGovernedTokenAccounts = Math.max(
     ...governedTokenAccountsWithoutNfts
       .filter((x) => x.isSol)
-      .map((x) => x.solAccount!.lamports)
+      .map((x) => x.extensions!.solAccount!.lamports)
   )
   const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol)
   const [form, setForm] = useState<CloseBuffersForm>({
@@ -67,10 +67,10 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
       ? solAccounts
           .find(
             (x) =>
-              x.solAccount?.lamports ===
+              x.extensions.solAccount?.lamports ===
               highestLampartsAmountInGovernedTokenAccounts
           )!
-          .transferAddress!.toBase58()
+          .extensions.transferAddress!.toBase58()
       : wallet?.publicKey?.toBase58()
       ? wallet?.publicKey?.toBase58()
       : '',
