@@ -45,7 +45,7 @@ module.exports = {
           'fgd-2': '#7a7a7a',
           'fgd-3': '#adadad',
           'fgd-4': '#cccccc',
-          'bkg-1': '#f9f9f9',
+          'bkg-1': '#fcfcfc',
           'bkg-2': '#f0f0f0',
           'bkg-3': '#e0e0e0',
           'bkg-4': '#d6d6d6',

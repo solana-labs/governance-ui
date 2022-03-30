@@ -119,6 +119,7 @@ function App({ Component, pageProps }) {
       getNfts(nftsGovernedTokenAccounts, connection.current)
     }
   }, [JSON.stringify(nftsGovernedTokenAccounts), realm?.pubkey.toBase58()])
+
   return (
     <div className="relative">
       <ErrorBoundary>
