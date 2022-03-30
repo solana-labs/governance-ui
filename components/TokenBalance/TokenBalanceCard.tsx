@@ -33,7 +33,10 @@ import { ChevronRightIcon } from '@heroicons/react/solid'
 import { ExclamationIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import { useEffect, useState } from 'react'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import Link from 'next/link'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const TokenBalanceCard = ({ proposal }: { proposal?: Option<Proposal> }) => {
   const { councilMint, mint, realm, symbol } = useRealm()
@@ -143,6 +146,11 @@ const TokenDeposit = ({
   const { fetchWalletTokenAccounts, fetchRealm } = useWalletStore(
     (s) => s.actions
   )
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const {
     realm,
     realmInfo,
@@ -154,6 +162,7 @@ const TokenDeposit = ({
     governances,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
+    config,
   } = useRealm()
   // Do not show deposits for mints with zero supply because nobody can deposit anyway
   if (!mint || mint.supply.isZero()) {
@@ -270,12 +279,12 @@ const TokenDeposit = ({
                 proposal.account.governance,
                 proposal.pubkey,
                 proposal.account.tokenOwnerRecord,
-                proposal.account.governingTokenMint
+                proposal.account.governingTokenMint,
+                maxVoterWeight
               )
             }
           }
         }
-
         // Note: We might hit single transaction limits here (accounts and size) if user has too many unrelinquished votes
         // It's not going to be an issue for now due to the limited number of proposals so I'm leaving it for now
         // As a temp. work around I'm leaving the 'Release Tokens' button on finalized Proposal to make it possible to release the tokens from one Proposal at a time
@@ -289,6 +298,11 @@ const TokenDeposit = ({
           voteRecord.pubkey,
           depositTokenRecord!.account.governingTokenOwner,
           wallet!.publicKey!
+        )
+        await client.withRelinquishVote(
+          instructions,
+          proposal,
+          voteRecord.pubkey
         )
       }
     }
@@ -413,12 +427,16 @@ const TokenDeposit = ({
           Withdraw
         </Button>
       </div>
-      {realm?.account.config.useCommunityVoterWeightAddin && (
-        <small className="text-xs mt-3 flex items-center">
-          <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
-          Please withdraw your tokens and deposit again to get governance power
-        </small>
-      )}
+      {config?.account.communityVoterWeightAddin &&
+        vsrPluginsPks.includes(
+          config?.account.communityVoterWeightAddin.toBase58()
+        ) && (
+          <small className="text-xs mt-3 flex items-center">
+            <ExclamationIcon className="w-5 h-5 mr-2"></ExclamationIcon>
+            Please withdraw your tokens and deposit again to get governance
+            power
+          </small>
+        )}
     </>
   )
 }

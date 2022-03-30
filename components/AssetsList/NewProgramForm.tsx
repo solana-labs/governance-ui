@@ -23,7 +23,8 @@ import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -43,7 +44,9 @@ const defaultFormValues = {
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const {
     realmInfo,
     realm,
@@ -174,6 +177,16 @@ const NewProgramForm = () => {
       })
     }
   }, [form.programId])
+  useEffect(() => {
+    setForm({
+      ...form,
+      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+        ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+        : realmMint
+        ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
+        : 0,
+    })
+  }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />

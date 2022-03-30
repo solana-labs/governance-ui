@@ -17,7 +17,7 @@ import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 
-const NEW_TREASURY_ROUTE = `/treasury/new`
+export const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()

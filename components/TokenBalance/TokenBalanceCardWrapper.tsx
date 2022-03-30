@@ -2,6 +2,7 @@ import { Proposal } from '@solana/spl-governance'
 import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
+import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -17,11 +18,19 @@ const TokenBalanceCardWrapper = ({
 }: {
   proposal?: Option<Proposal>
 }) => {
-  const { realm, ownTokenRecord } = useRealm()
-
+  const {
+    ownTokenRecord,
+    config,
+    ownCouncilTokenRecord,
+    councilTokenAccount,
+  } = useRealm()
+  const currentPluginPk = config?.account?.communityVoterWeightAddin
   const getTokenBalanceCard = () => {
     //based on realm config it will provide proper tokenBalanceCardComponent
-    const isLockTokensMode = realm?.account.config.useCommunityVoterWeightAddin
+    const isLockTokensMode =
+      currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
+    const isNftMode =
+      currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
     if (
       isLockTokensMode &&
       (!ownTokenRecord ||
@@ -30,10 +39,19 @@ const TokenBalanceCardWrapper = ({
       return <LockPluginTokenBalanceCard></LockPluginTokenBalanceCard>
     }
     if (
-      realm?.pubkey.toBase58() ===
-      'HVywtno57PwcgWQzRaf3Pv8RKWWrF1zoqLZGULNC2jGm'
+      isNftMode &&
+      (!ownTokenRecord ||
+        ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      return <NftBalanceCard></NftBalanceCard>
+      return (
+        <>
+          <NftBalanceCard></NftBalanceCard>
+          {(!ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero() ||
+            !councilTokenAccount?.account.amount.isZero()) && (
+            <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
+          )}
+        </>
+      )
     }
     //Default
     return <TokenBalanceCard proposal={proposal}></TokenBalanceCard>

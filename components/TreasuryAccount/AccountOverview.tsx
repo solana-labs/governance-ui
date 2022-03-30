@@ -15,6 +15,7 @@ import useWalletStore from 'stores/useWalletStore'
 import AccountHeader from './AccountHeader'
 import DepositNFT from './DepositNFT'
 import SendTokens from './SendTokens'
+import GenericSendTokens, { GenericSendTokensProps } from './GenericSendTokens'
 import {
   ExternalLinkIcon,
   PlusCircleIcon,
@@ -33,6 +34,8 @@ import {
   tryGetMangoAccountsForOwner,
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
+import LoadingRows from './LoadingRows'
+import TokenAccounts from './TokenAccounts'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -67,6 +70,10 @@ const AccountOverview = () => {
     TreasuryStrategy[]
   >([])
   const [showStrategies, setShowStrategies] = useState(false)
+  const [
+    genericSendTokenInfo,
+    setGenericSendTokenInfo,
+  ] = useState<GenericSendTokensProps | null>(null)
   const [
     proposedInvestment,
     setProposedInvestment,
@@ -282,14 +289,18 @@ const AccountOverview = () => {
           </div>
         )}
       </div>
+      {/* Only display owned token accounts if is SOL */}
+      {isSol && (
+        <div className="pb-8">
+          <h3 className="mb-4">Associated Token Accounts</h3>
+          <TokenAccounts setSendTokenInfo={setGenericSendTokenInfo} />
+        </div>
+      )}
+
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (
-          <div className="space-y-2">
-            <div className="animate-pulse bg-bkg-3 h-12 rounded-md" />
-            <div className="animate-pulse bg-bkg-3 h-12 rounded-md" />
-            <div className="animate-pulse bg-bkg-3 h-12 rounded-md" />
-          </div>
+          <LoadingRows />
         ) : recentActivity.length > 0 ? (
           recentActivity.map((activity) => (
             <a
@@ -377,6 +388,17 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {genericSendTokenInfo && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setGenericSendTokenInfo(null)
+          }}
+          isOpen={!!genericSendTokenInfo}
+        >
+          <GenericSendTokens {...genericSendTokenInfo} />
         </Modal>
       )}
     </>

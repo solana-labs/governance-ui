@@ -286,6 +286,10 @@ export enum Instructions {
   ForesightInitMarketList,
   ForesightInitCategory,
   ForesightResolveMarket,
+  RealmConfig,
+  CreateNftPluginRegistrar,
+  CreateNftPluginMaxVoterWeight,
+  ConfigureNftPluginCollection,
 }
 
 export type createParams = [

@@ -1,5 +1,8 @@
+import { BN, PublicKey } from '@blockworks-foundation/mango-client'
+import { ProgramAccount, TokenOwnerRecord } from '@solana/spl-governance'
 import { isPublicKey } from '@tools/core/pubkey'
 import { useRouter } from 'next/router'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useMemo, useState } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import {
@@ -7,9 +10,14 @@ import {
   getCertifiedRealmInfo,
   RealmInfo,
 } from '../models/registry/api'
-import { VoteRegistryVoterWeight, VoterWeight } from '../models/voteWeights'
+import {
+  VoteNftWeight,
+  VoteRegistryVoterWeight,
+  VoterWeight,
+} from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
+import { nftPluginsPks, vsrPluginsPks } from './useVotingPlugins'
 
 export default function useRealm() {
   const router = useRouter()
@@ -29,8 +37,10 @@ export default function useRealm() {
     tokenRecords,
     councilTokenOwnerRecords,
     programVersion,
+    config,
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
+  const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
@@ -87,7 +97,8 @@ export default function useRealm() {
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
-    !mint?.supply.isZero() &&
+    (!mint?.supply.isZero() ||
+      realm.account.config.useCommunityVoterWeightAddin) &&
     realm.account.config.councilMint &&
     !councilMint?.supply.isZero()
 
@@ -102,10 +113,16 @@ export default function useRealm() {
     ownCouncilTokenRecord?.account.outstandingProposalCount >=
       realmCfgMaxOutstandingProposalCount
 
-  //TODO change when more plugins implemented
-  const ownVoterWeight = realm?.account.config.useCommunityVoterWeightAddin
-    ? new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
-    : new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
+  const currentPluginPk = config?.account?.communityVoterWeightAddin
+
+  const ownVoterWeight = getVoterWeight(
+    currentPluginPk,
+    ownTokenRecord,
+    votingPower,
+    nftVotingPower,
+    ownCouncilTokenRecord
+  )
+
   return {
     realm,
     realmInfo,
@@ -127,5 +144,28 @@ export default function useRealm() {
     councilTokenOwnerRecords,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
+    config,
   }
+}
+
+const getVoterWeight = (
+  currentPluginPk: PublicKey | undefined,
+  ownTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+  votingPower: BN,
+  nftVotingPower: BN,
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+) => {
+  if (currentPluginPk) {
+    if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+    }
+    if (nftPluginsPks.includes(currentPluginPk.toBase58())) {
+      return new VoteNftWeight(
+        ownTokenRecord,
+        ownCouncilTokenRecord,
+        nftVotingPower
+      )
+    }
+  }
+  return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
 }

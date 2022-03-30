@@ -1,0 +1,183 @@
+import React, { useContext, useEffect, useState } from 'react'
+import * as yup from 'yup'
+import {
+  Governance,
+  ProgramAccount,
+  serializeInstructionToBase64,
+} from '@solana/spl-governance'
+import { validateInstruction } from '@utils/instructionTools'
+import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+
+import useWalletStore from 'stores/useWalletStore'
+
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
+import { GovernedTokenAccount } from '@utils/tokens'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { NewProposalContext } from '../../../new'
+import InstructionForm, {
+  InstructionInput,
+  InstructionInputType,
+} from '../FormCreator'
+import { PublicKey } from '@solana/web3.js'
+import {
+  getNftMaxVoterWeightRecord,
+  getNftRegistrarPDA,
+} from 'NftVotePlugin/sdk/accounts'
+import { getValidatedPublickKey } from '@utils/validations'
+import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+
+interface ConfigureCollectionForm {
+  governedAccount: GovernedTokenAccount | undefined
+  weight: number
+  size: number
+  collection: string
+}
+
+const ConfigureNftPluginCollection = ({
+  index,
+  governance,
+}: {
+  index: number
+  governance: ProgramAccount<Governance> | null
+}) => {
+  const { realm, mint } = useRealm()
+  const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const wallet = useWalletStore((s) => s.current)
+  const shouldBeGoverned = index !== 0 && governance
+  const [form, setForm] = useState<ConfigureCollectionForm>()
+  const [formErrors, setFormErrors] = useState({})
+  const { handleSetInstructions } = useContext(NewProposalContext)
+  async function getInstruction(): Promise<UiInstruction> {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    let serializedInstruction = ''
+    if (
+      isValid &&
+      form!.governedAccount?.governance?.account &&
+      wallet?.publicKey
+    ) {
+      const weight = getMintNaturalAmountFromDecimalAsBN(
+        form!.weight,
+        mint!.decimals
+      )
+      const { registrar } = await getNftRegistrarPDA(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        nftClient!.program.programId
+      )
+      const { maxVoterWeightRecord } = await getNftMaxVoterWeightRecord(
+        realm!.pubkey,
+        realm!.account.communityMint,
+        nftClient!.program.programId
+      )
+      const instruction = nftClient!.program.instruction.configureCollection(
+        weight,
+        form!.size,
+        {
+          accounts: {
+            registrar,
+            realm: realm!.pubkey,
+            realmAuthority: realm!.account.authority!,
+            collection: new PublicKey(form!.collection),
+            maxVoterWeightRecord: maxVoterWeightRecord,
+          },
+        }
+      )
+      serializedInstruction = serializeInstructionToBase64(instruction)
+    }
+    const obj: UiInstruction = {
+      serializedInstruction: serializedInstruction,
+      isValid,
+      governance: form!.governedAccount?.governance,
+    }
+    return obj
+  }
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: form?.governedAccount?.governance, getInstruction },
+      index
+    )
+  }, [form])
+  const schema = yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Governed account is required'),
+    collection: yup
+      .string()
+      .test(
+        'accountTests',
+        'Collection address validation error',
+        function (val: string) {
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Collection address is required`,
+            })
+          }
+        }
+      ),
+  })
+  const inputs: InstructionInput[] = [
+    {
+      label: 'Governance',
+      initialValue: null,
+      name: 'governedAccount',
+      type: InstructionInputType.GOVERNED_ACCOUNT,
+      shouldBeGoverned: shouldBeGoverned,
+      governance: governance,
+      options: governedMultiTypeAccounts.filter(
+        (x) =>
+          x.governance.pubkey.toBase58() ===
+          realm?.account.authority?.toBase58()
+      ),
+    },
+    {
+      label: 'Collection size',
+      initialValue: 0,
+      name: 'size',
+      inputType: 'number',
+      type: InstructionInputType.INPUT,
+      min: 1,
+      validateMinMax: true,
+    },
+    {
+      label: 'Collection weight',
+      initialValue: 1,
+      name: 'weight',
+      inputType: 'number',
+      type: InstructionInputType.INPUT,
+      min: 0,
+      validateMinMax: true,
+    },
+    {
+      label: 'Collection',
+      initialValue: '',
+      inputType: 'text',
+      name: 'collection',
+      type: InstructionInputType.INPUT,
+    },
+  ]
+  return (
+    <>
+      <InstructionForm
+        outerForm={form}
+        setForm={setForm}
+        inputs={inputs}
+        setFormErrors={setFormErrors}
+        formErrors={formErrors}
+      ></InstructionForm>
+    </>
+  )
+}
+
+export default ConfigureNftPluginCollection

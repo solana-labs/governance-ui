@@ -29,15 +29,13 @@ import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { TokenInfo } from '@solana/spl-token-registry'
 import Select from '@components/inputs/Select'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
 const defaultFormValues = {
   mintAddress: '',
-  // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
-  // This should be dynamic and set to 1% of the community mint supply or
-  // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
   minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
@@ -50,7 +48,9 @@ const NFT = 'NFT'
 
 const NewAccountForm = () => {
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const isCurrentVersionHigherThenV1 = () => {
     return (
@@ -234,6 +234,16 @@ const NewAccountForm = () => {
       propertyName: 'mintAddress',
     })
   }, [treasuryType])
+  useEffect(() => {
+    setForm({
+      ...form,
+      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+        ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+        : realmMint
+        ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
+        : 0,
+    })
+  }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />

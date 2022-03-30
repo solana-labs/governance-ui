@@ -18,6 +18,7 @@ import {
 } from '@solana/spl-token'
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
+import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const getValidateAccount = async (
   connection: Connection,
@@ -231,7 +232,17 @@ export const getFriktionWithdrawSchema = () => {
   })
 }
 
-export const getTokenTransferSchema = ({ form, connection }) => {
+export const getTokenTransferSchema = ({
+  form,
+  connection,
+  tokenAmount,
+  mintDecimals,
+}: {
+  form: any
+  connection: ConnectionContext
+  tokenAmount?: BN
+  mintDecimals?: number
+}) => {
   const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
   return yup.object().shape({
     governedTokenAccount: yup.object().required('Source account is required'),
@@ -254,8 +265,13 @@ export const getTokenTransferSchema = ({ form, connection }) => {
           if (val && governedTokenAccount && governedTokenAccount?.mint) {
             const mintValue = getMintNaturalAmountFromDecimalAsBN(
               val,
-              governedTokenAccount?.mint.account.decimals
+              typeof mintDecimals !== 'undefined'
+                ? mintDecimals
+                : governedTokenAccount?.mint.account.decimals
             )
+            if (tokenAmount) {
+              return tokenAmount.gte(mintValue)
+            }
             return !!(governedTokenAccount?.token?.publicKey &&
             !governedTokenAccount.isSol
               ? governedTokenAccount.token.account.amount.gte(mintValue)
@@ -408,5 +424,81 @@ export const getStakeSchema = ({ form }) => {
       .object()
       .nullable()
       .required('Source account is required'),
+  })
+}
+
+export const getRealmCfgSchema = ({ form }) => {
+  return yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Governed account is required'),
+    minCommunityTokensToCreateGovernance: yup
+      .number()
+      .required('Min community tokens to create governance is required'),
+    communityVoterWeightAddin: yup
+      .string()
+      .test(
+        'communityVoterWeightAddinTest',
+        'communityVoterWeightAddin validation error',
+        function (val: string) {
+          if (!form?.communityVoterWeightAddin) {
+            return true
+          }
+          if (val) {
+            try {
+              getValidatedPublickKey(val)
+              if ([...nftPluginsPks, ...vsrPluginsPks].includes(val)) {
+                return true
+              } else {
+                return this.createError({
+                  message: `Provided pubkey is not a known plugin pubkey`,
+                })
+              }
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `communityVoterWeightAddin is required`,
+            })
+          }
+        }
+      ),
+    maxCommunityVoterWeightAddin: yup
+      .string()
+      .test(
+        'maxCommunityVoterWeightAddin',
+        'maxCommunityVoterWeightAddin validation error',
+        function (val: string) {
+          if (!form?.maxCommunityVoterWeightAddin) {
+            return true
+          }
+          if (val) {
+            try {
+              getValidatedPublickKey(val)
+              if ([...nftPluginsPks].includes(val)) {
+                return true
+              } else {
+                return this.createError({
+                  message: `Provided pubkey is not a known plugin pubkey`,
+                })
+              }
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `maxCommunityVoterWeightAddin is required`,
+            })
+          }
+        }
+      ),
   })
 }

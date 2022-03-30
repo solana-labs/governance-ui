@@ -142,8 +142,8 @@ export const getTreasuryAccountItemInfoV2 = (account: Account) => {
   }
 }
 const getName = (governedAccountTokenAccount: GovernedTokenAccount) => {
-  const tokenAccName = governedAccountTokenAccount.token
-    ? getAccountName(governedAccountTokenAccount.token?.publicKey)
+  const tokenAccName = governedAccountTokenAccount.transferAddress
+    ? getAccountName(governedAccountTokenAccount.transferAddress)
     : ''
   const governanceAccName = governedAccountTokenAccount.governance?.pubkey
     ? getAccountName(governedAccountTokenAccount.governance.pubkey)
