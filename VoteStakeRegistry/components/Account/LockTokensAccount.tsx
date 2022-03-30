@@ -31,7 +31,6 @@ import {
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Account from './Account'
 import { abbreviateAddress } from '@utils/formatting'
-import NotificationsCard from '@components/NotificationsCard'
 
 interface DepositBox {
   mintPk: PublicKey
@@ -364,11 +363,6 @@ const LockTokensAccount = ({ tokenOwnerRecordPk }) => {
         )}
       </div>
       {connected && <Account withHeader={false}></Account>}
-      {realmInfo?.enableNotifications && (
-        <div className="col-span-12">
-          <NotificationsCard />
-        </div>
-      )}
     </div>
   )
 }
