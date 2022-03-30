@@ -5,10 +5,10 @@ import {
   getMintAccountLabelInfo,
   getSolAccountLabel,
   getTokenAccountLabelInfo,
-  GovernedMultiTypeAccount,
 } from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 const GovernedAccountSelect = ({
   onChange,
@@ -23,13 +23,13 @@ const GovernedAccountSelect = ({
   onChange
   value
   error?
-  governedAccounts: GovernedMultiTypeAccount[]
+  governedAccounts: AssetAccount[]
   shouldBeGoverned?
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
 }) => {
-  function getLabel(value: GovernedMultiTypeAccount) {
+  function getLabel(value: AssetAccount) {
     if (value) {
       const accountType = value.governance.account.accountType
       switch (accountType) {

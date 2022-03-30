@@ -11,7 +11,6 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
@@ -21,6 +20,7 @@ import InstructionForm, {
 } from '../FormCreator'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
 import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface CreateNftMaxVoterWeightRecord {
   governedAccount: AssetAccount | undefined
@@ -35,7 +35,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
 }) => {
   const { realm, realmInfo } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<CreateNftMaxVoterWeightRecord>()
@@ -95,7 +95,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,
       governance: governance,
-      options: governedMultiTypeAccounts.filter(
+      options: assetAccounts.filter(
         (x) =>
           x.governance.pubkey.toBase58() ===
           realm?.account.authority?.toBase58()
