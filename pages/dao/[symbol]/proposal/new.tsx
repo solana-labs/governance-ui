@@ -65,6 +65,7 @@ import MakeInitMarketParams from './components/instructions/Foresight/MakeInitMa
 import MakeInitMarketListParams from './components/instructions/Foresight/MakeInitMarketListParams'
 import MakeInitCategoryParams from './components/instructions/Foresight/MakeInitCategoryParams'
 import MakeResolveMarketParams from './components/instructions/Foresight/MakeResolveMarketParams'
+import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
 
 const schema = yup.object().shape({
@@ -410,6 +411,13 @@ const New = () => {
             index={idx}
             governance={governance}
           ></MakeResolveMarketParams>
+        )
+      case Instructions.ForesightAddMarketListToCategory:
+        return (
+          <MakeAddMarketListToCategoryParams
+            index={idx}
+            governance={governance}
+          ></MakeAddMarketListToCategoryParams>
         )
       case Instructions.RealmConfig:
         return <RealmConfig index={idx} governance={governance}></RealmConfig>

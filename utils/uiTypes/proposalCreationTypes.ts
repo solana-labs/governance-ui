@@ -206,6 +206,12 @@ export interface ForesightMakeInitCategoryParams
   categoryId: string
 }
 
+export interface ForesightMakeAddMarketListToCategoryParams
+  extends ForesightHasGovernedAccount {
+  categoryId: string
+  marketListId: string
+}
+
 export interface ForesightMakeResolveMarketParams
   extends ForesightHasGovernedAccount {
   marketListId: string
@@ -286,6 +292,7 @@ export enum Instructions {
   ForesightInitMarketList,
   ForesightInitCategory,
   ForesightResolveMarket,
+  ForesightAddMarketListToCategory,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
