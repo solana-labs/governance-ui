@@ -187,7 +187,7 @@ export interface MangoMakeChangeReferralFeeParams {
 }
 
 interface ForesightHasGovernedAccount {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: GovernedTokenAccount
 }
 
 export interface ForesightMakeInitMarketParams

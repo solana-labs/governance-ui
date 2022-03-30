@@ -32,10 +32,13 @@ const MakeInitMarketListParams = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const filteredTokenAccounts = governedTokenAccountsWithoutNfts.filter((x) =>
+    x.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
+  )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ForesightMakeInitMarketListParams>({
-    governedAccount: undefined,
+    governedAccount: filteredTokenAccounts[0],
     marketListId: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -59,7 +62,7 @@ const MakeInitMarketListParams = ({
       const { ix: initMarketListIx } = await foresightGov.genInitMarketListIx(
         Buffer.from(form.marketListId.padEnd(20)),
         program,
-        new PublicKey('9r1fxNbhQrd5ov8HSufrcYMqDhxphWuTjPfHdr1SDJ7L')
+        form.governedAccount.transferAddress!
       )
 
       serializedInstruction = serializeInstructionToBase64(initMarketListIx)

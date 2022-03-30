@@ -32,10 +32,13 @@ const MakeInitCategoryParams = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const filteredTokenAccounts = governedTokenAccountsWithoutNfts.filter((x) =>
+    x.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
+  )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ForesightMakeInitCategoryParams>({
-    governedAccount: undefined,
+    governedAccount: filteredTokenAccounts[0],
     categoryId: '',
   })
   const [formErrors, setFormErrors] = useState({})
@@ -59,7 +62,7 @@ const MakeInitCategoryParams = ({
       const { ix: initCategoryIx } = await foresightGov.genInitCategoryIx(
         Buffer.from(form.categoryId.padEnd(20)),
         program,
-        foresightGov.DEVNET_TREASURY
+        form.governedAccount.transferAddress!
       )
 
       serializedInstruction = serializeInstructionToBase64(initCategoryIx)
@@ -67,7 +70,7 @@ const MakeInitCategoryParams = ({
     const obj: UiInstruction = {
       serializedInstruction: serializedInstruction,
       isValid,
-      governance: form.governedAccount?.governance,
+      governance: form.governedAccount.governance,
     }
     return obj
   }
@@ -96,9 +99,7 @@ const MakeInitCategoryParams = ({
     <>
       <GovernedAccountSelect
         label="Program"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={filteredTokenAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
