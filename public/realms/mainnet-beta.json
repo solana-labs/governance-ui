@@ -30,6 +30,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+  "symbol": "POOR",
+  "displayName": "PoorDao (Famous Fox Edition)",
+  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "realmId": "12gEDQvesi9qSMoXcY1LSHxGqArUXZ2HemihyEShpoWf",
+  "website": "https://famousfoxes.com",
+  "twitter": "@PoorDao_FFF",
+  "ogImage": "/realms/PoorDao/img/archer.png"
+  },
+  {
     "symbol": "PSY",
     "displayName": "Psy Finance",
     "programId": "GovHgfDPyQ1GwazJTDY2avSVY8GGcpmCapmmCsymRaGe",
