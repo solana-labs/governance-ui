@@ -237,6 +237,15 @@
     "twitter": "@KiwiDAO"
   },
   {
+  "symbol": "POOR",
+  "displayName": "PoorDao (Famous Fox Edition)",
+  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+  "realmId": "12gEDQvesi9qSMoXcY1LSHxGqArUXZ2HemihyEShpoWf",
+  "website": "https://famousfoxes.com",
+  "twitter": "@PoorDao_FFF",
+  "ogImage": "/realms/PoorDao/img/archer.png"
+  },
+  {
     "symbol": "$XAPE",
     "displayName": "The Exiled Apes",
     "programId": "Ghope52FuF6HU3AAhJuAAyS2fiqbVhkAotb7YprL5tdS",
