@@ -21,7 +21,7 @@ export default function useGovernanceAssets() {
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
-  console.log(governedTokenAccounts)
+
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
