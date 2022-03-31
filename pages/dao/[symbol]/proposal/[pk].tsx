@@ -39,7 +39,8 @@ const Proposal = () => {
     (proposal.account.state === ProposalState.Completed ||
       proposal.account.state === ProposalState.Executing ||
       proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded)
+      proposal.account.state === ProposalState.Succeeded ||
+      proposal.account.state === ProposalState.ExecutingWithErrors)
 
   useEffect(() => {
     const handleResolveDescription = async () => {

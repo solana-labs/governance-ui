@@ -24,6 +24,7 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
+import BigNumber from 'bignumber.js'
 
 const Params = () => {
   const { realm, mint, councilMint, ownVoterWeight } = useRealm()
@@ -324,14 +325,12 @@ const Params = () => {
                     <DisplayField
                       label="Min Instruction Holdup Time"
                       padding
-                      val={
-                        activeGovernance.account.config.minInstructionHoldUpTime
-                      }
+                      val={`${activeGovernance.account.config.minInstructionHoldUpTime} secs`}
                     />
                     <DisplayField
                       label="Proposal Cool-off Time"
                       padding
-                      val={activeGovernance.account.config.proposalCoolOffTime}
+                      val={`${activeGovernance.account.config.proposalCoolOffTime} secs`}
                     />
                     <DisplayField
                       label="Vote Threshold Percentage"
@@ -471,7 +470,13 @@ const Params = () => {
                               <DisplayField
                                 bg={false}
                                 label="Supply"
-                                val={x.extensions.mint?.account.supply.toNumber()}
+                                val={new BigNumber(
+                                  x.extensions.mint!.account.supply.toString()
+                                )
+                                  .shiftedBy(
+                                    -x.extensions.mint!.account.decimals || 0
+                                  )
+                                  .toFormat()}
                               />
                               <DisplayField
                                 bg={false}
