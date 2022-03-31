@@ -2,6 +2,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { RealmInfo } from '@models/registry/api'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
+import { useTheme } from 'next-themes'
 
 export default function RealmsDashboard({
   realms,
@@ -12,6 +13,7 @@ export default function RealmsDashboard({
 }) {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const { theme } = useTheme()
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
@@ -55,11 +57,23 @@ export default function RealmsDashboard({
             >
               <div className="pb-5">
                 {realm.ogImage ? (
-                  <div className="bg-[rgba(255,255,255,0.06)] rounded-full h-16 w-16 flex items-center justify-center">
+                  <div
+                    className={`${
+                      theme === 'Dark'
+                        ? 'bg-[rgba(255,255,255,0.06)]'
+                        : 'bg-[rgba(0,0,0,0.06)]'
+                    } rounded-full h-16 w-16 flex items-center justify-center`}
+                  >
                     <img className="w-10" src={realm.ogImage}></img>
                   </div>
                 ) : (
-                  <div className="bg-[rgba(255,255,255,0.06)] h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3">
+                  <div
+                    className={`${
+                      theme === 'Dark'
+                        ? 'bg-[rgba(255,255,255,0.06)]'
+                        : 'bg-[rgba(0,0,0,0.06)]'
+                    } h-16 w-16 flex font-bold items-center justify-center rounded-full text-fgd-3`}
+                  >
                     {realm.displayName?.charAt(0)}
                   </div>
                 )}
