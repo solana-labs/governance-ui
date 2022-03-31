@@ -466,7 +466,7 @@ const Params = () => {
                             <DisplayField
                               bg={false}
                               label="Supply"
-                              val={x.extensions.mint?.account.supply.toNumber()}
+                              val={x.extensions.mint?.account.supply.toString()}
                             />
                             <DisplayField
                               bg={false}
