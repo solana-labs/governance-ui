@@ -175,12 +175,7 @@ const NotificationsCard = () => {
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <a
-        title="Questions? Click to learn more!"
-        href="https://docs.notifi.network/NotifiIntegrationsFAQ.html"
-      >
-        <h3 className="mb-4">Notifications</h3>
-      </a>
+      <h3 className="mb-4">Notifications</h3>
       {hasLoaded ? (
         !connected ? (
           <>
@@ -249,28 +244,40 @@ const NotificationsCard = () => {
                 />
               </InputRow>
             )}
-            <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4 items-center justify-between">
-              {
-                <Button
-                  tooltipMessage={
-                    disabled
-                      ? 'No unsaved changes!'
-                      : isAuthenticated()
-                      ? 'Save settings for notifications'
-                      : 'Fetch stored values for existing accounts'
-                  }
-                  className="sm:w-1/2"
-                  disabled={disabled}
-                  onClick={
-                    hasUnsavedChanges || isAuthenticated()
-                      ? handleSave
-                      : handleRefresh
-                  }
-                  isLoading={isLoading}
+            <div className="flex flex-col space-y-4 mt-4 items-start justify-start">
+              <Button
+                tooltipMessage={
+                  disabled
+                    ? 'No unsaved changes!'
+                    : isAuthenticated()
+                    ? 'Save settings for notifications'
+                    : 'Fetch stored values for existing accounts'
+                }
+                className="sm:w-1/2"
+                disabled={disabled}
+                onClick={
+                  hasUnsavedChanges || isAuthenticated()
+                    ? handleSave
+                    : handleRefresh
+                }
+                isLoading={isLoading}
+              >
+                {hasUnsavedChanges || isAuthenticated() ? 'Save' : 'Refresh'}
+              </Button>
+              <div className="flex flex-row justify-start text-xs items-center w-full sm:w-1/2">
+                Powered by&nbsp;
+                <NotifiLogo className="h-3 pb-0.5" />
+                <span className="flex-grow" />
+                <a
+                  href="https://docs.notifi.network/NotifiIntegrationsFAQ.html"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-primary-dark"
+                  title="Questions? Click to learn more!"
                 >
-                  {hasUnsavedChanges || isAuthenticated() ? 'Save' : 'Refresh'}
-                </Button>
-              }
+                  Learn More
+                </a>
+              </div>
             </div>
           </>
         )
@@ -302,6 +309,69 @@ const InputRow: FunctionComponent<InputRowProps> = ({
       </div>
       {children}
     </div>
+  )
+}
+
+const NotifiLogo = ({ className }: { className: string }) => {
+  return (
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="61"
+      height="14"
+      viewBox="0 0 61 14"
+      fill="currentColor"
+    >
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M11.4546 8.12234C11.0641 8.23352 10.6519 8.29305 10.2258 8.29305C7.75286 8.29305 5.74812 6.28831 5.74812 3.81534C5.74812 3.37405 5.81196 2.94766 5.9309 2.54492H1.29125C0.57811 2.54492 0 3.12303 0 3.83617V12.7083C0 13.4214 0.57811 13.9995 1.29125 13.9995H10.1633C10.8765 13.9995 11.4546 13.4214 11.4546 12.7083V8.12234Z"
+        fill="#F5F6FB"
+      />
+      <path
+        d="M14.0004 3.18183C14.0004 4.93911 12.5758 6.36366 10.8186 6.36366C9.06127 6.36366 7.63672 4.93911 7.63672 3.18183C7.63672 1.42455 9.06127 0 10.8186 0C12.5758 0 14.0004 1.42455 14.0004 3.18183Z"
+        fill="url(#paint0_linear_790_3397)"
+      />
+      <path
+        d="M27.5799 9.07334V13.9039H29.5859V9.07334C29.5859 6.10438 28.0453 4.16251 25.6059 4.16251C24.4183 4.16251 23.3591 4.86865 23.0061 5.8476V4.27485H21V13.9039H23.0061V9.08939C23.0061 7.38825 23.9529 6.16857 25.2528 6.16857C26.6651 6.16857 27.5799 7.30801 27.5799 9.07334Z"
+        fill="#F5F6FB"
+      />
+      <path
+        d="M30.9267 9.07334C30.9267 11.8658 32.9969 14.0002 35.661 14.0002C38.325 14.0002 40.3792 11.8658 40.3792 9.07334C40.3792 6.29696 38.325 4.16251 35.661 4.16251C32.9969 4.16251 30.9267 6.29696 30.9267 9.07334ZM35.661 6.16857C37.2016 6.16857 38.3732 7.42035 38.3732 9.07334C38.3732 10.7424 37.2016 11.9942 35.661 11.9942C34.1203 11.9942 32.9327 10.7424 32.9327 9.07334C32.9327 7.42035 34.1203 6.16857 35.661 6.16857Z"
+        fill="#F5F6FB"
+      />
+      <path
+        d="M43.2265 2.23669L42.745 4.27485H41.3167V6.16857H42.745V10.5979C42.745 12.9571 43.7079 13.9039 46.0028 13.9039H46.8374V11.9139H46.1954C45.2004 11.9139 44.7511 11.4806 44.7511 10.4856V6.16857H46.8374V4.27485H44.7511V2.23669H43.2265Z"
+        fill="#F5F6FB"
+      />
+      <path
+        d="M50.2386 13.9039V4.27485H48.2325V13.9039H50.2386Z"
+        fill="#F5F6FB"
+      />
+      <path
+        d="M60.5156 13.9039V4.27485H54.995V3.56872C54.995 2.57372 55.4443 2.12435 56.4393 2.12435H57.0813V0.150391H56.2467C53.9518 0.150391 52.9889 1.08121 52.9889 3.45638V4.27485H51.5766V6.16857H52.9889V13.9039H54.995V6.16857H58.5096V13.9039H60.5156Z"
+        fill="#F5F6FB"
+      />
+      <path
+        fillRule="evenodd"
+        clipRule="evenodd"
+        d="M49.0032 0C48.4363 0 48.2324 0.311122 48.2324 0.753594V2.3621H49.8052C50.3514 2.3621 50.5945 2.17089 50.5945 1.63162V0.753594C50.5945 0.2489 50.2615 0 49.7499 0H49.0032Z"
+        fill="#F5F6FB"
+      />
+      <defs>
+        <linearGradient
+          id="paint0_linear_790_3397"
+          x1="12.74"
+          y1="0.49587"
+          x2="9.68218"
+          y2="6.36366"
+          gradientUnits="userSpaceOnUse"
+        >
+          <stop stopColor="#FE7970" />
+          <stop offset="1" stopColor="#FEB776" />
+        </linearGradient>
+      </defs>
+    </svg>
   )
 }
 
