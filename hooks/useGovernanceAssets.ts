@@ -274,6 +274,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
     },
     {
+      id: Instructions.ForesightAddMarketMetadata,
+      name: 'Foresight: Add Market Metadata',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.ProgramUpgrade,
       name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,

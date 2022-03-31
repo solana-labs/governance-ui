@@ -14,6 +14,7 @@ import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
+import { consts as foresightConsts } from '@foresight-tmp/foresight-sdk'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -218,6 +219,14 @@ export interface ForesightMakeResolveMarketParams
   marketId: number
   winner: number
 }
+
+export interface ForesightMakeAddMarketMetadataParams
+  extends ForesightHasGovernedAccount {
+  marketListId: string
+  marketId: number
+  content: string
+  field: foresightConsts.MarketMetadataFieldName
+}
 export interface Base64InstructionForm {
   governedAccount: GovernedMultiTypeAccount | undefined
   base64: string
@@ -293,6 +302,7 @@ export enum Instructions {
   ForesightInitCategory,
   ForesightResolveMarket,
   ForesightAddMarketListToCategory,
+  ForesightAddMarketMetadata,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
