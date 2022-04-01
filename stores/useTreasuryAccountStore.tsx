@@ -18,7 +18,7 @@ import {
   TokenAccountWithKey,
 } from '@utils/deserializeTokenAccount'
 import batchLoadMints from '@utils/batchLoadMints'
-import { AssetAccount, AccountType } from './useGovernanceAssetsStore'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 
 type NewConnectionType = {
   cluster: Cluster

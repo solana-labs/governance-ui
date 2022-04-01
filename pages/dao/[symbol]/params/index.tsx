@@ -5,9 +5,7 @@ import useRealm from '@hooks/useRealm'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { capitalize } from '@utils/helpers'
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
-import useGovernanceAssetsStore, {
-  AccountType,
-} from 'stores/useGovernanceAssetsStore'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import {
   getFormattedStringFromDays,
   SECS_PER_DAY,
@@ -25,6 +23,7 @@ import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
 import BigNumber from 'bignumber.js'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const Params = () => {
   const { realm, mint, councilMint, ownVoterWeight } = useRealm()

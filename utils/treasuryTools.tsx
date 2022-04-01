@@ -3,9 +3,9 @@ import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import BigNumber from 'bignumber.js'
-import { AssetAccount, AccountType } from 'stores/useGovernanceAssetsStore'
 import { abbreviateAddress } from './formatting'
 import tokenService from './services/token'
+import { AccountType, AssetAccount } from './uiTypes/assets'
 import { NFTWithMint } from './uiTypes/nfts'
 
 export const getTreasuryAccountItemInfo = (
@@ -21,7 +21,8 @@ export const getTreasuryAccountItemInfo = (
 
   const amount =
     governedAccountTokenAccount &&
-    governedAccountTokenAccount.extensions.mint?.account
+    governedAccountTokenAccount.extensions.mint?.account &&
+    (governedAccountTokenAccount.isSol || governedAccountTokenAccount.isToken)
       ? getMintDecimalAmountFromNatural(
           governedAccountTokenAccount.extensions.mint?.account,
           new BN(

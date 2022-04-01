@@ -43,9 +43,7 @@ const AccountsCompactWrapper = () => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between pb-4">
         <h3 className="mb-0">Treasury</h3>
-        {governedTokenAccounts.find(
-          (acc) => acc.extensions !== AccountType.NFT
-        ) ? (
+        {governedTokenAccounts.find((acc) => acc.type !== AccountType.NFT) ? (
           <Link href={fmtUrlWithCluster(`/dao/${symbol}/treasury`)}>
             <a
               className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3`}

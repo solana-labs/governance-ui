@@ -94,7 +94,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
       s.governedTokenAccounts = accounts.filter(
         (x) =>
           x.type === AccountType.TOKEN ||
-          x.type === AccountType.MINT ||
+          x.type === AccountType.NFT ||
           x.type === AccountType.SOL
       )
       s.assetAccounts = accounts
@@ -122,7 +122,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
         ...accounts.filter(
           (x) =>
             x.type === AccountType.TOKEN ||
-            x.type === AccountType.MINT ||
+            x.type === AccountType.NFT ||
             x.type === AccountType.SOL
         ),
       ]

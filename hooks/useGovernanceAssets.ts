@@ -1,10 +1,8 @@
 import { GovernanceAccountType } from '@solana/spl-governance'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useRealm from './useRealm'
-import useGovernanceAssetsStore, {
-  AccountType,
-  AssetAccount,
-} from 'stores/useGovernanceAssetsStore'
 import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
