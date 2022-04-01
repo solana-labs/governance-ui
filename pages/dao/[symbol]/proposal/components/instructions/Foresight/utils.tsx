@@ -7,7 +7,11 @@ import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { Dispatch, useState } from 'react'
-import { ForesightHasGovernedAccount } from '@utils/uiTypes/proposalCreationTypes'
+import {
+  ForesightHasCategoryId,
+  ForesightHasGovernedAccount,
+} from '@utils/uiTypes/proposalCreationTypes'
+import Input from '@components/inputs/Input'
 
 export function getFilteredTokenAccounts(): GovernedTokenAccount[] {
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
@@ -25,7 +29,6 @@ export function ForesightGovernedAccountSelect<
   index: number
   governance: ProgramAccount<Governance> | null
 }) {
-  const [formErrors, setFormErrors] = useState({})
   const shouldBeGoverned = props.index !== 0 && props.governance
   function handleSetForm({
     propertyName,
@@ -34,7 +37,6 @@ export function ForesightGovernedAccountSelect<
     propertyName: string
     value: any
   }) {
-    setFormErrors({})
     props.setForm({ ...props.form, [propertyName]: value })
   }
   return (
@@ -47,9 +49,29 @@ export function ForesightGovernedAccountSelect<
         handleSetForm({ value, propertyName: 'governedAccount' })
       }}
       value={props.form.governedAccount}
-      error={formErrors['governedAccount']}
       shouldBeGoverned={shouldBeGoverned}
       governance={props.governance}
     ></GovernedAccountSelect>
+  )
+}
+
+export function CategoryIdInput<T extends ForesightHasCategoryId>(props: {
+  form: T
+  handleSetForm: any
+  formErrors: any
+}) {
+  return (
+    <Input
+      label="Category ID"
+      value={props.form.categoryId}
+      type="text"
+      onChange={(evt) =>
+        props.handleSetForm({
+          value: evt.target.value,
+          propertyName: 'categoryId',
+        })
+      }
+      error={props.formErrors['categoryId']}
+    />
   )
 }

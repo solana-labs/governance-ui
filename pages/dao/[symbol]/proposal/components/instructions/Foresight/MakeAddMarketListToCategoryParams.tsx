@@ -23,13 +23,13 @@ import {
   getFilteredTokenAccounts,
 } from './utils'
 
-const MakeAddMarketListToCategoryParams = ({
+function MakeAddMarketListToCategoryParams({
   index,
   governance,
 }: {
   index: number
   governance: ProgramAccount<Governance> | null
-}) => {
+}) {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const filteredTokenAccounts = getFilteredTokenAccounts()
@@ -102,7 +102,7 @@ const MakeAddMarketListToCategoryParams = ({
     categoryId: yup.string().required(),
     marketListId: yup.string().required(),
   })
-
+  let x = formErrors['categoryId']
   return (
     <>
       <ForesightGovernedAccountSelect<ForesightMakeAddMarketListToCategoryParams>
@@ -116,7 +116,6 @@ const MakeAddMarketListToCategoryParams = ({
         label="Category ID"
         value={form.categoryId}
         type="text"
-        min={0}
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,

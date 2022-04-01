@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ForesightMakeInitMarketParams,
+  ForesightHasMarketId,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { NewProposalContext } from '../../../new'
@@ -37,7 +37,7 @@ const MakeInitMarketParams = ({
   )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<ForesightMakeInitMarketParams>({
+  const [form, setForm] = useState<ForesightHasMarketId>({
     governedAccount: filteredTokenAccounts[0],
     marketListId: '',
     marketId: 0,

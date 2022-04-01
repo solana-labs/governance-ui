@@ -187,43 +187,32 @@ export interface MangoMakeChangeReferralFeeParams {
   refMngoRequired: number
 }
 
-interface ForesightHasGovernedAccount {
+export interface ForesightHasGovernedAccount {
   governedAccount: GovernedTokenAccount
 }
 
-export interface ForesightMakeInitMarketParams
-  extends ForesightHasGovernedAccount {
+export interface ForesightHasMarketListId extends ForesightHasGovernedAccount {
   marketListId: string
+}
+
+export interface ForesightHasMarketId extends ForesightHasMarketListId {
   marketId: number
 }
 
-export interface ForesightMakeInitMarketListParams
-  extends ForesightHasGovernedAccount {
-  marketListId: string
-}
-
-export interface ForesightMakeInitCategoryParams
-  extends ForesightHasGovernedAccount {
+export interface ForesightHasCategoryId extends ForesightHasGovernedAccount {
   categoryId: string
 }
 
 export interface ForesightMakeAddMarketListToCategoryParams
-  extends ForesightHasGovernedAccount {
-  categoryId: string
-  marketListId: string
-}
+  extends ForesightHasCategoryId,
+    ForesightHasMarketListId {}
 
-export interface ForesightMakeResolveMarketParams
-  extends ForesightHasGovernedAccount {
-  marketListId: string
-  marketId: number
+export interface ForesightMakeResolveMarketParams extends ForesightHasMarketId {
   winner: number
 }
 
 export interface ForesightMakeAddMarketMetadataParams
-  extends ForesightHasGovernedAccount {
-  marketListId: string
-  marketId: number
+  extends ForesightHasMarketId {
   content: string
   field: foresightConsts.MarketMetadataFieldName
 }
