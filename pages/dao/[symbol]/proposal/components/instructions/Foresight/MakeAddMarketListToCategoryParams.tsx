@@ -19,8 +19,8 @@ import {
   governance as foresightGov,
   consts as foresightConsts,
 } from '@foresight-tmp/foresight-sdk'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
+import { getFilteredTokenAccounts } from './utils'
 
 const MakeAddMarketListToCategoryParams = ({
   index,
@@ -31,10 +31,7 @@ const MakeAddMarketListToCategoryParams = ({
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const filteredTokenAccounts = governedTokenAccountsWithoutNfts.filter((x) =>
-    x.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
-  )
+  const filteredTokenAccounts = getFilteredTokenAccounts()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ForesightMakeAddMarketListToCategoryParams>({
@@ -44,7 +41,13 @@ const MakeAddMarketListToCategoryParams = ({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  const handleSetForm = ({ propertyName, value }) => {
+  function handleSetForm({
+    propertyName,
+    value,
+  }: {
+    propertyName: string
+    value: any
+  }) {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
@@ -104,9 +107,7 @@ const MakeAddMarketListToCategoryParams = ({
     <>
       <GovernedAccountSelect
         label="Program"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={filteredTokenAccounts as GovernedMultiTypeAccount[]}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
