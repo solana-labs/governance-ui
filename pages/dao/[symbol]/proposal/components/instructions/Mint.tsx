@@ -51,7 +51,7 @@ const Mint = ({
   ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintAccount
-    ? getMintMinAmountAsDecimal(form.mintAccount.mintInfo)
+    ? getMintMinAmountAsDecimal(form.mintAccount.extensions.mint!.account)
     : 1
   const currentPrecision = precision(mintMinAmount)
   const { handleSetInstructions } = useContext(NewProposalContext)

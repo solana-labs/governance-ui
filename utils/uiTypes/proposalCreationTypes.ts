@@ -4,7 +4,6 @@ import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
-import { GovernedMintInfoAccount, GovernedProgramAccount } from '@utils/tokens'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
@@ -79,12 +78,12 @@ export interface StakingViewForm {
 export interface MintForm {
   destinationAccount: string
   amount: number | undefined
-  mintAccount: GovernedMintInfoAccount | undefined
+  mintAccount: AssetAccount | undefined
   programId: string | undefined
 }
 
 export interface ProgramUpgradeForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   bufferAddress: string
   bufferSpillAddress?: string | undefined
@@ -93,14 +92,14 @@ export interface ProgramUpgradeForm {
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeAddOracleForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   oracleAccount: string | undefined
 }
 
 export interface MangoMakeAddSpotMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   oracleAccount: string | undefined
@@ -114,7 +113,7 @@ export interface MangoMakeAddSpotMarketForm {
 }
 
 export interface MangoMakeChangeSpotMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   baseSymbol: string | undefined
@@ -128,7 +127,7 @@ export interface MangoMakeChangeSpotMarketForm {
 }
 
 export interface MangoMakeChangePerpMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   perpMarket: string | undefined
@@ -147,7 +146,7 @@ export interface MangoMakeChangePerpMarketForm {
 }
 
 export interface MangoMakeCreatePerpMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   oracleAccount: string | undefined
@@ -168,13 +167,13 @@ export interface MangoMakeCreatePerpMarketForm {
   version: number
 }
 export interface MangoMakeChangeMaxAccountsForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   maxMangoAccounts: number
 }
 export interface MangoMakeChangeReferralFeeParams {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   refSurchargeCentibps: number

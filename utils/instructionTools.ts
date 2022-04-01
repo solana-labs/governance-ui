@@ -26,7 +26,7 @@ import {
 import type { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
-import { getTokenAccountsByMint, GovernedMintInfoAccount } from './tokens'
+import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
@@ -527,7 +527,7 @@ export async function getMintInstruction({
   programId: PublicKey | undefined
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
-  governedMintInfoAccount: GovernedMintInfoAccount | undefined
+  governedMintInfoAccount: AssetAccount | undefined
   setFormErrors: any
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })

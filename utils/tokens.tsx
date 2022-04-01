@@ -13,8 +13,7 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { MintMaxVoteWeightSource, ProgramAccount } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
+import { MintMaxVoteWeightSource } from '@solana/spl-governance'
 import { chunks } from './helpers'
 import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
@@ -30,13 +29,6 @@ import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
-export type GovernedMintInfoAccount = {
-  mintInfo: MintInfo
-  governance: ProgramAccount<Governance> | undefined
-}
-export type GovernedProgramAccount = {
-  governance: ProgramAccount<Governance> | undefined
-}
 
 export type TokenProgramAccount<T> = {
   publicKey: PublicKey

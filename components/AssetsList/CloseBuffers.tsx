@@ -16,7 +16,7 @@ import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
 import * as yup from 'yup'
-import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
 import Loading from '@components/Loading'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { getExplorerUrl } from '@components/explorer/tools'
@@ -25,9 +25,10 @@ import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBu
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { AssetAccount } from 'stores/useGovernanceAssetsStore'
 
 interface CloseBuffersForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   solReceiverAddress: string
   description: string
@@ -36,13 +37,16 @@ interface CloseBuffersForm {
 
 const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const {
+    governedTokenAccountsWithoutNfts,
+    assetAccounts,
+  } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const governedAccount = {
-    governance: program!,
-  }
+  const governedAccount = assetAccounts.find(
+    (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const { realmInfo, canChooseWhoVote, realm } = useRealm()
