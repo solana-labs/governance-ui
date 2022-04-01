@@ -1,12 +1,9 @@
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import {
-  governance as foresightGov,
-  consts as foresightConsts,
-} from '@foresight-tmp/foresight-sdk'
+import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { Dispatch, useState } from 'react'
+import { Dispatch } from 'react'
 import {
   ForesightHasCategoryId,
   ForesightHasGovernedAccount,
