@@ -32,7 +32,7 @@ import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import { WSOL_MINT } from '@components/instructions/tools'
 import Decimal from 'decimal.js'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export const validateInstruction = async ({
   schema,

@@ -11,7 +11,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const SetRealmAuthorityModal = ({
   closeModal,

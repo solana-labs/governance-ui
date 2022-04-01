@@ -1,6 +1,6 @@
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const AccountItem = ({
   governedAccountTokenAccount,

@@ -1,7 +1,7 @@
 import { FunctionComponent } from 'react'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface AccountsTabsProps {
   activeTab: AssetAccount | null

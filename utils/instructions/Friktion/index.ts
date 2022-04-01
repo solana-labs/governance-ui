@@ -26,7 +26,7 @@ import { getATA } from '../../ataTools'
 import { UiInstruction } from '../../uiTypes/proposalCreationTypes'
 import { validateInstruction } from '@utils/instructionTools'
 import BN from 'bn.js'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export async function getFriktionDepositInstruction({
   schema,

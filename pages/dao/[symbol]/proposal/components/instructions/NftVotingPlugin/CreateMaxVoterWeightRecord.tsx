@@ -19,7 +19,7 @@ import InstructionForm, {
   InstructionInputType,
 } from '../FormCreator'
 import { getNftMaxVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface CreateNftMaxVoterWeightRecord {

@@ -19,7 +19,7 @@ import {
 import { Connection } from '@solana/web3.js'
 import { BN } from '@project-serum/anchor'
 import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const getValidateAccount = async (
   connection: Connection,

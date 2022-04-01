@@ -11,7 +11,7 @@ import { useRouter } from 'next/router'
 import EmptyState from '@components/EmptyState'
 import { NEW_TREASURY_ROUTE } from 'pages/dao/[symbol]/treasury'
 import useWalletStore from 'stores/useWalletStore'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const AccountsCompactWrapper = () => {
   const { governedTokenAccounts } = useGovernanceAssets()

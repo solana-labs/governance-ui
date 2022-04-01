@@ -18,7 +18,8 @@ import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
 import GovernedAccountSelect from '../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
+
 const Mint = ({
   index,
   governance,

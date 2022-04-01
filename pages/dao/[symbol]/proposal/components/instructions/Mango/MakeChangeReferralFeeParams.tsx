@@ -21,7 +21,7 @@ import { makeChangeReferralFeeParamsInstruction } from '@blockworks-foundation/m
 import { BN } from '@project-serum/anchor'
 import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
 import { parseMintNaturalAmountFromDecimal } from '@tools/sdk/units'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const MakeChangeReferralFeeParams = ({
   index,

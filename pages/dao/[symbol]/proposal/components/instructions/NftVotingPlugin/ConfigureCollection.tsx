@@ -24,7 +24,7 @@ import {
 } from 'NftVotePlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface ConfigureCollectionForm {

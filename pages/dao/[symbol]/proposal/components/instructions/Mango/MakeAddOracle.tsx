@@ -17,7 +17,7 @@ import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { makeAddOracleInstruction } from '@blockworks-foundation/mango-client'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const MakeAddOracle = ({
   index,

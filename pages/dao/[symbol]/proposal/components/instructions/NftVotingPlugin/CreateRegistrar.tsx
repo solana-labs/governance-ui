@@ -15,7 +15,7 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, { InstructionInputType } from '../FormCreator'
 import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface CreateNftRegistrarForm {

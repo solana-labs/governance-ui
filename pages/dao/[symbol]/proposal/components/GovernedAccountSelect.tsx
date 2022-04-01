@@ -8,7 +8,7 @@ import {
 } from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const GovernedAccountSelect = ({
   onChange,

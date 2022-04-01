@@ -35,7 +35,7 @@ import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const Grant = ({
   index,

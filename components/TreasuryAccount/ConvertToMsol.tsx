@@ -28,7 +28,7 @@ import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
 import useCreateProposal from '@hooks/useCreateProposal'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const ConvertToMsol = () => {
   const { canChooseWhoVote, realm, symbol } = useRealm()

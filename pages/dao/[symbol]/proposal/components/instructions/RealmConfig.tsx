@@ -18,7 +18,7 @@ import { PublicKey } from '@solana/web3.js'
 import { getRealmCfgSchema } from '@utils/validations'
 import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface RealmConfigForm {
   governedAccount: AssetAccount | undefined

@@ -6,14 +6,10 @@ import useRealm from './useRealm'
 export default function handleGovernanceAssetsStore() {
   const { governances, realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
-  const {
-    setGovernancesArray,
-    setGovernedAccounts,
-  } = useGovernanceAssetsStore()
+  const { setGovernancesArray } = useGovernanceAssetsStore()
   useEffect(() => {
-    if (realm) {
-      setGovernancesArray(governances)
-      setGovernedAccounts(connection, realm)
+    if (realm && Object.keys(governances).length) {
+      setGovernancesArray(connection, realm, governances)
     }
   }, [
     JSON.stringify(governances),

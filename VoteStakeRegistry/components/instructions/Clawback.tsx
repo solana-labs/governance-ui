@@ -31,7 +31,7 @@ import tokenService from '@utils/services/token'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const Clawback = ({
   index,

@@ -42,7 +42,7 @@ import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
 import { validateInstruction } from '@utils/instructionTools'
 import * as yup from 'yup'
 import { getValidatedPublickKey } from '@utils/validations'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const DEPOSIT = 'Deposit'
 const CREATE_REF_LINK = 'Create Referral Link'

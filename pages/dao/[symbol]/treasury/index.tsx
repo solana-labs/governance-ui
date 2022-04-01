@@ -15,7 +15,7 @@ import tokenService from '@utils/services/token'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 

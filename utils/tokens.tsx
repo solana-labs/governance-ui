@@ -25,7 +25,7 @@ import { NFTWithMint } from './uiTypes/nfts'
 import { BN } from '@project-serum/anchor'
 import { abbreviateAddress } from './formatting'
 import BigNumber from 'bignumber.js'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo

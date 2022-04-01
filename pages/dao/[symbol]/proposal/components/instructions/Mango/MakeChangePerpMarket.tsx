@@ -23,7 +23,7 @@ import {
   makeChangePerpMarketParams2Instruction,
   optionalBNFromString,
 } from '@blockworks-foundation/mango-client'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const MakeChangePerpMarket = ({
   index,

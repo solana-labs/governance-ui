@@ -28,7 +28,7 @@ import {
   PerpEventQueueHeaderLayout,
 } from '@blockworks-foundation/mango-client'
 import * as common from '@project-serum/common'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const MakeCreatePerpMarket = ({
   index,

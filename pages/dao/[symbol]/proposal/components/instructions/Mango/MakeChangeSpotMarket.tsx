@@ -26,7 +26,7 @@ import {
   optionalBNFromString,
 } from '@blockworks-foundation/mango-client'
 import * as serum from '@project-serum/serum'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const MakeChangeSpotMarket = ({
   index,

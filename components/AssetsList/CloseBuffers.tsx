@@ -25,7 +25,7 @@ import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBu
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface CloseBuffersForm {
   governedAccount: AssetAccount | undefined

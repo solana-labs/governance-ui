@@ -10,7 +10,7 @@ import {
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
 import BigNumber from 'bignumber.js'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,

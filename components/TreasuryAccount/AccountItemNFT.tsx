@@ -2,7 +2,7 @@ import { PublicKey } from '@solana/web3.js'
 import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { AssetAccount } from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
