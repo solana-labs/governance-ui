@@ -14,13 +14,14 @@ import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
 import {
   governance as foresightGov,
   consts as foresightConsts,
 } from '@foresight-tmp/foresight-sdk'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { getFilteredTokenAccounts } from './utils'
+import {
+  ForesightGovernedAccountSelect,
+  getFilteredTokenAccounts,
+} from './utils'
 
 const MakeAddMarketListToCategoryParams = ({
   index,
@@ -32,7 +33,6 @@ const MakeAddMarketListToCategoryParams = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
   const filteredTokenAccounts = getFilteredTokenAccounts()
-  const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<ForesightMakeAddMarketListToCategoryParams>({
     governedAccount: filteredTokenAccounts[0],
@@ -105,17 +105,13 @@ const MakeAddMarketListToCategoryParams = ({
 
   return (
     <>
-      <GovernedAccountSelect
-        label="Program"
-        governedAccounts={filteredTokenAccounts as GovernedMultiTypeAccount[]}
-        onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedAccount' })
-        }}
-        value={form.governedAccount}
-        error={formErrors['governedAccount']}
-        shouldBeGoverned={shouldBeGoverned}
+      <ForesightGovernedAccountSelect<ForesightMakeAddMarketListToCategoryParams>
+        filteredTokenAccounts={filteredTokenAccounts}
+        form={form}
+        setForm={setForm}
+        index={index}
         governance={governance}
-      ></GovernedAccountSelect>
+      ></ForesightGovernedAccountSelect>
       <Input
         label="Category ID"
         value={form.categoryId}
