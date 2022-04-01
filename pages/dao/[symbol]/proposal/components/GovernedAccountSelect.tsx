@@ -139,7 +139,7 @@ const GovernedAccountSelect = ({
           return (
             <Select.Option
               className="border-red"
-              key={acc.extensions.transferAddress?.toBase58()}
+              key={acc.pubkey.toBase58()}
               value={acc}
             >
               {getLabel(acc)}
