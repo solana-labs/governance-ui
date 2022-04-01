@@ -1,9 +1,4 @@
-import {
-  ConnectedVoltSDK,
-  FriktionSDK,
-  PendingDepositWithKey,
-  VoltSDK,
-} from '@friktion-labs/friktion-sdk'
+import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import { WSOL_MINT } from '@components/instructions/tools'
 import Decimal from 'decimal.js'
@@ -74,7 +69,6 @@ export async function getFriktionDepositInstruction({
       governedTokenAccount.governance.pubkey
     )
 
-    const voltVault = cVoltSDK.voltVault
     const vaultMint = cVoltSDK.voltVault.vaultMint
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
@@ -96,36 +90,6 @@ export async function getFriktionDepositInstruction({
           governedTokenAccount.governance.pubkey, // owner of token account
           wallet.publicKey! // fee payer
         )
-      )
-    }
-
-    let pendingDepositInfo
-    try {
-      const key = (
-        await VoltSDK.findPendingDepositInfoAddress(
-          voltVaultId,
-          governedTokenAccount.governance.pubkey,
-          cVoltSDK.sdk.programs.Volt.programId
-        )
-      )[0]
-      const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
-        key
-      )
-      pendingDepositInfo = {
-        ...acct,
-        key: key,
-      } as PendingDepositWithKey
-    } catch (err) {
-      pendingDepositInfo = null
-    }
-
-    if (
-      pendingDepositInfo &&
-      pendingDepositInfo.roundNumber.lt(voltVault.roundNumber) &&
-      pendingDepositInfo?.numUnderlyingDeposited?.gtn(0)
-    ) {
-      prerequisiteInstructions.push(
-        await cVoltSDK.claimPending(receiverAddress)
       )
     }
 
@@ -171,7 +135,7 @@ export async function getFriktionDepositInstruction({
       }
 
       const depositIx = governedTokenAccount.isSol
-        ? await cVoltSDK.depositWithTransfer(
+        ? await cVoltSDK.depositWithClaim(
             new Decimal(amount),
             depositTokenAccountKey,
             receiverAddress,
@@ -179,13 +143,25 @@ export async function getFriktionDepositInstruction({
             governedTokenAccount.governance.pubkey,
             decimals
           )
-        : await cVoltSDK.deposit(
+        : await cVoltSDK.depositWithClaim(
             new Decimal(amount),
             depositTokenAccountKey,
             receiverAddress,
+            false,
+            undefined,
             governedTokenAccount.governance.pubkey,
             decimals
           )
+
+      if (governedTokenAccount.isSol) {
+        const transferAddressIndex = depositIx.keys.findIndex(
+          (k) =>
+            k.pubkey.toString() ===
+            governedTokenAccount.transferAddress?.toString()
+        )
+        depositIx.keys[transferAddressIndex].isSigner = true
+        depositIx.keys[transferAddressIndex].isWritable = true
+      }
 
       const governedAccountIndex = depositIx.keys.findIndex(
         (k) =>
@@ -259,7 +235,6 @@ export async function getFriktionWithdrawInstruction({
       governedTokenAccount.governance.pubkey
     )
 
-    const voltVault = cVoltSDK.voltVault
     const vaultMint = cVoltSDK.voltVault.vaultMint
 
     try {
@@ -317,66 +292,6 @@ export async function getFriktionWithdrawInstruction({
         )
       }
 
-      let pendingDepositInfo
-      try {
-        const key = (
-          await VoltSDK.findPendingDepositInfoAddress(
-            voltVaultId,
-            governedTokenAccount.governance.pubkey,
-            cVoltSDK.sdk.programs.Volt.programId
-          )
-        )[0]
-        const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
-          key
-        )
-        pendingDepositInfo = {
-          ...acct,
-          key: key,
-        } as PendingDepositWithKey
-      } catch (err) {
-        pendingDepositInfo = null
-      }
-
-      if (
-        pendingDepositInfo &&
-        pendingDepositInfo.roundNumber.lt(voltVault.roundNumber) &&
-        pendingDepositInfo?.numUnderlyingDeposited?.gtn(0)
-      ) {
-        prerequisiteInstructions.push(
-          await cVoltSDK.claimPending(vaultTokenAccount)
-        )
-      }
-
-      let pendingWithdrawalInfo
-
-      try {
-        const key = (
-          await VoltSDK.findPendingWithdrawalInfoAddress(
-            voltVaultId,
-            governedTokenAccount.governance.pubkey,
-            cVoltSDK.sdk.programs.Volt.programId
-          )
-        )[0]
-        const acct = await this.sdk.programs.Volt.account.pendingWithdrawal.fetch(
-          key
-        )
-        pendingWithdrawalInfo = {
-          ...acct,
-          key: key,
-        }
-      } catch (err) {
-        pendingWithdrawalInfo = null
-      }
-      if (
-        pendingWithdrawalInfo &&
-        pendingWithdrawalInfo.roundNumber.lt(voltVault.roundNumber) &&
-        pendingWithdrawalInfo?.numVoltRedeemed?.gtn(0)
-      ) {
-        prerequisiteInstructions.push(
-          await cVoltSDK.claimPendingWithdrawal(depositTokenDest)
-        )
-      }
-
       const withdrawIx = await cVoltSDK.withdrawHumanAmount(
         new BN(amount),
         depositTokenMint,
@@ -385,13 +300,6 @@ export async function getFriktionWithdrawInstruction({
         depositTokenDest,
         governedTokenAccount.governance.pubkey
       )
-
-      const governedAccountIndex = withdrawIx.keys.findIndex(
-        (k) =>
-          k.pubkey.toString() ===
-          governedTokenAccount.governance?.pubkey.toString()
-      )
-      withdrawIx.keys[governedAccountIndex].isSigner = true
 
       serializedInstruction = serializeInstructionToBase64(withdrawIx)
     } catch (e) {
