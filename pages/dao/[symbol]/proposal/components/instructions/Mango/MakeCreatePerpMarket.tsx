@@ -235,7 +235,6 @@ const MakeCreatePerpMarket = ({
   const quoteDecimals = groupConfig?.tokens.find(
     (t) => t.symbol == groupConfig?.quoteSymbol
   )?.decimals
-  console.log({ groupConfig, quoteDecimals })
 
   const recommendedLmSizeShift =
     form.maxDepthBps &&

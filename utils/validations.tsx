@@ -336,6 +336,7 @@ export const getTokenTransferSchema = ({
 }
 
 export const getMintSchema = ({ form, connection }) => {
+  console.log(form)
   return yup.object().shape({
     amount: yup
       .number()
@@ -349,7 +350,7 @@ export const getMintSchema = ({ form, connection }) => {
         if (val && form.mintAccount && form.mintAccount?.extensions.mint) {
           const mintValue = getMintNaturalAmountFromDecimal(
             val,
-            form.mintAccount?.extensions.mint.decimals
+            form.mintAccount?.extensions.mint.account.decimals
           )
           return !!(
             form.mintAccount.governance?.account.governedAccount && mintValue

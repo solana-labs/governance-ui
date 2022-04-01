@@ -530,6 +530,7 @@ export async function getMintInstruction({
   governedMintInfoAccount: AssetAccount | undefined
   setFormErrors: any
 }): Promise<UiInstruction> {
+  console.log(form)
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -539,7 +540,7 @@ export async function getMintInstruction({
     const mintPK = form.mintAccount.governance.account.governedAccount
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
-      form.mintAccount.extensions.mint?.decimals
+      form.mintAccount.extensions.mint.account?.decimals
     )
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
