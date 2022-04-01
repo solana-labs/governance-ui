@@ -250,7 +250,7 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
       setDestinationAccount(null)
     }
   }, [form.destinationAccount])
-  console.log(tokenAccount)
+
   const schema = getTokenTransferSchema({
     form,
     connection,

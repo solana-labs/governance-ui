@@ -346,10 +346,10 @@ export const getMintSchema = ({ form, connection }) => {
             message: `Please select mint to validate the amount`,
           })
         }
-        if (val && form.mintAccount && form.mintAccount?.mintInfo) {
+        if (val && form.mintAccount && form.mintAccount?.extensions.mint) {
           const mintValue = getMintNaturalAmountFromDecimal(
             val,
-            form.mintAccount?.mintInfo.decimals
+            form.mintAccount?.extensions.mint.decimals
           )
           return !!(
             form.mintAccount.governance?.account.governedAccount && mintValue
@@ -416,16 +416,17 @@ export const getStakeSchema = ({ form }) => {
           val &&
           form.governedTokenAccount &&
           form.governedTokenAccount?.isSol &&
-          form.governedTokenAccount?.mint &&
-          form.governedTokenAccount?.solAccount
+          form.governedTokenAccount?.extensions.mint &&
+          form.governedTokenAccount?.extensions.solAccount
         ) {
           const mintValue = getMintNaturalAmountFromDecimal(
             val,
-            form.governedTokenAccount?.mint.account.decimals
+            form.governedTokenAccount?.extensions.mint.account.decimals
           )
           return !!(
-            form.governedTokenAccount.solAccount.owner &&
-            form.governedTokenAccount.solAccount.lamports >= new BN(mintValue)
+            form.governedTokenAccount.extensions.solAccount.owner &&
+            form.governedTokenAccount.extensions.solAccount.lamports >=
+              new BN(mintValue)
           )
         }
         return this.createError({ message: 'Amount is required' })

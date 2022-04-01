@@ -539,7 +539,7 @@ export async function getMintInstruction({
     const mintPK = form.mintAccount.governance.account.governedAccount
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
-      form.mintAccount.mintInfo?.decimals
+      form.mintAccount.extensions.mint?.decimals
     )
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
