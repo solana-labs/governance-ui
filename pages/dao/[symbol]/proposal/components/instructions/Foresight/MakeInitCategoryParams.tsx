@@ -6,7 +6,7 @@ import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
 import {
   UiInstruction,
-  ForesightMakeInitCategoryParams,
+  ForesightHasCategoryId,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
@@ -37,7 +37,7 @@ const MakeInitCategoryParams = ({
   )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
-  const [form, setForm] = useState<ForesightMakeInitCategoryParams>({
+  const [form, setForm] = useState<ForesightHasCategoryId>({
     governedAccount: filteredTokenAccounts[0],
     categoryId: '',
   })

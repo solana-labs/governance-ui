@@ -102,7 +102,6 @@ function MakeAddMarketListToCategoryParams({
     categoryId: yup.string().required(),
     marketListId: yup.string().required(),
   })
-  let x = formErrors['categoryId']
   return (
     <>
       <ForesightGovernedAccountSelect<ForesightMakeAddMarketListToCategoryParams>
