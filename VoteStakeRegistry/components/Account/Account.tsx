@@ -38,7 +38,7 @@ const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
 
 const NotificationsPlugin = () => {
   const { realmInfo } = useRealm()
-  if (realmInfo?.enableNotifications) {
+  if (realmInfo?.enableNotifi) {
     return (
       <div className="col-span-12">
         <NotificationsCard />

@@ -28,8 +28,8 @@ export interface RealmInfo {
   // banner mage
   bannerImage?: string
 
-  // Allow Realm to send email/SMS/Telegram/etc., notifications to governance members
-  enableNotifications?: boolean
+  // Allow Realm to send email/SMS/Telegram/etc., notifications to governance members using Notifi
+  enableNotifi?: boolean
 
   isCertified: boolean
 
@@ -51,7 +51,7 @@ interface RealmInfoAsJSON
     RealmInfo,
     'programId' | 'realmId' | 'isCertified' | 'sharedWalletId'
   > {
-  enableNotifications?: boolean
+  enableNotifi?: boolean
   programId: string
   realmId: string
   sharedWalletId?: string
@@ -70,7 +70,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     sharedWalletId: realm.sharedWalletId && new PublicKey(realm.sharedWalletId),
     isCertified: true,
     programVersion: realm.programVersion,
-    enableNotifications: realm.enableNotifications,
+    enableNotifi: realm.enableNotifi ?? true, // enable by default
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -159,16 +159,11 @@ const EXCLUDED_REALMS = new Map<string, string>([
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const certifiedRealms = getCertifiedRealmInfos(connection)
-  const notificationsEnabledMap = new Map<string, boolean>()
 
   const allRealms = (
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
       arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) => {
-        if (p.enableNotifications) {
-          notificationsEnabledMap[p.realmId.toBase58()] = p.enableNotifications
-        }
-
         return getRealms(connection.current, p.programId)
       })
     )
@@ -186,27 +181,19 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
         excludedRealms.has(r.pubkey.toBase58()) ||
         EXCLUDED_REALMS.has(r.pubkey.toBase58())
       )
-        ? createUnchartedRealmInfo(
-            r,
-            notificationsEnabledMap.has(r.pubkey.toBase58())
-              ? notificationsEnabledMap[r.pubkey.toBase58()]
-              : false
-          )
+        ? createUnchartedRealmInfo(r)
         : undefined
     })
     .filter(Boolean) as readonly RealmInfo[]
 }
 
-export function createUnchartedRealmInfo(
-  realm: ProgramAccount<Realm>,
-  enableNotifications: boolean
-) {
+export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
   return {
     symbol: realm.account.name,
     programId: new PublicKey(realm.owner),
     realmId: realm.pubkey,
     displayName: realm.account.name,
     isCertified: false,
-    enableNotifications,
+    enableNotifi: true, // enable by default
   } as RealmInfo
 }
