@@ -1,5 +1,5 @@
 import create, { State } from 'zustand'
-import { getNfts, ukraineDaoTokenAccountsOwnerAddress } from '@utils/tokens'
+import { getNfts } from '@utils/tokens'
 import tokenService from '@utils/services/token'
 import {
   AccountInfo,
@@ -122,8 +122,6 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     }
   },
   getNfts: async (nftsGovernedTokenAccounts, connection) => {
-    //Just for ukraine dao, it will be replaced with good abstraction
-    const ukraineNftsGov = 'GVCbCA42c8B9WFkcr8uwKSZuQpXQErg4DKxTisfCGPCJ'
     set((s) => {
       s.isLoadingNfts = true
     })
@@ -135,15 +133,11 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
         const nfts = acc.governance.pubkey
           ? await getNfts(connection, acc.governance.pubkey)
           : []
-        //Just for ukraine dao, it will be replaced with good abstraction
-        if (acc.governance.pubkey.toBase58() === ukraineNftsGov) {
-          const ukrainNfts = acc.governance.pubkey
-            ? await getNfts(
-                connection,
-                new PublicKey(ukraineDaoTokenAccountsOwnerAddress)
-              )
+        if (acc.isSol) {
+          const solAccountNfts = acc.governance.pubkey
+            ? await getNfts(connection, new PublicKey(acc.governance.pubkey!))
             : []
-          realmNfts = [...realmNfts, ...ukrainNfts]
+          realmNfts = [...realmNfts, ...solAccountNfts]
         }
         realmNfts = [...realmNfts, ...nfts]
         if (governance) {

@@ -71,7 +71,7 @@ const defaultState = {
   governancesArray: [],
   assetAccounts: [],
   governedTokenAccounts: [],
-  loadGovernedAccounts: true,
+  loadGovernedAccounts: false,
 }
 
 const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
@@ -85,6 +85,9 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     })
   },
   setGovernedAccounts: async (connection, realm) => {
+    set((s) => {
+      s.loadGovernedAccounts = true
+    })
     const governancesArray = _get().governancesArray
     const mintGovernances = getGovernancesByAccountTypes(governancesArray, [
       GovernanceAccountType.MintGovernanceV1,

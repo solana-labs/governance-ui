@@ -148,9 +148,6 @@ const getName = (governedAccountTokenAccount: AssetAccount) => {
   const tokenAccName = governedAccountTokenAccount.extensions.transferAddress
     ? getAccountName(governedAccountTokenAccount.extensions.transferAddress)
     : ''
-  const governanceAccName = governedAccountTokenAccount.governance.pubkey
-    ? getAccountName(governedAccountTokenAccount.governance.pubkey)
-    : ''
 
-  return tokenAccName || governanceAccName
+  return tokenAccName
 }
