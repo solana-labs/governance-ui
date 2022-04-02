@@ -163,7 +163,11 @@ export function ForesightCategoryIdInput<
 
 export function ForesightMarketListIdInput<
   T extends ForesightHasMarketListId
->(props: { form: T; handleSetForm: HandleSetForm; formErrors: {} }) {
+>(props: {
+  form: T
+  handleSetForm: HandleSetForm
+  formErrors: Record<string, never>
+}) {
   return (
     <Input
       label="Market List ID"
