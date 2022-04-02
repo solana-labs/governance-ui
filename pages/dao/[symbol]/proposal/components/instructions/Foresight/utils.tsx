@@ -3,6 +3,7 @@ import {
   governance as foresightGov,
   consts as foresightConsts,
 } from '@foresight-tmp/foresight-sdk'
+import { isFormValid } from '@utils/formValidation'
 import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
 import {
   Governance,
@@ -21,6 +22,10 @@ import Input from '@components/inputs/Input'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
+import { ObjectSchema } from 'yup'
+
+type EmptyObject = Record<string, never>
+type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
 export function getFilteredTokenAccounts(): GovernedTokenAccount[] {
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
@@ -53,12 +58,25 @@ export function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
   return handleSetForm
 }
 
+export function makeValidateInstruction<T extends ForesightHasGovernedAccount>(
+  schema: ObjectSchema<any>,
+  form: T,
+  setFormErrors: SetFormErrors
+): () => Promise<boolean> {
+  async function validateInstruction(): Promise<boolean> {
+    const { isValid, validationErrors } = await isFormValid(schema, form)
+    setFormErrors(validationErrors)
+    return isValid
+  }
+  return validateInstruction
+}
+
 export function makeHandleSetFormWithErrors<
   T extends ForesightHasGovernedAccount
 >(
   form: T,
   setForm: Dispatch<React.SetStateAction<T>>,
-  setFormErrors: Dispatch<React.SetStateAction<Record<string, never>>>
+  setFormErrors: SetFormErrors
 ): HandleSetForm {
   function handleSetForm({
     propertyName,
@@ -140,11 +158,7 @@ export function ForesightGovernedAccountSelect<
 
 export function ForesightCategoryIdInput<
   T extends ForesightHasCategoryId
->(props: {
-  form: T
-  handleSetForm: HandleSetForm
-  formErrors: Record<string, never>
-}) {
+>(props: { form: T; handleSetForm: HandleSetForm; formErrors: EmptyObject }) {
   return (
     <Input
       label="Category ID"
@@ -163,11 +177,7 @@ export function ForesightCategoryIdInput<
 
 export function ForesightMarketListIdInput<
   T extends ForesightHasMarketListId
->(props: {
-  form: T
-  handleSetForm: HandleSetForm
-  formErrors: Record<string, never>
-}) {
+>(props: { form: T; handleSetForm: HandleSetForm; formErrors: EmptyObject }) {
   return (
     <Input
       label="Market List ID"

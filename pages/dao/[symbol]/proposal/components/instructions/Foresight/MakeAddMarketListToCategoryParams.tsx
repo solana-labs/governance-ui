@@ -20,6 +20,7 @@ import {
   getFilteredTokenAccounts,
   makeGetInstruction,
   makeHandleSetFormWithErrors,
+  makeValidateInstruction,
 } from './utils'
 
 function MakeAddMarketListToCategoryParams({
@@ -45,11 +46,19 @@ function MakeAddMarketListToCategoryParams({
     setForm,
     setFormErrors
   )
-  const validateInstruction = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
+  const schema = yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
+    categoryId: yup.string().required(),
+    marketListId: yup.string().required(),
+  })
+  const validateInstruction = makeValidateInstruction(
+    schema,
+    form,
+    setFormErrors
+  )
   async function ixCreator(
     form: ForesightMakeAddMarketListToCategoryParams,
     program: foresightTypes.PredictionMarketProgram
@@ -82,14 +91,7 @@ function MakeAddMarketListToCategoryParams({
       index
     )
   }, [form])
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
-    categoryId: yup.string().required(),
-    marketListId: yup.string().required(),
-  })
+
   return (
     <>
       <ForesightGovernedAccountSelect<ForesightMakeAddMarketListToCategoryParams>
