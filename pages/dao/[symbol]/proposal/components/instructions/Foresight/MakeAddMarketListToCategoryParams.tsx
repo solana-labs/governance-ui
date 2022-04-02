@@ -9,7 +9,10 @@ import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
+import {
+  governance as foresightGov,
+  types as foresightTypes,
+} from '@foresight-tmp/foresight-sdk'
 import {
   ForesightCategoryIdInput,
   ForesightGovernedAccountSelect,
@@ -18,7 +21,6 @@ import {
   makeGetInstruction,
   makeHandleSetFormWithErrors,
 } from './utils'
-import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 
 function MakeAddMarketListToCategoryParams({
   index,
@@ -50,7 +52,7 @@ function MakeAddMarketListToCategoryParams({
   }
   async function ixCreator(
     form: ForesightMakeAddMarketListToCategoryParams,
-    program: PredictionMarketProgram
+    program: foresightTypes.PredictionMarketProgram
   ) {
     const { ix } = await foresightGov.genAddMarketListToCategoryIx(
       Buffer.from(form.categoryId.padEnd(20)),
