@@ -58,7 +58,7 @@ export function makeHandleSetFormWithErrors<
 >(
   form: T,
   setForm: Dispatch<React.SetStateAction<T>>,
-  setFormErrors: Dispatch<React.SetStateAction<{}>>
+  setFormErrors: Dispatch<React.SetStateAction<Record<string, never>>>
 ): HandleSetForm {
   function handleSetForm({
     propertyName,
