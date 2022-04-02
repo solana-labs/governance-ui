@@ -336,7 +336,6 @@ export const getTokenTransferSchema = ({
 }
 
 export const getMintSchema = ({ form, connection }) => {
-  console.log(form)
   return yup.object().shape({
     amount: yup
       .number()
