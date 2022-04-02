@@ -15,11 +15,9 @@ import {
   ForesightGovernedAccountSelect,
   ForesightMarketListIdInput,
   getFilteredTokenAccounts,
-  getUiInstruction,
   makeGetInstruction,
   makeHandleSetFormWithErrors,
 } from './utils'
-import { PredictionMarket } from '@foresight-tmp/foresight-sdk/dist/idl/prediction_market'
 import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 
 function MakeAddMarketListToCategoryParams({
