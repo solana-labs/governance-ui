@@ -1,26 +1,21 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useContext, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
+import React, { useState } from 'react'
 import * as yup from 'yup'
 import { ForesightMakeAddMarketListToCategoryParams } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
 import {
   governance as foresightGov,
   types as foresightTypes,
 } from '@foresight-tmp/foresight-sdk'
 import {
+  commonAssets,
   ForesightCategoryIdInput,
   ForesightGovernedAccountSelect,
   ForesightMarketListIdInput,
   ForesightUseEffects,
-  getFilteredTokenAccounts,
-  makeGetInstruction,
+  getSchema,
   makeHandleSetFormWithErrors,
-  makeValidateInstruction,
 } from './utils'
 
 function MakeAddMarketListToCategoryParams({
@@ -30,35 +25,27 @@ function MakeAddMarketListToCategoryParams({
   index: number
   governance: ProgramAccount<Governance> | null
 }) {
-  const wallet = useWalletStore((s) => s.current)
-  const { realmInfo } = useRealm()
-  const filteredTokenAccounts = getFilteredTokenAccounts()
-  const programId: PublicKey | undefined = realmInfo?.programId
+  const {
+    wallet,
+    filteredTokenAccounts,
+    formErrors,
+    setFormErrors,
+    handleSetInstructions,
+  } = commonAssets()
   const [form, setForm] = useState<ForesightMakeAddMarketListToCategoryParams>({
     governedAccount: filteredTokenAccounts[0],
     categoryId: '',
     marketListId: '',
   })
-  const [formErrors, setFormErrors] = useState({})
-  const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = makeHandleSetFormWithErrors(
     form,
     setForm,
     setFormErrors
   )
-  const schema = yup.object().shape({
-    governedAccount: yup
-      .object()
-      .nullable()
-      .required('Program governed account is required'),
+  const schema = getSchema({
     categoryId: yup.string().required(),
     marketListId: yup.string().required(),
   })
-  const validateInstruction = makeValidateInstruction(
-    schema,
-    form,
-    setFormErrors
-  )
   async function ixCreator(
     form: ForesightMakeAddMarketListToCategoryParams,
     program: foresightTypes.PredictionMarketProgram
@@ -71,20 +58,14 @@ function MakeAddMarketListToCategoryParams({
     )
     return ix
   }
-  const getInstruction = makeGetInstruction(
-    ixCreator,
-    form,
-    validateInstruction,
-    programId,
-    wallet
-  )
   ForesightUseEffects(
     handleSetForm,
-    programId,
-    realmInfo,
     form,
     handleSetInstructions,
-    getInstruction,
+    ixCreator,
+    wallet,
+    schema,
+    setFormErrors,
     index
   )
 

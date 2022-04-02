@@ -11,7 +11,7 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { Dispatch, useEffect } from 'react'
+import { Dispatch, useContext, useEffect, useState } from 'react'
 import {
   ForesightHasCategoryId,
   ForesightHasGovernedAccount,
@@ -22,8 +22,12 @@ import Input from '@components/inputs/Input'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
-import { ObjectSchema } from 'yup'
+import * as yup from 'yup'
+import { ObjectSchema, StringSchema, NumberSchema } from 'yup'
 import { RealmInfo } from '@models/registry/api'
+import useRealm from '@hooks/useRealm'
+import useWalletStore from 'stores/useWalletStore'
+import { NewProposalContext } from '../../../new'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
@@ -110,10 +114,16 @@ type IxCreator<T extends ForesightHasGovernedAccount> = (
 export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   ixCreator: IxCreator<T>,
   form: T,
-  validateInstruction: () => Promise<boolean>,
   programId: PublicKey | undefined,
-  wallet: SignerWalletAdapter | undefined
+  wallet: SignerWalletAdapter | undefined,
+  schema: ObjectSchema<any>,
+  setFormErrors: SetFormErrors
 ): GetInstruction {
+  const validateInstruction = makeValidateInstruction(
+    schema,
+    form,
+    setFormErrors
+  )
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
@@ -129,21 +139,52 @@ export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   return getInstruction
 }
 
-export function ForesightUseEffects(
+export function commonAssets(): {
+  wallet: SignerWalletAdapter | undefined
+  filteredTokenAccounts: GovernedTokenAccount[]
+  formErrors: EmptyObject
+  setFormErrors: SetFormErrors
+  handleSetInstructions: HandleSetInstructions
+} {
+  const wallet = useWalletStore((s) => s.current)
+  const filteredTokenAccounts = getFilteredTokenAccounts()
+  const [formErrors, setFormErrors] = useState({})
+  const { handleSetInstructions } = useContext(NewProposalContext)
+  return {
+    wallet,
+    filteredTokenAccounts,
+    formErrors,
+    setFormErrors,
+    handleSetInstructions,
+  }
+}
+
+export function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
   handleSetForm: HandleSetForm,
-  programId: PublicKey | undefined,
-  realmInfo: RealmInfo | undefined,
-  form: ForesightHasGovernedAccount,
+  form: T,
   handleSetInstructions: HandleSetInstructions,
-  getInstruction: GetInstruction,
+  ixCreator: IxCreator<T>,
+  wallet: SignerWalletAdapter | undefined,
+  schema: ObjectSchema<any>,
+  setFormErrors: SetFormErrors,
   index: number
 ): void {
+  const { realmInfo } = useRealm()
+  const programId: PublicKey | undefined = realmInfo?.programId
+  const getInstruction = makeGetInstruction(
+    ixCreator,
+    form,
+    programId,
+    wallet,
+    schema,
+    setFormErrors
+  )
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
       value: programId?.toString(),
     })
-  }, [realmInfo?.programId])
+  }, [programId])
 
   useEffect(() => {
     handleSetInstructions(
@@ -151,6 +192,18 @@ export function ForesightUseEffects(
       index
     )
   }, [form])
+}
+
+export function getSchema(extraFields: {
+  [name: string]: StringSchema | NumberSchema
+}) {
+  return yup.object().shape({
+    governedAccount: yup
+      .object()
+      .nullable()
+      .required('Program governed account is required'),
+    ...extraFields,
+  })
 }
 
 export function getUiInstruction(
