@@ -16,6 +16,7 @@ import {
   ForesightCategoryIdInput,
   ForesightGovernedAccountSelect,
   ForesightMarketListIdInput,
+  ForesightUseEffects,
   getFilteredTokenAccounts,
   makeGetInstruction,
   makeHandleSetFormWithErrors,
@@ -77,23 +78,19 @@ function MakeAddMarketListToCategoryParams({
     programId,
     wallet
   )
-  useEffect(() => {
-    handleSetForm({
-      propertyName: 'programId',
-      value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
-
-  useEffect(() => {
-    handleSetInstructions(
-      { governedAccount: form.governedAccount?.governance, getInstruction },
-      index
-    )
-  }, [form])
+  ForesightUseEffects(
+    handleSetForm,
+    programId,
+    realmInfo,
+    form,
+    handleSetInstructions,
+    getInstruction,
+    index
+  )
 
   return (
     <>
-      <ForesightGovernedAccountSelect<ForesightMakeAddMarketListToCategoryParams>
+      <ForesightGovernedAccountSelect
         filteredTokenAccounts={filteredTokenAccounts}
         form={form}
         handleSetForm={handleSetForm}

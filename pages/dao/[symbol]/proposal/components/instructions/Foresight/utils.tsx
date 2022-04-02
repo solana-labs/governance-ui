@@ -11,7 +11,7 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { Dispatch } from 'react'
+import { Dispatch, useEffect } from 'react'
 import {
   ForesightHasCategoryId,
   ForesightHasGovernedAccount,
@@ -23,6 +23,7 @@ import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 import { ObjectSchema } from 'yup'
+import { RealmInfo } from '@models/registry/api'
 
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
@@ -42,6 +43,14 @@ type HandleSetForm = ({
   value: any
 }) => void
 
+type HandleSetInstructions = (
+  val: {
+    governedAccount: ProgramAccount<Governance> | undefined
+    getInstruction: GetInstruction
+  },
+  index: number
+) => void
+
 export function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
   form: T,
   setForm: Dispatch<React.SetStateAction<T>>
@@ -58,9 +67,9 @@ export function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
   return handleSetForm
 }
 
-export function makeValidateInstruction<T extends ForesightHasGovernedAccount>(
+export function makeValidateInstruction(
   schema: ObjectSchema<any>,
-  form: T,
+  form: ForesightHasGovernedAccount,
   setFormErrors: SetFormErrors
 ): () => Promise<boolean> {
   async function validateInstruction(): Promise<boolean> {
@@ -91,22 +100,12 @@ export function makeHandleSetFormWithErrors<
   return handleSetForm
 }
 
+type GetInstruction = () => Promise<UiInstruction>
+
 type IxCreator<T extends ForesightHasGovernedAccount> = (
   form: T,
   program: PredictionMarketProgram
 ) => Promise<TransactionInstruction>
-
-export function getUiInstruction<T extends ForesightHasGovernedAccount>(
-  serializedInstruction: string,
-  isValid: boolean,
-  form: T
-): UiInstruction {
-  return {
-    serializedInstruction: serializedInstruction,
-    isValid,
-    governance: form.governedAccount?.governance,
-  }
-}
 
 export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   ixCreator: IxCreator<T>,
@@ -114,7 +113,7 @@ export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   validateInstruction: () => Promise<boolean>,
   programId: PublicKey | undefined,
   wallet: SignerWalletAdapter | undefined
-): () => Promise<UiInstruction> {
+): GetInstruction {
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction()
     let serializedInstruction = ''
@@ -125,16 +124,50 @@ export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
       const ix = await ixCreator(form, program)
       serializedInstruction = serializeInstructionToBase64(ix)
     }
-    return getUiInstruction<T>(serializedInstruction, isValid, form)
+    return getUiInstruction(serializedInstruction, isValid, form)
   }
   return getInstruction
 }
 
-export function ForesightGovernedAccountSelect<
-  T extends ForesightHasGovernedAccount
->(props: {
+export function ForesightUseEffects(
+  handleSetForm: HandleSetForm,
+  programId: PublicKey | undefined,
+  realmInfo: RealmInfo | undefined,
+  form: ForesightHasGovernedAccount,
+  handleSetInstructions: HandleSetInstructions,
+  getInstruction: GetInstruction,
+  index: number
+): void {
+  useEffect(() => {
+    handleSetForm({
+      propertyName: 'programId',
+      value: programId?.toString(),
+    })
+  }, [realmInfo?.programId])
+
+  useEffect(() => {
+    handleSetInstructions(
+      { governedAccount: form.governedAccount?.governance, getInstruction },
+      index
+    )
+  }, [form])
+}
+
+export function getUiInstruction(
+  serializedInstruction: string,
+  isValid: boolean,
+  form: ForesightHasGovernedAccount
+): UiInstruction {
+  return {
+    serializedInstruction: serializedInstruction,
+    isValid,
+    governance: form.governedAccount?.governance,
+  }
+}
+
+export function ForesightGovernedAccountSelect(props: {
   filteredTokenAccounts: GovernedTokenAccount[]
-  form: T
+  form: ForesightHasGovernedAccount
   handleSetForm: HandleSetForm
   index: number
   governance: ProgramAccount<Governance> | null
@@ -156,9 +189,11 @@ export function ForesightGovernedAccountSelect<
   )
 }
 
-export function ForesightCategoryIdInput<
-  T extends ForesightHasCategoryId
->(props: { form: T; handleSetForm: HandleSetForm; formErrors: EmptyObject }) {
+export function ForesightCategoryIdInput(props: {
+  form: ForesightHasCategoryId
+  handleSetForm: HandleSetForm
+  formErrors: EmptyObject
+}) {
   return (
     <Input
       label="Category ID"
@@ -175,9 +210,11 @@ export function ForesightCategoryIdInput<
   )
 }
 
-export function ForesightMarketListIdInput<
-  T extends ForesightHasMarketListId
->(props: { form: T; handleSetForm: HandleSetForm; formErrors: EmptyObject }) {
+export function ForesightMarketListIdInput(props: {
+  form: ForesightHasMarketListId
+  handleSetForm: HandleSetForm
+  formErrors: EmptyObject
+}) {
   return (
     <Input
       label="Market List ID"
