@@ -4,24 +4,23 @@ import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import * as yup from 'yup'
 import { isFormValid } from '@utils/formValidation'
-import {
-  UiInstruction,
-  ForesightMakeAddMarketListToCategoryParams,
-} from '@utils/uiTypes/proposalCreationTypes'
+import { ForesightMakeAddMarketListToCategoryParams } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import Input from '@components/inputs/Input'
+import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import {
-  governance as foresightGov,
-  consts as foresightConsts,
-} from '@foresight-tmp/foresight-sdk'
-import {
+  ForesightCategoryIdInput,
   ForesightGovernedAccountSelect,
+  ForesightMarketListIdInput,
   getFilteredTokenAccounts,
+  getUiInstruction,
+  makeGetInstruction,
+  makeHandleSetFormWithErrors,
 } from './utils'
+import { PredictionMarket } from '@foresight-tmp/foresight-sdk/dist/idl/prediction_market'
+import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 
 function MakeAddMarketListToCategoryParams({
   index,
@@ -41,46 +40,35 @@ function MakeAddMarketListToCategoryParams({
   })
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  function handleSetForm({
-    propertyName,
-    value,
-  }: {
-    propertyName: string
-    value: any
-  }) {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+  const handleSetForm = makeHandleSetFormWithErrors(
+    form,
+    setForm,
+    setFormErrors
+  )
   const validateInstruction = async (): Promise<boolean> => {
     const { isValid, validationErrors } = await isFormValid(schema, form)
     setFormErrors(validationErrors)
     return isValid
   }
-  async function getInstruction(): Promise<UiInstruction> {
-    const isValid = await validateInstruction()
-    let serializedInstruction = ''
-    if (isValid && programId && wallet?.publicKey) {
-      const program = foresightGov.readonlyProgram(
-        new PublicKey(foresightConsts.DEVNET_PID)
-      )
-      const {
-        ix: initMarketListIx,
-      } = await foresightGov.genAddMarketListToCategoryIx(
-        Buffer.from(form.categoryId.padEnd(20)),
-        Buffer.from(form.marketListId.padEnd(20)),
-        program,
-        form.governedAccount.transferAddress!
-      )
-
-      serializedInstruction = serializeInstructionToBase64(initMarketListIx)
-    }
-    const obj: UiInstruction = {
-      serializedInstruction: serializedInstruction,
-      isValid,
-      governance: form.governedAccount?.governance,
-    }
-    return obj
+  async function ixCreator(
+    form: ForesightMakeAddMarketListToCategoryParams,
+    program: PredictionMarketProgram
+  ) {
+    const { ix } = await foresightGov.genAddMarketListToCategoryIx(
+      Buffer.from(form.categoryId.padEnd(20)),
+      Buffer.from(form.marketListId.padEnd(20)),
+      program,
+      form.governedAccount.transferAddress!
+    )
+    return ix
   }
+  const getInstruction = makeGetInstruction(
+    ixCreator,
+    form,
+    validateInstruction,
+    programId,
+    wallet
+  )
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
@@ -107,34 +95,19 @@ function MakeAddMarketListToCategoryParams({
       <ForesightGovernedAccountSelect<ForesightMakeAddMarketListToCategoryParams>
         filteredTokenAccounts={filteredTokenAccounts}
         form={form}
-        setForm={setForm}
+        handleSetForm={handleSetForm}
         index={index}
         governance={governance}
       ></ForesightGovernedAccountSelect>
-      <Input
-        label="Category ID"
-        value={form.categoryId}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'categoryId',
-          })
-        }
-        error={formErrors['categoryId']}
+      <ForesightCategoryIdInput
+        form={form}
+        handleSetForm={handleSetForm}
+        formErrors={formErrors}
       />
-      <Input
-        label="Market List ID"
-        value={form.marketListId}
-        type="text"
-        min={0}
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'marketListId',
-          })
-        }
-        error={formErrors['marketListID']}
+      <ForesightMarketListIdInput
+        form={form}
+        handleSetForm={handleSetForm}
+        formErrors={formErrors}
       />
     </>
   )
