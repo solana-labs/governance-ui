@@ -140,7 +140,11 @@ export function ForesightGovernedAccountSelect<
 
 export function ForesightCategoryIdInput<
   T extends ForesightHasCategoryId
->(props: { form: T; handleSetForm: HandleSetForm; formErrors: {} }) {
+>(props: {
+  form: T
+  handleSetForm: HandleSetForm
+  formErrors: Record<string, never>
+}) {
   return (
     <Input
       label="Category ID"
