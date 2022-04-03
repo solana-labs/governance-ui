@@ -30,22 +30,22 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
-  "symbol": "POOR",
-  "displayName": "PoorDao (Famous Fox Edition)",
-  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-  "realmId": "12gEDQvesi9qSMoXcY1LSHxGqArUXZ2HemihyEShpoWf",
-  "website": "https://famousfoxes.com",
-  "twitter": "@PoorDao_FFF",
-  "ogImage": "/realms/PoorDao/img/archer.png"
+    "symbol": "POOR",
+    "displayName": "PoorDao (Famous Fox Edition)",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "12gEDQvesi9qSMoXcY1LSHxGqArUXZ2HemihyEShpoWf",
+    "website": "https://famousfoxes.com",
+    "twitter": "@PoorDao_FFF",
+    "ogImage": "/realms/PoorDao/img/archer.png"
   },
   {
-  "symbol": "CHIAO",
-  "displayName": "Chiao (Chimpions)",
-  "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
-  "realmId": "41SoCf3dmToE3YNJxAzz3GqNMp9SnzzYBH7cB7f1RJ82",
-  "website": "https://www.chimpions.co/",
-  "twitter": "@TheChimpions",
-  "ogImage": "/realms/Chiao/img/chiao.png"
+    "symbol": "CHIAO",
+    "displayName": "Chiao (Chimpions)",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "41SoCf3dmToE3YNJxAzz3GqNMp9SnzzYBH7cB7f1RJ82",
+    "website": "https://www.chimpions.co/",
+    "twitter": "@TheChimpions",
+    "ogImage": "/realms/Chiao/img/chiao.png"
   },
   {
     "symbol": "PSY",
@@ -547,5 +547,24 @@
     "realmId": "12Q9JeKazwCbMDwiK4Hq9eGgCJJaE37Kt79AUpWwUPqP",
     "website": "https://www.radrugs.io",
     "ogImage": "/realms/RadRugsDAO/img/RadRugsDAO.png"
+  },
+  {
+    "symbol": "$OXSQ",
+    "displayName": "The Ox Squad",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "Bf5k7t1wKvvs6NF8d4SCbreSMJKYZE1e7wBm8YeZUJmD",
+    "website": "https://theoxsquadnft.com",
+    "twitter": "@TheOxSquadNFT",
+    "bannerImage": "/realms/TheOxSquad/img/TheOxSquad_banner.jpeg",
+    "ogImage": "/realms/TheOxSquad/img/TheOxSquad.png"
+  },
+  {
+    "symbol": "$ASH",
+    "displayName": "MorDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2vZwtXgeE7V5ipovRbSyxDcuDM6FgozHPsFPP92wiPfz",
+    "website": "https://mortuary-inc.io/",
+    "twitter": "@MortuaryIncNFT",
+    "ogImage": "/realms/MorDAO/img/logo.svg"
   }
 ]

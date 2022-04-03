@@ -35,6 +35,7 @@
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
     "@next/bundle-analyzer": "^12.1.0",
     "@nfteyez/sol-rayz": "^0.10.2",
+    "@notifi-network/notifi-react-hooks": "^0.10.1",
     "@project-serum/anchor": "^0.20.1",
     "@project-serum/common": "^0.0.1-beta.3",
     "@project-serum/sol-wallet-adapter": "^0.2.0",
@@ -73,6 +74,7 @@
     "zustand": "^3.4.1"
   },
   "devDependencies": {
+    "@notifi-network/notifi-core": "^0.10.1",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^11.2.5",
     "@types/jest": "^27.0.3",

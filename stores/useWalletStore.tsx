@@ -343,6 +343,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       await set((s) => {
         s.selectedRealm.proposals = proposals
       })
+      await get().actions.fetchOwnVoteRecords()
     },
     // Fetches and updates governance for the selected realm
     async fetchRealmGovernance(governancePk: PublicKey) {
