@@ -81,13 +81,13 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
   getGovernedAccounts: async (connection, realm) => {
     set((s) => {
       s.loadGovernedAccounts = true
+      s.governedTokenAccounts = []
+      s.assetAccounts = []
     })
     const governancesArray = _get().governancesArray
-    const accounts = await getAccountsForGovernances(
-      connection,
-      realm,
-      governancesArray
-    )
+    const accounts = governancesArray.length
+      ? await getAccountsForGovernances(connection, realm, governancesArray)
+      : []
     set((s) => {
       s.governancesArray = governancesArray
       s.loadGovernedAccounts = false

@@ -8,7 +8,7 @@ export default function handleGovernanceAssetsStore() {
   const connection = useWalletStore((s) => s.connection)
   const { setGovernancesArray } = useGovernanceAssetsStore()
   useEffect(() => {
-    if (realm && Object.keys(governances).length) {
+    if (realm) {
       setGovernancesArray(connection, realm, governances)
     }
   }, [
