@@ -68,6 +68,11 @@ function MakeAddMarketListToCategoryParams({
     setFormErrors,
     index
   )
+  const inputProps = {
+    form,
+    handleSetForm,
+    formErrors,
+  }
 
   return (
     <>
@@ -78,16 +83,8 @@ function MakeAddMarketListToCategoryParams({
         index={index}
         governance={governance}
       ></ForesightGovernedAccountSelect>
-      <ForesightCategoryIdInput
-        form={form}
-        handleSetForm={handleSetForm}
-        formErrors={formErrors}
-      />
-      <ForesightMarketListIdInput
-        form={form}
-        handleSetForm={handleSetForm}
-        formErrors={formErrors}
-      />
+      <ForesightCategoryIdInput {...inputProps} />
+      <ForesightMarketListIdInput {...inputProps} />
     </>
   )
 }
