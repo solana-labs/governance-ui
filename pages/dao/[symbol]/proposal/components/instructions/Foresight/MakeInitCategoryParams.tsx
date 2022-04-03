@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useState } from 'react'
+import React from 'react'
 import * as yup from 'yup'
 import { ForesightHasCategoryId } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
@@ -8,14 +8,7 @@ import {
   governance as foresightGov,
   types as foresightTypes,
 } from '@foresight-tmp/foresight-sdk'
-import {
-  commonAssets,
-  ForesightCategoryIdInput,
-  ForesightGovernedAccountSelect,
-  ForesightUseEffects,
-  getSchema,
-  makeHandleSetFormWithErrors,
-} from './utils'
+import { commonAssets, ForesightCategoryIdInput, getSchema } from './utils'
 
 const MakeInitCategoryParams = ({
   index,
@@ -25,20 +18,13 @@ const MakeInitCategoryParams = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const {
-    wallet,
-    filteredTokenAccounts,
-    formErrors,
-    setFormErrors,
-    handleSetInstructions,
-  } = commonAssets()
-  const [form, setForm] = useState<ForesightHasCategoryId>({
-    governedAccount: filteredTokenAccounts[0],
-    categoryId: '',
-  })
-  const handleSetForm = makeHandleSetFormWithErrors(
-    form,
-    setForm,
-    setFormErrors
+    inputProps,
+    effector,
+    governedAccountSelect,
+  } = commonAssets<ForesightHasCategoryId>(
+    { categoryId: '' },
+    index,
+    governance
   )
   const schema = getSchema({
     categoryId: yup.string().required(),
@@ -54,32 +40,10 @@ const MakeInitCategoryParams = ({
     )
     return ix
   }
-
-  const inputProps = {
-    form,
-    handleSetForm,
-    formErrors,
-  }
-  ForesightUseEffects(
-    handleSetForm,
-    form,
-    handleSetInstructions,
-    ixCreator,
-    wallet,
-    schema,
-    setFormErrors,
-    index
-  )
-
+  effector(ixCreator, schema, index)
   return (
     <>
-      <ForesightGovernedAccountSelect
-        filteredTokenAccounts={filteredTokenAccounts}
-        form={form}
-        handleSetForm={handleSetForm}
-        index={index}
-        governance={governance}
-      />
+      {governedAccountSelect}
       <ForesightCategoryIdInput {...inputProps} />
     </>
   )

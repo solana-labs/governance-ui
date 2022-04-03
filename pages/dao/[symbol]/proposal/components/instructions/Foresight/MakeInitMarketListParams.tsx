@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useState } from 'react'
+import React from 'react'
 import * as yup from 'yup'
 import { ForesightHasMarketListId } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
@@ -8,14 +8,7 @@ import {
   governance as foresightGov,
   types as foresightTypes,
 } from '@foresight-tmp/foresight-sdk'
-import {
-  commonAssets,
-  ForesightGovernedAccountSelect,
-  ForesightMarketListIdInput,
-  ForesightUseEffects,
-  getSchema,
-  makeHandleSetFormWithErrors,
-} from './utils'
+import { commonAssets, ForesightMarketListIdInput, getSchema } from './utils'
 
 const MakeInitMarketListParams = ({
   index,
@@ -25,20 +18,13 @@ const MakeInitMarketListParams = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const {
-    wallet,
-    filteredTokenAccounts,
-    formErrors,
-    setFormErrors,
-    handleSetInstructions,
-  } = commonAssets()
-  const [form, setForm] = useState<ForesightHasMarketListId>({
-    governedAccount: filteredTokenAccounts[0],
-    marketListId: '',
-  })
-  const handleSetForm = makeHandleSetFormWithErrors(
-    form,
-    setForm,
-    setFormErrors
+    inputProps,
+    effector,
+    governedAccountSelect,
+  } = commonAssets<ForesightHasMarketListId>(
+    { marketListId: '' },
+    index,
+    governance
   )
   const schema = getSchema({
     marketListId: yup.string().required(),
@@ -54,31 +40,11 @@ const MakeInitMarketListParams = ({
     )
     return ix
   }
-  const inputProps = {
-    form,
-    handleSetForm,
-    formErrors,
-  }
-  ForesightUseEffects(
-    handleSetForm,
-    form,
-    handleSetInstructions,
-    ixCreator,
-    wallet,
-    schema,
-    setFormErrors,
-    index
-  )
+  effector(ixCreator, schema, index)
 
   return (
     <>
-      <ForesightGovernedAccountSelect
-        filteredTokenAccounts={filteredTokenAccounts}
-        form={form}
-        handleSetForm={handleSetForm}
-        index={index}
-        governance={governance}
-      />
+      {governedAccountSelect}
       <ForesightMarketListIdInput {...inputProps} />
     </>
   )

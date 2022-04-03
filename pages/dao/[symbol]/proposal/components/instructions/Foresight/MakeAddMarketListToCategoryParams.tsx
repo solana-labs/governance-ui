@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useState } from 'react'
+import React from 'react'
 import * as yup from 'yup'
 import { ForesightMakeAddMarketListToCategoryParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
@@ -11,11 +11,8 @@ import {
 import {
   commonAssets,
   ForesightCategoryIdInput,
-  ForesightGovernedAccountSelect,
   ForesightMarketListIdInput,
-  ForesightUseEffects,
   getSchema,
-  makeHandleSetFormWithErrors,
 } from './utils'
 
 function MakeAddMarketListToCategoryParams({
@@ -26,21 +23,13 @@ function MakeAddMarketListToCategoryParams({
   governance: ProgramAccount<Governance> | null
 }) {
   const {
-    wallet,
-    filteredTokenAccounts,
-    formErrors,
-    setFormErrors,
-    handleSetInstructions,
-  } = commonAssets()
-  const [form, setForm] = useState<ForesightMakeAddMarketListToCategoryParams>({
-    governedAccount: filteredTokenAccounts[0],
-    categoryId: '',
-    marketListId: '',
-  })
-  const handleSetForm = makeHandleSetFormWithErrors(
-    form,
-    setForm,
-    setFormErrors
+    inputProps,
+    effector,
+    governedAccountSelect,
+  } = commonAssets<ForesightMakeAddMarketListToCategoryParams>(
+    { categoryId: '', marketListId: '' },
+    index,
+    governance
   )
   const schema = getSchema({
     categoryId: yup.string().required(),
@@ -58,31 +47,11 @@ function MakeAddMarketListToCategoryParams({
     )
     return ix
   }
-  ForesightUseEffects(
-    handleSetForm,
-    form,
-    handleSetInstructions,
-    ixCreator,
-    wallet,
-    schema,
-    setFormErrors,
-    index
-  )
-  const inputProps = {
-    form,
-    handleSetForm,
-    formErrors,
-  }
+  effector(ixCreator, schema, index)
 
   return (
     <>
-      <ForesightGovernedAccountSelect
-        filteredTokenAccounts={filteredTokenAccounts}
-        form={form}
-        handleSetForm={handleSetForm}
-        index={index}
-        governance={governance}
-      ></ForesightGovernedAccountSelect>
+      {governedAccountSelect}
       <ForesightCategoryIdInput {...inputProps} />
       <ForesightMarketListIdInput {...inputProps} />
     </>

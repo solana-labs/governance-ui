@@ -57,7 +57,7 @@ type HandleSetInstructions = (
   index: number
 ) => void
 
-export function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
+function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
   form: T,
   setForm: Dispatch<React.SetStateAction<T>>
 ): HandleSetForm {
@@ -73,7 +73,7 @@ export function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
   return handleSetForm
 }
 
-export function makeValidateInstruction(
+function makeValidateInstruction(
   schema: ObjectSchema<any>,
   form: ForesightHasGovernedAccount,
   setFormErrors: SetFormErrors
@@ -86,9 +86,7 @@ export function makeValidateInstruction(
   return validateInstruction
 }
 
-export function makeHandleSetFormWithErrors<
-  T extends ForesightHasGovernedAccount
->(
+function makeHandleSetFormWithErrors<T extends ForesightHasGovernedAccount>(
   form: T,
   setForm: Dispatch<React.SetStateAction<T>>,
   setFormErrors: SetFormErrors
@@ -113,7 +111,7 @@ type IxCreator<T extends ForesightHasGovernedAccount> = (
   program: PredictionMarketProgram
 ) => Promise<TransactionInstruction>
 
-export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
+function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   ixCreator: IxCreator<T>,
   form: T,
   programId: PublicKey | undefined,
@@ -141,27 +139,70 @@ export function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   return getInstruction
 }
 
-export function commonAssets(): {
-  wallet: SignerWalletAdapter | undefined
-  filteredTokenAccounts: GovernedTokenAccount[]
-  formErrors: EmptyObject
-  setFormErrors: SetFormErrors
-  handleSetInstructions: HandleSetInstructions
+export function commonAssets<T extends ForesightHasGovernedAccount>(
+  formDefaults: Omit<T, 'governedAccount'>,
+  index: number,
+  governance: ProgramAccount<Governance> | null
+): {
+  inputProps: InputProps<T>
+  effector: (
+    ixCreator: IxCreator<T>,
+    schema: ObjectSchema<any>,
+    index: number
+  ) => void
+  governedAccountSelect: JSX.Element
 } {
   const wallet = useWalletStore((s) => s.current)
   const filteredTokenAccounts = getFilteredTokenAccounts()
   const [formErrors, setFormErrors] = useState({})
   const { handleSetInstructions } = useContext(NewProposalContext)
-  return {
-    wallet,
-    filteredTokenAccounts,
+  const [form, setForm] = useState<T>({
+    governedAccount: filteredTokenAccounts[0],
+    ...formDefaults,
+  } as T)
+  const handleSetForm = makeHandleSetFormWithErrors(
+    form,
+    setForm,
+    setFormErrors
+  )
+  const inputProps = {
+    form,
+    handleSetForm,
     formErrors,
-    setFormErrors,
-    handleSetInstructions,
+  }
+  function effector(
+    ixCreator: IxCreator<T>,
+    schema: ObjectSchema<any>,
+    index: number
+  ): void {
+    ForesightUseEffects(
+      handleSetForm,
+      form,
+      handleSetInstructions,
+      ixCreator,
+      wallet,
+      schema,
+      setFormErrors,
+      index
+    )
+  }
+  const governedAccountSelect = (
+    <ForesightGovernedAccountSelect
+      filteredTokenAccounts={filteredTokenAccounts}
+      form={form}
+      handleSetForm={handleSetForm}
+      index={index}
+      governance={governance}
+    ></ForesightGovernedAccountSelect>
+  )
+  return {
+    inputProps,
+    effector,
+    governedAccountSelect,
   }
 }
 
-export function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
+function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
   handleSetForm: HandleSetForm,
   form: T,
   handleSetInstructions: HandleSetInstructions,
@@ -208,7 +249,7 @@ export function getSchema(extraFields: {
   })
 }
 
-export function getUiInstruction(
+function getUiInstruction(
   serializedInstruction: string,
   isValid: boolean,
   form: ForesightHasGovernedAccount
@@ -220,7 +261,7 @@ export function getUiInstruction(
   }
 }
 
-export function ForesightGovernedAccountSelect(props: {
+function ForesightGovernedAccountSelect(props: {
   filteredTokenAccounts: GovernedTokenAccount[]
   form: ForesightHasGovernedAccount
   handleSetForm: HandleSetForm
@@ -296,6 +337,7 @@ export function ForesightMarketIdInput(
       label="Market ID"
       value={props.form.marketId}
       type="number"
+      min={0}
       onChange={(evt) =>
         props.handleSetForm({
           value: evt.target.value,
@@ -303,6 +345,24 @@ export function ForesightMarketIdInput(
         })
       }
       error={props.formErrors['marketId']}
+    />
+  )
+}
+
+export function ForesightWinnerInput(props: InputProps<ForesightHasMarketId>) {
+  return (
+    <Input
+      label="Winner"
+      value={props.form.marketId}
+      type="number"
+      min={0}
+      onChange={(evt) =>
+        props.handleSetForm({
+          value: evt.target.value,
+          propertyName: 'winner',
+        })
+      }
+      error={props.formErrors['winner']}
     />
   )
 }

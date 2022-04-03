@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React, { useState } from 'react'
+import React from 'react'
 import * as yup from 'yup'
 import { ForesightMakeAddMarketMetadataParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
@@ -12,13 +12,10 @@ import {
 import {
   commonAssets,
   ForesightContentInput,
-  ForesightGovernedAccountSelect,
   ForesightMarketIdInput,
   ForesightMarketListIdInput,
   ForesightMarketMetadataFieldSelect,
-  ForesightUseEffects,
   getSchema,
-  makeHandleSetFormWithErrors,
 } from './utils'
 
 const MakeAddMarketMetadataParams = ({
@@ -29,25 +26,20 @@ const MakeAddMarketMetadataParams = ({
   governance: ProgramAccount<Governance> | null
 }) => {
   const {
-    wallet,
-    filteredTokenAccounts,
-    formErrors,
-    setFormErrors,
-    handleSetInstructions,
-  } = commonAssets()
-  const [form, setForm] = useState<ForesightMakeAddMarketMetadataParams>({
-    governedAccount: filteredTokenAccounts[0],
-    marketListId: '',
-    marketId: 0,
-    content: '',
-    field: Object.keys(
-      foresightConsts.MARKET_METADATA_FIELDS
-    )[0] as foresightConsts.MarketMetadataFieldName,
-  })
-  const handleSetForm = makeHandleSetFormWithErrors(
-    form,
-    setForm,
-    setFormErrors
+    inputProps,
+    effector,
+    governedAccountSelect,
+  } = commonAssets<ForesightMakeAddMarketMetadataParams>(
+    {
+      marketListId: '',
+      marketId: 0,
+      content: '',
+      field: Object.keys(
+        foresightConsts.MARKET_METADATA_FIELDS
+      )[0] as foresightConsts.MarketMetadataFieldName,
+    },
+    index,
+    governance
   )
   const schema = getSchema({
     marketId: yup.number().required(),
@@ -69,31 +61,10 @@ const MakeAddMarketMetadataParams = ({
     )
     return ix
   }
-  ForesightUseEffects(
-    handleSetForm,
-    form,
-    handleSetInstructions,
-    ixCreator,
-    wallet,
-    schema,
-    setFormErrors,
-    index
-  )
-  const inputProps = {
-    form,
-    handleSetForm,
-    formErrors,
-  }
-
+  effector(ixCreator, schema, index)
   return (
     <>
-      <ForesightGovernedAccountSelect
-        filteredTokenAccounts={filteredTokenAccounts}
-        form={form}
-        handleSetForm={handleSetForm}
-        index={index}
-        governance={governance}
-      />
+      {governedAccountSelect}
       <ForesightMarketIdInput {...inputProps} />
       <ForesightMarketListIdInput {...inputProps} />
       <ForesightContentInput {...inputProps} />
