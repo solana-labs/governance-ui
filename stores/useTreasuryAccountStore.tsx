@@ -134,8 +134,11 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
           ? await getNfts(connection, acc.governance.pubkey)
           : []
         if (acc.isSol) {
-          const solAccountNfts = acc.governance.pubkey
-            ? await getNfts(connection, new PublicKey(acc.governance.pubkey!))
+          const solAccountNfts = acc.extensions.transferAddress
+            ? await getNfts(
+                connection,
+                new PublicKey(acc.extensions.transferAddress!)
+              )
             : []
           realmNfts = [...realmNfts, ...solAccountNfts]
         }

@@ -183,11 +183,11 @@ const getTokenAccountsObj = async (
         accounts
       )
     }
+    if (isNft) {
+      return new AccountTypeNFT(tokenAccount, mint!, governance)
+    }
+    return new AccountTypeToken(tokenAccount, mint!, governance)
   }
-  if (isNft) {
-    return new AccountTypeNFT(tokenAccount, mint!, governance)
-  }
-  return new AccountTypeToken(tokenAccount, mint!, governance)
 }
 
 const getTokenAssetAccounts = async (
@@ -382,6 +382,7 @@ const getAccountsForGovernances = async (
       const account = parseTokenAccountData(publicKey, data)
       return { publicKey, account }
     })
+  console.log(tokenAccounts)
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccounts,
     governancesArray,

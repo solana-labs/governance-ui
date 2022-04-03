@@ -453,7 +453,7 @@ export async function getTransferNftInstruction({
     programId &&
     form.governedTokenAccount.extensions.token?.publicKey &&
     form.governedTokenAccount.extensions.token &&
-    form.governedTokenAccount?.mint?.account
+    form.governedTokenAccount?.extensions.mint?.account
   ) {
     const tokenAccountsWithNftMint = await getTokenAccountsByMint(
       connection.current,
@@ -600,14 +600,14 @@ export async function getConvertToMsolInstruction({
 
   if (
     isValid &&
-    form.governedTokenAccount.transferAddress &&
+    form.governedTokenAccount.extensions.transferAddress &&
     form.destinationAccount.governance.pubkey
   ) {
     const amount = getMintNaturalAmountFromDecimal(
       form.amount,
       form.governedTokenAccount.extensions.mint.account.decimals
     )
-    const originAccount = form.governedTokenAccount.transferAddress
+    const originAccount = form.governedTokenAccount.extensions.transferAddress
     const destinationAccount = form.destinationAccount.governance.pubkey
 
     const config = new MarinadeConfig({

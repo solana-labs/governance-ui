@@ -33,8 +33,10 @@ function App({ Component, pageProps }) {
     tokenService.fetchSolanaTokenList()
   }, [])
   const { loadMarket } = useMarketStore()
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-
+  const { governedTokenAccounts } = useGovernanceAssets()
+  const possibleNftsAccounts = governedTokenAccounts.filter(
+    (x) => x.isSol || x.isNft
+  )
   const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
   const { realm, realmInfo, symbol, ownTokenRecord, config } = useRealm()
@@ -42,8 +44,8 @@ function App({ Component, pageProps }) {
   const connection = useWalletStore((s) => s.connection)
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const realmName = realmInfo?.displayName ?? realm?.account?.name
-  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
-    JSON.stringify(nftsGovernedTokenAccounts)
+  const prevStringifyPossibleNftsAccounts = usePrevious(
+    JSON.stringify(possibleNftsAccounts)
   )
   const title = realmName ? `${realmName}` : 'Solana Governance'
 
@@ -112,13 +114,13 @@ function App({ Component, pageProps }) {
   }, [title])
   useEffect(() => {
     if (
-      prevStringifyNftsGovernedTokenAccounts !==
-        JSON.stringify(nftsGovernedTokenAccounts) &&
+      prevStringifyPossibleNftsAccounts !==
+        JSON.stringify(possibleNftsAccounts) &&
       realm?.pubkey
     ) {
-      getNfts(nftsGovernedTokenAccounts, connection.current)
+      getNfts(possibleNftsAccounts, connection.current)
     }
-  }, [JSON.stringify(nftsGovernedTokenAccounts), realm?.pubkey.toBase58()])
+  }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
 
   return (
     <div className="relative">
