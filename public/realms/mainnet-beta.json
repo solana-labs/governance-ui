@@ -557,5 +557,14 @@
     "twitter": "@TheOxSquadNFT",
     "bannerImage": "/realms/TheOxSquad/img/TheOxSquad_banner.jpeg",
     "ogImage": "/realms/TheOxSquad/img/TheOxSquad.png"
+  },
+  {
+    "symbol": "$ASH",
+    "displayName": "MorDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2vZwtXgeE7V5ipovRbSyxDcuDM6FgozHPsFPP92wiPfz",
+    "website": "https://mortuary-inc.io/",
+    "twitter": "@MortuaryIncNFT",
+    "ogImage": "/realms/MorDAO/img/logo.svg"
   }
 ]
