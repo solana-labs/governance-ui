@@ -57,22 +57,6 @@ type HandleSetInstructions = (
   index: number
 ) => void
 
-function makeHandleSetForm<T extends ForesightHasGovernedAccount>(
-  form: T,
-  setForm: Dispatch<React.SetStateAction<T>>
-): HandleSetForm {
-  function handleSetForm({
-    propertyName,
-    value,
-  }: {
-    propertyName: string
-    value: any
-  }) {
-    setForm({ ...form, [propertyName]: value })
-  }
-  return handleSetForm
-}
-
 function makeValidateInstruction(
   schema: ObjectSchema<any>,
   form: ForesightHasGovernedAccount,
