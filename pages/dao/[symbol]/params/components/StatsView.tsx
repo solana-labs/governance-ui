@@ -1,22 +1,25 @@
-import React from 'react'
 import { capitalize } from '@utils/helpers'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 
 const StatsView = ({ activeGovernance }) => {
   return (
-    <>
-      <DisplayField
-        label="Proposals Count"
-        padding
-        val={activeGovernance.account.proposalCount}
-      />
-      <DisplayField
-        label="Voting Proposals Count"
-        padding
-        val={activeGovernance.account.votingProposalCount}
-      />
-    </>
+    <div>
+      {activeGovernance && (
+        <>
+          <DisplayField
+            label="Proposals Count"
+            padding
+            val={activeGovernance.account.proposalCount}
+          />
+          <DisplayField
+            label="Voting Proposals Count"
+            padding
+            val={activeGovernance.account.votingProposalCount}
+          />
+        </>
+      )}
+    </div>
   )
 }
 
