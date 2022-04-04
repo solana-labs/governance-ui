@@ -5,24 +5,45 @@
 /* Theme */
 
 :root {
-  --primary-light: theme('colors.sierra-theme.primary.light');
-  --primary-dark: theme('colors.sierra-theme.primary.dark');
-  --secondary-1: theme('colors.sierra-theme["secondary-1"].light');
-  --secondary-1-dark: theme('colors.sierra-theme["secondary-1"].dark');
-  --secondary-2: theme('colors.sierra-theme["secondary-2"].light');
-  --secondary-2-dark: theme('colors.sierra-theme["secondary-2"].dark');
-  --red: theme('colors.sierra-theme.red');
-  --green: theme('colors.sierra-theme.green');
-  --orange: theme('colors.sierra-theme.orange');
-  --blue: theme('colors.sierra-theme.blue');
-  --bkg-1: theme('colors.sierra-theme["bkg-1"]');
-  --bkg-2: theme('colors.sierra-theme["bkg-2"]');
-  --bkg-3: theme('colors.sierra-theme["bkg-3"]');
-  --bkg-4: theme('colors.sierra-theme["bkg-4"]');
-  --fgd-1: theme('colors.sierra-theme["fgd-1"]');
-  --fgd-2: theme('colors.sierra-theme["fgd-2"]');
-  --fgd-3: theme('colors.sierra-theme["fgd-3"]');
-  --fgd-4: theme('colors.sierra-theme["fgd-4"]');
+  --primary-light: theme('colors.dark-theme.primary.light');
+  --primary-dark: theme('colors.dark-theme.primary.dark');
+  --secondary-1: theme('colors.dark-theme.secondary-1.light');
+  --secondary-1-dark: theme('colors.dark-theme.secondary-1.dark');
+  --secondary-2: theme('colors.dark-theme.secondary-2.light');
+  --secondary-2-dark: theme('colors.dark-theme.secondary-2.dark');
+  --red: theme('colors.dark-theme.red');
+  --green: theme('colors.dark-theme.green');
+  --orange: theme('colors.dark-theme.orange');
+  --blue: theme('colors.dark-theme.blue');
+  --bkg-1: theme('colors.dark-theme.bkg-1');
+  --bkg-2: theme('colors.dark-theme.bkg-2');
+  --bkg-3: theme('colors.dark-theme.bkg-3');
+  --bkg-4: theme('colors.dark-theme.bkg-4');
+  --fgd-1: theme('colors.dark-theme.fgd-1');
+  --fgd-2: theme('colors.dark-theme.fgd-2');
+  --fgd-3: theme('colors.dark-theme.fgd-3');
+  --fgd-4: theme('colors.dark-theme.fgd-4');
+}
+
+[data-theme='Light'] {
+  --primary-light: theme('colors.light-theme.primary.light');
+  --primary-dark: theme('colors.light-theme.primary.dark');
+  --secondary-1: theme('colors.light-theme.secondary-1.light');
+  --secondary-1-dark: theme('colors.light-theme.secondary-1.dark');
+  --secondary-2: theme('colors.light-theme.secondary-2.light');
+  --secondary-2-dark: theme('colors.light-theme.secondary-2.dark');
+  --red: theme('colors.light-theme.red');
+  --green: theme('colors.light-theme.green');
+  --orange: theme('colors.light-theme.orange');
+  --blue: theme('colors.light-theme.blue');
+  --bkg-1: theme('colors.light-theme.bkg-1');
+  --bkg-2: theme('colors.light-theme.bkg-2');
+  --bkg-3: theme('colors.light-theme.bkg-3');
+  --bkg-4: theme('colors.light-theme.bkg-4');
+  --fgd-1: theme('colors.light-theme.fgd-1');
+  --fgd-2: theme('colors.light-theme.fgd-2');
+  --fgd-3: theme('colors.light-theme.fgd-3');
+  --fgd-4: theme('colors.light-theme.fgd-4');
 }
 
 /* base */
@@ -83,6 +104,10 @@ button {
   @apply mb-4;
 }
 
+.markdown a {
+  @apply text-fgd-2 transition-all duration-300 underline hover:text-fgd-3 hover:no-underline;
+}
+
 .markdown li {
   @apply font-normal mb-2 ml-6 list-disc text-fgd-3;
 }
@@ -99,29 +124,45 @@ button {
   @apply font-body;
 }
 
-/* width */
-::-webkit-scrollbar {
-  width: 16px;
-  height: 16px;
+/* Scrollbars */
+
+body::-webkit-scrollbar {
+  width: 8px;
+  background-color: var(--bkg-1);
+}
+
+body::-webkit-scrollbar-thumb {
+  border-radius: 4px;
+  background-color: var(--bkg-4);
+}
+
+body::-webkit-scrollbar-track {
+  background-color: inherit;
+}
+
+body::-webkit-scrollbar-corner {
+  background-color: var(--bkg-3);
+}
+
+.thin-scroll::-webkit-scrollbar {
+  width: 4px;
 }
 
 /* Track */
-::-webkit-scrollbar-track {
-  border-radius: 100vh;
-  background: var(--bkg-2);
+.thin-scroll::-webkit-scrollbar-track {
+  -webkit-box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.3);
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
 }
 
 /* Handle */
-::-webkit-scrollbar-thumb {
-  background: var(--bkg-1);
-  border-radius: 100vh;
-  border: 3px solid var(--bkg-2);
+.thin-scroll::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 2px;
+  border-radius: 2px;
+  background: var(--bkg-4);
 }
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-  background: var(--bkg-3);
-  cursor: pointer;
+.thin-scroll::-webkit-scrollbar-thumb:window-inactive {
+  background: var(--bkg-4);
 }
 
 .pointer {

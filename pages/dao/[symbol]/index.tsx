@@ -20,9 +20,6 @@ import { SearchIcon } from '@heroicons/react/outline'
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
-const MembersCompactWrapper = dynamic(
-  () => import('@components/Members/MembersCompactWrapper')
-)
 const AssetsCompactWrapper = dynamic(
   () => import('@components/AssetsList/AssetsCompactWrapper')
 )
@@ -155,25 +152,17 @@ const REALM = () => {
                         src={realmInfo?.bannerImage}
                       ></img>
                       {/* temp. setup for Ukraine.SOL */}
-                      {realmInfo.realmId.equals(
-                        new PublicKey(
-                          '5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d'
-                        )
-                      ) ? (
+                      {realmInfo.sharedWalletId && (
                         <div>
                           <div className="mb-10">
                             <DepositLabel
                               abbreviatedAddress={false}
                               header="Wallet Address"
-                              transferAddress={
-                                new PublicKey(
-                                  '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
-                                )
-                              }
+                              transferAddress={realmInfo.sharedWalletId}
                             ></DepositLabel>
                           </div>
                         </div>
-                      ) : null}
+                      )}
                     </>
                   ) : null}
                 </div>
@@ -247,9 +236,6 @@ const REALM = () => {
               <TokenBalanceCardWrapper />
               <NFTSCompactWrapper />
               <AccountsCompactWrapper />
-              {!realm?.account.config.useCommunityVoterWeightAddin && (
-                <MembersCompactWrapper />
-              )}
               <AssetsCompactWrapper />
             </div>
           </>

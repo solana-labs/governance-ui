@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown/react-markdown.min'
+import remarkGfm from 'remark-gfm'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from 'hooks/useProposal'
 import ProposalStateBadge from 'components/ProposalStatusBadge'
@@ -38,7 +39,8 @@ const Proposal = () => {
     (proposal.account.state === ProposalState.Completed ||
       proposal.account.state === ProposalState.Executing ||
       proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded)
+      proposal.account.state === ProposalState.Succeeded ||
+      proposal.account.state === ProposalState.ExecutingWithErrors)
 
   useEffect(() => {
     const handleResolveDescription = async () => {
@@ -84,7 +86,11 @@ const Proposal = () => {
 
             {description && (
               <div className="pb-2">
-                <ReactMarkdown className="markdown">
+                <ReactMarkdown
+                  className="markdown"
+                  linkTarget="_blank"
+                  remarkPlugins={[remarkGfm]}
+                >
                   {description}
                 </ReactMarkdown>
               </div>

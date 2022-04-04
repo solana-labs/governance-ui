@@ -20,7 +20,7 @@ const MembersItems = ({ activeMembers }: { activeMembers: Member[] }) => {
 
   return (
     <>
-      <div className="space-y-3 overflow-auto" style={{ maxHeight: 350 }}>
+      <div className="space-y-3">
         {members.map((x) => (
           <MemberItem item={x} key={x.walletAddress}></MemberItem>
         ))}

@@ -45,7 +45,12 @@ export default function handleGovernanceAssetsStore() {
     if (realm && route.pathname.includes('/params')) {
       setGovernedAccounts(connection, realm)
     }
-  }, [JSON.stringify(governances), realm?.pubkey, route.pathname])
+  }, [
+    JSON.stringify(governances),
+    realm?.pubkey.toBase58(),
+    route.pathname,
+    realm?.account.authority?.toBase58(),
+  ])
   useEffect(() => {
     async function prepareTokenGovernances() {
       const governedTokenAccountsArray: GovernedTokenAccount[] = []

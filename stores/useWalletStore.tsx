@@ -372,10 +372,10 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           .filter((p) => !HIDDEN_PROPOSALS.has(p.pubkey.toBase58()))
       )
 
-      console.log('fetchRealm proposals', proposals)
       await set((s) => {
         s.selectedRealm.proposals = proposals
       })
+      await get().actions.fetchOwnVoteRecords()
     },
     // Fetches and updates governance for the selected realm
     async fetchRealmGovernance(governancePk: PublicKey) {

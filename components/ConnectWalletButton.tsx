@@ -78,7 +78,9 @@ const ConnectWalletButton = (props) => {
       <div
         disabled={connected}
         className={`bg-transparent border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
-          connected ? 'cursor-default' : 'hover:bg-bkg-3 focus:outline-none'
+          connected
+            ? 'cursor-default'
+            : 'cursor-pointer hover:bg-bkg-3 focus:outline-none'
         }`}
         onClick={handleConnectDisconnect}
         {...props}

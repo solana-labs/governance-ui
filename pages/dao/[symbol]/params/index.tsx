@@ -15,14 +15,17 @@ import RealmConfigModal from './RealmConfigModal'
 import GovernanceConfigModal from './GovernanceConfigModal'
 import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
+import useWalletStore from 'stores/useWalletStore'
+import SetRealmAuthorityModal from './SetRealmAuthorityModal'
+import BigNumber from 'bignumber.js'
 
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
 
 const Params = () => {
-  const { realm, mint } = useRealm()
-
+  const { realm, mint, councilMint, ownVoterWeight } = useRealm()
+  const wallet = useWalletStore((s) => s.current)
   const { canUseAuthorityInstruction } = useGovernanceAssets()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
@@ -43,7 +46,9 @@ const Params = () => {
   ] = useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
-
+  const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
+    false
+  )
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilMintPk = realmAccount?.config.councilMint?.toBase58()
@@ -61,6 +66,12 @@ const Params = () => {
   }
   const closeGovernanceProposalModal = () => {
     setIsGovernanceProposalModalOpen(false)
+  }
+  const openSetRealmAuthorityModal = () => {
+    setRealmAuthorityModalIsOpen(true)
+  }
+  const closeSetRealmAuthorityModal = () => {
+    setRealmAuthorityModalIsOpen(false)
   }
   const getYesNoString = (val) => {
     return val ? ' Yes' : ' No'
@@ -85,6 +96,12 @@ const Params = () => {
           isProposalModalOpen={isGovernanceProposalModalOpen}
           closeProposalModal={closeGovernanceProposalModal}
         ></GovernanceConfigModal>
+      )}
+      {isRealmAuthorityModalOpen && (
+        <SetRealmAuthorityModal
+          isOpen={isRealmAuthorityModalOpen}
+          closeModal={closeSetRealmAuthorityModal}
+        ></SetRealmAuthorityModal>
       )}
       <div className="bg-bkg-2 rounded-lg p-4 md:p-6 col-span-12">
         <div className="mb-4">
@@ -129,6 +146,17 @@ const Params = () => {
                     val={councilMintPk}
                   />
                 )}
+                <div className="flex">
+                  {wallet?.publicKey?.toBase58() ===
+                    realmAccount?.authority?.toBase58() && (
+                    <Button
+                      onClick={openSetRealmAuthorityModal}
+                      className="ml-auto"
+                    >
+                      Set authority
+                    </Button>
+                  )}
+                </div>
               </div>
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
                 <h2 className="flex items-center">Config </h2>
