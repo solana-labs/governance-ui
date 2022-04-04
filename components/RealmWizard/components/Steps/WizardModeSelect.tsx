@@ -47,7 +47,7 @@ const WizardModeSelect: React.FC<{
       </div>
       <div className="flex justify-center">
         <a
-          href="https://governance-docs.vercel.app/multisig-DAO/create-multisig-DAO/DAO-wizard"
+          href="https://governance-docs.vercel.app/DAO-Management/createing-DAOs/DAO-wizard"
           target="_blank"
           rel="noopener noreferrer"
         >
