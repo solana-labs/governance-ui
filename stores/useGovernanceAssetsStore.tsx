@@ -18,7 +18,6 @@ import {
   parseMintAccountData,
   parseTokenAccountData,
   TokenProgramAccount,
-  tryGetMint,
 } from '@utils/tokens'
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
@@ -36,6 +35,7 @@ import {
   AccountTypeToken,
   AssetAccount,
 } from '@utils/uiTypes/assets'
+
 const tokenAccountOwnerOffset = 32
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
@@ -161,13 +161,16 @@ const getTokenAccountsObj = async (
   realm: ProgramAccount<Realm>,
   governance: ProgramAccount<Governance>,
   tokenAccount: TokenProgramAccount<AccountInfo>,
-  connection: Connection,
-  accounts: AssetAccount[]
+  connection: ConnectionContext,
+  accounts: AssetAccount[],
+  mintAccounts: TokenProgramAccount<MintInfo>[]
 ) => {
   const isSol = tokenAccount.account.mint.toBase58() === DEFAULT_NATIVE_SOL_MINT
   const isNft =
     tokenAccount.account.mint.toBase58() === DEFAULT_NFT_TREASURY_MINT
-  const mint = await tryGetMint(connection, tokenAccount.account.mint)
+  const mint = mintAccounts.find(
+    (x) => x.publicKey.toBase58() === tokenAccount.account.mint.toBase58()
+  )
   if (
     (mint?.account.supply && mint?.account.supply.cmp(new BN(1)) === 1) ||
     isNft ||
@@ -197,9 +200,15 @@ const getTokenAssetAccounts = async (
   }[],
   governances: ProgramAccount<Governance>[],
   realm: ProgramAccount<Realm>,
-  connection: Connection
+  connection: ConnectionContext
 ) => {
   const accounts: AssetAccount[] = []
+  const mintAccounts = tokenAccounts.length
+    ? await getMintAccountsInfo(
+        connection,
+        tokenAccounts.map((x) => x.account.mint)
+      )
+    : []
   for (const tokenAccount of tokenAccounts) {
     const governance = governances.find(
       (x) => x.pubkey.toBase58() === tokenAccount.account.owner.toBase58()
@@ -209,7 +218,8 @@ const getTokenAssetAccounts = async (
       governance!,
       tokenAccount,
       connection,
-      accounts
+      accounts,
+      mintAccounts
     )
     if (account) {
       accounts.push(account)
@@ -266,7 +276,7 @@ const getGovernancesByAccountTypes = (
 const getSolAccount = async (
   realm: ProgramAccount<Realm>,
   governance: ProgramAccount<Governance>,
-  connection: Connection,
+  connection: ConnectionContext,
   tokenAccount: TokenProgramAccount<AccountInfo>,
   mint: TokenProgramAccount<MintInfo>,
   accounts: AssetAccount[]
@@ -275,11 +285,11 @@ const getSolAccount = async (
     realm.owner,
     governance!.pubkey
   )
-  const resp = await connection.getParsedAccountInfo(solAddress)
+  const resp = await connection.current.getParsedAccountInfo(solAddress)
   if (resp.value) {
     const accountsOwnedBySolAccount = (
       await getAccountsByOwner(
-        connection,
+        connection.current,
         TOKEN_PROGRAM_ID,
         solAddress,
         TokenAccountLayout.span,
@@ -291,19 +301,29 @@ const getSolAccount = async (
       const account = parseTokenAccountData(publicKey, data)
       return { publicKey, account }
     })
+
+    const mintAccounts = accountsOwnedBySolAccount.length
+      ? await getMintAccountsInfo(
+          connection,
+          accountsOwnedBySolAccount.map((x) => x.account.mint)
+        )
+      : []
     for (const acc of accountsOwnedBySolAccount) {
       const account = await getTokenAccountsObj(
         realm,
         governance,
         acc,
         connection,
-        accounts
+        accounts,
+        mintAccounts
       )
       if (account) {
         accounts.push(account)
       }
     }
-    const mintRentAmount = await connection.getMinimumBalanceForRentExemption(0)
+    const mintRentAmount = await connection.current.getMinimumBalanceForRentExemption(
+      0
+    )
     const solAccount = resp.value as AccountInfoGen<Buffer | ParsedAccountData>
     solAccount.lamports =
       solAccount.lamports !== 0
@@ -333,6 +353,10 @@ const getAccountsForGovernances = async (
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
   ])
+  const tokenGovernanes = getGovernancesByAccountTypes(governancesArray, [
+    GovernanceAccountType.TokenGovernanceV1,
+    GovernanceAccountType.TokenGovernanceV2,
+  ])
   const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
     connection.current,
     mintGovernances.map((x) => x.account.governedAccount)
@@ -346,7 +370,7 @@ const getAccountsForGovernances = async (
       'Content-Type': 'application/json',
     },
     data: JSON.stringify([
-      ...governancesArray.map((x) => {
+      ...tokenGovernanes.map((x) => {
         return {
           jsonrpc: '2.0',
           id: 1,
@@ -382,12 +406,12 @@ const getAccountsForGovernances = async (
       const account = parseTokenAccountData(publicKey, data)
       return { publicKey, account }
     })
-  console.log(tokenAccounts)
+
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccounts,
-    governancesArray,
+    tokenGovernanes,
     realm,
-    connection.current
+    connection
   )
   const governedTokenAccounts = tokenAssetAccounts
   await tokenService.fetchTokenPrices(
@@ -396,4 +420,42 @@ const getAccountsForGovernances = async (
       .map((x) => x.extensions.mint!.publicKey.toBase58())
   )
   return [...mintAccounts, ...programAccounts, ...governedTokenAccounts]
+}
+
+const getMintAccountsInfo = async (
+  connection: ConnectionContext,
+  pubkeys: PublicKey[]
+) => {
+  const getMintsAccounts = await axios.request({
+    url: connection.endpoint,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: JSON.stringify([
+      ...pubkeys.map((x) => {
+        return {
+          jsonrpc: '2.0',
+          id: x.toBase58(),
+          method: 'getAccountInfo',
+          params: [
+            x.toBase58(),
+            {
+              commitment: connection.current.commitment,
+              encoding: 'base64',
+            },
+          ],
+        }
+      }),
+    ]),
+  })
+  const mintAccountsJson = getMintsAccounts.data
+  const mintAccounts = mintAccountsJson?.map((x) => {
+    const result = x.result
+    const publicKey = new PublicKey(x.id)
+    const data = Buffer.from(result.value.data[0], 'base64')
+    const account = parseMintAccountData(data)
+    return { publicKey, account }
+  })
+  return mintAccounts
 }

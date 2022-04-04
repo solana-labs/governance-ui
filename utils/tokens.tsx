@@ -170,7 +170,7 @@ export function parseTokenAccountData(
 
 export function parseMintAccountData(data: Buffer) {
   const mintInfo = MintLayout.decode(data)
-
+  console.log(mintInfo)
   if (mintInfo.mintAuthorityOption === 0) {
     mintInfo.mintAuthority = null
   } else {
