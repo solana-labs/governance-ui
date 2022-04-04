@@ -1,18 +1,19 @@
-import moment from 'moment'
 import React from 'react'
-import { VoteRecord } from '../../models/accounts'
+import { VoteRecord } from '@solana/spl-governance'
 import {
   CheckCircleIcon,
   UserCircleIcon,
   XCircleIcon,
 } from '@heroicons/react/solid'
 import { ExternalLinkIcon } from '@heroicons/react/solid'
-import { ChatMessage } from '../../models/chat/accounts'
+import { ChatMessage } from '@solana/spl-governance'
 import { abbreviateAddress, fmtTokenAmount } from '../../utils/formatting'
 import useRealm from '../../hooks/useRealm'
 import { MintInfo } from '@solana/spl-token'
 import { isPublicKey } from '@tools/core/pubkey'
-
+import { getVoteWeight, isYesVote } from '@models/voteRecords'
+import dayjs from 'dayjs'
+const relativeTime = require('dayjs/plugin/relativeTime')
 const Comment = ({
   chatMessage,
   voteRecord,
@@ -22,15 +23,16 @@ const Comment = ({
   voteRecord: VoteRecord | undefined
   proposalMint: MintInfo | undefined
 }) => {
+  dayjs.extend(relativeTime)
   const { author, postedAt, body } = chatMessage
   const { realmInfo } = useRealm()
-
   const voteSymbol = !realmInfo
     ? ''
     : isPublicKey(realmInfo.symbol)
     ? realmInfo.displayName
     : realmInfo.symbol
-
+  //@ts-ignore
+  const fromNow = dayjs(postedAt.toNumber() * 1000).fromNow()
   return (
     <div className="border-b border-fgd-4 mt-4 pb-4 last:pb-0 last:border-b-0">
       <div className="flex items-center justify-between mb-4">
@@ -52,25 +54,23 @@ const Comment = ({
                 className={`flex-shrink-0 h-4 w-4 ml-1.5 text-primary-light`}
               />
             </a>
-            <div className="text-fgd-3 text-xs">
-              {moment.unix(postedAt.toNumber()).fromNow()}
-            </div>
+            <div className="text-fgd-3 text-xs">{fromNow}</div>
           </div>
         </div>
         {voteRecord && (
           <div className="bg-bkg-3 hidden lg:flex lg:items-center px-4 py-2 rounded-full">
             <div className="flex items-center pr-2 text-fgd-1 text-xs">
-              {voteRecord.isYes() ? (
+              {isYesVote(voteRecord) ? (
                 <CheckCircleIcon className="h-5 mr-1 text-green w-5" />
               ) : (
                 <XCircleIcon className="h-5 mr-1 text-red w-5" />
               )}
-              {voteRecord.isYes() ? 'Approve' : 'Deny'}
+              {isYesVote(voteRecord) ? 'Approve' : 'Deny'}
             </div>
             <span className="text-fgd-4">|</span>
             <span className="pl-2 text-xs">
               {`${fmtTokenAmount(
-                voteRecord.getVoteWeight(),
+                getVoteWeight(voteRecord)!,
                 proposalMint?.decimals
               ).toLocaleString()} ${voteSymbol}`}
             </span>

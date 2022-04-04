@@ -6,21 +6,21 @@ import {
   GovernanceAccountClass,
   GovernanceAccountType,
   Realm,
-} from 'models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
-import { MemcmpFilter, RpcContext } from 'models/core/api'
-import { GOVERNANCE_SCHEMA } from 'models/serialisation'
+} from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { MemcmpFilter, RpcContext } from '@solana/spl-governance'
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { deserializeBorsh } from 'utils/borsh'
 import { sleep } from '@project-serum/common'
 
 const fetch = require('node-fetch')
 
 export async function getRealms(rpcContext: RpcContext) {
-  return getGovernanceAccountsImpl<Realm>(
+  return getGovernanceAccounts<Realm>(
     rpcContext.programId,
     rpcContext.endpoint,
     Realm,
-    GovernanceAccountType.Realm
+    [GovernanceAccountType.RealmV1, GovernanceAccountType.RealmV2]
   )
 }
 
@@ -41,7 +41,7 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
     )
   }
 
-  let accounts: Record<string, ParsedAccount<TAccount>> = {}
+  let accounts: Record<string, ProgramAccount<TAccount>> = {}
 
   for (const at of accountTypes) {
     accounts = {
@@ -54,8 +54,12 @@ export async function getGovernanceAccounts<TAccount extends GovernanceAccount>(
         filters
       )),
     }
-    // XXX: sleep to prevent public RPC rate limits
-    await sleep(3_000)
+
+    // note: if we are not using a specific RPC, then most probably we are using a public RPC
+    // sleep to prevent public RPC rate limits
+    if (!process.env.CLUSTER_URL) {
+      await sleep(3_000)
+    }
   }
 
   return accounts
@@ -98,9 +102,10 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
     }),
   })
 
-  const accounts: Record<string, ParsedAccount<TAccount>> = new SanitizedObject(
-    {}
-  ) as Record<string, ParsedAccount<TAccount>>
+  const accounts: Record<
+    string,
+    ProgramAccount<TAccount>
+  > = new SanitizedObject({}) as Record<string, ProgramAccount<TAccount>>
   try {
     const response = await getProgramAccounts.json()
     if ('result' in response) {
@@ -118,7 +123,7 @@ async function getGovernanceAccountsImpl<TAccount extends GovernanceAccount>(
               accountClass,
               Buffer.from(rawAccount.account.data[0], 'base64')
             ),
-          }) as ParsedAccount<TAccount>
+          }) as ProgramAccount<TAccount>
 
           accounts[account.pubkey.toBase58()] = account
         } catch (ex) {

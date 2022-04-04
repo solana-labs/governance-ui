@@ -10,29 +10,32 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
-import { serializeInstructionToBase64 } from '@models/serialisation'
+import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { makeChangeMaxMangoAccountsInstruction } from '@blockworks-foundation/mango-client'
-import { BN } from '@project-serum/anchor'
+import {
+  BN,
+  makeChangeMaxMangoAccountsInstruction,
+} from '@blockworks-foundation/mango-client'
 
 const MakeChangeMaxAccounts = ({
   index,
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountType } = useGovernanceAssets()
-  const governedProgramAccounts = getGovernancesByAccountType(
-    GovernanceAccountType.ProgramGovernance
-  ).map((x) => {
+  const { getGovernancesByAccountTypes } = useGovernanceAssets()
+  const governedProgramAccounts = getGovernancesByAccountTypes([
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
+  ]).map((x) => {
     return {
       governance: x,
     }
@@ -42,7 +45,7 @@ const MakeChangeMaxAccounts = ({
   const [form, setForm] = useState<MangoMakeChangeMaxAccountsForm>({
     governedAccount: undefined,
     programId: programId?.toString(),
-    mangoGroupKey: undefined,
+    mangoGroup: undefined,
     maxMangoAccounts: 1,
   })
   const [formErrors, setFormErrors] = useState({})
@@ -62,13 +65,13 @@ const MakeChangeMaxAccounts = ({
     if (
       isValid &&
       programId &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       //Mango instruction call and serialize
       const setMaxMangoAccountsInstr = makeChangeMaxMangoAccountsInstruction(
-        form.governedAccount.governance.info.governedAccount,
-        new PublicKey(form.mangoGroupKey!),
+        form.governedAccount.governance.account.governedAccount,
+        new PublicKey(form.mangoGroup!),
         form.governedAccount.governance.pubkey,
         new BN(form.maxMangoAccounts)
       )
@@ -121,16 +124,16 @@ const MakeChangeMaxAccounts = ({
         governance={governance}
       ></GovernedAccountSelect>
       <Input
-        label="Mango group key"
-        value={form.mangoGroupKey}
+        label="Mango group"
+        value={form.mangoGroup}
         type="text"
         onChange={(evt) =>
           handleSetForm({
             value: evt.target.value,
-            propertyName: 'mangoGroupKey',
+            propertyName: 'mangoGroup',
           })
         }
-        error={formErrors['mangoGroupKey']}
+        error={formErrors['mangoGroup']}
       />
       <Input
         label="Max accounts"

@@ -1,6 +1,7 @@
 import { BN } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { BigNumber } from 'bignumber.js'
+import { TokenInfoWithMint } from 'stores/useTreasuryAccountStore'
 
 const SECONDS_PER_DAY = 86400
 
@@ -12,11 +13,26 @@ export function getTimestampFromDays(days: number) {
   return days * SECONDS_PER_DAY
 }
 
+export function fmtBnMintDecimals(amount: BN, decimals: number) {
+  return new BigNumber(amount.toString()).shiftedBy(-decimals).toFormat()
+}
+
 /// Formats mint amount (natural units) as a decimal string
 export function fmtMintAmount(mint: MintInfo | undefined, mintAmount: BN) {
   return mint
     ? getMintDecimalAmount(mint, mintAmount).toFormat()
     : new BigNumber(mintAmount.toString()).toFormat()
+}
+
+export function fmtTokenInfoWithMint(tokenInfoWithMint: TokenInfoWithMint) {
+  return `${fmtBnMintDecimals(
+    tokenInfoWithMint.amount,
+    tokenInfoWithMint.mintInfo.decimals
+  )} ${
+    tokenInfoWithMint.tokenInfo?.symbol
+      ? tokenInfoWithMint.tokenInfo?.symbol
+      : `${tokenInfoWithMint.mint.toString().substring(0, 12)}...`
+  }`
 }
 
 // Converts mint amount (natural units) to decimals
@@ -47,12 +63,29 @@ export function parseMintNaturalAmountFromDecimal(
   return getMintNaturalAmountFromDecimal(floatAmount, mintDecimals)
 }
 
+export function parseMintNaturalAmountFromDecimalAsBN(
+  decimalAmount: string | number,
+  mintDecimals: number
+) {
+  return new BN(
+    parseMintNaturalAmountFromDecimal(decimalAmount, mintDecimals).toString()
+  )
+}
+
 // Converts amount in decimals to mint amount (natural units)
 export function getMintNaturalAmountFromDecimal(
   decimalAmount: number,
   decimals: number
 ) {
   return new BigNumber(decimalAmount).shiftedBy(decimals).toNumber()
+}
+
+// Converts amount in decimals to mint amount (natural units)
+export function getMintNaturalAmountFromDecimalAsBN(
+  decimalAmount: number,
+  decimals: number
+) {
+  return new BN(new BigNumber(decimalAmount).shiftedBy(decimals).toString())
 }
 
 // Calculates mint min amount as decimal

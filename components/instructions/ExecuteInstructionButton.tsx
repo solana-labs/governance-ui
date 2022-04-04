@@ -1,20 +1,22 @@
 import { useEffect, useState } from 'react'
-import { executeInstruction } from 'actions/executeInstruction'
+import { executeTransaction } from 'actions/executeTransaction'
 import {
   InstructionExecutionStatus,
   Proposal,
-  ProposalInstruction,
+  ProposalTransaction,
   ProposalState,
-} from '@models/accounts'
+} from '@solana/spl-governance'
 import React from 'react'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
-import { RpcContext } from '@models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
-import { ParsedAccount } from '@models/core/accounts'
+import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
+import { getProgramVersionForRealm } from '@models/registry/api'
+import { notify } from '@utils/notifications'
 
 export enum PlayState {
   Played,
@@ -29,29 +31,29 @@ export function ExecuteInstructionButton({
   setPlaying,
   proposalInstruction,
 }: {
-  proposal: ParsedAccount<Proposal>
-  proposalInstruction: ParsedAccount<ProposalInstruction>
+  proposal: ProgramAccount<Proposal>
+  proposalInstruction: ProgramAccount<ProposalTransaction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
 }) {
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)
 
   const [currentSlot, setCurrentSlot] = useState(0)
 
-  const canExecuteAt = proposal?.info.votingCompletedAt
-    ? proposal.info.votingCompletedAt.toNumber() + 1
+  const canExecuteAt = proposal?.account.votingCompletedAt
+    ? proposal.account.votingCompletedAt.toNumber() + 1
     : 0
 
   const ineligibleToSee = currentSlot - canExecuteAt >= 0
 
   const rpcContext = new RpcContext(
-    new PublicKey(proposal.account.owner.toString()),
-    realmInfo?.programVersion,
-    wallet,
+    new PublicKey(proposal.owner.toString()),
+    getProgramVersionForRealm(realmInfo!),
+    wallet!,
     connection.current,
     connection.endpoint
   )
@@ -72,9 +74,10 @@ export function ExecuteInstructionButton({
     setPlaying(PlayState.Playing)
 
     try {
-      await executeInstruction(rpcContext, proposal, proposalInstruction)
-      await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
+      await executeTransaction(rpcContext, proposal, proposalInstruction)
+      await refetchProposals()
     } catch (error) {
+      notify({ type: 'error', message: `error executing instruction ${error}` })
       console.log('error executing instruction', error)
 
       setPlaying(PlayState.Error)
@@ -86,7 +89,7 @@ export function ExecuteInstructionButton({
   }
 
   if (
-    proposalInstruction.info.executionStatus ===
+    proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
   ) {
     return (
@@ -97,9 +100,9 @@ export function ExecuteInstructionButton({
   }
 
   if (
-    proposal.info.state !== ProposalState.Executing &&
-    proposal.info.state !== ProposalState.ExecutingWithErrors &&
-    proposal.info.state !== ProposalState.Succeeded
+    proposal.account.state !== ProposalState.Executing &&
+    proposal.account.state !== ProposalState.ExecutingWithErrors &&
+    proposal.account.state !== ProposalState.Succeeded
   ) {
     return null
   }
@@ -110,7 +113,7 @@ export function ExecuteInstructionButton({
 
   if (
     playing === PlayState.Unplayed &&
-    proposalInstruction.info.executionStatus !==
+    proposalInstruction.account.executionStatus !==
       InstructionExecutionStatus.Error
   ) {
     return (
@@ -126,7 +129,7 @@ export function ExecuteInstructionButton({
 
   if (
     playing === PlayState.Error ||
-    proposalInstruction.info.executionStatus ===
+    proposalInstruction.account.executionStatus ===
       InstructionExecutionStatus.Error
   ) {
     return (

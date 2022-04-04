@@ -4,6 +4,7 @@ import {
   PublicKey,
   TransactionInstruction,
   Commitment,
+  ParsedAccountData,
 } from '@solana/web3.js'
 import {
   AccountInfo,
@@ -13,35 +14,49 @@ import {
   Token,
   u64,
 } from '@solana/spl-token'
-import { ParsedAccount } from '@models/core/accounts'
-import { Governance } from '@models/accounts'
+import { MintMaxVoteWeightSource, ProgramAccount } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { chunks } from './helpers'
-import { getAccountName } from '@components/instructions/tools'
+import { getAccountName, WSOL_MINT } from '@components/instructions/tools'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
 import tokenService from './services/token'
+import { getParsedNftAccountsByOwner } from '@nfteyez/sol-rayz'
+import axios from 'axios'
+import { notify } from './notifications'
+import { NFTWithMint } from './uiTypes/nfts'
+import { BN } from '@project-serum/anchor'
+import { abbreviateAddress } from './formatting'
+import BigNumber from 'bignumber.js'
 
 export type TokenAccount = AccountInfo
 export type MintAccount = MintInfo
 export type GovernedTokenAccount = {
-  token: ProgramAccount<AccountInfo> | undefined
-  mint: ProgramAccount<MintInfo> | undefined
-  governance: ParsedAccount<Governance> | undefined
+  token: TokenProgramAccount<AccountInfo> | undefined
+  mint: TokenProgramAccount<MintInfo> | undefined
+  governance: ProgramAccount<Governance> | undefined
+  isNft: boolean
+  isSol: boolean
+  transferAddress: PublicKey | null
+  solAccount: null | AccountInfoGen<Buffer | ParsedAccountData>
 }
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedProgramAccount = {
-  governance: ParsedAccount<Governance> | undefined
+  governance: ProgramAccount<Governance> | undefined
 }
 export type GovernedMultiTypeAccount = {
-  token?: ProgramAccount<AccountInfo> | undefined
-  mint?: ProgramAccount<MintInfo> | undefined
-  governance: ParsedAccount<Governance>
+  token?: TokenProgramAccount<AccountInfo> | undefined
+  mint?: TokenProgramAccount<MintInfo> | undefined
+  governance: ProgramAccount<Governance>
   mintInfo?: MintInfo | undefined
+  isSol?: boolean
+  transferAddress?: PublicKey | null
+  solAccount?: null | AccountInfoGen<Buffer | ParsedAccountData>
 }
 
-export type ProgramAccount<T> = {
+export type TokenProgramAccount<T> = {
   publicKey: PublicKey
   account: T
 }
@@ -49,7 +64,7 @@ export type ProgramAccount<T> = {
 export async function getOwnedTokenAccounts(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<TokenAccount>[]> {
+): Promise<TokenProgramAccount<TokenAccount>[]> {
   const results = await connection.getTokenAccountsByOwner(publicKey, {
     programId: TOKEN_PROGRAM_ID,
   })
@@ -64,7 +79,7 @@ export async function getOwnedTokenAccounts(
 export const getTokenAccountsByMint = async (
   connection: Connection,
   mint: string
-): Promise<ProgramAccount<TokenAccount>[]> => {
+): Promise<TokenProgramAccount<TokenAccount>[]> => {
   const results = await connection.getProgramAccounts(TOKEN_PROGRAM_ID, {
     filters: [
       {
@@ -89,7 +104,7 @@ export const getTokenAccountsByMint = async (
 export async function tryGetMint(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<MintAccount> | undefined> {
+): Promise<TokenProgramAccount<MintAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
     const data = Buffer.from(result!.data)
@@ -106,7 +121,7 @@ export async function tryGetMint(
 export async function tryGetTokenAccount(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<TokenAccount> | undefined> {
+): Promise<TokenProgramAccount<TokenAccount> | undefined> {
   try {
     const result = await connection.getAccountInfo(publicKey)
 
@@ -129,7 +144,7 @@ export async function tryGetTokenAccount(
 export async function tryGetTokenMint(
   connection: Connection,
   publicKey: PublicKey
-): Promise<ProgramAccount<MintAccount> | undefined> {
+): Promise<TokenProgramAccount<MintAccount> | undefined> {
   const tokenAccount = await tryGetTokenAccount(connection, publicKey)
   return tokenAccount && tryGetMint(connection, tokenAccount.account.mint)
 }
@@ -141,6 +156,11 @@ export const TOKEN_PROGRAM_ID = new PublicKey(
 export const BPF_UPGRADE_LOADER_ID = new PublicKey(
   'BPFLoaderUpgradeab1e11111111111111111111111'
 )
+
+//Just for ukraine dao, it will be replaced with good abstraction
+export const ukraineDAOGovPk = 'AMCgLBvjgZjEA2gfAgPhjN6ckyo4iHyvbc5QjMV2aUmU'
+export const ukraineDaoTokenAccountsOwnerAddress =
+  '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
 
 export function parseTokenAccountData(
   account: PublicKey,
@@ -269,11 +289,42 @@ export function getTokenAccountLabelInfo(
     const info = tokenService.getTokenInfo(acc!.mint!.publicKey.toBase58())
     imgUrl = info?.logoURI ? info.logoURI : ''
     tokenAccount = acc.token.publicKey.toBase58()
-    tokenName = info?.name ? info.name : ''
+    tokenName = info?.name ? info.name : abbreviateAddress(acc.mint.publicKey)
     tokenAccountName = getAccountName(acc.token.publicKey)
     amount = formatMintNaturalAmountAsDecimal(
       acc.mint!.account,
       acc.token?.account.amount
+    )
+  }
+  return {
+    tokenAccount,
+    tokenName,
+    tokenAccountName,
+    amount,
+    imgUrl,
+  }
+}
+
+export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
+  let tokenAccount = ''
+  let tokenName = ''
+  let tokenAccountName = ''
+  let amount = ''
+  let imgUrl = ''
+
+  if (acc?.token && acc.mint) {
+    const info = tokenService.getTokenInfo(WSOL_MINT)
+    imgUrl = info?.logoURI ? info.logoURI : ''
+    tokenAccount =
+      acc.transferAddress?.toBase58() || acc.token.publicKey.toBase58()
+    tokenName = 'SOL'
+
+    tokenAccountName = acc.transferAddress
+      ? getAccountName(acc.transferAddress)
+      : ''
+    amount = formatMintNaturalAmountAsDecimal(
+      acc.mint!.account,
+      new BN(acc.solAccount!.lamports)
     )
   }
   return {
@@ -295,12 +346,12 @@ export function getMintAccountLabelInfo(
   let imgUrl = ''
   if (acc?.mintInfo && acc.governance) {
     const info = tokenService.getTokenInfo(
-      acc.governance.info.governedAccount.toBase58()
+      acc.governance.account.governedAccount.toBase58()
     )
     imgUrl = info?.logoURI ? info.logoURI : ''
-    account = acc.governance?.info.governedAccount.toBase58()
+    account = acc.governance?.account.governedAccount.toBase58()
     tokenName = info?.name ? info.name : ''
-    mintAccountName = getAccountName(acc.governance.info.governedAccount)
+    mintAccountName = getAccountName(acc.governance.account.governedAccount)
     amount = formatMintNaturalAmountAsDecimal(
       acc.mintInfo,
       acc?.mintInfo.supply
@@ -346,4 +397,54 @@ export const deserializeMint = (data: Buffer) => {
   }
 
   return mintInfo as MintInfo
+}
+
+export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
+  try {
+    const nfts = await getParsedNftAccountsByOwner({
+      publicAddress: ownerPk.toBase58(),
+      connection: connection,
+    })
+    const data = Object.keys(nfts).map((key) => nfts[key])
+    const arr: NFTWithMint[] = []
+    for (let i = 0; i < data.length; i++) {
+      try {
+        const val = (await axios.get(data[i].data.uri)).data
+        const tokenAccounts = await getTokenAccountsByMint(
+          connection,
+          data[i].mint
+        )
+        arr.push({
+          val,
+          mint: data[i].mint,
+          tokenAddress: tokenAccounts
+            .find((x) => x.account.owner.toBase58() === ownerPk.toBase58())!
+            .publicKey.toBase58(),
+        })
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    return arr
+  } catch (error) {
+    notify({
+      type: 'error',
+      message: 'Unable to fetch nfts',
+    })
+  }
+  return []
+}
+
+export const parseMintSupplyFraction = (fraction: string) => {
+  if (!fraction) {
+    return MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+  }
+
+  const fractionValue = new BigNumber(fraction)
+    .shiftedBy(MintMaxVoteWeightSource.SUPPLY_FRACTION_DECIMALS)
+    .toNumber()
+
+  return new MintMaxVoteWeightSource({
+    value: new BN(fractionValue),
+  })
 }

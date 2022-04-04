@@ -4,19 +4,26 @@ import {
   Transaction,
   TransactionInstruction,
 } from '@solana/web3.js'
-import { Proposal } from '../../models/accounts'
-import { ChatMessageBody } from '../../models/chat/accounts'
-import { withPostChatMessage } from '../../models/chat/withPostChatMessage'
-import { ParsedAccount } from '../../models/core/accounts'
-import { RpcContext } from '../../models/core/api'
+import {
+  GOVERNANCE_CHAT_PROGRAM_ID,
+  Proposal,
+  Realm,
+} from '@solana/spl-governance'
+import { ChatMessageBody } from '@solana/spl-governance'
+import { withPostChatMessage } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '../../utils/send'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  realm: ProgramAccount<Realm>,
+  proposal: ProgramAccount<Proposal>,
   tokeOwnerRecord: PublicKey,
   body: ChatMessageBody,
-  replyTo?: PublicKey
+  replyTo?: PublicKey,
+  client?: VotingClient
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
@@ -24,17 +31,26 @@ export async function postChatMessage(
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
 
+  //will run only if plugin is connected with realm
+  const plugin = await client?.withUpdateVoterWeightRecord(
+    instructions,
+    'commentProposal'
+  )
+
   await withPostChatMessage(
     instructions,
     signers,
+    GOVERNANCE_CHAT_PROGRAM_ID,
     programId,
-    proposal.info.governance,
+    realm.pubkey,
+    proposal.account.governance,
     proposal.pubkey,
     tokeOwnerRecord,
     governanceAuthority,
     payer,
     replyTo,
-    body
+    body,
+    plugin?.voterWeightPk
   )
 
   const transaction = new Transaction()

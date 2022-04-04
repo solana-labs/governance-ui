@@ -5,16 +5,16 @@ import {
   TransactionInstruction,
 } from '@solana/web3.js'
 
-import { Proposal } from '../models/accounts'
+import { getGovernanceProgramVersion, Proposal } from '@solana/spl-governance'
 
-import { withFlagInstructionError } from '../models/withFlagInstructionError'
-import { RpcContext } from '../models/core/api'
-import { ParsedAccount } from '@models/core/accounts'
+import { withFlagTransactionError } from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 
 export const flagInstructionError = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
-  proposal: ParsedAccount<Proposal>,
+  proposal: ProgramAccount<Proposal>,
   proposalInstruction: PublicKey
 ) => {
   const governanceAuthority = walletPubkey
@@ -22,11 +22,19 @@ export const flagInstructionError = async (
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
-  withFlagInstructionError(
+  // Explicitly request the version before making RPC calls to work around race conditions in resolving
+  // the version for RealmInfo
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId
+  )
+
+  withFlagTransactionError(
     instructions,
     programId,
+    programVersion,
     proposal.pubkey,
-    proposal.info.tokenOwnerRecord,
+    proposal.account.tokenOwnerRecord,
     governanceAuthority,
     proposalInstruction
   )

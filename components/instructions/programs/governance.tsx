@@ -1,14 +1,25 @@
-import { AccountMetaData, VoteWeightSource } from '@models/accounts'
+import {
+  AccountMetaData,
+  getGovernance,
+  getGovernanceProgramVersion,
+  getGovernanceSchema,
+  getRealm,
+  ProgramAccount,
+  RealmConfigAccount,
+  SetRealmAuthorityAction,
+  SetRealmAuthorityArgs,
+  tryGetRealmConfig,
+  VoteTipping,
+} from '@solana/spl-governance'
 import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
-} from '@models/instructions'
-import { GOVERNANCE_SCHEMA } from '@models/serialisation'
+} from '@solana/spl-governance'
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
 import { Connection } from '@solana/web3.js'
 import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
 import { deserialize } from 'borsh'
 
-import { getGovernance, getRealm } from '@models/api'
 import { tryGetMint } from '../../../utils/tokens'
 
 export const GOVERNANCE_INSTRUCTIONS = {
@@ -28,13 +39,13 @@ export const GOVERNANCE_INSTRUCTIONS = {
         ) as SetGovernanceConfigArgs
 
         const governance = await getGovernance(connection, accounts[0].pubkey)
-        const realm = await getRealm(connection, governance.info.realm)
+        const realm = await getRealm(connection, governance.account.realm)
         const communityMint = await tryGetMint(
           connection,
-          realm.info.communityMint
+          realm.account.communityMint
         )
-        const councilMint = realm.info.config.councilMint
-          ? await tryGetMint(connection, realm.info.config.councilMint)
+        const councilMint = realm.account.config.councilMint
+          ? await tryGetMint(connection, realm.account.config.councilMint)
           : undefined
 
         return (
@@ -48,7 +59,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${fmtMintAmount(
                 communityMint?.account,
                 args.config.minCommunityTokensToCreateProposal
-              )}`}
+              )}`}{' '}
+              ({args.config.minCommunityTokensToCreateProposal.toNumber()})
             </p>
             <p>
               {`minCouncilTokensToCreateProposal:
@@ -68,12 +80,46 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${getDaysFromTimestamp(args.config.maxVotingTime)} days(s)`}
             </p>
             <p>
-              {`voteWeightSource:
-              ${VoteWeightSource[args.config.voteWeightSource]}`}
+              {`voteTipping:
+              ${VoteTipping[args.config.voteTipping]}`}
             </p>
             <p>
               {`proposalCoolOffTime:
               ${getDaysFromTimestamp(args.config.proposalCoolOffTime)} days(s)`}
+            </p>
+          </>
+        )
+      },
+    },
+    21: {
+      name: 'Set Realm Authority',
+      accounts: [
+        { name: 'Realm' },
+        { name: 'Realm Authority' },
+        { name: 'New Realm Authority' },
+      ],
+      getDataUI: async (
+        connection: Connection,
+        data: Uint8Array,
+        accounts: AccountMetaData[]
+      ) => {
+        const realm = await getRealm(connection, accounts[0].pubkey)
+        const programVersion = await getGovernanceProgramVersion(
+          connection,
+          realm.owner
+        )
+
+        const args = deserialize(
+          getGovernanceSchema(programVersion),
+          SetRealmAuthorityArgs,
+          Buffer.from(data)
+        ) as SetRealmAuthorityArgs
+
+        return (
+          <>
+            <p>
+              {`action:
+               ${SetRealmAuthorityAction[args.action!]}`}
             </p>
           </>
         )
@@ -96,17 +142,29 @@ export const GOVERNANCE_INSTRUCTIONS = {
         const realm = await getRealm(connection, accounts[0].pubkey)
         const communityMint = await tryGetMint(
           connection,
-          realm.info.communityMint
+          realm.account.communityMint
         )
+        let config: ProgramAccount<RealmConfigAccount> | null = null
+        try {
+          config = await tryGetRealmConfig(
+            connection,
+            realm.owner,
+            realm.pubkey
+          )
+        } catch (e) {
+          console.log(e)
+        }
 
         return (
           <>
             <p>
               {`minCommunityTokensToCreateGovernance:
-               ${fmtMintAmount(
-                 communityMint?.account,
-                 args.configArgs.minCommunityTokensToCreateGovernance
-               )}`}
+              ${fmtMintAmount(
+                communityMint?.account,
+                args.configArgs.minCommunityTokensToCreateGovernance
+              )}`}{' '}
+              ({args.configArgs.minCommunityTokensToCreateGovernance.toNumber()}
+              )
             </p>
             <p>
               {`useCouncilMint:
@@ -114,8 +172,31 @@ export const GOVERNANCE_INSTRUCTIONS = {
             </p>
             <p>
               {`communityMintMaxVoteWeightSource:
-               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}
+               ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}{' '}
+              (
+              {args.configArgs.communityMintMaxVoteWeightSource.value.toNumber()}
+              )
             </p>
+            <p>
+              {`useCommunityVoterWeightAddin:
+               ${!!args.configArgs.useCommunityVoterWeightAddin}`}
+            </p>
+            <p>
+              {`useMaxCommunityVoterWeightAddin:
+               ${!!args.configArgs.useMaxCommunityVoterWeightAddin}`}
+            </p>
+            {config?.account.communityVoterWeightAddin && (
+              <p>
+                {`communityVoterWeightAddin :
+               ${config?.account.communityVoterWeightAddin?.toBase58()}`}
+              </p>
+            )}
+            {config?.account.maxCommunityVoterWeightAddin && (
+              <p>
+                {`maxCommunityVoterWeightAddin:
+               ${config?.account.maxCommunityVoterWeightAddin?.toBase58()}`}
+              </p>
+            )}
           </>
         )
       },

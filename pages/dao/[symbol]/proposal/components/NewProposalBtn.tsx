@@ -20,18 +20,22 @@ const NewProposalBtn = () => {
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
 
+  const governanceItems = Object.values(governances)
+
   const canCreateProposal =
     realm &&
-    Object.values(governances).some((g) =>
-      ownVoterWeight.canCreateProposal(g.info.config)
+    governanceItems.some((g) =>
+      ownVoterWeight.canCreateProposal(g.account.config)
     ) &&
     !toManyCommunityOutstandingProposalsForUser &&
     !toManyCouncilOutstandingProposalsForUse
 
   const tooltipContent = !connected
     ? 'Connect your wallet to create new proposal'
-    : !Object.values(governances).some((g) =>
-        ownVoterWeight.canCreateProposal(g.info.config)
+    : governanceItems.length === 0
+    ? 'There is no governance configuration to create a new proposal'
+    : !governanceItems.some((g) =>
+        ownVoterWeight.canCreateProposal(g.account.config)
       )
     ? "You don't have enough governance power to create a new proposal"
     : toManyCommunityOutstandingProposalsForUser
@@ -51,10 +55,10 @@ const NewProposalBtn = () => {
               className={`${
                 !canCreateProposal
                   ? 'cursor-not-allowed pointer-events-none'
-                  : 'hover:bg-bkg-3'
-              } default-transition flex items-center rounded-full ring-1 ring-fgd-3 px-3 py-2.5 text-fgd-1 text-sm focus:outline-none`}
+                  : ''
+              } flex items-center cursor-pointer text-primary-light hover:text-primary-dark text-sm`}
             >
-              <PlusCircleIcon className="h-5 mr-1.5 text-primary-light w-5" />
+              <PlusCircleIcon className="h-5 mr-1 w-5" />
               New
             </a>
           </Link>

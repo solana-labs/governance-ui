@@ -19,6 +19,8 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
     await schema.validate(formValues, { abortEarly })
     values.isValid = true
   } catch (err) {
+    console.log('Validation Error', err)
+
     values.isValid = false
     const fieldName = err.path
     if (
@@ -27,7 +29,7 @@ export const isFormValid = async (schema, formValues, abortEarly = false) => {
     ) {
       values.validationErrors[fieldName] = err.errors
     } else {
-      err.inner.forEach((error) => {
+      err.inner?.forEach((error) => {
         const fieldName = error.path
         if (
           error.path &&

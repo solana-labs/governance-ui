@@ -1,43 +1,67 @@
 import Link from 'next/link'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
-
-import TokenBalanceCard from '@components/TokenBalanceCard'
-import useRealm from '@hooks/useRealm'
-
-import useQueryContext from '@hooks/useQueryContext'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import Select from '@components/inputs/Select'
-import React, { createContext, useEffect, useState } from 'react'
-import Button, { LinkButton, SecondaryButton } from '@components/Button'
-import SplTokenTransfer from './components/instructions/SplTokenTransfer'
-import { RpcContext } from '@models/core/api'
-import { createProposal } from 'actions/createProposal'
-import useWalletStore from 'stores/useWalletStore'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
-import { PublicKey } from '@solana/web3.js'
-import { PlusCircleIcon, XCircleIcon } from '@heroicons/react/outline'
-import { notify } from 'utils/notifications'
-import * as yup from 'yup'
-import { formValidation, isFormValid } from '@utils/formValidation'
 import { useRouter } from 'next/router'
+import React, { createContext, useEffect, useState } from 'react'
+import * as yup from 'yup'
+import {
+  ArrowLeftIcon,
+  PlusCircleIcon,
+  XCircleIcon,
+} from '@heroicons/react/outline'
+import {
+  getInstructionDataFromBase64,
+  Governance,
+  GovernanceAccountType,
+  ProgramAccount,
+} from '@solana/spl-governance'
+import { PublicKey } from '@solana/web3.js'
+import Button, { LinkButton, SecondaryButton } from '@components/Button'
+import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
+import Textarea from '@components/inputs/Textarea'
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useQueryContext from '@hooks/useQueryContext'
+import useRealm from '@hooks/useRealm'
+import { getTimestampFromDays } from '@tools/sdk/units'
+import { formValidation, isFormValid } from '@utils/formValidation'
 import {
   ComponentInstructionData,
-  UiInstruction,
   Instructions,
   InstructionsContext,
+  UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { ParsedAccount } from '@models/core/accounts'
-import { Governance, GovernanceAccountType } from '@models/accounts'
+import useWalletStore from 'stores/useWalletStore'
+import { notify } from 'utils/notifications'
+import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import Grant from 'VoteStakeRegistry/components/instructions/Grant'
 import InstructionContentContainer from './components/InstructionContentContainer'
-import ProgramUpgrade from './components/instructions/ProgramUpgrade'
-import Empty from './components/instructions/Empty'
-import Mint from './components/instructions/Mint'
+import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
+import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
 import CustomBase64 from './components/instructions/CustomBase64'
-import { getTimestampFromDays } from '@tools/sdk/units'
+import Empty from './components/instructions/Empty'
 import MakeChangeMaxAccounts from './components/instructions/Mango/MakeChangeMaxAccounts'
+import MakeChangeReferralFeeParams from './components/instructions/Mango/MakeChangeReferralFeeParams'
+import Mint from './components/instructions/Mint'
+import CreateObligationAccount from './components/instructions/Solend/CreateObligationAccount'
+import DepositReserveLiquidityAndObligationCollateral from './components/instructions/Solend/DepositReserveLiquidityAndObligationCollateral'
+import InitObligationAccount from './components/instructions/Solend/InitObligationAccount'
+import RefreshObligation from './components/instructions/Solend/RefreshObligation'
+import RefreshReserve from './components/instructions/Solend/RefreshReserve'
+import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
+import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
+import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
+import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
+import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
+import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
+import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
+import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
+import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
+import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
+import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
+import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
+import useCreateProposal from '@hooks/useCreateProposal'
+import RealmConfig from './components/instructions/RealmConfig'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -52,24 +76,23 @@ export const NewProposalContext = createContext<InstructionsContext>(
   defaultGovernanceCtx
 )
 
+// Takes the first encountered governance account
+function extractGovernanceAccountFromInstructionsData(
+  instructionsData: ComponentInstructionData[]
+): ProgramAccount<Governance> | null {
+  return (
+    instructionsData.find((itx) => itx.governedAccount)?.governedAccount ?? null
+  )
+}
+
 const New = () => {
   const router = useRouter()
+  const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    symbol,
-    realm,
-    realmInfo,
-    realmDisplayName,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    canChooseWhoVote,
-  } = useRealm()
+  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
 
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
   const {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernances,
@@ -83,7 +106,7 @@ const New = () => {
   const [
     governance,
     setGovernance,
-  ] = useState<ParsedAccount<Governance> | null>(null)
+  ] = useState<ProgramAccount<Governance> | null>(null)
   const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
   const [isLoadingDraft, setIsLoadingDraft] = useState(false)
   const isLoading = isLoadingSignedProposal || isLoadingDraft
@@ -93,10 +116,11 @@ const New = () => {
     if (!governance) {
       return true
     } else {
-      const governanceType = governance.info.accountType
+      const governanceType = governance.account.accountType
       const instructionsAvailiableAfterProgramGovernance = [Instructions.Base64]
       switch (governanceType) {
-        case GovernanceAccountType.ProgramGovernance:
+        case GovernanceAccountType.ProgramGovernanceV1:
+        case GovernanceAccountType.ProgramGovernanceV2:
           return instructionsAvailiableAfterProgramGovernance.includes(
             instructionType
           )
@@ -179,14 +203,6 @@ const New = () => {
         handleTurnOffLoaders()
         throw Error('No governance selected')
       }
-
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.account.owner.toString()),
-        realmInfo?.programVersion,
-        wallet,
-        connection.current,
-        connection.endpoint
-      )
       const instructionsData = instructions.map((x) => {
         return {
           data: x.serializedInstruction
@@ -194,8 +210,11 @@ const New = () => {
             : null,
           holdUpTime: x.customHoldUpTime
             ? getTimestampFromDays(x.customHoldUpTime)
-            : selectedGovernance?.info?.config.minInstructionHoldUpTime,
+            : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
+          chunkSplitByDefault: x.chunkSplitByDefault || false,
+          signers: x.signers,
+          shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
         }
       })
 
@@ -203,40 +222,16 @@ const New = () => {
         // Fetch governance to get up to date proposalCount
         selectedGovernance = (await fetchRealmGovernance(
           governance.pubkey
-        )) as ParsedAccount<Governance>
+        )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance.info.config
-        )
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.info.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.info.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.info.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm.pubkey,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title,
-          form.description,
-          proposalMint,
-          selectedGovernance?.info?.proposalCount,
+        proposalAddress = await handleCreateProposal({
+          title: form.title,
+          description: form.description,
+          governance: selectedGovernance,
           instructionsData,
-          isDraft
-        )
+          voteByCouncil,
+          isDraft,
+        })
 
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
@@ -256,11 +251,13 @@ const New = () => {
   }, [instructionsData[0].governedAccount?.pubkey])
 
   useEffect(() => {
-    const firstInstruction = instructionsData[0]
-    if (firstInstruction && firstInstruction.governedAccount) {
-      setGovernance(firstInstruction.governedAccount)
-    }
-  }, [instructionsData[0]])
+    const governedAccount = extractGovernanceAccountFromInstructionsData(
+      instructionsData
+    )
+
+    setGovernance(governedAccount)
+  }, [instructionsData])
+
   useEffect(() => {
     //fetch to be up to date with amounts
     fetchTokenAccountsForSelectedRealmGovernances()
@@ -279,19 +276,115 @@ const New = () => {
         return (
           <ProgramUpgrade index={idx} governance={governance}></ProgramUpgrade>
         )
+      case Instructions.CreateAssociatedTokenAccount:
+        return (
+          <CreateAssociatedTokenAccount index={idx} governance={governance} />
+        )
+      case Instructions.DepositIntoVolt:
+        return <FriktionDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromVolt:
+        return <FriktionWithdraw index={idx} governance={governance} />
+      case Instructions.CreateSolendObligationAccount:
+        return <CreateObligationAccount index={idx} governance={governance} />
+      case Instructions.InitSolendObligationAccount:
+        return <InitObligationAccount index={idx} governance={governance} />
+      case Instructions.DepositReserveLiquidityAndObligationCollateral:
+        return (
+          <DepositReserveLiquidityAndObligationCollateral
+            index={idx}
+            governance={governance}
+          />
+        )
+      case Instructions.RefreshSolendObligation:
+        return <RefreshObligation index={idx} governance={governance} />
+      case Instructions.RefreshSolendReserve:
+        return <RefreshReserve index={idx} governance={governance} />
+      case Instructions.WithdrawObligationCollateralAndRedeemReserveLiquidity:
+        return (
+          <WithdrawObligationCollateralAndRedeemReserveLiquidity
+            index={idx}
+            governance={governance}
+          />
+        )
       case Instructions.Mint:
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.CreateNftPluginRegistrar:
+        return (
+          <CreateNftPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginRegistrar>
+        )
+      case Instructions.ConfigureNftPluginCollection:
+        return (
+          <ConfigureNftPluginCollection
+            index={idx}
+            governance={governance}
+          ></ConfigureNftPluginCollection>
+        )
+      case Instructions.CreateNftPluginMaxVoterWeight:
+        return (
+          <CreateNftPluginMaxVoterWeightRecord
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginMaxVoterWeightRecord>
+        )
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
-      case Instructions.MangoMakeChangeMaxAccounts:
+      case Instructions.MangoAddOracle:
+        return (
+          <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
+        )
+      case Instructions.MangoAddSpotMarket:
+        return (
+          <MakeAddSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeAddSpotMarket>
+        )
+      case Instructions.MangoChangeMaxAccounts:
         return (
           <MakeChangeMaxAccounts
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
         )
+      case Instructions.MangoChangePerpMarket:
+        return (
+          <MakeChangePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeChangePerpMarket>
+        )
+      case Instructions.MangoChangeReferralFeeParams:
+        return (
+          <MakeChangeReferralFeeParams
+            index={idx}
+            governance={governance}
+          ></MakeChangeReferralFeeParams>
+        )
+      case Instructions.MangoChangeSpotMarket:
+        return (
+          <MakeChangeSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeChangeSpotMarket>
+        )
+      case Instructions.MangoCreatePerpMarket:
+        return (
+          <MakeCreatePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeCreatePerpMarket>
+        )
+      case Instructions.RealmConfig:
+        return <RealmConfig index={idx} governance={governance}></RealmConfig>
+      case Instructions.Grant:
+        return <Grant index={idx} governance={governance}></Grant>
+      case Instructions.Clawback:
+        return <Clawback index={idx} governance={governance}></Clawback>
       default:
         null
     }
@@ -443,8 +536,8 @@ const New = () => {
           </div>
         </>
       </div>
-      <div className="col-span-12 md:col-span-5 lg:col-span-4">
-        <TokenBalanceCard />
+      <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+        <TokenBalanceCardWrapper />
       </div>
     </div>
   )

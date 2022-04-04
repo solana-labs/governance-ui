@@ -1,3 +1,4 @@
+import { utils } from '@project-serum/anchor'
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
@@ -42,12 +43,17 @@ export async function createATA(
   return ata
 }
 
-export async function getATA(
-  connection: ConnectionContext,
-  receiverAddress: PublicKey,
-  mintPK: PublicKey,
+export async function getATA({
+  connection,
+  receiverAddress,
+  mintPK,
+  wallet,
+}: {
+  connection: ConnectionContext
+  receiverAddress: PublicKey
+  mintPK: PublicKey
   wallet: any
-) {
+}) {
   if (!wallet?.publicKey) {
     throw 'please connect your wallet'
   }
@@ -58,7 +64,11 @@ export async function getATA(
     receiverAddress
   )
   if (!isExistingAccount) {
-    const existingAta = await tryGetAta(connection, mintPK, currentAddress)
+    const existingAta = await tryGetAta(
+      connection.current,
+      mintPK,
+      currentAddress
+    )
     if (!existingAta) {
       const ata = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
@@ -76,4 +86,19 @@ export async function getATA(
     currentAddress,
     needToCreateAta,
   }
+}
+
+export function findATAAddrSync(
+  wallet: PublicKey,
+  mintAddress: PublicKey
+): [PublicKey, number] {
+  const seeds = [
+    wallet.toBuffer(),
+    TOKEN_PROGRAM_ID.toBuffer(),
+    mintAddress.toBuffer(),
+  ]
+  return utils.publicKey.findProgramAddressSync(
+    seeds,
+    ASSOCIATED_TOKEN_PROGRAM_ID
+  )
 }

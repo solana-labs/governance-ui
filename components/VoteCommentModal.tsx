@@ -1,25 +1,31 @@
 import React, { FunctionComponent, useState } from 'react'
-import { postChatMessage } from '../actions/chat/postMessage'
-import { ChatMessageBody, ChatMessageBodyType } from '../models/chat/accounts'
-import { RpcContext } from '../models/core/api'
+
+import {
+  ChatMessageBody,
+  ChatMessageBodyType,
+  YesNoVote,
+} from '@solana/spl-governance'
+import { RpcContext } from '@solana/spl-governance'
 import useWalletStore from '../stores/useWalletStore'
 import useRealm from '../hooks/useRealm'
 import { castVote } from '../actions/castVote'
-import { Vote } from '../models/instructions'
+
 import Button, { SecondaryButton } from './Button'
 // import { notify } from '../utils/notifications'
 import Loading from './Loading'
 import Modal from './Modal'
 import Input from './inputs/Input'
 import Tooltip from './Tooltip'
-import { TokenOwnerRecord } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { TokenOwnerRecord } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
+import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 interface VoteCommentModalProps {
   onClose: () => void
   isOpen: boolean
-  vote: Vote
-  voterTokenRecord: ParsedAccount<TokenOwnerRecord>
+  vote: YesNoVote
+  voterTokenRecord: ProgramAccount<TokenOwnerRecord>
 }
 
 const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
@@ -28,47 +34,46 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
   vote,
   voterTokenRecord,
 }) => {
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const [submitting, setSubmitting] = useState(false)
   const [comment, setComment] = useState('')
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { proposal } = useWalletStore((s) => s.selectedProposal)
   const { fetchChatMessages } = useWalletStore((s) => s.actions)
-  const { fetchVoteRecords } = useWalletStore((s) => s.actions)
   const { realm, realmInfo } = useRealm()
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  const { refetchProposals } = useWalletStore((s) => s.actions)
 
-  const submitVote = async (vote: Vote) => {
+  const submitVote = async (vote: YesNoVote) => {
     setSubmitting(true)
     const rpcContext = new RpcContext(
-      proposal!.account.owner,
-      realmInfo?.programVersion,
-      wallet,
+      proposal!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
       connection.current,
       connection.endpoint
     )
 
-    const msg = new ChatMessageBody({
-      type: ChatMessageBodyType.Text,
-      value: comment,
-    })
+    const msg = comment
+      ? new ChatMessageBody({
+          type: ChatMessageBodyType.Text,
+          value: comment,
+        })
+      : undefined
 
     try {
       await castVote(
         rpcContext,
-        realm!.pubkey,
+        realm!,
         proposal!,
         voterTokenRecord.pubkey,
-        vote
+        vote,
+        msg,
+        client
       )
-      if (comment) {
-        await postChatMessage(
-          rpcContext,
-          proposal!,
-          voterTokenRecord.pubkey,
-          msg
-        )
-      }
+      await refetchProposals()
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?
       console.error("Can't cast vote", ex)
@@ -79,11 +84,9 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
     }
 
     fetchChatMessages(proposal!.pubkey)
-    fetchVoteRecords(proposal)
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
   }
 
-  const voteString = vote === 0 ? 'Approve' : 'Deny'
+  const voteString = vote === YesNoVote.Yes ? 'Yes' : 'No'
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -113,7 +116,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
           className="w-44 flex items-center justify-center"
           onClick={() => submitVote(vote)}
         >
-          {submitting ? <Loading /> : <span>{voteString} Proposal</span>}
+          {submitting ? <Loading /> : <span>Vote {voteString}</span>}
         </Button>
       </div>
     </Modal>

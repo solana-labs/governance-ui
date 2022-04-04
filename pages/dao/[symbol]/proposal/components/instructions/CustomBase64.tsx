@@ -1,38 +1,36 @@
 import React, { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import {
+  getInstructionDataFromBase64,
+  Governance,
+  ProgramAccount,
+} from '@solana/spl-governance'
+import Input from '@components/inputs/Input'
+import Textarea from '@components/inputs/Textarea'
+import { validateInstruction } from '@utils/instructionTools'
+import {
   Base64InstructionForm,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../new'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@models/accounts'
-import { ParsedAccount } from '@models/core/accounts'
+
 import useWalletStore from 'stores/useWalletStore'
+
+import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import { getInstructionDataFromBase64 } from '@models/serialisation'
-import { validateInstruction } from '@utils/instructionTools'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
 
 const CustomBase64 = ({
   index,
   governance,
 }: {
   index: number
-  governance: ParsedAccount<Governance> | null
+  governance: ProgramAccount<Governance> | null
 }) => {
+  const { ownVoterWeight } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const {
-    governancesArray,
-    governedTokenAccounts,
-    getMintWithGovernances,
-  } = useGovernanceAssets()
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
   const shouldBeGoverned = index !== 0 && governance
-  const [governedAccounts, setGovernedAccounts] = useState<
-    GovernedMultiTypeAccount[]
-  >([])
   const [form, setForm] = useState<Base64InstructionForm>({
     governedAccount: undefined,
     base64: '',
@@ -44,36 +42,12 @@ const CustomBase64 = ({
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  useEffect(() => {
-    async function prepGovernances() {
-      const mintWithGovernances = await getMintWithGovernances()
-      const matchedGovernances = governancesArray.map((gov) => {
-        const governedTokenAccount = governedTokenAccounts.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        const mintGovernance = mintWithGovernances.find(
-          (x) => x.governance?.pubkey.toBase58() === gov.pubkey.toBase58()
-        )
-        if (governedTokenAccount) {
-          return governedTokenAccount as GovernedMultiTypeAccount
-        }
-        if (mintGovernance) {
-          return mintGovernance as GovernedMultiTypeAccount
-        }
-        return {
-          governance: gov,
-        }
-      })
-      setGovernedAccounts(matchedGovernances)
-    }
-    prepGovernances()
-  }, [])
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
       isValid &&
-      form.governedAccount?.governance?.info &&
+      form.governedAccount?.governance?.account &&
       wallet?.publicKey
     ) {
       serializedInstruction = form.base64
@@ -132,7 +106,9 @@ const CustomBase64 = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedAccounts}
+        governedAccounts={governedMultiTypeAccounts.filter((x) =>
+          ownVoterWeight.canCreateProposal(x.governance.account.config)
+        )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}
@@ -140,7 +116,7 @@ const CustomBase64 = ({
         error={formErrors['governedAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
       <Input
         min={0}
         label="Hold up time (days)"

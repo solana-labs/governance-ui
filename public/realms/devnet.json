@@ -1,5 +1,12 @@
 [
   {
+    "symbol": "UNQ",
+    "displayName": "UNQ Universe",
+    "programId": "GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP",
+    "realmId": "HVywtno57PwcgWQzRaf3Pv8RKWWrF1zoqLZGULNC2jGm",
+    "ogImage": "/realms/UNQ/img/UNQ-logo.png"
+  },
+  {
     "symbol": "MNGO",
     "displayName": "Mango DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -7,7 +14,8 @@
     "website": "https://mango.markets",
     "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
     "twitter": "@mangomarkets",
-    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg",
+    "notificationsEnabled": true
   },
   {
     "symbol": "SOCEAN",
@@ -60,9 +68,9 @@
     "displayName": "Cardinal",
     "programId": "bqTjmeob6XTdfh12px2fZq4aJMpfSY1R1nHZ44VgVZD",
     "realmId": "8o1tcKzRsEFAWYzi7Ge2cyotCaQW6vt5f2dy2HkWmemg",
-    "ogImage": "https://app.cardinalconsensus.io/assets/logo-colored.png",
-    "website": "https://www.cardinalconsensus.io",
-    "twitter": "@cardinal_dao"
+    "ogImage": "https://app.cardinal.so/assets/logo-colored.png",
+    "website": "https://www.cardinal.so",
+    "twitter": "@cardinal__so"
   },
   {
     "symbol": "testgm",
@@ -102,5 +110,20 @@
     "displayName": "REALM99",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "62yTu6Pv172sKcrsa9sRoPfXiNsD648ZK6wGaWP8ak5j"
+  },
+  {
+    "symbol": "PRDAO",
+    "displayName": "PRDAO-demo2",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DYme6LFumrVj5E4xiTgeWrPx2SAvqiWFHdDjZUBJxQkN"
+  },
+  {
+    "symbol": "Alpha Illuminati DAO",
+    "displayName": "Alpha Illuminati",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "9u3s1APW4JDxt4a2p666rYYoa3UErcT12fvNKWNFqaj7",
+    "ogImage": "https://media.discordapp.net/attachments/933224453326909490/952347955157950504/alpha-illuminati-logo.png",
+    "website": "https://www.alphailluminati.xyz",
+    "twitter": "@illuminatialpha"
   }
 ]

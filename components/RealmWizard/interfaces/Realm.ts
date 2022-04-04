@@ -1,4 +1,3 @@
-import { ProgramVersion } from '@models/registry/constants'
 import { ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
@@ -15,8 +14,7 @@ export interface RealmArtifacts {
   transferAuthority?: boolean
   councilMintId?: string
   councilMint?: ProgramAccount<MintInfo>
-  programVersion?: ProgramVersion
-  communityMintMaxVoteWeightSource?: number
+  communityMintMaxVoteWeightSource?: string
   minCommunityTokensToCreateGovernance?: string
   teamWallets?: string[]
   yesThreshold?: number

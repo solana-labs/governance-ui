@@ -6,7 +6,7 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from 'models/core/api'
+import { PROGRAM_VERSION_V1, RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
@@ -14,26 +14,49 @@ import { debounce } from 'utils/debounce'
 import { isFormValid } from 'utils/formValidation'
 import { getGovernanceConfig } from '@utils/GovernanceTools'
 import { notify } from 'utils/notifications'
-import tokenService, { TokenRecord } from 'utils/services/token'
-import { ProgramAccount, tryGetMint } from 'utils/tokens'
+import tokenService from 'utils/services/token'
+import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
 import { createTreasuryAccount } from 'actions/createTreasuryAccount'
 import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
+import {
+  DEFAULT_NATIVE_SOL_MINT,
+  DEFAULT_NFT_TREASURY_MINT,
+} from '@components/instructions/tools'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { getProgramVersionForRealm } from '@models/registry/api'
+import { TokenInfo } from '@solana/spl-token-registry'
+import Select from '@components/inputs/Select'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
   mintAddress: string
 }
 const defaultFormValues = {
   mintAddress: '',
-  minCommunityTokensToCreateProposal: 100,
+  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
 }
+
+const SOL = 'SOL'
+const OTHER = 'OTHER'
+const NFT = 'NFT'
+
 const NewAccountForm = () => {
   const router = useRouter()
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const { fmtUrlWithCluster } = useQueryContext()
+  const isCurrentVersionHigherThenV1 = () => {
+    return (
+      realmInfo?.programVersion && realmInfo.programVersion > PROGRAM_VERSION_V1
+    )
+  }
   const {
     realmInfo,
     realm,
@@ -41,6 +64,17 @@ const NewAccountForm = () => {
     symbol,
     ownVoterWeight,
   } = useRealm()
+
+  const types = [
+    {
+      name: 'SOL Account',
+      value: SOL,
+      defaultMint: DEFAULT_NATIVE_SOL_MINT,
+      hide: !isCurrentVersionHigherThenV1(),
+    },
+    { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
+    { name: 'Token Account', value: OTHER, defaultMint: '' },
+  ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -48,11 +82,11 @@ const NewAccountForm = () => {
   const [form, setForm] = useState<NewTreasuryAccountForm>({
     ...defaultFormValues,
   })
-  const [tokenInfo, setTokenInfo] = useState<TokenRecord | undefined>(undefined)
-  const [mint, setMint] = useState<ProgramAccount<MintInfo> | null>(null)
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo | undefined>(undefined)
+  const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-
+  const [treasuryType, setTreasuryType] = useState(types[2])
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
@@ -78,10 +112,11 @@ const NewAccountForm = () => {
       setFormErrors(validationErrors)
       if (isValid && realmMint) {
         setIsLoading(true)
+
         const rpcContext = new RpcContext(
-          new PublicKey(realm.account.owner.toString()),
-          realmInfo?.programVersion,
-          wallet,
+          new PublicKey(realm.owner.toString()),
+          getProgramVersionForRealm(realmInfo!),
+          wallet!,
           connection.current,
           connection.endpoint
         )
@@ -93,19 +128,23 @@ const NewAccountForm = () => {
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
         }
+
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
+
         await createTreasuryAccount(
           rpcContext,
-          realm.pubkey,
+          realm,
           new PublicKey(form.mintAddress),
           governanceConfig,
-          tokenOwnerRecord!.pubkey
+          tokenOwnerRecord!.pubkey,
+          client
         )
         setIsLoading(false)
         fetchRealm(realmInfo!.programId, realmInfo!.realmId)
         router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
       }
     } catch (e) {
+      console.error('Create Treasury', e)
       //TODO how do we present errors maybe something more generic ?
       notify({
         type: 'error',
@@ -189,6 +228,22 @@ const NewAccountForm = () => {
     }
   }, [form.mintAddress])
 
+  useEffect(() => {
+    handleSetForm({
+      value: treasuryType.defaultMint,
+      propertyName: 'mintAddress',
+    })
+  }, [treasuryType])
+  useEffect(() => {
+    setForm({
+      ...form,
+      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+        ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+        : realmMint
+        ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
+        : 0,
+    })
+  }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
@@ -197,34 +252,54 @@ const NewAccountForm = () => {
           <h1>Create new treasury account</h1>
         </div>
       </div>
-      <Input
-        label="Mint address"
-        value={form.mintAddress}
-        type="text"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'mintAddress',
-          })
-        }
-        error={formErrors['mintAddress']}
-      />
-      {tokenInfo ? (
-        <div className="flex items-center">
-          {tokenInfo?.logoURI && (
-            <img
-              className="flex-shrink-0 h-6 w-6 mr-2.5"
-              src={tokenInfo.logoURI}
-            />
-          )}
-          <div>
-            {tokenInfo.name}
-            <p className="text-fgd-3 text-xs">{tokenInfo?.symbol}</p>
-          </div>
-        </div>
-      ) : mint ? (
-        <div>Mint found</div>
-      ) : null}
+      <Select
+        label={'Type'}
+        onChange={setTreasuryType}
+        placeholder="Please select..."
+        value={treasuryType.name}
+      >
+        {types
+          .filter((x) => !x.hide)
+          .map((x) => {
+            return (
+              <Select.Option key={x.value} value={x}>
+                {x.name}
+              </Select.Option>
+            )
+          })}
+      </Select>
+      {treasuryType.value === OTHER && (
+        <>
+          <Input
+            label="Mint address"
+            value={form.mintAddress}
+            type="text"
+            onChange={(evt) =>
+              handleSetForm({
+                value: evt.target.value,
+                propertyName: 'mintAddress',
+              })
+            }
+            error={formErrors['mintAddress']}
+          />
+          {tokenInfo ? (
+            <div className="flex items-center">
+              {tokenInfo?.logoURI && (
+                <img
+                  className="flex-shrink-0 h-6 w-6 mr-2.5"
+                  src={tokenInfo.logoURI}
+                />
+              )}
+              <div>
+                {tokenInfo.name}
+                <p className="text-fgd-3 text-xs">{tokenInfo?.symbol}</p>
+              </div>
+            </div>
+          ) : mint ? (
+            <div>Mint found</div>
+          ) : null}
+        </>
+      )}
       <BaseGovernanceForm
         formErrors={formErrors}
         form={form}

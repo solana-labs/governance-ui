@@ -4,7 +4,7 @@ import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from 'models/core/api'
+import { RpcContext } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
@@ -17,10 +17,14 @@ import * as yup from 'yup'
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
 } from './BaseGovernanceForm'
-import { registerGovernance } from 'actions/registerGovernance'
-import { GovernanceType } from 'models/enums'
+import { registerProgramGovernance } from 'actions/registerProgramGovernance'
+import { GovernanceType } from '@solana/spl-governance'
 import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -28,7 +32,10 @@ interface NewProgramForm extends BaseGovernanceFormFields {
 
 const defaultFormValues = {
   programId: '',
-  minCommunityTokensToCreateProposal: 100,
+  // TODO: This is temp. fix to avoid wrong default for Multisig DAOs
+  // This should be dynamic and set to 1% of the community mint supply or
+  // MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY when supply is 0
+  minCommunityTokensToCreateProposal: MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
@@ -37,6 +44,9 @@ const defaultFormValues = {
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const {
     realmInfo,
     realm,
@@ -78,10 +88,11 @@ const NewProgramForm = () => {
       setFormErrors(validationErrors)
       if (isValid && realmMint) {
         setIsLoading(true)
+
         const rpcContext = new RpcContext(
-          new PublicKey(realm.account.owner.toString()),
-          realmInfo?.programVersion,
-          wallet,
+          new PublicKey(realm.owner.toString()),
+          getProgramVersionForRealm(realmInfo!),
+          wallet!,
           connection.current,
           connection.endpoint
         )
@@ -94,14 +105,15 @@ const NewProgramForm = () => {
           mintDecimals: realmMint.decimals,
         }
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
-        await registerGovernance(
+        await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,
-          realm.pubkey,
+          realm,
           new PublicKey(form.programId),
           governanceConfig,
           form.transferAuthority,
-          tokenOwnerRecord!.pubkey
+          tokenOwnerRecord!.pubkey,
+          client
         )
         setIsLoading(false)
         fetchRealm(realmInfo!.programId, realmInfo!.realmId)
@@ -165,6 +177,16 @@ const NewProgramForm = () => {
       })
     }
   }, [form.programId])
+  useEffect(() => {
+    setForm({
+      ...form,
+      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+        ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+        : realmMint
+        ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
+        : 0,
+    })
+  }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />

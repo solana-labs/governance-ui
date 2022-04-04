@@ -1,24 +1,46 @@
-import { Keypair, Transaction, TransactionInstruction } from '@solana/web3.js'
+import {
+  Keypair,
+  PublicKey,
+  Transaction,
+  TransactionInstruction,
+} from '@solana/web3.js'
 
-import { RpcContext } from '../models/core/api'
-import { SignatoryRecord } from '@models/accounts'
-import { ParsedAccount } from 'models/core/accounts'
+import {
+  getGovernanceProgramVersion,
+  Proposal,
+  RpcContext,
+} from '@solana/spl-governance'
+import { SignatoryRecord } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
-import { withSignOffProposal } from '@models/withSignOffProposal'
+import { withSignOffProposal } from '@solana/spl-governance'
 
 export const signOffProposal = async (
-  { connection, wallet, programId, walletPubkey }: RpcContext,
-  signatoryRecord: ParsedAccount<SignatoryRecord>
+  { connection, wallet, programId }: RpcContext,
+  realmPk: PublicKey,
+  proposal: ProgramAccount<Proposal>,
+  signatoryRecord: ProgramAccount<SignatoryRecord>
 ) => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
 
+  // Explicitly request the version before making RPC calls to work around race conditions in resolving
+  // the version for RealmInfo
+  const programVersion = await getGovernanceProgramVersion(
+    connection,
+    programId
+  )
+
   withSignOffProposal(
     instructions,
     programId,
-    signatoryRecord?.info.proposal,
+    programVersion,
+    realmPk,
+    proposal.account.governance,
+    proposal.pubkey,
+    signatoryRecord.account.signatory,
     signatoryRecord?.pubkey,
-    walletPubkey
+    undefined
   )
 
   const transaction = new Transaction()

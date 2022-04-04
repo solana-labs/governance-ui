@@ -3,20 +3,21 @@ import Button from '../Button'
 import Input from '../inputs/Input'
 import useWalletStore from '../../stores/useWalletStore'
 import useRealm from '../../hooks/useRealm'
-import { RpcContext } from '../../models/core/api'
-import {
-  ChatMessageBody,
-  ChatMessageBodyType,
-} from '../../models/chat/accounts'
+import { RpcContext } from '@solana/spl-governance'
+import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
 import { postChatMessage } from '../../actions/chat/postMessage'
 import Loading from '../Loading'
 import Tooltip from '@components/Tooltip'
+import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const { ownVoterWeight, realmInfo } = useRealm()
-
+  const { ownVoterWeight, realmInfo, realm } = useRealm()
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const [submitting, setSubmitting] = useState(false)
 
   const wallet = useWalletStore((s) => s.current)
@@ -28,9 +29,9 @@ const DiscussionForm = () => {
     setSubmitting(true)
 
     const rpcContext = new RpcContext(
-      proposal!.account.owner,
-      realmInfo?.programVersion,
-      wallet,
+      proposal!.owner,
+      getProgramVersionForRealm(realmInfo!),
+      wallet!,
       connection.current,
       connection.endpoint
     )
@@ -43,9 +44,12 @@ const DiscussionForm = () => {
     try {
       await postChatMessage(
         rpcContext,
+        realm!,
         proposal!,
         ownVoterWeight.getTokenRecord(),
-        msg
+        msg,
+        undefined,
+        client
       )
 
       setComment('')

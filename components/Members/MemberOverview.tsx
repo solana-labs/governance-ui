@@ -1,87 +1,94 @@
+import { DisplayAddress } from '@cardinal/namespaces-components'
 import { getExplorerUrl } from '@components/explorer/tools'
 import {
-  ArrowLeftIcon,
+  ChatAltIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
   XCircleIcon,
-} from '@heroicons/react/solid'
+} from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { VoteRecord } from '@models/accounts'
-import { ChatMessage } from '@models/chat/accounts'
-import { getGovernanceChatMessagesByVoter } from '@models/chat/api'
-import { ParsedAccount } from '@models/core/accounts'
+import { getVoteRecordsByVoterMapByProposal } from '@models/api'
+import { isYesVote } from '@models/voteRecords'
+import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
+import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
+import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
+
 import { PublicKey } from '@solana/web3.js'
+import { tryParsePublicKey } from '@tools/core/pubkey'
+import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { fmtMintAmount } from '@tools/sdk/units'
-import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import tokenService from '@utils/services/token'
+import { Member } from '@utils/uiTypes/members'
 import React, { useEffect, useMemo, useState } from 'react'
-import useMembersListStore from 'stores/useMembersStore'
-import useWalletStore, { getVoteRecordsByProposal } from 'stores/useWalletStore'
-import { ViewState, WalletTokenRecordWithProposal } from './types'
+import useWalletStore from 'stores/useWalletStore'
+import { WalletTokenRecordWithProposal } from './types'
+import useMembers from '@components/Members/useMembers'
+import PaginationComponent from '@components/Pagination'
 
-const MemberOverview = () => {
-  const member = useMembersListStore((s) => s.compact.currentMember)
+const MemberOverview = ({ member }: { member: Member }) => {
+  const { realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()
-  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
-  const { walletAddress, community, council } = member!
   const { fmtUrlWithCluster } = useQueryContext()
-  const tokenName = tokenService.tokenList.find(
-    (x) => x.address === community?.info.governingTokenMint.toBase58()
-  )?.symbol
+  const { activeMembers } = useMembers()
   const [ownVoteRecords, setOwnVoteRecords] = useState<
     WalletTokenRecordWithProposal[]
   >([])
-  const totalCommunityVotes = community?.info.totalVotesCount || 0
-  const totalCouncilVotes = council?.info.totalVotesCount || 0
-  const totalVotes = totalCommunityVotes + totalCouncilVotes
+  const [recentVotes, setRecentVotes] = useState<
+    WalletTokenRecordWithProposal[]
+  >([])
+  const { walletAddress, councilVotes, communityVotes, votesCasted } = member
 
-  const communityAmount = community
-    ? useMemo(
-        () => fmtMintAmount(mint, community.info.governingTokenDepositAmount),
-        [community.info.governingTokenDepositAmount]
-      )
-    : null
-  const councilAmount = council
-    ? useMemo(
-        () =>
-          fmtMintAmount(councilMint, council.info.governingTokenDepositAmount),
-        [council.info.governingTokenDepositAmount]
-      )
-    : null
+  const walletPublicKey = tryParsePublicKey(walletAddress)
+  const tokenName = realm
+    ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
+    : ''
+  const communityAmount = useMemo(
+    () =>
+      communityVotes && communityVotes && !communityVotes.isZero()
+        ? fmtMintAmount(mint, communityVotes)
+        : '',
+    [walletAddress]
+  )
 
-  const handleGoBackToMainView = async () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
+  const councilAmount = useMemo(
+    () =>
+      councilVotes && councilVotes && !councilVotes.isZero()
+        ? fmtMintAmount(councilMint, councilVotes)
+        : '',
+    [walletAddress]
+  )
+
   const getVoteRecordsAndChatMsgs = async () => {
-    let voteRecords: { [pubKey: string]: ParsedAccount<VoteRecord> } = {}
-    let chat: { [pubKey: string]: ParsedAccount<ChatMessage> } = {}
+    let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
+    let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
     try {
-      const responsnes = await Promise.all([
-        getVoteRecordsByProposal(
+      const results = await Promise.all([
+        getVoteRecordsByVoterMapByProposal(
+          connection.current,
           selectedRealm!.programId!,
-          connection.endpoint,
-          new PublicKey(member!.walletAddress)
+          new PublicKey(walletAddress)
         ),
         getGovernanceChatMessagesByVoter(
-          connection!.endpoint,
-          new PublicKey(member!.walletAddress)
+          connection!.current,
+          GOVERNANCE_CHAT_PROGRAM_ID,
+          new PublicKey(walletAddress)
         ),
       ])
-      voteRecords = responsnes[0]
-      chat = responsnes[1]
+      voteRecords = results[0]
+      chatMessages = accountsToPubkeyMap(results[1])
     } catch (e) {
       notify({
         message: 'Unable to fetch vote records for selected wallet address',
         type: 'error',
       })
     }
-    return { voteRecords, chat }
+    return { voteRecords, chat: chatMessages }
   }
+
   useEffect(() => {
     //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
     const handleSetVoteRecords = async () => {
@@ -93,8 +100,8 @@ const MemberOverview = () => {
           const prevProposal = proposals[a]
           const nextProposal = proposals[b]
           return (
-            prevProposal?.info.getStateTimestamp() -
-            nextProposal?.info.getStateTimestamp()
+            prevProposal?.account.getStateTimestamp() -
+            nextProposal?.account.getStateTimestamp()
           )
         })
         .reverse()
@@ -103,15 +110,15 @@ const MemberOverview = () => {
           const currentProposal = proposals[x]
           const currentChatsMsgPk = Object.keys(chat).filter(
             (c) =>
-              chat[c]?.info.proposal.toBase58() ===
+              chat[c]?.account.proposal.toBase58() ===
               currentProposal?.pubkey.toBase58()
           )
           const currentChatMsgs = currentChatsMsgPk.map(
-            (c) => chat[c].info.body.value
+            (c) => chat[c].account.body.value
           )
           return {
             proposalPublicKey: x,
-            proposalName: currentProposal?.info.name,
+            proposalName: currentProposal?.account.name,
             chatMessages: currentChatMsgs,
             ...voteRecords[x],
           }
@@ -122,85 +129,141 @@ const MemberOverview = () => {
     handleSetVoteRecords()
   }, [walletAddress])
 
+  const memberVotePowerRank = useMemo(() => {
+    const sortedMembers = activeMembers.sort(
+      (a, b) => b.communityVotes.toNumber() - a.communityVotes.toNumber()
+    )
+    return (
+      sortedMembers.findIndex(
+        (m) => m.walletAddress === member?.walletAddress
+      ) + 1
+    )
+  }, [JSON.stringify(activeMembers)])
+
+  useEffect(() => {
+    setRecentVotes(paginateVotes(0))
+  }, [JSON.stringify(ownVoteRecords)])
+
+  const perPage = 8
+  const totalPages = Math.ceil(ownVoteRecords.length / perPage)
+  const onPageChange = (page) => {
+    setRecentVotes(paginateVotes(page))
+  }
+  const paginateVotes = (page) => {
+    return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
+  }
+
   return (
     <>
-      <h3 className="mb-4 flex items-center hover:cursor-pointer">
-        <>
-          <ArrowLeftIcon
-            onClick={handleGoBackToMainView}
-            className="h-4 w-4 mr-1 text-primary-light mr-2"
+      <div className="flex items-center justify-between mb-2 py-2">
+        <h2 className="mb-0">
+          <DisplayAddress
+            connection={connection.current}
+            address={walletPublicKey}
+            height="12px"
+            width="100px"
+            dark={true}
           />
-          {abbreviateAddress(new PublicKey(walletAddress))}
-        </>
-      </h3>
-      <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all flex">
-        <div>
-          {abbreviateAddress(new PublicKey(walletAddress))}
-          <div className="text-fgd-3 text-xs flex flex-col">
-            Votes cast: {totalVotes}
+        </h2>
+        <a
+          className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
+          href={
+            walletAddress
+              ? getExplorerUrl(connection.endpoint, walletAddress)
+              : ''
+          }
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={(e) => e.stopPropagation()}
+        >
+          Explorer
+          <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 w-4" />
+        </a>
+      </div>
+      <div className="flex flex-col space-y-3 md:space-y-0 md:flex-row md:space-x-3">
+        {(communityAmount || !councilAmount) && (
+          <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
+            <p>{tokenName} Votes</p>
+            <div className="font-bold text-fgd-1 text-2xl">
+              {communityAmount || 0}
+            </div>
+            <p>Vote Power Rank: {memberVotePowerRank}</p>
           </div>
-          <div className="text-fgd-3 text-xs flex flex-row">
-            {communityAmount && (
-              <span>
-                {tokenName} Votes {communityAmount}
-              </span>
-            )}
-            {communityAmount && council && <span className="ml-1 mr-1">|</span>}
-            {council && <span>Council Votes {councilAmount}</span>}
+        )}
+        {councilAmount && (
+          <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
+            <p>Council Votes</p>
+            <div className="font-bold text-fgd-1 text-2xl">{councilAmount}</div>
+          </div>
+        )}
+        <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
+          <p>Votes Cast</p>
+          <div className="font-bold text-fgd-1 text-2xl">{votesCasted}</div>
+          <div className="flex">
+            <p>
+              Yes Votes:{' '}
+              {ownVoteRecords.filter((v) => isYesVote(v.account))?.length}
+            </p>
+            <span className="px-2 text-fgd-4">|</span>
+            <p>
+              No Votes:{' '}
+              {ownVoteRecords.filter((v) => !isYesVote(v.account))?.length}
+            </p>
           </div>
         </div>
-        <div className="ml-auto">
-          <a
-            href={
-              walletAddress
-                ? getExplorerUrl(connection.endpoint, walletAddress)
-                : ''
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
-          </a>
-        </div>
       </div>
-      <div className="font-normal mr-1 text-xs text-fgd-3 mb-4 mt-4">
-        Recent votes
-      </div>
-      {/* TODO virtual scroll */}
-      <div style={{ maxHeight: '350px' }} className="overflow-auto">
-        {ownVoteRecords.map((x) => (
+      <div className="pt-4">
+        <h3 className="mb-3 text-base">
+          {ownVoteRecords?.length} Recent Votes
+        </h3>
+        {recentVotes.map((x) => (
           <a
             href={fmtUrlWithCluster(
               `/dao/${symbol}/proposal/${x.proposalPublicKey}`
             )}
             rel="noopener noreferrer"
-            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
+            className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 p-4 text-xs text-th-fgd-1 mb-2 block"
             key={x.proposalPublicKey}
           >
-            <div className="w-full pr-6">
-              <div className="break-all mb-2">
-                {x.proposalName.slice(0, 30)}
-                {x.proposalName.length > 30 ? '...' : ''}
-              </div>
-              {x.chatMessages.map((msg, index) => (
-                <div
-                  key={index}
-                  className={`text-xs text-fgd-3 text-xs p-2 border-t border-fgd-4`}
-                >
-                  {msg}
-                </div>
-              ))}
-            </div>
-            <div className="ml-auto text-fgd-3 text-xs flex flex-col">
-              {x.info.isYes() ? (
-                <CheckCircleIcon className="h-4 mr-1 text-green w-4" />
+            <div className="flex items-center justify-between">
+              <p className="font-bold mb-0 text-fgd-1">{x.proposalName}</p>
+              {isYesVote(x.account) ? (
+                <p className="bg-bkg-4 flex items-center mb-0 ml-4 px-2 py-1 rounded-full text-xs whitespace-nowrap">
+                  <CheckCircleIcon className="flex-shrink-0 h-5 mr-1 text-green w-5" />
+                  Voted Yes
+                </p>
               ) : (
-                <XCircleIcon className="h-4 mr-1 text-red w-4" />
+                <p className="bg-bkg-4 flex items-center mb-0 ml-4 px-2 py-1 rounded-full text-xs whitespace-nowrap">
+                  <XCircleIcon className="flex-shrink-0 h-5 mr-1 text-red w-5" />
+                  Voted No
+                </p>
               )}
             </div>
+            {x.chatMessages?.length > 0 ? (
+              <>
+                {x.chatMessages.map((msg, index) => (
+                  <div
+                    className="bg-bkg-1 space-y-2 mt-2 px-4 py-3 rounded-md"
+                    key={index}
+                  >
+                    <p
+                      className={`flex items-center text-xs text-fgd-3 text-xs`}
+                    >
+                      <ChatAltIcon className="flex-shrink-0 h-5 mr-1.5 text-fgd-2 w-5" />
+                      {msg}
+                    </p>
+                  </div>
+                ))}
+              </>
+            ) : null}
           </a>
         ))}
+        <div>
+          <PaginationComponent
+            totalPages={totalPages}
+            onPageChange={onPageChange}
+          ></PaginationComponent>
+        </div>
       </div>
     </>
   )

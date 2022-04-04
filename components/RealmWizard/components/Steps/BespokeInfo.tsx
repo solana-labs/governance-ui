@@ -3,8 +3,10 @@ import Divider from '@components/Divider'
 import Input from '@components/inputs/Input'
 import { StyledLabel } from '@components/inputs/styles'
 import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import React from 'react'
 import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
+import { getMintSupplyFactorPercent } from './BespokeConfig'
 
 const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -15,7 +17,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
     <>
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Realm summary</h1>
+          <h1>DAO summary</h1>
         </div>
       </div>
       <div>
@@ -87,7 +89,11 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     readOnly
                     label="Min community tokens to create governance"
                     placeholder="Min community tokens to create governance"
-                    value={form.minCommunityTokensToCreateGovernance}
+                    value={
+                      form.minCommunityTokensToCreateGovernance
+                        ? form.minCommunityTokensToCreateGovernance
+                        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+                    }
                     error={formErrors['minCommunityTokensToCreateGovernance']}
                     type="text"
                   />
@@ -98,7 +104,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                     className="border-none py-1 bg-transparent"
                     readOnly
                     label="Community mint supply factor (max vote weight)"
-                    value={form.communityMintMaxVoteWeightSource}
+                    value={getMintSupplyFactorPercent(form)}
                     error={formErrors['communityMintMaxVoteWeightSource']}
                     type="text"
                   />
@@ -119,18 +125,6 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                   </div>
                 </div>
               </div>
-            </div>
-            <div className="pt-4 pr-10 mr-2">
-              <Input
-                disabled
-                className="border-none py-1 bg-transparent"
-                readOnly
-                label="Governance program version"
-                placeholder={1}
-                value={'V' + (form?.programVersion ?? 1)}
-                error={formErrors['programVersion']}
-                type="text"
-              />
             </div>
           </div>
         </div>

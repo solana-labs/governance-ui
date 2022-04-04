@@ -1,9 +1,9 @@
 import { PublicKey } from '@solana/web3.js'
 import axios from 'axios'
 import { getConnectionContext } from 'utils/connection'
-import { pubkeyFilter } from 'models/core/api'
-import { getAccountTypes, Governance, Proposal } from '../models/accounts'
-import { ParsedAccount } from '../models/core/accounts'
+import { pubkeyFilter } from '@solana/spl-governance'
+import { getAccountTypes, Governance, Proposal } from '@solana/spl-governance'
+import { ProgramAccount } from '@solana/spl-governance'
 import { getCertifiedRealmInfo } from '../models/registry/api'
 import { getGovernanceAccounts } from './api'
 
@@ -21,7 +21,8 @@ function errorWrapper() {
 async function runNotifier() {
   const nowInSeconds = new Date().getTime() / 1000
 
-  const MAINNET_RPC_NODE = 'https://api.mainnet-beta.solana.com'
+  const MAINNET_RPC_NODE =
+    process.env.CLUSTER_URL || 'https://api.mainnet-beta.solana.com'
   const connectionContext = getConnectionContext('mainnet')
 
   const REALM_SYMBOL = process.env.REALM_SYMBOL || 'MNGO'
@@ -32,7 +33,7 @@ async function runNotifier() {
     MAINNET_RPC_NODE,
     Governance,
     getAccountTypes(Governance),
-    [pubkeyFilter(1, realmInfo!.realmId)]
+    [pubkeyFilter(1, realmInfo!.realmId)!]
   )
 
   const governanceIds = Object.keys(governances).map((k) => new PublicKey(k))
@@ -44,24 +45,24 @@ async function runNotifier() {
         MAINNET_RPC_NODE,
         Proposal,
         getAccountTypes(Proposal),
-        [pubkeyFilter(1, governanceId)]
+        [pubkeyFilter(1, governanceId)!]
       )
     })
   )
 
   const proposals: {
-    [proposal: string]: ParsedAccount<Proposal>
+    [proposal: string]: ProgramAccount<Proposal>
   } = Object.assign({}, ...proposalsByGovernance)
 
   const realmGovernances = Object.fromEntries(
     Object.entries(governances).filter(([_k, v]) =>
-      v.info.realm.equals(realmInfo!.realmId)
+      v.account.realm.equals(realmInfo!.realmId)
     )
   )
 
   const realmProposals = Object.fromEntries(
     Object.entries(proposals).filter(([_k, v]) =>
-      Object.keys(realmGovernances).includes(v.info.governance.toBase58())
+      Object.keys(realmGovernances).includes(v.account.governance.toBase58())
     )
   )
 
@@ -74,7 +75,7 @@ async function runNotifier() {
 
     if (
       // voting is closed
-      proposal.info.votingCompletedAt
+      proposal.account.votingCompletedAt
     ) {
       countClosed++
       continue
@@ -82,7 +83,7 @@ async function runNotifier() {
 
     if (
       // voting has not started yet
-      !proposal.info.votingAt
+      !proposal.account.votingAt
     ) {
       countVotingNotStartedYet++
       continue
@@ -90,7 +91,7 @@ async function runNotifier() {
 
     if (
       // proposal opened in last 5 mins
-      nowInSeconds - proposal.info.votingAt.toNumber() <=
+      nowInSeconds - proposal.account.votingAt.toNumber() <=
       fiveMinutesSeconds + toleranceSeconds
       // proposal opened in last 24 hrs - useful to notify when bot recently stopped working
       // and missed the 5 min window
@@ -100,7 +101,7 @@ async function runNotifier() {
       countJustOpenedForVoting++
 
       const msg = `“${
-        proposal.info.name
+        proposal.account.name
       }” proposal just opened for voting 🗳 https://dao-beta.mango.markets/dao/${escape(
         REALM_SYMBOL
       )}/proposal/${k}`

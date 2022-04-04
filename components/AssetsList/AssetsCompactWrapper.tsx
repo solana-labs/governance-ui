@@ -1,19 +1,23 @@
-import React, { useEffect } from 'react'
-import useAssetsStore from 'stores/useAssetsStore'
-import { ViewState } from './types'
-import MembersItems from './AssetsList'
-import { PlusIcon } from '@heroicons/react/outline'
-import Tooltip from '@components/Tooltip'
+import React from 'react'
+import AssetsList from './AssetsList'
+import { ChevronRightIcon } from '@heroicons/react/solid'
 import useRealm from '@hooks/useRealm'
-import AssetOverview from './AssetOverview'
 import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
-import UpgradeProgram from './UpgradeProgram'
 import useWalletStore from 'stores/useWalletStore'
-const NEW_PROGRAM_VIEW = `/program/new`
+import Link from 'next/link'
+import { useRouter } from 'next/router'
+import { TerminalIcon } from '@heroicons/react/outline'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { GovernanceAccountType } from '@solana/spl-governance'
+import EmptyState from '@components/EmptyState'
+import {
+  NEW_PROGRAM_VIEW,
+  renderAddNewAssetTooltip,
+} from 'pages/dao/[symbol]/assets'
 
 const AssetsCompactWrapper = () => {
   const router = useRouter()
+  const { fmtUrlWithCluster } = useQueryContext()
   const {
     symbol,
     realm,
@@ -22,73 +26,56 @@ const AssetsCompactWrapper = () => {
     toManyCouncilOutstandingProposalsForUse,
   } = useRealm()
   const connected = useWalletStore((s) => s.connected)
-  const { resetCompactViewState } = useAssetsStore()
-  const currentView = useAssetsStore((s) => s.compact.currentView)
-  const { fmtUrlWithCluster } = useQueryContext()
-  const goToNewAssetForm = () => {
-    router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
-  }
   const canCreateGovernance = realm
     ? ownVoterWeight.canCreateGovernance(realm)
     : null
 
-  const addNewAssetTooltip = !connected
-    ? 'Connect your wallet to create new asset'
-    : !canCreateGovernance
-    ? "You don't have enough governance power to create a new asset"
-    : toManyCommunityOutstandingProposalsForUser
-    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new asset.'
-    : toManyCouncilOutstandingProposalsForUse
-    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new asset.'
-    : ''
+  const newAssetToolTip = renderAddNewAssetTooltip(
+    connected,
+    canCreateGovernance,
+    toManyCommunityOutstandingProposalsForUser,
+    toManyCouncilOutstandingProposalsForUse
+  )
 
-  useEffect(() => {
-    resetCompactViewState()
-  }, [symbol])
-  const getCurrentView = () => {
-    switch (currentView) {
-      case ViewState.MainView:
-        return (
-          <>
-            <h3 className="mb-4 flex items-center">
-              Assets
-              <Tooltip contentClassName="ml-auto" content={addNewAssetTooltip}>
-                <div
-                  onClick={goToNewAssetForm}
-                  className={`bg-bkg-2 default-transition 
-                flex flex-col items-center justify-center
-                rounded-lg hover:bg-bkg-3 ml-auto ${
-                  addNewAssetTooltip
-                    ? 'cursor-not-allowed pointer-events-none opacity-60'
-                    : 'cursor-pointer'
-                }`}
-                >
-                  <div
-                    className="bg-[rgba(255,255,255,0.06)] h-6 w-6 flex 
-                font-bold items-center justify-center 
-                rounded-full text-fgd-3"
-                  >
-                    <PlusIcon />
-                  </div>
-                </div>
-              </Tooltip>
-            </h3>
-            <div style={{ maxHeight: '350px' }}>
-              <MembersItems></MembersItems>
-            </div>
-          </>
-        )
-      case ViewState.AssetOverview:
-        return <AssetOverview></AssetOverview>
-      case ViewState.Upgrade:
-        return <UpgradeProgram></UpgradeProgram>
-    }
+  const goToNewAssetForm = () => {
+    router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_PROGRAM_VIEW}`))
   }
-  useEffect(() => {
-    resetCompactViewState()
-  }, [symbol])
+  const { getGovernancesByAccountTypes } = useGovernanceAssets()
+  const programGovernances = getGovernancesByAccountTypes([
+    GovernanceAccountType.ProgramGovernanceV1,
+    GovernanceAccountType.ProgramGovernanceV2,
+  ])
+
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+      <div className="flex items-center justify-between pb-4">
+        <h3 className="mb-0">Programs</h3>
+        {programGovernances.length > 0 ? (
+          <Link href={fmtUrlWithCluster(`/dao/${symbol}/assets`)}>
+            <a
+              className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3`}
+            >
+              View
+              <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+            </a>
+          </Link>
+        ) : null}
+      </div>
+      {programGovernances.length > 0 ? (
+        <div className="overflow-y-auto" style={{ maxHeight: '350px' }}>
+          <AssetsList panelView />
+        </div>
+      ) : (
+        <EmptyState
+          desc="No programs found"
+          disableButton={!!newAssetToolTip}
+          buttonText="New Program"
+          icon={<TerminalIcon />}
+          onClickButton={goToNewAssetForm}
+          toolTipContent={newAssetToolTip}
+        />
+      )}
+    </div>
   )
 }
 
