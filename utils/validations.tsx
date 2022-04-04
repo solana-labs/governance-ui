@@ -244,11 +244,13 @@ export const getTokenTransferSchema = ({
   connection,
   tokenAmount,
   mintDecimals,
+  nftMode,
 }: {
   form: any
   connection: ConnectionContext
   tokenAmount?: BN
   mintDecimals?: number
+  nftMode?: boolean
 }) => {
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
   return yup.object().shape({
@@ -260,7 +262,7 @@ export const getTokenTransferSchema = ({
         'amount',
         'Transfer amount must be less than the source account available amount',
         async function (val: number) {
-          const isNft = governedTokenAccount?.isNft
+          const isNft = nftMode || governedTokenAccount?.isNft
           if (isNft) {
             return true
           }

@@ -21,7 +21,7 @@ const AccountItemNFT = ({
   const { setCurrentAccount } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount
-    ? governedAccountTokenAccount.governance.pubkey
+    ? governedAccountTokenAccount.extensions.transferAddress
     : null
   //TODO move to outside component
   async function handleGoToAccountOverview() {

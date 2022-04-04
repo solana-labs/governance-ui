@@ -190,7 +190,7 @@ const gallery = () => {
           onClose={handleCloseSendModal}
           isOpen={openSendNftsModal}
         >
-          <SendTokens></SendTokens>
+          <SendTokens isNft></SendTokens>
         </Modal>
       )}
     </div>

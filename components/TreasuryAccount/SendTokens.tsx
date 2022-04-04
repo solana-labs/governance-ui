@@ -51,7 +51,7 @@ import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
 import NFTAccountSelect from './NFTAccountSelect'
 
-const SendTokens = () => {
+const SendTokens = ({ isNft = false }) => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
@@ -60,7 +60,7 @@ const SendTokens = () => {
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
-  const isNFT = currentAccount?.isNft
+  const isNFT = isNft || currentAccount?.isNft
   const isSol = currentAccount?.isSol
   const { fmtUrlWithCluster } = useQueryContext()
   const wallet = useWalletStore((s) => s.current)
@@ -138,7 +138,6 @@ const SendTokens = () => {
       connection,
       wallet,
       currentAccount,
-
       setFormErrors,
     }
     if (isNFT) {
@@ -231,7 +230,7 @@ const SendTokens = () => {
     }
   }, [form.destinationAccount])
 
-  const schema = getTokenTransferSchema({ form, connection })
+  const schema = getTokenTransferSchema({ form, connection, nftMode: isNft })
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   const nftName = selectedNfts[0]?.val?.name
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
