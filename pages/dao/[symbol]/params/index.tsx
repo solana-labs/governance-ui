@@ -17,14 +17,13 @@ import { tryParsePublicKey } from '@tools/core/pubkey'
 import { getAccountName } from '@components/instructions/tools'
 import useWalletStore from 'stores/useWalletStore'
 import SetRealmAuthorityModal from './SetRealmAuthorityModal'
-import BigNumber from 'bignumber.js'
 
 import ParamsView from './components/ParamsView'
 import AccountsView from './components/AccountsView'
 import StatsView from './components/StatsView'
 
 const Params = () => {
-  const { realm, mint, councilMint, ownVoterWeight } = useRealm()
+  const { realm, mint } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const { canUseAuthorityInstruction } = useGovernanceAssets()
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
@@ -287,7 +286,7 @@ const Params = () => {
   )
 }
 
-const DisplayField = ({ label, val, padding = false, bg = false }) => {
+export const DisplayField = ({ label, val, padding = false, bg = false }) => {
   const pubkey = tryParsePublicKey(val)
   const name = pubkey ? getAccountName(pubkey) : ''
   return (
