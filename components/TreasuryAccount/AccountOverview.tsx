@@ -35,7 +35,6 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
-import TokenAccounts from './TokenAccounts'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -292,14 +291,6 @@ const AccountOverview = () => {
           </div>
         )}
       </div>
-      {/* Only display owned token accounts if is SOL */}
-      {isSol && (
-        <div className="pb-8">
-          <h3 className="mb-4">Associated Token Accounts</h3>
-          <TokenAccounts setSendTokenInfo={setGenericSendTokenInfo} />
-        </div>
-      )}
-
       <h3 className="mb-4">Recent Activity</h3>
       <div>
         {isLoadingRecentActivity ? (

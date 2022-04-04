@@ -3,6 +3,8 @@ import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import tokenService from '@utils/services/token'
+import { WSOL_MINT } from '@components/instructions/tools'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
@@ -25,6 +27,9 @@ const AccountItemNFT = ({
   async function handleGoToAccountOverview() {
     setCurrentAccount(governedAccountTokenAccount, connection)
   }
+  const info = governedAccountTokenAccount.isSol
+    ? tokenService.getTokenInfo(WSOL_MINT)
+    : undefined
   return (
     <div
       onClick={onClick ? onClick : handleGoToAccountOverview}
@@ -34,10 +39,18 @@ const AccountItemNFT = ({
         className && className
       }`}
     >
-      <img
-        src="/img/collectablesIcon.svg"
-        className="flex-shrink-0 h-5 w-5 mr-2.5"
-      />
+      {governedAccountTokenAccount.isSol ? (
+        <img
+          src={info?.logoURI}
+          className="flex-shrink-0 h-5 w-5 mr-2.5 rounded-full"
+        />
+      ) : (
+        <img
+          src="/img/collectablesIcon.svg"
+          className="flex-shrink-0 h-5 w-5 mr-2.5"
+        />
+      )}
+
       <div className="w-full">
         <div className="flex items-start justify-between mb-0.5">
           <div className="text-xs text-th-fgd-1">

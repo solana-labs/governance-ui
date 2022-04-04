@@ -16,12 +16,17 @@ import ImgWithLoader from '@components/ImgWithLoader'
 import Modal from '@components/Modal'
 import DepositNFT from '@components/TreasuryAccount/DepositNFT'
 import { LinkButton } from '@components/Button'
+import SendTokens from '@components/TreasuryAccount/SendTokens'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 
 const gallery = () => {
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
+  const isLoadingGovernances = useGovernanceAssetsStore(
+    (s) => s.loadGovernedAccounts
+  )
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const { symbol } = useRealm()
   const governancePk = router?.query?.governancePk
@@ -32,10 +37,15 @@ const gallery = () => {
     (x) => x.governance?.pubkey.toBase58() === governancePk
   )
   const { setCurrentAccount } = useTreasuryAccountStore()
+
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+  const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
   const handleCloseModal = () => {
     setOpenNftDepositModal(false)
+  }
+  const handleCloseSendModal = () => {
+    setOpenSendNftsModal(false)
   }
   useEffect(() => {
     const governedNfts = governanceNfts[governancePk as string]
@@ -55,16 +65,28 @@ const gallery = () => {
           <div className="flex flex-col sm:flex-row sm:items-center mb-4 sm:space-x-6">
             <div className="flex items-center justify-between w-full">
               <h1 className="mb-0">NFTs</h1>
-              <LinkButton
-                onClick={() => {
-                  setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
-                  setOpenNftDepositModal(true)
-                }}
-                className="flex items-center text-primary-light whitespace-nowrap"
-              >
-                <PlusCircleIcon className="h-5 mr-2 w-5" />
-                Deposit NFT
-              </LinkButton>
+              <div className="flex ">
+                <LinkButton
+                  onClick={() => {
+                    setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
+                    setOpenSendNftsModal(true)
+                  }}
+                  className="flex items-center text-primary-light whitespace-nowrap mr-3"
+                >
+                  <PlusCircleIcon className="h-5 mr-2 w-5" />
+                  Send NFT
+                </LinkButton>
+                <LinkButton
+                  onClick={() => {
+                    setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
+                    setOpenNftDepositModal(true)
+                  }}
+                  className="flex items-center text-primary-light whitespace-nowrap"
+                >
+                  <PlusCircleIcon className="h-5 mr-2 w-5" />
+                  Deposit NFT
+                </LinkButton>
+              </div>
             </div>
             <Select
               className="sm:w-44 mt-2 sm:mt-0"
@@ -84,7 +106,9 @@ const gallery = () => {
                 ) : (
                   <div>
                     <div className="mb-0.5 text-xs text-fgd-1">Show All</div>
-                    <div className="text-xs text-fgd-3">{nfts.length} NFTs</div>
+                    <div className="text-xs text-fgd-3">
+                      {realmNfts.length} NFTs
+                    </div>
                   </div>
                 )
               }
@@ -95,7 +119,9 @@ const gallery = () => {
               >
                 <div>
                   <div className="mb-0.5 text-xs text-fgd-1">Show All</div>
-                  <div className="text-xs text-fgd-3">{nfts.length} NFTs</div>
+                  <div className="text-xs text-fgd-3">
+                    {realmNfts.length} NFTs
+                  </div>
                 </div>
               </Select.Option>
 
@@ -114,7 +140,7 @@ const gallery = () => {
             </Select>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 grid-flow-row gap-6">
-            {isLoading ? (
+            {isLoading || isLoadingGovernances ? (
               <>
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
                 <div className="animate-pulse bg-bkg-3 col-span-1 h-48 rounded-lg" />
@@ -156,6 +182,15 @@ const gallery = () => {
           isOpen={openNftDepositModal}
         >
           <DepositNFT onClose={handleCloseModal}></DepositNFT>
+        </Modal>
+      )}
+      {openSendNftsModal && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={handleCloseSendModal}
+          isOpen={openSendNftsModal}
+        >
+          <SendTokens></SendTokens>
         </Modal>
       )}
     </div>

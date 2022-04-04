@@ -95,7 +95,9 @@ export default function useGovernanceAssets() {
     (x) => x.type !== AccountType.NFT
   )
   const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (govTokenAcc) => govTokenAcc.type === AccountType.NFT
+    (govTokenAcc) =>
+      govTokenAcc.type === AccountType.NFT ||
+      govTokenAcc.type === AccountType.SOL
   )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
     (acc) => {

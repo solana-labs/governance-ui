@@ -21,7 +21,7 @@ export const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -34,7 +34,6 @@ const Treasury = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const [treasuryAccounts, setTreasuryAccounts] = useState<AssetAccount[]>([])
   const [activeAccount, setActiveAccount] = useState<AssetAccount | null>(null)
   const [accountInfo, setAccountInfo] = useState<any>(null)
@@ -42,22 +41,26 @@ const Treasury = () => {
   useEffect(() => {
     if (
       tokenService._tokenList.length &&
-      governedTokenAccounts.filter((x) => x.extensions.mint).length
+      governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length
     ) {
       getStrategies(connection)
     }
   }, [
     tokenService._tokenList.length,
-    governedTokenAccounts.filter((x) => x.extensions.mint).length,
+    governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length,
   ])
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      if (governedTokenAccounts.every((x) => x.extensions.transferAddress)) {
-        setTreasuryAccounts(governedTokenAccounts)
+      if (
+        governedTokenAccountsWithoutNfts.every(
+          (x) => x.extensions.transferAddress
+        )
+      ) {
+        setTreasuryAccounts(governedTokenAccountsWithoutNfts)
       }
     }
     prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccounts)])
+  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
 
   useEffect(() => {
     if (treasuryAccounts.length > 0 && treasuryAccounts[0].extensions.mint) {
@@ -90,7 +93,7 @@ const Treasury = () => {
 
   useEffect(() => {
     if (activeAccount) {
-      const info = getTreasuryAccountItemInfo(activeAccount, governanceNfts)
+      const info = getTreasuryAccountItemInfo(activeAccount, {})
       setAccountInfo(info)
     }
   }, [activeAccount])
@@ -147,10 +150,7 @@ const Treasury = () => {
                   onChange={(g) =>
                     handleChangeAccountTab(
                       treasuryAccounts.find((acc) => {
-                        const info = getTreasuryAccountItemInfo(
-                          acc,
-                          governanceNfts
-                        )
+                        const info = getTreasuryAccountItemInfo(acc, {})
                         return info.accountName === g
                       })
                     )
@@ -159,10 +159,7 @@ const Treasury = () => {
                   value={accountInfo?.accountName}
                 >
                   {treasuryAccounts.map((x) => {
-                    const { name } = getTreasuryAccountItemInfo(
-                      x,
-                      governanceNfts
-                    )
+                    const { name } = getTreasuryAccountItemInfo(x, {})
                     return (
                       <Select.Option
                         key={x?.extensions.transferAddress?.toBase58()}
