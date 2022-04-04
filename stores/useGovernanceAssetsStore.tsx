@@ -398,14 +398,15 @@ const getAccountsForGovernances = async (
     ]),
   })
   const tokenAccountsJson = getOwnedTokenAccounts.data
-  const tokenAccounts = tokenAccountsJson
-    .flatMap((x) => x.result)
-    .map((x) => {
-      const publicKey = new PublicKey(x.pubkey)
-      const data = Buffer.from(x.account.data[0], 'base64')
-      const account = parseTokenAccountData(publicKey, data)
-      return { publicKey, account }
-    })
+  const tokenAccounts =
+    tokenAccountsJson
+      ?.flatMap((x) => x.result)
+      .map((x) => {
+        const publicKey = new PublicKey(x.pubkey)
+        const data = Buffer.from(x.account.data[0], 'base64')
+        const account = parseTokenAccountData(publicKey, data)
+        return { publicKey, account }
+      }) || []
 
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccounts,
