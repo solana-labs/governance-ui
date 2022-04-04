@@ -49,10 +49,13 @@ import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import NFTSelector from '@components/NFTS/NFTSelector'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
 import useCreateProposal from '@hooks/useCreateProposal'
+import NFTAccountSelect from './NFTAccountSelect'
 
 const SendTokens = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const connection = useWalletStore((s) => s.connection)
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const { setCurrentAccount } = useTreasuryAccountStore()
   const { realmInfo, symbol, realm, canChooseWhoVote } = useRealm()
   const { handleCreateProposal } = useCreateProposal()
   const { canUseTransferInstruction } = useGovernanceAssets()
@@ -253,7 +256,15 @@ const SendTokens = () => {
           Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
         </>
       </h3>
-      <AccountLabel></AccountLabel>
+      {isNFT ? (
+        <NFTAccountSelect
+          onChange={(value) => setCurrentAccount(value, connection)}
+          currentAccount={currentAccount}
+          nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
+        ></NFTAccountSelect>
+      ) : (
+        <AccountLabel></AccountLabel>
+      )}
       <div className="space-y-4 w-full pb-4">
         <Input
           label="Destination account"
