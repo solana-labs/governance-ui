@@ -1,3 +1,4 @@
+import _ from 'lodash'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
   governance as foresightGov,
@@ -123,19 +124,40 @@ function makeGetInstruction<T extends ForesightHasGovernedAccount>(
   return getInstruction
 }
 
+type NonDefault<T extends ForesightHasGovernedAccount> = Omit<
+  T,
+  'governedAccount'
+>
+type ValueOf<T> = T[keyof T]
+type AllowedSchema = NumberSchema<any> | StringSchema<any>
+
+function defaultValToYupSchema<T extends ForesightHasGovernedAccount>(
+  val: ValueOf<NonDefault<T>>
+): AllowedSchema {
+  if (typeof val === 'number') {
+    return yup.number().required()
+  }
+  return yup.string().required()
+}
+
+type formEntryToSchema<T extends ForesightHasGovernedAccount> = {
+  [name in keyof NonDefault<T>]: AllowedSchema
+}
+
 export function commonAssets<T extends ForesightHasGovernedAccount>(
-  formDefaults: Omit<T, 'governedAccount'>,
+  formDefaults: NonDefault<T>,
   index: number,
   governance: ProgramAccount<Governance> | null
 ): {
   inputProps: InputProps<T>
-  effector: (
-    ixCreator: IxCreator<T>,
-    schema: ObjectSchema<any>,
-    index: number
-  ) => void
+  effector: (ixCreator: IxCreator<T>) => void
   governedAccountSelect: JSX.Element
 } {
+  const extraSchemaFields: formEntryToSchema<T> = _.mapValues(
+    formDefaults,
+    defaultValToYupSchema
+  )
+  const schema = getSchema<T>(extraSchemaFields)
   const wallet = useWalletStore((s) => s.current)
   const filteredTokenAccounts = getFilteredTokenAccounts()
   const [formErrors, setFormErrors] = useState({})
@@ -154,11 +176,7 @@ export function commonAssets<T extends ForesightHasGovernedAccount>(
     handleSetForm,
     formErrors,
   }
-  function effector(
-    ixCreator: IxCreator<T>,
-    schema: ObjectSchema<any>,
-    index: number
-  ): void {
+  function effector(ixCreator: IxCreator<T>): void {
     ForesightUseEffects(
       handleSetForm,
       form,
@@ -221,9 +239,11 @@ function ForesightUseEffects<T extends ForesightHasGovernedAccount>(
   }, [form])
 }
 
-export function getSchema(extraFields: {
-  [name: string]: StringSchema | NumberSchema
-}) {
+export function getSchema<T extends ForesightHasGovernedAccount>(
+  extraFields: {
+    [name in keyof Omit<T, 'governedAccount'>]: StringSchema | NumberSchema
+  }
+) {
   return yup.object().shape({
     governedAccount: yup
       .object()

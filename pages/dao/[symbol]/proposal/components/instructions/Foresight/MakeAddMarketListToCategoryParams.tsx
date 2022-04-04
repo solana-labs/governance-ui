@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
-import * as yup from 'yup'
 import { ForesightMakeAddMarketListToCategoryParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -12,7 +11,6 @@ import {
   commonAssets,
   ForesightCategoryIdInput,
   ForesightMarketListIdInput,
-  getSchema,
 } from './utils'
 
 function MakeAddMarketListToCategoryParams({
@@ -31,10 +29,6 @@ function MakeAddMarketListToCategoryParams({
     index,
     governance
   )
-  const schema = getSchema({
-    categoryId: yup.string().required(),
-    marketListId: yup.string().required(),
-  })
   async function ixCreator(
     form: ForesightMakeAddMarketListToCategoryParams,
     program: foresightTypes.PredictionMarketProgram
@@ -47,7 +41,7 @@ function MakeAddMarketListToCategoryParams({
     )
     return ix
   }
-  effector(ixCreator, schema, index)
+  effector(ixCreator)
 
   return (
     <>

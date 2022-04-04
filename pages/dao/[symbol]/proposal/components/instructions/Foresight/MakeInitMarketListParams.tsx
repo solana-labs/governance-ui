@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
-import * as yup from 'yup'
 import { ForesightHasMarketListId } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -26,9 +25,6 @@ const MakeInitMarketListParams = ({
     index,
     governance
   )
-  const schema = getSchema({
-    marketListId: yup.string().required(),
-  })
   async function ixCreator(
     form: ForesightHasMarketListId,
     program: foresightTypes.PredictionMarketProgram
@@ -40,7 +36,7 @@ const MakeInitMarketListParams = ({
     )
     return ix
   }
-  effector(ixCreator, schema, index)
+  effector(ixCreator)
 
   return (
     <>

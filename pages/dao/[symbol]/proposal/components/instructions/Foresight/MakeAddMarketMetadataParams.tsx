@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React from 'react'
-import * as yup from 'yup'
 import { ForesightMakeAddMarketMetadataParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
@@ -15,7 +14,6 @@ import {
   ForesightMarketIdInput,
   ForesightMarketListIdInput,
   ForesightMarketMetadataFieldSelect,
-  getSchema,
 } from './utils'
 
 const MakeAddMarketMetadataParams = ({
@@ -41,11 +39,6 @@ const MakeAddMarketMetadataParams = ({
     index,
     governance
   )
-  const schema = getSchema({
-    marketId: yup.number().required(),
-    marketListId: yup.string().required(),
-    content: yup.string().required(),
-  })
   async function ixCreator(
     form: ForesightMakeAddMarketMetadataParams,
     program: foresightTypes.PredictionMarketProgram
@@ -61,7 +54,7 @@ const MakeAddMarketMetadataParams = ({
     )
     return ix
   }
-  effector(ixCreator, schema, index)
+  effector(ixCreator)
   return (
     <>
       {governedAccountSelect}
