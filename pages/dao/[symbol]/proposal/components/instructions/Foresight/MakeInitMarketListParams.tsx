@@ -7,7 +7,7 @@ import {
   governance as foresightGov,
   types as foresightTypes,
 } from '@foresight-tmp/foresight-sdk'
-import { commonAssets, ForesightMarketListIdInput, getSchema } from './utils'
+import { commonAssets, ForesightMarketListIdInput } from './utils'
 
 const MakeInitMarketListParams = ({
   index,

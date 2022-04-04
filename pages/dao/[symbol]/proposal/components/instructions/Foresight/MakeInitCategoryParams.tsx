@@ -7,7 +7,7 @@ import {
   governance as foresightGov,
   types as foresightTypes,
 } from '@foresight-tmp/foresight-sdk'
-import { commonAssets, ForesightCategoryIdInput, getSchema } from './utils'
+import { commonAssets, ForesightCategoryIdInput } from './utils'
 
 const MakeInitCategoryParams = ({
   index,
