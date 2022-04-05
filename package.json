@@ -51,7 +51,7 @@
     "@solendprotocol/solend-sdk": "^0.4.9",
     "@tippyjs/react": "^4.2.5",
     "axios": "^0.21.1",
-    "bignumber.js": "^9.0.1",
+    "bignumber.js": "^9.0.2",
     "buffer-layout": "^1.2.2",
     "classnames": "^2.3.1",
     "dayjs": "^1.10.7",
