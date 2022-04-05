@@ -215,10 +215,17 @@ export default function useMembers() {
       members = matchMembers(members, communityMembers, 'community')
       setMembers(members)
     }
-    if (realm?.pubkey && previousRealmPubKey !== realm?.pubkey.toBase58()) {
+    if (
+      realm?.pubkey &&
+      previousRealmPubKey !== realm?.pubkey.toBase58() &&
+      !realm?.account.config.useCommunityVoterWeightAddin
+    ) {
       handleSetMembers()
     }
-    if (!realm?.pubkey) {
+    if (
+      !realm?.pubkey ||
+      (realm.pubkey && realm?.account.config.useCommunityVoterWeightAddin)
+    ) {
       setMembers([])
     }
   }, [realm?.pubkey.toBase58()])
