@@ -121,11 +121,11 @@ export const calculateAllDepositsInMangoAccountsForMint = (
   market: MarketStore
 ) => {
   let deposited = 0
-  const group = market!.group!
-  const depositIndex = group.tokens.findIndex(
+  const group = market!.group
+  const depositIndex = group?.tokens.findIndex(
     (x) => x.mint.toBase58() === mint.toBase58()
   )
-  if (accounts?.length) {
+  if (accounts?.length && typeof depositIndex !== 'undefined' && group) {
     const depositsWithAmountHiherThenZero = accounts
       .map((x) => x.deposits[depositIndex])
       .filter((x) => !x?.isZero())

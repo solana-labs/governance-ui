@@ -11,6 +11,7 @@ import {
   DEFAULT_NATIVE_SOL_MINT,
   DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
+  HIDDEN_TREASURES,
 } from '@components/instructions/tools'
 import {
   AccountInfoGen,
@@ -398,9 +399,14 @@ const getAccountsForGovernances = async (
     ]),
   })
   const tokenAccountsJson = getOwnedTokenAccounts.data
-  const tokenAccounts = tokenAccountsJson.lenght
+  const tokenAccounts = tokenAccountsJson.length
     ? tokenAccountsJson
         .flatMap((x) => x.result)
+        .filter((x) => {
+          const pubkey =
+            typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
+          return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
+        })
         .map((x) => {
           const publicKey = new PublicKey(x.pubkey)
           const data = Buffer.from(x.account.data[0], 'base64')
