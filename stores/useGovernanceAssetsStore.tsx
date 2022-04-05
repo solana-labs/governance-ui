@@ -136,26 +136,11 @@ export default useGovernanceAssetsStore
 const getAccountsByOwner = (
   connection: Connection,
   programId: PublicKey,
-  owner: PublicKey,
-  dataSize: number,
-  offset: number
+  owner: PublicKey
 ) => {
-  return connection.getProgramAccounts(
-    programId, // new PublicKey("TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA")
-    {
-      filters: [
-        {
-          dataSize: dataSize, // number of bytes
-        },
-        {
-          memcmp: {
-            offset: offset, // number of bytes
-            bytes: owner.toBase58(), // base58 encoded string
-          },
-        },
-      ],
-    }
-  )
+  return connection.getTokenAccountsByOwner(owner, {
+    programId: programId,
+  })
 }
 
 const getTokenAccountsObj = async (
@@ -288,15 +273,12 @@ const getSolAccount = async (
   )
   const resp = await connection.current.getParsedAccountInfo(solAddress)
   if (resp.value) {
-    const accountsOwnedBySolAccount = (
-      await getAccountsByOwner(
-        connection.current,
-        TOKEN_PROGRAM_ID,
-        solAddress,
-        TokenAccountLayout.span,
-        tokenAccountOwnerOffset
-      )
-    ).map((x) => {
+    const accountsByOwnerResp = await getAccountsByOwner(
+      connection.current,
+      TOKEN_PROGRAM_ID,
+      solAddress
+    )
+    const accountsOwnedBySolAccount = accountsByOwnerResp.value.map((x) => {
       const publicKey = x.pubkey
       const data = Buffer.from(x.account.data)
       const account = parseTokenAccountData(publicKey, data)
