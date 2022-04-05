@@ -25,8 +25,8 @@ import { Member } from '@utils/uiTypes/members'
 import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { WalletTokenRecordWithProposal } from './types'
-import useMembers from '@components/Members/useMembers'
 import PaginationComponent from '@components/Pagination'
+import useMembersStore from 'stores/useMembersStore'
 
 const MemberOverview = ({ member }: { member: Member }) => {
   const { realm } = useRealm()
@@ -34,7 +34,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { activeMembers } = useMembers()
+  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const [ownVoteRecords, setOwnVoteRecords] = useState<
     WalletTokenRecordWithProposal[]
   >([])
