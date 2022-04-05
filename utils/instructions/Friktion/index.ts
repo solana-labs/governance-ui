@@ -273,29 +273,12 @@ export async function getFriktionWithdrawInstruction({
       }
 
       //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-      const {
-        currentAddress: vaultTokenAccount,
-        needToCreateAta,
-      } = await getATA({
+      const { currentAddress: vaultTokenAccount } = await getATA({
         connection: connection,
         receiverAddress: governedTokenAccount.governance.pubkey,
         mintPK: vaultMint,
         wallet,
       })
-      //we push this createATA instruction to transactions to create right before creating proposal
-      //we don't want to create ata only when instruction is serialized
-      if (needToCreateAta) {
-        prerequisiteInstructions.push(
-          Token.createAssociatedTokenAccountInstruction(
-            ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
-            TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
-            vaultMint, // mint
-            vaultTokenAccount, // ata
-            governedTokenAccount.governance.pubkey, // owner of token account
-            wallet.publicKey! // fee payer
-          )
-        )
-      }
 
       const withdrawIx = await cVoltSDK.withdrawHumanAmount(
         new BN(amount),
@@ -305,6 +288,13 @@ export async function getFriktionWithdrawInstruction({
         depositTokenDest,
         governedTokenAccount.governance.pubkey
       )
+
+      const governedAccountIndex = withdrawIx.keys.findIndex(
+        (k) =>
+          k.pubkey.toString() ===
+          governedTokenAccount.governance?.pubkey.toString()
+      )
+      withdrawIx.keys[governedAccountIndex].isSigner = true
 
       serializedInstruction = serializeInstructionToBase64(withdrawIx)
     } catch (e) {
