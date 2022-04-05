@@ -376,9 +376,12 @@ const Grant = ({
         error={formErrors['amount']}
         onBlur={validateAmountOnBlur}
       />
-      {form.lockupKind.value === 'monthly' && form.amount && (
-        <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
-      )}
+      {form.lockupKind.value === 'monthly' &&
+        form.amount &&
+        !isNaN(form.amount) &&
+        !isNaN(form.periods) && (
+          <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
+        )}
     </>
   )
 }
