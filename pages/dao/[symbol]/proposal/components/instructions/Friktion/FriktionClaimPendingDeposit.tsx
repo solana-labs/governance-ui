@@ -97,9 +97,7 @@ const FriktionClaimPendingDeposit = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts
-        }
+        governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
