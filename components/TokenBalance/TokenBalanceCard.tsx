@@ -222,7 +222,7 @@ const TokenDeposit = ({
 
     await sendTransaction({
       connection,
-      wallet,
+      wallet: wallet!,
       transaction,
       signers,
       sendingMessage: 'Depositing tokens',
@@ -322,7 +322,7 @@ const TokenDeposit = ({
         const transaction = new Transaction().add(...chunk)
         await sendTransaction({
           connection,
-          wallet,
+          wallet: wallet!,
           transaction,
           sendingMessage:
             index == ixChunks.length - 1

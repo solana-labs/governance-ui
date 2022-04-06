@@ -34,7 +34,7 @@ export async function sendTransaction({
   timeout = DEFAULT_TIMEOUT,
 }: {
   transaction: Transaction
-  wallet: WalletSigner | undefined
+  wallet: WalletSigner
   signers?: Array<Keypair>
   connection: Connection
   sendingMessage?: string

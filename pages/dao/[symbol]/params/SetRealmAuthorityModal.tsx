@@ -43,7 +43,7 @@ const SetRealmAuthorityModal = ({
     transaction.add(...instructions)
     await sendTransaction({
       transaction: transaction,
-      wallet,
+      wallet: wallet!,
       connection: connection.current,
       signers: [],
       sendingMessage: `Setting authority`,
