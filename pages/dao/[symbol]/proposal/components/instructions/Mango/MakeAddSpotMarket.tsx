@@ -15,13 +15,12 @@ import {
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
+import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import Input from '@components/inputs/Input'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import {
   Config,
   createAccountInstruction,
@@ -34,6 +33,7 @@ import {
 } from '@blockworks-foundation/mango-client'
 import * as common from '@project-serum/common'
 import * as serum from '@project-serum/serum'
+import { AccountType } from '@utils/uiTypes/assets'
 
 const MakeAddSpotMarket = ({
   index,
@@ -45,15 +45,10 @@ const MakeAddSpotMarket = ({
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
   const { realmInfo } = useRealm()
-  const { getGovernancesByAccountTypes } = useGovernanceAssets()
-  const governedProgramAccounts = getGovernancesByAccountTypes([
-    GovernanceAccountType.ProgramGovernanceV1,
-    GovernanceAccountType.ProgramGovernanceV2,
-  ]).map((x) => {
-    return {
-      governance: x,
-    }
-  })
+  const { assetAccounts } = useGovernanceAssets()
+  const governedProgramAccounts = assetAccounts.filter(
+    (x) => x.type === AccountType.PROGRAM
+  )
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<MangoMakeAddSpotMarketForm>({
@@ -218,7 +213,7 @@ const MakeAddSpotMarket = ({
     <>
       <GovernedAccountSelect
         label="Program"
-        governedAccounts={governedProgramAccounts as GovernedMultiTypeAccount[]}
+        governedAccounts={governedProgramAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

@@ -1,7 +1,6 @@
 import Modal from '@components/Modal'
 import { useState } from 'react'
 import Button from '@components/Button'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import GovernedAccountSelect from '../proposal/components/GovernedAccountSelect'
 import {
   SetRealmAuthorityAction,
@@ -11,7 +10,8 @@ import useRealm from '@hooks/useRealm'
 import useWalletStore from 'stores/useWalletStore'
 import { Transaction, TransactionInstruction } from '@solana/web3.js'
 import { sendTransaction } from '@utils/send'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const SetRealmAuthorityModal = ({
   closeModal,
@@ -24,8 +24,8 @@ const SetRealmAuthorityModal = ({
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const { fetchRealm, fetchAllRealms } = useWalletStore((s) => s.actions)
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  const [account, setAccount] = useState<GovernedMultiTypeAccount | null>(null)
+  const { assetAccounts } = useGovernanceAssets()
+  const [account, setAccount] = useState<AssetAccount | null>(null)
   const [settingAuthority, setSettingAuthority] = useState(false)
   const handleSetAuthority = async () => {
     setSettingAuthority(true)
@@ -62,7 +62,7 @@ const SetRealmAuthorityModal = ({
       <div>
         <GovernedAccountSelect
           label="Governance"
-          governedAccounts={governedMultiTypeAccounts}
+          governedAccounts={assetAccounts}
           onChange={(value) => {
             setAccount(value)
           }}

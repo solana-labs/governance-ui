@@ -7,13 +7,13 @@ import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 import Tooltip from './Tooltip'
-import useMembers from './Members/useMembers'
+import useMembersStore from 'stores/useMembersStore'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { realm, realmInfo, realmDisplayName, symbol } = useRealm()
   const { REALM } = process.env
-  const { activeMembers } = useMembers()
+  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
 
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 

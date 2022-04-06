@@ -21,11 +21,11 @@ import { notify } from '@utils/notifications'
 import useRealm from '@hooks/useRealm'
 import { useState } from 'react'
 import Button from '@components/Button'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import RealmConfigFormComponent, {
   RealmConfigForm,
 } from '../proposal/components/forms/RealmConfigFormComponent'
 import { abbreviateAddress } from '@utils/formatting'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface RealmConfigProposal extends RealmConfigForm {
   title: string
@@ -35,9 +35,9 @@ interface RealmConfigProposal extends RealmConfigForm {
 const RealmConfigModal = ({ closeProposalModal, isProposalModalOpen }) => {
   const router = useRouter()
   const { realm, mint, canChooseWhoVote, realmInfo, symbol } = useRealm()
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
 
-  const realmAuthorityGovernance = governedMultiTypeAccounts.find(
+  const realmAuthorityGovernance = assetAccounts.find(
     (x) =>
       x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )

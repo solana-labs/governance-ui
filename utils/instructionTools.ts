@@ -26,16 +26,13 @@ import {
 import type { ConnectionContext } from 'utils/connection'
 import { getATA } from './ataTools'
 import { isFormValid } from './formValidation'
-import {
-  getTokenAccountsByMint,
-  GovernedMintInfoAccount,
-  GovernedTokenAccount,
-} from './tokens'
+import { getTokenAccountsByMint } from './tokens'
 import { UiInstruction } from './uiTypes/proposalCreationTypes'
 import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import { WSOL_MINT } from '@components/instructions/tools'
 import Decimal from 'decimal.js'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export const validateInstruction = async ({
   schema,
@@ -66,16 +63,16 @@ export async function getFriktionDepositInstruction({
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   const voltVaultId = new PublicKey(form.voltVaultId as string)
 
   const signers: Keypair[] = []
   if (
     isValid &&
     amount &&
-    governedTokenAccount?.token?.publicKey &&
-    governedTokenAccount?.token &&
-    governedTokenAccount?.mint?.account &&
+    governedTokenAccount?.extensions.token?.publicKey &&
+    governedTokenAccount?.extensions.token &&
+    governedTokenAccount?.extensions.mint?.account &&
     governedTokenAccount?.governance &&
     wallet
   ) {
@@ -158,7 +155,7 @@ export async function getFriktionDepositInstruction({
       }
       depositTokenAccountKey = receiverAddress
     } else {
-      depositTokenAccountKey = governedTokenAccount.transferAddress!
+      depositTokenAccountKey = governedTokenAccount.extensions.transferAddress!
     }
 
     try {
@@ -167,7 +164,7 @@ export async function getFriktionDepositInstruction({
       if (!governedTokenAccount.isSol) {
         const underlyingAssetMintInfo = await new Token(
           connection.current,
-          governedTokenAccount.mint.publicKey,
+          governedTokenAccount.extensions.mint!.publicKey,
           TOKEN_PROGRAM_ID,
           (null as unknown) as Account
         ).getMintInfo()
@@ -179,7 +176,7 @@ export async function getFriktionDepositInstruction({
             new Decimal(amount),
             depositTokenAccountKey,
             receiverAddress,
-            governedTokenAccount.transferAddress!,
+            governedTokenAccount.extensions.transferAddress!,
             governedTokenAccount.governance.pubkey,
             decimals
           )
@@ -314,27 +311,27 @@ export async function getTransferInstruction({
   programId: PublicKey | undefined
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
-  currentAccount: GovernedTokenAccount | null
+  currentAccount: AssetAccount | null
   setFormErrors: any
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   if (
     isValid &&
     programId &&
-    governedTokenAccount?.token?.publicKey &&
-    governedTokenAccount?.token &&
-    governedTokenAccount?.mint?.account
+    governedTokenAccount.extensions?.token?.publicKey &&
+    governedTokenAccount.extensions?.token &&
+    governedTokenAccount.extensions?.mint?.account
   ) {
-    const sourceAccount = governedTokenAccount.token?.account.address
+    const sourceAccount = governedTokenAccount.extensions.token?.account.address
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
-    const mintPK = form.governedTokenAccount.mint.publicKey
+    const mintPK = form.governedTokenAccount.extensions.mint.publicKey
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
-      governedTokenAccount.mint.account.decimals
+      governedTokenAccount.extensions.mint.account.decimals
     )
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
@@ -362,7 +359,7 @@ export async function getTransferInstruction({
       TOKEN_PROGRAM_ID,
       sourceAccount,
       receiverAddress,
-      currentAccount!.token!.account.owner,
+      currentAccount!.extensions!.token!.account.owner,
       [],
       new u64(mintAmount.toString())
     )
@@ -390,26 +387,26 @@ export async function getSolTransferInstruction({
   programId: PublicKey | undefined
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
-  currentAccount: GovernedTokenAccount | null
+  currentAccount: AssetAccount | null
   setFormErrors: any
 }): Promise<UiInstruction> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
-  const governedTokenAccount = form.governedTokenAccount as GovernedTokenAccount
+  const governedTokenAccount = form.governedTokenAccount as AssetAccount
   if (
     isValid &&
     programId &&
-    governedTokenAccount?.token?.publicKey &&
-    governedTokenAccount?.token &&
-    governedTokenAccount?.mint?.account
+    governedTokenAccount?.extensions.token?.publicKey &&
+    governedTokenAccount?.extensions.token &&
+    governedTokenAccount?.extensions.mint?.account
   ) {
-    const sourceAccount = governedTokenAccount.transferAddress
+    const sourceAccount = governedTokenAccount.extensions.transferAddress
     const destinationAccount = new PublicKey(form.destinationAccount)
     //We have configured mint that has same decimals settings as SOL
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
-      governedTokenAccount.mint.account.decimals
+      governedTokenAccount.extensions.mint.account.decimals
     )
 
     const transferIx = SystemProgram.transfer({
@@ -444,7 +441,7 @@ export async function getTransferNftInstruction({
   programId: PublicKey | undefined
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
-  currentAccount: GovernedTokenAccount | null
+  currentAccount: AssetAccount | null
   setFormErrors: any
   nftMint: string
 }): Promise<UiInstruction> {
@@ -454,9 +451,9 @@ export async function getTransferNftInstruction({
   if (
     isValid &&
     programId &&
-    form.governedTokenAccount?.token?.publicKey &&
-    form.governedTokenAccount?.token &&
-    form.governedTokenAccount?.mint?.account
+    form.governedTokenAccount.extensions.token?.publicKey &&
+    form.governedTokenAccount.extensions.token &&
+    form.governedTokenAccount?.extensions.mint?.account
   ) {
     const tokenAccountsWithNftMint = await getTokenAccountsByMint(
       connection.current,
@@ -530,9 +527,10 @@ export async function getMintInstruction({
   programId: PublicKey | undefined
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
-  governedMintInfoAccount: GovernedMintInfoAccount | undefined
+  governedMintInfoAccount: AssetAccount | undefined
   setFormErrors: any
 }): Promise<UiInstruction> {
+  console.log(form)
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -542,7 +540,7 @@ export async function getMintInstruction({
     const mintPK = form.mintAccount.governance.account.governedAccount
     const mintAmount = parseMintNaturalAmountFromDecimal(
       form.amount!,
-      form.mintAccount.mintInfo?.decimals
+      form.mintAccount.extensions.mint.account?.decimals
     )
 
     //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
@@ -602,14 +600,14 @@ export async function getConvertToMsolInstruction({
 
   if (
     isValid &&
-    form.governedTokenAccount.transferAddress &&
+    form.governedTokenAccount.extensions.transferAddress &&
     form.destinationAccount.governance.pubkey
   ) {
     const amount = getMintNaturalAmountFromDecimal(
       form.amount,
-      form.governedTokenAccount.mint.account.decimals
+      form.governedTokenAccount.extensions.mint.account.decimals
     )
-    const originAccount = form.governedTokenAccount.transferAddress
+    const originAccount = form.governedTokenAccount.extensions.transferAddress
     const destinationAccount = form.destinationAccount.governance.pubkey
 
     const config = new MarinadeConfig({

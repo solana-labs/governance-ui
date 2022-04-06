@@ -155,6 +155,19 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
 
+const HIDDEN_MNGO_TREASURES = [
+  'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
+  'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
+  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
+  'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
+  'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
+  '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
+  '4Z8nAK9grjokaUqJNtw2AEkYAR1vcw8pkCWZcbVEEdh5',
+  'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
+]
+
+export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
+
 export interface AccountDescriptor {
   name: string
   important?: boolean
