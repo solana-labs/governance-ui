@@ -1,6 +1,6 @@
 const urlRegex =
   // eslint-disable-next-line
-  /(https:\/\/)(gist.github.com\/)([\w\/]{1,39}\/)([\w]{1,32})/
+  /(https:\/\/)(gist\.github.com\/)([\w\/]{1,39}\/)([\w]{1,32})/
 
 export async function fetchGistFile(gistUrl: string) {
   const pieces = gistUrl.match(urlRegex)
