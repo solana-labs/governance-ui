@@ -214,7 +214,6 @@ export async function getFriktionWithdrawInstruction({
   const prerequisiteInstructions: TransactionInstruction[] = []
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
   const voltVaultId = new PublicKey(form.voltVaultId as string)
-  const depositTokenMint = new PublicKey(form.depositTokenMint as string)
   const signers: Keypair[] = []
   if (
     isValid &&
@@ -281,9 +280,7 @@ export async function getFriktionWithdrawInstruction({
 
       const withdrawIx = await cVoltSDK.withdrawHumanAmount(
         new Decimal(amount),
-        depositTokenMint,
         vaultTokenAccount,
-        null,
         depositTokenDest,
         governedTokenAccount.governance.pubkey
       )

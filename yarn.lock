@@ -901,12 +901,32 @@
     dotenv-expand "^6.0.1"
     yargs "^17.0.1"
 
-"@friktion-labs/friktion-sdk@^1.1.42":
-  version "1.1.42"
-  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.42.tgz#90a6445275208752a811217b1d15986fd65e5e72"
-  integrity sha512-S3bmtC3W5C82bSgXZtOg0Mw5XM6pFfFXO+Agd7hjME4qzf+hS/LglpzUj45rCqdsBVT4Ou8NytADAPPEBnApqw==
+"@friktion-labs/entropy-client@^1.4.7":
+  version "1.4.8"
+  resolved "https://registry.yarnpkg.com/@friktion-labs/entropy-client/-/entropy-client-1.4.8.tgz#dd9c6a386603114e93467847ba513ffbc35924a9"
+  integrity sha512-yB8ZEzhJ9olqo9wV4Mr7DuVnIQFFZMKRG3Ia4RYg8w2DjZSt2aJRw44f21tAJMmE7QK2/4WiOt3WquocOi8uuw==
   dependencies:
     "@friktion-labs/entropy-client" "^1.0.0"
+    "@project-serum/anchor" "^0.16.2"
+    "@project-serum/borsh" "^0.2.3"
+    "@project-serum/serum" "0.13.55"
+    "@project-serum/sol-wallet-adapter" "^0.2.0"
+    "@solana/spl-token" "^0.1.6"
+    "@solana/web3.js" "^1.21.0"
+    axios "^0.25.0"
+    big.js "^6.1.1"
+    bn.js "^5.2.0"
+    buffer-layout "^1.2.1"
+    dotenv "^10.0.0"
+    dotenv-expand "^6.0.1"
+    yargs "^17.0.1"
+
+"@friktion-labs/friktion-sdk@^1.1.68":
+  version "1.1.68"
+  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.68.tgz#0dd08d41b0d516d7582c123cd294616693d6dfb1"
+  integrity sha512-5oqAA+5nK6yaNkkbMLDekfIqo7L1OnNetaPCQF1XqUP+gCPm8CxL6D6db94OxR5paDFJqqWOuAvZzryOQg4lTw==
+  dependencies:
+    "@friktion-labs/entropy-client" "^1.4.7"
     "@oclif/command" "^1.8.16"
     "@project-serum/anchor" "^0.23.0"
     "@project-serum/common" "^0.0.1-beta.3"
