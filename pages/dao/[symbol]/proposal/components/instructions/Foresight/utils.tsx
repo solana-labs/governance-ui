@@ -152,6 +152,7 @@ export function commonAssets<T extends ForesightHasGovernedAccount>(
   inputProps: InputProps<T>
   effector: (ixCreator: IxCreator<T>) => void
   governedAccountSelect: JSX.Element
+  wallet: SignerWalletAdapter | undefined
 } {
   const extraSchemaFields: formEntryToSchema<T> = _.mapValues(
     formDefaults,
@@ -201,6 +202,7 @@ export function commonAssets<T extends ForesightHasGovernedAccount>(
     inputProps,
     effector,
     governedAccountSelect,
+    wallet,
   }
 }
 
