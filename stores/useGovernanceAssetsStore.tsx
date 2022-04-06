@@ -23,7 +23,7 @@ import {
 import { Connection, ParsedAccountData, PublicKey } from '@solana/web3.js'
 import { AccountInfo, MintInfo } from '@solana/spl-token'
 import { AccountInfo as AccountInfoGeneric } from '@solana/web3.js'
-import { BN, TokenAccountLayout } from '@blockworks-foundation/mango-client'
+import { TokenAccountLayout } from '@blockworks-foundation/mango-client'
 import tokenService from '@utils/services/token'
 import { ConnectionContext } from '@utils/connection'
 import axios from 'axios'
@@ -157,11 +157,7 @@ const getTokenAccountsObj = async (
   const mint = mintAccounts.find(
     (x) => x.publicKey.toBase58() === tokenAccount.account.mint.toBase58()
   )
-  if (
-    (mint?.account.supply && mint?.account.supply.cmp(new BN(1)) === 1) ||
-    isNft ||
-    isSol
-  ) {
+  if ((mint?.account.supply && mint.account.decimals) || isNft || isSol) {
     if (isSol) {
       return await getSolAccount(
         realm,
@@ -396,7 +392,6 @@ const getAccountsForGovernances = async (
           return { publicKey, account }
         })
     : []
-
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccounts,
     tokenGovernanes,
