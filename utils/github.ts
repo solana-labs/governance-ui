@@ -1,6 +1,6 @@
 const urlRegex =
   // eslint-disable-next-line
-  /(https:\/\/)(gist.github.com\/)([\w\/]{1,39}\/)([\w]{1,32})/
+  /(https:\/\/)(gist\.github.com\/)([\w\/]{1,39}\/)([\w]{1,32})/
 
 export async function fetchGistFile(gistUrl: string) {
   const pieces = gistUrl.match(urlRegex)
@@ -13,7 +13,7 @@ export async function fetchGistFile(gistUrl: string) {
         const jsonContent = await apiResponse.json()
         const nextUrlFileName = Object.keys(jsonContent['files'])[0]
         const nextUrl = jsonContent['files'][nextUrlFileName]['raw_url']
-        if (nextUrl.startsWith('https://gist.githubusercontent.com')) {
+        if (nextUrl.startsWith('https://gist.githubusercontent.com/')) {
           const fileResponse = await fetch(nextUrl)
 
           //console.log('fetchGistFile file', gistUrl, fileResponse)
