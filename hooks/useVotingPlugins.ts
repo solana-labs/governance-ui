@@ -26,11 +26,8 @@ export function useVotingPlugins() {
     handleSetNftRegistrar,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
-  const {
-    setVotingNfts,
-    setMaxVoterWeight,
-    setIsLoadingNfts,
-  } = useNftPluginStore()
+  const { setVotingNfts, setMaxVoterWeight, setIsLoadingNfts } =
+    useNftPluginStore()
 
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)

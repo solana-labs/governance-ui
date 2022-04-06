@@ -54,8 +54,8 @@ const CreateNftPluginMaxVoterWeightRecord = ({
         realm!.account.communityMint,
         nftClient!.program.programId
       )
-      const instruction = nftClient!.program.instruction.createMaxVoterWeightRecord(
-        {
+      const instruction =
+        nftClient!.program.instruction.createMaxVoterWeightRecord({
           accounts: {
             maxVoterWeightRecord,
             governanceProgramId: realmInfo!.programId,
@@ -64,8 +64,7 @@ const CreateNftPluginMaxVoterWeightRecord = ({
             payer: wallet.publicKey!,
             systemProgram: SYSTEM_PROGRAM_ID,
           },
-        }
-      )
+        })
       serializedInstruction = serializeInstructionToBase64(instruction)
     }
     const obj: UiInstruction = {

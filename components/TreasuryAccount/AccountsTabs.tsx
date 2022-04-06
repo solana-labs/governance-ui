@@ -31,13 +31,8 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
         }}
       />
       {tabs.map((x) => {
-        const {
-          amountFormatted,
-          logo,
-          name,
-          symbol,
-          displayPrice,
-        } = getTreasuryAccountItemInfo(x, governanceNfts)
+        const { amountFormatted, logo, name, symbol, displayPrice } =
+          getTreasuryAccountItemInfo(x, governanceNfts)
         return (
           <button
             key={x.extensions.transferAddress?.toBase58()}

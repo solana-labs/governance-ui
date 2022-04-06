@@ -79,7 +79,7 @@ export async function getFriktionDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as unknown as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -166,7 +166,7 @@ export async function getFriktionDepositInstruction({
           connection.current,
           governedTokenAccount.extensions.mint!.publicKey,
           TOKEN_PROGRAM_ID,
-          (null as unknown) as Account
+          null as unknown as Account
         ).getMintInfo()
         decimals = underlyingAssetMintInfo.decimals
       }

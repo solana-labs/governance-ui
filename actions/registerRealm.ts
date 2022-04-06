@@ -182,13 +182,14 @@ function createGovernanceConfig(
 ): GovernanceConfig {
   console.debug('mounting governance config')
 
-  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
-    minCommunityTokensToCreateGovernance &&
-      +minCommunityTokensToCreateGovernance > 0
-      ? +minCommunityTokensToCreateGovernance
-      : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-    tokenDecimals ?? COMMUNITY_MINT_DECIMALS
-  )
+  const minCommunityTokensToCreateAsMintValue =
+    getMintNaturalAmountFromDecimalAsBN(
+      minCommunityTokensToCreateGovernance &&
+        +minCommunityTokensToCreateGovernance > 0
+        ? +minCommunityTokensToCreateGovernance
+        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+      tokenDecimals ?? COMMUNITY_MINT_DECIMALS
+    )
 
   // Put community and council mints under the realm governance with default config
   return new GovernanceConfig({
@@ -392,9 +393,8 @@ export async function registerRealm(
     councilWalletPks
   )
 
-  let communityMintInstructions:
-    | TransactionInstruction[]
-    | undefined = undefined
+  let communityMintInstructions: TransactionInstruction[] | undefined =
+    undefined
   let communityMintPk: PublicKey | undefined = communityMint
   let communityMintSigners: Keypair[] | undefined = undefined
 
@@ -412,13 +412,14 @@ export async function registerRealm(
 
   if (!communityMintPk) throw new Error('Invalid community mint public key.')
 
-  const _minCommunityTokensToCreateGovernance = getMintNaturalAmountFromDecimalAsBN(
-    minCommunityTokensToCreateGovernance &&
-      +minCommunityTokensToCreateGovernance > 0
-      ? +minCommunityTokensToCreateGovernance
-      : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-    communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
-  )
+  const _minCommunityTokensToCreateGovernance =
+    getMintNaturalAmountFromDecimalAsBN(
+      minCommunityTokensToCreateGovernance &&
+        +minCommunityTokensToCreateGovernance > 0
+        ? +minCommunityTokensToCreateGovernance
+        : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
+      communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
+    )
 
   const realmAddress = await withCreateRealm(
     realmInstructions,

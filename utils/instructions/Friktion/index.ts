@@ -63,7 +63,7 @@ export async function getFriktionDepositInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as unknown as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -108,9 +108,8 @@ export async function getFriktionDepositInstruction({
           cVoltSDK.sdk.programs.Volt.programId
         )
       )[0]
-      const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
-        key
-      )
+      const acct =
+        await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(key)
       pendingDepositInfo = {
         ...acct,
         key: key,
@@ -165,7 +164,7 @@ export async function getFriktionDepositInstruction({
           connection.current,
           governedTokenAccount.extensions.mint.publicKey,
           TOKEN_PROGRAM_ID,
-          (null as unknown) as Account
+          null as unknown as Account
         ).getMintInfo()
         decimals = underlyingAssetMintInfo.decimals
       }
@@ -248,7 +247,7 @@ export async function getFriktionWithdrawInstruction({
     const sdk = new FriktionSDK({
       provider: {
         connection: connection.current,
-        wallet: (wallet as unknown) as AnchorWallet,
+        wallet: wallet as unknown as AnchorWallet,
       },
     })
     const cVoltSDK = new ConnectedVoltSDK(
@@ -266,15 +265,13 @@ export async function getFriktionWithdrawInstruction({
       let depositTokenDest: PublicKey | null
 
       if (governedTokenAccount.isSol) {
-        const {
-          currentAddress: receiverAddress,
-          needToCreateAta,
-        } = await getATA({
-          connection: connection,
-          receiverAddress: governedTokenAccount.governance.pubkey,
-          mintPK: new PublicKey(WSOL_MINT),
-          wallet,
-        })
+        const { currentAddress: receiverAddress, needToCreateAta } =
+          await getATA({
+            connection: connection,
+            receiverAddress: governedTokenAccount.governance.pubkey,
+            mintPK: new PublicKey(WSOL_MINT),
+            wallet,
+          })
         if (needToCreateAta) {
           prerequisiteInstructions.push(
             Token.createAssociatedTokenAccountInstruction(
@@ -293,15 +290,13 @@ export async function getFriktionWithdrawInstruction({
       }
 
       //we find true receiver address if its wallet and we need to create ATA the ata address will be the receiver
-      const {
-        currentAddress: vaultTokenAccount,
-        needToCreateAta,
-      } = await getATA({
-        connection: connection,
-        receiverAddress: governedTokenAccount.governance.pubkey,
-        mintPK: vaultMint,
-        wallet,
-      })
+      const { currentAddress: vaultTokenAccount, needToCreateAta } =
+        await getATA({
+          connection: connection,
+          receiverAddress: governedTokenAccount.governance.pubkey,
+          mintPK: vaultMint,
+          wallet,
+        })
       //we push this createATA instruction to transactions to create right before creating proposal
       //we don't want to create ata only when instruction is serialized
       if (needToCreateAta) {
@@ -326,9 +321,8 @@ export async function getFriktionWithdrawInstruction({
             cVoltSDK.sdk.programs.Volt.programId
           )
         )[0]
-        const acct = await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(
-          key
-        )
+        const acct =
+          await cVoltSDK.sdk.programs.Volt.account.pendingDeposit.fetch(key)
         pendingDepositInfo = {
           ...acct,
           key: key,
@@ -357,9 +351,8 @@ export async function getFriktionWithdrawInstruction({
             cVoltSDK.sdk.programs.Volt.programId
           )
         )[0]
-        const acct = await this.sdk.programs.Volt.account.pendingWithdrawal.fetch(
-          key
-        )
+        const acct =
+          await this.sdk.programs.Volt.account.pendingWithdrawal.fetch(key)
         pendingWithdrawalInfo = {
           ...acct,
           key: key,

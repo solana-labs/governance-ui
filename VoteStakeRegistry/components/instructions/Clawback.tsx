@@ -43,10 +43,8 @@ const Clawback = ({
   const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const connection = useWalletStore((s) => s.connection)
   const { realm } = useRealm()
-  const {
-    governedTokenAccountsWithoutNfts,
-    governancesArray,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts, governancesArray } =
+    useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [voters, setVoters] = useState<Voter[]>([])
   const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
@@ -76,8 +74,8 @@ const Clawback = ({
       form.voter &&
       form.deposit
     ) {
-      const clawbackDestination = form.governedTokenAccount!.extensions.token
-        .account.address
+      const clawbackDestination =
+        form.governedTokenAccount!.extensions.token.account.address
       const voterWalletAddress = form.voter.voterAuthority
       const clawbackIx = await getClawbackInstruction({
         realmPk: realm!.pubkey,

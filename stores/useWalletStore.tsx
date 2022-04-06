@@ -197,11 +197,12 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const set = get().set
 
       if (connected && walletOwner && programId) {
-        const ownVoteRecordsByProposal = await getVoteRecordsByVoterMapByProposal(
-          connection,
-          programId,
-          walletOwner
-        )
+        const ownVoteRecordsByProposal =
+          await getVoteRecordsByVoterMapByProposal(
+            connection,
+            programId,
+            walletOwner
+          )
 
         set((state) => {
           state.ownVoteRecordsByProposal = ownVoteRecordsByProposal
@@ -256,31 +257,27 @@ const useWalletStore = create<WalletStore>((set, get) => ({
       const realmCouncilMintPk = realm.account.config.councilMint
       const realmCouncilMint =
         realmCouncilMintPk && realmMints[realmCouncilMintPk.toBase58()]
-      const [
-        governances,
-        tokenRecords,
-        councilTokenOwnerRecords,
-        config,
-      ] = await Promise.all([
-        getGovernanceAccounts(connection, programId, Governance, [
-          pubkeyFilter(1, realmId)!,
-        ]),
+      const [governances, tokenRecords, councilTokenOwnerRecords, config] =
+        await Promise.all([
+          getGovernanceAccounts(connection, programId, Governance, [
+            pubkeyFilter(1, realmId)!,
+          ]),
 
-        getTokenOwnerRecordsForRealmMintMapByOwner(
-          connection,
-          programId,
-          realmId,
-          realmMintPk
-        ),
+          getTokenOwnerRecordsForRealmMintMapByOwner(
+            connection,
+            programId,
+            realmId,
+            realmMintPk
+          ),
 
-        getTokenOwnerRecordsForRealmMintMapByOwner(
-          connection,
-          programId,
-          realmId,
-          realmCouncilMintPk
-        ),
-        getRealmConfig(connection, programId, realmId),
-      ])
+          getTokenOwnerRecordsForRealmMintMapByOwner(
+            connection,
+            programId,
+            realmId,
+            realmCouncilMintPk
+          ),
+          getRealmConfig(connection, programId, realmId),
+        ])
 
       const governancesMap = accountsToPubkeyMap(governances)
 

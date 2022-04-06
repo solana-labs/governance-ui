@@ -94,10 +94,8 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] =
+    useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =
@@ -218,9 +216,10 @@ const GenericSendTokens: React.FC<GenericSendTokensProps> = ({
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount?.extensions.token?.account?.amount?.gte(
-        mintValue
-      )
+      gte =
+        form.governedTokenAccount?.extensions.token?.account?.amount?.gte(
+          mintValue
+        )
     } catch (e) {
       //silent fail
     }

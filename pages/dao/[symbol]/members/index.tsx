@@ -23,10 +23,8 @@ const MembersPage = () => {
   } = useRealm()
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const connected = useWalletStore((s) => s.connected)
-  const {
-    canUseMintInstruction,
-    canMintRealmCouncilToken,
-  } = useGovernanceAssets()
+  const { canUseMintInstruction, canMintRealmCouncilToken } =
+    useGovernanceAssets()
   const [activeMember, setActiveMember] = useState(activeMembers[0])
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false)
   const [searchString, setSearchString] = useState('')

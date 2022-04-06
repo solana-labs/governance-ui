@@ -59,9 +59,9 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as ClawbackInstruction | null
+          const decodedInstructionData =
+            vsrClient.program.coder.instruction.decode(Buffer.from(data))
+              ?.data as ClawbackInstruction | null
           const existingVoter = await tryGetVoter(accounts[2].pubkey, vsrClient)
           const deposit = decodedInstructionData
             ? existingVoter?.deposits[decodedInstructionData.depositEntryIndex]
@@ -119,9 +119,9 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as VotingMintCfgInstruction
+          const decodedInstructionData =
+            vsrClient.program.coder.instruction.decode(Buffer.from(data))
+              ?.data as VotingMintCfgInstruction
           const {
             maxExtraLockupVoteWeightScaledFactor,
             lockupSaturationSecs,
@@ -152,8 +152,10 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
               <div>
                 Max multiplier:{' '}
                 {calcMultiplier({
-                  depositScaledFactor: baselineVoteWeightScaledFactor.toNumber(),
-                  maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactor.toNumber(),
+                  depositScaledFactor:
+                    baselineVoteWeightScaledFactor.toNumber(),
+                  maxExtraLockupVoteWeightScaledFactor:
+                    maxExtraLockupVoteWeightScaledFactor.toNumber(),
                   lockupSaturationSecs: lockupSaturationSecs.toNumber(),
                   lockupSecs: lockupSaturationSecs.toNumber(),
                 })}
@@ -197,9 +199,9 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
             options
           )
           const vsrClient = await VsrClient.connect(provider)
-          const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as GrantInstruction | null
+          const decodedInstructionData =
+            vsrClient.program.coder.instruction.decode(Buffer.from(data))
+              ?.data as GrantInstruction | null
           const mintPk = accounts[9].pubkey
           const mint = await tryGetMint(connection, mintPk!)
           const lockupKind = decodedInstructionData

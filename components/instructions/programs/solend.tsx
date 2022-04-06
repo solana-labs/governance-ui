@@ -142,52 +142,58 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       },
     },
 
-    [LendingInstruction.WithdrawObligationCollateralAndRedeemReserveLiquidity]: {
-      name:
-        'Solend - Withdraw Obligation Collateral And Redeem Reserve Liquidity',
-      accounts: [
-        'Source Collateral',
-        'Destination Collateral',
-        'Withdraw Reserve',
-        'Obligation',
-        'Lending Market',
-        'Lending Market Authority',
-        'Destination Liquidity',
-        'Reserve Collateral Mint',
-        'Reserve Liquidity Supply',
-        'Obligation Owner',
-        'Transfer Authority',
-        'Sysvar: Clock',
-        'Token Program',
-      ],
-      getDataUI: (
-        _connection: Connection,
-        data: Uint8Array,
-        accounts: AccountMetaData[]
-      ) => {
-        const dataLayout = struct([u8('instruction'), nu64('collateralAmount')])
+    [LendingInstruction.WithdrawObligationCollateralAndRedeemReserveLiquidity]:
+      {
+        name: 'Solend - Withdraw Obligation Collateral And Redeem Reserve Liquidity',
+        accounts: [
+          'Source Collateral',
+          'Destination Collateral',
+          'Withdraw Reserve',
+          'Obligation',
+          'Lending Market',
+          'Lending Market Authority',
+          'Destination Liquidity',
+          'Reserve Collateral Mint',
+          'Reserve Liquidity Supply',
+          'Obligation Owner',
+          'Transfer Authority',
+          'Sysvar: Clock',
+          'Token Program',
+        ],
+        getDataUI: (
+          _connection: Connection,
+          data: Uint8Array,
+          accounts: AccountMetaData[]
+        ) => {
+          const dataLayout = struct([
+            u8('instruction'),
+            nu64('collateralAmount'),
+          ])
 
-        const { collateralAmount } = dataLayout.decode(Buffer.from(data)) as any
+          const { collateralAmount } = dataLayout.decode(
+            Buffer.from(data)
+          ) as any
 
-        const reserve = accounts[2]
+          const reserve = accounts[2]
 
-        const tokenName =
-          SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown'
+          const tokenName =
+            SolendConfiguration.getTokenNameByReservePublicKey(
+              reserve.pubkey
+            ) ?? 'unknown'
 
-        return (
-          <div className="flex flex-col">
-            <div className="flex justify-between">
-              <span>Token</span>
-              <span>{tokenName}</span>
+          return (
+            <div className="flex flex-col">
+              <div className="flex justify-between">
+                <span>Token</span>
+                <span>{tokenName}</span>
+              </div>
+              <div className="flex justify-between">
+                <span>Amount</span>
+                <span>{collateralAmount}</span>
+              </div>
             </div>
-            <div className="flex justify-between">
-              <span>Amount</span>
-              <span>{collateralAmount}</span>
-            </div>
-          </div>
-        )
+          )
+        },
       },
-    },
   },
 }

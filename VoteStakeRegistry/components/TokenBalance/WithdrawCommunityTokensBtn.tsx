@@ -123,8 +123,8 @@ const WithDrawCommunityTokens = () => {
       realmPk: realm!.pubkey!,
       amount: depositRecord!.amountDepositedNative,
       communityMintPk: realm!.account.communityMint,
-      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
-        .pubkey!,
+      tokenOwnerRecordPubKey:
+        tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
       depositIndex: depositRecord!.index,
       connection,
       client: client,

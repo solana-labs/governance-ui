@@ -27,9 +27,9 @@ export const NFT_VOTER_INSTRUCTIONS = {
             options
           )
           const nftClient = await NftVoterClient.connect(provider)
-          const decodedInstructionData = nftClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as any
+          const decodedInstructionData =
+            nftClient.program.coder.instruction.decode(Buffer.from(data))
+              ?.data as any
           return (
             <div className="space-y-3">
               <div>
@@ -67,9 +67,9 @@ export const NFT_VOTER_INSTRUCTIONS = {
           const realm = await getRealm(connection, accounts[1].pubkey)
           const mint = await tryGetMint(connection, realm.account.communityMint)
           const nftClient = await NftVoterClient.connect(provider)
-          const decodedInstructionData = nftClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as any
+          const decodedInstructionData =
+            nftClient.program.coder.instruction.decode(Buffer.from(data))
+              ?.data as any
           const weight = fmtTokenAmount(
             decodedInstructionData.weight,
             mint?.account.decimals

@@ -87,11 +87,12 @@ const NewAccountForm = () => {
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const [treasuryType, setTreasuryType] = useState(types[2])
-  const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
-    ? ownVoterWeight.councilTokenRecord
-    : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
-    ? ownVoterWeight.communityTokenRecord
-    : undefined
+  const tokenOwnerRecord =
+    ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
+      ? ownVoterWeight.councilTokenRecord
+      : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
+      ? ownVoterWeight.communityTokenRecord
+      : undefined
 
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})

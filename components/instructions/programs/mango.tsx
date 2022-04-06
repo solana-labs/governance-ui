@@ -104,8 +104,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .AddSpotMarket
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).AddSpotMarket
         return <>{displayAllArgs(args)}</>
       },
     },
@@ -125,8 +127,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .AddPerpMarket
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).AddPerpMarket
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
@@ -146,8 +150,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangePerpMarketParams
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).ChangePerpMarketParams
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
@@ -171,8 +177,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .CreatePerpMarket
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).CreatePerpMarket
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
@@ -211,8 +219,10 @@ export const MANGO_INSTRUCTIONS = {
           ),
           group.loadRootBanks(_connection),
         ])
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangePerpMarketParams2
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).ChangePerpMarketParams2
         const mngoPerPeriod = !args.mngoPerPeriodOption
           ? perpMarket.liquidityMiningInfo.mngoPerPeriod
           : args.mngoPerPeriod
@@ -300,8 +310,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .CreateMangoAccount
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).CreateMangoAccount
         return <>{displayAllArgs(args)}</>
       },
     },
@@ -318,8 +330,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .SetDelegate
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).SetDelegate
         return <>{displayAllArgs(args)}</>
       },
     },
@@ -333,8 +347,10 @@ export const MANGO_INSTRUCTIONS = {
         data: Uint8Array,
         _accounts: AccountMetaData[]
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangeReferralFeeParams
+        const args = MangoInstructionLayout.decode(
+          Buffer.from(data),
+          0
+        ).ChangeReferralFeeParams
         return <>{displayAllArgs(args)}</>
       },
     },

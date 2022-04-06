@@ -49,18 +49,12 @@ const NotificationsCard = () => {
       env = BlockchainEnvironment.LocalNet
       break
   }
-  const {
-    data,
-    logIn,
-    fetchData,
-    isAuthenticated,
-    createAlert,
-    updateAlert,
-  } = useNotifiClient({
-    dappAddress: realm?.pubkey?.toBase58() ?? '',
-    walletPublicKey: wallet?.publicKey?.toString() ?? '',
-    env,
-  })
+  const { data, logIn, fetchData, isAuthenticated, createAlert, updateAlert } =
+    useNotifiClient({
+      dappAddress: realm?.pubkey?.toBase58() ?? '',
+      walletPublicKey: wallet?.publicKey?.toString() ?? '',
+      env,
+    })
 
   const [email, setEmail] = useState<string>('')
   const [phone, setPhone] = useState<string>('')
@@ -92,7 +86,7 @@ const NotificationsCard = () => {
     // user is not authenticated
     if (!isAuthenticated() && wallet && wallet.publicKey) {
       try {
-        await logIn((wallet as unknown) as MessageSigner)
+        await logIn(wallet as unknown as MessageSigner)
       } catch (e) {
         handleError([e])
       }
@@ -108,7 +102,7 @@ const NotificationsCard = () => {
     // user is not authenticated
     if (!isAuthenticated() && wallet && wallet.publicKey) {
       try {
-        await logIn((wallet as unknown) as MessageSigner)
+        await logIn(wallet as unknown as MessageSigner)
         localData = await fetchData()
       } catch (e) {
         handleError([e])

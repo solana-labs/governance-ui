@@ -117,10 +117,11 @@ export const createMultisigRealm = async (
   const realmSigners: Keypair[] = []
 
   // Convert to mint natural amount
-  const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
-    minCommunityTokensToCreate,
-    communityMintDecimals
-  )
+  const minCommunityTokensToCreateAsMintValue =
+    getMintNaturalAmountFromDecimalAsBN(
+      minCommunityTokensToCreate,
+      communityMintDecimals
+    )
 
   const realmPk = await withCreateRealm(
     realmInstructions,

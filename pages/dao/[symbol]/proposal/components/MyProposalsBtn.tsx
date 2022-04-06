@@ -38,12 +38,8 @@ const MyProposalsBn = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
-  const {
-    proposals,
-    ownTokenRecord,
-    ownCouncilTokenRecord,
-    realmInfo,
-  } = useRealm()
+  const { proposals, ownTokenRecord, ownCouncilTokenRecord, realmInfo } =
+    useRealm()
   const myProposals = useMemo(
     () =>
       connected
@@ -103,9 +99,8 @@ const MyProposalsBn = () => {
     if (!wallet || !programId || !realm) return
     setIsLoading(true)
     try {
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
+      const { blockhash: recentBlockhash } =
+        await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
       for (let i = 0; i < proposalsArray.length; i++) {

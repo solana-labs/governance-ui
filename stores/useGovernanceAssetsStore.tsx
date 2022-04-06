@@ -304,9 +304,8 @@ const getSolAccount = async (
         accounts.push(account)
       }
     }
-    const mintRentAmount = await connection.current.getMinimumBalanceForRentExemption(
-      0
-    )
+    const mintRentAmount =
+      await connection.current.getMinimumBalanceForRentExemption(0)
     const solAccount = resp.value as AccountInfoGen<Buffer | ParsedAccountData>
     solAccount.lamports =
       solAccount.lamports !== 0

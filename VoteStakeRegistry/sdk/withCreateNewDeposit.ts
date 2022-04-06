@@ -132,27 +132,28 @@ export const withCreateNewDeposit = async ({
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
     const allowClawback = false
     const startTime = new BN(new Date().getTime() / 1000)
-    const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
-      firstFreeIdx,
-      { [lockupKind]: {} },
-      startTime,
-      period,
-      allowClawback,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          payer: walletPk,
-          voterAuthority: walletPk,
-          depositMint: mintPk,
-          rent: SYSVAR_RENT_PUBKEY,
-          systemProgram: systemProgram,
-          tokenProgram: TOKEN_PROGRAM_ID,
-          associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
-          vault: voterATAPk,
-        },
-      }
-    )
+    const createDepositEntryInstruction =
+      client?.program.instruction.createDepositEntry(
+        firstFreeIdx,
+        { [lockupKind]: {} },
+        startTime,
+        period,
+        allowClawback,
+        {
+          accounts: {
+            registrar: registrar,
+            voter: voter,
+            payer: walletPk,
+            voterAuthority: walletPk,
+            depositMint: mintPk,
+            rent: SYSVAR_RENT_PUBKEY,
+            systemProgram: systemProgram,
+            tokenProgram: TOKEN_PROGRAM_ID,
+            associatedTokenProgram: ASSOCIATED_TOKEN_PROGRAM_ID,
+            vault: voterATAPk,
+          },
+        }
+      )
     instructions.push(createDepositEntryInstruction)
   }
 

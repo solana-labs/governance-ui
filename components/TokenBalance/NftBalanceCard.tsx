@@ -44,19 +44,18 @@ const NftBalanceCard = () => {
       client.client!.program.programId
     )
     instructions.push(
-      (client.client as NftVoterClient).program.instruction.createVoterWeightRecord(
-        wallet!.publicKey!,
-        {
-          accounts: {
-            voterWeightRecord: voterWeightPk,
-            governanceProgramId: realm!.owner,
-            realm: realm!.pubkey,
-            realmGoverningTokenMint: realm!.account.communityMint,
-            payer: wallet!.publicKey!,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-        }
-      )
+      (
+        client.client as NftVoterClient
+      ).program.instruction.createVoterWeightRecord(wallet!.publicKey!, {
+        accounts: {
+          voterWeightRecord: voterWeightPk,
+          governanceProgramId: realm!.owner,
+          realm: realm!.pubkey,
+          realmGoverningTokenMint: realm!.account.communityMint,
+          payer: wallet!.publicKey!,
+          systemProgram: SYSTEM_PROGRAM_ID,
+        },
+      })
     )
     await withCreateTokenOwnerRecord(
       instructions,

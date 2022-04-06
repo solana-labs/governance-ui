@@ -8,14 +8,8 @@ const AccountItem = ({
   governedAccountTokenAccount: AssetAccount
 }) => {
   const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-  const {
-    amountFormatted,
-    logo,
-    name,
-    symbol,
-    displayPrice,
-    isSol,
-  } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
+  const { amountFormatted, logo, name, symbol, displayPrice, isSol } =
+    getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
 
   return (
     <div className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">

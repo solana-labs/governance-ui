@@ -55,37 +55,34 @@ export const voteRegistryLockDeposit = async ({
     amountFromVoteRegistryDeposit
   )
   const instructions: TransactionInstruction[] = []
-  const {
-    depositIdx,
-    voter,
-    registrar,
-    voterATAPk,
-  } = await withCreateNewDeposit({
-    instructions,
-    walletPk: rpcContext.walletPubkey,
-    mintPk,
-    realmPk,
-    programId,
-    tokenOwnerRecordPk,
-    lockUpPeriodInDays,
-    lockupKind,
-    communityMintPk,
-    client,
-  })
+  const { depositIdx, voter, registrar, voterATAPk } =
+    await withCreateNewDeposit({
+      instructions,
+      walletPk: rpcContext.walletPubkey,
+      mintPk,
+      realmPk,
+      programId,
+      tokenOwnerRecordPk,
+      lockUpPeriodInDays,
+      lockupKind,
+      communityMintPk,
+      client,
+    })
 
   if (!amountFromVoteRegistryDeposit.isZero()) {
-    const internalTransferUnlockedInstruction = client?.program.instruction.internalTransferUnlocked(
-      sourceDepositIdx!,
-      depositIdx,
-      amountFromVoteRegistryDeposit,
-      {
-        accounts: {
-          registrar: registrar,
-          voter: voter,
-          voterAuthority: wallet!.publicKey,
-        },
-      }
-    )
+    const internalTransferUnlockedInstruction =
+      client?.program.instruction.internalTransferUnlocked(
+        sourceDepositIdx!,
+        depositIdx,
+        amountFromVoteRegistryDeposit,
+        {
+          accounts: {
+            registrar: registrar,
+            voter: voter,
+            voterAuthority: wallet!.publicKey,
+          },
+        }
+      )
 
     instructions.push(internalTransferUnlockedInstruction)
   }

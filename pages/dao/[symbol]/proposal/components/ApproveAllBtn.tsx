@@ -50,9 +50,8 @@ const ApproveAllBtn = () => {
 
     try {
       setIsLoading(true)
-      const {
-        blockhash: recentBlockhash,
-      } = await connection.getLatestBlockhash()
+      const { blockhash: recentBlockhash } =
+        await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
       for (let i = 0; i < votingProposals.length; i++) {

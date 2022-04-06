@@ -38,18 +38,14 @@ const Params = () => {
     (x) =>
       x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
-  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
-    false
-  )
-  const [
-    isGovernanceProposalModalOpen,
-    setIsGovernanceProposalModalOpen,
-  ] = useState(false)
+  const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] =
+    useState(false)
+  const [isGovernanceProposalModalOpen, setIsGovernanceProposalModalOpen] =
+    useState(false)
   const [activeGovernance, setActiveGovernance] = useState<any>(null)
   const [activeTab, setActiveTab] = useState('Params')
-  const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] = useState(
-    false
-  )
+  const [isRealmAuthorityModalOpen, setRealmAuthorityModalIsOpen] =
+    useState(false)
   const realmAccount = realm?.account
   const communityMint = realmAccount?.communityMint.toBase58()
   const councilMintPk = realmAccount?.config.councilMint?.toBase58()
