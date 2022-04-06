@@ -110,7 +110,7 @@ function App({ Component, pageProps }) {
       }
     }
     changeFavicon(faviconUrl)
-  }, [faviconUrl])
+  }, [faviconSelector])
   useEffect(() => {
     document.title = title
   }, [title])

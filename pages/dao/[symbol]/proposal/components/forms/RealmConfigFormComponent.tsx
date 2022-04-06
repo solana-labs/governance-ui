@@ -154,6 +154,7 @@ const RealmConfigFormComponent = ({
       hide: typeof councilMint === 'undefined',
     },
   ]
+
   return (
     <>
       {form && (
