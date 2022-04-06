@@ -1,23 +1,16 @@
-# GitHub SAST (static application security testing) tool that scans code for security bugs and unsafe coding practices
+name: 'CodeQL Scan'
 
-name: "CodeQL Scan"
-
-# Events that triggers CodeQL to run
 on:
   push:
     branches: [ main ]
   pull_request:
     branches: [ main ]
-    
-# Option to configure as a scheduled action to monitor for drift in code
-#  schedule:
-#    - cron: '0 6 * * 1'
 
 jobs:
   analyze:
     name: CodeQL Analysis
     runs-on: ubuntu-latest
-    # Skip any PR created by dependabot to avoid permission issues (if used)
+    # Skip any PR created by dependabot to avoid permission issues
     if: (github.actor != 'dependabot[bot]')
     permissions:
       actions: read
@@ -27,24 +20,17 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        # Add more languages if relevnt to the project
         language: [ 'javascript' ]
-        # CodeQL supports [ 'cpp', 'csharp', 'go', 'java', 'javascript', 'python', 'ruby' ]
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
 
-    # Initialises the CodeQL tools for scanning (sorry Americans)
     - name: Initialise CodeQL
       uses: github/codeql-action/init@v1
       with:
         languages: ${{ matrix.language }}
-        # If you wish to specify custom queries, you can do so here or in a config file.
-        # By default, queries listed here will override any specified in a config file.
-        # Prefix the list here with "+" to use these queries and those in the config file.
-        # queries: ./path/to/local/query, your-org/your-repo/queries@main
     
     # Run the analysis and upload results to the security tab
-    - name: Perform CodeQL Analysis
+    - name: Run CodeQL
       uses: github/codeql-action/analyze@v1
