@@ -1,13 +1,19 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
 import * as yup from 'yup'
 import Select from '@components/inputs/Select'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
 import { refreshObligation } from '@tools/sdk/solend/refreshObligation'
+import { SOLEND_MINT_NAME_OPTIONS } from '@tools/sdk/solend/utils'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { RefreshObligationForm } from '@utils/uiTypes/proposalCreationTypes'
 import SelectOptionList from '../../SelectOptionList'
-import { SOLEND_MINT_NAME_OPTIONS } from '@tools/sdk/solend/utils'
+
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  mintName: yup.string().required('Token Name is required'),
+})
 
 const RefreshObligation = ({
   index,
@@ -26,16 +32,10 @@ const RefreshObligation = ({
     initialFormValues: {
       governedAccount,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governed account is required'),
-      mintName: yup.string().required('Token Name is required'),
-    }),
-    buildInstruction: async function () {
+    schema,
+    buildInstruction: async function ({ form, governedAccountPubkey }) {
       return refreshObligation({
-        obligationOwner: governedAccount!.governance.pubkey,
+        obligationOwner: governedAccountPubkey,
         mintNames: [form.mintName!],
       })
     },

@@ -14,6 +14,7 @@ import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { AmountSide } from '@raydium-io/raydium-sdk'
+import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -186,6 +187,64 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
   insuranceWithdrawnAmount: number
 }
 
+export interface TribecaCreateEpochGaugeForm {
+  governedAccount?: GovernedMultiTypeAccount
+  gaugeName?: string
+}
+
+export interface TribecaCreateEscrowGovernanceTokenATAForm {
+  governedAccount?: GovernedMultiTypeAccount
+  tribecaConfiguration: ATribecaConfiguration | null
+}
+
+export interface TribecaCreateGaugeVoteForm {
+  governedAccount?: GovernedMultiTypeAccount
+  gaugeName?: string
+}
+
+export interface TribecaCreateGaugeVoterForm {
+  governedAccount?: GovernedMultiTypeAccount
+  tribecaConfiguration: ATribecaConfiguration | null
+}
+
+export interface TribecaGaugeCommitVoteForm {
+  governedAccount?: GovernedMultiTypeAccount
+  gaugeName?: string
+}
+
+export interface TribecaGaugeRevertVoteForm {
+  governedAccount?: GovernedMultiTypeAccount
+  gaugeName?: string
+}
+
+export interface TribecaLockForm {
+  governedAccount?: GovernedMultiTypeAccount
+  tribecaConfiguration: ATribecaConfiguration | null
+  uiAmount: number
+  durationSeconds: number
+}
+
+export interface TribecaNewEscrowForm {
+  governedAccount?: GovernedMultiTypeAccount
+  tribecaConfiguration: ATribecaConfiguration | null
+}
+
+export interface TribecaPrepareEpochGaugeVoterForm {
+  governedAccount?: GovernedMultiTypeAccount
+  tribecaConfiguration: ATribecaConfiguration | null
+}
+
+export interface TribecaResetEpochGaugeVoterForm {
+  governedAccount?: GovernedMultiTypeAccount
+  tribecaConfiguration: ATribecaConfiguration | null
+}
+
+export interface TribecaGaugeSetVoteForm {
+  governedAccount?: GovernedMultiTypeAccount
+  gaugeName?: string
+  weight?: number
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -205,6 +264,17 @@ export enum Instructions {
   SolendWithdrawObligationCollateralAndRedeemReserveLiquidity,
   SolendRefreshObligation,
   SolendRefreshReserve,
+  TribecaCreateEpochGauge,
+  TribecaCreateEscrowGovernanceTokenATA,
+  TribecaCreateGaugeVote,
+  TribecaCreateGaugeVoter,
+  TribecaGaugeCommitVote,
+  TribecaGaugeRevertVote,
+  TribecaLock,
+  TribecaNewEscrow,
+  TribecaPrepareEpochGaugeVoter,
+  TribecaResetEpochGaugeVoter,
+  TribecaGaugeSetVote,
   UXDInitializeController,
   UXDSetRedeemableGlobalSupplyCap,
   UXDSetMangoDepositoriesRedeemableSoftCap,

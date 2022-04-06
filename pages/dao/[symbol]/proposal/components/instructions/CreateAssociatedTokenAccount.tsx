@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
 import * as yup from 'yup'
 import Select from '@components/inputs/Select'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
@@ -7,6 +5,14 @@ import { createAssociatedTokenAccount } from '@utils/associated'
 import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { CreateAssociatedTokenAccountForm } from '@utils/uiTypes/proposalCreationTypes'
+
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  splTokenMintUIName: yup.string().required('SPL Token Mint is required'),
+})
 
 const CreateAssociatedTokenAccount = ({
   index,
@@ -16,7 +22,6 @@ const CreateAssociatedTokenAccount = ({
   governedAccount?: GovernedMultiTypeAccount
 }) => {
   const {
-    wallet,
     form,
     formErrors,
     handleSetForm,
@@ -25,20 +30,14 @@ const CreateAssociatedTokenAccount = ({
     initialFormValues: {
       governedAccount,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governed account is required'),
-      splTokenMintUIName: yup.string().required('SPL Token Mint is required'),
-    }),
-    buildInstruction: async function () {
+    schema,
+    buildInstruction: async function ({ wallet, governedAccountPubkey, form }) {
       const [tx] = await createAssociatedTokenAccount(
         // fundingAddress
-        wallet!.publicKey!,
+        wallet.publicKey!,
 
         // walletAddress
-        governedAccount!.governance.pubkey,
+        governedAccountPubkey,
 
         // splTokenMintAddress
         getSplTokenMintAddressByUIName(form.splTokenMintUIName!)

@@ -1,24 +1,43 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import React, { useEffect } from 'react'
 import * as yup from 'yup'
 import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-
 import { createAddLiquidityInstruction } from '@tools/sdk/raydium/createAddLiquidityInstruction'
 import {
   getAmountOut,
   getLiquidityPoolKeysByLabel,
 } from '@tools/sdk/raydium/helpers'
 import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
+import { uiAmountToNativeBN } from '@tools/sdk/units'
 import { debounce } from '@utils/debounce'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { AddLiquidityRaydiumForm } from '@utils/uiTypes/proposalCreationTypes'
 import SelectOptionList from '../../SelectOptionList'
-import { uiAmountToNativeBN } from '@tools/sdk/units'
 
 const SLIPPAGE_OPTIONS = [0.5, 1, 2]
 const FIXED_SIDE_LIST = ['base', 'quote']
+
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Program governed account is required'),
+  liquidityPool: yup.string().required('Liquidity Pool is required'),
+  baseAmountIn: yup
+    .number()
+    .moreThan(0, 'Amount for Base token should be more than 0')
+    .required('Amount for Base token is required'),
+  quoteAmountIn: yup
+    .number()
+    .moreThan(0, 'Amount for Quote token should be more than 0')
+    .required('Amount for Quote token is required'),
+  fixedSide: yup
+    .string()
+    .equals(['base', 'quote'])
+    .required('Fixed Side is required'),
+  slippage: yup.number().required('Slippage value is required'),
+})
 
 const RaydiumAddLiquidityToPool = ({
   index,
@@ -39,27 +58,8 @@ const RaydiumAddLiquidityToPool = ({
       fixedSide: 'base',
       slippage: 0.5,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Program governed account is required'),
-      liquidityPool: yup.string().required('Liquidity Pool is required'),
-      baseAmountIn: yup
-        .number()
-        .moreThan(0, 'Amount for Base token should be more than 0')
-        .required('Amount for Base token is required'),
-      quoteAmountIn: yup
-        .number()
-        .moreThan(0, 'Amount for Quote token should be more than 0')
-        .required('Amount for Quote token is required'),
-      fixedSide: yup
-        .string()
-        .equals(['base', 'quote'])
-        .required('Fixed Side is required'),
-      slippage: yup.number().required('Slippage value is required'),
-    }),
-    buildInstruction: async function () {
+    schema,
+    buildInstruction: async function ({ form, governedAccountPubkey }) {
       const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool!)
       const [base, quote] = await Promise.all([
         connection.current.getTokenSupply(poolKeys.baseMint),
@@ -70,7 +70,7 @@ const RaydiumAddLiquidityToPool = ({
         uiAmountToNativeBN(form.baseAmountIn!, base.value.decimals),
         uiAmountToNativeBN(form.quoteAmountIn!, quote.value.decimals),
         form.fixedSide,
-        form.governedAccount!.governance.pubkey
+        governedAccountPubkey
       )
     },
   })

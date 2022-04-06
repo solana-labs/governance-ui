@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
 import * as yup from 'yup'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { TransactionInstruction } from '@solana/web3.js'
+import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
@@ -9,6 +9,8 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import useWalletStore from 'stores/useWalletStore'
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
+import useGovernedMultiTypeAccounts from './useGovernedMultiTypeAccounts'
 
 function useInstructionFormBuilder<
   T extends {
@@ -27,11 +29,22 @@ function useInstructionFormBuilder<
       [key in keyof T]: yup.AnySchema
     }
   >
-  buildInstruction?: () => Promise<TransactionInstruction>
+  buildInstruction?: ({
+    form,
+    connection,
+    wallet,
+    governedAccountPubkey,
+  }: {
+    form: T
+    connection: Connection
+    wallet: SignerWalletAdapter
+    governedAccountPubkey: PublicKey
+  }) => Promise<TransactionInstruction>
 }) {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const { handleSetInstructions } = useContext(NewProposalContext)
+  const { getGovernedAccountPublicKey } = useGovernedMultiTypeAccounts()
 
   const [form, setForm] = useState<T>(initialFormValues)
   const [formErrors, setFormErrors] = useState({})
@@ -48,10 +61,14 @@ function useInstructionFormBuilder<
   }
 
   const getInstruction = async (): Promise<UiInstruction> => {
+    const governedAccountPubkey = getGovernedAccountPublicKey(
+      form.governedAccount,
+      true
+    )
     if (
       !wallet?.publicKey ||
       !form.governedAccount?.governance?.account ||
-      //!buildInstruction ||
+      !governedAccountPubkey ||
       !(await validateForm())
     ) {
       return {
@@ -60,11 +77,17 @@ function useInstructionFormBuilder<
         governance: form.governedAccount?.governance,
       }
     }
-
     try {
       return {
         serializedInstruction: buildInstruction
-          ? serializeInstructionToBase64(await buildInstruction())
+          ? serializeInstructionToBase64(
+              await buildInstruction({
+                form,
+                connection: connection.current,
+                wallet,
+                governedAccountPubkey,
+              })
+            )
           : '',
         isValid: true,
         governance: form.governedAccount?.governance,
@@ -98,11 +121,10 @@ function useInstructionFormBuilder<
   }, [form])
 
   return {
-    form,
-    setForm,
-    wallet,
     connection,
+    wallet,
     formErrors,
+    form,
     handleSetForm,
     validateForm,
   }

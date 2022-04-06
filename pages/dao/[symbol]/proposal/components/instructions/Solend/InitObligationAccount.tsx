@@ -1,10 +1,15 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
 import * as yup from 'yup'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
 import { initObligationAccount } from '@tools/sdk/solend/initObligationAccount'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { InitSolendObligationAccountForm } from '@utils/uiTypes/proposalCreationTypes'
+
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+})
 
 const InitObligationAccount = ({
   index,
@@ -20,15 +25,10 @@ const InitObligationAccount = ({
     initialFormValues: {
       governedAccount,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governed account is required'),
-    }),
-    buildInstruction: async function () {
+    schema,
+    buildInstruction: async function ({ governedAccountPubkey }) {
       return initObligationAccount({
-        obligationOwner: governedAccount!.governance.pubkey,
+        obligationOwner: governedAccountPubkey,
       })
     },
   })

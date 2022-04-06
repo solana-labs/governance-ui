@@ -21,7 +21,6 @@ const ProgramUpgrade = ({
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const {
-    wallet,
     form,
     formErrors,
     handleSetForm,
@@ -82,19 +81,19 @@ const ProgramUpgrade = ({
           }
         ),
     }),
-    buildInstruction: async function () {
+    buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
       if (!governedAccount?.governance?.account) {
         throw new Error('Governance must be a Program Account Governance')
       }
 
       const bufferSpillAddress = form.bufferSpillAddress
         ? new PublicKey(form.bufferSpillAddress)
-        : wallet!.publicKey!
+        : wallet.publicKey!
 
       return createUpgradeInstruction(
         form.governedAccount!.governance.account.governedAccount,
         new PublicKey(form.bufferAddress!),
-        form.governedAccount!.governance.pubkey,
+        governedAccountPubkey,
         bufferSpillAddress
       )
     },

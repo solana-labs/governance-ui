@@ -1,6 +1,11 @@
-import { PublicKey } from '@solana/web3.js'
+import { Wallet } from '@project-serum/common'
+import {
+  SolanaAugmentedProvider,
+  SolanaProvider,
+} from '@saberhq/solana-contrib'
+import { Connection, PublicKey } from '@solana/web3.js'
 import { SPL_TOKENS } from '@utils/splTokens'
-import ATribecaConfiguration from './ATribecaConfiguration'
+import ATribecaConfiguration, { TribecaPrograms } from './ATribecaConfiguration'
 
 class SaberTribecaConfiguration extends ATribecaConfiguration {
   public readonly locker = new PublicKey(
@@ -36,4 +41,33 @@ export function getConfigurationByName(
       (configuration) => configuration.name === name
     ) ?? null
   )
+}
+
+export function getTribecaPrograms({
+  connection,
+  wallet,
+  config,
+}: {
+  connection: Connection
+  wallet: Wallet
+  config: ATribecaConfiguration
+}) {
+  return config.loadPrograms(
+    new SolanaAugmentedProvider(
+      SolanaProvider.init({
+        connection,
+        wallet,
+      })
+    )
+  )
+}
+
+export async function getTribecaLocker({
+  programs,
+  config,
+}: {
+  programs: TribecaPrograms
+  config: ATribecaConfiguration
+}) {
+  return programs.LockedVoter.account.locker.fetch(config.locker)
 }

@@ -1,5 +1,4 @@
 import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
 import Select from '@components/inputs/Select'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
 import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction'
@@ -11,6 +10,15 @@ import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { RegisterMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes'
 import SelectOptionList from '../../SelectOptionList'
 
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governance account is required'),
+  collateralName: yup.string().required('Valid Collateral name is required'),
+  insuranceName: yup.string().required('Valid Insurance name is required'),
+})
+
 const RegisterMangoDepository = ({
   index,
   governedAccount,
@@ -20,7 +28,6 @@ const RegisterMangoDepository = ({
 }) => {
   const {
     connection,
-    wallet,
     form,
     formErrors,
     handleSetForm,
@@ -29,25 +36,13 @@ const RegisterMangoDepository = ({
     initialFormValues: {
       governedAccount,
     },
-    schema: yup.object().shape({
-      collateralName: yup
-        .string()
-        .required('Valid Collateral name is required'),
-      insuranceName: yup.string().required('Valid Insurance name is required'),
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governance account is required'),
-    }),
-    buildInstruction: async function () {
-      if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
-      }
+    schema,
+    buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
       return createRegisterMangoDepositoryInstruction(
         connection,
         form.governedAccount!.governance.account.governedAccount,
-        form.governedAccount!.governance.pubkey,
-        new PublicKey(wallet!.publicKey!.toBase58()),
+        governedAccountPubkey,
+        wallet.publicKey!,
         form.collateralName!,
         form.insuranceName!
       )

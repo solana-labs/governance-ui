@@ -16,7 +16,6 @@ const ProposalForm = ({
   itxType: number
 }) => {
   const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-
   const shouldBeGoverned = index !== 0 && governance
 
   const [governedAccount, setGovernanceAccount] = useState<

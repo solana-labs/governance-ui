@@ -1,17 +1,27 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
-import Input from '@components/inputs/Input'
 import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
+import Input from '@components/inputs/Input'
 import Select from '@components/inputs/Select'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
 import SolendConfiguration from '@tools/sdk/solend/configuration'
+import { SOLEND_MINT_NAME_OPTIONS } from '@tools/sdk/solend/utils'
 import { withdrawObligationCollateralAndRedeemReserveLiquidity } from '@tools/sdk/solend/withdrawObligationCollateralAndRedeemReserveLiquidity'
+import { uiAmountToNativeBN } from '@tools/sdk/units'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { WithdrawObligationCollateralAndRedeemReserveLiquidityForm } from '@utils/uiTypes/proposalCreationTypes'
 import SelectOptionList from '../../SelectOptionList'
-import { uiAmountToNativeBN } from '@tools/sdk/units'
-import { SOLEND_MINT_NAME_OPTIONS } from '@tools/sdk/solend/utils'
+
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+  mintName: yup.string().required('Token Name is required'),
+  uiAmount: yup
+    .number()
+    .moreThan(0, 'Amount should be more than 0')
+    .required('Amount is required'),
+})
 
 const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   index,
@@ -32,20 +42,10 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
         governedAccount,
         uiAmount: 0,
       },
-      schema: yup.object().shape({
-        governedAccount: yup
-          .object()
-          .nullable()
-          .required('Governed account is required'),
-        mintName: yup.string().required('Token Name is required'),
-        uiAmount: yup
-          .number()
-          .moreThan(0, 'Amount should be more than 0')
-          .required('Amount is required'),
-      }),
-      buildInstruction: async function () {
+      schema,
+      buildInstruction: async function ({ form, governedAccountPubkey }) {
         return withdrawObligationCollateralAndRedeemReserveLiquidity({
-          obligationOwner: governedAccount!.governance.pubkey,
+          obligationOwner: governedAccountPubkey,
           liquidityAmount: uiAmountToNativeBN(
             form.uiAmount,
             SolendConfiguration.getSupportedMintInformation(form.mintName!)

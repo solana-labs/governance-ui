@@ -1,11 +1,15 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
 import * as yup from 'yup'
-;('@hooks/useGovernedMultiTypeAccounts')
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
 import { createObligationAccount } from '@tools/sdk/solend/createObligationAccount'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { CreateSolendObligationAccountForm } from '@utils/uiTypes/proposalCreationTypes'
+
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governed account is required'),
+})
 
 const CreateObligationAccount = ({
   index,
@@ -15,23 +19,17 @@ const CreateObligationAccount = ({
   governedAccount?: GovernedMultiTypeAccount
 }) => {
   const {
-    wallet,
     connection,
   } = useInstructionFormBuilder<CreateSolendObligationAccountForm>({
     index,
     initialFormValues: {
       governedAccount,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governed account is required'),
-    }),
-    buildInstruction: async function () {
+    schema,
+    buildInstruction: async function ({ wallet, governedAccountPubkey }) {
       return createObligationAccount({
-        fundingAddress: wallet!.publicKey!,
-        walletAddress: governedAccount!.governance.pubkey,
+        fundingAddress: wallet.publicKey!,
+        walletAddress: governedAccountPubkey,
       })
     },
   })

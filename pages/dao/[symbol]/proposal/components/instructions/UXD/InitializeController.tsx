@@ -1,10 +1,21 @@
 import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
 import Input from '@components/inputs/Input'
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
 import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { InitializeControllerForm } from '@utils/uiTypes/proposalCreationTypes'
+
+const schema = yup.object().shape({
+  mintDecimals: yup
+    .number()
+    .min(0, 'Mint decimals cannot be less than 0')
+    .max(9, 'Mint decimals cannot be more than 9')
+    .required('Mint Decimals is required'),
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governance account is required'),
+})
 
 const InitializeController = ({
   index,
@@ -14,7 +25,6 @@ const InitializeController = ({
   governedAccount?: GovernedMultiTypeAccount
 }) => {
   const {
-    wallet,
     form,
     formErrors,
     handleSetForm,
@@ -24,26 +34,13 @@ const InitializeController = ({
       governedAccount,
       mintDecimals: 0,
     },
-    schema: yup.object().shape({
-      mintDecimals: yup
-        .number()
-        .min(0, 'Mint decimals cannot be less than 0')
-        .max(9, 'Mint decimals cannot be more than 9')
-        .required('Mint Decimals is required'),
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governance account is required'),
-    }),
-    buildInstruction: async function () {
-      if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
-      }
+    schema,
+    buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
       return createInitializeControllerInstruction(
         form.governedAccount!.governance.account.governedAccount,
         form.mintDecimals,
-        form.governedAccount!.governance.pubkey,
-        new PublicKey(wallet!.publicKey!.toBase58())
+        governedAccountPubkey,
+        wallet.publicKey!
       )
     },
   })

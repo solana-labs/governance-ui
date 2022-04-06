@@ -6,6 +6,17 @@ import { SetRedeemableGlobalSupplyCapForm } from '@utils/uiTypes/proposalCreatio
 import Input from '@components/inputs/Input'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Program governed account is required'),
+  supplyCap: yup
+    .number()
+    .moreThan(0, 'Redeemable global supply cap should be more than 0')
+    .required('Redeemable global supply cap is required'),
+})
+
 const SetRedeemGlobalSupplyCap = ({
   index,
   governedAccount,
@@ -23,24 +34,12 @@ const SetRedeemGlobalSupplyCap = ({
       governedAccount,
       supplyCap: 0,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Program governed account is required'),
-      supplyCap: yup
-        .number()
-        .moreThan(0, 'Redeemable global supply cap should be more than 0')
-        .required('Redeemable global supply cap is required'),
-    }),
-    buildInstruction: async function () {
-      if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
-      }
+    schema,
+    buildInstruction: async function ({ form, governedAccountPubkey }) {
       return createSetRedeemableGlobalSupplyCapInstruction(
         form.governedAccount!.governance.account.governedAccount,
         form.supplyCap,
-        form.governedAccount!.governance.pubkey
+        governedAccountPubkey
       )
     },
   })

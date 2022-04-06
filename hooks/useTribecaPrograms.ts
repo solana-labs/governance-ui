@@ -1,14 +1,11 @@
 import { Wallet } from '@project-serum/common'
-import {
-  SolanaAugmentedProvider,
-  SolanaProvider,
-} from '@saberhq/solana-contrib'
 import { useEffect, useState } from 'react'
 
 import useWalletStore from 'stores/useWalletStore'
 import ATribecaConfiguration, {
   TribecaPrograms,
 } from '@tools/sdk/tribeca/ATribecaConfiguration'
+import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations'
 
 export default function useTribecaPrograms(
   tribecaConfiguration: ATribecaConfiguration | null
@@ -23,16 +20,12 @@ export default function useTribecaPrograms(
       return
     }
 
-    const solanaProvider = SolanaProvider.load({
-      connection: connection.current,
-      sendConnection: connection.current,
-      wallet: wallet as Wallet,
-    })
-
     setPrograms(
-      tribecaConfiguration.loadPrograms(
-        new SolanaAugmentedProvider(solanaProvider)
-      )
+      getTribecaPrograms({
+        connection: connection.current,
+        wallet: wallet as Wallet,
+        config: tribecaConfiguration,
+      })
     )
   }, [connection, wallet, tribecaConfiguration])
 

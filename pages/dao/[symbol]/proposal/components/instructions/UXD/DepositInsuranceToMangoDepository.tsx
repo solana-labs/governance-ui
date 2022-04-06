@@ -11,6 +11,19 @@ import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { DepositInsuranceToMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes'
 import SelectOptionList from '../../SelectOptionList'
 
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governance account is required'),
+  collateralName: yup.string().required('Collateral Name address is required'),
+  insuranceName: yup.string().required('Insurance Name address is required'),
+  insuranceDepositedAmount: yup
+    .number()
+    .moreThan(0, 'Insurance Deposited amount should be more than 0')
+    .required('Insurance Deposited amount is required'),
+})
+
 const UXDDepositInsuranceToMangoDepository = ({
   index,
   governedAccount,
@@ -29,30 +42,12 @@ const UXDDepositInsuranceToMangoDepository = ({
       governedAccount,
       insuranceDepositedAmount: 0,
     },
-    schema: yup.object().shape({
-      collateralName: yup
-        .string()
-        .required('Collateral Name address is required'),
-      insuranceName: yup
-        .string()
-        .required('Insurance Name address is required'),
-      insuranceDepositedAmount: yup
-        .number()
-        .moreThan(0, 'Insurance Deposited amount should be more than 0')
-        .required('Insurance Deposited amount is required'),
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governance account is required'),
-    }),
-    buildInstruction: async function () {
-      if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
-      }
+    schema,
+    buildInstruction: async function ({ form, governedAccountPubkey }) {
       return createDepositInsuranceToMangoDepositoryInstruction(
         connection,
         form.governedAccount!.governance!.account.governedAccount,
-        form.governedAccount!.governance!.pubkey,
+        governedAccountPubkey,
         form.collateralName!,
         form.insuranceName!,
         form.insuranceDepositedAmount

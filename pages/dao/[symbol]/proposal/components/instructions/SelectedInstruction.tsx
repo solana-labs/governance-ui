@@ -18,6 +18,17 @@ import SolendInitObligationAccount from './Solend/InitObligationAccount'
 import SolendRefreshObligation from './Solend/RefreshObligation'
 import SolendRefreshReserve from './Solend/RefreshReserve'
 import SolendWithdrawObligationCollateralAndRedeemReserveLiquidity from './Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
+import TribecaCreateEpochGauge from './Tribeca/CreateEpochGauge'
+import TribecaCreateEscrowGovernanceTokenATA from './Tribeca/CreateEscrowGovernanceTokenATA'
+import TribecaCreateGaugeVote from './Tribeca/CreateGaugeVote'
+import TribecaCreateGaugeVoter from './Tribeca/CreateGaugeVoter'
+import TribecaGaugeCommitVote from './Tribeca/GaugeCommitVote'
+import TribecaGaugeRevertVote from './Tribeca/GaugeRevertVote'
+import TribecaLock from './Tribeca/Lock'
+import TribecaNewEscrow from './Tribeca/NewEscrow'
+import TribecaPrepareEpochGaugeVoter from './Tribeca/PrepareEpochGaugeVoter'
+import TribecaResetEpochGaugeVoter from './Tribeca/ResetEpochGaugeVoter'
+import TribecaGaugeSetVote from './Tribeca/SetGaugeVote'
 import UXDDepositInsuranceToMangoDepository from './UXD/DepositInsuranceToMangoDepository'
 import UXDInitializeController from './UXD/InitializeController'
 import UXDRegisterMangoDeposiory from './UXD/RegisterMangoDepository'
@@ -146,6 +157,72 @@ const SelectedInstruction = ({
           index={index}
           governedAccount={governedAccount}
         />
+      )
+    case Instructions.TribecaCreateEpochGauge:
+      return (
+        <TribecaCreateEpochGauge
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaCreateEscrowGovernanceTokenATA:
+      return (
+        <TribecaCreateEscrowGovernanceTokenATA
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaCreateGaugeVote:
+      return (
+        <TribecaCreateGaugeVote
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaCreateGaugeVoter:
+      return (
+        <TribecaCreateGaugeVoter
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaGaugeCommitVote:
+      return (
+        <TribecaGaugeCommitVote
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaGaugeRevertVote:
+      return (
+        <TribecaGaugeRevertVote
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaLock:
+      return <TribecaLock index={index} governedAccount={governedAccount} />
+    case Instructions.TribecaNewEscrow:
+      return (
+        <TribecaNewEscrow index={index} governedAccount={governedAccount} />
+      )
+    case Instructions.TribecaPrepareEpochGaugeVoter:
+      return (
+        <TribecaPrepareEpochGaugeVoter
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaResetEpochGaugeVoter:
+      return (
+        <TribecaResetEpochGaugeVoter
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case Instructions.TribecaGaugeSetVote:
+      return (
+        <TribecaGaugeSetVote index={index} governedAccount={governedAccount} />
       )
     case Instructions.Mint:
       return <Mint index={index} governance={governance} />

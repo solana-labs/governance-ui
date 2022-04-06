@@ -138,6 +138,61 @@ export default function useGovernanceAssets() {
 
   const availableInstructions = [
     {
+      id: Instructions.TribecaCreateEpochGauge,
+      name: 'Tribeca: Create Epoch Gauge',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaCreateEscrowGovernanceTokenATA,
+      name: 'Tribeca: Create Escrow Governance Token ATA',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaCreateGaugeVote,
+      name: 'Tribeca: Create Gauge Vote',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaCreateGaugeVoter,
+      name: 'Tribeca: Create Gauge Voter',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaGaugeCommitVote,
+      name: 'Tribeca: Gauge Commit Vote',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaGaugeRevertVote,
+      name: 'Tribeca: Gauge Revert Vote',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaLock,
+      name: 'Tribeca: Lock Tokens',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaNewEscrow,
+      name: 'Tribeca: New Escrow',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaPrepareEpochGaugeVoter,
+      name: 'Tribeca: Prepare Epoch Gauge Voter',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaResetEpochGaugeVoter,
+      name: 'Tribeca: Reset Epoch Gauge Voter',
+      isVisible: canUseAnyInstruction,
+    },
+    {
+      id: Instructions.TribecaGaugeSetVote,
+      name: 'Tribeca: Set Gauge Vote',
+      isVisible: canUseAnyInstruction,
+    },
+    {
       id: Instructions.SolendCreateObligationAccount,
       name: 'Solend: Create Obligation Account',
       isVisible: canUseAnyInstruction,

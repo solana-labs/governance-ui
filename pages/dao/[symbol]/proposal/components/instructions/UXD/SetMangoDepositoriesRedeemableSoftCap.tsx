@@ -5,6 +5,17 @@ import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/u
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { SetMangoDepositoriesRedeemableSoftCapForm } from '@utils/uiTypes/proposalCreationTypes'
 
+const schema = yup.object().shape({
+  governedAccount: yup
+    .object()
+    .nullable()
+    .required('Governance account is required'),
+  softCap: yup
+    .number()
+    .moreThan(0, 'Redeemable soft cap should be more than 0')
+    .required('Redeemable soft cap is required'),
+})
+
 const SetMangoDepositoriesRedeemableSoftCap = ({
   index,
   governedAccount,
@@ -22,24 +33,12 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       governedAccount,
       softCap: 0,
     },
-    schema: yup.object().shape({
-      governedAccount: yup
-        .object()
-        .nullable()
-        .required('Governance account is required'),
-      softCap: yup
-        .number()
-        .moreThan(0, 'Redeemable soft cap should be more than 0')
-        .required('Redeemable soft cap is required'),
-    }),
-    buildInstruction: async function () {
-      if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
-      }
+    schema,
+    buildInstruction: async function ({ form, governedAccountPubkey }) {
       return createSetMangoDepositoriesRedeemableSoftCapInstruction(
         form.governedAccount!.governance.account.governedAccount,
         form.softCap,
-        form.governedAccount!.governance.pubkey
+        governedAccountPubkey
       )
     },
   })
