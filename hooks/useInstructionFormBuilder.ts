@@ -11,6 +11,7 @@ import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import useWalletStore from 'stores/useWalletStore'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import useGovernedMultiTypeAccounts from './useGovernedMultiTypeAccounts'
+import { EndpointTypes } from '@models/types'
 
 export type SerializedInstruction = string
 
@@ -35,11 +36,13 @@ function useInstructionFormBuilder<
   buildInstruction?: ({
     form,
     connection,
+    cluster,
     wallet,
     governedAccountPubkey,
   }: {
     form: T
     connection: Connection
+    cluster: EndpointTypes
     wallet: SignerWalletAdapter
     governedAccountPubkey: PublicKey
   }) => Promise<TransactionInstruction | SerializedInstruction>
@@ -86,6 +89,7 @@ function useInstructionFormBuilder<
         ? await buildInstruction({
             form,
             connection: connection.current,
+            cluster: connection.cluster,
             wallet,
             governedAccountPubkey,
           })
@@ -127,7 +131,6 @@ function useInstructionFormBuilder<
   }, [JSON.stringify(initialFormValues.governedAccount)])
 
   useEffect(() => {
-    console.debug('form', form)
     debounce.debounceFcn(async () => {
       await validateForm()
     })

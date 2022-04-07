@@ -200,6 +200,10 @@ export default function useGovernanceAssets() {
       name: 'Tribeca',
       image: '/img/tribeca.png',
     },
+    [PackageEnum.Socean]: {
+      name: 'Socean',
+      image: '/img/socean.png',
+    },
   }
 
   const instructions: Instructions = {
@@ -257,6 +261,41 @@ export default function useGovernanceAssets() {
       name: 'Tribeca: Set Gauge Vote',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
+    },
+    [InstructionEnum.SoceanMintBondedTokens]: {
+      name: 'Socean: Mint Bonded Tokens',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Socean,
+    },
+    [InstructionEnum.SoceanDepositToAuctionPool]: {
+      name: 'Socean: Deposit to Auction',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Socean,
+    },
+    [InstructionEnum.SoceanPurchaseBondedTokens]: {
+      name: 'Socean: Purchase Bonded Tokens',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Socean,
+    },
+    [InstructionEnum.SoceanCloseAuction]: {
+      name: 'Socean: Close Auction',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Socean,
+    },
+    [InstructionEnum.SoceanVest]: {
+      name: 'Socean: Vest',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Socean,
+    },
+    [InstructionEnum.SoceanCancelVest]: {
+      name: 'Socean: Cancel Vest',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Socean,
+    },
+    [InstructionEnum.SolendCreateObligationAccount]: {
+      name: 'Solend: Create Obligation Account',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
     [InstructionEnum.SolendCreateObligationAccount]: {
       name: 'Create Obligation Account',

@@ -2131,6 +2131,21 @@
   dependencies:
     "@sinonjs/commons" "^1.7.0"
 
+"@soceanfi/bonding@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@soceanfi/bonding/-/bonding-0.3.0.tgz#ca219f480eb221983860d7b7f79456dd7e83a78b"
+  integrity sha512-PLrr3tIlBUBLQjkqf/8aIgNrXh5d0X9fjrb8OrbHkwOiLq/kHdjjMhtpGf9FqGwOT+twYJi+LtKNXBU32uL57Q==
+  dependencies:
+    "@project-serum/anchor" "0.20.1"
+
+"@soceanfi/descending-auction@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@soceanfi/descending-auction/-/descending-auction-0.2.1.tgz#1af6043ce3a764ea6bd383accd4ed074c993eb7e"
+  integrity sha512-c+3suYUFAzig6xevxCNX42FZHgqYGemM+awya3WymqYYYLa5UdnI7kXYDO7RzwqfrQCG6n+fT2WS6rUcDJBiaQ==
+  dependencies:
+    "@project-serum/anchor" "0.20.1"
+    dayjs "^1.10.7"
+
 "@solana/buffer-layout@^3.0.0":
   version "3.0.0"
   resolved "https://registry.yarnpkg.com/@solana/buffer-layout/-/buffer-layout-3.0.0.tgz#b9353caeb9a1589cb77a1b145bcb1a9a93114326"

@@ -189,6 +189,59 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
   insuranceWithdrawnAmount: number
 }
 
+export interface SoceanMintBondedTokensForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiAmount?: number
+  depositFrom?: string
+  bondPool?: string
+  bondedMint?: string
+  mintTo?: string
+}
+
+export interface SoceanDepositToAuctionPoolForm {
+  governedAccount?: GovernedMultiTypeAccount
+  uiDepositAmount?: number
+  auction?: string
+  sourceAccount?: string
+  bondedMint?: string
+}
+
+export interface SoceanCloseAuctionForm {
+  governedAccount?: GovernedMultiTypeAccount
+  auction?: string
+  bondedMint?: string
+  destinationAccount?: string
+}
+
+export interface SoceanPurchaseBondedTokensForm {
+  governedAccount?: GovernedMultiTypeAccount
+  auction?: string
+  bondedMint?: string
+  paymentDestination?: string
+  buyer?: string
+  paymentSource?: string
+  saleDestination?: string
+  uiPurchaseAmount?: number
+  uiExpectedPayment?: number
+  slippageTolerance?: number
+}
+
+export interface SoceanCancelVestForm {
+  governedAccount?: GovernedMultiTypeAccount
+  bondPool?: string
+  bondedMint?: string
+  userBondedAccount?: string
+  userTargetAccount?: string
+}
+
+export interface SoceanVestForm {
+  governedAccount?: GovernedMultiTypeAccount
+  bondPool?: string
+  bondedMint?: string
+  userBondedAccount?: string
+  uiAmount?: number
+}
+
 export interface TribecaCreateEpochGaugeForm {
   governedAccount?: GovernedMultiTypeAccount
   gaugeName?: string
@@ -302,6 +355,12 @@ export enum InstructionEnum {
   SolendWithdrawObligationCollateralAndRedeemReserveLiquidity,
   SolendRefreshObligation,
   SolendRefreshReserve,
+  SoceanMintBondedTokens,
+  SoceanDepositToAuctionPool,
+  SoceanCloseAuction,
+  SoceanPurchaseBondedTokens,
+  SoceanCancelVest,
+  SoceanVest,
   TribecaCreateEpochGauge,
   TribecaCreateEscrowGovernanceTokenATA,
   TribecaCreateGaugeVote,
@@ -335,6 +394,7 @@ export enum PackageEnum {
   UXDStaking,
   Friktion,
   Tribeca,
+  Socean,
 }
 
 export type createParams = [

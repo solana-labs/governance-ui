@@ -5,8 +5,17 @@ import CreateAssociatedTokenAccount from './Native/CreateAssociatedTokenAccount'
 import RaydiumAddLiquidityToPool from './Raydium/AddLiquidityToPool'
 import RaydiumRemoveLiquidityFromPool from './Raydium/RemoveLiquidityFromPool'
 import FriktionDeposit from './Friktion/FriktionDeposit'
+import NativeMint from './Native/Mint'
+import NativeEmpty from './Native/Empty'
+import NativeCustomBase64 from './Native/CustomBase64'
 import SetProgramAuthority from './Native/SetProgramAuthority'
 import SplTokenTransfer from './Native/SplTokenTransfer'
+import SoceanCancelVest from './Socean/CancelVest'
+import SoceanCloseAuction from './Socean/CloseAuction'
+import SoceanDepositToAuctionPool from './Socean/DepositToAuctionPool'
+import SoceanMintBondedTokens from './Socean/MintBondedTokens'
+import SoceanPurchaseBondedTokens from './Socean/PurchaseBondedTokens'
+import SoceanVest from './Socean/Vest'
 import SolendCreateObligationAccount from './Solend/CreateObligationAccount'
 import SolendDepositReserveLiquidityAndObligationCollateral from './Solend/DepositReserveLiquidityAndObligationCollateral'
 import SolendInitObligationAccount from './Solend/InitObligationAccount'
@@ -30,9 +39,6 @@ import UXDRegisterMangoDeposiory from './UXD/RegisterMangoDepository'
 import UXDSetMangoDepositoriesRedeemableSoftCap from './UXD/SetMangoDepositoriesRedeemableSoftCap'
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap'
 import UXDWithdrawInsuranceFromMangoDepository from './UXD/WithdrawInsuranceFromMangoDepository'
-import NativeMint from './Native/Mint'
-import NativeEmpty from './Native/Empty'
-import NativeCustomBase64 from './Native/CustomBase64'
 import VoteStakeRegistryGrant from 'VoteStakeRegistry/components/instructions/Grant'
 import VoteStakeRegistryClawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign'
@@ -277,6 +283,37 @@ const SelectedInstruction = ({
     case InstructionEnum.None:
       return <NativeEmpty index={index} governedAccount={governedAccount} />
 
+    case InstructionEnum.SoceanCancelVest:
+      return (
+        <SoceanCancelVest index={index} governedAccount={governedAccount} />
+      )
+    case InstructionEnum.SoceanCloseAuction:
+      return (
+        <SoceanCloseAuction index={index} governedAccount={governedAccount} />
+      )
+    case InstructionEnum.SoceanDepositToAuctionPool:
+      return (
+        <SoceanDepositToAuctionPool
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.SoceanMintBondedTokens:
+      return (
+        <SoceanMintBondedTokens
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.SoceanPurchaseBondedTokens:
+      return (
+        <SoceanPurchaseBondedTokens
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.SoceanVest:
+      return <SoceanVest index={index} governedAccount={governedAccount} />
     default:
       return null
   }
