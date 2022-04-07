@@ -48,8 +48,8 @@ const MakeResolveMarketParams = ({
   return (
     <>
       {governedAccountSelect}
-      <ForesightMarketIdInput {...inputProps} />
       <ForesightMarketListIdInput {...inputProps} />
+      <ForesightMarketIdInput {...inputProps} />
       <ForesightWinnerInput {...inputProps} />
     </>
   )

@@ -47,8 +47,8 @@ const MakeInitMarketParams = ({
   return (
     <>
       {governedAccountSelect}
-      <ForesightMarketIdInput {...inputProps} />
       <ForesightMarketListIdInput {...inputProps} />
+      <ForesightMarketIdInput {...inputProps} />
     </>
   )
 }
