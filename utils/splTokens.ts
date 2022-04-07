@@ -92,9 +92,9 @@ export function getSplTokenNameByMint(mint: PublicKey): string {
   )
 }
 
-export function getSplTokenMintAddressByUIName(
+export function getSplTokenInformationByUIName(
   nameToMatch: SplTokenUIName
-): PublicKey {
+): SplTokenInformation {
   const item = Object.entries(SPL_TOKENS).find(
     ([_, { name }]) => name === nameToMatch
   )
@@ -104,7 +104,13 @@ export function getSplTokenMintAddressByUIName(
     throw new Error('Unable to find SPL token mint address by UI name')
   }
 
-  const [, { mint }] = item
+  return item[1]
+}
+
+export function getSplTokenMintAddressByUIName(
+  nameToMatch: SplTokenUIName
+): PublicKey {
+  const { mint } = getSplTokenInformationByUIName(nameToMatch)
 
   return mint
 }

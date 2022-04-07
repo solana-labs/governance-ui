@@ -5,6 +5,7 @@ import HotWalletPluginTribecaGauges from './plugins/TribecaGauges/TribecaGauges'
 import { saberTribecaConfiguration } from '@tools/sdk/tribeca/configurations'
 import HotWalletPluginTokenAccounts from './plugins/TokenAccounts/TokenAccounts'
 import HotWalletPluginSaberStats from './plugins/SaberStats/SaberStats'
+import HotWalletPluginUXDStaking from './plugins/UXDStaking/UXDStaking'
 
 const HotWallet = (): JSX.Element => {
   const { hotWalletAccount } = useHotWallet()
@@ -25,11 +26,10 @@ const HotWallet = (): JSX.Element => {
         hotWalletName={hotWalletAccount.name}
       />
 
-      <div
-        style={{ maxHeight: '1300px' }}
-        className="overflow-y-auto space-y-6 mt-6"
-      >
+      <div className="space-y-6 mt-6">
         <HotWalletPluginTokenAccounts hotWalletAccount={hotWalletAccount} />
+
+        <HotWalletPluginUXDStaking hotWalletAccount={hotWalletAccount} />
 
         <HotWalletPluginTribecaGauges
           tribecaConfiguration={saberTribecaConfiguration}

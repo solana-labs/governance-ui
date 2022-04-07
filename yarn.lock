@@ -2985,6 +2985,11 @@
     "@project-serum/anchor" "0.20.0"
     camelcase "^5.3.1"
 
+"@uxdprotocol/uxd-staking-client@1.3.0":
+  version "1.3.0"
+  resolved "https://npm.pkg.github.com/download/@uxdprotocol/uxd-staking-client/1.3.0/599b0a2bb08e51da355d3aa2ce9738382366e171ec1f35fcc9fb3610bbd4f67c#5e4be05f19139ed28a2a952e922077a16a2c9d3a"
+  integrity sha512-+X/q9QbBhRJoPHLH8+4auYiy3VidHX5lbFFJoK9wBiC5Kl0+VMWft9hoOtDfFc1HObzYJvA7rEmf2aYB4FQmXw==
+
 "@yarnpkg/lockfile@^1.1.0":
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/@yarnpkg/lockfile/-/lockfile-1.1.0.tgz#e77a97fbd345b76d83245edcd17d393b1b41fb31"

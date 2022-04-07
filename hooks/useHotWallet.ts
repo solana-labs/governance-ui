@@ -13,6 +13,12 @@ const RealmsHotWallet = {
     publicKey: new PublicKey('AuQHcJZhTd1dnXRrM78RomFiCvW6a9CqxxJ94Fp9h8b'),
   },
 
+  // Devnet realm
+  'kek world': {
+    name: `SOL Treasury's Owner`,
+    publicKey: new PublicKey('AWuSjBCEMVtk8fX2HAwtuMjoHLmLM72PJxi1dZdKHPFu'),
+  },
+
   // <---- declare your realm hot wallet here
 }
 

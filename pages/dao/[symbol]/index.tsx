@@ -83,14 +83,7 @@ function getVotingStateRank(
 }
 
 const REALM = () => {
-  const {
-    realm,
-    realmInfo,
-    proposals,
-    realmTokenAccount,
-    ownTokenRecord,
-    governances,
-  } = useRealm()
+  const { realm, realmInfo, proposals, governances } = useRealm()
   const proposalsPerPage = 20
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const prevStringifyNftsGovernedTokenAccounts = usePrevious(
@@ -106,7 +99,6 @@ const REALM = () => {
     [string, ProgramAccount<Proposal>][]
   >([])
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
-  const wallet = useWalletStore((s) => s.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
     compareProposals(b[1].account, a[1].account, governances)
@@ -142,21 +134,7 @@ const REALM = () => {
       getNfts(nftsGovernedTokenAccounts, connection)
     }
   }, [JSON.stringify(nftsGovernedTokenAccounts)])
-  // DEBUG print remove
-  console.log(
-    'governance page tokenAccount',
-    realmTokenAccount && realmTokenAccount.publicKey.toBase58()
-  )
 
-  console.log(
-    'governance page wallet',
-    wallet?.connected && wallet?.publicKey?.toBase58()
-  )
-
-  console.log(
-    'governance page tokenRecord',
-    wallet?.connected && ownTokenRecord
-  )
   const onProposalPageChange = (page) => {
     setPaginatedProposals(paginateProposals(page))
   }

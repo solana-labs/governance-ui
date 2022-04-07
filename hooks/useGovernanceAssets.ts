@@ -188,6 +188,10 @@ export default function useGovernanceAssets() {
       name: 'UXD',
       image: '/img/uxd.png',
     },
+    [PackageEnum.UXDStaking]: {
+      name: 'UXD Staking',
+      image: '/img/uxd-staking.png',
+    },
     [PackageEnum.Friktion]: {
       name: 'Friktion',
       image: '/img/friktion.png',
@@ -386,6 +390,31 @@ export default function useGovernanceAssets() {
         )
       ),
       packageId: PackageEnum.Native,
+    },
+    [InstructionEnum.UXDStakingInitializeStakingCampaign]: {
+      name: 'Initialize Staking Campaign',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDStaking,
+    },
+    [InstructionEnum.UXDStakingFinalizeStakingCampaign]: {
+      name: 'Finalize Staking Campaign',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDStaking,
+    },
+    [InstructionEnum.UXDStakingAddStakingOption]: {
+      name: 'Add Staking Option',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDStaking,
+    },
+    [InstructionEnum.UXDStakingActivateStakingOption]: {
+      name: 'Activate Staking Option',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDStaking,
+    },
+    [InstructionEnum.UXDStakingRefillRewardVault]: {
+      name: 'UXD Staking: Refill Reward Vault',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.UXDStaking,
     },
   }
 

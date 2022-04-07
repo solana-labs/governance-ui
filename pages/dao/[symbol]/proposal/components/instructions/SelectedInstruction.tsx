@@ -35,6 +35,11 @@ import NativeEmpty from './Native/Empty'
 import NativeCustomBase64 from './Native/CustomBase64'
 import VoteStakeRegistryGrant from 'VoteStakeRegistry/components/instructions/Grant'
 import VoteStakeRegistryClawback from 'VoteStakeRegistry/components/instructions/Clawback'
+import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign'
+import UXDStakingFinalizeStakingCampaign from './UXDStaking/FinalizeStakingCampaign'
+import UXDStakingAddStakingOption from './UXDStaking/AddStakingOption'
+import UXDStakingActivateStakingOption from './UXDStaking/ActivateStakingOption'
+import UXDStakingRefillRewardVault from './UXDStaking/RefillRewardVault'
 
 const SelectedInstruction = ({
   itxType,
@@ -152,6 +157,41 @@ const SelectedInstruction = ({
     case InstructionEnum.UXDWithdrawInsuranceFromMangoDepository:
       return (
         <UXDWithdrawInsuranceFromMangoDepository
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.UXDStakingInitializeStakingCampaign:
+      return (
+        <UXDStakingInitializeStakingCampaign
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.UXDStakingFinalizeStakingCampaign:
+      return (
+        <UXDStakingFinalizeStakingCampaign
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.UXDStakingAddStakingOption:
+      return (
+        <UXDStakingAddStakingOption
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.UXDStakingActivateStakingOption:
+      return (
+        <UXDStakingActivateStakingOption
+          index={index}
+          governedAccount={governedAccount}
+        />
+      )
+    case InstructionEnum.UXDStakingRefillRewardVault:
+      return (
+        <UXDStakingRefillRewardVault
           index={index}
           governedAccount={governedAccount}
         />
