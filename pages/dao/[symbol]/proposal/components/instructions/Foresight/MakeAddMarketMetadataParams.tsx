@@ -27,6 +27,7 @@ const MakeAddMarketMetadataParams = ({
     inputProps,
     effector,
     governedAccountSelect,
+    wallet,
   } = commonAssets<ForesightMakeAddMarketMetadataParams>(
     {
       marketListId: '',
@@ -50,7 +51,7 @@ const MakeAddMarketMetadataParams = ({
       form.content,
       field,
       program,
-      form.governedAccount.transferAddress!
+      wallet!.publicKey!
     )
     return ix
   }

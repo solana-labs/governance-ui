@@ -24,6 +24,7 @@ const MakeInitMarketParams = ({
     inputProps,
     effector,
     governedAccountSelect,
+    wallet,
   } = commonAssets<ForesightHasMarketId>(
     { marketListId: '', marketId: 0 },
     index,
@@ -37,7 +38,7 @@ const MakeInitMarketParams = ({
       Buffer.from(form.marketListId.padEnd(20)),
       Uint8Array.from([form.marketId]),
       program,
-      form.governedAccount.transferAddress!
+      wallet!.publicKey!
     )
     return ix
   }
