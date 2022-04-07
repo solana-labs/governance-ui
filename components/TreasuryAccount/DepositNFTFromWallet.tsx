@@ -79,7 +79,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       )
       await sendTransaction({
         connection: connection.current,
-        wallet,
+        wallet: wallet!,
         transaction,
         sendingMessage: 'Depositing NFT',
         successMessage: 'NFT has been deposited',
