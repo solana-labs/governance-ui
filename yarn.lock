@@ -2067,10 +2067,10 @@
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
 
-"@solana/spl-governance@^0.0.33":
-  version "0.0.33"
-  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.33.tgz#fabf08ae6f4e3f6d4bb9278b067d3818b5cb0223"
-  integrity sha512-B4mSRbomcbNFJ1vTb7iro6uzQTbZJ8RKhTdG2Kfe7DKA4Ahg/Eb3e9tWyBKdII7et2jLysR5g9Z71XfArwCX3Q==
+"@solana/spl-governance@^0.0.34":
+  version "0.0.34"
+  resolved "https://registry.yarnpkg.com/@solana/spl-governance/-/spl-governance-0.0.34.tgz#c61d81d356dbcee961bbc85e5d3538846fea57ad"
+  integrity sha512-tZppBiiVkUa5v+B/Ds+TqZ4yxR/vaIYLRxBk7x6R22dwk4/9SU87bVE60kRdDqTdMzqScFxIMdhaGl/fCX533A==
   dependencies:
     "@solana/web3.js" "^1.22.0"
     bignumber.js "^9.0.1"
