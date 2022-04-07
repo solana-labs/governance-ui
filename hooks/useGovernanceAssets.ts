@@ -5,12 +5,48 @@ import {
   GovernedMintInfoAccount,
   parseMintAccountData,
 } from '@utils/tokens'
-import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
+import {
+  InstructionEnum,
+  PackageEnum,
+} from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 
 import useRealm from './useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+
+export type InstructionTag = 'beta' | 'deprecated'
+
+type Instruction = {
+  name: string
+  isVisible?: boolean
+  packageId: PackageEnum
+  tag?: InstructionTag
+}
+
+type Instructions = {
+  [instructionId in InstructionEnum]: Instruction
+}
+
+export type InstructionType = {
+  id: InstructionEnum
+  name: string
+  packageId: PackageEnum
+  tag?: InstructionTag
+}
+
+type Package = {
+  name: string
+  image?: string
+}
+
+type Packages = {
+  [packageId in PackageEnum]: Package
+}
+
+export type PackageType = Package & {
+  id: PackageEnum
+}
 
 export default function useGovernanceAssets() {
   const { ownVoterWeight, realm, symbol, governances } = useRealm()
@@ -92,10 +128,6 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(gov.account.config)
     )
 
-  const getAvailableInstructions = () => {
-    return availableInstructions.filter((itx) => itx.isVisible)
-  }
-
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
@@ -136,200 +168,260 @@ export default function useGovernanceAssets() {
       ownVoterWeight.canCreateProposal(acc.governance?.account?.config)
   )
 
-  const availableInstructions = [
-    {
-      id: Instructions.TribecaCreateEpochGauge,
+  const packages: Packages = {
+    [PackageEnum.Native]: {
+      name: 'Native',
+    },
+    [PackageEnum.VoteStakeRegistry]: {
+      name: 'Vote Stake Registry',
+      image: '/img/vote-stake-registry.png',
+    },
+    [PackageEnum.Solend]: {
+      name: 'Solend',
+      image: '/img/solend.png',
+    },
+    [PackageEnum.Raydium]: {
+      name: 'Raydium',
+      image: '/img/raydium.png',
+    },
+    [PackageEnum.UXD]: {
+      name: 'UXD',
+      image: '/img/uxd.png',
+    },
+    [PackageEnum.Friktion]: {
+      name: 'Friktion',
+      image: '/img/friktion.png',
+    },
+    [PackageEnum.Tribeca]: {
+      name: 'Tribeca',
+      image: '/img/tribeca.png',
+    },
+  }
+
+  const instructions: Instructions = {
+    [InstructionEnum.TribecaCreateEpochGauge]: {
       name: 'Tribeca: Create Epoch Gauge',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaCreateEscrowGovernanceTokenATA,
+    [InstructionEnum.TribecaCreateEscrowGovernanceTokenATA]: {
       name: 'Tribeca: Create Escrow Governance Token ATA',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaCreateGaugeVote,
+    [InstructionEnum.TribecaCreateGaugeVote]: {
       name: 'Tribeca: Create Gauge Vote',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaCreateGaugeVoter,
+    [InstructionEnum.TribecaCreateGaugeVoter]: {
       name: 'Tribeca: Create Gauge Voter',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaGaugeCommitVote,
+    [InstructionEnum.TribecaGaugeCommitVote]: {
       name: 'Tribeca: Gauge Commit Vote',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaGaugeRevertVote,
+    [InstructionEnum.TribecaGaugeRevertVote]: {
       name: 'Tribeca: Gauge Revert Vote',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaLock,
+    [InstructionEnum.TribecaLock]: {
       name: 'Tribeca: Lock Tokens',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaNewEscrow,
+    [InstructionEnum.TribecaNewEscrow]: {
       name: 'Tribeca: New Escrow',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaPrepareEpochGaugeVoter,
+    [InstructionEnum.TribecaPrepareEpochGaugeVoter]: {
       name: 'Tribeca: Prepare Epoch Gauge Voter',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaResetEpochGaugeVoter,
+    [InstructionEnum.TribecaResetEpochGaugeVoter]: {
       name: 'Tribeca: Reset Epoch Gauge Voter',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.TribecaGaugeSetVote,
+    [InstructionEnum.TribecaGaugeSetVote]: {
       name: 'Tribeca: Set Gauge Vote',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Tribeca,
     },
-    {
-      id: Instructions.SolendCreateObligationAccount,
-      name: 'Solend: Create Obligation Account',
+    [InstructionEnum.SolendCreateObligationAccount]: {
+      name: 'Create Obligation Account',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
-    {
-      id: Instructions.SolendInitObligationAccount,
-      name: 'Solend: Init Obligation Account',
+    [InstructionEnum.SolendInitObligationAccount]: {
+      name: 'Init Obligation Account',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
-    {
-      id: Instructions.SolendDepositReserveLiquidityAndObligationCollateral,
-      name: 'Solend: Deposit Funds',
+    [InstructionEnum.SolendDepositReserveLiquidityAndObligationCollateral]: {
+      name: 'Deposit Funds',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
-    {
-      id: Instructions.SolendRefreshReserve,
-      name: 'Solend: Refresh Reserve',
+    [InstructionEnum.SolendRefreshReserve]: {
+      name: 'Refresh Reserve',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
-    {
-      id: Instructions.SolendRefreshObligation,
-      name: 'Solend: Refresh Obligation',
+    [InstructionEnum.SolendRefreshObligation]: {
+      name: 'Refresh Obligation',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
-    {
-      id:
-        Instructions.SolendWithdrawObligationCollateralAndRedeemReserveLiquidity,
-      name: 'Solend: Withdraw Funds',
+    [InstructionEnum.SolendWithdrawObligationCollateralAndRedeemReserveLiquidity]: {
+      name: 'Withdraw Funds',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Solend,
     },
-    {
-      id: Instructions.UXDInitializeController,
-      name: 'UXD: Initialize Controller',
+    [InstructionEnum.UXDInitializeController]: {
+      name: 'Initialize Controller',
       isVisible: canUseUxdInstructions,
+      packageId: PackageEnum.UXD,
     },
-    {
-      id: Instructions.UXDSetRedeemableGlobalSupplyCap,
-      name: 'UXD: Set Redeemable Global Supply Cap',
+    [InstructionEnum.UXDSetRedeemableGlobalSupplyCap]: {
+      name: 'Set Redeemable Global Supply Cap',
       isVisible: canUseUxdInstructions,
+      packageId: PackageEnum.UXD,
     },
-    {
-      id: Instructions.UXDSetMangoDepositoriesRedeemableSoftCap,
-      name: 'UXD: Set Mango Depositories Redeemable Supply Soft Cap',
+    [InstructionEnum.UXDSetMangoDepositoriesRedeemableSoftCap]: {
+      name: 'Set Mango Depositories Redeemable Supply Soft Cap',
       isVisible: canUseUxdInstructions,
+      packageId: PackageEnum.UXD,
     },
-    {
-      id: Instructions.UXDRegisterMangoDepository,
-      name: 'UXD: Register Mango Depository',
+    [InstructionEnum.UXDRegisterMangoDepository]: {
+      name: 'Register Mango Depository',
       isVisible: canUseUxdInstructions,
+      packageId: PackageEnum.UXD,
     },
-    {
-      id: Instructions.UXDDepositInsuranceToMangoDepository,
-      name: 'UXD: Deposit Insurance To Mango Depository',
+    [InstructionEnum.UXDDepositInsuranceToMangoDepository]: {
+      name: 'Deposit Insurance To Mango Depository',
       isVisible: canUseUxdInstructions,
+      packageId: PackageEnum.UXD,
     },
-    {
-      id: Instructions.UXDWithdrawInsuranceFromMangoDepository,
-      name: 'UXD: Withdraw Insurance From Mango Depository',
+    [InstructionEnum.UXDWithdrawInsuranceFromMangoDepository]: {
+      name: 'Withdraw Insurance From Mango Depository',
       isVisible: canUseUxdInstructions,
+      packageId: PackageEnum.UXD,
     },
-    {
-      id: Instructions.RaydiumAddLiquidity,
-      name: 'Raydium: Add To Liquidity Pool',
+    [InstructionEnum.RaydiumAddLiquidity]: {
+      name: 'Add To Liquidity Pool',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Raydium,
     },
-    {
-      id: Instructions.RaydiumRemoveLiquidity,
-      name: 'Raydium: Remove From Liquidity Pool',
+    [InstructionEnum.RaydiumRemoveLiquidity]: {
+      name: 'Remove From Liquidity Pool',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Raydium,
     },
-    {
-      id: Instructions.Transfer,
+    [InstructionEnum.FriktionDepositIntoVolt]: {
+      name: 'Deposit into Volt',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Friktion,
+    },
+    [InstructionEnum.Transfer]: {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
+      packageId: PackageEnum.Native,
+      tag: 'deprecated',
     },
-    {
-      id: Instructions.Grant,
+    [InstructionEnum.Grant]: {
       name: 'Grant',
       isVisible:
         canUseTokenTransferInstruction &&
         realm?.account.config.useCommunityVoterWeightAddin,
+      packageId: PackageEnum.VoteStakeRegistry,
+      tag: 'deprecated',
     },
-    {
-      id: Instructions.Clawback,
+    [InstructionEnum.Clawback]: {
       name: 'Clawback',
       isVisible:
         canUseTokenTransferInstruction &&
         realm?.account.config.useCommunityVoterWeightAddin,
+      packageId: PackageEnum.VoteStakeRegistry,
+      tag: 'deprecated',
     },
-    {
-      id: Instructions.CreateAssociatedTokenAccount,
+    [InstructionEnum.CreateAssociatedTokenAccount]: {
       name: 'Create Associated Token Account',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Native,
     },
-    {
-      id: Instructions.FriktionDepositIntoVolt,
-      name: 'Friktion: Deposit into Volt',
-      isVisible: canUseAnyInstruction,
-    },
-    {
-      id: Instructions.ProgramUpgrade,
+    [InstructionEnum.ProgramUpgrade]: {
       name: 'Upgrade Program',
       isVisible: canUseProgramUpgradeInstruction,
+      packageId: PackageEnum.Native,
     },
-    {
-      id: Instructions.SetProgramAuthority,
+    [InstructionEnum.SetProgramAuthority]: {
       name: 'Set Program Authority',
       isVisible: canUseProgramUpgradeInstruction,
+      packageId: PackageEnum.Native,
     },
-    {
-      id: Instructions.Mint,
+    [InstructionEnum.Mint]: {
       name: 'Mint Tokens',
       isVisible: canUseMintInstruction,
+      packageId: PackageEnum.Native,
+      tag: 'deprecated',
     },
-    {
-      id: Instructions.Base64,
+    [InstructionEnum.Base64]: {
       name: 'Execute Custom Instruction',
       isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Native,
     },
-    {
-      id: Instructions.None,
+    [InstructionEnum.None]: {
       name: 'None',
-      isVisible:
+      isVisible: !!(
         realm &&
         Object.values(governances).some((g) =>
           ownVoterWeight.canCreateProposal(g.account.config)
-        ),
+        )
+      ),
+      packageId: PackageEnum.Native,
     },
-  ]
+  }
+
+  const availableInstructions = Object.entries(instructions)
+    .filter(
+      ([, { isVisible }]) => typeof isVisible === 'undefined' || isVisible
+    )
+    .map(([id, { name, packageId, tag }]) => ({
+      id: Number(id) as InstructionEnum,
+      name,
+      packageId,
+      tag,
+    }))
+
+  const availablePackages: PackageType[] = Object.entries(packages).map(
+    ([id, infos]) => ({
+      id: Number(id) as PackageEnum,
+      ...infos,
+    })
+  )
+
+  const getPackageTypeById = (packageId: PackageEnum) => {
+    return availablePackages.find(
+      (availablePackage) => availablePackage.id === packageId
+    )
+  }
+
   return {
     governancesArray,
     getGovernancesByAccountType,
     getGovernancesByAccountTypes,
+    availablePackages,
     availableInstructions,
-    getAvailableInstructions,
     governedTokenAccounts,
     getMintWithGovernances,
+    getPackageTypeById,
     canUseTransferInstruction,
     canUseMintInstruction,
     canMintRealmCommunityToken,

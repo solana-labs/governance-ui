@@ -17,7 +17,7 @@ const ProgramUpgrade = ({
   governedAccount,
 }: {
   index: number
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount?: GovernedMultiTypeAccount
 }) => {
   const connection = useWalletStore((s) => s.connection)
   const {

@@ -1,17 +1,12 @@
-import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
-import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
-import Grant from 'VoteStakeRegistry/components/instructions/Grant'
+import { InstructionEnum } from '@utils/uiTypes/proposalCreationTypes'
 import ProgramUpgrade from './bpfUpgradeableLoader/ProgramUpgrade'
-import CreateAssociatedTokenAccount from './CreateAssociatedTokenAccount'
-import CustomBase64 from './CustomBase64'
-import Empty from './Empty'
-import Mint from './Mint'
+import CreateAssociatedTokenAccount from './Native/CreateAssociatedTokenAccount'
 import RaydiumAddLiquidityToPool from './Raydium/AddLiquidityToPool'
 import RaydiumRemoveLiquidityFromPool from './Raydium/RemoveLiquidityFromPool'
-import SetProgramAuthority from './SetProgramAuthority'
-import SplTokenTransfer from './SplTokenTransfer'
+import FriktionDeposit from './Friktion/FriktionDeposit'
+import SetProgramAuthority from './Native/SetProgramAuthority'
+import SplTokenTransfer from './Native/SplTokenTransfer'
 import SolendCreateObligationAccount from './Solend/CreateObligationAccount'
 import SolendDepositReserveLiquidityAndObligationCollateral from './Solend/DepositReserveLiquidityAndObligationCollateral'
 import SolendInitObligationAccount from './Solend/InitObligationAccount'
@@ -35,205 +30,213 @@ import UXDRegisterMangoDeposiory from './UXD/RegisterMangoDepository'
 import UXDSetMangoDepositoriesRedeemableSoftCap from './UXD/SetMangoDepositoriesRedeemableSoftCap'
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap'
 import UXDWithdrawInsuranceFromMangoDepository from './UXD/WithdrawInsuranceFromMangoDepository'
+import NativeMint from './Native/Mint'
+import NativeEmpty from './Native/Empty'
+import NativeCustomBase64 from './Native/CustomBase64'
+import VoteStakeRegistryGrant from 'VoteStakeRegistry/components/instructions/Grant'
+import VoteStakeRegistryClawback from 'VoteStakeRegistry/components/instructions/Clawback'
 
 const SelectedInstruction = ({
   itxType,
   index,
-  governance,
   governedAccount,
 }: {
-  itxType: number
+  itxType: InstructionEnum
   index: number
-  governance: ProgramAccount<Governance> | null
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount?: GovernedMultiTypeAccount
 }) => {
   switch (itxType) {
-    case Instructions.Transfer:
-      return <SplTokenTransfer index={index} governance={governance} />
-    case Instructions.ProgramUpgrade:
+    case InstructionEnum.Transfer:
+      return <SplTokenTransfer index={index} governance={null} />
+    case InstructionEnum.ProgramUpgrade:
       return <ProgramUpgrade index={index} governedAccount={governedAccount} />
-    case Instructions.SetProgramAuthority:
+    case InstructionEnum.SetProgramAuthority:
       return (
         <SetProgramAuthority index={index} governedAccount={governedAccount} />
       )
-    case Instructions.CreateAssociatedTokenAccount:
+    case InstructionEnum.CreateAssociatedTokenAccount:
       return (
         <CreateAssociatedTokenAccount
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.SolendCreateObligationAccount:
+    case InstructionEnum.SolendCreateObligationAccount:
       return (
         <SolendCreateObligationAccount
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.SolendInitObligationAccount:
+    case InstructionEnum.SolendInitObligationAccount:
       return (
         <SolendInitObligationAccount
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.SolendDepositReserveLiquidityAndObligationCollateral:
+    case InstructionEnum.SolendDepositReserveLiquidityAndObligationCollateral:
       return (
         <SolendDepositReserveLiquidityAndObligationCollateral
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.SolendRefreshObligation:
+    case InstructionEnum.SolendRefreshObligation:
       return (
         <SolendRefreshObligation
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.SolendRefreshReserve:
+    case InstructionEnum.SolendRefreshReserve:
       return (
         <SolendRefreshReserve index={index} governedAccount={governedAccount} />
       )
-    case Instructions.SolendWithdrawObligationCollateralAndRedeemReserveLiquidity:
+    case InstructionEnum.SolendWithdrawObligationCollateralAndRedeemReserveLiquidity:
       return (
         <SolendWithdrawObligationCollateralAndRedeemReserveLiquidity
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.RaydiumAddLiquidity:
+    case InstructionEnum.RaydiumAddLiquidity:
       return (
         <RaydiumAddLiquidityToPool
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.RaydiumRemoveLiquidity:
+    case InstructionEnum.RaydiumRemoveLiquidity:
       return (
         <RaydiumRemoveLiquidityFromPool
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.UXDInitializeController:
+    case InstructionEnum.UXDInitializeController:
       return (
         <UXDInitializeController
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.UXDSetRedeemableGlobalSupplyCap:
+    case InstructionEnum.UXDSetRedeemableGlobalSupplyCap:
       return (
         <UXDSetRedeemableGlobalSupplyCap
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.UXDSetMangoDepositoriesRedeemableSoftCap:
+    case InstructionEnum.UXDSetMangoDepositoriesRedeemableSoftCap:
       return (
         <UXDSetMangoDepositoriesRedeemableSoftCap
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.UXDRegisterMangoDepository:
+    case InstructionEnum.UXDRegisterMangoDepository:
       return (
         <UXDRegisterMangoDeposiory
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.UXDDepositInsuranceToMangoDepository:
+    case InstructionEnum.UXDDepositInsuranceToMangoDepository:
       return (
         <UXDDepositInsuranceToMangoDepository
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.UXDWithdrawInsuranceFromMangoDepository:
+    case InstructionEnum.UXDWithdrawInsuranceFromMangoDepository:
       return (
         <UXDWithdrawInsuranceFromMangoDepository
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaCreateEpochGauge:
+    case InstructionEnum.TribecaCreateEpochGauge:
       return (
         <TribecaCreateEpochGauge
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaCreateEscrowGovernanceTokenATA:
+    case InstructionEnum.TribecaCreateEscrowGovernanceTokenATA:
       return (
         <TribecaCreateEscrowGovernanceTokenATA
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaCreateGaugeVote:
+    case InstructionEnum.TribecaCreateGaugeVote:
       return (
         <TribecaCreateGaugeVote
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaCreateGaugeVoter:
+    case InstructionEnum.TribecaCreateGaugeVoter:
       return (
         <TribecaCreateGaugeVoter
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaGaugeCommitVote:
+    case InstructionEnum.TribecaGaugeCommitVote:
       return (
         <TribecaGaugeCommitVote
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaGaugeRevertVote:
+    case InstructionEnum.TribecaGaugeRevertVote:
       return (
         <TribecaGaugeRevertVote
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaLock:
+    case InstructionEnum.TribecaLock:
       return <TribecaLock index={index} governedAccount={governedAccount} />
-    case Instructions.TribecaNewEscrow:
+    case InstructionEnum.TribecaNewEscrow:
       return (
         <TribecaNewEscrow index={index} governedAccount={governedAccount} />
       )
-    case Instructions.TribecaPrepareEpochGaugeVoter:
+    case InstructionEnum.TribecaPrepareEpochGaugeVoter:
       return (
         <TribecaPrepareEpochGaugeVoter
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaResetEpochGaugeVoter:
+    case InstructionEnum.TribecaResetEpochGaugeVoter:
       return (
         <TribecaResetEpochGaugeVoter
           index={index}
           governedAccount={governedAccount}
         />
       )
-    case Instructions.TribecaGaugeSetVote:
+    case InstructionEnum.TribecaGaugeSetVote:
       return (
         <TribecaGaugeSetVote index={index} governedAccount={governedAccount} />
       )
-    case Instructions.Mint:
-      return <Mint index={index} governance={governance} />
-    case Instructions.Base64:
-      return <CustomBase64 index={index} governance={governance} />
-    case Instructions.None:
-      return <Empty index={index} governedAccount={governedAccount} />
-    case Instructions.Grant:
-      return <Grant index={index} governance={governance} />
-    case Instructions.Clawback:
-      return <Clawback index={index} governance={governance} />
+    case InstructionEnum.FriktionDepositIntoVolt:
+      return <FriktionDeposit index={index} governance={null} />
+    case InstructionEnum.Mint:
+      return <NativeMint index={index} governance={null} />
+    case InstructionEnum.Grant:
+      return <VoteStakeRegistryGrant index={index} governance={null} />
+    case InstructionEnum.Clawback:
+      return <VoteStakeRegistryClawback index={index} governance={null} />
+    case InstructionEnum.Base64:
+      return (
+        <NativeCustomBase64 index={index} governedAccount={governedAccount} />
+      )
+    case InstructionEnum.None:
+      return <NativeEmpty index={index} governedAccount={governedAccount} />
+
     default:
       return null
   }

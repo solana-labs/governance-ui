@@ -27,7 +27,7 @@ import {
   GovernedMintInfoAccount,
   GovernedTokenAccount,
 } from './tokens'
-import { UiInstruction } from './uiTypes/proposalCreationTypes'
+import { FormInstructionData } from './uiTypes/proposalCreationTypes'
 import { ConnectedVoltSDK, FriktionSDK } from '@friktion-labs/friktion-sdk'
 import { AnchorWallet } from '@friktion-labs/friktion-sdk/dist/cjs/src/miscUtils'
 import { WSOL_MINT } from '@components/instructions/tools'
@@ -58,7 +58,7 @@ export async function getFriktionDepositInstruction({
   connection: ConnectionContext
   wallet: WalletAdapter | undefined
   setFormErrors: any
-}): Promise<UiInstruction> {
+}): Promise<FormInstructionData> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -202,7 +202,7 @@ export async function getFriktionDepositInstruction({
       throw e
     }
   }
-  const obj: UiInstruction = {
+  const obj: FormInstructionData = {
     serializedInstruction,
     isValid,
     governance: governedTokenAccount?.governance,
@@ -229,7 +229,7 @@ export async function getTransferInstruction({
   wallet: WalletAdapter | undefined
   currentAccount: GovernedTokenAccount | null
   setFormErrors: any
-}): Promise<UiInstruction> {
+}): Promise<FormInstructionData> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -282,7 +282,7 @@ export async function getTransferInstruction({
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
 
-  const obj: UiInstruction = {
+  const obj: FormInstructionData = {
     serializedInstruction,
     isValid,
     governance: currentAccount?.governance,
@@ -305,7 +305,7 @@ export async function getSolTransferInstruction({
   wallet: WalletAdapter | undefined
   currentAccount: GovernedTokenAccount | null
   setFormErrors: any
-}): Promise<UiInstruction> {
+}): Promise<FormInstructionData> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -333,7 +333,7 @@ export async function getSolTransferInstruction({
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
 
-  const obj: UiInstruction = {
+  const obj: FormInstructionData = {
     serializedInstruction,
     isValid,
     governance: currentAccount?.governance,
@@ -360,7 +360,7 @@ export async function getTransferNftInstruction({
   currentAccount: GovernedTokenAccount | null
   setFormErrors: any
   nftMint: string
-}): Promise<UiInstruction> {
+}): Promise<FormInstructionData> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -420,7 +420,7 @@ export async function getTransferNftInstruction({
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
 
-  const obj: UiInstruction = {
+  const obj: FormInstructionData = {
     serializedInstruction,
     isValid,
     governance: currentAccount?.governance,
@@ -445,7 +445,7 @@ export async function getMintInstruction({
   wallet: WalletAdapter | undefined
   governedMintInfoAccount: GovernedMintInfoAccount | undefined
   setFormErrors: any
-}): Promise<UiInstruction> {
+}): Promise<FormInstructionData> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
@@ -489,7 +489,7 @@ export async function getMintInstruction({
     )
     serializedInstruction = serializeInstructionToBase64(transferIx)
   }
-  const obj: UiInstruction = {
+  const obj: FormInstructionData = {
     serializedInstruction,
     isValid,
     governance: governedMintInfoAccount?.governance,
@@ -508,7 +508,7 @@ export async function getConvertToMsolInstruction({
   form: any
   connection: ConnectionContext
   setFormErrors: any
-}): Promise<UiInstruction> {
+}): Promise<FormInstructionData> {
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   const prerequisiteInstructions: TransactionInstruction[] = []
   let serializedInstruction = ''
@@ -544,7 +544,7 @@ export async function getConvertToMsolInstruction({
     }
   }
 
-  const obj: UiInstruction = {
+  const obj: FormInstructionData = {
     serializedInstruction,
     isValid,
     governance: form.governedTokenAccount?.governance,

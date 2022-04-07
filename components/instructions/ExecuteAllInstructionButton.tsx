@@ -77,7 +77,10 @@ export function ExecuteAllInstructionButton({
       await executeInstructions(rpcContext, proposal, proposalInstructions)
       await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
     } catch (error) {
-      notify({ type: 'error', message: `error executing instruction ${error}` })
+      notify({
+        type: 'error',
+        message: `error executing instruction ${error}`,
+      })
       console.error('error executing instruction', error)
 
       setPlaying(PlayState.Error)

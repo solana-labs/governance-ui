@@ -8,7 +8,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
 import {
   FriktionDepositForm,
-  UiInstruction,
+  FormInstructionData,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { NewProposalContext } from '../../../new'
 import { getFriktionDepositSchema } from '@utils/validations'
@@ -52,7 +52,7 @@ const FriktionDeposit = ({
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  const { handleSetInstruction } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -81,7 +81,7 @@ const FriktionDeposit = ({
     })
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstruction(): Promise<FormInstructionData> {
     return getFriktionDepositInstruction({
       schema,
       form,
@@ -112,7 +112,7 @@ const FriktionDeposit = ({
     })
   }, [realmInfo?.programId])
   useEffect(() => {
-    handleSetInstructions(
+    handleSetInstruction(
       { governedAccount: governedAccount, getInstruction },
       index
     )

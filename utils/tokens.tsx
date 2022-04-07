@@ -275,9 +275,7 @@ export async function getMultipleAccountInfoChunked(
 }
 
 //TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
-export function getTokenAccountLabelInfo(
-  acc: GovernedMultiTypeAccount | undefined
-) {
+export function getTokenAccountLabelInfo(acc?: GovernedMultiTypeAccount) {
   let tokenAccount = ''
   let tokenName = ''
   let tokenAccountName = ''
@@ -304,7 +302,7 @@ export function getTokenAccountLabelInfo(
   }
 }
 
-export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
+export function getSolAccountLabel(acc?: GovernedMultiTypeAccount) {
   let tokenAccount = ''
   let tokenName = ''
   let tokenAccountName = ''
@@ -332,9 +330,7 @@ export function getSolAccountLabel(acc: GovernedMultiTypeAccount | undefined) {
   }
 }
 
-export function getMintAccountLabelInfo(
-  acc: GovernedMultiTypeAccount | undefined
-) {
+export function getMintAccountLabelInfo(acc?: GovernedMultiTypeAccount) {
   let account = ''
   let tokenName = ''
   let mintAccountName = ''

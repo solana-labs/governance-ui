@@ -48,16 +48,14 @@ const Select = ({
                   noMaxWidth,
                 })}
               >
-                <div
-                  className={`flex items-center justify-between text-fgd-1 text-left`}
-                >
+                <div className={`flex items-center text-fgd-1 text-left`}>
                   {componentLabel
                     ? componentLabel
                     : value
                     ? value
                     : placeholder}
                   <ChevronDownIcon
-                    className={`default-transition flex-shrink-0 h-5 w-5 mr-1 text-primary-light ${
+                    className={`default-transition ml-auto flex-shrink-0 h-5 w-5 mr-1 text-primary-light ${
                       open ? 'transform rotate-180' : 'transform rotate-360'
                     }`}
                   />

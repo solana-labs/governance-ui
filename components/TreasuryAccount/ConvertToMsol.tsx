@@ -7,7 +7,7 @@ import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import {
   StakingViewForm,
-  UiInstruction,
+  FormInstructionData,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import Input from '@components/inputs/Input'
@@ -86,7 +86,7 @@ const ConvertToMsol = () => {
 
   const handlePropose = async () => {
     setIsLoading(true)
-    const instruction: UiInstruction = await getConvertToMsolInstruction({
+    const instruction: FormInstructionData = await getConvertToMsolInstruction({
       schema,
       form,
       connection,

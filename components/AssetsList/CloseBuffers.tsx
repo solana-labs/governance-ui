@@ -9,7 +9,7 @@ import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
 import useWalletStore from 'stores/useWalletStore'
 import { getValidatedPublickKey } from 'utils/validations'
 import { useEffect, useState } from 'react'
-import { UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
+import { FormInstructionData } from 'utils/uiTypes/proposalCreationTypes'
 import { serializeInstructionToBase64 } from '@solana/spl-governance'
 import { useRouter } from 'next/router'
 import { notify } from 'utils/notifications'
@@ -117,9 +117,9 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
       .nullable()
       .required('Program governed account is required'),
   })
-  async function getInstructions(): Promise<UiInstruction[]> {
+  async function getInstructions(): Promise<FormInstructionData[]> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    const instructions: UiInstruction[] = []
+    const instructions: FormInstructionData[] = []
     for (let i = 0; i < buffers.length; i++) {
       let serializedInstruction = ''
       if (
@@ -135,7 +135,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
         )
         serializedInstruction = serializeInstructionToBase64(closeIx)
       }
-      const obj: UiInstruction = {
+      const obj: FormInstructionData = {
         serializedInstruction: serializedInstruction,
         isValid,
         governance: form.governedAccount?.governance,
@@ -146,7 +146,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   }
   const handlePropose = async () => {
     setIsLoading(true)
-    const instructions: UiInstruction[] = await getInstructions()
+    const instructions: FormInstructionData[] = await getInstructions()
     if (instructions.length && instructions[0].isValid) {
       const governance = form.governedAccount?.governance
       if (!realm) {

@@ -8,7 +8,7 @@ const Empty = ({
   governedAccount,
 }: {
   index: number
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount?: GovernedMultiTypeAccount
 }) => {
   useInstructionFormBuilder<EmptyInstructionForm>({
     index,

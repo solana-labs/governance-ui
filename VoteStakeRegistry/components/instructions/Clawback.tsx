@@ -5,7 +5,7 @@ import useWalletStore from 'stores/useWalletStore'
 import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
 import {
   ClawbackForm,
-  UiInstruction,
+  FormInstructionData,
 } from '@utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import {
@@ -58,12 +58,12 @@ const Clawback = ({
     ProgramAccount<Governance> | undefined
   >(undefined)
   const [formErrors, setFormErrors] = useState({})
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  const { handleSetInstruction } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstruction(): Promise<FormInstructionData> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     const prerequisiteInstructions: TransactionInstruction[] = []
@@ -91,7 +91,7 @@ const Clawback = ({
       serializedInstruction = serializeInstructionToBase64(clawbackIx!)
     }
 
-    const obj: UiInstruction = {
+    const obj: FormInstructionData = {
       serializedInstruction,
       isValid,
       governance: governancesArray.find(
@@ -103,7 +103,7 @@ const Clawback = ({
     return obj
   }
   useEffect(() => {
-    handleSetInstructions(
+    handleSetInstruction(
       { governedAccount: governedAccount, getInstruction },
       index
     )

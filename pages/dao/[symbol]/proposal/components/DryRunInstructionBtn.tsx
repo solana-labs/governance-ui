@@ -5,7 +5,7 @@ import Modal from '@components/Modal'
 import { getInstructionDataFromBase64 } from '@solana/spl-governance'
 import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
 import { notify } from '@utils/notifications'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes'
 import { dryRunInstruction } from 'actions/dryRunInstruction'
 import React, { useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
@@ -14,7 +14,7 @@ const DryRunInstructionBtn = ({
   getInstructionDataFcn,
   btnClassNames,
 }: {
-  getInstructionDataFcn: (() => Promise<UiInstruction>) | undefined
+  getInstructionDataFcn: (() => Promise<FormInstructionData>) | undefined
   btnClassNames: string
 }) => {
   const connection = useWalletStore((s) => s.connection)

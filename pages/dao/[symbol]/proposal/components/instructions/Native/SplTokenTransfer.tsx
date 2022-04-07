@@ -14,20 +14,20 @@ import {
 } from '@utils/tokens'
 import {
   SplTokenTransferForm,
-  UiInstruction,
+  FormInstructionData,
 } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { debounce } from '@utils/debounce'
-import { NewProposalContext } from '../../new'
 import { getTokenTransferSchema } from '@utils/validations'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import GovernedAccountSelect from '../GovernedAccountSelect'
 import {
   getSolTransferInstruction,
   getTransferInstruction,
 } from '@utils/instructionTools'
+import { NewProposalContext } from '../../../new'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 
 const SplTokenTransfer = ({
   index,
@@ -62,7 +62,7 @@ const SplTokenTransfer = ({
     ? getMintMinAmountAsDecimal(form.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  const { handleSetInstruction } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -90,7 +90,7 @@ const SplTokenTransfer = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstruction(): Promise<FormInstructionData> {
     return !form.governedTokenAccount?.isSol
       ? getTransferInstruction({
           schema,
@@ -134,7 +134,7 @@ const SplTokenTransfer = ({
     }
   }, [form.destinationAccount])
   useEffect(() => {
-    handleSetInstructions(
+    handleSetInstruction(
       { governedAccount: governedAccount, getInstruction },
       index
     )
@@ -163,7 +163,8 @@ const SplTokenTransfer = ({
         error={formErrors['governedTokenAccount']}
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
+
       <Input
         label="Destination account"
         value={form.destinationAccount}

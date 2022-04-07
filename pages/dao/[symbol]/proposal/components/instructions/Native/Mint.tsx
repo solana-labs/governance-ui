@@ -13,15 +13,18 @@ import {
   TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens'
-import { UiInstruction, MintForm } from 'utils/uiTypes/proposalCreationTypes'
+import {
+  FormInstructionData,
+  MintForm,
+} from 'utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from 'components/instructions/tools'
 import { debounce } from 'utils/debounce'
-import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../../new'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import { getMintSchema } from 'utils/validations'
-import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../../GovernedAccountSelect'
 import { getMintInstruction } from 'utils/instructionTools'
 const Mint = ({
   index,
@@ -59,7 +62,7 @@ const Mint = ({
     ? getMintMinAmountAsDecimal(form.mintAccount.mintInfo)
     : 1
   const currentPrecision = precision(mintMinAmount)
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  const { handleSetInstruction } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -84,7 +87,7 @@ const Mint = ({
       propertyName: 'amount',
     })
   }
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstruction(): Promise<FormInstructionData> {
     return getMintInstruction({
       schema,
       form,
@@ -117,15 +120,18 @@ const Mint = ({
       setDestinationAccount(null)
     }
   }, [form.destinationAccount])
+
   useEffect(() => {
-    handleSetInstructions(
+    handleSetInstruction(
       { governedAccount: governedAccount, getInstruction },
       index
     )
   }, [form, governedAccount])
+
   useEffect(() => {
     setGovernedAccount(form?.mintAccount?.governance)
   }, [form.mintAccount])
+
   useEffect(() => {
     async function getMintWithGovernancesFcn() {
       const resp = await getMintWithGovernances()
@@ -153,6 +159,7 @@ const Mint = ({
         shouldBeGoverned={shouldBeGoverned}
         governance={governance}
       ></GovernedAccountSelect>
+
       <Input
         label="Destination account"
         value={form.destinationAccount}
@@ -165,6 +172,7 @@ const Mint = ({
         }
         error={formErrors['destinationAccount']}
       />
+
       {destinationAccount && (
         <div>
           <div className="pb-0.5 text-fgd-3 text-xs">Account owner</div>

@@ -10,7 +10,7 @@ import { validateBuffer } from 'utils/validations'
 import { useEffect, useState } from 'react'
 import {
   ProgramUpgradeForm,
-  UiInstruction,
+  FormInstructionData,
 } from 'utils/uiTypes/proposalCreationTypes'
 import {
   getInstructionDataFromBase64,
@@ -106,7 +106,7 @@ const UpgradeProgram = ({
       .nullable()
       .required('Program governed account is required'),
   })
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstruction(): Promise<FormInstructionData> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
     let serializedInstruction = ''
     if (
@@ -124,7 +124,7 @@ const UpgradeProgram = ({
       )
       serializedInstruction = serializeInstructionToBase64(upgradeIx)
     }
-    const obj: UiInstruction = {
+    const obj: FormInstructionData = {
       serializedInstruction: serializedInstruction,
       isValid,
       governance: form.governedAccount?.governance,
@@ -133,7 +133,7 @@ const UpgradeProgram = ({
   }
   const handlePropose = async () => {
     setIsLoading(true)
-    const instruction: UiInstruction = await getInstruction()
+    const instruction: FormInstructionData = await getInstruction()
     if (instruction.isValid) {
       const governance = form.governedAccount?.governance
       let proposalAddress: PublicKey | null = null

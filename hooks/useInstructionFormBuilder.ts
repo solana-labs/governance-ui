@@ -5,12 +5,14 @@ import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { debounce } from '@utils/debounce'
 import { isFormValid } from '@utils/formValidation'
 import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes'
 
 import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
 import useWalletStore from 'stores/useWalletStore'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import useGovernedMultiTypeAccounts from './useGovernedMultiTypeAccounts'
+
+export type SerializedInstruction = string
 
 function useInstructionFormBuilder<
   T extends {
@@ -21,8 +23,9 @@ function useInstructionFormBuilder<
   initialFormValues,
   schema,
   buildInstruction,
+  getCustomHoldUpTime,
 }: {
-  index?: number
+  index: number
   initialFormValues: T
   schema: yup.ObjectSchema<
     {
@@ -39,11 +42,12 @@ function useInstructionFormBuilder<
     connection: Connection
     wallet: SignerWalletAdapter
     governedAccountPubkey: PublicKey
-  }) => Promise<TransactionInstruction>
+  }) => Promise<TransactionInstruction | SerializedInstruction>
+  getCustomHoldUpTime?: () => Promise<number>
 }) {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const { handleSetInstructions } = useContext(NewProposalContext)
+  const { handleSetInstruction } = useContext(NewProposalContext)
   const { getGovernedAccountPublicKey } = useGovernedMultiTypeAccounts()
 
   const [form, setForm] = useState<T>(initialFormValues)
@@ -60,7 +64,7 @@ function useInstructionFormBuilder<
     return isValid
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const getInstruction = async (): Promise<FormInstructionData> => {
     const governedAccountPubkey = getGovernedAccountPublicKey(
       form.governedAccount,
       true
@@ -78,22 +82,35 @@ function useInstructionFormBuilder<
       }
     }
     try {
-      return {
-        serializedInstruction: buildInstruction
-          ? serializeInstructionToBase64(
-              await buildInstruction({
-                form,
-                connection: connection.current,
-                wallet,
-                governedAccountPubkey,
-              })
+      const transactionInstructionOrSerializedInstruction = buildInstruction
+        ? await buildInstruction({
+            form,
+            connection: connection.current,
+            wallet,
+            governedAccountPubkey,
+          })
+        : ''
+
+      const serializedInstruction =
+        typeof transactionInstructionOrSerializedInstruction === 'string'
+          ? transactionInstructionOrSerializedInstruction
+          : serializeInstructionToBase64(
+              transactionInstructionOrSerializedInstruction
             )
-          : '',
+
+      const customHoldUpTime = getCustomHoldUpTime
+        ? await getCustomHoldUpTime()
+        : undefined
+
+      return {
+        serializedInstruction,
         isValid: true,
         governance: form.governedAccount?.governance,
+        customHoldUpTime,
       }
     } catch (e) {
       console.error(e)
+
       return {
         serializedInstruction: '',
         isValid: false,
@@ -114,7 +131,7 @@ function useInstructionFormBuilder<
     debounce.debounceFcn(async () => {
       await validateForm()
     })
-    handleSetInstructions(
+    handleSetInstruction(
       { governedAccount: form.governedAccount?.governance, getInstruction },
       index
     )

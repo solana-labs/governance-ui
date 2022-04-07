@@ -15,7 +15,7 @@ import { abbreviateAddress, precision } from '@utils/formatting'
 import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import {
   SendTokenCompactViewForm,
-  UiInstruction,
+  FormInstructionData,
 } from '@utils/uiTypes/proposalCreationTypes'
 import React, { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
@@ -148,7 +148,7 @@ const SendTokens = () => {
     return totalPriceFormatted
   }
 
-  async function getInstruction(): Promise<UiInstruction> {
+  async function getInstruction(): Promise<FormInstructionData> {
     const selectedNftMint = selectedNfts[0]?.mint
     const defaultProps = {
       schema,
@@ -173,7 +173,7 @@ const SendTokens = () => {
   }
   const handlePropose = async () => {
     setIsLoading(true)
-    const instruction: UiInstruction = await getInstruction()
+    const instruction: FormInstructionData = await getInstruction()
     if (instruction.isValid) {
       const governance = currentAccount?.governance
       let proposalAddress: PublicKey | null = null

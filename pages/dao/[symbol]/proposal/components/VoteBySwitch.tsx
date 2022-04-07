@@ -5,9 +5,9 @@ import React from 'react'
 const VoteBySwitch = ({ checked, onChange }) => {
   const { toManyCouncilOutstandingProposalsForUse } = useRealm()
   return !toManyCouncilOutstandingProposalsForUse ? (
-    <div className="text-sm mb-3">
-      <div className="mb-2">Vote by council</div>
-      <div className="flex flex-row text-xs items-center">
+    <div className="text-sm mb-3 flex">
+      <div>Vote by council</div>
+      <div className="flex flex-row text-xs items-center ml-3">
         <Switch checked={checked} onChange={onChange} />
       </div>
     </div>

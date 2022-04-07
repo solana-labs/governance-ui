@@ -37,6 +37,7 @@ const Input = ({
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
+
       {subtitle && <p className="text-gray-500 mb-1 -mt-2">{subtitle}</p>}
       {prefix ? (
         <div

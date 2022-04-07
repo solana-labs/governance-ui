@@ -8,7 +8,10 @@ import { abbreviateAddress, precision } from 'utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
 import { getMintSchema } from 'utils/validations'
 import { useEffect, useState } from 'react'
-import { MintForm, UiInstruction } from 'utils/uiTypes/proposalCreationTypes'
+import {
+  MintForm,
+  FormInstructionData,
+} from 'utils/uiTypes/proposalCreationTypes'
 import useGovernanceAssets from 'hooks/useGovernanceAssets'
 import {
   getInstructionDataFromBase64,
@@ -112,7 +115,7 @@ const AddMemberForm = ({ close }) => {
     })
   }
 
-  const getInstruction = async (): Promise<UiInstruction> => {
+  const getInstruction = async (): Promise<FormInstructionData> => {
     return getMintInstruction({
       schema,
       form,
@@ -128,7 +131,7 @@ const AddMemberForm = ({ close }) => {
   const handlePropose = async () => {
     setIsLoading(true)
 
-    const instruction: UiInstruction = await getInstruction()
+    const instruction: FormInstructionData = await getInstruction()
 
     if (instruction.isValid && wallet && realmInfo) {
       const governance = form.mintAccount?.governance

@@ -25,7 +25,7 @@ import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVot
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
-import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
+import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -41,7 +41,7 @@ export class InstructionDataWithHoldUpTime {
     instruction,
     governance,
   }: {
-    instruction: UiInstruction
+    instruction: FormInstructionData
     governance?: ProgramAccount<Governance>
   }) {
     this.data = instruction.serializedInstruction

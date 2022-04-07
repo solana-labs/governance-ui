@@ -92,7 +92,7 @@ const useHotWalletPluginTokenAccounts = (
             ),
           }
         })
-        .sort((a, b) => b.amount.toNumber() - a.amount.toNumber())
+        .sort((a, b) => (b.amount.toString() < a.amount.toString() ? -1 : 1))
     )
   }, [
     connection,
