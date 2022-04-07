@@ -3,7 +3,6 @@ import {
   InstructionExecutionStatus,
   ProgramAccount,
   Proposal,
-  ProposalState,
   ProposalTransaction,
   RpcContext,
 } from '@solana/spl-governance'
@@ -14,7 +13,7 @@ import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletStore, { EnhancedProposalState } from 'stores/useWalletStore'
 import { notify } from '@utils/notifications'
 
 export enum PlayState {
@@ -93,9 +92,10 @@ export function ExecuteAllInstructionButton({
 
   if (
     ![
-      ProposalState.Executing,
-      ProposalState.ExecutingWithErrors,
-      ProposalState.Succeeded,
+      EnhancedProposalState.Executing,
+      EnhancedProposalState.ExecutingWithErrors,
+      EnhancedProposalState.Succeeded,
+      EnhancedProposalState.Outdated,
     ].includes(proposal.account.state)
   ) {
     return null

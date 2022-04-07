@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { ProposalState } from '@solana/spl-governance'
 
 import ApprovalQuorum from '@components/ApprovalQuorum'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
@@ -21,6 +20,7 @@ import useProposal from 'hooks/useProposal'
 import useProposalVotes from 'hooks/useProposalVotes'
 import { option } from 'tools/core/option'
 import { getRealmExplorerHost } from 'tools/routing'
+import { EnhancedProposalState } from 'stores/useWalletStore'
 
 const Proposal = () => {
   const { realmInfo } = useRealm()
@@ -32,15 +32,16 @@ const Proposal = () => {
 
   const showResults =
     proposal &&
-    proposal.account.state !== ProposalState.Cancelled &&
-    proposal.account.state !== ProposalState.Draft
+    proposal.account.state !== EnhancedProposalState.Cancelled &&
+    proposal.account.state !== EnhancedProposalState.Draft
 
   const votePassed =
     proposal &&
-    (proposal.account.state === ProposalState.Completed ||
-      proposal.account.state === ProposalState.Executing ||
-      proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded)
+    (proposal.account.state === EnhancedProposalState.Completed ||
+      proposal.account.state === EnhancedProposalState.Executing ||
+      proposal.account.state === EnhancedProposalState.SigningOff ||
+      proposal.account.state === EnhancedProposalState.Succeeded ||
+      proposal.account.state === EnhancedProposalState.Outdated)
 
   useEffect(() => {
     const handleResolveDescription = async () => {
@@ -109,7 +110,7 @@ const Proposal = () => {
         {showResults ? (
           <div className="bg-bkg-2 rounded-lg">
             <div className="p-4 md:p-6">
-              {proposal?.account.state === ProposalState.Voting ? (
+              {proposal?.account.state === EnhancedProposalState.Voting ? (
                 <div className="flex items-end justify-between mb-4">
                   <h3 className="mb-0">Voting Now</h3>
                   <ProposalTimeStatus proposal={proposal?.account} />
@@ -117,7 +118,7 @@ const Proposal = () => {
               ) : (
                 <h3 className="mb-4">Results</h3>
               )}
-              {proposal?.account.state === ProposalState.Voting ? (
+              {proposal?.account.state === EnhancedProposalState.Voting ? (
                 <div className="pb-3">
                   <ApprovalQuorum
                     yesVotesRequired={yesVotesRequired}

@@ -6,11 +6,10 @@ import { useCallback, useState } from 'react'
 import { relinquishVote } from '../actions/relinquishVote'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import { ProposalState } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
 
-import useWalletStore from '../stores/useWalletStore'
+import useWalletStore, { EnhancedProposalState } from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -47,7 +46,8 @@ const VotePanel = () => {
 
   const isVoteCast = ownVoteRecord !== undefined
   const isVoting =
-    proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
+    proposal?.account.state === EnhancedProposalState.Voting &&
+    !hasVoteTimeExpired
 
   const isVoteEnabled =
     connected &&
@@ -63,12 +63,13 @@ const VotePanel = () => {
     ownVoteRecord &&
     !ownVoteRecord?.account.isRelinquished &&
     proposal &&
-    (proposal!.account.state === ProposalState.Voting ||
-      proposal!.account.state === ProposalState.Completed ||
-      proposal!.account.state === ProposalState.Cancelled ||
-      proposal!.account.state === ProposalState.Succeeded ||
-      proposal!.account.state === ProposalState.Executing ||
-      proposal!.account.state === ProposalState.Defeated)
+    (proposal!.account.state === EnhancedProposalState.Voting ||
+      proposal!.account.state === EnhancedProposalState.Completed ||
+      proposal!.account.state === EnhancedProposalState.Cancelled ||
+      proposal!.account.state === EnhancedProposalState.Succeeded ||
+      proposal!.account.state === EnhancedProposalState.Outdated ||
+      proposal!.account.state === EnhancedProposalState.Executing ||
+      proposal!.account.state === EnhancedProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
     const programId = realmInfo?.programId
@@ -84,7 +85,7 @@ const VotePanel = () => {
       const instructions: TransactionInstruction[] = []
 
       if (
-        proposal?.account.state === ProposalState.Voting &&
+        proposal?.account.state === EnhancedProposalState.Voting &&
         hasVoteTimeExpired
       ) {
         await withFinalizeVote(
@@ -150,10 +151,10 @@ const VotePanel = () => {
     : ''
 
   const notVisibleStatesForNotConnectedWallet = [
-    ProposalState.Cancelled,
-    ProposalState.Succeeded,
-    ProposalState.Draft,
-    ProposalState.Completed,
+    EnhancedProposalState.Cancelled,
+    EnhancedProposalState.Succeeded,
+    EnhancedProposalState.Draft,
+    EnhancedProposalState.Completed,
   ]
 
   const isVisibleToWallet = !connected

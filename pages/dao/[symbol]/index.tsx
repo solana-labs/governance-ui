@@ -95,6 +95,7 @@ const REALM = () => {
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
   )
+
   const [paginatedProposals, setPaginatedProposals] = useState<
     [string, ProgramAccount<Proposal>][]
   >([])
@@ -103,6 +104,7 @@ const REALM = () => {
   const allProposals = Object.entries(proposals).sort((a, b) =>
     compareProposals(b[1].account, a[1].account, governances)
   )
+
   useEffect(() => {
     setPaginatedProposals(paginateProposals(0))
   }, [filteredProposals])
@@ -122,6 +124,7 @@ const REALM = () => {
       filters.length > 0
         ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
         : allProposals
+
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
   }, [proposals])

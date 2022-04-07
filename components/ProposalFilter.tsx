@@ -3,18 +3,23 @@ import styled from '@emotion/styled'
 import { ChevronDownIcon } from '@heroicons/react/solid'
 import { Disclosure } from '@headlessui/react'
 import Switch from './Switch'
-import { ProposalState } from '@solana/spl-governance'
+import { EnhancedProposalState } from 'stores/useWalletStore'
 
-const initialFilterSettings = {
-  [ProposalState.Draft]: false,
-  [ProposalState.SigningOff]: true,
-  [ProposalState.Voting]: true,
-  [ProposalState.Succeeded]: true,
-  [ProposalState.Executing]: true,
-  [ProposalState.Completed]: true,
-  [ProposalState.Cancelled]: false,
-  [ProposalState.Defeated]: true,
-  [ProposalState.ExecutingWithErrors]: true,
+type Filters = {
+  [key in EnhancedProposalState]: boolean
+}
+
+const initialFilterSettings: Filters = {
+  [EnhancedProposalState.Draft]: false,
+  [EnhancedProposalState.SigningOff]: true,
+  [EnhancedProposalState.Voting]: true,
+  [EnhancedProposalState.Succeeded]: true,
+  [EnhancedProposalState.Executing]: true,
+  [EnhancedProposalState.Completed]: true,
+  [EnhancedProposalState.Cancelled]: false,
+  [EnhancedProposalState.Defeated]: true,
+  [EnhancedProposalState.ExecutingWithErrors]: true,
+  [EnhancedProposalState.Outdated]: false,
 }
 
 const StyledAlertCount = styled.span`
@@ -22,17 +27,26 @@ const StyledAlertCount = styled.span`
 `
 
 const ProposalFilter = ({ filters, setFilters }) => {
-  const [filterSettings, setFilterSettings] = useReducer(
-    (state, newState) => ({ ...state, ...newState }),
-    initialFilterSettings
-  )
+  const [filterSettings, setFilterSettings] = useReducer<
+    (state: Filters, newState: Partial<Filters>) => any
+  >((state, newState) => ({ ...state, ...newState }), initialFilterSettings)
 
-  const handleFilters = (proposalState, checked) => {
-    setFilterSettings({ [proposalState]: checked })
+  console.log('>>> initialFilterSettings', initialFilterSettings)
+
+  const handleFilters = (
+    proposalState: EnhancedProposalState,
+    checked: boolean
+  ) => {
+    setFilterSettings({
+      [proposalState]: checked,
+    })
+
     if (!checked) {
       setFilters([...filters, proposalState])
     } else {
-      setFilters(filters.filter((n) => n !== proposalState))
+      setFilters(
+        filters.filter((n: EnhancedProposalState) => n !== proposalState)
+      )
     }
   }
 
@@ -73,81 +87,95 @@ const ProposalFilter = ({ filters, setFilters }) => {
               <div className="flex items-center justify-between pb-2">
                 Cancelled
                 <Switch
-                  checked={filterSettings[ProposalState.Cancelled]}
+                  checked={filterSettings[EnhancedProposalState.Cancelled]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Cancelled, checked)
+                    handleFilters(EnhancedProposalState.Cancelled, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 Completed
                 <Switch
-                  checked={filterSettings[ProposalState.Completed]}
+                  checked={filterSettings[EnhancedProposalState.Completed]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Completed, checked)
+                    handleFilters(EnhancedProposalState.Completed, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 Defeated
                 <Switch
-                  checked={filterSettings[ProposalState.Defeated]}
+                  checked={filterSettings[EnhancedProposalState.Defeated]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Defeated, checked)
+                    handleFilters(EnhancedProposalState.Defeated, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 Draft
                 <Switch
-                  checked={filterSettings[ProposalState.Draft]}
+                  checked={filterSettings[EnhancedProposalState.Draft]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Draft, checked)
+                    handleFilters(EnhancedProposalState.Draft, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 Executing
                 <Switch
-                  checked={filterSettings[ProposalState.Executing]}
+                  checked={filterSettings[EnhancedProposalState.Executing]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Executing, checked)
+                    handleFilters(EnhancedProposalState.Executing, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 ExecutingWithErrors
                 <Switch
-                  checked={filterSettings[ProposalState.ExecutingWithErrors]}
+                  checked={
+                    filterSettings[EnhancedProposalState.ExecutingWithErrors]
+                  }
                   onChange={(checked) =>
-                    handleFilters(ProposalState.ExecutingWithErrors, checked)
+                    handleFilters(
+                      EnhancedProposalState.ExecutingWithErrors,
+                      checked
+                    )
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 SigningOff
                 <Switch
-                  checked={filterSettings[ProposalState.SigningOff]}
+                  checked={filterSettings[EnhancedProposalState.SigningOff]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.SigningOff, checked)
+                    handleFilters(EnhancedProposalState.SigningOff, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between pb-2">
                 Succeeded
                 <Switch
-                  checked={filterSettings[ProposalState.Succeeded]}
+                  checked={filterSettings[EnhancedProposalState.Succeeded]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Succeeded, checked)
+                    handleFilters(EnhancedProposalState.Succeeded, checked)
+                  }
+                />
+              </div>
+              <div className="flex items-center justify-between pb-2">
+                Outdated
+                <Switch
+                  checked={filterSettings[EnhancedProposalState.Outdated]}
+                  onChange={(checked) =>
+                    handleFilters(EnhancedProposalState.Outdated, checked)
                   }
                 />
               </div>
               <div className="flex items-center justify-between">
                 Voting
                 <Switch
-                  checked={filterSettings[ProposalState.Voting]}
+                  checked={filterSettings[EnhancedProposalState.Voting]}
                   onChange={(checked) =>
-                    handleFilters(ProposalState.Voting, checked)
+                    handleFilters(EnhancedProposalState.Voting, checked)
                   }
                 />
               </div>

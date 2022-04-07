@@ -2,11 +2,8 @@
 import { useEffect, useState } from 'react'
 import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
 import useRealm from '../hooks/useRealm'
-import {
-  getSignatoryRecordAddress,
-  ProposalState,
-} from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
+import { getSignatoryRecordAddress } from '@solana/spl-governance'
+import useWalletStore, { EnhancedProposalState } from '../stores/useWalletStore'
 import Button, { SecondaryButton } from './Button'
 
 import { RpcContext } from '@solana/spl-governance'
@@ -32,7 +29,8 @@ const ProposalActionsPanel = () => {
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
 
   const canFinalizeVote =
-    hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
+    hasVoteTimeExpired &&
+    proposal?.account.state === EnhancedProposalState.Voting
 
   const walletPk = wallet?.publicKey
 
@@ -56,8 +54,8 @@ const ProposalActionsPanel = () => {
 
   const canSignOff =
     signatoryRecord &&
-    (proposal?.account.state === ProposalState.Draft ||
-      proposal?.account.state === ProposalState.SigningOff)
+    (proposal?.account.state === EnhancedProposalState.Draft ||
+      proposal?.account.state === EnhancedProposalState.SigningOff)
 
   const canCancelProposal =
     proposal &&
@@ -75,8 +73,8 @@ const ProposalActionsPanel = () => {
     : !signatoryRecord
     ? 'Only a  signatory of the proposal can sign it off'
     : !(
-        proposal?.account.state === ProposalState.Draft ||
-        proposal?.account.state === ProposalState.SigningOff
+        proposal?.account.state === EnhancedProposalState.Draft ||
+        proposal?.account.state === EnhancedProposalState.SigningOff
       )
     ? 'Invalid proposal state. To sign off a proposal, it must be a draft or be in signing off state after creation.'
     : ''
@@ -99,7 +97,8 @@ const ProposalActionsPanel = () => {
     ? 'Connect your wallet to finalize this proposal'
     : !hasVoteTimeExpired
     ? "Vote time has not expired yet. You can finalize a vote only after it's time has expired."
-    : proposal?.account.state === ProposalState.Voting && !hasVoteTimeExpired
+    : proposal?.account.state === EnhancedProposalState.Voting &&
+      !hasVoteTimeExpired
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
     : ''
   const handleFinalizeVote = async () => {
@@ -186,9 +185,10 @@ const ProposalActionsPanel = () => {
   }
   return (
     <>
-      {ProposalState.Cancelled === proposal?.account.state ||
-      ProposalState.Succeeded === proposal?.account.state ||
-      ProposalState.Defeated === proposal?.account.state ||
+      {EnhancedProposalState.Cancelled === proposal?.account.state ||
+      EnhancedProposalState.Succeeded === proposal?.account.state ||
+      EnhancedProposalState.Outdated === proposal?.account.state ||
+      EnhancedProposalState.Defeated === proposal?.account.state ||
       (!canCancelProposal && !canSignOff && !canFinalizeVote) ? null : (
         <div>
           <div className="bg-bkg-2 rounded-lg p-6 space-y-6 flex justify-center items-center text-center flex-col w-full mt-4">

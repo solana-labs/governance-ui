@@ -2,16 +2,17 @@ import { useEffect, useState } from 'react'
 import { executeTransaction } from 'actions/executeTransaction'
 import {
   InstructionExecutionStatus,
-  Proposal,
   ProposalTransaction,
-  ProposalState,
 } from '@solana/spl-governance'
 import React from 'react'
 import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
 import Button from '@components/Button'
 import { RpcContext } from '@solana/spl-governance'
 import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletStore, {
+  EnhancedProposal,
+  EnhancedProposalState,
+} from 'stores/useWalletStore'
 import { ProgramAccount } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
@@ -32,7 +33,7 @@ export function ExecuteInstructionButton({
   setPlaying,
   proposalInstruction,
 }: {
-  proposal: ProgramAccount<Proposal>
+  proposal: ProgramAccount<EnhancedProposal>
   proposalInstruction: ProgramAccount<ProposalTransaction>
   playing: PlayState
   setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
@@ -115,9 +116,10 @@ export function ExecuteInstructionButton({
   }
 
   if (
-    proposal.account.state !== ProposalState.Executing &&
-    proposal.account.state !== ProposalState.ExecutingWithErrors &&
-    proposal.account.state !== ProposalState.Succeeded
+    proposal.account.state !== EnhancedProposalState.Executing &&
+    proposal.account.state !== EnhancedProposalState.ExecutingWithErrors &&
+    proposal.account.state !== EnhancedProposalState.Succeeded &&
+    proposal.account.state !== EnhancedProposalState.Outdated
   ) {
     return null
   }

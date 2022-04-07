@@ -21,6 +21,7 @@ import {
   GovernanceAccountType,
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
+  ProposalState,
   ProposalTransaction,
   Realm,
   SignatoryRecord,
@@ -47,6 +48,20 @@ import {
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
 
+export const EnhancedProposalState = {
+  ...ProposalState,
+
+  // Special Enhanced Type
+  // Outdated = Suceeded proposal that did not get executed for a long time
+  Outdated: 42 as const,
+} as const
+
+export type EnhancedProposalState = ProposalState | 42
+
+export declare type EnhancedProposal = Omit<Proposal, 'state'> & {
+  state: EnhancedProposalState
+}
+
 interface WalletStore extends State {
   connected: boolean
   connection: ConnectionContext
@@ -62,7 +77,7 @@ interface WalletStore extends State {
     governances: { [governance: string]: ProgramAccount<Governance> }
     tokenMints: TokenProgramAccount<MintInfo>[]
     tokenAccounts: TokenProgramAccount<TokenAccount>[]
-    proposals: { [proposal: string]: ProgramAccount<Proposal> }
+    proposals: { [proposal: string]: ProgramAccount<EnhancedProposal> }
     /// Community token records by owner
     tokenRecords: { [owner: string]: ProgramAccount<TokenOwnerRecord> }
     /// Council token records by owner
@@ -73,7 +88,7 @@ interface WalletStore extends State {
     programVersion: number
   }
   selectedProposal: {
-    proposal: ProgramAccount<Proposal> | undefined
+    proposal: ProgramAccount<EnhancedProposal> | undefined
     governance: ProgramAccount<Governance> | undefined
     realm: ProgramAccount<Realm> | undefined
     instructions: {
@@ -122,6 +137,42 @@ const INITIAL_PROPOSAL_STATE = {
   proposalMint: undefined,
   loading: true,
   proposalOwner: undefined,
+}
+
+const TEN_DAYS_IN_MS = 3600 * 24 * 10
+
+function isProposalOutdated(
+  proposal: ProgramAccount<EnhancedProposal>
+): boolean {
+  if (proposal.account.state !== EnhancedProposalState.Succeeded) {
+    return false
+  }
+
+  if (!proposal.account.votingCompletedAt) {
+    return false
+  }
+
+  if (
+    Date.now() - proposal.account.votingCompletedAt.toNumber() <=
+    TEN_DAYS_IN_MS
+  ) {
+    return false
+  }
+
+  return true
+}
+
+// Set Outdated flag for proposals that succeeded more than 10 days ago
+function setOutdatedStateForProposals(
+  proposals: Record<string, ProgramAccount<EnhancedProposal>>
+) {
+  Object.values(proposals).forEach((proposal) => {
+    if (!isProposalOutdated(proposal)) {
+      return
+    }
+
+    proposal.account.state = EnhancedProposalState.Outdated
+  })
 }
 
 const useWalletStore = create<WalletStore>((set, get) => ({
@@ -334,7 +385,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
           .filter((p) => !HIDDEN_PROPOSALS.has(p.pubkey.toBase58()))
       )
 
-      console.log('fetchRealm proposals', proposals)
+      setOutdatedStateForProposals(proposals)
 
       set((s) => {
         s.selectedRealm.proposals = proposals
@@ -373,11 +424,15 @@ const useWalletStore = create<WalletStore>((set, get) => ({
 
       const proposalPubKey = new PublicKey(proposalPk)
 
-      const proposal = await getGovernanceAccount<Proposal>(
+      const proposal = await getGovernanceAccount<EnhancedProposal>(
         connection,
         proposalPubKey,
         Proposal
       )
+
+      if (isProposalOutdated(proposal)) {
+        proposal.account.state = EnhancedProposalState.Outdated
+      }
 
       const proposalMint =
         realmMints[proposal.account.governingTokenMint.toBase58()]
@@ -553,7 +608,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
         s.selectedRealm.tokenAccounts = tokenAccounts
       })
     },
-    async fetchVoteRecords(proposal: ProgramAccount<Proposal>) {
+    async fetchVoteRecords(proposal: ProgramAccount<EnhancedProposal>) {
       const connection = get().connection.current
       const set = get().set
 

@@ -1,10 +1,9 @@
 import useRealm from '@hooks/useRealm'
 import React, { useMemo, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import useWalletStore, { EnhancedProposalState } from 'stores/useWalletStore'
 import {
   ProgramAccount,
   Proposal,
-  ProposalState,
   withCancelProposal,
   withFinalizeVote,
   withRelinquishVote,
@@ -50,7 +49,7 @@ const MyProposalsBn = () => {
     [proposals, ownVoteRecordsByProposal, connected]
   )
   const drafts = myProposals.filter((x) => {
-    return x.account.state === ProposalState.Draft
+    return x.account.state === EnhancedProposalState.Draft
   })
   const notfinalized = myProposals.filter((x) => {
     const governance = governancesArray.find(
@@ -66,7 +65,7 @@ const MyProposalsBn = () => {
         : undefined
       : undefined
     return (
-      x.account.state === ProposalState.Voting &&
+      x.account.state === EnhancedProposalState.Voting &&
       !x.account.isVoteFinalized() &&
       timestamp &&
       now > timestamp
@@ -74,14 +73,16 @@ const MyProposalsBn = () => {
   })
   const unReleased = myProposals.filter(
     (x) =>
-      (x.account.state === ProposalState.Succeeded ||
-        x.account.state === ProposalState.Completed) &&
+      (x.account.state === EnhancedProposalState.Succeeded ||
+        x.account.state === EnhancedProposalState.Outdated ||
+        x.account.state === EnhancedProposalState.Completed) &&
       x.account.isVoteFinalized() &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
   const createdVoting = myProposals.filter((x) => {
     return (
-      x.account.state === ProposalState.Voting && !x.account.isVoteFinalized()
+      x.account.state === EnhancedProposalState.Voting &&
+      !x.account.isVoteFinalized()
     )
   })
 

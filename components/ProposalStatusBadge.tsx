@@ -1,42 +1,57 @@
 import { PublicKey } from '@solana/web3.js'
 import useRealmGovernance from '../hooks/useRealmGovernance'
-import { Proposal, ProposalState } from '@solana/spl-governance'
-import useWalletStore from '../stores/useWalletStore'
+import useWalletStore, {
+  EnhancedProposal,
+  EnhancedProposalState,
+} from '../stores/useWalletStore'
 import { isYesVote } from '@models/voteRecords'
 
-function getProposalStateLabel(state: ProposalState, hasVoteEnded: boolean) {
+function getProposalStateLabel(
+  state: EnhancedProposalState,
+  hasVoteEnded: boolean
+) {
   switch (state) {
-    case ProposalState.ExecutingWithErrors:
+    case EnhancedProposalState.ExecutingWithErrors:
       return 'Execution Errors'
-    case ProposalState.Voting:
+    case EnhancedProposalState.Outdated:
+      return 'Outdated'
+    case EnhancedProposalState.Voting:
       // If there is no tipping point and voting period ends then proposal stays in Voting state and needs to be manually finalized
       return hasVoteEnded ? 'Finalizing' : 'Voting'
     default:
-      return ProposalState[state]
+      return EnhancedProposalState[state]
   }
 }
 
-function getProposalStateStyle(state: ProposalState) {
+function getProposalStateStyle(state: EnhancedProposalState) {
   if (
-    state === ProposalState.Voting ||
-    state === ProposalState.Executing ||
-    state === ProposalState.SigningOff
+    state === EnhancedProposalState.Voting ||
+    state === EnhancedProposalState.Executing ||
+    state === EnhancedProposalState.SigningOff
   ) {
     return 'border border-blue text-blue'
-  } else if (
-    state === ProposalState.Completed ||
-    state === ProposalState.Succeeded
+  }
+
+  if (
+    state === EnhancedProposalState.Completed ||
+    state === EnhancedProposalState.Succeeded
   ) {
     return 'border border-green text-green'
-  } else if (
-    state === ProposalState.Cancelled ||
-    state === ProposalState.Defeated ||
-    state === ProposalState.ExecutingWithErrors
+  }
+
+  if (
+    state === EnhancedProposalState.Cancelled ||
+    state === EnhancedProposalState.Defeated ||
+    state === EnhancedProposalState.ExecutingWithErrors
   ) {
     return 'border border-red text-red'
-  } else {
-    return 'border border-fgd-3 text-fgd-3'
   }
+
+  if (state === EnhancedProposalState.Outdated) {
+    return 'border border-orange text-orange'
+  }
+
+  return 'border border-fgd-3 text-fgd-3'
 }
 
 const ProposalStateBadge = ({
@@ -45,7 +60,7 @@ const ProposalStateBadge = ({
   open,
 }: {
   proposalPk: PublicKey
-  proposal: Proposal
+  proposal: EnhancedProposal
   open: boolean
 }) => {
   const governance = useRealmGovernance(proposal.governance)
