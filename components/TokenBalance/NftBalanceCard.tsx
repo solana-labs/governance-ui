@@ -71,7 +71,7 @@ const NftBalanceCard = () => {
 
     await sendTransaction({
       transaction: transaction,
-      wallet,
+      wallet: wallet!,
       connection: connection.current,
       signers: [],
       sendingMessage: `Registering`,
