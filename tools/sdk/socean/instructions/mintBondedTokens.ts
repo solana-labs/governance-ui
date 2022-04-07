@@ -1,15 +1,15 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@project-serum/anchor';
 import {
   createBondMintAuthorityPDA,
   createVaultPda,
   findBondMintAuthorityPDA,
   findVaultPDA,
-} from '@soceanfi/bonding'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
-import { BondingProgram } from '../programs'
-import soceanConfiguration from '../configuration'
+} from '@soceanfi/bonding';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
+import { BondingProgram } from '../programs';
+import soceanConfiguration from '../configuration';
 
 export async function mintBondedTokens({
   cluster,
@@ -21,21 +21,21 @@ export async function mintBondedTokens({
   bondedMint,
   mintTo,
 }: {
-  cluster: EndpointTypes
-  program: BondingProgram
-  amount: BN
-  depositFrom: PublicKey
-  authority: PublicKey
-  bondPool: PublicKey
-  bondedMint: PublicKey
-  mintTo: PublicKey
+  cluster: EndpointTypes;
+  program: BondingProgram;
+  amount: BN;
+  depositFrom: PublicKey;
+  authority: PublicKey;
+  bondPool: PublicKey;
+  bondedMint: PublicKey;
+  mintTo: PublicKey;
 }): Promise<TransactionInstruction> {
-  const bondingProgramId = soceanConfiguration.bondingProgramId[cluster]
+  const bondingProgramId = soceanConfiguration.bondingProgramId[cluster];
 
   if (!bondingProgramId) {
     throw new Error(
-      'unsupported cluster to create mintBondedTokens instruction'
-    )
+      'unsupported cluster to create mintBondedTokens instruction',
+    );
   }
 
   const [bondMintAuthority, vault] = await Promise.all([
@@ -43,25 +43,25 @@ export async function mintBondedTokens({
       const [
         bondMintAuthority,
         bondMintAuthorityBump,
-      ] = await findBondMintAuthorityPDA(bondingProgramId, bondPool)
+      ] = await findBondMintAuthorityPDA(bondingProgramId, bondPool);
 
       await createBondMintAuthorityPDA(
         bondingProgramId,
         bondPool,
-        bondMintAuthorityBump
-      )
+        bondMintAuthorityBump,
+      );
 
-      return bondMintAuthority
+      return bondMintAuthority;
     })(),
 
     (async () => {
-      const [vault, vaultBump] = await findVaultPDA(bondingProgramId, bondPool)
+      const [vault, vaultBump] = await findVaultPDA(bondingProgramId, bondPool);
 
-      await createVaultPda(bondingProgramId, bondPool, vaultBump)
+      await createVaultPda(bondingProgramId, bondPool, vaultBump);
 
-      return vault
+      return vault;
     })(),
-  ])
+  ]);
 
   console.log('MindBondedTokens', {
     owner: authority.toString(),
@@ -73,7 +73,7 @@ export async function mintBondedTokens({
     bondPool: bondPool.toString(),
     tokenProgram: TOKEN_PROGRAM_ID.toString(),
     amount: amount.toString(),
-  })
+  });
 
   return program.instruction.deposit(amount, {
     accounts: {
@@ -86,5 +86,5 @@ export async function mintBondedTokens({
       bondPool,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
-  })
+  });
 }

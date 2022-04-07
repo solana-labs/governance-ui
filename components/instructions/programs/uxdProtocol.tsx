@@ -1,11 +1,11 @@
-import { Connection } from '@solana/web3.js'
-import { struct, u8, u48 } from 'buffer-layout'
-import { AccountMetaData } from '@solana/spl-governance'
-import { u128, u64 } from '@project-serum/borsh'
-import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient'
-import { UXD_DECIMALS } from '@uxdprotocol/uxd-client'
-import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units'
-import { BN } from '@project-serum/anchor'
+import { Connection } from '@solana/web3.js';
+import { struct, u8, u48 } from 'buffer-layout';
+import { AccountMetaData } from '@solana/spl-governance';
+import { u128, u64 } from '@project-serum/borsh';
+import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient';
+import { UXD_DECIMALS } from '@uxdprotocol/uxd-client';
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
+import { BN } from '@project-serum/anchor';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
@@ -23,7 +23,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -37,17 +37,17 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           u8('bump'),
           u8('redeemableBump'),
           u8('redeemableMintDecimals'),
-        ])
+        ]);
 
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
+        const args = dataLayout.decode(Buffer.from(data)) as any;
+        console.log('args', args);
         return (
           <>
             <p>{`bump: ${args.bump}`}</p>
             <p>{`redeemable bump: ${args.redeemableBump}`}</p>
             <p>{`redeemable mint decimals: ${args.redeemableMintDecimals.toString()}`}</p>
           </>
-        )
+        );
       },
     },
     45: {
@@ -56,7 +56,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -68,17 +68,17 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           u8('SIGHASH_6'),
           u8('SIGHASH_7'),
           u128('redeemableGlobalSupplyCap'),
-        ])
+        ]);
 
-        const args = dataLayout.decode(Buffer.from(data)) as any
+        const args = dataLayout.decode(Buffer.from(data)) as any;
         return (
           <>
             <p>{`Redeemable Global Supply Cap: ${nativeAmountToFormattedUiAmount(
               new BN(args.redeemableGlobalSupplyCap.toString()),
-              UXD_DECIMALS
+              UXD_DECIMALS,
             )}`}</p>
           </>
-        )
+        );
       },
     },
     213: {
@@ -87,7 +87,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -99,17 +99,17 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           u8('SIGHASH_6'),
           u8('SIGHASH_7'),
           u128('softCap'),
-        ])
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
+        ]);
+        const args = dataLayout.decode(Buffer.from(data)) as any;
+        console.log('args', args);
         return (
           <>
             <p>{`Redeemable Supply Soft Cap: ${nativeAmountToFormattedUiAmount(
               new BN(args.softCap.toString()),
-              UXD_DECIMALS
+              UXD_DECIMALS,
             )}`}</p>
           </>
-        )
+        );
       },
     },
     133: {
@@ -133,7 +133,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -148,9 +148,9 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           u8('collateralPassthroughBump'),
           u8('insurancePassthroughBump'),
           u8('mangoAccountBump'),
-        ])
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
+        ]);
+        const args = dataLayout.decode(Buffer.from(data)) as any;
+        console.log('args', args);
         return (
           <>
             <p>{`bump: ${args.bump.toString()}`}</p>
@@ -158,7 +158,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
             <p>{`insurancePassthroughBump: ${args.insurancePassthroughBump.toString()}`}</p>
             <p>{`mangoAccountBump: ${args.mangoAccountBump.toString()}`}</p>
           </>
-        )
+        );
       },
     },
     198: {
@@ -184,7 +184,7 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -196,18 +196,18 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
           u8('SIGHASH_6'),
           u8('SIGHASH_7'),
           u64('insuranceAmount'),
-        ])
+        ]);
 
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
+        const args = dataLayout.decode(Buffer.from(data)) as any;
+        console.log('args', args);
         return (
           <>
             <p>{`Insurance Amount to deposit: ${nativeAmountToFormattedUiAmount(
               new BN(args.insuranceAmount.toString()),
-              INSURANCE_MINTS.mainnet.USDC.decimals
+              INSURANCE_MINTS.mainnet.USDC.decimals,
             )}`}</p>
           </>
-        )
+        );
       },
     },
     227: {
@@ -234,18 +234,18 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')])
+        const dataLayout = struct([u48('redeemable_global_supply_cap')]);
 
-        const args = dataLayout.decode(Buffer.from(data)) as any
-        console.log('args', args)
+        const args = dataLayout.decode(Buffer.from(data)) as any;
+        console.log('args', args);
         return (
           <>
             <p>{args}</p>
           </>
-        )
+        );
       },
     },
   },
-}
+};

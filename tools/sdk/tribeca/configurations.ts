@@ -1,46 +1,48 @@
-import { Wallet } from '@project-serum/common'
+import { Wallet } from '@project-serum/common';
 import {
   SolanaAugmentedProvider,
   SolanaProvider,
-} from '@saberhq/solana-contrib'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { SPL_TOKENS } from '@utils/splTokens'
-import ATribecaConfiguration, { TribecaPrograms } from './ATribecaConfiguration'
+} from '@saberhq/solana-contrib';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { SPL_TOKENS } from '@utils/splTokens';
+import ATribecaConfiguration, {
+  TribecaPrograms,
+} from './ATribecaConfiguration';
 
 class SaberTribecaConfiguration extends ATribecaConfiguration {
   public readonly locker = new PublicKey(
-    '8erad8kmNrLJDJPe9UkmTHomrMV3EW48sjGeECyVjbYX'
-  )
+    '8erad8kmNrLJDJPe9UkmTHomrMV3EW48sjGeECyVjbYX',
+  );
 
-  public readonly token = SPL_TOKENS.SBR
-  public readonly name = 'Saber'
+  public readonly token = SPL_TOKENS.SBR;
+  public readonly name = 'Saber';
 }
 
 class SunnyTribecaConfiguration extends ATribecaConfiguration {
   public readonly locker = new PublicKey(
-    '4tr9CDSgZRLYPGdcsm9PztaGSfJtX5CEmqDbEbvCTX2G'
-  )
+    '4tr9CDSgZRLYPGdcsm9PztaGSfJtX5CEmqDbEbvCTX2G',
+  );
 
-  public readonly token = SPL_TOKENS.SUNNY
-  public readonly name = 'Sunny'
+  public readonly token = SPL_TOKENS.SUNNY;
+  public readonly name = 'Sunny';
 }
 
-export const saberTribecaConfiguration = new SaberTribecaConfiguration()
-export const sunnyTribecaConfiguration = new SunnyTribecaConfiguration()
+export const saberTribecaConfiguration = new SaberTribecaConfiguration();
+export const sunnyTribecaConfiguration = new SunnyTribecaConfiguration();
 
 export const configurations = {
   saber: saberTribecaConfiguration,
   sunny: sunnyTribecaConfiguration,
-}
+};
 
 export function getConfigurationByName(
-  name: string
+  name: string,
 ): ATribecaConfiguration | null {
   return (
     Object.values(configurations).find(
-      (configuration) => configuration.name === name
+      (configuration) => configuration.name === name,
     ) ?? null
-  )
+  );
 }
 
 export function getTribecaPrograms({
@@ -48,26 +50,26 @@ export function getTribecaPrograms({
   wallet,
   config,
 }: {
-  connection: Connection
-  wallet: Wallet
-  config: ATribecaConfiguration
+  connection: Connection;
+  wallet: Wallet;
+  config: ATribecaConfiguration;
 }) {
   return config.loadPrograms(
     new SolanaAugmentedProvider(
       SolanaProvider.init({
         connection,
         wallet,
-      })
-    )
-  )
+      }),
+    ),
+  );
 }
 
 export async function getTribecaLocker({
   programs,
   config,
 }: {
-  programs: TribecaPrograms
-  config: ATribecaConfiguration
+  programs: TribecaPrograms;
+  config: ATribecaConfiguration;
 }) {
-  return programs.LockedVoter.account.locker.fetch(config.locker)
+  return programs.LockedVoter.account.locker.fetch(config.locker);
 }

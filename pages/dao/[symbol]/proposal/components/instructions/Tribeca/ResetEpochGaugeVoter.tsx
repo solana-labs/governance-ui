@@ -1,12 +1,12 @@
-import * as yup from 'yup'
-import { Wallet } from '@project-serum/common'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations'
-import { resetEpochGaugeVoterInstruction } from '@tools/sdk/tribeca/instructions/resetEpochGaugeVoterInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { TribecaResetEpochGaugeVoterForm } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
-import GovernorSelect from './GovernorSelect'
+import * as yup from 'yup';
+import { Wallet } from '@project-serum/common';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations';
+import { resetEpochGaugeVoterInstruction } from '@tools/sdk/tribeca/instructions/resetEpochGaugeVoterInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { TribecaResetEpochGaugeVoterForm } from '@utils/uiTypes/proposalCreationTypes';
+import useWalletStore from 'stores/useWalletStore';
+import GovernorSelect from './GovernorSelect';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -17,14 +17,14 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Tribeca Configuration Governor is required'),
-})
+});
 
 const ResetEpochGaugeVoter = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -46,19 +46,19 @@ const ResetEpochGaugeVoter = ({
         connection,
         wallet: wallet as Wallet,
         config: form.tribecaConfiguration!,
-      })
+      });
       return resetEpochGaugeVoterInstruction({
         programs,
         authority: governedAccountPubkey,
         tribecaConfiguration: form.tribecaConfiguration!,
-      })
+      });
     },
-  })
-  const connection = useWalletStore((s) => s.connection)
+  });
+  const connection = useWalletStore((s) => s.connection);
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
-    return <>This instruction does not support {connection.cluster}</>
+    return <>This instruction does not support {connection.cluster}</>;
   }
 
   return (
@@ -68,7 +68,7 @@ const ResetEpochGaugeVoter = ({
         handleSetForm({ value, propertyName: 'tribecaConfiguration' })
       }
     />
-  )
-}
+  );
+};
 
-export default ResetEpochGaugeVoter
+export default ResetEpochGaugeVoter;

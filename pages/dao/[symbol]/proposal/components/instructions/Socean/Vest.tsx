@@ -1,13 +1,13 @@
-import BigNumber from 'bignumber.js'
-import * as yup from 'yup'
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import soceanConfig from '@tools/sdk/socean/configuration'
-import { vest } from '@tools/sdk/socean/instructions/vest'
-import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens'
-import { SoceanVestForm } from '@utils/uiTypes/proposalCreationTypes'
+import BigNumber from 'bignumber.js';
+import * as yup from 'yup';
+import { BN } from '@project-serum/anchor';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import soceanConfig from '@tools/sdk/socean/configuration';
+import { vest } from '@tools/sdk/socean/instructions/vest';
+import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
+import { SoceanVestForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -18,14 +18,14 @@ const schema = yup.object().shape({
   bondedMint: yup.string().required('Bonded Mint is required'),
   userBondedAccount: yup.string().required('User Bonded Account is required'),
   uiAmount: yup.number().required('Amount is required'),
-})
+});
 
 const Vest = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -48,13 +48,13 @@ const Vest = ({
         connection,
         cluster,
         wallet,
-      })
+      });
 
       const mintInfo = await tryGetTokenMint(
         connection,
-        new PublicKey(form.userBondedAccount!)
-      )
-      if (!mintInfo) throw new Error('Cannot load userBondedAccount mint info')
+        new PublicKey(form.userBondedAccount!),
+      );
+      if (!mintInfo) throw new Error('Cannot load userBondedAccount mint info');
 
       return vest({
         cluster,
@@ -67,11 +67,11 @@ const Vest = ({
         amount: new BN(
           new BigNumber(form.uiAmount!.toString())
             .shiftedBy(mintInfo.account.decimals)
-            .toString()
+            .toString(),
         ),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -128,7 +128,7 @@ const Vest = ({
         error={formErrors['uiAmount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default Vest
+export default Vest;

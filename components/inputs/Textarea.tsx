@@ -1,13 +1,13 @@
-import { StyledLabel, StyledSuffix, inputClasses } from './styles'
-import ErrorField from './ErrorField'
+import { StyledLabel, StyledSuffix, inputClasses } from './styles';
+import ErrorField from './ErrorField';
 
 interface TextareaProps {
-  value: any
-  onChange?: (e) => void
-  className?: string
-  disabled?: boolean
-  useDefaultStyle?: boolean
-  [x: string]: any
+  value: any;
+  onChange?: (e) => void;
+  className?: string;
+  disabled?: boolean;
+  useDefaultStyle?: boolean;
+  [x: string]: any;
 }
 
 const TextareaProps = ({
@@ -45,7 +45,7 @@ const TextareaProps = ({
 
       <ErrorField text={error}></ErrorField>
     </div>
-  )
-}
+  );
+};
 
-export default TextareaProps
+export default TextareaProps;

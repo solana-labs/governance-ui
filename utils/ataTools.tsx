@@ -1,13 +1,13 @@
-import { utils } from '@project-serum/anchor'
+import { utils } from '@project-serum/anchor';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import { Connection, PublicKey, Transaction } from '@solana/web3.js'
-import type { ConnectionContext } from 'utils/connection'
-import { sendTransaction } from './send'
-import { tryGetAta, isExistingTokenAccount } from './validations'
+} from '@solana/spl-token';
+import { Connection, PublicKey, Transaction } from '@solana/web3.js';
+import type { ConnectionContext } from 'utils/connection';
+import { sendTransaction } from './send';
+import { tryGetAta, isExistingTokenAccount } from './validations';
 
 // calculate ATA
 export async function createATA(
@@ -15,16 +15,16 @@ export async function createATA(
   wallet,
   mintPubkey: PublicKey,
   owner: PublicKey,
-  feePayer: PublicKey
+  feePayer: PublicKey,
 ) {
   const ata = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
     mintPubkey, // mint
-    owner // owner
-  )
+    owner, // owner
+  );
 
-  const transaction = new Transaction()
+  const transaction = new Transaction();
   transaction.add(
     Token.createAssociatedTokenAccountInstruction(
       ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
@@ -32,15 +32,15 @@ export async function createATA(
       mintPubkey, // mint
       ata, // ata
       owner, // owner of token account
-      feePayer // fee payer
-    )
-  )
+      feePayer, // fee payer
+    ),
+  );
   await sendTransaction({
     connection,
     wallet,
     transaction,
-  })
-  return ata
+  });
+  return ata;
 }
 
 export async function getATA({
@@ -49,56 +49,56 @@ export async function getATA({
   mintPK,
   wallet,
 }: {
-  connection: ConnectionContext
-  receiverAddress: PublicKey
-  mintPK: PublicKey
-  wallet: any
+  connection: ConnectionContext;
+  receiverAddress: PublicKey;
+  mintPK: PublicKey;
+  wallet: any;
 }) {
   if (!wallet?.publicKey) {
-    throw 'please connect your wallet'
+    throw 'please connect your wallet';
   }
-  let currentAddress = receiverAddress
-  let needToCreateAta = false
+  let currentAddress = receiverAddress;
+  let needToCreateAta = false;
   const isExistingAccount = await isExistingTokenAccount(
     connection,
-    receiverAddress
-  )
+    receiverAddress,
+  );
   if (!isExistingAccount) {
     const existingAta = await tryGetAta(
       connection.current,
       mintPK,
-      currentAddress
-    )
+      currentAddress,
+    );
     if (!existingAta) {
       const ata = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
         mintPK, // mint
-        receiverAddress // owner
-      )
-      needToCreateAta = true
-      currentAddress = ata
+        receiverAddress, // owner
+      );
+      needToCreateAta = true;
+      currentAddress = ata;
     } else {
-      currentAddress = existingAta.publicKey
+      currentAddress = existingAta.publicKey;
     }
   }
   return {
     currentAddress,
     needToCreateAta,
-  }
+  };
 }
 
 export function findATAAddrSync(
   wallet: PublicKey,
-  mintAddress: PublicKey
+  mintAddress: PublicKey,
 ): [PublicKey, number] {
   const seeds = [
     wallet.toBuffer(),
     TOKEN_PROGRAM_ID.toBuffer(),
     mintAddress.toBuffer(),
-  ]
+  ];
   return utils.publicKey.findProgramAddressSync(
     seeds,
-    ASSOCIATED_TOKEN_PROGRAM_ID
-  )
+    ASSOCIATED_TOKEN_PROGRAM_ID,
+  );
 }

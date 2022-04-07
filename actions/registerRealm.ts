@@ -4,8 +4,8 @@ import {
   PublicKey,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
-import BN from 'bn.js'
+} from '@solana/web3.js';
+import BN from 'bn.js';
 import {
   getTokenOwnerRecordAddress,
   GovernanceConfig,
@@ -13,47 +13,47 @@ import {
   SetRealmAuthorityAction,
   VoteThresholdPercentage,
   VoteTipping,
-} from '@solana/spl-governance'
-import { withCreateRealm } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
+} from '@solana/spl-governance';
+import { withCreateRealm } from '@solana/spl-governance';
+import { sendTransaction } from '../utils/send';
 
 import {
   sendTransactions,
   SequenceType,
   WalletSigner,
-} from 'utils/sendTransactions'
-import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
-import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
-import { withMintTo } from '@tools/sdk/splToken/withMintTo'
-import { chunks } from '@utils/helpers'
+} from 'utils/sendTransactions';
+import { withCreateMint } from '@tools/sdk/splToken/withCreateMint';
+import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount';
+import { withMintTo } from '@tools/sdk/splToken/withMintTo';
+import { chunks } from '@utils/helpers';
 import {
   SignerWalletAdapter,
   WalletConnectionError,
-} from '@solana/wallet-adapter-base'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
+} from '@solana/wallet-adapter-base';
+import { withDepositGoverningTokens } from '@solana/spl-governance';
 import {
   getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
-} from '@tools/sdk/units'
-import { withCreateMintGovernance } from '@solana/spl-governance'
-import { withSetRealmAuthority } from '@solana/spl-governance'
-import { AccountInfo, u64 } from '@solana/spl-token'
-import { ProgramAccount } from '@project-serum/common'
-import { tryGetAta } from '@utils/validations'
-import { ConnectionContext } from '@utils/connection'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
-import BigNumber from 'bignumber.js'
+} from '@tools/sdk/units';
+import { withCreateMintGovernance } from '@solana/spl-governance';
+import { withSetRealmAuthority } from '@solana/spl-governance';
+import { AccountInfo, u64 } from '@solana/spl-token';
+import { ProgramAccount } from '@project-serum/common';
+import { tryGetAta } from '@utils/validations';
+import { ConnectionContext } from '@utils/connection';
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants';
+import BigNumber from 'bignumber.js';
 
 interface RegisterRealmRpc {
-  connection: ConnectionContext
-  wallet: SignerWalletAdapter
-  walletPubkey: PublicKey
+  connection: ConnectionContext;
+  wallet: SignerWalletAdapter;
+  walletPubkey: PublicKey;
 }
 
 /**
  * The default amount of decimals for the community token
  */
-export const COMMUNITY_MINT_DECIMALS = 6
+export const COMMUNITY_MINT_DECIMALS = 6;
 
 /**
  * Prepares the mint instructions
@@ -74,18 +74,18 @@ async function prepareMintInstructions(
   tokenDecimals = 0,
   council = false,
   mintPk?: PublicKey,
-  otherOwners?: PublicKey[]
+  otherOwners?: PublicKey[],
 ) {
-  console.debug('preparing mint instructions')
+  console.debug('preparing mint instructions');
 
-  let _mintPk: PublicKey | undefined = undefined
-  let walletAtaPk: PublicKey | undefined
-  const mintInstructions: TransactionInstruction[] = []
-  const mintSigners: Keypair[] = []
+  let _mintPk: PublicKey | undefined = undefined;
+  let walletAtaPk: PublicKey | undefined;
+  const mintInstructions: TransactionInstruction[] = [];
+  const mintSigners: Keypair[] = [];
 
   const councilTokenAmount = new u64(
-    new BigNumber(1).shiftedBy(tokenDecimals).toString()
-  )
+    new BigNumber(1).shiftedBy(tokenDecimals).toString(),
+  );
 
   if (!council || (council && otherOwners?.length)) {
     // If mintPk is undefined, then
@@ -99,8 +99,8 @@ async function prepareMintInstructions(
         walletPubkey,
         null,
         tokenDecimals,
-        walletPubkey
-      ))
+        walletPubkey,
+      ));
 
     // If the array of other owners is not empty
     // then should create mints to them
@@ -109,9 +109,9 @@ async function prepareMintInstructions(
         const ata: ProgramAccount<AccountInfo> | undefined = await tryGetAta(
           connection.current,
           ownerPk,
-          _mintPk
-        )
-        const shouldMint = !ata?.account.amount.gt(new BN(0))
+          _mintPk,
+        );
+        const shouldMint = !ata?.account.amount.gt(new BN(0));
 
         const ataPk =
           ata?.publicKey ??
@@ -119,31 +119,31 @@ async function prepareMintInstructions(
             mintInstructions,
             _mintPk,
             ownerPk,
-            walletPubkey
-          ))
+            walletPubkey,
+          ));
 
         // Mint 1 token to each owner
         if (shouldMint && ataPk) {
-          console.debug('will mint to ', { ataPk })
+          console.debug('will mint to ', { ataPk });
           await withMintTo(
             mintInstructions,
             _mintPk,
             ataPk,
             walletPubkey,
-            councilTokenAmount
-          )
+            councilTokenAmount,
+          );
         }
 
         if (ownerPk.equals(walletPubkey)) {
-          walletAtaPk = ataPk
+          walletAtaPk = ataPk;
         }
       }
     }
   }
 
-  const instructionChunks = chunks(mintInstructions, 10)
-  const signersChunks = Array(instructionChunks.length).fill([])
-  signersChunks[0] = mintSigners
+  const instructionChunks = chunks(mintInstructions, 10);
+  const signersChunks = Array(instructionChunks.length).fill([]);
+  signersChunks[0] = mintSigners;
   return {
     mintPk: _mintPk,
     walletAtaPk,
@@ -167,7 +167,7 @@ async function prepareMintInstructions(
      * Amount of tokens minted to the council members
      */
     councilTokenAmount,
-  }
+  };
 }
 
 /**
@@ -178,17 +178,17 @@ async function prepareMintInstructions(
 function createGovernanceConfig(
   yesVoteThreshold = 60,
   tokenDecimals?: number,
-  minCommunityTokensToCreateGovernance?: string
+  minCommunityTokensToCreateGovernance?: string,
 ): GovernanceConfig {
-  console.debug('mounting governance config')
+  console.debug('mounting governance config');
 
   const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
     minCommunityTokensToCreateGovernance &&
       +minCommunityTokensToCreateGovernance > 0
       ? +minCommunityTokensToCreateGovernance
       : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-    tokenDecimals ?? COMMUNITY_MINT_DECIMALS
-  )
+    tokenDecimals ?? COMMUNITY_MINT_DECIMALS,
+  );
 
   // Put community and council mints under the realm governance with default config
   return new GovernanceConfig({
@@ -203,7 +203,7 @@ function createGovernanceConfig(
     voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
-  })
+  });
 }
 
 /**
@@ -229,18 +229,18 @@ async function prepareGovernanceInstructions(
   realmPk: PublicKey,
   tokenOwnerRecordPk: PublicKey,
   realmInstructions: TransactionInstruction[],
-  transferAuthority?: boolean
+  transferAuthority?: boolean,
 ) {
-  console.debug('Preparing governance instructions')
+  console.debug('Preparing governance instructions');
 
   const config = createGovernanceConfig(
     yesVoteThreshold,
     communityTokenDecimals,
-    minCommunityTokensToCreateGovernance
-  )
+    minCommunityTokensToCreateGovernance,
+  );
 
   if (transferAuthority) {
-    console.debug('transfer community mint authority')
+    console.debug('transfer community mint authority');
     const communityMintGovPk = await withCreateMintGovernance(
       realmInstructions,
       programId,
@@ -252,8 +252,8 @@ async function prepareGovernanceInstructions(
       walletPubkey,
       tokenOwnerRecordPk,
       walletPubkey,
-      walletPubkey
-    )
+      walletPubkey,
+    );
 
     // Set the community governance as the realm authority
     withSetRealmAuthority(
@@ -263,8 +263,8 @@ async function prepareGovernanceInstructions(
       realmPk,
       walletPubkey,
       communityMintGovPk,
-      SetRealmAuthorityAction.SetChecked
-    )
+      SetRealmAuthorityAction.SetChecked,
+    );
   }
 
   if (councilMintPk)
@@ -280,8 +280,8 @@ async function prepareGovernanceInstructions(
       walletPubkey,
       tokenOwnerRecordPk,
       walletPubkey,
-      walletPubkey
-    )
+      walletPubkey,
+    );
 }
 
 /**
@@ -302,21 +302,21 @@ function sendTransactionFactory(
   councilSignersChunks: Keypair[][],
   realmInstructions: TransactionInstruction[],
   communityMintInstructions?: TransactionInstruction[],
-  communityMintSigners?: Keypair[]
+  communityMintSigners?: Keypair[],
 ) {
-  console.debug('factoring sendtransaction')
+  console.debug('factoring sendtransaction');
 
-  const instructions: TransactionInstruction[][] = [realmInstructions]
-  const signerSets: Keypair[][] = [[]]
+  const instructions: TransactionInstruction[][] = [realmInstructions];
+  const signerSets: Keypair[][] = [[]];
 
   if (councilMembersChunks.length) {
-    instructions.unshift(...councilMembersChunks)
-    signerSets.unshift(...councilSignersChunks)
+    instructions.unshift(...councilMembersChunks);
+    signerSets.unshift(...councilSignersChunks);
   }
 
   if (communityMintInstructions && communityMintSigners) {
-    instructions.unshift(communityMintInstructions)
-    signerSets.unshift(communityMintSigners)
+    instructions.unshift(communityMintInstructions);
+    signerSets.unshift(communityMintSigners);
   }
 
   if (instructions.length > 1) {
@@ -325,12 +325,12 @@ function sendTransactionFactory(
       wallet,
       instructions,
       signerSets,
-      SequenceType.Sequential
-    )
+      SequenceType.Sequential,
+    );
   } else {
-    const transaction = new Transaction()
-    transaction.add(...realmInstructions)
-    return sendTransaction({ transaction, wallet, connection })
+    const transaction = new Transaction();
+    transaction.add(...realmInstructions);
+    return sendTransaction({ transaction, wallet, connection });
   }
 }
 
@@ -370,12 +370,12 @@ export async function registerRealm(
   transferAuthority = true,
   communityMintTokenDecimals?: number,
   councilMintTokenDecimals?: number,
-  councilWalletPks?: PublicKey[]
+  councilWalletPks?: PublicKey[],
 ): Promise<PublicKey> {
-  if (!wallet) throw WalletConnectionError
-  console.debug('starting register realm')
+  if (!wallet) throw WalletConnectionError;
+  console.debug('starting register realm');
 
-  const realmInstructions: TransactionInstruction[] = []
+  const realmInstructions: TransactionInstruction[] = [];
 
   const {
     mintPk: councilMintPk,
@@ -389,36 +389,36 @@ export async function registerRealm(
     councilMintTokenDecimals,
     true,
     councilMint,
-    councilWalletPks
-  )
+    councilWalletPks,
+  );
 
   let communityMintInstructions:
     | TransactionInstruction[]
-    | undefined = undefined
-  let communityMintPk: PublicKey | undefined = communityMint
-  let communityMintSigners: Keypair[] | undefined = undefined
+    | undefined = undefined;
+  let communityMintPk: PublicKey | undefined = communityMint;
+  let communityMintSigners: Keypair[] | undefined = undefined;
 
   // If user doens't provides a community mint, we'll generate it
   if (!communityMint) {
     const communityDetails = await prepareMintInstructions(
       connection,
       walletPubkey,
-      COMMUNITY_MINT_DECIMALS
-    )
-    communityMintInstructions = communityDetails.mintInstructions
-    communityMintPk = communityDetails.mintPk
-    communityMintSigners = communityDetails.mintSigners
+      COMMUNITY_MINT_DECIMALS,
+    );
+    communityMintInstructions = communityDetails.mintInstructions;
+    communityMintPk = communityDetails.mintPk;
+    communityMintSigners = communityDetails.mintSigners;
   }
 
-  if (!communityMintPk) throw new Error('Invalid community mint public key.')
+  if (!communityMintPk) throw new Error('Invalid community mint public key.');
 
   const _minCommunityTokensToCreateGovernance = getMintNaturalAmountFromDecimalAsBN(
     minCommunityTokensToCreateGovernance &&
       +minCommunityTokensToCreateGovernance > 0
       ? +minCommunityTokensToCreateGovernance
       : MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY,
-    communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS
-  )
+    communityMintTokenDecimals ?? COMMUNITY_MINT_DECIMALS,
+  );
 
   const realmAddress = await withCreateRealm(
     realmInstructions,
@@ -431,10 +431,10 @@ export async function registerRealm(
     councilMintPk,
     communityMintMaxVoteWeightSource,
     _minCommunityTokensToCreateGovernance,
-    undefined
-  )
+    undefined,
+  );
 
-  let tokenOwnerRecordPk: PublicKey | undefined = undefined
+  let tokenOwnerRecordPk: PublicKey | undefined = undefined;
 
   // If the current wallet is in the team then deposit the council token
   if (councilMintPk) {
@@ -444,8 +444,8 @@ export async function registerRealm(
         programId,
         realmAddress,
         councilMintPk,
-        walletPubkey
-      )
+        walletPubkey,
+      );
 
       await withDepositGoverningTokens(
         realmInstructions,
@@ -457,12 +457,12 @@ export async function registerRealm(
         walletPubkey,
         walletPubkey,
         walletPubkey,
-        councilTokenAmount
-      )
+        councilTokenAmount,
+      );
     } else {
       // Let's throw for now if the current wallet isn't in the team
       // TODO: To fix it we would have to make it temp. as part of the team and then remove after the realm is created
-      throw new Error('Current wallet must be in the team')
+      throw new Error('Current wallet must be in the team');
     }
   }
 
@@ -481,8 +481,8 @@ export async function registerRealm(
       realmAddress,
       tokenOwnerRecordPk,
       realmInstructions,
-      transferAuthority
-    )
+      transferAuthority,
+    );
   }
 
   const txnToSend = sendTransactionFactory(
@@ -492,14 +492,14 @@ export async function registerRealm(
     councilSignersChunks,
     realmInstructions,
     communityMintInstructions,
-    communityMintSigners
-  )
-  console.debug('sending transaction')
-  await txnToSend
-  console.debug('transaction sent')
+    communityMintSigners,
+  );
+  console.debug('sending transaction');
+  await txnToSend;
+  console.debug('transaction sent');
   console.debug({
     communityMintPk,
     councilMintPk,
-  })
-  return realmAddress
+  });
+  return realmAddress;
 }

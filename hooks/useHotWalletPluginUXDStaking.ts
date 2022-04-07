@@ -1,12 +1,12 @@
-import { useCallback, useEffect, useState } from 'react'
-import { HotWalletAccount } from './useHotWallet'
-import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration'
-import useWalletStore from 'stores/useWalletStore'
+import { useCallback, useEffect, useState } from 'react';
+import { HotWalletAccount } from './useHotWallet';
+import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
+import useWalletStore from 'stores/useWalletStore';
 import {
   getOnchainStakingCampaign,
   StakingCampaignState,
-} from '@uxdprotocol/uxd-staking-client'
-import { PublicKey } from '@solana/web3.js'
+} from '@uxdprotocol/uxd-staking-client';
+import { PublicKey } from '@solana/web3.js';
 
 const UsersCampaigns = {
   ['AWuSjBCEMVtk8fX2HAwtuMjoHLmLM72PJxi1dZdKHPFu']: [
@@ -32,52 +32,52 @@ const UsersCampaigns = {
       pda: new PublicKey('GMkG1Xr1ZAtLbHRxfbqLFEHqjP7rGwEfhQFed41aEL1k'),
     },
   ],
-}
+};
 
 export type StakingCampaignInfo = Omit<
   StakingCampaignState,
   'validStakingOptions' | 'getStakedVaultBalance'
 > & {
-  name: string
-  pda: PublicKey
-  stakedVaultBalance?: number
-}
+  name: string;
+  pda: PublicKey;
+  stakedVaultBalance?: number;
+};
 
 const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
   const [stakingCampaignsInfo, setStakingCampaignsInfo] = useState<
     StakingCampaignInfo[]
-  >()
-  const connection = useWalletStore((s) => s.connection)
+  >();
+  const connection = useWalletStore((s) => s.connection);
 
   const loadUXDStakingCampaignInfo = useCallback(async () => {
     try {
       const programId =
-        uxdProtocolStakingConfiguration.programId[connection.cluster]
+        uxdProtocolStakingConfiguration.programId[connection.cluster];
 
       if (!programId) {
         throw new Error(
-          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`
-        )
+          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`,
+        );
       }
 
       const campaigns =
-        UsersCampaigns[hotWalletAccount.publicKey.toBase58()] ?? []
+        UsersCampaigns[hotWalletAccount.publicKey.toBase58()] ?? [];
 
       const stakingCampaignStates: StakingCampaignState[] = await Promise.all(
         campaigns.map(({ pda }) =>
           getOnchainStakingCampaign(
             pda,
             connection.current,
-            uxdProtocolStakingConfiguration.TXN_OPTS
-          )
-        )
-      )
+            uxdProtocolStakingConfiguration.TXN_OPTS,
+          ),
+        ),
+      );
 
       const stakedVaultBalances = await Promise.allSettled(
         stakingCampaignStates.map((stakingCampaignState) =>
-          stakingCampaignState.getStakedVaultBalance(connection.current)
-        )
-      )
+          stakingCampaignState.getStakedVaultBalance(connection.current),
+        ),
+      );
 
       setStakingCampaignsInfo(
         stakingCampaignStates.map(
@@ -87,9 +87,9 @@ const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
               getStakedVaultBalance: _getStakedVaultBalance,
               ...other
             },
-            index
+            index,
           ) => {
-            const stakedVaultBalanceResult = stakedVaultBalances[index]
+            const stakedVaultBalanceResult = stakedVaultBalances[index];
 
             return {
               ...other,
@@ -99,21 +99,21 @@ const useHotWalletPluginUXDStaking = (hotWalletAccount: HotWalletAccount) => {
                   : undefined,
               name: campaigns[index].name,
               pda: campaigns[index].pda,
-            }
-          }
-        )
-      )
+            };
+          },
+        ),
+      );
     } catch (e) {
-      console.log(e)
-      setStakingCampaignsInfo([])
+      console.log(e);
+      setStakingCampaignsInfo([]);
     }
-  }, [connection, hotWalletAccount])
+  }, [connection, hotWalletAccount]);
 
   useEffect(() => {
-    loadUXDStakingCampaignInfo()
-  }, [loadUXDStakingCampaignInfo])
+    loadUXDStakingCampaignInfo();
+  }, [loadUXDStakingCampaignInfo]);
 
-  return { stakingCampaignsInfo }
-}
+  return { stakingCampaignsInfo };
+};
 
-export default useHotWalletPluginUXDStaking
+export default useHotWalletPluginUXDStaking;

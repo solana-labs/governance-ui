@@ -1,8 +1,8 @@
-import { BN } from '@project-serum/anchor'
-import { MintInfo } from '@solana/spl-token'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { LightningBoltIcon } from '@heroicons/react/solid'
-import Tooltip from '@components/Tooltip'
+import { BN } from '@project-serum/anchor';
+import { MintInfo } from '@solana/spl-token';
+import { fmtMintAmount } from '@tools/sdk/units';
+import { LightningBoltIcon } from '@heroicons/react/solid';
+import Tooltip from '@components/Tooltip';
 
 const VotingPowerBox = ({
   votingPower,
@@ -11,14 +11,14 @@ const VotingPowerBox = ({
   className = '',
   style,
 }: {
-  votingPower: BN
-  mint: MintInfo
-  votingPowerFromDeposits: BN
-  className?: string
-  style?: any
+  votingPower: BN;
+  mint: MintInfo;
+  votingPowerFromDeposits: BN;
+  className?: string;
+  style?: any;
 }) => {
   const votingPowerFmt =
-    votingPower && mint ? fmtMintAmount(mint, votingPower) : '0'
+    votingPower && mint ? fmtMintAmount(mint, votingPower) : '0';
 
   return (
     <div className={`bg-bkg-1 rounded-md ${className}`} style={style}>
@@ -37,7 +37,7 @@ const VotingPowerBox = ({
         )}
       </span>
     </div>
-  )
-}
+  );
+};
 
-export default VotingPowerBox
+export default VotingPowerBox;

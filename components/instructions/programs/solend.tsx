@@ -1,8 +1,8 @@
-import { nu64, struct, u8 } from 'buffer-layout'
-import SolendConfiguration from '@tools/sdk/solend/configuration'
-import { LendingInstruction } from '@solendprotocol/solend-sdk/dist/instructions/instruction'
-import { Connection } from '@solana/web3.js'
-import { AccountMetaData } from '@solana/spl-governance'
+import { nu64, struct, u8 } from 'buffer-layout';
+import SolendConfiguration from '@tools/sdk/solend/configuration';
+import { LendingInstruction } from '@solendprotocol/solend-sdk/dist/instructions/instruction';
+import { Connection } from '@solana/web3.js';
+import { AccountMetaData } from '@solana/spl-governance';
 
 export const SOLEND_PROGRAM_INSTRUCTIONS = {
   [SolendConfiguration.programID.toBase58()]: {
@@ -19,9 +19,9 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         _data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const mint = accounts[2].pubkey.toString()
+        const mint = accounts[2].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -30,7 +30,7 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
               <span>{mint}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -45,17 +45,17 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         _data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
         // All accounts starting at index 2 are reserve accounts
-        const reserveAccounts = accounts.slice(2)
+        const reserveAccounts = accounts.slice(2);
 
         const reserveNames = reserveAccounts.map(
           (reserveAcc) =>
             SolendConfiguration.getTokenNameByReservePublicKey(
-              reserveAcc.pubkey
-            ) ?? 'unknown'
-        )
+              reserveAcc.pubkey,
+            ) ?? 'unknown',
+        );
 
         return (
           <div className="flex flex-col">
@@ -66,7 +66,7 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
               </div>
             ))}
           </div>
-        )
+        );
       },
     },
 
@@ -76,20 +76,20 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         _data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const reserve = accounts[0]
+        const reserve = accounts[0];
 
         const tokenName =
           SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown'
+          'unknown';
 
         return (
           <div className="flex justify-between">
             <span>Reserve</span>
             <span>{tokenName}</span>
           </div>
-        )
+        );
       },
     },
 
@@ -114,17 +114,17 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const dataLayout = struct([u8('instruction'), nu64('liquidityAmount')])
+        const dataLayout = struct([u8('instruction'), nu64('liquidityAmount')]);
 
-        const { liquidityAmount } = dataLayout.decode(Buffer.from(data)) as any
+        const { liquidityAmount } = dataLayout.decode(Buffer.from(data)) as any;
 
-        const reserve = accounts[2]
+        const reserve = accounts[2];
 
         const tokenName =
           SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown'
+          'unknown';
 
         return (
           <div className="flex flex-col">
@@ -137,7 +137,7 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
               <span>{liquidityAmount}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -162,17 +162,22 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const dataLayout = struct([u8('instruction'), nu64('collateralAmount')])
+        const dataLayout = struct([
+          u8('instruction'),
+          nu64('collateralAmount'),
+        ]);
 
-        const { collateralAmount } = dataLayout.decode(Buffer.from(data)) as any
+        const { collateralAmount } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
 
-        const reserve = accounts[2]
+        const reserve = accounts[2];
 
         const tokenName =
           SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown'
+          'unknown';
 
         return (
           <div className="flex flex-col">
@@ -185,8 +190,8 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
               <span>{collateralAmount}</span>
             </div>
           </div>
-        )
+        );
       },
     },
   },
-}
+};

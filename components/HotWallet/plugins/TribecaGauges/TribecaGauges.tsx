@@ -1,20 +1,20 @@
-import { AdjustmentsIcon } from '@heroicons/react/solid'
-import useTribecaGaugeInfos from '@hooks/useTribecaGaugesInfos'
-import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration'
-import ActiveGaugeVotes from './ActiveGaugeVotes'
-import EpochGaugeVoterData from './EpochGaugeVoterData'
-import EscrowData from './EscrowData'
-import TribecaGaugesEpoch from './TribecaGaugesEpoch'
+import { AdjustmentsIcon } from '@heroicons/react/solid';
+import useTribecaGaugeInfos from '@hooks/useTribecaGaugesInfos';
+import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
+import ActiveGaugeVotes from './ActiveGaugeVotes';
+import EpochGaugeVoterData from './EpochGaugeVoterData';
+import EscrowData from './EscrowData';
+import TribecaGaugesEpoch from './TribecaGaugesEpoch';
 
 const HotWalletPluginTribecaGauges = ({
   tribecaConfiguration,
 }: {
-  tribecaConfiguration: ATribecaConfiguration
+  tribecaConfiguration: ATribecaConfiguration;
 }) => {
-  const { infos, escrowOwner } = useTribecaGaugeInfos(tribecaConfiguration)
+  const { infos, escrowOwner } = useTribecaGaugeInfos(tribecaConfiguration);
 
   if (!escrowOwner) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -44,7 +44,7 @@ const HotWalletPluginTribecaGauges = ({
         epochGaugeVoterData={infos?.nextEpochGaugeVoterData}
       />
     </div>
-  )
-}
+  );
+};
 
-export default HotWalletPluginTribecaGauges
+export default HotWalletPluginTribecaGauges;

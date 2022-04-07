@@ -1,10 +1,10 @@
-import { ChevronDownIcon } from '@heroicons/react/outline'
-import useRealm from '@hooks/useRealm'
-import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import { useState } from 'react'
-import { LinkButton } from './Button'
-import Input from './inputs/Input'
-import Textarea from './inputs/Textarea'
+import { ChevronDownIcon } from '@heroicons/react/outline';
+import useRealm from '@hooks/useRealm';
+import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch';
+import { useState } from 'react';
+import { LinkButton } from './Button';
+import Input from './inputs/Input';
+import Textarea from './inputs/Textarea';
 
 const AdditionalProposalOptions = ({
   title,
@@ -15,16 +15,16 @@ const AdditionalProposalOptions = ({
   voteByCouncil,
   setVoteByCouncil,
 }: {
-  title: string
-  description: string
-  setTitle: (evt) => void
-  setDescription: (evt) => void
-  defaultTitle: string
-  voteByCouncil: boolean
-  setVoteByCouncil: (val) => void
+  title: string;
+  description: string;
+  setTitle: (evt) => void;
+  setDescription: (evt) => void;
+  defaultTitle: string;
+  voteByCouncil: boolean;
+  setVoteByCouncil: (val) => void;
 }) => {
-  const [showOptions, setShowOptions] = useState(false)
-  const { canChooseWhoVote } = useRealm()
+  const [showOptions, setShowOptions] = useState(false);
+  const { canChooseWhoVote } = useRealm();
   return (
     <>
       <LinkButton
@@ -62,14 +62,14 @@ const AdditionalProposalOptions = ({
             <VoteBySwitch
               checked={voteByCouncil}
               onChange={() => {
-                setVoteByCouncil(!voteByCouncil)
+                setVoteByCouncil(!voteByCouncil);
               }}
             />
           )}
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default AdditionalProposalOptions
+export default AdditionalProposalOptions;

@@ -2,10 +2,10 @@ import {
   PublicKey,
   SystemProgram,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '../ATribecaConfiguration'
+} from '../ATribecaConfiguration';
 
 export async function gaugeCommitVoteInstruction({
   programs,
@@ -14,46 +14,46 @@ export async function gaugeCommitVoteInstruction({
   payer,
   tribecaConfiguration,
 }: {
-  programs: TribecaPrograms
-  gauge: PublicKey
-  authority: PublicKey
-  payer: PublicKey
-  tribecaConfiguration: ATribecaConfiguration
+  programs: TribecaPrograms;
+  gauge: PublicKey;
+  authority: PublicKey;
+  payer: PublicKey;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
   const { currentRewardsEpoch } = await tribecaConfiguration.fetchGaugemeister(
-    programs.Gauge
-  )
+    programs.Gauge,
+  );
 
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
-  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow)
+  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow);
 
   const [gaugeVote] = await tribecaConfiguration.findGaugeVoteAddress(
     gaugeVoter,
-    gauge
-  )
+    gauge,
+  );
 
-  const votingEpoch = currentRewardsEpoch + 1
+  const votingEpoch = currentRewardsEpoch + 1;
 
   const [epochGauge] = await tribecaConfiguration.findEpochGaugeAddress(
     gauge,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   const [
     epochGaugeVoter,
   ] = await tribecaConfiguration.findEpochGaugeVoterAddress(
     gaugeVoter,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   const [
     epochGaugeVote,
     voteBump,
   ] = await tribecaConfiguration.findEpochGaugeVoteAddress(
     gaugeVote,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   return programs.Gauge.instruction.gaugeCommitVote(voteBump, {
     accounts: {
@@ -67,5 +67,5 @@ export async function gaugeCommitVoteInstruction({
       epochGaugeVoter,
       epochGaugeVote,
     },
-  })
+  });
 }

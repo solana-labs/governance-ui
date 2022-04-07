@@ -1,42 +1,42 @@
-import Button from '@components/Button'
-import useRealm from '@hooks/useRealm'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { RpcContext } from '@solana/spl-governance'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
-import useWalletStore from 'stores/useWalletStore'
-import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw'
+import Button from '@components/Button';
+import useRealm from '@hooks/useRealm';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import { RpcContext } from '@solana/spl-governance';
+import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units';
+import useWalletStore from 'stores/useWalletStore';
+import { voteRegistryWithdraw } from 'VoteStakeRegistry/actions/voteRegistryWithdraw';
 import {
   DepositWithMintAccount,
   LockupType,
-} from 'VoteStakeRegistry/sdk/accounts'
-import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import tokenService from '@utils/services/token'
-import LockTokensModal from './LockTokensModal'
-import { useState } from 'react'
+} from 'VoteStakeRegistry/sdk/accounts';
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore';
+import tokenService from '@utils/services/token';
+import LockTokensModal from './LockTokensModal';
+import { useState } from 'react';
 import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
-} from 'VoteStakeRegistry/tools/dateTools'
-import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
-import { abbreviateAddress } from '@utils/formatting'
-import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-import dayjs from 'dayjs'
+} from 'VoteStakeRegistry/tools/dateTools';
+import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit';
+import { abbreviateAddress } from '@utils/formatting';
+import { notify } from '@utils/notifications';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
+import dayjs from 'dayjs';
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
-  const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
-  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false)
+  const { getOwnedDeposits } = useDepositStore();
+  const { realm, realmInfo, tokenRecords, ownTokenRecord } = useRealm();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection.current);
+  const endpoint = useWalletStore((s) => s.connection.endpoint);
+  const [isUnlockModalOpen, setIsUnlockModalOpen] = useState(false);
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+    (s) => s.actions,
+  );
 
   const handleWithDrawFromDeposit = async (
-    depositEntry: DepositWithMintAccount
+    depositEntry: DepositWithMintAccount,
   ) => {
     if (
       ownTokenRecord!.account!.unrelinquishedVotesCount &&
@@ -47,16 +47,16 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         type: 'error',
         message:
           "You can't withdraw community tokens when you have active proposals",
-      })
-      return
+      });
+      return;
     }
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection,
-      endpoint
-    )
+      endpoint,
+    );
     await voteRegistryWithdraw({
       rpcContext,
       mintPk: depositEntry!.mint.publicKey,
@@ -68,64 +68,66 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         .pubkey!,
       depositIndex: depositEntry.index,
       client: client,
-    })
+    });
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
       client: client!,
       connection,
-    })
-    await fetchWalletTokenAccounts()
-    await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-  }
+    });
+    await fetchWalletTokenAccounts();
+    await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
+  };
   const handleStartUnlock = () => {
-    setIsUnlockModalOpen(true)
-  }
+    setIsUnlockModalOpen(true);
+  };
   const handleCloseDeposit = async () => {
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection,
-      endpoint
-    )
+      endpoint,
+    );
     await closeDeposit({
       rpcContext,
       realmPk: realm!.pubkey!,
       depositIndex: deposit.index,
       communityMintPk: realm!.account.communityMint,
       client,
-    })
+    });
     await getOwnedDeposits({
       realmPk: realm!.pubkey,
       communityMintPk: realm!.account.communityMint,
       walletPk: wallet!.publicKey!,
       client: client!,
       connection,
-    })
-  }
+    });
+  };
 
   const lockedTokens = fmtMintAmount(
     deposit.mint.account,
-    deposit.currentlyLocked.add(deposit.available)
-  )
-  const type = Object.keys(deposit.lockup.kind)[0] as LockupType
-  const typeName = type !== 'monthly' ? type : 'Vested'
-  const isVest = type === 'monthly'
+    deposit.currentlyLocked.add(deposit.available),
+  );
+  const type = Object.keys(deposit.lockup.kind)[0] as LockupType;
+  const typeName = type !== 'monthly' ? type : 'Vested';
+  const isVest = type === 'monthly';
   const isRealmCommunityMint =
     deposit.mint.publicKey.toBase58() ===
-    realm?.account.communityMint.toBase58()
-  const isConstant = type === 'constant'
+    realm?.account.communityMint.toBase58();
+  const isConstant = type === 'constant';
   const CardLabel = ({ label, value }) => {
     return (
       <div className="flex flex-col w-1/2 py-2">
         <p className="text-xs text-fgd-2">{label}</p>
         <p className="font-bold text-fgd-1">{value}</p>
       </div>
-    )
-  }
-  const tokenInfo = tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())
+    );
+  };
+  const tokenInfo = tokenService.getTokenInfo(
+    deposit.mint.publicKey.toBase58(),
+  );
   return (
     <div className="border border-fgd-4 rounded-lg flex flex-col">
       <div className="bg-bkg-3 px-4 py-4 pr-16 rounded-md rounded-b-none flex items-center">
@@ -154,7 +156,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
               label="Initial Amount"
               value={fmtMintAmount(
                 deposit.mint.account,
-                deposit.amountInitiallyLockedNative
+                deposit.amountInitiallyLockedNative,
               )}
             />
           )}
@@ -165,7 +167,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
                 deposit.vestingRate &&
                 `${getMintDecimalAmount(
                   deposit.mint.account,
-                  deposit.vestingRate
+                  deposit.vestingRate,
                 ).toFormat(2)} p/mo`
               }
             />
@@ -174,7 +176,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             <CardLabel
               label="Next Vesting"
               value={dayjs(
-                deposit.nextVestingTimestamp?.toNumber() * 1000
+                deposit.nextVestingTimestamp?.toNumber() * 1000,
               ).format('DD-MM-YYYY')}
             />
           )}
@@ -231,7 +233,7 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
         ></LockTokensModal>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DepositCard
+export default DepositCard;

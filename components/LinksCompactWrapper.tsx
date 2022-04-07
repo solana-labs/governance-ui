@@ -2,7 +2,7 @@ import {
   CloudDownloadIcon,
   DocumentIcon,
   LinkIcon,
-} from '@heroicons/react/outline'
+} from '@heroicons/react/outline';
 
 const LinksCompactWrapper = () => {
   return (
@@ -29,7 +29,7 @@ const LinksCompactWrapper = () => {
         </div>
       </a>
     </>
-  )
-}
+  );
+};
 
-export default LinksCompactWrapper
+export default LinksCompactWrapper;

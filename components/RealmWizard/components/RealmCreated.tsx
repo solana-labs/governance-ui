@@ -1,9 +1,9 @@
-import { PublicKey } from '@solana/web3.js'
-import React from 'react'
+import { PublicKey } from '@solana/web3.js';
+import React from 'react';
 
 const RealmCreated: React.FC<{
-  realmAddress: PublicKey
-  governanceProgramId: string
+  realmAddress: PublicKey;
+  governanceProgramId: string;
 }> = ({ realmAddress, governanceProgramId }) => {
   return (
     <>
@@ -41,7 +41,7 @@ const RealmCreated: React.FC<{
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default RealmCreated
+export default RealmCreated;

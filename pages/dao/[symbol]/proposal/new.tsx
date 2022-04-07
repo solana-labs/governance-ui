@@ -1,157 +1,157 @@
-import Link from 'next/link'
-import { useRouter } from 'next/router'
-import React, { createContext, useEffect, useState } from 'react'
-import * as yup from 'yup'
-import { ArrowLeftIcon } from '@heroicons/react/outline'
+import Link from 'next/link';
+import { useRouter } from 'next/router';
+import React, { createContext, useEffect, useState } from 'react';
+import * as yup from 'yup';
+import { ArrowLeftIcon } from '@heroicons/react/outline';
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
-} from '@solana/spl-governance'
-import Button, { SecondaryButton } from '@components/Button'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import useCreateProposal from '@hooks/useCreateProposal'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { getTimestampFromDays } from '@tools/sdk/units'
-import { formValidation, isFormValid } from '@utils/formValidation'
+} from '@solana/spl-governance';
+import Button, { SecondaryButton } from '@components/Button';
+import Input from '@components/inputs/Input';
+import Textarea from '@components/inputs/Textarea';
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper';
+import useCreateProposal from '@hooks/useCreateProposal';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import { getTimestampFromDays } from '@tools/sdk/units';
+import { formValidation, isFormValid } from '@utils/formValidation';
 import {
   ComponentInstructionData,
   InstructionsContext,
   FormInstructionData,
-} from '@utils/uiTypes/proposalCreationTypes'
+} from '@utils/uiTypes/proposalCreationTypes';
 
-import useWalletStore from 'stores/useWalletStore'
-import { notify } from 'utils/notifications'
+import useWalletStore from 'stores/useWalletStore';
+import { notify } from 'utils/notifications';
 
-import VoteBySwitch from './components/VoteBySwitch'
-import InstructionsForm from '@components/InstructionsForm'
-import GovernedAccountSelect from './components/GovernedAccountSelect'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import VoteBySwitch from './components/VoteBySwitch';
+import InstructionsForm from '@components/InstructionsForm';
+import GovernedAccountSelect from './components/GovernedAccountSelect';
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
 
 type Form = {
-  title: string
-  description: string
-}
+  title: string;
+  description: string;
+};
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
   description: yup.string(),
-})
+});
 
 const defaultGovernanceCtx: InstructionsContext = {
   instructions: [],
   handleSetInstruction: () => null,
-}
+};
 
 export const NewProposalContext = createContext<InstructionsContext>(
-  defaultGovernanceCtx
-)
+  defaultGovernanceCtx,
+);
 
 const New = () => {
-  const router = useRouter()
-  const { handleCreateProposal } = useCreateProposal()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
-  const { availableInstructions } = useGovernanceAssets()
+  const router = useRouter();
+  const { handleCreateProposal } = useCreateProposal();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm();
+  const { availableInstructions } = useGovernanceAssets();
   const {
     fetchRealmGovernance,
     fetchTokenAccountsForSelectedRealmGovernance,
-  } = useWalletStore((s) => s.actions)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
+  } = useWalletStore((s) => s.actions);
+  const [voteByCouncil, setVoteByCouncil] = useState(false);
   const [form, setForm] = useState<Form>({
     title: '',
     description: '',
-  })
-  const [formErrors, setFormErrors] = useState({})
-  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false)
-  const [isLoadingDraft, setIsLoadingDraft] = useState(false)
-  const isLoading = isLoadingSignedProposal || isLoadingDraft
+  });
+  const [formErrors, setFormErrors] = useState({});
+  const [isLoadingSignedProposal, setIsLoadingSignedProposal] = useState(false);
+  const [isLoadingDraft, setIsLoadingDraft] = useState(false);
+  const isLoading = isLoadingSignedProposal || isLoadingDraft;
 
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts();
 
   const [governedAccount, setGovernedAccount] = useState<
     GovernedMultiTypeAccount | undefined
-  >()
+  >();
 
   const [instructions, setInstructions] = useState<ComponentInstructionData[]>(
-    []
-  )
+    [],
+  );
 
   const handleSetForm = ({
     propertyName,
     value,
   }: {
-    propertyName: keyof typeof form
-    value: unknown
+    propertyName: keyof typeof form;
+    value: unknown;
   }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
 
   const getFormInstructionsData = async () => {
-    const formInstructionsData: FormInstructionData[] = []
+    const formInstructionsData: FormInstructionData[] = [];
 
     for (const inst of instructions) {
       if (inst.getInstruction) {
-        const formInstructionData: FormInstructionData = await inst?.getInstruction()
+        const formInstructionData: FormInstructionData = await inst?.getInstruction();
 
-        formInstructionsData.push(formInstructionData)
+        formInstructionsData.push(formInstructionData);
       }
     }
 
-    return formInstructionsData
-  }
+    return formInstructionsData;
+  };
 
   const handleTurnOffLoaders = () => {
-    setIsLoadingSignedProposal(false)
-    setIsLoadingDraft(false)
-  }
+    setIsLoadingSignedProposal(false);
+    setIsLoadingDraft(false);
+  };
 
   const handleCreate = async (isDraft: boolean) => {
-    setFormErrors({})
+    setFormErrors({});
 
     if (!realm) {
-      handleTurnOffLoaders()
-      throw 'No realm selected'
+      handleTurnOffLoaders();
+      throw 'No realm selected';
     }
 
     if (!governedAccount) {
-      handleTurnOffLoaders()
-      throw Error('No governance selected')
+      handleTurnOffLoaders();
+      throw Error('No governance selected');
     }
 
     if (isDraft) {
-      setIsLoadingDraft(true)
+      setIsLoadingDraft(true);
     } else {
-      setIsLoadingSignedProposal(true)
+      setIsLoadingSignedProposal(true);
     }
 
     const { isValid, validationErrors }: formValidation = await isFormValid(
       schema,
-      form
-    )
+      form,
+    );
 
-    const formInstructionsData: FormInstructionData[] = await getFormInstructionsData()
+    const formInstructionsData: FormInstructionData[] = await getFormInstructionsData();
 
     if (
       !isValid ||
       formInstructionsData.some((x: FormInstructionData) => !x.isValid)
     ) {
-      setFormErrors(validationErrors)
-      handleTurnOffLoaders()
-      return
+      setFormErrors(validationErrors);
+      handleTurnOffLoaders();
+      return;
     }
 
     try {
       // Fetch governance to get up to date proposalCount
       const selectedGovernance = (await fetchRealmGovernance(
-        governedAccount.governance.pubkey
-      )) as ProgramAccount<Governance>
+        governedAccount.governance.pubkey,
+      )) as ProgramAccount<Governance>;
 
       const proposalAddress = await handleCreateProposal({
         title: form.title,
@@ -164,7 +164,7 @@ const New = () => {
           return {
             data: formInstructionData.serializedInstruction
               ? getInstructionDataFromBase64(
-                  formInstructionData.serializedInstruction
+                  formInstructionData.serializedInstruction,
                 )
               : null,
             holdUpTime: formInstructionData.customHoldUpTime
@@ -177,24 +177,24 @@ const New = () => {
             signers: formInstructionData.signers,
             shouldSplitIntoSeparateTxs:
               formInstructionData.shouldSplitIntoSeparateTxs,
-          }
+          };
         }),
-      })
+      });
 
       router.push(
-        fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`)
-      )
+        fmtUrlWithCluster(`/dao/${symbol}/proposal/${proposalAddress}`),
+      );
     } catch (ex) {
-      notify({ type: 'error', message: `${ex}` })
+      notify({ type: 'error', message: `${ex}` });
     }
-  }
+  };
 
   useEffect(() => {
-    if (!fetchTokenAccountsForSelectedRealmGovernance) return
+    if (!fetchTokenAccountsForSelectedRealmGovernance) return;
 
     // fetch to be up to date with amounts
-    fetchTokenAccountsForSelectedRealmGovernance()
-  }, [])
+    fetchTokenAccountsForSelectedRealmGovernance();
+  }, []);
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -252,7 +252,7 @@ const New = () => {
             <VoteBySwitch
               checked={voteByCouncil}
               onChange={() => {
-                setVoteByCouncil(!voteByCouncil)
+                setVoteByCouncil(!voteByCouncil);
               }}
             />
           )}
@@ -271,9 +271,9 @@ const New = () => {
             <InstructionsForm
               availableInstructions={availableInstructions}
               onInstructionsChange={(
-                instructions: ComponentInstructionData[]
+                instructions: ComponentInstructionData[],
               ) => {
-                setInstructions(instructions)
+                setInstructions(instructions);
               }}
               governedAccount={governedAccount}
             />
@@ -303,7 +303,7 @@ const New = () => {
         <TokenBalanceCardWrapper />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default New
+export default New;

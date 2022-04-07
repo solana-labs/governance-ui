@@ -1,79 +1,79 @@
 // Rust style Option with typeScript twist inspired by https://gist.github.com/s-panferov/575da5a7131c285c0539
 
 export interface Option<T> {
-  map<U>(fn: (a: T) => U): Option<U>
-  isSome(): this is Some<T>
-  isNone(): this is None<T>
-  unwrap(): T
-  tryUnwrap(): T | undefined
+  map<U>(fn: (a: T) => U): Option<U>;
+  isSome(): this is Some<T>;
+  isNone(): this is None<T>;
+  unwrap(): T;
+  tryUnwrap(): T | undefined;
 }
 
 export function some<T>(value: T) {
-  return new Some<T>(value)
+  return new Some<T>(value);
 }
 
 export function none<T>() {
-  return new None<T>()
+  return new None<T>();
 }
 
 export function option<T>(value: T | undefined) {
-  return value ? some(value) : none<T>()
+  return value ? some(value) : none<T>();
 }
 
 export class Some<T> implements Option<T> {
-  value: T
+  value: T;
 
   map<U>(fn: (a: T) => U): Option<U> {
-    return new Some(fn(this.value))
+    return new Some(fn(this.value));
   }
 
   constructor(value: T) {
-    this.value = value
+    this.value = value;
   }
 
   isSome(): this is Some<T> {
-    return true
+    return true;
   }
 
   isNone(): this is None<T> {
-    return false
+    return false;
   }
 
   unwrap(): T {
-    return this.value
+    return this.value;
   }
 
   tryUnwrap(): T | undefined {
-    return this.unwrap()
+    return this.unwrap();
   }
 
   toString(): string {
-    return `Some(${this.value})`
+    return `Some(${this.value})`;
   }
 }
 
 export class None<T> implements Option<T> {
   map<U>(_fn: (a: T) => U): Option<U> {
-    return new None<U>()
+    return new None<U>();
   }
 
   isSome(): this is Some<T> {
-    return false
+    return false;
   }
 
   isNone(): this is None<T> {
-    return true
+    return true;
   }
 
   unwrap(): T {
-    throw new Error('None has no value')
+    throw new Error('None has no value');
   }
 
   tryUnwrap(): T | undefined {
-    return undefined
+    return undefined;
   }
 
   public toString(): string {
-    return 'None'
+    return 'None';
   }
 }

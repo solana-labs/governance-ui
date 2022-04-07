@@ -1,46 +1,46 @@
-import Button from '@components/Button'
-import Loading from '@components/Loading'
-import useRealm from '@hooks/useRealm'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
-import { RpcContext } from '@solana/spl-governance'
-import { notify } from '@utils/notifications'
-import { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup'
-import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import Button from '@components/Button';
+import Loading from '@components/Loading';
+import useRealm from '@hooks/useRealm';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import { BN } from '@project-serum/anchor';
+import { RpcContext } from '@solana/spl-governance';
+import { notify } from '@utils/notifications';
+import { useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import { voteRegistryDepositWithoutLockup } from 'VoteStakeRegistry/actions/voteRegistryDepositWithoutLockup';
+import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 
 const DepositCommunityTokensBtn = ({ className = '' }) => {
-  const { getOwnedDeposits } = useDepositStore()
-  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const [isLoading, setIsLoading] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
-  const connection = useWalletStore((s) => s.connection.current)
-  const endpoint = useWalletStore((s) => s.connection.endpoint)
+  const { getOwnedDeposits } = useDepositStore();
+  const { realm, realmInfo, realmTokenAccount, tokenRecords } = useRealm();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const [isLoading, setIsLoading] = useState(false);
+  const wallet = useWalletStore((s) => s.current);
+  const connected = useWalletStore((s) => s.connected);
+  const connection = useWalletStore((s) => s.connection.current);
+  const endpoint = useWalletStore((s) => s.connection.endpoint);
   const { fetchRealm, fetchWalletTokenAccounts } = useWalletStore(
-    (s) => s.actions
-  )
+    (s) => s.actions,
+  );
 
   const depositAllTokens = async function () {
     if (!realm) {
-      throw 'No realm selected'
+      throw 'No realm selected';
     }
-    setIsLoading(true)
-    const currentTokenOwnerRecord = tokenRecords[wallet!.publicKey!.toBase58()]
+    setIsLoading(true);
+    const currentTokenOwnerRecord = tokenRecords[wallet!.publicKey!.toBase58()];
     const tokenOwnerRecordPk =
       typeof currentTokenOwnerRecord !== 'undefined'
         ? currentTokenOwnerRecord.pubkey
-        : null
+        : null;
     const rpcContext = new RpcContext(
       realm.owner,
       getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection,
-      endpoint
-    )
+      endpoint,
+    );
     try {
       await voteRegistryDepositWithoutLockup({
         rpcContext,
@@ -52,31 +52,31 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
         tokenOwnerRecordPk,
         client: client,
         communityMintPk: realm.account.communityMint,
-      })
+      });
       await getOwnedDeposits({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         walletPk: wallet!.publicKey!,
         client: client!,
         connection,
-      })
-      await fetchWalletTokenAccounts()
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+      });
+      await fetchWalletTokenAccounts();
+      await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
     } catch (e) {
-      console.log(e)
-      notify({ message: `Something went wrong ${e}`, type: 'error' })
+      console.log(e);
+      notify({ message: `Something went wrong ${e}`, type: 'error' });
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   const hasTokensInWallet =
-    realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0))
+    realmTokenAccount && realmTokenAccount.account.amount.gt(new BN(0));
 
   const depositTooltipContent = !connected
     ? 'Connect your wallet to deposit'
     : !hasTokensInWallet
     ? "You don't have any governance tokens in your wallet to deposit."
-    : ''
+    : '';
 
   return (
     <Button
@@ -87,7 +87,7 @@ const DepositCommunityTokensBtn = ({ className = '' }) => {
     >
       {isLoading ? <Loading></Loading> : 'Deposit'}
     </Button>
-  )
-}
+  );
+};
 
-export default DepositCommunityTokensBtn
+export default DepositCommunityTokensBtn;

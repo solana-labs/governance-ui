@@ -1,29 +1,29 @@
-import { PublicKey } from '@solana/web3.js'
-import { GovernedTokenAccount } from '@utils/tokens'
-import { abbreviateAddress } from '@utils/formatting'
-import useWalletStore from '../../stores/useWalletStore'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { PublicKey } from '@solana/web3.js';
+import { GovernedTokenAccount } from '@utils/tokens';
+import { abbreviateAddress } from '@utils/formatting';
+import useWalletStore from '../../stores/useWalletStore';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
   onClick,
   border = false,
 }: {
-  governedAccountTokenAccount: GovernedTokenAccount
-  className?: string
-  onClick?: () => void
-  border?: boolean
+  governedAccountTokenAccount: GovernedTokenAccount;
+  className?: string;
+  onClick?: () => void;
+  border?: boolean;
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-  const { setCurrentAccount } = useTreasuryAccountStore()
+  const connection = useWalletStore((s) => s.connection);
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
+  const { setCurrentAccount } = useTreasuryAccountStore();
 
   const accountPublicKey = governedAccountTokenAccount
     ? governedAccountTokenAccount.governance?.pubkey
-    : null
+    : null;
   //TODO move to outside component
   async function handleGoToAccountOverview() {
-    setCurrentAccount(governedAccountTokenAccount, connection)
+    setCurrentAccount(governedAccountTokenAccount, connection);
   }
   return (
     <div
@@ -54,7 +54,7 @@ const AccountItemNFT = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AccountItemNFT
+export default AccountItemNFT;

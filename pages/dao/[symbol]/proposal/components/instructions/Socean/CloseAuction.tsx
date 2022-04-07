@@ -1,11 +1,11 @@
-import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import soceanConfig from '@tools/sdk/socean/configuration'
-import { closeAuction } from '@tools/sdk/socean/instructions/closeAuction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { SoceanCloseAuctionForm } from '@utils/uiTypes/proposalCreationTypes'
+import * as yup from 'yup';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import soceanConfig from '@tools/sdk/socean/configuration';
+import { closeAuction } from '@tools/sdk/socean/instructions/closeAuction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { SoceanCloseAuctionForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -15,14 +15,14 @@ const schema = yup.object().shape({
   auction: yup.string().required('Auction is required'),
   bondedMint: yup.string().required('Bonded mint is required'),
   destinationAccount: yup.string().required('Destination account is required'),
-})
+});
 
 const CloseAuction = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -45,7 +45,7 @@ const CloseAuction = ({
         connection,
         wallet,
         cluster,
-      })
+      });
       return closeAuction({
         cluster: cluster,
         program: programs.DescendingAuction,
@@ -53,9 +53,9 @@ const CloseAuction = ({
         authority: governedAccountPubkey,
         bondedMint: new PublicKey(form.bondedMint!),
         destinationAccount: new PublicKey(form.destinationAccount!),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -98,7 +98,7 @@ const CloseAuction = ({
         error={formErrors['destinationAccount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default CloseAuction
+export default CloseAuction;

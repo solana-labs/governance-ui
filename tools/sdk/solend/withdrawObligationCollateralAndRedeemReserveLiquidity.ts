@@ -1,10 +1,10 @@
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
-import { withdrawObligationCollateralAndRedeemReserveLiquidity as originalWithdrawFunction } from '@solendprotocol/solend-sdk'
-import { findATAAddrSync } from '@utils/ataTools'
-import SolendConfiguration, { SupportedMintName } from './configuration'
+import { BN } from '@project-serum/anchor';
+import { PublicKey } from '@solana/web3.js';
+import { withdrawObligationCollateralAndRedeemReserveLiquidity as originalWithdrawFunction } from '@solendprotocol/solend-sdk';
+import { findATAAddrSync } from '@utils/ataTools';
+import SolendConfiguration, { SupportedMintName } from './configuration';
 
-import { deriveObligationAddressFromWalletAndSeed } from './utils'
+import { deriveObligationAddressFromWalletAndSeed } from './utils';
 
 export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
   obligationOwner,
@@ -12,10 +12,10 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
   mintName,
   destinationLiquidity,
 }: {
-  obligationOwner: PublicKey
-  liquidityAmount: number | BN
-  mintName: SupportedMintName
-  destinationLiquidity?: PublicKey
+  obligationOwner: PublicKey;
+  liquidityAmount: number | BN;
+  mintName: SupportedMintName;
+  destinationLiquidity?: PublicKey;
 }) {
   const {
     relatedCollateralMint,
@@ -23,24 +23,24 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
     reserve,
     reserveLiquiditySupply,
     reserveCollateralSupplySplTokenAccount,
-  } = SolendConfiguration.getSupportedMintInformation(mintName)
+  } = SolendConfiguration.getSupportedMintInformation(mintName);
 
-  const reserveCollateralMint = relatedCollateralMint.mint
+  const reserveCollateralMint = relatedCollateralMint.mint;
 
-  const [usdcTokenAccount] = findATAAddrSync(obligationOwner, mint)
+  const [usdcTokenAccount] = findATAAddrSync(obligationOwner, mint);
   const [cusdcTokenAccount] = findATAAddrSync(
     obligationOwner,
-    relatedCollateralMint.mint
-  )
+    relatedCollateralMint.mint,
+  );
 
   const obligation = await deriveObligationAddressFromWalletAndSeed(
-    obligationOwner
-  )
+    obligationOwner,
+  );
 
-  const transferAuthority = obligationOwner
-  const sourceCollateral = reserveCollateralSupplySplTokenAccount
-  const destinationCollateral = cusdcTokenAccount
-  const withdrawReserve = reserve
+  const transferAuthority = obligationOwner;
+  const sourceCollateral = reserveCollateralSupplySplTokenAccount;
+  const destinationCollateral = cusdcTokenAccount;
+  const withdrawReserve = reserve;
 
   return originalWithdrawFunction(
     liquidityAmount,
@@ -55,6 +55,6 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
     reserveLiquiditySupply,
     obligationOwner,
     transferAuthority,
-    SolendConfiguration.programID
-  )
+    SolendConfiguration.programID,
+  );
 }

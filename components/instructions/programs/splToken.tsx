@@ -1,11 +1,11 @@
-import { Connection, PublicKey } from '@solana/web3.js'
-import { AccountMetaData } from '@solana/spl-governance'
-import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens'
-import BN from 'bn.js'
-import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
+import { Connection, PublicKey } from '@solana/web3.js';
+import { AccountMetaData } from '@solana/spl-governance';
+import { tryGetMint, tryGetTokenAccount } from '../../../utils/tokens';
+import BN from 'bn.js';
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units';
+import tokenService from '@utils/services/token';
 export interface TokenMintMetadata {
-  name: string
+  name: string;
 }
 
 // Mint metadata for Well known tokens displayed on the instruction card
@@ -16,18 +16,18 @@ export const MINT_METADATA = {
   SRMuApVNdxXokk5GT7XD5cUUgXMBCoAz2LHeuAoKWRt: { name: 'SRM' },
   MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: { name: 'OMH' },
   UXPhBoR3qG4UCiGNJfV7MqhHyFqKN68g45GoYvAeL2M: { name: 'UXP' },
-}
+};
 
 export function getMintMetadata(
-  tokenMintPk: PublicKey | undefined
+  tokenMintPk: PublicKey | undefined,
 ): TokenMintMetadata {
-  const tokenMintAddress = tokenMintPk ? tokenMintPk.toBase58() : ''
+  const tokenMintAddress = tokenMintPk ? tokenMintPk.toBase58() : '';
   const tokenInfo = tokenMintAddress
     ? tokenService.getTokenInfo(tokenMintAddress)
-    : null
+    : null;
   return tokenInfo
     ? { name: tokenInfo.symbol }
-    : MINT_METADATA[tokenMintAddress]
+    : MINT_METADATA[tokenMintAddress];
 }
 
 export const SPL_TOKEN_INSTRUCTIONS = {
@@ -42,18 +42,18 @@ export const SPL_TOKEN_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
         const tokenAccount = await tryGetTokenAccount(
           connection,
-          accounts[0].pubkey
-        )
+          accounts[0].pubkey,
+        );
         const tokenMint = await tryGetMint(
           connection,
-          tokenAccount!.account.mint
-        )
+          tokenAccount!.account.mint,
+        );
 
-        const tokenMintDescriptor = getMintMetadata(tokenAccount?.account.mint)
+        const tokenMintDescriptor = getMintMetadata(tokenAccount?.account.mint);
 
         // TokenTransfer instruction layout
         // TODO: Use BufferLayout to decode the instruction
@@ -61,10 +61,10 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         //     BufferLayout.u8('instruction'),
         //     Layout.uint64('amount'),
         //   ]);
-        const rawAmount = new BN(data.slice(1), 'le')
+        const rawAmount = new BN(data.slice(1), 'le');
         const tokenAmount = tokenMint
           ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)
-          : rawAmount
+          : rawAmount;
 
         return (
           <>
@@ -81,7 +81,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
               <div>{JSON.stringify(data)}</div>
             )}
           </>
-        )
+        );
       },
     },
     7: {
@@ -94,11 +94,11 @@ export const SPL_TOKEN_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const tokenMint = await tryGetMint(connection, accounts[0].pubkey)
+        const tokenMint = await tryGetMint(connection, accounts[0].pubkey);
 
-        const tokenMintDescriptor = getMintMetadata(accounts[0].pubkey)
+        const tokenMintDescriptor = getMintMetadata(accounts[0].pubkey);
 
         // TokenMint instruction layout
         // TODO: Use BufferLayout to decode the instruction
@@ -106,10 +106,10 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         //     BufferLayout.u8('instruction'),
         //     Layout.uint64('amount'),
         //   ]);
-        const rawAmount = new BN(data.slice(1), 'le')
+        const rawAmount = new BN(data.slice(1), 'le');
         const tokenAmount = tokenMint
           ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)
-          : rawAmount
+          : rawAmount;
 
         return (
           <>
@@ -126,7 +126,7 @@ export const SPL_TOKEN_INSTRUCTIONS = {
               <div>{JSON.stringify(data)}</div>
             )}
           </>
-        )
+        );
       },
     },
     8: {
@@ -139,17 +139,17 @@ export const SPL_TOKEN_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const mint = accounts[1].pubkey
-        const tokenMint = await tryGetMint(connection, mint)
+        const mint = accounts[1].pubkey;
+        const tokenMint = await tryGetMint(connection, mint);
 
-        const tokenMintDescriptor = getMintMetadata(mint)
+        const tokenMintDescriptor = getMintMetadata(mint);
 
-        const rawAmount = new BN(data.slice(1), 'le')
+        const rawAmount = new BN(data.slice(1), 'le');
         const tokenAmount = tokenMint
           ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)
-          : rawAmount
+          : rawAmount;
 
         return (
           <>
@@ -166,8 +166,8 @@ export const SPL_TOKEN_INSTRUCTIONS = {
               <div>{JSON.stringify(data)}</div>
             )}
           </>
-        )
+        );
       },
     },
   },
-}
+};

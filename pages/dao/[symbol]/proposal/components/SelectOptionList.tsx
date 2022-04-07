@@ -1,11 +1,11 @@
-import Select from '@components/inputs/Select'
+import Select from '@components/inputs/Select';
 
 type Props = {
-  list: string[] | number[]
-}
+  list: string[] | number[];
+};
 
 const SelectOptionList = ({ list }: Props) => {
-  if (!list?.length) return null
+  if (!list?.length) return null;
   return (
     <>
       {list.map((elt) => (
@@ -14,7 +14,7 @@ const SelectOptionList = ({ list }: Props) => {
         </Select.Option>
       ))}
     </>
-  )
-}
+  );
+};
 
-export default SelectOptionList
+export default SelectOptionList;

@@ -1,16 +1,16 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens';
 
 async function createSetProgramAuthorityInstruction(
   programId: PublicKey,
   upgradeAuthority: PublicKey,
-  newUpgradeAuthority: PublicKey
+  newUpgradeAuthority: PublicKey,
 ): Promise<TransactionInstruction> {
-  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID
+  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID;
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [programId.toBuffer()],
-    bpfUpgradableLoaderId
-  )
+    bpfUpgradableLoaderId,
+  );
   const keys = [
     {
       pubkey: programDataAddress,
@@ -27,12 +27,12 @@ async function createSetProgramAuthorityInstruction(
       isWritable: false,
       isSigner: false,
     },
-  ]
+  ];
   return new TransactionInstruction({
     keys,
     programId: bpfUpgradableLoaderId,
     data: Buffer.from([4, 0, 0, 0]), // SetAuthority instruction bincode
-  })
+  });
 }
 
-export default createSetProgramAuthorityInstruction
+export default createSetProgramAuthorityInstruction;

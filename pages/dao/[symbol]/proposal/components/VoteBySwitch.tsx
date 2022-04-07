@@ -1,9 +1,9 @@
-import Switch from '@components/Switch'
-import useRealm from '@hooks/useRealm'
-import React from 'react'
+import Switch from '@components/Switch';
+import useRealm from '@hooks/useRealm';
+import React from 'react';
 
 const VoteBySwitch = ({ checked, onChange }) => {
-  const { toManyCouncilOutstandingProposalsForUse } = useRealm()
+  const { toManyCouncilOutstandingProposalsForUse } = useRealm();
   return !toManyCouncilOutstandingProposalsForUse ? (
     <div className="text-sm mb-3 flex">
       <div>Vote by council</div>
@@ -11,7 +11,7 @@ const VoteBySwitch = ({ checked, onChange }) => {
         <Switch checked={checked} onChange={onChange} />
       </div>
     </div>
-  ) : null
-}
+  ) : null;
+};
 
-export default VoteBySwitch
+export default VoteBySwitch;

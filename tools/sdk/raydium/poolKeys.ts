@@ -24,4 +24,4 @@ export const liquidityPoolKeysList = {
     marketAsks: '68xmWKfE32qDoFL4iKBsjKpDyAfaiW4efdTDSAm33sKj',
     marketEventQueue: 'Cta4TEwKCKhSphkMNzXsURVr2V6mozm2SPaV8tCgDPwy',
   },
-}
+};

@@ -1,61 +1,61 @@
-import Button from '@components/Button'
-import Input from '@components/inputs/Input'
-import { getAccountName } from '@components/instructions/tools'
-import useRealm from '@hooks/useRealm'
-import { AccountInfo } from '@solana/spl-token'
-import { PublicKey } from '@solana/web3.js'
+import Button from '@components/Button';
+import Input from '@components/inputs/Input';
+import { getAccountName } from '@components/instructions/tools';
+import useRealm from '@hooks/useRealm';
+import { AccountInfo } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
 import {
   //   getMintDecimalAmountFromNatural,
   getMintMinAmountAsDecimal,
   getMintNaturalAmountFromDecimalAsBN,
-} from '@tools/sdk/units'
-import { tryParseKey } from '@tools/validators/pubkey'
-import { debounce } from '@utils/debounce'
-import { abbreviateAddress, precision } from '@utils/formatting'
-import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
+} from '@tools/sdk/units';
+import { tryParseKey } from '@tools/validators/pubkey';
+import { debounce } from '@utils/debounce';
+import { abbreviateAddress, precision } from '@utils/formatting';
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens';
 import {
   SendTokenCompactViewForm,
   FormInstructionData,
-} from '@utils/uiTypes/proposalCreationTypes'
-import React, { useEffect, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
+} from '@utils/uiTypes/proposalCreationTypes';
+import React, { useEffect, useState } from 'react';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import useWalletStore from 'stores/useWalletStore';
 
-import { getTokenTransferSchema } from '@utils/validations'
+import { getTokenTransferSchema } from '@utils/validations';
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
   //   InformationCircleIcon,
-} from '@heroicons/react/solid'
-import tokenService from '@utils/services/token'
-import BigNumber from 'bignumber.js'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
-import useQueryContext from '@hooks/useQueryContext'
-import { RpcContext } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { createProposal } from 'actions/createProposal'
-import { useRouter } from 'next/router'
-import { notify } from '@utils/notifications'
-import Textarea from '@components/inputs/Textarea'
+} from '@heroicons/react/solid';
+import tokenService from '@utils/services/token';
+import BigNumber from 'bignumber.js';
+import { getInstructionDataFromBase64 } from '@solana/spl-governance';
+import useQueryContext from '@hooks/useQueryContext';
+import { RpcContext } from '@solana/spl-governance';
+import { Governance } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { createProposal } from 'actions/createProposal';
+import { useRouter } from 'next/router';
+import { notify } from '@utils/notifications';
+import Textarea from '@components/inputs/Textarea';
 // import { Popover } from '@headlessui/react'
-import AccountLabel from './AccountHeader'
-import Tooltip from '@components/Tooltip'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import AccountLabel from './AccountHeader';
+import Tooltip from '@components/Tooltip';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import {
   getSolTransferInstruction,
   getTransferInstruction,
   getTransferNftInstruction,
-} from '@utils/instructionTools'
-import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import NFTSelector from '@components/NFTS/NFTSelector'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+} from '@utils/instructionTools';
+import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch';
+import NFTSelector from '@components/NFTS/NFTSelector';
+import { NFTWithMint } from '@utils/uiTypes/nfts';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 
 const SendTokens = () => {
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const connection = useWalletStore((s) => s.connection)
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount);
+  const connection = useWalletStore((s) => s.connection);
   const {
     realmInfo,
     symbol,
@@ -64,17 +64,17 @@ const SendTokens = () => {
     mint,
     councilMint,
     canChooseWhoVote,
-  } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const { canUseTransferInstruction } = useGovernanceAssets()
-  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
-  const isNFT = currentAccount?.isNft
-  const isSol = currentAccount?.isSol
-  const { fmtUrlWithCluster } = useQueryContext()
-  const wallet = useWalletStore((s) => s.current)
-  const router = useRouter()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
-  const programId: PublicKey | undefined = realmInfo?.programId
+  } = useRealm();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const { canUseTransferInstruction } = useGovernanceAssets();
+  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo);
+  const isNFT = currentAccount?.isNft;
+  const isSol = currentAccount?.isSol;
+  const { fmtUrlWithCluster } = useQueryContext();
+  const wallet = useWalletStore((s) => s.current);
+  const router = useRouter();
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions);
+  const programId: PublicKey | undefined = realmInfo?.programId;
   const [form, setForm] = useState<SendTokenCompactViewForm>({
     destinationAccount: '',
     amount: isNFT ? 1 : undefined,
@@ -83,48 +83,48 @@ const SendTokens = () => {
     mintInfo: undefined,
     title: '',
     description: '',
-  })
-  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
+  });
+  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([]);
+  const [voteByCouncil, setVoteByCouncil] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const [
     destinationAccount,
     setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
+  ] = useState<TokenProgramAccount<AccountInfo> | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const destinationAccountName =
     destinationAccount?.publicKey &&
-    getAccountName(destinationAccount?.account.address)
+    getAccountName(destinationAccount?.account.address);
   const mintMinAmount = form.governedTokenAccount?.mint
     ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
-    : 1
-  const currentPrecision = precision(mintMinAmount)
+    : 1;
+  const currentPrecision = precision(mintMinAmount);
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   const setAmount = (event) => {
-    const value = event.target.value
+    const value = event.target.value;
     handleSetForm({
       value: value,
       propertyName: 'amount',
-    })
-  }
+    });
+  };
   const validateAmountOnBlur = () => {
-    const value = form.amount
+    const value = form.amount;
 
     handleSetForm({
       value: parseFloat(
         Math.max(
           Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed(currentPrecision)
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value)),
+        ).toFixed(currentPrecision),
       ),
       propertyName: 'amount',
-    })
-  }
+    });
+  };
   //   const setMaxAmount = () => {
   //     const amount =
   //       currentAccount && currentAccount.mint?.account
@@ -140,16 +140,16 @@ const SendTokens = () => {
   //   }
   const calcTransactionDolarAmount = (amount) => {
     const price = tokenService.getUSDTokenPrice(
-      currentAccount!.mint!.publicKey.toBase58()
-    )
-    const totalPrice = amount * price
+      currentAccount!.mint!.publicKey.toBase58(),
+    );
+    const totalPrice = amount * price;
     const totalPriceFormatted =
-      amount && price ? new BigNumber(totalPrice).toFormat(2) : ''
-    return totalPriceFormatted
-  }
+      amount && price ? new BigNumber(totalPrice).toFormat(2) : '';
+    return totalPriceFormatted;
+  };
 
   async function getInstruction(): Promise<FormInstructionData> {
-    const selectedNftMint = selectedNfts[0]?.mint
+    const selectedNftMint = selectedNfts[0]?.mint;
     const defaultProps = {
       schema,
       form,
@@ -159,27 +159,27 @@ const SendTokens = () => {
       currentAccount,
 
       setFormErrors,
-    }
+    };
     if (isNFT) {
       return getTransferNftInstruction({
         ...defaultProps,
         nftMint: selectedNftMint,
-      })
+      });
     }
     if (isSol) {
-      return getSolTransferInstruction(defaultProps)
+      return getSolTransferInstruction(defaultProps);
     }
-    return getTransferInstruction(defaultProps)
+    return getTransferInstruction(defaultProps);
   }
   const handlePropose = async () => {
-    setIsLoading(true)
-    const instruction: FormInstructionData = await getInstruction()
+    setIsLoading(true);
+    const instruction: FormInstructionData = await getInstruction();
     if (instruction.isValid) {
-      const governance = currentAccount?.governance
-      let proposalAddress: PublicKey | null = null
+      const governance = currentAccount?.governance;
+      let proposalAddress: PublicKey | null = null;
       if (!realm) {
-        setIsLoading(false)
-        throw 'No realm selected'
+        setIsLoading(false);
+        throw 'No realm selected';
       }
 
       const rpcContext = new RpcContext(
@@ -187,40 +187,40 @@ const SendTokens = () => {
         getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
-        connection.endpoint
-      )
+        connection.endpoint,
+      );
       const instructionData = {
         data: instruction.serializedInstruction
           ? getInstructionDataFromBase64(instruction.serializedInstruction)
           : null,
         holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-      }
+      };
       try {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
+          governance?.pubkey,
+        )) as ProgramAccount<Governance>;
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
+          governance!.account.config,
+        );
 
         const defaultProposalMint = !mint?.supply.isZero()
           ? realm.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm.account.config.councilMint
-          : undefined
+          : undefined;
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
             ? realm.account.config.councilMint
-            : defaultProposalMint
+            : defaultProposalMint;
 
         if (!proposalMint) {
           throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
+            'There is no suitable governing token for the proposal',
+          );
         }
         //Description same as title
         proposalAddress = await createProposal(
@@ -234,72 +234,72 @@ const SendTokens = () => {
           selectedGovernance?.account?.proposalCount,
           [instructionData],
           false,
-          client
-        )
+          client,
+        );
         const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
-        router.push(url)
+          `/dao/${symbol}/proposal/${proposalAddress}`,
+        );
+        router.push(url);
       } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
+        notify({ type: 'error', message: `${ex}` });
       }
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
   const IsAmountNotHigherThenBalance = () => {
     const mintValue = getMintNaturalAmountFromDecimalAsBN(
       form.amount!,
-      form.governedTokenAccount!.mint!.account.decimals
-    )
-    let gte: boolean | undefined = false
+      form.governedTokenAccount!.mint!.account.decimals,
+    );
+    let gte: boolean | undefined = false;
     try {
-      gte = form.governedTokenAccount?.token?.account?.amount?.gte(mintValue)
+      gte = form.governedTokenAccount?.token?.account?.amount?.gte(mintValue);
     } catch (e) {
       //silent fail
     }
-    return form.governedTokenAccount?.token?.publicKey && gte
-  }
+    return form.governedTokenAccount?.token?.publicKey && gte;
+  };
 
   useEffect(() => {
     if (currentAccount) {
       handleSetForm({
         value: currentAccount,
         propertyName: 'governedTokenAccount',
-      })
+      });
     }
-  }, [currentAccount])
+  }, [currentAccount]);
   useEffect(() => {
     if (form.destinationAccount) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.destinationAccount)
+        const pubKey = tryParseKey(form.destinationAccount);
         if (pubKey) {
-          const account = await tryGetTokenAccount(connection.current, pubKey)
-          setDestinationAccount(account ? account : null)
+          const account = await tryGetTokenAccount(connection.current, pubKey);
+          setDestinationAccount(account ? account : null);
         } else {
-          setDestinationAccount(null)
+          setDestinationAccount(null);
         }
-      })
+      });
     } else {
-      setDestinationAccount(null)
+      setDestinationAccount(null);
     }
-  }, [form.destinationAccount])
+  }, [form.destinationAccount]);
 
-  const schema = getTokenTransferSchema({ form, connection })
-  const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
-  const nftName = selectedNfts[0]?.val?.name
+  const schema = getTokenTransferSchema({ form, connection });
+  const transactionDolarAmount = calcTransactionDolarAmount(form.amount);
+  const nftName = selectedNfts[0]?.val?.name;
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
     form.destinationAccount
-  }`
+  }`;
   const proposalTitle = isNFT
     ? nftTitle
     : `Pay ${form.amount}${tokenInfo ? ` ${tokenInfo?.symbol} ` : ' '}to ${
         tryParseKey(form.destinationAccount)
           ? abbreviateAddress(new PublicKey(form.destinationAccount))
           : ''
-      }`
+      }`;
 
   if (!currentAccount) {
-    return null
+    return null;
   }
 
   return (
@@ -426,7 +426,7 @@ const SendTokens = () => {
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
+                  setVoteByCouncil(!voteByCouncil);
                 }}
               ></VoteBySwitch>
             )}
@@ -458,7 +458,7 @@ const SendTokens = () => {
         </Button>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default SendTokens
+export default SendTokens;

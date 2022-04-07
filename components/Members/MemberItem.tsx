@@ -1,21 +1,21 @@
-import { UserCircleIcon, LogoutIcon } from '@heroicons/react/outline'
-import useRealm from '@hooks/useRealm'
-import { tryParsePublicKey } from '@tools/core/pubkey'
-import { fmtMintAmount } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
-import useMembersListStore from 'stores/useMembersStore'
-import { ViewState } from './types'
-import { useMemo } from 'react'
-import { Member } from '@utils/uiTypes/members'
-import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
-import useWalletStore from 'stores/useWalletStore'
+import { UserCircleIcon, LogoutIcon } from '@heroicons/react/outline';
+import useRealm from '@hooks/useRealm';
+import { tryParsePublicKey } from '@tools/core/pubkey';
+import { fmtMintAmount } from '@tools/sdk/units';
+import tokenService from '@utils/services/token';
+import useMembersListStore from 'stores/useMembersStore';
+import { ViewState } from './types';
+import { useMemo } from 'react';
+import { Member } from '@utils/uiTypes/members';
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components';
+import useWalletStore from 'stores/useWalletStore';
 
 const MemberItem = ({ item }: { item: Member }) => {
-  const { mint, councilMint, realm } = useRealm()
+  const { mint, councilMint, realm } = useRealm();
   const {
     setCurrentCompactView,
     setCurrentCompactViewMember,
-  } = useMembersListStore()
+  } = useMembersListStore();
   const {
     walletAddress,
     councilVotes,
@@ -23,28 +23,28 @@ const MemberItem = ({ item }: { item: Member }) => {
     votesCasted,
     hasCouncilTokenOutsideRealm,
     hasCommunityTokenOutsideRealm,
-  } = item
-  const { connection } = useWalletStore((s) => s)
+  } = item;
+  const { connection } = useWalletStore((s) => s);
 
-  const walletPublicKey = tryParsePublicKey(walletAddress)
+  const walletPublicKey = tryParsePublicKey(walletAddress);
   const tokenName = realm
     ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
-    : ''
-  const totalVotes = votesCasted
+    : '';
+  const totalVotes = votesCasted;
   const communityAmount =
     communityVotes && !communityVotes.isZero()
       ? useMemo(() => fmtMintAmount(mint, communityVotes), [item.walletAddress])
-      : null
+      : null;
   const councilAmount =
     councilVotes && !councilVotes.isZero()
       ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
           item.walletAddress,
         ])
-      : null
+      : null;
 
   async function handleGoToMemberOverview() {
-    setCurrentCompactView(ViewState.MemberOverview)
-    setCurrentCompactViewMember(item)
+    setCurrentCompactView(ViewState.MemberOverview);
+    setCurrentCompactViewMember(item);
   }
 
   const address = useMemo(
@@ -58,8 +58,8 @@ const MemberItem = ({ item }: { item: Member }) => {
         placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
       />
     ),
-    [item.walletAddress]
-  )
+    [item.walletAddress],
+  );
 
   const addressName = useMemo(
     () => (
@@ -71,8 +71,8 @@ const MemberItem = ({ item }: { item: Member }) => {
         dark={true}
       />
     ),
-    [item.walletAddress]
-  )
+    [item.walletAddress],
+  );
 
   return (
     <div
@@ -107,7 +107,7 @@ const MemberItem = ({ item }: { item: Member }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MemberItem
+export default MemberItem;

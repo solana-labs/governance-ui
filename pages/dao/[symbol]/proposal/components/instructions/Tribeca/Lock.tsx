@@ -1,19 +1,19 @@
-import { BigNumber } from 'bignumber.js'
-import * as yup from 'yup'
-import { BN } from '@project-serum/anchor'
-import { Wallet } from '@project-serum/common'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
+import { BigNumber } from 'bignumber.js';
+import * as yup from 'yup';
+import { BN } from '@project-serum/anchor';
+import { Wallet } from '@project-serum/common';
+import Input from '@components/inputs/Input';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import {
   getTribecaLocker,
   getTribecaPrograms,
-} from '@tools/sdk/tribeca/configurations'
-import { lockInstruction } from '@tools/sdk/tribeca/instructions/lockInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { TribecaLockForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
-import GovernorSelect from './GovernorSelect'
+} from '@tools/sdk/tribeca/configurations';
+import { lockInstruction } from '@tools/sdk/tribeca/instructions/lockInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { TribecaLockForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
+import GovernorSelect from './GovernorSelect';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -29,14 +29,14 @@ const schema = yup.object().shape({
     .moreThan(0, 'Amount should be more than 0')
     .required('Amount is required'),
   durationSeconds: yup.number().required('Duration is required'),
-})
+});
 
 const Lock = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -61,11 +61,11 @@ const Lock = ({
         connection,
         wallet: wallet as Wallet,
         config: form.tribecaConfiguration!,
-      })
+      });
       const lockerData = await getTribecaLocker({
         programs,
         config: form.tribecaConfiguration!,
-      })
+      });
 
       return lockInstruction({
         tribecaConfiguration: form.tribecaConfiguration!,
@@ -75,12 +75,12 @@ const Lock = ({
         amount: new BN(
           new BigNumber(form.uiAmount!)
             .shiftedBy(form.tribecaConfiguration!.token.decimals)
-            .toNumber()
+            .toNumber(),
         ),
         durationSeconds: new BN(form.durationSeconds * 60 * 60 * 24 * 365),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -135,7 +135,7 @@ const Lock = ({
         error={formErrors['durationSeconds']}
       /> */}
     </>
-  )
-}
+  );
+};
 
-export default Lock
+export default Lock;

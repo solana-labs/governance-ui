@@ -1,89 +1,89 @@
-import Button, { LinkButton, SecondaryButton } from '@components/Button'
-import { getExplorerInspectorUrl } from '@components/explorer/tools'
-import Loading from '@components/Loading'
-import Modal from '@components/Modal'
-import { getInstructionDataFromBase64 } from '@solana/spl-governance'
-import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js'
-import { notify } from '@utils/notifications'
-import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes'
-import { dryRunInstruction } from 'actions/dryRunInstruction'
-import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import Button, { LinkButton, SecondaryButton } from '@components/Button';
+import { getExplorerInspectorUrl } from '@components/explorer/tools';
+import Loading from '@components/Loading';
+import Modal from '@components/Modal';
+import { getInstructionDataFromBase64 } from '@solana/spl-governance';
+import { SimulatedTransactionResponse, Transaction } from '@solana/web3.js';
+import { notify } from '@utils/notifications';
+import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes';
+import { dryRunInstruction } from 'actions/dryRunInstruction';
+import React, { useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
 
 const DryRunInstructionBtn = ({
   getInstructionDataFcn,
   btnClassNames,
 }: {
-  getInstructionDataFcn: (() => Promise<FormInstructionData>) | undefined
-  btnClassNames: string
+  getInstructionDataFcn: (() => Promise<FormInstructionData>) | undefined;
+  btnClassNames: string;
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const [isPending, setIsPending] = useState(false)
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
+  const [isPending, setIsPending] = useState(false);
   const [result, setResult] = useState<{
-    response: SimulatedTransactionResponse
-    transaction: Transaction
-  } | null>(null)
-  const [isOpen, setIsOpen] = useState(false)
+    response: SimulatedTransactionResponse;
+    transaction: Transaction;
+  } | null>(null);
+  const [isOpen, setIsOpen] = useState(false);
 
   const onInspect = () => {
     if (result) {
       const inspectUrl = getExplorerInspectorUrl(
         connection.endpoint,
-        result.transaction
-      )
-      window.open(inspectUrl, '_blank')
+        result.transaction,
+      );
+      window.open(inspectUrl, '_blank');
     } else {
-      notify({ type: 'error', message: 'no results to inspect' })
+      notify({ type: 'error', message: 'no results to inspect' });
     }
-  }
+  };
   const handleDryRun = async () => {
     try {
       if (!getInstructionDataFcn) {
-        throw 'No get instructionDataFcn provided'
+        throw 'No get instructionDataFcn provided';
       }
-      setIsPending(true)
-      const instructionData = await getInstructionDataFcn()
+      setIsPending(true);
+      const instructionData = await getInstructionDataFcn();
       const prerequisiteInstructionsToRun =
-        instructionData.prerequisiteInstructions
+        instructionData.prerequisiteInstructions;
       if (!instructionData?.isValid) {
-        setIsPending(false)
-        throw new Error('Invalid instruction')
+        setIsPending(false);
+        throw new Error('Invalid instruction');
       }
       const result = await dryRunInstruction(
         connection.current,
         wallet!,
         getInstructionDataFromBase64(instructionData?.serializedInstruction),
-        prerequisiteInstructionsToRun
-      )
-      setResult(result)
-      setIsOpen(true)
+        prerequisiteInstructionsToRun,
+      );
+      setResult(result);
+      setIsOpen(true);
     } catch (ex) {
       notify({
         type: 'error',
         message: `Can't simulate transaction`,
         description: 'The instruction is invalid',
-      })
-      console.error('Simulation error', ex)
+      });
+      console.error('Simulation error', ex);
     } finally {
-      setIsPending(false)
+      setIsPending(false);
     }
-  }
+  };
   const onClose = () => {
-    setIsOpen(false)
-    setResult(null)
-  }
+    setIsOpen(false);
+    setResult(null);
+  };
   function getLogTextType(text: string) {
     // Use some heuristics to highlight  error and success log messages
 
-    text = text.toLowerCase()
+    text = text.toLowerCase();
 
     if (text.includes('failed')) {
-      return 'text-red'
+      return 'text-red';
     }
 
     if (text.includes('success')) {
-      return 'text-green'
+      return 'text-green';
     }
   }
   return (
@@ -120,7 +120,7 @@ const DryRunInstructionBtn = ({
         </Modal>
       )}
     </>
-  )
-}
+  );
+};
 
-export default DryRunInstructionBtn
+export default DryRunInstructionBtn;

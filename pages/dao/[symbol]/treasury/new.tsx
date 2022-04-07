@@ -1,5 +1,5 @@
-import NewAccountForm from '@components/TreasuryAccount/NewTreasuryAccountForm'
-import React from 'react'
+import NewAccountForm from '@components/TreasuryAccount/NewTreasuryAccountForm';
+import React from 'react';
 
 const New = () => {
   return (
@@ -8,7 +8,7 @@ const New = () => {
         <NewAccountForm></NewAccountForm>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default New
+export default New;

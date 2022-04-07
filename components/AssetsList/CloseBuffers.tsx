@@ -1,65 +1,65 @@
-import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js'
-import useRealm from 'hooks/useRealm'
-import Input from 'components/inputs/Input'
-import Button, { LinkButton } from '@components/Button'
-import Textarea from 'components/inputs/Textarea'
-import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import useWalletStore from 'stores/useWalletStore'
-import { getValidatedPublickKey } from 'utils/validations'
-import { useEffect, useState } from 'react'
-import { FormInstructionData } from 'utils/uiTypes/proposalCreationTypes'
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { useRouter } from 'next/router'
-import { notify } from 'utils/notifications'
-import useQueryContext from 'hooks/useQueryContext'
-import { validateInstruction } from 'utils/instructionTools'
-import * as yup from 'yup'
-import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
-import Loading from '@components/Loading'
-import useCreateProposal from '@hooks/useCreateProposal'
-import { getExplorerUrl } from '@components/explorer/tools'
-import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
-import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer'
-import { abbreviateAddress } from '@utils/formatting'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { ExternalLinkIcon } from '@heroicons/react/outline';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import { AccountInfo, ParsedAccountData, PublicKey } from '@solana/web3.js';
+import useRealm from 'hooks/useRealm';
+import Input from 'components/inputs/Input';
+import Button, { LinkButton } from '@components/Button';
+import Textarea from 'components/inputs/Textarea';
+import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch';
+import useWalletStore from 'stores/useWalletStore';
+import { getValidatedPublickKey } from 'utils/validations';
+import { useEffect, useState } from 'react';
+import { FormInstructionData } from 'utils/uiTypes/proposalCreationTypes';
+import { serializeInstructionToBase64 } from '@solana/spl-governance';
+import { useRouter } from 'next/router';
+import { notify } from 'utils/notifications';
+import useQueryContext from 'hooks/useQueryContext';
+import { validateInstruction } from 'utils/instructionTools';
+import * as yup from 'yup';
+import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens';
+import Loading from '@components/Loading';
+import useCreateProposal from '@hooks/useCreateProposal';
+import { getExplorerUrl } from '@components/explorer/tools';
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal';
+import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBuffer';
+import { abbreviateAddress } from '@utils/formatting';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import { Governance, ProgramAccount } from '@solana/spl-governance';
 
 interface CloseBuffersForm {
-  governedAccount: GovernedProgramAccount | undefined
-  programId: string | undefined
-  solReceiverAddress: string
-  description: string
-  title: string
+  governedAccount: GovernedProgramAccount | undefined;
+  programId: string | undefined;
+  solReceiverAddress: string;
+  description: string;
+  title: string;
 }
 
 const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
-  const { handleCreateProposal } = useCreateProposal()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const { handleCreateProposal } = useCreateProposal();
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets();
+  const router = useRouter();
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
   const governedAccount = {
     governance: program!,
-  }
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol } = router.query
-  const { realmInfo, canChooseWhoVote, realm } = useRealm()
-  const [isBuffersLoading, setIsBuffersLoading] = useState(false)
-  const programId: PublicKey | undefined = realmInfo?.programId
+  };
+  const { fmtUrlWithCluster } = useQueryContext();
+  const { symbol } = router.query;
+  const { realmInfo, canChooseWhoVote, realm } = useRealm();
+  const [isBuffersLoading, setIsBuffersLoading] = useState(false);
+  const programId: PublicKey | undefined = realmInfo?.programId;
   const [buffers, setBuffers] = useState<
     {
-      pubkey: PublicKey
-      account: AccountInfo<Buffer | ParsedAccountData>
+      pubkey: PublicKey;
+      account: AccountInfo<Buffer | ParsedAccountData>;
     }[]
-  >([])
+  >([]);
   const highestLampartsAmountInGovernedTokenAccounts = Math.max(
     ...governedTokenAccountsWithoutNfts
       .filter((x) => x.isSol)
-      .map((x) => x.solAccount!.lamports)
-  )
-  const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol)
+      .map((x) => x.solAccount!.lamports),
+  );
+  const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol);
   const [form, setForm] = useState<CloseBuffersForm>({
     governedAccount: governedAccount,
     programId: programId?.toString(),
@@ -68,7 +68,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
           .find(
             (x) =>
               x.solAccount?.lamports ===
-              highestLampartsAmountInGovernedTokenAccounts
+              highestLampartsAmountInGovernedTokenAccounts,
           )!
           .transferAddress!.toBase58()
       : wallet?.publicKey?.toBase58()
@@ -76,52 +76,52 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
       : '',
     description: '',
     title: '',
-  })
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
+  });
+  const [voteByCouncil, setVoteByCouncil] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const proposalTitle = `Close buffers for program ${
     form.governedAccount?.governance?.account.governedAccount
       ? abbreviateAddress(
-          form.governedAccount?.governance?.account.governedAccount
+          form.governedAccount?.governance?.account.governedAccount,
         )
       : ''
-  }`
+  }`;
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   const schema = yup.object().shape({
     solReceiverAddress: yup
       .string()
       .test('accountTests', 'Account validation error', function (val: string) {
         if (val) {
           try {
-            return !!getValidatedPublickKey(val)
+            return !!getValidatedPublickKey(val);
           } catch (e) {
-            console.log(e)
+            console.log(e);
             return this.createError({
               message: `${e}`,
-            })
+            });
           }
         } else {
           return this.createError({
             message: `Retrieved SOL receiver address is required`,
-          })
+          });
         }
       }),
     governedAccount: yup
       .object()
       .nullable()
       .required('Program governed account is required'),
-  })
+  });
   async function getInstructions(): Promise<FormInstructionData[]> {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
-    const instructions: FormInstructionData[] = []
+    const isValid = await validateInstruction({ schema, form, setFormErrors });
+    const instructions: FormInstructionData[] = [];
     for (let i = 0; i < buffers.length; i++) {
-      let serializedInstruction = ''
+      let serializedInstruction = '';
       if (
         isValid &&
         programId &&
@@ -131,27 +131,27 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
         const closeIx = await createCloseBuffer(
           buffers[i].pubkey,
           new PublicKey(form.solReceiverAddress),
-          form.governedAccount.governance.pubkey
-        )
-        serializedInstruction = serializeInstructionToBase64(closeIx)
+          form.governedAccount.governance.pubkey,
+        );
+        serializedInstruction = serializeInstructionToBase64(closeIx);
       }
       const obj: FormInstructionData = {
         serializedInstruction: serializedInstruction,
         isValid,
         governance: form.governedAccount?.governance,
-      }
-      instructions.push(obj)
+      };
+      instructions.push(obj);
     }
-    return instructions
+    return instructions;
   }
   const handlePropose = async () => {
-    setIsLoading(true)
-    const instructions: FormInstructionData[] = await getInstructions()
+    setIsLoading(true);
+    const instructions: FormInstructionData[] = await getInstructions();
     if (instructions.length && instructions[0].isValid) {
-      const governance = form.governedAccount?.governance
+      const governance = form.governedAccount?.governance;
       if (!realm) {
-        setIsLoading(false)
-        throw 'No realm selected'
+        setIsLoading(false);
+        throw 'No realm selected';
       }
 
       const instructionsData = instructions.map(
@@ -159,8 +159,8 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
           new InstructionDataWithHoldUpTime({
             instruction: x,
             governance,
-          })
-      )
+          }),
+      );
       try {
         const proposalAddress = await handleCreateProposal({
           title: form.title ? form.title : proposalTitle,
@@ -168,30 +168,30 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
           voteByCouncil,
           instructionsData: instructionsData,
           governance: governance!,
-        })
+        });
         const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
-        router.push(url)
+          `/dao/${symbol}/proposal/${proposalAddress}`,
+        );
+        router.push(url);
       } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
+        notify({ type: 'error', message: `${ex}` });
       }
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
       value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
+    });
+  }, [realmInfo?.programId]);
 
   useEffect(() => {
     const getBuffers = async () => {
       try {
-        setBuffers([])
-        setIsBuffersLoading(true)
+        setBuffers([]);
+        setIsBuffersLoading(true);
         const buffers = await connection.current.getParsedProgramAccounts(
           BPF_UPGRADE_LOADER_ID,
           {
@@ -203,18 +203,18 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
                 },
               },
             ],
-          }
-        )
-        setBuffers(buffers)
+          },
+        );
+        setBuffers(buffers);
       } catch (e) {
-        notify({ type: 'error', message: "Can't fetch buffers" })
+        notify({ type: 'error', message: "Can't fetch buffers" });
       }
-      setIsBuffersLoading(false)
-    }
+      setIsBuffersLoading(false);
+    };
     if (form.governedAccount?.governance?.pubkey.toBase58()) {
-      getBuffers()
+      getBuffers();
     }
-  }, [form.governedAccount?.governance?.pubkey.toBase58()])
+  }, [form.governedAccount?.governance?.pubkey.toBase58()]);
   return (
     <>
       <h3 className="mb-4 flex items-center hover:cursor-pointer">
@@ -303,7 +303,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
+                  setVoteByCouncil(!voteByCouncil);
                 }}
               />
             )}
@@ -319,7 +319,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
         <div>Propose Close {buffers.length > 1 ? 'Buffers' : 'Buffer'}</div>
       </Button>
     </>
-  )
-}
+  );
+};
 
-export default CloseBuffers
+export default CloseBuffers;

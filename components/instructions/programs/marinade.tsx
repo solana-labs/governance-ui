@@ -1,9 +1,9 @@
-import { BN } from '@project-serum/anchor'
-import { Connection, PublicKey } from '@solana/web3.js'
-import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import { tryGetMint } from '@utils/tokens'
-import { WSOL_MINT } from '../tools'
-import BufferLayout from 'buffer-layout'
+import { BN } from '@project-serum/anchor';
+import { Connection, PublicKey } from '@solana/web3.js';
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units';
+import { tryGetMint } from '@utils/tokens';
+import { WSOL_MINT } from '../tools';
+import BufferLayout from 'buffer-layout';
 
 export const MARINADE_INSTRUCTIONS = {
   MarBmsSgKXdrN1egZf5sqe1TMai9K1rChYNDJgjq7aD: {
@@ -21,19 +21,22 @@ export const MARINADE_INSTRUCTIONS = {
         { name: 'mSOL Mint Authority' },
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
-        const tokenMint = await tryGetMint(connection, new PublicKey(WSOL_MINT))
+        const tokenMint = await tryGetMint(
+          connection,
+          new PublicKey(WSOL_MINT),
+        );
 
         //@ts-ignore
         const { lamports } = BufferLayout.struct([
           BufferLayout.nu64('lamports'),
-        ]).decode(Buffer.from(data), 8)
+        ]).decode(Buffer.from(data), 8);
 
-        console.log(lamports)
+        console.log(lamports);
 
-        const rawAmount = new BN(lamports)
+        const rawAmount = new BN(lamports);
         const tokenAmount = tokenMint
           ? getMintDecimalAmountFromNatural(tokenMint.account, rawAmount)
-          : rawAmount
+          : rawAmount;
 
         return (
           <>
@@ -50,8 +53,8 @@ export const MARINADE_INSTRUCTIONS = {
               <div>{JSON.stringify(data)}</div>
             )}
           </>
-        )
+        );
       },
     },
   },
-}
+};

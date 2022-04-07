@@ -1,13 +1,13 @@
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import SolendConfiguration from '@tools/sdk/solend/configuration'
-import { depositReserveLiquidityAndObligationCollateral } from '@tools/sdk/solend/depositReserveLiquidityAndObligationCollateral'
-import { uiAmountToNativeBN } from '@tools/sdk/units'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { DepositReserveLiquidityAndObligationCollateralForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import SolendConfiguration from '@tools/sdk/solend/configuration';
+import { depositReserveLiquidityAndObligationCollateral } from '@tools/sdk/solend/depositReserveLiquidityAndObligationCollateral';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { DepositReserveLiquidityAndObligationCollateralForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -19,14 +19,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Amount should be more than 0')
     .required('Amount is required'),
-})
+});
 
 const DepositReserveLiquidityAndObligationCollateral = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -47,17 +47,17 @@ const DepositReserveLiquidityAndObligationCollateral = ({
           liquidityAmount: uiAmountToNativeBN(
             form.uiAmount,
             SolendConfiguration.getSupportedMintInformation(form.mintName!)
-              .decimals
+              .decimals,
           ),
           mintName: form.mintName!,
-        })
+        });
       },
-    }
-  )
+    },
+  );
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
-    return <>This instruction does not support {connection.cluster}</>
+    return <>This instruction does not support {connection.cluster}</>;
   }
 
   return (
@@ -86,7 +86,7 @@ const DepositReserveLiquidityAndObligationCollateral = ({
         error={formErrors['uiAmount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default DepositReserveLiquidityAndObligationCollateral
+export default DepositReserveLiquidityAndObligationCollateral;

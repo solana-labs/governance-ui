@@ -1,10 +1,10 @@
-import { Governance, Proposal } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { useIsBeyondTimestamp } from './useIsBeyondTimestamp'
+import { Governance, Proposal } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { useIsBeyondTimestamp } from './useIsBeyondTimestamp';
 
 export const useHasVoteTimeExpired = (
   governance: ProgramAccount<Governance> | undefined,
-  proposal: ProgramAccount<Proposal>
+  proposal: ProgramAccount<Proposal>,
 ) => {
   return useIsBeyondTimestamp(
     proposal
@@ -14,6 +14,6 @@ export const useHasVoteTimeExpired = (
         ? proposal.account.votingAt.toNumber() +
           governance.account.config.maxVotingTime
         : undefined
-      : undefined
-  )
-}
+      : undefined,
+  );
+};

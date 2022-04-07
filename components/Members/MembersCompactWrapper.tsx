@@ -1,16 +1,16 @@
-import useRealm from '@hooks/useRealm'
-import React, { useEffect, useState } from 'react'
-import useMembersListStore from 'stores/useMembersStore'
-import { ViewState } from './types'
-import MembersItems from './MembersItems'
-import useMembers from './useMembers'
-import MemberOverview from './MemberOverview'
-import { PlusIcon } from '@heroicons/react/outline'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
-import Modal from '@components/Modal'
-import AddMemberForm from './AddMemberForm'
+import useRealm from '@hooks/useRealm';
+import React, { useEffect, useState } from 'react';
+import useMembersListStore from 'stores/useMembersStore';
+import { ViewState } from './types';
+import MembersItems from './MembersItems';
+import useMembers from './useMembers';
+import MemberOverview from './MemberOverview';
+import { PlusIcon } from '@heroicons/react/outline';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import Tooltip from '@components/Tooltip';
+import useWalletStore from 'stores/useWalletStore';
+import Modal from '@components/Modal';
+import AddMemberForm from './AddMemberForm';
 
 const MembersCompactWrapper = () => {
   const {
@@ -18,21 +18,21 @@ const MembersCompactWrapper = () => {
     councilMint,
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
-  } = useRealm()
-  const { members, activeMembers } = useMembers()
-  const connected = useWalletStore((s) => s.connected)
-  const activeMembersCount = activeMembers.length
-  const { resetCompactViewState } = useMembersListStore()
+  } = useRealm();
+  const { members, activeMembers } = useMembers();
+  const connected = useWalletStore((s) => s.connected);
+  const activeMembersCount = activeMembers.length;
+  const { resetCompactViewState } = useMembersListStore();
   const {
     canUseMintInstruction,
     canMintRealmCouncilToken,
-  } = useGovernanceAssets()
-  const currentView = useMembersListStore((s) => s.compact.currentView)
+  } = useGovernanceAssets();
+  const currentView = useMembersListStore((s) => s.compact.currentView);
   const totalVotesCast = members.reduce((prev, current) => {
-    return prev + current.votesCasted
-  }, 0)
+    return prev + current.votesCasted;
+  }, 0);
 
-  const [openAddMemberModal, setOpenAddMemberModal] = useState(false)
+  const [openAddMemberModal, setOpenAddMemberModal] = useState(false);
 
   const addNewMemberTooltip = !connected
     ? 'Connect your wallet to add new council member'
@@ -44,7 +44,7 @@ const MembersCompactWrapper = () => {
     ? 'You have too many community outstanding proposals. You need to finalize them before creating a new council member.'
     : toManyCouncilOutstandingProposalsForUse
     ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
-    : ''
+    : '';
 
   const getCurrentView = () => {
     switch (currentView) {
@@ -96,19 +96,19 @@ const MembersCompactWrapper = () => {
               </Modal>
             )}
           </>
-        )
+        );
       case ViewState.MemberOverview:
-        return <MemberOverview />
+        return <MemberOverview />;
     }
-  }
+  };
 
   useEffect(() => {
-    resetCompactViewState()
-  }, [symbol])
+    resetCompactViewState();
+  }, [symbol]);
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">{getCurrentView()}</div>
-  )
-}
+  );
+};
 
-export default MembersCompactWrapper
+export default MembersCompactWrapper;

@@ -3,16 +3,16 @@ import {
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+} from '@solana/web3.js';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 
 export const SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID: PublicKey = new PublicKey(
-  'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL'
-)
+  'ATokenGPvbdGVxr1b2hvZbsiqW5xWH25efTNsLJA8knL',
+);
 
 export async function findAssociatedTokenAddress(
   walletAddress: PublicKey,
-  tokenMintAddress: PublicKey
+  tokenMintAddress: PublicKey,
 ): Promise<PublicKey> {
   return (
     await PublicKey.findProgramAddress(
@@ -21,20 +21,20 @@ export async function findAssociatedTokenAddress(
         TOKEN_PROGRAM_ID.toBuffer(),
         tokenMintAddress.toBuffer(),
       ],
-      SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID
+      SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID,
     )
-  )[0]
+  )[0];
 }
 
 export async function createAssociatedTokenAccount(
   fundingAddress: PublicKey,
   walletAddress: PublicKey,
-  splTokenMintAddress: PublicKey
+  splTokenMintAddress: PublicKey,
 ): Promise<[TransactionInstruction, PublicKey]> {
   const associatedTokenAddress = await findAssociatedTokenAddress(
     walletAddress,
-    splTokenMintAddress
-  )
+    splTokenMintAddress,
+  );
   const keys = [
     {
       pubkey: fundingAddress,
@@ -71,7 +71,7 @@ export async function createAssociatedTokenAccount(
       isSigner: false,
       isWritable: false,
     },
-  ]
+  ];
   return [
     new TransactionInstruction({
       keys,
@@ -79,5 +79,5 @@ export async function createAssociatedTokenAccount(
       data: Buffer.from([]),
     }),
     associatedTokenAddress,
-  ]
+  ];
 }

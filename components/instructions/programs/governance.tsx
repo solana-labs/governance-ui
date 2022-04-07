@@ -7,17 +7,17 @@ import {
   SetRealmAuthorityAction,
   SetRealmAuthorityArgs,
   VoteTipping,
-} from '@solana/spl-governance'
+} from '@solana/spl-governance';
 import {
   SetGovernanceConfigArgs,
   SetRealmConfigArgs,
-} from '@solana/spl-governance'
-import { GOVERNANCE_SCHEMA } from '@solana/spl-governance'
-import { Connection } from '@solana/web3.js'
-import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units'
-import { deserialize } from 'borsh'
+} from '@solana/spl-governance';
+import { GOVERNANCE_SCHEMA } from '@solana/spl-governance';
+import { Connection } from '@solana/web3.js';
+import { fmtMintAmount, getDaysFromTimestamp } from '@tools/sdk/units';
+import { deserialize } from 'borsh';
 
-import { tryGetMint } from '../../../utils/tokens'
+import { tryGetMint } from '../../../utils/tokens';
 
 export const GOVERNANCE_INSTRUCTIONS = {
   GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw: {
@@ -27,23 +27,23 @@ export const GOVERNANCE_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
         const args = deserialize(
           GOVERNANCE_SCHEMA,
           SetGovernanceConfigArgs,
-          Buffer.from(data)
-        ) as SetGovernanceConfigArgs
+          Buffer.from(data),
+        ) as SetGovernanceConfigArgs;
 
-        const governance = await getGovernance(connection, accounts[0].pubkey)
-        const realm = await getRealm(connection, governance.account.realm)
+        const governance = await getGovernance(connection, accounts[0].pubkey);
+        const realm = await getRealm(connection, governance.account.realm);
         const communityMint = await tryGetMint(
           connection,
-          realm.account.communityMint
-        )
+          realm.account.communityMint,
+        );
         const councilMint = realm.account.config.councilMint
           ? await tryGetMint(connection, realm.account.config.councilMint)
-          : undefined
+          : undefined;
 
         return (
           <>
@@ -55,20 +55,20 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`minCommunityTokensToCreateProposal:
               ${fmtMintAmount(
                 communityMint?.account,
-                args.config.minCommunityTokensToCreateProposal
+                args.config.minCommunityTokensToCreateProposal,
               )}`}
             </p>
             <p>
               {`minCouncilTokensToCreateProposal:
               ${fmtMintAmount(
                 councilMint?.account,
-                args.config.minCouncilTokensToCreateProposal
+                args.config.minCouncilTokensToCreateProposal,
               )}`}
             </p>
             <p>
               {`minInstructionHoldUpTime:
               ${getDaysFromTimestamp(
-                args.config.minInstructionHoldUpTime
+                args.config.minInstructionHoldUpTime,
               )} day(s)`}
             </p>
             <p>
@@ -84,7 +84,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
               ${getDaysFromTimestamp(args.config.proposalCoolOffTime)} days(s)`}
             </p>
           </>
-        )
+        );
       },
     },
     21: {
@@ -97,19 +97,19 @@ export const GOVERNANCE_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const realm = await getRealm(connection, accounts[0].pubkey)
+        const realm = await getRealm(connection, accounts[0].pubkey);
         const programVersion = await getGovernanceProgramVersion(
           connection,
-          realm.owner
-        )
+          realm.owner,
+        );
 
         const args = deserialize(
           getGovernanceSchema(programVersion),
           SetRealmAuthorityArgs,
-          Buffer.from(data)
-        ) as SetRealmAuthorityArgs
+          Buffer.from(data),
+        ) as SetRealmAuthorityArgs;
 
         return (
           <>
@@ -118,7 +118,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${SetRealmAuthorityAction[args.action!]}`}
             </p>
           </>
-        )
+        );
       },
     },
     22: {
@@ -127,19 +127,19 @@ export const GOVERNANCE_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
         const args = deserialize(
           GOVERNANCE_SCHEMA,
           SetRealmConfigArgs,
-          Buffer.from(data)
-        ) as SetRealmConfigArgs
+          Buffer.from(data),
+        ) as SetRealmConfigArgs;
 
-        const realm = await getRealm(connection, accounts[0].pubkey)
+        const realm = await getRealm(connection, accounts[0].pubkey);
         const communityMint = await tryGetMint(
           connection,
-          realm.account.communityMint
-        )
+          realm.account.communityMint,
+        );
 
         return (
           <>
@@ -147,7 +147,7 @@ export const GOVERNANCE_INSTRUCTIONS = {
               {`minCommunityTokensToCreateGovernance:
               ${fmtMintAmount(
                 communityMint?.account,
-                args.configArgs.minCommunityTokensToCreateGovernance
+                args.configArgs.minCommunityTokensToCreateGovernance,
               )}`}
             </p>
             <p>
@@ -159,8 +159,8 @@ export const GOVERNANCE_INSTRUCTIONS = {
                ${args.configArgs.communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}% supply`}
             </p>
           </>
-        )
+        );
       },
     },
   },
-}
+};

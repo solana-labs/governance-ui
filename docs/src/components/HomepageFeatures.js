@@ -1,6 +1,6 @@
-import React from 'react'
-import clsx from 'clsx'
-import styles from './HomepageFeatures.module.css'
+import React from 'react';
+import clsx from 'clsx';
+import styles from './HomepageFeatures.module.css';
 
 const FeatureList = [
   {
@@ -33,7 +33,7 @@ const FeatureList = [
       </>
     ),
   },
-]
+];
 
 function Feature({ Svg, title, description }) {
   return (
@@ -46,7 +46,7 @@ function Feature({ Svg, title, description }) {
         <p>{description}</p>
       </div>
     </div>
-  )
+  );
 }
 
 export default function HomepageFeatures() {
@@ -60,5 +60,5 @@ export default function HomepageFeatures() {
         </div>
       </div>
     </section>
-  )
+  );
 }

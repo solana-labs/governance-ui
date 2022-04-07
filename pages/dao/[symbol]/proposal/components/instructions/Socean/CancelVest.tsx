@@ -1,11 +1,11 @@
-import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import soceanConfiguration from '@tools/sdk/socean/configuration'
-import { cancelVest } from '@tools/sdk/socean/instructions/cancelVest'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { SoceanCancelVestForm } from '@utils/uiTypes/proposalCreationTypes'
+import * as yup from 'yup';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import soceanConfiguration from '@tools/sdk/socean/configuration';
+import { cancelVest } from '@tools/sdk/socean/instructions/cancelVest';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { SoceanCancelVestForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -16,14 +16,14 @@ const schema = yup.object().shape({
   bondedMint: yup.string().required('Bonded Mint is required'),
   userBondedAccount: yup.string().required('User Bonded Account is required'),
   userTargetAccount: yup.string().required('User Target Account is required'),
-})
+});
 
 const CancelVest = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -46,7 +46,7 @@ const CancelVest = ({
         connection,
         wallet,
         cluster,
-      })
+      });
       return cancelVest({
         cluster: cluster,
         program: programs.Bonding,
@@ -56,9 +56,9 @@ const CancelVest = ({
         bondedMint: new PublicKey(form.bondedMint!),
         userBondedAccount: new PublicKey(form.userBondedAccount!),
         userTargetAccount: new PublicKey(form.userTargetAccount!),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -114,7 +114,7 @@ const CancelVest = ({
         error={formErrors['userTargetAccount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default CancelVest
+export default CancelVest;

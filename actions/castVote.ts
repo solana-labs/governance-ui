@@ -3,7 +3,7 @@ import {
   PublicKey,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 import {
   ChatMessageBody,
   getGovernanceProgramVersion,
@@ -12,16 +12,16 @@ import {
   Realm,
   withPostChatMessage,
   YesNoVote,
-} from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
+} from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { RpcContext } from '@solana/spl-governance';
 
-import { Vote } from '@solana/spl-governance'
+import { Vote } from '@solana/spl-governance';
 
-import { withCastVote } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { withCastVote } from '@solana/spl-governance';
+import { sendTransaction } from '../utils/send';
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord';
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -30,28 +30,28 @@ export async function castVote(
   tokeOwnerRecord: PublicKey,
   yesNoVote: YesNoVote,
   message?: ChatMessageBody | undefined,
-  client?: VsrClient
+  client?: VsrClient,
 ) {
-  const signers: Keypair[] = []
-  const instructions: TransactionInstruction[] = []
+  const signers: Keypair[] = [];
+  const instructions: TransactionInstruction[] = [];
 
-  const governanceAuthority = walletPubkey
-  const payer = walletPubkey
+  const governanceAuthority = walletPubkey;
+  const payer = walletPubkey;
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await getGovernanceProgramVersion(
     connection,
-    programId
-  )
+    programId,
+  );
 
   //will run only if plugin is connected with realm
   const voterWeight = await withUpdateVoterWeightRecord(
     instructions,
     wallet.publicKey!,
     realm,
-    client
-  )
+    client,
+  );
 
   await withCastVote(
     instructions,
@@ -66,8 +66,8 @@ export async function castVote(
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
     payer,
-    voterWeight
-  )
+    voterWeight,
+  );
 
   if (message) {
     await withPostChatMessage(
@@ -83,12 +83,12 @@ export async function castVote(
       payer,
       undefined,
       message,
-      voterWeight
-    )
+      voterWeight,
+    );
   }
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+  const transaction = new Transaction();
+  transaction.add(...instructions);
 
-  await sendTransaction({ transaction, wallet, connection, signers })
+  await sendTransaction({ transaction, wallet, connection, signers });
 }

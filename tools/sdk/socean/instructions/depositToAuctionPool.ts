@@ -1,13 +1,13 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@project-serum/anchor';
 import {
   findAuctionAuthority,
   findAuctionPool,
-} from '@soceanfi/descending-auction'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
-import soceanConfiguration from '../configuration'
-import { DescendingAuctionProgram } from '../programs'
+} from '@soceanfi/descending-auction';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
+import soceanConfiguration from '../configuration';
+import { DescendingAuctionProgram } from '../programs';
 
 export async function depositToAuctionPool({
   cluster,
@@ -18,27 +18,27 @@ export async function depositToAuctionPool({
   sourceAccount,
   bondedMint,
 }: {
-  cluster: EndpointTypes
-  program: DescendingAuctionProgram
-  depositAmount: BN
-  auction: PublicKey
-  authority: PublicKey
-  sourceAccount: PublicKey
-  bondedMint: PublicKey
+  cluster: EndpointTypes;
+  program: DescendingAuctionProgram;
+  depositAmount: BN;
+  auction: PublicKey;
+  authority: PublicKey;
+  sourceAccount: PublicKey;
+  bondedMint: PublicKey;
 }): Promise<TransactionInstruction> {
   const descendingAuctionProgramId =
-    soceanConfiguration.descendingAuctionProgramId[cluster]
+    soceanConfiguration.descendingAuctionProgramId[cluster];
 
   if (!descendingAuctionProgramId) {
     throw new Error(
-      'unsupported cluster to create depositToAuctionPool instruction'
-    )
+      'unsupported cluster to create depositToAuctionPool instruction',
+    );
   }
 
   const [[auctionAuthority], [auctionPool]] = await Promise.all([
     findAuctionAuthority(descendingAuctionProgramId, auction),
     findAuctionPool(descendingAuctionProgramId, auction, bondedMint),
-  ])
+  ]);
 
   console.log('Deposit to auction pool', {
     auction: auction.toString(),
@@ -47,7 +47,7 @@ export async function depositToAuctionPool({
     authority: authority.toString(),
     sourceAccount: sourceAccount.toString(),
     depositAmount: depositAmount.toString(),
-  })
+  });
 
   return program.instruction.depositToAuctionPool(depositAmount, {
     accounts: {
@@ -58,5 +58,5 @@ export async function depositToAuctionPool({
       sourceAccount,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
-  })
+  });
 }

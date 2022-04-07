@@ -1,8 +1,8 @@
-import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom'
-import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet'
+import { PhantomWalletAdapter } from '@solana/wallet-adapter-phantom';
+import { SolletWalletAdapter } from '@solana/wallet-adapter-sollet';
 
 const ASSET_URL =
-  'https://cdn.jsdelivr.net/gh/solana-labs/oyster@main/assets/wallets'
+  'https://cdn.jsdelivr.net/gh/solana-labs/oyster@main/assets/wallets';
 
 export const WALLET_PROVIDERS = [
   {
@@ -17,9 +17,9 @@ export const WALLET_PROVIDERS = [
     icon: `${ASSET_URL}/sollet.svg`,
     adapter: new SolletWalletAdapter({ provider: 'https://www.sollet.io' }),
   },
-]
+];
 
-export const DEFAULT_PROVIDER = WALLET_PROVIDERS[0]
+export const DEFAULT_PROVIDER = WALLET_PROVIDERS[0];
 
 export const getWalletProviderByUrl = (urlOrNull) =>
-  WALLET_PROVIDERS.find(({ url }) => url === urlOrNull) || DEFAULT_PROVIDER
+  WALLET_PROVIDERS.find(({ url }) => url === urlOrNull) || DEFAULT_PROVIDER;

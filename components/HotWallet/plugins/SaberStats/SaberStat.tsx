@@ -1,4 +1,4 @@
-import { SaberStats } from '@hooks/useSaberStats'
+import { SaberStats } from '@hooks/useSaberStats';
 
 const SaberStat = ({
   liquidityPoolName,
@@ -24,7 +24,7 @@ const SaberStat = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default SaberStat
+export default SaberStat;

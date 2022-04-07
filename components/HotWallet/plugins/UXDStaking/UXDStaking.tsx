@@ -1,19 +1,19 @@
-import { DatabaseIcon } from '@heroicons/react/outline'
-import { HotWalletAccount } from '@hooks/useHotWallet'
-import useHotWalletPluginUXDStaking from '@hooks/useHotWalletPluginUXDStaking'
-import StakingCampaign from './StakingCampaign'
+import { DatabaseIcon } from '@heroicons/react/outline';
+import { HotWalletAccount } from '@hooks/useHotWallet';
+import useHotWalletPluginUXDStaking from '@hooks/useHotWalletPluginUXDStaking';
+import StakingCampaign from './StakingCampaign';
 
 const HotWalletPluginUXDStaking = ({
   hotWalletAccount,
 }: {
-  hotWalletAccount: HotWalletAccount
+  hotWalletAccount: HotWalletAccount;
 }) => {
   const { stakingCampaignsInfo } = useHotWalletPluginUXDStaking(
-    hotWalletAccount
-  )
+    hotWalletAccount,
+  );
 
   if (!stakingCampaignsInfo) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -38,7 +38,7 @@ const HotWalletPluginUXDStaking = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default HotWalletPluginUXDStaking
+export default HotWalletPluginUXDStaking;

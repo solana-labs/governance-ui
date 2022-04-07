@@ -1,2 +1,2 @@
-export * from './bonding'
-export * from './descendingAuction'
+export * from './bonding';
+export * from './descendingAuction';

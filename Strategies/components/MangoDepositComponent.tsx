@@ -2,51 +2,51 @@ import {
   MangoAccount,
   MangoAccountLayout,
   PublicKey,
-} from '@blockworks-foundation/mango-client'
-import Button, { LinkButton } from '@components/Button'
-import Input from '@components/inputs/Input'
-import Loading from '@components/Loading'
-import Tooltip from '@components/Tooltip'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { BN } from '@project-serum/anchor'
+} from '@blockworks-foundation/mango-client';
+import Button, { LinkButton } from '@components/Button';
+import Input from '@components/inputs/Input';
+import Loading from '@components/Loading';
+import Tooltip from '@components/Tooltip';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import { BN } from '@project-serum/anchor';
 import {
   getNativeTreasuryAddress,
   RpcContext,
   withCreateNativeTreasury,
-} from '@solana/spl-governance'
-import { SystemProgram, TransactionInstruction } from '@solana/web3.js'
+} from '@solana/spl-governance';
+import { SystemProgram, TransactionInstruction } from '@solana/web3.js';
 import {
   fmtMintAmount,
   getMintDecimalAmount,
   getMintMinAmountAsDecimal,
   parseMintNaturalAmountFromDecimal,
-} from '@tools/sdk/units'
-import { abbreviateAddress, precision } from '@utils/formatting'
-import tokenService from '@utils/services/token'
-import { GovernedTokenAccount } from '@utils/tokens'
-import BigNumber from 'bignumber.js'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import useMarketStore, { MarketStore } from 'Strategies/store/marketStore'
-import { HandleCreateProposalWithStrategy } from 'Strategies/types/types'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-import ButtonGroup from '@components/ButtonGroup'
-import Switch from '@components/Switch'
-import Select from '@components/inputs/Select'
-import CreateRefForm from './CreateRefLink'
-import DelegateForm from './Delegate'
-import AdditionalProposalOptions from '@components/AdditionalProposalOptions'
-import { validateInstruction } from '@utils/instructionTools'
-import * as yup from 'yup'
-import { getValidatedPublickKey } from '@utils/validations'
+} from '@tools/sdk/units';
+import { abbreviateAddress, precision } from '@utils/formatting';
+import tokenService from '@utils/services/token';
+import { GovernedTokenAccount } from '@utils/tokens';
+import BigNumber from 'bignumber.js';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import useMarketStore, { MarketStore } from 'Strategies/store/marketStore';
+import { HandleCreateProposalWithStrategy } from 'Strategies/types/types';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
+import ButtonGroup from '@components/ButtonGroup';
+import Switch from '@components/Switch';
+import Select from '@components/inputs/Select';
+import CreateRefForm from './CreateRefLink';
+import DelegateForm from './Delegate';
+import AdditionalProposalOptions from '@components/AdditionalProposalOptions';
+import { validateInstruction } from '@utils/instructionTools';
+import * as yup from 'yup';
+import { getValidatedPublickKey } from '@utils/validations';
 
-const DEPOSIT = 'Deposit'
-const CREATE_REF_LINK = 'Create Referral Link'
-const DELEGATE_ACCOUNT = 'Delegate'
+const DEPOSIT = 'Deposit';
+const CREATE_REF_LINK = 'Create Referral Link';
+const DELEGATE_ACCOUNT = 'Delegate';
 
 const MangoDepositComponent = ({
   handledMint,
@@ -55,14 +55,14 @@ const MangoDepositComponent = ({
   mangoAccounts,
   governedTokenAccount,
 }: {
-  handledMint: string
-  currentPositionFtm: string
-  createProposalFcn: HandleCreateProposalWithStrategy
-  mangoAccounts: MangoAccount[]
-  governedTokenAccount: GovernedTokenAccount
+  handledMint: string;
+  currentPositionFtm: string;
+  createProposalFcn: HandleCreateProposalWithStrategy;
+  mangoAccounts: MangoAccount[];
+  governedTokenAccount: GovernedTokenAccount;
 }) => {
-  const router = useRouter()
-  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter();
+  const { fmtUrlWithCluster } = useQueryContext();
   const {
     proposals,
     realmInfo,
@@ -71,139 +71,139 @@ const MangoDepositComponent = ({
     mint,
     councilMint,
     symbol,
-  } = useRealm()
-  const [isDepositing, setIsDepositing] = useState(false)
+  } = useRealm();
+  const [isDepositing, setIsDepositing] = useState(false);
   const [
     selectedMangoAccount,
     setSelectedMangoAccount,
   ] = useState<MangoAccount | null>(
-    mangoAccounts.length ? mangoAccounts[0] : null
-  )
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const market = useMarketStore((s) => s)
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const tokenInfo = tokenService.getTokenInfo(handledMint)
-  const { canUseTransferInstruction } = useGovernanceAssets()
+    mangoAccounts.length ? mangoAccounts[0] : null,
+  );
+  const [voteByCouncil, setVoteByCouncil] = useState(false);
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const market = useMarketStore((s) => s);
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
+  const tokenInfo = tokenService.getTokenInfo(handledMint);
+  const { canUseTransferInstruction } = useGovernanceAssets();
   const treasuryAmount = governedTokenAccount?.token
     ? governedTokenAccount.token.account.amount
-    : new BN(0)
-  const mintInfo = governedTokenAccount?.mint?.account
+    : new BN(0);
+  const mintInfo = governedTokenAccount?.mint?.account;
   const [form, setForm] = useState({
     title: '',
     description: '',
     delegateAddress: '',
     delegateDeposit: false,
     amount: '',
-  })
-  const [formErrors, setFormErrors] = useState({})
+  });
+  const [formErrors, setFormErrors] = useState({});
   const proposalTitle = `Deposit ${form.amount} ${
     tokenService.getTokenInfo(governedTokenAccount.mint!.publicKey.toBase58())
       ?.symbol || 'tokens'
-  } to Mango account`
+  } to Mango account`;
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
-  const [proposalType, setProposalType] = useState('Deposit')
-  const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
+  const [proposalType, setProposalType] = useState('Deposit');
+  const mintMinAmount = mintInfo ? getMintMinAmountAsDecimal(mintInfo) : 1;
   const maxAmount = mintInfo
     ? getMintDecimalAmount(mintInfo, treasuryAmount)
-    : new BigNumber(0)
-  const maxAmountFtm = fmtMintAmount(mintInfo, treasuryAmount)
-  const currentPrecision = precision(mintMinAmount)
-  const group = market!.group!
+    : new BigNumber(0);
+  const maxAmountFtm = fmtMintAmount(mintInfo, treasuryAmount);
+  const currentPrecision = precision(mintMinAmount);
+  const group = market!.group!;
   const depositIndex = group.tokens.findIndex(
-    (x) => x.mint.toBase58() === handledMint
-  )
+    (x) => x.mint.toBase58() === handledMint,
+  );
   const tabs = [
     { val: DEPOSIT, isVisible: true },
     { val: CREATE_REF_LINK, isVisible: selectedMangoAccount !== null },
     { val: DELEGATE_ACCOUNT, isVisible: selectedMangoAccount !== null },
   ]
     .filter((x) => x.isVisible)
-    .map((x) => x.val)
+    .map((x) => x.val);
   const validateAmountOnBlur = () => {
     handleSetForm({
       propertyName: 'amount',
       value: parseFloat(
         Math.max(
           Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(form.amount))
-        ).toFixed(currentPrecision)
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(form.amount)),
+        ).toFixed(currentPrecision),
       ),
-    })
-  }
+    });
+  };
   useEffect(() => {
     if (selectedMangoAccount === null) {
-      setProposalType(DEPOSIT)
+      setProposalType(DEPOSIT);
     }
-  }, [selectedMangoAccount])
+  }, [selectedMangoAccount]);
   const handleSolPayment = async () => {
-    const instructions: TransactionInstruction[] = []
+    const instructions: TransactionInstruction[] = [];
     const toAddress = await getNativeTreasuryAddress(
       realm!.owner,
-      governedTokenAccount!.governance!.pubkey
-    )
+      governedTokenAccount!.governance!.pubkey,
+    );
     const hasSolAccount = await connection.current.getParsedAccountInfo(
-      toAddress
-    )
+      toAddress,
+    );
     if (!hasSolAccount.value) {
       await withCreateNativeTreasury(
         instructions,
         realm!.owner,
         governedTokenAccount!.governance!.pubkey,
-        wallet!.publicKey!
-      )
+        wallet!.publicKey!,
+      );
     }
 
     const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
-      MangoAccountLayout.span
-    )
+      MangoAccountLayout.span,
+    );
 
     const transferIx = SystemProgram.transfer({
       fromPubkey: wallet!.publicKey!,
       toPubkey: toAddress,
       lamports: minRentAmount,
-    })
-    instructions.push(transferIx)
-    return instructions
-  }
+    });
+    instructions.push(transferIx);
+    return instructions;
+  };
   const handleDeposit = async () => {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    const isValid = await validateInstruction({ schema, form, setFormErrors });
     if (!isValid) {
-      return
+      return;
     }
     try {
-      setIsDepositing(true)
-      const prerequisiteInstructions: TransactionInstruction[] = []
-      const mangoAccountPk = selectedMangoAccount?.publicKey || null
+      setIsDepositing(true);
+      const prerequisiteInstructions: TransactionInstruction[] = [];
+      const mangoAccountPk = selectedMangoAccount?.publicKey || null;
       if (!mangoAccountPk) {
-        const solAccountInstruction = await handleSolPayment()
-        prerequisiteInstructions.push(...solAccountInstruction)
+        const solAccountInstruction = await handleSolPayment();
+        prerequisiteInstructions.push(...solAccountInstruction);
       }
       const rpcContext = new RpcContext(
         new PublicKey(realm!.owner.toString()),
         getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
-        connection.endpoint
-      )
+        connection.endpoint,
+      );
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount!,
-        governedTokenAccount!.mint!.account.decimals
-      )
+        governedTokenAccount!.mint!.account.decimals,
+      );
       const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-        governedTokenAccount!.governance!.account.config
-      )
+        governedTokenAccount!.governance!.account.config,
+      );
       const defaultProposalMint = voteByCouncil
         ? realm?.account.config.councilMint
         : !mint?.supply.isZero()
         ? realm!.account.communityMint
         : !councilMint?.supply.isZero()
         ? realm!.account.config.councilMint
-        : undefined
+        : undefined;
       const proposalAddress = await createProposalFcn(
         rpcContext,
         handledMint,
@@ -222,17 +222,17 @@ const MangoDepositComponent = ({
         prerequisiteInstructions,
         false,
         market,
-        client
-      )
+        client,
+      );
       const url = fmtUrlWithCluster(
-        `/dao/${symbol}/proposal/${proposalAddress}`
-      )
-      router.push(url)
+        `/dao/${symbol}/proposal/${proposalAddress}`,
+      );
+      router.push(url);
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-    setIsDepositing(false)
-  }
+    setIsDepositing(false);
+  };
   const schema = yup.object().shape({
     delegateAddress: yup
       .string()
@@ -241,26 +241,26 @@ const MangoDepositComponent = ({
         'Delegate address validation error',
         function (val: string) {
           if (!form.delegateDeposit) {
-            return true
+            return true;
           }
           if (val) {
             try {
-              return !!getValidatedPublickKey(val)
+              return !!getValidatedPublickKey(val);
             } catch (e) {
-              console.log(e)
+              console.log(e);
               return this.createError({
                 message: `${e}`,
-              })
+              });
             }
           } else {
             return this.createError({
               message: `Delegate address is required`,
-            })
+            });
           }
-        }
+        },
       ),
     amount: yup.number().required('Amount is required').min(mintMinAmount),
-  })
+  });
   return (
     <div>
       <Select
@@ -436,21 +436,21 @@ const MangoDepositComponent = ({
         </div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default MangoDepositComponent
+export default MangoDepositComponent;
 
 const MangoAccountItem = ({
   value,
   market,
   depositIndex,
 }: {
-  value: MangoAccount | null
-  market: MarketStore
-  depositIndex: number
+  value: MangoAccount | null;
+  market: MarketStore;
+  depositIndex: number;
 }) => {
-  const group = market!.group!
+  const group = market!.group!;
   return value ? (
     <div className="flex flex-col">
       <div className="text-xs">{abbreviateAddress(value.publicKey)}</div>
@@ -461,9 +461,9 @@ const MangoAccountItem = ({
             .getUiDeposit(
               market.cache!.rootBankCache[depositIndex],
               group,
-              depositIndex
+              depositIndex,
             )
-            .toNumber()
+            .toNumber(),
         ).toFormat(2)}
       </div>
       {value.delegate.toBase58() && (
@@ -472,5 +472,5 @@ const MangoAccountItem = ({
     </div>
   ) : (
     <div>Create new account</div>
-  )
-}
+  );
+};

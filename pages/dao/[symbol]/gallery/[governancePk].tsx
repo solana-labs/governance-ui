@@ -1,60 +1,60 @@
-import { getExplorerUrl } from '@components/explorer/tools'
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Select from '@components/inputs/Select'
-import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT'
-import useRealm from '@hooks/useRealm'
-import useQueryContext from '@hooks/useQueryContext'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import ImgWithLoader from '@components/ImgWithLoader'
-import Modal from '@components/Modal'
-import DepositNFT from '@components/TreasuryAccount/DepositNFT'
-import { LinkButton } from '@components/Button'
+import { getExplorerUrl } from '@components/explorer/tools';
+import PreviousRouteBtn from '@components/PreviousRouteBtn';
+import { useRouter } from 'next/router';
+import { useEffect, useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline';
+import { NFTWithMint } from '@utils/uiTypes/nfts';
+import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import Select from '@components/inputs/Select';
+import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT';
+import useRealm from '@hooks/useRealm';
+import useQueryContext from '@hooks/useQueryContext';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import ImgWithLoader from '@components/ImgWithLoader';
+import Modal from '@components/Modal';
+import DepositNFT from '@components/TreasuryAccount/DepositNFT';
+import { LinkButton } from '@components/Button';
 
 const gallery = () => {
-  const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
-  const { getNfts } = useTreasuryAccountStore()
-  const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
-  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-  const { symbol } = useRealm()
-  const governancePk = router?.query?.governancePk
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const fetchAllNftsForRealm = DEFAULT_NFT_TREASURY_MINT === governancePk
+  const router = useRouter();
+  const connection = useWalletStore((s) => s.connection);
+  const { getNfts } = useTreasuryAccountStore();
+  const realmNfts = useTreasuryAccountStore((s) => s.allNfts);
+  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts);
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
+  const { symbol } = useRealm();
+  const governancePk = router?.query?.governancePk;
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const fetchAllNftsForRealm = DEFAULT_NFT_TREASURY_MINT === governancePk;
   const currentAccount = nftsGovernedTokenAccounts.find(
-    (x) => x.governance?.pubkey.toBase58() === governancePk
-  )
-  const { setCurrentAccount } = useTreasuryAccountStore()
-  const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
+    (x) => x.governance?.pubkey.toBase58() === governancePk,
+  );
+  const { setCurrentAccount } = useTreasuryAccountStore();
+  const [nfts, setNfts] = useState<NFTWithMint[]>([]);
+  const [openNftDepositModal, setOpenNftDepositModal] = useState(false);
   const handleCloseModal = () => {
-    setOpenNftDepositModal(false)
-  }
+    setOpenNftDepositModal(false);
+  };
   useEffect(() => {
     if (governancePk) {
-      getNfts(nftsGovernedTokenAccounts, connection.current)
+      getNfts(nftsGovernedTokenAccounts, connection.current);
     }
   }, [
     governancePk,
     connection.endpoint,
     JSON.stringify(nftsGovernedTokenAccounts),
-  ])
+  ]);
   useEffect(() => {
-    const governedNfts = governanceNfts[governancePk as string]
+    const governedNfts = governanceNfts[governancePk as string];
     if (fetchAllNftsForRealm) {
-      setNfts(realmNfts)
+      setNfts(realmNfts);
     } else if (governedNfts) {
-      setNfts(governanceNfts[governancePk as string])
+      setNfts(governanceNfts[governancePk as string]);
     }
-  }, [realmNfts.length, JSON.stringify(governanceNfts), governancePk])
+  }, [realmNfts.length, JSON.stringify(governanceNfts), governancePk]);
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -67,8 +67,8 @@ const gallery = () => {
               <h1 className="mb-0">NFTs</h1>
               <LinkButton
                 onClick={() => {
-                  setCurrentAccount(nftsGovernedTokenAccounts[0], connection)
-                  setOpenNftDepositModal(true)
+                  setCurrentAccount(nftsGovernedTokenAccounts[0], connection);
+                  setOpenNftDepositModal(true);
                 }}
                 className="flex items-center text-primary-light whitespace-nowrap"
               >
@@ -80,8 +80,8 @@ const gallery = () => {
               className="sm:w-44 mt-2 sm:mt-0"
               onChange={(value) => {
                 router.push(
-                  fmtUrlWithCluster(`/dao/${symbol}/gallery/${value}`)
-                )
+                  fmtUrlWithCluster(`/dao/${symbol}/gallery/${value}`),
+                );
               }}
               value={currentAccount?.governance?.pubkey.toBase58()}
               componentLabel={
@@ -169,7 +169,7 @@ const gallery = () => {
         </Modal>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default gallery
+export default gallery;

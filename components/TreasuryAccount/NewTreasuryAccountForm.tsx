@@ -1,37 +1,37 @@
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
-} from 'components/AssetsList/BaseGovernanceForm'
-import Button from 'components/Button'
-import Input from 'components/inputs/Input'
-import PreviousRouteBtn from 'components/PreviousRouteBtn'
-import useQueryContext from 'hooks/useQueryContext'
-import useRealm from 'hooks/useRealm'
-import { PROGRAM_VERSION_V1, RpcContext } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
-import { PublicKey } from '@solana/web3.js'
-import { tryParseKey } from 'tools/validators/pubkey'
-import { debounce } from 'utils/debounce'
-import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from '@utils/GovernanceTools'
-import { notify } from 'utils/notifications'
-import tokenService from 'utils/services/token'
-import { TokenProgramAccount, tryGetMint } from 'utils/tokens'
-import { createTreasuryAccount } from 'actions/createTreasuryAccount'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import * as yup from 'yup'
+} from 'components/AssetsList/BaseGovernanceForm';
+import Button from 'components/Button';
+import Input from 'components/inputs/Input';
+import PreviousRouteBtn from 'components/PreviousRouteBtn';
+import useQueryContext from 'hooks/useQueryContext';
+import useRealm from 'hooks/useRealm';
+import { PROGRAM_VERSION_V1, RpcContext } from '@solana/spl-governance';
+import { MintInfo } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
+import { tryParseKey } from 'tools/validators/pubkey';
+import { debounce } from 'utils/debounce';
+import { isFormValid } from 'utils/formValidation';
+import { getGovernanceConfig } from '@utils/GovernanceTools';
+import { notify } from 'utils/notifications';
+import tokenService from 'utils/services/token';
+import { TokenProgramAccount, tryGetMint } from 'utils/tokens';
+import { createTreasuryAccount } from 'actions/createTreasuryAccount';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import * as yup from 'yup';
 import {
   DEFAULT_NATIVE_SOL_MINT,
   DEFAULT_NFT_TREASURY_MINT,
-} from '@components/instructions/tools'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { TokenInfo } from '@solana/spl-token-registry'
-import Select from '@components/inputs/Select'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+} from '@components/instructions/tools';
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import { TokenInfo } from '@solana/spl-token-registry';
+import Select from '@components/inputs/Select';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 interface NewTreasuryAccountForm extends BaseGovernanceFormFields {
-  mintAddress: string
+  mintAddress: string;
 }
 const defaultFormValues = {
   mintAddress: '',
@@ -42,28 +42,28 @@ const defaultFormValues = {
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
-}
+};
 
-const SOL = 'SOL'
-const OTHER = 'OTHER'
-const NFT = 'NFT'
+const SOL = 'SOL';
+const OTHER = 'OTHER';
+const NFT = 'NFT';
 
 const NewAccountForm = () => {
-  const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const { fmtUrlWithCluster } = useQueryContext();
   const isCurrentVersionHigherThenV1 = () => {
     return (
       realmInfo?.programVersion && realmInfo.programVersion > PROGRAM_VERSION_V1
-    )
-  }
+    );
+  };
   const {
     realmInfo,
     realm,
     mint: realmMint,
     symbol,
     ownVoterWeight,
-  } = useRealm()
+  } = useRealm();
 
   const types = [
     {
@@ -74,52 +74,52 @@ const NewAccountForm = () => {
     },
     { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
     { name: 'Token Account', value: OTHER, defaultMint: '' },
-  ]
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  ];
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
+  const connected = useWalletStore((s) => s.connected);
+  const { fetchRealm } = useWalletStore((s) => s.actions);
   const [form, setForm] = useState<NewTreasuryAccountForm>({
     ...defaultFormValues,
-  })
-  const [tokenInfo, setTokenInfo] = useState<TokenInfo | undefined>(undefined)
-  const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
-  const [treasuryType, setTreasuryType] = useState(types[2])
+  });
+  const [tokenInfo, setTokenInfo] = useState<TokenInfo | undefined>(undefined);
+  const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [treasuryType, setTreasuryType] = useState(types[2]);
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
-    : undefined
+    : undefined;
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   const handleCreate = async () => {
     try {
       if (!realm) {
-        throw 'No realm selected'
+        throw 'No realm selected';
       }
       if (!connected) {
-        throw 'Please connect your wallet'
+        throw 'Please connect your wallet';
       }
       if (!tokenOwnerRecord) {
-        throw "You don't have enough governance power to create a new treasury account"
+        throw "You don't have enough governance power to create a new treasury account";
       }
-      const { isValid, validationErrors } = await isFormValid(schema, form)
-      setFormErrors(validationErrors)
+      const { isValid, validationErrors } = await isFormValid(schema, form);
+      setFormErrors(validationErrors);
       if (isValid && realmMint) {
-        setIsLoading(true)
+        setIsLoading(true);
 
         const rpcContext = new RpcContext(
           new PublicKey(realm.owner.toString()),
           getProgramVersionForRealm(realmInfo!),
           wallet!,
           connection.current,
-          connection.endpoint
-        )
+          connection.endpoint,
+        );
 
         const governanceConfigValues = {
           minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
@@ -127,9 +127,9 @@ const NewAccountForm = () => {
           maxVotingTime: form.maxVotingTime,
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
-        }
+        };
 
-        const governanceConfig = getGovernanceConfig(governanceConfigValues)
+        const governanceConfig = getGovernanceConfig(governanceConfigValues);
 
         await createTreasuryAccount(
           rpcContext,
@@ -137,29 +137,29 @@ const NewAccountForm = () => {
           new PublicKey(form.mintAddress),
           governanceConfig,
           tokenOwnerRecord!.pubkey,
-          client
-        )
-        setIsLoading(false)
-        fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-        router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
+          client,
+        );
+        setIsLoading(false);
+        fetchRealm(realmInfo!.programId, realmInfo!.realmId);
+        router.push(fmtUrlWithCluster(`/dao/${symbol}/`));
       }
     } catch (e) {
-      console.error('Create Treasury', e)
+      console.error('Create Treasury', e);
       //TODO how do we present errors maybe something more generic ?
       notify({
         type: 'error',
         message: `Can't create governance`,
         description: `Transaction error ${e}`,
-      })
-      setIsLoading(false)
+      });
+      setIsLoading(false);
     }
-  }
+  };
   const handleSetDefaultMintError = () => {
-    const mintError = { mintAddress: 'Invalid mint address' }
-    setFormErrors(mintError)
-    setMint(null)
-    setTokenInfo(undefined)
-  }
+    const mintError = { mintAddress: 'Invalid mint address' };
+    setFormErrors(mintError);
+    setMint(null);
+    setTokenInfo(undefined);
+  };
 
   const schema = yup.object().shape({
     mintAddress: yup
@@ -170,70 +170,70 @@ const NewAccountForm = () => {
         async function (val: string) {
           if (val) {
             try {
-              const pubKey = tryParseKey(val)
+              const pubKey = tryParseKey(val);
               if (!pubKey) {
                 return this.createError({
                   message: `Invalid mint address`,
-                })
+                });
               }
 
               const accountData = await connection.current.getAccountInfo(
-                pubKey
-              )
+                pubKey,
+              );
               if (!accountData) {
                 return this.createError({
                   message: `Account not found`,
-                })
+                });
               }
-              const mint = tryGetMint(connection.current, pubKey)
+              const mint = tryGetMint(connection.current, pubKey);
               if (!mint) {
                 return this.createError({
                   message: `Account is not a valid mint`,
-                })
+                });
               }
-              return true
+              return true;
             } catch (e) {
               return this.createError({
                 message: `Invalid mint address`,
-              })
+              });
             }
           } else {
             return this.createError({
               message: `Mint address is required`,
-            })
+            });
           }
-        }
+        },
       ),
-  })
+  });
   useEffect(() => {
     if (form.mintAddress) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.mintAddress)
+        const pubKey = tryParseKey(form.mintAddress);
         if (pubKey) {
-          const mintAccount = await tryGetMint(connection.current, pubKey)
+          const mintAccount = await tryGetMint(connection.current, pubKey);
           if (mintAccount) {
-            setMint(mintAccount)
-            const info = tokenService.getTokenInfo(form.mintAddress)
-            setTokenInfo(info)
+            setMint(mintAccount);
+            const info = tokenService.getTokenInfo(form.mintAddress);
+            setTokenInfo(info);
           } else {
-            handleSetDefaultMintError()
+            handleSetDefaultMintError();
           }
         } else {
-          handleSetDefaultMintError()
+          handleSetDefaultMintError();
         }
-      })
+      });
     } else {
-      setMint(null)
-      setTokenInfo(undefined)
+      setMint(null);
+      setTokenInfo(undefined);
     }
-  }, [form.mintAddress])
+  }, [form.mintAddress]);
 
   useEffect(() => {
     handleSetForm({
       value: treasuryType.defaultMint,
       propertyName: 'mintAddress',
-    })
-  }, [treasuryType])
+    });
+  }, [treasuryType]);
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
@@ -255,7 +255,7 @@ const NewAccountForm = () => {
               <Select.Option key={x.value} value={x}>
                 {x.name}
               </Select.Option>
-            )
+            );
           })}
       </Select>
       {treasuryType.value === OTHER && (
@@ -307,7 +307,7 @@ const NewAccountForm = () => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NewAccountForm
+export default NewAccountForm;

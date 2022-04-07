@@ -1,21 +1,21 @@
-import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
+import { LockupType } from 'VoteStakeRegistry/sdk/accounts';
 
 export interface Period {
-  defaultValue: number
-  display: string
+  defaultValue: number;
+  display: string;
 }
 export interface LockupKind {
-  value: LockupType
-  info: string[]
-  displayName: string
+  value: LockupType;
+  info: string[];
+  displayName: string;
 }
 export interface VestingPeriod {
-  value: number
-  display: string
-  info: string
+  value: number;
+  display: string;
+  info: string;
 }
-export const MONTHLY = 'monthly'
-export const CONSTANT = 'constant'
+export const MONTHLY = 'monthly';
+export const CONSTANT = 'constant';
 export const lockupTypes: LockupKind[] = [
   {
     value: 'cliff',
@@ -44,7 +44,7 @@ export const lockupTypes: LockupKind[] = [
       'Example: You lock 12.000 tokens for one year with monthly vesting. Every month 1.000 tokens unlock. After the year, all tokens have unlocked.',
     ],
   },
-]
+];
 
 export const vestingPeriods: VestingPeriod[] = [
   {
@@ -52,4 +52,4 @@ export const vestingPeriods: VestingPeriod[] = [
     display: 'Monthly',
     info: 'per month',
   },
-]
+];

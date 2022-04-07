@@ -1,43 +1,43 @@
-import { useEffect, useState } from 'react'
-import GovernedAccountsTabs from '@components/GovernedAccountsTabs'
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import useRealm from '@hooks/useRealm'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { capitalize } from '@utils/helpers'
-import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
+import { useEffect, useState } from 'react';
+import GovernedAccountsTabs from '@components/GovernedAccountsTabs';
+import PreviousRouteBtn from '@components/PreviousRouteBtn';
+import useRealm from '@hooks/useRealm';
+import { fmtMintAmount } from '@tools/sdk/units';
+import { capitalize } from '@utils/helpers';
+import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools';
 import useGovernanceAssetsStore, {
   AccountType,
-} from 'stores/useGovernanceAssetsStore'
+} from 'stores/useGovernanceAssetsStore';
 import {
   getFormattedStringFromDays,
   SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
-import Tabs from '@components/Tabs'
-import Select from '@components/inputs/Select'
+} from 'VoteStakeRegistry/tools/dateTools';
+import Tabs from '@components/Tabs';
+import Select from '@components/inputs/Select';
 
 const Params = () => {
-  const { realm, mint, councilMint } = useRealm()
-  const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
+  const { realm, mint, councilMint } = useRealm();
+  const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts);
   const loadGovernedAccounts = useGovernanceAssetsStore(
-    (s) => s.loadGovernedAccounts
-  )
-  const [activeGovernance, setActiveGovernance] = useState<any>(null)
-  const [activeTab, setActiveTab] = useState('Params')
-  const realmAccount = realm?.account
-  const communityMint = realmAccount?.communityMint.toBase58()
-  const councilMintPk = realmAccount?.config.councilMint?.toBase58()
+    (s) => s.loadGovernedAccounts,
+  );
+  const [activeGovernance, setActiveGovernance] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState('Params');
+  const realmAccount = realm?.account;
+  const communityMint = realmAccount?.communityMint.toBase58();
+  const councilMintPk = realmAccount?.config.councilMint?.toBase58();
   const communityMintMaxVoteWeightSource =
-    realmAccount?.config.communityMintMaxVoteWeightSource
-  const realmConfig = realmAccount?.config
+    realmAccount?.config.communityMintMaxVoteWeightSource;
+  const realmConfig = realmAccount?.config;
   const getYesNoString = (val) => {
-    return val ? ' Yes' : ' No'
-  }
+    return val ? ' Yes' : ' No';
+  };
 
   useEffect(() => {
     if (governedAccounts.length > 0) {
-      setActiveGovernance(governedAccounts[0])
+      setActiveGovernance(governedAccounts[0]);
     }
-  }, [governedAccounts])
+  }, [governedAccounts]);
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -101,7 +101,7 @@ const Params = () => {
                     realmConfig &&
                     fmtMintAmount(
                       mint,
-                      realmConfig!.minCommunityTokensToCreateGovernance
+                      realmConfig!.minCommunityTokensToCreateGovernance,
                     )
                   }
                 />
@@ -109,14 +109,14 @@ const Params = () => {
                   padding
                   label="Use community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useCommunityVoterWeightAddin
+                    realmConfig?.useCommunityVoterWeightAddin,
                   )}
                 />
                 <DisplayField
                   padding
                   label="Use max community voter weight add-in"
                   val={getYesNoString(
-                    realmConfig?.useMaxCommunityVoterWeightAddin
+                    realmConfig?.useMaxCommunityVoterWeightAddin,
                   )}
                 />
               </div>
@@ -136,7 +136,7 @@ const Params = () => {
                 label={'Governances'}
                 onChange={(g) =>
                   setActiveGovernance(
-                    governedAccounts.find((acc) => acc.pubkey.toBase58() === g)
+                    governedAccounts.find((acc) => acc.pubkey.toBase58() === g),
                   )
                 }
                 placeholder="Please select..."
@@ -150,7 +150,7 @@ const Params = () => {
                     >
                       {x.pubkey.toBase58()}
                     </Select.Option>
-                  )
+                  );
                 })}
               </Select>
             </div>
@@ -204,7 +204,7 @@ const Params = () => {
                       padding
                       val={getFormattedStringFromDays(
                         activeGovernance.account.config.maxVotingTime /
-                          SECS_PER_DAY
+                          SECS_PER_DAY,
                       )}
                     />
                     {communityMint && (
@@ -214,7 +214,7 @@ const Params = () => {
                         val={fmtMintAmount(
                           mint,
                           activeGovernance.account.config
-                            .minCommunityTokensToCreateProposal
+                            .minCommunityTokensToCreateProposal,
                         )}
                       />
                     )}
@@ -225,7 +225,7 @@ const Params = () => {
                         val={fmtMintAmount(
                           councilMint,
                           activeGovernance.account.config
-                            .minCouncilTokensToCreateProposal
+                            .minCouncilTokensToCreateProposal,
                         )}
                       />
                     )}
@@ -255,7 +255,7 @@ const Params = () => {
                 ) : (
                   <div className="space-y-3">
                     {activeGovernance.accounts.map((x) => {
-                      const info = getTreasuryAccountItemInfoV2(x)
+                      const info = getTreasuryAccountItemInfoV2(x);
                       if (
                         x.type === AccountType.TOKEN ||
                         x.type === AccountType.SOL
@@ -305,7 +305,7 @@ const Params = () => {
                               />
                             )}
                           </div>
-                        )
+                        );
                       }
 
                       if (x.type === AccountType.NFT) {
@@ -325,7 +325,7 @@ const Params = () => {
                               val={x.extensions?.transferAddress?.toBase58()}
                             />
                           </div>
-                        )
+                        );
                       }
                       if (x.type === AccountType.MINT) {
                         return (
@@ -362,7 +362,7 @@ const Params = () => {
                               bg={false}
                               label="Is Initialized"
                               val={getYesNoString(
-                                x.extensions.mint?.account.isInitialized
+                                x.extensions.mint?.account.isInitialized,
                               )}
                             />
                             {x.extensions.mint?.account.freezeAuthority ? (
@@ -373,7 +373,7 @@ const Params = () => {
                               />
                             ) : null}
                           </div>
-                        )
+                        );
                       }
                       if (x.type === AccountType.PROGRAM) {
                         return (
@@ -392,7 +392,7 @@ const Params = () => {
                               val={x.pubkey.toBase58()}
                             />
                           </div>
-                        )
+                        );
                       }
                     })}
                   </div>
@@ -405,8 +405,8 @@ const Params = () => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const DisplayField = ({ label, val, padding = false, bg = false }) => {
   return (
@@ -418,7 +418,7 @@ const DisplayField = ({ label, val, padding = false, bg = false }) => {
       <div className="text-xs text-fgd-3">{capitalize(label)}</div>
       <div className="text-sm break-all">{val}</div>
     </div>
-  )
-}
+  );
+};
 
-export default Params
+export default Params;

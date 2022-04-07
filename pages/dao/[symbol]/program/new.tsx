@@ -1,5 +1,5 @@
-import NewProgramForm from '@components/AssetsList/NewProgramForm'
-import React from 'react'
+import NewProgramForm from '@components/AssetsList/NewProgramForm';
+import React from 'react';
 
 const New = () => {
   return (
@@ -8,7 +8,7 @@ const New = () => {
         <NewProgramForm></NewProgramForm>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default New
+export default New;

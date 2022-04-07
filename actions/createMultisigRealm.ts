@@ -5,35 +5,35 @@ import {
   SetRealmAuthorityAction,
   VoteThresholdPercentage,
   VoteTipping,
-} from '@solana/spl-governance'
+} from '@solana/spl-governance';
 
-import { withCreateMintGovernance } from '@solana/spl-governance'
-import { withCreateRealm } from '@solana/spl-governance'
-import { withDepositGoverningTokens } from '@solana/spl-governance'
-import { withSetRealmAuthority } from '@solana/spl-governance'
-import { BN } from '@project-serum/anchor'
+import { withCreateMintGovernance } from '@solana/spl-governance';
+import { withCreateRealm } from '@solana/spl-governance';
+import { withDepositGoverningTokens } from '@solana/spl-governance';
+import { withSetRealmAuthority } from '@solana/spl-governance';
+import { BN } from '@project-serum/anchor';
 import {
   Connection,
   Keypair,
   PublicKey,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 
-import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount'
-import { withCreateMint } from '@tools/sdk/splToken/withCreateMint'
-import { withMintTo } from '@tools/sdk/splToken/withMintTo'
+import { withCreateAssociatedTokenAccount } from '@tools/sdk/splToken/withCreateAssociatedTokenAccount';
+import { withCreateMint } from '@tools/sdk/splToken/withCreateMint';
+import { withMintTo } from '@tools/sdk/splToken/withMintTo';
 import {
   getMintNaturalAmountFromDecimalAsBN,
   getTimestampFromDays,
-} from '@tools/sdk/units'
+} from '@tools/sdk/units';
 import {
   getWalletPublicKey,
   sendTransactions,
   SequenceType,
   WalletSigner,
-} from 'utils/sendTransactions'
-import { chunks } from '@utils/helpers'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
+} from 'utils/sendTransactions';
+import { chunks } from '@utils/helpers';
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants';
 
 /// Creates multisig realm with community mint with 0 supply
 /// and council mint used as multisig token
@@ -46,24 +46,24 @@ export const createMultisigRealm = async (
   yesVoteThreshold: number,
   councilWalletPks: PublicKey[],
 
-  wallet: WalletSigner
+  wallet: WalletSigner,
 ) => {
-  const walletPk = getWalletPublicKey(wallet)
+  const walletPk = getWalletPublicKey(wallet);
 
-  const mintsSetupInstructions: TransactionInstruction[] = []
-  const councilMembersInstructions: TransactionInstruction[] = []
+  const mintsSetupInstructions: TransactionInstruction[] = [];
+  const councilMembersInstructions: TransactionInstruction[] = [];
 
-  const mintsSetupSigners: Keypair[] = []
+  const mintsSetupSigners: Keypair[] = [];
 
   // Default to 100% supply
   const communityMintMaxVoteWeightSource =
-    MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION
+    MintMaxVoteWeightSource.FULL_SUPPLY_FRACTION;
 
   // The community mint is going to have 0 supply and we arbitrarily set it to 1m
-  const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+  const minCommunityTokensToCreate = MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY;
 
   // Community mint decimals
-  const communityMintDecimals = 6
+  const communityMintDecimals = 6;
 
   // Create community mint
   const communityMintPk = await withCreateMint(
@@ -73,8 +73,8 @@ export const createMultisigRealm = async (
     walletPk,
     null,
     communityMintDecimals,
-    walletPk
-  )
+    walletPk,
+  );
 
   // Create council mint
   const councilMintPk = await withCreateMint(
@@ -84,19 +84,19 @@ export const createMultisigRealm = async (
     walletPk,
     null,
     0,
-    walletPk
-  )
+    walletPk,
+  );
 
-  let walletAtaPk: PublicKey | undefined
-  const tokenAmount = 1
+  let walletAtaPk: PublicKey | undefined;
+  const tokenAmount = 1;
 
   for (const teamWalletPk of councilWalletPks) {
     const ataPk = await withCreateAssociatedTokenAccount(
       councilMembersInstructions,
       councilMintPk,
       teamWalletPk,
-      walletPk
-    )
+      walletPk,
+    );
 
     // Mint 1 council token to each team member
     await withMintTo(
@@ -104,23 +104,23 @@ export const createMultisigRealm = async (
       councilMintPk,
       ataPk,
       walletPk,
-      tokenAmount
-    )
+      tokenAmount,
+    );
 
     if (teamWalletPk.equals(walletPk)) {
-      walletAtaPk = ataPk
+      walletAtaPk = ataPk;
     }
   }
 
   // Create realm
-  const realmInstructions: TransactionInstruction[] = []
-  const realmSigners: Keypair[] = []
+  const realmInstructions: TransactionInstruction[] = [];
+  const realmSigners: Keypair[] = [];
 
   // Convert to mint natural amount
   const minCommunityTokensToCreateAsMintValue = getMintNaturalAmountFromDecimalAsBN(
     minCommunityTokensToCreate,
-    communityMintDecimals
-  )
+    communityMintDecimals,
+  );
 
   const realmPk = await withCreateRealm(
     realmInstructions,
@@ -133,10 +133,10 @@ export const createMultisigRealm = async (
     councilMintPk,
     communityMintMaxVoteWeightSource,
     minCommunityTokensToCreateAsMintValue,
-    undefined
-  )
+    undefined,
+  );
 
-  let tokenOwnerRecordPk: PublicKey
+  let tokenOwnerRecordPk: PublicKey;
 
   // If the current wallet is in the team then deposit the council token
   if (walletAtaPk) {
@@ -150,20 +150,20 @@ export const createMultisigRealm = async (
       walletPk,
       walletPk,
       walletPk,
-      new BN(tokenAmount)
-    )
+      new BN(tokenAmount),
+    );
 
     // TODO: return from withDepositGoverningTokens in the SDK
     tokenOwnerRecordPk = await getTokenOwnerRecordAddress(
       programId,
       realmPk,
       councilMintPk,
-      walletPk
-    )
+      walletPk,
+    );
   } else {
     // Let's throw for now if the current wallet isn't in the team
     // TODO: To fix it we would have to make it temp. as part of the team and then remove after the realm is created
-    throw new Error('Current wallet must be in the team')
+    throw new Error('Current wallet must be in the team');
   }
 
   // Put community and council mints under the realm governance with default config
@@ -179,7 +179,7 @@ export const createMultisigRealm = async (
     voteTipping: VoteTipping.Strict,
     proposalCoolOffTime: 0,
     minCouncilTokensToCreateProposal: new BN(1),
-  })
+  });
 
   const communityMintGovPk = await withCreateMintGovernance(
     realmInstructions,
@@ -192,8 +192,8 @@ export const createMultisigRealm = async (
     walletPk,
     tokenOwnerRecordPk,
     walletPk,
-    walletPk
-  )
+    walletPk,
+  );
 
   await withCreateMintGovernance(
     realmInstructions,
@@ -206,8 +206,8 @@ export const createMultisigRealm = async (
     walletPk,
     tokenOwnerRecordPk,
     walletPk,
-    walletPk
-  )
+    walletPk,
+  );
 
   // Set the community governance as the realm authority
   withSetRealmAuthority(
@@ -217,32 +217,32 @@ export const createMultisigRealm = async (
     realmPk,
     walletPk,
     communityMintGovPk,
-    SetRealmAuthorityAction.SetChecked
-  )
+    SetRealmAuthorityAction.SetChecked,
+  );
 
   try {
-    const councilMembersChunks = chunks(councilMembersInstructions, 10)
+    const councilMembersChunks = chunks(councilMembersInstructions, 10);
     // only walletPk needs to sign the minting instructions and it's a signer by default and we don't have to include any more signers
     const councilMembersSignersChunks = Array(councilMembersChunks.length).fill(
-      []
-    )
+      [],
+    );
 
     const tx = await sendTransactions(
       connection,
       wallet,
       [mintsSetupInstructions, ...councilMembersChunks, realmInstructions],
       [mintsSetupSigners, ...councilMembersSignersChunks, realmSigners],
-      SequenceType.Sequential
-    )
+      SequenceType.Sequential,
+    );
 
     return {
       tx,
       realmPk,
       communityMintPk,
       councilMintPk,
-    }
+    };
   } catch (ex) {
-    console.error(ex)
-    throw ex
+    console.error(ex);
+    throw ex;
   }
-}
+};

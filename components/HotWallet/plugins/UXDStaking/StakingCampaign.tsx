@@ -1,19 +1,19 @@
-import { StakingCampaignInfo } from '@hooks/useHotWalletPluginUXDStaking'
-import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units'
-import { getSplTokenNameByMint } from '@utils/splTokens'
+import { StakingCampaignInfo } from '@hooks/useHotWalletPluginUXDStaking';
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
+import { getSplTokenNameByMint } from '@utils/splTokens';
 
 const StakingCampaign = ({
   stakingCampaignInfo,
 }: {
-  stakingCampaignInfo: StakingCampaignInfo
+  stakingCampaignInfo: StakingCampaignInfo;
 }) => {
   const startDate = new Date(
-    Number(stakingCampaignInfo.startTs) * 1_000
-  ).toUTCString()
+    Number(stakingCampaignInfo.startTs) * 1_000,
+  ).toUTCString();
 
   const endDate = stakingCampaignInfo.endTs
     ? new Date(Number(stakingCampaignInfo.endTs) * 1_000).toUTCString()
-    : '-'
+    : '-';
 
   const options = stakingCampaignInfo.stakingOptions.length ? (
     stakingCampaignInfo.stakingOptions
@@ -42,10 +42,10 @@ const StakingCampaign = ({
       ))
   ) : (
     <span className="text-sm">No options</span>
-  )
+  );
 
-  const rewardMintName = getSplTokenNameByMint(stakingCampaignInfo.rewardMint)
-  const stackedMintName = getSplTokenNameByMint(stakingCampaignInfo.stakedMint)
+  const rewardMintName = getSplTokenNameByMint(stakingCampaignInfo.rewardMint);
+  const stackedMintName = getSplTokenNameByMint(stakingCampaignInfo.stakedMint);
 
   return (
     <>
@@ -76,7 +76,7 @@ const StakingCampaign = ({
           <span className="text-xs">
             {nativeAmountToFormattedUiAmount(
               stakingCampaignInfo.initialRewardAmount,
-              stakingCampaignInfo.rewardMintDecimals
+              stakingCampaignInfo.rewardMintDecimals,
             )}
             <span className="ml-1">{rewardMintName}</span>
           </span>
@@ -87,7 +87,7 @@ const StakingCampaign = ({
           <span className="text-xs">
             {nativeAmountToFormattedUiAmount(
               stakingCampaignInfo.remainingRewardAmount,
-              stakingCampaignInfo.rewardMintDecimals
+              stakingCampaignInfo.rewardMintDecimals,
             )}
             <span className="ml-1">{rewardMintName}</span>
           </span>
@@ -107,7 +107,7 @@ const StakingCampaign = ({
           <span className="text-xs">total created staking accounts:</span>
           <span className="text-xs">
             {Number(
-              stakingCampaignInfo.totalCreatedStakingAccounts
+              stakingCampaignInfo.totalCreatedStakingAccounts,
             ).toLocaleString()}
           </span>
         </div>
@@ -116,7 +116,7 @@ const StakingCampaign = ({
           <span className="text-xs">total current staking accounts:</span>
           <span className="text-xs">
             {Number(
-              stakingCampaignInfo.totalCreatedStakingAccounts
+              stakingCampaignInfo.totalCreatedStakingAccounts,
             ).toLocaleString()}
           </span>
         </div>
@@ -140,7 +140,7 @@ const StakingCampaign = ({
         {options}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default StakingCampaign
+export default StakingCampaign;

@@ -1,15 +1,15 @@
-import { PublicKey } from '@solana/web3.js'
-import * as yup from 'yup'
+import { PublicKey } from '@solana/web3.js';
+import * as yup from 'yup';
 
 const publicKeyValidationTest = (value: string) => {
   try {
-    if (!value) return false
-    new PublicKey(value)
-    return true
+    if (!value) return false;
+    new PublicKey(value);
+    return true;
   } catch (e) {
-    return false
+    return false;
   }
-}
+};
 
 const CreateFormSchema = yup.object().shape({
   governanceProgramId: yup
@@ -18,7 +18,7 @@ const CreateFormSchema = yup.object().shape({
     .test(
       'is-public-key',
       'Governance program id is not a valid public key',
-      publicKeyValidationTest
+      publicKeyValidationTest,
     ),
   name: yup.string().required('Name is required'),
   communityMintId: yup
@@ -26,7 +26,7 @@ const CreateFormSchema = yup.object().shape({
     .test(
       'is-public-key',
       'Community token mint id is not a valid public key',
-      (value) => (value ? publicKeyValidationTest(value) : true)
+      (value) => (value ? publicKeyValidationTest(value) : true),
     ),
   // communityMint: yup.object().required('Community token mint is not valid'),
   councilMintId: yup
@@ -34,12 +34,12 @@ const CreateFormSchema = yup.object().shape({
     .test(
       'is-public-key',
       'Council token mint id is not a valid public key',
-      (value) => (value ? publicKeyValidationTest(value) : true)
+      (value) => (value ? publicKeyValidationTest(value) : true),
     ),
   councilMint: yup.object().when('councilMintId', {
     is: (value) => value,
     then: yup.object().required('Council token mint is not valid'),
   }),
-})
+});
 
-export { CreateFormSchema, publicKeyValidationTest }
+export { CreateFormSchema, publicKeyValidationTest };

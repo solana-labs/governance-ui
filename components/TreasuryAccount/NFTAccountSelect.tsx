@@ -1,5 +1,5 @@
-import Select from '@components/inputs/Select'
-import AccountItemNFT from './AccountItemNFT'
+import Select from '@components/inputs/Select';
+import AccountItemNFT from './AccountItemNFT';
 
 const NFTAccountSelect = ({
   onChange,
@@ -35,7 +35,7 @@ const NFTAccountSelect = ({
         </Select.Option>
       ))}
     </Select>
-  )
-}
+  );
+};
 
-export default NFTAccountSelect
+export default NFTAccountSelect;

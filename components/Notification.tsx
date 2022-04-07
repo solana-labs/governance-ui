@@ -1,30 +1,30 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import {
   CheckCircleIcon,
   InformationCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/outline'
-import { XIcon } from '@heroicons/react/solid'
-import useNotificationStore from '../stores/useNotificationStore'
+} from '@heroicons/react/outline';
+import { XIcon } from '@heroicons/react/solid';
+import useNotificationStore from '../stores/useNotificationStore';
 
 const NotificationList = () => {
   const { notifications, set: setNotificationStore } = useNotificationStore(
-    (s) => s
-  )
+    (s) => s,
+  );
 
   useEffect(() => {
     if (notifications.length > 0) {
       const id = setInterval(() => {
         setNotificationStore((state) => {
-          state.notifications = notifications.slice(1, notifications.length)
-        })
-      }, 6000)
+          state.notifications = notifications.slice(1, notifications.length);
+        });
+      }, 6000);
 
       return () => {
-        clearInterval(id)
-      }
+        clearInterval(id);
+      };
     }
-  }, [notifications, setNotificationStore])
+  }, [notifications, setNotificationStore]);
 
   return (
     <div
@@ -43,13 +43,13 @@ const NotificationList = () => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Notification = ({ type, message, description, txid, idx }) => {
-  const [showNotification, setShowNotification] = useState(true)
+  const [showNotification, setShowNotification] = useState(true);
 
-  if (!showNotification) return null
+  if (!showNotification) return null;
 
   return (
     <div
@@ -97,7 +97,7 @@ const Notification = ({ type, message, description, txid, idx }) => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NotificationList
+export default NotificationList;

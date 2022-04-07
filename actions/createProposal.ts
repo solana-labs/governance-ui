@@ -3,7 +3,7 @@ import {
   PublicKey,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 
 import {
   getGovernanceProgramVersion,
@@ -14,26 +14,26 @@ import {
   Realm,
   VoteType,
   withCreateProposal,
-} from '@solana/spl-governance'
-import { withAddSignatory } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { withInsertTransaction } from '@solana/spl-governance'
-import { InstructionData } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
-import { withSignOffProposal } from '@solana/spl-governance'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { sendTransactions, SequenceType } from '@utils/sendTransactions'
-import { chunks } from '@utils/helpers'
-import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes'
+} from '@solana/spl-governance';
+import { withAddSignatory } from '@solana/spl-governance';
+import { RpcContext } from '@solana/spl-governance';
+import { withInsertTransaction } from '@solana/spl-governance';
+import { InstructionData } from '@solana/spl-governance';
+import { sendTransaction } from 'utils/send';
+import { withSignOffProposal } from '@solana/spl-governance';
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord';
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
+import { sendTransactions, SequenceType } from '@utils/sendTransactions';
+import { chunks } from '@utils/helpers';
+import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes';
 
 export interface InstructionDataWithHoldUpTime {
-  data: InstructionData | null
-  holdUpTime: number | undefined
-  prerequisiteInstructions: TransactionInstruction[]
-  chunkSplitByDefault?: boolean
-  signers?: Keypair[]
-  shouldSplitIntoSeparateTxs?: boolean | undefined
+  data: InstructionData | null;
+  holdUpTime: number | undefined;
+  prerequisiteInstructions: TransactionInstruction[];
+  chunkSplitByDefault?: boolean;
+  signers?: Keypair[];
+  shouldSplitIntoSeparateTxs?: boolean | undefined;
 }
 
 export class InstructionDataWithHoldUpTime {
@@ -41,19 +41,19 @@ export class InstructionDataWithHoldUpTime {
     instruction,
     governance,
   }: {
-    instruction: FormInstructionData
-    governance?: ProgramAccount<Governance>
+    instruction: FormInstructionData;
+    governance?: ProgramAccount<Governance>;
   }) {
     this.data = instruction.serializedInstruction
       ? getInstructionDataFromBase64(instruction.serializedInstruction)
-      : null
+      : null;
     this.holdUpTime =
       typeof instruction.customHoldUpTime !== undefined
         ? instruction.customHoldUpTime
-        : governance?.account?.config.minInstructionHoldUpTime
+        : governance?.account?.config.minInstructionHoldUpTime;
 
-    this.prerequisiteInstructions = instruction.prerequisiteInstructions || []
-    this.chunkSplitByDefault = instruction.chunkSplitByDefault || false
+    this.prerequisiteInstructions = instruction.prerequisiteInstructions || [];
+    this.chunkSplitByDefault = instruction.chunkSplitByDefault || false;
   }
 }
 
@@ -68,41 +68,41 @@ export const createProposal = async (
   proposalIndex: number,
   instructionsData: InstructionDataWithHoldUpTime[],
   isDraft: boolean,
-  client?: VsrClient
+  client?: VsrClient,
 ): Promise<PublicKey> => {
-  const instructions: TransactionInstruction[] = []
+  const instructions: TransactionInstruction[] = [];
 
-  const governanceAuthority = walletPubkey
-  const signatory = walletPubkey
-  const payer = walletPubkey
-  const notificationTitle = isDraft ? 'proposal draft' : 'proposal'
-  const prerequisiteInstructions: TransactionInstruction[] = []
+  const governanceAuthority = walletPubkey;
+  const signatory = walletPubkey;
+  const payer = walletPubkey;
+  const notificationTitle = isDraft ? 'proposal draft' : 'proposal';
+  const prerequisiteInstructions: TransactionInstruction[] = [];
 
   // sum up signers
-  const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? [])
+  const signers: Keypair[] = instructionsData.flatMap((x) => x.signers ?? []);
   const shouldSplitIntoSeparateTxs: boolean = instructionsData
     .flatMap((x) => x.shouldSplitIntoSeparateTxs)
-    .some((x) => x)
+    .some((x) => x);
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await getGovernanceProgramVersion(
     connection,
-    programId
-  )
+    programId,
+  );
 
   // V2 Approve/Deny configuration
-  const voteType = VoteType.SINGLE_CHOICE
-  const options = ['Approve']
-  const useDenyOption = true
+  const voteType = VoteType.SINGLE_CHOICE;
+  const options = ['Approve'];
+  const useDenyOption = true;
 
   //will run only if plugin is connected with realm
   const voterWeight = await withUpdateVoterWeightRecord(
     instructions,
     wallet.publicKey!,
     realm,
-    client
-  )
+    client,
+  );
 
   const proposalAddress = await withCreateProposal(
     instructions,
@@ -120,8 +120,8 @@ export const createProposal = async (
     options,
     useDenyOption,
     payer,
-    voterWeight
-  )
+    voterWeight,
+  );
 
   await withAddSignatory(
     instructions,
@@ -131,27 +131,27 @@ export const createProposal = async (
     tokenOwnerRecord,
     governanceAuthority,
     signatory,
-    payer
-  )
+    payer,
+  );
 
   // TODO: Return signatoryRecordAddress from the SDK call
   const signatoryRecordAddress = await getSignatoryRecordAddress(
     programId,
     proposalAddress,
-    signatory
-  )
+    signatory,
+  );
 
-  const insertInstructions: TransactionInstruction[] = []
+  const insertInstructions: TransactionInstruction[] = [];
   const splitToChunkByDefault = instructionsData.filter(
-    (x) => x.chunkSplitByDefault
-  ).length
+    (x) => x.chunkSplitByDefault,
+  ).length;
 
   for (const [index, instruction] of instructionsData
     .filter((x) => x.data)
     .entries()) {
     if (instruction.data) {
       if (instruction.prerequisiteInstructions) {
-        prerequisiteInstructions.push(...instruction.prerequisiteInstructions)
+        prerequisiteInstructions.push(...instruction.prerequisiteInstructions);
       }
       await withInsertTransaction(
         insertInstructions,
@@ -165,12 +165,12 @@ export const createProposal = async (
         0,
         instruction.holdUpTime || 0,
         [instruction.data],
-        payer
-      )
+        payer,
+      );
     }
   }
 
-  const insertInstructionCount = insertInstructions.length
+  const insertInstructionCount = insertInstructions.length;
 
   if (!isDraft) {
     withSignOffProposal(
@@ -182,16 +182,16 @@ export const createProposal = async (
       proposalAddress,
       signatory,
       signatoryRecordAddress,
-      undefined
-    )
+      undefined,
+    );
   }
 
   if (shouldSplitIntoSeparateTxs) {
-    const transaction1 = new Transaction()
-    const transaction2 = new Transaction()
+    const transaction1 = new Transaction();
+    const transaction2 = new Transaction();
 
-    transaction1.add(...prerequisiteInstructions, ...instructions)
-    transaction2.add(...insertInstructions)
+    transaction1.add(...prerequisiteInstructions, ...instructions);
+    transaction2.add(...insertInstructions);
 
     await sendTransaction({
       transaction: transaction1,
@@ -200,7 +200,7 @@ export const createProposal = async (
       signers,
       sendingMessage: `creating ${notificationTitle}`,
       successMessage: `${notificationTitle} created`,
-    })
+    });
 
     await sendTransaction({
       transaction: transaction2,
@@ -209,20 +209,20 @@ export const createProposal = async (
       signers: undefined,
       sendingMessage: `inserting into ${notificationTitle}`,
       successMessage: `inserted into ${notificationTitle}`,
-    })
+    });
   } else if (insertInstructionCount <= 2 && !splitToChunkByDefault) {
     // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size
-    const transaction = new Transaction()
+    const transaction = new Transaction();
     // We merge instructions with prerequisiteInstructions
     // Prerequisite  instructions can came from instructions as something we need to do before instruction can be executed
     // For example we create ATAs if they don't exist as part of the proposal creation flow
     transaction.add(
       ...prerequisiteInstructions,
       ...instructions,
-      ...insertInstructions
-    )
+      ...insertInstructions,
+    );
 
     await sendTransaction({
       transaction,
@@ -231,21 +231,21 @@ export const createProposal = async (
       signers,
       sendingMessage: `creating ${notificationTitle}`,
       successMessage: `${notificationTitle} created`,
-    })
+    });
   } else {
-    const insertChunks = chunks(insertInstructions, 2)
-    const signerChunks = Array(insertChunks.length).fill([])
+    const insertChunks = chunks(insertInstructions, 2);
+    const signerChunks = Array(insertChunks.length).fill([]);
 
-    console.log(`Creating proposal using ${insertChunks.length} chunks`)
+    console.log(`Creating proposal using ${insertChunks.length} chunks`);
 
     await sendTransactions(
       connection,
       wallet,
       [prerequisiteInstructions, instructions, ...insertChunks],
       [[], [], ...signerChunks],
-      SequenceType.Sequential
-    )
+      SequenceType.Sequential,
+    );
   }
 
-  return proposalAddress
-}
+  return proposalAddress;
+};

@@ -1,17 +1,17 @@
-import React from 'react'
+import React from 'react';
 
 class ErrorBoundary extends React.Component<
   any,
   { hasError: boolean; error: any }
 > {
   constructor(props) {
-    super(props)
-    this.state = { hasError: false, error: null }
+    super(props);
+    this.state = { hasError: false, error: null };
   }
 
   static getDerivedStateFromError(error) {
     // Update state so the next render will show the fallback UI.
-    return { hasError: true, error: error }
+    return { hasError: true, error: error };
   }
 
   componentDidCatch(error, errorInfo) {
@@ -26,9 +26,9 @@ class ErrorBoundary extends React.Component<
           body: JSON.stringify({
             content: `UI ERROR: ${error} : ${errorInfo?.componentStack}`,
           }),
-        })
+        });
       } catch (err) {
-        console.error('Error posting to notify webhook:', err)
+        console.error('Error posting to notify webhook:', err);
       }
     }
   }
@@ -45,11 +45,11 @@ class ErrorBoundary extends React.Component<
           </button>
           <div className="mt-4 px-4">{this.state.error.stack}</div>
         </div>
-      )
+      );
     }
 
-    return this.props.children
+    return this.props.children;
   }
 }
 
-export default ErrorBoundary
+export default ErrorBoundary;

@@ -2,10 +2,10 @@ import {
   PublicKey,
   SystemProgram,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '../ATribecaConfiguration'
+} from '../ATribecaConfiguration';
 
 export async function createGaugeVoteInstruction({
   programs,
@@ -14,20 +14,20 @@ export async function createGaugeVoteInstruction({
   payer,
   tribecaConfiguration,
 }: {
-  programs: TribecaPrograms
-  gauge: PublicKey
-  authority: PublicKey
-  payer: PublicKey
-  tribecaConfiguration: ATribecaConfiguration
+  programs: TribecaPrograms;
+  gauge: PublicKey;
+  authority: PublicKey;
+  payer: PublicKey;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
-  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow)
+  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow);
 
   const [gaugeVote, bump] = await tribecaConfiguration.findGaugeVoteAddress(
     gaugeVoter,
-    gauge
-  )
+    gauge,
+  );
 
   console.log('create gauge vote', {
     gaugeVoter: gaugeVoter.toString(),
@@ -35,7 +35,7 @@ export async function createGaugeVoteInstruction({
     gauge: gauge.toString(),
     payer: payer.toString(),
     systemProgram: SystemProgram.programId.toString(),
-  })
+  });
 
   return programs.Gauge.instruction.createGaugeVote(bump, {
     accounts: {
@@ -45,5 +45,5 @@ export async function createGaugeVoteInstruction({
       payer,
       systemProgram: SystemProgram.programId,
     },
-  })
+  });
 }

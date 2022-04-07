@@ -1,23 +1,23 @@
-import { useContext, useEffect, useState } from 'react'
-import * as yup from 'yup'
-import { serializeInstructionToBase64 } from '@solana/spl-governance'
-import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { debounce } from '@utils/debounce'
-import { isFormValid } from '@utils/formValidation'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes'
+import { useContext, useEffect, useState } from 'react';
+import * as yup from 'yup';
+import { serializeInstructionToBase64 } from '@solana/spl-governance';
+import { Connection, PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { debounce } from '@utils/debounce';
+import { isFormValid } from '@utils/formValidation';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { FormInstructionData } from '@utils/uiTypes/proposalCreationTypes';
 
-import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
-import useWalletStore from 'stores/useWalletStore'
-import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
-import useGovernedMultiTypeAccounts from './useGovernedMultiTypeAccounts'
-import { EndpointTypes } from '@models/types'
+import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new';
+import useWalletStore from 'stores/useWalletStore';
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base';
+import useGovernedMultiTypeAccounts from './useGovernedMultiTypeAccounts';
+import { EndpointTypes } from '@models/types';
 
-export type SerializedInstruction = string
+export type SerializedInstruction = string;
 
 function useInstructionFormBuilder<
   T extends {
-    governedAccount?: GovernedMultiTypeAccount
+    governedAccount?: GovernedMultiTypeAccount;
   }
 >({
   index,
@@ -26,13 +26,13 @@ function useInstructionFormBuilder<
   buildInstruction,
   getCustomHoldUpTime,
 }: {
-  index: number
-  initialFormValues: T
+  index: number;
+  initialFormValues: T;
   schema: yup.ObjectSchema<
     {
-      [key in keyof T]: yup.AnySchema
+      [key in keyof T]: yup.AnySchema;
     }
-  >
+  >;
   buildInstruction?: ({
     form,
     connection,
@@ -40,38 +40,38 @@ function useInstructionFormBuilder<
     wallet,
     governedAccountPubkey,
   }: {
-    form: T
-    connection: Connection
-    cluster: EndpointTypes
-    wallet: SignerWalletAdapter
-    governedAccountPubkey: PublicKey
-  }) => Promise<TransactionInstruction | SerializedInstruction>
-  getCustomHoldUpTime?: () => Promise<number>
+    form: T;
+    connection: Connection;
+    cluster: EndpointTypes;
+    wallet: SignerWalletAdapter;
+    governedAccountPubkey: PublicKey;
+  }) => Promise<TransactionInstruction | SerializedInstruction>;
+  getCustomHoldUpTime?: () => Promise<number>;
 }) {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const { handleSetInstruction } = useContext(NewProposalContext)
-  const { getGovernedAccountPublicKey } = useGovernedMultiTypeAccounts()
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
+  const { handleSetInstruction } = useContext(NewProposalContext);
+  const { getGovernedAccountPublicKey } = useGovernedMultiTypeAccounts();
 
-  const [form, setForm] = useState<T>(initialFormValues)
-  const [formErrors, setFormErrors] = useState({})
+  const [form, setForm] = useState<T>(initialFormValues);
+  const [formErrors, setFormErrors] = useState({});
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
 
   const validateForm = async (): Promise<boolean> => {
-    const { isValid, validationErrors } = await isFormValid(schema, form)
-    setFormErrors(validationErrors)
-    return isValid
-  }
+    const { isValid, validationErrors } = await isFormValid(schema, form);
+    setFormErrors(validationErrors);
+    return isValid;
+  };
 
   const getInstruction = async (): Promise<FormInstructionData> => {
     const governedAccountPubkey = getGovernedAccountPublicKey(
       form.governedAccount,
-      true
-    )
+      true,
+    );
     if (
       !wallet?.publicKey ||
       !form.governedAccount?.governance?.account ||
@@ -82,7 +82,7 @@ function useInstructionFormBuilder<
         serializedInstruction: '',
         isValid: false,
         governance: form.governedAccount?.governance,
-      }
+      };
     }
     try {
       const transactionInstructionOrSerializedInstruction = buildInstruction
@@ -93,52 +93,52 @@ function useInstructionFormBuilder<
             wallet,
             governedAccountPubkey,
           })
-        : ''
+        : '';
 
       const serializedInstruction =
         typeof transactionInstructionOrSerializedInstruction === 'string'
           ? transactionInstructionOrSerializedInstruction
           : serializeInstructionToBase64(
-              transactionInstructionOrSerializedInstruction
-            )
+              transactionInstructionOrSerializedInstruction,
+            );
 
       const customHoldUpTime = getCustomHoldUpTime
         ? await getCustomHoldUpTime()
-        : undefined
+        : undefined;
 
       return {
         serializedInstruction,
         isValid: true,
         governance: form.governedAccount?.governance,
         customHoldUpTime,
-      }
+      };
     } catch (e) {
-      console.error(e)
+      console.error(e);
 
       return {
         serializedInstruction: '',
         isValid: false,
         governance: form.governedAccount?.governance,
-      }
+      };
     }
-  }
+  };
 
   useEffect(() => {
     handleSetForm({
       propertyName: 'governedAccount',
       value: initialFormValues.governedAccount,
-    })
-  }, [JSON.stringify(initialFormValues.governedAccount)])
+    });
+  }, [JSON.stringify(initialFormValues.governedAccount)]);
 
   useEffect(() => {
     debounce.debounceFcn(async () => {
-      await validateForm()
-    })
+      await validateForm();
+    });
     handleSetInstruction(
       { governedAccount: form.governedAccount?.governance, getInstruction },
-      index
-    )
-  }, [form])
+      index,
+    );
+  }, [form]);
 
   return {
     connection,
@@ -147,7 +147,7 @@ function useInstructionFormBuilder<
     form,
     handleSetForm,
     validateForm,
-  }
+  };
 }
 
-export default useInstructionFormBuilder
+export default useInstructionFormBuilder;

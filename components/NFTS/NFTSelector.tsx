@@ -3,18 +3,18 @@ import React, {
   useEffect,
   useImperativeHandle,
   useState,
-} from 'react'
-import { PhotographIcon } from '@heroicons/react/solid'
-import useWalletStore from 'stores/useWalletStore'
-import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { CheckCircleIcon } from '@heroicons/react/solid'
-import { PublicKey } from '@solana/web3.js'
-import Loading from '@components/Loading'
-import { getNfts } from '@utils/tokens'
-import ImgWithLoader from '@components/ImgWithLoader'
+} from 'react';
+import { PhotographIcon } from '@heroicons/react/solid';
+import useWalletStore from 'stores/useWalletStore';
+import { NFTWithMint } from '@utils/uiTypes/nfts';
+import { CheckCircleIcon } from '@heroicons/react/solid';
+import { PublicKey } from '@solana/web3.js';
+import Loading from '@components/Loading';
+import { getNfts } from '@utils/tokens';
+import ImgWithLoader from '@components/ImgWithLoader';
 
 export interface NftSelectorFunctions {
-  handleGetNfts: () => void
+  handleGetNfts: () => void;
 }
 
 function NFTSelector(
@@ -26,49 +26,49 @@ function NFTSelector(
     selectable = true,
     familyName = '',
   }: {
-    ownerPk: PublicKey
-    onNftSelect: (nfts: NFTWithMint[]) => void
-    nftWidth?: string
-    nftHeight?: string
-    selectable?: boolean
-    familyName?: string
+    ownerPk: PublicKey;
+    onNftSelect: (nfts: NFTWithMint[]) => void;
+    nftWidth?: string;
+    nftHeight?: string;
+    selectable?: boolean;
+    familyName?: string;
   },
-  ref: React.Ref<NftSelectorFunctions>
+  ref: React.Ref<NftSelectorFunctions>,
 ) {
-  const [nfts, setNfts] = useState<NFTWithMint[]>([])
-  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
-  const connection = useWalletStore((s) => s.connection)
-  const [isLoading, setIsLoading] = useState(false)
+  const [nfts, setNfts] = useState<NFTWithMint[]>([]);
+  const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([]);
+  const connection = useWalletStore((s) => s.connection);
+  const [isLoading, setIsLoading] = useState(false);
   const handleSelectNft = (nft: NFTWithMint) => {
-    const isSelected = selectedNfts.find((x) => x.mint === nft.mint)
+    const isSelected = selectedNfts.find((x) => x.mint === nft.mint);
     if (isSelected) {
-      setSelectedNfts([...selectedNfts.filter((x) => x.mint !== nft.mint)])
+      setSelectedNfts([...selectedNfts.filter((x) => x.mint !== nft.mint)]);
     } else {
       //For now only one nft at the time
-      setSelectedNfts([nft])
+      setSelectedNfts([nft]);
     }
-  }
+  };
   const handleGetNfts = async () => {
-    setIsLoading(true)
-    const nfts = await getNfts(connection.current, ownerPk)
+    setIsLoading(true);
+    const nfts = await getNfts(connection.current, ownerPk);
     if (nfts.length === 1) {
-      handleSelectNft(nfts[0])
+      handleSelectNft(nfts[0]);
     }
-    setNfts(nfts)
-    setIsLoading(false)
-  }
+    setNfts(nfts);
+    setIsLoading(false);
+  };
   useImperativeHandle(ref, () => ({
     handleGetNfts,
-  }))
+  }));
 
   useEffect(() => {
     if (ownerPk) {
-      handleGetNfts()
+      handleGetNfts();
     }
-  }, [ownerPk])
+  }, [ownerPk]);
   useEffect(() => {
-    onNftSelect(selectedNfts)
-  }, [selectedNfts])
+    onNftSelect(selectedNfts);
+  }, [selectedNfts]);
   return (
     <>
       <div
@@ -80,7 +80,7 @@ function NFTSelector(
             <div className="flex flex-row flex-wrap gap-4 mb-4">
               {nfts
                 .filter(
-                  (x) => !familyName || x.val.collection.family === familyName
+                  (x) => !familyName || x.val.collection.family === familyName,
                 )
                 .map((x) => (
                   <div
@@ -95,7 +95,7 @@ function NFTSelector(
                     }}
                   >
                     {selectedNfts.find(
-                      (selectedNfts) => selectedNfts.mint === x.mint
+                      (selectedNfts) => selectedNfts.mint === x.mint,
                     ) && (
                       <CheckCircleIcon className="w-10 h-10 absolute text-green z-10"></CheckCircleIcon>
                     )}
@@ -117,7 +117,7 @@ function NFTSelector(
         )}
       </div>
     </>
-  )
+  );
 }
 
-export default forwardRef(NFTSelector)
+export default forwardRef(NFTSelector);

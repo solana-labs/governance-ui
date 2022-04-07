@@ -1,7 +1,7 @@
-import { Connection } from '@solana/web3.js'
-import { AccountMetaData } from '@solana/spl-governance'
-import { SPL_TOKENS } from '@utils/splTokens'
-import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from '@utils/associated'
+import { Connection } from '@solana/web3.js';
+import { AccountMetaData } from '@solana/spl-governance';
+import { SPL_TOKENS } from '@utils/splTokens';
+import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from '@utils/associated';
 
 export const ATA_PROGRAM_INSTRUCTIONS = {
   [SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID.toBase58()]: {
@@ -15,16 +15,16 @@ export const ATA_PROGRAM_INSTRUCTIONS = {
     getDataUI: (
       _connection: Connection,
       _data: Uint8Array,
-      accounts: AccountMetaData[]
+      accounts: AccountMetaData[],
     ) => {
-      const ata = accounts[1].pubkey.toString()
-      const tokenMint = accounts[3].pubkey.toString()
+      const ata = accounts[1].pubkey.toString();
+      const tokenMint = accounts[3].pubkey.toString();
       const tokenName =
         SPL_TOKENS[
           Object.keys(SPL_TOKENS).find(
-            (name) => SPL_TOKENS[name].mint?.toString() === tokenMint
+            (name) => SPL_TOKENS[name].mint?.toString() === tokenMint,
           )!
-        ].name ?? 'unknown'
+        ].name ?? 'unknown';
 
       return (
         <div className="flex flex-col">
@@ -37,7 +37,7 @@ export const ATA_PROGRAM_INSTRUCTIONS = {
             <span>{tokenName}</span>
           </div>
         </div>
-      )
+      );
     },
   },
-}
+};

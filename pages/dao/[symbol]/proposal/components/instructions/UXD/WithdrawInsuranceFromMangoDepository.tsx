@@ -1,15 +1,15 @@
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction'
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import createWithdrawInsuranceFromMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createWithdrawInsuranceFromMangoDepositoryInstruction';
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { WithdrawInsuranceFromMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
+} from '@tools/sdk/uxdProtocol/uxdClient';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { WithdrawInsuranceFromMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -22,14 +22,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Insurance Withdrawn amount should be more than 0')
     .required('Insurance Withdrawn amount is required'),
-})
+});
 
 const WithdrawInsuranceFromMangoDepository = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     connection,
@@ -50,10 +50,10 @@ const WithdrawInsuranceFromMangoDepository = ({
         governedAccountPubkey,
         form.collateralName!,
         form.insuranceName!,
-        form.insuranceWithdrawnAmount
-      )
+        form.insuranceWithdrawnAmount,
+      );
     },
-  })
+  });
 
   return (
     <>
@@ -95,7 +95,7 @@ const WithdrawInsuranceFromMangoDepository = ({
         error={formErrors['insuranceWithdrawnAmount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default WithdrawInsuranceFromMangoDepository
+export default WithdrawInsuranceFromMangoDepository;

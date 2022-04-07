@@ -1,15 +1,15 @@
-import create, { State } from 'zustand'
+import create, { State } from 'zustand';
 
 interface RouterHistoryStore extends State {
-  history: string[]
-  setHistory: (history: string[]) => void
+  history: string[];
+  setHistory: (history: string[]) => void;
 }
 
 const useRouterHistoryStore = create<RouterHistoryStore>((set, _get) => ({
   history: [],
   setHistory: (history) => {
-    set({ history: history })
+    set({ history: history });
   },
-}))
+}));
 
-export default useRouterHistoryStore
+export default useRouterHistoryStore;

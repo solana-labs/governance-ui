@@ -1,22 +1,22 @@
-import React from 'react'
-import useRealm from 'hooks/useRealm'
-import { CogIcon, GlobeAltIcon } from '@heroicons/react/outline'
-import { ArrowLeftIcon } from '@heroicons/react/solid'
-import Link from 'next/link'
-import { TwitterIcon } from './icons'
-import useQueryContext from 'hooks/useQueryContext'
-import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { getRealmExplorerHost } from 'tools/routing'
+import React from 'react';
+import useRealm from 'hooks/useRealm';
+import { CogIcon, GlobeAltIcon } from '@heroicons/react/outline';
+import { ArrowLeftIcon } from '@heroicons/react/solid';
+import Link from 'next/link';
+import { TwitterIcon } from './icons';
+import useQueryContext from 'hooks/useQueryContext';
+import { ExternalLinkIcon } from '@heroicons/react/outline';
+import { getRealmExplorerHost } from 'tools/routing';
 
 const RealmHeader = () => {
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { realmInfo, realmDisplayName, symbol } = useRealm()
-  const { REALM } = process.env
+  const { fmtUrlWithCluster } = useQueryContext();
+  const { realmInfo, realmDisplayName, symbol } = useRealm();
+  const { REALM } = process.env;
 
-  const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
+  const isBackNavVisible = realmInfo?.symbol !== REALM; // hide backnav for the default realm
 
-  const explorerHost = getRealmExplorerHost(realmInfo)
-  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`
+  const explorerHost = getRealmExplorerHost(realmInfo);
+  const realmUrl = `https://${explorerHost}/#/realm/${realmInfo?.realmId.toBase58()}?programId=${realmInfo?.programId.toBase58()}`;
 
   return (
     <div className="pb-4">
@@ -94,7 +94,7 @@ const RealmHeader = () => {
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default RealmHeader
+export default RealmHeader;

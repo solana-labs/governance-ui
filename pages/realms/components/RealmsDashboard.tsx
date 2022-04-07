@@ -1,34 +1,34 @@
-import useQueryContext from '@hooks/useQueryContext'
-import { RealmInfo } from '@models/registry/api'
-import { useRouter } from 'next/router'
-import React, { useMemo } from 'react'
+import useQueryContext from '@hooks/useQueryContext';
+import { RealmInfo } from '@models/registry/api';
+import { useRouter } from 'next/router';
+import React, { useMemo } from 'react';
 
 export default function RealmsDashboard({
   realms,
   isLoading,
 }: {
-  realms: readonly RealmInfo[]
-  isLoading: boolean
+  realms: readonly RealmInfo[];
+  isLoading: boolean;
 }) {
-  const router = useRouter()
-  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter();
+  const { fmtUrlWithCluster } = useQueryContext();
 
   const goToRealm = (realmInfo: RealmInfo) => {
     const symbol =
       realmInfo.isCertified && realmInfo.symbol
         ? realmInfo.symbol
-        : realmInfo.realmId.toBase58()
-    const url = fmtUrlWithCluster(`/dao/${symbol}`)
-    router.push(url)
-  }
+        : realmInfo.realmId.toBase58();
+    const url = fmtUrlWithCluster(`/dao/${symbol}`);
+    router.push(url);
+  };
 
   const certifiedRealms = useMemo(() => realms?.filter((r) => r.isCertified), [
     realms,
-  ])
+  ]);
 
   const unchartedRealms = useMemo(() => realms?.filter((r) => !r.isCertified), [
     realms,
-  ])
+  ]);
 
   return isLoading ? (
     <div className="grid grid-flow-row grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
@@ -109,5 +109,5 @@ export default function RealmsDashboard({
         </div>
       </div>
     </>
-  )
+  );
 }

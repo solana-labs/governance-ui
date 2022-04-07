@@ -1,172 +1,172 @@
-import { GovernanceAccountType } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
+import { GovernanceAccountType } from '@solana/spl-governance';
+import { MintInfo } from '@solana/spl-token';
 import {
   getMultipleAccountInfoChunked,
   GovernedMintInfoAccount,
   parseMintAccountData,
-} from '@utils/tokens'
+} from '@utils/tokens';
 import {
   InstructionEnum,
   PackageEnum,
-} from '@utils/uiTypes/proposalCreationTypes'
+} from '@utils/uiTypes/proposalCreationTypes';
 
-import useWalletStore from 'stores/useWalletStore'
+import useWalletStore from 'stores/useWalletStore';
 
-import useRealm from './useRealm'
-import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import useRealm from './useRealm';
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore';
 
-export type InstructionTag = 'beta' | 'deprecated'
+export type InstructionTag = 'beta' | 'deprecated';
 
 type Instruction = {
-  name: string
-  isVisible?: boolean
-  packageId: PackageEnum
-  tag?: InstructionTag
-}
+  name: string;
+  isVisible?: boolean;
+  packageId: PackageEnum;
+  tag?: InstructionTag;
+};
 
 type Instructions = {
-  [instructionId in InstructionEnum]: Instruction
-}
+  [instructionId in InstructionEnum]: Instruction;
+};
 
 export type InstructionType = {
-  id: InstructionEnum
-  name: string
-  packageId: PackageEnum
-  tag?: InstructionTag
-}
+  id: InstructionEnum;
+  name: string;
+  packageId: PackageEnum;
+  tag?: InstructionTag;
+};
 
 type Package = {
-  name: string
-  image?: string
-}
+  name: string;
+  image?: string;
+};
 
 type Packages = {
-  [packageId in PackageEnum]: Package
-}
+  [packageId in PackageEnum]: Package;
+};
 
 export type PackageType = Package & {
-  id: PackageEnum
-}
+  id: PackageEnum;
+};
 
 export default function useGovernanceAssets() {
-  const { ownVoterWeight, realm, symbol, governances } = useRealm()
-  const connection = useWalletStore((s) => s.connection.current)
+  const { ownVoterWeight, realm, symbol, governances } = useRealm();
+  const connection = useWalletStore((s) => s.connection.current);
   const governedTokenAccounts = useGovernanceAssetsStore(
-    (s) => s.governedTokenAccounts
-  )
-  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
+    (s) => s.governedTokenAccounts,
+  );
+  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray);
 
   const getGovernancesByAccountType = (type: GovernanceAccountType) => {
     const governancesFiltered = governancesArray.filter(
-      (gov) => gov.account?.accountType === type
-    )
-    return governancesFiltered
-  }
+      (gov) => gov.account?.accountType === type,
+    );
+    return governancesFiltered;
+  };
 
   const getGovernancesByAccountTypes = (types: GovernanceAccountType[]) => {
     const governancesFiltered = governancesArray.filter((gov) =>
-      types.some((t) => gov.account?.accountType === t)
-    )
-    return governancesFiltered
-  }
+      types.some((t) => gov.account?.accountType === t),
+    );
+    return governancesFiltered;
+  };
 
   function canUseGovernanceForInstruction(types: GovernanceAccountType[]) {
     return (
       realm &&
       getGovernancesByAccountTypes(types).some((govAcc) =>
-        ownVoterWeight.canCreateProposal(govAcc.account.config)
+        ownVoterWeight.canCreateProposal(govAcc.account.config),
       )
-    )
+    );
   }
   const canMintRealmCommunityToken = () => {
     const governances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
       GovernanceAccountType.MintGovernanceV2,
-    ])
+    ]);
     return !!governances.find((govAcc) =>
-      realm?.account.communityMint.equals(govAcc.account.governedAccount)
-    )
-  }
+      realm?.account.communityMint.equals(govAcc.account.governedAccount),
+    );
+  };
   const canMintRealmCouncilToken = () => {
     const governances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
       GovernanceAccountType.MintGovernanceV2,
-    ])
+    ]);
 
     return !!governances.find(
       (x) =>
         x.account.governedAccount.toBase58() ==
-        realm?.account.config.councilMint?.toBase58()
-    )
-  }
+        realm?.account.config.councilMint?.toBase58(),
+    );
+  };
   // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
   const canUseTransferInstruction = canUseGovernanceForInstruction([
     GovernanceAccountType.TokenGovernanceV1,
     GovernanceAccountType.TokenGovernanceV2,
-  ])
+  ]);
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
-  ])
+  ]);
 
   const canUseMintInstruction = canUseGovernanceForInstruction([
     GovernanceAccountType.MintGovernanceV1,
     GovernanceAccountType.MintGovernanceV2,
-  ])
+  ]);
 
   const canUseUxdInstructions =
     symbol === 'UXP' &&
     canUseGovernanceForInstruction([
       GovernanceAccountType.ProgramGovernanceV1,
       GovernanceAccountType.ProgramGovernanceV2,
-    ])
+    ]);
 
   const canUseAnyInstruction =
     realm &&
     governancesArray.some((gov) =>
-      ownVoterWeight.canCreateProposal(gov.account.config)
-    )
+      ownVoterWeight.canCreateProposal(gov.account.config),
+    );
 
   async function getMintWithGovernances() {
     const mintGovernances = getGovernancesByAccountTypes([
       GovernanceAccountType.MintGovernanceV1,
       GovernanceAccountType.MintGovernanceV2,
-    ])
-    const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
+    ]);
+    const governedMintInfoAccounts: GovernedMintInfoAccount[] = [];
     const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
       connection,
-      mintGovernances.map((x) => x.account.governedAccount)
-    )
+      mintGovernances.map((x) => x.account.governedAccount),
+    );
     mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
-      const governance = mintGovernances[index]
+      const governance = mintGovernances[index];
       if (!mintAccountInfo) {
         throw new Error(
-          `Missing mintAccountInfo for: ${governance.pubkey.toBase58()}`
-        )
+          `Missing mintAccountInfo for: ${governance.pubkey.toBase58()}`,
+        );
       }
-      const data = Buffer.from(mintAccountInfo.data)
-      const parsedMintInfo = parseMintAccountData(data) as MintInfo
+      const data = Buffer.from(mintAccountInfo.data);
+      const parsedMintInfo = parseMintAccountData(data) as MintInfo;
       const obj = {
         governance,
         mintInfo: parsedMintInfo,
-      }
-      governedMintInfoAccounts.push(obj)
-    })
-    return governedMintInfoAccounts
+      };
+      governedMintInfoAccounts.push(obj);
+    });
+    return governedMintInfoAccounts;
   }
 
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
-    (x) => !x.isNft
-  )
+    (x) => !x.isNft,
+  );
   const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (govTokenAcc) => govTokenAcc.isNft
-  )
+    (govTokenAcc) => govTokenAcc.isNft,
+  );
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
     (acc) =>
       acc.governance &&
-      ownVoterWeight.canCreateProposal(acc.governance?.account?.config)
-  )
+      ownVoterWeight.canCreateProposal(acc.governance?.account?.config),
+  );
 
   const packages: Packages = {
     [PackageEnum.Native]: {
@@ -204,7 +204,7 @@ export default function useGovernanceAssets() {
       name: 'Socean',
       image: '/img/socean.png',
     },
-  }
+  };
 
   const instructions: Instructions = {
     [InstructionEnum.TribecaCreateEpochGauge]: {
@@ -425,7 +425,7 @@ export default function useGovernanceAssets() {
       isVisible: !!(
         realm &&
         Object.values(governances).some((g) =>
-          ownVoterWeight.canCreateProposal(g.account.config)
+          ownVoterWeight.canCreateProposal(g.account.config),
         )
       ),
       packageId: PackageEnum.Native,
@@ -455,31 +455,31 @@ export default function useGovernanceAssets() {
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXDStaking,
     },
-  }
+  };
 
   const availableInstructions = Object.entries(instructions)
     .filter(
-      ([, { isVisible }]) => typeof isVisible === 'undefined' || isVisible
+      ([, { isVisible }]) => typeof isVisible === 'undefined' || isVisible,
     )
     .map(([id, { name, packageId, tag }]) => ({
       id: Number(id) as InstructionEnum,
       name,
       packageId,
       tag,
-    }))
+    }));
 
   const availablePackages: PackageType[] = Object.entries(packages).map(
     ([id, infos]) => ({
       id: Number(id) as PackageEnum,
       ...infos,
-    })
-  )
+    }),
+  );
 
   const getPackageTypeById = (packageId: PackageEnum) => {
     return availablePackages.find(
-      (availablePackage) => availablePackage.id === packageId
-    )
-  }
+      (availablePackage) => availablePackage.id === packageId,
+    );
+  };
 
   return {
     governancesArray,
@@ -497,5 +497,5 @@ export default function useGovernanceAssets() {
     canUseProgramUpgradeInstruction,
     governedTokenAccountsWithoutNfts,
     nftsGovernedTokenAccounts,
-  }
+  };
 }

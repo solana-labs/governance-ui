@@ -1,16 +1,16 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens';
 
 export async function createCloseProgramAccountInstruction(
   programId: PublicKey,
   receiver: PublicKey,
-  signer: PublicKey
+  signer: PublicKey,
 ): Promise<TransactionInstruction> {
-  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID
+  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID;
   const [programDataAddress] = await PublicKey.findProgramAddress(
     [programId.toBuffer()],
-    bpfUpgradableLoaderId
-  )
+    bpfUpgradableLoaderId,
+  );
 
   const keys = [
     {
@@ -33,11 +33,11 @@ export async function createCloseProgramAccountInstruction(
       isWritable: true,
       isSigner: false,
     },
-  ]
+  ];
 
   return new TransactionInstruction({
     keys,
     programId: bpfUpgradableLoaderId,
     data: Buffer.from([5, 0, 0, 0]), // CloseAccount instruction bincode
-  })
+  });
 }

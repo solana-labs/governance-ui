@@ -3,4 +3,4 @@ module.exports = {
     tailwindcss: {},
     'postcss-preset-env': { stage: 1 },
   },
-}
+};

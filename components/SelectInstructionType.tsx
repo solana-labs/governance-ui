@@ -1,10 +1,10 @@
-import Select from '@components/inputs/Select'
+import Select from '@components/inputs/Select';
 import useGovernanceAssets, {
   InstructionType,
-} from '@hooks/useGovernanceAssets'
-import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
-import { useCallback, useEffect, useState } from 'react'
-import PackageSelection from './PackageSelection'
+} from '@hooks/useGovernanceAssets';
+import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes';
+import { useCallback, useEffect, useState } from 'react';
+import PackageSelection from './PackageSelection';
 
 const SelectInstructionType = ({
   idx,
@@ -12,63 +12,63 @@ const SelectInstructionType = ({
   selectedInstruction,
   onChange,
 }: {
-  idx: number
-  selectedInstruction?: InstructionType
-  instructionTypes: InstructionType[]
+  idx: number;
+  selectedInstruction?: InstructionType;
+  instructionTypes: InstructionType[];
 
   onChange: ({
     instructionType,
     idx,
   }: {
-    instructionType: InstructionType | null
-    idx: number
-  }) => void
+    instructionType: InstructionType | null;
+    idx: number;
+  }) => void;
 }) => {
-  const [packageId, setPackageId] = useState<PackageEnum | null>(null)
-  const { availablePackages, getPackageTypeById } = useGovernanceAssets()
+  const [packageId, setPackageId] = useState<PackageEnum | null>(null);
+  const { availablePackages, getPackageTypeById } = useGovernanceAssets();
 
   const [filteredInstructionTypes, setFilteredInstructionTypes] = useState<
     InstructionType[]
-  >([])
+  >([]);
 
   const computeFilteredInstructionsTypes = useCallback(() => {
     if (packageId === null) {
-      setFilteredInstructionTypes(instructionTypes)
+      setFilteredInstructionTypes(instructionTypes);
 
       // Select first instruction by default
       if (instructionTypes.length && !selectedInstruction) {
-        onChange({ instructionType: instructionTypes[0], idx })
+        onChange({ instructionType: instructionTypes[0], idx });
       }
 
-      return
+      return;
     }
 
     if (selectedInstruction && selectedInstruction.packageId !== packageId) {
-      onChange({ instructionType: null, idx })
+      onChange({ instructionType: null, idx });
     }
 
     const filteredInstructionTypes = instructionTypes.filter(
-      (instructionType) => instructionType.packageId === packageId
-    )
+      (instructionType) => instructionType.packageId === packageId,
+    );
 
     // Select first instruction by default
     if (filteredInstructionTypes.length && !selectedInstruction) {
-      onChange({ instructionType: filteredInstructionTypes[0], idx })
+      onChange({ instructionType: filteredInstructionTypes[0], idx });
     }
 
-    setFilteredInstructionTypes(filteredInstructionTypes)
-  }, [packageId, instructionTypes])
+    setFilteredInstructionTypes(filteredInstructionTypes);
+  }, [packageId, instructionTypes]);
 
   useEffect(() => {
-    computeFilteredInstructionsTypes()
-  }, [computeFilteredInstructionsTypes])
+    computeFilteredInstructionsTypes();
+  }, [computeFilteredInstructionsTypes]);
 
   // Only display the package name is a no package is selected
   const getInstructionDisplayName = (
-    instruction?: InstructionType
+    instruction?: InstructionType,
   ): string | JSX.Element => {
     if (!instruction) {
-      return ''
+      return '';
     }
 
     return (
@@ -87,8 +87,8 @@ const SelectInstructionType = ({
           </span>
         ) : null}
       </>
-    )
-  }
+    );
+  };
 
   return (
     <div>
@@ -106,11 +106,11 @@ const SelectInstructionType = ({
           onClick={(selectedPackageId: PackageEnum) => {
             // Clicking on selected packageName unselect it
             if (selectedPackageId === packageId) {
-              setPackageId(null)
-              return
+              setPackageId(null);
+              return;
             }
 
-            setPackageId(selectedPackageId)
+            setPackageId(selectedPackageId);
           }}
         />
       </div>
@@ -135,7 +135,7 @@ const SelectInstructionType = ({
         ))}
       </Select>
     </div>
-  )
-}
+  );
+};
 
-export default SelectInstructionType
+export default SelectInstructionType;

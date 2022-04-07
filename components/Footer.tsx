@@ -1,11 +1,11 @@
-import DiscordIcon from './DiscordIcon'
-import GithubIcon from './GithubIcon'
-import TwitterIcon from './TwitterIcon'
+import DiscordIcon from './DiscordIcon';
+import GithubIcon from './GithubIcon';
+import TwitterIcon from './TwitterIcon';
 
 const Footer = () => {
-  const { REALM } = process.env
+  const { REALM } = process.env;
 
-  if (REALM) return null
+  if (REALM) return null;
   else
     return (
       <div className="flex flex-row h-20   justify-around bottom-0 bg-bkg-1 gap-y-8 md:gap-y-0 w-full absolute left-0  px-12 border-t border-primary-light">
@@ -72,7 +72,7 @@ const Footer = () => {
           </a>
         </div>
       </div>
-    )
-}
+    );
+};
 
-export default Footer
+export default Footer;

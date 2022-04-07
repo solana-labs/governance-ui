@@ -1,19 +1,19 @@
-import React from 'react'
-import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
+import React from 'react';
+import * as yup from 'yup';
+import { PublicKey } from '@solana/web3.js';
 
-import { SetProgramAuthorityForm } from '@utils/uiTypes/proposalCreationTypes'
-import Input from '@components/inputs/Input'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import createSetProgramAuthorityInstruction from '@tools/sdk/bpfUpgradeableLoader/createSetProgramAuthorityInstruction'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
+import { SetProgramAuthorityForm } from '@utils/uiTypes/proposalCreationTypes';
+import Input from '@components/inputs/Input';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import createSetProgramAuthorityInstruction from '@tools/sdk/bpfUpgradeableLoader/createSetProgramAuthorityInstruction';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 
 const SetProgramAuthority = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -36,18 +36,18 @@ const SetProgramAuthority = ({
 
     buildInstruction: async function () {
       if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
+        throw new Error('Governance must be a Program Account Governance');
       }
       if (!form.destinationAuthority) {
-        throw new Error('missing form input: destination authority')
+        throw new Error('missing form input: destination authority');
       }
       return createSetProgramAuthorityInstruction(
         form.governedAccount!.governance.account.governedAccount,
         form.governedAccount!.governance.pubkey,
-        new PublicKey(form.destinationAuthority)
-      )
+        new PublicKey(form.destinationAuthority),
+      );
     },
-  })
+  });
 
   return (
     <Input
@@ -62,7 +62,7 @@ const SetProgramAuthority = ({
       }
       error={formErrors['destinationAuthority']}
     />
-  )
-}
+  );
+};
 
-export default SetProgramAuthority
+export default SetProgramAuthority;

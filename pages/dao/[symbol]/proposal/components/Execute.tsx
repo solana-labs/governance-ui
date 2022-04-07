@@ -1,30 +1,30 @@
-import React from 'react'
-import { RpcContext } from '@solana/spl-governance'
-import useWalletStore from 'stores/useWalletStore'
-import useRealm from 'hooks/useRealm'
-import Button, { SecondaryButton } from '@components/Button'
-import { notify } from 'utils/notifications'
-import Modal from '@components/Modal'
-import { executeTransaction } from 'actions/executeTransaction'
-import { ProposalTransaction } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { getProgramVersionForRealm } from '@models/registry/api'
+import React from 'react';
+import { RpcContext } from '@solana/spl-governance';
+import useWalletStore from 'stores/useWalletStore';
+import useRealm from 'hooks/useRealm';
+import Button, { SecondaryButton } from '@components/Button';
+import { notify } from 'utils/notifications';
+import Modal from '@components/Modal';
+import { executeTransaction } from 'actions/executeTransaction';
+import { ProposalTransaction } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { getProgramVersionForRealm } from '@models/registry/api';
 
 type ExecuteInstructionProps = {
-  onClose: () => void
-  isOpen: boolean
-  instruction: ProgramAccount<ProposalTransaction> | any
-}
+  onClose: () => void;
+  isOpen: boolean;
+  instruction: ProgramAccount<ProposalTransaction> | any;
+};
 
 const ExecuteInstruction = ({
   onClose,
   isOpen,
   instruction,
 }: ExecuteInstructionProps) => {
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { realmInfo } = useRealm()
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
+  const { proposal } = useWalletStore((s) => s.selectedProposal);
+  const { realmInfo } = useRealm();
 
   const handleExecuteInstruction = async () => {
     try {
@@ -34,24 +34,24 @@ const ExecuteInstruction = ({
           getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
-          connection.endpoint
-        )
+          connection.endpoint,
+        );
 
-        await executeTransaction(rpcContext, proposal, instruction)
+        await executeTransaction(rpcContext, proposal, instruction);
 
-        onClose()
+        onClose();
       }
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not execute instruction.`,
-      })
+      });
 
-      console.log('error executing instruction', error)
+      console.log('error executing instruction', error);
 
-      onClose()
+      onClose();
     }
-  }
+  };
 
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
@@ -69,7 +69,7 @@ const ExecuteInstruction = ({
         </Button>
       </div>
     </Modal>
-  )
-}
+  );
+};
 
-export default ExecuteInstruction
+export default ExecuteInstruction;

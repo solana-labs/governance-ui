@@ -1,9 +1,9 @@
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { SetMangoDepositoriesRedeemableSoftCapForm } from '@utils/uiTypes/proposalCreationTypes'
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import createSetMangoDepositoriesRedeemableSoftCapInstruction from '@tools/sdk/uxdProtocol/createSetMangoDepositoriesRedeemableSoftCapInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { SetMangoDepositoriesRedeemableSoftCapForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -14,14 +14,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Redeemable soft cap should be more than 0')
     .required('Redeemable soft cap is required'),
-})
+});
 
 const SetMangoDepositoriesRedeemableSoftCap = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -38,10 +38,10 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       return createSetMangoDepositoriesRedeemableSoftCapInstruction(
         form.governedAccount!.governance.account.governedAccount,
         form.softCap,
-        governedAccountPubkey
-      )
+        governedAccountPubkey,
+      );
     },
-  })
+  });
 
   return (
     <Input
@@ -57,7 +57,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
       }
       error={formErrors['softCap']}
     />
-  )
-}
+  );
+};
 
-export default SetMangoDepositoriesRedeemableSoftCap
+export default SetMangoDepositoriesRedeemableSoftCap;

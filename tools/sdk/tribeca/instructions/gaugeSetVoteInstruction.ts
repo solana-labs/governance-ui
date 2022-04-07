@@ -1,7 +1,7 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '../ATribecaConfiguration'
+} from '../ATribecaConfiguration';
 
 export async function gaugeSetVoteInstruction({
   weight,
@@ -10,20 +10,20 @@ export async function gaugeSetVoteInstruction({
   authority,
   tribecaConfiguration,
 }: {
-  weight: number
-  programs: TribecaPrograms
-  gauge: PublicKey
-  authority: PublicKey
-  tribecaConfiguration: ATribecaConfiguration
+  weight: number;
+  programs: TribecaPrograms;
+  gauge: PublicKey;
+  authority: PublicKey;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
-  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow)
+  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow);
 
   const [gaugeVote] = await tribecaConfiguration.findGaugeVoteAddress(
     gaugeVoter,
-    gauge
-  )
+    gauge,
+  );
 
   console.log('Gauge Set Vote', {
     escrow: escrow.toString(),
@@ -31,7 +31,7 @@ export async function gaugeSetVoteInstruction({
     gaugeVoter: gaugeVoter.toString(),
     gaugeVote: gaugeVote.toString(),
     gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
-  })
+  });
 
   return programs.Gauge.instruction.gaugeSetVote(weight, {
     accounts: {
@@ -42,5 +42,5 @@ export async function gaugeSetVoteInstruction({
       gaugeVote,
       voteDelegate: authority,
     },
-  })
+  });
 }

@@ -1,14 +1,14 @@
-import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline'
-import React from 'react'
-import { Pagination } from 'react-headless-pagination'
+import { ArrowLeftIcon, ArrowRightIcon } from '@heroicons/react/outline';
+import React from 'react';
+import { Pagination } from 'react-headless-pagination';
 
 const PaginationComponent = ({ totalPages = 5, onPageChange }) => {
-  const [page, setPage] = React.useState<number>(0)
+  const [page, setPage] = React.useState<number>(0);
 
   const handlePageChange = (page: number) => {
-    setPage(page)
-    onPageChange(page)
-  }
+    setPage(page);
+    onPageChange(page);
+  };
 
   return (
     <>
@@ -43,7 +43,7 @@ const PaginationComponent = ({ totalPages = 5, onPageChange }) => {
         </Pagination>
       ) : null}
     </>
-  )
-}
+  );
+};
 
-export default PaginationComponent
+export default PaginationComponent;

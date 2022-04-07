@@ -1,12 +1,12 @@
-import BN from 'bn.js'
-import dayjs from 'dayjs'
-import { PublicKey } from '@solana/web3.js'
-const relativeTime = require('dayjs/plugin/relativeTime')
+import BN from 'bn.js';
+import dayjs from 'dayjs';
+import { PublicKey } from '@solana/web3.js';
+const relativeTime = require('dayjs/plugin/relativeTime');
 
-const votePrecision = 10000
+const votePrecision = 10000;
 export const calculatePct = (c: BN = new BN(0), total?: BN) => {
   if (total?.isZero()) {
-    return 0
+    return 0;
   }
 
   return (
@@ -15,28 +15,28 @@ export const calculatePct = (c: BN = new BN(0), total?: BN) => {
       .div(total ?? new BN(1))
       .toNumber() *
     (100 / votePrecision)
-  )
-}
+  );
+};
 
 export const fmtTokenAmount = (c: BN = new BN(0), decimals?: number) =>
-  c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber()
+  c.div(new BN(10).pow(new BN(decimals ?? 0))).toNumber();
 
-dayjs.extend(relativeTime)
+dayjs.extend(relativeTime);
 //@ts-ignore
-export const fmtUnixTime = (d: BN) => dayjs(d.toNumber() * 1000).fromNow()
+export const fmtUnixTime = (d: BN) => dayjs(d.toNumber() * 1000).fromNow();
 
 export function abbreviateAddress(address: PublicKey, size = 5) {
-  const base58 = address.toBase58()
-  return base58.slice(0, size) + '…' + base58.slice(-size)
+  const base58 = address.toBase58();
+  return base58.slice(0, size) + '…' + base58.slice(-size);
 }
 
 export function precision(a) {
-  if (!isFinite(a)) return 0
+  if (!isFinite(a)) return 0;
   let e = 1,
-    p = 0
+    p = 0;
   while (Math.round(a * e) / e !== a) {
-    e *= 10
-    p++
+    e *= 10;
+    p++;
   }
-  return p
+  return p;
 }

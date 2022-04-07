@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react';
 
 interface GovernedAccountsTabsProps {
-  activeTab: any
-  onChange: (x) => void
-  tabs: Array<any>
+  activeTab: any;
+  onChange: (x) => void;
+  tabs: Array<any>;
 }
 
 const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
@@ -18,15 +18,15 @@ const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
         style={{
           transform: `translateY(${
             tabs.findIndex(
-              (t) => t.pubkey.toBase58() === activeTab?.pubkey.toBase58()
+              (t) => t.pubkey.toBase58() === activeTab?.pubkey.toBase58(),
             ) * 100
           }%)`,
           height: `${100 / tabs.length}%`,
         }}
       />
       {tabs.map((x) => {
-        const pubKey = x.pubkey
-        const activePubKey = activeTab?.pubkey
+        const pubKey = x.pubkey;
+        const activePubKey = activeTab?.pubkey;
         return (
           <button
             key={pubKey}
@@ -48,10 +48,10 @@ const GovernedAccountsTabs: FunctionComponent<GovernedAccountsTabsProps> = ({
               )} */}
             </div>
           </button>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default GovernedAccountsTabs
+export default GovernedAccountsTabs;

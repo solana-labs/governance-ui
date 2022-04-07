@@ -1,23 +1,23 @@
-import { ProgramAccount } from '@project-serum/anchor'
-import { MintInfo } from '@solana/spl-token'
-import { PublicKey } from '@solana/web3.js'
-import React from 'react'
+import { ProgramAccount } from '@project-serum/anchor';
+import { MintInfo } from '@solana/spl-token';
+import { PublicKey } from '@solana/web3.js';
+import React from 'react';
 
 /**
  * Default realm artifact interface
  */
 export interface RealmArtifacts {
-  governanceProgramId?: string
-  name?: string
-  communityMintId?: string
-  communityMint?: ProgramAccount<MintInfo>
-  transferAuthority?: boolean
-  councilMintId?: string
-  councilMint?: ProgramAccount<MintInfo>
-  communityMintMaxVoteWeightSource?: string
-  minCommunityTokensToCreateGovernance?: string
-  teamWallets?: string[]
-  yesThreshold?: number
+  governanceProgramId?: string;
+  name?: string;
+  communityMintId?: string;
+  communityMint?: ProgramAccount<MintInfo>;
+  transferAuthority?: boolean;
+  councilMintId?: string;
+  councilMint?: ProgramAccount<MintInfo>;
+  communityMintMaxVoteWeightSource?: string;
+  minCommunityTokensToCreateGovernance?: string;
+  teamWallets?: string[];
+  yesThreshold?: number;
 }
 
 /**
@@ -78,20 +78,20 @@ export enum StepDirection {
 }
 
 export interface RealmWizardStepComponentProps {
-  form: RealmArtifacts
-  setForm: (data: RealmArtifacts) => void
-  beforeClickNext?: React.Dispatch<(...args) => boolean>
-  [key: string]: any
+  form: RealmArtifacts;
+  setForm: (data: RealmArtifacts) => void;
+  beforeClickNext?: React.Dispatch<(...args) => boolean>;
+  [key: string]: any;
 }
 
 export interface RealmProps {
-  address?: string
-  tx: number
-  realmName: string
-  communityMintAddress: PublicKey
-  councilMintAddress: PublicKey
+  address?: string;
+  tx: number;
+  realmName: string;
+  communityMintAddress: PublicKey;
+  councilMintAddress: PublicKey;
   tokenGovernance: {
-    tokenAccountAddress: string
-    beneficiaryTokenAccountAddress: string
-  }
+    tokenAccountAddress: string;
+    beneficiaryTokenAccountAddress: string;
+  };
 }

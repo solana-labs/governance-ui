@@ -1,14 +1,14 @@
-import * as yup from 'yup'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction'
+import * as yup from 'yup';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import createRegisterMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createRegisterMangoDepositoryInstruction';
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { RegisterMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
+} from '@tools/sdk/uxdProtocol/uxdClient';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { RegisterMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -17,14 +17,14 @@ const schema = yup.object().shape({
     .required('Governance account is required'),
   collateralName: yup.string().required('Valid Collateral name is required'),
   insuranceName: yup.string().required('Valid Insurance name is required'),
-})
+});
 
 const RegisterMangoDepository = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     connection,
@@ -44,10 +44,10 @@ const RegisterMangoDepository = ({
         governedAccountPubkey,
         wallet.publicKey!,
         form.collateralName!,
-        form.insuranceName!
-      )
+        form.insuranceName!,
+      );
     },
-  })
+  });
 
   return (
     <>
@@ -75,7 +75,7 @@ const RegisterMangoDepository = ({
         <SelectOptionList list={getInsuranceMintSymbols(connection.cluster)} />
       </Select>
     </>
-  )
-}
+  );
+};
 
-export default RegisterMangoDepository
+export default RegisterMangoDepository;

@@ -1,13 +1,13 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@project-serum/anchor';
 import {
   findAuctionAuthority,
   findAuctionPool,
-} from '@soceanfi/descending-auction'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
-import soceanConfiguration from '../configuration'
-import { DescendingAuctionProgram } from '../programs'
+} from '@soceanfi/descending-auction';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
+import soceanConfiguration from '../configuration';
+import { DescendingAuctionProgram } from '../programs';
 
 export async function purchase({
   cluster,
@@ -22,29 +22,29 @@ export async function purchase({
   expectedPayment,
   slippageTolerance,
 }: {
-  cluster: EndpointTypes
-  program: DescendingAuctionProgram
-  auction: PublicKey
-  bondedMint: PublicKey
-  paymentDestination: PublicKey
-  buyer: PublicKey
-  paymentSource: PublicKey
-  saleDestination: PublicKey
-  purchaseAmount: BN
-  expectedPayment: BN
-  slippageTolerance: BN
+  cluster: EndpointTypes;
+  program: DescendingAuctionProgram;
+  auction: PublicKey;
+  bondedMint: PublicKey;
+  paymentDestination: PublicKey;
+  buyer: PublicKey;
+  paymentSource: PublicKey;
+  saleDestination: PublicKey;
+  purchaseAmount: BN;
+  expectedPayment: BN;
+  slippageTolerance: BN;
 }): Promise<TransactionInstruction> {
   const descendingAuctionProgramId =
-    soceanConfiguration.descendingAuctionProgramId[cluster]
+    soceanConfiguration.descendingAuctionProgramId[cluster];
 
   if (!descendingAuctionProgramId) {
-    throw new Error('unsupported cluster to create closeAuction instruction')
+    throw new Error('unsupported cluster to create closeAuction instruction');
   }
 
   const [[auctionAuthority], [auctionPool]] = await Promise.all([
     findAuctionAuthority(descendingAuctionProgramId, auction),
     findAuctionPool(descendingAuctionProgramId, auction, bondedMint),
-  ])
+  ]);
 
   console.log('Purchase tx', {
     auction: auction.toString(),
@@ -57,7 +57,7 @@ export async function purchase({
     purchaseAmount: purchaseAmount.toString(),
     expectedPayment: expectedPayment.toString(),
     slippageTolerance: slippageTolerance.toString(),
-  })
+  });
 
   return program.instruction.purchase(
     purchaseAmount,
@@ -75,6 +75,6 @@ export async function purchase({
         saleDestination,
         tokenProgram: TOKEN_PROGRAM_ID,
       },
-    }
-  )
+    },
+  );
 }

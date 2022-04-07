@@ -1,17 +1,17 @@
-import { BookOpenIcon } from '@heroicons/react/solid'
-import { HotWalletAccount } from '@hooks/useHotWallet'
-import useHotWalletPluginTokenAccounts from '@hooks/useHotWalletPluginTokenAccounts'
-import TokenAccount from './TokenAccount'
+import { BookOpenIcon } from '@heroicons/react/solid';
+import { HotWalletAccount } from '@hooks/useHotWallet';
+import useHotWalletPluginTokenAccounts from '@hooks/useHotWalletPluginTokenAccounts';
+import TokenAccount from './TokenAccount';
 
 const HotWalletPluginTokenAccounts = ({
   hotWalletAccount,
 }: {
-  hotWalletAccount: HotWalletAccount
+  hotWalletAccount: HotWalletAccount;
 }) => {
-  const { tokenAccounts } = useHotWalletPluginTokenAccounts(hotWalletAccount)
+  const { tokenAccounts } = useHotWalletPluginTokenAccounts(hotWalletAccount);
 
   if (!hotWalletAccount) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -33,7 +33,7 @@ const HotWalletPluginTokenAccounts = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default HotWalletPluginTokenAccounts
+export default HotWalletPluginTokenAccounts;

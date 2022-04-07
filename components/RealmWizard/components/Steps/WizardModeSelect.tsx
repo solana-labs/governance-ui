@@ -1,8 +1,8 @@
-import React from 'react'
-import { RealmWizardMode } from '@components/RealmWizard/interfaces/Realm'
+import React from 'react';
+import { RealmWizardMode } from '@components/RealmWizard/interfaces/Realm';
 
 const WizardModeSelect: React.FC<{
-  onSelect: (option: number) => void
+  onSelect: (option: number) => void;
 }> = ({ onSelect }) => {
   return (
     <>
@@ -14,7 +14,7 @@ const WizardModeSelect: React.FC<{
           <div
             className="border rounded px-5 py-3 w-6/12 hover:bg-bkg-3"
             onClick={() => {
-              onSelect(RealmWizardMode.BASIC)
+              onSelect(RealmWizardMode.BASIC);
             }}
           >
             <h2 className="mb-0">
@@ -31,7 +31,7 @@ const WizardModeSelect: React.FC<{
           <div
             className="border rounded px-5 py-3 w-6/12 hover:bg-bkg-3 pointer"
             onClick={() => {
-              onSelect(RealmWizardMode.ADVANCED)
+              onSelect(RealmWizardMode.ADVANCED);
             }}
           >
             <h2 className="mb-0">
@@ -57,7 +57,7 @@ const WizardModeSelect: React.FC<{
         </a>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default WizardModeSelect
+export default WizardModeSelect;

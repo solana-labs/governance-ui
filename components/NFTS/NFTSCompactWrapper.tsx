@@ -1,25 +1,25 @@
-import { getExplorerUrl } from '@components/explorer/tools'
-import ImgWithLoader from '@components/ImgWithLoader'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
-import { PhotographIcon } from '@heroicons/react/outline'
-import { ChevronRightIcon } from '@heroicons/react/solid'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { useRouter } from 'next/router'
-import React from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
-import { LinkButton } from '@components/Button'
+import { getExplorerUrl } from '@components/explorer/tools';
+import ImgWithLoader from '@components/ImgWithLoader';
+import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools';
+import { PhotographIcon } from '@heroicons/react/outline';
+import { ChevronRightIcon } from '@heroicons/react/solid';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import { useRouter } from 'next/router';
+import React from 'react';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import useWalletStore from 'stores/useWalletStore';
+import { LinkButton } from '@components/Button';
 
 const NFTSCompactWrapper = () => {
-  const router = useRouter()
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
-  const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
-  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
-  const { symbol } = useRealm()
-  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter();
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets();
+  const connection = useWalletStore((s) => s.connection);
+  const realmNfts = useTreasuryAccountStore((s) => s.allNfts);
+  const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts);
+  const { symbol } = useRealm();
+  const { fmtUrlWithCluster } = useQueryContext();
   return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between pb-4">
@@ -28,9 +28,9 @@ const NFTSCompactWrapper = () => {
           className={`flex items-center text-primary-light`}
           onClick={() => {
             const url = fmtUrlWithCluster(
-              `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
-            )
-            router.push(url)
+              `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`,
+            );
+            router.push(url);
           }}
         >
           View
@@ -73,7 +73,7 @@ const NFTSCompactWrapper = () => {
         </div>
       </div>
     </div>
-  ) : null
-}
+  ) : null;
+};
 
-export default NFTSCompactWrapper
+export default NFTSCompactWrapper;

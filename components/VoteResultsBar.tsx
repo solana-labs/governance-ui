@@ -1,7 +1,7 @@
 type VoteResultsBarProps = {
-  approveVotePercentage: number
-  denyVotePercentage: number
-}
+  approveVotePercentage: number;
+  denyVotePercentage: number;
+};
 
 const VoteResultsBar = ({
   approveVotePercentage = 0,
@@ -36,7 +36,7 @@ const VoteResultsBar = ({
         ></div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default VoteResultsBar
+export default VoteResultsBar;

@@ -1,12 +1,12 @@
 import {
   findAuctionAuthority,
   findAuctionPool,
-} from '@soceanfi/descending-auction'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
-import soceanConfiguration from '../configuration'
-import { DescendingAuctionProgram } from '../programs/descendingAuction'
+} from '@soceanfi/descending-auction';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
+import soceanConfiguration from '../configuration';
+import { DescendingAuctionProgram } from '../programs/descendingAuction';
 
 export async function closeAuction({
   cluster,
@@ -16,24 +16,24 @@ export async function closeAuction({
   bondedMint,
   destinationAccount,
 }: {
-  cluster: EndpointTypes
-  program: DescendingAuctionProgram
-  auction: PublicKey
-  authority: PublicKey
-  bondedMint: PublicKey
-  destinationAccount: PublicKey
+  cluster: EndpointTypes;
+  program: DescendingAuctionProgram;
+  auction: PublicKey;
+  authority: PublicKey;
+  bondedMint: PublicKey;
+  destinationAccount: PublicKey;
 }): Promise<TransactionInstruction> {
   const descendingAuctionProgramId =
-    soceanConfiguration.descendingAuctionProgramId[cluster]
+    soceanConfiguration.descendingAuctionProgramId[cluster];
 
   if (!descendingAuctionProgramId) {
-    throw new Error('unsupported cluster to create closeAuction instruction')
+    throw new Error('unsupported cluster to create closeAuction instruction');
   }
 
   const [[auctionAuthority], [auctionPool]] = await Promise.all([
     findAuctionAuthority(descendingAuctionProgramId, auction),
     findAuctionPool(descendingAuctionProgramId, auction, bondedMint),
-  ])
+  ]);
 
   console.log('closeAuction', {
     auction: auction.toString(),
@@ -41,7 +41,7 @@ export async function closeAuction({
     auctionAuthority: auctionAuthority.toString(),
     authority: authority.toString(),
     destinationAccount: destinationAccount.toString(),
-  })
+  });
 
   return program.instruction.closeAuction({
     accounts: {
@@ -52,5 +52,5 @@ export async function closeAuction({
       destinationAccount,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
-  })
+  });
 }

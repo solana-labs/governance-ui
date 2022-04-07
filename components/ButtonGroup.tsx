@@ -1,12 +1,12 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react';
 
 interface ButtonGroupProps {
-  activeValue: string
-  className?: string
-  onChange: (x) => void
-  unit?: string
-  values: Array<string>
-  names?: Array<string>
+  activeValue: string;
+  className?: string;
+  onChange: (x) => void;
+  unit?: string;
+  values: Array<string>;
+  names?: Array<string>;
 }
 
 const ButtonGroup: FunctionComponent<ButtonGroupProps> = ({
@@ -51,7 +51,7 @@ const ButtonGroup: FunctionComponent<ButtonGroupProps> = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ButtonGroup
+export default ButtonGroup;

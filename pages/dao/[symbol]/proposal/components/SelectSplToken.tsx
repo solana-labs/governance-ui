@@ -1,5 +1,5 @@
-import Select from '@components/inputs/Select'
-import { SPL_TOKENS, SupportedSplTokenNames } from '@utils/splTokens'
+import Select from '@components/inputs/Select';
+import { SPL_TOKENS, SupportedSplTokenNames } from '@utils/splTokens';
 
 const SelectSplToken = ({
   label,
@@ -7,10 +7,10 @@ const SelectSplToken = ({
   onChange,
   error,
 }: {
-  label: string
-  selectedValue?: string
-  onChange: (value: SupportedSplTokenNames) => void
-  error?: string
+  label: string;
+  selectedValue?: string;
+  onChange: (value: SupportedSplTokenNames) => void;
+  error?: string;
 }) => (
   <Select
     label={label}
@@ -29,6 +29,6 @@ const SelectSplToken = ({
       </Select.Option>
     ))}
   </Select>
-)
+);
 
-export default SelectSplToken
+export default SelectSplToken;

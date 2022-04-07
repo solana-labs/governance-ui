@@ -1,13 +1,13 @@
-import { PublicKey } from '@solana/web3.js'
-import CommandLineInfo from '../../ComandLineInfo'
+import { PublicKey } from '@solana/web3.js';
+import CommandLineInfo from '../../ComandLineInfo';
 
 export default function ProgramUpgradeInfo({
   governancePk,
 }: {
-  governancePk: PublicKey | undefined
+  governancePk: PublicKey | undefined;
 }) {
   if (!governancePk) {
-    return null
+    return null;
   }
 
   return (
@@ -25,5 +25,5 @@ export default function ProgramUpgradeInfo({
         info={`solana program set-buffer-authority --new-buffer-authority ${governancePk?.toBase58()} <BUFFER_PUBKEY>`}
       />
     </div>
-  )
+  );
 }

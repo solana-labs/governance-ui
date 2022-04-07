@@ -16,7 +16,7 @@ const TwitterIcon = ({ className }) => {
         strokeLinejoin="round"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default TwitterIcon
+export default TwitterIcon;

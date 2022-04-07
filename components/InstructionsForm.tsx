@@ -1,58 +1,58 @@
-import { LinkButton } from '@components/Button'
-import { PlusCircleIcon } from '@heroicons/react/solid'
-import { InstructionType } from '@hooks/useGovernanceAssets'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
-import { useState } from 'react'
-import InstructionForm from './InstructionForm'
+import { LinkButton } from '@components/Button';
+import { PlusCircleIcon } from '@heroicons/react/solid';
+import { InstructionType } from '@hooks/useGovernanceAssets';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes';
+import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new';
+import { useState } from 'react';
+import InstructionForm from './InstructionForm';
 
 const InstructionsForm = ({
   availableInstructions,
   onInstructionsChange,
   governedAccount,
 }: {
-  availableInstructions: InstructionType[]
-  onInstructionsChange: (instructions: ComponentInstructionData[]) => void
-  governedAccount?: GovernedMultiTypeAccount
+  availableInstructions: InstructionType[];
+  onInstructionsChange: (instructions: ComponentInstructionData[]) => void;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const [instructions, setInstructions] = useState<ComponentInstructionData[]>([
     // One empty instruction at start
     {},
-  ])
+  ]);
 
   const handleSetInstruction = (
     val: Partial<ComponentInstructionData>,
-    idx: number
+    idx: number,
   ) => {
-    const newInstructions = [...instructions]
-    newInstructions[idx] = { ...instructions[idx], ...val }
-    setInstructions(newInstructions)
-    onInstructionsChange(newInstructions)
-  }
+    const newInstructions = [...instructions];
+    newInstructions[idx] = { ...instructions[idx], ...val };
+    setInstructions(newInstructions);
+    onInstructionsChange(newInstructions);
+  };
 
   const setInstructionType = ({
     instructionType,
     idx,
   }: {
-    instructionType: InstructionType | null
-    idx: number
+    instructionType: InstructionType | null;
+    idx: number;
   }) => {
     handleSetInstruction(
       {
         type: instructionType ? instructionType : undefined,
       },
-      idx
-    )
-  }
+      idx,
+    );
+  };
 
   const addInstruction = () => {
-    setInstructions([...instructions, { type: undefined }])
-  }
+    setInstructions([...instructions, { type: undefined }]);
+  };
 
   const removeInstruction = (idx: number) => {
-    setInstructions([...instructions.filter((x, index) => index !== idx)])
-  }
+    setInstructions([...instructions.filter((x, index) => index !== idx)]);
+  };
 
   return (
     <>
@@ -87,7 +87,7 @@ const InstructionsForm = ({
         </LinkButton>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default InstructionsForm
+export default InstructionsForm;

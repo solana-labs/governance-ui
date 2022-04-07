@@ -1,13 +1,13 @@
-import { MintLayout, Token } from '@solana/spl-token'
+import { MintLayout, Token } from '@solana/spl-token';
 import {
   Connection,
   Keypair,
   PublicKey,
   SystemProgram,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 
-import { TOKEN_PROGRAM_ID } from '@utils/tokens'
+import { TOKEN_PROGRAM_ID } from '@utils/tokens';
 
 export const withCreateMint = async (
   connection: Connection,
@@ -16,13 +16,13 @@ export const withCreateMint = async (
   ownerPk: PublicKey,
   freezeAuthorityPk: PublicKey | null,
   decimals: number,
-  payerPk: PublicKey
+  payerPk: PublicKey,
 ) => {
   const mintRentExempt = await connection.getMinimumBalanceForRentExemption(
-    MintLayout.span
-  )
+    MintLayout.span,
+  );
 
-  const mintAccount = new Keypair()
+  const mintAccount = new Keypair();
 
   instructions.push(
     SystemProgram.createAccount({
@@ -31,9 +31,9 @@ export const withCreateMint = async (
       lamports: mintRentExempt,
       space: MintLayout.span,
       programId: TOKEN_PROGRAM_ID,
-    })
-  )
-  signers.push(mintAccount)
+    }),
+  );
+  signers.push(mintAccount);
 
   instructions.push(
     Token.createInitMintInstruction(
@@ -41,8 +41,8 @@ export const withCreateMint = async (
       mintAccount.publicKey,
       decimals,
       ownerPk,
-      freezeAuthorityPk
-    )
-  )
-  return mintAccount.publicKey
-}
+      freezeAuthorityPk,
+    ),
+  );
+  return mintAccount.publicKey;
+};

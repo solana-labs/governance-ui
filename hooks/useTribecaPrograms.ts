@@ -1,23 +1,23 @@
-import { Wallet } from '@project-serum/common'
-import { useEffect, useState } from 'react'
+import { Wallet } from '@project-serum/common';
+import { useEffect, useState } from 'react';
 
-import useWalletStore from 'stores/useWalletStore'
+import useWalletStore from 'stores/useWalletStore';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '@tools/sdk/tribeca/ATribecaConfiguration'
-import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations'
+} from '@tools/sdk/tribeca/ATribecaConfiguration';
+import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations';
 
 export default function useTribecaPrograms(
-  tribecaConfiguration: ATribecaConfiguration | null
+  tribecaConfiguration: ATribecaConfiguration | null,
 ) {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
 
-  const [programs, setPrograms] = useState<TribecaPrograms | null>(null)
+  const [programs, setPrograms] = useState<TribecaPrograms | null>(null);
 
   useEffect(() => {
     if (!connection || !wallet || !tribecaConfiguration) {
-      return
+      return;
     }
 
     setPrograms(
@@ -25,11 +25,11 @@ export default function useTribecaPrograms(
         connection: connection.current,
         wallet: wallet as Wallet,
         config: tribecaConfiguration,
-      })
-    )
-  }, [connection, wallet, tribecaConfiguration])
+      }),
+    );
+  }, [connection, wallet, tribecaConfiguration]);
 
   return {
     programs,
-  }
+  };
 }

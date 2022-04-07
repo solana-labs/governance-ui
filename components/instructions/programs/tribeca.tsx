@@ -1,7 +1,7 @@
-import { nu64, struct, u32, u8 } from 'buffer-layout'
-import { AccountMetaData } from '@solana/spl-governance'
-import { Connection } from '@solana/web3.js'
-import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration'
+import { nu64, struct, u32, u8 } from 'buffer-layout';
+import { AccountMetaData } from '@solana/spl-governance';
+import { Connection } from '@solana/web3.js';
+import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
 
 export const TRIBECA_PROGRAM_INSTRUCTIONS = {
   [ATribecaConfiguration.gaugeProgramId.toBase58()]: {
@@ -17,9 +17,9 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         _data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const gaugeVoterMint = accounts[0].pubkey.toString()
+        const gaugeVoterMint = accounts[0].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -28,7 +28,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{gaugeVoterMint}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -44,11 +44,11 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         _data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const gaugeVoterMint = accounts[1].pubkey.toString()
-        const gaugeVoteMint = accounts[0].pubkey.toString()
-        const gaugeMint = accounts[2].pubkey.toString()
+        const gaugeVoterMint = accounts[1].pubkey.toString();
+        const gaugeVoteMint = accounts[0].pubkey.toString();
+        const gaugeMint = accounts[2].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -67,7 +67,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{gaugeMint}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -84,11 +84,11 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const gauge = accounts[1].pubkey.toString()
-        const gaugeVoter = accounts[2].pubkey.toString()
-        const gaugeVote = accounts[3].pubkey.toString()
+        const gauge = accounts[1].pubkey.toString();
+        const gaugeVoter = accounts[2].pubkey.toString();
+        const gaugeVote = accounts[3].pubkey.toString();
 
         const dataLayout = struct([
           u8('instruction'),
@@ -97,9 +97,9 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
           ...Array.from(new Array(7)).map(u8),
 
           u32('weight'),
-        ])
+        ]);
 
-        const { weight } = dataLayout.decode(Buffer.from(data)) as any
+        const { weight } = dataLayout.decode(Buffer.from(data)) as any;
 
         return (
           <div className="flex flex-col">
@@ -123,7 +123,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{weight}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -141,11 +141,11 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const gaugeVoter = accounts[3].pubkey.toString()
-        const epochGaugeVoter = accounts[4].pubkey.toString()
-        const payer = accounts[5].pubkey.toString()
+        const gaugeVoter = accounts[3].pubkey.toString();
+        const epochGaugeVoter = accounts[4].pubkey.toString();
+        const payer = accounts[5].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -164,7 +164,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{payer}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -184,15 +184,15 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const gauge = accounts[1].pubkey.toString()
-        const gaugeVoter = accounts[2].pubkey.toString()
-        const gaugeVote = accounts[3].pubkey.toString()
-        const epochGauge = accounts[4].pubkey.toString()
-        const epochGaugeVoter = accounts[5].pubkey.toString()
-        const epochGaugeVote = accounts[6].pubkey.toString()
-        const payer = accounts[7].pubkey.toString()
+        const gauge = accounts[1].pubkey.toString();
+        const gaugeVoter = accounts[2].pubkey.toString();
+        const gaugeVote = accounts[3].pubkey.toString();
+        const epochGauge = accounts[4].pubkey.toString();
+        const epochGaugeVoter = accounts[5].pubkey.toString();
+        const epochGaugeVote = accounts[6].pubkey.toString();
+        const payer = accounts[7].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -231,7 +231,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{payer}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -252,17 +252,17 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const gauge = accounts[1].pubkey.toString()
-        const gaugeVoter = accounts[2].pubkey.toString()
-        const gaugeVote = accounts[3].pubkey.toString()
-        const epochGauge = accounts[4].pubkey.toString()
-        const epochGaugeVoter = accounts[5].pubkey.toString()
-        const escrow = accounts[6].pubkey.toString()
-        const voteDelegate = accounts[7].pubkey.toString()
-        const epochGaugeVote = accounts[8].pubkey.toString()
-        const payer = accounts[9].pubkey.toString()
+        const gauge = accounts[1].pubkey.toString();
+        const gaugeVoter = accounts[2].pubkey.toString();
+        const gaugeVote = accounts[3].pubkey.toString();
+        const epochGauge = accounts[4].pubkey.toString();
+        const epochGaugeVoter = accounts[5].pubkey.toString();
+        const escrow = accounts[6].pubkey.toString();
+        const voteDelegate = accounts[7].pubkey.toString();
+        const epochGaugeVote = accounts[8].pubkey.toString();
+        const payer = accounts[9].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -311,7 +311,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{payer}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -327,11 +327,11 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const escrow = accounts[2].pubkey.toString()
-        const gaugeVoter = accounts[3].pubkey.toString()
-        const epochGaugeVoter = accounts[4].pubkey.toString()
+        const escrow = accounts[2].pubkey.toString();
+        const gaugeVoter = accounts[3].pubkey.toString();
+        const epochGaugeVoter = accounts[4].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -350,7 +350,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{escrow}</span>
             </div>
           </div>
-        )
+        );
       },
     },
   },
@@ -362,9 +362,9 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         _data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
-        const escrowMint = accounts[1].pubkey.toString()
+        const escrowMint = accounts[1].pubkey.toString();
 
         return (
           <div className="flex flex-col">
@@ -373,7 +373,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{escrowMint}</span>
             </div>
           </div>
-        )
+        );
       },
     },
 
@@ -390,7 +390,7 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const dataLayout = struct([
           u8('instruction'),
@@ -400,9 +400,11 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
 
           nu64('amount'),
           nu64('duration'),
-        ])
+        ]);
 
-        const { amount, duration } = dataLayout.decode(Buffer.from(data)) as any
+        const { amount, duration } = dataLayout.decode(
+          Buffer.from(data),
+        ) as any;
 
         return (
           <div className="flex flex-col">
@@ -416,8 +418,8 @@ export const TRIBECA_PROGRAM_INSTRUCTIONS = {
               <span>{Number(duration).toLocaleString()}</span>
             </div>
           </div>
-        )
+        );
       },
     },
   },
-}
+};

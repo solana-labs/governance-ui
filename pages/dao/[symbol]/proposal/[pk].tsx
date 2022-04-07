@@ -1,39 +1,39 @@
-import React, { useEffect, useState } from 'react'
-import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ExternalLinkIcon } from '@heroicons/react/outline'
+import React, { useEffect, useState } from 'react';
+import ReactMarkdown from 'react-markdown/react-markdown.min';
+import { ExternalLinkIcon } from '@heroicons/react/outline';
 
-import ApprovalQuorum from '@components/ApprovalQuorum'
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import ProposalActionsPanel from '@components/ProposalActions'
-import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import VoteResults from '@components/VoteResults'
-import VoteResultStatus from '@components/VoteResultStatus'
-import useRealm from '@hooks/useRealm'
-import { resolveProposalDescription } from '@utils/helpers'
+import ApprovalQuorum from '@components/ApprovalQuorum';
+import PreviousRouteBtn from '@components/PreviousRouteBtn';
+import ProposalActionsPanel from '@components/ProposalActions';
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper';
+import VoteResults from '@components/VoteResults';
+import VoteResultStatus from '@components/VoteResultStatus';
+import useRealm from '@hooks/useRealm';
+import { resolveProposalDescription } from '@utils/helpers';
 
-import DiscussionPanel from 'components/chat/DiscussionPanel'
-import { InstructionPanel } from 'components/instructions/instructionPanel'
-import ProposalStateBadge from 'components/ProposalStatusBadge'
-import ProposalTimeStatus from 'components/ProposalTimeStatus'
-import VotePanel from 'components/VotePanel'
-import useProposal from 'hooks/useProposal'
-import useProposalVotes from 'hooks/useProposalVotes'
-import { option } from 'tools/core/option'
-import { getRealmExplorerHost } from 'tools/routing'
-import { EnhancedProposalState } from 'stores/useWalletStore'
+import DiscussionPanel from 'components/chat/DiscussionPanel';
+import { InstructionPanel } from 'components/instructions/instructionPanel';
+import ProposalStateBadge from 'components/ProposalStatusBadge';
+import ProposalTimeStatus from 'components/ProposalTimeStatus';
+import VotePanel from 'components/VotePanel';
+import useProposal from 'hooks/useProposal';
+import useProposalVotes from 'hooks/useProposalVotes';
+import { option } from 'tools/core/option';
+import { getRealmExplorerHost } from 'tools/routing';
+import { EnhancedProposalState } from 'stores/useWalletStore';
 
 const Proposal = () => {
-  const { realmInfo } = useRealm()
-  const { proposal, descriptionLink } = useProposal()
-  const [description, setDescription] = useState('')
+  const { realmInfo } = useRealm();
+  const { proposal, descriptionLink } = useProposal();
+  const [description, setDescription] = useState('');
   const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
-    proposal?.account
-  )
+    proposal?.account,
+  );
 
   const showResults =
     proposal &&
     proposal.account.state !== EnhancedProposalState.Cancelled &&
-    proposal.account.state !== EnhancedProposalState.Draft
+    proposal.account.state !== EnhancedProposalState.Draft;
 
   const votePassed =
     proposal &&
@@ -41,17 +41,17 @@ const Proposal = () => {
       proposal.account.state === EnhancedProposalState.Executing ||
       proposal.account.state === EnhancedProposalState.SigningOff ||
       proposal.account.state === EnhancedProposalState.Succeeded ||
-      proposal.account.state === EnhancedProposalState.Outdated)
+      proposal.account.state === EnhancedProposalState.Outdated);
 
   useEffect(() => {
     const handleResolveDescription = async () => {
-      const description = await resolveProposalDescription(descriptionLink!)
-      setDescription(description)
-    }
+      const description = await resolveProposalDescription(descriptionLink!);
+      setDescription(description);
+    };
     if (descriptionLink) {
-      handleResolveDescription()
+      handleResolveDescription();
     }
-  }, [descriptionLink])
+  }, [descriptionLink]);
 
   return (
     <div className="grid grid-cols-12 gap-4">
@@ -63,7 +63,7 @@ const Proposal = () => {
               <div className="flex items-center">
                 <a
                   href={`https://${getRealmExplorerHost(
-                    realmInfo
+                    realmInfo,
                   )}/#/proposal/${proposal.pubkey.toBase58()}?programId=${proposal.owner.toBase58()}`}
                   target="_blank"
                   rel="noopener noreferrer"
@@ -144,7 +144,7 @@ const Proposal = () => {
         <ProposalActionsPanel />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Proposal
+export default Proposal;

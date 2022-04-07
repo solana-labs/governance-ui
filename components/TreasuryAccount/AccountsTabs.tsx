@@ -1,11 +1,11 @@
-import { FunctionComponent } from 'react'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { FunctionComponent } from 'react';
+import { getTreasuryAccountItemInfo } from '@utils/treasuryTools';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
 
 interface AccountsTabsProps {
-  activeTab: any
-  onChange: (x) => void
-  tabs: Array<any>
+  activeTab: any;
+  onChange: (x) => void;
+  tabs: Array<any>;
 }
 
 const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
@@ -13,7 +13,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
   onChange,
   tabs,
 }) => {
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
   return (
     <div className={`relative`}>
       <div
@@ -21,7 +21,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
         style={{
           transform: `translateY(${
             tabs.findIndex(
-              (t) => t.transferAddress === activeTab?.transferAddress
+              (t) => t.transferAddress === activeTab?.transferAddress,
             ) * 100
           }%)`,
           height: `${100 / tabs.length}%`,
@@ -34,7 +34,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
           name,
           symbol,
           displayPrice,
-        } = getTreasuryAccountItemInfo(x, governanceNfts)
+        } = getTreasuryAccountItemInfo(x, governanceNfts);
         return (
           <button
             key={x.transferAddress}
@@ -58,10 +58,10 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
               )}
             </div>
           </button>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default AccountsTabs
+export default AccountsTabs;

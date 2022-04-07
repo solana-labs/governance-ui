@@ -1,13 +1,13 @@
-import BigNumber from 'bignumber.js'
-import * as yup from 'yup'
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import soceanConfig from '@tools/sdk/socean/configuration'
-import { depositToAuctionPool } from '@tools/sdk/socean/instructions/depositToAuctionPool'
-import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens'
-import { SoceanDepositToAuctionPoolForm } from '@utils/uiTypes/proposalCreationTypes'
+import BigNumber from 'bignumber.js';
+import * as yup from 'yup';
+import { BN } from '@project-serum/anchor';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import soceanConfig from '@tools/sdk/socean/configuration';
+import { depositToAuctionPool } from '@tools/sdk/socean/instructions/depositToAuctionPool';
+import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
+import { SoceanDepositToAuctionPoolForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -21,14 +21,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Deposit amount should be more than 0')
     .required('Deposit amount is required'),
-})
+});
 
 const DepositToAuctionPool = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -51,12 +51,12 @@ const DepositToAuctionPool = ({
         connection,
         wallet,
         cluster,
-      })
+      });
       const mintInfo = await tryGetTokenMint(
         connection,
-        new PublicKey(form.sourceAccount!)
-      )
-      if (!mintInfo) throw new Error('Cannot load sourceAccount mint info')
+        new PublicKey(form.sourceAccount!),
+      );
+      if (!mintInfo) throw new Error('Cannot load sourceAccount mint info');
 
       return depositToAuctionPool({
         cluster,
@@ -64,15 +64,15 @@ const DepositToAuctionPool = ({
         depositAmount: new BN(
           new BigNumber(form.uiDepositAmount!.toString())
             .shiftedBy(mintInfo.account.decimals)
-            .toString()
+            .toString(),
         ),
         auction: new PublicKey(form.auction!),
         authority: governedAccountPubkey,
         sourceAccount: new PublicKey(form.sourceAccount!),
         bondedMint: new PublicKey(form.bondedMint!),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -129,7 +129,7 @@ const DepositToAuctionPool = ({
         error={formErrors['uiDepositAmount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default DepositToAuctionPool
+export default DepositToAuctionPool;

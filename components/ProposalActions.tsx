@@ -1,38 +1,40 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import { useEffect, useState } from 'react'
-import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
-import useRealm from '../hooks/useRealm'
-import { getSignatoryRecordAddress } from '@solana/spl-governance'
-import useWalletStore, { EnhancedProposalState } from '../stores/useWalletStore'
-import Button, { SecondaryButton } from './Button'
+import { useEffect, useState } from 'react';
+import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired';
+import useRealm from '../hooks/useRealm';
+import { getSignatoryRecordAddress } from '@solana/spl-governance';
+import useWalletStore, {
+  EnhancedProposalState,
+} from '../stores/useWalletStore';
+import Button, { SecondaryButton } from './Button';
 
-import { RpcContext } from '@solana/spl-governance'
-import { signOffProposal } from 'actions/signOffProposal'
-import { notify } from '@utils/notifications'
-import { finalizeVote } from 'actions/finalizeVotes'
-import { Proposal } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { cancelProposal } from 'actions/cancelProposal'
-import { getProgramVersionForRealm } from '@models/registry/api'
+import { RpcContext } from '@solana/spl-governance';
+import { signOffProposal } from 'actions/signOffProposal';
+import { notify } from '@utils/notifications';
+import { finalizeVote } from 'actions/finalizeVotes';
+import { Proposal } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { cancelProposal } from 'actions/cancelProposal';
+import { getProgramVersionForRealm } from '@models/registry/api';
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
-    (s) => s.selectedProposal
-  )
-  const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
-  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
-  const signatories = useWalletStore((s) => s.selectedProposal.signatories)
-  const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
+    (s) => s.selectedProposal,
+  );
+  const { realmInfo } = useRealm();
+  const wallet = useWalletStore((s) => s.current);
+  const connected = useWalletStore((s) => s.connected);
+  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!);
+  const signatories = useWalletStore((s) => s.selectedProposal.signatories);
+  const connection = useWalletStore((s) => s.connection);
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm);
+  const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined);
 
   const canFinalizeVote =
     hasVoteTimeExpired &&
-    proposal?.account.state === EnhancedProposalState.Voting
+    proposal?.account.state === EnhancedProposalState.Voting;
 
-  const walletPk = wallet?.publicKey
+  const walletPk = wallet?.publicKey;
 
   useEffect(() => {
     const setup = async () => {
@@ -40,22 +42,22 @@ const ProposalActionsPanel = () => {
         const signatoryRecordPk = await getSignatoryRecordAddress(
           realmInfo.programId,
           proposal.pubkey,
-          walletPk
-        )
+          walletPk,
+        );
 
         if (signatoryRecordPk && signatories) {
-          setSignatoryRecord(signatories[signatoryRecordPk.toBase58()])
+          setSignatoryRecord(signatories[signatoryRecordPk.toBase58()]);
         }
       }
-    }
+    };
 
-    setup()
-  }, [proposal, realmInfo, walletPk])
+    setup();
+  }, [proposal, realmInfo, walletPk]);
 
   const canSignOff =
     signatoryRecord &&
     (proposal?.account.state === EnhancedProposalState.Draft ||
-      proposal?.account.state === EnhancedProposalState.SigningOff)
+      proposal?.account.state === EnhancedProposalState.SigningOff);
 
   const canCancelProposal =
     proposal &&
@@ -65,8 +67,8 @@ const ProposalActionsPanel = () => {
     proposal.account.canWalletCancel(
       governance.account,
       proposalOwner.account,
-      wallet.publicKey
-    )
+      wallet.publicKey,
+    );
 
   const signOffTooltipContent = !connected
     ? 'Connect your wallet to sign off this proposal'
@@ -77,7 +79,7 @@ const ProposalActionsPanel = () => {
         proposal?.account.state === EnhancedProposalState.SigningOff
       )
     ? 'Invalid proposal state. To sign off a proposal, it must be a draft or be in signing off state after creation.'
-    : ''
+    : '';
 
   const cancelTooltipContent = !connected
     ? 'Connect your wallet to cancel this proposal'
@@ -88,10 +90,10 @@ const ProposalActionsPanel = () => {
       !proposal?.account.canWalletCancel(
         governance.account,
         proposalOwner.account,
-        wallet.publicKey
+        wallet.publicKey,
       )
     ? 'Only the owner of the proposal can execute this action'
-    : ''
+    : '';
 
   const finalizeVoteTooltipContent = !connected
     ? 'Connect your wallet to finalize this proposal'
@@ -100,7 +102,7 @@ const ProposalActionsPanel = () => {
     : proposal?.account.state === EnhancedProposalState.Voting &&
       !hasVoteTimeExpired
     ? 'Proposal is being voting right now, you need to wait the vote to finish to be able to finalize it.'
-    : ''
+    : '';
   const handleFinalizeVote = async () => {
     try {
       if (proposal && realmInfo && governance) {
@@ -109,22 +111,22 @@ const ProposalActionsPanel = () => {
           getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
-          connection.endpoint
-        )
+          connection.endpoint,
+        );
 
-        await finalizeVote(rpcContext, governance?.account.realm, proposal)
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await finalizeVote(rpcContext, governance?.account.realm, proposal);
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
       }
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not finalize vote.`,
         description: `${error}`,
-      })
+      });
 
-      console.error('error finalizing vote', error)
+      console.error('error finalizing vote', error);
     }
-  }
+  };
 
   const handleSignOffProposal = async () => {
     try {
@@ -134,30 +136,30 @@ const ProposalActionsPanel = () => {
           getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
-          connection.endpoint
-        )
+          connection.endpoint,
+        );
 
         await signOffProposal(
           rpcContext,
           realmInfo.realmId,
           proposal,
-          signatoryRecord
-        )
+          signatoryRecord,
+        );
 
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
       }
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not sign off proposal.`,
         description: `${error}`,
-      })
+      });
 
-      console.error('error sign off', error)
+      console.error('error sign off', error);
     }
-  }
+  };
   const handleCancelProposal = async (
-    proposal: ProgramAccount<Proposal> | undefined
+    proposal: ProgramAccount<Proposal> | undefined,
   ) => {
     try {
       if (proposal && realmInfo) {
@@ -166,23 +168,23 @@ const ProposalActionsPanel = () => {
           getProgramVersionForRealm(realmInfo),
           wallet!,
           connection.current,
-          connection.endpoint
-        )
+          connection.endpoint,
+        );
 
-        await cancelProposal(rpcContext, realmInfo.realmId, proposal)
+        await cancelProposal(rpcContext, realmInfo.realmId, proposal);
 
-        await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+        await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
       }
     } catch (error) {
       notify({
         type: 'error',
         message: `Error: Could not cancel proposal.`,
         description: `${error}`,
-      })
+      });
 
-      console.error('error cancelling proposal', error)
+      console.error('error cancelling proposal', error);
     }
-  }
+  };
   return (
     <>
       {EnhancedProposalState.Cancelled === proposal?.account.state ||
@@ -228,7 +230,7 @@ const ProposalActionsPanel = () => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default ProposalActionsPanel
+export default ProposalActionsPanel;

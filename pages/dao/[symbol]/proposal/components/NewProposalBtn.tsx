@@ -1,15 +1,15 @@
-import Link from 'next/link'
-import { PlusCircleIcon } from '@heroicons/react/outline'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import React from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import Tooltip from '@components/Tooltip'
+import Link from 'next/link';
+import { PlusCircleIcon } from '@heroicons/react/outline';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import React from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import Tooltip from '@components/Tooltip';
 
 const NewProposalBtn = () => {
-  const { fmtUrlWithCluster } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext();
 
-  const connected = useWalletStore((s) => s.connected)
+  const connected = useWalletStore((s) => s.connected);
 
   const {
     symbol,
@@ -18,31 +18,31 @@ const NewProposalBtn = () => {
     ownVoterWeight,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
-  } = useRealm()
+  } = useRealm();
 
-  const governanceItems = Object.values(governances)
+  const governanceItems = Object.values(governances);
 
   const canCreateProposal =
     realm &&
     governanceItems.some((g) =>
-      ownVoterWeight.canCreateProposal(g.account.config)
+      ownVoterWeight.canCreateProposal(g.account.config),
     ) &&
     !toManyCommunityOutstandingProposalsForUser &&
-    !toManyCouncilOutstandingProposalsForUse
+    !toManyCouncilOutstandingProposalsForUse;
 
   const tooltipContent = !connected
     ? 'Connect your wallet to create new proposal'
     : governanceItems.length === 0
     ? 'There is no governance configuration to create a new proposal'
     : !governanceItems.some((g) =>
-        ownVoterWeight.canCreateProposal(g.account.config)
+        ownVoterWeight.canCreateProposal(g.account.config),
       )
     ? "You don't have enough governance power to create a new proposal"
     : toManyCommunityOutstandingProposalsForUser
     ? 'Too many community outstanding proposals. You need to finalize them before creating a new one.'
     : toManyCouncilOutstandingProposalsForUse
     ? 'Too many council outstanding proposals. You need to finalize them before creating a new one.'
-    : ''
+    : '';
 
   return (
     <>
@@ -65,7 +65,7 @@ const NewProposalBtn = () => {
         </div>
       </Tooltip>
     </>
-  )
-}
+  );
+};
 
-export default NewProposalBtn
+export default NewProposalBtn;

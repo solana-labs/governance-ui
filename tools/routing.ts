@@ -1,10 +1,10 @@
-import { RealmInfo } from 'models/registry/api'
+import { RealmInfo } from 'models/registry/api';
 
 export function getRealmExplorerHost(realmInfo: RealmInfo | undefined) {
   switch (realmInfo?.symbol) {
     case 'MNGO':
-      return 'dao.mango.markets'
+      return 'dao.mango.markets';
     default:
-      return 'realms-explorer.com'
+      return 'realms-explorer.com';
   }
 }

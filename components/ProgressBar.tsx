@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 const ProgressBar = ({ progress, prefix }) => {
   return (
@@ -22,7 +22,7 @@ const ProgressBar = ({ progress, prefix }) => {
         ></div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProgressBar
+export default ProgressBar;

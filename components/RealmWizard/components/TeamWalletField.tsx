@@ -1,40 +1,40 @@
-import React, { useEffect, useState } from 'react'
-import { StyledLabel } from '@components/inputs/styles'
-import AddWalletModal from './AddWalletModal'
-import { TrashIcon } from '@heroicons/react/solid'
-import { PlusCircleIcon } from '@heroicons/react/outline'
-import useWalletStore from 'stores/useWalletStore'
-import Tooltip from '@components/Tooltip'
+import React, { useEffect, useState } from 'react';
+import { StyledLabel } from '@components/inputs/styles';
+import AddWalletModal from './AddWalletModal';
+import { TrashIcon } from '@heroicons/react/solid';
+import { PlusCircleIcon } from '@heroicons/react/outline';
+import useWalletStore from 'stores/useWalletStore';
+import Tooltip from '@components/Tooltip';
 
 const TeamWalletField: React.FC<{
-  onInsert: (wallets: string[]) => void
-  onRemove: (index: number) => void
-  wallets?: string[]
+  onInsert: (wallets: string[]) => void;
+  onRemove: (index: number) => void;
+  wallets?: string[];
 }> = ({ wallets = [], onInsert, onRemove }) => {
-  const [showAddWalletModal, setShowWalletModal] = useState(false)
-  const { current: wallet } = useWalletStore((s) => s)
+  const [showAddWalletModal, setShowWalletModal] = useState(false);
+  const { current: wallet } = useWalletStore((s) => s);
 
   const newWalletButton = (
     <div
       className="add-wallet-btn pointer w-10 h-10"
       onClick={() => {
-        setShowWalletModal(true)
+        setShowWalletModal(true);
       }}
     >
       <PlusCircleIcon />
     </div>
-  )
+  );
 
   const isCurrentWallet = (index: number) =>
-    wallets[index] === wallet?.publicKey?.toBase58()
+    wallets[index] === wallet?.publicKey?.toBase58();
 
   const handleRemoveWallet = (index: number) => {
-    if (!isCurrentWallet(index)) onRemove(index)
-  }
+    if (!isCurrentWallet(index)) onRemove(index);
+  };
 
   const trashIcon = (
     type: 'disabled' | 'enabled' = 'enabled',
-    index: number
+    index: number,
   ) => {
     return (
       <TrashIcon
@@ -42,20 +42,20 @@ const TeamWalletField: React.FC<{
           type === 'disabled' ? 'opacity-30' : 'text-red pointer'
         }`}
         onClick={() => {
-          handleRemoveWallet(index)
+          handleRemoveWallet(index);
         }}
       />
-    )
-  }
+    );
+  };
 
   useEffect(() => {
     if (
       wallet?.publicKey &&
       !wallets.find((addr) => addr === wallet.publicKey?.toBase58())
     ) {
-      onInsert([wallet.publicKey?.toBase58()])
+      onInsert([wallet.publicKey?.toBase58()]);
     }
-  }, [wallets.length, wallet?.publicKey])
+  }, [wallets.length, wallet?.publicKey]);
 
   return (
     <div className="team-wallets-wrapper">
@@ -85,12 +85,12 @@ const TeamWalletField: React.FC<{
         isOpen={showAddWalletModal}
         onOk={onInsert}
         onClose={() => {
-          setShowWalletModal(false)
+          setShowWalletModal(false);
         }}
       />
       <div className="flex justify-start">{newWalletButton}</div>
     </div>
-  )
-}
+  );
+};
 
-export default TeamWalletField
+export default TeamWalletField;

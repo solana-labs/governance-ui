@@ -1,14 +1,14 @@
-import { Provider } from '@project-serum/anchor'
-import { TransactionInstruction, PublicKey } from '@solana/web3.js'
-import { Controller, UXD_DECIMALS } from '@uxdprotocol/uxd-client'
-import type { ConnectionContext } from 'utils/connection'
+import { Provider } from '@project-serum/anchor';
+import { TransactionInstruction, PublicKey } from '@solana/web3.js';
+import { Controller, UXD_DECIMALS } from '@uxdprotocol/uxd-client';
+import type { ConnectionContext } from 'utils/connection';
 import {
   uxdClient,
   initializeMango,
   instantiateMangoDepository,
   getDepositoryMintKey,
   getInsuranceMintKey,
-} from './uxdClient'
+} from './uxdClient';
 
 const createDepositInsuranceToMangoDepositoryInstruction = async (
   connection: ConnectionContext,
@@ -16,17 +16,17 @@ const createDepositInsuranceToMangoDepositoryInstruction = async (
   authority: PublicKey,
   depositoryMintName: string,
   insuranceMintName: string,
-  insuranceDepositedAmount: number
+  insuranceDepositedAmount: number,
 ): Promise<TransactionInstruction> => {
-  const client = uxdClient(uxdProgramId)
+  const client = uxdClient(uxdProgramId);
 
-  const mango = await initializeMango(connection.current, connection.cluster)
+  const mango = await initializeMango(connection.current, connection.cluster);
 
   const depository = instantiateMangoDepository(
     uxdProgramId,
     getDepositoryMintKey(connection.cluster, depositoryMintName),
-    getInsuranceMintKey(connection.cluster, insuranceMintName)
-  )
+    getInsuranceMintKey(connection.cluster, insuranceMintName),
+  );
 
   return client.createDepositInsuranceToMangoDepositoryInstruction(
     insuranceDepositedAmount,
@@ -34,8 +34,8 @@ const createDepositInsuranceToMangoDepositoryInstruction = async (
     depository,
     mango,
     authority,
-    Provider.defaultOptions()
-  )
-}
+    Provider.defaultOptions(),
+  );
+};
 
-export default createDepositInsuranceToMangoDepositoryInstruction
+export default createDepositInsuranceToMangoDepositoryInstruction;

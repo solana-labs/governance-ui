@@ -1,4 +1,4 @@
-import React from 'react'
+import React from 'react';
 
 const RealmCreated: React.FC<{ realmAddress: string }> = ({ realmAddress }) => {
   return (
@@ -6,7 +6,7 @@ const RealmCreated: React.FC<{ realmAddress: string }> = ({ realmAddress }) => {
       <h4>Your Realm was Created!</h4>
       Address: {realmAddress}
     </>
-  )
-}
+  );
+};
 
-export default RealmCreated
+export default RealmCreated;

@@ -1,13 +1,13 @@
-import React from 'react'
-import Input from '@components/inputs/Input'
-import { StyledLabel } from '@components/inputs/styles'
-import AmountSlider from '@components/Slider'
+import React from 'react';
+import Input from '@components/inputs/Input';
+import { StyledLabel } from '@components/inputs/styles';
+import AmountSlider from '@components/Slider';
 
 const ApprovalQuorumInput: React.FC<{
-  onChange: (amount: number) => void
-  onBlur?: () => void
-  value?: number
-  slider?: boolean
+  onChange: (amount: number) => void;
+  onBlur?: () => void;
+  value?: number;
+  slider?: boolean;
 }> = ({ onChange, onBlur, value, slider = true }) => {
   return (
     <>
@@ -20,12 +20,12 @@ const ApprovalQuorumInput: React.FC<{
         max={100}
         onBlur={onBlur}
         onChange={($e) => {
-          let yesThreshold = $e.target.value
+          let yesThreshold = $e.target.value;
           if (yesThreshold.length) {
             yesThreshold =
-              +yesThreshold < 1 ? 1 : +yesThreshold > 100 ? 100 : yesThreshold
+              +yesThreshold < 1 ? 1 : +yesThreshold > 100 ? 100 : yesThreshold;
           }
-          onChange(+yesThreshold)
+          onChange(+yesThreshold);
         }}
       />
 
@@ -39,7 +39,7 @@ const ApprovalQuorumInput: React.FC<{
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default ApprovalQuorumInput
+export default ApprovalQuorumInput;

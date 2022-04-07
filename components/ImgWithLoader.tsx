@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { PhotographIcon } from '@heroicons/react/outline'
+import { useState } from 'react';
+import { PhotographIcon } from '@heroicons/react/outline';
 
 const ImgWithLoader = (props) => {
-  const [isLoading, setIsLoading] = useState(true)
+  const [isLoading, setIsLoading] = useState(true);
   return (
     <div className="relative">
       {isLoading && (
@@ -10,7 +10,7 @@ const ImgWithLoader = (props) => {
       )}
       <img {...props} onLoad={() => setIsLoading(false)} />
     </div>
-  )
-}
+  );
+};
 
-export default ImgWithLoader
+export default ImgWithLoader;

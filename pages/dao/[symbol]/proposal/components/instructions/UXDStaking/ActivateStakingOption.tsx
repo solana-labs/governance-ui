@@ -1,28 +1,28 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
-import * as yup from 'yup'
+import React from 'react';
+import * as yup from 'yup';
 import {
   getOnchainStakingCampaign,
   SingleSideStakingClient,
   StakingCampaign,
-} from '@uxdprotocol/uxd-staking-client'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { UXDStakingActivateStakingOptionForm } from '@utils/uiTypes/proposalCreationTypes'
-import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration'
-import useWalletStore from 'stores/useWalletStore'
-import { PublicKey } from '@solana/web3.js'
-import Switch from '@components/Switch'
+} from '@uxdprotocol/uxd-staking-client';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { UXDStakingActivateStakingOptionForm } from '@utils/uiTypes/proposalCreationTypes';
+import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
+import useWalletStore from 'stores/useWalletStore';
+import { PublicKey } from '@solana/web3.js';
+import Switch from '@components/Switch';
 
 const ActivateStakingOption = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletStore((s) => s.current);
 
   const {
     form,
@@ -52,27 +52,27 @@ const ActivateStakingOption = ({
 
     buildInstruction: async function () {
       const programId =
-        uxdProtocolStakingConfiguration.programId[connection.cluster]
+        uxdProtocolStakingConfiguration.programId[connection.cluster];
 
       if (!programId) {
         throw new Error(
-          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`
-        )
+          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`,
+        );
       }
 
-      const stakingCampaignPda = new PublicKey(form.stakingCampaignPda!)
+      const stakingCampaignPda = new PublicKey(form.stakingCampaignPda!);
 
       const stakingCampaignState = await getOnchainStakingCampaign(
         stakingCampaignPda,
         connection.current,
-        uxdProtocolStakingConfiguration.TXN_OPTS
-      )
+        uxdProtocolStakingConfiguration.TXN_OPTS,
+      );
 
       const client: SingleSideStakingClient = new SingleSideStakingClient(
-        programId
-      )
+        programId,
+      );
 
-      const authority = governedAccount!.governance.pubkey
+      const authority = governedAccount!.governance.pubkey;
 
       console.log('Activate/Deactivate Staking Option', {
         stakingCampaignPda: stakingCampaignPda.toString(),
@@ -91,14 +91,14 @@ const ActivateStakingOption = ({
             identifier,
             lockupSecs: lockupSecs.toString(),
             apr: apr.toString(),
-          })
+          }),
         ),
-      })
+      });
 
       const stakingCampaign = StakingCampaign.fromState(
         stakingCampaignPda,
-        stakingCampaignState
-      )
+        stakingCampaignState,
+      );
 
       return client.createActivateStakingOptionInstruction({
         authority,
@@ -107,9 +107,9 @@ const ActivateStakingOption = ({
         activate: form.activate!,
         options: uxdProtocolStakingConfiguration.TXN_OPTS,
         payer: wallet!.publicKey!,
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -155,7 +155,7 @@ const ActivateStakingOption = ({
         error={formErrors['stakingOptionIdentifier']}
       />
     </>
-  )
-}
+  );
+};
 
-export default ActivateStakingOption
+export default ActivateStakingOption;

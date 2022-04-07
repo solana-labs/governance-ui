@@ -1,9 +1,9 @@
-import MultisigOptions from './MultisigOptions'
-import BespokeConfig from './BespokeConfig'
-import BespokeCouncil from './BespokeCouncil'
-import BespokeInfo from './BespokeInfo'
-import WizardModeSelect from './WizardModeSelect'
-import RealmCreated from './RealmCreated'
+import MultisigOptions from './MultisigOptions';
+import BespokeConfig from './BespokeConfig';
+import BespokeCouncil from './BespokeCouncil';
+import BespokeInfo from './BespokeInfo';
+import WizardModeSelect from './WizardModeSelect';
+import RealmCreated from './RealmCreated';
 
 export {
   MultisigOptions,
@@ -12,4 +12,4 @@ export {
   BespokeInfo,
   WizardModeSelect,
   RealmCreated,
-}
+};

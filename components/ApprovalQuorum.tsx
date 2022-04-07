@@ -1,14 +1,14 @@
-import Tooltip from './Tooltip'
+import Tooltip from './Tooltip';
 import {
   CheckCircleIcon,
   InformationCircleIcon,
-} from '@heroicons/react/outline'
+} from '@heroicons/react/outline';
 
 type ApprovalProgressProps = {
-  progress: number
-  showBg?: boolean
-  yesVotesRequired: number
-}
+  progress: number;
+  showBg?: boolean;
+  yesVotesRequired: number;
+};
 
 const ApprovalProgress = ({
   progress,
@@ -31,7 +31,7 @@ const ApprovalProgress = ({
               undefined,
               {
                 maximumFractionDigits: 0,
-              }
+              },
             )} ${progress > 0 ? 'more' : ''} Yes vote${
               yesVotesRequired > 1 ? 's' : ''
             } required`}</p>
@@ -58,7 +58,7 @@ const ApprovalProgress = ({
       </div>
       {/* ) : null} */}
     </div>
-  )
-}
+  );
+};
 
-export default ApprovalProgress
+export default ApprovalProgress;

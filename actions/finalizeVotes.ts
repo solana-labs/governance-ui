@@ -1,32 +1,32 @@
 import {
   getGovernanceProgramVersion,
   ProgramAccount,
-} from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
+} from '@solana/spl-governance';
+import { RpcContext } from '@solana/spl-governance';
 import {
   Keypair,
   PublicKey,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
-import { Proposal } from '@solana/spl-governance'
-import { withFinalizeVote } from '@solana/spl-governance'
+} from '@solana/web3.js';
+import { sendTransaction } from '@utils/send';
+import { Proposal } from '@solana/spl-governance';
+import { withFinalizeVote } from '@solana/spl-governance';
 
 export const finalizeVote = async (
   { connection, wallet, programId }: RpcContext,
   realm: PublicKey,
-  proposal: ProgramAccount<Proposal>
+  proposal: ProgramAccount<Proposal>,
 ) => {
-  const signers: Keypair[] = []
-  const instructions: TransactionInstruction[] = []
+  const signers: Keypair[] = [];
+  const instructions: TransactionInstruction[] = [];
 
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await getGovernanceProgramVersion(
     connection,
-    programId
-  )
+    programId,
+  );
 
   await withFinalizeVote(
     instructions,
@@ -36,12 +36,12 @@ export const finalizeVote = async (
     proposal.account.governance,
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
-    proposal.account.governingTokenMint
-  )
+    proposal.account.governingTokenMint,
+  );
 
-  const transaction = new Transaction()
+  const transaction = new Transaction();
 
-  transaction.add(...instructions)
+  transaction.add(...instructions);
 
   await sendTransaction({
     transaction,
@@ -50,5 +50,5 @@ export const finalizeVote = async (
     signers,
     sendingMessage: 'Finalizing votes',
     successMessage: 'Votes finalized',
-  })
-}
+  });
+};

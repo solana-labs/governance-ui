@@ -1,16 +1,16 @@
 import {
   ComponentInstructionData,
   InstructionEnum,
-} from '@utils/uiTypes/proposalCreationTypes'
-import React, { ReactNode } from 'react'
-import DryRunInstructionBtn from './DryRunInstructionBtn'
+} from '@utils/uiTypes/proposalCreationTypes';
+import React, { ReactNode } from 'react';
+import DryRunInstructionBtn from './DryRunInstructionBtn';
 
 const InstructionContentContainer = ({
   children,
   instruction,
 }: {
-  children: ReactNode
-  instruction?: ComponentInstructionData
+  children: ReactNode;
+  instruction?: ComponentInstructionData;
 }) => {
   return (
     <div className="space-y-4 w-full">
@@ -23,7 +23,7 @@ const InstructionContentContainer = ({
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default InstructionContentContainer
+export default InstructionContentContainer;

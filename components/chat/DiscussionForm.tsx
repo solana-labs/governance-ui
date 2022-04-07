@@ -1,43 +1,43 @@
-import { useState } from 'react'
-import Button from '../Button'
-import Input from '../inputs/Input'
-import useWalletStore from '../../stores/useWalletStore'
-import useRealm from '../../hooks/useRealm'
-import { RpcContext } from '@solana/spl-governance'
-import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance'
-import { postChatMessage } from '../../actions/chat/postMessage'
-import Loading from '../Loading'
-import Tooltip from '@components/Tooltip'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import { useState } from 'react';
+import Button from '../Button';
+import Input from '../inputs/Input';
+import useWalletStore from '../../stores/useWalletStore';
+import useRealm from '../../hooks/useRealm';
+import { RpcContext } from '@solana/spl-governance';
+import { ChatMessageBody, ChatMessageBodyType } from '@solana/spl-governance';
+import { postChatMessage } from '../../actions/chat/postMessage';
+import Loading from '../Loading';
+import Tooltip from '@components/Tooltip';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 
 const DiscussionForm = () => {
-  const [comment, setComment] = useState('')
-  const connected = useWalletStore((s) => s.connected)
-  const { ownVoterWeight, realmInfo, realm } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const [submitting, setSubmitting] = useState(false)
+  const [comment, setComment] = useState('');
+  const connected = useWalletStore((s) => s.connected);
+  const { ownVoterWeight, realmInfo, realm } = useRealm();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const [submitting, setSubmitting] = useState(false);
 
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const { proposal } = useWalletStore((s) => s.selectedProposal)
-  const { fetchChatMessages } = useWalletStore((s) => s.actions)
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
+  const { proposal } = useWalletStore((s) => s.selectedProposal);
+  const { fetchChatMessages } = useWalletStore((s) => s.actions);
 
   const submitComment = async () => {
-    setSubmitting(true)
+    setSubmitting(true);
 
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection.current,
-      connection.endpoint
-    )
+      connection.endpoint,
+    );
 
     const msg = new ChatMessageBody({
       type: ChatMessageBodyType.Text,
       value: comment,
-    })
+    });
 
     try {
       await postChatMessage(
@@ -47,22 +47,22 @@ const DiscussionForm = () => {
         ownVoterWeight.getTokenRecord(),
         msg,
         undefined,
-        client
-      )
+        client,
+      );
 
-      setComment('')
+      setComment('');
     } catch (ex) {
-      console.error("Can't post chat message", ex)
+      console.error("Can't post chat message", ex);
       //TODO: How do we present transaction errors to users? Just the notification?
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
 
-    fetchChatMessages(proposal!.pubkey)
-  }
+    fetchChatMessages(proposal!.pubkey);
+  };
 
   const postEnabled =
-    proposal && connected && ownVoterWeight.hasAnyWeight() && comment
+    proposal && connected && ownVoterWeight.hasAnyWeight() && comment;
 
   const tooltipContent = !connected
     ? 'Connect your wallet to send a comment'
@@ -70,7 +70,7 @@ const DiscussionForm = () => {
     ? 'You need to have deposited some tokens to submit your comment.'
     : !comment
     ? 'Write a comment to submit'
-    : ''
+    : '';
 
   return (
     <>
@@ -93,7 +93,7 @@ const DiscussionForm = () => {
         </Tooltip>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default DiscussionForm
+export default DiscussionForm;

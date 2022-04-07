@@ -1,30 +1,30 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
-import * as yup from 'yup'
+import React from 'react';
+import * as yup from 'yup';
 import {
   SingleSideStakingClient,
   StakingCampaign,
-} from '@uxdprotocol/uxd-staking-client'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { UXDStakingInitializeStakingCampaignForm } from '@utils/uiTypes/proposalCreationTypes'
-import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration'
-import { getSplTokenInformationByUIName } from '@utils/splTokens'
-import SelectSplToken from '../../SelectSplToken'
-import { findATAAddrSync } from '@utils/ataTools'
-import useWalletStore from 'stores/useWalletStore'
+} from '@uxdprotocol/uxd-staking-client';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { UXDStakingInitializeStakingCampaignForm } from '@utils/uiTypes/proposalCreationTypes';
+import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
+import { getSplTokenInformationByUIName } from '@utils/splTokens';
+import SelectSplToken from '../../SelectSplToken';
+import { findATAAddrSync } from '@utils/ataTools';
+import useWalletStore from 'stores/useWalletStore';
 
 const InitializeStakingCampaign = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletStore((s) => s.current);
 
-  const nowInSec = Math.floor(Date.now() / 1000)
+  const nowInSec = Math.floor(Date.now() / 1000);
 
   const {
     form,
@@ -59,29 +59,29 @@ const InitializeStakingCampaign = ({
 
     buildInstruction: async function () {
       const programId =
-        uxdProtocolStakingConfiguration.programId[connection.cluster]
+        uxdProtocolStakingConfiguration.programId[connection.cluster];
 
       if (!programId) {
         throw new Error(
-          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`
-        )
+          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`,
+        );
       }
 
       const client: SingleSideStakingClient = new SingleSideStakingClient(
-        programId
-      )
+        programId,
+      );
 
       const rewardSplToken = getSplTokenInformationByUIName(
-        form.rewardMintUIName!
-      )
+        form.rewardMintUIName!,
+      );
       const stakedSplToken = getSplTokenInformationByUIName(
-        form.stakedMintUIName!
-      )
+        form.stakedMintUIName!,
+      );
 
-      const authority = governedAccount!.governance.pubkey
+      const authority = governedAccount!.governance.pubkey;
 
-      const [rewardVaultPda] = findATAAddrSync(authority, rewardSplToken.mint)
-      const [stakedVaultPda] = findATAAddrSync(authority, stakedSplToken.mint)
+      const [rewardVaultPda] = findATAAddrSync(authority, rewardSplToken.mint);
+      const [stakedVaultPda] = findATAAddrSync(authority, stakedSplToken.mint);
 
       const stakingCampaign = StakingCampaign.setup(
         rewardSplToken.mint,
@@ -90,8 +90,8 @@ const InitializeStakingCampaign = ({
         stakedSplToken.decimals,
         programId,
         Number(form.startTs!),
-        form.endTs ? form.endTs : undefined
-      )
+        form.endTs ? form.endTs : undefined,
+      );
 
       console.log('Initialize Staking Campaign', {
         authority: authority.toString(),
@@ -106,7 +106,7 @@ const InitializeStakingCampaign = ({
         endTs: form.endTs,
         payer: wallet!.publicKey!.toBase58(),
         uiRewardAmountToDeposit: form.uiRewardAmountToDeposit?.toString(),
-      })
+      });
 
       return client.createInitializeStakingCampaignInstruction({
         authority,
@@ -114,9 +114,9 @@ const InitializeStakingCampaign = ({
         rewardDepositAmount: form.uiRewardAmountToDeposit!,
         options: uxdProtocolStakingConfiguration.TXN_OPTS,
         payer: wallet!.publicKey!,
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -188,7 +188,7 @@ const InitializeStakingCampaign = ({
         error={formErrors['uiRewardAmountToDeposit']}
       />
     </>
-  )
-}
+  );
+};
 
-export default InitializeStakingCampaign
+export default InitializeStakingCampaign;

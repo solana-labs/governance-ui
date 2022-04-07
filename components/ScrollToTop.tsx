@@ -1,27 +1,27 @@
-import React, { useEffect, useState } from 'react'
-import { ChevronUpIcon } from '@heroicons/react/solid'
+import React, { useEffect, useState } from 'react';
+import { ChevronUpIcon } from '@heroicons/react/solid';
 
 export default function ScrollToTop() {
-  const [isVisible, setIsVisible] = useState(false)
+  const [isVisible, setIsVisible] = useState(false);
 
   const toggleVisibility = () => {
     if (window.pageYOffset > 300) {
-      setIsVisible(true)
+      setIsVisible(true);
     } else {
-      setIsVisible(false)
+      setIsVisible(false);
     }
-  }
+  };
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
       behavior: 'smooth',
-    })
-  }
+    });
+  };
 
   useEffect(() => {
-    window.addEventListener('scroll', toggleVisibility)
-  }, [])
+    window.addEventListener('scroll', toggleVisibility);
+  }, []);
 
   return (
     isVisible && (
@@ -32,5 +32,5 @@ export default function ScrollToTop() {
         <ChevronUpIcon className="h-6 w-6 text-primary-light" />
       </div>
     )
-  )
+  );
 }

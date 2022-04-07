@@ -1,10 +1,10 @@
-import useQueryContext from '@hooks/useQueryContext'
-import Link from 'next/link'
+import useQueryContext from '@hooks/useQueryContext';
+import Link from 'next/link';
 
-import ConnectWalletButton from './ConnectWalletButton'
+import ConnectWalletButton from './ConnectWalletButton';
 
 const NavBar = () => {
-  const { fmtUrlWithCluster } = useQueryContext()
+  const { fmtUrlWithCluster } = useQueryContext();
 
   return (
     <div className="grid grid-cols-12 mb-3">
@@ -18,7 +18,7 @@ const NavBar = () => {
         <ConnectWalletButton />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NavBar
+export default NavBar;

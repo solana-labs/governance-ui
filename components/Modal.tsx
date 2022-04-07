@@ -1,5 +1,5 @@
-import { XIcon } from '@heroicons/react/outline'
-import { Portal } from 'react-portal'
+import { XIcon } from '@heroicons/react/outline';
+import { Portal } from 'react-portal';
 
 const Modal = ({
   isOpen,
@@ -57,13 +57,13 @@ const Modal = ({
         </div>
       </div>
     </Portal>
-  )
-}
+  );
+};
 
 const Header = ({ children }) => {
-  return <div className={`flex justify-center bg-bkg-2 pb-4`}>{children}</div>
-}
+  return <div className={`flex justify-center bg-bkg-2 pb-4`}>{children}</div>;
+};
 
-Modal.Header = Header
+Modal.Header = Header;
 
-export default Modal
+export default Modal;

@@ -1,25 +1,25 @@
-import { Menu } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import Loading from '@components/Loading'
+import { Menu } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import Loading from '@components/Loading';
 
 export interface DropdownBtnOptions {
-  isDefault: boolean | undefined
-  label: string
-  callback: () => Promise<void>
+  isDefault: boolean | undefined;
+  label: string;
+  callback: () => Promise<void>;
 }
 
 const DropdownBtn = ({
   options,
   isLoading,
 }: {
-  options: DropdownBtnOptions[]
-  isLoading?: boolean
+  options: DropdownBtnOptions[];
+  isLoading?: boolean;
 }) => {
-  const defaultFunction = options.find((x) => x.isDefault)
+  const defaultFunction = options.find((x) => x.isDefault);
   if (!defaultFunction) {
-    throw 'DropdownBtn must have at least one default option'
+    throw 'DropdownBtn must have at least one default option';
   }
-  const filtredOptions = options.filter((x) => !x.isDefault)
+  const filtredOptions = options.filter((x) => !x.isDefault);
   return (
     <div className="flex">
       {isLoading ? (
@@ -67,7 +67,7 @@ const DropdownBtn = ({
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default DropdownBtn
+export default DropdownBtn;

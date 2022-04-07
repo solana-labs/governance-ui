@@ -1,18 +1,18 @@
-import { BN } from '@project-serum/anchor'
+import { BN } from '@project-serum/anchor';
 import {
   findAuctionAuthority,
   findAuctionPool,
-} from '@soceanfi/descending-auction/dist/pda'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+} from '@soceanfi/descending-auction/dist/pda';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
   PublicKey,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
-import soceanConfiguration from '../configuration'
-import { DescendingAuctionProgram } from '../programs'
+} from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
+import soceanConfiguration from '../configuration';
+import { DescendingAuctionProgram } from '../programs';
 
 export async function initializeAuction({
   cluster,
@@ -27,23 +27,23 @@ export async function initializeAuction({
   ceilPrice,
   floorPrice,
 }: {
-  cluster: EndpointTypes
-  program: DescendingAuctionProgram
-  auction: PublicKey
-  authority: PublicKey
-  paymentMint: PublicKey
-  paymentDestination: PublicKey
-  saleMint: PublicKey
-  startTimestamp: BN
-  endTimestamp: BN
-  ceilPrice: BN
-  floorPrice: BN
+  cluster: EndpointTypes;
+  program: DescendingAuctionProgram;
+  auction: PublicKey;
+  authority: PublicKey;
+  paymentMint: PublicKey;
+  paymentDestination: PublicKey;
+  saleMint: PublicKey;
+  startTimestamp: BN;
+  endTimestamp: BN;
+  ceilPrice: BN;
+  floorPrice: BN;
 }): Promise<TransactionInstruction> {
   const descendingAuctionProgramId =
-    soceanConfiguration.descendingAuctionProgramId[cluster]
+    soceanConfiguration.descendingAuctionProgramId[cluster];
 
   if (!descendingAuctionProgramId) {
-    throw new Error('unsupported cluster to create createAuction instruction')
+    throw new Error('unsupported cluster to create createAuction instruction');
   }
 
   const [
@@ -52,7 +52,7 @@ export async function initializeAuction({
   ] = await Promise.all([
     findAuctionAuthority(descendingAuctionProgramId, auction),
     findAuctionPool(descendingAuctionProgramId, auction, saleMint),
-  ])
+  ]);
 
   console.log('initializeAuction <<<<', {
     cluster,
@@ -70,7 +70,7 @@ export async function initializeAuction({
     auctionAuthorityBump,
     auctionPool: auctionPool.toString(),
     auctionPoolBump,
-  })
+  });
 
   return program.instruction.initializeAuction(
     startTimestamp,
@@ -92,6 +92,6 @@ export async function initializeAuction({
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
       },
-    }
-  )
+    },
+  );
 }

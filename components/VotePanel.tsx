@@ -1,53 +1,55 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 
-import { withFinalizeVote, YesNoVote } from '@solana/spl-governance'
-import { TransactionInstruction } from '@solana/web3.js'
-import { useCallback, useState } from 'react'
-import { relinquishVote } from '../actions/relinquishVote'
-import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired'
-import useRealm from '../hooks/useRealm'
-import { RpcContext } from '@solana/spl-governance'
-import { GoverningTokenType } from '@solana/spl-governance'
+import { withFinalizeVote, YesNoVote } from '@solana/spl-governance';
+import { TransactionInstruction } from '@solana/web3.js';
+import { useCallback, useState } from 'react';
+import { relinquishVote } from '../actions/relinquishVote';
+import { useHasVoteTimeExpired } from '../hooks/useHasVoteTimeExpired';
+import useRealm from '../hooks/useRealm';
+import { RpcContext } from '@solana/spl-governance';
+import { GoverningTokenType } from '@solana/spl-governance';
 
-import useWalletStore, { EnhancedProposalState } from '../stores/useWalletStore'
-import Button, { SecondaryButton } from './Button'
-import VoteCommentModal from './VoteCommentModal'
-import { getProgramVersionForRealm } from '@models/registry/api'
+import useWalletStore, {
+  EnhancedProposalState,
+} from '../stores/useWalletStore';
+import Button, { SecondaryButton } from './Button';
+import VoteCommentModal from './VoteCommentModal';
+import { getProgramVersionForRealm } from '@models/registry/api';
 
 const VotePanel = () => {
-  const [showVoteModal, setShowVoteModal] = useState(false)
-  const [vote, setVote] = useState<YesNoVote | null>(null)
+  const [showVoteModal, setShowVoteModal] = useState(false);
+  const [vote, setVote] = useState<YesNoVote | null>(null);
   const {
     governance,
     proposal,
     voteRecordsByVoter,
     tokenType,
-  } = useWalletStore((s) => s.selectedProposal)
+  } = useWalletStore((s) => s.selectedProposal);
   const {
     ownTokenRecord,
     ownCouncilTokenRecord,
     realm,
     realmInfo,
     ownVoterWeight,
-  } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
+  } = useRealm();
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
+  const connected = useWalletStore((s) => s.connected);
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm);
+  const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!);
 
   const ownVoteRecord =
-    wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
+    wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()];
 
   const voterTokenRecord =
     tokenType === GoverningTokenType.Community
       ? ownTokenRecord
-      : ownCouncilTokenRecord
+      : ownCouncilTokenRecord;
 
-  const isVoteCast = ownVoteRecord !== undefined
+  const isVoteCast = ownVoteRecord !== undefined;
   const isVoting =
     proposal?.account.state === EnhancedProposalState.Voting &&
-    !hasVoteTimeExpired
+    !hasVoteTimeExpired;
 
   const isVoteEnabled =
     connected &&
@@ -55,8 +57,8 @@ const VotePanel = () => {
     !isVoteCast &&
     voterTokenRecord &&
     ownVoterWeight.hasMinAmountToVote(
-      voterTokenRecord.account.governingTokenMint
-    )
+      voterTokenRecord.account.governingTokenMint,
+    );
 
   const isWithdrawEnabled =
     connected &&
@@ -69,20 +71,20 @@ const VotePanel = () => {
       proposal!.account.state === EnhancedProposalState.Succeeded ||
       proposal!.account.state === EnhancedProposalState.Outdated ||
       proposal!.account.state === EnhancedProposalState.Executing ||
-      proposal!.account.state === EnhancedProposalState.Defeated)
+      proposal!.account.state === EnhancedProposalState.Defeated);
 
   const submitRelinquishVote = async () => {
-    const programId = realmInfo?.programId
-    const realmId = realmInfo?.realmId
+    const programId = realmInfo?.programId;
+    const realmId = realmInfo?.realmId;
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
       wallet!,
       connection.current,
-      connection.endpoint
-    )
+      connection.endpoint,
+    );
     try {
-      const instructions: TransactionInstruction[] = []
+      const instructions: TransactionInstruction[] = [];
 
       if (
         proposal?.account.state === EnhancedProposalState.Voting &&
@@ -96,8 +98,8 @@ const VotePanel = () => {
           proposal.account.governance,
           proposal.pubkey,
           proposal.account.tokenOwnerRecord,
-          proposal.account.governingTokenMint
-        )
+          proposal.account.governingTokenMint,
+        );
       }
 
       await relinquishVote(
@@ -106,30 +108,30 @@ const VotePanel = () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
         ownVoteRecord!.pubkey,
-        instructions
-      )
+        instructions,
+      );
     } catch (ex) {
-      console.error("Can't relinquish vote", ex)
+      console.error("Can't relinquish vote", ex);
     }
 
-    await fetchRealm(programId, realmId)
-  }
+    await fetchRealm(programId, realmId);
+  };
 
   const handleShowVoteModal = (vote: YesNoVote) => {
-    setVote(vote)
-    setShowVoteModal(true)
-  }
+    setVote(vote);
+    setShowVoteModal(true);
+  };
 
   const handleCloseShowVoteModal = useCallback(() => {
-    setShowVoteModal(false)
-  }, [])
+    setShowVoteModal(false);
+  }, []);
 
   const actionLabel =
     !isVoteCast || !connected
       ? 'Cast your vote'
       : isVoting
       ? 'Withdraw your vote'
-      : 'Release your tokens'
+      : 'Release your tokens';
 
   const withdrawTooltipContent = !connected
     ? 'You need to connect your wallet'
@@ -137,7 +139,7 @@ const VotePanel = () => {
     ? !ownVoteRecord?.account.isRelinquished
       ? 'Owner vote record is not relinquished'
       : 'The proposal is not in a valid state to execute this action.'
-    : ''
+    : '';
 
   const voteTooltipContent = !connected
     ? 'You need to connect your wallet to be able to vote'
@@ -145,26 +147,26 @@ const VotePanel = () => {
     ? 'Proposal is not in a voting state anymore.'
     : !voterTokenRecord ||
       !ownVoterWeight.hasMinAmountToVote(
-        voterTokenRecord.account.governingTokenMint
+        voterTokenRecord.account.governingTokenMint,
       )
     ? 'You don’t have governance power to vote in this realm'
-    : ''
+    : '';
 
   const notVisibleStatesForNotConnectedWallet = [
     EnhancedProposalState.Cancelled,
     EnhancedProposalState.Succeeded,
     EnhancedProposalState.Draft,
     EnhancedProposalState.Completed,
-  ]
+  ];
 
   const isVisibleToWallet = !connected
     ? !hasVoteTimeExpired &&
       typeof notVisibleStatesForNotConnectedWallet.find(
-        (x) => x === proposal?.account.state
+        (x) => x === proposal?.account.state,
       ) === 'undefined'
-    : !ownVoteRecord?.account.isRelinquished
+    : !ownVoteRecord?.account.isRelinquished;
 
-  const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet
+  const isPanelVisible = (isVoting || isVoteCast) && isVisibleToWallet;
   return (
     <>
       {isPanelVisible && (
@@ -219,7 +221,7 @@ const VotePanel = () => {
         </div>
       )}
     </>
-  )
-}
+  );
+};
 
-export default VotePanel
+export default VotePanel;

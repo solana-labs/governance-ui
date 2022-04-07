@@ -1,72 +1,72 @@
-import React, { useContext, useEffect, useState } from 'react'
-import useRealm from '@hooks/useRealm'
-import { TransactionInstruction } from '@solana/web3.js'
-import useWalletStore from 'stores/useWalletStore'
-import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
+import React, { useContext, useEffect, useState } from 'react';
+import useRealm from '@hooks/useRealm';
+import { TransactionInstruction } from '@solana/web3.js';
+import useWalletStore from 'stores/useWalletStore';
+import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens';
 import {
   ClawbackForm,
   FormInstructionData,
-} from '@utils/uiTypes/proposalCreationTypes'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
+} from '@utils/uiTypes/proposalCreationTypes';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
 import {
   Governance,
   serializeInstructionToBase64,
-} from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { validateInstruction } from '@utils/instructionTools'
-import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new'
-import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
-import * as yup from 'yup'
+} from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { validateInstruction } from '@utils/instructionTools';
+import { NewProposalContext } from 'pages/dao/[symbol]/proposal/new';
+import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect';
+import * as yup from 'yup';
 import {
   Deposit,
   DepositWithMintAccount,
   getRegistrarPDA,
   unusedMintPk,
   Voter,
-} from 'VoteStakeRegistry/sdk/accounts'
-import Select from '@components/inputs/Select'
-import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
-import { fmtMintAmount } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
-import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
-import { abbreviateAddress } from '@utils/formatting'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+} from 'VoteStakeRegistry/sdk/accounts';
+import Select from '@components/inputs/Select';
+import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api';
+import { fmtMintAmount } from '@tools/sdk/units';
+import tokenService from '@utils/services/token';
+import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction';
+import { abbreviateAddress } from '@utils/formatting';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 
 const Clawback = ({
   index,
   governance,
 }: {
-  index: number
-  governance: ProgramAccount<Governance> | null
+  index: number;
+  governance: ProgramAccount<Governance> | null;
 }) => {
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const connection = useWalletStore((s) => s.connection)
-  const { realm } = useRealm()
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const connection = useWalletStore((s) => s.connection);
+  const { realm } = useRealm();
   const {
     governedTokenAccountsWithoutNfts,
     governancesArray,
-  } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
-  const [voters, setVoters] = useState<Voter[]>([])
-  const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([])
+  } = useGovernanceAssets();
+  const shouldBeGoverned = index !== 0 && governance;
+  const [voters, setVoters] = useState<Voter[]>([]);
+  const [deposits, setDeposits] = useState<DepositWithMintAccount[]>([]);
   const [form, setForm] = useState<ClawbackForm>({
     governedTokenAccount: undefined,
     voter: null,
     deposit: null,
-  })
+  });
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
-  >(undefined)
-  const [formErrors, setFormErrors] = useState({})
-  const { handleSetInstruction } = useContext(NewProposalContext)
+  >(undefined);
+  const [formErrors, setFormErrors] = useState({});
+  const { handleSetInstruction } = useContext(NewProposalContext);
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   async function getInstruction(): Promise<FormInstructionData> {
-    const isValid = await validateInstruction({ schema, form, setFormErrors })
-    let serializedInstruction = ''
-    const prerequisiteInstructions: TransactionInstruction[] = []
+    const isValid = await validateInstruction({ schema, form, setFormErrors });
+    let serializedInstruction = '';
+    const prerequisiteInstructions: TransactionInstruction[] = [];
     if (
       isValid &&
       form.governedTokenAccount?.token?.publicKey &&
@@ -76,8 +76,8 @@ const Clawback = ({
       form.deposit
     ) {
       const clawbackDestination =
-        form.governedTokenAccount.token?.account.address
-      const voterWalletAddress = form.voter.voterAuthority
+        form.governedTokenAccount.token?.account.address;
+      const voterWalletAddress = form.voter.voterAuthority;
       const clawbackIx = await getClawbackInstruction({
         realmPk: realm!.pubkey,
         realmAuthority: realm!.account.authority!,
@@ -87,41 +87,41 @@ const Clawback = ({
         grantMintPk: form.deposit.mint.publicKey,
         realmCommunityMintPk: realm!.account.communityMint,
         client,
-      })
-      serializedInstruction = serializeInstructionToBase64(clawbackIx!)
+      });
+      serializedInstruction = serializeInstructionToBase64(clawbackIx!);
     }
 
     const obj: FormInstructionData = {
       serializedInstruction,
       isValid,
       governance: governancesArray.find(
-        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
+        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58(),
       ),
       prerequisiteInstructions: prerequisiteInstructions,
       chunkSplitByDefault: true,
-    }
-    return obj
+    };
+    return obj;
   }
   useEffect(() => {
     handleSetInstruction(
       { governedAccount: governedAccount, getInstruction },
-      index
-    )
-  }, [form])
+      index,
+    );
+  }, [form]);
   useEffect(() => {
     setGovernedAccount(
       governancesArray.find(
-        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
-      )
-    )
-  }, [form.governedTokenAccount])
+        (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58(),
+      ),
+    );
+  }, [form.governedTokenAccount]);
   useEffect(() => {
     const getVoters = async () => {
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        client!.program.programId
-      )
+        client!.program.programId,
+      );
       const resp = await client?.program.account.voter.all([
         {
           memcmp: {
@@ -129,38 +129,38 @@ const Clawback = ({
             bytes: registrar.toString(),
           },
         },
-      ])
+      ]);
       const voters =
         resp
           ?.filter(
             (x) =>
               (x.account.deposits as Deposit[]).filter(
-                (depo) => depo.allowClawback
-              ).length
+                (depo) => depo.allowClawback,
+              ).length,
           )
-          .map((x) => x.account as Voter) || []
+          .map((x) => x.account as Voter) || [];
 
-      setVoters([...voters])
-    }
+      setVoters([...voters]);
+    };
     if (client) {
-      getVoters()
+      getVoters();
     }
-  }, [client])
+  }, [client]);
   useEffect(() => {
     const getOwnedDepositsInfo = async () => {
       const { registrar } = await getRegistrarPDA(
         realm!.pubkey,
         realm!.account.communityMint,
-        client!.program.programId
-      )
-      const existingRegistrar = await tryGetRegistrar(registrar, client!)
-      const mintCfgs = existingRegistrar?.votingMints
-      const mints = {}
+        client!.program.programId,
+      );
+      const existingRegistrar = await tryGetRegistrar(registrar, client!);
+      const mintCfgs = existingRegistrar?.votingMints;
+      const mints = {};
       if (mintCfgs) {
         for (const i of mintCfgs) {
           if (i.mint.toBase58() !== unusedMintPk) {
-            const mint = await tryGetMint(connection.current, i.mint)
-            mints[i.mint.toBase58()] = mint
+            const mint = await tryGetMint(connection.current, i.mint);
+            mints[i.mint.toBase58()] = mint;
           }
         }
       }
@@ -171,46 +171,46 @@ const Clawback = ({
             index,
             mint: mints[mintCfgs![depo.votingMintConfigIdx].mint.toBase58()],
             //warning no currentlyLocked, available, vestingrate props
-          } as DepositWithMintAccount
-        }) || []
-      setDeposits(deposits)
-    }
+          } as DepositWithMintAccount;
+        }) || [];
+      setDeposits(deposits);
+    };
     if (form.voter) {
-      getOwnedDepositsInfo()
+      getOwnedDepositsInfo();
     } else {
-      setDeposits([])
+      setDeposits([]);
     }
-    setForm({ ...form, deposit: null, governedTokenAccount: undefined })
-  }, [form.voter])
+    setForm({ ...form, deposit: null, governedTokenAccount: undefined });
+  }, [form.voter]);
   useEffect(() => {
-    setForm({ ...form, governedTokenAccount: undefined })
-  }, [form.deposit])
+    setForm({ ...form, governedTokenAccount: undefined });
+  }, [form.deposit]);
   const schema = yup.object().shape({
     governedTokenAccount: yup
       .object()
       .required('Clawback destination required'),
     voter: yup.object().nullable().required('Voter required'),
     deposit: yup.object().nullable().required('Deposit required'),
-  })
+  });
 
   const getOwnedDepositsLabel = (deposit: DepositWithMintAccount | null) => {
     const symbol = deposit
       ? tokenService.getTokenInfo(deposit.mint.publicKey.toBase58())?.symbol ||
         ''
-      : null
+      : null;
     return deposit
       ? `${fmtMintAmount(
           deposit.mint.account,
-          deposit.amountDepositedNative
+          deposit.amountDepositedNative,
         )} ${symbol ? symbol : abbreviateAddress(deposit.mint.publicKey)}`
-      : null
-  }
+      : null;
+  };
   return (
     <>
       <Select
         label="Voter"
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'voter' })
+          handleSetForm({ value, propertyName: 'voter' });
         }}
         placeholder="Please select..."
         value={form.voter?.voterAuthority.toBase58()}
@@ -221,13 +221,13 @@ const Clawback = ({
             <Select.Option key={idx} value={x}>
               {x.voterAuthority.toBase58()}
             </Select.Option>
-          )
+          );
         })}
       </Select>
       <Select
         label="Deposit"
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'deposit' })
+          handleSetForm({ value, propertyName: 'deposit' });
         }}
         placeholder="Please select..."
         value={getOwnedDepositsLabel(form.deposit)}
@@ -240,7 +240,7 @@ const Clawback = ({
               <Select.Option key={idx} value={x}>
                 {getOwnedDepositsLabel(x)}
               </Select.Option>
-            )
+            );
           })}
       </Select>
       <GovernedAccountSelect
@@ -249,11 +249,11 @@ const Clawback = ({
           governedTokenAccountsWithoutNfts.filter(
             (x) =>
               x.mint?.publicKey.toBase58() ===
-              form.deposit?.mint.publicKey.toBase58()
+              form.deposit?.mint.publicKey.toBase58(),
           ) as GovernedMultiTypeAccount[]
         }
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedTokenAccount' })
+          handleSetForm({ value, propertyName: 'governedTokenAccount' });
         }}
         value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
@@ -261,7 +261,7 @@ const Clawback = ({
         governance={governance}
       ></GovernedAccountSelect>
     </>
-  )
-}
+  );
+};
 
-export default Clawback
+export default Clawback;

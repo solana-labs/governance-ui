@@ -1,152 +1,154 @@
-import useWalletStore from 'stores/useWalletStore'
-import useRealm from 'hooks/useRealm'
-import React, { useEffect, useState } from 'react'
-import ProposalFilter from 'components/ProposalFilter'
+import useWalletStore from 'stores/useWalletStore';
+import useRealm from 'hooks/useRealm';
+import React, { useEffect, useState } from 'react';
+import ProposalFilter from 'components/ProposalFilter';
 import {
   Governance,
   ProgramAccount,
   Proposal,
   ProposalState,
-} from '@solana/spl-governance'
-import NewProposalBtn from './proposal/components/NewProposalBtn'
-import { PublicKey } from '@solana/web3.js'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { usePrevious } from '@hooks/usePrevious'
-import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import ApproveAllBtn from './proposal/components/ApproveAllBtn'
-import dynamic from 'next/dynamic'
-import Loading from '@components/Loading'
-import PaginationComponent from '@components/Pagination'
-import HotWallet from '@components/HotWallet/HotWallet'
+} from '@solana/spl-governance';
+import NewProposalBtn from './proposal/components/NewProposalBtn';
+import { PublicKey } from '@solana/web3.js';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import { usePrevious } from '@hooks/usePrevious';
+import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper';
+import ApproveAllBtn from './proposal/components/ApproveAllBtn';
+import dynamic from 'next/dynamic';
+import Loading from '@components/Loading';
+import PaginationComponent from '@components/Pagination';
+import HotWallet from '@components/HotWallet/HotWallet';
 const AccountsCompactWrapper = dynamic(
-  () => import('@components/TreasuryAccount/AccountsCompactWrapper')
-)
+  () => import('@components/TreasuryAccount/AccountsCompactWrapper'),
+);
 const MembersCompactWrapper = dynamic(
-  () => import('@components/Members/MembersCompactWrapper')
-)
+  () => import('@components/Members/MembersCompactWrapper'),
+);
 const AssetsCompactWrapper = dynamic(
-  () => import('@components/AssetsList/AssetsCompactWrapper')
-)
+  () => import('@components/AssetsList/AssetsCompactWrapper'),
+);
 const NFTSCompactWrapper = dynamic(
-  () => import('@components/NFTS/NFTSCompactWrapper')
-)
-const ProposalCard = dynamic(() => import('components/ProposalCard'))
-const RealmHeader = dynamic(() => import('components/RealmHeader'))
+  () => import('@components/NFTS/NFTSCompactWrapper'),
+);
+const ProposalCard = dynamic(() => import('components/ProposalCard'));
+const RealmHeader = dynamic(() => import('components/RealmHeader'));
 const DepositLabel = dynamic(
-  () => import('@components/TreasuryAccount/DepositLabel')
-)
+  () => import('@components/TreasuryAccount/DepositLabel'),
+);
 
 const compareProposals = (
   p1: Proposal,
   p2: Proposal,
   governances: {
-    [governance: string]: ProgramAccount<Governance>
-  }
+    [governance: string]: ProgramAccount<Governance>;
+  },
 ) => {
-  const p1Rank = p1.getStateSortRank()
-  const p2Rank = p2.getStateSortRank()
+  const p1Rank = p1.getStateSortRank();
+  const p2Rank = p2.getStateSortRank();
 
   if (p1Rank > p2Rank) {
-    return 1
+    return 1;
   } else if (p1Rank < p2Rank) {
-    return -1
+    return -1;
   }
 
   if (p1.state === ProposalState.Voting && p2.state === ProposalState.Voting) {
-    const p1VotingRank = getVotingStateRank(p1, governances)
-    const p2VotingRank = getVotingStateRank(p2, governances)
+    const p1VotingRank = getVotingStateRank(p1, governances);
+    const p2VotingRank = getVotingStateRank(p2, governances);
 
     if (p1VotingRank > p2VotingRank) {
-      return 1
+      return 1;
     } else if (p1VotingRank < p2VotingRank) {
-      return -1
+      return -1;
     }
 
     // Show the proposals in voting state expiring earlier at the top
-    return p2.getStateTimestamp() - p1.getStateTimestamp()
+    return p2.getStateTimestamp() - p1.getStateTimestamp();
   }
 
-  return p1.getStateTimestamp() - p2.getStateTimestamp()
-}
+  return p1.getStateTimestamp() - p2.getStateTimestamp();
+};
 
 /// Compares proposals in voting state to distinguish between Voting and Finalizing states
 function getVotingStateRank(
   proposal: Proposal,
   governances: {
-    [governance: string]: ProgramAccount<Governance>
-  }
+    [governance: string]: ProgramAccount<Governance>;
+  },
 ) {
   // Show proposals in Voting state before proposals in Finalizing state
-  const governance = governances[proposal.governance.toBase58()].account
-  return proposal.hasVoteTimeEnded(governance) ? 0 : 1
+  const governance = governances[proposal.governance.toBase58()].account;
+  return proposal.hasVoteTimeEnded(governance) ? 0 : 1;
 }
 
 const REALM = () => {
-  const { realm, realmInfo, proposals, governances } = useRealm()
-  const proposalsPerPage = 20
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
+  const { realm, realmInfo, proposals, governances } = useRealm();
+  const proposalsPerPage = 20;
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets();
   const prevStringifyNftsGovernedTokenAccounts = usePrevious(
-    JSON.stringify(nftsGovernedTokenAccounts)
-  )
-  const connection = useWalletStore((s) => s.connection.current)
-  const { getNfts } = useTreasuryAccountStore()
-  const [filters, setFilters] = useState<ProposalState[]>([])
+    JSON.stringify(nftsGovernedTokenAccounts),
+  );
+  const connection = useWalletStore((s) => s.connection.current);
+  const { getNfts } = useTreasuryAccountStore();
+  const [filters, setFilters] = useState<ProposalState[]>([]);
   const [displayedProposals, setDisplayedProposals] = useState(
-    Object.entries(proposals)
-  )
+    Object.entries(proposals),
+  );
 
   const [paginatedProposals, setPaginatedProposals] = useState<
     [string, ProgramAccount<Proposal>][]
-  >([])
-  const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
+  >([]);
+  const [filteredProposals, setFilteredProposals] = useState(
+    displayedProposals,
+  );
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].account, a[1].account, governances)
-  )
+    compareProposals(b[1].account, a[1].account, governances),
+  );
 
   useEffect(() => {
-    setPaginatedProposals(paginateProposals(0))
-  }, [filteredProposals])
+    setPaginatedProposals(paginateProposals(0));
+  }, [filteredProposals]);
   useEffect(() => {
     if (filters.length > 0) {
       const proposals = allProposals.filter(
-        ([, v]) => !filters.includes(v.account.state)
-      )
-      setFilteredProposals(proposals)
+        ([, v]) => !filters.includes(v.account.state),
+      );
+      setFilteredProposals(proposals);
     } else {
-      setFilteredProposals(allProposals)
+      setFilteredProposals(allProposals);
     }
-  }, [filters])
+  }, [filters]);
 
   useEffect(() => {
     const proposals =
       filters.length > 0
         ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
-        : allProposals
+        : allProposals;
 
-    setDisplayedProposals(proposals)
-    setFilteredProposals(proposals)
-  }, [proposals])
+    setDisplayedProposals(proposals);
+    setFilteredProposals(proposals);
+  }, [proposals]);
 
   useEffect(() => {
     if (
       prevStringifyNftsGovernedTokenAccounts !==
       JSON.stringify(nftsGovernedTokenAccounts)
     ) {
-      getNfts(nftsGovernedTokenAccounts, connection)
+      getNfts(nftsGovernedTokenAccounts, connection);
     }
-  }, [JSON.stringify(nftsGovernedTokenAccounts)])
+  }, [JSON.stringify(nftsGovernedTokenAccounts)]);
 
   const onProposalPageChange = (page) => {
-    setPaginatedProposals(paginateProposals(page))
-  }
+    setPaginatedProposals(paginateProposals(page));
+  };
   const paginateProposals = (page) => {
     return filteredProposals.slice(
       page * proposalsPerPage,
-      (page + 1) * proposalsPerPage
-    )
-  }
+      (page + 1) * proposalsPerPage,
+    );
+  };
   return (
     <>
       <div className="grid grid-cols-12 gap-4">
@@ -168,8 +170,8 @@ const REALM = () => {
                     {/* temp. setup for Ukraine.SOL */}
                     {realmInfo.realmId.equals(
                       new PublicKey(
-                        '5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d'
-                      )
+                        '5piGF94RbCqaogoFFWA9cYmt29qUpQejGCEjRKuwCz7d',
+                      ),
                     ) ? (
                       <div>
                         <div className="mb-10">
@@ -178,7 +180,7 @@ const REALM = () => {
                             header="Wallet Address"
                             transferAddress={
                               new PublicKey(
-                                '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV'
+                                '66pJhhESDjdeBBDdkKmxYYd7q6GUggYPWjxpMKNX39KV',
                               )
                             }
                           ></DepositLabel>
@@ -213,7 +215,7 @@ const REALM = () => {
                     ))}
                     <PaginationComponent
                       totalPages={Math.ceil(
-                        filteredProposals.length / proposalsPerPage
+                        filteredProposals.length / proposalsPerPage,
                       )}
                       onPageChange={onProposalPageChange}
                     ></PaginationComponent>
@@ -252,7 +254,7 @@ const REALM = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default REALM
+export default REALM;

@@ -1,12 +1,12 @@
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js';
 
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { getRegistrarPDA, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
+import { getRegistrarPDA, getVoterPDA } from 'VoteStakeRegistry/sdk/accounts';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
+} from '@solana/spl-token';
 
 export const getClawbackInstruction = async ({
   realmPk,
@@ -18,34 +18,34 @@ export const getClawbackInstruction = async ({
   realmCommunityMintPk,
   client,
 }: {
-  realmPk: PublicKey
-  realmAuthority: PublicKey
-  voterWalletAddress: PublicKey
-  destination: PublicKey
-  voterDepositIndex: number
-  grantMintPk: PublicKey
-  realmCommunityMintPk: PublicKey
-  client?: VsrClient
+  realmPk: PublicKey;
+  realmAuthority: PublicKey;
+  voterWalletAddress: PublicKey;
+  destination: PublicKey;
+  voterDepositIndex: number;
+  grantMintPk: PublicKey;
+  realmCommunityMintPk: PublicKey;
+  client?: VsrClient;
 }) => {
-  const clientProgramId = client!.program.programId
+  const clientProgramId = client!.program.programId;
 
   const { registrar } = await getRegistrarPDA(
     realmPk,
     realmCommunityMintPk,
-    clientProgramId
-  )
+    clientProgramId,
+  );
   const { voter } = await getVoterPDA(
     registrar,
     voterWalletAddress,
-    clientProgramId
-  )
+    clientProgramId,
+  );
 
   const voterATAPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     grantMintPk,
-    voter
-  )
+    voter,
+  );
 
   const clawbackIx = client?.program.instruction.clawback(voterDepositIndex, {
     accounts: {
@@ -56,6 +56,6 @@ export const getClawbackInstruction = async ({
       destination,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
-  })
-  return clawbackIx
-}
+  });
+  return clawbackIx;
+};

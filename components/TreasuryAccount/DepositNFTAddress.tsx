@@ -1,70 +1,70 @@
-import React, { useEffect, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import Input from '@components/inputs/Input'
-import { tryParseKey } from '@tools/validators/pubkey'
-import { debounce } from '@utils/debounce'
-import useWalletStore from 'stores/useWalletStore'
-import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
-import axios from 'axios'
-import { notify } from '@utils/notifications'
-import Loading from '@components/Loading'
-import Button, { LinkButton } from '@components/Button'
-import { PublicKey } from '@solana/web3.js'
+import React, { useEffect, useState } from 'react';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import Input from '@components/inputs/Input';
+import { tryParseKey } from '@tools/validators/pubkey';
+import { debounce } from '@utils/debounce';
+import useWalletStore from 'stores/useWalletStore';
+import { Metadata } from '@metaplex-foundation/mpl-token-metadata';
+import axios from 'axios';
+import { notify } from '@utils/notifications';
+import Loading from '@components/Loading';
+import Button, { LinkButton } from '@components/Button';
+import { PublicKey } from '@solana/web3.js';
 import {
   ASSOCIATED_TOKEN_PROGRAM_ID,
   Token,
   TOKEN_PROGRAM_ID,
-} from '@solana/spl-token'
-import Tooltip from '@components/Tooltip'
-import { tryGetAta } from '@utils/validations'
-import useRealm from '@hooks/useRealm'
-import { createATA } from '@utils/ataTools'
-import { abbreviateAddress } from '@utils/formatting'
-import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import DepositLabel from './DepositLabel'
-import NFTAccountSelect from './NFTAccountSelect'
-import ImgWithLoader from '@components/ImgWithLoader'
+} from '@solana/spl-token';
+import Tooltip from '@components/Tooltip';
+import { tryGetAta } from '@utils/validations';
+import useRealm from '@hooks/useRealm';
+import { createATA } from '@utils/ataTools';
+import { abbreviateAddress } from '@utils/formatting';
+import { DuplicateIcon, ExclamationIcon } from '@heroicons/react/outline';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import DepositLabel from './DepositLabel';
+import NFTAccountSelect from './NFTAccountSelect';
+import ImgWithLoader from '@components/ImgWithLoader';
 const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount);
 
-  const wallet = useWalletStore((s) => s.current)
-  const { realm } = useRealm()
-  const connected = useWalletStore((s) => s.connected)
+  const wallet = useWalletStore((s) => s.current);
+  const { realm } = useRealm();
+  const connected = useWalletStore((s) => s.connected);
   const [form, setForm] = useState({
     mint: '',
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [nftMetaData, setNftMetaData] = useState<Metadata | null>(null)
-  const [isInvalidMint, setIsInvalidMint] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
-  const [imgUrl, setImgUrl] = useState('')
-  const [ataAddress, setAtaAddress] = useState('')
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [nftMetaData, setNftMetaData] = useState<Metadata | null>(null);
+  const [isInvalidMint, setIsInvalidMint] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
+  const [imgUrl, setImgUrl] = useState('');
+  const [ataAddress, setAtaAddress] = useState('');
+  const { nftsGovernedTokenAccounts } = useGovernanceAssets();
+  const { setCurrentAccount } = useTreasuryAccountStore();
+  const connection = useWalletStore((s) => s.connection);
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   const handleGenerateATAAddress = async () => {
-    setAtaAddress('')
+    setAtaAddress('');
     if (!currentAccount) {
-      throw 'No governance selected'
+      throw 'No governance selected';
     }
     if (!realm) {
-      throw 'no realm selected'
+      throw 'no realm selected';
     }
-    const mintPK = new PublicKey(form.mint)
-    const owner = currentAccount!.governance!.pubkey
+    const mintPK = new PublicKey(form.mint);
+    const owner = currentAccount!.governance!.pubkey;
     const ataPk = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
       TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
       mintPK, // mint
-      owner! // owner
-    )
-    const ata = ataPk.toBase58()
-    const isExistingAta = await tryGetAta(connection.current, mintPK, owner)
+      owner!, // owner
+    );
+    const ata = ataPk.toBase58();
+    const isExistingAta = await tryGetAta(connection.current, mintPK, owner);
     if (!isExistingAta) {
       try {
         await createATA(
@@ -72,73 +72,73 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
           wallet,
           mintPK,
           owner,
-          wallet!.publicKey!
-        )
-        setAtaAddress(ata)
+          wallet!.publicKey!,
+        );
+        setAtaAddress(ata);
       } catch (e) {
         notify({
           type: 'error',
           message: 'Unable to create address',
-        })
-        setAtaAddress('')
+        });
+        setAtaAddress('');
       }
     } else {
-      setAtaAddress(ata)
+      setAtaAddress(ata);
     }
-  }
+  };
   useEffect(() => {
-    setIsInvalidMint(false)
+    setIsInvalidMint(false);
     if (form.mint) {
       debounce.debounceFcn(async () => {
-        const pubKey = tryParseKey(form.mint)
+        const pubKey = tryParseKey(form.mint);
         if (pubKey) {
-          setIsLoading(true)
+          setIsLoading(true);
           try {
-            const metadataPDA = await Metadata.getPDA(pubKey)
+            const metadataPDA = await Metadata.getPDA(pubKey);
             const tokenMetadata = await Metadata.load(
               connection.current,
-              metadataPDA
-            )
-            setNftMetaData(tokenMetadata)
+              metadataPDA,
+            );
+            setNftMetaData(tokenMetadata);
           } catch (e) {
             notify({
               type: 'error',
               message: 'Unable to fetch nft',
-            })
-            setNftMetaData(null)
+            });
+            setNftMetaData(null);
           }
-          setIsLoading(false)
+          setIsLoading(false);
         } else {
-          setIsInvalidMint(true)
-          setNftMetaData(null)
+          setIsInvalidMint(true);
+          setNftMetaData(null);
         }
-      })
+      });
     } else {
-      setNftMetaData(null)
+      setNftMetaData(null);
     }
-  }, [form.mint])
+  }, [form.mint]);
   useEffect(() => {
-    const uri = nftMetaData?.data?.data?.uri
+    const uri = nftMetaData?.data?.data?.uri;
     const getNftData = async (uri) => {
       if (uri) {
-        setIsLoading(true)
+        setIsLoading(true);
         try {
-          const nftResponse = (await axios.get(uri)).data
-          setImgUrl(nftResponse.image)
+          const nftResponse = (await axios.get(uri)).data;
+          setImgUrl(nftResponse.image);
         } catch (e) {
           notify({
             type: 'error',
             message: 'Unable to fetch nft',
-          })
+          });
         }
-        setIsLoading(false)
+        setIsLoading(false);
       } else {
-        setImgUrl('')
+        setImgUrl('');
       }
-    }
-    setAtaAddress('')
-    getNftData(uri)
-  }, [JSON.stringify(nftMetaData)])
+    };
+    setAtaAddress('');
+    getNftData(uri);
+  }, [JSON.stringify(nftMetaData)]);
   return (
     <>
       <NFTAccountSelect
@@ -204,7 +204,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
             <LinkButton
               className="ml-4 text-th-fgd-1"
               onClick={() => {
-                navigator.clipboard.writeText(ataAddress)
+                navigator.clipboard.writeText(ataAddress);
               }}
             >
               <DuplicateIcon className="w-5 h-5 mt-1" />
@@ -216,7 +216,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         <div className="ml-auto">{additionalBtns}</div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default DepositNFTAddress
+export default DepositNFTAddress;

@@ -1,10 +1,10 @@
-import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline'
+import { XCircleIcon, CheckCircleIcon } from '@heroicons/react/outline';
 
 type VoteResultStatusProps = {
-  progress: number
-  votePassed: boolean | undefined
-  yesVotesRequired: number
-}
+  progress: number;
+  votePassed: boolean | undefined;
+  yesVotesRequired: number;
+};
 
 const VoteResultStatus = ({
   progress,
@@ -26,7 +26,7 @@ const VoteResultStatus = ({
             undefined,
             {
               maximumFractionDigits: 0,
-            }
+            },
           )} more Yes vote${yesVotesRequired > 1 ? 's' : ''} were needed`}</p>
         </div>
       </div>
@@ -41,7 +41,7 @@ const VoteResultStatus = ({
         ></div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default VoteResultStatus
+export default VoteResultStatus;

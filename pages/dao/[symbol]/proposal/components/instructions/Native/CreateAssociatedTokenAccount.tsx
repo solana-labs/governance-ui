@@ -1,10 +1,10 @@
-import * as yup from 'yup'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { createAssociatedTokenAccount } from '@utils/associated'
-import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { CreateAssociatedTokenAccountForm } from '@utils/uiTypes/proposalCreationTypes'
+import * as yup from 'yup';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { createAssociatedTokenAccount } from '@utils/associated';
+import { getSplTokenMintAddressByUIName, SPL_TOKENS } from '@utils/splTokens';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { CreateAssociatedTokenAccountForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -12,14 +12,14 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governed account is required'),
   splTokenMintUIName: yup.string().required('SPL Token Mint is required'),
-})
+});
 
 const CreateAssociatedTokenAccount = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -40,11 +40,11 @@ const CreateAssociatedTokenAccount = ({
         governedAccountPubkey,
 
         // splTokenMintAddress
-        getSplTokenMintAddressByUIName(form.splTokenMintUIName!)
-      )
-      return tx
+        getSplTokenMintAddressByUIName(form.splTokenMintUIName!),
+      );
+      return tx;
     },
-  })
+  });
 
   return (
     <Select
@@ -66,7 +66,7 @@ const CreateAssociatedTokenAccount = ({
         </Select.Option>
       ))}
     </Select>
-  )
-}
+  );
+};
 
-export default CreateAssociatedTokenAccount
+export default CreateAssociatedTokenAccount;

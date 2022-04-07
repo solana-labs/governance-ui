@@ -1,11 +1,15 @@
-import { findHoldingPDA, findVaultPDA, findVestingPDA } from '@soceanfi/bonding'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
-import { BondingProgram } from '../programs'
-import soceanConfiguration from '../configuration'
+import {
+  findHoldingPDA,
+  findVaultPDA,
+  findVestingPDA,
+} from '@soceanfi/bonding';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
+import { BondingProgram } from '../programs';
+import soceanConfiguration from '../configuration';
 
-const INDEX_MAGIC_NUMBER = 0
+const INDEX_MAGIC_NUMBER = 0;
 
 export async function cancelVest({
   cluster,
@@ -17,29 +21,29 @@ export async function cancelVest({
   userBondedAccount,
   userTargetAccount,
 }: {
-  cluster: EndpointTypes
-  program: BondingProgram
-  refundRentTo: PublicKey
-  authority: PublicKey
-  bondPool: PublicKey
-  bondedMint: PublicKey
-  userBondedAccount: PublicKey
-  userTargetAccount: PublicKey
+  cluster: EndpointTypes;
+  program: BondingProgram;
+  refundRentTo: PublicKey;
+  authority: PublicKey;
+  bondPool: PublicKey;
+  bondedMint: PublicKey;
+  userBondedAccount: PublicKey;
+  userTargetAccount: PublicKey;
 }): Promise<TransactionInstruction> {
-  const bondingProgramId = soceanConfiguration.bondingProgramId[cluster]
+  const bondingProgramId = soceanConfiguration.bondingProgramId[cluster];
 
   if (!bondingProgramId) {
     throw new Error(
-      'unsupported cluster to create mintBondedTokens instruction'
-    )
+      'unsupported cluster to create mintBondedTokens instruction',
+    );
   }
 
   const [[vault], [vesting]] = await Promise.all([
     findVaultPDA(bondingProgramId, bondPool),
     findVestingPDA(bondingProgramId, bondPool, authority, INDEX_MAGIC_NUMBER),
-  ])
+  ]);
 
-  const [holding] = await findHoldingPDA(bondingProgramId, vesting)
+  const [holding] = await findHoldingPDA(bondingProgramId, vesting);
 
   console.log('Cancel vest', {
     vault: vault.toString(),
@@ -50,7 +54,7 @@ export async function cancelVest({
     bondPool: bondPool.toString(),
     bondedMint: bondedMint.toString(),
     holding: holding.toString(),
-  })
+  });
 
   return program.instruction.cancelVest({
     accounts: {
@@ -65,5 +69,5 @@ export async function cancelVest({
       vault,
       tokenProgram: TOKEN_PROGRAM_ID,
     },
-  })
+  });
 }

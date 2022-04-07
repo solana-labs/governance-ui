@@ -1,22 +1,22 @@
-import React from 'react'
-import { flagInstructionError } from 'actions/flagInstructionError'
+import React from 'react';
+import { flagInstructionError } from 'actions/flagInstructionError';
 import {
   InstructionExecutionStatus,
   Proposal,
   ProposalTransaction,
   TokenOwnerRecord,
-} from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import useRealm from '@hooks/useRealm'
-import useWalletStore from 'stores/useWalletStore'
-import { PlayState } from './ExecuteInstructionButton'
-import { ExclamationCircleIcon } from '@heroicons/react/solid'
-import Button from '@components/Button'
-import Tooltip from '@components/Tooltip'
-import { notify } from '@utils/notifications'
-import { PublicKey } from '@solana/web3.js'
-import { getProgramVersionForRealm } from '@models/registry/api'
+} from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { RpcContext } from '@solana/spl-governance';
+import useRealm from '@hooks/useRealm';
+import useWalletStore from 'stores/useWalletStore';
+import { PlayState } from './ExecuteInstructionButton';
+import { ExclamationCircleIcon } from '@heroicons/react/solid';
+import Button from '@components/Button';
+import Tooltip from '@components/Tooltip';
+import { notify } from '@utils/notifications';
+import { PublicKey } from '@solana/web3.js';
+import { getProgramVersionForRealm } from '@models/registry/api';
 
 export function FlagInstructionErrorButton({
   proposal,
@@ -24,14 +24,14 @@ export function FlagInstructionErrorButton({
   playState,
   proposalAuthority,
 }: {
-  proposal: ProgramAccount<Proposal>
-  proposalInstruction: ProgramAccount<ProposalTransaction>
-  playState: PlayState
-  proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined
+  proposal: ProgramAccount<Proposal>;
+  proposalInstruction: ProgramAccount<ProposalTransaction>;
+  playState: PlayState;
+  proposalAuthority: ProgramAccount<TokenOwnerRecord> | undefined;
 }) {
-  const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
+  const { realmInfo } = useRealm();
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
 
   if (
     playState !== PlayState.Error ||
@@ -39,7 +39,7 @@ export function FlagInstructionErrorButton({
       InstructionExecutionStatus.Error ||
     !proposalAuthority
   ) {
-    return null
+    return null;
   }
 
   const onFlagError = async () => {
@@ -49,22 +49,22 @@ export function FlagInstructionErrorButton({
         getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
-        connection.endpoint
-      )
+        connection.endpoint,
+      );
 
       await flagInstructionError(
         rpcContext,
         proposal,
-        proposalInstruction.pubkey
-      )
+        proposalInstruction.pubkey,
+      );
     } catch (error) {
       notify({
         type: 'error',
         message: 'could not flag as broken',
         description: `${error}`,
-      })
+      });
     }
-  }
+  };
 
   return (
     <Tooltip content="Flag instruction as broken">
@@ -77,5 +77,5 @@ export function FlagInstructionErrorButton({
         </Button>
       </p>
     </Tooltip>
-  )
+  );
 }

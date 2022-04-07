@@ -1,24 +1,24 @@
-import { abbreviateAddress } from '@utils/formatting'
-import { HotWalletTokenAccounts } from '@hooks/useHotWalletPluginTokenAccounts'
-import { getExplorerUrl } from '@components/explorer/tools'
-import useWalletStore from 'stores/useWalletStore'
-import { createRef } from 'react'
-import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units'
+import { abbreviateAddress } from '@utils/formatting';
+import { HotWalletTokenAccounts } from '@hooks/useHotWalletPluginTokenAccounts';
+import { getExplorerUrl } from '@components/explorer/tools';
+import useWalletStore from 'stores/useWalletStore';
+import { createRef } from 'react';
+import { ExternalLinkIcon } from '@heroicons/react/outline';
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 
 const TokenAccount = ({ info }: { info: HotWalletTokenAccounts[0] }) => {
-  const connection = useWalletStore((store) => store.connection)
+  const connection = useWalletStore((store) => store.connection);
 
-  const linkRef = createRef<HTMLAnchorElement>()
+  const linkRef = createRef<HTMLAnchorElement>();
 
   const amountFormatted = nativeAmountToFormattedUiAmount(
     info.amount,
-    info.decimals
-  )
+    info.decimals,
+  );
 
   const usdTotalValueFormatted = info.usdTotalValue.isZero()
     ? ''
-    : `$${nativeAmountToFormattedUiAmount(info.usdTotalValue, info.decimals)}`
+    : `$${nativeAmountToFormattedUiAmount(info.usdTotalValue, info.decimals)}`;
 
   return (
     <div
@@ -50,7 +50,7 @@ const TokenAccount = ({ info }: { info: HotWalletTokenAccounts[0] }) => {
         <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
       </a>
     </div>
-  )
-}
+  );
+};
 
-export default TokenAccount
+export default TokenAccount;

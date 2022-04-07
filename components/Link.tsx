@@ -1,6 +1,6 @@
-import { FunctionComponent } from 'react'
-import styled from '@emotion/styled'
-import tw from 'twin.macro'
+import { FunctionComponent } from 'react';
+import styled from '@emotion/styled';
+import tw from 'twin.macro';
 
 const StyledButton = styled.a`
   font-weight: 700;
@@ -13,7 +13,7 @@ const StyledButton = styled.a`
   :disabled {
     ${tw`cursor-not-allowed opacity-60`}
   }
-`
+`;
 
 // default heroicon does not allow customizing stroke
 const ChevronRightIcon = ({ className }) => (
@@ -26,10 +26,10 @@ const ChevronRightIcon = ({ className }) => (
   >
     <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7"></path>
   </svg>
-)
+);
 
 interface LinkProps {
-  className?: string
+  className?: string;
 }
 
 const Link: FunctionComponent<LinkProps> = ({
@@ -47,7 +47,7 @@ const Link: FunctionComponent<LinkProps> = ({
         className={`relative stroke-3 top-1 h-4 w-4 text-fgd-1 ml-1`}
       />
     </StyledButton>
-  )
-}
+  );
+};
 
-export default Link
+export default Link;

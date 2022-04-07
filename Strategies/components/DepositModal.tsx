@@ -1,7 +1,7 @@
-import Modal from '@components/Modal'
-import ModalHeader from './ModalHeader'
-import MangoDeposit from './MangoDepositComponent'
-import BigNumber from 'bignumber.js'
+import Modal from '@components/Modal';
+import ModalHeader from './ModalHeader';
+import MangoDeposit from './MangoDepositComponent';
+import BigNumber from 'bignumber.js';
 
 const DepositModal = ({
   onClose,
@@ -18,8 +18,8 @@ const DepositModal = ({
   governedTokenAccount,
 }) => {
   const currentPositionFtm = new BigNumber(
-    currentPosition.toFixed(0)
-  ).toFormat()
+    currentPosition.toFixed(0),
+  ).toFormat();
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
       <ModalHeader
@@ -40,7 +40,7 @@ const DepositModal = ({
         ></MangoDeposit>
       ) : null}
     </Modal>
-  )
-}
+  );
+};
 
-export default DepositModal
+export default DepositModal;

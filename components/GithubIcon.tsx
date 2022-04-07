@@ -16,7 +16,7 @@ const GithubIcon = ({ className }) => {
         strokeLinejoin="round"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default GithubIcon
+export default GithubIcon;

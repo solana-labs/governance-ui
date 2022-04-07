@@ -1,53 +1,53 @@
-import { getRealms, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance'
+import { getRealms, PROGRAM_VERSION_V1, Realm } from '@solana/spl-governance';
 
-import { ProgramAccount } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
-import { arrayToMap, arrayToUnique } from '@tools/core/script'
+import { ProgramAccount } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
+import { arrayToMap, arrayToUnique } from '@tools/core/script';
 
-import devnetRealms from 'public/realms/devnet.json'
-import mainnetBetaRealms from 'public/realms/mainnet-beta.json'
-import type { ConnectionContext } from 'utils/connection'
-import { equalsIgnoreCase } from '../../tools/core/strings'
+import devnetRealms from 'public/realms/devnet.json';
+import mainnetBetaRealms from 'public/realms/mainnet-beta.json';
+import type { ConnectionContext } from 'utils/connection';
+import { equalsIgnoreCase } from '../../tools/core/strings';
 
 export interface RealmInfo {
-  symbol: string
-  programId: PublicKey
-  programVersion?: number
-  realmId: PublicKey
-  website?: string
+  symbol: string;
+  programId: PublicKey;
+  programVersion?: number;
+  realmId: PublicKey;
+  website?: string;
   // Specifies the realm mainnet name for resource lookups
   // It's required for none mainnet environments when the realm name is different than on mainnet
-  displayName?: string
+  displayName?: string;
   // Website keywords
-  keywords?: string
+  keywords?: string;
   // twitter:site meta
-  twitter?: string
+  twitter?: string;
   // og:image
-  ogImage?: string
+  ogImage?: string;
 
   // banner mage
-  bannerImage?: string
+  bannerImage?: string;
 
-  isCertified: boolean
+  isCertified: boolean;
   // 3- featured DAOs  ,2- new DAO with active proposals, 1- DAOs with active proposal,
-  sortRank?: number
+  sortRank?: number;
 }
 
 export function getProgramVersionForRealm(realmInfo: RealmInfo) {
   // TODO: as a temp fix V1 is returned by default
-  return realmInfo?.programVersion ?? PROGRAM_VERSION_V1
+  return realmInfo?.programVersion ?? PROGRAM_VERSION_V1;
 }
 
 interface RealmInfoAsJSON
   extends Omit<RealmInfo, 'programId' | 'realmId' | 'isCertified'> {
-  programId: string
-  realmId: string
+  programId: string;
+  realmId: string;
 }
 
 // TODO: Once governance program clones registry program and governance
 //       accounts metadata is on-chain the list should be moved there
-const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms)
-const DEVNET_REALMS = parseCertifiedRealms(devnetRealms)
+const MAINNET_REALMS = parseCertifiedRealms(mainnetBetaRealms);
+const DEVNET_REALMS = parseCertifiedRealms(devnetRealms);
 
 function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
   return realms.map((realm) => ({
@@ -56,31 +56,31 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     realmId: new PublicKey(realm.realmId),
     isCertified: true,
     programVersion: realm.programVersion,
-  })) as ReadonlyArray<RealmInfo>
+  })) as ReadonlyArray<RealmInfo>;
 }
 
 // Returns certified realms
 // Note: the certification process is currently done through PRs to this repo
 // This is a temp. workaround until we have the registry up and running
 export function getCertifiedRealmInfos({ cluster }: ConnectionContext) {
-  return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS
+  return cluster === 'mainnet' ? MAINNET_REALMS : DEVNET_REALMS;
 }
 
 export function getCertifiedRealmInfo(
   realmId: string,
-  connection: ConnectionContext
+  connection: ConnectionContext,
 ) {
   if (!realmId) {
-    return undefined
+    return undefined;
   }
 
   const realmInfo = getCertifiedRealmInfos(connection).find(
     (r) =>
       equalsIgnoreCase(r.realmId.toBase58(), realmId) ||
-      equalsIgnoreCase(r.symbol, realmId)
-  )
+      equalsIgnoreCase(r.symbol, realmId),
+  );
 
-  return realmInfo
+  return realmInfo;
 }
 
 // Whitelist of Realms we exclude even from the Unchartered category
@@ -139,26 +139,26 @@ const EXCLUDED_REALMS = new Map<string, string>([
   ['9Xe5qW76XPhyohKaz8joecybGnKrgT4N6JNEuM5ZZwa9', ''], // 1SOL test
   ['2mDwFhax7XcudkVzoV85pxo3B5aRqCt3diavVydjkBJC', ''], // 1SOL test
   ['DkSvNgykZPPFczhJVh8HDkhz25ByrDoPcB32q75AYu9k', ''], // UXDProtocolDAO test
-])
+]);
 
 // Returns all known realms from all known spl-gov instances which are not certified
 export async function getUnchartedRealmInfos(connection: ConnectionContext) {
-  const certifiedRealms = getCertifiedRealmInfos(connection)
+  const certifiedRealms = getCertifiedRealmInfos(connection);
 
   const allRealms = (
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
       arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(connection.current, p.programId)
-      )
+        getRealms(connection.current, p.programId),
+      ),
     )
   )
     .flatMap((r) => Object.values(r))
-    .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name))
+    .sort((r1, r2) => r1.account.name.localeCompare(r2.account.name));
 
   const excludedRealms = arrayToMap(certifiedRealms, (r) =>
-    r.realmId.toBase58()
-  )
+    r.realmId.toBase58(),
+  );
 
   return Object.values(allRealms)
     .map((r) => {
@@ -167,9 +167,9 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
         EXCLUDED_REALMS.has(r.pubkey.toBase58())
       )
         ? createUnchartedRealmInfo(r)
-        : undefined
+        : undefined;
     })
-    .filter(Boolean) as readonly RealmInfo[]
+    .filter(Boolean) as readonly RealmInfo[];
 }
 
 export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
@@ -179,5 +179,5 @@ export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
     realmId: realm.pubkey,
     displayName: realm.account.name,
     isCertified: false,
-  } as RealmInfo
+  } as RealmInfo;
 }

@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react';
 
 interface LoadingProps {
-  className?: string
-  w?: string
-  h?: string
+  className?: string;
+  w?: string;
+  h?: string;
 }
 
 const Loading: FunctionComponent<LoadingProps> = ({
@@ -34,7 +34,7 @@ const Loading: FunctionComponent<LoadingProps> = ({
         ></path>
       </svg>
     </div>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

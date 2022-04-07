@@ -1,13 +1,13 @@
-import BigNumber from 'bignumber.js'
-import * as yup from 'yup'
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import soceanConfig from '@tools/sdk/socean/configuration'
-import { mintBondedTokens } from '@tools/sdk/socean/instructions/mintBondedTokens'
-import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens'
-import { SoceanMintBondedTokensForm } from '@utils/uiTypes/proposalCreationTypes'
+import BigNumber from 'bignumber.js';
+import * as yup from 'yup';
+import { BN } from '@project-serum/anchor';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import soceanConfig from '@tools/sdk/socean/configuration';
+import { mintBondedTokens } from '@tools/sdk/socean/instructions/mintBondedTokens';
+import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
+import { SoceanMintBondedTokensForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -22,14 +22,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Amount should be more than 0')
     .required('Amount is required'),
-})
+});
 
 const MintBondedTokens = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -52,29 +52,29 @@ const MintBondedTokens = ({
         connection,
         cluster,
         wallet,
-      })
+      });
 
       const mintInfo = await tryGetTokenMint(
         connection,
-        new PublicKey(form.depositFrom!)
-      )
-      if (!mintInfo) throw new Error('Cannot load depositFrom mint info')
+        new PublicKey(form.depositFrom!),
+      );
+      if (!mintInfo) throw new Error('Cannot load depositFrom mint info');
       return mintBondedTokens({
         cluster,
         program: programs.Bonding,
         amount: new BN(
           new BigNumber(form.uiAmount!.toString())
             .shiftedBy(mintInfo.account.decimals)
-            .toString()
+            .toString(),
         ),
         depositFrom: new PublicKey(form.depositFrom!),
         authority: governedAccountPubkey,
         bondPool: new PublicKey(form.bondPool!),
         bondedMint: new PublicKey(form.bondedMint!),
         mintTo: new PublicKey(form.mintTo!),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -144,7 +144,7 @@ const MintBondedTokens = ({
         error={formErrors['uiAmount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default MintBondedTokens
+export default MintBondedTokens;

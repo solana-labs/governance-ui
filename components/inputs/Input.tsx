@@ -1,16 +1,16 @@
-import { StyledLabel, StyledSuffix, inputClasses } from './styles'
-import ErrorField from './ErrorField'
-import { CheckCircleIcon } from '@heroicons/react/outline'
+import { StyledLabel, StyledSuffix, inputClasses } from './styles';
+import ErrorField from './ErrorField';
+import { CheckCircleIcon } from '@heroicons/react/outline';
 
 interface InputProps {
-  type: string
-  value: any
-  onChange?: (e) => void
-  className?: string
-  disabled?: boolean
-  useDefaultStyle?: boolean
-  [x: string]: any
-  checkIcon?: boolean
+  type: string;
+  value: any;
+  onChange?: (e) => void;
+  className?: string;
+  disabled?: boolean;
+  useDefaultStyle?: boolean;
+  [x: string]: any;
+  checkIcon?: boolean;
 }
 
 const Input = ({
@@ -74,7 +74,7 @@ const Input = ({
         <ErrorField text={error}></ErrorField>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Input
+export default Input;

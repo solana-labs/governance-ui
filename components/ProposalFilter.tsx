@@ -1,13 +1,13 @@
-import { useEffect, useReducer } from 'react'
-import styled from '@emotion/styled'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import { Disclosure } from '@headlessui/react'
-import Switch from './Switch'
-import { EnhancedProposalState } from 'stores/useWalletStore'
+import { useEffect, useReducer } from 'react';
+import styled from '@emotion/styled';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import { Disclosure } from '@headlessui/react';
+import Switch from './Switch';
+import { EnhancedProposalState } from 'stores/useWalletStore';
 
 type Filters = {
-  [key in EnhancedProposalState]: boolean
-}
+  [key in EnhancedProposalState]: boolean;
+};
 
 const initialFilterSettings: Filters = {
   [EnhancedProposalState.Draft]: false,
@@ -20,43 +20,43 @@ const initialFilterSettings: Filters = {
   [EnhancedProposalState.Defeated]: true,
   [EnhancedProposalState.ExecutingWithErrors]: true,
   [EnhancedProposalState.Outdated]: false,
-}
+};
 
 const StyledAlertCount = styled.span`
   font-size: 0.6rem;
-`
+`;
 
 const ProposalFilter = ({ filters, setFilters }) => {
   const [filterSettings, setFilterSettings] = useReducer<
     (state: Filters, newState: Partial<Filters>) => any
-  >((state, newState) => ({ ...state, ...newState }), initialFilterSettings)
+  >((state, newState) => ({ ...state, ...newState }), initialFilterSettings);
 
-  console.log('>>> initialFilterSettings', initialFilterSettings)
+  console.log('>>> initialFilterSettings', initialFilterSettings);
 
   const handleFilters = (
     proposalState: EnhancedProposalState,
-    checked: boolean
+    checked: boolean,
   ) => {
     setFilterSettings({
       [proposalState]: checked,
-    })
+    });
 
     if (!checked) {
-      setFilters([...filters, proposalState])
+      setFilters([...filters, proposalState]);
     } else {
       setFilters(
-        filters.filter((n: EnhancedProposalState) => n !== proposalState)
-      )
+        filters.filter((n: EnhancedProposalState) => n !== proposalState),
+      );
     }
-  }
+  };
 
   useEffect(() => {
     const initialFilters = Object.keys(initialFilterSettings)
       .filter((x) => !initialFilterSettings[x])
-      .map(Number)
+      .map(Number);
 
-    setFilters([...initialFilters])
-  }, [])
+    setFilters([...initialFilters]);
+  }, []);
   return (
     <Disclosure as="div" className="relative">
       {({ open }) => (
@@ -138,7 +138,7 @@ const ProposalFilter = ({ filters, setFilters }) => {
                   onChange={(checked) =>
                     handleFilters(
                       EnhancedProposalState.ExecutingWithErrors,
-                      checked
+                      checked,
                     )
                   }
                 />
@@ -184,7 +184,7 @@ const ProposalFilter = ({ filters, setFilters }) => {
         </>
       )}
     </Disclosure>
-  )
-}
+  );
+};
 
-export default ProposalFilter
+export default ProposalFilter;

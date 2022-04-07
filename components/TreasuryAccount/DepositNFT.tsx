@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import Button, { SecondaryButton } from '@components/Button'
-import Tooltip from '@components/Tooltip'
-import DepositNFTFromWallet from './DepositNFTFromWallet'
-import DepositNFTAddress from './DepositNFTAddress'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { abbreviateAddress } from '@utils/formatting'
-import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid'
-import { getExplorerUrl } from '@components/explorer/tools'
+import React, { useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import Button, { SecondaryButton } from '@components/Button';
+import Tooltip from '@components/Tooltip';
+import DepositNFTFromWallet from './DepositNFTFromWallet';
+import DepositNFTAddress from './DepositNFTAddress';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import { abbreviateAddress } from '@utils/formatting';
+import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/solid';
+import { getExplorerUrl } from '@components/explorer/tools';
 
 enum DepositState {
   DepositNFTFromWallet,
@@ -15,13 +15,13 @@ enum DepositState {
 }
 
 const DepositNFT = ({ onClose }) => {
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount);
+  const connection = useWalletStore((s) => s.connection);
+  const connected = useWalletStore((s) => s.connected);
   const [
     currentDepositView,
     setCurrentDepositView,
-  ] = useState<DepositState | null>(null)
+  ] = useState<DepositState | null>(null);
 
   return (
     <>
@@ -41,7 +41,7 @@ const DepositNFT = ({ onClose }) => {
             currentAccount?.governance?.pubkey
               ? getExplorerUrl(
                   connection.endpoint,
-                  currentAccount!.governance!.pubkey.toBase58()
+                  currentAccount!.governance!.pubkey.toBase58(),
                 )
               : ''
           }
@@ -86,7 +86,7 @@ const DepositNFT = ({ onClose }) => {
         ></DepositNFTAddress>
       )}
     </>
-  )
-}
+  );
+};
 
-export default DepositNFT
+export default DepositNFT;

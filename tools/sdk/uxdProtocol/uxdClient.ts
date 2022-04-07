@@ -1,15 +1,15 @@
-import { Cluster } from '@blockworks-foundation/mango-client'
-import { EndpointTypes } from '@models/types'
-import { Program, Provider } from '@project-serum/anchor'
-import Wallet from '@project-serum/sol-wallet-adapter'
-import { Connection, PublicKey } from '@solana/web3.js'
+import { Cluster } from '@blockworks-foundation/mango-client';
+import { EndpointTypes } from '@models/types';
+import { Program, Provider } from '@project-serum/anchor';
+import Wallet from '@project-serum/sol-wallet-adapter';
+import { Connection, PublicKey } from '@solana/web3.js';
 import {
   createAndInitializeMango,
   findAddrSync,
   MangoDepository,
   UXD,
   UXDHelpers,
-} from '@uxdprotocol/uxd-client'
+} from '@uxdprotocol/uxd-client';
 
 export const DEPOSITORY_MINTS = {
   devnet: {
@@ -40,7 +40,7 @@ export const DEPOSITORY_MINTS = {
       decimals: 6,
     },
   },
-}
+};
 
 export const INSURANCE_MINTS = {
   devnet: {
@@ -55,7 +55,7 @@ export const INSURANCE_MINTS = {
       decimals: 6,
     },
   },
-}
+};
 
 export const GOVERNANCE_MINTS = {
   mainnet: {
@@ -68,37 +68,37 @@ export const GOVERNANCE_MINTS = {
       decimals: 9,
     },
   },
-}
+};
 
 export const getDepositoryMintSymbols = (cluster: Cluster): string[] => [
   ...Object.keys(DEPOSITORY_MINTS[cluster]),
-]
+];
 export const getDepositoryMintKey = (
   cluster: Cluster,
-  symbol: string
-): PublicKey => new PublicKey(DEPOSITORY_MINTS[cluster][symbol].address)
+  symbol: string,
+): PublicKey => new PublicKey(DEPOSITORY_MINTS[cluster][symbol].address);
 
 export const getDepositoryToken = (cluster: Cluster, symbol: string) =>
-  DEPOSITORY_MINTS[cluster][symbol]
+  DEPOSITORY_MINTS[cluster][symbol];
 
 export const getInsuranceMintSymbols = (cluster: Cluster): string[] => [
   ...Object.keys(INSURANCE_MINTS[cluster]),
-]
+];
 export const getInsuranceMintKey = (
   cluster: Cluster,
-  symbol: string
-): PublicKey => new PublicKey(INSURANCE_MINTS[cluster][symbol].address)
+  symbol: string,
+): PublicKey => new PublicKey(INSURANCE_MINTS[cluster][symbol].address);
 
 export const getGovernanceMintSymbols = (cluster: Cluster): string[] => [
   ...Object.keys(GOVERNANCE_MINTS[cluster]),
-]
+];
 export const getGovernanceMintKey = (
   cluster: Cluster,
-  symbol: string
-): PublicKey => new PublicKey(GOVERNANCE_MINTS[cluster][symbol].address)
+  symbol: string,
+): PublicKey => new PublicKey(GOVERNANCE_MINTS[cluster][symbol].address);
 
 export const getGovernanceToken = (cluster: Cluster, symbol: string) =>
-  GOVERNANCE_MINTS[cluster][symbol]
+  GOVERNANCE_MINTS[cluster][symbol];
 
 export const isDepositoryRegistered = async (
   connection: Connection,
@@ -106,41 +106,41 @@ export const isDepositoryRegistered = async (
   uxdProgram: Program,
   collateralName: string,
   insuranceName: string,
-  wallet: Wallet
+  wallet: Wallet,
 ): Promise<boolean> => {
-  const uxdHelper = new UXDHelpers()
+  const uxdHelper = new UXDHelpers();
   try {
     await uxdHelper.getMangoDepositoryAccount(
       new Provider(connection, wallet, Provider.defaultOptions()),
       instantiateMangoDepository(
         uxdProgram.programId,
         getDepositoryMintKey(cluster, collateralName),
-        getInsuranceMintKey(cluster, insuranceName)
+        getInsuranceMintKey(cluster, insuranceName),
       ),
-      Provider.defaultOptions()
-    )
+      Provider.defaultOptions(),
+    );
 
-    return true
+    return true;
   } catch (e) {
-    console.error(e)
-    return false
+    console.error(e);
+    return false;
   }
-}
+};
 
 export const uxdClient = (programId: PublicKey): UXD => {
-  return new UXD(programId)
-}
+  return new UXD(programId);
+};
 
 export const initializeMango = async (
   connection: Connection,
-  cluster: EndpointTypes
+  cluster: EndpointTypes,
 ) => {
-  return createAndInitializeMango(connection, cluster)
-}
+  return createAndInitializeMango(connection, cluster);
+};
 
 export const getControllerPda = (uxdProgramId: PublicKey): PublicKey => {
-  return findAddrSync([Buffer.from('CONTROLLER')], uxdProgramId)[0]
-}
+  return findAddrSync([Buffer.from('CONTROLLER')], uxdProgramId)[0];
+};
 
 // We do not need the decimals and names for both depository and insurance
 // in order to register a new mango depository
@@ -152,7 +152,7 @@ export const instantiateMangoDepository = (
   depositoryName = 'collateral',
   depositoryDecimals = 6,
   insuranceName = 'insurance',
-  insuranceDecimals = 6
+  insuranceDecimals = 6,
 ): MangoDepository => {
   return new MangoDepository(
     depositoryMint,
@@ -161,6 +161,6 @@ export const instantiateMangoDepository = (
     insuranceMint,
     insuranceName,
     insuranceDecimals,
-    uxdProgramId
-  )
-}
+    uxdProgramId,
+  );
+};

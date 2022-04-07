@@ -1,128 +1,128 @@
-import Button, { LinkButton } from '@components/Button'
-import { getExplorerUrl } from '@components/explorer/tools'
-import { getAccountName } from '@components/instructions/tools'
-import Modal from '@components/Modal'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { PublicKey } from '@solana/web3.js'
-import { abbreviateAddress, fmtUnixTime } from '@utils/formatting'
-import BN from 'bn.js'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import useWalletStore from 'stores/useWalletStore'
-import AccountHeader from './AccountHeader'
-import DepositNFT from './DepositNFT'
-import SendTokens from './SendTokens'
+import Button, { LinkButton } from '@components/Button';
+import { getExplorerUrl } from '@components/explorer/tools';
+import { getAccountName } from '@components/instructions/tools';
+import Modal from '@components/Modal';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import { PublicKey } from '@solana/web3.js';
+import { abbreviateAddress, fmtUnixTime } from '@utils/formatting';
+import BN from 'bn.js';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import useWalletStore from 'stores/useWalletStore';
+import AccountHeader from './AccountHeader';
+import DepositNFT from './DepositNFT';
+import SendTokens from './SendTokens';
 import {
   ExternalLinkIcon,
   PlusCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/outline'
-import Tooltip from '@components/Tooltip'
-import ConvertToMsol from './ConvertToMsol'
-import useStrategiesStore from 'Strategies/store/useStrategiesStore'
-import DepositModal from 'Strategies/components/DepositModal'
-import { TreasuryStrategy } from 'Strategies/types/types'
-import BigNumber from 'bignumber.js'
-import { MangoAccount } from '@blockworks-foundation/mango-client'
+} from '@heroicons/react/outline';
+import Tooltip from '@components/Tooltip';
+import ConvertToMsol from './ConvertToMsol';
+import useStrategiesStore from 'Strategies/store/useStrategiesStore';
+import DepositModal from 'Strategies/components/DepositModal';
+import { TreasuryStrategy } from 'Strategies/types/types';
+import BigNumber from 'bignumber.js';
+import { MangoAccount } from '@blockworks-foundation/mango-client';
 import {
   calculateAllDepositsInMangoAccountsForMint,
   MANGO,
   tryGetMangoAccountsForOwner,
-} from 'Strategies/protocols/mango/tools'
-import useMarketStore from 'Strategies/store/marketStore'
+} from 'Strategies/protocols/mango/tools';
+import useMarketStore from 'Strategies/store/marketStore';
 
 const AccountOverview = () => {
-  const router = useRouter()
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const router = useRouter();
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount);
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
       ? governanceNfts[currentAccount?.governance?.pubkey.toBase58()]?.length
-      : 0
-  const { symbol } = useRealm()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const isNFT = currentAccount?.isNft
-  const isSol = currentAccount?.isSol
-  const { canUseTransferInstruction } = useGovernanceAssets()
-  const connection = useWalletStore((s) => s.connection)
-  const recentActivity = useTreasuryAccountStore((s) => s.recentActivity)
+      : 0;
+  const { symbol } = useRealm();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const isNFT = currentAccount?.isNft;
+  const isSol = currentAccount?.isSol;
+  const { canUseTransferInstruction } = useGovernanceAssets();
+  const connection = useWalletStore((s) => s.connection);
+  const recentActivity = useTreasuryAccountStore((s) => s.recentActivity);
   const isLoadingRecentActivity = useTreasuryAccountStore(
-    (s) => s.isLoadingRecentActivity
-  )
-  const market = useMarketStore((s) => s)
-  const [currentMangoDeposits, setCurrentMangoDeposits] = useState(0)
-  const [mngoAccounts, setMngoAccounts] = useState<MangoAccount[]>([])
-  const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
-  const [openCommonSendModal, setOpenCommonSendModal] = useState(false)
-  const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false)
-  const accountPublicKey = currentAccount?.transferAddress
-  const strategies = useStrategiesStore((s) => s.strategies)
+    (s) => s.isLoadingRecentActivity,
+  );
+  const market = useMarketStore((s) => s);
+  const [currentMangoDeposits, setCurrentMangoDeposits] = useState(0);
+  const [mngoAccounts, setMngoAccounts] = useState<MangoAccount[]>([]);
+  const [openNftDepositModal, setOpenNftDepositModal] = useState(false);
+  const [openCommonSendModal, setOpenCommonSendModal] = useState(false);
+  const [openMsolConvertModal, setOpenMsolConvertModal] = useState(false);
+  const accountPublicKey = currentAccount?.transferAddress;
+  const strategies = useStrategiesStore((s) => s.strategies);
   const [accountInvestments, setAccountInvestments] = useState<
     TreasuryStrategy[]
-  >([])
+  >([]);
   const [eligibleInvestments, setEligibleInvestments] = useState<
     TreasuryStrategy[]
-  >([])
-  const [showStrategies, setShowStrategies] = useState(false)
+  >([]);
+  const [showStrategies, setShowStrategies] = useState(false);
   const [
     proposedInvestment,
     setProposedInvestment,
-  ] = useState<TreasuryStrategy | null>(null)
-  const [isCopied, setIsCopied] = useState<boolean>(false)
+  ] = useState<TreasuryStrategy | null>(null);
+  const [isCopied, setIsCopied] = useState<boolean>(false);
 
   useEffect(() => {
     if (strategies.length > 0) {
       const eligibleInvestments = strategies.filter(
         (strat) =>
-          strat.handledMint === currentAccount?.token?.account.mint.toString()
-      )
-      setEligibleInvestments(eligibleInvestments)
+          strat.handledMint === currentAccount?.token?.account.mint.toString(),
+      );
+      setEligibleInvestments(eligibleInvestments);
     }
-  }, [currentAccount, strategies, mngoAccounts])
+  }, [currentAccount, strategies, mngoAccounts]);
   useEffect(() => {
     const handleGetMangoAccounts = async () => {
       const accounts = await tryGetMangoAccountsForOwner(
         market,
-        currentAccount!.governance!.pubkey
-      )
-      const currentAccountMint = currentAccount?.token?.account.mint
+        currentAccount!.governance!.pubkey,
+      );
+      const currentAccountMint = currentAccount?.token?.account.mint;
       const currentPositions = calculateAllDepositsInMangoAccountsForMint(
         mngoAccounts,
         currentAccountMint!,
-        market
-      )
-      setCurrentMangoDeposits(currentPositions)
-      setMngoAccounts(accounts ? accounts : [])
+        market,
+      );
+      setCurrentMangoDeposits(currentPositions);
+      setMngoAccounts(accounts ? accounts : []);
       if (currentPositions > 0) {
         setAccountInvestments(
-          eligibleInvestments.filter((x) => x.protocolName === MANGO)
-        )
+          eligibleInvestments.filter((x) => x.protocolName === MANGO),
+        );
       }
-    }
+    };
     if (eligibleInvestments.filter((x) => x.protocolName === MANGO).length) {
-      handleGetMangoAccounts()
+      handleGetMangoAccounts();
     }
-  }, [eligibleInvestments])
+  }, [eligibleInvestments]);
 
   useEffect(() => {
     if (isCopied) {
       const timer = setTimeout(() => {
-        setIsCopied(false)
-      }, 1500)
-      return () => clearTimeout(timer)
+        setIsCopied(false);
+      }, 1500);
+      return () => clearTimeout(timer);
     }
-  }, [isCopied])
+  }, [isCopied]);
 
   const handleCopyAddress = (address: string) => {
-    navigator.clipboard.writeText(address)
-    setIsCopied(true)
-  }
+    navigator.clipboard.writeText(address);
+    setIsCopied(true);
+  };
 
   if (!currentAccount) {
-    return null
+    return null;
   }
 
   return (
@@ -141,9 +141,9 @@ const AccountOverview = () => {
               className="cursor-pointer default-transition text-primary-light hover:text-primary-dark"
               onClick={() => {
                 const url = fmtUrlWithCluster(
-                  `/dao/${symbol}/gallery/${currentAccount.transferAddress}`
-                )
-                router.push(url)
+                  `/dao/${symbol}/gallery/${currentAccount.transferAddress}`,
+                );
+                router.push(url);
               }}
             >
               View Collection
@@ -288,7 +288,7 @@ const AccountOverview = () => {
                   ? getExplorerUrl(
                       connection.endpoint,
                       activity.signature,
-                      'tx'
+                      'tx',
                     )
                   : ''
               }
@@ -322,7 +322,7 @@ const AccountOverview = () => {
           apy={proposedInvestment.apy}
           handledMint={proposedInvestment.handledMint}
           onClose={() => {
-            setProposedInvestment(null)
+            setProposedInvestment(null);
           }}
           isOpen={proposedInvestment}
           protocolName={proposedInvestment.protocolName}
@@ -336,13 +336,13 @@ const AccountOverview = () => {
         <Modal
           sizeClassName="sm:max-w-3xl"
           onClose={() => {
-            setOpenNftDepositModal(false)
+            setOpenNftDepositModal(false);
           }}
           isOpen={openNftDepositModal}
         >
           <DepositNFT
             onClose={() => {
-              setOpenNftDepositModal(false)
+              setOpenNftDepositModal(false);
             }}
           ></DepositNFT>
         </Modal>
@@ -351,7 +351,7 @@ const AccountOverview = () => {
         <Modal
           sizeClassName="sm:max-w-3xl"
           onClose={() => {
-            setOpenCommonSendModal(false)
+            setOpenCommonSendModal(false);
           }}
           isOpen={openCommonSendModal}
         >
@@ -362,7 +362,7 @@ const AccountOverview = () => {
         <Modal
           sizeClassName="sm:max-w-3xl"
           onClose={() => {
-            setOpenMsolConvertModal(false)
+            setOpenMsolConvertModal(false);
           }}
           isOpen={openMsolConvertModal}
         >
@@ -370,13 +370,13 @@ const AccountOverview = () => {
         </Modal>
       )}
     </>
-  )
-}
+  );
+};
 
 interface StrategyCardProps {
-  onClick?: () => void
-  strat: TreasuryStrategy
-  currentMangoDeposits: number
+  onClick?: () => void;
+  strat: TreasuryStrategy;
+  currentMangoDeposits: number;
 }
 
 const StrategyCard = ({
@@ -390,10 +390,10 @@ const StrategyCard = ({
     protocolName,
     handledTokenSymbol,
     apy,
-  } = strat
+  } = strat;
   const currentPositionFtm = new BigNumber(
-    currentMangoDeposits.toFixed(0)
-  ).toFormat()
+    currentMangoDeposits.toFixed(0),
+  ).toFormat();
   return (
     <div className="border border-fgd-4 flex items-center justify-between mt-2 p-4 rounded-md">
       <div className="flex items-center">
@@ -418,7 +418,7 @@ const StrategyCard = ({
         ) : null}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AccountOverview
+export default AccountOverview;

@@ -5,11 +5,11 @@ const withTM = require('next-transpile-modules')([
   '@solana/wallet-adapter-base',
   '@solana/wallet-adapter-phantom',
   '@solana/wallet-adapter-sollet',
-])
+]);
 
 const withBundleAnalyzer = require('@next/bundle-analyzer')({
   enabled: process.env.ANALYZE === 'true',
-})
+});
 
 module.exports = withBundleAnalyzer(
   withTM({
@@ -17,9 +17,9 @@ module.exports = withBundleAnalyzer(
       config.module.rules.push({
         test: /\.svg$/,
         use: ['@svgr/webpack'],
-      })
-      if (!isServer) config.resolve.fallback.fs = false
-      return config
+      });
+      if (!isServer) config.resolve.fallback.fs = false;
+      return config;
     },
     env: {
       REALM: process.env.REALM,
@@ -34,7 +34,7 @@ module.exports = withBundleAnalyzer(
           destination: '/dao/UXP/:path*',
           permanent: true,
         },
-      ]
+      ];
     },
-  })
-)
+  }),
+);

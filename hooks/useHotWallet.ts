@@ -1,6 +1,6 @@
-import { PublicKey } from '@solana/web3.js'
-import { useEffect, useState } from 'react'
-import useRealm from './useRealm'
+import { PublicKey } from '@solana/web3.js';
+import { useEffect, useState } from 'react';
+import useRealm from './useRealm';
 
 const RealmsHotWallet = {
   UXDProtocol: {
@@ -20,30 +20,30 @@ const RealmsHotWallet = {
   },
 
   // <---- declare your realm hot wallet here
-}
+};
 
 export type HotWalletAccount = {
-  name: string
-  publicKey: PublicKey
-}
+  name: string;
+  publicKey: PublicKey;
+};
 
 const useHotWallet = () => {
-  const { realm } = useRealm()
+  const { realm } = useRealm();
 
   const [hotWalletAccount, setHotWalletAccount] = useState<{
-    name: string
-    publicKey: PublicKey
-  } | null>(null)
+    name: string;
+    publicKey: PublicKey;
+  } | null>(null);
 
   useEffect(() => {
-    if (!realm) return
+    if (!realm) return;
 
-    setHotWalletAccount(RealmsHotWallet[realm.account.name] ?? null)
-  }, [realm])
+    setHotWalletAccount(RealmsHotWallet[realm.account.name] ?? null);
+  }, [realm]);
 
   return {
     hotWalletAccount,
-  }
-}
+  };
+};
 
-export default useHotWallet
+export default useHotWallet;

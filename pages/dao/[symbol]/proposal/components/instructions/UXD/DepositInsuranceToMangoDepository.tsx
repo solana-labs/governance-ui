@@ -1,15 +1,15 @@
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import createDepositInsuranceToMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createDepositInsuranceToMangoDepositoryInstruction'
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import createDepositInsuranceToMangoDepositoryInstruction from '@tools/sdk/uxdProtocol/createDepositInsuranceToMangoDepositoryInstruction';
 import {
   getDepositoryMintSymbols,
   getInsuranceMintSymbols,
-} from '@tools/sdk/uxdProtocol/uxdClient'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { DepositInsuranceToMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
+} from '@tools/sdk/uxdProtocol/uxdClient';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { DepositInsuranceToMangoDepositoryForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -22,14 +22,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Insurance Deposited amount should be more than 0')
     .required('Insurance Deposited amount is required'),
-})
+});
 
 const UXDDepositInsuranceToMangoDepository = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     connection,
@@ -50,10 +50,10 @@ const UXDDepositInsuranceToMangoDepository = ({
         governedAccountPubkey,
         form.collateralName!,
         form.insuranceName!,
-        form.insuranceDepositedAmount
-      )
+        form.insuranceDepositedAmount,
+      );
     },
-  })
+  });
 
   return (
     <>
@@ -96,7 +96,7 @@ const UXDDepositInsuranceToMangoDepository = ({
         error={formErrors['insuranceDepositedAmount']}
       />
     </>
-  )
-}
+  );
+};
 
-export default UXDDepositInsuranceToMangoDepository
+export default UXDDepositInsuranceToMangoDepository;

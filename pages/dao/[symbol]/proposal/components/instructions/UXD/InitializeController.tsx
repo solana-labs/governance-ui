@@ -1,9 +1,9 @@
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { InitializeControllerForm } from '@utils/uiTypes/proposalCreationTypes'
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import createInitializeControllerInstruction from '@tools/sdk/uxdProtocol/createInitializeControllerInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { InitializeControllerForm } from '@utils/uiTypes/proposalCreationTypes';
 
 const schema = yup.object().shape({
   mintDecimals: yup
@@ -15,14 +15,14 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governance account is required'),
-})
+});
 
 const InitializeController = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -40,10 +40,10 @@ const InitializeController = ({
         form.governedAccount!.governance.account.governedAccount,
         form.mintDecimals,
         governedAccountPubkey,
-        wallet.publicKey!
-      )
+        wallet.publicKey!,
+      );
     },
-  })
+  });
 
   return (
     <>
@@ -62,7 +62,7 @@ const InitializeController = ({
         error={formErrors['mintDecimals']}
       />
     </>
-  )
-}
+  );
+};
 
-export default InitializeController
+export default InitializeController;

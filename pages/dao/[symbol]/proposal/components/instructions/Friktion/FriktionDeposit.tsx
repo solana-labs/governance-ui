@@ -1,85 +1,85 @@
-import React, { useContext, useEffect, useState } from 'react'
-import Input from '@components/inputs/Input'
-import useRealm from '@hooks/useRealm'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import { PublicKey } from '@solana/web3.js'
-import { precision } from '@utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import React, { useContext, useEffect, useState } from 'react';
+import Input from '@components/inputs/Input';
+import useRealm from '@hooks/useRealm';
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units';
+import { PublicKey } from '@solana/web3.js';
+import { precision } from '@utils/formatting';
+import useWalletStore from 'stores/useWalletStore';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
 import {
   FriktionDepositForm,
   FormInstructionData,
-} from '@utils/uiTypes/proposalCreationTypes'
-import { NewProposalContext } from '../../../new'
-import { getFriktionDepositSchema } from '@utils/validations'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { Governance } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import GovernedAccountSelect from '../../GovernedAccountSelect'
-import { getFriktionDepositInstruction } from '@utils/instructionTools'
-import Select from '@components/inputs/Select'
-import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk'
+} from '@utils/uiTypes/proposalCreationTypes';
+import { NewProposalContext } from '../../../new';
+import { getFriktionDepositSchema } from '@utils/validations';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import { Governance } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import GovernedAccountSelect from '../../GovernedAccountSelect';
+import { getFriktionDepositInstruction } from '@utils/instructionTools';
+import Select from '@components/inputs/Select';
+import { FriktionSnapshot, VoltSnapshot } from '@friktion-labs/friktion-sdk';
 
 const FriktionDeposit = ({
   index,
   governance,
 }: {
-  index: number
-  governance: ProgramAccount<Governance> | null
+  index: number;
+  governance: ProgramAccount<Governance> | null;
 }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const { realmInfo } = useRealm()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const shouldBeGoverned = index !== 0 && governance
-  const programId: PublicKey | undefined = realmInfo?.programId
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
+  const { realmInfo } = useRealm();
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets();
+  const shouldBeGoverned = index !== 0 && governance;
+  const programId: PublicKey | undefined = realmInfo?.programId;
   const [form, setForm] = useState<FriktionDepositForm>({
     amount: undefined,
     governedTokenAccount: undefined,
     voltVaultId: '',
     programId: programId?.toString(),
     mintInfo: undefined,
-  })
+  });
   // eslint-disable-next-line @typescript-eslint/ban-types
   const [friktionVolts, setFriktionVolts] = useState<VoltSnapshot[] | null>(
-    null
-  )
+    null,
+  );
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
-  >(undefined)
-  const [formErrors, setFormErrors] = useState({})
+  >(undefined);
+  const [formErrors, setFormErrors] = useState({});
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
-    : 1
-  const currentPrecision = precision(mintMinAmount)
-  const { handleSetInstruction } = useContext(NewProposalContext)
+    : 1;
+  const currentPrecision = precision(mintMinAmount);
+  const { handleSetInstruction } = useContext(NewProposalContext);
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   const setMintInfo = (value) => {
-    setForm({ ...form, mintInfo: value })
-  }
+    setForm({ ...form, mintInfo: value });
+  };
   const setAmount = (event) => {
-    const value = event.target.value
+    const value = event.target.value;
     handleSetForm({
       value: value,
       propertyName: 'amount',
-    })
-  }
+    });
+  };
   const validateAmountOnBlur = () => {
-    const value = form.amount
+    const value = form.amount;
 
     handleSetForm({
       value: parseFloat(
         Math.max(
           Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed(currentPrecision)
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value)),
+        ).toFixed(currentPrecision),
       ),
       propertyName: 'amount',
-    })
-  }
+    });
+  };
 
   async function getInstruction(): Promise<FormInstructionData> {
     return getFriktionDepositInstruction({
@@ -90,38 +90,38 @@ const FriktionDeposit = ({
       connection,
       wallet,
       setFormErrors,
-    })
+    });
   }
   useEffect(() => {
     // call for the mainnet friktion volts
     const callfriktionRequest = async () => {
       const response = await fetch(
-        'https://friktion-labs.github.io/mainnet-tvl-snapshots/friktionSnapshot.json'
-      )
-      const parsedResponse = (await response.json()) as FriktionSnapshot
-      setFriktionVolts(parsedResponse.allMainnetVolts as VoltSnapshot[])
-    }
+        'https://friktion-labs.github.io/mainnet-tvl-snapshots/friktionSnapshot.json',
+      );
+      const parsedResponse = (await response.json()) as FriktionSnapshot;
+      setFriktionVolts(parsedResponse.allMainnetVolts as VoltSnapshot[]);
+    };
 
-    callfriktionRequest()
-  }, [])
+    callfriktionRequest();
+  }, []);
 
   useEffect(() => {
     handleSetForm({
       propertyName: 'programId',
       value: programId?.toString(),
-    })
-  }, [realmInfo?.programId])
+    });
+  }, [realmInfo?.programId]);
   useEffect(() => {
     handleSetInstruction(
       { governedAccount: governedAccount, getInstruction },
-      index
-    )
-  }, [form])
+      index,
+    );
+  }, [form]);
   useEffect(() => {
-    setGovernedAccount(form.governedTokenAccount?.governance)
-    setMintInfo(form.governedTokenAccount?.mint?.account)
-  }, [form.governedTokenAccount])
-  const schema = getFriktionDepositSchema({ form })
+    setGovernedAccount(form.governedTokenAccount?.governance);
+    setMintInfo(form.governedTokenAccount?.mint?.account);
+  }, [form.governedTokenAccount]);
+  const schema = getFriktionDepositSchema({ form });
 
   return (
     <>
@@ -131,7 +131,7 @@ const FriktionDeposit = ({
           governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
         }
         onChange={(value) => {
-          handleSetForm({ value, propertyName: 'governedTokenAccount' })
+          handleSetForm({ value, propertyName: 'governedTokenAccount' });
         }}
         value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
@@ -180,7 +180,7 @@ const FriktionDeposit = ({
         onBlur={validateAmountOnBlur}
       />
     </>
-  )
-}
+  );
+};
 
-export default FriktionDeposit
+export default FriktionDeposit;

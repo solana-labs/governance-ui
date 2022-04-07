@@ -1,22 +1,22 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 import soceanConfiguration, {
   SoceanPrograms,
-} from '@tools/sdk/socean/configuration'
-import useWalletStore from 'stores/useWalletStore'
+} from '@tools/sdk/socean/configuration';
+import useWalletStore from 'stores/useWalletStore';
 
 export default function useSoceanPrograms() {
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
 
-  const [programs, setPrograms] = useState<SoceanPrograms | null>(null)
+  const [programs, setPrograms] = useState<SoceanPrograms | null>(null);
 
   useEffect(() => {
     if (!connection || !wallet) {
-      return
+      return;
     }
 
     if (connection.cluster === 'localnet') {
-      throw new Error('unsupported cluster for Socean programs loading')
+      throw new Error('unsupported cluster for Socean programs loading');
     }
 
     setPrograms(
@@ -24,11 +24,11 @@ export default function useSoceanPrograms() {
         connection: connection.current,
         wallet,
         cluster: connection.cluster,
-      })
-    )
-  }, [connection, wallet])
+      }),
+    );
+  }, [connection, wallet]);
 
   return {
     programs,
-  }
+  };
 }

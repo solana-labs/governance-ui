@@ -3,19 +3,19 @@ import {
   Keypair,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
+} from '@solana/web3.js';
 import {
   GOVERNANCE_CHAT_PROGRAM_ID,
   Proposal,
   Realm,
-} from '@solana/spl-governance'
-import { ChatMessageBody } from '@solana/spl-governance'
-import { withPostChatMessage } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
-import { RpcContext } from '@solana/spl-governance'
-import { sendTransaction } from '../../utils/send'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
+} from '@solana/spl-governance';
+import { ChatMessageBody } from '@solana/spl-governance';
+import { withPostChatMessage } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
+import { RpcContext } from '@solana/spl-governance';
+import { sendTransaction } from '../../utils/send';
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
+import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord';
 
 export async function postChatMessage(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -24,21 +24,21 @@ export async function postChatMessage(
   tokeOwnerRecord: PublicKey,
   body: ChatMessageBody,
   replyTo?: PublicKey,
-  client?: VsrClient
+  client?: VsrClient,
 ) {
-  const signers: Keypair[] = []
-  const instructions: TransactionInstruction[] = []
+  const signers: Keypair[] = [];
+  const instructions: TransactionInstruction[] = [];
 
-  const governanceAuthority = walletPubkey
-  const payer = walletPubkey
+  const governanceAuthority = walletPubkey;
+  const payer = walletPubkey;
 
   //will run only if plugin is connected with realm
   const voterWeight = await withUpdateVoterWeightRecord(
     instructions,
     wallet.publicKey!,
     realm,
-    client
-  )
+    client,
+  );
 
   await withPostChatMessage(
     instructions,
@@ -53,11 +53,11 @@ export async function postChatMessage(
     payer,
     replyTo,
     body,
-    voterWeight
-  )
+    voterWeight,
+  );
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+  const transaction = new Transaction();
+  transaction.add(...instructions);
 
-  await sendTransaction({ transaction, wallet, connection, signers })
+  await sendTransaction({ transaction, wallet, connection, signers });
 }

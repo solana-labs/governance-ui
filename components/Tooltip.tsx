@@ -1,14 +1,14 @@
-import React, { ReactNode } from 'react'
-import Tippy from '@tippyjs/react'
-import 'tippy.js/animations/scale.css'
+import React, { ReactNode } from 'react';
+import Tippy from '@tippyjs/react';
+import 'tippy.js/animations/scale.css';
 
 type TooltipProps = {
-  content: ReactNode
-  placement?: any
-  className?: string
-  children?: ReactNode
-  contentClassName?: string
-}
+  content: ReactNode;
+  placement?: any;
+  className?: string;
+  children?: ReactNode;
+  contentClassName?: string;
+};
 
 const Tooltip = ({
   children,
@@ -38,8 +38,8 @@ const Tooltip = ({
     </Tippy>
   ) : (
     <>{children}</>
-  )
-}
+  );
+};
 
 const Content = ({ className = '', children }) => {
   return (
@@ -48,9 +48,9 @@ const Content = ({ className = '', children }) => {
     >
       {children}
     </div>
-  )
-}
+  );
+};
 
-Tooltip.Content = Content
+Tooltip.Content = Content;
 
-export default Tooltip
+export default Tooltip;

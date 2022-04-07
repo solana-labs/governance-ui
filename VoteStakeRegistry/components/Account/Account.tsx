@@ -1,10 +1,10 @@
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { LinkIcon } from '@heroicons/react/outline'
-import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBtn'
-import useWalletStore from 'stores/useWalletStore'
+import PreviousRouteBtn from '@components/PreviousRouteBtn';
+import { LinkIcon } from '@heroicons/react/outline';
+import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBtn';
+import useWalletStore from 'stores/useWalletStore';
 
 const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
-  const connected = useWalletStore((s) => s.connected)
+  const connected = useWalletStore((s) => s.connected);
   return (
     <div className="bg-bkg-2 col-span-12  p-4 md:p-6 rounded-lg">
       {withHeader && (
@@ -29,7 +29,7 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Account
+export default Account;

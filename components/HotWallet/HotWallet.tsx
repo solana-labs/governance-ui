@@ -1,17 +1,17 @@
-import useHotWallet from '@hooks/useHotWallet'
-import { FireIcon } from '@heroicons/react/solid'
-import HotWalletName from './HotWalletName'
-import HotWalletPluginTribecaGauges from './plugins/TribecaGauges/TribecaGauges'
-import { saberTribecaConfiguration } from '@tools/sdk/tribeca/configurations'
-import HotWalletPluginTokenAccounts from './plugins/TokenAccounts/TokenAccounts'
-import HotWalletPluginSaberStats from './plugins/SaberStats/SaberStats'
-import HotWalletPluginUXDStaking from './plugins/UXDStaking/UXDStaking'
+import useHotWallet from '@hooks/useHotWallet';
+import { FireIcon } from '@heroicons/react/solid';
+import HotWalletName from './HotWalletName';
+import HotWalletPluginTribecaGauges from './plugins/TribecaGauges/TribecaGauges';
+import { saberTribecaConfiguration } from '@tools/sdk/tribeca/configurations';
+import HotWalletPluginTokenAccounts from './plugins/TokenAccounts/TokenAccounts';
+import HotWalletPluginSaberStats from './plugins/SaberStats/SaberStats';
+import HotWalletPluginUXDStaking from './plugins/UXDStaking/UXDStaking';
 
 const HotWallet = (): JSX.Element => {
-  const { hotWalletAccount } = useHotWallet()
+  const { hotWalletAccount } = useHotWallet();
 
   if (!hotWalletAccount) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -38,7 +38,7 @@ const HotWallet = (): JSX.Element => {
         <HotWalletPluginSaberStats hotWalletAccount={hotWalletAccount} />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default HotWallet
+export default HotWallet;

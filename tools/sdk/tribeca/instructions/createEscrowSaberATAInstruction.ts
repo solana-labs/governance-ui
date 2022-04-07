@@ -1,7 +1,7 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { createAssociatedTokenAccount } from '@utils/associated'
-import { LockerData } from '../programs/lockedVoter'
-import ATribecaConfiguration from '../ATribecaConfiguration'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
+import { createAssociatedTokenAccount } from '@utils/associated';
+import { LockerData } from '../programs/lockedVoter';
+import ATribecaConfiguration from '../ATribecaConfiguration';
 
 export async function createEscrowATAInstruction({
   lockerData,
@@ -9,18 +9,18 @@ export async function createEscrowATAInstruction({
   payer,
   tribecaConfiguration,
 }: {
-  lockerData: LockerData
-  authority: PublicKey
-  payer: PublicKey
-  tribecaConfiguration: ATribecaConfiguration
+  lockerData: LockerData;
+  authority: PublicKey;
+  payer: PublicKey;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
   const [tx] = await createAssociatedTokenAccount(
     payer,
     escrow,
-    lockerData.tokenMint
-  )
+    lockerData.tokenMint,
+  );
 
-  return tx
+  return tx;
 }

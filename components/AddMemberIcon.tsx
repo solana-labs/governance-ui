@@ -37,7 +37,7 @@ const AddMemberIcon = ({ className }) => {
         strokeLinejoin="round"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default AddMemberIcon
+export default AddMemberIcon;

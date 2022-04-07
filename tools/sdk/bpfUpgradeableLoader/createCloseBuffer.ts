@@ -1,12 +1,12 @@
-import { BPF_UPGRADE_LOADER_ID } from '@solana/spl-governance'
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { BPF_UPGRADE_LOADER_ID } from '@solana/spl-governance';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 
 export async function createCloseBuffer(
   bufferAddress: PublicKey,
   closedAccountSolReceiver: PublicKey,
-  upgradeAuthority: PublicKey
+  upgradeAuthority: PublicKey,
 ) {
-  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID
+  const bpfUpgradableLoaderId = BPF_UPGRADE_LOADER_ID;
 
   const keys = [
     {
@@ -24,11 +24,11 @@ export async function createCloseBuffer(
       isWritable: false,
       isSigner: true,
     },
-  ]
+  ];
 
   return new TransactionInstruction({
     keys,
     programId: bpfUpgradableLoaderId,
     data: Buffer.from([5, 0, 0, 0]), // close instruction bincode
-  })
+  });
 }

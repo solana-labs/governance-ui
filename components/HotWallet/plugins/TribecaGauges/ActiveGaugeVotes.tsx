@@ -1,9 +1,9 @@
-import { ActiveGaugeVoteData } from '@hooks/useTribecaGaugesInfos'
+import { ActiveGaugeVoteData } from '@hooks/useTribecaGaugesInfos';
 
 const ActiveGaugeVotes = ({
   activeGaugeVotesData,
 }: {
-  activeGaugeVotesData?: ActiveGaugeVoteData[] | null
+  activeGaugeVotesData?: ActiveGaugeVoteData[] | null;
 }) => {
   return (
     <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full relative">
@@ -25,13 +25,13 @@ const ActiveGaugeVotes = ({
                 <span className="text-fgd-3">({weightPercentage}%)</span>
               </span>
             </div>
-          )
+          ),
         )
       ) : (
         <div>No weight repartition</div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default ActiveGaugeVotes
+export default ActiveGaugeVotes;

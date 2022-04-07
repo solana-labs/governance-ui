@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import * as yup from 'yup'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import createSetRedeemableGlobalSupplyCapInstruction from '@tools/sdk/uxdProtocol/createSetRedeemableGlobalSupplyCapInstruction'
-import { SetRedeemableGlobalSupplyCapForm } from '@utils/uiTypes/proposalCreationTypes'
-import Input from '@components/inputs/Input'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import * as yup from 'yup';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import createSetRedeemableGlobalSupplyCapInstruction from '@tools/sdk/uxdProtocol/createSetRedeemableGlobalSupplyCapInstruction';
+import { SetRedeemableGlobalSupplyCapForm } from '@utils/uiTypes/proposalCreationTypes';
+import Input from '@components/inputs/Input';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -15,14 +15,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Redeemable global supply cap should be more than 0')
     .required('Redeemable global supply cap is required'),
-})
+});
 
 const SetRedeemGlobalSupplyCap = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -39,10 +39,10 @@ const SetRedeemGlobalSupplyCap = ({
       return createSetRedeemableGlobalSupplyCapInstruction(
         form.governedAccount!.governance.account.governedAccount,
         form.supplyCap,
-        governedAccountPubkey
-      )
+        governedAccountPubkey,
+      );
     },
-  })
+  });
 
   return (
     <Input
@@ -58,7 +58,7 @@ const SetRedeemGlobalSupplyCap = ({
       }
       error={formErrors['supplyCap']}
     />
-  )
-}
+  );
+};
 
-export default SetRedeemGlobalSupplyCap
+export default SetRedeemGlobalSupplyCap;

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react';
 
 const SANCTIONED_COUNTRIES = [
   { country: 'Antigua and Barbuda', code: 'AG' },
@@ -27,34 +27,38 @@ const SANCTIONED_COUNTRIES = [
   { country: 'Yemen', code: 'YE' },
   { country: 'Zimbabwe', code: 'ZW' },
   { country: 'United States', code: 'US' },
-]
+];
 
-const SANCTIONED_COUNTRY_CODES = SANCTIONED_COUNTRIES.map(({ code }) => code)
+const SANCTIONED_COUNTRY_CODES = SANCTIONED_COUNTRIES.map(({ code }) => code);
 
 export default function useIpAddress() {
-  const [ipAllowed, setIpAllowed] = useState(true)
+  const [ipAllowed, setIpAllowed] = useState(true);
 
   useEffect(() => {
     const checkIpLocation = async () => {
-      let ipCountryCode
+      let ipCountryCode;
       try {
-        const response = await fetch(`https://www.cloudflare.com/cdn-cgi/trace`)
-        const parsedResponse = await response.text()
-        const ipLocation = parsedResponse.match(/loc=(.+)/)
-        ipCountryCode = ipLocation ? ipLocation[1] : ''
+        const response = await fetch(
+          `https://www.cloudflare.com/cdn-cgi/trace`,
+        );
+        const parsedResponse = await response.text();
+        const ipLocation = parsedResponse.match(/loc=(.+)/);
+        ipCountryCode = ipLocation ? ipLocation[1] : '';
       } catch {
-        const response = await fetch(`https://countrycode.bonfida.workers.dev/`)
-        const parsedResponse = await response.json()
-        ipCountryCode = parsedResponse.countryCode
+        const response = await fetch(
+          `https://countrycode.bonfida.workers.dev/`,
+        );
+        const parsedResponse = await response.json();
+        ipCountryCode = parsedResponse.countryCode;
       }
 
       if (ipCountryCode) {
-        setIpAllowed(!SANCTIONED_COUNTRY_CODES.includes(ipCountryCode))
+        setIpAllowed(!SANCTIONED_COUNTRY_CODES.includes(ipCountryCode));
       }
-    }
+    };
 
-    checkIpLocation()
-  }, [])
+    checkIpLocation();
+  }, []);
 
-  return { ipAllowed }
+  return { ipAllowed };
 }

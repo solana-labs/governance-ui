@@ -1,14 +1,14 @@
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js';
 import SolendConfiguration, {
   SupportedCollateralMintNames as SolendSupportedCollateralMintNames,
-} from '@tools/sdk/solend/configuration'
-import { abbreviateAddress } from './formatting'
+} from '@tools/sdk/solend/configuration';
+import { abbreviateAddress } from './formatting';
 
 export type SplTokenInformation = {
-  name: string
-  mint: PublicKey
-  decimals: number
-}
+  name: string;
+  mint: PublicKey;
+  decimals: number;
+};
 
 export type SupportedSplTokenNames =
   | 'USDC'
@@ -20,10 +20,10 @@ export type SupportedSplTokenNames =
   | 'B30UXP'
   | 'Saber UXD-USDC LP'
   | 'Saber IOU Token'
-  | SolendSupportedCollateralMintNames
+  | SolendSupportedCollateralMintNames;
 
 export const SPL_TOKENS: {
-  [key in SupportedSplTokenNames]: SplTokenInformation
+  [key in SupportedSplTokenNames]: SplTokenInformation;
 } = {
   USDC: {
     name: 'USD Coin',
@@ -80,37 +80,37 @@ export const SPL_TOKENS: {
   },
 
   ...SolendConfiguration.getSupportedCollateralMintsInformation(),
-} as const
+} as const;
 
-export type SplTokenUIName = typeof SPL_TOKENS[keyof typeof SPL_TOKENS]['name']
+export type SplTokenUIName = typeof SPL_TOKENS[keyof typeof SPL_TOKENS]['name'];
 
 export function getSplTokenNameByMint(mint: PublicKey): string {
   return (
     Object.values(SPL_TOKENS).find(
-      (splToken) => splToken.mint.toBase58() === mint.toBase58()
+      (splToken) => splToken.mint.toBase58() === mint.toBase58(),
     )?.name ?? abbreviateAddress(mint)
-  )
+  );
 }
 
 export function getSplTokenInformationByUIName(
-  nameToMatch: SplTokenUIName
+  nameToMatch: SplTokenUIName,
 ): SplTokenInformation {
   const item = Object.entries(SPL_TOKENS).find(
-    ([_, { name }]) => name === nameToMatch
-  )
+    ([_, { name }]) => name === nameToMatch,
+  );
 
   // theoretically impossible case
   if (!item) {
-    throw new Error('Unable to find SPL token mint address by UI name')
+    throw new Error('Unable to find SPL token mint address by UI name');
   }
 
-  return item[1]
+  return item[1];
 }
 
 export function getSplTokenMintAddressByUIName(
-  nameToMatch: SplTokenUIName
+  nameToMatch: SplTokenUIName,
 ): PublicKey {
-  const { mint } = getSplTokenInformationByUIName(nameToMatch)
+  const { mint } = getSplTokenInformationByUIName(nameToMatch);
 
-  return mint
+  return mint;
 }

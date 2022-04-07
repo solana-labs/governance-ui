@@ -1,11 +1,11 @@
-import type { EpochGaugeVoterData } from '@tools/sdk/tribeca/programs'
+import type { EpochGaugeVoterData } from '@tools/sdk/tribeca/programs';
 
 const EpochGaugeVoterDataBloc = ({
   title,
   epochGaugeVoterData,
 }: {
-  title: string
-  epochGaugeVoterData?: EpochGaugeVoterData | null
+  title: string;
+  epochGaugeVoterData?: EpochGaugeVoterData | null;
 }) => {
   return (
     <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full relative">
@@ -31,7 +31,7 @@ const EpochGaugeVoterDataBloc = ({
         <div className="mt-3">Non-initialized epoch</div>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default EpochGaugeVoterDataBloc
+export default EpochGaugeVoterDataBloc;

@@ -1,7 +1,7 @@
-import { Listbox } from '@headlessui/react'
-import { ChevronDownIcon } from '@heroicons/react/solid'
-import { StyledLabel, inputClasses } from './styles'
-import ErrorField from './ErrorField'
+import { Listbox } from '@headlessui/react';
+import { ChevronDownIcon } from '@heroicons/react/solid';
+import { StyledLabel, inputClasses } from './styles';
+import ErrorField from './ErrorField';
 
 const Select = ({
   value,
@@ -18,19 +18,19 @@ const Select = ({
   wrapperClassNames = '',
   minWidth = '',
 }: {
-  value: any | undefined
-  onChange: any | undefined
-  children: any | undefined
-  className?: string | undefined
-  placeholder?: string | undefined
-  error?: string | undefined
-  disabled?: boolean | undefined
-  label?: string | undefined
-  componentLabel?: any | undefined
-  useDefaultStyle?: boolean
-  noMaxWidth?: boolean
-  wrapperClassNames?: string
-  minWidth?: string
+  value: any | undefined;
+  onChange: any | undefined;
+  children: any | undefined;
+  className?: string | undefined;
+  placeholder?: string | undefined;
+  error?: string | undefined;
+  disabled?: boolean | undefined;
+  label?: string | undefined;
+  componentLabel?: any | undefined;
+  useDefaultStyle?: boolean;
+  noMaxWidth?: boolean;
+  wrapperClassNames?: string;
+  minWidth?: string;
 }) => {
   return (
     <div className={`${wrapperClassNames}`} style={{ minWidth: minWidth }}>
@@ -77,8 +77,8 @@ const Select = ({
         <ErrorField text={error}></ErrorField>
       </div>
     </div>
-  )
-}
+  );
+};
 
 const Option = ({ value, children, className = '' }) => {
   return (
@@ -93,9 +93,9 @@ const Option = ({ value, children, className = '' }) => {
         </div>
       )}
     </Listbox.Option>
-  )
-}
+  );
+};
 
-Select.Option = Option
+Select.Option = Option;
 
-export default Select
+export default Select;

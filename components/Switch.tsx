@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react';
 
 interface SwitchProps {
-  checked: boolean
-  className?: string
-  onChange: (x: boolean) => void
+  checked: boolean;
+  className?: string;
+  onChange: (x: boolean) => void;
 }
 
 const Switch: FunctionComponent<SwitchProps> = ({
@@ -13,8 +13,8 @@ const Switch: FunctionComponent<SwitchProps> = ({
   onChange,
 }) => {
   const handleClick = () => {
-    onChange(!checked)
-  }
+    onChange(!checked);
+  };
 
   return (
     <div className={`flex items-center ${className}`}>
@@ -42,7 +42,7 @@ const Switch: FunctionComponent<SwitchProps> = ({
         ></span>
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default Switch
+export default Switch;

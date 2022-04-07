@@ -1,48 +1,48 @@
-import { BN } from '@project-serum/anchor'
-import type { EscrowData } from '@tools/sdk/tribeca/programs'
-import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units'
-import { tryGetTokenMint } from '@utils/tokens'
-import { useCallback, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { BN } from '@project-serum/anchor';
+import type { EscrowData } from '@tools/sdk/tribeca/programs';
+import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
+import { tryGetTokenMint } from '@utils/tokens';
+import { useCallback, useEffect, useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
 
 function formatDate(dateInSec: BN): string {
   if (dateInSec.isZero()) {
-    return '-'
+    return '-';
   }
 
   // mul by 1000 to get ms
-  return new Date(dateInSec.mul(new BN(1000)).toNumber()).toUTCString()
+  return new Date(dateInSec.mul(new BN(1000)).toNumber()).toUTCString();
 }
 
 const EscrowDataBloc = ({ escrowData }: { escrowData?: EscrowData }) => {
-  const connection = useWalletStore((s) => s.connection)
-  const [uiAmount, setUiAmount] = useState<string>('-')
+  const connection = useWalletStore((s) => s.connection);
+  const [uiAmount, setUiAmount] = useState<string>('-');
 
   const loadUiAmount = useCallback(async (): Promise<string> => {
-    if (!escrowData) return '-'
+    if (!escrowData) return '-';
 
     const tokenInfo = await tryGetTokenMint(
       connection.current,
-      escrowData.tokens
-    )
+      escrowData.tokens,
+    );
 
     if (!tokenInfo) {
       console.log(
         'Cannot load information about token mint related to escrow data (tribeca gauges)',
-        escrowData.tokens
-      )
-      return '-'
+        escrowData.tokens,
+      );
+      return '-';
     }
 
     return nativeAmountToFormattedUiAmount(
       escrowData.amount,
-      tokenInfo.account.decimals
-    )
-  }, [connection, escrowData])
+      tokenInfo.account.decimals,
+    );
+  }, [connection, escrowData]);
 
   useEffect(() => {
-    loadUiAmount().then(setUiAmount)
-  }, [loadUiAmount])
+    loadUiAmount().then(setUiAmount);
+  }, [loadUiAmount]);
 
   return (
     <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full relative">
@@ -75,7 +75,7 @@ const EscrowDataBloc = ({ escrowData }: { escrowData?: EscrowData }) => {
         <span>-</span>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default EscrowDataBloc
+export default EscrowDataBloc;

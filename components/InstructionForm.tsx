@@ -1,11 +1,11 @@
-import { LinkButton } from '@components/Button'
-import { XCircleIcon } from '@heroicons/react/solid'
-import { InstructionType } from '@hooks/useGovernanceAssets'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes'
-import SelectedInstruction from 'pages/dao/[symbol]/proposal/components/instructions/SelectedInstruction'
-import InstructionContentContainer from '../pages/dao/[symbol]/proposal/components/InstructionContentContainer'
-import SelectInstructionType from './SelectInstructionType'
+import { LinkButton } from '@components/Button';
+import { XCircleIcon } from '@heroicons/react/solid';
+import { InstructionType } from '@hooks/useGovernanceAssets';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { ComponentInstructionData } from '@utils/uiTypes/proposalCreationTypes';
+import SelectedInstruction from 'pages/dao/[symbol]/proposal/components/instructions/SelectedInstruction';
+import InstructionContentContainer from '../pages/dao/[symbol]/proposal/components/InstructionContentContainer';
+import SelectInstructionType from './SelectInstructionType';
 
 const InstructionForm = ({
   idx,
@@ -15,20 +15,20 @@ const InstructionForm = ({
   setInstructionType,
   removeInstruction,
 }: {
-  idx: number
-  selectedInstruction: ComponentInstructionData
-  governedAccount?: GovernedMultiTypeAccount
-  availableInstructions: InstructionType[]
+  idx: number;
+  selectedInstruction: ComponentInstructionData;
+  governedAccount?: GovernedMultiTypeAccount;
+  availableInstructions: InstructionType[];
 
   setInstructionType: ({
     instructionType,
     idx,
   }: {
-    instructionType: InstructionType | null
-    idx: number
-  }) => void
+    instructionType: InstructionType | null;
+    idx: number;
+  }) => void;
 
-  removeInstruction: (idx: number) => void
+  removeInstruction: (idx: number) => void;
 }) => {
   return (
     <div key={idx} className="mb-3 border border-fgd-4 p-4 md:p-6 rounded-lg">
@@ -63,7 +63,7 @@ const InstructionForm = ({
         ) : null}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default InstructionForm
+export default InstructionForm;

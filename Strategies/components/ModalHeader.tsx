@@ -15,7 +15,7 @@ const ModalHeader = ({
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ModalHeader
+export default ModalHeader;

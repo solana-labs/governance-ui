@@ -4,6 +4,6 @@ const PageBodyContainer = ({ children }) => (
       {children}
     </div>
   </div>
-)
+);
 
-export default PageBodyContainer
+export default PageBodyContainer;

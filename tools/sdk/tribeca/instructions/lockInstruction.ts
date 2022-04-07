@@ -1,16 +1,16 @@
-import { BN } from '@project-serum/anchor'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { BN } from '@project-serum/anchor';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
   PublicKey,
   SYSVAR_INSTRUCTIONS_PUBKEY,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { getATAAddress } from '@saberhq/token-utils'
-import { LockerData } from '../programs'
+} from '@solana/web3.js';
+import { getATAAddress } from '@saberhq/token-utils';
+import { LockerData } from '../programs';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '../ATribecaConfiguration'
-import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools'
+} from '../ATribecaConfiguration';
+import { DEFAULT_GOVERNANCE_PROGRAM_ID } from '@components/instructions/tools';
 
 export async function lockInstruction({
   programs,
@@ -20,30 +20,30 @@ export async function lockInstruction({
   durationSeconds,
   tribecaConfiguration,
 }: {
-  programs: TribecaPrograms
-  lockerData: LockerData
-  authority: PublicKey
-  amount: BN
-  durationSeconds: BN
-  tribecaConfiguration: ATribecaConfiguration
+  programs: TribecaPrograms;
+  lockerData: LockerData;
+  authority: PublicKey;
+  amount: BN;
+  durationSeconds: BN;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
   const {
     tokens: escrowTokens,
     owner: escrowOwner,
-  } = await programs.LockedVoter.account.escrow.fetch(escrow)
+  } = await programs.LockedVoter.account.escrow.fetch(escrow);
 
   const sourceTokens = await getATAAddress({
     mint: tribecaConfiguration.token.mint,
     owner: escrowOwner,
-  })
+  });
 
   const [whitelistEntry] = await tribecaConfiguration.findWhitelistAddress(
     tribecaConfiguration.locker,
     new PublicKey(DEFAULT_GOVERNANCE_PROGRAM_ID),
-    authority
-  )
+    authority,
+  );
 
   console.log({
     locker: tribecaConfiguration.locker.toString(),
@@ -54,7 +54,7 @@ export async function lockInstruction({
     tokenProgram: TOKEN_PROGRAM_ID.toString(),
     whitelistEntry: whitelistEntry.toString(),
     SYSVAR_INSTRUCTIONS_PUBKEY: SYSVAR_INSTRUCTIONS_PUBKEY.toString(),
-  })
+  });
 
   return programs.LockedVoter.instruction.lock(amount, durationSeconds, {
     accounts: {
@@ -79,5 +79,5 @@ export async function lockInstruction({
           },
         ]
       : [],
-  })
+  });
 }

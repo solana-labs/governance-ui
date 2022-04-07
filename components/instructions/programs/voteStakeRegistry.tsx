@@ -1,37 +1,37 @@
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { BN, Provider } from '@project-serum/anchor'
-import { AccountMetaData } from '@solana/spl-governance'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
-import { fmtMintAmount } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
-import { tryGetMint } from '@utils/tokens'
-import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api'
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
+import { Wallet } from '@marinade.finance/marinade-ts-sdk';
+import { BN, Provider } from '@project-serum/anchor';
+import { AccountMetaData } from '@solana/spl-governance';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { fmtMintAmount } from '@tools/sdk/units';
+import tokenService from '@utils/services/token';
+import { tryGetMint } from '@utils/tokens';
+import { tryGetRegistrar, tryGetVoter } from 'VoteStakeRegistry/sdk/api';
 import {
   DAYS_PER_MONTH,
   getFormattedStringFromDays,
   secsToDays,
   SECS_PER_DAY,
-} from 'VoteStakeRegistry/tools/dateTools'
-import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits'
+} from 'VoteStakeRegistry/tools/dateTools';
+import { calcMultiplier } from 'VoteStakeRegistry/tools/deposits';
 
 interface ClawbackInstruction {
-  depositEntryIndex: number
+  depositEntryIndex: number;
 }
 interface VotingMintCfgInstruction {
-  idx: number
-  digitShift: number
-  baselineVoteWeightScaledFactor: BN
-  maxExtraLockupVoteWeightScaledFactor: BN
-  lockupSaturationSecs: BN
-  grantAuthority: PublicKey
+  idx: number;
+  digitShift: number;
+  baselineVoteWeightScaledFactor: BN;
+  maxExtraLockupVoteWeightScaledFactor: BN;
+  lockupSaturationSecs: BN;
+  grantAuthority: PublicKey;
 }
 interface GrantInstruction {
-  periods: number
-  kind: object
-  amount: BN
-  startTs: BN
-  allowClawback: boolean
+  periods: number;
+  kind: object;
+  amount: BN;
+  startTs: BN;
+  allowClawback: boolean;
 }
 
 export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
@@ -49,30 +49,33 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
         try {
-          const options = Provider.defaultOptions()
+          const options = Provider.defaultOptions();
           const provider = new Provider(
             connection,
             new Wallet(Keypair.generate()),
-            options
-          )
-          const vsrClient = await VsrClient.connect(provider)
+            options,
+          );
+          const vsrClient = await VsrClient.connect(provider);
           const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as ClawbackInstruction | null
-          const existingVoter = await tryGetVoter(accounts[2].pubkey, vsrClient)
+            Buffer.from(data),
+          )?.data as ClawbackInstruction | null;
+          const existingVoter = await tryGetVoter(
+            accounts[2].pubkey,
+            vsrClient,
+          );
           const deposit = decodedInstructionData
             ? existingVoter?.deposits[decodedInstructionData.depositEntryIndex]
-            : null
+            : null;
           const existingRegistrar = await tryGetRegistrar(
             accounts[0].pubkey,
-            vsrClient
-          )
+            vsrClient,
+          );
           const mintPk =
-            existingRegistrar?.votingMints[deposit!.votingMintConfigIdx].mint
-          const mint = await tryGetMint(connection, mintPk!)
+            existingRegistrar?.votingMints[deposit!.votingMintConfigIdx].mint;
+          const mint = await tryGetMint(connection, mintPk!);
 
           return (
             <div className="space-y-3">
@@ -82,10 +85,10 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                 {fmtMintAmount(mint?.account, deposit!.amountDepositedNative)}
               </div>
             </div>
-          )
+          );
         } catch (e) {
-          console.log(e)
-          return <div>{JSON.stringify(data)}</div>
+          console.log(e);
+          return <div>{JSON.stringify(data)}</div>;
         }
       },
     },
@@ -100,7 +103,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         { name: 'Payer' },
       ],
       getDataUI: async () => {
-        return <div></div>
+        return <div></div>;
       },
     },
     113: {
@@ -112,21 +115,21 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
         try {
-          const options = Provider.defaultOptions()
+          const options = Provider.defaultOptions();
           const provider = new Provider(
             connection,
             new Wallet(Keypair.generate()),
-            options
-          )
-          const vsrClient = await VsrClient.connect(provider)
+            options,
+          );
+          const vsrClient = await VsrClient.connect(provider);
           const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as VotingMintCfgInstruction
+            Buffer.from(data),
+          )?.data as VotingMintCfgInstruction;
           const {
             maxExtraLockupVoteWeightScaledFactor,
             lockupSaturationSecs,
             baselineVoteWeightScaledFactor,
-          } = decodedInstructionData
+          } = decodedInstructionData;
           return (
             <div className="space-y-3">
               <div>Index: {decodedInstructionData?.idx}</div>
@@ -145,7 +148,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                 Max lockup time:{' '}
                 {decodedInstructionData &&
                   getFormattedStringFromDays(
-                    secsToDays(lockupSaturationSecs.toNumber())
+                    secsToDays(lockupSaturationSecs.toNumber()),
                   )}{' '}
                 (secs: {lockupSaturationSecs.toNumber()})
               </div>
@@ -163,10 +166,10 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                 {decodedInstructionData?.grantAuthority.toBase58()}
               </div>
             </div>
-          )
+          );
         } catch (e) {
-          console.log(e)
-          return <div>{JSON.stringify(data)}</div>
+          console.log(e);
+          return <div>{JSON.stringify(data)}</div>;
         }
       },
     },
@@ -187,26 +190,26 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
       getDataUI: async (
         connection: Connection,
         data: Uint8Array,
-        accounts: AccountMetaData[]
+        accounts: AccountMetaData[],
       ) => {
         try {
-          const options = Provider.defaultOptions()
+          const options = Provider.defaultOptions();
           const provider = new Provider(
             connection,
             new Wallet(Keypair.generate()),
-            options
-          )
-          const vsrClient = await VsrClient.connect(provider)
+            options,
+          );
+          const vsrClient = await VsrClient.connect(provider);
           const decodedInstructionData = vsrClient.program.coder.instruction.decode(
-            Buffer.from(data)
-          )?.data as GrantInstruction | null
-          const mintPk = accounts[9].pubkey
-          const mint = await tryGetMint(connection, mintPk!)
+            Buffer.from(data),
+          )?.data as GrantInstruction | null;
+          const mintPk = accounts[9].pubkey;
+          const mint = await tryGetMint(connection, mintPk!);
           const lockupKind = decodedInstructionData
             ? Object.keys(decodedInstructionData?.kind)[0]
-            : null
-          const periods = decodedInstructionData?.periods
-          const logoUrl = tokenService.getTokenInfo(mintPk.toBase58())?.logoURI
+            : null;
+          const periods = decodedInstructionData?.periods;
+          const logoUrl = tokenService.getTokenInfo(mintPk.toBase58())?.logoURI;
           return (
             <>
               {decodedInstructionData ? (
@@ -217,7 +220,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                     Amount:{' '}
                     {fmtMintAmount(
                       mint!.account,
-                      decodedInstructionData.amount
+                      decodedInstructionData.amount,
                     )}
                   </div>
                   {lockupKind === 'monthly' && periods && (
@@ -225,7 +228,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                       Vested:{' '}
                       {fmtMintAmount(
                         mint!.account,
-                        decodedInstructionData.amount.div(new BN(periods))
+                        decodedInstructionData.amount.div(new BN(periods)),
                       )}{' '}
                       p/m
                     </div>
@@ -238,7 +241,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                   <div>
                     Start date:{' '}
                     {new Date(
-                      decodedInstructionData.startTs.toNumber() * 1000
+                      decodedInstructionData.startTs.toNumber() * 1000,
                     ).toDateString()}
                   </div>
                   {periods && (
@@ -248,7 +251,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                         decodedInstructionData.startTs.toNumber() * 1000 +
                           (lockupKind === 'monthly'
                             ? periods * DAYS_PER_MONTH * SECS_PER_DAY * 1000
-                            : periods * SECS_PER_DAY * 1000)
+                            : periods * SECS_PER_DAY * 1000),
                       ).toDateString()}
                     </div>
                   )}
@@ -262,12 +265,12 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
                 <div>{JSON.stringify(data)}</div>
               )}
             </>
-          )
+          );
         } catch (e) {
-          console.log(e)
-          return <div>{JSON.stringify(data)}</div>
+          console.log(e);
+          return <div>{JSON.stringify(data)}</div>;
         }
       },
     },
   },
-}
+};

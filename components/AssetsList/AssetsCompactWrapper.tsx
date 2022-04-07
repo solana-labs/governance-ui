@@ -1,15 +1,15 @@
-import React from 'react'
-import AssetsList from './AssetsList'
-import { ChevronRightIcon } from '@heroicons/react/solid'
-import useRealm from '@hooks/useRealm'
-import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
-import { LinkButton } from '@components/Button'
+import React from 'react';
+import AssetsList from './AssetsList';
+import { ChevronRightIcon } from '@heroicons/react/solid';
+import useRealm from '@hooks/useRealm';
+import useQueryContext from '@hooks/useQueryContext';
+import { useRouter } from 'next/router';
+import { LinkButton } from '@components/Button';
 
 const AssetsCompactWrapper = () => {
-  const router = useRouter()
-  const { symbol } = useRealm()
-  const { fmtUrlWithCluster } = useQueryContext()
+  const router = useRouter();
+  const { symbol } = useRealm();
+  const { fmtUrlWithCluster } = useQueryContext();
 
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
@@ -18,8 +18,8 @@ const AssetsCompactWrapper = () => {
         <LinkButton
           className={`flex items-center text-primary-light`}
           onClick={() => {
-            const url = fmtUrlWithCluster(`/dao/${symbol}/assets`)
-            router.push(url)
+            const url = fmtUrlWithCluster(`/dao/${symbol}/assets`);
+            router.push(url);
           }}
         >
           View
@@ -30,7 +30,7 @@ const AssetsCompactWrapper = () => {
         <AssetsList panelView />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AssetsCompactWrapper
+export default AssetsCompactWrapper;

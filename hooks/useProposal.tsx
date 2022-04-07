@@ -1,9 +1,9 @@
-import { useRouter } from 'next/router'
-import useWalletStore from '../stores/useWalletStore'
+import { useRouter } from 'next/router';
+import useWalletStore from '../stores/useWalletStore';
 
 export default function useProposal() {
-  const router = useRouter()
-  const { pk } = router.query
+  const router = useRouter();
+  const { pk } = router.query;
 
   const {
     proposal,
@@ -12,7 +12,7 @@ export default function useProposal() {
     proposalMint,
     governance,
     proposalOwner,
-  } = useWalletStore((s) => s.selectedProposal)
+  } = useWalletStore((s) => s.selectedProposal);
 
   return {
     pk,
@@ -22,5 +22,5 @@ export default function useProposal() {
     proposalMint,
     governance,
     proposalOwner,
-  }
+  };
 }

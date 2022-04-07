@@ -21,7 +21,7 @@ const DiscordIcon = ({ className }) => {
         mask="url(#path-1-inside-1_1901_7895)"
       />
     </svg>
-  )
-}
+  );
+};
 
-export default DiscordIcon
+export default DiscordIcon;

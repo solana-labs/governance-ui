@@ -1,10 +1,10 @@
-import React, { useEffect } from 'react'
-import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
-import TeamWalletField from '../TeamWalletField'
-import Input from '@components/inputs/Input'
+import React, { useEffect } from 'react';
+import { RealmWizardStepComponentProps } from '../../interfaces/Realm';
+import TeamWalletField from '../TeamWalletField';
+import Input from '@components/inputs/Input';
 
-import useWalletStore from 'stores/useWalletStore'
-import ApprovalQuorumInput from '../ApprovalQuorumInput'
+import useWalletStore from 'stores/useWalletStore';
+import ApprovalQuorumInput from '../ApprovalQuorumInput';
 
 /**
  * This is the Step One for the Realm Wizard.
@@ -18,41 +18,41 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
   form,
 }) => {
-  const DEFAULT_APPROVAL_QUORUM = 60
-  const { current: wallet } = useWalletStore((s) => s)
+  const DEFAULT_APPROVAL_QUORUM = 60;
+  const { current: wallet } = useWalletStore((s) => s);
 
   const handleInsertTeamWallet = (wallets: string[]) => {
-    const teamWallets: string[] = form?.teamWallets ?? []
+    const teamWallets: string[] = form?.teamWallets ?? [];
 
     wallets.forEach((wallet) => {
       if (!teamWallets.find((addr) => addr === wallet)) {
-        teamWallets.push(wallet)
+        teamWallets.push(wallet);
       }
-    })
-    setForm({ teamWallets })
-  }
+    });
+    setForm({ teamWallets });
+  };
 
   const handleRemoveTeamWallet = (index: number) => {
     if (form?.teamWallets && form.teamWallets[index]) {
-      const teamWallets = form.teamWallets
-      teamWallets.splice(index, 1)
-      setForm({ teamWallets })
+      const teamWallets = form.teamWallets;
+      teamWallets.splice(index, 1);
+      setForm({ teamWallets });
     }
-  }
+  };
 
   const addCurrentWallet = () => {
     if (wallet?.publicKey) {
-      handleInsertTeamWallet([wallet.publicKey?.toBase58()])
+      handleInsertTeamWallet([wallet.publicKey?.toBase58()]);
     }
-  }
+  };
 
   useEffect(() => {
-    addCurrentWallet()
-  }, [wallet?.publicKey])
+    addCurrentWallet();
+  }, [wallet?.publicKey]);
 
   useEffect(() => {
-    addCurrentWallet()
-  }, [])
+    addCurrentWallet();
+  }, []);
 
   return (
     <div>
@@ -71,7 +71,7 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
           onChange={($e) => {
             setForm({
               name: $e.target.value,
-            })
+            });
           }}
         />
       </div>
@@ -79,7 +79,7 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
         <ApprovalQuorumInput
           value={form.yesThreshold}
           onChange={($e) => {
-            setForm({ yesThreshold: $e })
+            setForm({ yesThreshold: $e });
           }}
           onBlur={() => {
             if (
@@ -88,7 +88,7 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
             ) {
               setForm({
                 yesThreshold: DEFAULT_APPROVAL_QUORUM,
-              })
+              });
             }
           }}
         />
@@ -101,7 +101,7 @@ const MultisigOptions: React.FC<RealmWizardStepComponentProps> = ({
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MultisigOptions
+export default MultisigOptions;

@@ -1,7 +1,7 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '../ATribecaConfiguration'
+} from '../ATribecaConfiguration';
 
 export async function gaugeRevertVoteInstruction({
   programs,
@@ -10,43 +10,43 @@ export async function gaugeRevertVoteInstruction({
   payer,
   tribecaConfiguration,
 }: {
-  programs: TribecaPrograms
-  gauge: PublicKey
-  authority: PublicKey
-  payer: PublicKey
-  tribecaConfiguration: ATribecaConfiguration
+  programs: TribecaPrograms;
+  gauge: PublicKey;
+  authority: PublicKey;
+  payer: PublicKey;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
   const { currentRewardsEpoch } = await tribecaConfiguration.fetchGaugemeister(
-    programs.Gauge
-  )
+    programs.Gauge,
+  );
 
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
-  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow)
+  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow);
 
   const [gaugeVote] = await tribecaConfiguration.findGaugeVoteAddress(
     gaugeVoter,
-    gauge
-  )
+    gauge,
+  );
 
-  const votingEpoch = currentRewardsEpoch + 1
+  const votingEpoch = currentRewardsEpoch + 1;
 
   const [epochGauge] = await tribecaConfiguration.findEpochGaugeAddress(
     gauge,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   const [
     epochGaugeVoter,
   ] = await tribecaConfiguration.findEpochGaugeVoterAddress(
     gaugeVoter,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   const [epochGaugeVote] = await tribecaConfiguration.findEpochGaugeVoteAddress(
     gaugeVote,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   console.log('Gauge Revert Vote', {
     gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
@@ -59,7 +59,7 @@ export async function gaugeRevertVoteInstruction({
     voteDelegate: authority.toString(),
     epochGaugeVote: epochGaugeVote.toString(),
     payer: payer.toString(),
-  })
+  });
 
   return programs.Gauge.instruction.gaugeRevertVote({
     accounts: {
@@ -74,5 +74,5 @@ export async function gaugeRevertVoteInstruction({
       epochGaugeVote,
       payer,
     },
-  })
+  });
 }

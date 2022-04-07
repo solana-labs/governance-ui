@@ -1,4 +1,4 @@
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey } from '@solana/web3.js';
 
 export const GOVERNANCE_PROGRAM_NAMES = {
   GqTPL6qRf5aUuqscLh8Rg2HTxPUXfhhAXDptTLhp1t2J: 'Mango Governance Program',
@@ -8,7 +8,7 @@ export const GOVERNANCE_PROGRAM_NAMES = {
     'Phantasia Governance Program',
   smfjietFKFJ4Sbw1cqESBTpPhF4CwbMwN8kBEC1e5ui:
     'Strangemood Foundation Governance Program',
-}
+};
 
 // Well known program names displayed on the instruction card
 export const PROGRAM_NAMES = {
@@ -32,12 +32,12 @@ export const PROGRAM_NAMES = {
   '4Q6WW2ouZ6V3iaNm56MTd5n2tnTm4C5fiH8miFHnAFHo':
     'Mango Voter Stake Registry Program',
   ...GOVERNANCE_PROGRAM_NAMES,
-}
+};
 
 export function getProgramName(programId: PublicKey) {
-  return PROGRAM_NAMES[programId.toBase58()]
+  return PROGRAM_NAMES[programId.toBase58()];
 }
 
 export function isGovernanceProgram(programId: PublicKey) {
-  return GOVERNANCE_PROGRAM_NAMES[programId.toBase58()]
+  return GOVERNANCE_PROGRAM_NAMES[programId.toBase58()];
 }

@@ -1,13 +1,13 @@
-import { GovernedTokenAccount } from '@utils/tokens'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
+import { GovernedTokenAccount } from '@utils/tokens';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import { getTreasuryAccountItemInfo } from '@utils/treasuryTools';
 
 const AccountItem = ({
   governedAccountTokenAccount,
 }: {
-  governedAccountTokenAccount: GovernedTokenAccount
+  governedAccountTokenAccount: GovernedTokenAccount;
 }) => {
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
   const {
     amountFormatted,
     logo,
@@ -15,7 +15,7 @@ const AccountItem = ({
     symbol,
     displayPrice,
     isSol,
-  } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
+  } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts);
 
   return (
     <div className="flex items-start text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
@@ -41,7 +41,7 @@ const AccountItem = ({
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AccountItem
+export default AccountItem;

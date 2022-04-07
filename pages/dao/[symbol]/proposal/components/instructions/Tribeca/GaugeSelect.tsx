@@ -1,5 +1,5 @@
-import Select from '@components/inputs/Select'
-import { GaugeInfos } from '@tools/sdk/tribeca/ATribecaConfiguration'
+import Select from '@components/inputs/Select';
+import { GaugeInfos } from '@tools/sdk/tribeca/ATribecaConfiguration';
 
 const GaugeSelect = ({
   gauges,
@@ -7,10 +7,10 @@ const GaugeSelect = ({
   error,
   onChange,
 }: {
-  gauges: GaugeInfos | null
-  value?: string
-  error?: string
-  onChange: (v: string) => void
+  gauges: GaugeInfos | null;
+  value?: string;
+  error?: string;
+  onChange: (v: string) => void;
 }) => {
   return (
     <Select
@@ -30,7 +30,7 @@ const GaugeSelect = ({
         </Select.Option>
       ))}
     </Select>
-  )
-}
+  );
+};
 
-export default GaugeSelect
+export default GaugeSelect;

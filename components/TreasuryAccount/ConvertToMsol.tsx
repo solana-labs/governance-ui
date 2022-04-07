@@ -1,38 +1,38 @@
-import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import AccountLabel from './AccountHeader'
-import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { useEffect, useState } from 'react'
+import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import AccountLabel from './AccountHeader';
+import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { useEffect, useState } from 'react';
 import {
   StakingViewForm,
   FormInstructionData,
-} from '@utils/uiTypes/proposalCreationTypes'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import Input from '@components/inputs/Input'
-import Textarea from '@components/inputs/Textarea'
-import { precision } from '@utils/formatting'
-import useRealm from '@hooks/useRealm'
-import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import Button from '@components/Button'
-import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
-import { getStakeSchema } from '@utils/validations'
-import { getConvertToMsolInstruction } from '@utils/instructionTools'
-import { PublicKey } from '@solana/web3.js'
+} from '@utils/uiTypes/proposalCreationTypes';
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units';
+import Input from '@components/inputs/Input';
+import Textarea from '@components/inputs/Textarea';
+import { precision } from '@utils/formatting';
+import useRealm from '@hooks/useRealm';
+import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch';
+import Button from '@components/Button';
+import Tooltip from '@components/Tooltip';
+import useWalletStore from 'stores/useWalletStore';
+import { getStakeSchema } from '@utils/validations';
+import { getConvertToMsolInstruction } from '@utils/instructionTools';
+import { PublicKey } from '@solana/web3.js';
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
   RpcContext,
-} from '@solana/spl-governance'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { createProposal } from 'actions/createProposal'
-import useQueryContext from '@hooks/useQueryContext'
-import { useRouter } from 'next/router'
-import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+} from '@solana/spl-governance';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import { createProposal } from 'actions/createProposal';
+import useQueryContext from '@hooks/useQueryContext';
+import { useRouter } from 'next/router';
+import { notify } from '@utils/notifications';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 
 const ConvertToMsol = () => {
   const {
@@ -43,71 +43,71 @@ const ConvertToMsol = () => {
     mint,
     councilMint,
     symbol,
-  } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const { canUseTransferInstruction } = useGovernanceAssets()
-  const { governedTokenAccounts } = useGovernanceAssets()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const router = useRouter()
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
+  } = useRealm();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const { canUseTransferInstruction } = useGovernanceAssets();
+  const { governedTokenAccounts } = useGovernanceAssets();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const router = useRouter();
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions);
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount);
   const notConnectedMessage =
-    'You need to be connected to your wallet to have the ability to create a staking proposal'
+    'You need to be connected to your wallet to have the ability to create a staking proposal';
 
-  const [formErrors, setFormErrors] = useState({})
+  const [formErrors, setFormErrors] = useState({});
   const [form, setForm] = useState<StakingViewForm>({
     destinationAccount: undefined,
     amount: undefined,
     governedTokenAccount: undefined,
     title: '',
     description: '',
-  })
-  const [showOptions, setShowOptions] = useState(false)
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  });
+  const [showOptions, setShowOptions] = useState(false);
+  const [voteByCouncil, setVoteByCouncil] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   const mSolTokenAccounts = governedTokenAccounts.filter(
     (acc) =>
       acc.mint?.publicKey.toString() ===
-      'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So'
-  )
+      'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So',
+  );
   const mintMinAmount = form.governedTokenAccount?.mint
     ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
-    : 1
-  const proposalTitle = `Convert ${form.amount} SOL to mSOL`
-  const schema = getStakeSchema({ form })
+    : 1;
+  const proposalTitle = `Convert ${form.amount} SOL to mSOL`;
+  const schema = getStakeSchema({ form });
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
 
   const handlePropose = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     const instruction: FormInstructionData = await getConvertToMsolInstruction({
       schema,
       form,
       connection,
       setFormErrors,
-    })
+    });
 
     if (instruction.isValid) {
       if (!realm) {
-        setIsLoading(false)
-        throw 'No realm selected'
+        setIsLoading(false);
+        throw 'No realm selected';
       }
 
-      const governance = currentAccount?.governance
+      const governance = currentAccount?.governance;
       const rpcContext = new RpcContext(
         new PublicKey(realm.owner.toString()),
         getProgramVersionForRealm(realmInfo!),
         wallet!,
         connection.current,
-        connection.endpoint
-      )
-      const holdUpTime = governance?.account?.config.minInstructionHoldUpTime
+        connection.endpoint,
+      );
+      const holdUpTime = governance?.account?.config.minInstructionHoldUpTime;
 
       const instructionData = {
         data: instruction.serializedInstruction
@@ -115,33 +115,33 @@ const ConvertToMsol = () => {
           : null,
         holdUpTime: holdUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-      }
+      };
 
       try {
         // Fetch governance to get up to date proposalCount
         const selectedGovernance = (await fetchRealmGovernance(
-          currentAccount?.governance?.pubkey
-        )) as ProgramAccount<Governance>
+          currentAccount?.governance?.pubkey,
+        )) as ProgramAccount<Governance>;
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
+          governance!.account.config,
+        );
 
         const defaultProposalMint = !mint?.supply.isZero()
           ? realm.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm.account.config.councilMint
-          : undefined
+          : undefined;
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
             ? realm.account.config.councilMint
-            : defaultProposalMint
+            : defaultProposalMint;
 
         if (!proposalMint) {
           throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
+            'There is no suitable governing token for the proposal',
+          );
         }
 
         const proposalAddress = await createProposal(
@@ -155,25 +155,25 @@ const ConvertToMsol = () => {
           selectedGovernance?.account?.proposalCount,
           [instructionData],
           false,
-          client
-        )
+          client,
+        );
         const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
-        router.push(url)
+          `/dao/${symbol}/proposal/${proposalAddress}`,
+        );
+        router.push(url);
       } catch (ex) {
-        notify({ type: 'error', message: `${ex}` })
+        notify({ type: 'error', message: `${ex}` });
       }
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     handleSetForm({
       value: currentAccount,
       propertyName: 'governedTokenAccount',
-    })
-  }, [currentAccount])
+    });
+  }, [currentAccount]);
 
   return (
     <>
@@ -214,9 +214,9 @@ const ConvertToMsol = () => {
                   Number(mintMinAmount),
                   Math.min(
                     Number(Number.MAX_SAFE_INTEGER),
-                    Number(evt.target.value)
-                  )
-                ).toFixed(precision(mintMinAmount))
+                    Number(evt.target.value),
+                  ),
+                ).toFixed(precision(mintMinAmount)),
               ),
               propertyName: 'amount',
             })
@@ -271,7 +271,7 @@ const ConvertToMsol = () => {
               <VoteBySwitch
                 checked={voteByCouncil}
                 onChange={() => {
-                  setVoteByCouncil(!voteByCouncil)
+                  setVoteByCouncil(!voteByCouncil);
                 }}
               ></VoteBySwitch>
             )}
@@ -291,7 +291,7 @@ const ConvertToMsol = () => {
         </Button>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default ConvertToMsol
+export default ConvertToMsol;

@@ -1,13 +1,13 @@
-import BigNumber from 'bignumber.js'
-import * as yup from 'yup'
-import { BN } from '@project-serum/anchor'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import soceanConfig from '@tools/sdk/socean/configuration'
-import { purchase } from '@tools/sdk/socean/instructions/purchase'
-import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens'
-import { SoceanPurchaseBondedTokensForm } from '@utils/uiTypes/proposalCreationTypes'
+import BigNumber from 'bignumber.js';
+import * as yup from 'yup';
+import { BN } from '@project-serum/anchor';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import soceanConfig from '@tools/sdk/socean/configuration';
+import { purchase } from '@tools/sdk/socean/instructions/purchase';
+import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
+import { SoceanPurchaseBondedTokensForm } from '@utils/uiTypes/proposalCreationTypes';
 
 //TODO: Make a reusable SELECT component for Slippage
 const schema = yup.object().shape({
@@ -33,14 +33,14 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Slippage tolerance should be more than 0')
     .required('Slippage tolerance is required'),
-})
+});
 
 const PurchaseBondedTokens = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -57,16 +57,16 @@ const PurchaseBondedTokens = ({
         connection,
         cluster,
         wallet,
-      })
+      });
 
       const [paymentMintInfo, saleMintInfo] = await Promise.all([
         tryGetTokenMint(connection, new PublicKey(form.paymentSource!)),
         tryGetTokenMint(connection, new PublicKey(form.saleDestination!)),
-      ])
+      ]);
       if (!paymentMintInfo)
-        throw new Error('Cannot load paymentSource mint info')
+        throw new Error('Cannot load paymentSource mint info');
       if (!saleMintInfo)
-        throw new Error('Cannot load saleDestination mint info')
+        throw new Error('Cannot load saleDestination mint info');
 
       return purchase({
         cluster,
@@ -80,17 +80,17 @@ const PurchaseBondedTokens = ({
         purchaseAmount: new BN(
           new BigNumber(form.uiPurchaseAmount!.toString())
             .shiftedBy(saleMintInfo.account.decimals)
-            .toString()
+            .toString(),
         ),
         expectedPayment: new BN(
           new BigNumber(form.uiExpectedPayment!.toString())
             .shiftedBy(paymentMintInfo.account.decimals)
-            .toString()
+            .toString(),
         ),
         slippageTolerance: new BN(form.slippageTolerance!),
-      })
+      });
     },
-  })
+  });
 
   return (
     <>
@@ -214,7 +214,7 @@ const PurchaseBondedTokens = ({
         error={formErrors['slippageTolerance']}
       />
     </>
-  )
-}
+  );
+};
 
-export default PurchaseBondedTokens
+export default PurchaseBondedTokens;

@@ -1,57 +1,57 @@
-import { PublicKey } from '@solana/web3.js'
-import useRealm from 'hooks/useRealm'
-import Input from 'components/inputs/Input'
-import Button, { SecondaryButton } from '@components/Button'
-import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch'
-import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
-import { abbreviateAddress, precision } from 'utils/formatting'
-import useWalletStore from 'stores/useWalletStore'
-import { getMintSchema } from 'utils/validations'
-import { useEffect, useState } from 'react'
+import { PublicKey } from '@solana/web3.js';
+import useRealm from 'hooks/useRealm';
+import Input from 'components/inputs/Input';
+import Button, { SecondaryButton } from '@components/Button';
+import VoteBySwitch from 'pages/dao/[symbol]/proposal/components/VoteBySwitch';
+import { getMintMinAmountAsDecimal } from '@tools/sdk/units';
+import { abbreviateAddress, precision } from 'utils/formatting';
+import useWalletStore from 'stores/useWalletStore';
+import { getMintSchema } from 'utils/validations';
+import { useEffect, useState } from 'react';
 import {
   MintForm,
   FormInstructionData,
-} from 'utils/uiTypes/proposalCreationTypes'
-import useGovernanceAssets from 'hooks/useGovernanceAssets'
+} from 'utils/uiTypes/proposalCreationTypes';
+import useGovernanceAssets from 'hooks/useGovernanceAssets';
 import {
   getInstructionDataFromBase64,
   RpcContext,
   Governance,
   ProgramAccount,
-} from '@solana/spl-governance'
-import { useRouter } from 'next/router'
-import { createProposal } from 'actions/createProposal'
-import { notify } from 'utils/notifications'
-import useQueryContext from 'hooks/useQueryContext'
-import { getMintInstruction } from 'utils/instructionTools'
-import AddMemberIcon from '@components/AddMemberIcon'
-import { getProgramVersionForRealm } from '@models/registry/api'
+} from '@solana/spl-governance';
+import { useRouter } from 'next/router';
+import { createProposal } from 'actions/createProposal';
+import { notify } from 'utils/notifications';
+import useQueryContext from 'hooks/useQueryContext';
+import { getMintInstruction } from 'utils/instructionTools';
+import AddMemberIcon from '@components/AddMemberIcon';
+import { getProgramVersionForRealm } from '@models/registry/api';
 import {
   ArrowCircleDownIcon,
   ArrowCircleUpIcon,
-} from '@heroicons/react/outline'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+} from '@heroicons/react/outline';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 
 interface AddMemberForm extends MintForm {
-  description: string
-  title: string
+  description: string;
+  title: string;
 }
 
 const AddMemberForm = ({ close }) => {
-  const [voteByCouncil, setVoteByCouncil] = useState(false)
-  const [showOptions, setShowOptions] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
+  const [voteByCouncil, setVoteByCouncil] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
 
-  const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
+  const router = useRouter();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
+  const connection = useWalletStore((s) => s.connection);
+  const wallet = useWalletStore((s) => s.current);
 
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
-  const { symbol } = router.query
-  const { getMintWithGovernances } = useGovernanceAssets()
+  const { fmtUrlWithCluster } = useQueryContext();
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions);
+  const { symbol } = router.query;
+  const { getMintWithGovernances } = useGovernanceAssets();
 
   const {
     realmInfo,
@@ -60,9 +60,9 @@ const AddMemberForm = ({ close }) => {
     realm,
     ownVoterWeight,
     mint,
-  } = useRealm()
+  } = useRealm();
 
-  const programId: PublicKey | undefined = realmInfo?.programId
+  const programId: PublicKey | undefined = realmInfo?.programId;
 
   const [form, setForm] = useState<AddMemberForm>({
     destinationAccount: '',
@@ -71,49 +71,49 @@ const AddMemberForm = ({ close }) => {
     programId: programId?.toString(),
     description: '',
     title: '',
-  })
+  });
 
-  const schema = getMintSchema({ form, connection })
+  const schema = getMintSchema({ form, connection });
 
   const mintMinAmount = form.mintAccount
     ? getMintMinAmountAsDecimal(councilMint!)
-    : 1
+    : 1;
 
-  const currentPrecision = precision(mintMinAmount)
+  const currentPrecision = precision(mintMinAmount);
 
   const proposalTitle = `Add council member ${
     form.destinationAccount
       ? abbreviateAddress(new PublicKey(form.destinationAccount))
       : ''
-  }`
+  }`;
 
   const setAmount = (event) => {
-    const value = event.target.value
+    const value = event.target.value;
 
     handleSetForm({
       value: value,
       propertyName: 'amount',
-    })
-  }
+    });
+  };
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
 
   const validateAmountOnBlur = () => {
-    const value = form.amount
+    const value = form.amount;
 
     handleSetForm({
       value: parseFloat(
         Math.max(
           Number(mintMinAmount),
-          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value))
-        ).toFixed(currentPrecision)
+          Math.min(Number(Number.MAX_SAFE_INTEGER), Number(value)),
+        ).toFixed(currentPrecision),
       ),
       propertyName: 'amount',
-    })
-  }
+    });
+  };
 
   const getInstruction = async (): Promise<FormInstructionData> => {
     return getMintInstruction({
@@ -124,24 +124,24 @@ const AddMemberForm = ({ close }) => {
       wallet,
       governedMintInfoAccount: form.mintAccount,
       setFormErrors,
-    })
-  }
+    });
+  };
 
   //TODO common handle propose
   const handlePropose = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
 
-    const instruction: FormInstructionData = await getInstruction()
+    const instruction: FormInstructionData = await getInstruction();
 
     if (instruction.isValid && wallet && realmInfo) {
-      const governance = form.mintAccount?.governance
+      const governance = form.mintAccount?.governance;
 
-      let proposalAddress: PublicKey | null = null
+      let proposalAddress: PublicKey | null = null;
 
       if (!realm) {
-        setIsLoading(false)
+        setIsLoading(false);
 
-        throw new Error('No realm selected')
+        throw new Error('No realm selected');
       }
 
       const rpcContext = new RpcContext(
@@ -149,8 +149,8 @@ const AddMemberForm = ({ close }) => {
         getProgramVersionForRealm(realmInfo),
         wallet,
         connection.current,
-        connection.endpoint
-      )
+        connection.endpoint,
+      );
 
       const instructionData = {
         data: instruction.serializedInstruction
@@ -158,32 +158,32 @@ const AddMemberForm = ({ close }) => {
           : null,
         holdUpTime: governance?.account?.config.minInstructionHoldUpTime,
         prerequisiteInstructions: instruction.prerequisiteInstructions || [],
-      }
+      };
 
       try {
         const selectedGovernance = (await fetchRealmGovernance(
-          governance?.pubkey
-        )) as ProgramAccount<Governance>
+          governance?.pubkey,
+        )) as ProgramAccount<Governance>;
 
         const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
+          governance!.account.config,
+        );
 
         const defaultProposalMint = !mint?.supply.isZero()
           ? realm.account.communityMint
           : !councilMint?.supply.isZero()
           ? realm.account.config.councilMint
-          : undefined
+          : undefined;
 
         const proposalMint =
           canChooseWhoVote && voteByCouncil
             ? realm.account.config.councilMint
-            : defaultProposalMint
+            : defaultProposalMint;
 
         if (!proposalMint) {
           throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
+            'There is no suitable governing token for the proposal',
+          );
         }
 
         proposalAddress = await createProposal(
@@ -197,43 +197,43 @@ const AddMemberForm = ({ close }) => {
           selectedGovernance?.account?.proposalCount,
           [instructionData],
           false,
-          client
-        )
+          client,
+        );
 
         const url = fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalAddress}`
-        )
+          `/dao/${symbol}/proposal/${proposalAddress}`,
+        );
 
-        router.push(url)
+        router.push(url);
       } catch (error) {
         notify({
           type: 'error',
           message: `${error}`,
-        })
+        });
 
-        close()
+        close();
       }
     }
 
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   useEffect(() => {
     const initForm = async () => {
-      const response = await getMintWithGovernances()
+      const response = await getMintWithGovernances();
 
       handleSetForm({
         value: response.find(
           (x) =>
             x.governance?.account.governedAccount.toBase58() ===
-            realm?.account.config.councilMint?.toBase58()
+            realm?.account.config.councilMint?.toBase58(),
         ),
         propertyName: 'mintAccount',
-      })
-    }
+      });
+    };
 
-    initForm()
-  }, [])
+    initForm();
+  }, []);
 
   return (
     <>
@@ -328,7 +328,7 @@ const AddMemberForm = ({ close }) => {
             <VoteBySwitch
               checked={voteByCouncil}
               onChange={() => {
-                setVoteByCouncil(!voteByCouncil)
+                setVoteByCouncil(!voteByCouncil);
               }}
             />
           )}
@@ -353,7 +353,7 @@ const AddMemberForm = ({ close }) => {
         </Button>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default AddMemberForm
+export default AddMemberForm;

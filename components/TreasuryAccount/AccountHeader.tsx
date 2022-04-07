@@ -1,20 +1,20 @@
-import { BN } from '@project-serum/anchor'
-import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
-import tokenService from '@utils/services/token'
-import BigNumber from 'bignumber.js'
-import { useEffect, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { BN } from '@project-serum/anchor';
+import { getMintDecimalAmountFromNatural } from '@tools/sdk/units';
+import tokenService from '@utils/services/token';
+import BigNumber from 'bignumber.js';
+import { useEffect, useState } from 'react';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
 
 const AccountHeader = () => {
-  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount);
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
       ? governanceNfts[currentAccount?.governance?.pubkey.toBase58()]?.length
-      : 0
-  const isNFT = currentAccount?.isNft
-  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
-  const [totalPrice, setTotalPrice] = useState('')
+      : 0;
+  const isNFT = currentAccount?.isNft;
+  const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo);
+  const [totalPrice, setTotalPrice] = useState('');
   const amount =
     currentAccount && currentAccount.mint?.account
       ? getMintDecimalAmountFromNatural(
@@ -22,23 +22,23 @@ const AccountHeader = () => {
           new BN(
             !currentAccount.isSol
               ? currentAccount.token!.account.amount
-              : currentAccount.solAccount!.lamports
-          )
+              : currentAccount.solAccount!.lamports,
+          ),
         ).toNumber()
-      : 0
-  const amountFormatted = new BigNumber(amount).toFormat()
-  const mintAddress = useTreasuryAccountStore((s) => s.mintAddress)
+      : 0;
+  const amountFormatted = new BigNumber(amount).toFormat();
+  const mintAddress = useTreasuryAccountStore((s) => s.mintAddress);
   function handleSetTotalPrice() {
-    const price = tokenService.getUSDTokenPrice(mintAddress)
-    const totalPrice = amount * price
+    const price = tokenService.getUSDTokenPrice(mintAddress);
+    const totalPrice = amount * price;
     const totalPriceFormatted = amount
       ? new BigNumber(totalPrice).toFormat(0)
-      : ''
-    setTotalPrice(totalPriceFormatted)
+      : '';
+    setTotalPrice(totalPriceFormatted);
   }
   useEffect(() => {
-    handleSetTotalPrice()
-  }, [currentAccount])
+    handleSetTotalPrice();
+  }, [currentAccount]);
   return (
     <div className="bg-bkg-1 mb-4 p-4 rounded-md w-full flex items-center">
       {(tokenInfo?.logoURI || isNFT) && (
@@ -59,7 +59,7 @@ const AccountHeader = () => {
         </p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AccountHeader
+export default AccountHeader;

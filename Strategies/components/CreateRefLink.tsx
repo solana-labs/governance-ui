@@ -4,74 +4,74 @@ import {
   makeRegisterReferrerIdInstruction,
   MangoGroup,
   INFO_LEN,
-} from '@blockworks-foundation/mango-client'
-import Button, { LinkButton } from '@components/Button'
-import Input from '@components/inputs/Input'
-import Tooltip from '@components/Tooltip'
-import { DuplicateIcon } from '@heroicons/react/outline'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { PublicKey, Transaction } from '@solana/web3.js'
-import { notify } from '@utils/notifications'
-import { sendTransaction } from '@utils/send'
-import { useState, useEffect } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import { tryGetMangoAccount } from 'Strategies/protocols/mango/tools'
-import { MarketStore } from 'Strategies/store/marketStore'
-const minMngoToCreateLink = 10000
+} from '@blockworks-foundation/mango-client';
+import Button, { LinkButton } from '@components/Button';
+import Input from '@components/inputs/Input';
+import Tooltip from '@components/Tooltip';
+import { DuplicateIcon } from '@heroicons/react/outline';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import { PublicKey, Transaction } from '@solana/web3.js';
+import { notify } from '@utils/notifications';
+import { sendTransaction } from '@utils/send';
+import { useState, useEffect } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import { tryGetMangoAccount } from 'Strategies/protocols/mango/tools';
+import { MarketStore } from 'Strategies/store/marketStore';
+const minMngoToCreateLink = 10000;
 const CreateRefForm = ({
   selectedMangoAccount,
   market,
   mint,
 }: {
-  selectedMangoAccount: MangoAccount
-  market: MarketStore
-  mint: PublicKey
+  selectedMangoAccount: MangoAccount;
+  market: MarketStore;
+  mint: PublicKey;
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useWalletStore((s) => s.connection);
 
   const link =
     connection.cluster === 'devnet'
       ? `http://devnet.mango.markets/?ref=`
-      : `https://trade.mango.markets/?ref`
+      : `https://trade.mango.markets/?ref`;
   const depositIndex = market.group!.tokens.findIndex(
-    (x) => x.mint.toBase58() === mint.toBase58()
-  )
-  const { canUseTransferInstruction } = useGovernanceAssets()
+    (x) => x.mint.toBase58() === mint.toBase58(),
+  );
+  const { canUseTransferInstruction } = useGovernanceAssets();
 
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletStore((s) => s.current);
   const currentPosition = selectedMangoAccount
     .getUiDeposit(
       market.cache!.rootBankCache[depositIndex],
       market.group!,
-      depositIndex
+      depositIndex,
     )
-    .toNumber()
-  const [existingLinks, setExistingLinks] = useState<ReferrerIdRecord[]>([])
-  const [linkGenerated, setLinkGenerated] = useState(false)
-  const [linkName, setLinkName] = useState('')
-  const connected = useWalletStore((s) => s.connected)
+    .toNumber();
+  const [existingLinks, setExistingLinks] = useState<ReferrerIdRecord[]>([]);
+  const [linkGenerated, setLinkGenerated] = useState(false);
+  const [linkName, setLinkName] = useState('');
+  const connected = useWalletStore((s) => s.connected);
   const handleCreateLink = async () => {
-    setLinkGenerated(false)
+    setLinkGenerated(false);
     try {
-      const signers = []
-      const programId = market.client!.programId
-      const mangoGroup = market.group
+      const signers = [];
+      const programId = market.client!.programId;
+      const mangoGroup = market.group;
       const { referrerPda, encodedReferrerId } = await getReferrerPda(
         mangoGroup!,
         linkName,
-        programId
-      )
+        programId,
+      );
       const instruction = makeRegisterReferrerIdInstruction(
         programId,
         mangoGroup!.publicKey,
         selectedMangoAccount!.publicKey,
         referrerPda,
         wallet!.publicKey!,
-        encodedReferrerId
-      )
+        encodedReferrerId,
+      );
 
-      const transaction = new Transaction()
-      transaction.add(instruction)
+      const transaction = new Transaction();
+      transaction.add(instruction);
       await sendTransaction({
         transaction,
         wallet,
@@ -79,29 +79,29 @@ const CreateRefForm = ({
         signers,
         sendingMessage: 'Creating ref link',
         successMessage: 'Ref link created',
-      })
-      setLinkGenerated(true)
+      });
+      setLinkGenerated(true);
     } catch (e) {
-      setLinkGenerated(false)
-      notify({ type: 'error', message: "Can't generate link" })
+      setLinkGenerated(false);
+      notify({ type: 'error', message: "Can't generate link" });
     }
-  }
+  };
   const getReferrerPda = async (
     mangoGroup: MangoGroup,
     referrerId: string,
-    programId: PublicKey
+    programId: PublicKey,
   ): Promise<{ referrerPda: PublicKey; encodedReferrerId: Buffer }> => {
-    const encoded = Buffer.from(referrerId, 'utf8')
+    const encoded = Buffer.from(referrerId, 'utf8');
     if (encoded.length > INFO_LEN) {
       throw new Error(
-        `info string too long. Must be less than or equal to ${INFO_LEN} bytes`
-      )
+        `info string too long. Must be less than or equal to ${INFO_LEN} bytes`,
+      );
     }
 
     const encodedReferrerId = Buffer.concat([
       encoded,
       Buffer.alloc(INFO_LEN - encoded.length, 0),
-    ])
+    ]);
 
     // Generate the PDA pubkey
     const [referrerIdRecordPk] = await PublicKey.findProgramAddress(
@@ -110,30 +110,32 @@ const CreateRefForm = ({
         new Buffer('ReferrerIdRecord', 'utf-8'),
         encodedReferrerId,
       ],
-      programId
-    )
+      programId,
+    );
 
-    return { referrerPda: referrerIdRecordPk, encodedReferrerId }
-  }
+    return { referrerPda: referrerIdRecordPk, encodedReferrerId };
+  };
   useEffect(() => {
     const getRefLinks = async () => {
-      const client = market.client
-      const mangoAccountPk = selectedMangoAccount!.publicKey
-      const account = await tryGetMangoAccount(market, mangoAccountPk)
+      const client = market.client;
+      const mangoAccountPk = selectedMangoAccount!.publicKey;
+      const account = await tryGetMangoAccount(market, mangoAccountPk);
       if (account) {
-        const referrerIds = await client?.getReferrerIdsForMangoAccount(account)
+        const referrerIds = await client?.getReferrerIdsForMangoAccount(
+          account,
+        );
         if (referrerIds) {
-          setExistingLinks(referrerIds)
+          setExistingLinks(referrerIds);
         }
       }
-    }
+    };
     if (selectedMangoAccount) {
-      getRefLinks()
+      getRefLinks();
     } else {
-      setExistingLinks([])
+      setExistingLinks([]);
     }
-    setLinkName('')
-  }, [selectedMangoAccount])
+    setLinkName('');
+  }, [selectedMangoAccount]);
   return (
     <div>
       <Input
@@ -180,7 +182,7 @@ const CreateRefForm = ({
                 <LinkButton
                   className="ml-4 text-primary-light"
                   onClick={() => {
-                    navigator.clipboard.writeText(`${link}${linkName}`)
+                    navigator.clipboard.writeText(`${link}${linkName}`);
                   }}
                 >
                   <DuplicateIcon className="w-5 h-5 mt-1" />
@@ -203,7 +205,7 @@ const CreateRefForm = ({
                 <LinkButton
                   className="ml-4 text-primary-light"
                   onClick={() => {
-                    navigator.clipboard.writeText(`${link}${x.referrerId}`)
+                    navigator.clipboard.writeText(`${link}${x.referrerId}`);
                   }}
                 >
                   <DuplicateIcon className="w-5 h-5 mt-1" />
@@ -214,7 +216,7 @@ const CreateRefForm = ({
         </div>
       ) : null}
     </div>
-  )
-}
+  );
+};
 
-export default CreateRefForm
+export default CreateRefForm;

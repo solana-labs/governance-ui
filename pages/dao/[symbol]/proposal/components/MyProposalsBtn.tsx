@@ -1,40 +1,40 @@
-import useRealm from '@hooks/useRealm'
-import React, { useMemo, useState } from 'react'
-import useWalletStore, { EnhancedProposalState } from 'stores/useWalletStore'
+import useRealm from '@hooks/useRealm';
+import React, { useMemo, useState } from 'react';
+import useWalletStore, { EnhancedProposalState } from 'stores/useWalletStore';
 import {
   ProgramAccount,
   Proposal,
   withCancelProposal,
   withFinalizeVote,
   withRelinquishVote,
-} from '@solana/spl-governance'
-import { Transaction, TransactionInstruction } from '@solana/web3.js'
-import { sendTransaction } from '@utils/send'
-import Modal from '@components/Modal'
-import Button from '@components/Button'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import dayjs from 'dayjs'
-import { notify } from '@utils/notifications'
-import Loading from '@components/Loading'
+} from '@solana/spl-governance';
+import { Transaction, TransactionInstruction } from '@solana/web3.js';
+import { sendTransaction } from '@utils/send';
+import Modal from '@components/Modal';
+import Button from '@components/Button';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import dayjs from 'dayjs';
+import { notify } from '@utils/notifications';
+import Loading from '@components/Loading';
 
 const MyProposalsBn = () => {
-  const [modalIsOpen, setModalIsOpen] = useState(false)
-  const wallet = useWalletStore((s) => s.current)
-  const connected = useWalletStore((s) => s.connected)
-  const [isLoading, setIsLoading] = useState(false)
-  const { governancesArray } = useGovernanceAssets()
-  const { current: connection } = useWalletStore((s) => s.connection)
+  const [modalIsOpen, setModalIsOpen] = useState(false);
+  const wallet = useWalletStore((s) => s.current);
+  const connected = useWalletStore((s) => s.connected);
+  const [isLoading, setIsLoading] = useState(false);
+  const { governancesArray } = useGovernanceAssets();
+  const { current: connection } = useWalletStore((s) => s.connection);
   const ownVoteRecordsByProposal = useWalletStore(
-    (s) => s.ownVoteRecordsByProposal
-  )
-  const { realm, programId } = useWalletStore((s) => s.selectedRealm)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+    (s) => s.ownVoteRecordsByProposal,
+  );
+  const { realm, programId } = useWalletStore((s) => s.selectedRealm);
+  const { fetchRealm } = useWalletStore((s) => s.actions);
   const {
     proposals,
     ownTokenRecord,
     ownCouncilTokenRecord,
     realmInfo,
-  } = useRealm()
+  } = useRealm();
   const myProposals = useMemo(
     () =>
       connected
@@ -43,19 +43,19 @@ const MyProposalsBn = () => {
               p.account.tokenOwnerRecord.toBase58() ===
                 ownTokenRecord?.pubkey.toBase58() ||
               p.account.tokenOwnerRecord.toBase58() ===
-                ownCouncilTokenRecord?.pubkey.toBase58()
+                ownCouncilTokenRecord?.pubkey.toBase58(),
           )
         : [],
-    [proposals, ownVoteRecordsByProposal, connected]
-  )
+    [proposals, ownVoteRecordsByProposal, connected],
+  );
   const drafts = myProposals.filter((x) => {
-    return x.account.state === EnhancedProposalState.Draft
-  })
+    return x.account.state === EnhancedProposalState.Draft;
+  });
   const notfinalized = myProposals.filter((x) => {
     const governance = governancesArray.find(
-      (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58()
-    )
-    const now = dayjs().unix()
+      (gov) => gov.pubkey.toBase58() === x.account.governance.toBase58(),
+    );
+    const now = dayjs().unix();
     const timestamp = x
       ? x.account.isVoteFinalized()
         ? 0 // If vote is finalized then set the timestamp to 0 to make it expired
@@ -63,70 +63,70 @@ const MyProposalsBn = () => {
         ? x.account.votingAt.toNumber() +
           governance.account.config.maxVotingTime
         : undefined
-      : undefined
+      : undefined;
     return (
       x.account.state === EnhancedProposalState.Voting &&
       !x.account.isVoteFinalized() &&
       timestamp &&
       now > timestamp
-    )
-  })
+    );
+  });
   const unReleased = myProposals.filter(
     (x) =>
       (x.account.state === EnhancedProposalState.Succeeded ||
         x.account.state === EnhancedProposalState.Outdated ||
         x.account.state === EnhancedProposalState.Completed) &&
       x.account.isVoteFinalized() &&
-      !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
-  )
+      !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished,
+  );
   const createdVoting = myProposals.filter((x) => {
     return (
       x.account.state === EnhancedProposalState.Voting &&
       !x.account.isVoteFinalized()
-    )
-  })
+    );
+  });
 
   const cleanSelected = async (
     proposalsArray: ProgramAccount<Proposal>[],
-    withInstruction
+    withInstruction,
   ) => {
-    if (!wallet || !programId || !realm) return
-    setIsLoading(true)
+    if (!wallet || !programId || !realm) return;
+    setIsLoading(true);
     try {
       const {
         blockhash: recentBlockhash,
-      } = await connection.getRecentBlockhash()
+      } = await connection.getRecentBlockhash();
 
       const transactions = await Promise.all(
         proposalsArray.map(async (proposal) => {
-          console.log(proposal.pubkey.toBase58(), ownTokenRecord)
+          console.log(proposal.pubkey.toBase58(), ownTokenRecord);
 
-          const instructions: TransactionInstruction[] = []
+          const instructions: TransactionInstruction[] = [];
 
-          await withInstruction(instructions, proposal)
+          await withInstruction(instructions, proposal);
 
           const transaction = new Transaction({
             recentBlockhash,
             feePayer: wallet.publicKey!,
-          })
-          transaction.add(...instructions)
-          return transaction
-        })
-      )
+          });
+          transaction.add(...instructions);
+          return transaction;
+        }),
+      );
 
-      const signedTXs = await wallet.signAllTransactions(transactions)
+      const signedTXs = await wallet.signAllTransactions(transactions);
 
       await Promise.all(
         signedTXs.map((transaction) =>
-          sendTransaction({ transaction, wallet, connection })
-        )
-      )
-      await fetchRealm(realmInfo!.programId, realmInfo!.realmId)
+          sendTransaction({ transaction, wallet, connection }),
+        ),
+      );
+      await fetchRealm(realmInfo!.programId, realmInfo!.realmId);
     } catch (e) {
-      notify({ type: 'error', message: 'Something wnet wrong' })
+      notify({ type: 'error', message: 'Something wnet wrong' });
     }
-    setIsLoading(false)
-  }
+    setIsLoading(false);
+  };
 
   const cleanDrafts = () => {
     const withInstruction = (instructions, proposal) => {
@@ -138,23 +138,23 @@ const MyProposalsBn = () => {
         proposal!.account.governance,
         proposal!.pubkey,
         proposal!.account.tokenOwnerRecord,
-        wallet!.publicKey!
-      )
-    }
-    cleanSelected(drafts, withInstruction)
-  }
+        wallet!.publicKey!,
+      );
+    };
+    cleanSelected(drafts, withInstruction);
+  };
   const releaseAllTokens = () => {
     const withInstruction = (
       instructions,
-      proposal: ProgramAccount<Proposal>
+      proposal: ProgramAccount<Proposal>,
     ) => {
       const voterTokenRecord =
         proposal.account.governingTokenMint.toBase58() ===
         realm?.account.communityMint.toBase58()
           ? ownTokenRecord
-          : ownCouncilTokenRecord
-      const governanceAuthority = wallet!.publicKey!
-      const beneficiary = wallet!.publicKey!
+          : ownCouncilTokenRecord;
+      const governanceAuthority = wallet!.publicKey!;
+      const beneficiary = wallet!.publicKey!;
 
       return withRelinquishVote(
         instructions,
@@ -165,15 +165,15 @@ const MyProposalsBn = () => {
         proposal.account.governingTokenMint,
         ownVoteRecordsByProposal[proposal.pubkey.toBase58()].pubkey,
         governanceAuthority,
-        beneficiary
-      )
-    }
-    cleanSelected(unReleased, withInstruction)
-  }
+        beneficiary,
+      );
+    };
+    cleanSelected(unReleased, withInstruction);
+  };
   const finalizeAll = () => {
     const withInstruction = (
       instructions,
-      proposal: ProgramAccount<Proposal>
+      proposal: ProgramAccount<Proposal>,
     ) => {
       return withFinalizeVote(
         instructions,
@@ -183,11 +183,11 @@ const MyProposalsBn = () => {
         proposal.account.governance,
         proposal.pubkey,
         proposal.account.tokenOwnerRecord,
-        proposal.account.governingTokenMint
-      )
-    }
-    cleanSelected(notfinalized, withInstruction)
-  }
+        proposal.account.governingTokenMint,
+      );
+    };
+    cleanSelected(notfinalized, withInstruction);
+  };
   return (
     <>
       <div>
@@ -197,7 +197,7 @@ const MyProposalsBn = () => {
         <Modal
           sizeClassName="sm:max-w-3xl"
           onClose={() => {
-            setModalIsOpen(false)
+            setModalIsOpen(false);
           }}
           isOpen={modalIsOpen}
         >
@@ -237,8 +237,8 @@ const MyProposalsBn = () => {
         </Modal>
       )}
     </>
-  )
-}
+  );
+};
 
 const ProposalList = ({
   title,
@@ -247,11 +247,11 @@ const ProposalList = ({
   proposals,
   isLoading,
 }: {
-  title: string
-  fcn: () => void
-  btnName: string
-  proposals: ProgramAccount<Proposal>[]
-  isLoading: boolean
+  title: string;
+  fcn: () => void;
+  btnName: string;
+  proposals: ProgramAccount<Proposal>[];
+  isLoading: boolean;
 }) => {
   return (
     <>
@@ -275,7 +275,7 @@ const ProposalList = ({
         ))}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default MyProposalsBn
+export default MyProposalsBn;

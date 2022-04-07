@@ -1,14 +1,14 @@
-import Select from '@components/inputs/Select'
-import { Governance, GovernanceAccountType } from '@solana/spl-governance'
-import { ProgramAccount } from '@solana/spl-governance'
+import Select from '@components/inputs/Select';
+import { Governance, GovernanceAccountType } from '@solana/spl-governance';
+import { ProgramAccount } from '@solana/spl-governance';
 import {
   getMintAccountLabelInfo,
   getSolAccountLabel,
   getTokenAccountLabelInfo,
   GovernedMultiTypeAccount,
-} from '@utils/tokens'
-import React, { useEffect } from 'react'
-import { getProgramName } from '@components/instructions/programs/names'
+} from '@utils/tokens';
+import React, { useEffect } from 'react';
+import { getProgramName } from '@components/instructions/programs/names';
 
 const GovernedAccountSelect = ({
   onChange,
@@ -20,37 +20,37 @@ const GovernedAccountSelect = ({
   label,
   noMaxWidth,
 }: {
-  onChange
-  value
-  error?
-  governedAccounts: GovernedMultiTypeAccount[]
-  shouldBeGoverned?
-  governance?: ProgramAccount<Governance> | null | undefined
-  label?
-  noMaxWidth?: boolean
+  onChange;
+  value;
+  error?;
+  governedAccounts: GovernedMultiTypeAccount[];
+  shouldBeGoverned?;
+  governance?: ProgramAccount<Governance> | null | undefined;
+  label?;
+  noMaxWidth?: boolean;
 }) => {
   function getLabel(value: GovernedMultiTypeAccount) {
     if (value) {
-      const accountType = value.governance.account.accountType
+      const accountType = value.governance.account.accountType;
       switch (accountType) {
         case GovernanceAccountType.MintGovernanceV1:
         case GovernanceAccountType.MintGovernanceV2:
-          return getMintAccountLabelComponent(getMintAccountLabelInfo(value))
+          return getMintAccountLabelComponent(getMintAccountLabelInfo(value));
         case GovernanceAccountType.TokenGovernanceV1:
         case GovernanceAccountType.TokenGovernanceV2:
           return getTokenAccountLabelComponent(
             value.isSol
               ? getSolAccountLabel(value)
-              : getTokenAccountLabelInfo(value)
-          )
+              : getTokenAccountLabelInfo(value),
+          );
         case GovernanceAccountType.ProgramGovernanceV1:
         case GovernanceAccountType.ProgramGovernanceV2:
-          return getProgramAccountLabel(value.governance)
+          return getProgramAccountLabel(value.governance);
         default:
-          return value.governance.account.governedAccount.toBase58()
+          return value.governance.account.governedAccount.toBase58();
       }
     } else {
-      return null
+      return null;
     }
   }
   //TODO refactor both methods (getMintAccountLabelComponent, getTokenAccountLabelComponent) make it more common
@@ -75,7 +75,7 @@ const GovernedAccountSelect = ({
           <div>Supply: {amount}</div>
         </div>
       </div>
-    )
+    );
   }
   function getTokenAccountLabelComponent({
     tokenAccount,
@@ -99,25 +99,25 @@ const GovernedAccountSelect = ({
           </div>
         </div>
       </div>
-    )
+    );
   }
   function getProgramAccountLabel(val: ProgramAccount<Governance>) {
-    const name = val ? getProgramName(val.account.governedAccount) : ''
+    const name = val ? getProgramName(val.account.governedAccount) : '';
     return (
       <div className="flex flex-col">
         {name && <div>{name}</div>}
         <div>{val?.account?.governedAccount?.toBase58()}</div>
       </div>
-    )
+    );
   }
   useEffect(() => {
     if (governedAccounts.length == 1) {
       //wait for microtask queue to be empty
       setTimeout(() => {
-        onChange(governedAccounts[0])
-      })
+        onChange(governedAccounts[0]);
+      });
     }
-  }, [JSON.stringify(governedAccounts)])
+  }, [JSON.stringify(governedAccounts)]);
   return (
     <Select
       label={label}
@@ -133,7 +133,7 @@ const GovernedAccountSelect = ({
           !shouldBeGoverned
             ? !shouldBeGoverned
             : x?.governance?.pubkey.toBase58() ===
-              governance?.pubkey?.toBase58()
+              governance?.pubkey?.toBase58(),
         )
         .map((acc) => {
           return (
@@ -143,10 +143,10 @@ const GovernedAccountSelect = ({
             >
               {getLabel(acc)}
             </Select.Option>
-          )
+          );
         })}
     </Select>
-  )
-}
+  );
+};
 
-export default GovernedAccountSelect
+export default GovernedAccountSelect;

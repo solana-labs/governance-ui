@@ -1,14 +1,14 @@
-import * as yup from 'yup'
-import { EmptyInstructionForm } from '@utils/uiTypes/proposalCreationTypes'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import * as yup from 'yup';
+import { EmptyInstructionForm } from '@utils/uiTypes/proposalCreationTypes';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
 
 const Empty = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   useInstructionFormBuilder<EmptyInstructionForm>({
     index,
@@ -21,9 +21,9 @@ const Empty = ({
         .nullable()
         .required('Governed account is required'),
     }),
-  })
+  });
 
-  return null
-}
+  return null;
+};
 
-export default Empty
+export default Empty;

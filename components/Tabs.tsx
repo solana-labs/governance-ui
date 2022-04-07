@@ -1,9 +1,9 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react';
 
 interface TabsProps {
-  activeTab: string
-  onChange: (x) => void
-  tabs: Array<string>
+  activeTab: string;
+  onChange: (x) => void;
+  tabs: Array<string>;
 }
 
 const Tabs: FunctionComponent<TabsProps> = ({ activeTab, onChange, tabs }) => {
@@ -36,11 +36,11 @@ const Tabs: FunctionComponent<TabsProps> = ({ activeTab, onChange, tabs }) => {
             >
               {tabName}
             </a>
-          )
+          );
         })}
       </nav>
     </div>
-  )
-}
+  );
+};
 
-export default Tabs
+export default Tabs;

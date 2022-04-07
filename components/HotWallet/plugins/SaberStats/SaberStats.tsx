@@ -1,17 +1,17 @@
-import useSaberStats from '@hooks/useSaberStats'
-import { SupportIcon } from '@heroicons/react/outline'
-import SaberStat from './SaberStat'
-import { HotWalletAccount } from '@hooks/useHotWallet'
+import useSaberStats from '@hooks/useSaberStats';
+import { SupportIcon } from '@heroicons/react/outline';
+import SaberStat from './SaberStat';
+import { HotWalletAccount } from '@hooks/useHotWallet';
 
 const HotWalletPluginSaberStats = ({
   hotWalletAccount,
 }: {
-  hotWalletAccount: HotWalletAccount
+  hotWalletAccount: HotWalletAccount;
 }) => {
-  const { saberStats } = useSaberStats(hotWalletAccount)
+  const { saberStats } = useSaberStats(hotWalletAccount);
 
   if (!saberStats) {
-    return <></>
+    return <></>;
   }
 
   return (
@@ -27,7 +27,7 @@ const HotWalletPluginSaberStats = ({
         ))}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default HotWalletPluginSaberStats
+export default HotWalletPluginSaberStats;

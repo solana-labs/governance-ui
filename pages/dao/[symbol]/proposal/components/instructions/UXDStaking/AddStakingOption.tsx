@@ -1,30 +1,30 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
-import React from 'react'
-import * as yup from 'yup'
-import { XCircleIcon } from '@heroicons/react/outline'
+import React from 'react';
+import * as yup from 'yup';
+import { XCircleIcon } from '@heroicons/react/outline';
 import {
   getOnchainStakingCampaign,
   SingleSideStakingClient,
   StakingCampaign,
   StakingCampaignState,
-} from '@uxdprotocol/uxd-staking-client'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { UXDStakingAddStakingOptionForm } from '@utils/uiTypes/proposalCreationTypes'
-import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration'
-import useWalletStore from 'stores/useWalletStore'
-import { PublicKey } from '@solana/web3.js'
-import { BN } from '@project-serum/anchor'
+} from '@uxdprotocol/uxd-staking-client';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { UXDStakingAddStakingOptionForm } from '@utils/uiTypes/proposalCreationTypes';
+import uxdProtocolStakingConfiguration from '@tools/sdk/uxdProtocolStaking/configuration';
+import useWalletStore from 'stores/useWalletStore';
+import { PublicKey } from '@solana/web3.js';
+import { BN } from '@project-serum/anchor';
 
 const AddStakingOption = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
-  const wallet = useWalletStore((s) => s.current)
+  const wallet = useWalletStore((s) => s.current);
 
   const {
     form,
@@ -59,36 +59,36 @@ const AddStakingOption = ({
             .moreThan(0, 'Apr should be more than 0')
             .lessThan(
               uxdProtocolStakingConfiguration.APR_BASIS + 1,
-              `Apr should be less or equal than ${uxdProtocolStakingConfiguration.APR_BASIS}`
+              `Apr should be less or equal than ${uxdProtocolStakingConfiguration.APR_BASIS}`,
             )
             .required('Apr is required'),
-        })
+        }),
       ),
     }),
 
     buildInstruction: async function () {
       const programId =
-        uxdProtocolStakingConfiguration.programId[connection.cluster]
+        uxdProtocolStakingConfiguration.programId[connection.cluster];
 
       if (!programId) {
         throw new Error(
-          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`
-        )
+          `Unsupported cluster ${connection.cluster} for UXD Protocol Staking`,
+        );
       }
 
-      const stakingCampaignPda = new PublicKey(form.stakingCampaignPda!)
+      const stakingCampaignPda = new PublicKey(form.stakingCampaignPda!);
 
       const stakingCampaignState: StakingCampaignState = await getOnchainStakingCampaign(
         stakingCampaignPda,
         connection.current,
-        uxdProtocolStakingConfiguration.TXN_OPTS
-      )
+        uxdProtocolStakingConfiguration.TXN_OPTS,
+      );
 
       const client: SingleSideStakingClient = new SingleSideStakingClient(
-        programId
-      )
+        programId,
+      );
 
-      const authority = governedAccount!.governance.pubkey
+      const authority = governedAccount!.governance.pubkey;
 
       console.log('Add Staking Option', {
         stakingCampaignPda: stakingCampaignPda.toString(),
@@ -102,12 +102,12 @@ const AddStakingOption = ({
         startTs: stakingCampaignState.startTs.toString(),
         endTs: stakingCampaignState.endTs?.toString(),
         stakingOptions: form.stakingOptions,
-      })
+      });
 
       const stakingCampaign = StakingCampaign.fromState(
         new PublicKey(form.stakingCampaignPda!),
-        stakingCampaignState
-      )
+        stakingCampaignState,
+      );
 
       return client.createAddStakingOptionInstruction({
         authority,
@@ -118,46 +118,46 @@ const AddStakingOption = ({
         })),
         options: uxdProtocolStakingConfiguration.TXN_OPTS,
         payer: wallet!.publicKey!,
-      })
+      });
     },
-  })
+  });
 
   const handleSetStakingOption = ({
     index,
     ...props
   }: {
-    lockupSecs?: number
-    apr?: number
-    index: number
+    lockupSecs?: number;
+    apr?: number;
+    index: number;
   }) => {
     form.stakingOptions[index] = {
       ...form.stakingOptions[index],
       ...props,
-    }
+    };
 
     handleSetForm({
       value: form.stakingOptions,
       propertyName: 'stakingOptions',
-    })
-  }
+    });
+  };
 
   const addStakingOption = () => {
-    form.stakingOptions.push({})
+    form.stakingOptions.push({});
 
     handleSetForm({
       value: form.stakingOptions,
       propertyName: 'stakingOptions',
-    })
-  }
+    });
+  };
 
   const deleteStakingOption = (index: number) => {
-    form.stakingOptions.splice(index, 1)
+    form.stakingOptions.splice(index, 1);
 
     handleSetForm({
       value: form.stakingOptions,
       propertyName: 'stakingOptions',
-    })
-  }
+    });
+  };
 
   return (
     <div className="flex flex-col space-y-4">
@@ -218,7 +218,7 @@ const AddStakingOption = ({
               />
             </div>
           </div>
-        )
+        );
       })}
 
       <button
@@ -228,7 +228,7 @@ const AddStakingOption = ({
         Add Staking Option
       </button>
     </div>
-  )
-}
+  );
+};
 
-export default AddStakingOption
+export default AddStakingOption;

@@ -1,52 +1,52 @@
-import { useEffect, useState } from 'react'
-import { ExternalLinkIcon, TerminalIcon } from '@heroicons/react/outline'
-import { ProgramAccount } from '@solana/spl-governance'
-import { Governance } from '@solana/spl-governance'
-import { getProgramName } from '@components/instructions/programs/names'
-import { abbreviateAddress } from '@utils/formatting'
-import { PublicKey } from '@solana/web3.js'
-import Button, { SecondaryButton } from '@components/Button'
-import Tooltip from '@components/Tooltip'
-import useWalletStore from 'stores/useWalletStore'
-import { getProgramSlot } from '@tools/sdk/bpfUpgradeableLoader/accounts'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import Modal from '@components/Modal'
-import UpgradeProgram from './UpgradeProgram'
-import CloseBuffers from './CloseBuffers'
-import { getExplorerUrl } from '@components/explorer/tools'
+import { useEffect, useState } from 'react';
+import { ExternalLinkIcon, TerminalIcon } from '@heroicons/react/outline';
+import { ProgramAccount } from '@solana/spl-governance';
+import { Governance } from '@solana/spl-governance';
+import { getProgramName } from '@components/instructions/programs/names';
+import { abbreviateAddress } from '@utils/formatting';
+import { PublicKey } from '@solana/web3.js';
+import Button, { SecondaryButton } from '@components/Button';
+import Tooltip from '@components/Tooltip';
+import useWalletStore from 'stores/useWalletStore';
+import { getProgramSlot } from '@tools/sdk/bpfUpgradeableLoader/accounts';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import Modal from '@components/Modal';
+import UpgradeProgram from './UpgradeProgram';
+import CloseBuffers from './CloseBuffers';
+import { getExplorerUrl } from '@components/explorer/tools';
 
 const AssetItem = ({
   item,
   panelView,
 }: {
-  item: ProgramAccount<Governance>
-  panelView?: boolean
+  item: ProgramAccount<Governance>;
+  panelView?: boolean;
 }) => {
-  const { canUseProgramUpgradeInstruction } = useGovernanceAssets()
-  const [slot, setSlot] = useState(0)
-  const [openUpgradeModal, setOpenUpgradeModal] = useState(false)
-  const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false)
-  const [loadSlot, setLoadSlot] = useState(false)
-  const connection = useWalletStore((s) => s.connection)
-  const name = item ? getProgramName(item.account.governedAccount) : ''
+  const { canUseProgramUpgradeInstruction } = useGovernanceAssets();
+  const [slot, setSlot] = useState(0);
+  const [openUpgradeModal, setOpenUpgradeModal] = useState(false);
+  const [openCloseBuffersModal, setOpenCloseBuffersModal] = useState(false);
+  const [loadSlot, setLoadSlot] = useState(false);
+  const connection = useWalletStore((s) => s.connection);
+  const name = item ? getProgramName(item.account.governedAccount) : '';
   const governedAccount = item
     ? abbreviateAddress(item?.account.governedAccount as PublicKey)
-    : ''
-  const programId = item!.account.governedAccount.toBase58()
+    : '';
+  const programId = item!.account.governedAccount.toBase58();
 
   useEffect(() => {
     const handleSetProgramVersion = async () => {
       try {
-        setLoadSlot(true)
-        const slot = await getProgramSlot(connection.current, programId)
-        setSlot(slot)
+        setLoadSlot(true);
+        const slot = await getProgramSlot(connection.current, programId);
+        setSlot(slot);
       } catch (e) {
-        console.log(e)
+        console.log(e);
       }
-      setLoadSlot(false)
-    }
-    handleSetProgramVersion()
-  }, [JSON.stringify(item)])
+      setLoadSlot(false);
+    };
+    handleSetProgramVersion();
+  }, [JSON.stringify(item)]);
 
   return (
     <div className="text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
@@ -62,7 +62,7 @@ const AssetItem = ({
             className="default-transition flex items-center mt-0.5 text-fgd-3 hover:text-fgd-2 text-xs"
             href={getExplorerUrl(
               connection.endpoint,
-              item?.account.governedAccount
+              item?.account.governedAccount,
             )}
             target="_blank"
             rel="noopener noreferrer"
@@ -122,7 +122,7 @@ const AssetItem = ({
       {openUpgradeModal && (
         <Modal
           onClose={() => {
-            setOpenUpgradeModal(false)
+            setOpenUpgradeModal(false);
           }}
           isOpen={openUpgradeModal}
         >
@@ -132,7 +132,7 @@ const AssetItem = ({
       {openCloseBuffersModal && (
         <Modal
           onClose={() => {
-            setOpenCloseBuffersModal(false)
+            setOpenCloseBuffersModal(false);
           }}
           isOpen={openCloseBuffersModal}
         >
@@ -140,7 +140,7 @@ const AssetItem = ({
         </Modal>
       )}
     </div>
-  )
-}
+  );
+};
 
-export default AssetItem
+export default AssetItem;

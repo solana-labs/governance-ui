@@ -1,33 +1,33 @@
-import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import ATribecaConfiguration, {
   TribecaPrograms,
-} from '../ATribecaConfiguration'
+} from '../ATribecaConfiguration';
 
 export async function resetEpochGaugeVoterInstruction({
   programs,
   authority,
   tribecaConfiguration,
 }: {
-  programs: TribecaPrograms
-  authority: PublicKey
-  tribecaConfiguration: ATribecaConfiguration
+  programs: TribecaPrograms;
+  authority: PublicKey;
+  tribecaConfiguration: ATribecaConfiguration;
 }): Promise<TransactionInstruction> {
   const { currentRewardsEpoch } = await tribecaConfiguration.fetchGaugemeister(
-    programs.Gauge
-  )
+    programs.Gauge,
+  );
 
-  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority)
+  const [escrow] = await tribecaConfiguration.findEscrowAddress(authority);
 
-  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow)
+  const [gaugeVoter] = await tribecaConfiguration.findGaugeVoterAddress(escrow);
 
-  const votingEpoch = currentRewardsEpoch + 1
+  const votingEpoch = currentRewardsEpoch + 1;
 
   const [
     epochGaugeVoter,
   ] = await tribecaConfiguration.findEpochGaugeVoterAddress(
     gaugeVoter,
-    votingEpoch
-  )
+    votingEpoch,
+  );
 
   console.log('Reset Epoch Gauge Voter', {
     gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
@@ -35,7 +35,7 @@ export async function resetEpochGaugeVoterInstruction({
     escrow: escrow.toString(),
     gaugeVoter: gaugeVoter.toString(),
     epochGaugeVoter: epochGaugeVoter.toString(),
-  })
+  });
 
   return programs.Gauge.instruction.resetEpochGaugeVoter({
     accounts: {
@@ -45,5 +45,5 @@ export async function resetEpochGaugeVoterInstruction({
       gaugeVoter,
       epochGaugeVoter,
     },
-  })
+  });
 }

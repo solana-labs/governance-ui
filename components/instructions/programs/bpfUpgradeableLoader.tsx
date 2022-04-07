@@ -8,7 +8,7 @@ export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
         { name: 'Upgrade authority' },
       ],
       getDataUI: () => {
-        return <div></div>
+        return <div></div>;
       },
     },
     3: {
@@ -24,7 +24,7 @@ export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
       ],
     },
     getDataUI: () => {
-      return <div></div>
+      return <div></div>;
     },
   },
-}
+};

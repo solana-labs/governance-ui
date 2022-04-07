@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from 'react'
-import * as yup from 'yup'
-import { jsonInfo2PoolKeys } from '@raydium-io/raydium-sdk'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction'
-import { fetchLiquidityPoolData } from '@tools/sdk/raydium/helpers'
-import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
-import { uiAmountToNativeBN } from '@tools/sdk/units'
-import { notify } from '@utils/notifications'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { RemoveLiquidityRaydiumForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
+import React, { useEffect, useState } from 'react';
+import * as yup from 'yup';
+import { jsonInfo2PoolKeys } from '@raydium-io/raydium-sdk';
+import Input from '@components/inputs/Input';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { createRemoveLiquidityInstruction } from '@tools/sdk/raydium/createRemoveLiquidityInstruction';
+import { fetchLiquidityPoolData } from '@tools/sdk/raydium/helpers';
+import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
+import { notify } from '@utils/notifications';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { RemoveLiquidityRaydiumForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
 
-const POOL_KEYS_OPTIONS = Object.keys(liquidityPoolKeysList)
+const POOL_KEYS_OPTIONS = Object.keys(liquidityPoolKeysList);
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -25,19 +25,19 @@ const schema = yup.object().shape({
     .number()
     .moreThan(0, 'Amount for LP token should be more than 0')
     .required('Amount for LP token is required'),
-})
+});
 
 const RaydiumRemoveLiquidityFromPool = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const [lpMintInfo, setLpMintInfo] = useState<{
-    balance: number
-    decimals: number
-  } | null>(null)
+    balance: number;
+    decimals: number;
+  } | null>(null);
 
   const {
     form,
@@ -54,16 +54,16 @@ const RaydiumRemoveLiquidityFromPool = ({
     schema,
     buildInstruction: async function ({ form, governedAccountPubkey }) {
       if (!lpMintInfo) {
-        throw new Error('missing parameter Liquidity Pool Mint Info')
+        throw new Error('missing parameter Liquidity Pool Mint Info');
       }
 
       return createRemoveLiquidityInstruction(
         governedAccountPubkey,
         jsonInfo2PoolKeys(liquidityPoolKeysList[form.liquidityPool]),
-        uiAmountToNativeBN(form.amountIn, lpMintInfo.decimals)
-      )
+        uiAmountToNativeBN(form.amountIn, lpMintInfo.decimals),
+      );
     },
-  })
+  });
 
   useEffect(() => {
     async function fetchLpMintInfo() {
@@ -72,18 +72,18 @@ const RaydiumRemoveLiquidityFromPool = ({
           governanceKey: governedAccount?.governance.pubkey,
           lp: form.liquidityPool,
           connection: connection.current,
-        })
-        setLpMintInfo({ balance: maxBalance, decimals })
+        });
+        setLpMintInfo({ balance: maxBalance, decimals });
       } catch (e) {
         notify({
           type: 'error',
           message: 'Could not fetch LP Account',
           description: `${form.liquidityPool} LP Token Account could not be found for the selected Governance`,
-        })
+        });
       }
     }
-    fetchLpMintInfo()
-  }, [governedAccount?.governance.pubkey, form.liquidityPool])
+    fetchLpMintInfo();
+  }, [governedAccount?.governance.pubkey, form.liquidityPool]);
 
   return (
     <>
@@ -115,7 +115,7 @@ const RaydiumRemoveLiquidityFromPool = ({
         error={formErrors['amountIn']}
       />
     </>
-  )
-}
+  );
+};
 
-export default RaydiumRemoveLiquidityFromPool
+export default RaydiumRemoveLiquidityFromPool;

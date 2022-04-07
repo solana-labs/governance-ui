@@ -1,20 +1,20 @@
-import { getExplorerUrl } from '@components/explorer/tools'
-import { ExternalLinkIcon } from '@heroicons/react/outline'
-import { PublicKey } from '@solana/web3.js'
-import { abbreviateAddress } from '@utils/formatting'
-import { createRef } from 'react'
-import useWalletStore from 'stores/useWalletStore'
+import { getExplorerUrl } from '@components/explorer/tools';
+import { ExternalLinkIcon } from '@heroicons/react/outline';
+import { PublicKey } from '@solana/web3.js';
+import { abbreviateAddress } from '@utils/formatting';
+import { createRef } from 'react';
+import useWalletStore from 'stores/useWalletStore';
 
 const HotWalletName = ({
   hotWalletName,
   hotWalletAddress,
 }: {
-  hotWalletName: string
-  hotWalletAddress: PublicKey
+  hotWalletName: string;
+  hotWalletAddress: PublicKey;
 }) => {
-  const connection = useWalletStore((store) => store.connection)
+  const connection = useWalletStore((store) => store.connection);
 
-  const linkRef = createRef<HTMLAnchorElement>()
+  const linkRef = createRef<HTMLAnchorElement>();
 
   return (
     <div
@@ -35,7 +35,7 @@ const HotWalletName = ({
         <ExternalLinkIcon className="flex-shrink-0 h-4 ml-2 mt-0.5 text-primary-light w-4" />
       </a>
     </div>
-  )
-}
+  );
+};
 
-export default HotWalletName
+export default HotWalletName;

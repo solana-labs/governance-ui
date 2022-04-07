@@ -1,29 +1,29 @@
-import { Menu } from '@headlessui/react'
-import { useMemo, useState } from 'react'
-import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
-import styled from '@emotion/styled'
-import useWalletStore from '../stores/useWalletStore'
+import { Menu } from '@headlessui/react';
+import { useMemo, useState } from 'react';
+import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid';
+import styled from '@emotion/styled';
+import useWalletStore from '../stores/useWalletStore';
 import {
   getWalletProviderByUrl,
   WALLET_PROVIDERS,
-} from '../utils/wallet-adapters'
+} from '../utils/wallet-adapters';
 import {
   AddressImage,
   DisplayAddress,
   useAddressName,
   useWalletIdentity,
-} from '@cardinal/namespaces-components'
-import { BackspaceIcon } from '@heroicons/react/solid'
-import { UserCircleIcon } from '@heroicons/react/outline'
-import { abbreviateAddress } from '@utils/formatting'
-import { useRouter } from 'next/router'
-import TwitterIcon from './TwitterIcon'
-import Switch from './Switch'
+} from '@cardinal/namespaces-components';
+import { BackspaceIcon } from '@heroicons/react/solid';
+import { UserCircleIcon } from '@heroicons/react/outline';
+import { abbreviateAddress } from '@utils/formatting';
+import { useRouter } from 'next/router';
+import TwitterIcon from './TwitterIcon';
+import Switch from './Switch';
 
 const StyledWalletProviderLabel = styled.p`
   font-size: 0.65rem;
   line-height: 1.5;
-`
+`;
 
 const ConnectWalletButton = (props) => {
   const {
@@ -32,45 +32,45 @@ const ConnectWalletButton = (props) => {
     providerUrl,
     connection,
     set: setWalletStore,
-  } = useWalletStore((s) => s)
+  } = useWalletStore((s) => s);
 
   const provider = useMemo(() => getWalletProviderByUrl(providerUrl), [
     providerUrl,
-  ])
+  ]);
 
-  const [useDevnet, setUseDevnet] = useState(false)
-  const router = useRouter()
+  const [useDevnet, setUseDevnet] = useState(false);
+  const router = useRouter();
   const handleToggleDevnet = () => {
-    setUseDevnet(!useDevnet)
+    setUseDevnet(!useDevnet);
     if (useDevnet) {
-      router.push(`${window.location.pathname}`)
+      router.push(`${window.location.pathname}`);
     } else {
-      router.push(`${window.location.href}?cluster=devnet`)
+      router.push(`${window.location.href}?cluster=devnet`);
     }
-  }
+  };
 
   const handleConnectDisconnect = async () => {
     try {
       if (connected) {
-        await current?.disconnect()
+        await current?.disconnect();
       } else {
-        await current?.connect()
+        await current?.connect();
       }
     } catch (e) {
-      console.warn('handleConnectDisconnect', e)
+      console.warn('handleConnectDisconnect', e);
     }
-  }
+  };
 
-  const { show } = useWalletIdentity()
+  const { show } = useWalletIdentity();
 
   const { displayName } = useAddressName(
     connection.current,
-    current?.publicKey || undefined
-  )
+    current?.publicKey || undefined,
+  );
 
   const walletAddressFormatted = current?.publicKey
     ? abbreviateAddress(current?.publicKey)
-    : ''
+    : '';
 
   return (
     <div className="flex">
@@ -150,7 +150,7 @@ const ConnectWalletButton = (props) => {
                         className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none"
                         onClick={() =>
                           setWalletStore((s) => {
-                            s.providerUrl = url
+                            s.providerUrl = url;
                           })
                         }
                       >
@@ -176,7 +176,7 @@ const ConnectWalletButton = (props) => {
                             // @ts-ignore
                             current,
                             connection.current,
-                            connection.cluster
+                            connection.cluster,
                           )
                         }
                       >
@@ -199,7 +199,7 @@ const ConnectWalletButton = (props) => {
                       <Menu.Item
                         key={'devnet'}
                         onClick={() => {
-                          handleToggleDevnet()
+                          handleToggleDevnet();
                         }}
                       >
                         <button className="flex default-transition h-9 items-center p-2 w-full hover:bg-bkg-3 hover:cursor-pointer hover:rounded font-normal focus:outline-none">
@@ -207,7 +207,7 @@ const ConnectWalletButton = (props) => {
                           <Switch
                             checked={useDevnet}
                             onChange={() => {
-                              handleToggleDevnet()
+                              handleToggleDevnet();
                             }}
                           />
                         </button>
@@ -221,7 +221,7 @@ const ConnectWalletButton = (props) => {
         </Menu>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ConnectWalletButton
+export default ConnectWalletButton;

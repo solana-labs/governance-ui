@@ -1,15 +1,15 @@
-import React, { useState } from 'react'
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import useTribecaGauge from '@hooks/useTribecaGauge'
-import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration'
-import { gaugeSetVoteInstruction } from '@tools/sdk/tribeca/instructions/gaugeSetVoteInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { TribecaGaugeSetVoteForm } from '@utils/uiTypes/proposalCreationTypes'
-import useWalletStore from 'stores/useWalletStore'
-import GaugeSelect from './GaugeSelect'
-import GovernorSelect from './GovernorSelect'
+import React, { useState } from 'react';
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import useTribecaGauge from '@hooks/useTribecaGauge';
+import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
+import { gaugeSetVoteInstruction } from '@tools/sdk/tribeca/instructions/gaugeSetVoteInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { TribecaGaugeSetVoteForm } from '@utils/uiTypes/proposalCreationTypes';
+import useWalletStore from 'stores/useWalletStore';
+import GaugeSelect from './GaugeSelect';
+import GovernorSelect from './GovernorSelect';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -21,23 +21,23 @@ const schema = yup.object().shape({
     .number()
     .min(0, 'Weight should be equals or more than 0')
     .required('Weight is required'),
-})
+});
 
 const SetGaugeVote = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useWalletStore((s) => s.connection);
 
   const [
     tribecaConfiguration,
     setTribecaConfiguration,
-  ] = useState<ATribecaConfiguration | null>(null)
+  ] = useState<ATribecaConfiguration | null>(null);
 
-  const { gauges, programs } = useTribecaGauge(tribecaConfiguration)
+  const { gauges, programs } = useTribecaGauge(tribecaConfiguration);
 
   const {
     form,
@@ -56,7 +56,7 @@ const SetGaugeVote = ({
         !gauges[form.gaugeName!] ||
         !tribecaConfiguration
       ) {
-        throw new Error('Error initializing Tribeca configuration')
+        throw new Error('Error initializing Tribeca configuration');
       }
 
       return gaugeSetVoteInstruction({
@@ -65,13 +65,13 @@ const SetGaugeVote = ({
         programs,
         gauge: gauges[form.gaugeName!].mint,
         authority: governedAccountPubkey,
-      })
+      });
     },
-  })
+  });
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
-    return <>This instruction does not support {connection.cluster}</>
+    return <>This instruction does not support {connection.cluster}</>;
   }
 
   return (
@@ -107,7 +107,7 @@ const SetGaugeVote = ({
         error={formErrors['weight']}
       />
     </>
-  )
-}
+  );
+};
 
-export default SetGaugeVote
+export default SetGaugeVote;

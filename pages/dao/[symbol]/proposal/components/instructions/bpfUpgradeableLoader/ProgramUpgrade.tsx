@@ -1,25 +1,25 @@
-import * as yup from 'yup'
-import { PublicKey } from '@solana/web3.js'
-import Input from '@components/inputs/Input'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
+import * as yup from 'yup';
+import { PublicKey } from '@solana/web3.js';
+import Input from '@components/inputs/Input';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { createUpgradeInstruction } from '@tools/sdk/bpfUpgradeableLoader/createUpgradeInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
 import {
   ProgramUpgradeForm,
   programUpgradeFormNameOf,
-} from '@utils/uiTypes/proposalCreationTypes'
-import { validateAccount, validateBuffer } from '@utils/validations'
-import useWalletStore from 'stores/useWalletStore'
-import ProgramUpgradeInfo from './ProgramUpgradeInfo'
+} from '@utils/uiTypes/proposalCreationTypes';
+import { validateAccount, validateBuffer } from '@utils/validations';
+import useWalletStore from 'stores/useWalletStore';
+import ProgramUpgradeInfo from './ProgramUpgradeInfo';
 
 const ProgramUpgrade = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
-  const connection = useWalletStore((s) => s.connection)
+  const connection = useWalletStore((s) => s.connection);
   const {
     form,
     formErrors,
@@ -38,18 +38,18 @@ const ProgramUpgrade = ({
               await validateBuffer(
                 connection,
                 val,
-                form.governedAccount?.governance?.pubkey
-              )
-              return true
+                form.governedAccount?.governance?.pubkey,
+              );
+              return true;
             } catch (e) {
               return this.createError({
                 message: `${e}`,
-              })
+              });
             }
           } else {
             return this.createError({
               message: `Buffer address is required`,
-            })
+            });
           }
         }),
       governedAccount: yup
@@ -65,39 +65,39 @@ const ProgramUpgrade = ({
           async function (val: string) {
             if (val) {
               try {
-                await validateAccount(connection, val)
-                return true
+                await validateAccount(connection, val);
+                return true;
               } catch (ex) {
                 return this.createError({
                   message: `${ex}`,
-                })
+                });
               }
-              return true
+              return true;
             } else {
               return this.createError({
                 message: `Buffer spill address is required`,
-              })
+              });
             }
-          }
+          },
         ),
     }),
     buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
       if (!governedAccount?.governance?.account) {
-        throw new Error('Governance must be a Program Account Governance')
+        throw new Error('Governance must be a Program Account Governance');
       }
 
       const bufferSpillAddress = form.bufferSpillAddress
         ? new PublicKey(form.bufferSpillAddress)
-        : wallet.publicKey!
+        : wallet.publicKey!;
 
       return createUpgradeInstruction(
         form.governedAccount!.governance.account.governedAccount,
         new PublicKey(form.bufferAddress!),
         governedAccountPubkey,
-        bufferSpillAddress
-      )
+        bufferSpillAddress,
+      );
     },
-  })
+  });
 
   return (
     <>
@@ -131,7 +131,7 @@ const ProgramUpgrade = ({
         error={formErrors[programUpgradeFormNameOf('bufferSpillAddress')]}
       />
     </>
-  )
-}
+  );
+};
 
-export default ProgramUpgrade
+export default ProgramUpgrade;

@@ -1,23 +1,23 @@
-import styled from '@emotion/styled'
-import { ChevronRightIcon } from '@heroicons/react/solid'
-import ProposalStateBadge from './ProposalStatusBadge'
-import Link from 'next/link'
-import { Proposal, ProposalState } from '@solana/spl-governance'
-import ApprovalQuorum from './ApprovalQuorum'
-import useRealm from '../hooks/useRealm'
-import useProposalVotes from '../hooks/useProposalVotes'
-import ProposalTimeStatus from './ProposalTimeStatus'
+import styled from '@emotion/styled';
+import { ChevronRightIcon } from '@heroicons/react/solid';
+import ProposalStateBadge from './ProposalStatusBadge';
+import Link from 'next/link';
+import { Proposal, ProposalState } from '@solana/spl-governance';
+import ApprovalQuorum from './ApprovalQuorum';
+import useRealm from '../hooks/useRealm';
+import useProposalVotes from '../hooks/useProposalVotes';
+import ProposalTimeStatus from './ProposalTimeStatus';
 
-import useQueryContext from '../hooks/useQueryContext'
-import { PublicKey } from '@solana/web3.js'
-import VoteResults from './VoteResults'
+import useQueryContext from '../hooks/useQueryContext';
+import { PublicKey } from '@solana/web3.js';
+import VoteResults from './VoteResults';
 
 type ProposalCardProps = {
-  proposalPk: PublicKey
-  proposal: Proposal
-}
+  proposalPk: PublicKey;
+  proposal: Proposal;
+};
 
-const StyledSvg = styled(ChevronRightIcon)``
+const StyledSvg = styled(ChevronRightIcon)``;
 
 const StyledCardWrapper = styled.div`
   :hover {
@@ -25,18 +25,18 @@ const StyledCardWrapper = styled.div`
       transform: translateX(4px);
     }
   }
-`
+`;
 
 const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
-  const { symbol } = useRealm()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal)
+  const { symbol } = useRealm();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const { yesVoteProgress, yesVotesRequired } = useProposalVotes(proposal);
 
   return (
     <div>
       <Link
         href={fmtUrlWithCluster(
-          `/dao/${symbol}/proposal/${proposalPk.toBase58()}`
+          `/dao/${symbol}/proposal/${proposalPk.toBase58()}`,
         )}
       >
         <a>
@@ -72,7 +72,7 @@ const ProposalCard = ({ proposalPk, proposal }: ProposalCardProps) => {
         </a>
       </Link>
     </div>
-  )
-}
+  );
+};
 
-export default ProposalCard
+export default ProposalCard;

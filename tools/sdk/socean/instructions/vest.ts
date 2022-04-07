@@ -1,18 +1,18 @@
-import { BN } from '@project-serum/anchor'
-import { findHoldingPDA, findVestingPDA } from '@soceanfi/bonding'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { BN } from '@project-serum/anchor';
+import { findHoldingPDA, findVestingPDA } from '@soceanfi/bonding';
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import {
   PublicKey,
   SystemProgram,
   SYSVAR_RENT_PUBKEY,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { EndpointTypes } from '@models/types'
+} from '@solana/web3.js';
+import { EndpointTypes } from '@models/types';
 
-import soceanConfiguration from '../configuration'
-import { BondingProgram } from '../programs'
+import soceanConfiguration from '../configuration';
+import { BondingProgram } from '../programs';
 
-const INDEX_MAGIC_NUMBER = 0
+const INDEX_MAGIC_NUMBER = 0;
 
 export async function vest({
   cluster,
@@ -24,30 +24,33 @@ export async function vest({
   userBondedAccount,
   amount,
 }: {
-  cluster: EndpointTypes
-  program: BondingProgram
-  payer: PublicKey
-  authority: PublicKey
-  bondPool: PublicKey
-  bondedMint: PublicKey
-  userBondedAccount: PublicKey
-  amount: BN
+  cluster: EndpointTypes;
+  program: BondingProgram;
+  payer: PublicKey;
+  authority: PublicKey;
+  bondPool: PublicKey;
+  bondedMint: PublicKey;
+  userBondedAccount: PublicKey;
+  amount: BN;
 }): Promise<TransactionInstruction> {
-  const bondingProgramId = soceanConfiguration.bondingProgramId[cluster]
+  const bondingProgramId = soceanConfiguration.bondingProgramId[cluster];
 
   if (!bondingProgramId) {
     throw new Error(
-      'unsupported cluster to create mintBondedTokens instruction'
-    )
+      'unsupported cluster to create mintBondedTokens instruction',
+    );
   }
 
   const [vesting, vestingBump] = await findVestingPDA(
     bondingProgramId,
     bondPool,
     authority,
-    INDEX_MAGIC_NUMBER
-  )
-  const [holding, holdingBump] = await findHoldingPDA(bondingProgramId, vesting)
+    INDEX_MAGIC_NUMBER,
+  );
+  const [holding, holdingBump] = await findHoldingPDA(
+    bondingProgramId,
+    vesting,
+  );
 
   console.log('vest', {
     user: authority.toString(),
@@ -63,7 +66,7 @@ export async function vest({
     vestingBump,
     holdingBump,
     amount: amount.toString(),
-  })
+  });
 
   return program.instruction.vest(
     INDEX_MAGIC_NUMBER,
@@ -83,6 +86,6 @@ export async function vest({
         systemProgram: SystemProgram.programId,
         rent: SYSVAR_RENT_PUBKEY,
       },
-    }
-  )
+    },
+  );
 }

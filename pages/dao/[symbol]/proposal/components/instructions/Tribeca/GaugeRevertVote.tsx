@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
-import * as yup from 'yup'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import useTribecaGauge from '@hooks/useTribecaGauge'
-import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration'
-import { gaugeRevertVoteInstruction } from '@tools/sdk/tribeca/instructions/gaugeRevertVoteInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { TribecaGaugeRevertVoteForm } from '@utils/uiTypes/proposalCreationTypes'
-import GaugeSelect from './GaugeSelect'
-import GovernorSelect from './GovernorSelect'
+import React, { useState } from 'react';
+import * as yup from 'yup';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import useTribecaGauge from '@hooks/useTribecaGauge';
+import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
+import { gaugeRevertVoteInstruction } from '@tools/sdk/tribeca/instructions/gaugeRevertVoteInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { TribecaGaugeRevertVoteForm } from '@utils/uiTypes/proposalCreationTypes';
+import GaugeSelect from './GaugeSelect';
+import GovernorSelect from './GovernorSelect';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -15,21 +15,21 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governed account is required'),
   gaugeName: yup.string().required('Gauge is required'),
-})
+});
 
 const GaugeRevertVote = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const [
     tribecaConfiguration,
     setTribecaConfiguration,
-  ] = useState<ATribecaConfiguration | null>(null)
+  ] = useState<ATribecaConfiguration | null>(null);
 
-  const { gauges, programs } = useTribecaGauge(tribecaConfiguration)
+  const { gauges, programs } = useTribecaGauge(tribecaConfiguration);
   const {
     connection,
     form,
@@ -48,7 +48,7 @@ const GaugeRevertVote = ({
         !gauges[form.gaugeName!] ||
         !tribecaConfiguration
       ) {
-        throw new Error('Error initializing Tribeca configuration')
+        throw new Error('Error initializing Tribeca configuration');
       }
 
       return gaugeRevertVoteInstruction({
@@ -57,13 +57,13 @@ const GaugeRevertVote = ({
         authority: governedAccountPubkey,
         payer: wallet.publicKey!,
         tribecaConfiguration,
-      })
+      });
     },
-  })
+  });
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
-    return <>This instruction does not support {connection.cluster}</>
+    return <>This instruction does not support {connection.cluster}</>;
   }
 
   return (
@@ -85,7 +85,7 @@ const GaugeRevertVote = ({
         error={formErrors['gaugeName']}
       />
     </>
-  )
-}
+  );
+};
 
-export default GaugeRevertVote
+export default GaugeRevertVote;

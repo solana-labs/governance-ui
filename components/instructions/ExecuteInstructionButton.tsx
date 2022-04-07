@@ -1,24 +1,24 @@
-import { useEffect, useState } from 'react'
-import { executeTransaction } from 'actions/executeTransaction'
+import { useEffect, useState } from 'react';
+import { executeTransaction } from 'actions/executeTransaction';
 import {
   InstructionExecutionStatus,
   ProposalTransaction,
-} from '@solana/spl-governance'
-import React from 'react'
-import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid'
-import Button from '@components/Button'
-import { RpcContext } from '@solana/spl-governance'
-import useRealm from '@hooks/useRealm'
+} from '@solana/spl-governance';
+import React from 'react';
+import { CheckCircleIcon, PlayIcon, RefreshIcon } from '@heroicons/react/solid';
+import Button from '@components/Button';
+import { RpcContext } from '@solana/spl-governance';
+import useRealm from '@hooks/useRealm';
 import useWalletStore, {
   EnhancedProposal,
   EnhancedProposalState,
-} from 'stores/useWalletStore'
-import { ProgramAccount } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
-import Tooltip from '@components/Tooltip'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useTransactionSignature from '@hooks/useTransactionSignature'
-import { notify } from '@utils/notifications'
+} from 'stores/useWalletStore';
+import { ProgramAccount } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
+import Tooltip from '@components/Tooltip';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import useTransactionSignature from '@hooks/useTransactionSignature';
+import { notify } from '@utils/notifications';
 
 export enum PlayState {
   Played,
@@ -33,66 +33,66 @@ export function ExecuteInstructionButton({
   setPlaying,
   proposalInstruction,
 }: {
-  proposal: ProgramAccount<EnhancedProposal>
-  proposalInstruction: ProgramAccount<ProposalTransaction>
-  playing: PlayState
-  setPlaying: React.Dispatch<React.SetStateAction<PlayState>>
+  proposal: ProgramAccount<EnhancedProposal>;
+  proposalInstruction: ProgramAccount<ProposalTransaction>;
+  playing: PlayState;
+  setPlaying: React.Dispatch<React.SetStateAction<PlayState>>;
 }) {
-  const { realmInfo } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
-  const connected = useWalletStore((s) => s.connected)
-  const [currentSlot, setCurrentSlot] = useState(0)
+  const { realmInfo } = useRealm();
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
+  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm);
+  const connected = useWalletStore((s) => s.connected);
+  const [currentSlot, setCurrentSlot] = useState(0);
   const { transactionSignature } = useTransactionSignature(
-    proposalInstruction.pubkey
-  )
+    proposalInstruction.pubkey,
+  );
   const canExecuteAt = proposal?.account.votingCompletedAt
     ? proposal.account.votingCompletedAt.toNumber() + 1
-    : 0
+    : 0;
 
-  const ineligibleToSee = currentSlot - canExecuteAt >= 0
+  const ineligibleToSee = currentSlot - canExecuteAt >= 0;
 
   const rpcContext = new RpcContext(
     new PublicKey(proposal.owner.toString()),
     getProgramVersionForRealm(realmInfo!),
     wallet!,
     connection.current,
-    connection.endpoint
-  )
+    connection.endpoint,
+  );
 
   useEffect(() => {
     if (ineligibleToSee && proposal) {
       const timer = setTimeout(() => {
-        rpcContext.connection.getSlot().then(setCurrentSlot)
-      }, 5000)
+        rpcContext.connection.getSlot().then(setCurrentSlot);
+      }, 5000);
 
       return () => {
-        clearTimeout(timer)
-      }
+        clearTimeout(timer);
+      };
     }
-  }, [ineligibleToSee, rpcContext.connection, currentSlot])
+  }, [ineligibleToSee, rpcContext.connection, currentSlot]);
 
   const onExecuteInstruction = async () => {
-    setPlaying(PlayState.Playing)
+    setPlaying(PlayState.Playing);
 
     try {
-      await executeTransaction(rpcContext, proposal, proposalInstruction)
-      await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
+      await executeTransaction(rpcContext, proposal, proposalInstruction);
+      await fetchRealm(realmInfo?.programId, realmInfo?.realmId);
     } catch (error) {
       notify({
         type: 'error',
         message: `error executing instruction ${error}`,
-      })
-      console.log('error executing instruction', error)
+      });
+      console.log('error executing instruction', error);
 
-      setPlaying(PlayState.Error)
+      setPlaying(PlayState.Error);
 
-      return
+      return;
     }
 
-    setPlaying(PlayState.Played)
-  }
+    setPlaying(PlayState.Played);
+  };
   if (
     proposalInstruction.account.executionStatus ===
     InstructionExecutionStatus.Success
@@ -112,7 +112,7 @@ export function ExecuteInstructionButton({
           <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
         )}
       </Tooltip>
-    )
+    );
   }
 
   if (
@@ -121,11 +121,11 @@ export function ExecuteInstructionButton({
     proposal.account.state !== EnhancedProposalState.Succeeded &&
     proposal.account.state !== EnhancedProposalState.Outdated
   ) {
-    return null
+    return null;
   }
 
   if (ineligibleToSee) {
-    return null
+    return null;
   }
 
   if (
@@ -137,11 +137,11 @@ export function ExecuteInstructionButton({
       <Button small disabled={!connected} onClick={onExecuteInstruction}>
         Execute
       </Button>
-    )
+    );
   }
 
   if (playing === PlayState.Playing) {
-    return <PlayIcon className="h-5 ml-2 text-orange w-5" />
+    return <PlayIcon className="h-5 ml-2 text-orange w-5" />;
   }
 
   if (
@@ -156,8 +156,8 @@ export function ExecuteInstructionButton({
           className="h-5 ml-2 text-orange w-5"
         />
       </Tooltip>
-    )
+    );
   }
 
-  return <CheckCircleIcon className="h-5 ml-2 text-green w-5" key="played" />
+  return <CheckCircleIcon className="h-5 ml-2 text-green w-5" key="played" />;
 }

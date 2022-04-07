@@ -1,5 +1,5 @@
-import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
-import { getExplorerUrl } from '@components/explorer/tools'
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components';
+import { getExplorerUrl } from '@components/explorer/tools';
 import {
   ArrowLeftIcon,
   CheckCircleIcon,
@@ -7,37 +7,40 @@ import {
   LogoutIcon,
   UserCircleIcon,
   XCircleIcon,
-} from '@heroicons/react/outline'
-import useQueryContext from '@hooks/useQueryContext'
-import useRealm from '@hooks/useRealm'
-import { getVoteRecordsByVoterMapByProposal } from '@models/api'
-import { isYesVote } from '@models/voteRecords'
-import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance'
-import { ChatMessage, ProgramAccount } from '@solana/spl-governance'
-import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance'
+} from '@heroicons/react/outline';
+import useQueryContext from '@hooks/useQueryContext';
+import useRealm from '@hooks/useRealm';
+import { getVoteRecordsByVoterMapByProposal } from '@models/api';
+import { isYesVote } from '@models/voteRecords';
+import { GOVERNANCE_CHAT_PROGRAM_ID, VoteRecord } from '@solana/spl-governance';
+import { ChatMessage, ProgramAccount } from '@solana/spl-governance';
+import { getGovernanceChatMessagesByVoter } from '@solana/spl-governance';
 
-import { PublicKey } from '@solana/web3.js'
-import { tryParsePublicKey } from '@tools/core/pubkey'
-import { accountsToPubkeyMap } from '@tools/sdk/accounts'
-import { fmtMintAmount } from '@tools/sdk/units'
-import { notify } from '@utils/notifications'
-import tokenService from '@utils/services/token'
-import React, { useEffect, useMemo, useState } from 'react'
-import useMembersListStore from 'stores/useMembersStore'
-import useWalletStore from 'stores/useWalletStore'
-import { ViewState, WalletTokenRecordWithProposal } from './types'
+import { PublicKey } from '@solana/web3.js';
+import { tryParsePublicKey } from '@tools/core/pubkey';
+import { accountsToPubkeyMap } from '@tools/sdk/accounts';
+import { fmtMintAmount } from '@tools/sdk/units';
+import { notify } from '@utils/notifications';
+import tokenService from '@utils/services/token';
+import React, { useEffect, useMemo, useState } from 'react';
+import useMembersListStore from 'stores/useMembersStore';
+import useWalletStore from 'stores/useWalletStore';
+import { ViewState, WalletTokenRecordWithProposal } from './types';
 
 const MemberOverview = () => {
-  const { realm } = useRealm()
-  const member = useMembersListStore((s) => s.compact.currentMember)
-  const connection = useWalletStore((s) => s.connection)
-  const selectedRealm = useWalletStore((s) => s.selectedRealm)
-  const { mint, councilMint, proposals, symbol } = useRealm()
-  const { setCurrentCompactView, resetCompactViewState } = useMembersListStore()
-  const { fmtUrlWithCluster } = useQueryContext()
+  const { realm } = useRealm();
+  const member = useMembersListStore((s) => s.compact.currentMember);
+  const connection = useWalletStore((s) => s.connection);
+  const selectedRealm = useWalletStore((s) => s.selectedRealm);
+  const { mint, councilMint, proposals, symbol } = useRealm();
+  const {
+    setCurrentCompactView,
+    resetCompactViewState,
+  } = useMembersListStore();
+  const { fmtUrlWithCluster } = useQueryContext();
   const [ownVoteRecords, setOwnVoteRecords] = useState<
     WalletTokenRecordWithProposal[]
-  >([])
+  >([]);
 
   const {
     walletAddress,
@@ -46,94 +49,94 @@ const MemberOverview = () => {
     votesCasted,
     hasCommunityTokenOutsideRealm,
     hasCouncilTokenOutsideRealm,
-  } = member!
-  const walletPublicKey = tryParsePublicKey(walletAddress)
+  } = member!;
+  const walletPublicKey = tryParsePublicKey(walletAddress);
   const tokenName = realm
     ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
-    : ''
-  const totalVotes = votesCasted
+    : '';
+  const totalVotes = votesCasted;
   const communityAmount =
     communityVotes && !communityVotes.isZero()
       ? useMemo(() => fmtMintAmount(mint, communityVotes), [
           member!.walletAddress,
         ])
-      : null
+      : null;
   const councilAmount =
     councilVotes && !councilVotes.isZero()
       ? useMemo(() => fmtMintAmount(councilMint, councilVotes), [
           member!.walletAddress,
         ])
-      : null
+      : null;
 
   const handleGoBackToMainView = async () => {
-    setCurrentCompactView(ViewState.MainView)
-    resetCompactViewState()
-  }
+    setCurrentCompactView(ViewState.MainView);
+    resetCompactViewState();
+  };
   const getVoteRecordsAndChatMsgs = async () => {
-    let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {}
-    let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {}
+    let voteRecords: { [pubKey: string]: ProgramAccount<VoteRecord> } = {};
+    let chatMessages: { [pubKey: string]: ProgramAccount<ChatMessage> } = {};
     try {
       const results = await Promise.all([
         getVoteRecordsByVoterMapByProposal(
           connection.current,
           selectedRealm!.programId!,
-          new PublicKey(member!.walletAddress)
+          new PublicKey(member!.walletAddress),
         ),
         getGovernanceChatMessagesByVoter(
           connection!.current,
           GOVERNANCE_CHAT_PROGRAM_ID,
-          new PublicKey(member!.walletAddress)
+          new PublicKey(member!.walletAddress),
         ),
-      ])
-      voteRecords = results[0]
-      chatMessages = accountsToPubkeyMap(results[1])
+      ]);
+      voteRecords = results[0];
+      chatMessages = accountsToPubkeyMap(results[1]);
     } catch (e) {
       notify({
         message: 'Unable to fetch vote records for selected wallet address',
         type: 'error',
-      })
+      });
     }
-    return { voteRecords, chat: chatMessages }
-  }
+    return { voteRecords, chat: chatMessages };
+  };
   useEffect(() => {
     //we get voteRecords sorted by proposal date and match it with proposal name and chat msgs leaved by token holder.
     const handleSetVoteRecords = async () => {
-      const { voteRecords, chat } = await getVoteRecordsAndChatMsgs()
+      const { voteRecords, chat } = await getVoteRecordsAndChatMsgs();
       const voteRecordsArray: WalletTokenRecordWithProposal[] = Object.keys(
-        voteRecords
+        voteRecords,
       )
         .sort((a, b) => {
-          const prevProposal = proposals[a]
-          const nextProposal = proposals[b]
+          const prevProposal = proposals[a];
+          const nextProposal = proposals[b];
           return (
             prevProposal?.account.getStateTimestamp() -
             nextProposal?.account.getStateTimestamp()
-          )
+          );
         })
         .reverse()
         .filter((x) => proposals[x])
         .flatMap((x) => {
-          const currentProposal = proposals[x]
+          const currentProposal = proposals[x];
           const currentChatsMsgPk = Object.keys(chat).filter(
             (c) =>
               chat[c]?.account.proposal.toBase58() ===
-              currentProposal?.pubkey.toBase58()
-          )
+              currentProposal?.pubkey.toBase58(),
+          );
           const currentChatMsgs = currentChatsMsgPk.map(
-            (c) => chat[c].account.body.value
-          )
+            (c) => chat[c].account.body.value,
+          );
           return {
             proposalPublicKey: x,
             proposalName: currentProposal?.account.name,
             chatMessages: currentChatMsgs,
             ...voteRecords[x],
-          }
-        })
+          };
+        });
 
-      setOwnVoteRecords(voteRecordsArray)
-    }
-    handleSetVoteRecords()
-  }, [walletAddress])
+      setOwnVoteRecords(voteRecordsArray);
+    };
+    handleSetVoteRecords();
+  }, [walletAddress]);
 
   return (
     <>
@@ -206,7 +209,7 @@ const MemberOverview = () => {
         {ownVoteRecords.map((x) => (
           <a
             href={fmtUrlWithCluster(
-              `/dao/${symbol}/proposal/${x.proposalPublicKey}`
+              `/dao/${symbol}/proposal/${x.proposalPublicKey}`,
             )}
             rel="noopener noreferrer"
             className="border border-fgd-4 default-transition rounded-lg hover:bg-bkg-3 css-1ug690d-StyledCardWrapepr elzt7lo0 p-4 text-xs text-th-fgd-1 mb-2 flex"
@@ -237,7 +240,7 @@ const MemberOverview = () => {
         ))}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default MemberOverview
+export default MemberOverview;

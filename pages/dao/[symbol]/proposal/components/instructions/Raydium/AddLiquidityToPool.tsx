@@ -1,22 +1,22 @@
-import React, { useEffect } from 'react'
-import * as yup from 'yup'
-import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
-import { createAddLiquidityInstruction } from '@tools/sdk/raydium/createAddLiquidityInstruction'
+import React, { useEffect } from 'react';
+import * as yup from 'yup';
+import Input from '@components/inputs/Input';
+import Select from '@components/inputs/Select';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
+import { createAddLiquidityInstruction } from '@tools/sdk/raydium/createAddLiquidityInstruction';
 import {
   getAmountOut,
   getLiquidityPoolKeysByLabel,
-} from '@tools/sdk/raydium/helpers'
-import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys'
-import { uiAmountToNativeBN } from '@tools/sdk/units'
-import { debounce } from '@utils/debounce'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { AddLiquidityRaydiumForm } from '@utils/uiTypes/proposalCreationTypes'
-import SelectOptionList from '../../SelectOptionList'
+} from '@tools/sdk/raydium/helpers';
+import { liquidityPoolKeysList } from '@tools/sdk/raydium/poolKeys';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
+import { debounce } from '@utils/debounce';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { AddLiquidityRaydiumForm } from '@utils/uiTypes/proposalCreationTypes';
+import SelectOptionList from '../../SelectOptionList';
 
-const SLIPPAGE_OPTIONS = [0.5, 1, 2]
-const FIXED_SIDE_LIST = ['base', 'quote']
+const SLIPPAGE_OPTIONS = [0.5, 1, 2];
+const FIXED_SIDE_LIST = ['base', 'quote'];
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -37,14 +37,14 @@ const schema = yup.object().shape({
     .equals(['base', 'quote'])
     .required('Fixed Side is required'),
   slippage: yup.number().required('Slippage value is required'),
-})
+});
 
 const RaydiumAddLiquidityToPool = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     form,
@@ -60,36 +60,36 @@ const RaydiumAddLiquidityToPool = ({
     },
     schema,
     buildInstruction: async function ({ form, governedAccountPubkey }) {
-      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool!)
+      const poolKeys = getLiquidityPoolKeysByLabel(form.liquidityPool!);
       const [base, quote] = await Promise.all([
         connection.current.getTokenSupply(poolKeys.baseMint),
         connection.current.getTokenSupply(poolKeys.quoteMint),
-      ])
+      ]);
       return createAddLiquidityInstruction(
         poolKeys,
         uiAmountToNativeBN(form.baseAmountIn!, base.value.decimals),
         uiAmountToNativeBN(form.quoteAmountIn!, quote.value.decimals),
         form.fixedSide,
-        governedAccountPubkey
-      )
+        governedAccountPubkey,
+      );
     },
-  })
+  });
 
   useEffect(() => {
     debounce.debounceFcn(async () => {
-      if (!form.baseAmountIn || !form.liquidityPool) return
+      if (!form.baseAmountIn || !form.liquidityPool) return;
 
       handleSetForm({
         value: await getAmountOut(
           form.liquidityPool,
           form.baseAmountIn,
           connection.current,
-          form.slippage
+          form.slippage,
         ),
         propertyName: 'quoteAmountIn',
-      })
-    })
-  }, [form.baseAmountIn, form.slippage])
+      });
+    });
+  }, [form.baseAmountIn, form.slippage]);
 
   return (
     <>
@@ -154,7 +154,7 @@ const RaydiumAddLiquidityToPool = ({
         </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default RaydiumAddLiquidityToPool
+export default RaydiumAddLiquidityToPool;

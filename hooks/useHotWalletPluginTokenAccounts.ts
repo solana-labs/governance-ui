@@ -1,81 +1,81 @@
-import { MintInfo, u64 } from '@solana/spl-token'
-import BigNumber from 'bignumber.js'
-import { PublicKey } from '@solana/web3.js'
+import { MintInfo, u64 } from '@solana/spl-token';
+import BigNumber from 'bignumber.js';
+import { PublicKey } from '@solana/web3.js';
 import {
   getOwnedTokenAccounts,
   TokenProgramAccount,
   tryGetMint,
-} from '@utils/tokens'
-import { useCallback, useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import tokenService from '@utils/services/token'
-import { BN } from '@project-serum/anchor'
-import { HotWalletAccount } from './useHotWallet'
-import { getSplTokenNameByMint } from '@utils/splTokens'
+} from '@utils/tokens';
+import { useCallback, useEffect, useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import tokenService from '@utils/services/token';
+import { BN } from '@project-serum/anchor';
+import { HotWalletAccount } from './useHotWallet';
+import { getSplTokenNameByMint } from '@utils/splTokens';
 
 export type HotWalletTokenAccounts = {
-  publicKey: PublicKey
-  mint: PublicKey
-  decimals: number
-  amount: u64
-  mintName?: string
-  usdMintValue: number
-  usdTotalValue: u64
-}[]
+  publicKey: PublicKey;
+  mint: PublicKey;
+  decimals: number;
+  amount: u64;
+  mintName?: string;
+  usdMintValue: number;
+  usdTotalValue: u64;
+}[];
 
 const useHotWalletPluginTokenAccounts = (
-  hotWalletAccount: HotWalletAccount
+  hotWalletAccount: HotWalletAccount,
 ) => {
-  const connection = useWalletStore((store) => store.connection)
+  const connection = useWalletStore((store) => store.connection);
   const [
     tokenAccounts,
     setTokenAccounts,
-  ] = useState<HotWalletTokenAccounts | null>(null)
+  ] = useState<HotWalletTokenAccounts | null>(null);
 
   const loadTokenAccounts = useCallback(async () => {
-    if (!connection.current) return
+    if (!connection.current) return;
 
     const ownedTokenAccounts = await getOwnedTokenAccounts(
       connection.current,
-      hotWalletAccount.publicKey
-    )
+      hotWalletAccount.publicKey,
+    );
 
     const tokenMintAddresses = [
       ...new Set(ownedTokenAccounts.map(({ account: { mint } }) => mint)),
-    ]
+    ];
 
     const mintInfos = (
       await Promise.all(
         tokenMintAddresses.map((tokenMintAddress) =>
-          tryGetMint(connection.current, tokenMintAddress)
-        )
+          tryGetMint(connection.current, tokenMintAddress),
+        ),
       )
     ).reduce(
       (acc, mintInfo) => {
-        if (!mintInfo) throw new Error('Cannot load mint info')
+        if (!mintInfo) throw new Error('Cannot load mint info');
 
         acc[mintInfo.publicKey.toBase58()] = {
           ...mintInfo,
           name: getSplTokenNameByMint(mintInfo.publicKey),
           usdValue: tokenService.getUSDTokenPrice(
-            mintInfo.publicKey.toBase58()
+            mintInfo.publicKey.toBase58(),
           ),
-        }
+        };
 
-        return acc
+        return acc;
       },
       {} as {
         [key: string]: TokenProgramAccount<MintInfo> & {
-          name?: string
-          usdValue: number
-        }
-      }
-    )
+          name?: string;
+          usdValue: number;
+        };
+      },
+    );
 
     setTokenAccounts(
       ownedTokenAccounts
         .map((tokenAccount) => {
-          const mintInfo = mintInfos[tokenAccount.account.mint.toBase58()]
+          const mintInfo = mintInfos[tokenAccount.account.mint.toBase58()];
 
           return {
             mint: tokenAccount.account.mint,
@@ -88,25 +88,25 @@ const useHotWalletPluginTokenAccounts = (
               new BigNumber(tokenAccount.account.amount.toString())
                 .multipliedBy(mintInfo.usdValue)
                 .integerValue()
-                .toString()
+                .toString(),
             ),
-          }
+          };
         })
-        .sort((a, b) => (b.amount.toString() < a.amount.toString() ? -1 : 1))
-    )
+        .sort((a, b) => (b.amount.toString() < a.amount.toString() ? -1 : 1)),
+    );
   }, [
     connection,
     JSON.stringify(tokenService._tokenPriceToUSDlist),
     hotWalletAccount,
-  ])
+  ]);
 
   useEffect(() => {
-    loadTokenAccounts()
-  }, [loadTokenAccounts])
+    loadTokenAccounts();
+  }, [loadTokenAccounts]);
 
   return {
     tokenAccounts,
-  }
-}
+  };
+};
 
-export default useHotWalletPluginTokenAccounts
+export default useHotWalletPluginTokenAccounts;

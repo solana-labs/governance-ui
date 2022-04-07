@@ -1,15 +1,15 @@
-import { FunctionComponent } from 'react'
+import { FunctionComponent } from 'react';
 import {
   CheckCircleIcon,
   ExclamationCircleIcon,
   ExclamationIcon,
   InformationCircleIcon,
-} from '@heroicons/react/outline'
+} from '@heroicons/react/outline';
 
 interface InlineNotificationProps {
-  desc?: string | (() => string)
-  title?: string
-  type: string
+  desc?: string | (() => string);
+  title?: string;
+  type: string;
 }
 
 const InlineNotification: FunctionComponent<InlineNotificationProps> = ({
@@ -49,6 +49,6 @@ const InlineNotification: FunctionComponent<InlineNotificationProps> = ({
       </div>
     </div>
   </div>
-)
+);
 
-export default InlineNotification
+export default InlineNotification;

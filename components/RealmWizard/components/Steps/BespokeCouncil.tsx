@@ -1,15 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import React, { useEffect, useState } from 'react'
-import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm'
-import Input from '@components/inputs/Input'
-import Switch from '@components/Switch'
-import { StyledLabel } from '@components/inputs/styles'
-import TeamWalletField from '../TeamWalletField'
-import useWalletStore from 'stores/useWalletStore'
-import ApprovalQuorumInput from '../ApprovalQuorumInput'
-import { tryGetMint } from '@utils/tokens'
-import { PublicKey } from '@solana/web3.js'
-import _ from 'lodash'
+import React, { useEffect, useState } from 'react';
+import { RealmWizardStepComponentProps } from '@components/RealmWizard/interfaces/Realm';
+import Input from '@components/inputs/Input';
+import Switch from '@components/Switch';
+import { StyledLabel } from '@components/inputs/styles';
+import TeamWalletField from '../TeamWalletField';
+import useWalletStore from 'stores/useWalletStore';
+import ApprovalQuorumInput from '../ApprovalQuorumInput';
+import { tryGetMint } from '@utils/tokens';
+import { PublicKey } from '@solana/web3.js';
+import _ from 'lodash';
 
 const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -18,69 +18,69 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
   switchState = true,
   onSwitch = () => null,
 }) => {
-  const { current: wallet, connection } = useWalletStore((s) => s)
+  const { current: wallet, connection } = useWalletStore((s) => s);
   const handleInsertTeamWallet = (wallets: string[]) => {
-    let teamWallets: string[] = []
+    let teamWallets: string[] = [];
     if (form?.teamWallets) {
-      teamWallets = form.teamWallets
+      teamWallets = form.teamWallets;
     }
     wallets.forEach((wallet) => {
       if (!teamWallets.find((addr) => addr === wallet)) {
-        teamWallets.push(wallet)
-        setForm({ teamWallets })
+        teamWallets.push(wallet);
+        setForm({ teamWallets });
       }
-    })
-  }
+    });
+  };
 
   const handleRemoveTeamWallet = (index: number) => {
     if (form?.teamWallets && form.teamWallets[index]) {
-      const teamWallets = form.teamWallets
-      teamWallets.splice(index, 1)
-      setForm({ teamWallets })
+      const teamWallets = form.teamWallets;
+      teamWallets.splice(index, 1);
+      setForm({ teamWallets });
     }
-  }
+  };
 
   const handleWallets = () => {
     if (switchState && wallet?.publicKey) {
       // Forces to add the current wallet
-      handleInsertTeamWallet([wallet.publicKey.toBase58()])
+      handleInsertTeamWallet([wallet.publicKey.toBase58()]);
     } else {
-      setForm({ teamWallets: [] })
+      setForm({ teamWallets: [] });
     }
-  }
+  };
 
   const handleCouncilMint = async (mintId: string) => {
     try {
-      const mintPublicKey = new PublicKey(mintId)
-      const mint = await tryGetMint(connection.current, mintPublicKey)
+      const mintPublicKey = new PublicKey(mintId);
+      const mint = await tryGetMint(connection.current, mintPublicKey);
       if (mint) {
         setForm({
           councilMint: mint,
-        })
+        });
       }
     } catch (e) {
-      console.log('failed to set council mint', e)
+      console.log('failed to set council mint', e);
     }
-  }
+  };
 
   useEffect(() => {
     _.debounce(async () => {
       if (form?.councilMintId) {
-        await handleCouncilMint(form.councilMintId)
+        await handleCouncilMint(form.councilMintId);
       }
-    }, 250)()
+    }, 250)();
     if (!form?.communityMintId?.length) {
-      setForm({ communityMint: undefined })
+      setForm({ communityMint: undefined });
     }
-  }, [form?.councilMintId])
+  }, [form?.councilMintId]);
 
   useEffect(() => {
-    handleWallets()
-  }, [switchState])
+    handleWallets();
+  }, [switchState]);
 
   useEffect(() => {
-    handleWallets()
-  }, [])
+    handleWallets();
+  }, []);
 
   return (
     <>
@@ -95,7 +95,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
             className="mt-2 mb-2"
             checked={switchState}
             onChange={(check) => {
-              if (typeof onSwitch === 'function') onSwitch(check)
+              if (typeof onSwitch === 'function') onSwitch(check);
             }}
           />
           <StyledLabel className="mt-1.5 ml-3">Use Council</StyledLabel>
@@ -117,7 +117,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
             <ApprovalQuorumInput
               value={form.yesThreshold}
               onChange={($e) => {
-                setForm({ yesThreshold: $e })
+                setForm({ yesThreshold: $e });
               }}
               onBlur={() => {
                 if (
@@ -126,7 +126,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
                 ) {
                   setForm({
                     yesThreshold: 60,
-                  })
+                  });
                 }
               }}
             />
@@ -140,7 +140,7 @@ const BespokeCouncil: React.FC<RealmWizardStepComponentProps> = ({
         </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default BespokeCouncil
+export default BespokeCouncil;

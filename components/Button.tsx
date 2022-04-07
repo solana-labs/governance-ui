@@ -1,15 +1,15 @@
-import { FunctionComponent } from 'react'
-import Loading from './Loading'
-import Tooltip from './Tooltip'
+import { FunctionComponent } from 'react';
+import Loading from './Loading';
+import Tooltip from './Tooltip';
 
 interface ButtonProps {
-  className?: string
-  isLoading?: boolean
-  onClick?: () => void
-  disabled?: boolean
-  small?: boolean
-  tooltipMessage?: string
-  style?: any
+  className?: string;
+  isLoading?: boolean;
+  onClick?: () => void;
+  disabled?: boolean;
+  small?: boolean;
+  tooltipMessage?: string;
+  style?: any;
 }
 
 const Button: FunctionComponent<ButtonProps> = ({
@@ -39,10 +39,10 @@ const Button: FunctionComponent<ButtonProps> = ({
         <div>{isLoading ? <Loading /> : children}</div>
       </Tooltip>
     </button>
-  )
-}
+  );
+};
 
-export default Button
+export default Button;
 
 export const SecondaryButton: FunctionComponent<ButtonProps> = ({
   children,
@@ -67,8 +67,8 @@ export const SecondaryButton: FunctionComponent<ButtonProps> = ({
         <div>{isLoading ? <Loading /> : children}</div>
       </Tooltip>
     </button>
-  )
-}
+  );
+};
 
 export const LinkButton: FunctionComponent<ButtonProps> = ({
   children,
@@ -86,5 +86,5 @@ export const LinkButton: FunctionComponent<ButtonProps> = ({
     >
       {children}
     </button>
-  )
-}
+  );
+};

@@ -3,7 +3,7 @@ import {
   RealmWizardMode,
   RealmWizardStep,
   StepDirection,
-} from '../interfaces/Realm'
+} from '../interfaces/Realm';
 
 /**
  * This class provides methods to control the Realm Creator Wizard.
@@ -18,14 +18,14 @@ import {
  * @since v0.1.0
  */
 class RealmWizardController {
-  private mode: RealmWizardMode
-  private steps: number[] = []
-  private currentStep: RealmWizardStep
+  private mode: RealmWizardMode;
+  private steps: number[] = [];
+  private currentStep: RealmWizardStep;
 
   constructor(mode: RealmWizardMode) {
-    this.mountSteps(mode)
+    this.mountSteps(mode);
 
-    this.currentStep = RealmWizardStep.SELECT_MODE
+    this.currentStep = RealmWizardStep.SELECT_MODE;
   }
 
   /**
@@ -33,21 +33,21 @@ class RealmWizardController {
    * @param mode
    */
   private mountSteps(mode: RealmWizardMode) {
-    this.mode = mode
-    this.steps.push(RealmWizardStep.SELECT_MODE)
+    this.mode = mode;
+    this.steps.push(RealmWizardStep.SELECT_MODE);
     switch (this.mode) {
       case RealmWizardMode.BASIC:
-        this.steps.push(RealmWizardStep.MULTISIG_CONFIG)
-        break
+        this.steps.push(RealmWizardStep.MULTISIG_CONFIG);
+        break;
       case RealmWizardMode.ADVANCED:
-        this.steps.push(RealmWizardStep.BESPOKE_CONFIG)
-        this.steps.push(RealmWizardStep.BESPOKE_COUNCIL)
-        this.steps.push(RealmWizardStep.BESPOKE_INFO)
-        break
+        this.steps.push(RealmWizardStep.BESPOKE_CONFIG);
+        this.steps.push(RealmWizardStep.BESPOKE_COUNCIL);
+        this.steps.push(RealmWizardStep.BESPOKE_INFO);
+        break;
       default:
-        throw new Error('The selected mode is not available')
+        throw new Error('The selected mode is not available');
     }
-    this.steps.push(RealmWizardStep.REALM_CREATED)
+    this.steps.push(RealmWizardStep.REALM_CREATED);
   }
 
   /**
@@ -58,23 +58,23 @@ class RealmWizardController {
    */
   getNextStep(
     currentStep: RealmWizardStep,
-    direction: StepDirection
+    direction: StepDirection,
   ): RealmWizardStep {
-    const stepIndex = this.steps.indexOf(currentStep)
-    const nextStep = this.steps[stepIndex + direction]
+    const stepIndex = this.steps.indexOf(currentStep);
+    const nextStep = this.steps[stepIndex + direction];
     if (nextStep !== undefined) {
-      this.currentStep = nextStep
-      return nextStep
+      this.currentStep = nextStep;
+      return nextStep;
     }
 
-    throw new Error('The chosen step is not available.')
+    throw new Error('The chosen step is not available.');
   }
 
   /**
    * Checks if the state is equal to the last step
    */
   isLastStep(): boolean {
-    return this.currentStep === this.steps[this.steps.length - 2]
+    return this.currentStep === this.steps[this.steps.length - 2];
   }
 
   /**
@@ -84,37 +84,37 @@ class RealmWizardController {
     return (
       this.currentStep === this.steps[1] ||
       this.currentStep === RealmWizardStep.REALM_CREATED
-    )
+    );
   }
 
   /**
    * Checks if the page is the mode selector
    */
   isModeSelect(): boolean {
-    return this.currentStep === RealmWizardStep.SELECT_MODE
+    return this.currentStep === RealmWizardStep.SELECT_MODE;
   }
 
   /**
    * Return the current step
    */
   getCurrentStep(): RealmWizardStep {
-    return this.currentStep
+    return this.currentStep;
   }
 
   /**
    * Returns the pagination position of the current step
    */
   getStepPagination(): string {
-    const currentStepIdx = this.steps.indexOf(this.currentStep) + 1
-    const pages = this.steps.length
-    return `Step ${currentStepIdx} of ${pages}`
+    const currentStepIdx = this.steps.indexOf(this.currentStep) + 1;
+    const pages = this.steps.length;
+    return `Step ${currentStepIdx} of ${pages}`;
   }
 
   /**
    * Return the current wizard mode
    */
   getMode(): RealmWizardMode {
-    return this.mode
+    return this.mode;
   }
 }
-export default RealmWizardController
+export default RealmWizardController;

@@ -1,12 +1,12 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import Divider from '@components/Divider'
-import Input from '@components/inputs/Input'
-import { StyledLabel } from '@components/inputs/styles'
-import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
-import React from 'react'
-import { RealmWizardStepComponentProps } from '../../interfaces/Realm'
-import { getMintSupplyFactorPercent } from './BespokeConfig'
+import Divider from '@components/Divider';
+import Input from '@components/inputs/Input';
+import { StyledLabel } from '@components/inputs/styles';
+import { formatMintNaturalAmountAsDecimal } from '@tools/sdk/units';
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants';
+import React from 'react';
+import { RealmWizardStepComponentProps } from '../../interfaces/Realm';
+import { getMintSupplyFactorPercent } from './BespokeConfig';
 
 const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
   setForm,
@@ -60,7 +60,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
                   <div className="text-xs">
                     {formatMintNaturalAmountAsDecimal(
                       form.communityMint.account,
-                      form.communityMint.account.supply
+                      form.communityMint.account.supply,
                     )}
                   </div>
                 </div>
@@ -186,7 +186,7 @@ const BespokeInfo: React.FC<RealmWizardStepComponentProps> = ({
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default BespokeInfo
+export default BespokeInfo;

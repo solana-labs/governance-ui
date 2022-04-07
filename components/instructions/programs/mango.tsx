@@ -1,13 +1,13 @@
-import { Connection } from '@solana/web3.js'
-import { AccountMetaData } from '@solana/spl-governance'
-import { MangoInstructionLayout } from '@blockworks-foundation/mango-client'
+import { Connection } from '@solana/web3.js';
+import { AccountMetaData } from '@solana/spl-governance';
+import { MangoInstructionLayout } from '@blockworks-foundation/mango-client';
 
 function displayInstructionArgument(decodedArgs, argName) {
   return (
     <p key={argName}>
       {argName}: {decodedArgs[argName].toString()}
     </p>
-  )
+  );
 }
 
 function displayOptionalInstructionArgument(decodedArgs, argName) {
@@ -15,30 +15,30 @@ function displayOptionalInstructionArgument(decodedArgs, argName) {
     displayInstructionArgument(decodedArgs, argName)
   ) : (
     <></>
-  )
+  );
 }
 
 function displayAllArgs(decodedArgs, exceptions: any[] = []) {
   const optionalArgs = Object.keys(decodedArgs)
     .filter((k) => k.endsWith('Option'))
     .map((k) => k.replace('Option', ''))
-    .filter((k) => !exceptions.includes(k))
+    .filter((k) => !exceptions.includes(k));
 
   const otherArgs = Object.keys(decodedArgs).filter(
     (k) =>
       !k.endsWith('Option') &&
       !optionalArgs.includes(k) &&
-      !exceptions.includes(k)
-  )
+      !exceptions.includes(k),
+  );
 
   return (
     <>
       {otherArgs.map((a) => displayInstructionArgument(decodedArgs, a))}
       {optionalArgs.map((a) =>
-        displayOptionalInstructionArgument(decodedArgs, a)
+        displayOptionalInstructionArgument(decodedArgs, a),
       )}
     </>
-  )
+  );
 }
 
 function displayOptionalDecimalArgument(decodedArgs, argName, decimals = 6) {
@@ -48,7 +48,7 @@ function displayOptionalDecimalArgument(decodedArgs, argName, decimals = 6) {
     </p>
   ) : (
     <></>
-  )
+  );
 }
 
 function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
@@ -58,7 +58,7 @@ function displayDecimalArgument(decodedArgs, argName, decimals = 6) {
     </p>
   ) : (
     <></>
-  )
+  );
 }
 
 export const MANGO_INSTRUCTIONS = {
@@ -79,10 +79,11 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
-        const args = MangoInstructionLayout.decode(Buffer.from(data), 0).Deposit
-        return <>{displayAllArgs(args)}</>
+        const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
+          .Deposit;
+        return <>{displayAllArgs(args)}</>;
       },
     },
     4: {
@@ -97,11 +98,11 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .AddSpotMarket
-        return <>{displayAllArgs(args)}</>
+          .AddSpotMarket;
+        return <>{displayAllArgs(args)}</>;
       },
     },
     10: {
@@ -118,16 +119,16 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .AddPerpMarket
+          .AddPerpMarket;
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
             {displayDecimalArgument(args, 'mngoPerPeriod')}
           </>
-        )
+        );
       },
     },
     37: {
@@ -139,16 +140,16 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangePerpMarketParams
+          .ChangePerpMarketParams;
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
             {displayOptionalDecimalArgument(args, 'mngoPerPeriod')}
           </>
-        )
+        );
       },
     },
     46: {
@@ -164,16 +165,16 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: async (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .CreatePerpMarket
+          .CreatePerpMarket;
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
             {displayDecimalArgument(args, 'mngoPerPeriod')}
           </>
-        )
+        );
       },
     },
     47: {
@@ -185,16 +186,16 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangePerpMarketParams2
+          .ChangePerpMarketParams2;
         return (
           <>
             {displayAllArgs(args, ['mngoPerPeriod'])}
             {displayOptionalDecimalArgument(args, 'mngoPerPeriod')}
           </>
-        )
+        );
       },
     },
     55: {
@@ -208,11 +209,11 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .CreateMangoAccount
-        return <>{displayAllArgs(args)}</>
+          .CreateMangoAccount;
+        return <>{displayAllArgs(args)}</>;
       },
     },
     58: {
@@ -226,11 +227,11 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .SetDelegate
-        return <>{displayAllArgs(args)}</>
+          .SetDelegate;
+        return <>{displayAllArgs(args)}</>;
       },
     },
     61: {
@@ -241,16 +242,16 @@ export const MANGO_INSTRUCTIONS = {
       getDataUI: (
         _connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[]
+        _accounts: AccountMetaData[],
       ) => {
         const args = MangoInstructionLayout.decode(Buffer.from(data), 0)
-          .ChangeReferralFeeParams
-        return <>{displayAllArgs(args)}</>
+          .ChangeReferralFeeParams;
+        return <>{displayAllArgs(args)}</>;
       },
     },
   },
-}
+};
 
 // also allow decoding of instructions for devnet versions of mango
 MANGO_INSTRUCTIONS['4skJ85cdxQAFVKbcGgfun8iZPL7BadVYXG3kGEGkufqA'] =
-  MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68']
+  MANGO_INSTRUCTIONS['mv3ekLzLbnVPNxjSKvqBpU3ZeZXPQdEC3bp5MDEBG68'];

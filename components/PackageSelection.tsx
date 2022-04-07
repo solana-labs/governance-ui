@@ -1,5 +1,5 @@
-import { PackageType } from '@hooks/useGovernanceAssets'
-import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes'
+import { PackageType } from '@hooks/useGovernanceAssets';
+import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes';
 
 const PackageSelection = ({
   selected,
@@ -7,10 +7,10 @@ const PackageSelection = ({
   onClick,
   packages,
 }: {
-  selected: PackageEnum | null
-  className?: string | undefined
-  onClick: (selected: PackageEnum) => void
-  packages: PackageType[]
+  selected: PackageEnum | null;
+  className?: string | undefined;
+  onClick: (selected: PackageEnum) => void;
+  packages: PackageType[];
 }) => {
   return (
     <div className={`flex items-center space-x-3 ${className}`}>
@@ -29,7 +29,7 @@ const PackageSelection = ({
               } cursor-pointer`}
               onClick={() => onClick(Number(id) as PackageEnum)}
             />
-          )
+          );
         }
 
         // There is no image, we use the text instead
@@ -46,10 +46,10 @@ const PackageSelection = ({
           >
             {name}
           </span>
-        )
+        );
       })}
     </div>
-  )
-}
+  );
+};
 
-export default PackageSelection
+export default PackageSelection;

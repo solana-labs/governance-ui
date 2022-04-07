@@ -1,103 +1,103 @@
-import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { useTotalTreasuryPrice } from '@hooks/useTotalTreasuryPrice'
-import { GovernedTokenAccount } from '@utils/tokens'
-import { useEffect, useState } from 'react'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import AccountsTabs from '@components/TreasuryAccount/AccountsTabs'
-import AccountOverview from '@components/TreasuryAccount/AccountOverview'
-import useWalletStore from 'stores/useWalletStore'
-import useRealm from 'hooks/useRealm'
-import { CurrencyDollarIcon, PlusCircleIcon } from '@heroicons/react/outline'
-import { LinkButton } from '@components/Button'
-import { useRouter } from 'next/router'
-import useQueryContext from '@hooks/useQueryContext'
-import tokenService from '@utils/services/token'
-import useStrategiesStore from 'Strategies/store/useStrategiesStore'
-import Select from '@components/inputs/Select'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
+import PreviousRouteBtn from '@components/PreviousRouteBtn';
+import useGovernanceAssets from '@hooks/useGovernanceAssets';
+import { useTotalTreasuryPrice } from '@hooks/useTotalTreasuryPrice';
+import { GovernedTokenAccount } from '@utils/tokens';
+import { useEffect, useState } from 'react';
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
+import AccountsTabs from '@components/TreasuryAccount/AccountsTabs';
+import AccountOverview from '@components/TreasuryAccount/AccountOverview';
+import useWalletStore from 'stores/useWalletStore';
+import useRealm from 'hooks/useRealm';
+import { CurrencyDollarIcon, PlusCircleIcon } from '@heroicons/react/outline';
+import { LinkButton } from '@components/Button';
+import { useRouter } from 'next/router';
+import useQueryContext from '@hooks/useQueryContext';
+import tokenService from '@utils/services/token';
+import useStrategiesStore from 'Strategies/store/useStrategiesStore';
+import Select from '@components/inputs/Select';
+import { getTreasuryAccountItemInfo } from '@utils/treasuryTools';
 
-const NEW_TREASURY_ROUTE = `/treasury/new`
+const NEW_TREASURY_ROUTE = `/treasury/new`;
 
 const Treasury = () => {
-  const { getStrategies } = useStrategiesStore()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
-  const { setCurrentAccount } = useTreasuryAccountStore()
-  const connection = useWalletStore((s) => s.connection)
+  const { getStrategies } = useStrategiesStore();
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets();
+  const { setCurrentAccount } = useTreasuryAccountStore();
+  const connection = useWalletStore((s) => s.connection);
   const {
     ownVoterWeight,
     symbol,
     realm,
     toManyCommunityOutstandingProposalsForUser,
     toManyCouncilOutstandingProposalsForUse,
-  } = useRealm()
-  const router = useRouter()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const connected = useWalletStore((s) => s.connected)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  } = useRealm();
+  const router = useRouter();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const connected = useWalletStore((s) => s.connected);
+  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts);
 
   const [treasuryAccounts, setTreasuryAccounts] = useState<
     GovernedTokenAccount[]
-  >([])
+  >([]);
   const [
     activeAccount,
     setActiveAccount,
-  ] = useState<GovernedTokenAccount | null>(null)
-  const [accountInfo, setAccountInfo] = useState<any>(null)
-  const { realmInfo } = useRealm()
+  ] = useState<GovernedTokenAccount | null>(null);
+  const [accountInfo, setAccountInfo] = useState<any>(null);
+  const { realmInfo } = useRealm();
   useEffect(() => {
     if (
       tokenService._tokenList.length &&
       governedTokenAccountsWithoutNfts.filter((x) => x.mint).length
     ) {
-      getStrategies(connection)
+      getStrategies(connection);
     }
   }, [
     tokenService._tokenList.length,
     governedTokenAccountsWithoutNfts.filter((x) => x.mint).length,
-  ])
+  ]);
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      setTreasuryAccounts(governedTokenAccountsWithoutNfts)
+      setTreasuryAccounts(governedTokenAccountsWithoutNfts);
     }
-    prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
+    prepTreasuryAccounts();
+  }, [JSON.stringify(governedTokenAccountsWithoutNfts)]);
 
   useEffect(() => {
     if (treasuryAccounts.length > 0 && treasuryAccounts[0].mint) {
-      setActiveAccount(treasuryAccounts[0])
-      setCurrentAccount(treasuryAccounts[0], connection)
+      setActiveAccount(treasuryAccounts[0]);
+      setCurrentAccount(treasuryAccounts[0], connection);
     }
-  }, [treasuryAccounts])
+  }, [treasuryAccounts]);
 
-  const { totalPriceFormatted } = useTotalTreasuryPrice()
+  const { totalPriceFormatted } = useTotalTreasuryPrice();
 
   const handleChangeAccountTab = (acc) => {
     if (acc) {
-      setActiveAccount(acc)
-      setCurrentAccount(acc, connection)
+      setActiveAccount(acc);
+      setCurrentAccount(acc, connection);
     }
-  }
+  };
 
   const goToNewAccountForm = () => {
-    router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`))
-  }
+    router.push(fmtUrlWithCluster(`/dao/${symbol}${NEW_TREASURY_ROUTE}`));
+  };
 
   const canCreateGovernance = realm
     ? ownVoterWeight.canCreateGovernance(realm)
-    : null
+    : null;
   const isConnectedWithGovernanceCreationPermission =
     connected &&
     canCreateGovernance &&
     !toManyCommunityOutstandingProposalsForUser &&
-    !toManyCouncilOutstandingProposalsForUse
+    !toManyCouncilOutstandingProposalsForUse;
 
   useEffect(() => {
     if (activeAccount) {
-      const info = getTreasuryAccountItemInfo(activeAccount, governanceNfts)
-      setAccountInfo(info)
+      const info = getTreasuryAccountItemInfo(activeAccount, governanceNfts);
+      setAccountInfo(info);
     }
-  }, [activeAccount])
+  }, [activeAccount]);
 
   return (
     <>
@@ -153,10 +153,10 @@ const Treasury = () => {
                       treasuryAccounts.find((acc) => {
                         const info = getTreasuryAccountItemInfo(
                           acc,
-                          governanceNfts
-                        )
-                        return info.accountName === g
-                      })
+                          governanceNfts,
+                        );
+                        return info.accountName === g;
+                      }),
                     )
                   }
                   placeholder="Please select..."
@@ -165,8 +165,8 @@ const Treasury = () => {
                   {treasuryAccounts.map((x) => {
                     const { name } = getTreasuryAccountItemInfo(
                       x,
-                      governanceNfts
-                    )
+                      governanceNfts,
+                    );
                     return (
                       <Select.Option
                         key={x?.transferAddress?.toBase58()}
@@ -174,7 +174,7 @@ const Treasury = () => {
                       >
                         {name}
                       </Select.Option>
-                    )
+                    );
                   })}
                 </Select>
               </div>
@@ -193,7 +193,7 @@ const Treasury = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Treasury
+export default Treasury;

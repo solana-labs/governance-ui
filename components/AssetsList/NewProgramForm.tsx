@@ -1,32 +1,32 @@
-import Button from 'components/Button'
-import Input from 'components/inputs/Input'
-import PreviousRouteBtn from 'components/PreviousRouteBtn'
-import Tooltip from 'components/Tooltip'
-import useQueryContext from 'hooks/useQueryContext'
-import useRealm from 'hooks/useRealm'
-import { RpcContext } from '@solana/spl-governance'
-import { PublicKey } from '@solana/web3.js'
-import { tryParseKey } from 'tools/validators/pubkey'
-import { isFormValid } from 'utils/formValidation'
-import { getGovernanceConfig } from 'utils/GovernanceTools'
-import { notify } from 'utils/notifications'
-import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import useWalletStore from 'stores/useWalletStore'
-import * as yup from 'yup'
+import Button from 'components/Button';
+import Input from 'components/inputs/Input';
+import PreviousRouteBtn from 'components/PreviousRouteBtn';
+import Tooltip from 'components/Tooltip';
+import useQueryContext from 'hooks/useQueryContext';
+import useRealm from 'hooks/useRealm';
+import { RpcContext } from '@solana/spl-governance';
+import { PublicKey } from '@solana/web3.js';
+import { tryParseKey } from 'tools/validators/pubkey';
+import { isFormValid } from 'utils/formValidation';
+import { getGovernanceConfig } from 'utils/GovernanceTools';
+import { notify } from 'utils/notifications';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
+import useWalletStore from 'stores/useWalletStore';
+import * as yup from 'yup';
 import BaseGovernanceForm, {
   BaseGovernanceFormFields,
-} from './BaseGovernanceForm'
-import { registerProgramGovernance } from 'actions/registerProgramGovernance'
-import { GovernanceType } from '@solana/spl-governance'
-import Switch from 'components/Switch'
-import { debounce } from '@utils/debounce'
-import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+} from './BaseGovernanceForm';
+import { registerProgramGovernance } from 'actions/registerProgramGovernance';
+import { GovernanceType } from '@solana/spl-governance';
+import Switch from 'components/Switch';
+import { debounce } from '@utils/debounce';
+import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants';
+import { getProgramVersionForRealm } from '@models/registry/api';
+import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore';
 interface NewProgramForm extends BaseGovernanceFormFields {
-  programId: string
-  transferAuthority: boolean
+  programId: string;
+  transferAuthority: boolean;
 }
 
 const defaultFormValues = {
@@ -39,60 +39,60 @@ const defaultFormValues = {
   maxVotingTime: 3,
   voteThreshold: 60,
   transferAuthority: true,
-}
+};
 const NewProgramForm = () => {
-  const router = useRouter()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const router = useRouter();
+  const { fmtUrlWithCluster } = useQueryContext();
+  const client = useVoteStakeRegistryClientStore((s) => s.state.client);
   const {
     realmInfo,
     realm,
     mint: realmMint,
     symbol,
     ownVoterWeight,
-  } = useRealm()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const connected = useWalletStore((s) => s.connected)
-  const { fetchRealm } = useWalletStore((s) => s.actions)
+  } = useRealm();
+  const wallet = useWalletStore((s) => s.current);
+  const connection = useWalletStore((s) => s.connection);
+  const connected = useWalletStore((s) => s.connected);
+  const { fetchRealm } = useWalletStore((s) => s.actions);
   const [form, setForm] = useState<NewProgramForm>({
     ...defaultFormValues,
-  })
-  const [isLoading, setIsLoading] = useState(false)
-  const [formErrors, setFormErrors] = useState({})
+  });
+  const [isLoading, setIsLoading] = useState(false);
+  const [formErrors, setFormErrors] = useState({});
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
     ? ownVoterWeight.communityTokenRecord
-    : undefined
+    : undefined;
 
   const handleSetForm = ({ propertyName, value }) => {
-    setFormErrors({})
-    setForm({ ...form, [propertyName]: value })
-  }
+    setFormErrors({});
+    setForm({ ...form, [propertyName]: value });
+  };
   const handleCreate = async () => {
     try {
       if (!realm) {
-        throw 'No realm selected'
+        throw 'No realm selected';
       }
       if (!connected) {
-        throw 'Please connect your wallet'
+        throw 'Please connect your wallet';
       }
       if (!tokenOwnerRecord) {
-        throw "You don't have enough governance power to create a new program governance"
+        throw "You don't have enough governance power to create a new program governance";
       }
-      const { isValid, validationErrors } = await isFormValid(schema, form)
-      setFormErrors(validationErrors)
+      const { isValid, validationErrors } = await isFormValid(schema, form);
+      setFormErrors(validationErrors);
       if (isValid && realmMint) {
-        setIsLoading(true)
+        setIsLoading(true);
 
         const rpcContext = new RpcContext(
           new PublicKey(realm.owner.toString()),
           getProgramVersionForRealm(realmInfo!),
           wallet!,
           connection.current,
-          connection.endpoint
-        )
+          connection.endpoint,
+        );
 
         const governanceConfigValues = {
           minTokensToCreateProposal: form.minCommunityTokensToCreateProposal,
@@ -100,8 +100,8 @@ const NewProgramForm = () => {
           maxVotingTime: form.maxVotingTime,
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
-        }
-        const governanceConfig = getGovernanceConfig(governanceConfigValues)
+        };
+        const governanceConfig = getGovernanceConfig(governanceConfigValues);
         await registerProgramGovernance(
           rpcContext,
           GovernanceType.Program,
@@ -110,11 +110,11 @@ const NewProgramForm = () => {
           governanceConfig,
           form.transferAuthority,
           tokenOwnerRecord!.pubkey,
-          client
-        )
-        setIsLoading(false)
-        fetchRealm(realmInfo!.programId, realmInfo!.realmId)
-        router.push(fmtUrlWithCluster(`/dao/${symbol}/`))
+          client,
+        );
+        setIsLoading(false);
+        fetchRealm(realmInfo!.programId, realmInfo!.realmId);
+        router.push(fmtUrlWithCluster(`/dao/${symbol}/`));
       }
     } catch (e) {
       //TODO how do we present errors maybe something more generic ?
@@ -122,10 +122,10 @@ const NewProgramForm = () => {
         type: 'error',
         message: `Can't create governance`,
         description: `Transaction error ${e}`,
-      })
-      setIsLoading(false)
+      });
+      setIsLoading(false);
     }
-  }
+  };
   //if you altering this look at useEffect for form.programId
   const schema = yup.object().shape({
     programId: yup
@@ -136,44 +136,44 @@ const NewProgramForm = () => {
         async function (val: string) {
           if (val) {
             try {
-              const pubKey = tryParseKey(val)
+              const pubKey = tryParseKey(val);
               if (!pubKey) {
                 return this.createError({
                   message: `Invalid account address`,
-                })
+                });
               }
 
               const accountData = await connection.current.getParsedAccountInfo(
-                pubKey
-              )
+                pubKey,
+              );
               if (!accountData || !accountData.value) {
                 return this.createError({
                   message: `Account not found`,
-                })
+                });
               }
-              return true
+              return true;
             } catch (e) {
               return this.createError({
                 message: `Invalid account address`,
-              })
+              });
             }
           } else {
             return this.createError({
               message: `Program id is required`,
-            })
+            });
           }
-        }
+        },
       ),
-  })
+  });
   useEffect(() => {
     if (form.programId) {
       //now validation contains only programId if more fields come it would be good to reconsider this method.
       debounce.debounceFcn(async () => {
-        const { validationErrors } = await isFormValid(schema, form)
-        setFormErrors(validationErrors)
-      })
+        const { validationErrors } = await isFormValid(schema, form);
+        setFormErrors(validationErrors);
+      });
     }
-  }, [form.programId])
+  }, [form.programId]);
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />
@@ -226,7 +226,7 @@ const NewProgramForm = () => {
         </Tooltip>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default NewProgramForm
+export default NewProgramForm;

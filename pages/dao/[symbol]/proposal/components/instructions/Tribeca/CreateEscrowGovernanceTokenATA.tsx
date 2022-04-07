@@ -1,14 +1,14 @@
-import * as yup from 'yup'
-import { Wallet } from '@project-serum/common'
-import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder'
+import * as yup from 'yup';
+import { Wallet } from '@project-serum/common';
+import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import {
   getTribecaLocker,
   getTribecaPrograms,
-} from '@tools/sdk/tribeca/configurations'
-import { createEscrowATAInstruction } from '@tools/sdk/tribeca/instructions/createEscrowSaberATAInstruction'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
-import { TribecaCreateEscrowGovernanceTokenATAForm } from '@utils/uiTypes/proposalCreationTypes'
-import GovernorSelect from './GovernorSelect'
+} from '@tools/sdk/tribeca/configurations';
+import { createEscrowATAInstruction } from '@tools/sdk/tribeca/instructions/createEscrowSaberATAInstruction';
+import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { TribecaCreateEscrowGovernanceTokenATAForm } from '@utils/uiTypes/proposalCreationTypes';
+import GovernorSelect from './GovernorSelect';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -19,14 +19,14 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Tribeca Configuration governor is required'),
-})
+});
 
 const CreateEscrowGovernanceATA = ({
   index,
   governedAccount,
 }: {
-  index: number
-  governedAccount?: GovernedMultiTypeAccount
+  index: number;
+  governedAccount?: GovernedMultiTypeAccount;
 }) => {
   const {
     connection,
@@ -49,14 +49,14 @@ const CreateEscrowGovernanceATA = ({
         connection,
         wallet: wallet as Wallet,
         config: form.tribecaConfiguration!,
-      })
+      });
       const lockerData = await getTribecaLocker({
         config: form.tribecaConfiguration!,
         programs,
-      })
+      });
       // FIXME: does not pass this check without refreshing the form
       if (!lockerData) {
-        throw new Error('Error initializing Tribeca configuration')
+        throw new Error('Error initializing Tribeca configuration');
       }
 
       return createEscrowATAInstruction({
@@ -64,13 +64,13 @@ const CreateEscrowGovernanceATA = ({
         lockerData,
         payer: wallet.publicKey!,
         authority: governedAccountPubkey,
-      })
+      });
     },
-  })
+  });
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
-    return <>This instruction does not support {connection.cluster}</>
+    return <>This instruction does not support {connection.cluster}</>;
   }
 
   return (
@@ -80,7 +80,7 @@ const CreateEscrowGovernanceATA = ({
         handleSetForm({ propertyName: 'tribecaConfiguration', value })
       }
     />
-  )
-}
+  );
+};
 
-export default CreateEscrowGovernanceATA
+export default CreateEscrowGovernanceATA;

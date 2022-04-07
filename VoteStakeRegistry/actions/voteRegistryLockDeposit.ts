@@ -3,15 +3,15 @@ import {
   PublicKey,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { RpcContext, TOKEN_PROGRAM_ID } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
+} from '@solana/web3.js';
+import { RpcContext, TOKEN_PROGRAM_ID } from '@solana/spl-governance';
+import { sendTransaction } from 'utils/send';
 
-import { BN } from '@project-serum/anchor'
-import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit'
-import { getPeriod } from 'VoteStakeRegistry/tools/deposits'
+import { BN } from '@project-serum/anchor';
+import { LockupType } from 'VoteStakeRegistry/sdk/accounts';
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
+import { withCreateNewDeposit } from '../sdk/withCreateNewDeposit';
+import { getPeriod } from 'VoteStakeRegistry/tools/deposits';
 
 export const voteRegistryLockDeposit = async ({
   rpcContext,
@@ -28,33 +28,33 @@ export const voteRegistryLockDeposit = async ({
   sourceTokenAccount,
   communityMintPk,
 }: {
-  rpcContext: RpcContext
-  mintPk: PublicKey
-  realmPk: PublicKey
-  programId: PublicKey
+  rpcContext: RpcContext;
+  mintPk: PublicKey;
+  realmPk: PublicKey;
+  programId: PublicKey;
   //amount that will be taken from vote registry deposit
-  amountFromVoteRegistryDeposit: BN
-  totalTransferAmount: BN
-  lockUpPeriodInDays: number
-  lockupKind: LockupType
-  sourceDepositIdx: number
-  tokenOwnerRecordPk: PublicKey | null
-  sourceTokenAccount: PublicKey
-  communityMintPk: PublicKey
-  client?: VsrClient
+  amountFromVoteRegistryDeposit: BN;
+  totalTransferAmount: BN;
+  lockUpPeriodInDays: number;
+  lockupKind: LockupType;
+  sourceDepositIdx: number;
+  tokenOwnerRecordPk: PublicKey | null;
+  sourceTokenAccount: PublicKey;
+  communityMintPk: PublicKey;
+  client?: VsrClient;
 }) => {
-  const signers: Keypair[] = []
-  const { wallet, connection } = rpcContext
+  const signers: Keypair[] = [];
+  const { wallet, connection } = rpcContext;
   if (!client) {
-    throw 'no vote registry plugin'
+    throw 'no vote registry plugin';
   }
   if (!wallet.publicKey) {
-    throw 'no wallet connected'
+    throw 'no wallet connected';
   }
   const fromWalletTransferAmount = totalTransferAmount.sub(
-    amountFromVoteRegistryDeposit
-  )
-  const instructions: TransactionInstruction[] = []
+    amountFromVoteRegistryDeposit,
+  );
+  const instructions: TransactionInstruction[] = [];
   const {
     depositIdx,
     voter,
@@ -71,7 +71,7 @@ export const voteRegistryLockDeposit = async ({
     lockupKind,
     communityMintPk,
     client,
-  })
+  });
 
   if (!amountFromVoteRegistryDeposit.isZero()) {
     const internalTransferUnlockedInstruction = client?.program.instruction.internalTransferUnlocked(
@@ -84,10 +84,10 @@ export const voteRegistryLockDeposit = async ({
           voter: voter,
           voterAuthority: wallet!.publicKey,
         },
-      }
-    )
+      },
+    );
 
-    instructions.push(internalTransferUnlockedInstruction)
+    instructions.push(internalTransferUnlockedInstruction);
   }
 
   if (!fromWalletTransferAmount.isZero() && !fromWalletTransferAmount.isNeg()) {
@@ -103,13 +103,13 @@ export const voteRegistryLockDeposit = async ({
           depositAuthority: wallet!.publicKey!,
           tokenProgram: TOKEN_PROGRAM_ID,
         },
-      }
-    )
-    instructions.push(depositInstruction)
+      },
+    );
+    instructions.push(depositInstruction);
   }
 
   if (!amountFromVoteRegistryDeposit.isZero()) {
-    const period = getPeriod(lockUpPeriodInDays, lockupKind)
+    const period = getPeriod(lockUpPeriodInDays, lockupKind);
     const resetLockup = client?.program.instruction.resetLockup(
       depositIdx,
       { [lockupKind]: {} },
@@ -120,14 +120,14 @@ export const voteRegistryLockDeposit = async ({
           voter: voter,
           voterAuthority: wallet!.publicKey,
         },
-      }
-    )
+      },
+    );
 
-    instructions.push(resetLockup)
+    instructions.push(resetLockup);
   }
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+  const transaction = new Transaction();
+  transaction.add(...instructions);
 
   await sendTransaction({
     transaction,
@@ -136,5 +136,5 @@ export const voteRegistryLockDeposit = async ({
     signers,
     sendingMessage: `Depositing`,
     successMessage: `Deposit successful`,
-  })
-}
+  });
+};

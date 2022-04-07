@@ -1,13 +1,13 @@
-import { FunctionComponent, useEffect, useState } from 'react'
-import tw from 'twin.macro'
-import styled from '@emotion/styled'
-import Slider from 'rc-slider'
-import 'rc-slider/assets/index.css'
+import { FunctionComponent, useEffect, useState } from 'react';
+import tw from 'twin.macro';
+import styled from '@emotion/styled';
+import Slider from 'rc-slider';
+import 'rc-slider/assets/index.css';
 
 type StyledSliderProps = {
-  enableTransition?: boolean
-  disabled?: boolean
-}
+  enableTransition?: boolean;
+  disabled?: boolean;
+};
 
 const StyledSlider = styled(Slider)<StyledSliderProps>`
   .rc-slider-rail {
@@ -53,16 +53,16 @@ const StyledSlider = styled(Slider)<StyledSliderProps>`
   }
 
   ${({ disabled }) => disabled && 'background-color: transparent'}
-`
+`;
 
 const StyledSliderButtonWrapper = styled.div`
   ${tw`absolute left-0 top-4 w-full`}
-`
+`;
 
 type StyledSliderButtonProps = {
-  styleValue: number
-  sliderValue: number
-}
+  styleValue: number;
+  sliderValue: number;
+};
 
 const StyledSliderButton = styled.button<StyledSliderButtonProps>`
   ${tw`bg-none font-display transition-all duration-300 hover:text-primary-light focus:outline-none`}
@@ -97,16 +97,16 @@ const StyledSliderButton = styled.button<StyledSliderButtonProps>`
   ${({ styleValue, sliderValue }) =>
     styleValue === sliderValue && tw`animate-pulse text-primary-light`}
   ${({ disabled }) => disabled && 'cursor: default'}
-`
+`;
 
 type SliderProps = {
-  onChange: (...args: any[]) => any
-  step: number
-  value: number
-  disabled: boolean
-  max?: number
-  maxButtonTransition?: boolean
-}
+  onChange: (...args: any[]) => any;
+  step: number;
+  value: number;
+  disabled: boolean;
+  max?: number;
+  maxButtonTransition?: boolean;
+};
 
 const AmountSlider: FunctionComponent<SliderProps> = ({
   onChange,
@@ -116,27 +116,27 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
   max,
   maxButtonTransition,
 }) => {
-  const [enableTransition, setEnableTransition] = useState(false)
+  const [enableTransition, setEnableTransition] = useState(false);
 
   useEffect(() => {
     if (maxButtonTransition) {
-      setEnableTransition(true)
+      setEnableTransition(true);
     }
-  }, [maxButtonTransition])
+  }, [maxButtonTransition]);
 
   useEffect(() => {
     if (enableTransition) {
       const transitionTimer = setTimeout(() => {
-        setEnableTransition(false)
-      }, 500)
-      return () => clearTimeout(transitionTimer)
+        setEnableTransition(false);
+      }, 500);
+      return () => clearTimeout(transitionTimer);
     }
-  }, [enableTransition])
+  }, [enableTransition]);
 
   const handleSliderButtonClick = (value) => {
-    onChange(value)
-    setEnableTransition(true)
-  }
+    onChange(value);
+    setEnableTransition(true);
+  };
 
   return (
     <div className="relative">
@@ -192,7 +192,7 @@ const AmountSlider: FunctionComponent<SliderProps> = ({
         </StyledSliderButton>
       </StyledSliderButtonWrapper>
     </div>
-  )
-}
+  );
+};
 
-export default AmountSlider
+export default AmountSlider;

@@ -1,16 +1,16 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo } from 'react';
 
-import useWalletStore from '../stores/useWalletStore'
-import { notify } from '../utils/notifications'
+import useWalletStore from '../stores/useWalletStore';
+import { notify } from '../utils/notifications';
 import {
   DEFAULT_PROVIDER,
   getWalletProviderByUrl,
-} from '../utils/wallet-adapters'
+} from '../utils/wallet-adapters';
 
-import useInterval from './useInterval'
-import useLocalStorageState from './useLocalStorageState'
+import useInterval from './useInterval';
+import useLocalStorageState from './useLocalStorageState';
 
-const SECONDS = 1000
+const SECONDS = 1000;
 
 export default function useWallet() {
   const {
@@ -20,63 +20,63 @@ export default function useWallet() {
     providerUrl: selectedProviderUrl,
     set: setWalletStore,
     actions,
-  } = useWalletStore((state) => state)
+  } = useWalletStore((state) => state);
 
   const [savedProviderUrl, setSavedProviderUrl] = useLocalStorageState(
     'walletProvider',
-    DEFAULT_PROVIDER.url
-  )
+    DEFAULT_PROVIDER.url,
+  );
 
   // initialize selection from local storage
   useEffect(() => {
     if (!selectedProviderUrl) {
       setWalletStore((s) => {
-        s.providerUrl = savedProviderUrl
-      })
+        s.providerUrl = savedProviderUrl;
+      });
     }
-  }, [selectedProviderUrl, savedProviderUrl])
+  }, [selectedProviderUrl, savedProviderUrl]);
 
   const provider = useMemo(() => getWalletProviderByUrl(selectedProviderUrl), [
     selectedProviderUrl,
-  ])
+  ]);
 
   // save selection in local storage
   useEffect(() => {
     if (selectedProviderUrl && selectedProviderUrl != savedProviderUrl) {
-      setSavedProviderUrl(selectedProviderUrl)
+      setSavedProviderUrl(selectedProviderUrl);
     }
-  }, [selectedProviderUrl])
+  }, [selectedProviderUrl]);
 
   useEffect(() => {
     if (provider) {
       const updateWallet = () => {
         // hack to also update wallet synchronously in case it disconnects
-        const wallet = provider.adapter
+        const wallet = provider.adapter;
         setWalletStore((state) => {
-          state.current = wallet
-        })
-      }
+          state.current = wallet;
+        });
+      };
 
       if (document.readyState !== 'complete') {
         // wait to ensure that browser extensions are loaded
         const listener = () => {
-          updateWallet()
-          window.removeEventListener('load', listener)
-        }
-        window.addEventListener('load', listener)
-        return () => window.removeEventListener('load', listener)
+          updateWallet();
+          window.removeEventListener('load', listener);
+        };
+        window.addEventListener('load', listener);
+        return () => window.removeEventListener('load', listener);
       } else {
-        updateWallet()
+        updateWallet();
       }
     }
-  }, [provider, connection])
+  }, [provider, connection]);
 
   useEffect(() => {
-    if (!wallet) return
+    if (!wallet) return;
     wallet.on('connect', async () => {
       setWalletStore((state) => {
-        state.connected = true
-      })
+        state.connected = true;
+      });
       notify({
         message: 'Wallet connected',
         description:
@@ -84,40 +84,40 @@ export default function useWallet() {
           wallet!.publicKey!.toString().substr(0, 5) +
           '...' +
           wallet!.publicKey!.toString().substr(-5),
-      })
-      await actions.fetchWalletTokenAccounts()
-      await actions.fetchOwnVoteRecords()
-    })
+      });
+      await actions.fetchWalletTokenAccounts();
+      await actions.fetchOwnVoteRecords();
+    });
     wallet.on('disconnect', () => {
       setWalletStore((state) => {
-        state.connected = false
-        state.tokenAccounts = []
-      })
+        state.connected = false;
+        state.tokenAccounts = [];
+      });
       notify({
         type: 'info',
         message: 'Disconnected from wallet',
-      })
-    })
+      });
+    });
     return () => {
-      wallet?.disconnect?.()
+      wallet?.disconnect?.();
       setWalletStore((state) => {
-        state.connected = false
-      })
-    }
-  }, [wallet])
+        state.connected = false;
+      });
+    };
+  }, [wallet]);
 
   // fetch on page load
   useEffect(() => {
     const pageLoad = async () => {
-      console.log('pageLoad')
-    }
-    pageLoad()
-  }, [])
+      console.log('pageLoad');
+    };
+    pageLoad();
+  }, []);
 
   // refresh regularly
   useInterval(async () => {
-    console.log('refresh')
-  }, 10 * SECONDS)
+    console.log('refresh');
+  }, 10 * SECONDS);
 
-  return { connected, wallet }
+  return { connected, wallet };
 }

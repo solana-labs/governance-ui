@@ -3,13 +3,13 @@ import {
   PublicKey,
   Transaction,
   TransactionInstruction,
-} from '@solana/web3.js'
-import { RpcContext } from '@solana/spl-governance'
-import { sendTransaction } from 'utils/send'
+} from '@solana/web3.js';
+import { RpcContext } from '@solana/spl-governance';
+import { sendTransaction } from 'utils/send';
 
-import { BN } from '@project-serum/anchor'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { withVoteRegistryDeposit } from '../sdk/withVoteRegistryDeposit'
+import { BN } from '@project-serum/anchor';
+import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client';
+import { withVoteRegistryDeposit } from '../sdk/withVoteRegistryDeposit';
 
 export const voteRegistryDepositWithoutLockup = async ({
   rpcContext,
@@ -22,22 +22,22 @@ export const voteRegistryDepositWithoutLockup = async ({
   tokenOwnerRecordPk,
   client,
 }: {
-  rpcContext: RpcContext
+  rpcContext: RpcContext;
   //from where we deposit our founds
-  fromPk: PublicKey
-  mintPk: PublicKey
-  communityMintPk: PublicKey
-  realmPk: PublicKey
-  programId: PublicKey
-  amount: BN
-  tokenOwnerRecordPk: PublicKey | null
-  client?: VsrClient
+  fromPk: PublicKey;
+  mintPk: PublicKey;
+  communityMintPk: PublicKey;
+  realmPk: PublicKey;
+  programId: PublicKey;
+  amount: BN;
+  tokenOwnerRecordPk: PublicKey | null;
+  client?: VsrClient;
 }) => {
-  const lockUpPeriodInDays = 0
-  const lockupKind = 'none'
-  const signers: Keypair[] = []
-  const { wallet, connection } = rpcContext
-  const instructions: TransactionInstruction[] = []
+  const lockUpPeriodInDays = 0;
+  const lockupKind = 'none';
+  const signers: Keypair[] = [];
+  const { wallet, connection } = rpcContext;
+  const instructions: TransactionInstruction[] = [];
   await withVoteRegistryDeposit({
     instructions,
     walletPk: rpcContext.walletPubkey,
@@ -51,10 +51,10 @@ export const voteRegistryDepositWithoutLockup = async ({
     communityMintPk,
     lockupKind,
     client,
-  })
+  });
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+  const transaction = new Transaction();
+  transaction.add(...instructions);
 
   await sendTransaction({
     transaction,
@@ -63,5 +63,5 @@ export const voteRegistryDepositWithoutLockup = async ({
     signers,
     sendingMessage: `Depositing`,
     successMessage: `Deposit successful`,
-  })
-}
+  });
+};
