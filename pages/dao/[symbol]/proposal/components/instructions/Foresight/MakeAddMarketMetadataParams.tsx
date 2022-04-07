@@ -59,8 +59,8 @@ const MakeAddMarketMetadataParams = ({
   return (
     <>
       {governedAccountSelect}
-      <ForesightMarketIdInput {...inputProps} />
       <ForesightMarketListIdInput {...inputProps} />
+      <ForesightMarketIdInput {...inputProps} />
       <ForesightContentInput {...inputProps} />
       <ForesightMarketMetadataFieldSelect {...inputProps} />
     </>
