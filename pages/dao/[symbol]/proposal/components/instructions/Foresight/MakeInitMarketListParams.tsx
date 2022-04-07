@@ -33,7 +33,8 @@ const MakeInitMarketListParams = ({
     const { ix } = await foresightGov.genInitMarketListIx(
       Buffer.from(form.marketListId.padEnd(20)),
       program,
-      wallet!.publicKey!
+      wallet!.publicKey!,
+      form.governedAccount.transferAddress!
     )
     return ix
   }
