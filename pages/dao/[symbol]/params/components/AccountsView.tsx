@@ -1,6 +1,6 @@
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AccountType } from 'stores/useGovernanceAssetsStore'
-import { DisplayField } from '../index'
+import { AddressField } from '../index'
 
 const AccountsView = ({ activeGovernance, getYesNoString }) => {
   return (
@@ -14,13 +14,13 @@ const AccountsView = ({ activeGovernance, getYesNoString }) => {
                 className="bg-bkg-1 p-4 pb-2 rounded-md"
                 key={x.pubkey.toBase58()}
               >
-                <DisplayField bg={false} label="Name" val={info.name} />
-                <DisplayField
+                <AddressField bg={false} label="Name" val={info.name} />
+                <AddressField
                   bg={false}
                   label="Address"
                   val={x.extensions?.transferAddress?.toBase58()}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Balance"
                   val={
@@ -34,13 +34,13 @@ const AccountsView = ({ activeGovernance, getYesNoString }) => {
                     </div>
                   }
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Type"
                   val={AccountType[x.type]}
                 />
                 {x.type !== AccountType.SOL && (
-                  <DisplayField
+                  <AddressField
                     label="Mint"
                     bg={false}
                     val={x.extensions.mint?.publicKey.toBase58()}
@@ -56,12 +56,12 @@ const AccountsView = ({ activeGovernance, getYesNoString }) => {
                 className="bg-bkg-1 p-4 pb-2 rounded-md"
                 key={x.pubkey.toBase58()}
               >
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Type"
                   val={AccountType[x.type]}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Address"
                   val={x.extensions?.transferAddress?.toBase58()}
@@ -75,38 +75,38 @@ const AccountsView = ({ activeGovernance, getYesNoString }) => {
                 className="bg-bkg-1 p-4 pb-2 rounded-md"
                 key={x.pubkey.toBase58()}
               >
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Type"
                   val={AccountType[x.type]}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Pubkey"
                   val={x.extensions.mint?.publicKey.toBase58()}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Decimals"
                   val={x.extensions.mint?.account.decimals}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Mint Authority"
                   val={x.extensions.mint?.account.mintAuthority?.toBase58()}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Supply"
                   val={x.extensions.mint?.account.supply.toNumber()}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Is Initialized"
                   val={getYesNoString(x.extensions.mint?.account.isInitialized)}
                 />
                 {x.extensions.mint?.account.freezeAuthority ? (
-                  <DisplayField
+                  <AddressField
                     bg={false}
                     label="Freeze Authority"
                     val={x.extensions.mint?.account.freezeAuthority?.toBase58()}
@@ -121,12 +121,12 @@ const AccountsView = ({ activeGovernance, getYesNoString }) => {
                 className="bg-bkg-1 p-4 pb-2 rounded-md"
                 key={x.pubkey.toBase58()}
               >
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Type"
                   val={AccountType[x.type]}
                 />
-                <DisplayField
+                <AddressField
                   bg={false}
                   label="Pubkey"
                   val={x.pubkey.toBase58()}

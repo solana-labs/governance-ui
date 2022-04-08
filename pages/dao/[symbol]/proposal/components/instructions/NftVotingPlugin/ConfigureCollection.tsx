@@ -10,9 +10,7 @@ import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
-import { GovernedTokenAccount } from '@utils/tokens'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { NewProposalContext } from '../../../new'
 import InstructionForm, {
@@ -26,9 +24,11 @@ import {
 } from 'NftVotePlugin/sdk/accounts'
 import { getValidatedPublickKey } from '@utils/validations'
 import { getMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
+import { AssetAccount } from '@utils/uiTypes/assets'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 interface ConfigureCollectionForm {
-  governedAccount: GovernedTokenAccount | undefined
+  governedAccount: AssetAccount | undefined
   weight: number
   size: number
   collection: string
@@ -43,7 +43,7 @@ const ConfigureNftPluginCollection = ({
 }) => {
   const { realm, mint } = useRealm()
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<ConfigureCollectionForm>()
@@ -54,7 +54,7 @@ const ConfigureNftPluginCollection = ({
     let serializedInstruction = ''
     if (
       isValid &&
-      form!.governedAccount?.governance?.account &&
+      form!.governedAccount?.governance.pubkey &&
       wallet?.publicKey
     ) {
       const weight = getMintNaturalAmountFromDecimalAsBN(
@@ -135,7 +135,7 @@ const ConfigureNftPluginCollection = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned,
       governance: governance,
-      options: governedMultiTypeAccounts.filter(
+      options: assetAccounts.filter(
         (x) =>
           x.governance.pubkey.toBase58() ===
           realm?.account.authority?.toBase58()

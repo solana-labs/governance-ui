@@ -6,7 +6,7 @@ import {
 } from 'VoteStakeRegistry/tools/dateTools'
 import Button from '@components/Button'
 import { VoteTipping } from '@solana/spl-governance'
-import { DisplayField } from '../index'
+import { AddressField, NumberField } from '../index'
 
 const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
   const { realm, mint, councilMint, ownVoterWeight } = useRealm()
@@ -20,9 +20,9 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
         <>
           {realmAccount?.authority?.toBase58() ===
             activeGovernance.pubkey.toBase58() && (
-            <DisplayField label="Realm Authority" padding val={'Yes'} />
+            <AddressField label="Realm Authority" padding val={'Yes'} />
           )}
-          <DisplayField
+          <AddressField
             label="Max Voting Time"
             padding
             val={getFormattedStringFromDays(
@@ -30,7 +30,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             )}
           />
           {communityMint && (
-            <DisplayField
+            <AddressField
               label="Min community tokens to create a proposal"
               padding
               val={fmtMintAmount(
@@ -41,7 +41,7 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
             />
           )}
           {councilMint && (
-            <DisplayField
+            <AddressField
               label="Min council tokens to create a proposal"
               padding
               val={fmtMintAmount(
@@ -50,23 +50,23 @@ const ParamsView = ({ activeGovernance, openGovernanceProposalModal }) => {
               )}
             />
           )}
-          <DisplayField
+          <NumberField
             label="Min Instruction Holdup Time"
             padding
             val={activeGovernance.account.config.minInstructionHoldUpTime}
           />
           {/* NOT NEEDED RIGHT NOW */}
-          {/* <DisplayField
+          {/* <AddressField
           label="Proposal Cool-off Time"
           padding
           val={activeGovernance.account.config.proposalCoolOffTime}
           /> */}
-          <DisplayField
+          <AddressField
             label="Vote Threshold Percentage"
             padding
             val={`${activeGovernance.account.config.voteThresholdPercentage.value}%`}
           />
-          <DisplayField
+          <AddressField
             label="Vote Tipping"
             padding
             val={

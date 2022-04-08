@@ -1,16 +1,16 @@
-import { DisplayField } from '../index'
+import { AddressField, NumberField } from '../index'
 
 const StatsView = ({ activeGovernance }) => {
   return (
     <div>
       {activeGovernance && (
         <>
-          <DisplayField
+          <AddressField
             label="Proposals Count"
             padding
             val={activeGovernance.account.proposalCount}
           />
-          <DisplayField
+          <NumberField
             label="Voting Proposals Count"
             padding
             val={activeGovernance.account.votingProposalCount}

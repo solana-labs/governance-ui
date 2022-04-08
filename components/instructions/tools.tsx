@@ -108,7 +108,22 @@ export const ACCOUNT_NAMES = {
   '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
   Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
     'ClubDAO Main NFT Treasury Vault',
+
+  //MonkeDAO
   Cb4uLreZRcb7kbu6gbsGJp2xjnU5K25MDZbvFknBFyqU: 'ClubDAO NMBC Royalties Vault',
+  '9Z6x8sVq78saCddcveTSmQWFHCS9vaMS7eoeQMrGMUXw': 'Luna Holdings',
+  DKdBj8KF9sieWq2XWkZVnRPyDrw9PwAHinkCMvjAkRdZ: "MonkeDAO NFT's",
+  EdNP7sERADU525E9bov6YdfL3oK3idnRTMdKUh2J7FCM:
+    'SMB SOL Royalty Treasury Holdings',
+  '5bAHkmagXYJzjzxYPDht7AVZRxjiJ6r12NQU3L67bkTr': 'SMB USDC Royalty Holdings',
+  CYLSMKuMiDFNg4eDrZdaaWYCJedsLMAEQgUCtnoUq4n1:
+    'Primary USDC Treasury Holdings',
+  '2qhApGpizKoCyw45oho8Z4F7c14Es4tKvHmBuTnCqubn':
+    'Primary SOL Treasury Holdings',
+  J45sC6ow6u2cXZU8tvewC548CcFiU6VGnFpnxW71WNgm: 'GG SHDW Tokens',
+  wpSyytRSgo1b5RE6PYT9GMWubdq6EdbGC8PEbcz4Kff: 'DAOPool Fee Collection',
+  xuEfu6gmCn1RSXSAVpWLTYttx685m9rAbzqwwYUjYXJ: 'DAOJones Fractionalized Tokens',
+  GQDFqZ7URyWAiPMQs4ywZ9pKBqrUg4srdkqnZpRUstQz: 'Merch Escrow Holdings',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -142,6 +157,19 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 )
 
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
+
+const HIDDEN_MNGO_TREASURES = [
+  'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
+  'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
+  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
+  'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
+  'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
+  '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
+  '4Z8nAK9grjokaUqJNtw2AEkYAR1vcw8pkCWZcbVEEdh5',
+  'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
+]
+
+export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
 
 export interface AccountDescriptor {
   name: string

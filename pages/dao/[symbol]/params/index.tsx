@@ -9,7 +9,6 @@ import Tabs from '@components/Tabs'
 import Select from '@components/inputs/Select'
 import Button from '@components/Button'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 import RealmConfigModal from './RealmConfigModal'
 import GovernanceConfigModal from './GovernanceConfigModal'
@@ -25,14 +24,13 @@ import StatsView from './components/StatsView'
 const Params = () => {
   const { realm, mint } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const { canUseAuthorityInstruction } = useGovernanceAssets()
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  const governedAccounts = useGovernanceAssetsStore((s) => s.governedAccounts)
+  const { canUseAuthorityInstruction, assetAccounts } = useGovernanceAssets()
+  const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
   const loadGovernedAccounts = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
 
-  const realmAuthorityGovernance = governedMultiTypeAccounts.find(
+  const realmAuthorityGovernance = assetAccounts.find(
     (x) =>
       x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
@@ -77,10 +75,10 @@ const Params = () => {
   }
 
   useEffect(() => {
-    if (governedAccounts.length > 0) {
-      setActiveGovernance(governedAccounts[0])
+    if (governancesArray.length > 0) {
+      setActiveGovernance(governancesArray[0])
     }
-  }, [governedAccounts])
+  }, [governancesArray])
   return (
     <div className="grid grid-cols-12 gap-4">
       {isRealmProposalModalOpen && (
@@ -116,30 +114,30 @@ const Params = () => {
             <>
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
                 <h2>Addresses</h2>
-                <DisplayField
+                <AddressField
                   padding
                   label="Pubkey"
                   val={realm?.pubkey.toBase58()}
                 />
-                <DisplayField
+                <AddressField
                   padding
                   label="Authority"
                   val={realmAccount?.authority?.toBase58()}
                 />
-                <DisplayField
+                <AddressField
                   padding
                   label="Owner"
                   val={realm?.owner.toBase58()}
                 />
                 {communityMint && (
-                  <DisplayField
+                  <AddressField
                     padding
                     label="Community Mint"
                     val={communityMint}
                   />
                 )}
                 {councilMintPk && (
-                  <DisplayField
+                  <AddressField
                     padding
                     label="Council Mint"
                     val={councilMintPk}
@@ -160,13 +158,13 @@ const Params = () => {
               <div className="border border-fgd-4 col-span-1 p-4 rounded-md">
                 <h2 className="flex items-center">Config </h2>
                 {communityMintMaxVoteWeightSource && (
-                  <DisplayField
+                  <AddressField
                     padding
                     label="Community mint max vote weight source"
                     val={`${communityMintMaxVoteWeightSource.fmtSupplyFractionPercentage()}%`}
                   />
                 )}
-                <DisplayField
+                <AddressField
                   padding
                   label="Min community tokens to create governance"
                   val={
@@ -177,14 +175,14 @@ const Params = () => {
                     )
                   }
                 />
-                <DisplayField
+                <AddressField
                   padding
                   label="Use community voter weight add-in"
                   val={getYesNoString(
                     realmConfig?.useCommunityVoterWeightAddin
                   )}
                 />
-                <DisplayField
+                <AddressField
                   padding
                   label="Use max community voter weight add-in"
                   val={getYesNoString(
@@ -222,13 +220,13 @@ const Params = () => {
                 label={'Governances'}
                 onChange={(g) =>
                   setActiveGovernance(
-                    governedAccounts.find((acc) => acc.pubkey.toBase58() === g)
+                    governancesArray.find((acc) => acc.pubkey.toBase58() === g)
                   )
                 }
                 placeholder="Please select..."
                 value={activeGovernance?.pubkey.toBase58()}
               >
-                {governedAccounts.map((x) => {
+                {governancesArray.map((x) => {
                   return (
                     <Select.Option
                       key={x.pubkey.toBase58()}
@@ -241,11 +239,11 @@ const Params = () => {
               </Select>
             </div>
             <div className="hidden lg:block lg:col-span-4">
-              <h3 className="mb-4">{governedAccounts.length} Governances</h3>
+              <h3 className="mb-4">{governancesArray.length} Governances</h3>
               <GovernedAccountsTabs
                 activeTab={activeGovernance}
                 onChange={(g) => setActiveGovernance(g)}
-                tabs={governedAccounts}
+                tabs={governancesArray}
               />
             </div>
             {activeGovernance ? (
@@ -253,7 +251,11 @@ const Params = () => {
                 <h3 className="break-all mb-4">
                   {activeGovernance.pubkey.toBase58()}
                 </h3>
-                {activeGovernance.accounts.length > 0 ? (
+                {assetAccounts.filter(
+                  (x) =>
+                    x.governance.pubkey.toBase58() ===
+                    activeGovernance.pubkey.toBase58()
+                ).length > 0 ? (
                   <Tabs
                     activeTab={activeTab}
                     onChange={(t) => setActiveTab(t)}
@@ -286,7 +288,7 @@ const Params = () => {
   )
 }
 
-export const DisplayField = ({ label, val, padding = false, bg = false }) => {
+export const AddressField = ({ label, val, padding = false, bg = false }) => {
   const pubkey = tryParsePublicKey(val)
   const name = pubkey ? getAccountName(pubkey) : ''
   return (
@@ -305,6 +307,27 @@ export const DisplayField = ({ label, val, padding = false, bg = false }) => {
         ) : (
           <div>{val}</div>
         )}
+      </div>
+    </div>
+  )
+}
+
+//Only displays number
+export const NumberField = ({
+  label,
+  val = 0,
+  padding = false,
+  bg = false,
+}) => {
+  return (
+    <div
+      className={`flex flex-col mb-2 ${bg ? 'bg-bkg-1' : ''} ${
+        padding ? 'py-1' : ''
+      }`}
+    >
+      <div className="text-xs text-fgd-3">{capitalize(label)}</div>
+      <div className="text-sm break-all">
+        <div>{val}</div>
       </div>
     </div>
   )

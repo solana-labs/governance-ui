@@ -1,24 +1,17 @@
 import { GovernanceAccountType } from '@solana/spl-governance'
-import { MintInfo } from '@solana/spl-token'
-import {
-  getMultipleAccountInfoChunked,
-  GovernedMintInfoAccount,
-  parseMintAccountData,
-} from '@utils/tokens'
+import { AccountType, AssetAccount } from '@utils/uiTypes/assets'
 import { Instructions } from '@utils/uiTypes/proposalCreationTypes'
-
-import useWalletStore from 'stores/useWalletStore'
-
-import useRealm from './useRealm'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import useRealm from './useRealm'
 import { vsrPluginsPks } from './useVotingPlugins'
 
 export default function useGovernanceAssets() {
   const { ownVoterWeight, realm, symbol, governances, config } = useRealm()
-  const connection = useWalletStore((s) => s.connection.current)
-  const governedTokenAccounts = useGovernanceAssetsStore(
+  const governedTokenAccounts: AssetAccount[] = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const assetAccounts = useGovernanceAssetsStore((s) => s.assetAccounts)
+
   const currentPluginPk = config?.account.communityVoterWeightAddin
   const governancesArray = useGovernanceAssetsStore((s) => s.governancesArray)
 
@@ -98,43 +91,24 @@ export default function useGovernanceAssets() {
   const getAvailableInstructions = () => {
     return availableInstructions.filter((itx) => itx.isVisible)
   }
-  async function getMintWithGovernances() {
-    const mintGovernances = getGovernancesByAccountTypes([
-      GovernanceAccountType.MintGovernanceV1,
-      GovernanceAccountType.MintGovernanceV2,
-    ])
-    const governedMintInfoAccounts: GovernedMintInfoAccount[] = []
-    const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
-      connection,
-      mintGovernances.map((x) => x.account.governedAccount)
-    )
-    mintGovernancesMintInfo.forEach((mintAccountInfo, index) => {
-      const governance = mintGovernances[index]
-      if (!mintAccountInfo) {
-        throw new Error(
-          `Missing mintAccountInfo for: ${governance.pubkey.toBase58()}`
-        )
-      }
-      const data = Buffer.from(mintAccountInfo.data)
-      const parsedMintInfo = parseMintAccountData(data) as MintInfo
-      const obj = {
-        governance,
-        mintInfo: parsedMintInfo,
-      }
-      governedMintInfoAccounts.push(obj)
-    })
-    return governedMintInfoAccounts
-  }
   const governedTokenAccountsWithoutNfts = governedTokenAccounts.filter(
-    (x) => !x.isNft
+    (x) => x.type !== AccountType.NFT
   )
   const nftsGovernedTokenAccounts = governedTokenAccounts.filter(
-    (govTokenAcc) => govTokenAcc.isNft
+    (govTokenAcc) =>
+      govTokenAcc.type === AccountType.NFT ||
+      govTokenAcc.type === AccountType.SOL
   )
   const canUseTokenTransferInstruction = governedTokenAccountsWithoutNfts.some(
-    (acc) =>
-      acc.governance &&
-      ownVoterWeight.canCreateProposal(acc.governance?.account?.config)
+    (acc) => {
+      const governance = governancesArray.find(
+        (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
+      )
+      return (
+        governance &&
+        ownVoterWeight.canCreateProposal(governance?.account?.config)
+      )
+    }
   )
   const availableInstructions = [
     {
@@ -291,7 +265,6 @@ export default function useGovernanceAssets() {
     availableInstructions,
     getAvailableInstructions,
     governedTokenAccounts,
-    getMintWithGovernances,
     canUseTransferInstruction,
     canUseMintInstruction,
     canMintRealmCommunityToken,
@@ -300,5 +273,6 @@ export default function useGovernanceAssets() {
     governedTokenAccountsWithoutNfts,
     nftsGovernedTokenAccounts,
     canUseAuthorityInstruction,
+    assetAccounts,
   }
 }

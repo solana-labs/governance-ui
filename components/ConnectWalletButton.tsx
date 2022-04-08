@@ -72,7 +72,39 @@ const ConnectWalletButton = (props) => {
   const walletAddressFormatted = current?.publicKey
     ? abbreviateAddress(current?.publicKey)
     : ''
-
+  const displayAddressComponent = useMemo(() => {
+    return connected && current?.publicKey ? (
+      <DisplayAddress
+        connection={connection.current}
+        address={current.publicKey!}
+        width="100px"
+        height="20px"
+        dark={true}
+      />
+    ) : null
+  }, [current?.publicKey?.toBase58()])
+  const displayAddressImage = useMemo(() => {
+    return connected && current?.publicKey ? (
+      <div className="w-12 pr-2">
+        <AddressImage
+          dark={true}
+          connection={connection.current}
+          address={current?.publicKey}
+          height="40px"
+          width="40px"
+          placeholder={
+            <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10 mr-2">
+              <UserCircleIcon className="h-9 text-fgd-3 w-9" />
+            </div>
+          }
+        />{' '}
+      </div>
+    ) : (
+      <div className="pr-2 pl-2">
+        <img src={provider?.icon} className="h-5 w-5" />
+      </div>
+    )
+  }, [])
   return (
     <div className="flex">
       <div
@@ -86,36 +118,11 @@ const ConnectWalletButton = (props) => {
         {...props}
       >
         <div className="flex font-bold items-center text-fgd-1 text-left text-sm relative">
-          {connected && current?.publicKey ? (
-            <div className="w-12 pr-2">
-              <AddressImage
-                dark={true}
-                connection={connection.current}
-                address={current?.publicKey}
-                height="40px"
-                width="40px"
-                placeholder={
-                  <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10 mr-2">
-                    <UserCircleIcon className="h-9 text-fgd-3 w-9" />
-                  </div>
-                }
-              />
-            </div>
-          ) : (
-            <div className="pr-2 pl-2">
-              <img src={provider?.icon} className="h-5 w-5" />
-            </div>
-          )}
+          {displayAddressImage}
           <div>
             {connected && current?.publicKey ? (
               <>
-                <DisplayAddress
-                  connection={connection.current}
-                  address={current?.publicKey}
-                  width="100px"
-                  height="20px"
-                  dark={true}
-                />
+                {displayAddressComponent}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
                   {walletAddressFormatted}
                 </StyledWalletProviderLabel>

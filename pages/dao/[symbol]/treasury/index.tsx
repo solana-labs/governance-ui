@@ -1,7 +1,6 @@
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { useTotalTreasuryPrice } from '@hooks/useTotalTreasuryPrice'
-import { GovernedTokenAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountsTabs from '@components/TreasuryAccount/AccountsTabs'
@@ -16,12 +15,13 @@ import tokenService from '@utils/services/token'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import Select from '@components/inputs/Select'
 import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
 const Treasury = () => {
   const { getStrategies } = useStrategiesStore()
-  const { governedTokenAccounts } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   const { setCurrentAccount } = useTreasuryAccountStore()
   const connection = useWalletStore((s) => s.connection)
   const {
@@ -34,38 +34,36 @@ const Treasury = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-  const [treasuryAccounts, setTreasuryAccounts] = useState<
-    GovernedTokenAccount[]
-  >([])
-  const [
-    activeAccount,
-    setActiveAccount,
-  ] = useState<GovernedTokenAccount | null>(null)
+  const [treasuryAccounts, setTreasuryAccounts] = useState<AssetAccount[]>([])
+  const [activeAccount, setActiveAccount] = useState<AssetAccount | null>(null)
   const [accountInfo, setAccountInfo] = useState<any>(null)
   const { realmInfo } = useRealm()
   useEffect(() => {
     if (
       tokenService._tokenList.length &&
-      governedTokenAccounts.filter((x) => x.mint).length
+      governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length
     ) {
       getStrategies(connection)
     }
   }, [
     tokenService._tokenList.length,
-    governedTokenAccounts.filter((x) => x.mint).length,
+    governedTokenAccountsWithoutNfts.filter((x) => x.extensions.mint).length,
   ])
   useEffect(() => {
     async function prepTreasuryAccounts() {
-      if (governedTokenAccounts.every((x) => x.transferAddress)) {
-        setTreasuryAccounts(governedTokenAccounts)
+      if (
+        governedTokenAccountsWithoutNfts.every(
+          (x) => x.extensions.transferAddress
+        )
+      ) {
+        setTreasuryAccounts(governedTokenAccountsWithoutNfts)
       }
     }
     prepTreasuryAccounts()
-  }, [JSON.stringify(governedTokenAccounts)])
+  }, [JSON.stringify(governedTokenAccountsWithoutNfts)])
 
   useEffect(() => {
-    if (treasuryAccounts.length > 0 && treasuryAccounts[0].mint) {
+    if (treasuryAccounts.length > 0 && treasuryAccounts[0].extensions.mint) {
       setActiveAccount(treasuryAccounts[0])
       setCurrentAccount(treasuryAccounts[0], connection)
     }
@@ -95,7 +93,7 @@ const Treasury = () => {
 
   useEffect(() => {
     if (activeAccount) {
-      const info = getTreasuryAccountItemInfo(activeAccount, governanceNfts)
+      const info = getTreasuryAccountItemInfo(activeAccount, {})
       setAccountInfo(info)
     }
   }, [activeAccount])
@@ -152,10 +150,7 @@ const Treasury = () => {
                   onChange={(g) =>
                     handleChangeAccountTab(
                       treasuryAccounts.find((acc) => {
-                        const info = getTreasuryAccountItemInfo(
-                          acc,
-                          governanceNfts
-                        )
+                        const info = getTreasuryAccountItemInfo(acc, {})
                         return info.accountName === g
                       })
                     )
@@ -164,13 +159,10 @@ const Treasury = () => {
                   value={accountInfo?.accountName}
                 >
                   {treasuryAccounts.map((x) => {
-                    const { name } = getTreasuryAccountItemInfo(
-                      x,
-                      governanceNfts
-                    )
+                    const { name } = getTreasuryAccountItemInfo(x, {})
                     return (
                       <Select.Option
-                        key={x?.transferAddress?.toBase58()}
+                        key={x?.extensions.transferAddress?.toBase58()}
                         value={name}
                       >
                         {name}
