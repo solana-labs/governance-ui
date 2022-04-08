@@ -157,20 +157,25 @@ const getTokenAccountsObj = async (
   const mint = mintAccounts.find(
     (x) => x.publicKey.toBase58() === tokenAccount.account.mint.toBase58()
   )
-  if ((mint?.account.supply && mint.account.decimals) || isNft || isSol) {
-    if (isSol) {
-      return await getSolAccount(
-        realm,
-        governance,
-        connection,
-        tokenAccount,
-        mint!,
-        accounts
-      )
-    }
-    if (isNft) {
-      return new AccountTypeNFT(tokenAccount, mint!, governance)
-    }
+  if (isSol) {
+    return await getSolAccount(
+      realm,
+      governance,
+      connection,
+      tokenAccount,
+      mint!,
+      accounts
+    )
+  }
+  if (isNft) {
+    return new AccountTypeNFT(tokenAccount, mint!, governance)
+  }
+  console.log(
+    mint?.account.supply?.toString(),
+    mint?.account.decimals,
+    '@@@@@@@'
+  )
+  if (mint?.account.supply && mint?.account.supply.cmpn(1) !== 0) {
     return new AccountTypeToken(tokenAccount, mint!, governance)
   }
 }
