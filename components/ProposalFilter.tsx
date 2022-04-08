@@ -31,8 +31,6 @@ const ProposalFilter = ({ filters, setFilters }) => {
     (state: Filters, newState: Partial<Filters>) => any
   >((state, newState) => ({ ...state, ...newState }), initialFilterSettings);
 
-  console.log('>>> initialFilterSettings', initialFilterSettings);
-
   const handleFilters = (
     proposalState: EnhancedProposalState,
     checked: boolean,

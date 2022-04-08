@@ -140,7 +140,7 @@ const INITIAL_PROPOSAL_STATE = {
   proposalOwner: undefined,
 };
 
-const TEN_DAYS_IN_MS = 3600 * 24 * 10;
+const TEN_DAYS_IN_MS = 3600 * 24 * 10 * 1000;
 
 function isProposalOutdated(
   proposal: ProgramAccount<EnhancedProposal>,
