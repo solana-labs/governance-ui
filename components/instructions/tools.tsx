@@ -101,8 +101,11 @@ export const ACCOUNT_NAMES = {
 
   //UXD DAO
   '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO USDC Treasury Vault',
+  '89WLRw7xc6XEC3hdo89fSb8boAxAJu9wYVFok8JEDSJa':
+    'UXD DAO USDC Secondary Treasury Vault',
   GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXD DAO UXP Treasury Vault',
   '39qcqpaiLivyFLBLh4wvPmLrs336BBpXkKYb88i8dSiJ': 'UXD Council Token',
+
   // MMCC ClubDAO
   '92tozWPkbybEjPeiGpNFL8onAnT739cxLRQofGVnrmm6': 'ClubDAO DCF Revenue Vault',
   A6HXL3WMWT4gB1QvYJfZgDp2ufTfLkWBaX6Theakdf5h:
