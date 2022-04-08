@@ -30,7 +30,7 @@
     "@emotion/styled": "^11.3.0",
     "@friktion-labs/friktion-sdk": "^1.1.25",
     "@headlessui/react": "^1.4.2",
-    "@heroicons/react": "^1.0.1",
+    "@heroicons/react": "^1.0.6",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
     "@next/bundle-analyzer": "^12.1.0",
