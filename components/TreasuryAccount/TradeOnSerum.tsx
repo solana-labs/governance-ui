@@ -286,7 +286,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
     if (!currentAccount || !currentAccount!.extensions!.token!.account.owner) {
       throw new Error('currentAccount is null or undefined')
     }
-    if (wallet && isValid) {
+    if (wallet && wallet.publicKey && isValid) {
       // create the anchor Program
       // @ts-ignore: Wallet compatability issues
       const provider = new Provider(connection.current, wallet, {})
@@ -351,6 +351,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
       }
 
       const proposalInstructions: InstructionDataWithHoldUpTime[] = []
+      const prerequisiteInstructions: web3.TransactionInstruction[] = []
       // Check if an associated token account for the other side of the
       //  market is required. If so, add the create associated token account ix
       const aTADepositAddress = await Token.getAssociatedTokenAddress(
@@ -372,19 +373,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             : market.quoteMintAddress,
           aTADepositAddress,
           currentAccount!.extensions!.token!.account.owner,
-          currentAccount!.extensions!.token!.account.owner
+          wallet.publicKey
         )
-        const serializedIx = serializeInstructionToBase64(createAtaIx)
-
-        const instructionData = {
-          data: getInstructionDataFromBase64(serializedIx),
-          holdUpTime:
-            currentAccount?.governance?.account?.config
-              .minInstructionHoldUpTime,
-          prerequisiteInstructions: [],
-          shouldSplitIntoSeparateTxs: true,
-        }
-        proposalInstructions.push(instructionData)
+        prerequisiteInstructions.push(createAtaIx)
       }
 
       const instruction = await serumRemoteInstructions.initBoundedStrategyIx(
@@ -411,7 +402,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         data: getInstructionDataFromBase64(serializedIx),
         holdUpTime:
           currentAccount?.governance?.account?.config.minInstructionHoldUpTime,
-        prerequisiteInstructions: [],
+        prerequisiteInstructions,
         shouldSplitIntoSeparateTxs: true,
       }
       proposalInstructions.push(instructionData)

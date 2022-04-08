@@ -34,7 +34,7 @@
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
     "@next/bundle-analyzer": "^12.1.4",
-    "@mithraic-labs/serum-remote": "^0.0.1-rc.15",
+    "@mithraic-labs/serum-remote": "^0.0.1-rc.16",
     "@nfteyez/sol-rayz": "^0.10.2",
     "@notifi-network/notifi-react-hooks": "^0.11.0",
     "@project-serum/anchor": "^0.23.0",
