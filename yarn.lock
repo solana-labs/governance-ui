@@ -1478,10 +1478,10 @@
   resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-utils/-/notifi-axios-utils-0.10.0.tgz#4f18dbc49f4f2d9908d0745187e68d7b1dc267fc"
   integrity sha512-RH49Q3UVlflpKwN6lJQZMMO2vax7q5EC8PILrUydTmMQyColsPGDIROpgUBnxxJ+g7I3uf+sCKG9H/+YLsLOLg==
 
-"@notifi-network/notifi-core@^0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.10.1.tgz#b3cf25b2bc816732311655f7fff94cd0aa700d7d"
-  integrity sha512-l+lQz3Q+YmoNI4n7jckx7MO75NS/1ZwgLgQOIVazZSI6XvlgnEFDxB855zk62YQfGuy56kK9H5NCD1YAg2NXyg==
+"@notifi-network/notifi-core@^0.11.0":
+  version "0.11.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.11.0.tgz#b003f473b21d05d9eb9ea96b006c2f294b98a162"
+  integrity sha512-wOJhRwtBqrKpaLxoXbGjb+Qlko8KSX+GCl6LyrN4xSMbZQuXRKA4AG2gb7gWdiYDW7/u40myqrH+MLUAeBwgkg==
 
 "@notifi-network/notifi-react-hooks@^0.10.1":
   version "0.10.1"
