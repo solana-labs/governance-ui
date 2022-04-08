@@ -170,11 +170,7 @@ const getTokenAccountsObj = async (
   if (isNft) {
     return new AccountTypeNFT(tokenAccount, mint!, governance)
   }
-  console.log(
-    mint?.account.supply?.toString(),
-    mint?.account.decimals,
-    '@@@@@@@'
-  )
+
   if (mint?.account.supply && mint?.account.supply.cmpn(1) !== 0) {
     return new AccountTypeToken(tokenAccount, mint!, governance)
   }
