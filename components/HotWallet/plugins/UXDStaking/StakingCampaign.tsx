@@ -99,7 +99,6 @@ const StakingCampaign = ({
             {stakingCampaignInfo.stakedVaultBalance
               ? `${stakingCampaignInfo.stakedVaultBalance.toLocaleString()} ${stackedMintName}`
               : 'unknown'}
-            <span className="ml-1">{rewardMintName}</span>
           </span>
         </div>
 
