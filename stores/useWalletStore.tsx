@@ -47,6 +47,7 @@ import {
 } from '@models/api';
 import { accountsToPubkeyMap } from '@tools/sdk/accounts';
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools';
+import { BN } from '@blockworks-foundation/mango-client';
 
 export const EnhancedProposalState = {
   ...ProposalState,
@@ -153,7 +154,8 @@ function isProposalOutdated(
   }
 
   if (
-    Date.now() - proposal.account.votingCompletedAt.toNumber() <=
+    Date.now() -
+      proposal.account.votingCompletedAt.mul(new BN(1000)).toNumber() <=
     TEN_DAYS_IN_MS
   ) {
     return false;
