@@ -2,7 +2,6 @@ import { BN, ProgramAccount } from '@project-serum/anchor'
 import { MintInfo } from '@solana/spl-token'
 import { TokenInfo } from '@solana/spl-token-registry'
 import { BigNumber } from 'bignumber.js'
-import { TokenInfoWithMint } from 'stores/useTreasuryAccountStore'
 
 const SECONDS_PER_DAY = 86400
 

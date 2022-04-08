@@ -10,9 +10,7 @@ import {
 import { Market as SerumMarket } from '@project-serum/serum'
 import tokenService from '@utils/services/token'
 import React, { useCallback, useState } from 'react'
-import useTreasuryAccountStore, {
-  TokenInfoWithMint,
-} from 'stores/useTreasuryAccountStore'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './BaseAccountHeader'
 import {
   Bound,
