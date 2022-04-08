@@ -7,8 +7,8 @@ import {
   getMintDecimalAmountFromNatural,
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
-import { GovernedTokenAccount } from '@utils/tokens'
 import { Market as SerumMarket } from '@project-serum/serum'
+import tokenService from '@utils/services/token'
 import React, { useCallback, useState } from 'react'
 import useTreasuryAccountStore, {
   TokenInfoWithMint,
@@ -46,18 +46,21 @@ import { useRouter } from 'next/router'
 import useCreateProposal from '@hooks/useCreateProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import {
+  AccountInfo,
   ASSOCIATED_TOKEN_PROGRAM_ID,
+  MintInfo,
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
 import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
+import { AssetAccount } from '@utils/uiTypes/assets'
+import { TokenProgramAccount } from '@utils/tokens'
 
-export type TradeOnSerumProps = { tokenAccount: TokenInfoWithMint }
+export type TradeOnSerumProps = { tokenAccount: AssetAccount }
 
 type TradeOnSerumForm = {
   amount: number
   boundedPrice: number
-  governedTokenAccount?: GovernedTokenAccount
   serumRemoteProgramId: string
   serumProgramId: string
   serumMarketId: string
@@ -70,16 +73,16 @@ type TradeOnSerumForm = {
   title: string
 }
 
-const formSchema = (tokenAccount: TokenInfoWithMint) => {
+const formSchema = (
+  mintInfo: TokenProgramAccount<MintInfo>,
+  token: TokenProgramAccount<AccountInfo>
+) => {
   return (
     yup
       .object()
       .shape({
         title: yup.string(),
         description: yup.string(),
-        governedTokenAccount: yup
-          .object()
-          .required('Governance Token Account is required'),
         amount: yup
           .number()
           .typeError('Amount is required')
@@ -89,9 +92,9 @@ const formSchema = (tokenAccount: TokenInfoWithMint) => {
             function (val: number) {
               const mintValue = getMintNaturalAmountFromDecimalAsBN(
                 val,
-                tokenAccount.mintInfo.decimals
+                mintInfo.account.decimals
               )
-              return tokenAccount.amount.gte(mintValue)
+              return token.account.amount.gte(mintValue)
             }
           )
           .test(
@@ -238,34 +241,40 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const [form, setForm] = useState<TradeOnSerumForm>({
     amount: 0,
     boundedPrice: 0,
-    governedTokenAccount: currentAccount ?? undefined,
     title: 'Diversify treasury with Serum',
     description:
       'A proposal to trade some asset for another using Serum. PLEASE EXPLAIN IN MORE DETAIL',
     serumRemoteProgramId: serumRemoteProgramId.toString(),
     serumProgramId: serumProgramKey.toString(),
     serumMarketId: '',
-    assetMint: tokenAccount.mint.toString(),
+    assetMint: tokenAccount.extensions.mint!.publicKey.toString(),
     orderSide: 0,
     bound: 1,
     // Default reclaim date of 10 days
     reclaimDate: new Date(new Date().getTime() + 1_000 * 3600 * 24 * 10),
     // The reclaim address must be the same account where the initial assets come from
-    reclaimAddress: tokenAccount.key.toString(),
+    reclaimAddress: tokenAccount.pubkey.toString(),
   })
   const [formErrors, setFormErrors] = useState({})
   const [showOptions, setShowOptions] = useState(false)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
-  const schema = formSchema(tokenAccount)
+  if (!tokenAccount.extensions.mint || !tokenAccount.extensions.token) {
+    throw new Error('No mint information on the tokenAccount')
+  }
+  const mintAccount = tokenAccount.extensions.mint
+  const token = tokenAccount.extensions.token
+  const schema = formSchema(mintAccount, token)
+
+  const tokenInfo = tokenService.getTokenInfo(mintAccount.publicKey.toString())
 
   const totalValue = useTotalTokenValue({
     amount: getMintDecimalAmountFromNatural(
-      tokenAccount.mintInfo,
-      tokenAccount.amount
+      mintAccount.account,
+      token.account.amount
     ).toNumber(),
-    mintAddress: tokenAccount.mint.toString(),
+    mintAddress: mintAccount.publicKey.toString(),
   })
 
   const handleSetForm = ({ propertyName, value }) => {
@@ -276,7 +285,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
   const handlePropose = useCallback(async () => {
     setIsLoading(true)
     const isValid = await validateInstruction({ schema, form, setFormErrors })
-    if (!currentAccount || !currentAccount.transferAddress) {
+    if (!currentAccount || !currentAccount!.extensions!.token!.account.owner) {
       throw new Error('currentAccount is null or undefined')
     }
     if (wallet && isValid) {
@@ -291,7 +300,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
       // convert amount to mintAmount
       const mintValue = getMintNaturalAmountFromDecimalAsBN(
         form.amount,
-        tokenAccount.mintInfo.decimals
+        mintAccount.account.decimals
       )
       const dexProgramId = new web3.PublicKey(form.serumProgramId)
       const serumMarketId = new web3.PublicKey(form.serumMarketId)
@@ -350,7 +359,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         ASSOCIATED_TOKEN_PROGRAM_ID,
         TOKEN_PROGRAM_ID,
         form.orderSide === 0 ? market.baseMintAddress : market.quoteMintAddress,
-        currentAccount.transferAddress
+        currentAccount!.extensions!.token!.account.owner
       )
       const depositAccountInfo = await connection.current.getAccountInfo(
         aTADepositAddress
@@ -364,8 +373,8 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
             ? market.baseMintAddress
             : market.quoteMintAddress,
           aTADepositAddress,
-          currentAccount.transferAddress,
-          currentAccount.transferAddress
+          currentAccount!.extensions!.token!.account.owner,
+          currentAccount!.extensions!.token!.account.owner
         )
         const serializedIx = serializeInstructionToBase64(createAtaIx)
 
@@ -395,7 +404,7 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           orderSide: form.orderSide,
           bound: form.bound,
         },
-        { owner: currentAccount.transferAddress }
+        { owner: currentAccount!.extensions!.token!.account.owner }
       )
 
       const serializedIx = serializeInstructionToBase64(instruction)
@@ -441,8 +450,12 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
         <h3 className="mb-4 flex items-center">Trade on Serum!</h3>
         <AccountLabel
           isNFT={false}
-          tokenInfo={tokenAccount.tokenInfo}
-          amountFormatted={fmtTokenInfoWithMint(tokenAccount)}
+          tokenInfo={tokenInfo}
+          amountFormatted={fmtTokenInfoWithMint(
+            token.account.amount,
+            mintAccount,
+            tokenInfo
+          )}
           totalPrice={totalValue}
         />
         {/* Add Serum Remote form */}
@@ -462,9 +475,9 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
           />
           <Input
             label={`Amount of ${
-              tokenAccount.tokenInfo?.symbol
-                ? tokenAccount.tokenInfo?.symbol
-                : `${tokenAccount.mint.toString().substring(0, 6)}...`
+              tokenInfo?.symbol
+                ? tokenInfo?.symbol
+                : `${mintAccount.publicKey.toString().substring(0, 6)}...`
             } to trade with`}
             value={form.amount}
             type="number"

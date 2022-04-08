@@ -34,6 +34,7 @@ import {
 } from 'Strategies/protocols/mango/tools'
 import useMarketStore from 'Strategies/store/marketStore'
 import LoadingRows from './LoadingRows'
+import TradeOnSerum, { TradeOnSerumProps } from './TradeOnSerum'
 
 const AccountOverview = () => {
   const router = useRouter()
@@ -73,6 +74,10 @@ const AccountOverview = () => {
     setProposedInvestment,
   ] = useState<TreasuryStrategy | null>(null)
   const [isCopied, setIsCopied] = useState<boolean>(false)
+  const [
+    tradeSerumInfo,
+    setTradeSerumInfo,
+  ] = useState<TradeOnSerumProps | null>(null)
 
   useEffect(() => {
     if (strategies.length > 0) {
@@ -187,6 +192,12 @@ const AccountOverview = () => {
               Copied to Clipboard
             </div>
           )}
+          <Button
+            className="w-full"
+            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
+          >
+            Trade On Serum
+          </Button>
           <Button
             className="w-full"
             onClick={() =>
@@ -377,6 +388,17 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
+        </Modal>
+      )}
+      {tradeSerumInfo && (
+        <Modal
+          sizeClassName="sm:max-w-3xl"
+          onClose={() => {
+            setTradeSerumInfo(null)
+          }}
+          isOpen={!!tradeSerumInfo}
+        >
+          <TradeOnSerum {...tradeSerumInfo} />
         </Modal>
       )}
     </>

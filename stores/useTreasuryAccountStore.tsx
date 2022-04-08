@@ -25,7 +25,6 @@ interface TreasuryAccountStore extends State {
   recentActivity: ConfirmedSignatureInfo[]
 
   allNfts: NFTWithMint[]
-  allTokenAccounts: TokenInfoWithMint[]
   governanceNfts: {
     [governance: string]: NFTWithMint[]
   }
@@ -46,7 +45,6 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   tokenInfo: undefined,
   recentActivity: [],
   allNfts: [],
-  allTokenAccounts: [],
   governanceNfts: {},
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
