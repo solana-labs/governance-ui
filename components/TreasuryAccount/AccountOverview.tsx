@@ -194,12 +194,6 @@ const AccountOverview = () => {
           )}
           <Button
             className="w-full"
-            onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
-          >
-            Trade On Serum
-          </Button>
-          <Button
-            className="w-full"
             onClick={() =>
               isNFT
                 ? setOpenNftDepositModal(true)
@@ -211,6 +205,18 @@ const AccountOverview = () => {
             {isNFT ? 'Deposit' : 'Copy Deposit Address'}
           </Button>
         </div>
+        <Button
+          tooltipMessage={
+            !canUseTransferInstruction
+              ? 'You need to have connected wallet with ability to create token transfer proposals'
+              : ''
+          }
+          className="w-full"
+          onClick={() => setTradeSerumInfo({ tokenAccount: currentAccount })}
+          disabled={!canUseTransferInstruction}
+        >
+          Trade On Serum
+        </Button>
         <Button
           tooltipMessage={
             !canUseTransferInstruction
