@@ -65,7 +65,7 @@
     "react-dom": "^18.0.0",
     "react-headless-pagination": "^0.1.0",
     "react-markdown": "^7.0.0",
-    "react-portal": "^4.2.1",
+    "react-portal": "^4.2.2",
     "remark-gfm": "^3.0.1",
     "superstruct": "^0.15.3",
     "ts-node": "^10.5.0",
