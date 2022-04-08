@@ -48,7 +48,7 @@
     "@solana/wallet-adapter-solflare": "^0.6.6",
     "@solana/wallet-adapter-sollet": "^0.11.1",
     "@solana/web3.js": "^1.37.1",
-    "@solendprotocol/solend-sdk": "^0.4.9",
+    "@solendprotocol/solend-sdk": "^0.5.5",
     "@tippyjs/react": "^4.2.6",
     "axios": "^0.26.1",
     "bignumber.js": "^9.0.2",
