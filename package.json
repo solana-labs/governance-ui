@@ -50,7 +50,7 @@
     "@solana/web3.js": "^1.37.1",
     "@solendprotocol/solend-sdk": "^0.4.9",
     "@tippyjs/react": "^4.2.6",
-    "axios": "^0.21.1",
+    "axios": "^0.26.1",
     "bignumber.js": "^9.0.2",
     "buffer-layout": "^1.2.2",
     "classnames": "^2.3.1",
