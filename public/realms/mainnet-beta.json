@@ -557,5 +557,24 @@
     "twitter": "@TheOxSquadNFT",
     "bannerImage": "/realms/TheOxSquad/img/TheOxSquad_banner.jpeg",
     "ogImage": "/realms/TheOxSquad/img/TheOxSquad.png"
+  },
+  {
+    "symbol": "$ASH",
+    "displayName": "MorDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "2vZwtXgeE7V5ipovRbSyxDcuDM6FgozHPsFPP92wiPfz",
+    "website": "https://mortuary-inc.io/",
+    "twitter": "@MortuaryIncNFT",
+    "ogImage": "/realms/MorDAO/img/logo.svg"
+  },
+  {
+    "symbol": "EVS",
+    "displayName": "EverSOL",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7pX17rs38WKHVw5mpJNBCjGXRz5eZsPj5QHAEZv1Zu4d",
+    "bannerImage": "/realms/EverSol/img/EverSol_Banner.jpg",
+    "ogImage": "/realms/EverSol/img/EverSol_Logo.jpg",
+    "website": "https://eversol.one/",
+    "twitter": "@eversol_pool"
   }
 ]

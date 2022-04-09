@@ -4,16 +4,11 @@ import { RpcContext } from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js'
 import { getNameOf } from '@tools/core/script'
-import {
-  GovernedMintInfoAccount,
-  GovernedMultiTypeAccount,
-  GovernedProgramAccount,
-  GovernedTokenAccount,
-} from '@utils/tokens'
 import { SupportedMintName } from '@tools/sdk/solend/configuration'
 import { SplTokenUIName } from '@utils/splTokens'
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts'
 import { LockupKind } from 'VoteStakeRegistry/tools/types'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface UiInstruction {
   serializedInstruction: string
@@ -28,14 +23,14 @@ export interface UiInstruction {
 export interface SplTokenTransferForm {
   destinationAccount: string
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   programId: string | undefined
   mintInfo: MintInfo | undefined
 }
 
 export interface FriktionDepositForm {
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
   programId: string | undefined
   mintInfo: MintInfo | undefined
@@ -43,7 +38,7 @@ export interface FriktionDepositForm {
 
 export interface FriktionWithdrawForm {
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   voltVaultId: string
   depositTokenMint: string | undefined
   programId: string | undefined
@@ -53,7 +48,7 @@ export interface FriktionWithdrawForm {
 export interface GrantForm {
   destinationAccount: string
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   mintInfo: MintInfo | undefined
   lockupKind: LockupKind
   startDateUnixSeconds: number
@@ -62,7 +57,7 @@ export interface GrantForm {
 }
 
 export interface ClawbackForm {
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   voter: Voter | null
   deposit: DepositWithMintAccount | null
 }
@@ -73,9 +68,9 @@ export interface SendTokenCompactViewForm extends SplTokenTransferForm {
 }
 
 export interface StakingViewForm {
-  destinationAccount: GovernedTokenAccount | undefined
+  destinationAccount: AssetAccount | undefined
   amount: number | undefined
-  governedTokenAccount: GovernedTokenAccount | undefined
+  governedTokenAccount: AssetAccount | undefined
   description: string
   title: string
 }
@@ -83,12 +78,12 @@ export interface StakingViewForm {
 export interface MintForm {
   destinationAccount: string
   amount: number | undefined
-  mintAccount: GovernedMintInfoAccount | undefined
+  mintAccount: AssetAccount | undefined
   programId: string | undefined
 }
 
 export interface ProgramUpgradeForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   bufferAddress: string
   bufferSpillAddress?: string | undefined
@@ -97,14 +92,14 @@ export interface ProgramUpgradeForm {
 export const programUpgradeFormNameOf = getNameOf<ProgramUpgradeForm>()
 
 export interface MangoMakeAddOracleForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   oracleAccount: string | undefined
 }
 
 export interface MangoMakeAddSpotMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   oracleAccount: string | undefined
@@ -118,7 +113,7 @@ export interface MangoMakeAddSpotMarketForm {
 }
 
 export interface MangoMakeChangeSpotMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   baseSymbol: string | undefined
@@ -132,7 +127,7 @@ export interface MangoMakeChangeSpotMarketForm {
 }
 
 export interface MangoMakeChangePerpMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   perpMarket: string | undefined
@@ -151,7 +146,7 @@ export interface MangoMakeChangePerpMarketForm {
 }
 
 export interface MangoMakeCreatePerpMarketForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   oracleAccount: string | undefined
@@ -172,13 +167,13 @@ export interface MangoMakeCreatePerpMarketForm {
   version: number
 }
 export interface MangoMakeChangeMaxAccountsForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   maxMangoAccounts: number
 }
 export interface MangoMakeChangeReferralFeeParams {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   mangoGroup: string | undefined
   refSurchargeCentibps: number
@@ -186,48 +181,48 @@ export interface MangoMakeChangeReferralFeeParams {
   refMngoRequired: number
 }
 export interface Base64InstructionForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount: AssetAccount | undefined
   base64: string
   holdUpTime: number
 }
 
 export interface EmptyInstructionForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount: AssetAccount | undefined
 }
 
 export interface CreateAssociatedTokenAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   splTokenMintUIName?: SplTokenUIName
 }
 
 export interface CreateSolendObligationAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
 }
 
 export interface InitSolendObligationAccountForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
 }
 
 export interface DepositReserveLiquidityAndObligationCollateralForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   uiAmount: string
   mintName?: SupportedMintName
 }
 
 export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   uiAmount: string
   mintName?: SupportedMintName
   destinationLiquidity?: string
 }
 
 export interface RefreshObligationForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   mintName?: SupportedMintName
 }
 
 export interface RefreshReserveForm {
-  governedAccount?: GovernedMultiTypeAccount
+  governedAccount?: AssetAccount
   mintName?: SupportedMintName
 }
 

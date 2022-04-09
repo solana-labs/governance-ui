@@ -4,6 +4,7 @@ import {
   ChatAltIcon,
   CheckCircleIcon,
   ExternalLinkIcon,
+  LogoutIcon,
   XCircleIcon,
 } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
@@ -24,8 +25,8 @@ import { Member } from '@utils/uiTypes/members'
 import React, { useEffect, useMemo, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { WalletTokenRecordWithProposal } from './types'
-import useMembers from '@components/Members/useMembers'
 import PaginationComponent from '@components/Pagination'
+import useMembersStore from 'stores/useMembersStore'
 
 const MemberOverview = ({ member }: { member: Member }) => {
   const { realm } = useRealm()
@@ -33,14 +34,21 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const selectedRealm = useWalletStore((s) => s.selectedRealm)
   const { mint, councilMint, proposals, symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
-  const { activeMembers } = useMembers()
+  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const [ownVoteRecords, setOwnVoteRecords] = useState<
     WalletTokenRecordWithProposal[]
   >([])
   const [recentVotes, setRecentVotes] = useState<
     WalletTokenRecordWithProposal[]
   >([])
-  const { walletAddress, councilVotes, communityVotes, votesCasted } = member
+  const {
+    walletAddress,
+    councilVotes,
+    communityVotes,
+    votesCasted,
+    hasCouncilTokenOutsideRealm,
+    hasCommunityTokenOutsideRealm,
+  } = member
 
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
@@ -152,19 +160,21 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const paginateVotes = (page) => {
     return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
   }
-
+  const Address = useMemo(() => {
+    return (
+      <DisplayAddress
+        connection={connection.current}
+        address={walletPublicKey}
+        height="12px"
+        width="100px"
+        dark={true}
+      />
+    )
+  }, [walletPublicKey?.toBase58()])
   return (
     <>
       <div className="flex items-center justify-between mb-2 py-2">
-        <h2 className="mb-0">
-          <DisplayAddress
-            connection={connection.current}
-            address={walletPublicKey}
-            height="12px"
-            width="100px"
-            dark={true}
-          />
-        </h2>
+        <h2 className="mb-0">{Address}</h2>
         <a
           className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
           href={
@@ -184,8 +194,11 @@ const MemberOverview = ({ member }: { member: Member }) => {
         {(communityAmount || !councilAmount) && (
           <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
             <p>{tokenName} Votes</p>
-            <div className="font-bold text-fgd-1 text-2xl">
-              {communityAmount || 0}
+            <div className="font-bold text-fgd-1 text-2xl flex items-center">
+              {communityAmount || 0}{' '}
+              {hasCommunityTokenOutsideRealm && (
+                <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
+              )}
             </div>
             <p>Vote Power Rank: {memberVotePowerRank}</p>
           </div>
@@ -193,7 +206,13 @@ const MemberOverview = ({ member }: { member: Member }) => {
         {councilAmount && (
           <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
             <p>Council Votes</p>
-            <div className="font-bold text-fgd-1 text-2xl">{councilAmount}</div>
+            <div className="font-bold text-fgd-1 text-2xl flex items-center">
+              {councilAmount}{' '}
+              {hasCouncilTokenOutsideRealm && (
+                <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
+              )}
+            </div>
+            <div></div>
           </div>
         )}
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">

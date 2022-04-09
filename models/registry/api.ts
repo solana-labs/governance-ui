@@ -28,7 +28,11 @@ export interface RealmInfo {
   // banner mage
   bannerImage?: string
 
+  // Allow Realm to send email/SMS/Telegram/etc., notifications to governance members using Notifi
+  enableNotifi?: boolean
+
   isCertified: boolean
+
   // 3- featured DAOs  ,2- new DAO with active proposals, 1- DAOs with active proposal,
   sortRank?: number
 
@@ -47,6 +51,7 @@ interface RealmInfoAsJSON
     RealmInfo,
     'programId' | 'realmId' | 'isCertified' | 'sharedWalletId'
   > {
+  enableNotifi?: boolean
   programId: string
   realmId: string
   sharedWalletId?: string
@@ -65,6 +70,7 @@ function parseCertifiedRealms(realms: RealmInfoAsJSON[]) {
     sharedWalletId: realm.sharedWalletId && new PublicKey(realm.sharedWalletId),
     isCertified: true,
     programVersion: realm.programVersion,
+    enableNotifi: realm.enableNotifi ?? true, // enable by default
   })) as ReadonlyArray<RealmInfo>
 }
 
@@ -157,9 +163,9 @@ export async function getUnchartedRealmInfos(connection: ConnectionContext) {
   const allRealms = (
     await Promise.all(
       // Assuming all the known spl-gov instances are already included in the certified realms list
-      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) =>
-        getRealms(connection.current, p.programId)
-      )
+      arrayToUnique(certifiedRealms, (r) => r.programId.toBase58()).map((p) => {
+        return getRealms(connection.current, p.programId)
+      })
     )
   )
     .flatMap((r) => Object.values(r))
@@ -188,5 +194,6 @@ export function createUnchartedRealmInfo(realm: ProgramAccount<Realm>) {
     realmId: realm.pubkey,
     displayName: realm.account.name,
     isCertified: false,
+    enableNotifi: true, // enable by default
   } as RealmInfo
 }
