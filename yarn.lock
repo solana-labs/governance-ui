@@ -504,10 +504,10 @@
   version "0.2.3"
   resolved "https://registry.npmjs.org/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz"
 
-"@blockworks-foundation/mango-client@^3.3.16":
-  version "3.3.16"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.3.16.tgz#e164cb90c3ae04a3822898b2e29bf280bde8d25a"
-  integrity sha512-n7saMS9fJIaCeL7abM8vyZi9qfpJMlDnFQh3CV9WDya2KBwT/hu0MCAYFrPT0yOuYYtZVck5ZCc5I48XBwrymA==
+"@blockworks-foundation/mango-client@^3.4.2":
+  version "3.4.2"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/mango-client/-/mango-client-3.4.2.tgz#42c1752bc5a949d2eec1aea51fd94eddfd9e0d64"
+  integrity sha512-CcypTdoHxIojxWAzDF6v6BqasfvCzP2Wv0nJ5yZuY5ofIWnlKJGWbHxU5sHClo3GHt8bbDjeKXeQth3az84koA==
   dependencies:
     "@project-serum/anchor" "^0.21.0"
     "@project-serum/serum" "0.13.55"
@@ -515,10 +515,11 @@
     "@solana/spl-token" "^0.1.6"
     "@solana/web3.js" "^1.31.0"
     big.js "^6.1.1"
-    bn.js "^5.2.0"
+    bn.js "^5.1.0"
     buffer-layout "^1.2.1"
     cross-fetch "^3.1.5"
     dotenv "^10.0.0"
+    toformat "^2.0.0"
     yargs "^17.0.1"
 
 "@blockworks-foundation/voter-stake-registry-client@^0.2.0":
@@ -1748,18 +1749,7 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@project-serum/serum@^0.13.21":
-  version "0.13.57"
-  resolved "https://registry.npmjs.org/@project-serum/serum/-/serum-0.13.57.tgz"
-  integrity sha512-I638MKCEIQDv1WoPeRJhjOUmAn73fQCy1hNyb3f6GIecwxfiesoN6e0CClXyN7GG2nE7KPjFejGkF1KziJaltA==
-  dependencies:
-    "@project-serum/anchor" "^0.11.1"
-    "@solana/spl-token" "^0.1.6"
-    "@solana/web3.js" "^1.21.0"
-    bn.js "^5.1.2"
-    buffer-layout "^1.2.0"
-
-"@project-serum/serum@^0.13.61":
+"@project-serum/serum@^0.13.21", "@project-serum/serum@^0.13.61":
   version "0.13.61"
   resolved "https://registry.yarnpkg.com/@project-serum/serum/-/serum-0.13.61.tgz#1f0e6dfa7786a71e4317593911e9915d8b2a06e6"
   integrity sha512-aebaRGQ0/K7a5kJ9UXO59BAQFJILVu5jbGobU8GD2CTSy6SPceprB6/pgZmZLQIabhXWUHaZRF/wXIClgWataA==
@@ -1770,14 +1760,14 @@
     bn.js "^5.1.2"
     buffer-layout "^1.2.0"
 
-"@project-serum/sol-wallet-adapter@0.2.0", "@project-serum/sol-wallet-adapter@^0.2.0":
+"@project-serum/sol-wallet-adapter@0.2.0":
   version "0.2.0"
   resolved "https://registry.npmjs.org/@project-serum/sol-wallet-adapter/-/sol-wallet-adapter-0.2.0.tgz"
   dependencies:
     bs58 "^4.0.1"
     eventemitter3 "^4.0.4"
 
-"@project-serum/sol-wallet-adapter@^0.2.6":
+"@project-serum/sol-wallet-adapter@^0.2.0", "@project-serum/sol-wallet-adapter@^0.2.6":
   version "0.2.6"
   resolved "https://registry.npmjs.org/@project-serum/sol-wallet-adapter/-/sol-wallet-adapter-0.2.6.tgz"
   integrity sha512-cpIb13aWPW8y4KzkZAPDgw+Kb+DXjCC6rZoH74MGm3I/6e/zKyGnfAuW5olb2zxonFqsYgnv7ev8MQnvSgJ3/g==
