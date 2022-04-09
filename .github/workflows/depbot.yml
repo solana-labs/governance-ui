@@ -5,7 +5,7 @@ on: pull_request_target
 permissions:
   pull-requests: write
   contents: write
-  
+
 jobs:
   dependabot:
     runs-on: ubuntu-latest
@@ -17,7 +17,7 @@ jobs:
         id: dependabot-metadata
         uses: dependabot/fetch-metadata@v1.3.0
         with:
-          github-token: "${{ secrets.GITHUB_TOKEN }}"
+          github-token: '${{ secrets.GITHUB_TOKEN }}'
       # Approves PRs
       - name: Approve PR
         run: gh pr review --approve "$PR_URL"

@@ -6,10 +6,13 @@ import {
   ProgramAccount,
   Proposal,
   ProposalState,
+  Vote,
+  withCastVote,
+  YesNoVote,
 } from '@solana/spl-governance'
 import useWalletStore from 'stores/useWalletStore'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
-import { PublicKey } from '@solana/web3.js'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
 import dynamic from 'next/dynamic'
 import PaginationComponent from '@components/Pagination'
@@ -21,6 +24,11 @@ import Switch from '@components/Switch'
 import ProposalSelectCard from '@components/ProposalSelectCard'
 import Checkbox from '@components/inputs/Checkbox'
 import Button from '@components/Button'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { NftVoterClient } from '@solana/governance-program-library'
+import { notify } from '@utils/notifications'
+import { sendSignedTransaction } from '@utils/send'
+
 const AccountsCompactWrapper = dynamic(
   () => import('@components/TreasuryAccount/AccountsCompactWrapper')
 )
@@ -83,7 +91,7 @@ function getVotingStateRank(
 
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const { realm, realmInfo, proposals, governances } = useRealm()
+  const { realm, realmInfo, proposals, governances, tokenRecords } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
@@ -96,11 +104,19 @@ const REALM = () => {
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const [activeTab, setActiveTab] = useState('Proposals')
   const [multiVoteMode, setMultiVoteMode] = useState(false)
-  const [selectedProposals, setSelectedProposals] = useState<any[]>([])
+  const [selectedProposals, setSelectedProposals] = useState<
+    SelectedProposal[]
+  >([])
   const ownVoteRecordsByProposal = useWalletStore(
     (s) => s.ownVoteRecordsByProposal
   )
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
     compareProposals(b[1].account, a[1].account, governances)
@@ -150,15 +166,19 @@ const REALM = () => {
 
   const votingProposals = useMemo(
     () =>
-      allProposals.filter(
-        ([k, v]) =>
+      allProposals.filter(([k, v]) => {
+        const governance = governances[v.account.governance.toBase58()].account
+        return (
           v.account.state === ProposalState.Voting &&
-          !ownVoteRecordsByProposal[k]
-      ),
+          !ownVoteRecordsByProposal[k] &&
+          !v.account.hasVoteTimeEnded(governance)
+        )
+      }),
     [allProposals]
   )
 
   useEffect(() => {
+    setSelectedProposals([])
     if (multiVoteMode) {
       setFilteredProposals(votingProposals)
     } else {
@@ -186,6 +206,74 @@ const REALM = () => {
     }
   }
 
+  const voteOnSelected = async (vote: YesNoVote) => {
+    if (!wallet || !realmInfo!.programId || !realm) return
+
+    const governanceAuthority = wallet.publicKey!
+    const payer = wallet.publicKey!
+
+    try {
+      const {
+        blockhash: recentBlockhash,
+      } = await connection.getLatestBlockhash()
+
+      const transactions: Transaction[] = []
+      for (let i = 0; i < selectedProposals.length; i++) {
+        const selectedProposal = selectedProposals[i]
+        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
+
+        const instructions: TransactionInstruction[] = []
+
+        //will run only if plugin is connected with realm
+        const plugin = await client?.withCastPluginVote(
+          instructions,
+          selectedProposal.proposalPk
+        )
+        if (client.client instanceof NftVoterClient === false) {
+          await withCastVote(
+            instructions,
+            realmInfo!.programId,
+            realmInfo!.programVersion!,
+            realm.pubkey,
+            selectedProposal.proposal.governance,
+            selectedProposal.proposalPk,
+            selectedProposal.proposal.tokenOwnerRecord,
+            ownTokenRecord.pubkey,
+            governanceAuthority,
+            selectedProposal.proposal.governingTokenMint,
+            Vote.fromYesNoVote(vote),
+            payer,
+            plugin?.voterWeightPk,
+            plugin?.maxVoterWeightRecord
+          )
+        }
+
+        const transaction = new Transaction()
+        transaction.add(...instructions)
+        transaction.recentBlockhash = recentBlockhash
+        transaction.setSigners(
+          // fee payed by the wallet owner
+          wallet.publicKey!
+        )
+        transactions.push(transaction)
+      }
+      const signedTXs = await wallet.signAllTransactions(transactions)
+      await Promise.all(
+        signedTXs.map((transaction) =>
+          sendSignedTransaction({ signedTransaction: transaction, connection })
+        )
+      )
+      toggleMultiVoteMode()
+      await refetchProposals()
+      notify({
+        message: 'Successfully voted on all proposals',
+        type: 'success',
+      })
+    } catch (e) {
+      notify({ type: 'erorr', message: `Something went wrong, ${e}` })
+    }
+  }
+
   return (
     <>
       <div
@@ -210,12 +298,14 @@ const REALM = () => {
             <Button
               className="whitespace-nowrap"
               disabled={selectedProposals.length === 0}
+              onClick={() => voteOnSelected(YesNoVote.Yes)}
             >
               Vote Yes
             </Button>
             <Button
               className="whitespace-nowrap"
               disabled={selectedProposals.length === 0}
+              onClick={() => voteOnSelected(YesNoVote.No)}
             >
               Vote No
             </Button>
@@ -368,3 +458,8 @@ const REALM = () => {
 }
 
 export default REALM
+
+export interface SelectedProposal {
+  proposal: Proposal
+  proposalPk: PublicKey
+}

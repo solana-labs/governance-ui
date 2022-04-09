@@ -6,12 +6,13 @@ import useProposalVotes from '../hooks/useProposalVotes'
 import ProposalTimeStatus from './ProposalTimeStatus'
 import { PublicKey } from '@solana/web3.js'
 import VoteResults from './VoteResults'
+import { SelectedProposal } from 'pages/dao/[symbol]'
 
 type ProposalCardProps = {
   proposalPk: PublicKey
   proposal: Proposal
-  setSelectedProposals: any
-  selectedProposals: Proposal[]
+  setSelectedProposals: (val: SelectedProposal[]) => void
+  selectedProposals: SelectedProposal[]
 }
 
 const ProposalSelectCard = ({
