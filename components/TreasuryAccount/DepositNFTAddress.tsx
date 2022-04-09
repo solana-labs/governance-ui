@@ -61,7 +61,8 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
       TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
       mintPK, // mint
-      owner! // owner
+      owner!, // owner
+      true
     )
     const ata = ataPk.toBase58()
     const isExistingAta = await tryGetAta(connection.current, mintPK, owner)
