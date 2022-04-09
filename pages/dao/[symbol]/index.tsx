@@ -100,6 +100,7 @@ const REALM = () => {
   const [paginatedProposals, setPaginatedProposals] = useState<
     [string, ProgramAccount<Proposal>][]
   >([])
+  const [isMultiVoting, setIsMultiVoting] = useState(false)
   const [proposalSearch, setProposalSearch] = useState('')
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
   const [activeTab, setActiveTab] = useState('Proposals')
@@ -213,6 +214,7 @@ const REALM = () => {
     const payer = wallet.publicKey!
 
     try {
+      setIsMultiVoting(true)
       const {
         blockhash: recentBlockhash,
       } = await connection.getLatestBlockhash()
@@ -263,8 +265,8 @@ const REALM = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
-      toggleMultiVoteMode()
       await refetchProposals()
+      toggleMultiVoteMode()
       notify({
         message: 'Successfully voted on all proposals',
         type: 'success',
@@ -272,6 +274,7 @@ const REALM = () => {
     } catch (e) {
       notify({ type: 'erorr', message: `Something went wrong, ${e}` })
     }
+    setIsMultiVoting(false)
   }
 
   return (
@@ -297,15 +300,17 @@ const REALM = () => {
           <div className="flex items-center space-x-3">
             <Button
               className="whitespace-nowrap"
-              disabled={selectedProposals.length === 0}
+              disabled={selectedProposals.length === 0 || isMultiVoting}
               onClick={() => voteOnSelected(YesNoVote.Yes)}
+              isLoading={isMultiVoting}
             >
               Vote Yes
             </Button>
             <Button
               className="whitespace-nowrap"
-              disabled={selectedProposals.length === 0}
+              disabled={selectedProposals.length === 0 || isMultiVoting}
               onClick={() => voteOnSelected(YesNoVote.No)}
+              isLoading={isMultiVoting}
             >
               Vote No
             </Button>
