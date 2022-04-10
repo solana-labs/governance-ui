@@ -79,10 +79,8 @@ const SendTokens = ({ isNft = false }) => {
   const [selectedNfts, setSelectedNfts] = useState<NFTWithMint[]>([])
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [showOptions, setShowOptions] = useState(false)
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] =
+    useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
   const destinationAccountName =
@@ -197,9 +195,10 @@ const SendTokens = ({ isNft = false }) => {
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount!.extensions.token?.account?.amount?.gte(
-        mintValue
-      )
+      gte =
+        form.governedTokenAccount!.extensions.token?.account?.amount?.gte(
+          mintValue
+        )
     } catch (e) {
       //silent fail
     }
@@ -252,7 +251,7 @@ const SendTokens = ({ isNft = false }) => {
     <>
       <h3 className="mb-4 flex items-center">
         <>
-          Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
+          Send {!isNFT && tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
         </>
       </h3>
       {isNFT ? (
@@ -295,7 +294,7 @@ const SendTokens = ({ isNft = false }) => {
         {isNFT ? (
           <NFTSelector
             onNftSelect={(nfts) => setSelectedNfts(nfts)}
-            ownerPk={currentAccount.governance!.pubkey}
+            ownerPk={currentAccount.extensions.transferAddress!}
           ></NFTSelector>
         ) : (
           <Input
