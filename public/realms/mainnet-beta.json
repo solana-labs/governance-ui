@@ -30,6 +30,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "The Sporagers",
+    "displayName": "The Sporagers",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "896vmJYkitEGhnBnRo8XxywUJu2qtgxidR9HXm5kjwrM",
+    "website": "https://www.thesporagers.io",
+    "twitter": "@TheSporagers",
+    "ogImage": "/realms/TheSporagers/img/the_sporagers.png"
+  },
+  {
     "symbol": "POOR",
     "displayName": "PoorDao (Famous Fox Edition)",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
