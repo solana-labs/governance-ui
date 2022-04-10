@@ -15,7 +15,8 @@ export const withCreateAssociatedTokenAccount = async (
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mintPk,
-    ownerPk // owner
+    ownerPk, // owner
+    true
   )
 
   instructions.push(

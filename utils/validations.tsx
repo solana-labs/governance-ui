@@ -61,7 +61,8 @@ export const tryGetAta = async (
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
     mint, // mint
-    owner // owner
+    owner, // owner
+    true
   )
   const tokenAccount = await tryGetTokenAccount(connection, ata)
   return tokenAccount
