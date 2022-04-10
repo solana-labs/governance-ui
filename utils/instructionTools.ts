@@ -463,7 +463,7 @@ export async function getTransferNftInstruction({
     const sourceAccount = tokenAccountsWithNftMint.find(
       (x) =>
         x.account.owner.toBase58() ===
-        form.governedTokenAccount.governance.pubkey?.toBase58()
+        form.governedTokenAccount.extensions.transferAddress.toBase58()
     )?.publicKey
     if (!sourceAccount) {
       throw 'Nft ata not found for governance'
@@ -497,7 +497,7 @@ export async function getTransferNftInstruction({
       TOKEN_PROGRAM_ID,
       sourceAccount!,
       receiverAddress,
-      form.governedTokenAccount.governance!.pubkey,
+      form.governedTokenAccount.extensions.transferAddress,
       [],
       mintAmount
     )
