@@ -33,7 +33,7 @@
     "@heroicons/react": "^1.0.1",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
-    "@next/bundle-analyzer": "^12.1.0",
+    "@next/bundle-analyzer": "^12.1.4",
     "@nfteyez/sol-rayz": "^0.10.2",
     "@notifi-network/notifi-react-hooks": "^0.10.1",
     "@project-serum/anchor": "^0.23.0",
