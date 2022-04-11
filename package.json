@@ -25,7 +25,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.3.16",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
-    "@cardinal/namespaces-components": "^2.5.2",
+    "@cardinal/namespaces-components": "^2.5.5",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.3.0",
     "@friktion-labs/friktion-sdk": "^1.1.25",
