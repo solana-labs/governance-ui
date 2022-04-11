@@ -6,7 +6,11 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { PROGRAM_VERSION_V1, RpcContext } from '@solana/spl-governance'
+import {
+  PROGRAM_VERSION_V1,
+  RpcContext,
+  VoteTipping,
+} from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
@@ -40,6 +44,7 @@ const defaultFormValues = {
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
+  voteTipping: VoteTipping.Strict,
 }
 
 const SOL = 'SOL'
@@ -127,6 +132,7 @@ const NewAccountForm = () => {
           maxVotingTime: form.maxVotingTime,
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
+          voteTipping: form.voteTipping,
         }
 
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
