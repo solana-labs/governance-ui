@@ -10,8 +10,7 @@ import { useTheme } from 'next-themes'
 import useWalletStore from 'stores/useWalletStore'
 
 const REALMS_PUBLIC_KEY = new anchor.web3.PublicKey(
-  // TODO: change with one for REALMS
-  'D2pyBevYb6dit1oCx6e8vCxFK9mBeYCRe8TTntk2Tm98'
+  '2j9Jk9iFEMz7t1Vb5Ghp97u81DABsAvjq3nRRMzbyCsA'
 )
 
 const themeVariables: IncomingThemeVariables = {
