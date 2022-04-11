@@ -255,7 +255,7 @@ const NewAccountForm = () => {
       <PreviousRouteBtn />
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Create new treasury account</h1>
+          <h1>Create new DAO wallet</h1>
         </div>
       </div>
       <Select

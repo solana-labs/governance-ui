@@ -14,8 +14,9 @@ import useQueryContext from '@hooks/useQueryContext'
 import tokenService from '@utils/services/token'
 import useStrategiesStore from 'Strategies/store/useStrategiesStore'
 import Select from '@components/inputs/Select'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
+import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
+import Tooltip from '@components/Tooltip'
 
 export const NEW_TREASURY_ROUTE = `/treasury/new`
 
@@ -91,9 +92,18 @@ const Treasury = () => {
     !toManyCommunityOutstandingProposalsForUser &&
     !toManyCouncilOutstandingProposalsForUse
 
+  const addNewAssetTooltip = !connected
+    ? 'Connect your wallet to create new asset'
+    : !canCreateGovernance
+    ? "You don't have enough governance power to create a new asset"
+    : toManyCommunityOutstandingProposalsForUser
+    ? 'You have too many community outstanding proposals. You need to finalize them before creating a new asset.'
+    : toManyCouncilOutstandingProposalsForUse
+    ? 'You have too many council outstanding proposals. You need to finalize them before creating a new asset.'
+    : ''
   useEffect(() => {
     if (activeAccount) {
-      const info = getTreasuryAccountItemInfo(activeAccount, {})
+      const info = getTreasuryAccountItemInfoV2(activeAccount)
       setAccountInfo(info)
     }
   }, [activeAccount])
@@ -135,14 +145,19 @@ const Treasury = () => {
             <div className="col-span-12 lg:col-span-4">
               <div className="flex items-center justify-between pb-4 pt-3">
                 <h2 className="mb-0 text-base">Treasury Accounts</h2>
-                <LinkButton
-                  className="flex items-center text-primary-light whitespace-nowrap"
-                  disabled={!isConnectedWithGovernanceCreationPermission}
-                  onClick={goToNewAccountForm}
+                <Tooltip
+                  contentClassName="ml-auto"
+                  content={addNewAssetTooltip}
                 >
-                  <PlusCircleIcon className="h-5 mr-2 w-5" />
-                  New Account
-                </LinkButton>
+                  <LinkButton
+                    className="flex items-center text-primary-light whitespace-nowrap"
+                    disabled={!isConnectedWithGovernanceCreationPermission}
+                    onClick={goToNewAccountForm}
+                  >
+                    <PlusCircleIcon className="h-5 mr-2 w-5" />
+                    New DAO wallet
+                  </LinkButton>
+                </Tooltip>
               </div>
               <div className="col-span-12 lg:hidden">
                 <Select
@@ -150,7 +165,7 @@ const Treasury = () => {
                   onChange={(g) =>
                     handleChangeAccountTab(
                       treasuryAccounts.find((acc) => {
-                        const info = getTreasuryAccountItemInfo(acc, {})
+                        const info = getTreasuryAccountItemInfoV2(acc)
                         return info.accountName === g
                       })
                     )
@@ -159,7 +174,7 @@ const Treasury = () => {
                   value={accountInfo?.accountName}
                 >
                   {treasuryAccounts.map((x) => {
-                    const { name } = getTreasuryAccountItemInfo(x, {})
+                    const { name } = getTreasuryAccountItemInfoV2(x)
                     return (
                       <Select.Option
                         key={x?.extensions.transferAddress?.toBase58()}
