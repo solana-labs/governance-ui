@@ -146,7 +146,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
         (m) => m.walletAddress === member?.walletAddress
       ) + 1
     )
-  }, [JSON.stringify(activeMembers)])
+  }, [JSON.stringify(activeMembers), member.walletAddress])
 
   useEffect(() => {
     setRecentVotes(paginateVotes(0))

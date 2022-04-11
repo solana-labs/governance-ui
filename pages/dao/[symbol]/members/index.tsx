@@ -1,5 +1,5 @@
 import useRealm from '@hooks/useRealm'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import MemberOverview from '@components/Members/MemberOverview'
 import { PlusCircleIcon, SearchIcon, UsersIcon } from '@heroicons/react/outline'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -14,6 +14,7 @@ import Select from '@components/inputs/Select'
 import Input from '@components/inputs/Input'
 import { Member } from '@utils/uiTypes/members'
 import useMembersStore from 'stores/useMembersStore'
+import PaginationComponent from '@components/Pagination'
 
 const MembersPage = () => {
   const {
@@ -21,17 +22,19 @@ const MembersPage = () => {
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
   } = useRealm()
+  const pagination = useRef<{ setPage: (val) => void }>(null)
+  const membersPerPage = 10
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
   const connected = useWalletStore((s) => s.connected)
   const {
     canUseMintInstruction,
     canMintRealmCouncilToken,
   } = useGovernanceAssets()
-  const [activeMember, setActiveMember] = useState(activeMembers[0])
+  const [paginatedMembers, setPaginatedMembers] = useState<Member[]>([])
+  const [activeMember, setActiveMember] = useState<Member>(activeMembers[0])
   const [openAddMemberModal, setOpenAddMemberModal] = useState(false)
   const [searchString, setSearchString] = useState('')
   const [filteredMembers, setFilteredMembers] = useState<Member[]>([])
-
   const filterMembers = (v) => {
     setSearchString(v)
     if (v.length > 0) {
@@ -55,14 +58,25 @@ const MembersPage = () => {
     : toManyCouncilOutstandingProposalsForUse
     ? 'You have too many council outstanding proposals. You need to finalize them before creating a new council member.'
     : ''
-
+  const onPageChange = (page) => {
+    setPaginatedMembers(paginateMembers(page))
+  }
+  const paginateMembers = (page) => {
+    return filteredMembers.slice(
+      page * membersPerPage,
+      (page + 1) * membersPerPage
+    )
+  }
   useEffect(() => {
     if (activeMembers.length > 0) {
       setActiveMember(activeMembers[0])
       setFilteredMembers(activeMembers)
     }
   }, [JSON.stringify(activeMembers)])
-
+  useEffect(() => {
+    setPaginatedMembers(paginateMembers(0))
+    pagination?.current?.setPage(0)
+  }, [JSON.stringify(filteredMembers)])
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -158,8 +172,13 @@ const MembersPage = () => {
             <MembersTabs
               activeTab={activeMember}
               onChange={(t) => setActiveMember(t)}
-              tabs={filteredMembers}
+              tabs={paginatedMembers}
             />
+            <PaginationComponent
+              ref={pagination}
+              totalPages={Math.ceil(filteredMembers.length / 10)}
+              onPageChange={onPageChange}
+            ></PaginationComponent>
           </div>
         </div>
         <div className="col-span-12 lg:col-span-8">

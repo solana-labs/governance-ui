@@ -56,7 +56,8 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
         nftMintPk, // mint
-        governance! // owner
+        governance!, // owner
+        true
       )
       if (!isAtaForGovernanceExist) {
         await createATA(

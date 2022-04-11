@@ -25,7 +25,7 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.3.16",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
-    "@cardinal/namespaces-components": "^2.5.2",
+    "@cardinal/namespaces-components": "^2.5.5",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.3.0",
     "@friktion-labs/friktion-sdk": "^1.1.25",
@@ -33,7 +33,7 @@
     "@heroicons/react": "^1.0.6",
     "@marinade.finance/marinade-ts-sdk": "^2.0.9",
     "@metaplex-foundation/mpl-token-metadata": "^1.2.5",
-    "@next/bundle-analyzer": "^12.1.0",
+    "@next/bundle-analyzer": "^12.1.4",
     "@nfteyez/sol-rayz": "^0.10.2",
     "@notifi-network/notifi-react-hooks": "^0.10.1",
     "@project-serum/anchor": "^0.23.0",

@@ -60,14 +60,16 @@ export const withVoteRegistryWithdraw = async ({
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mintPk,
-    voter
+    voter,
+    true
   )
 
   const ataPk = await Token.getAssociatedTokenAddress(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
     mintPk, // mint
-    walletPk // owner
+    walletPk, // owner
+    true
   )
   const isExistingAta = await tryGetTokenAccount(connection, ataPk)
   if (!isExistingAta) {

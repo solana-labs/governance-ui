@@ -252,7 +252,7 @@ const SendTokens = ({ isNft = false }) => {
     <>
       <h3 className="mb-4 flex items-center">
         <>
-          Send {tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
+          Send {!isNft && tokenInfo && tokenInfo?.symbol} {isNFT && 'NFT'}
         </>
       </h3>
       {isNFT ? (
@@ -295,7 +295,7 @@ const SendTokens = ({ isNft = false }) => {
         {isNFT ? (
           <NFTSelector
             onNftSelect={(nfts) => setSelectedNfts(nfts)}
-            ownerPk={currentAccount.governance!.pubkey}
+            ownerPk={currentAccount.extensions.transferAddress!}
           ></NFTSelector>
         ) : (
           <Input
