@@ -91,7 +91,15 @@ function getVotingStateRank(
 
 const REALM = () => {
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const { realm, realmInfo, proposals, governances, tokenRecords } = useRealm()
+  const {
+    realm,
+    realmInfo,
+    proposals,
+    governances,
+    tokenRecords,
+    ownVoterWeight,
+    ownTokenRecord,
+  } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
@@ -193,6 +201,11 @@ const REALM = () => {
 
   const allVotingProposalsSelected =
     selectedProposals.length === votingProposals.length
+  const hasCommunityVoteWeight =
+    ownTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+  const cantMultiVote =
+    selectedProposals.length === 0 || isMultiVoting || !hasCommunityVoteWeight
 
   const toggleSelectAll = () => {
     if (allVotingProposalsSelected) {
@@ -300,7 +313,10 @@ const REALM = () => {
           <div className="flex items-center space-x-3">
             <Button
               className="whitespace-nowrap"
-              disabled={selectedProposals.length === 0 || isMultiVoting}
+              disabled={cantMultiVote}
+              tooltipMessage={
+                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+              }
               onClick={() => voteOnSelected(YesNoVote.Yes)}
               isLoading={isMultiVoting}
             >
@@ -308,7 +324,10 @@ const REALM = () => {
             </Button>
             <Button
               className="whitespace-nowrap"
-              disabled={selectedProposals.length === 0 || isMultiVoting}
+              disabled={cantMultiVote}
+              tooltipMessage={
+                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+              }
               onClick={() => voteOnSelected(YesNoVote.No)}
               isLoading={isMultiVoting}
             >
