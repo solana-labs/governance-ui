@@ -176,7 +176,7 @@ const REALM = () => {
   const votingProposals = useMemo(
     () =>
       allProposals.filter(([k, v]) => {
-        const governance = governances[v.account.governance.toBase58()].account
+        const governance = governances[v.account.governance.toBase58()]?.account
         return (
           v.account.state === ProposalState.Voting &&
           !ownVoteRecordsByProposal[k] &&
