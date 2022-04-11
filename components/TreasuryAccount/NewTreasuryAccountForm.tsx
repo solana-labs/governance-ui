@@ -77,8 +77,18 @@ const NewAccountForm = () => {
       defaultMint: DEFAULT_NATIVE_SOL_MINT,
       hide: !isCurrentVersionHigherThenV1(),
     },
-    { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
-    { name: 'Token Account', value: OTHER, defaultMint: '' },
+    {
+      name: 'NFT Account',
+      value: NFT,
+      defaultMint: DEFAULT_NFT_TREASURY_MINT,
+      hide: isCurrentVersionHigherThenV1(),
+    },
+    {
+      name: 'Token Account',
+      value: OTHER,
+      defaultMint: '',
+      hide: isCurrentVersionHigherThenV1(),
+    },
   ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
