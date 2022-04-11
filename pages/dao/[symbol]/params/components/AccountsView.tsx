@@ -1,5 +1,5 @@
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
-import { AccountType } from 'stores/useGovernanceAssetsStore'
+import { AccountType } from '@utils/uiTypes/assets'
 import { AddressField } from '../index'
 
 const AccountsView = ({ activeGovernance, getYesNoString }) => {
