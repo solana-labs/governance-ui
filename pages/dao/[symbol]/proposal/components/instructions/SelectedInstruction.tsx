@@ -10,6 +10,9 @@ import NativeEmpty from './Native/Empty';
 import NativeCustomBase64 from './Native/CustomBase64';
 import SetProgramAuthority from './Native/SetProgramAuthority';
 import SplTokenTransfer from './Native/SplTokenTransfer';
+import SaberPoolsDeposit from './SaberPools/Deposit';
+import SaberPoolsWithdrawOne from './SaberPools/WithdrawOne';
+import SaberPeripheryRedeemAllTokenFromMintProxy from './SaberPeriphery/RedeemAllTokensFromMintProxy';
 import SoceanCancelVest from './Socean/CancelVest';
 import SoceanCloseAuction from './Socean/CloseAuction';
 import SoceanDepositToAuctionPool from './Socean/DepositToAuctionPool';
@@ -121,6 +124,24 @@ const SelectedInstruction = ({
     case InstructionEnum.RaydiumRemoveLiquidity:
       return (
         <RaydiumRemoveLiquidityFromPool
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.SaberPoolsDeposit:
+      return (
+        <SaberPoolsDeposit index={index} governedAccount={governedAccount} />
+      );
+    case InstructionEnum.SaberPoolsWithdrawOne:
+      return (
+        <SaberPoolsWithdrawOne
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.SaberPeripheryRedeemAllTokensFromMintProxy:
+      return (
+        <SaberPeripheryRedeemAllTokenFromMintProxy
           index={index}
           governedAccount={governedAccount}
         />

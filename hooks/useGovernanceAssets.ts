@@ -204,91 +204,95 @@ export default function useGovernanceAssets() {
       name: 'Socean',
       image: '/img/socean.png',
     },
+    [PackageEnum.Saber]: {
+      name: 'Saber',
+      image: '/img/saber.png',
+    },
   };
 
   const instructions: Instructions = {
     [InstructionEnum.TribecaCreateEpochGauge]: {
-      name: 'Tribeca: Create Epoch Gauge',
+      name: 'Create Epoch Gauge',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaCreateEscrowGovernanceTokenATA]: {
-      name: 'Tribeca: Create Escrow Governance Token ATA',
+      name: 'Create Escrow Governance Token ATA',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaCreateGaugeVote]: {
-      name: 'Tribeca: Create Gauge Vote',
+      name: 'Create Gauge Vote',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaCreateGaugeVoter]: {
-      name: 'Tribeca: Create Gauge Voter',
+      name: 'Create Gauge Voter',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaGaugeCommitVote]: {
-      name: 'Tribeca: Gauge Commit Vote',
+      name: 'Gauge Commit Vote',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaGaugeRevertVote]: {
-      name: 'Tribeca: Gauge Revert Vote',
+      name: 'Gauge Revert Vote',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaLock]: {
-      name: 'Tribeca: Lock Tokens',
+      name: 'Lock Tokens',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaNewEscrow]: {
-      name: 'Tribeca: New Escrow',
+      name: 'New Escrow',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaPrepareEpochGaugeVoter]: {
-      name: 'Tribeca: Prepare Epoch Gauge Voter',
+      name: 'Prepare Epoch Gauge Voter',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaResetEpochGaugeVoter]: {
-      name: 'Tribeca: Reset Epoch Gauge Voter',
+      name: 'Reset Epoch Gauge Voter',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.TribecaGaugeSetVote]: {
-      name: 'Tribeca: Set Gauge Vote',
+      name: 'Set Gauge Vote',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Tribeca,
     },
     [InstructionEnum.SoceanMintBondedTokens]: {
-      name: 'Socean: Mint Bonded Tokens',
+      name: 'Mint Bonded Tokens',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Socean,
     },
     [InstructionEnum.SoceanDepositToAuctionPool]: {
-      name: 'Socean: Deposit to Auction',
+      name: 'Deposit to Auction',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Socean,
     },
     [InstructionEnum.SoceanPurchaseBondedTokens]: {
-      name: 'Socean: Purchase Bonded Tokens',
+      name: 'Purchase Bonded Tokens',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Socean,
     },
     [InstructionEnum.SoceanCloseAuction]: {
-      name: 'Socean: Close Auction',
+      name: 'Close Auction',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Socean,
     },
     [InstructionEnum.SoceanVest]: {
-      name: 'Socean: Vest',
+      name: 'Vest',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Socean,
     },
     [InstructionEnum.SoceanCancelVest]: {
-      name: 'Socean: Cancel Vest',
+      name: 'Cancel Vest',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Socean,
     },
@@ -326,6 +330,21 @@ export default function useGovernanceAssets() {
       name: 'Withdraw Funds',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.Solend,
+    },
+    [InstructionEnum.SaberPoolsDeposit]: {
+      name: 'Pool Deposit',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Saber,
+    },
+    [InstructionEnum.SaberPoolsWithdrawOne]: {
+      name: 'Withdraw One From Pool',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Saber,
+    },
+    [InstructionEnum.SaberPeripheryRedeemAllTokensFromMintProxy]: {
+      name: 'Redeem All Tokens From Mint Proxy',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Saber,
     },
     [InstructionEnum.UXDInitializeController]: {
       name: 'Initialize Controller',

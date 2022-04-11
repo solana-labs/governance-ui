@@ -1,4 +1,3 @@
-import BigNumber from 'bignumber.js';
 import * as yup from 'yup';
 import { BN } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
@@ -8,6 +7,7 @@ import soceanConfig from '@tools/sdk/socean/configuration';
 import { purchase } from '@tools/sdk/socean/instructions/purchase';
 import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
 import { SoceanPurchaseBondedTokensForm } from '@utils/uiTypes/proposalCreationTypes';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
 
 //TODO: Make a reusable SELECT component for Slippage
 const schema = yup.object().shape({
@@ -77,15 +77,13 @@ const PurchaseBondedTokens = ({
         buyer: new PublicKey(form.buyer!),
         paymentSource: new PublicKey(form.paymentSource!),
         saleDestination: new PublicKey(form.saleDestination!),
-        purchaseAmount: new BN(
-          new BigNumber(form.uiPurchaseAmount!.toString())
-            .shiftedBy(saleMintInfo.account.decimals)
-            .toString(),
+        purchaseAmount: uiAmountToNativeBN(
+          form.uiPurchaseAmount!.toString(),
+          saleMintInfo.account.decimals,
         ),
-        expectedPayment: new BN(
-          new BigNumber(form.uiExpectedPayment!.toString())
-            .shiftedBy(paymentMintInfo.account.decimals)
-            .toString(),
+        expectedPayment: uiAmountToNativeBN(
+          form.uiExpectedPayment!.toString(),
+          paymentMintInfo.account.decimals,
         ),
         slippageTolerance: new BN(form.slippageTolerance!),
       });

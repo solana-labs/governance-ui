@@ -1,6 +1,4 @@
-import BigNumber from 'bignumber.js';
 import * as yup from 'yup';
-import { BN } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
@@ -8,6 +6,7 @@ import soceanConfig from '@tools/sdk/socean/configuration';
 import { mintBondedTokens } from '@tools/sdk/socean/instructions/mintBondedTokens';
 import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
 import { SoceanMintBondedTokensForm } from '@utils/uiTypes/proposalCreationTypes';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -62,10 +61,9 @@ const MintBondedTokens = ({
       return mintBondedTokens({
         cluster,
         program: programs.Bonding,
-        amount: new BN(
-          new BigNumber(form.uiAmount!.toString())
-            .shiftedBy(mintInfo.account.decimals)
-            .toString(),
+        amount: uiAmountToNativeBN(
+          form.uiAmount!.toString(),
+          mintInfo.account.decimals,
         ),
         depositFrom: new PublicKey(form.depositFrom!),
         authority: governedAccountPubkey,

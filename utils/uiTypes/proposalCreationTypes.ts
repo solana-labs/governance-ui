@@ -4,18 +4,20 @@ import { RpcContext } from '@solana/spl-governance';
 import { MintInfo } from '@solana/spl-token';
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js';
 import { getNameOf } from '@tools/core/script';
+import { SupportedMintName } from '@tools/sdk/solend/configuration';
+import { SupportedMintName as QuarryMineSupportedMintName } from '@tools/sdk/quarryMine/configuration';
 import {
   GovernedMintInfoAccount,
   GovernedMultiTypeAccount,
   GovernedTokenAccount,
 } from '@utils/tokens';
-import { SupportedMintName } from '@tools/sdk/solend/configuration';
 import { SplTokenUIName } from '@utils/splTokens';
 import { DepositWithMintAccount, Voter } from 'VoteStakeRegistry/sdk/accounts';
 import { LockupKind } from 'VoteStakeRegistry/tools/types';
 import { AmountSide } from '@raydium-io/raydium-sdk';
 import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
 import { InstructionType } from '@hooks/useGovernanceAssets';
+import { SupportedSaberPoolNames } from '@tools/sdk/saberPools/configuration';
 
 export interface FormInstructionData {
   serializedInstruction: string;
@@ -189,6 +191,30 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
   insuranceWithdrawnAmount: number;
 }
 
+export interface SaberPoolsDepositForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: SupportedSaberPoolNames;
+  sourceA?: string;
+  sourceB?: string;
+  uiTokenAmountA?: number;
+  uiTokenAmountB?: number;
+  uiMinimumPoolTokenAmount?: number;
+}
+
+export interface SaberPoolsWithdrawOneForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  poolName?: SupportedSaberPoolNames;
+  destinationAccount?: PublicKey;
+  baseTokenName?: string;
+  uiPoolTokenAmount?: number;
+  uiMinimumTokenAmount?: number;
+}
+
+export interface SaberPeripheryRedeemAllTokensFromMintProxyForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  mintName?: QuarryMineSupportedMintName;
+}
+
 export interface SoceanMintBondedTokensForm {
   governedAccount?: GovernedMultiTypeAccount;
   uiAmount?: number;
@@ -349,6 +375,9 @@ export enum InstructionEnum {
   FriktionDepositIntoVolt,
   RaydiumAddLiquidity,
   RaydiumRemoveLiquidity,
+  SaberPoolsDeposit,
+  SaberPoolsWithdrawOne,
+  SaberPeripheryRedeemAllTokensFromMintProxy,
   SolendCreateObligationAccount,
   SolendInitObligationAccount,
   SolendDepositReserveLiquidityAndObligationCollateral,
@@ -395,6 +424,7 @@ export enum PackageEnum {
   Friktion,
   Tribeca,
   Socean,
+  Saber,
 }
 
 export type createParams = [

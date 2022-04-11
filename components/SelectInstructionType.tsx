@@ -92,15 +92,15 @@ const SelectInstructionType = ({
 
   return (
     <div>
-      <div className="flex pb-2">
+      <div className="flex flex-col justify-between pb-2">
         <span>Instruction {idx + 1}</span>
 
-        <span className="text-xs items-center flex items-center text-fgd-3 ml-3">
-          Filters by package
+        <span className="text-xs flex items-center text-fgd-3 mb-1 mt-1 ml-3">
+          Filters by package:
         </span>
 
         <PackageSelection
-          className="ml-3"
+          className="ml-1"
           selected={packageId}
           packages={availablePackages}
           onClick={(selectedPackageId: PackageEnum) => {

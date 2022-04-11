@@ -1,6 +1,4 @@
-import BigNumber from 'bignumber.js';
 import * as yup from 'yup';
-import { BN } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import Input from '@components/inputs/Input';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
@@ -8,6 +6,7 @@ import soceanConfig from '@tools/sdk/socean/configuration';
 import { depositToAuctionPool } from '@tools/sdk/socean/instructions/depositToAuctionPool';
 import { GovernedMultiTypeAccount, tryGetTokenMint } from '@utils/tokens';
 import { SoceanDepositToAuctionPoolForm } from '@utils/uiTypes/proposalCreationTypes';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -61,10 +60,9 @@ const DepositToAuctionPool = ({
       return depositToAuctionPool({
         cluster,
         program: programs.DescendingAuction,
-        depositAmount: new BN(
-          new BigNumber(form.uiDepositAmount!.toString())
-            .shiftedBy(mintInfo.account.decimals)
-            .toString(),
+        depositAmount: uiAmountToNativeBN(
+          form.uiDepositAmount!.toString(),
+          mintInfo.account.decimals,
         ),
         auction: new PublicKey(form.auction!),
         authority: governedAccountPubkey,
