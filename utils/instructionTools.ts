@@ -325,7 +325,7 @@ export async function getTransferInstruction({
     governedTokenAccount.extensions?.token &&
     governedTokenAccount.extensions?.mint?.account
   ) {
-    const sourceAccount = governedTokenAccount.extensions.token?.account.address
+    const sourceAccount = governedTokenAccount.extensions.transferAddress
     //this is the original owner
     const destinationAccount = new PublicKey(form.destinationAccount)
     const mintPK = form.governedTokenAccount.extensions.mint.publicKey
@@ -357,7 +357,7 @@ export async function getTransferInstruction({
     }
     const transferIx = Token.createTransferInstruction(
       TOKEN_PROGRAM_ID,
-      sourceAccount,
+      sourceAccount!,
       receiverAddress,
       currentAccount!.extensions!.token!.account.owner,
       [],
@@ -394,13 +394,7 @@ export async function getSolTransferInstruction({
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []
   const governedTokenAccount = form.governedTokenAccount as AssetAccount
-  if (
-    isValid &&
-    programId &&
-    governedTokenAccount?.extensions.token?.publicKey &&
-    governedTokenAccount?.extensions.token &&
-    governedTokenAccount?.extensions.mint?.account
-  ) {
+  if (isValid && programId && governedTokenAccount?.extensions.mint?.account) {
     const sourceAccount = governedTokenAccount.extensions.transferAddress
     const destinationAccount = new PublicKey(form.destinationAccount)
     //We have configured mint that has same decimals settings as SOL

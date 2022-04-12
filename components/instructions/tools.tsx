@@ -147,9 +147,6 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
-export const DEFAULT_NATIVE_SOL_MINT =
-  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
-
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
 }
@@ -169,6 +166,8 @@ const HIDDEN_MNGO_TREASURES = [
   '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
   '4Z8nAK9grjokaUqJNtw2AEkYAR1vcw8pkCWZcbVEEdh5',
   'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
+  'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
+  'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
 ]
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]

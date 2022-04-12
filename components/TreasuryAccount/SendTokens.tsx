@@ -197,13 +197,11 @@ const SendTokens = ({ isNft = false }) => {
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount!.extensions.token?.account?.amount?.gte(
-        mintValue
-      )
+      gte = form.governedTokenAccount!.extensions.amount?.gte(mintValue)
     } catch (e) {
       //silent fail
     }
-    return form.governedTokenAccount!.extensions.token?.publicKey && gte
+    return gte
   }
 
   useEffect(() => {
