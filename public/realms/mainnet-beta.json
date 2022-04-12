@@ -30,6 +30,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "The Sporagers",
+    "displayName": "The Sporagers",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "896vmJYkitEGhnBnRo8XxywUJu2qtgxidR9HXm5kjwrM",
+    "website": "https://www.thesporagers.io",
+    "twitter": "@TheSporagers",
+    "ogImage": "/realms/TheSporagers/img/the_sporagers.png"
+  },
+  {
     "symbol": "POOR",
     "displayName": "PoorDao (Famous Fox Edition)",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -566,5 +575,15 @@
     "website": "https://mortuary-inc.io/",
     "twitter": "@MortuaryIncNFT",
     "ogImage": "/realms/MorDAO/img/logo.svg"
+  },
+  {
+    "symbol": "EVS",
+    "displayName": "EverSOL",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "7pX17rs38WKHVw5mpJNBCjGXRz5eZsPj5QHAEZv1Zu4d",
+    "bannerImage": "/realms/EverSol/img/EverSol_Banner.jpg",
+    "ogImage": "/realms/EverSol/img/EverSol_Logo.jpg",
+    "website": "https://eversol.one/",
+    "twitter": "@eversol_pool"
   }
 ]

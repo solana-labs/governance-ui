@@ -62,11 +62,11 @@ export default function InstructionCard({
         sourcePk
       )
       const isSol = governedTokenAccountsWithoutNfts.find(
-        (x) => x.transferAddress?.toBase58() === sourcePk.toBase58()
+        (x) => x.extensions.transferAddress?.toBase58() === sourcePk.toBase58()
       )?.isSol
       const isNFTAccount = nftsGovernedTokenAccounts.find(
         (x) =>
-          x.governance?.pubkey.toBase58() ===
+          x.extensions.transferAddress?.toBase58() ===
           tokenAccount?.account.owner.toBase58()
       )
       if (isNFTAccount) {

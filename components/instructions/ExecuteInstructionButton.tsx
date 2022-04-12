@@ -17,6 +17,11 @@ import { PublicKey } from '@solana/web3.js'
 import Tooltip from '@components/Tooltip'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { notify } from '@utils/notifications'
+import dayjs from 'dayjs'
+import {
+  getFormattedStringFromDays,
+  SECS_PER_DAY,
+} from 'VoteStakeRegistry/tools/dateTools'
 
 export enum PlayState {
   Played,
@@ -116,7 +121,19 @@ export function ExecuteInstructionButton({
     proposalInstruction.account.executionStatus !==
       InstructionExecutionStatus.Error
   ) {
-    return (
+    const timeLeftToExectue =
+      (proposal.account.votingCompletedAt &&
+        dayjs
+          .unix(proposal.account.votingCompletedAt.toNumber())
+          .add(proposalInstruction.account.holdUpTime, 'second')
+          .unix() - dayjs().unix()) ||
+      0
+    return timeLeftToExectue > 0 ? (
+      <Button small disabled={true} onClick={onExecuteInstruction}>
+        Can execute in{' '}
+        {getFormattedStringFromDays(timeLeftToExectue / SECS_PER_DAY)}
+      </Button>
+    ) : (
       <Button small disabled={!connected} onClick={onExecuteInstruction}>
         Execute
       </Button>

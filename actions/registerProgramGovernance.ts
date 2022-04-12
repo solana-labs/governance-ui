@@ -44,8 +44,6 @@ export const registerProgramGovernance = async (
     'createGovernance'
   )
 
-  console.log('VERSION', programVersion)
-
   switch (governanceType) {
     case GovernanceType.Program: {
       governanceAddress = await withCreateProgramGovernance(

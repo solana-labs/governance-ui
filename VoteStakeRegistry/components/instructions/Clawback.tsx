@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import useRealm from '@hooks/useRealm'
 import { TransactionInstruction } from '@solana/web3.js'
 import useWalletStore from 'stores/useWalletStore'
-import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens'
+import { tryGetMint } from '@utils/tokens'
 import {
   ClawbackForm,
   UiInstruction,
@@ -31,6 +31,7 @@ import tokenService from '@utils/services/token'
 import { getClawbackInstruction } from 'VoteStakeRegistry/actions/getClawbackInstruction'
 import { abbreviateAddress } from '@utils/formatting'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const Clawback = ({
   index,
@@ -69,14 +70,14 @@ const Clawback = ({
     const prerequisiteInstructions: TransactionInstruction[] = []
     if (
       isValid &&
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount?.token &&
-      form.governedTokenAccount?.mint?.account &&
+      form.governedTokenAccount!.extensions.token?.publicKey &&
+      form.governedTokenAccount!.extensions.token &&
+      form.governedTokenAccount!.extensions.mint?.account &&
       form.voter &&
       form.deposit
     ) {
-      const clawbackDestination =
-        form.governedTokenAccount.token?.account.address
+      const clawbackDestination = form.governedTokenAccount!.extensions.token
+        .account.address
       const voterWalletAddress = form.voter.voterAuthority
       const clawbackIx = await getClawbackInstruction({
         realmPk: realm!.pubkey,
@@ -248,9 +249,9 @@ const Clawback = ({
         governedAccounts={
           governedTokenAccountsWithoutNfts.filter(
             (x) =>
-              x.mint?.publicKey.toBase58() ===
+              x.extensions.mint?.publicKey.toBase58() ===
               form.deposit?.mint.publicKey.toBase58()
-          ) as GovernedMultiTypeAccount[]
+          ) as AssetAccount[]
         }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })

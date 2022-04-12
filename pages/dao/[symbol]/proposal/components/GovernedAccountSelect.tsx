@@ -5,10 +5,10 @@ import {
   getMintAccountLabelInfo,
   getSolAccountLabel,
   getTokenAccountLabelInfo,
-  GovernedMultiTypeAccount,
 } from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const GovernedAccountSelect = ({
   onChange,
@@ -19,17 +19,19 @@ const GovernedAccountSelect = ({
   governance,
   label,
   noMaxWidth,
+  autoselectFirst = true,
 }: {
   onChange
   value
   error?
-  governedAccounts: GovernedMultiTypeAccount[]
+  governedAccounts: AssetAccount[]
   shouldBeGoverned?
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
+  autoselectFirst?: boolean
 }) => {
-  function getLabel(value: GovernedMultiTypeAccount) {
+  function getLabel(value: AssetAccount) {
     if (value) {
       const accountType = value.governance.account.accountType
       switch (accountType) {
@@ -111,7 +113,7 @@ const GovernedAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (governedAccounts.length == 1) {
+    if (governedAccounts.length == 1 && autoselectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(governedAccounts[0])
@@ -139,7 +141,7 @@ const GovernedAccountSelect = ({
           return (
             <Select.Option
               className="border-red"
-              key={acc.governance?.account.governedAccount.toBase58()}
+              key={acc.pubkey.toBase58()}
               value={acc}
             >
               {getLabel(acc)}

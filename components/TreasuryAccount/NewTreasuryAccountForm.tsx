@@ -6,7 +6,11 @@ import Input from 'components/inputs/Input'
 import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { PROGRAM_VERSION_V1, RpcContext } from '@solana/spl-governance'
+import {
+  PROGRAM_VERSION_V1,
+  RpcContext,
+  VoteTipping,
+} from '@solana/spl-governance'
 import { MintInfo } from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
@@ -40,6 +44,7 @@ const defaultFormValues = {
   minInstructionHoldUpTime: 0,
   maxVotingTime: 3,
   voteThreshold: 60,
+  voteTipping: VoteTipping.Strict,
 }
 
 const SOL = 'SOL'
@@ -72,8 +77,18 @@ const NewAccountForm = () => {
       defaultMint: DEFAULT_NATIVE_SOL_MINT,
       hide: !isCurrentVersionHigherThenV1(),
     },
-    { name: 'NFT Account', value: NFT, defaultMint: DEFAULT_NFT_TREASURY_MINT },
-    { name: 'Token Account', value: OTHER, defaultMint: '' },
+    {
+      name: 'NFT Account',
+      value: NFT,
+      defaultMint: DEFAULT_NFT_TREASURY_MINT,
+      hide: isCurrentVersionHigherThenV1(),
+    },
+    {
+      name: 'Token Account',
+      value: OTHER,
+      defaultMint: '',
+      hide: isCurrentVersionHigherThenV1(),
+    },
   ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
@@ -127,6 +142,7 @@ const NewAccountForm = () => {
           maxVotingTime: form.maxVotingTime,
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
+          voteTipping: form.voteTipping,
         }
 
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
@@ -249,7 +265,7 @@ const NewAccountForm = () => {
       <PreviousRouteBtn />
       <div className="border-b border-fgd-4 pb-4 pt-2">
         <div className="flex items-center justify-between">
-          <h1>Create new treasury account</h1>
+          <h1>Create new DAO wallet</h1>
         </div>
       </div>
       <Select

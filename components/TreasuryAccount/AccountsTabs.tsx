@@ -1,11 +1,11 @@
 import { FunctionComponent } from 'react'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface AccountsTabsProps {
-  activeTab: any
+  activeTab: AssetAccount | null
   onChange: (x) => void
-  tabs: Array<any>
+  tabs: Array<AssetAccount>
 }
 
 const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
@@ -13,7 +13,6 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
   onChange,
   tabs,
 }) => {
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   return (
     <div className={`relative`}>
       <div
@@ -21,7 +20,9 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
         style={{
           transform: `translateY(${
             tabs.findIndex(
-              (t) => t.transferAddress === activeTab?.transferAddress
+              (t) =>
+                t.extensions.transferAddress ===
+                activeTab?.extensions.transferAddress
             ) * 100
           }%)`,
           height: `${100 / tabs.length}%`,
@@ -34,13 +35,14 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
           name,
           symbol,
           displayPrice,
-        } = getTreasuryAccountItemInfo(x, governanceNfts)
+        } = getTreasuryAccountItemInfoV2(x)
         return (
           <button
-            key={x.transferAddress}
+            key={x.extensions.transferAddress?.toBase58()}
             onClick={() => onChange(x)}
             className={`cursor-pointer default-transition flex items-center h-24 px-4 relative w-full hover:bg-bkg-3 hover:rounded-md ${
-              activeTab?.transferAddress === x.transferAddress
+              activeTab?.extensions.transferAddress ===
+              x.extensions.transferAddress
                 ? `bg-bkg-3 rounded-md rounded-l-none text-primary-light`
                 : `text-fgd-2 hover:text-primary-light`
             }
@@ -48,7 +50,17 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
           >
             <div className="text-left">
               <h3 className="mb-1 text-sm flex">
-                {logo && <img src={logo} className="w-5 h-5 mr-2"></img>} {name}
+                {logo && (
+                  <img
+                    src={logo}
+                    onError={({ currentTarget }) => {
+                      currentTarget.onerror = null // prevents looping
+                      currentTarget.hidden = true
+                    }}
+                    className="w-5 h-5 mr-2"
+                  ></img>
+                )}{' '}
+                {name}
               </h3>
               <p className="mb-0 text-fgd-1 text-xs">
                 {amountFormatted} {symbol}
