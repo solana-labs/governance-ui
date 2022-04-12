@@ -105,16 +105,8 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             x.type === AccountType.NFT ||
             x.type === AccountType.SOL
         )
-        .filter((x) => {
-          const pubkey =
-            typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-          return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
-        })
-      s.assetAccounts = accounts.filter((x) => {
-        const pubkey =
-          typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-        return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
-      })
+        .filter(filterOutHiddenAccs)
+      s.assetAccounts = accounts.filter(filterOutHiddenAccs)
     })
   },
   refetchGovernanceAccounts: async (connection, realm, governancePk) => {
@@ -143,11 +135,9 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             x.type === AccountType.SOL
         ),
       ]
-      s.assetAccounts = [...previousAccounts, ...accounts].filter((x) => {
-        const pubkey =
-          typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-        return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
-      })
+      s.assetAccounts = [...previousAccounts, ...accounts].filter(
+        filterOutHiddenAccs
+      )
     })
   },
 }))
@@ -512,4 +502,9 @@ const getSolAccountsInfo = async (
         .filter((x) => x.acc)
     : []
   return accounts as SolAccInfo[]
+}
+
+const filterOutHiddenAccs = (x) => {
+  const pubkey = typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
+  return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
 }

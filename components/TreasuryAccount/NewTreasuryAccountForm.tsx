@@ -25,10 +25,7 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
-import {
-  DEFAULT_NATIVE_SOL_MINT,
-  DEFAULT_NFT_TREASURY_MINT,
-} from '@components/instructions/tools'
+import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { TokenInfo } from '@solana/spl-token-registry'
@@ -74,7 +71,7 @@ const NewAccountForm = () => {
     {
       name: 'SOL Account',
       value: SOL,
-      defaultMint: DEFAULT_NATIVE_SOL_MINT,
+      defaultMint: '',
       hide: !isCurrentVersionHigherThenV1(),
     },
     {
