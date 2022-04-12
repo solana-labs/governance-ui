@@ -524,7 +524,6 @@ export async function getMintInstruction({
   governedMintInfoAccount: AssetAccount | undefined
   setFormErrors: any
 }): Promise<UiInstruction> {
-  console.log(form)
   const isValid = await validateInstruction({ schema, form, setFormErrors })
   let serializedInstruction = ''
   const prerequisiteInstructions: TransactionInstruction[] = []

@@ -15,7 +15,6 @@ import useWalletStore from 'stores/useWalletStore'
 import AccountHeader from './AccountHeader'
 import DepositNFT from './DepositNFT'
 import SendTokens from './SendTokens'
-import GenericSendTokens, { GenericSendTokensProps } from './GenericSendTokens'
 import {
   ExternalLinkIcon,
   PlusCircleIcon,
@@ -69,10 +68,6 @@ const AccountOverview = () => {
     TreasuryStrategy[]
   >([])
   const [showStrategies, setShowStrategies] = useState(false)
-  const [
-    genericSendTokenInfo,
-    setGenericSendTokenInfo,
-  ] = useState<GenericSendTokensProps | null>(null)
   const [
     proposedInvestment,
     setProposedInvestment,
@@ -382,17 +377,6 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
-        </Modal>
-      )}
-      {genericSendTokenInfo && (
-        <Modal
-          sizeClassName="sm:max-w-3xl"
-          onClose={() => {
-            setGenericSendTokenInfo(null)
-          }}
-          isOpen={!!genericSendTokenInfo}
-        >
-          <GenericSendTokens {...genericSendTokenInfo} />
         </Modal>
       )}
     </>
