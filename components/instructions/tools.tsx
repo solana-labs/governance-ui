@@ -125,7 +125,7 @@ export const ACCOUNT_NAMES = {
   xuEfu6gmCn1RSXSAVpWLTYttx685m9rAbzqwwYUjYXJ: 'DAOJones Fractionalized Tokens',
   GQDFqZ7URyWAiPMQs4ywZ9pKBqrUg4srdkqnZpRUstQz: 'Merch Escrow Holdings',
   '7JPpGyJTEXwR9uQSqhi6RAK5GiSTr41oq72PJ4fU5CXf': 'Marketing Wallet SOL',
-  '2FCKVvw3JmRD6Q2DFb3ZzW697GKjYka8JwGMSF7juWZd': 'Marketing Wallet USDC'
+  '2FCKVvw3JmRD6Q2DFb3ZzW697GKjYka8JwGMSF7juWZd': 'Marketing Wallet USDC',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -143,6 +143,9 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
 export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
 ])
+
+export const DEFAULT_NATIVE_SOL_MINT =
+  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
 
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
