@@ -11,7 +11,7 @@ import { LockupKind } from 'VoteStakeRegistry/tools/types'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface UiInstruction {
-  serializedInstruction?: string
+  serializedInstruction: string
   additionalSerializedInstructions?: string[]
   isValid: boolean
   governance: ProgramAccount<Governance> | undefined
