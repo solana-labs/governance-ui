@@ -445,8 +445,6 @@ export async function getTransferNftInstruction({
   if (
     isValid &&
     programId &&
-    form.governedTokenAccount.extensions.token?.publicKey &&
-    form.governedTokenAccount.extensions.token &&
     form.governedTokenAccount?.extensions.mint?.account
   ) {
     const tokenAccountsWithNftMint = await getTokenAccountsByMint(

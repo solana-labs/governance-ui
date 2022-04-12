@@ -35,7 +35,9 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
     setIsLoading(true)
     setSendingSuccess(false)
     try {
-      const governance = currentAccount!.governance!.pubkey
+      const owner = currentAccount?.isSol
+        ? currentAccount.extensions.transferAddress!
+        : currentAccount!.governance!.pubkey
       const ConnectedWalletAddress = wallet?.publicKey
       const selectedNft = selectedNfts[0]
       const nftMintPk = new PublicKey(selectedNft.mint)
@@ -47,16 +49,16 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       const fromAddress = tokenAccountsWithNftMint.find(
         (x) => x.account.owner.toBase58() === ConnectedWalletAddress?.toBase58()
       )?.publicKey
-      //we check is there ata created for nft before inside governance
+      //we check is there ata created for nft before
       const isAtaForGovernanceExist = tokenAccountsWithNftMint.find(
-        (x) => x.account.owner.toBase58() === governance.toBase58()
+        (x) => x.account.owner.toBase58() === owner.toBase58()
       )
 
       const ataPk = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
         nftMintPk, // mint
-        governance!, // owner
+        owner!, // owner
         true
       )
       if (!isAtaForGovernanceExist) {
@@ -64,7 +66,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
           connection.current,
           wallet,
           nftMintPk,
-          governance,
+          owner!,
           wallet!.publicKey!
         )
       }
