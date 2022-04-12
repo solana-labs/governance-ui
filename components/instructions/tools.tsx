@@ -124,6 +124,8 @@ export const ACCOUNT_NAMES = {
   wpSyytRSgo1b5RE6PYT9GMWubdq6EdbGC8PEbcz4Kff: 'DAOPool Fee Collection',
   xuEfu6gmCn1RSXSAVpWLTYttx685m9rAbzqwwYUjYXJ: 'DAOJones Fractionalized Tokens',
   GQDFqZ7URyWAiPMQs4ywZ9pKBqrUg4srdkqnZpRUstQz: 'Merch Escrow Holdings',
+  '7JPpGyJTEXwR9uQSqhi6RAK5GiSTr41oq72PJ4fU5CXf': 'Marketing Wallet SOL',
+  '2FCKVvw3JmRD6Q2DFb3ZzW697GKjYka8JwGMSF7juWZd': 'Marketing Wallet USDC'
 }
 
 // Blacklisted governances which should not be displayed in the UI
