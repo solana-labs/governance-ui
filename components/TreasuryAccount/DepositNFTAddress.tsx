@@ -61,7 +61,8 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
       TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
       mintPK, // mint
-      owner! // owner
+      owner!, // owner
+      true
     )
     const ata = ataPk.toBase58()
     const isExistingAta = await tryGetAta(connection.current, mintPK, owner)
@@ -147,7 +148,7 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
         nftsGovernedTokenAccounts={nftsGovernedTokenAccounts}
       ></NFTAccountSelect>
       <DepositLabel
-        transferAddress={currentAccount?.transferAddress}
+        transferAddress={currentAccount?.extensions.transferAddress}
       ></DepositLabel>
       <div className="space-y-4 w-full pb-4">
         <div className="text-sm mt-4">

@@ -21,7 +21,8 @@ export async function createATA(
     ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
     TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
     mintPubkey, // mint
-    owner // owner
+    owner, // owner
+    true
   )
 
   const transaction = new Transaction()
@@ -74,7 +75,8 @@ export async function getATA({
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
         mintPK, // mint
-        receiverAddress // owner
+        receiverAddress, // owner
+        true
       )
       needToCreateAta = true
       currentAddress = ata

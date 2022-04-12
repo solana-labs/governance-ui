@@ -6,15 +6,20 @@ interface MembersStore extends State {
   compact: {
     currentView: ViewState
     currentMember: Member | null
+    members: Member[]
+    activeMembers: Member[]
   }
   setCurrentCompactViewMember: (item: Member) => void
   setCurrentCompactView: (viewState: ViewState) => void
   resetCompactViewState: () => void
+  setMembers: (members: Member[]) => void
 }
 
 const compactDefaultState = {
   currentView: ViewState.MainView,
   currentMember: null,
+  members: [],
+  activeMembers: [],
 }
 
 const useMembersStore = create<MembersStore>((set, _get) => ({
@@ -34,6 +39,15 @@ const useMembersStore = create<MembersStore>((set, _get) => ({
   resetCompactViewState: () => {
     set((s) => {
       s.compact = { ...compactDefaultState }
+    })
+  },
+  setMembers: (members: Member[]) => {
+    const activeMembers: Member[] = members.filter(
+      (x) => !x.councilVotes.isZero() || !x.communityVotes.isZero()
+    )
+    set((s) => {
+      s.compact.members = members
+      s.compact.activeMembers = activeMembers
     })
   },
 }))

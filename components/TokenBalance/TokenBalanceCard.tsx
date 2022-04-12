@@ -222,7 +222,7 @@ const TokenDeposit = ({
 
     await sendTransaction({
       connection,
-      wallet,
+      wallet: wallet!,
       transaction,
       signers,
       sendingMessage: 'Depositing tokens',
@@ -245,8 +245,6 @@ const TokenDeposit = ({
         realmInfo!.programId,
         depositTokenRecord!.account!.governingTokenOwner
       )
-
-      console.log('Vote Records', voteRecords)
 
       for (const voteRecord of Object.values(voteRecords)) {
         let proposal = proposals[voteRecord.account.proposal.toBase58()]
@@ -324,7 +322,7 @@ const TokenDeposit = ({
         const transaction = new Transaction().add(...chunk)
         await sendTransaction({
           connection,
-          wallet,
+          wallet: wallet!,
           transaction,
           sendingMessage:
             index == ixChunks.length - 1

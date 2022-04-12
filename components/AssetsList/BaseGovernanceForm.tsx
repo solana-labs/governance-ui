@@ -1,6 +1,8 @@
 import Input from '@components/inputs/Input'
+import Select from '@components/inputs/Select'
 import AmountSlider from '@components/Slider'
 import useRealm from '@hooks/useRealm'
+import { VoteTipping } from '@solana/spl-governance'
 import {
   fmtPercentage,
   getMintMinAmountAsDecimal,
@@ -17,6 +19,7 @@ export interface BaseGovernanceFormFields {
   minInstructionHoldUpTime: number
   maxVotingTime: number
   voteThreshold: number
+  voteTipping: VoteTipping
 }
 
 const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
@@ -167,6 +170,23 @@ const BaseGovernanceForm = ({ formErrors, form, setForm, setFormErrors }) => {
           }}
         />
       </div>
+      <Select
+        value={VoteTipping[form.voteTipping as any]}
+        onChange={(selected) =>
+          handleSetForm({
+            value: selected,
+            propertyName: 'voteTipping',
+          })
+        }
+      >
+        {Object.keys(VoteTipping)
+          .filter((vt) => typeof VoteTipping[vt as any] === 'string')
+          .map((vt) => (
+            <Select.Option key={vt} value={vt}>
+              {VoteTipping[vt as any]}{' '}
+            </Select.Option>
+          ))}
+      </Select>
     </>
   )
 }

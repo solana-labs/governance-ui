@@ -13,17 +13,15 @@ import useWalletStore from 'stores/useWalletStore'
 import { NewProposalContext } from '../../new'
 import useRealm from '@hooks/useRealm'
 import { parseMintNaturalAmountFromDecimalAsBN } from '@tools/sdk/units'
-import {
-  GovernedMultiTypeAccount,
-  parseMintSupplyFraction,
-} from '@utils/tokens'
+import { parseMintSupplyFraction } from '@utils/tokens'
 import { PublicKey } from '@solana/web3.js'
 import { getRealmCfgSchema } from '@utils/validations'
 import RealmConfigFormComponent from '../forms/RealmConfigFormComponent'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface RealmConfigForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount: AssetAccount | undefined
   minCommunityTokensToCreateGovernance: number
   communityVoterWeightAddin: string
   removeCouncil: boolean
@@ -41,8 +39,8 @@ const RealmConfig = ({
   const { realm, mint, realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const shouldBeGoverned = index !== 0 && governance
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  const realmAuthority = governedMultiTypeAccounts.find(
+  const { assetAccounts } = useGovernanceAssets()
+  const realmAuthority = assetAccounts.find(
     (x) =>
       x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )

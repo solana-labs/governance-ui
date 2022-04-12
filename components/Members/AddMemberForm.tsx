@@ -44,7 +44,7 @@ const AddMemberForm = ({ close }) => {
   const { fmtUrlWithCluster } = useQueryContext()
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const { symbol } = router.query
-  const { getMintWithGovernances } = useGovernanceAssets()
+  const { assetAccounts } = useGovernanceAssets()
 
   const { realmInfo, canChooseWhoVote, councilMint, realm } = useRealm()
 
@@ -171,10 +171,8 @@ const AddMemberForm = ({ close }) => {
 
   useEffect(() => {
     const initForm = async () => {
-      const response = await getMintWithGovernances()
-
       handleSetForm({
-        value: response.find(
+        value: assetAccounts.find(
           (x) =>
             x.governance?.account.governedAccount.toBase58() ===
             realm?.account.config.councilMint?.toBase58()

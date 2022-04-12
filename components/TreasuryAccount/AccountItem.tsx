@@ -1,30 +1,29 @@
-import { GovernedTokenAccount } from '@utils/tokens'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-
+import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
+import { AssetAccount } from '@utils/uiTypes/assets'
 const AccountItem = ({
   governedAccountTokenAccount,
 }: {
-  governedAccountTokenAccount: GovernedTokenAccount
+  governedAccountTokenAccount: AssetAccount
 }) => {
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   const {
     amountFormatted,
     logo,
     name,
     symbol,
     displayPrice,
-    isSol,
-  } = getTreasuryAccountItemInfo(governedAccountTokenAccount, governanceNfts)
-
+  } = getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
   return (
     <div className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
       {logo && (
         <img
           className={`flex-shrink-0 h-6 w-6 mr-2.5 mt-0.5 ${
-            isSol && 'rounded-full'
+            governedAccountTokenAccount.isSol && 'rounded-full'
           }`}
           src={logo}
+          onError={({ currentTarget }) => {
+            currentTarget.onerror = null // prevents looping
+            currentTarget.hidden = true
+          }}
         />
       )}
       <div className="w-full">
