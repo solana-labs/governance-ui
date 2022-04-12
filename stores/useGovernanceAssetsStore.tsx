@@ -492,7 +492,7 @@ const getSolAccounts = async (
     ]),
   })
   const solAccounts = getSolAccounts.data
-  const accounts = solAccounts.length
+  const accounts = solAccounts?.length
     ? solAccounts
         .flatMap((x, index) => {
           return {
