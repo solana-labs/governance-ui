@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { Wallet } from '@project-serum/common';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations';
 import { resetEpochGaugeVoterInstruction } from '@tools/sdk/tribeca/instructions/resetEpochGaugeVoterInstruction';
@@ -44,7 +43,7 @@ const ResetEpochGaugeVoter = ({
     }) {
       const programs = getTribecaPrograms({
         connection,
-        wallet: wallet as Wallet,
+        wallet,
         config: form.tribecaConfiguration!,
       });
       return resetEpochGaugeVoterInstruction({

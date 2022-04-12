@@ -1,7 +1,5 @@
-import { BigNumber } from 'bignumber.js';
 import * as yup from 'yup';
 import { BN } from '@project-serum/anchor';
-import { Wallet } from '@project-serum/common';
 import Input from '@components/inputs/Input';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
@@ -14,6 +12,7 @@ import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { TribecaLockForm } from '@utils/uiTypes/proposalCreationTypes';
 import SelectOptionList from '../../SelectOptionList';
 import GovernorSelect from './GovernorSelect';
+import { uiAmountToNativeBN } from '@tools/sdk/units';
 
 const schema = yup.object().shape({
   governedAccount: yup
@@ -59,7 +58,7 @@ const Lock = ({
     }) {
       const programs = getTribecaPrograms({
         connection,
-        wallet: wallet as Wallet,
+        wallet,
         config: form.tribecaConfiguration!,
       });
       const lockerData = await getTribecaLocker({
@@ -72,10 +71,9 @@ const Lock = ({
         programs,
         lockerData,
         authority: governedAccountPubkey,
-        amount: new BN(
-          new BigNumber(form.uiAmount!)
-            .shiftedBy(form.tribecaConfiguration!.token.decimals)
-            .toNumber(),
+        amount: uiAmountToNativeBN(
+          form.uiAmount!.toString(),
+          form.tribecaConfiguration!.token.decimals,
         ),
         durationSeconds: new BN(form.durationSeconds * 60 * 60 * 24 * 365),
       });

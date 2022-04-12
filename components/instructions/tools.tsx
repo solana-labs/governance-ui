@@ -12,7 +12,10 @@ import { GOVERNANCE_INSTRUCTIONS } from './programs/governance';
 import { MANGO_INSTRUCTIONS } from './programs/mango';
 import { getProgramName, isGovernanceProgram } from './programs/names';
 import { RAYDIUM_INSTRUCTIONS } from './programs/raydium';
+import { QUARRY_MINE_PROGRAM_INSTRUCTIONS } from './programs/quarry';
 import { SPL_TOKEN_INSTRUCTIONS } from './programs/splToken';
+import { SABER_POOLS_PROGRAM_INSTRUCTIONS } from './programs/saberPools';
+import { SOCEAN_PROGRAM_INSTRUCTIONS } from './programs/socean';
 import { UXD_PROGRAM_INSTRUCTIONS } from './programs/uxdProtocol';
 import { SYSTEM_INSTRUCTIONS } from './programs/system';
 import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry';
@@ -175,6 +178,9 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...MANGO_INSTRUCTIONS,
   ...RAYDIUM_INSTRUCTIONS,
   ...UXD_PROGRAM_INSTRUCTIONS,
+  ...QUARRY_MINE_PROGRAM_INSTRUCTIONS,
+  ...SABER_POOLS_PROGRAM_INSTRUCTIONS,
+  ...SOCEAN_PROGRAM_INSTRUCTIONS,
   ...MARINADE_INSTRUCTIONS,
   ...SOLEND_PROGRAM_INSTRUCTIONS,
   ...ATA_PROGRAM_INSTRUCTIONS,

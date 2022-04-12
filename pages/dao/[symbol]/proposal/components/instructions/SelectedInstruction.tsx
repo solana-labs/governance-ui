@@ -10,9 +10,14 @@ import NativeEmpty from './Native/Empty';
 import NativeCustomBase64 from './Native/CustomBase64';
 import SetProgramAuthority from './Native/SetProgramAuthority';
 import SplTokenTransfer from './Native/SplTokenTransfer';
+import QuarryClaimRewards from './quarryMine/ClaimRewards';
+import QuarryCreateMiner from './quarryMine/CreateMiner';
+import QuarryCreateMinerVaultAccount from './quarryMine/CreateMinerVaultAccount';
+import QuarryStakeTokens from './quarryMine/StakeTokens';
+import QuarryWithdrawTokens from './quarryMine/WithdrawTokens';
+import SaberPeripheryRedeemAllTokenFromMintProxy from './SaberPeriphery/RedeemAllTokensFromMintProxy';
 import SaberPoolsDeposit from './SaberPools/Deposit';
 import SaberPoolsWithdrawOne from './SaberPools/WithdrawOne';
-import SaberPeripheryRedeemAllTokenFromMintProxy from './SaberPeriphery/RedeemAllTokensFromMintProxy';
 import SoceanCancelVest from './Socean/CancelVest';
 import SoceanCloseAuction from './Socean/CloseAuction';
 import SoceanDepositToAuctionPool from './Socean/DepositToAuctionPool';
@@ -127,6 +132,29 @@ const SelectedInstruction = ({
           index={index}
           governedAccount={governedAccount}
         />
+      );
+    case InstructionEnum.QuarryClaimRewards:
+      return (
+        <QuarryClaimRewards index={index} governedAccount={governedAccount} />
+      );
+    case InstructionEnum.QuarryCreateMiner:
+      return (
+        <QuarryCreateMiner index={index} governedAccount={governedAccount} />
+      );
+    case InstructionEnum.QuarryCreateMinerVaultAccount:
+      return (
+        <QuarryCreateMinerVaultAccount
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.QuarryStakeTokens:
+      return (
+        <QuarryStakeTokens index={index} governedAccount={governedAccount} />
+      );
+    case InstructionEnum.QuarryWithdrawTokens:
+      return (
+        <QuarryWithdrawTokens index={index} governedAccount={governedAccount} />
       );
     case InstructionEnum.SaberPoolsDeposit:
       return (

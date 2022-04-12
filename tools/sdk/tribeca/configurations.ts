@@ -1,10 +1,7 @@
-import { Wallet } from '@project-serum/common';
-import {
-  SolanaAugmentedProvider,
-  SolanaProvider,
-} from '@saberhq/solana-contrib';
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { SPL_TOKENS } from '@utils/splTokens';
+import { augmentedProvider } from '../augmentedProvider';
 import ATribecaConfiguration, {
   TribecaPrograms,
 } from './ATribecaConfiguration';
@@ -51,17 +48,10 @@ export function getTribecaPrograms({
   config,
 }: {
   connection: Connection;
-  wallet: Wallet;
+  wallet: SignerWalletAdapter;
   config: ATribecaConfiguration;
 }) {
-  return config.loadPrograms(
-    new SolanaAugmentedProvider(
-      SolanaProvider.init({
-        connection,
-        wallet,
-      }),
-    ),
-  );
+  return config.loadPrograms(augmentedProvider(connection, wallet));
 }
 
 export async function getTribecaLocker({

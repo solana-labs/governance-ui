@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { Wallet } from '@project-serum/common';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations';
 import { prepareEpochGaugeVoterInstruction } from '@tools/sdk/tribeca/instructions/prepareEpochGaugeVoterInstruction';
@@ -40,7 +39,7 @@ const PrepareEpochGaugeVoter = ({
     buildInstruction: async function ({ wallet, form, governedAccountPubkey }) {
       const programs = getTribecaPrograms({
         connection: connection.current,
-        wallet: wallet as Wallet,
+        wallet,
         config: form.tribecaConfiguration!,
       });
 

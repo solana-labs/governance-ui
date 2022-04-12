@@ -1,4 +1,3 @@
-import { Wallet } from '@project-serum/common';
 import { useEffect, useState } from 'react';
 
 import useWalletStore from 'stores/useWalletStore';
@@ -23,7 +22,7 @@ export default function useTribecaPrograms(
     setPrograms(
       getTribecaPrograms({
         connection: connection.current,
-        wallet: wallet as Wallet,
+        wallet,
         config: tribecaConfiguration,
       }),
     );

@@ -326,6 +326,35 @@ export interface TribecaGaugeSetVoteForm {
   weight?: number;
 }
 
+export interface QuarryMineCreateMinerForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  mintName?: QuarryMineSupportedMintName;
+}
+
+export interface QuarryMineCreateMinerVaultAccountForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  mintName?: QuarryMineSupportedMintName;
+}
+
+export interface QuarryMineStakeTokensForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  sourceAccount?: string;
+  uiAmount?: number;
+  mintName?: QuarryMineSupportedMintName;
+}
+
+export interface QuarryMineWithdrawTokensForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  destinationAccount?: string;
+  uiAmount?: number;
+  mintName?: QuarryMineSupportedMintName;
+}
+
+export interface QuarryMineClaimRewardsForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  mintName?: QuarryMineSupportedMintName;
+}
+
 export interface UXDStakingInitializeStakingCampaignForm {
   governedAccount?: GovernedMultiTypeAccount;
   rewardMintUIName?: SplTokenUIName;
@@ -373,6 +402,11 @@ export enum InstructionEnum {
   Clawback,
   CreateAssociatedTokenAccount,
   FriktionDepositIntoVolt,
+  QuarryClaimRewards,
+  QuarryCreateMiner,
+  QuarryCreateMinerVaultAccount,
+  QuarryStakeTokens,
+  QuarryWithdrawTokens,
   RaydiumAddLiquidity,
   RaydiumRemoveLiquidity,
   SaberPoolsDeposit,
@@ -425,6 +459,7 @@ export enum PackageEnum {
   Tribeca,
   Socean,
   Saber,
+  Quarry,
 }
 
 export type createParams = [

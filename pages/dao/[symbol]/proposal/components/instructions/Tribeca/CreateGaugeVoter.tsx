@@ -1,5 +1,4 @@
 import * as yup from 'yup';
-import { Wallet } from '@project-serum/common';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import { getTribecaPrograms } from '@tools/sdk/tribeca/configurations';
 import { createGaugeVoterInstruction } from '@tools/sdk/tribeca/instructions/createGaugeVoterInstruction';
@@ -43,7 +42,7 @@ const CreateGaugeVoter = ({
       governedAccountPubkey,
     }) {
       const programs = getTribecaPrograms({
-        wallet: wallet as Wallet,
+        wallet,
         connection,
         config: form.tribecaConfiguration!,
       });

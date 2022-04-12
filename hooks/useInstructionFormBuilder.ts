@@ -66,12 +66,12 @@ function useInstructionFormBuilder<
     setFormErrors(validationErrors);
     return isValid;
   };
+  const governedAccountPubkey = getGovernedAccountPublicKey(
+    form.governedAccount,
+    true,
+  );
 
   const getInstruction = async (): Promise<FormInstructionData> => {
-    const governedAccountPubkey = getGovernedAccountPublicKey(
-      form.governedAccount,
-      true,
-    );
     if (
       !wallet?.publicKey ||
       !form.governedAccount?.governance?.account ||
@@ -142,6 +142,7 @@ function useInstructionFormBuilder<
 
   return {
     connection,
+    governedAccountPubkey,
     wallet,
     formErrors,
     form,

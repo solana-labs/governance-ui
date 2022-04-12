@@ -208,9 +208,38 @@ export default function useGovernanceAssets() {
       name: 'Saber',
       image: '/img/saber.png',
     },
+    [PackageEnum.Quarry]: {
+      name: 'Quarry',
+      image: '/img/quarry.png',
+    },
   };
 
   const instructions: Instructions = {
+    [InstructionEnum.QuarryClaimRewards]: {
+      name: 'Claim Rewards',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Quarry,
+    },
+    [InstructionEnum.QuarryCreateMiner]: {
+      name: 'Create Miner',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Quarry,
+    },
+    [InstructionEnum.QuarryCreateMinerVaultAccount]: {
+      name: 'Create Miner Vault Account',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Quarry,
+    },
+    [InstructionEnum.QuarryStakeTokens]: {
+      name: 'Stake Tokens',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Quarry,
+    },
+    [InstructionEnum.QuarryWithdrawTokens]: {
+      name: 'Withdraw Tokens',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Quarry,
+    },
     [InstructionEnum.TribecaCreateEpochGauge]: {
       name: 'Create Epoch Gauge',
       isVisible: canUseAnyInstruction,
