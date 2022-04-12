@@ -62,6 +62,8 @@ import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpot
 import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
 import useCreateProposal from '@hooks/useCreateProposal'
 import RealmConfig from './components/instructions/RealmConfig'
+import CloseTokenAccount from './components/instructions/CloseTokenAccount'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -200,20 +202,45 @@ const New = () => {
         handleTurnOffLoaders()
         throw Error('No governance selected')
       }
-      const instructionsData = instructions.map((x) => {
-        return {
-          data: x.serializedInstruction
-            ? getInstructionDataFromBase64(x.serializedInstruction)
-            : null,
-          holdUpTime: x.customHoldUpTime
-            ? getTimestampFromDays(x.customHoldUpTime)
-            : selectedGovernance?.account?.config.minInstructionHoldUpTime,
-          prerequisiteInstructions: x.prerequisiteInstructions || [],
-          chunkSplitByDefault: x.chunkSplitByDefault || false,
-          signers: x.signers,
-          shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
-        }
-      })
+
+      const additionalInstructions = [
+        ...(instructions
+          .flatMap((instruction) => {
+            return instruction.additionalSerializedInstructions?.map((x) => {
+              return {
+                data: x ? getInstructionDataFromBase64(x) : null,
+                holdUpTime: instruction.customHoldUpTime
+                  ? getTimestampFromDays(instruction.customHoldUpTime)
+                  : selectedGovernance?.account?.config
+                      .minInstructionHoldUpTime,
+                prerequisiteInstructions: [],
+                chunkSplitByDefault: instruction.chunkSplitByDefault || false,
+                signers: instruction.signers,
+                shouldSplitIntoSeparateTxs:
+                  instruction.shouldSplitIntoSeparateTxs,
+              }
+            })
+          })
+          .filter((x) => x) as InstructionDataWithHoldUpTime[]),
+      ]
+
+      const instructionsData = [
+        ...additionalInstructions,
+        ...instructions.map((x) => {
+          return {
+            data: x.serializedInstruction
+              ? getInstructionDataFromBase64(x.serializedInstruction)
+              : null,
+            holdUpTime: x.customHoldUpTime
+              ? getTimestampFromDays(x.customHoldUpTime)
+              : selectedGovernance?.account?.config.minInstructionHoldUpTime,
+            prerequisiteInstructions: x.prerequisiteInstructions || [],
+            chunkSplitByDefault: x.chunkSplitByDefault || false,
+            signers: x.signers,
+            shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
+          }
+        }),
+      ]
 
       try {
         // Fetch governance to get up to date proposalCount
@@ -377,6 +404,13 @@ const New = () => {
         return <Grant index={idx} governance={governance}></Grant>
       case Instructions.Clawback:
         return <Clawback index={idx} governance={governance}></Clawback>
+      case Instructions.CloseTokenAccount:
+        return (
+          <CloseTokenAccount
+            index={idx}
+            governance={governance}
+          ></CloseTokenAccount>
+        )
       default:
         null
     }
