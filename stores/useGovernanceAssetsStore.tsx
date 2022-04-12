@@ -492,13 +492,15 @@ const getSolAccounts = async (
     ]),
   })
   const solAccounts = getSolAccounts.data
-  const accounts = solAccounts
-    .flatMap((x, index) => {
-      return {
-        acc: x.result.value,
-        ...pubkeys[index],
-      }
-    })
-    .filter((x) => x.acc)
+  const accounts = solAccounts?.length
+    ? solAccounts
+        .flatMap((x, index) => {
+          return {
+            acc: x.result.value,
+            ...pubkeys[index],
+          }
+        })
+        .filter((x) => x.acc)
+    : []
   return accounts as SolAccInfo[]
 }
