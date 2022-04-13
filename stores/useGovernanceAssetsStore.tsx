@@ -8,6 +8,7 @@ import {
 } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
+  DEFAULT_NATIVE_SOL_MINT,
   DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
   HIDDEN_TREASURES,
@@ -167,7 +168,11 @@ const getTokenAccountsObj = async (
     return new AccountTypeNFT(tokenAccount, mint!, governance)
   }
 
-  if (mint?.account.supply && mint?.account.supply.cmpn(1) !== 0) {
+  if (
+    mint?.account.supply &&
+    mint?.account.supply.cmpn(1) !== 0 &&
+    mint.publicKey.toBase58() !== DEFAULT_NATIVE_SOL_MINT
+  ) {
     return new AccountTypeToken(tokenAccount, mint!, governance)
   }
 }

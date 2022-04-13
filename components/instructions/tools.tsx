@@ -144,6 +144,9 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
 ])
 
+export const DEFAULT_NATIVE_SOL_MINT =
+  'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
+
 export const DEFAULT_NFT_TREASURY_MINT =
   'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 

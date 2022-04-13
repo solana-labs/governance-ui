@@ -400,7 +400,7 @@ const Params = () => {
                                       />
                                     )}
                                     <span>{`${info.amountFormatted} ${
-                                      info.info?.symbol && info.info?.symbol
+                                      info.info?.symbol || ''
                                     }`}</span>
                                   </div>
                                 }
@@ -528,7 +528,7 @@ const Params = () => {
 }
 
 const DisplayField = ({ label, val, padding = false, bg = false }) => {
-  const pubkey = tryParsePublicKey(val)
+  const pubkey = isNaN(val) && tryParsePublicKey(val)
   const name = pubkey ? getAccountName(pubkey) : ''
   return (
     <div

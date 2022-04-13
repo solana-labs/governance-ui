@@ -311,7 +311,7 @@ const SendTokens = ({ isNft = false }) => {
           />
         )}
         <small className="text-red">
-          {transactionDolarAmount
+          {transactionDolarAmount && !isNft
             ? IsAmountNotHigherThenBalance()
               ? `~$${transactionDolarAmount}`
               : 'Insufficient balance'
