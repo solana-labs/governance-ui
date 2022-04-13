@@ -24,7 +24,11 @@ import {
   SerumRemote,
 } from '@mithraic-labs/serum-remote'
 import useWalletStore from 'stores/useWalletStore'
-import { ArrowCircleDownIcon, ArrowCircleUpIcon } from '@heroicons/react/solid'
+import {
+  ArrowCircleDownIcon,
+  ArrowCircleUpIcon,
+  ExternalLinkIcon,
+} from '@heroicons/react/solid'
 import ProposalOptions from './ProposalOptions'
 import useRealm from '@hooks/useRealm'
 import Button from '@components/Button'
@@ -437,6 +441,19 @@ const TradeOnSerum: React.FC<TradeOnSerumProps> = ({ tokenAccount }) => {
     <>
       <div>
         <h3 className="mb-4 flex items-center">Trade on Serum!</h3>
+        <h6 className="mb-4 flex items-center">
+          <a
+            href="https://github.com/mithraiclabs/serum-remote"
+            target="_blank"
+            rel="noreferrer"
+          >
+            <div className="flex items-center">
+              Serum Remote{' '}
+              <ExternalLinkIcon className="flex-shrink-0 h-3.5 ml-1 text-primary-light w-3.5" />
+            </div>
+          </a>
+          &nbsp;is open sourced, yet unaudited. Do your own research.
+        </h6>
         <AccountLabel
           isNFT={false}
           tokenInfo={tokenInfo}
