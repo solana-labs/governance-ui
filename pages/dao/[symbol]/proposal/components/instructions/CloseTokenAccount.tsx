@@ -24,7 +24,7 @@ import * as yup from 'yup'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
-  foundsDestinationAccount: string
+  fundsDestinationAccount: string
 }
 
 const CloseTokenAccount = ({
@@ -64,7 +64,7 @@ const CloseTokenAccount = ({
             connection: connection,
             governedTokenAccount: form!.governedAccount!,
             amount: form!.governedAccount.extensions.token!.account.amount!,
-            destinationAccount: form!.foundsDestinationAccount!,
+            destinationAccount: form!.fundsDestinationAccount!,
             wallet: wallet,
           })
         : null
@@ -105,7 +105,7 @@ const CloseTokenAccount = ({
   }, [form])
   const inputs: InstructionInput[] = [
     {
-      label: 'Governance',
+      label: 'Token account',
       initialValue: null,
       name: 'governedAccount',
       type: InstructionInputType.GOVERNED_ACCOUNT,
@@ -114,9 +114,9 @@ const CloseTokenAccount = ({
       options: governedTokenAccountsWithoutNfts.filter((x) => !x.isSol),
     },
     {
-      label: 'Founds destination account',
+      label: 'Funds destination account',
       initialValue: '',
-      name: 'foundsDestinationAccount',
+      name: 'fundsDestinationAccount',
       type: InstructionInputType.INPUT,
       inputType: 'text',
       hide: form?.governedAccount?.extensions.amount?.isZero(),
