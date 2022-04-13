@@ -15,6 +15,7 @@ import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { executeInstructions } from 'actions/executeInstructions'
 import useWalletStore from 'stores/useWalletStore'
+import { notify } from '@utils/notifications'
 
 export enum PlayState {
   Played,
@@ -37,7 +38,7 @@ export function ExecuteAllInstructionButton({
   const { realmInfo } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const connected = useWalletStore((s) => s.connected)
 
   const [currentSlot, setCurrentSlot] = useState(0)
@@ -74,8 +75,9 @@ export function ExecuteAllInstructionButton({
 
     try {
       await executeInstructions(rpcContext, proposal, proposalInstructions)
-      await fetchRealm(realmInfo?.programId, realmInfo?.realmId)
+      await refetchProposals()
     } catch (error) {
+      notify({ type: 'error', message: `error executing instruction ${error}` })
       console.error('error executing instruction', error)
 
       setPlaying(PlayState.Error)
@@ -84,18 +86,6 @@ export function ExecuteAllInstructionButton({
     }
 
     setPlaying(PlayState.Played)
-  }
-
-  if (
-    proposalInstructions.every(
-      (x) => x.account.executionStatus === InstructionExecutionStatus.Success
-    )
-  ) {
-    return (
-      <Tooltip content="instruction executed successfully">
-        <CheckCircleIcon className="h-5 ml-2 text-green w-5" />
-      </Tooltip>
-    )
   }
 
   if (

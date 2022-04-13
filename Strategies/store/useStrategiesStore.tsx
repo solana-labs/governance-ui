@@ -1,3 +1,4 @@
+import { ConnectionContext } from '@utils/connection'
 import { notify } from '@utils/notifications'
 import { tvl } from 'Strategies/protocols/mango/tools'
 import { TreasuryStrategy } from 'Strategies/types/types'
@@ -6,18 +7,18 @@ import create, { State } from 'zustand'
 interface StrategiesStore extends State {
   strategies: TreasuryStrategy[]
   strategiesLoading: boolean
-  getStrategies: () => void
+  getStrategies: (connection: ConnectionContext) => void
 }
 
-const useAssetsStore = create<StrategiesStore>((set, _get) => ({
+const useStrategiesStore = create<StrategiesStore>((set, _get) => ({
   strategies: [],
   strategiesLoading: false,
-  getStrategies: async () => {
+  getStrategies: async (connection: ConnectionContext) => {
     set((s) => {
       s.strategiesLoading = true
     })
     try {
-      const mango = await tvl(Date.now() / 1000)
+      const mango = await tvl(Date.now() / 1000, connection)
       //add fetch functions for your protocol in promise.all
       const strategies: TreasuryStrategy[] = [...mango]
       set((s) => {
@@ -33,4 +34,4 @@ const useAssetsStore = create<StrategiesStore>((set, _get) => ({
   },
 }))
 
-export default useAssetsStore
+export default useStrategiesStore

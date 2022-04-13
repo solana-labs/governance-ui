@@ -11,7 +11,6 @@ class TokenService {
   constructor() {
     this._tokenList = []
     this._tokenPriceToUSDlist = {}
-    this.fetchSolanaTokenList()
   }
   async fetchSolanaTokenList() {
     try {
@@ -29,33 +28,33 @@ class TokenService {
     }
   }
   async fetchTokenPrices(mintAddresses: string[]) {
-    const mintAddressesWithSol = [...mintAddresses, WSOL_MINT, MANGO_MINT]
-    if (!this._tokenList.length) {
-      await this.fetchSolanaTokenList()
-    }
-    const tokenListRecords = this._tokenList?.filter((x) =>
-      mintAddressesWithSol.includes(x.address)
-    )
-    const coingeckoIds = tokenListRecords
-      .map((x) => x.extensions?.coingeckoId)
-      .join(',')
-    try {
-      const priceToUsdResponse = await axios.get(
-        `${coingeckoPriceEndpoint}?ids=${coingeckoIds}&vs_currencies=usd`
+    if (mintAddresses.length) {
+      const mintAddressesWithSol = [...mintAddresses, WSOL_MINT, MANGO_MINT]
+      const tokenListRecords = this._tokenList?.filter((x) =>
+        mintAddressesWithSol.includes(x.address)
       )
-      const priceToUsd = priceToUsdResponse.data
-      this._tokenPriceToUSDlist = {
-        ...this._tokenPriceToUSDlist,
-        ...priceToUsd,
+      const coingeckoIds = tokenListRecords
+        .map((x) => x.extensions?.coingeckoId)
+        .join(',')
+      try {
+        const priceToUsdResponse = await axios.get(
+          `${coingeckoPriceEndpoint}?ids=${coingeckoIds}&vs_currencies=usd`
+        )
+        const priceToUsd = priceToUsdResponse.data
+        this._tokenPriceToUSDlist = {
+          ...this._tokenPriceToUSDlist,
+          ...priceToUsd,
+        }
+        return priceToUsd
+      } catch (e) {
+        notify({
+          type: 'error',
+          message: 'unable to fetch token prices',
+        })
+        return {}
       }
-      return priceToUsd
-    } catch (e) {
-      notify({
-        type: 'error',
-        message: 'unable to fetch token prices',
-      })
-      return {}
     }
+    return {}
   }
   getUSDTokenPrice(mintAddress: string): number {
     if (mintAddress) {

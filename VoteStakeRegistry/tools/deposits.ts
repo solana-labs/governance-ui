@@ -95,6 +95,9 @@ export const getDeposits = async ({
         x.vestingRate = additionalInfoData.locking?.vesting?.rate || new BN(0)
         x.nextVestingTimestamp =
           additionalInfoData.locking?.vesting?.nextTimestamp || null
+        x.votingPower = additionalInfoData.votingPower || new BN(0)
+        x.votingPowerBaseline =
+          additionalInfoData.votingPowerBaseline || new BN(0)
         return x
       })
       if (
@@ -123,6 +126,25 @@ export const calcMultiplier = ({
   lockupSecs: number
   lockupSaturationSecs: number
 }) => {
+  //   if (isVested) {
+  //     const onMonthSecs = SECS_PER_DAY * DAYS_PER_MONTH
+  //     const n_periods_before_saturation = lockupSaturationSecs / onMonthSecs
+  //     const n_periods = lockupSecs / onMonthSecs
+  //     const n_unsaturated_periods = Math.min(
+  //       n_periods,
+  //       n_periods_before_saturation
+  //     )
+  //     const n_saturated_periods = Math.max(0, n_periods - n_unsaturated_periods)
+  //     const calc =
+  //       (depositScaledFactor +
+  //         (maxExtraLockupVoteWeightScaledFactor / n_periods) *
+  //           (n_saturated_periods +
+  //             ((n_unsaturated_periods + 1) * n_unsaturated_periods) /
+  //               2 /
+  //               n_periods_before_saturation)) /
+  //       depositScaledFactor
+  //     return depositScaledFactor !== 0 ? calc : 0
+  //   }
   const calc =
     (depositScaledFactor +
       (maxExtraLockupVoteWeightScaledFactor *
@@ -201,30 +223,25 @@ const getDepositsAdditionalInfoEvents = async (
   const events: any[] = []
   const parser = new EventParser(client.program.programId, client.program.coder)
   const maxRange = 8
-  const highestIndex = Math.max.apply(
-    0,
-    usedDeposits.map((x) => x.index)
-  )
-
-  const numberOfSimulations =
-    highestIndex === 0 ? 1 : Math.ceil(highestIndex / maxRange)
-
+  const itemsCount = usedDeposits.length
+  const numberOfSimulations = Math.ceil(itemsCount / maxRange)
   for (let i = 0; i < numberOfSimulations; i++) {
+    const take = maxRange
     const transaction = new Transaction({ feePayer: walletPk })
     transaction.add(
-      client.program.instruction.logVoterInfo(maxRange * i, maxRange, {
+      client.program.instruction.logVoterInfo(maxRange * i, take, {
         accounts: {
           registrar,
           voter,
         },
       })
     )
-    const fistBatchOfDeposits = await simulateTransaction(
+    const batchOfDeposits = await simulateTransaction(
       connection,
       transaction,
       'recent'
     )
-    parser.parseLogs(fistBatchOfDeposits.value.logs!, (event) => {
+    parser.parseLogs(batchOfDeposits.value.logs!, (event) => {
       events.push(event)
     })
   }

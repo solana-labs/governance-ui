@@ -1,40 +1,71 @@
 import { dryRunInstruction } from '../../actions/dryRunInstruction'
-import { InstructionData } from '@solana/spl-governance'
+import {
+  InstructionExecutionStatus,
+  ProgramAccount,
+  ProposalTransaction,
+} from '@solana/spl-governance'
 import useWalletStore from '../../stores/useWalletStore'
-import { getExplorerInspectorUrl } from './tools'
+import { getExplorerInspectorUrl, getExplorerUrl } from './tools'
 import { SecondaryButton } from '../Button'
+import { notify } from '@utils/notifications'
 
 export default function InspectorButton({
-  instructionData,
+  proposalInstruction,
 }: {
-  instructionData: InstructionData
+  proposalInstruction: ProgramAccount<ProposalTransaction>
 }) {
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
-
+  const wasExecuted =
+    proposalInstruction.account.executionStatus ===
+    InstructionExecutionStatus.Success
   const showInspector = async () => {
-    const result = await dryRunInstruction(
-      connection.current,
-      wallet!,
-      instructionData
-    )
+    let inspectUrl = ''
+    if (!wasExecuted) {
+      const instructionData = proposalInstruction.account.getSingleInstruction()
+      const result = await dryRunInstruction(
+        connection.current,
+        wallet!,
+        instructionData
+      )
 
-    const inspectUrl = getExplorerInspectorUrl(
-      connection.endpoint,
-      result.transaction
-    )
-
-    window.open(inspectUrl, '_blank')
+      inspectUrl = getExplorerInspectorUrl(
+        connection.endpoint,
+        result.transaction
+      )
+    } else {
+      try {
+        const recentActivity = await connection.current.getConfirmedSignaturesForAddress2(
+          proposalInstruction.pubkey,
+          {
+            limit: 5,
+          },
+          'confirmed'
+        )
+        inspectUrl = getExplorerUrl(
+          connection.endpoint,
+          recentActivity[0].signature,
+          'tx'
+        )
+      } catch (e) {
+        console.log(e)
+      }
+    }
+    if (inspectUrl) {
+      window.open(inspectUrl, '_blank')
+    } else {
+      notify({ type: 'error', message: 'Something went wrong url not found' })
+    }
   }
 
   return (
     <SecondaryButton
       small
-      disabled={!connected}
+      disabled={!connected && !wasExecuted}
       onClick={() => showInspector()}
     >
-      Inspect
+      {!wasExecuted ? 'Inspect' : 'View transaction'}
     </SecondaryButton>
   )
 }

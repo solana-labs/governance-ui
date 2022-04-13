@@ -17,7 +17,8 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useRealm from '@hooks/useRealm'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const CustomBase64 = ({
   index,
@@ -26,8 +27,9 @@ const CustomBase64 = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  const { ownVoterWeight } = useRealm()
   const wallet = useWalletStore((s) => s.current)
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<Base64InstructionForm>({
     governedAccount: undefined,
@@ -104,7 +106,9 @@ const CustomBase64 = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedMultiTypeAccounts}
+        governedAccounts={assetAccounts.filter((x) =>
+          ownVoterWeight.canCreateProposal(x.governance.account.config)
+        )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

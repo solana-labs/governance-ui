@@ -1,6 +1,6 @@
-import Link from 'next/link'
 import ReactMarkdown from 'react-markdown/react-markdown.min'
-import { ArrowLeftIcon, ExternalLinkIcon } from '@heroicons/react/outline'
+import remarkGfm from 'remark-gfm'
+import { ExternalLinkIcon } from '@heroicons/react/outline'
 import useProposal from 'hooks/useProposal'
 import ProposalStateBadge from 'components/ProposalStatusBadge'
 import { InstructionPanel } from 'components/instructions/instructionPanel'
@@ -11,7 +11,6 @@ import useRealm from 'hooks/useRealm'
 import useProposalVotes from 'hooks/useProposalVotes'
 import ProposalTimeStatus from 'components/ProposalTimeStatus'
 import { option } from 'tools/core/option'
-import useQueryContext from 'hooks/useQueryContext'
 import React, { useEffect, useState } from 'react'
 import ProposalActionsPanel from '@components/ProposalActions'
 import { getRealmExplorerHost } from 'tools/routing'
@@ -20,10 +19,10 @@ import { ProposalState } from '@solana/spl-governance'
 import VoteResultStatus from '@components/VoteResultStatus'
 import VoteResults from '@components/VoteResults'
 import { resolveProposalDescription } from '@utils/helpers'
+import PreviousRouteBtn from '@components/PreviousRouteBtn'
 
 const Proposal = () => {
-  const { fmtUrlWithCluster } = useQueryContext()
-  const { symbol, realmInfo } = useRealm()
+  const { realmInfo } = useRealm()
   const { proposal, descriptionLink } = useProposal()
   const [description, setDescription] = useState('')
   const { yesVoteProgress, yesVotesRequired } = useProposalVotes(
@@ -40,7 +39,8 @@ const Proposal = () => {
     (proposal.account.state === ProposalState.Completed ||
       proposal.account.state === ProposalState.Executing ||
       proposal.account.state === ProposalState.SigningOff ||
-      proposal.account.state === ProposalState.Succeeded)
+      proposal.account.state === ProposalState.Succeeded ||
+      proposal.account.state === ProposalState.ExecutingWithErrors)
 
   useEffect(() => {
     const handleResolveDescription = async () => {
@@ -58,13 +58,7 @@ const Proposal = () => {
         {proposal ? (
           <>
             <div className="flex flex-items justify-between">
-              <Link href={fmtUrlWithCluster(`/dao/${symbol}/`)}>
-                <a className="flex items-center text-fgd-3 text-sm transition-all hover:text-fgd-1">
-                  <ArrowLeftIcon className="h-4 w-4 mr-1 text-primary-light" />
-                  Back
-                </a>
-              </Link>
-
+              <PreviousRouteBtn />
               <div className="flex items-center">
                 <a
                   href={`https://${getRealmExplorerHost(
@@ -81,7 +75,7 @@ const Proposal = () => {
 
             <div className="py-4">
               <div className="flex items-center justify-between mb-1">
-                <h1 className="mr-2 break-all">{proposal?.account.name}</h1>
+                <h1 className="mr-2">{proposal?.account.name}</h1>
                 <ProposalStateBadge
                   proposalPk={proposal.pubkey}
                   proposal={proposal.account}
@@ -92,7 +86,11 @@ const Proposal = () => {
 
             {description && (
               <div className="pb-2">
-                <ReactMarkdown className="markdown">
+                <ReactMarkdown
+                  className="markdown"
+                  linkTarget="_blank"
+                  remarkPlugins={[remarkGfm]}
+                >
                   {description}
                 </ReactMarkdown>
               </div>
@@ -124,7 +122,7 @@ const Proposal = () => {
                 <h3 className="mb-4">Results</h3>
               )}
               {proposal?.account.state === ProposalState.Voting ? (
-                <div className="pb-4">
+                <div className="pb-3">
                   <ApprovalQuorum
                     yesVotesRequired={yesVotesRequired}
                     progress={yesVoteProgress}
@@ -132,8 +130,12 @@ const Proposal = () => {
                   />
                 </div>
               ) : (
-                <div className="pb-4">
-                  <VoteResultStatus votePassed={votePassed} />
+                <div className="pb-3">
+                  <VoteResultStatus
+                    progress={yesVoteProgress}
+                    votePassed={votePassed}
+                    yesVotesRequired={yesVotesRequired}
+                  />
                 </div>
               )}
               <VoteResults proposal={proposal.account} />

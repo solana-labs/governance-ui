@@ -1,5 +1,16 @@
 export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
   BPFLoaderUpgradeab1e11111111111111111111111: {
+    5: {
+      name: 'Close buffer',
+      accounts: [
+        { name: 'Buffer' },
+        { name: 'Sol receiver' },
+        { name: 'Upgrade authority' },
+      ],
+      getDataUI: () => {
+        return <div></div>
+      },
+    },
     3: {
       name: 'Program: Upgrade',
       accounts: [
@@ -11,6 +22,9 @@ export const BPF_UPGRADEABLE_LOADER_INSTRUCTIONS = {
         { name: 'Sysvar: Clock' },
         { name: 'Upgrade Authority' },
       ],
+    },
+    getDataUI: () => {
+      return <div></div>
     },
   },
 }

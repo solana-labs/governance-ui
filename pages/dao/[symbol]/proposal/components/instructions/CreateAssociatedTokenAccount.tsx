@@ -8,7 +8,6 @@ import {
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Select from '@components/inputs/Select'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { createAssociatedTokenAccount } from '@utils/associated'
 import { isFormValid } from '@utils/formValidation'
@@ -23,6 +22,7 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
 import GovernedAccountSelect from '../GovernedAccountSelect'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const CreateAssociatedTokenAccount = ({
   index,
@@ -35,7 +35,7 @@ const CreateAssociatedTokenAccount = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
 
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
 
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
@@ -119,7 +119,7 @@ const CreateAssociatedTokenAccount = ({
     <>
       <GovernedAccountSelect
         label="Governance"
-        governedAccounts={governedMultiTypeAccounts}
+        governedAccounts={assetAccounts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedAccount' })
         }}

@@ -1,6 +1,6 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { Wallet } from '@marinade.finance/marinade-ts-sdk'
 import { BN, Provider } from '@project-serum/anchor'
-import { Wallet } from '@project-serum/sol-wallet-adapter'
 import { AccountMetaData } from '@solana/spl-governance'
 import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
@@ -95,7 +95,7 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
         { name: 'Registrar' },
         { name: 'Realm' },
         { name: 'Governance program id' },
-        { name: 'Realm govering token mint' },
+        { name: 'Realm governing token mint' },
         { name: 'Realm authority' },
         { name: 'Payer' },
       ],

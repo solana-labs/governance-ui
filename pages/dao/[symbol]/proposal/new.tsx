@@ -12,7 +12,6 @@ import {
   Governance,
   GovernanceAccountType,
   ProgramAccount,
-  RpcContext,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import Button, { LinkButton, SecondaryButton } from '@components/Button'
@@ -23,8 +22,6 @@ import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWr
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
 import useRealm from '@hooks/useRealm'
-import { getProgramVersionForRealm } from '@models/registry/api'
-
 import { getTimestampFromDays } from '@tools/sdk/units'
 import { formValidation, isFormValid } from '@utils/formValidation'
 import {
@@ -33,14 +30,10 @@ import {
   InstructionsContext,
   UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
-
-import { createProposal } from 'actions/createProposal'
 import useWalletStore from 'stores/useWalletStore'
 import { notify } from 'utils/notifications'
 import Clawback from 'VoteStakeRegistry/components/instructions/Clawback'
 import Grant from 'VoteStakeRegistry/components/instructions/Grant'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
-
 import InstructionContentContainer from './components/InstructionContentContainer'
 import ProgramUpgrade from './components/instructions/bpfUpgradeableLoader/ProgramUpgrade'
 import CreateAssociatedTokenAccount from './components/instructions/CreateAssociatedTokenAccount'
@@ -57,6 +50,18 @@ import RefreshReserve from './components/instructions/Solend/RefreshReserve'
 import WithdrawObligationCollateralAndRedeemReserveLiquidity from './components/instructions/Solend/WithdrawObligationCollateralAndRedeemReserveLiquidity'
 import SplTokenTransfer from './components/instructions/SplTokenTransfer'
 import VoteBySwitch from './components/VoteBySwitch'
+import FriktionDeposit from './components/instructions/Friktion/FriktionDeposit'
+import CreateNftPluginRegistrar from './components/instructions/NftVotingPlugin/CreateRegistrar'
+import CreateNftPluginMaxVoterWeightRecord from './components/instructions/NftVotingPlugin/CreateMaxVoterWeightRecord'
+import ConfigureNftPluginCollection from './components/instructions/NftVotingPlugin/ConfigureCollection'
+import FriktionWithdraw from './components/instructions/Friktion/FriktionWithdraw'
+import MakeChangePerpMarket from './components/instructions/Mango/MakeChangePerpMarket'
+import MakeAddOracle from './components/instructions/Mango/MakeAddOracle'
+import MakeAddSpotMarket from './components/instructions/Mango/MakeAddSpotMarket'
+import MakeChangeSpotMarket from './components/instructions/Mango/MakeChangeSpotMarket'
+import MakeCreatePerpMarket from './components/instructions/Mango/MakeCreatePerpMarket'
+import useCreateProposal from '@hooks/useCreateProposal'
+import RealmConfig from './components/instructions/RealmConfig'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -82,27 +87,13 @@ function extractGovernanceAccountFromInstructionsData(
 
 const New = () => {
   const router = useRouter()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const { handleCreateProposal } = useCreateProposal()
   const { fmtUrlWithCluster } = useQueryContext()
-  const {
-    symbol,
-    realm,
-    realmInfo,
-    realmDisplayName,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    canChooseWhoVote,
-  } = useRealm()
+  const { symbol, realm, realmDisplayName, canChooseWhoVote } = useRealm()
 
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
-  const wallet = useWalletStore((s) => s.current)
-  const connection = useWalletStore((s) => s.connection)
-  const {
-    fetchRealmGovernance,
-    fetchTokenAccountsForSelectedRealmGovernances,
-  } = useWalletStore((s) => s.actions)
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -209,14 +200,6 @@ const New = () => {
         handleTurnOffLoaders()
         throw Error('No governance selected')
       }
-
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
       const instructionsData = instructions.map((x) => {
         return {
           data: x.serializedInstruction
@@ -227,6 +210,8 @@ const New = () => {
             : selectedGovernance?.account?.config.minInstructionHoldUpTime,
           prerequisiteInstructions: x.prerequisiteInstructions || [],
           chunkSplitByDefault: x.chunkSplitByDefault || false,
+          signers: x.signers,
+          shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
         }
       })
 
@@ -236,39 +221,14 @@ const New = () => {
           governance.pubkey
         )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance.account.config
-        )
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-
-        proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title,
-          form.description,
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
+        proposalAddress = await handleCreateProposal({
+          title: form.title,
+          description: form.description,
+          governance: selectedGovernance,
           instructionsData,
+          voteByCouncil,
           isDraft,
-          client
-        )
+        })
 
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
@@ -295,11 +255,6 @@ const New = () => {
     setGovernance(governedAccount)
   }, [instructionsData])
 
-  useEffect(() => {
-    //fetch to be up to date with amounts
-    fetchTokenAccountsForSelectedRealmGovernances()
-  }, [])
-
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
       case Instructions.Transfer:
@@ -317,6 +272,10 @@ const New = () => {
         return (
           <CreateAssociatedTokenAccount index={idx} governance={governance} />
         )
+      case Instructions.DepositIntoVolt:
+        return <FriktionDeposit index={idx} governance={governance} />
+      case Instructions.WithdrawFromVolt:
+        return <FriktionWithdraw index={idx} governance={governance} />
       case Instructions.CreateSolendObligationAccount:
         return <CreateObligationAccount index={idx} governance={governance} />
       case Instructions.InitSolendObligationAccount:
@@ -343,14 +302,53 @@ const New = () => {
         return <Mint index={idx} governance={governance}></Mint>
       case Instructions.Base64:
         return <CustomBase64 index={idx} governance={governance}></CustomBase64>
+      case Instructions.CreateNftPluginRegistrar:
+        return (
+          <CreateNftPluginRegistrar
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginRegistrar>
+        )
+      case Instructions.ConfigureNftPluginCollection:
+        return (
+          <ConfigureNftPluginCollection
+            index={idx}
+            governance={governance}
+          ></ConfigureNftPluginCollection>
+        )
+      case Instructions.CreateNftPluginMaxVoterWeight:
+        return (
+          <CreateNftPluginMaxVoterWeightRecord
+            index={idx}
+            governance={governance}
+          ></CreateNftPluginMaxVoterWeightRecord>
+        )
       case Instructions.None:
         return <Empty index={idx} governance={governance}></Empty>
-      case Instructions.MangoMakeChangeMaxAccounts:
+      case Instructions.MangoAddOracle:
+        return (
+          <MakeAddOracle index={idx} governance={governance}></MakeAddOracle>
+        )
+      case Instructions.MangoAddSpotMarket:
+        return (
+          <MakeAddSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeAddSpotMarket>
+        )
+      case Instructions.MangoChangeMaxAccounts:
         return (
           <MakeChangeMaxAccounts
             index={idx}
             governance={governance}
           ></MakeChangeMaxAccounts>
+        )
+      case Instructions.MangoChangePerpMarket:
+        return (
+          <MakeChangePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeChangePerpMarket>
         )
       case Instructions.MangoChangeReferralFeeParams:
         return (
@@ -359,6 +357,22 @@ const New = () => {
             governance={governance}
           ></MakeChangeReferralFeeParams>
         )
+      case Instructions.MangoChangeSpotMarket:
+        return (
+          <MakeChangeSpotMarket
+            index={idx}
+            governance={governance}
+          ></MakeChangeSpotMarket>
+        )
+      case Instructions.MangoCreatePerpMarket:
+        return (
+          <MakeCreatePerpMarket
+            index={idx}
+            governance={governance}
+          ></MakeCreatePerpMarket>
+        )
+      case Instructions.RealmConfig:
+        return <RealmConfig index={idx} governance={governance}></RealmConfig>
       case Instructions.Grant:
         return <Grant index={idx} governance={governance}></Grant>
       case Instructions.Clawback:
@@ -514,7 +528,7 @@ const New = () => {
           </div>
         </>
       </div>
-      <div className="col-span-12 md:col-span-5 lg:col-span-4">
+      <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
         <TokenBalanceCardWrapper />
       </div>
     </div>

@@ -1,23 +1,56 @@
-import useWalletStore from 'stores/useWalletStore'
 import useRealm from 'hooks/useRealm'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import ProposalFilter from 'components/ProposalFilter'
-import ProposalCard from 'components/ProposalCard'
-import { Proposal, ProposalState } from '@solana/spl-governance'
+import {
+  Governance,
+  ProgramAccount,
+  Proposal,
+  ProposalState,
+  Vote,
+  withCastVote,
+  YesNoVote,
+} from '@solana/spl-governance'
+import useWalletStore from 'stores/useWalletStore'
 import NewProposalBtn from './proposal/components/NewProposalBtn'
-import RealmHeader from 'components/RealmHeader'
-import { PublicKey } from '@solana/web3.js'
-import AccountsCompactWrapper from '@components/TreasuryAccount/AccountsCompactWrapper'
-import MembersCompactWrapper from '@components/Members/MembersCompactWrapper'
-import AssetsCompactWrapper from '@components/AssetsList/AssetsCompactWrapper'
-import NFTSCompactWrapper from '@components/NFTS/NFTSCompactWrapper'
-import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
-import { usePrevious } from '@hooks/usePrevious'
+import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
 import TokenBalanceCardWrapper from '@components/TokenBalance/TokenBalanceCardWrapper'
-import ApproveAllBtn from './proposal/components/ApproveAllBtn'
+import dynamic from 'next/dynamic'
+import PaginationComponent from '@components/Pagination'
+import Tabs from '@components/Tabs'
+import AboutRealm from '@components/AboutRealm'
+import Input from '@components/inputs/Input'
+import { SearchIcon } from '@heroicons/react/outline'
+import Switch from '@components/Switch'
+import ProposalSelectCard from '@components/ProposalSelectCard'
+import Checkbox from '@components/inputs/Checkbox'
+import Button from '@components/Button'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { NftVoterClient } from '@solana/governance-program-library'
+import { notify } from '@utils/notifications'
+import { sendSignedTransaction } from '@utils/send'
 
-const compareProposals = (p1: Proposal, p2: Proposal) => {
+const AccountsCompactWrapper = dynamic(
+  () => import('@components/TreasuryAccount/AccountsCompactWrapper')
+)
+const AssetsCompactWrapper = dynamic(
+  () => import('@components/AssetsList/AssetsCompactWrapper')
+)
+const NFTSCompactWrapper = dynamic(
+  () => import('@components/NFTS/NFTSCompactWrapper')
+)
+const ProposalCard = dynamic(() => import('components/ProposalCard'))
+const RealmHeader = dynamic(() => import('components/RealmHeader'))
+const DepositLabel = dynamic(
+  () => import('@components/TreasuryAccount/DepositLabel')
+)
+
+const compareProposals = (
+  p1: Proposal,
+  p2: Proposal,
+  governances: {
+    [governance: string]: ProgramAccount<Governance>
+  }
+) => {
   const p1Rank = p1.getStateSortRank()
   const p2Rank = p2.getStateSortRank()
 
@@ -27,47 +60,95 @@ const compareProposals = (p1: Proposal, p2: Proposal) => {
     return -1
   }
 
-  const tsCompare = p1.getStateTimestamp() - p2.getStateTimestamp()
+  if (p1.state === ProposalState.Voting && p2.state === ProposalState.Voting) {
+    const p1VotingRank = getVotingStateRank(p1, governances)
+    const p2VotingRank = getVotingStateRank(p2, governances)
 
-  // Show the proposals in voting state expiring earlier at the top
-  return p1.state === ProposalState.Voting ? ~tsCompare : tsCompare
+    if (p1VotingRank > p2VotingRank) {
+      return 1
+    } else if (p1VotingRank < p2VotingRank) {
+      return -1
+    }
+
+    // Show the proposals in voting state expiring earlier at the top
+    return p2.getStateTimestamp() - p1.getStateTimestamp()
+  }
+
+  return p1.getStateTimestamp() - p2.getStateTimestamp()
+}
+
+/// Compares proposals in voting state to distinguish between Voting and Finalizing states
+function getVotingStateRank(
+  proposal: Proposal,
+  governances: {
+    [governance: string]: ProgramAccount<Governance>
+  }
+) {
+  // Show proposals in Voting state before proposals in Finalizing state
+  const governance = governances[proposal.governance.toBase58()].account
+  return proposal.hasVoteTimeEnded(governance) ? 0 : 1
 }
 
 const REALM = () => {
+  const pagination = useRef<{ setPage: (val) => void }>(null)
   const {
     realm,
     realmInfo,
     proposals,
-    realmTokenAccount,
+    governances,
+    tokenRecords,
+    ownVoterWeight,
     ownTokenRecord,
   } = useRealm()
-  const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const prevStringifyNftsGovernedTokenAccounts = usePrevious(
-    JSON.stringify(nftsGovernedTokenAccounts)
-  )
-  const connection = useWalletStore((s) => s.connection.current)
-  const { getNfts } = useTreasuryAccountStore()
+  const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
   const [displayedProposals, setDisplayedProposals] = useState(
     Object.entries(proposals)
   )
+  const [paginatedProposals, setPaginatedProposals] = useState<
+    [string, ProgramAccount<Proposal>][]
+  >([])
+  const [isMultiVoting, setIsMultiVoting] = useState(false)
+  const [proposalSearch, setProposalSearch] = useState('')
   const [filteredProposals, setFilteredProposals] = useState(displayedProposals)
+  const [activeTab, setActiveTab] = useState('Proposals')
+  const [multiVoteMode, setMultiVoteMode] = useState(false)
+  const [selectedProposals, setSelectedProposals] = useState<
+    SelectedProposal[]
+  >([])
+  const ownVoteRecordsByProposal = useWalletStore(
+    (s) => s.ownVoteRecordsByProposal
+  )
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const wallet = useWalletStore((s) => s.current)
+  const connected = useWalletStore((s) => s.connected)
+  const connection = useWalletStore((s) => s.connection.current)
 
   const allProposals = Object.entries(proposals).sort((a, b) =>
-    compareProposals(b[1].account, a[1].account)
+    compareProposals(b[1].account, a[1].account, governances)
   )
+  useEffect(() => {
+    setPaginatedProposals(paginateProposals(0))
+    pagination?.current?.setPage(0)
+  }, [JSON.stringify(filteredProposals)])
 
   useEffect(() => {
-    if (filters.length > 0) {
-      const proposals = displayedProposals.filter(
-        ([, v]) => !filters.includes(v.account.state)
+    let proposals =
+      filters.length > 0
+        ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
+        : allProposals
+    if (proposalSearch) {
+      proposals = proposals.filter(([, v]) =>
+        v.account.name
+          .toLowerCase()
+          .includes(proposalSearch.toLocaleLowerCase())
       )
-      setFilteredProposals(proposals)
-    } else {
-      setFilteredProposals(allProposals)
     }
-  }, [filters])
+    setFilteredProposals(proposals)
+  }, [filters, proposalSearch])
 
   useEffect(() => {
     const proposals =
@@ -76,86 +157,347 @@ const REALM = () => {
         : allProposals
     setDisplayedProposals(proposals)
     setFilteredProposals(proposals)
-  }, [proposals])
+  }, [JSON.stringify(proposals)])
+
+  const onProposalPageChange = (page) => {
+    setPaginatedProposals(paginateProposals(page))
+  }
+  const paginateProposals = (page) => {
+    return filteredProposals.slice(
+      page * proposalsPerPage,
+      (page + 1) * proposalsPerPage
+    )
+  }
+
+  const toggleMultiVoteMode = () => {
+    setMultiVoteMode(!multiVoteMode)
+  }
+
+  const votingProposals = useMemo(
+    () =>
+      allProposals.filter(([k, v]) => {
+        const governance = governances[v.account.governance.toBase58()]?.account
+        return (
+          v.account.state === ProposalState.Voting &&
+          !ownVoteRecordsByProposal[k] &&
+          !v.account.hasVoteTimeEnded(governance)
+        )
+      }),
+    [allProposals]
+  )
 
   useEffect(() => {
-    if (
-      prevStringifyNftsGovernedTokenAccounts !==
-      JSON.stringify(nftsGovernedTokenAccounts)
-    ) {
-      getNfts(nftsGovernedTokenAccounts, connection)
+    setSelectedProposals([])
+    if (multiVoteMode) {
+      setFilteredProposals(votingProposals)
+    } else {
+      const proposals =
+        filters.length > 0
+          ? allProposals.filter(([, v]) => !filters.includes(v.account.state))
+          : allProposals
+      setFilteredProposals(proposals)
     }
-  }, [JSON.stringify(nftsGovernedTokenAccounts)])
-  // DEBUG print remove
-  console.log(
-    'governance page tokenAccount',
-    realmTokenAccount && realmTokenAccount.publicKey.toBase58()
-  )
+  }, [multiVoteMode])
 
-  console.log(
-    'governance page wallet',
-    wallet?.connected && wallet?.publicKey?.toBase58()
-  )
+  const allVotingProposalsSelected =
+    selectedProposals.length === votingProposals.length
+  const hasCommunityVoteWeight =
+    ownTokenRecord &&
+    ownVoterWeight.hasMinAmountToVote(ownTokenRecord.account.governingTokenMint)
+  const cantMultiVote =
+    selectedProposals.length === 0 || isMultiVoting || !hasCommunityVoteWeight
 
-  console.log(
-    'governance page tokenRecord',
-    wallet?.connected && ownTokenRecord
+  const toggleSelectAll = () => {
+    if (allVotingProposalsSelected) {
+      setSelectedProposals([])
+    } else {
+      setSelectedProposals(
+        votingProposals.map(([k, v]) => ({
+          proposal: v.account,
+          proposalPk: new PublicKey(k),
+        }))
+      )
+    }
+  }
+
+  const voteOnSelected = async (vote: YesNoVote) => {
+    if (!wallet || !realmInfo!.programId || !realm) return
+
+    const governanceAuthority = wallet.publicKey!
+    const payer = wallet.publicKey!
+
+    try {
+      setIsMultiVoting(true)
+      const {
+        blockhash: recentBlockhash,
+      } = await connection.getLatestBlockhash()
+
+      const transactions: Transaction[] = []
+      for (let i = 0; i < selectedProposals.length; i++) {
+        const selectedProposal = selectedProposals[i]
+        const ownTokenRecord = tokenRecords[wallet.publicKey!.toBase58()]
+
+        const instructions: TransactionInstruction[] = []
+
+        //will run only if plugin is connected with realm
+        const plugin = await client?.withCastPluginVote(
+          instructions,
+          selectedProposal.proposalPk
+        )
+        if (client.client instanceof NftVoterClient === false) {
+          await withCastVote(
+            instructions,
+            realmInfo!.programId,
+            realmInfo!.programVersion!,
+            realm.pubkey,
+            selectedProposal.proposal.governance,
+            selectedProposal.proposalPk,
+            selectedProposal.proposal.tokenOwnerRecord,
+            ownTokenRecord.pubkey,
+            governanceAuthority,
+            selectedProposal.proposal.governingTokenMint,
+            Vote.fromYesNoVote(vote),
+            payer,
+            plugin?.voterWeightPk,
+            plugin?.maxVoterWeightRecord
+          )
+        }
+
+        const transaction = new Transaction()
+        transaction.add(...instructions)
+        transaction.recentBlockhash = recentBlockhash
+        transaction.setSigners(
+          // fee payed by the wallet owner
+          wallet.publicKey!
+        )
+        transactions.push(transaction)
+      }
+      const signedTXs = await wallet.signAllTransactions(transactions)
+      await Promise.all(
+        signedTXs.map((transaction) =>
+          sendSignedTransaction({ signedTransaction: transaction, connection })
+        )
+      )
+      await refetchProposals()
+      toggleMultiVoteMode()
+      notify({
+        message: 'Successfully voted on all proposals',
+        type: 'success',
+      })
+    } catch (e) {
+      notify({ type: 'erorr', message: `Something went wrong, ${e}` })
+    }
+    setIsMultiVoting(false)
+  }
+
+  const showMultiVote = useMemo(
+    () => (realm ? realm.account.votingProposalCount > 1 && connected : false),
+    [realm, connected]
   )
 
   return (
     <>
-      <div className="grid grid-cols-12 gap-4">
-        <div className="bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last p-4 md:p-6 rounded-lg">
-          <RealmHeader />
+      <div
+        className={`bottom-0 bg-bkg-3 flex flex-col justify-center fixed h-24 px-4 md:px-6 lg:px-8 transform transition-all duration-300 ease-in-out w-full left-1/2 -translate-x-1/2 z-10 ${
+          multiVoteMode ? 'translate-y-0' : 'translate-y-full'
+        }`}
+      >
+        <div className="flex items-center justify-between">
           <div>
-            {realmInfo?.bannerImage ? (
-              <img
-                className="col-span-12 mb-10"
-                src={realmInfo?.bannerImage}
-              ></img>
-            ) : null}
+            <h4 className="mb-2">
+              {`${selectedProposals.length} Proposal${
+                selectedProposals.length === 1 ? '' : 's'
+              } Selected`}
+            </h4>
+            <Checkbox
+              checked={allVotingProposalsSelected}
+              label={allVotingProposalsSelected ? 'Deselect All' : 'Select All'}
+              onChange={() => toggleSelectAll()}
+            />
           </div>
-          <div className="flex items-center justify-between pb-3">
-            <h4 className="text-fgd-2">{`${filteredProposals.length} proposals`}</h4>
-            <div className="flex items-center">
-              <div className="mr-4">
-                <ApproveAllBtn />
-              </div>
-              <div className="mr-4">
-                <NewProposalBtn />
-              </div>
+          <div className="flex items-center space-x-3">
+            <Button
+              className="whitespace-nowrap"
+              disabled={cantMultiVote}
+              tooltipMessage={
+                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+              }
+              onClick={() => voteOnSelected(YesNoVote.Yes)}
+              isLoading={isMultiVoting}
+            >
+              Vote Yes
+            </Button>
+            <Button
+              className="whitespace-nowrap"
+              disabled={cantMultiVote}
+              tooltipMessage={
+                !hasCommunityVoteWeight ? "You don't have voting power" : ''
+              }
+              onClick={() => voteOnSelected(YesNoVote.No)}
+              isLoading={isMultiVoting}
+            >
+              Vote No
+            </Button>
+          </div>
+        </div>
+      </div>
+      <div className="grid grid-cols-12 gap-4">
+        {realm ? (
+          <>
+            <div
+              className={`bg-bkg-2 col-span-12 md:col-span-7 md:order-first lg:col-span-8 order-last rounded-lg`}
+            >
+              {realm && <RealmHeader />}
+              <div className="p-4 md:p-6 ">
+                <div>
+                  {realmInfo?.bannerImage ? (
+                    <>
+                      <img
+                        className="mb-10 h-80"
+                        src={realmInfo?.bannerImage}
+                      ></img>
+                      {/* temp. setup for Ukraine.SOL */}
+                      {realmInfo.sharedWalletId && (
+                        <div>
+                          <div className="mb-10">
+                            <DepositLabel
+                              abbreviatedAddress={false}
+                              header="Wallet Address"
+                              transferAddress={realmInfo.sharedWalletId}
+                            ></DepositLabel>
+                          </div>
+                        </div>
+                      )}
+                    </>
+                  ) : null}
+                </div>
 
-              <ProposalFilter filters={filters} setFilters={setFilters} />
-            </div>
-          </div>
-          <div className="space-y-3">
-            {filteredProposals.length > 0 ? (
-              filteredProposals.map(([k, v]) => (
-                <ProposalCard
-                  key={k}
-                  proposalPk={new PublicKey(k)}
-                  proposal={v.account}
+                <Tabs
+                  activeTab={activeTab}
+                  onChange={(t) => setActiveTab(t)}
+                  tabs={['Proposals', 'About']}
                 />
-              ))
-            ) : (
-              <div className="bg-bkg-3 px-4 md:px-6 py-4 rounded-lg text-center text-fgd-3">
-                No proposals found
+                {activeTab === 'Proposals' && (
+                  <>
+                    <div className="pb-3">
+                      <div className="flex items-center pb-4 space-x-3">
+                        <Input
+                          className="pl-8 w-full"
+                          type="text"
+                          placeholder="Search Proposals"
+                          value={proposalSearch}
+                          noMaxWidth
+                          onChange={(e) => {
+                            setProposalSearch(e.target.value)
+                          }}
+                          prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />}
+                        />
+                        <ProposalFilter
+                          disabled={multiVoteMode}
+                          filters={filters}
+                          setFilters={setFilters}
+                        />
+                      </div>
+                      <div
+                        className={`flex lg:flex-row items-center justify-between lg:space-x-3 w-full ${
+                          showMultiVote ? 'flex-col-reverse' : 'flex-row'
+                        }`}
+                      >
+                        <h4 className="font-normal mb-0 text-fgd-2 whitespace-nowrap">{`${
+                          filteredProposals.length
+                        } Proposal${
+                          filteredProposals.length === 1 ? '' : 's'
+                        }`}</h4>
+                        <div
+                          className={`flex items-center lg:justify-end lg:pb-0 lg:space-x-3 w-full ${
+                            showMultiVote
+                              ? 'justify-between pb-3'
+                              : 'justify-end'
+                          }`}
+                        >
+                          {showMultiVote ? (
+                            <div className="flex items-center">
+                              <p className="mb-0 mr-1 text-fgd-3">
+                                Multi-vote Mode
+                              </p>
+                              <Switch
+                                checked={multiVoteMode}
+                                onChange={() => {
+                                  toggleMultiVoteMode()
+                                }}
+                              />
+                            </div>
+                          ) : null}
+                          <NewProposalBtn />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="space-y-3">
+                      {filteredProposals.length > 0 ? (
+                        <>
+                          {paginatedProposals.map(([k, v]) =>
+                            multiVoteMode ? (
+                              <ProposalSelectCard
+                                key={k}
+                                proposalPk={new PublicKey(k)}
+                                proposal={v.account}
+                                selectedProposals={selectedProposals}
+                                setSelectedProposals={setSelectedProposals}
+                              />
+                            ) : (
+                              <ProposalCard
+                                key={k}
+                                proposalPk={new PublicKey(k)}
+                                proposal={v.account}
+                              />
+                            )
+                          )}
+                          <PaginationComponent
+                            ref={pagination}
+                            totalPages={Math.ceil(
+                              filteredProposals.length / proposalsPerPage
+                            )}
+                            onPageChange={onProposalPageChange}
+                          ></PaginationComponent>
+                        </>
+                      ) : (
+                        <div className="bg-bkg-3 px-4 md:px-6 py-4 rounded-lg text-center text-fgd-3">
+                          No proposals found
+                        </div>
+                      )}
+                    </div>
+                  </>
+                )}
+                {activeTab === 'About' && <AboutRealm />}
               </div>
-            )}
-          </div>
-        </div>
-        <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
-          <TokenBalanceCardWrapper />
-          <NFTSCompactWrapper></NFTSCompactWrapper>
-          <AccountsCompactWrapper />
-          {!realm?.account.config.useCommunityVoterWeightAddin && (
-            <MembersCompactWrapper></MembersCompactWrapper>
-          )}
-          <AssetsCompactWrapper></AssetsCompactWrapper>
-        </div>
+            </div>
+            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+              <TokenBalanceCardWrapper />
+              <NFTSCompactWrapper />
+              <AccountsCompactWrapper />
+              <AssetsCompactWrapper />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={`col-span-12 md:col-span-7 lg:col-span-8`}>
+              <div className="animate-pulse bg-bkg-3 h-full rounded-lg w-full" />
+            </div>
+            <div className="col-span-12 md:col-span-5 lg:col-span-4 space-y-4">
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+              <div className="animate-pulse bg-bkg-3 h-64 rounded-lg w-full" />
+            </div>
+          </>
+        )}
       </div>
     </>
   )
 }
 
 export default REALM
+
+export interface SelectedProposal {
+  proposal: Proposal
+  proposalPk: PublicKey
+}

@@ -11,16 +11,19 @@ export default function ProgramUpgradeInfo({
   }
 
   return (
-    <div className="text-sm mb-5">
-      <div className="mb-2">Upgrade authority</div>
+    <div className="border border-fgd-4 p-4 rounded-md">
+      <div className="pb-3">
+        <p className="mb-0.5 text-xs">Upgrade authority</p>
+        <CommandLineInfo info={governancePk?.toBase58()} />
+      </div>
 
-      <CommandLineInfo info={governancePk?.toBase58()}></CommandLineInfo>
-
-      <div className="mb-2">Solana CLI</div>
-      <CommandLineInfo info="solana program write-buffer <PROGRAM_FILEPATH>"></CommandLineInfo>
+      <div className="pb-3">
+        <p className="mb-0.5 text-xs">Solana CLI</p>
+        <CommandLineInfo info="solana program write-buffer <PROGRAM_FILEPATH>" />
+      </div>
       <CommandLineInfo
         info={`solana program set-buffer-authority --new-buffer-authority ${governancePk?.toBase58()} <BUFFER_PUBKEY>`}
-      ></CommandLineInfo>
+      />
     </div>
   )
 }

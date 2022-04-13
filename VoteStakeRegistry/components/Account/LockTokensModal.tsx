@@ -1,9 +1,7 @@
-import Button, { SecondaryButton } from '@components/Button'
+import Button, { LinkButton, SecondaryButton } from '@components/Button'
 import Input from '@components/inputs/Input'
-import Select from '@components/inputs/Select'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
 import Modal from '@components/Modal'
-import { Tab } from '@headlessui/react'
 import { QuestionMarkCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { getProgramVersionForRealm } from '@models/registry/api'
@@ -16,17 +14,16 @@ import {
   getMintNaturalAmountFromDecimalAsBN,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import classNames from 'classnames'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { voteRegistryLockDeposit } from 'VoteStakeRegistry/actions/voteRegistryLockDeposit'
 import { DepositWithMintAccount } from 'VoteStakeRegistry/sdk/accounts'
 import {
   yearsToDays,
-  yearsToSecs,
-  daysToYear,
   daysToMonths,
   getMinDurationInDays,
+  SECS_PER_DAY,
+  getFormattedStringFromDays,
 } from 'VoteStakeRegistry/tools/dateTools'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import { voteRegistryStartUnlock } from 'VoteStakeRegistry/actions/voteRegistryStartUnlock'
@@ -40,11 +37,14 @@ import {
   vestingPeriods,
 } from 'VoteStakeRegistry/tools/types'
 import BigNumber from 'bignumber.js'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { calcMintMultiplier } from 'VoteStakeRegistry/tools/deposits'
+import ButtonGroup from '@components/ButtonGroup'
+import InlineNotification from '@components/InlineNotification'
+import Tooltip from '@components/Tooltip'
 
-const YES = 'YES'
-const NO = 'NO'
+const YES = 'Yes'
+const NO = 'No'
 
 const LockTokensModal = ({
   onClose,
@@ -57,9 +57,9 @@ const LockTokensModal = ({
 }) => {
   const { getOwnedDeposits } = useDepositStore()
   const { mint, realm, realmTokenAccount, realmInfo, tokenRecords } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
-  const communityMintRegistrar = useVoteStakeRegistryClientStore(
-    (s) => s.state.communityMintRegistrar
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
+  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrar
   )
   const connection = useWalletStore((s) => s.connection.current)
   const endpoint = useWalletStore((s) => s.connection.endpoint)
@@ -71,79 +71,71 @@ const LockTokensModal = ({
 
   const lockupPeriods: Period[] = [
     {
-      value: yearsToDays(1),
+      defaultValue: yearsToDays(1),
       display: '1y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(1),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(2),
+      defaultValue: yearsToDays(2),
       display: '2y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(2),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(3),
+      defaultValue: yearsToDays(3),
       display: '3y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(3),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(4),
+      defaultValue: yearsToDays(4),
       display: '4y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(4),
-        communityMintRegistrar,
-        realm
-      ),
     },
     {
-      value: yearsToDays(5),
+      defaultValue: yearsToDays(5),
       display: '5y',
-      multiplier: calcMintMultiplier(
-        yearsToSecs(5),
-        communityMintRegistrar,
-        realm
-      ),
+    },
+    {
+      defaultValue: 1,
+      display: 'Custom',
     },
   ].filter((x) =>
-    depositToUnlock ? getMinDurationInDays(depositToUnlock) <= x.value : true
+    depositToUnlock
+      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue
+      : true
   )
 
-  const maxMultiplier = lockupPeriods
-    .map((x) => x.multiplier)
+  const maxNonCustomDaysLockup = lockupPeriods
+    .map((x) => x.defaultValue)
     .reduce((prev, current) => {
       return prev > current ? prev : current
     })
+  const maxMultiplier = calcMintMultiplier(
+    maxNonCustomDaysLockup * SECS_PER_DAY,
+    voteStakeRegistryRegistrar,
+    realm
+  )
+
   const depositRecord = deposits.find(
     (x) =>
       x.mint.publicKey.toBase58() === realm!.account.communityMint.toBase58() &&
       x.lockup.kind.none
   )
+  const [lockupPeriodDays, setLockupPeriodDays] = useState<number>(0)
   const [lockupPeriod, setLockupPeriod] = useState<Period>(lockupPeriods[0])
   const [amount, setAmount] = useState<number | undefined>()
-  const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>('')
-  const [lockupType, setLockupType] = useState<LockupKind>(lockupTypes[0])
-  const [vestingPeriod, setVestingPeriod] = useState<VestingPeriod>(
-    vestingPeriods[0]
+  const [lockMoreThenDeposited, setLockMoreThenDeposited] = useState<string>(
+    YES
   )
+  const [lockupType, setLockupType] = useState<LockupKind>(lockupTypes[0])
+  const [
+    vestingPeriod,
+    // setVestingPeriod
+  ] = useState<VestingPeriod>(vestingPeriods[0])
   const [currentStep, setCurrentStep] = useState(0)
+  const [showLockupTypeInfo, setShowLockupTypeInfo] = useState<boolean>(false)
 
   const depositedTokens = depositRecord
     ? fmtMintAmount(mint, depositRecord.amountDepositedNative)
     : '0'
   const mintMinAmount = mint ? getMintMinAmountAsDecimal(mint) : 1
   const hasMoreTokensInWallet = !realmTokenAccount?.account.amount.isZero()
-  const wantToLockMoreThenDeposited = lockMoreThenDeposited === 'YES'
+  const wantToLockMoreThenDeposited = lockMoreThenDeposited === 'Yes'
   const currentPrecision = precision(mintMinAmount)
   const maxAmountToUnlock = depositToUnlock
     ? getMintDecimalAmount(
@@ -187,18 +179,14 @@ const LockTokensModal = ({
   const tokenName = mint
     ? getMintMetadata(realm?.account.communityMint)?.name || 'tokens'
     : ''
+  const currentMultiplier = calcMintMultiplier(
+    lockupPeriodDays * SECS_PER_DAY,
+    voteStakeRegistryRegistrar,
+    realm
+  )
   const currentPercentOfMaxMultiplier =
-    (100 * lockupPeriod.multiplier) / maxMultiplier
+    (100 * currentMultiplier) / maxMultiplier
 
-  const handleSetVestingPeriod = (idx: number) => {
-    setVestingPeriod(vestingPeriods[idx])
-  }
-  const handleSetLockupPeriod = (idx: number) => {
-    setLockupPeriod(lockupPeriods[idx])
-  }
-  const handleSetLockupType = (idx: number) => {
-    setLockupType(lockupTypes[idx])
-  }
   const handleNextStep = () => {
     setCurrentStep(currentStep + 1)
   }
@@ -242,7 +230,7 @@ const LockTokensModal = ({
       programId: realm!.owner,
       amountFromVoteRegistryDeposit: amountFromDeposit,
       totalTransferAmount: totalAmountToLock,
-      lockUpPeriodInDays: lockupPeriod.value,
+      lockUpPeriodInDays: lockupPeriodDays,
       lockupKind: lockupType.value,
       sourceDepositIdx: depositRecord!.index,
       sourceTokenAccount: realmTokenAccount!.publicKey,
@@ -291,7 +279,7 @@ const LockTokensModal = ({
       programId: realm!.owner,
       transferAmount: totalAmountToUnlock,
       amountAfterOperation: whatWillBeLeftInsideDeposit,
-      lockUpPeriodInDays: lockupPeriod.value,
+      lockUpPeriodInDays: lockupPeriodDays,
       sourceDepositIdx: depositToUnlock!.index,
       communityMintPk: realm!.account.communityMint,
       tokenOwnerRecordPk:
@@ -308,198 +296,196 @@ const LockTokensModal = ({
 
     onClose()
   }
-  const baseTabClasses =
-    'w-full default-transition font-bold px-4 py-2.5 text-sm focus:outline-none bg-bkg-4 hover:bg-primary-dark'
-  const tabClasses = ({ val, index, currentValue, lastItemIdx }) => {
-    return classNames(
-      baseTabClasses,
-      val === currentValue ? 'bg-primary-light text-bkg-2' : '',
-      index === 0 ? 'rounded-l-lg' : '',
-      index === lastItemIdx + 1 ? 'rounded-r-lg' : ''
-    )
-  }
-  const labelClasses = 'text-xs mb-2'
+  const labelClasses = 'mb-2 text-fgd-2 text-sm'
   const DoYouWantToDepositMoreComponent = () => (
-    <>
-      <div className="text-xs mb-2">
-        Do you want to lock more then the {depositedTokens} you have deposited?
+    <div className="pb-4">
+      <div className={labelClasses}>
+        Lock more than the {depositedTokens} {realmInfo?.symbol} you have
+        deposited?
       </div>
-      <Tab.Group
-        onChange={(index) => {
-          index === 0
-            ? setLockMoreThenDeposited(YES)
-            : setLockMoreThenDeposited(NO)
-        }}
-      >
-        <Tab.List className="flex mb-6">
-          <Tab
-            className={`${baseTabClasses} rounded-l-lg ${
-              lockMoreThenDeposited === YES && 'bg-primary-light text-bkg-2'
-            }`}
-          >
-            Yes
-          </Tab>
-          <Tab
-            className={`${baseTabClasses} rounded-r-lg ${
-              lockMoreThenDeposited === NO && 'bg-primary-light text-bkg-2'
-            }`}
-          >
-            No
-          </Tab>
-        </Tab.List>
-      </Tab.Group>
-    </>
+      <ButtonGroup
+        activeValue={lockMoreThenDeposited}
+        className="h-10"
+        onChange={(v) => setLockMoreThenDeposited(v)}
+        values={[YES, NO]}
+      />
+    </div>
   )
   const getCurrentStep = () => {
     switch (currentStep) {
       case 0:
         return (
           <>
-            <div className={labelClasses}>Lockup Type</div>
-            <Tab.Group onChange={handleSetLockupType}>
-              <Tab.List className="flex mb-6">
-                {lockupTypes.map((type, index) => (
-                  <Tab
-                    key={type.value}
-                    className={tabClasses({
-                      val: lockupType.value,
-                      index: index,
-                      currentValue: type.value,
-                      lastItemIdx: lockupTypes.length,
-                    })}
+            {!depositToUnlock ? (
+              <>
+                <div className="flex items-center justify-between">
+                  <div className={labelClasses}>Lockup Type</div>
+                  <LinkButton
+                    className="mb-2"
+                    onClick={() => setShowLockupTypeInfo(true)}
                   >
-                    {type.displayName}
-                  </Tab>
-                ))}
-              </Tab.List>
-            </Tab.Group>
-            <div className={`${labelClasses} font-bold`}>
-              {lockupType.displayName} Lockup
-            </div>
-            {lockupType.info.map((text, index) => (
-              <div key={index} className="text-xs mb-2">
-                {text}
+                    About Lockup Types
+                  </LinkButton>
+                </div>
+                <div className="mb-4">
+                  <ButtonGroup
+                    activeValue={lockupType.displayName}
+                    className="h-10"
+                    onChange={(type) =>
+                      setLockupType(
+                        //@ts-ignore
+                        lockupTypes
+                          .filter((x) => x.value !== MONTHLY)
+                          .find((t) => t.displayName === type)
+                      )
+                    }
+                    values={lockupTypes
+                      .filter((x) => x.value !== MONTHLY)
+                      .map((type) => type.displayName)}
+                  />
+                </div>
+              </>
+            ) : null}
+            <div className="mb-4">
+              {depositToUnlock && (
+                <div className="mb-4">
+                  <InlineNotification
+                    desc="To initiate the unlock process you need to convert all, or part of your constant lockup to a cliff lockup with a duration greater than or equal to the constant lockup duration."
+                    type="info"
+                  />
+                </div>
+              )}
+              {hasMoreTokensInWallet && !depositToUnlock && (
+                <DoYouWantToDepositMoreComponent />
+              )}
+              <div className="mb-4">
+                <div className={`${labelClasses} flex justify-between`}>
+                  {depositToUnlock ? 'Amount to Unlock' : 'Amount to Lock'}
+                  <LinkButton
+                    className="text-primary-light"
+                    onClick={() => setAmount(Number(maxAmount))}
+                  >
+                    Max: {maxAmountFmt}
+                  </LinkButton>
+                </div>
+                <Input
+                  max={maxAmount}
+                  min={mintMinAmount}
+                  value={amount}
+                  type="number"
+                  onChange={(e) => setAmount(e.target.value)}
+                  step={mintMinAmount}
+                  onBlur={validateAmountOnBlur}
+                />
               </div>
-            ))}
+              <div className="mb-4">
+                <div className={labelClasses}>Duration</div>
+                <ButtonGroup
+                  activeValue={lockupPeriod.display}
+                  className="h-10"
+                  onChange={(period) =>
+                    setLockupPeriod(
+                      //@ts-ignore
+                      lockupPeriods.find((p) => p.display === period)
+                    )
+                  }
+                  values={lockupPeriods.map((p) => p.display)}
+                />
+              </div>
+              {lockupPeriod.defaultValue === 1 && (
+                <>
+                  <div className={`${labelClasses} flex justify-between`}>
+                    Number of days
+                  </div>
+                  <Input
+                    className="mb-4"
+                    min={1}
+                    value={lockupPeriodDays}
+                    type="number"
+                    onChange={(e) => setLockupPeriodDays(e.target.value)}
+                    step={1}
+                  />
+                </>
+              )}
+
+              {lockupType.value === MONTHLY && (
+                <div className="mb-4">
+                  <div className="flex justify-between mb-1">
+                    <p>Vesting Period</p>
+                    <p className="font-bold mb-0 text-fgd-1">Monthly</p>
+                  </div>
+                  {/* <Tab.Group onChange={handleSetVestingPeriod}>
+                    <Tab.List className="flex mb-6">
+                      {vestingPeriods.map((period, index) => (
+                        <Tab
+                          key={period.value}
+                          className={tabClasses({
+                            val: vestingPeriod.value,
+                            index: index,
+                            currentValue: period.value,
+                            lastItemIdx: vestingPeriods.length,
+                          })}
+                        >
+                          {period.display}
+                        </Tab>
+                      ))}
+                    </Tab.List>
+                  </Tab.Group> */}
+                  <div className="flex items-center justify-between">
+                    <p>Vesting Rate</p>
+                    {amount ? (
+                      <p className="font-bold mb-0 text-fgd-1">
+                        {(amount / daysToMonths(lockupPeriodDays)).toFixed(2)}{' '}
+                        {vestingPeriod.info}
+                      </p>
+                    ) : (
+                      <p className="mb-0 text-orange text-xs">
+                        Enter an amount to lock
+                      </p>
+                    )}
+                  </div>
+                </div>
+              )}
+              <div className={`${labelClasses} flex items-center`}>
+                {lockupType.value === CONSTANT
+                  ? 'Vote Weight Multiplier'
+                  : 'Initial Vote Weight Multiplier'}
+                {lockupType.value !== CONSTANT ? (
+                  <Tooltip content="The multiplier will decline linearly over time">
+                    <QuestionMarkCircleIcon className="cursor-help h-4 ml-1 w-4" />
+                  </Tooltip>
+                ) : null}
+                <span className="font-bold ml-auto text-fgd-1">
+                  {currentMultiplier}x
+                </span>
+              </div>
+              <div className="w-full h-2 bg-bkg-1 rounded-lg">
+                <div
+                  style={{ width: `${currentPercentOfMaxMultiplier}%` }}
+                  className="bg-primary-light h-2 rounded-lg"
+                ></div>
+              </div>
+            </div>
           </>
         )
       case 1:
         return (
-          <DoYouWantToDepositMoreComponent></DoYouWantToDepositMoreComponent>
-        )
-      case 2:
-        return (
-          <div className="mb-6">
-            {lockupType.value == CONSTANT && (
-              <div className="text-xs mb-6">
-                To initiate the unlock process you need to convert all, or part
-                of your constant lockup to a cliff lockup with a duration
-                greater than or equal to the constant lockup duration.
-              </div>
-            )}
-            {hasMoreTokensInWallet && !depositToUnlock && (
-              <DoYouWantToDepositMoreComponent></DoYouWantToDepositMoreComponent>
-            )}
-            <div className="mb-6">
-              <div className={`${labelClasses} flex`}>
-                Amount to lock{' '}
-                <div
-                  className="ml-auto underline cursor-pointer"
-                  onClick={() => setAmount(Number(maxAmount))}
-                >
-                  Max: {maxAmountFmt}
-                </div>
-              </div>
-              <Input
-                max={maxAmount}
-                min={mintMinAmount}
-                value={amount}
-                type="number"
-                onChange={(e) => setAmount(e.target.value)}
-                step={mintMinAmount}
-                onBlur={validateAmountOnBlur}
-              />
-            </div>
-            <div className={labelClasses}>Duration</div>
-            <Tab.Group onChange={handleSetLockupPeriod}>
-              <Tab.List className="flex mb-6">
-                {lockupPeriods.map((period, index) => (
-                  <Tab
-                    key={period.value}
-                    className={tabClasses({
-                      val: lockupPeriod.value,
-                      index: index,
-                      currentValue: period.value,
-                      lastItemIdx: lockupPeriods.length,
-                    })}
-                  >
-                    {period.display}
-                  </Tab>
-                ))}
-              </Tab.List>
-            </Tab.Group>
-            {lockupType.value === MONTHLY && (
-              <div className="mb-6">
-                <div className={labelClasses}>Vesting Period</div>
-                <Tab.Group onChange={handleSetVestingPeriod}>
-                  <Tab.List className="flex mb-6">
-                    {vestingPeriods.map((period, index) => (
-                      <Tab
-                        key={period.value}
-                        className={tabClasses({
-                          val: vestingPeriod.value,
-                          index: index,
-                          currentValue: period.value,
-                          lastItemIdx: vestingPeriods.length,
-                        })}
-                      >
-                        {period.display}
-                      </Tab>
-                    ))}
-                  </Tab.List>
-                </Tab.Group>
-                <div className={labelClasses}>Vesting rate</div>
-                {amount && (
-                  <div className="text-xs">
-                    {(amount / daysToMonths(lockupPeriod.value)).toFixed(2)}{' '}
-                    {vestingPeriod.info}
-                  </div>
-                )}
-              </div>
-            )}
-            {/* TODO tooltip */}
-            <div className={`${labelClasses} flex`}>
-              Initial Vote Weight Multiplier
-              <QuestionMarkCircleIcon className="w-4 h-4 ml-1"></QuestionMarkCircleIcon>
-              <span className="ml-auto">{lockupPeriod.multiplier}x</span>
-            </div>
-            <div className="w-full h-2 bg-bkg-1 rounded-lg">
-              <div
-                style={{ width: `${currentPercentOfMaxMultiplier}%` }}
-                className="bg-primary-light h-2 rounded-lg"
-              ></div>
-            </div>
-          </div>
-        )
-      case 3:
-        return (
-          <div className="flex flex-col text-center mb-6">
+          <div className="flex flex-col text-center mb-4">
             {depositToUnlock ? (
               <h2>
                 This will convert {new BigNumber(amount!).toFormat()}{' '}
                 {tokenName} into a cliff type lockup that unlocks in{' '}
-                {daysToYear(lockupPeriod.value)} years.
+                {getFormattedStringFromDays(lockupPeriodDays, true)}
               </h2>
             ) : (
               <h2>
                 Lock {new BigNumber(amount!).toFormat()} {tokenName} for{' '}
-                {lockupType.value == CONSTANT && ' at least '}
-                {daysToYear(lockupPeriod.value)}{' '}
-                {lockupPeriod.value > yearsToDays(1) ? 'years' : 'year'}?
+                {lockupType.value === CONSTANT && ' at least '}
+                {getFormattedStringFromDays(lockupPeriodDays, true)}
               </h2>
             )}
             {!depositToUnlock && (
-              <div className="text-xs">Locking tokens can’t be undone.</div>
+              <p className="mb-0">Locking tokens can’t be undone.</p>
             )}
           </div>
         )
@@ -507,17 +493,6 @@ const LockTokensModal = ({
         return 'Unknown step'
     }
   }
-
-  useEffect(() => {
-    if (currentStep === 1) {
-      handleNextStep()
-    }
-  }, [lockMoreThenDeposited])
-  useEffect(() => {
-    if (currentStep === 1 && !hasMoreTokensInWallet) {
-      handleNextStep()
-    }
-  }, [currentStep])
   useEffect(() => {
     if (amount) {
       validateAmountOnBlur()
@@ -525,27 +500,35 @@ const LockTokensModal = ({
   }, [lockMoreThenDeposited])
   useEffect(() => {
     setLockupPeriod(lockupPeriods[0])
-  }, [communityMintRegistrar])
+  }, [voteStakeRegistryRegistrar])
   useEffect(() => {
     if (depositToUnlock) {
-      goToStep(2)
+      goToStep(0)
     }
   }, [depositToUnlock])
-  const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 1
+  useEffect(() => {
+    setLockupPeriodDays(lockupPeriod.defaultValue)
+  }, [lockupPeriod.defaultValue])
+  // const isMainBtnVisible = !hasMoreTokensInWallet || currentStep !== 0
   const isTitleVisible = currentStep !== 3
   const getCurrentBtnForStep = () => {
     switch (currentStep) {
-      case 2:
+      case 0:
         return (
           <Button
             className="mb-4"
             onClick={handleNextStep}
-            disabled={!amount || !maxAmount}
+            disabled={
+              !amount ||
+              !maxAmount ||
+              !lockupPeriodDays ||
+              Number(lockupPeriodDays) === 0
+            }
           >
             {depositToUnlock ? 'Start unlock' : 'Lock Tokens'}
           </Button>
         )
-      case 3:
+      case 1:
         return (
           <Button
             className="mb-4"
@@ -556,37 +539,57 @@ const LockTokensModal = ({
         )
       default:
         return (
-          <Button className="mb-4" onClick={handleNextStep}>
-            Next
+          <Button
+            className="mb-4"
+            onClick={handleNextStep}
+            disabled={!amount || !maxAmount}
+          >
+            {depositToUnlock ? 'Start unlock' : 'Lock Tokens'}
           </Button>
         )
     }
   }
   return (
     <Modal onClose={onClose} isOpen={isOpen}>
-      <h2 className="mb-6 flex flex-row items-center">
-        {isTitleVisible && (depositToUnlock ? 'Start unlock' : 'Lock Tokens')}
-        {currentStep === 2 && !depositToUnlock && (
-          <div className="ml-auto">
-            <Select
-              className="text-xs w-24"
-              onChange={handleSetLockupType}
-              value={lockupType.displayName}
-            >
-              {lockupTypes.map((x, idx) => (
-                <Select.Option key={x.value} value={idx}>
-                  <div>{x.displayName}</div>
-                </Select.Option>
+      {currentStep !== 1 ? (
+        <h2 className="mb-4 flex flex-row items-center">
+          {isTitleVisible && (depositToUnlock ? 'Start Unlock' : 'Lock Tokens')}
+        </h2>
+      ) : null}
+      {showLockupTypeInfo ? (
+        <>
+          {lockupTypes.map((type) => (
+            <>
+              <h2 className="text-base" key={type.displayName}>
+                {type.displayName}
+              </h2>
+              {type.info.map((info) => (
+                <p className="mb-2" key={info}>
+                  {info}
+                </p>
               ))}
-            </Select>
+            </>
+          ))}
+
+          <Button
+            className="mt-4 w-full"
+            onClick={() => setShowLockupTypeInfo(false)}
+          >
+            Back
+          </Button>
+        </>
+      ) : (
+        <>
+          {getCurrentStep()}
+          <div className="flex flex-col pt-4">
+            {
+              // isMainBtnVisible &&
+              getCurrentBtnForStep()
+            }
+            <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
           </div>
-        )}
-      </h2>
-      {getCurrentStep()}
-      <div className="flex flex-col py-4">
-        {isMainBtnVisible && getCurrentBtnForStep()}
-        <SecondaryButton onClick={onClose}>Cancel</SecondaryButton>
-      </div>
+        </>
+      )}
     </Modal>
   )
 }

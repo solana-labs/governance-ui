@@ -24,7 +24,7 @@ const NFTAccountSelect = ({
     >
       {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
         <Select.Option
-          key={accountWithGovernance?.governance?.pubkey.toBase58()}
+          key={accountWithGovernance?.extensions.transferAddress.toBase58()}
           value={accountWithGovernance}
         >
           <AccountItemNFT

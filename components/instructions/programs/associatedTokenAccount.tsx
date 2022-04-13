@@ -1,9 +1,10 @@
 import { Connection } from '@solana/web3.js'
-import { AccountMetaData, TOKEN_PROGRAM_ID } from '@solana/spl-governance'
+import { AccountMetaData } from '@solana/spl-governance'
 import { SPL_TOKENS } from '@utils/splTokens'
+import { SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID } from '@utils/associated'
 
 export const ATA_PROGRAM_INSTRUCTIONS = {
-  [TOKEN_PROGRAM_ID.toBase58()]: {
+  [SPL_ASSOCIATED_TOKEN_ACCOUNT_PROGRAM_ID.toBase58()]: {
     name: 'Associated Token Account Program - Create Associated Token Account',
     accounts: [
       'Authority',

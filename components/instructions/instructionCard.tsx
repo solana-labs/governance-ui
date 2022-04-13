@@ -51,7 +51,7 @@ export default function InstructionCard({
   const [tokenImgUrl, setTokenImgUrl] = useState('')
   useEffect(() => {
     getInstructionDescriptor(
-      connection.current,
+      connection,
       proposalInstruction.account.getSingleInstruction()
     ).then((d) => setDescriptor(d))
     const getAmountImg = async () => {
@@ -62,11 +62,11 @@ export default function InstructionCard({
         sourcePk
       )
       const isSol = governedTokenAccountsWithoutNfts.find(
-        (x) => x.transferAddress?.toBase58() === sourcePk.toBase58()
+        (x) => x.extensions.transferAddress?.toBase58() === sourcePk.toBase58()
       )?.isSol
       const isNFTAccount = nftsGovernedTokenAccounts.find(
         (x) =>
-          x.governance?.pubkey.toBase58() ===
+          x.extensions.transferAddress?.toBase58() ===
           tokenAccount?.account.owner.toBase58()
       )
       if (isNFTAccount) {
@@ -105,11 +105,7 @@ export default function InstructionCard({
       return
     }
     getAmountImg()
-  }, [
-    proposalInstruction,
-    governedTokenAccountsWithoutNfts.length,
-    governedTokenAccountsWithoutNfts.length,
-  ])
+  }, [proposalInstruction, governedTokenAccountsWithoutNfts.length])
   const isSol = tokenImgUrl.includes(WSOL_MINT)
 
   const proposalAuthority = tokenRecords[proposal.owner.toBase58()]
@@ -143,7 +139,11 @@ export default function InstructionCard({
           ))}
       </div>
       <div className="flex items-center justify-between mb-2">
-        <div className="font-bold text-sm">Data</div>
+        {descriptor?.dataUI.props ? (
+          <div className="font-bold text-sm">Data</div>
+        ) : (
+          ''
+        )}
       </div>
 
       {nftImgUrl ? (
@@ -157,9 +157,7 @@ export default function InstructionCard({
         <InstructionData descriptor={descriptor}></InstructionData>
       )}
       <div className="flex justify-end items-center gap-x-4 mt-6 mb-8">
-        <InspectorButton
-          instructionData={proposalInstruction.account.getSingleInstruction()}
-        />
+        <InspectorButton proposalInstruction={proposalInstruction} />
 
         <FlagInstructionErrorButton
           playState={playing}

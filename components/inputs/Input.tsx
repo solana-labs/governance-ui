@@ -22,6 +22,8 @@ const Input = ({
   wrapperClassName = 'w-full',
   disabled,
   label,
+  prefix,
+  prefixClassName,
   suffix,
   min,
   error = '',
@@ -35,7 +37,14 @@ const Input = ({
   return (
     <div className={`flex flex-col relative ${wrapperClassName}`}>
       {label && <StyledLabel>{label}</StyledLabel>}
-      {subtitle && <p className="text-gray-500 mb-1 -mt-2">{subtitle}</p>}
+      {subtitle && <p className="text-fgd-3 mb-1 -mt-2">{subtitle}</p>}
+      {prefix ? (
+        <div
+          className={`absolute left-2 top-1/2 transform -translate-y-1/2 ${prefixClassName}`}
+        >
+          {prefix}
+        </div>
+      ) : null}
       <input
         max={max}
         min={min}

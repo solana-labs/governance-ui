@@ -28,7 +28,7 @@ const Button: FunctionComponent<ButtonProps> = ({
         small ? 'py-1' : 'py-2.5'
       } text-sm focus:outline-none ${
         disabled
-          ? 'bg-bkg-4 cursor-not-allowed text-fgd-2'
+          ? 'bg-fgd-4 cursor-not-allowed text-fgd-3'
           : 'bg-primary-light text-bkg-2 hover:bg-primary-dark'
       }`}
       {...props}
@@ -81,7 +81,7 @@ export const LinkButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} border-0 default-transition text-sm underline hover:no-underline hover:opacity-60 focus:outline-none`}
+      className={`${className} border-0 default-transition text-sm disabled:cursor-not-allowed disabled:opacity-60 hover:opacity-60 focus:outline-none`}
       {...props}
     >
       {children}

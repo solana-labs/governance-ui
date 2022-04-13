@@ -65,7 +65,8 @@ export const getGrantInstruction = async ({
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     grantMintPk,
-    voter
+    voter,
+    true
   )
 
   const grantIx = client?.program.instruction.grant(
