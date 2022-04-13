@@ -48,10 +48,9 @@ export const SPL_TOKEN_INSTRUCTIONS = {
           connection,
           accounts[0].pubkey
         )
-        const tokenMint = await tryGetMint(
-          connection,
-          tokenAccount!.account.mint
-        )
+        const tokenMint = tokenAccount
+          ? await tryGetMint(connection, tokenAccount!.account.mint)
+          : null
 
         const tokenMintDescriptor = getMintMetadata(tokenAccount?.account.mint)
 
