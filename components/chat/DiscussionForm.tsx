@@ -14,7 +14,13 @@ import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 const DiscussionForm = () => {
   const [comment, setComment] = useState('')
   const connected = useWalletStore((s) => s.connected)
-  const { ownVoterWeight, realmInfo, realm } = useRealm()
+  const {
+    ownVoterWeight,
+    realmInfo,
+    realm,
+    ownTokenRecord,
+    ownCouncilTokenRecord,
+  } = useRealm()
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
