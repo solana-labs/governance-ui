@@ -168,5 +168,16 @@ export const SPL_TOKEN_INSTRUCTIONS = {
         )
       },
     },
+    9: {
+      name: 'Close Token Account',
+      accounts: [
+        { name: 'Token Account', important: true },
+        { name: 'Rent destination' },
+        { name: 'Account Owner' },
+      ],
+      getDataUI: async () => {
+        return <></>
+      },
+    },
   },
 }
