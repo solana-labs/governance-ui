@@ -585,5 +585,24 @@
     "ogImage": "/realms/EverSol/img/EverSol_Logo.jpg",
     "website": "https://eversol.one/",
     "twitter": "@eversol_pool"
+  },
+  {
+    "symbol": "ALLOVR",
+    "displayName": "ALLOVR DAO",
+    "programId": "ALLGnZikNaJQeN4KCAbDjZRSzvSefUdeTpk18yfizZvT",
+    "realmId": "A7nud4wxpAySc7Ai11vwXtkez79tHvcEvSquFBxw4iDh",
+    "website": "https://www.allovr.io",
+    "keywords": "Fine Art, Provenance, ALLOVR, Token Economy, Artist, Art, Decentralized Art Network",
+    "twitter": "@allovr_protocol",
+    "ogImage": "https://raw.githubusercontent.com/ALLOVRStudios/ovr-program/main/img/logo.png"
+  },
+  {
+    "symbol": "CARROT",
+    "displayName": "CARROT DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "794Cz2u7BqcqjuQBB87E8Jg8rdtG46pBodrh5sJLMJdz",
+    "ogImage": "https://raw.githubusercontent.com/cmgonsalves/token/main/carrot-logo.png",
+    "website": "https://www.begrudgedbunnies.com/",
+    "twitter": "@begrudgeddao"
   }
 ]

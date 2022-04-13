@@ -197,13 +197,11 @@ const SendTokens = ({ isNft = false }) => {
     )
     let gte: boolean | undefined = false
     try {
-      gte = form.governedTokenAccount!.extensions.token?.account?.amount?.gte(
-        mintValue
-      )
+      gte = form.governedTokenAccount!.extensions.amount?.gte(mintValue)
     } catch (e) {
       //silent fail
     }
-    return form.governedTokenAccount!.extensions.token?.publicKey && gte
+    return gte
   }
 
   useEffect(() => {
@@ -234,7 +232,9 @@ const SendTokens = ({ isNft = false }) => {
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   const nftName = selectedNfts[0]?.val?.name
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
-    form.destinationAccount
+    tryParseKey(form.destinationAccount)
+      ? abbreviateAddress(new PublicKey(form.destinationAccount))
+      : ''
   }`
   const proposalTitle = isNFT
     ? nftTitle
@@ -311,7 +311,7 @@ const SendTokens = ({ isNft = false }) => {
           />
         )}
         <small className="text-red">
-          {transactionDolarAmount
+          {transactionDolarAmount && !isNft
             ? IsAmountNotHigherThenBalance()
               ? `~$${transactionDolarAmount}`
               : 'Insufficient balance'

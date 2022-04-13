@@ -25,10 +25,7 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import * as yup from 'yup'
-import {
-  DEFAULT_NATIVE_SOL_MINT,
-  DEFAULT_NFT_TREASURY_MINT,
-} from '@components/instructions/tools'
+import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import { TokenInfo } from '@solana/spl-token-registry'
@@ -56,10 +53,13 @@ const NewAccountForm = () => {
   const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
+  const [types, setTypes] = useState<any[]>([])
   const { fmtUrlWithCluster } = useQueryContext()
   const isCurrentVersionHigherThenV1 = () => {
     return (
-      realmInfo?.programVersion && realmInfo.programVersion > PROGRAM_VERSION_V1
+      (realmInfo?.programVersion &&
+        realmInfo.programVersion > PROGRAM_VERSION_V1) ||
+      false
     )
   }
   const {
@@ -69,27 +69,30 @@ const NewAccountForm = () => {
     symbol,
     ownVoterWeight,
   } = useRealm()
+  useEffect(() => {
+    const accTypes = [
+      {
+        name: 'SOL Account',
+        value: SOL,
+        defaultMint: '',
+        hide: !isCurrentVersionHigherThenV1(),
+      },
+      {
+        name: 'NFT Account',
+        value: NFT,
+        defaultMint: DEFAULT_NFT_TREASURY_MINT,
+        hide: isCurrentVersionHigherThenV1(),
+      },
+      {
+        name: 'Token Account',
+        value: OTHER,
+        defaultMint: '',
+        hide: isCurrentVersionHigherThenV1(),
+      },
+    ]
+    setTypes(accTypes)
+  }, [realmInfo?.programVersion])
 
-  const types = [
-    {
-      name: 'SOL Account',
-      value: SOL,
-      defaultMint: DEFAULT_NATIVE_SOL_MINT,
-      hide: !isCurrentVersionHigherThenV1(),
-    },
-    {
-      name: 'NFT Account',
-      value: NFT,
-      defaultMint: DEFAULT_NFT_TREASURY_MINT,
-      hide: isCurrentVersionHigherThenV1(),
-    },
-    {
-      name: 'Token Account',
-      value: OTHER,
-      defaultMint: '',
-      hide: isCurrentVersionHigherThenV1(),
-    },
-  ]
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -101,7 +104,7 @@ const NewAccountForm = () => {
   const [mint, setMint] = useState<TokenProgramAccount<MintInfo> | null>(null)
   const [isLoading, setIsLoading] = useState(false)
   const [formErrors, setFormErrors] = useState({})
-  const [treasuryType, setTreasuryType] = useState(types[2])
+  const [treasuryType, setTreasuryType] = useState<any>(null)
   const tokenOwnerRecord = ownVoterWeight.canCreateGovernanceUsingCouncilTokens()
     ? ownVoterWeight.councilTokenRecord
     : realm && ownVoterWeight.canCreateGovernanceUsingCommunityTokens(realm)
@@ -112,6 +115,9 @@ const NewAccountForm = () => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
   }
+  useEffect(() => {
+    setTreasuryType(types[0])
+  }, [types.length])
   const handleCreate = async () => {
     try {
       if (!realm) {
@@ -150,7 +156,7 @@ const NewAccountForm = () => {
         await createTreasuryAccount(
           rpcContext,
           realm,
-          new PublicKey(form.mintAddress),
+          treasuryType?.value === SOL ? null : new PublicKey(form.mintAddress),
           governanceConfig,
           tokenOwnerRecord!.pubkey,
           client
@@ -184,6 +190,9 @@ const NewAccountForm = () => {
         'mintAddressTest',
         'Mint address validation error',
         async function (val: string) {
+          if (treasuryType.value === SOL) {
+            return true
+          }
           if (val) {
             try {
               const pubKey = tryParseKey(val)
@@ -246,7 +255,7 @@ const NewAccountForm = () => {
 
   useEffect(() => {
     handleSetForm({
-      value: treasuryType.defaultMint,
+      value: treasuryType?.defaultMint,
       propertyName: 'mintAddress',
     })
   }, [treasuryType])
@@ -272,7 +281,7 @@ const NewAccountForm = () => {
         label={'Type'}
         onChange={setTreasuryType}
         placeholder="Please select..."
-        value={treasuryType.name}
+        value={treasuryType?.name}
       >
         {types
           .filter((x) => !x.hide)
@@ -284,7 +293,7 @@ const NewAccountForm = () => {
             )
           })}
       </Select>
-      {treasuryType.value === OTHER && (
+      {treasuryType?.value === OTHER && (
         <>
           <Input
             label="Mint address"
