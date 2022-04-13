@@ -522,10 +522,10 @@
     toformat "^2.0.0"
     yargs "^17.0.1"
 
-"@blockworks-foundation/voter-stake-registry-client@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.2.0.tgz#46aebc1c4f075146ffe7d90b8fbec0d2cb3cdb7c"
-  integrity sha512-N4GZm4BxxPTHEw9ecG0ZoOtH3goPnMpJppDX4FguB7blYsTdM3jqf+prNv/UgnX2QR98Gx/08cP6PfD27r7UPQ==
+"@blockworks-foundation/voter-stake-registry-client@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.2.1.tgz#81fca48a7dd46d4ae6e1d5b4968c9227f60d0410"
+  integrity sha512-ocBcXc5FGSZyAcVfB3afnmpM6iRGfN4mkK6n8byFo8BaE35eQxHmvP2cQnvmvXKSmvcWiV5QxNHKPPqk6wgVFw==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
