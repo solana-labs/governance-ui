@@ -21,7 +21,7 @@ export const inputClasses = ({
     disabled
       ? disabledStyle
       : 'hover:border-primary-light focus:border-primary-light focus:outline-none bg-bkg-1'
-  } px-3 py-2 h-auto w-full border border-fgd-3 default-transition text-sm text-fgd-1 rounded-md ${className}`
+  } px-3 py-2 h-10 w-full border border-fgd-3 default-transition text-sm text-fgd-1 rounded-md ${className}`
 
   return `
     ${
