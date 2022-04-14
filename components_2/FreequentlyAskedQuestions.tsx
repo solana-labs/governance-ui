@@ -1,9 +1,13 @@
+import GradientTitle from './GradientTitle'
+
 const FreequentlyAskedQuestions = () => {
   return (
     <div className="py-20 px-56">
       <div className="text-blue">
-        <img src="/img/realms-web/icons/faq.svg" className="my-2 h-5" alt="" />
-        <h1>Frequently Asked Questions (FAQs)</h1>
+        <img src="/img/realms-web/icons/faq.svg" className="my-2 h-7" alt="" />
+        <h1 className="md:text-3xl font-thin">
+          <GradientTitle>Frequently Asked Questions (FAQs)</GradientTitle>
+        </h1>
       </div>
       <div>
         <div>

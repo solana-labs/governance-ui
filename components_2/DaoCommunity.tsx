@@ -1,9 +1,15 @@
+import GradientTitle from './GradientTitle'
+
 const DaoCommunity = () => {
   return (
     <div className="py-28 px-56">
       <div className="text-blue">
-        <h1>A DAO is a community working</h1>
-        <h1>together to make decisions</h1>
+        <h1 className="md:text-3xl font-thin">
+          <GradientTitle>A DAO is a community working</GradientTitle>
+        </h1>
+        <h1 className="md:text-3xl font-thin">
+          <GradientTitle>together to make decisions</GradientTitle>
+        </h1>
       </div>
       <div>
         <p>

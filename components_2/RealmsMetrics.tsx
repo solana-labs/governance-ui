@@ -1,3 +1,5 @@
+import GradientTitle from './GradientTitle'
+
 const RealmsMetrics = () => {
   return (
     <div>
@@ -10,7 +12,9 @@ const RealmsMetrics = () => {
       </div>
       <div className="py-28 px-56">
         <div className="text-blue">
-          <h1>Key Metrics on Realms</h1>
+          <h1 className="md:text-3xl font-thin">
+            <GradientTitle>Key Metrics on Realms</GradientTitle>
+          </h1>
         </div>
         <div>
           <div>

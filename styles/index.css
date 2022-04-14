@@ -23,9 +23,11 @@
   --fgd-2: theme('colors.dark-theme.fgd-2');
   --fgd-3: theme('colors.dark-theme.fgd-3');
   --fgd-4: theme('colors.dark-theme.fgd-4');
-  --bkg-11: theme('colors.dark-theme.bkg-11');
-  --bkg-12: theme('colors.dark-theme.bkg-12');
-  --bkg-13: theme('colors.dark-theme.bkg-13');
+  --bkg-11: theme('colors.realms-theme.bkg-11');
+  --bkg-12: theme('colors.realms-theme.bkg-12');
+  --bkg-13: theme('colors.realms-theme.bkg-13');
+  --lightblue: theme('colors.realms-theme.lightblue');
+  --turquoise: theme('colors.realms-theme.turquoise');
 }
 
 [data-theme='Light'] {

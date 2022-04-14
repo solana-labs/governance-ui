@@ -1,11 +1,17 @@
+import GradientTitle from './GradientTitle'
+
 const SolanaPerks = () => {
   return (
     <div className="py-28 px-56">
       <div className="flex">
         <div className="flex-none w-80">
           <div className="text-bkg-13">
-            <h1 className="md:text-3xl font-thin">Why is Solana</h1>
-            <h1 className="md:text-3xl font-thin">perfect for DAOs?</h1>
+            <h1 className="md:text-3xl font-thin">
+              <GradientTitle>Why is Solana</GradientTitle>
+            </h1>
+            <h1 className="md:text-3xl font-thin">
+              <GradientTitle>perfect for DAOs?</GradientTitle>
+            </h1>
           </div>
         </div>
 
