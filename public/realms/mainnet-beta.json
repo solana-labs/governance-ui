@@ -45,7 +45,8 @@
     "realmId": "896vmJYkitEGhnBnRo8XxywUJu2qtgxidR9HXm5kjwrM",
     "website": "https://www.thesporagers.io",
     "twitter": "@TheSporagers",
-    "ogImage": "/realms/TheSporagers/img/the_sporagers.png"
+    "ogImage": "/realms/TheSporagers/img/the_sporagers.png",
+    "bannerImage": "/realms/TheSporagers/img/the_sporagers_banner.jpeg"
   },
   {
     "symbol": "POOR",
