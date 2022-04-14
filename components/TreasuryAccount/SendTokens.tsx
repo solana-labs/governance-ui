@@ -232,7 +232,9 @@ const SendTokens = ({ isNft = false }) => {
   const transactionDolarAmount = calcTransactionDolarAmount(form.amount)
   const nftName = selectedNfts[0]?.val?.name
   const nftTitle = `Send ${nftName ? nftName : 'NFT'} to ${
-    form.destinationAccount
+    tryParseKey(form.destinationAccount)
+      ? abbreviateAddress(new PublicKey(form.destinationAccount))
+      : ''
   }`
   const proposalTitle = isNFT
     ? nftTitle

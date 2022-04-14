@@ -12,6 +12,7 @@ import { AssetAccount } from '@utils/uiTypes/assets'
 
 export interface UiInstruction {
   serializedInstruction: string
+  additionalSerializedInstructions?: string[]
   isValid: boolean
   governance: ProgramAccount<Governance> | undefined
   customHoldUpTime?: number
@@ -254,6 +255,7 @@ export enum Instructions {
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
   ConfigureNftPluginCollection,
+  CloseTokenAccount,
 }
 
 export type createParams = [

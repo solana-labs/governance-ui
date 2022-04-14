@@ -135,7 +135,7 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             x.type === AccountType.NFT ||
             x.type === AccountType.SOL
         ),
-      ]
+      ].filter(filterOutHiddenAccs)
       s.assetAccounts = [...previousAccounts, ...accounts].filter(
         filterOutHiddenAccs
       )
@@ -214,11 +214,13 @@ const getTokenAssetAccounts = async (
   connection: ConnectionContext
 ) => {
   const accounts: AssetAccount[] = []
+  const mintsPks = [...tokenAccounts.map((x) => x.account.mint)]
+  //WSOL is used as mint for sol accounts to calculate amounts
+  if (!mintsPks.find((x) => x.toBase58() === WSOL_MINT)) {
+    mintsPks.push(new PublicKey(WSOL_MINT))
+  }
   const mintAccounts = tokenAccounts.length
-    ? await getMintAccountsInfo(connection, [
-        ...tokenAccounts.map((x) => x.account.mint),
-        new PublicKey(WSOL_MINT),
-      ])
+    ? await getMintAccountsInfo(connection, [...mintsPks])
     : []
   const nativeSolAddresses = await Promise.all(
     governances.map((x) => getNativeTreasuryAddress(realm.owner, x!.pubkey))
@@ -509,7 +511,10 @@ const getSolAccountsInfo = async (
   return accounts as SolAccInfo[]
 }
 
-const filterOutHiddenAccs = (x) => {
+const filterOutHiddenAccs = (x: AssetAccount) => {
   const pubkey = typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-  return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
+  return (
+    HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1 &&
+    (!x.extensions.token || !x.extensions.token?.account.isFrozen)
+  )
 }

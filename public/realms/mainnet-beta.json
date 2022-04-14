@@ -30,6 +30,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "JET",
+    "displayName": "Jet DAO",
+    "programId": "JPGov2SBA6f7XSJF5R4Si5jEJekGiyrwP2m7gSEqLUs",
+    "realmId": "78TbURwqF71Qk4w1Xp6Jd2gaoQb6EC7yKBh5xDJmq6qh",
+    "website": "https://www.jetassociation.org/",
+    "twitter": "@jet_association",
+    "ogImage": "https://govern.jetassociation.org/img/jet_assoc/assoc_turbine.jpg"
+  },
+  {
     "symbol": "The Sporagers",
     "displayName": "The Sporagers",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
@@ -595,5 +604,14 @@
     "keywords": "Fine Art, Provenance, ALLOVR, Token Economy, Artist, Art, Decentralized Art Network",
     "twitter": "@allovr_protocol",
     "ogImage": "https://raw.githubusercontent.com/ALLOVRStudios/ovr-program/main/img/logo.png"
+  },
+  {
+    "symbol": "CARROT",
+    "displayName": "CARROT DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "794Cz2u7BqcqjuQBB87E8Jg8rdtG46pBodrh5sJLMJdz",
+    "ogImage": "https://raw.githubusercontent.com/cmgonsalves/token/main/carrot-logo.png",
+    "website": "https://www.begrudgedbunnies.com/",
+    "twitter": "@begrudgeddao"
   }
 ]
