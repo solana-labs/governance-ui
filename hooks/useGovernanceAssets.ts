@@ -248,6 +248,11 @@ export default function useGovernanceAssets() {
       isVisible: canUseAuthorityInstruction,
     },
     {
+      id: Instructions.CloseTokenAccount,
+      name: 'Close token account',
+      isVisible: canUseTransferInstruction,
+    },
+    {
       id: Instructions.None,
       name: 'None',
       isVisible:

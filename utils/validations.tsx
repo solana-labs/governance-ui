@@ -309,7 +309,7 @@ export const getTokenTransferSchema = ({
           if (val) {
             try {
               if (
-                governedTokenAccount?.extensions.token?.account.address.toBase58() ==
+                governedTokenAccount?.extensions?.transferAddress?.toBase58() ==
                 val
               ) {
                 return this.createError({
@@ -319,7 +319,7 @@ export const getTokenTransferSchema = ({
               await validateDestinationAccAddress(
                 connection,
                 val,
-                governedTokenAccount?.extensions.token?.account.address
+                governedTokenAccount?.extensions.transferAddress
               )
               return true
             } catch (e) {

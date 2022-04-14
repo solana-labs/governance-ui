@@ -12,6 +12,7 @@ import {
   DEFAULT_NFT_TREASURY_MINT,
   HIDDEN_GOVERNANCES,
   HIDDEN_TREASURES,
+  WSOL_MINT,
 } from '@components/instructions/tools'
 import {
   AccountInfoGen,
@@ -38,6 +39,12 @@ import {
 } from '@utils/uiTypes/assets'
 
 const tokenAccountOwnerOffset = 32
+
+interface SolAccInfo {
+  governancePk: PublicKey
+  acc: any
+  nativeSolAddress: PublicKey
+}
 interface GovernanceAssetsStore extends State {
   governancesArray: ProgramAccount<Governance>[]
   governedTokenAccounts: AssetAccount[]
@@ -92,13 +99,15 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
     set((s) => {
       s.governancesArray = governancesArray
       s.loadGovernedAccounts = false
-      s.governedTokenAccounts = accounts.filter(
-        (x) =>
-          x.type === AccountType.TOKEN ||
-          x.type === AccountType.NFT ||
-          x.type === AccountType.SOL
-      )
-      s.assetAccounts = accounts
+      s.governedTokenAccounts = accounts
+        .filter(
+          (x) =>
+            x.type === AccountType.TOKEN ||
+            x.type === AccountType.NFT ||
+            x.type === AccountType.SOL
+        )
+        .filter(filterOutHiddenAccs)
+      s.assetAccounts = accounts.filter(filterOutHiddenAccs)
     })
   },
   refetchGovernanceAccounts: async (connection, realm, governancePk) => {
@@ -126,8 +135,10 @@ const useGovernanceAssetsStore = create<GovernanceAssetsStore>((set, _get) => ({
             x.type === AccountType.NFT ||
             x.type === AccountType.SOL
         ),
-      ]
-      s.assetAccounts = [...previousAccounts, ...accounts]
+      ].filter(filterOutHiddenAccs)
+      s.assetAccounts = [...previousAccounts, ...accounts].filter(
+        filterOutHiddenAccs
+      )
     })
   },
 }))
@@ -144,36 +155,53 @@ const getAccountsByOwner = (
 }
 
 const getTokenAccountsObj = async (
-  realm: ProgramAccount<Realm>,
   governance: ProgramAccount<Governance>,
   tokenAccount: TokenProgramAccount<AccountInfo>,
-  connection: ConnectionContext,
-  accounts: AssetAccount[],
   mintAccounts: TokenProgramAccount<MintInfo>[]
 ) => {
-  const isSol = tokenAccount.account.mint.toBase58() === DEFAULT_NATIVE_SOL_MINT
   const isNft =
     tokenAccount.account.mint.toBase58() === DEFAULT_NFT_TREASURY_MINT
   const mint = mintAccounts.find(
     (x) => x.publicKey.toBase58() === tokenAccount.account.mint.toBase58()
   )
-  if (isSol) {
-    return await getSolAccount(
-      realm,
-      governance,
-      connection,
-      tokenAccount,
-      mint!,
-      accounts
-    )
-  }
   if (isNft) {
     return new AccountTypeNFT(tokenAccount, mint!, governance)
   }
 
-  if (mint?.account.supply && mint?.account.supply.cmpn(1) !== 0) {
+  if (
+    mint?.account.supply &&
+    mint?.account.supply.cmpn(1) !== 0 &&
+    mint.publicKey.toBase58() !== DEFAULT_NATIVE_SOL_MINT
+  ) {
     return new AccountTypeToken(tokenAccount, mint!, governance)
   }
+}
+
+const getSolAccounts = async (
+  connection: ConnectionContext,
+  accounts: AssetAccount[],
+  solAccounts: SolAccInfo[],
+  mintAccounts: TokenProgramAccount<MintInfo>[],
+  governances: ProgramAccount<Governance>[]
+) => {
+  const solAccs: AccountTypeSol[] = []
+  for (const i of solAccounts) {
+    const mint = mintAccounts.find((x) => x.publicKey.toBase58() === WSOL_MINT)
+    const governance = governances.find(
+      (x) => x.pubkey.toBase58() === i.governancePk.toBase58()
+    )
+    const account = await getSolAccount(
+      governance!,
+      connection,
+      mint!,
+      accounts,
+      i
+    )
+    if (account) {
+      solAccs.push(account)
+    }
+  }
+  return solAccs as AssetAccount[]
 }
 
 const getTokenAssetAccounts = async (
@@ -186,27 +214,46 @@ const getTokenAssetAccounts = async (
   connection: ConnectionContext
 ) => {
   const accounts: AssetAccount[] = []
-  const mintAccounts = tokenAccounts.length
-    ? await getMintAccountsInfo(
-        connection,
-        tokenAccounts.map((x) => x.account.mint)
-      )
+  const mintsPks = [...tokenAccounts.map((x) => x.account.mint)]
+  //WSOL is used as mint for sol accounts to calculate amounts
+  if (!mintsPks.find((x) => x.toBase58() === WSOL_MINT)) {
+    mintsPks.push(new PublicKey(WSOL_MINT))
+  }
+  const mintAccounts = mintsPks.length
+    ? await getMintAccountsInfo(connection, [...mintsPks])
     : []
+  const nativeSolAddresses = await Promise.all(
+    governances.map((x) => getNativeTreasuryAddress(realm.owner, x!.pubkey))
+  )
+  const govNativeSolAddress = nativeSolAddresses.map((x, index) => {
+    return {
+      governancePk: governances[index].pubkey,
+      nativeSolAddress: x,
+    }
+  })
+  const solAccs = await getSolAccountsInfo(connection, govNativeSolAddress)
   for (const tokenAccount of tokenAccounts) {
     const governance = governances.find(
       (x) => x.pubkey.toBase58() === tokenAccount.account.owner.toBase58()
     )
     const account = await getTokenAccountsObj(
-      realm,
       governance!,
       tokenAccount,
-      connection,
-      accounts,
       mintAccounts
     )
     if (account) {
       accounts.push(account)
     }
+  }
+  const solAccounts = await getSolAccounts(
+    connection,
+    accounts,
+    solAccs,
+    mintAccounts,
+    governances
+  )
+  if (solAccounts.length) {
+    accounts.push(...solAccounts)
   }
   return accounts
 }
@@ -257,23 +304,17 @@ const getGovernancesByAccountTypes = (
 }
 
 const getSolAccount = async (
-  realm: ProgramAccount<Realm>,
   governance: ProgramAccount<Governance>,
   connection: ConnectionContext,
-  tokenAccount: TokenProgramAccount<AccountInfo>,
   mint: TokenProgramAccount<MintInfo>,
-  accounts: AssetAccount[]
+  accounts: AssetAccount[],
+  solAcc: SolAccInfo
 ) => {
-  const solAddress = await getNativeTreasuryAddress(
-    realm.owner,
-    governance!.pubkey
-  )
-  const resp = await connection.current.getParsedAccountInfo(solAddress)
-  if (resp.value) {
+  if (solAcc.acc) {
     const accountsByOwnerResp = await getAccountsByOwner(
       connection.current,
       TOKEN_PROGRAM_ID,
-      solAddress
+      solAcc.nativeSolAddress
     )
     const accountsOwnedBySolAccount = accountsByOwnerResp.value.map((x) => {
       const publicKey = x.pubkey
@@ -289,14 +330,7 @@ const getSolAccount = async (
         )
       : []
     for (const acc of accountsOwnedBySolAccount) {
-      const account = await getTokenAccountsObj(
-        realm,
-        governance,
-        acc,
-        connection,
-        accounts,
-        mintAccounts
-      )
+      const account = await getTokenAccountsObj(governance, acc, mintAccounts)
       if (account) {
         accounts.push(account)
       }
@@ -304,16 +338,15 @@ const getSolAccount = async (
     const mintRentAmount = await connection.current.getMinimumBalanceForRentExemption(
       0
     )
-    const solAccount = resp.value as AccountInfoGen<Buffer | ParsedAccountData>
+    const solAccount = solAcc.acc as AccountInfoGen<Buffer | ParsedAccountData>
     solAccount.lamports =
       solAccount.lamports !== 0
         ? solAccount.lamports - mintRentAmount
         : solAccount.lamports
 
     return new AccountTypeSol(
-      tokenAccount,
       mint!,
-      solAddress,
+      solAcc.nativeSolAddress,
       solAccount,
       governance
     )
@@ -333,10 +366,6 @@ const getAccountsForGovernances = async (
     GovernanceAccountType.ProgramGovernanceV1,
     GovernanceAccountType.ProgramGovernanceV2,
   ])
-  const tokenGovernanes = getGovernancesByAccountTypes(governancesArray, [
-    GovernanceAccountType.TokenGovernanceV1,
-    GovernanceAccountType.TokenGovernanceV2,
-  ])
   const mintGovernancesMintInfo = await getMultipleAccountInfoChunked(
     connection.current,
     mintGovernances.map((x) => x.account.governedAccount)
@@ -350,7 +379,7 @@ const getAccountsForGovernances = async (
       'Content-Type': 'application/json',
     },
     data: JSON.stringify([
-      ...tokenGovernanes.map((x) => {
+      ...governancesArray.map((x) => {
         return {
           jsonrpc: '2.0',
           id: 1,
@@ -381,11 +410,6 @@ const getAccountsForGovernances = async (
   const tokenAccounts = tokenAccountsJson.length
     ? tokenAccountsJson
         .flatMap((x) => x.result)
-        .filter((x) => {
-          const pubkey =
-            typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-          return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
-        })
         .map((x) => {
           const publicKey = new PublicKey(x.pubkey)
           const data = Buffer.from(x.account.data[0], 'base64')
@@ -395,7 +419,7 @@ const getAccountsForGovernances = async (
     : []
   const tokenAssetAccounts = await getTokenAssetAccounts(
     tokenAccounts,
-    tokenGovernanes,
+    governancesArray,
     realm,
     connection
   )
@@ -444,4 +468,53 @@ const getMintAccountsInfo = async (
     return { publicKey, account }
   })
   return mintAccounts
+}
+
+const getSolAccountsInfo = async (
+  connection: ConnectionContext,
+  pubkeys: { governancePk: PublicKey; nativeSolAddress: PublicKey }[]
+) => {
+  const getSolAccounts = await axios.request({
+    url: connection.endpoint,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: JSON.stringify([
+      ...pubkeys.map((x) => {
+        return {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getAccountInfo',
+          params: [
+            x.nativeSolAddress.toBase58(),
+            {
+              commitment: connection.current.commitment,
+              encoding: 'jsonParsed',
+            },
+          ],
+        }
+      }),
+    ]),
+  })
+  const solAccounts = getSolAccounts.data
+  const accounts = solAccounts?.length
+    ? solAccounts
+        .flatMap((x, index) => {
+          return {
+            acc: x.result.value,
+            ...pubkeys[index],
+          }
+        })
+        .filter((x) => x.acc)
+    : []
+  return accounts as SolAccInfo[]
+}
+
+const filterOutHiddenAccs = (x: AssetAccount) => {
+  const pubkey = typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
+  return (
+    HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1 &&
+    (!x.extensions.token || !x.extensions.token?.account.isFrozen)
+  )
 }

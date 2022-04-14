@@ -1,6 +1,5 @@
 import { FunctionComponent } from 'react'
-import { getTreasuryAccountItemInfo } from '@utils/treasuryTools'
-import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface AccountsTabsProps {
@@ -14,7 +13,6 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
   onChange,
   tabs,
 }) => {
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
   return (
     <div className={`relative`}>
       <div
@@ -37,7 +35,7 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
           name,
           symbol,
           displayPrice,
-        } = getTreasuryAccountItemInfo(x, governanceNfts)
+        } = getTreasuryAccountItemInfoV2(x)
         return (
           <button
             key={x.extensions.transferAddress?.toBase58()}
@@ -52,7 +50,17 @@ const AccountsTabs: FunctionComponent<AccountsTabsProps> = ({
           >
             <div className="text-left">
               <h3 className="mb-1 text-sm flex">
-                {logo && <img src={logo} className="w-5 h-5 mr-2"></img>} {name}
+                {logo && (
+                  <img
+                    src={logo}
+                    onError={({ currentTarget }) => {
+                      currentTarget.onerror = null // prevents looping
+                      currentTarget.hidden = true
+                    }}
+                    className="w-5 h-5 mr-2"
+                  ></img>
+                )}{' '}
+                {name}
               </h3>
               <p className="mb-0 text-fgd-1 text-xs">
                 {amountFormatted} {symbol}
