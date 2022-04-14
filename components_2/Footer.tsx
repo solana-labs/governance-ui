@@ -6,8 +6,7 @@ const Footer = () => {
   if (REALM) return null
   else
     return (
-      <div>
-        {/* <div className="bg-cover bg-bkg-12 px-56 pt-12 pb-24"> */}
+      <div className="bg-cover bg-bkg-12 px-56 pt-12 pb-24">
         <div className="flex">
           <div>
             <img src="/img/realms-web/icons/Realms-logo.svg" className="mr-2" />
@@ -28,7 +27,6 @@ const Footer = () => {
           <a href="">Your Privacy | </a>
           <a href="">Terms</a>
         </div>
-        {/* </div> */}
       </div>
     )
 }

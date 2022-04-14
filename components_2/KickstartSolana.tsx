@@ -1,7 +1,6 @@
 const KickstartSolana = () => {
   return (
-    <div>
-      {/* <div className="bg-cover bg-hero-graphic py-10 px-56"> */}
+    <div className="bg-cover bg-hero-graphic py-10 px-56">
       <div className="flex">
         <div>
           <img src="/img/realms-web/icons/Realms-logo.svg" className="mr-2" />
@@ -40,7 +39,6 @@ const KickstartSolana = () => {
           Create DAO
         </button>
       </div>
-      {/* </div> */}
     </div>
   )
 }
