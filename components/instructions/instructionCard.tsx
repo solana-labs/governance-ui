@@ -67,7 +67,9 @@ export default function InstructionCard({
       const isNFTAccount = nftsGovernedTokenAccounts.find(
         (x) =>
           x.extensions.transferAddress?.toBase58() ===
-          tokenAccount?.account.owner.toBase58()
+            tokenAccount?.account.owner.toBase58() ||
+          x.governance.pubkey.toBase58() ===
+            tokenAccount?.account.owner.toBase58()
       )
       if (isNFTAccount) {
         const mint = tokenAccount?.account.mint

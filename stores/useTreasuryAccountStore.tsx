@@ -26,7 +26,7 @@ interface TreasuryAccountStore extends State {
 
   allNfts: NFTWithMint[]
   allTokenAccounts: TokenInfoWithMint[]
-  governanceNfts: {
+  nftsPerPubkey: {
     [governance: string]: NFTWithMint[]
   }
   isLoadingNfts: boolean
@@ -47,7 +47,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
   recentActivity: [],
   allNfts: [],
   allTokenAccounts: [],
-  governanceNfts: {},
+  nftsPerPubkey: {},
   isLoadingNfts: false,
   isLoadingRecentActivity: false,
   isLoadingTokenAccounts: false,
@@ -56,7 +56,7 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
       s.isLoadingNfts = true
     })
     let realmNfts: NFTWithMint[] = []
-    const governanceNfts = {}
+    const nftsPerPubkey = {}
     for (const acc of nftsGovernedTokenAccounts) {
       const governance = acc.governance.pubkey.toBase58()
       try {
@@ -71,19 +71,17 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
               )
             : []
           realmNfts = [...realmNfts, ...solAccountNfts]
-          if (governance) {
-            governanceNfts[governance] = [...solAccountNfts]
-          }
+
+          nftsPerPubkey[acc.extensions.transferAddress!.toBase58()] = [
+            ...solAccountNfts,
+          ]
         }
         realmNfts = [...realmNfts, ...nfts]
         if (governance) {
-          if (governanceNfts[governance]) {
-            governanceNfts[governance] = [
-              ...governanceNfts[governance],
-              ...nfts,
-            ]
+          if (nftsPerPubkey[governance]) {
+            nftsPerPubkey[governance] = [...nftsPerPubkey[governance], ...nfts]
           } else {
-            governanceNfts[governance] = [...nfts]
+            nftsPerPubkey[governance] = [...nfts]
           }
         }
       } catch (e) {
@@ -95,11 +93,20 @@ const useTreasuryAccountStore = create<TreasuryAccountStore>((set, _get) => ({
     }
     set((s) => {
       s.allNfts = realmNfts
-      s.governanceNfts = governanceNfts
+      s.nftsPerPubkey = nftsPerPubkey
       s.isLoadingNfts = false
     })
   },
   setCurrentAccount: async (account, connection) => {
+    if (!account) {
+      set((s) => {
+        s.currentAccount = null
+        s.mintAddress = ''
+        s.tokenInfo = undefined
+        s.recentActivity = []
+      })
+      return
+    }
     let mintAddress =
       account && account.extensions.token
         ? account.extensions.token.account.mint.toBase58()

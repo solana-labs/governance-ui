@@ -1,6 +1,5 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import ImgWithLoader from '@components/ImgWithLoader'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import { PhotographIcon } from '@heroicons/react/outline'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
@@ -22,11 +21,7 @@ const NFTSCompactWrapper = () => {
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between pb-4">
         <h3 className="mb-0">NFTs</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
-          )}
-        >
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/gallery`)}>
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3`}
           >

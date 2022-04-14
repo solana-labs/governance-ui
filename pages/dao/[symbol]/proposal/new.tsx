@@ -482,7 +482,7 @@ const New = () => {
                 setGovernance,
               }}
             >
-              <h2>Instructions</h2>
+              <h2>Transactions</h2>
               {instructionsData.map((instruction, idx) => {
                 const availableInstructionsForIdx = getAvailableInstructionsForIndex(
                   idx
@@ -500,7 +500,7 @@ const New = () => {
                           ? 'Select instruction'
                           : 'No available instructions'
                       }`}
-                      label={`Instruction ${idx + 1}`}
+                      label={`Transaction ${idx + 1}`}
                       onChange={(value) => setInstructionType({ value, idx })}
                       value={instruction.type?.name}
                     >
@@ -540,7 +540,7 @@ const New = () => {
                 onClick={addInstruction}
               >
                 <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-                Add instruction
+                Add transaction
               </LinkButton>
             </div>
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">

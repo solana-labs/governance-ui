@@ -219,7 +219,7 @@ const getTokenAssetAccounts = async (
   if (!mintsPks.find((x) => x.toBase58() === WSOL_MINT)) {
     mintsPks.push(new PublicKey(WSOL_MINT))
   }
-  const mintAccounts = tokenAccounts.length
+  const mintAccounts = mintsPks.length
     ? await getMintAccountsInfo(connection, [...mintsPks])
     : []
   const nativeSolAddresses = await Promise.all(
@@ -511,7 +511,10 @@ const getSolAccountsInfo = async (
   return accounts as SolAccInfo[]
 }
 
-const filterOutHiddenAccs = (x) => {
+const filterOutHiddenAccs = (x: AssetAccount) => {
   const pubkey = typeof x.pubkey === 'string' ? x.pubkey : x.pubkey.toBase58()
-  return HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1
+  return (
+    HIDDEN_TREASURES.findIndex((x) => x === pubkey) === -1 &&
+    (!x.extensions.token || !x.extensions.token?.account.isFrozen)
+  )
 }

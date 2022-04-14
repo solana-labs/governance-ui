@@ -191,18 +191,22 @@ const Params = () => {
                   )}
                 />
                 <div className="flex">
-                  {realmAuthorityGovernance && (
-                    <Button
-                      disabled={!canUseAuthorityInstruction}
-                      tooltipMessage={
-                        'Please connect wallet with enough voting power to create realm config proposals'
-                      }
-                      onClick={openRealmProposalModal}
-                      className="ml-auto"
-                    >
-                      Change config
-                    </Button>
-                  )}
+                  <Button
+                    disabled={
+                      !canUseAuthorityInstruction || !realmAuthorityGovernance
+                    }
+                    tooltipMessage={
+                      !canUseAuthorityInstruction
+                        ? 'Please connect wallet with enough voting power to create realm config proposals'
+                        : !realmAuthorityGovernance
+                        ? 'None of the governances is realm authority'
+                        : ''
+                    }
+                    onClick={openRealmProposalModal}
+                    className="ml-auto"
+                  >
+                    Change config
+                  </Button>
                 </div>
               </div>
             </>
