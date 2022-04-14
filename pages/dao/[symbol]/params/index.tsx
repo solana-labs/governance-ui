@@ -194,18 +194,22 @@ const Params = () => {
                   )}
                 />
                 <div className="flex">
-                  {realmAuthorityGovernance && (
-                    <Button
-                      disabled={!canUseAuthorityInstruction}
-                      tooltipMessage={
-                        'Please connect wallet with enough voting power to create realm config proposals'
-                      }
-                      onClick={openRealmProposalModal}
-                      className="ml-auto"
-                    >
-                      Change config
-                    </Button>
-                  )}
+                  <Button
+                    disabled={
+                      !canUseAuthorityInstruction || !realmAuthorityGovernance
+                    }
+                    tooltipMessage={
+                      !canUseAuthorityInstruction
+                        ? 'Please connect wallet with enough voting power to create realm config proposals'
+                        : !realmAuthorityGovernance
+                        ? 'None of the governances is realm authority'
+                        : ''
+                    }
+                    onClick={openRealmProposalModal}
+                    className="ml-auto"
+                  >
+                    Change config
+                  </Button>
                 </div>
               </div>
             </>
@@ -353,7 +357,11 @@ const Params = () => {
                           )
                         }
                         tooltipMessage={
-                          'Please connect wallet with enough voting power to create governance config proposals'
+                          !ownVoterWeight.canCreateProposal(
+                            activeGovernance.account.config
+                          )
+                            ? 'Please connect wallet with enough voting power to create governance config proposals'
+                            : ''
                         }
                         onClick={openGovernanceProposalModal}
                         className="ml-auto"
@@ -400,7 +408,7 @@ const Params = () => {
                                       />
                                     )}
                                     <span>{`${info.amountFormatted} ${
-                                      info.info?.symbol && info.info?.symbol
+                                      info.info?.symbol || ''
                                     }`}</span>
                                   </div>
                                 }
@@ -528,7 +536,7 @@ const Params = () => {
 }
 
 const DisplayField = ({ label, val, padding = false, bg = false }) => {
-  const pubkey = tryParsePublicKey(val)
+  const pubkey = isNaN(val) && tryParsePublicKey(val)
   const name = pubkey ? getAccountName(pubkey) : ''
   return (
     <div
