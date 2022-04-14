@@ -50,7 +50,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
         (x) => x.account.owner.toBase58() === ConnectedWalletAddress?.toBase58()
       )?.publicKey
       //we check is there ata created for nft before
-      const isAtaForGovernanceExist = tokenAccountsWithNftMint.find(
+      const doseAtaForReciverAddressExisit = tokenAccountsWithNftMint.find(
         (x) => x.account.owner.toBase58() === owner.toBase58()
       )
 
@@ -61,7 +61,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
         owner!, // owner
         true
       )
-      if (!isAtaForGovernanceExist) {
+      if (!doseAtaForReciverAddressExisit) {
         await createATA(
           connection.current,
           wallet,
