@@ -114,8 +114,13 @@ module.exports = {
         gradient: 'gradient 4s ease-in-out infinite',
       },
       backgroundImage: {
-        'spl-gov': "url('/img/realms-web/backgrounds/Spl-Gov-background.svg')",
-        'hero-graphic': "url('/img/realms-web/backgrounds/Hero-graphic.svg')",
+        'spl-gov': "url('/img/realms-web/backgrounds/spl-gov-background.svg')",
+        'hero-graphic': "url('/img/realms-web/backgrounds/hero-graphic.svg')",
+        'btn-blue': "url('/img/realms-web/buttons/button-create-default.svg')",
+        'btn-blue-hover':
+          "url('/img/realms-web/buttons/button-create-hover.svg')",
+        'btn-blue-active':
+          "url('/img/realms-web/buttons/button-create-active.svg')",
       },
       keyframes: {
         'connect-wallet-ping': {

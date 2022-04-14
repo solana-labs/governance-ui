@@ -1,6 +1,8 @@
+import Button from './Button'
+
 const KickstartSolana = () => {
   return (
-    <div className="bg-cover bg-hero-graphic py-10 px-56">
+    <div className="bg-cover bg-hero-graphic pt-10 pb-16 px-56">
       <div className="flex">
         <div>
           <img src="/img/realms-web/icons/Realms-logo.svg" className="mr-2" />
@@ -25,19 +27,17 @@ const KickstartSolana = () => {
           </div>
         </div>
       </div>
-      <div className="text-center">
+      <div className="text-center mt-28">
         <h1 className="md:text-6xl font-thin tracking-tight">Kickstart your</h1>
         <h1 className="md:text-6xl font-thin tracking-tight">
           community on Solana
         </h1>
-        <p className="mt-4 tracking-tight">
+        <p className="mt-4 text-base opacity-70 tracking-tight">
           Create and participate in fully on-chain DAOs of all kinds.
         </p>
       </div>
-      <div className="text-center pt-4">
-        <button className="border border-500 border-white p-4 m-4 text-xs font-medium">
-          Create DAO
-        </button>
+      <div className="text-center py-4">
+        <Button className="m-4">Create DAO</Button>
       </div>
     </div>
   )
