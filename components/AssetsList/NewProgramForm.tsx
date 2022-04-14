@@ -4,7 +4,7 @@ import PreviousRouteBtn from 'components/PreviousRouteBtn'
 import Tooltip from 'components/Tooltip'
 import useQueryContext from 'hooks/useQueryContext'
 import useRealm from 'hooks/useRealm'
-import { RpcContext } from '@solana/spl-governance'
+import { RpcContext, VoteTipping } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { tryParseKey } from 'tools/validators/pubkey'
 import { isFormValid } from 'utils/formValidation'
@@ -23,7 +23,8 @@ import Switch from 'components/Switch'
 import { debounce } from '@utils/debounce'
 import { MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY } from '@tools/constants'
 import { getProgramVersionForRealm } from '@models/registry/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 interface NewProgramForm extends BaseGovernanceFormFields {
   programId: string
   transferAuthority: boolean
@@ -39,11 +40,14 @@ const defaultFormValues = {
   maxVotingTime: 3,
   voteThreshold: 60,
   transferAuthority: true,
+  voteTipping: VoteTipping.Strict,
 }
 const NewProgramForm = () => {
   const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
   const {
     realmInfo,
     realm,
@@ -100,6 +104,7 @@ const NewProgramForm = () => {
           maxVotingTime: form.maxVotingTime,
           voteThresholdPercentage: form.voteThreshold,
           mintDecimals: realmMint.decimals,
+          voteTipping: form.voteTipping,
         }
         const governanceConfig = getGovernanceConfig(governanceConfigValues)
         await registerProgramGovernance(
@@ -174,6 +179,16 @@ const NewProgramForm = () => {
       })
     }
   }, [form.programId])
+  useEffect(() => {
+    setForm({
+      ...form,
+      minCommunityTokensToCreateProposal: realmMint?.supply.isZero()
+        ? MIN_COMMUNITY_TOKENS_TO_CREATE_W_0_SUPPLY
+        : realmMint
+        ? getMintDecimalAmount(realmMint!, realmMint!.supply).toNumber() * 0.01
+        : 0,
+    })
+  }, [JSON.stringify(realmMint)])
   return (
     <div className="space-y-3">
       <PreviousRouteBtn />

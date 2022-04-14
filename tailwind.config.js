@@ -1,15 +1,15 @@
 module.exports = {
   mode: 'jit',
-  purge: [
+  content: [
     './pages/**/*.{js,ts,jsx,tsx}',
     './components/**/*.{js,ts,jsx,tsx}',
     './Strategies/**/*.{js,ts,jsx,tsx}',
+    './VoteStakeRegistry/**/*.{js,ts,jsx,tsx}',
   ],
   future: {
     removeDeprecatedGapUtilities: true,
     purgeLayersByDefault: true,
   },
-  darkMode: false,
   theme: {
     fontFamily: {
       display: ['PT Mono, monospace'],
@@ -20,7 +20,7 @@ module.exports = {
         help: 'help',
       },
       colors: {
-        'sierra-theme': {
+        'dark-theme': {
           primary: { light: '#E1CE7A', dark: '#D2B537' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
           'secondary-2': { light: '#E54033', dark: '#C7251A' },
@@ -36,6 +36,23 @@ module.exports = {
           red: '#cb676f',
           green: '#78C46C',
           blue: '#8AACEB',
+        },
+        'light-theme': {
+          primary: { light: '#292929', dark: '#101010' },
+          'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
+          'secondary-2': { light: '#E54033', dark: '#C7251A' },
+          'fgd-1': '#3d3d3d',
+          'fgd-2': '#7a7a7a',
+          'fgd-3': '#adadad',
+          'fgd-4': '#cccccc',
+          'bkg-1': '#fcfcfc',
+          'bkg-2': '#f0f0f0',
+          'bkg-3': '#e0e0e0',
+          'bkg-4': '#d6d6d6',
+          orange: '#F7A531',
+          red: '#cb676f',
+          green: '#6BBF5F',
+          blue: '#3F77DE',
         },
         'mango-theme': {
           primary: { light: '#F2C94C', dark: '#EEB91B' },

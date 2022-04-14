@@ -5,10 +5,10 @@ import {
   getMintAccountLabelInfo,
   getSolAccountLabel,
   getTokenAccountLabelInfo,
-  GovernedMultiTypeAccount,
 } from '@utils/tokens'
 import React, { useEffect } from 'react'
 import { getProgramName } from '@components/instructions/programs/names'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const GovernedAccountSelect = ({
   onChange,
@@ -19,17 +19,19 @@ const GovernedAccountSelect = ({
   governance,
   label,
   noMaxWidth,
+  autoselectFirst = true,
 }: {
   onChange
   value
   error?
-  governedAccounts: GovernedMultiTypeAccount[]
+  governedAccounts: AssetAccount[]
   shouldBeGoverned?
   governance?: ProgramAccount<Governance> | null | undefined
   label?
   noMaxWidth?: boolean
+  autoselectFirst?: boolean
 }) => {
-  function getLabel(value: GovernedMultiTypeAccount) {
+  function getLabel(value: AssetAccount) {
     if (value) {
       const accountType = value.governance.account.accountType
       switch (accountType) {
@@ -82,23 +84,21 @@ const GovernedAccountSelect = ({
     tokenAccountName,
     tokenName,
     amount,
-    imgUrl,
   }) {
     return (
       <div className="break-all text-fgd-1 ">
         {tokenAccountName && <div className="mb-0.5">{tokenAccountName}</div>}
-        <div className="mb-2">{tokenAccount}</div>
-        <div className="space-y-0.5 text-xs text-fgd-3">
+        <div className="mb-2 text-fgd-3 text-xs">{tokenAccount}</div>
+        <div className="flex space-x-3 text-xs text-fgd-3">
           {tokenName && (
             <div className="flex items-center">
-              Token:{' '}
-              {imgUrl && (
-                <img className="flex-shrink-0 h-4 mx-1 w-4" src={imgUrl} />
-              )}
-              {tokenName}
+              Token:
+              <span className="ml-1 text-fgd-1">{tokenName}</span>
             </div>
           )}
-          <div>Amount: {amount}</div>
+          <div>
+            Bal:<span className="ml-1 text-fgd-1">{amount}</span>
+          </div>
         </div>
       </div>
     )
@@ -113,7 +113,7 @@ const GovernedAccountSelect = ({
     )
   }
   useEffect(() => {
-    if (governedAccounts.length == 1) {
+    if (governedAccounts.length == 1 && autoselectFirst) {
       //wait for microtask queue to be empty
       setTimeout(() => {
         onChange(governedAccounts[0])
@@ -140,7 +140,8 @@ const GovernedAccountSelect = ({
         .map((acc) => {
           return (
             <Select.Option
-              key={acc.governance?.account.governedAccount.toBase58()}
+              className="border-red"
+              key={acc.pubkey.toBase58()}
               value={acc}
             >
               {getLabel(acc)}

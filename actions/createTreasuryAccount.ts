@@ -10,6 +10,7 @@ import {
   GovernanceConfig,
   ProgramAccount,
   Realm,
+  withCreateGovernance,
   withCreateNativeTreasury,
 } from '@solana/spl-governance'
 
@@ -17,17 +18,15 @@ import { withCreateTokenGovernance } from '@solana/spl-governance'
 import { RpcContext } from '@solana/spl-governance'
 import { sendTransaction } from '@utils/send'
 import { withCreateSplTokenAccount } from '@models/withCreateSplTokenAccount'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
-import { DEFAULT_NATIVE_SOL_MINT } from '@components/instructions/tools'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export const createTreasuryAccount = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
   realm: ProgramAccount<Realm>,
-  mint: PublicKey,
+  mint: PublicKey | null,
   config: GovernanceConfig,
   tokenOwnerRecord: PublicKey,
-  client?: VsrClient
+  client?: VotingClient
 ): Promise<PublicKey> => {
   const instructions: TransactionInstruction[] = []
   const signers: Keypair[] = []
@@ -40,39 +39,52 @@ export const createTreasuryAccount = async (
   )
 
   //will run only if plugin is connected with realm
-  const voterWeight = await withUpdateVoterWeightRecord(
+  const plugin = await client?.withUpdateVoterWeightRecord(
     instructions,
-    wallet.publicKey!,
-    realm,
-    client
+    'createGovernance'
   )
 
-  const tokenAccount = await withCreateSplTokenAccount(
-    connection,
-    wallet!,
-    instructions,
-    signers,
-    mint
-  )
+  const tokenAccount = mint
+    ? await withCreateSplTokenAccount(
+        connection,
+        wallet!,
+        instructions,
+        signers,
+        mint
+      )
+    : null
 
   const governanceAuthority = walletPubkey
 
-  const governanceAddress = await withCreateTokenGovernance(
-    instructions,
-    programId,
-    programVersion,
-    realm.pubkey,
-    tokenAccount.tokenAccountAddress,
-    config,
-    true,
-    walletPubkey,
-    tokenOwnerRecord,
-    walletPubkey,
-    governanceAuthority,
-    voterWeight
-  )
+  const governanceAddress = tokenAccount
+    ? await withCreateTokenGovernance(
+        instructions,
+        programId,
+        programVersion,
+        realm.pubkey,
+        tokenAccount.tokenAccountAddress,
+        config,
+        true,
+        walletPubkey,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+        plugin?.voterWeightPk
+      )
+    : await withCreateGovernance(
+        instructions,
+        programId,
+        programVersion,
+        realm.pubkey,
+        undefined,
+        config,
+        tokenOwnerRecord,
+        walletPubkey,
+        governanceAuthority,
+        plugin?.voterWeightPk
+      )
 
-  if (mint.toBase58() === DEFAULT_NATIVE_SOL_MINT) {
+  if (!tokenAccount) {
     await withCreateNativeTreasury(
       instructions,
       programId,

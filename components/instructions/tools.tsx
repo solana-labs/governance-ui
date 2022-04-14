@@ -18,6 +18,8 @@ import { VOTE_STAKE_REGISTRY_INSTRUCTIONS } from './programs/voteStakeRegistry'
 import { MARINADE_INSTRUCTIONS } from './programs/marinade'
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend'
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount'
+import { ConnectionContext } from '@utils/connection'
+import { NFT_VOTER_INSTRUCTIONS } from './programs/nftVotingClient'
 /**
  * Default governance program id instance
  */
@@ -32,25 +34,27 @@ export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
+  AQeo6r6jdwnmf48AMejgoKdUGtV8qzbVJH42Gb5sWdi: 'Deprecated: Mango IDO program',
+  '9pDEi3yT9ooT1uw1PApQDYK65advJs4Nt65EJG1m59Yq':
+    'Mango Developer Council Mint',
+
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
-  '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3':
-    'Mango DAO MNGO Treasury Governance',
+  '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
-  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
-    'Mango DAO USDC Treasury Governance',
+  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Treasury',
   '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
     'Mango DAO Voter Stake Registry Registrar',
   DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
   '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
-    'Mango DAO Governance Realm Authority',
+    'Mango DAO Governance Program',
   '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
     'Mango v3 Insurance Fund Vault',
   '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
-  '6GX2brfV7byA8bCurwgcqiGxNEgzjUmdYgarYZZr2MKe': 'Mango v3 Revenue Governance',
+  '6GX2brfV7byA8bCurwgcqiGxNEgzjUmdYgarYZZr2MKe': 'Mango v3 Revenue Vault',
   CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
     'Mango v3 BTC-PERP Incentive Vault',
-  '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
+  '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango V3 Admin Key',
   MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
   EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
 
@@ -96,6 +100,32 @@ export const ACCOUNT_NAMES = {
 
   // MonkOG DAO
   CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
+
+  // MMCC ClubDAO
+  '92tozWPkbybEjPeiGpNFL8onAnT739cxLRQofGVnrmm6': 'ClubDAO DCF Revenue Vault',
+  A6HXL3WMWT4gB1QvYJfZgDp2ufTfLkWBaX6Theakdf5h:
+    'ClubDAO Main SOL Treasury Vault',
+  '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
+  Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
+    'ClubDAO Main NFT Treasury Vault',
+
+  //MonkeDAO
+  Cb4uLreZRcb7kbu6gbsGJp2xjnU5K25MDZbvFknBFyqU: 'ClubDAO NMBC Royalties Vault',
+  '9Z6x8sVq78saCddcveTSmQWFHCS9vaMS7eoeQMrGMUXw': 'Luna Holdings',
+  DKdBj8KF9sieWq2XWkZVnRPyDrw9PwAHinkCMvjAkRdZ: "MonkeDAO NFT's",
+  EdNP7sERADU525E9bov6YdfL3oK3idnRTMdKUh2J7FCM:
+    'SMB SOL Royalty Treasury Holdings',
+  '5bAHkmagXYJzjzxYPDht7AVZRxjiJ6r12NQU3L67bkTr': 'SMB USDC Royalty Holdings',
+  CYLSMKuMiDFNg4eDrZdaaWYCJedsLMAEQgUCtnoUq4n1:
+    'Primary USDC Treasury Holdings',
+  '2qhApGpizKoCyw45oho8Z4F7c14Es4tKvHmBuTnCqubn':
+    'Primary SOL Treasury Holdings',
+  J45sC6ow6u2cXZU8tvewC548CcFiU6VGnFpnxW71WNgm: 'GG SHDW Tokens',
+  wpSyytRSgo1b5RE6PYT9GMWubdq6EdbGC8PEbcz4Kff: 'DAOPool Fee Collection',
+  xuEfu6gmCn1RSXSAVpWLTYttx685m9rAbzqwwYUjYXJ: 'DAOJones Fractionalized Tokens',
+  GQDFqZ7URyWAiPMQs4ywZ9pKBqrUg4srdkqnZpRUstQz: 'Merch Escrow Holdings',
+  '7JPpGyJTEXwR9uQSqhi6RAK5GiSTr41oq72PJ4fU5CXf': 'Marketing Wallet SOL',
+  '2FCKVvw3JmRD6Q2DFb3ZzW697GKjYka8JwGMSF7juWZd': 'Marketing Wallet USDC',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -105,6 +135,7 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['A3Fb876sEiUmDWgrJ1fShASstw8b5wHB6XETzQa8VM7S', ''],
   ['2j2oe8YXdYJyS7G8CeEW5KARijdjjZkuPy5MnN8gBQqQ', ''],
   ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
+  ['4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9', ''],
 ])
 
 // Blacklisted proposals which should not be displayed in the UI
@@ -113,11 +144,11 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
 ])
 
-export const DEFAULT_NFT_TREASURY_MINT =
-  'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
-
 export const DEFAULT_NATIVE_SOL_MINT =
   'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
+
+export const DEFAULT_NFT_TREASURY_MINT =
+  'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
@@ -128,6 +159,21 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 )
 
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
+
+const HIDDEN_MNGO_TREASURES = [
+  'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
+  'J6jYLFDWeeGwg4u2TXhKDCcH4fSzJFQyDE2VSv2drRkg',
+  '9VEbrfajRanMXoR1ubQiuR1ni9cNWx4QcGv3WgUUikgu',
+  'HXxjhCQwm496HAXsHBWfuVkiXBLinHJqUbVKomCjKsfo',
+  'EwPgko6gXD5PAgQaFo1KD7R9tPUEgRcTAfsGvgdhkP4Z',
+  '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
+  '4Z8nAK9grjokaUqJNtw2AEkYAR1vcw8pkCWZcbVEEdh5',
+  'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
+  'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
+  'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
+]
+
+export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]
 
 export interface AccountDescriptor {
   name: string
@@ -161,10 +207,11 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...ATA_PROGRAM_INSTRUCTIONS,
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
+  ...NFT_VOTER_INSTRUCTIONS,
 }
 
 export async function getInstructionDescriptor(
-  connection: Connection,
+  connection: ConnectionContext,
   instruction: InstructionData
 ) {
   let descriptors: any
@@ -182,10 +229,11 @@ export async function getInstructionDescriptor(
     : descriptors && descriptors[instruction.data[0]]
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
-      connection,
+      connection.current,
       instruction.data,
       instruction.accounts,
-      instruction.programId
+      instruction.programId,
+      connection.cluster
     ))) ?? <>{JSON.stringify(instruction.data)}</>
   return {
     name: descriptor?.name,

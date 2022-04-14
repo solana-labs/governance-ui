@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import { ThemeProvider } from 'next-themes'
 import '../styles/index.css'
 import useWallet from '../hooks/useWallet'
@@ -8,34 +7,49 @@ import PageBodyContainer from '../components/PageBodyContainer'
 import useHydrateStore from '../hooks/useHydrateStore'
 import useRealm from '../hooks/useRealm'
 import { getResourcePathPart } from '../tools/core/resources'
-import useRouterHistory from '@hooks/useRouterHistory'
+import handleRouterHistory from '@hooks/handleRouterHistory'
 import Footer from '@components/Footer'
 import { useEffect } from 'react'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import useWalletStore from 'stores/useWalletStore'
-import { useVoteRegistry } from 'VoteStakeRegistry/hooks/useVoteRegistry'
+import { useVotingPlugins, vsrPluginsPks } from '@hooks/useVotingPlugins'
 import ErrorBoundary from '@components/ErrorBoundary'
 import { WalletIdentityProvider } from '@cardinal/namespaces-components'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useMarketStore from 'Strategies/store/marketStore'
 import handleGovernanceAssetsStore from '@hooks/handleGovernanceAssetsStore'
+import tokenService from '@utils/services/token'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import { usePrevious } from '@hooks/usePrevious'
+import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import useMembers from '@components/Members/useMembers'
 
 function App({ Component, pageProps }) {
   useHydrateStore()
   useWallet()
-  useRouterHistory()
-  useVoteRegistry()
+  handleRouterHistory()
+  useVotingPlugins()
   handleGovernanceAssetsStore()
+  useMembers()
+  useEffect(() => {
+    tokenService.fetchSolanaTokenList()
+  }, [])
   const { loadMarket } = useMarketStore()
+  const { governedTokenAccounts } = useGovernanceAssets()
+  const possibleNftsAccounts = governedTokenAccounts.filter(
+    (x) => x.isSol || x.isNft
+  )
+  const { getNfts } = useTreasuryAccountStore()
   const { getOwnedDeposits, resetDepositState } = useDepositStore()
-  const { realm, realmInfo, symbol, ownTokenRecord } = useRealm()
+  const { realm, realmInfo, symbol, ownTokenRecord, config } = useRealm()
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const realmName = realmInfo?.displayName ?? realm?.account?.name
-
+  const prevStringifyPossibleNftsAccounts = usePrevious(
+    JSON.stringify(possibleNftsAccounts)
+  )
   const title = realmName ? `${realmName}` : 'Solana Governance'
-  const description = `Discuss and vote on ${title} proposals.`
 
   // Note: ?v==${Date.now()} is added to the url to force favicon refresh.
   // Without it browsers would cache the last used and won't change it for different realms
@@ -45,11 +59,17 @@ function App({ Component, pageProps }) {
     faviconSelector as string
   )}/favicon.ico?v=${Date.now()}`
   useEffect(() => {
-    loadMarket(connection, connection.cluster)
-  }, [connection.cluster])
+    if (realm?.pubkey) {
+      loadMarket(connection, connection.cluster)
+    }
+  }, [connection.cluster, realm?.pubkey.toBase58()])
   useEffect(() => {
     if (
-      realm?.account.config.useCommunityVoterWeightAddin &&
+      realm &&
+      config?.account.communityVoterWeightAddin &&
+      vsrPluginsPks.includes(
+        config.account.communityVoterWeightAddin.toBase58()
+      ) &&
       realm.pubkey &&
       wallet?.connected &&
       client
@@ -70,43 +90,44 @@ function App({ Component, pageProps }) {
     wallet?.connected,
     client,
   ])
+  //hack to remove 'Do not add <script> tags using next/head warning'
+  useEffect(() => {
+    const changeFavicon = (link) => {
+      let $favicon = document.querySelector('link[rel="icon"]')
+      // If a <link rel="icon"> element already exists,
+      // change its href to the given link.
+      if ($favicon !== null) {
+        //@ts-ignore
+        $favicon.href = link
+        // Otherwise, create a new element and append it to <head>.
+      } else {
+        $favicon = document.createElement('link')
+        //@ts-ignore
+        $favicon.rel = 'icon'
+        //@ts-ignore
+        $favicon.href = link
+        document.head.appendChild($favicon)
+      }
+    }
+    changeFavicon(faviconUrl)
+  }, [faviconSelector])
+  useEffect(() => {
+    document.title = title
+  }, [title])
+  useEffect(() => {
+    if (
+      prevStringifyPossibleNftsAccounts !==
+        JSON.stringify(possibleNftsAccounts) &&
+      realm?.pubkey
+    ) {
+      getNfts(possibleNftsAccounts, connection.current)
+    }
+  }, [JSON.stringify(possibleNftsAccounts), realm?.pubkey.toBase58()])
+
   return (
     <div className="relative">
-      <Head>
-        <title>{title}</title>
-        <link rel="preconnect" href="https://fonts.gstatic.com" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=PT+Mono&display=swap"
-          rel="stylesheet"
-        />
-
-        {faviconUrl && <link rel="icon" href={faviconUrl} />}
-
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
-
-        {realmInfo?.keywords && (
-          <meta name="keywords" content={realmInfo.keywords} />
-        )}
-
-        <meta name="description" content={description} />
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-        <meta name="msapplication-TileColor" content="#ffffff" />
-        <meta name="theme-color" content="#ffffff" />
-
-        <meta property="og:type" content="website" />
-        <meta property="og:title" content={title} />
-        <meta property="og:description" content={description} />
-        {realmInfo?.ogImage && (
-          <meta property="og:image" content={realmInfo.ogImage} />
-        )}
-        <meta name="twitter:card" content="summary" />
-
-        {realmInfo?.twitter && (
-          <meta name="twitter:site" content={realmInfo.twitter} />
-        )}
-      </Head>
       <ErrorBoundary>
-        <ThemeProvider defaultTheme="Mango">
+        <ThemeProvider defaultTheme="Dark">
           <WalletIdentityProvider appName={'Realms'}>
             <NavBar />
             <Notifications />

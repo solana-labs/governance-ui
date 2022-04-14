@@ -20,8 +20,7 @@ import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
-import { withUpdateVoterWeightRecord } from 'VoteStakeRegistry/sdk/withUpdateVoterWeightRecord'
-import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { VotingClient } from '@utils/uiTypes/VotePlugin'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -30,14 +29,13 @@ export async function castVote(
   tokeOwnerRecord: PublicKey,
   yesNoVote: YesNoVote,
   message?: ChatMessageBody | undefined,
-  client?: VsrClient
+  votingPlugin?: VotingClient
 ) {
   const signers: Keypair[] = []
   const instructions: TransactionInstruction[] = []
 
   const governanceAuthority = walletPubkey
   const payer = walletPubkey
-
   // Explicitly request the version before making RPC calls to work around race conditions in resolving
   // the version for RealmInfo
   const programVersion = await getGovernanceProgramVersion(
@@ -45,14 +43,11 @@ export async function castVote(
     programId
   )
 
-  //will run only if plugin is connected with realm
-  const voterWeight = await withUpdateVoterWeightRecord(
+  //will run only if any plugin is connected with realm
+  const plugin = await votingPlugin?.withCastPluginVote(
     instructions,
-    wallet.publicKey!,
-    realm,
-    client
+    proposal.pubkey
   )
-
   await withCastVote(
     instructions,
     programId,
@@ -66,10 +61,15 @@ export async function castVote(
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
     payer,
-    voterWeight
+    plugin?.voterWeightPk,
+    plugin?.maxVoterWeightRecord
   )
 
   if (message) {
+    const plugin = await votingPlugin?.withUpdateVoterWeightRecord(
+      instructions,
+      'commentProposal'
+    )
     await withPostChatMessage(
       instructions,
       signers,
@@ -83,7 +83,7 @@ export async function castVote(
       payer,
       undefined,
       message,
-      voterWeight
+      plugin?.voterWeightPk
     )
   }
 
