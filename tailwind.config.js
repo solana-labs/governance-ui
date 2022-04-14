@@ -36,6 +36,9 @@ module.exports = {
           red: '#cb676f',
           green: '#78C46C',
           blue: '#8AACEB',
+          'bkg-11': '#131418',
+          'bkg-12': '#0c0d0f',
+          'bkg-13': '#50cbf2',
         },
         'light-theme': {
           primary: { light: '#292929', dark: '#101010' },
@@ -89,6 +92,9 @@ module.exports = {
         green: 'var(--green)',
         orange: 'var(--orange)',
         blue: 'var(--blue)',
+        'bkg-11': 'var(--bkg-11)',
+        'bkg-12': 'var(--bkg-12)',
+        'bkg-13': 'var(--bkg-13)',
       },
       animation: {
         'connect-wallet-ping':
