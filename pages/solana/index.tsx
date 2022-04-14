@@ -6,6 +6,7 @@ import SplGov from '../../components_2/SplGov'
 import DaoCommunity from '../../components_2/DaoCommunity'
 import RealmsMetrics from '../../components_2/RealmsMetrics'
 import SocialChannels from '../../components_2/SocialChannels'
+import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
 import Footer from '../../components_2/Footer'
 
 const Solana = () => {
@@ -23,6 +24,7 @@ const Solana = () => {
       <div className="px-32">
         <SocialChannels />
       </div>
+      <FreequentlyAskedQuestions />
       <Footer />
     </div>
   )
