@@ -277,22 +277,25 @@ const NewAccountForm = () => {
           <h1>Create new DAO wallet</h1>
         </div>
       </div>
-      <Select
-        label={'Type'}
-        onChange={setTreasuryType}
-        placeholder="Please select..."
-        value={treasuryType?.name}
-      >
-        {types
-          .filter((x) => !x.hide)
-          .map((x) => {
-            return (
-              <Select.Option key={x.value} value={x}>
-                {x.name}
-              </Select.Option>
-            )
-          })}
-      </Select>
+      {types.filter((x) => !x.hide).length < 2 && (
+        <Select
+          label={'Type'}
+          onChange={setTreasuryType}
+          placeholder="Please select..."
+          value={treasuryType?.name}
+        >
+          {types
+            .filter((x) => !x.hide)
+            .map((x) => {
+              return (
+                <Select.Option key={x.value} value={x}>
+                  {x.name}
+                </Select.Option>
+              )
+            })}
+        </Select>
+      )}
+
       {treasuryType?.value === OTHER && (
         <>
           <Input

@@ -21,10 +21,13 @@ import InstructionForm, {
 } from './FormCreator'
 import { Token, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import * as yup from 'yup'
+import { getValidatedPublickKey } from '@utils/validations'
+import { PublicKey } from '@solana/web3.js'
 
 export interface CloseTokenAccountForm {
   governedAccount: AssetAccount | undefined
   fundsDestinationAccount: string
+  solRentDestination: string
 }
 
 const CloseTokenAccount = ({
@@ -47,6 +50,53 @@ const CloseTokenAccount = ({
       .object()
       .nullable()
       .required('Program governed account is required'),
+    fundsDestinationAccount: yup
+      .string()
+      .test(
+        'fundsDestinationAccountTest',
+        'Funds destination address validation error',
+        function (val: string) {
+          if (form?.governedAccount?.extensions.amount?.isZero()) {
+            return true
+          }
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Funds destination address is required`,
+            })
+          }
+        }
+      ),
+    solRentDestination: yup
+      .string()
+      .test(
+        'solRentDestinationTest',
+        'Sol rent destination address validation error',
+        function (val: string) {
+          if (val) {
+            try {
+              return !!getValidatedPublickKey(val)
+            } catch (e) {
+              console.log(e)
+              return this.createError({
+                message: `${e}`,
+              })
+            }
+          } else {
+            return this.createError({
+              message: `Sol rent destination address  is required`,
+            })
+          }
+        }
+      ),
   })
   async function getInstruction(): Promise<UiInstruction> {
     const isValid = await validateInstruction({ schema, form, setFormErrors })
@@ -71,7 +121,7 @@ const CloseTokenAccount = ({
       const closeInstruction = Token.createCloseAccountInstruction(
         TOKEN_PROGRAM_ID,
         form!.governedAccount.extensions.token!.publicKey!,
-        wallet.publicKey,
+        new PublicKey(form!.solRentDestination),
         form!.governedAccount.extensions.token!.account.owner!,
         []
       )
@@ -120,6 +170,17 @@ const CloseTokenAccount = ({
       type: InstructionInputType.INPUT,
       inputType: 'text',
       hide: form?.governedAccount?.extensions.amount?.isZero(),
+    },
+    {
+      label: 'Sol rent destination',
+      initialValue:
+        governedTokenAccountsWithoutNfts
+          .find((x) => x.isSol)
+          ?.extensions.transferAddress?.toBase58() ||
+        wallet?.publicKey?.toBase58(),
+      name: 'solRentDestination',
+      type: InstructionInputType.INPUT,
+      inputType: 'text',
     },
   ]
   return (
