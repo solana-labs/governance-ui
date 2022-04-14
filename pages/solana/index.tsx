@@ -4,6 +4,7 @@ import DaoTypes from '../../components_2/DaoTypes'
 import RealmsOptions from '../../components_2/RealmsOptions'
 import SplGov from '../../components_2/SplGov'
 import DaoCommunity from '../../components_2/DaoCommunity'
+import RealmsMetrics from '../../components_2/RealmsMetrics'
 import Footer from '../../components_2/Footer'
 
 const Solana = () => {
@@ -17,6 +18,7 @@ const Solana = () => {
         <SplGov />
       </div>
       <DaoCommunity />
+      <RealmsMetrics />
       <Footer />
     </div>
   )
