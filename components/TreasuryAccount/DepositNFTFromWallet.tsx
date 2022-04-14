@@ -114,7 +114,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       ></NFTAccountSelect>
       <NFTSelector
         ref={nftSelectorRef}
-        ownerPk={wallet!.publicKey!}
+        ownersPk={[wallet!.publicKey!]}
         onNftSelect={(selected) => setSelectedNfts(selected)}
       ></NFTSelector>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">
