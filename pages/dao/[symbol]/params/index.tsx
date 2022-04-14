@@ -80,14 +80,6 @@ const Params = () => {
     }
   }, [governancesArray])
 
-  // useEffect(() => {
-  //   async function tempFunction(){
-  //     const tempConst = await activeGovernance.account
-  //     console.log("EEEEE23: ", tempConst)
-  //   }
-  //   tempFunction()
-  // }, [activeGovernance])
-
   return (
     <div className="grid grid-cols-12 gap-4">
       {isRealmProposalModalOpen && (
@@ -281,7 +273,6 @@ const Params = () => {
                   <AccountsView
                     activeGovernance={activeGovernance}
                     getYesNoString={getYesNoString}
-                    assetAccounts={assetAccounts}
                   />
                 )}
                 {activeTab === 'Statistics' && (

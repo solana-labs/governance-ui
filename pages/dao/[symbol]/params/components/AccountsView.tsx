@@ -1,8 +1,10 @@
 import { getTreasuryAccountItemInfoV2 } from '@utils/treasuryTools'
 import { AccountType } from '@utils/uiTypes/assets'
 import { AddressField } from '../index'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
-const AccountsView = ({ activeGovernance, getYesNoString, assetAccounts }) => {
+const AccountsView = ({ activeGovernance, getYesNoString }) => {
+  const { assetAccounts } = useGovernanceAssets()
   return (
     <div className="space-y-3">
       {assetAccounts
