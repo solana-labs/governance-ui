@@ -19,25 +19,26 @@ const StakingCampaign = ({
     stakingCampaignInfo.stakingOptions
       .filter(({ identifier }) => identifier)
       .map(({ identifier, lockupSecs, apr }) => (
-        <div key={identifier} className="flex items-center justify-between">
-          <span className="text-xs w-1/3 flex">
-            <span className="text-xs">option:</span>
-            <span className="text-xs  ml-2 text-fgd-3">{identifier}</span>
-          </span>
-
-          <span className="w-1/3 flex">
-            <span className="text-xs">lock time:</span>
-            <span className="text-xs  ml-2 text-fgd-3">
-              {lockupSecs.toNumber().toLocaleString()}s
+        <div key={identifier} className="flex flex-col">
+          <div className="flex justify-between">
+            <span className="text-xs w-14 whitespace-nowrap pr-2">
+              option {identifier}:
             </span>
-          </span>
 
-          <span className="w-1/3 flex">
-            <span className="text-xs">apr:</span>
-            <span className="text-xs ml-2 text-fgd-3">
-              {apr.toNumber() / 100}%
+            <span className="flex w-40 pr-2">
+              <span className="text-xs whitespace-nowrap">lock time</span>
+              <span className="text-xs ml-1 text-fgd-3 whitespace-nowrap">
+                {lockupSecs.toNumber().toLocaleString()}s
+              </span>
             </span>
-          </span>
+
+            <span className="flex">
+              <span className="text-xs whitespace-nowrap">apr</span>
+              <span className="text-xs ml-1 text-fgd-3 whitespace-nowrap">
+                {apr.toNumber() / 100}%
+              </span>
+            </span>
+          </div>
         </div>
       ))
   ) : (
@@ -135,7 +136,7 @@ const StakingCampaign = ({
         </div>
       </div>
 
-      <div className="flex flex-col bg-bkg-1 p-2 rounded-md space-y-1">
+      <div className="flex flex-col bg-bkg-1 p-2 rounded-md space-y-1 overflow-x-auto">
         {options}
       </div>
     </>
