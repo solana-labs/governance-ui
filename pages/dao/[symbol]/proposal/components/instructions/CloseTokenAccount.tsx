@@ -164,7 +164,7 @@ const CloseTokenAccount = ({
       options: governedTokenAccountsWithoutNfts.filter((x) => !x.isSol),
     },
     {
-      label: 'Funds destination account',
+      label: 'Token recipient',
       initialValue: '',
       name: 'fundsDestinationAccount',
       type: InstructionInputType.INPUT,
@@ -172,7 +172,7 @@ const CloseTokenAccount = ({
       hide: form?.governedAccount?.extensions.amount?.isZero(),
     },
     {
-      label: 'Sol rent destination',
+      label: 'Sol recipient',
       initialValue:
         governedTokenAccountsWithoutNfts
           .find((x) => x.isSol)

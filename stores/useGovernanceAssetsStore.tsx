@@ -219,7 +219,7 @@ const getTokenAssetAccounts = async (
   if (!mintsPks.find((x) => x.toBase58() === WSOL_MINT)) {
     mintsPks.push(new PublicKey(WSOL_MINT))
   }
-  const mintAccounts = tokenAccounts.length
+  const mintAccounts = mintsPks.length
     ? await getMintAccountsInfo(connection, [...mintsPks])
     : []
   const nativeSolAddresses = await Promise.all(

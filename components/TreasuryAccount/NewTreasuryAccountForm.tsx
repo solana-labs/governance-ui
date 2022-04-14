@@ -277,7 +277,8 @@ const NewAccountForm = () => {
           <h1>Create new DAO wallet</h1>
         </div>
       </div>
-      {types.filter((x) => !x.hide).length < 2 && (
+
+      {types.filter((x) => !x.hide).length > 1 && (
         <Select
           label={'Type'}
           onChange={setTreasuryType}
