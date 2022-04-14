@@ -101,6 +101,10 @@ module.exports = {
           'connect-wallet-ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite',
         gradient: 'gradient 4s ease-in-out infinite',
       },
+      backgroundImage: {
+        'spl-gov': "url('/img/realms-web/backgrounds/Spl-Gov-background.svg')",
+        'hero-graphic': "url('/img/realms-web/backgrounds/Hero-graphic.svg')",
+      },
       keyframes: {
         'connect-wallet-ping': {
           '75%, 100%': {
