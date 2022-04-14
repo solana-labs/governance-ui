@@ -20,6 +20,7 @@ export type SupportedSplTokenNames =
   | 'B30UXP'
   | 'Saber UXD-USDC LP'
   | 'Saber IOU Token'
+  | 'Lifinity UXD-USDC LP'
   | SolendSupportedCollateralMintNames;
 
 export const SPL_TOKENS: {
@@ -76,6 +77,11 @@ export const SPL_TOKENS: {
   'Saber IOU Token': {
     name: 'SBR - Saber IOU Token (Liquidity Mining Rewards)',
     mint: new PublicKey('iouQcQBAiEXe6cKLS85zmZxUqaCqBdeHFpqKoSz615u'),
+    decimals: 6,
+  },
+  'Lifinity UXD-USDC LP': {
+    name: 'Lifinity UXD-USDC LP',
+    mint: new PublicKey('DM2Grhnear76DwNiRUSfeiFMt6jSj2op9GWinQDc7Yqh'),
     decimals: 6,
   },
 

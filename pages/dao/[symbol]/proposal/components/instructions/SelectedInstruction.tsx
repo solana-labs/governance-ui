@@ -10,6 +10,8 @@ import NativeEmpty from './Native/Empty';
 import NativeCustomBase64 from './Native/CustomBase64';
 import SetProgramAuthority from './Native/SetProgramAuthority';
 import SplTokenTransfer from './Native/SplTokenTransfer';
+import LifinityDepositToPool from './Lifinity/DepositToPool';
+import LifinityWithdrawFromPool from './Lifinity/WithdrawFromPool';
 import QuarryClaimRewards from './quarryMine/ClaimRewards';
 import QuarryCreateMiner from './quarryMine/CreateMiner';
 import QuarryCreateMinerVaultAccount from './quarryMine/CreateMinerVaultAccount';
@@ -316,6 +318,20 @@ const SelectedInstruction = ({
     case InstructionEnum.TribecaGaugeSetVote:
       return (
         <TribecaGaugeSetVote index={index} governedAccount={governedAccount} />
+      );
+    case InstructionEnum.LifinityDepositToPool:
+      return (
+        <LifinityDepositToPool
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
+    case InstructionEnum.LifinityWithdrawFromPool:
+      return (
+        <LifinityWithdrawFromPool
+          index={index}
+          governedAccount={governedAccount}
+        />
       );
     case InstructionEnum.FriktionDepositIntoVolt:
       return <FriktionDeposit index={index} governance={null} />;

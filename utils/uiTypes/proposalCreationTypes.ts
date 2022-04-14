@@ -105,6 +105,22 @@ export interface EmptyInstructionForm {
   governedAccount?: GovernedMultiTypeAccount;
 }
 
+export interface LifinityDepositToPoolForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  liquidityPool?: string;
+  amountTokenA?: number;
+  amountTokenB?: number;
+  amountTokenLP?: number;
+  slippage: number;
+}
+
+export interface LifinityWithdrawFromPoolForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  liquidityPool?: string;
+  amountTokenLP?: number;
+  slippage: number;
+}
+
 export interface CreateAssociatedTokenAccountForm {
   governedAccount?: GovernedMultiTypeAccount;
   splTokenMintUIName?: SplTokenUIName;
@@ -402,6 +418,8 @@ export enum InstructionEnum {
   Clawback,
   CreateAssociatedTokenAccount,
   FriktionDepositIntoVolt,
+  LifinityDepositToPool,
+  LifinityWithdrawFromPool,
   QuarryClaimRewards,
   QuarryCreateMiner,
   QuarryCreateMinerVaultAccount,
@@ -460,6 +478,7 @@ export enum PackageEnum {
   Socean,
   Saber,
   Quarry,
+  Lifinity,
 }
 
 export type createParams = [

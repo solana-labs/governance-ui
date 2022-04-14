@@ -23,6 +23,7 @@ import { MARINADE_INSTRUCTIONS } from './programs/marinade';
 import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend';
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount';
 import { UXD_PROTOCOL_STAKING_INSTRUCTIONS } from './programs/uxdProtocolStaking';
+import { LIFINITY_PROGRAM_INSTRUCTIONS } from './programs/lifinity';
 /**
  * Default governance program id instance
  */
@@ -37,85 +38,12 @@ export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
 
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
-  Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
-  '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3':
-    'Mango DAO MNGO Treasury Governance',
-  '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
-    'Mango DAO USDC Treasury Vault',
-  '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq':
-    'Mango DAO USDC Treasury Governance',
-  '4WQSYg21RrJNYhF4251XFpoy1uYbMHcMfZNLMXA3x5Mp':
-    'Mango DAO Voter Stake Registry Registrar',
-  DPiH3H3c7t47BMxqTxLsuPQpEC6Kne8GA9VXbxpnZxFE: 'Mango DAO Governance Realm',
-  '7Sn4TN4ZkMghVBAhZ88UkyzXoYkMScaE6qtk9eWV3rJz':
-    'Mango DAO Governance Realm Authority',
-  '59BEyxwrFpt3x4sZ7TcXC3bHx3seGfqGkATcDx6siLWy':
-    'Mango v3 Insurance Fund Vault',
-  '9qFV99WD5TKnpYw8w3xz3mgMBR5anoSZo2BynrGmNZqY': 'Mango v3 Revenue Vault',
-  '6GX2brfV7byA8bCurwgcqiGxNEgzjUmdYgarYZZr2MKe': 'Mango v3 Revenue Governance',
-  CF8sDcPztLDkvnEbYnCaXiDxhUpZ2uKLStpmFfRDNxSd:
-    'Mango v3 BTC-PERP Incentive Vault',
-  '7Gm5zF6FNJpyhqdwKcEdMQw3r5YzitYUGVDKYMPT1cMy': 'Mango v3 Program Governance',
-  MangoCzJ36AjZyKwVj3VnYU4GTonjfVEnJmvvWaxLac: 'MNGO Token Mint',
-  EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v: 'USDC Token Mint',
-
-  MyHd6a7HWKTMeJMHBkrbMq4hZwZxwn9x7dxXcopQ4Wd: 'OMH Token',
-  '2A7UgheVhmoQqXBAQyG1wCoMpooPuiUf2DK6XFiQTtbG': 'OMH Mint Governance',
-
-  // Metaplex Foundation
-  Cmtpx4jmkc9ShvWub4hcAvCqrqvWRpWW9eLUdruyZAN8:
-    'Metaplex Foundation Council Mint',
-  '2yf8YggL4cUhCygoppFMWWeBuJtmLQE9oHkiiUnXP1uM':
-    'Metaplex Foundation Council Mint Governance',
-  mtpXxYKnxwJJReD3PiZ1NLCfbMkHgNcJeGsdXFTfoBk:
-    'Metaplex Foundation Community Mint',
-  '2ZxVbyU35dqtMHgLbZZPoGURf2XuPVmSgmVHY8bTfiMC':
-    'Metaplex Foundation Community Mint Governance',
-
-  // Metaplex Genesis
-  CMPxgYJPXRA8BRfC41uvv6YvpQwtFvLeV9PXjSLpNhYq: 'Metaplex Genesis Council Mint',
-  '68NxN1Vo2TLhA3H33yBjwQE5D5UxqB2iL1HL4dgHyF66':
-    'Metaplex Genesis Council Mint Governance',
-  mpXGnkKdGs1eRZPKkBQ3GW5G4LsVgcX4RzGa5WPo67v:
-    'Metaplex Genesis Community Mint',
-  '4A9WiAZyXpBBEYaBv3UNQCKTqmDth7fukGnBoprLLH2i':
-    'Metaplex Genesis Community Mint Governance',
-
-  Cfafd52FfHRA5FRkTXmMNyHZfhNkbaHpZ12ggmeTVEMw:
-    'Friends and Family Council Mint',
-  FAFDfoUkaxoMqiNur9F1iigdBNrXFf4uNmS5XrhMewvf:
-    'Friends and Family Community Mint',
-
-  // GM DAO
-  '7WbRWL33mM3pbFLvuqNjBztihQtHWWFPGr4HLHyqViG9': 'Team funds',
-  DWhnQm42vCBLkA9RsrBB2spyR3uAJq1BGeroyNMKgnEh: 'Marketing funds',
-
-  // GSAIL
-  '39J1sWHCJgWab8pn6zpTqFCYRXTYVqbEkpLimrq8kTYJ':
-    'GSAIL VAULT 2022-2026 VESTING SCHEDULE',
-  GAMpPYx4DcJdPhnr7sM84gxym4NiNpzo4G6WufpRLemP: 'GSAIL TREASURY VAULT',
-
-  // Marinade DAO
-  B7ux5n2LYxJhS2TsMAcE98eMbkY3dBHUWyrZPBnDmMT5: 'MNDE Treasury',
-  GewCM8ipoPnEraZZqEp6VgVPLZfxr8xwJREmidXVU1EH: 'mSOL Treasury',
-
-  // MonkOG DAO
-  CVuCjHrqj97fSTsnSKzEBVPeYzXEEv6uiRjzBLRvnouj: 'MonkOG DAO Treasury Vault',
-
   //UXD DAO
   '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO USDC Treasury Vault',
   '89WLRw7xc6XEC3hdo89fSb8boAxAJu9wYVFok8JEDSJa':
     'UXD DAO USDC Secondary Treasury Vault',
   GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXD DAO UXP Treasury Vault',
   '39qcqpaiLivyFLBLh4wvPmLrs336BBpXkKYb88i8dSiJ': 'UXD Council Token',
-
-  // MMCC ClubDAO
-  '92tozWPkbybEjPeiGpNFL8onAnT739cxLRQofGVnrmm6': 'ClubDAO DCF Revenue Vault',
-  A6HXL3WMWT4gB1QvYJfZgDp2ufTfLkWBaX6Theakdf5h:
-    'ClubDAO Main SOL Treasury Vault',
-  '9UbiR69cKVVtQEejb5pzwSNJFrtr7pjRoygGaBBjUtpR': 'ClubDAO RB Revenue Vault',
-  Dn1G2mh9VdZg9VoX62i545domg25Jbvx7VwuiXNyV6Qe:
-    'ClubDAO Main NFT Treasury Vault ',
 };
 
 // Blacklisted governances which should not be displayed in the UI
@@ -187,6 +115,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...SYSTEM_INSTRUCTIONS,
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...UXD_PROTOCOL_STAKING_INSTRUCTIONS,
+  ...LIFINITY_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(

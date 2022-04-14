@@ -145,7 +145,7 @@ export default function useGovernanceAssets() {
           `Missing mintAccountInfo for: ${governance.pubkey.toBase58()}`,
         );
       }
-      const data = Buffer.from(mintAccountInfo.data);
+      const data = Buffer.from(mintAccountInfo.data as Buffer);
       const parsedMintInfo = parseMintAccountData(data) as MintInfo;
       const obj = {
         governance,
@@ -196,6 +196,10 @@ export default function useGovernanceAssets() {
       name: 'Friktion',
       image: '/img/friktion.png',
     },
+    [PackageEnum.Lifinity]: {
+      name: 'Lifinity',
+      image: '/img/lifinity.png',
+    },
     [PackageEnum.Tribeca]: {
       name: 'Tribeca',
       image: '/img/tribeca.png',
@@ -215,6 +219,16 @@ export default function useGovernanceAssets() {
   };
 
   const instructions: Instructions = {
+    [InstructionEnum.LifinityDepositToPool]: {
+      name: 'Deposit To Pool',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Lifinity,
+    },
+    [InstructionEnum.LifinityWithdrawFromPool]: {
+      name: 'Withdraw From Pool',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Lifinity,
+    },
     [InstructionEnum.QuarryClaimRewards]: {
       name: 'Claim Rewards',
       isVisible: canUseAnyInstruction,
