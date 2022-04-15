@@ -1,6 +1,6 @@
 import { GovernanceAccountType } from '@solana/spl-governance';
 import { PublicKey } from '@solana/web3.js';
-import { GovernedMultiTypeAccount } from '@utils/tokens';
+import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens';
 import { useCallback, useEffect, useState } from 'react';
 import useGovernanceAssets from './useGovernanceAssets';
 
@@ -70,20 +70,23 @@ export default function useGovernedMultiTypeAccounts() {
     // can force the fact to use the owner for SOL Token Governance
     forceToUseSolTokenGovernanceOwner?: boolean,
   ): PublicKey | undefined => {
-    if (!governedAccount) {
+    if (!governedAccount || !governedAccount.governance) {
       return;
     }
 
     const accountType = governedAccount.governance.account.accountType;
 
     if (
-      accountType === GovernanceAccountType.ProgramGovernanceV1 ||
-      accountType === GovernanceAccountType.ProgramGovernanceV2
+      accountType === GovernanceAccountType.TokenGovernanceV1 ||
+      accountType === GovernanceAccountType.TokenGovernanceV2
     ) {
-      if (governedAccount.isSol && !forceToUseSolTokenGovernanceOwner) {
-        return governedAccount.transferAddress ?? undefined;
+      const programGovernedAccount = governedAccount as GovernedTokenAccount;
+
+      if (programGovernedAccount.isSol && !forceToUseSolTokenGovernanceOwner) {
+        return programGovernedAccount.transferAddress ?? undefined;
       }
     }
+
     return governedAccount.governance.pubkey;
   }, []);
 

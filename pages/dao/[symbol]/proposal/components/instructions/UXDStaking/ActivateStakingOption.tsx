@@ -72,7 +72,7 @@ const ActivateStakingOption = ({
         programId,
       );
 
-      const authority = governedAccount!.governance.pubkey;
+      const authority = governedAccount!.governance!.pubkey;
 
       console.log('Activate/Deactivate Staking Option', {
         stakingCampaignPda: stakingCampaignPda.toString(),

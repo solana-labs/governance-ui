@@ -7,11 +7,7 @@ import { PublicKey } from '@solana/web3.js';
 import { precision } from '@utils/formatting';
 import { tryParseKey } from '@tools/validators/pubkey';
 import useWalletStore from 'stores/useWalletStore';
-import {
-  GovernedMultiTypeAccount,
-  TokenProgramAccount,
-  tryGetTokenAccount,
-} from '@utils/tokens';
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens';
 import {
   SplTokenTransferForm,
   FormInstructionData,
@@ -153,15 +149,13 @@ const SplTokenTransfer = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' });
         }}
         value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
-        shouldBeGoverned={shouldBeGoverned}
+        shouldBeGoverned={!!shouldBeGoverned}
         governance={governance}
       />
 

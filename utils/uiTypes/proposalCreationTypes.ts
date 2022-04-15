@@ -467,7 +467,7 @@ export enum InstructionEnum {
 }
 
 export enum PackageEnum {
-  Native,
+  Native = 1,
   VoteStakeRegistry,
   Solend,
   Raydium,

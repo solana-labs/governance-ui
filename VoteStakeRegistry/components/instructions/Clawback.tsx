@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import useRealm from '@hooks/useRealm';
 import { TransactionInstruction } from '@solana/web3.js';
 import useWalletStore from 'stores/useWalletStore';
-import { GovernedMultiTypeAccount, tryGetMint } from '@utils/tokens';
+import { tryGetMint } from '@utils/tokens';
 import {
   ClawbackForm,
   FormInstructionData,
@@ -245,21 +245,19 @@ const Clawback = ({
       </Select>
       <GovernedAccountSelect
         label="Clawback destination"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts.filter(
-            (x) =>
-              x.mint?.publicKey.toBase58() ===
-              form.deposit?.mint.publicKey.toBase58(),
-          ) as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={governedTokenAccountsWithoutNfts.filter(
+          (x) =>
+            x.mint?.publicKey.toBase58() ===
+            form.deposit?.mint.publicKey.toBase58(),
+        )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' });
         }}
         value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
-        shouldBeGoverned={shouldBeGoverned}
+        shouldBeGoverned={!!shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
     </>
   );
 };

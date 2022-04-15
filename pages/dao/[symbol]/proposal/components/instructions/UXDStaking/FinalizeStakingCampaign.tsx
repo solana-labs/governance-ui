@@ -65,7 +65,7 @@ const FinalizeStakingCampaign = ({
         programId,
       );
 
-      const authority = governedAccount!.governance.pubkey;
+      const authority = governedAccount!.governance!.pubkey;
 
       console.log('Finalize Staking Campaign', {
         stakingCampaignPda: stakingCampaignPda.toString(),

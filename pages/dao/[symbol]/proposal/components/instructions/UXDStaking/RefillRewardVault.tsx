@@ -69,7 +69,7 @@ const RefillRewardVault = ({
         programId,
       );
 
-      const authority = governedAccount!.governance.pubkey;
+      const authority = governedAccount!.governance!.pubkey;
 
       console.log('Refill Reward Vault Staking Campaign', {
         uiRewardRefillAmount: form.uiRewardRefillAmount!,

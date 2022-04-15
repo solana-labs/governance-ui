@@ -42,8 +42,8 @@ const SetProgramAuthority = ({
         throw new Error('missing form input: destination authority');
       }
       return createSetProgramAuthorityInstruction(
-        form.governedAccount!.governance.account.governedAccount,
-        form.governedAccount!.governance.pubkey,
+        form.governedAccount!.governance!.account.governedAccount,
+        form.governedAccount!.governance!.pubkey,
         new PublicKey(form.destinationAuthority),
       );
     },

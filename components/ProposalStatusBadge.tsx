@@ -87,7 +87,7 @@ const ProposalStateBadge = ({
             <div
               className={`${getProposalStateStyle(
                 proposal.state,
-              )} inline-block px-2 py-1 rounded-full text-xs`}
+              )} inline-block px-2 py-1 rounded-full text-xs whitespace-nowrap`}
             >
               {statusLabel}
             </div>
@@ -97,7 +97,7 @@ const ProposalStateBadge = ({
         <div
           className={`${getProposalStateStyle(
             proposal.state,
-          )} inline-block px-2 py-1 rounded-full text-xs`}
+          )} inline-block px-2 py-1 rounded-full text-xs whitespace-nowrap`}
         >
           {statusLabel}
         </div>

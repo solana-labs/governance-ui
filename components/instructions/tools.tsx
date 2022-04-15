@@ -39,11 +39,14 @@ export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   //UXD DAO
-  '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'UXD DAO USDC Treasury Vault',
+  '9SAveSCmGTVR9csAjK45keGitb1kdsC22Pb1AFdoUcSD': 'USDC Treasury Vault',
   '89WLRw7xc6XEC3hdo89fSb8boAxAJu9wYVFok8JEDSJa':
-    'UXD DAO USDC Secondary Treasury Vault',
-  GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXD DAO UXP Treasury Vault',
+    'USDC Secondary Treasury Vault',
+  GEkb8xU5DrPw4TW75BgoRbqUeuyKpsZ4Q2RHMX9M74W5: 'UXP Treasury Vault',
   '39qcqpaiLivyFLBLh4wvPmLrs336BBpXkKYb88i8dSiJ': 'UXD Council Token',
+  '4dQ66QipF693wXjf832n1PXvAVz1A252P8EoSY2CFqjg': 'SBR Treasury Vault',
+  '6VfHhLym1TjQhD64ZL8Qi5eMVcCzgkUsa8evEKGKRXto': 'SOL Treasury Vault',
+  E2SZHFGNbNpaQv62RQb6AcDu6c1EBBC7tG3xsQMk2XKB: 'SUNNY Treasury Vault',
 };
 
 // Blacklisted governances which should not be displayed in the UI

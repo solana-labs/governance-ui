@@ -51,8 +51,11 @@ const useHotWalletPluginTokenAccounts = (
         ),
       )
     ).reduce(
-      (acc, mintInfo) => {
-        if (!mintInfo) throw new Error('Cannot load mint info');
+      (acc, mintInfo, index) => {
+        if (!mintInfo)
+          throw new Error(
+            `Cannot load mint info ${tokenMintAddresses[index].toBase58()}`,
+          );
 
         acc[mintInfo.publicKey.toBase58()] = {
           ...mintInfo,

@@ -9,7 +9,6 @@ import { tryParseKey } from 'tools/validators/pubkey';
 import useWalletStore from 'stores/useWalletStore';
 import {
   GovernedMintInfoAccount,
-  GovernedMultiTypeAccount,
   TokenProgramAccount,
   tryGetTokenAccount,
 } from '@utils/tokens';
@@ -148,17 +147,15 @@ const Mint = ({
     <>
       <GovernedAccountSelect
         label="Mint"
-        governedAccounts={
-          mintGovernancesWithMintInfo as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={mintGovernancesWithMintInfo}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'mintAccount' });
         }}
         value={form.mintAccount}
         error={formErrors['mintAccount']}
-        shouldBeGoverned={shouldBeGoverned}
+        shouldBeGoverned={!!shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
 
       <Input
         label="Destination account"

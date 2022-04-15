@@ -148,6 +148,12 @@ const New = () => {
     }
 
     try {
+      if (!governedAccount.governance) {
+        throw new Error(
+          'No program governance for the selected governed account',
+        );
+      }
+
       // Fetch governance to get up to date proposalCount
       const selectedGovernance = (await fetchRealmGovernance(
         governedAccount.governance.pubkey,
@@ -260,9 +266,9 @@ const New = () => {
           <GovernedAccountSelect
             label="Governance"
             governedAccounts={governedMultiTypeAccounts}
-            onChange={(governedAccount?: GovernedMultiTypeAccount) =>
-              setGovernedAccount(governedAccount)
-            }
+            onChange={(governedAccount) => {
+              setGovernedAccount(governedAccount ?? undefined);
+            }}
             value={governedAccount}
             governance={governedAccount?.governance}
           />

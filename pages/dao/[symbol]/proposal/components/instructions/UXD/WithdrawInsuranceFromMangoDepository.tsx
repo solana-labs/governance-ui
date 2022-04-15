@@ -46,7 +46,7 @@ const WithdrawInsuranceFromMangoDepository = ({
     buildInstruction: async function ({ form, governedAccountPubkey }) {
       return createWithdrawInsuranceFromMangoDepositoryInstruction(
         connection,
-        form.governedAccount!.governance.account.governedAccount,
+        form.governedAccount!.governance!.account.governedAccount,
         governedAccountPubkey,
         form.collateralName!,
         form.insuranceName!,

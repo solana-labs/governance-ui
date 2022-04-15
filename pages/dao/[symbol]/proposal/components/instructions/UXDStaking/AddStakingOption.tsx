@@ -88,7 +88,7 @@ const AddStakingOption = ({
         programId,
       );
 
-      const authority = governedAccount!.governance.pubkey;
+      const authority = governedAccount!.governance!.pubkey;
 
       console.log('Add Staking Option', {
         stakingCampaignPda: stakingCampaignPda.toString(),

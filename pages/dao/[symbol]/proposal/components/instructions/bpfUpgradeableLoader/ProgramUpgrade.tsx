@@ -91,7 +91,7 @@ const ProgramUpgrade = ({
         : wallet.publicKey!;
 
       return createUpgradeInstruction(
-        form.governedAccount!.governance.account.governedAccount,
+        form.governedAccount!.governance!.account.governedAccount,
         new PublicKey(form.bufferAddress!),
         governedAccountPubkey,
         bufferSpillAddress,

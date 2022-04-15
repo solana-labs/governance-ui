@@ -3,7 +3,6 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore';
 import AccountLabel from './AccountHeader';
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect';
 import useGovernanceAssets from '@hooks/useGovernanceAssets';
-import { GovernedMultiTypeAccount } from '@utils/tokens';
 import { useEffect, useState } from 'react';
 import {
   StakingViewForm,
@@ -182,7 +181,7 @@ const ConvertToMsol = () => {
       <div className="space-y-4 w-full pb-4">
         <GovernedAccountSelect
           label="mSOL Treasury account"
-          governedAccounts={mSolTokenAccounts as GovernedMultiTypeAccount[]}
+          governedAccounts={mSolTokenAccounts}
           shouldBeGoverned={false}
           governance={currentAccount?.governance}
           value={form.destinationAccount}
@@ -194,7 +193,7 @@ const ConvertToMsol = () => {
           }
           error={formErrors['destinationAccount']}
           noMaxWidth={true}
-        ></GovernedAccountSelect>
+        />
         <Input
           min={mintMinAmount}
           label="Amount SOL"

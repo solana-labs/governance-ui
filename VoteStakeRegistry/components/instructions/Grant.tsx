@@ -10,11 +10,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { precision } from '@utils/formatting';
 import { tryParseKey } from '@tools/validators/pubkey';
 import useWalletStore from 'stores/useWalletStore';
-import {
-  GovernedMultiTypeAccount,
-  TokenProgramAccount,
-  tryGetTokenAccount,
-} from '@utils/tokens';
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens';
 import {
   GrantForm,
   FormInstructionData,
@@ -276,20 +272,18 @@ const Grant = ({
       <div className="text-xs max-w-lg">{form.lockupKind.info}</div>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts.filter(
-            (x) =>
-              x.mint && useableGrantMints.includes(x.mint.publicKey.toBase58()),
-          ) as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={governedTokenAccountsWithoutNfts.filter(
+          (x) =>
+            x.mint && useableGrantMints.includes(x.mint.publicKey.toBase58()),
+        )}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' });
         }}
         value={form.governedTokenAccount}
         error={formErrors['governedTokenAccount']}
-        shouldBeGoverned={shouldBeGoverned}
+        shouldBeGoverned={!!shouldBeGoverned}
         governance={governance}
-      ></GovernedAccountSelect>
+      />
       <div className="text-sm mb-3">
         <div className="mb-2">Allow dao to clawback</div>
         <div className="flex flex-row text-xs items-center">

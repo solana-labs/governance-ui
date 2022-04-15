@@ -101,7 +101,7 @@ const WithdrawFromPool = ({
       }
     }
     fetchLpMintInfo();
-  }, [governedAccount?.governance.pubkey, form.liquidityPool]);
+  }, [governedAccount?.governance?.pubkey, form.liquidityPool]);
 
   useEffect(() => {
     debounce.debounceFcn(async () => {

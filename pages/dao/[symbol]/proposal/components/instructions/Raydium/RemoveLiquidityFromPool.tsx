@@ -69,7 +69,7 @@ const RaydiumRemoveLiquidityFromPool = ({
     async function fetchLpMintInfo() {
       try {
         const { maxBalance, decimals } = await fetchLiquidityPoolData({
-          governanceKey: governedAccount?.governance.pubkey,
+          governanceKey: governedAccount?.governance?.pubkey,
           lp: form.liquidityPool,
           connection: connection.current,
         });
@@ -83,7 +83,7 @@ const RaydiumRemoveLiquidityFromPool = ({
       }
     }
     fetchLpMintInfo();
-  }, [governedAccount?.governance.pubkey, form.liquidityPool]);
+  }, [governedAccount?.governance?.pubkey, form.liquidityPool]);
 
   return (
     <>

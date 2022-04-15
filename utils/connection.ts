@@ -5,7 +5,9 @@ import type { EndpointInfo } from '../@types/types';
 const ENDPOINTS: EndpointInfo[] = [
   {
     name: 'mainnet',
-    url: process.env.MAINNET_RPC || 'https://ssc-dao.genesysgo.net/',
+    url:
+      process.env.MAINNET_RPC ||
+      'https://billowing-proud-glitter.solana-mainnet.quiknode.pro/7f49d7f436c2d3af0738270d90dee86962f13a82/',
   },
   {
     name: 'devnet',

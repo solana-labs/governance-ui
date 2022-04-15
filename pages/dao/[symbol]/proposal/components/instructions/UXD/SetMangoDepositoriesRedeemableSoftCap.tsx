@@ -36,7 +36,7 @@ const SetMangoDepositoriesRedeemableSoftCap = ({
     schema,
     buildInstruction: async function ({ form, governedAccountPubkey }) {
       return createSetMangoDepositoriesRedeemableSoftCapInstruction(
-        form.governedAccount!.governance.account.governedAccount,
+        form.governedAccount!.governance!.account.governedAccount,
         form.softCap,
         governedAccountPubkey,
       );

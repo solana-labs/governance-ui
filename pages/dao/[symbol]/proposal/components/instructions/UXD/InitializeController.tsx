@@ -37,7 +37,7 @@ const InitializeController = ({
     schema,
     buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
       return createInitializeControllerInstruction(
-        form.governedAccount!.governance.account.governedAccount,
+        form.governedAccount!.governance!.account.governedAccount,
         form.mintDecimals,
         governedAccountPubkey,
         wallet.publicKey!,

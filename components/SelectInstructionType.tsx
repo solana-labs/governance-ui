@@ -4,7 +4,7 @@ import useGovernanceAssets, {
 } from '@hooks/useGovernanceAssets';
 import { PackageEnum } from '@utils/uiTypes/proposalCreationTypes';
 import { useCallback, useEffect, useState } from 'react';
-import PackageSelection from './PackageSelection';
+import ImageTextSelection from './ImageTextSelection';
 
 const SelectInstructionType = ({
   idx,
@@ -90,50 +90,47 @@ const SelectInstructionType = ({
     );
   };
 
+  const packages = [
+    {
+      id: null,
+      name: 'All',
+    },
+    ...availablePackages,
+  ];
+
   return (
-    <div>
-      <div className="flex flex-col justify-between pb-2">
-        <span>Instruction {idx + 1}</span>
+    <div className="flex flex-col">
+      <span className="mb-2">Instruction {idx + 1}</span>
 
-        <span className="text-xs flex items-center text-fgd-3 mb-1 mt-1 ml-3">
-          Filters by package:
-        </span>
-
-        <PackageSelection
-          className="ml-1"
+      <div className="flex flex-col bg-bkg-1 w-full max-w-lg h-auto border border-fgd-3 default-transition rounded-md h-12">
+        <ImageTextSelection
+          className="pl-4 pr-4 border-b border-fgd-3 w-full"
           selected={packageId}
-          packages={availablePackages}
-          onClick={(selectedPackageId: PackageEnum) => {
-            // Clicking on selected packageName unselect it
-            if (selectedPackageId === packageId) {
-              setPackageId(null);
-              return;
-            }
-
-            setPackageId(selectedPackageId);
-          }}
+          imageTextElements={packages}
+          onClick={setPackageId}
         />
-      </div>
 
-      <Select
-        className="h-12"
-        disabled={!filteredInstructionTypes.length}
-        placeholder={`${
-          filteredInstructionTypes.length
-            ? 'Select instruction'
-            : 'No available instructions'
-        }`}
-        onChange={(instructionType: InstructionType) =>
-          onChange({ instructionType, idx })
-        }
-        value={getInstructionDisplayName(selectedInstruction)}
-      >
-        {filteredInstructionTypes.map((instructionType) => (
-          <Select.Option key={instructionType.name} value={instructionType}>
-            <span>{getInstructionDisplayName(instructionType)}</span>
-          </Select.Option>
-        ))}
-      </Select>
+        <Select
+          className="p-2 w-full text-sm"
+          disabled={!filteredInstructionTypes.length}
+          placeholder={`${
+            filteredInstructionTypes.length
+              ? 'Select instruction'
+              : 'No available instructions'
+          }`}
+          onChange={(instructionType: InstructionType) =>
+            onChange({ instructionType, idx })
+          }
+          value={getInstructionDisplayName(selectedInstruction)}
+          useDefaultStyle={false}
+        >
+          {filteredInstructionTypes.map((instructionType) => (
+            <Select.Option key={instructionType.name} value={instructionType}>
+              <span>{getInstructionDisplayName(instructionType)}</span>
+            </Select.Option>
+          ))}
+        </Select>
+      </div>
     </div>
   );
 };

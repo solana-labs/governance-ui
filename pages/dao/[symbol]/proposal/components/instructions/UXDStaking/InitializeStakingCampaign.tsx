@@ -78,7 +78,7 @@ const InitializeStakingCampaign = ({
         form.stakedMintUIName!,
       );
 
-      const authority = governedAccount!.governance.pubkey;
+      const authority = governedAccount!.governance!.pubkey;
 
       const [rewardVaultPda] = findATAAddrSync(authority, rewardSplToken.mint);
       const [stakedVaultPda] = findATAAddrSync(authority, stakedSplToken.mint);

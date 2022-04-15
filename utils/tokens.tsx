@@ -29,6 +29,7 @@ import { abbreviateAddress } from './formatting';
 
 export type TokenAccount = AccountInfo;
 export type MintAccount = MintInfo;
+
 export type GovernedTokenAccount = {
   token: TokenProgramAccount<AccountInfo> | undefined;
   mint: TokenProgramAccount<MintInfo> | undefined;
@@ -38,22 +39,20 @@ export type GovernedTokenAccount = {
   transferAddress: PublicKey | null;
   solAccount: null | AccountInfoGen<Buffer | ParsedAccountData>;
 };
+
 export type GovernedMintInfoAccount = {
   mintInfo: MintInfo;
   governance: ProgramAccount<Governance> | undefined;
 };
+
 export type GovernedProgramAccount = {
   governance: ProgramAccount<Governance> | undefined;
 };
-export type GovernedMultiTypeAccount = {
-  token?: TokenProgramAccount<AccountInfo> | undefined;
-  mint?: TokenProgramAccount<MintInfo> | undefined;
-  governance: ProgramAccount<Governance>;
-  mintInfo?: MintInfo | undefined;
-  isSol?: boolean;
-  transferAddress?: PublicKey | null;
-  solAccount?: null | AccountInfoGen<Buffer | ParsedAccountData>;
-};
+
+export type GovernedMultiTypeAccount =
+  | GovernedProgramAccount
+  | GovernedMintInfoAccount
+  | GovernedTokenAccount;
 
 export type TokenProgramAccount<T> = {
   publicKey: PublicKey;
@@ -275,7 +274,7 @@ export async function getMultipleAccountInfoChunked(
 }
 
 //TODO refactor both methods (getMintAccountLabelInfo, getTokenAccountLabelInfo) make it more common
-export function getTokenAccountLabelInfo(acc?: GovernedMultiTypeAccount) {
+export function getTokenAccountLabelInfo(acc?: GovernedTokenAccount) {
   let tokenAccount = '';
   let tokenName = '';
   let tokenAccountName = '';
@@ -302,7 +301,7 @@ export function getTokenAccountLabelInfo(acc?: GovernedMultiTypeAccount) {
   };
 }
 
-export function getSolAccountLabel(acc?: GovernedMultiTypeAccount) {
+export function getSolAccountLabel(acc?: GovernedTokenAccount) {
   let tokenAccount = '';
   let tokenName = '';
   let tokenAccountName = '';
@@ -330,7 +329,7 @@ export function getSolAccountLabel(acc?: GovernedMultiTypeAccount) {
   };
 }
 
-export function getMintAccountLabelInfo(acc?: GovernedMultiTypeAccount) {
+export function getMintAccountLabelInfo(acc?: GovernedMintInfoAccount) {
   let account = '';
   let tokenName = '';
   let mintAccountName = '';

@@ -40,7 +40,7 @@ const RegisterMangoDepository = ({
     buildInstruction: async function ({ form, wallet, governedAccountPubkey }) {
       return createRegisterMangoDepositoryInstruction(
         connection,
-        form.governedAccount!.governance.account.governedAccount,
+        form.governedAccount!.governance!.account.governedAccount,
         governedAccountPubkey,
         wallet.publicKey!,
         form.collateralName!,

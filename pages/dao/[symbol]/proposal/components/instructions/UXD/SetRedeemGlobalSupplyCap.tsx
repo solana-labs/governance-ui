@@ -37,7 +37,7 @@ const SetRedeemGlobalSupplyCap = ({
     schema,
     buildInstruction: async function ({ form, governedAccountPubkey }) {
       return createSetRedeemableGlobalSupplyCapInstruction(
-        form.governedAccount!.governance.account.governedAccount,
+        form.governedAccount!.governance!.account.governedAccount,
         form.supplyCap,
         governedAccountPubkey,
       );
