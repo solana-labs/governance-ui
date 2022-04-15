@@ -21,11 +21,11 @@ const schema = yup.object().shape({
     .required('Governed account is required'),
   destinationAccount: yup.string().required('Destination Account is required'),
   baseTokenName: yup.string().required('Base Token Name is required'),
-  poolTokenAmount: yup
+  uiPoolTokenAmount: yup
     .number()
     .moreThan(0, 'Pool Token Amount needs to be more than 0')
     .required('Pool Token Amount is required'),
-  minimumTokenAmount: yup
+  uiMinimumTokenAmount: yup
     .number()
     .moreThan(0, 'Minimum Token Amount needs to be more than 0')
     .required('Minimum Token Amount is required'),
@@ -71,6 +71,8 @@ const WithdrawOne = ({
       });
     },
   });
+
+  console.log('formErrors', formErrors);
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
