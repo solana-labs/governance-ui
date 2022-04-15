@@ -210,8 +210,6 @@ export interface WithdrawInsuranceFromMangoDepositoryForm {
 export interface SaberPoolsDepositForm {
   governedAccount?: GovernedMultiTypeAccount;
   poolName?: SupportedSaberPoolNames;
-  sourceA?: string;
-  sourceB?: string;
   uiTokenAmountA?: number;
   uiTokenAmountB?: number;
   uiMinimumPoolTokenAmount?: number;

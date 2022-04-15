@@ -1,4 +1,5 @@
 import { PublicKey } from '@solana/web3.js';
+import { SPL_TOKENS } from '@utils/splTokens';
 
 export type SupportedSaberPoolNames = 'UXDxUSDC';
 
@@ -10,12 +11,14 @@ export type Pool = {
   };
   tokenAccountA: {
     name: string;
+    tokenMint: PublicKey;
     mint: PublicKey;
     decimals: number;
     adminDestinationAccount: PublicKey;
   };
   tokenAccountB: {
     name: string;
+    tokenMint: PublicKey;
     mint: PublicKey;
     decimals: number;
     adminDestinationAccount: PublicKey;
@@ -47,6 +50,7 @@ class SaberPools {
 
       tokenAccountA: {
         name: 'UXD',
+        tokenMint: SPL_TOKENS.UXD.mint,
         mint: new PublicKey('9zj4aX38Uxf3h6AUjS4EipWS8mwbEofasHAf3a1uKGds'),
         decimals: 6,
         adminDestinationAccount: new PublicKey(
@@ -56,6 +60,7 @@ class SaberPools {
 
       tokenAccountB: {
         name: 'USDC',
+        tokenMint: SPL_TOKENS.USDC.mint,
         mint: new PublicKey('CwQDG1MWunn9cLNwcZLd8YBacweSR7ARo32w4mLua1Yr'),
         decimals: 6,
         adminDestinationAccount: new PublicKey(

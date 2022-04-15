@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import * as yup from 'yup';
 import { PublicKey } from '@solana/web3.js';
 import Input from '@components/inputs/Input';
@@ -13,22 +13,15 @@ import { SaberPoolsDepositForm } from '@utils/uiTypes/proposalCreationTypes';
 
 import useWalletStore from 'stores/useWalletStore';
 import { uiAmountToNativeBN } from '@tools/sdk/units';
+import { findATAAddrSync } from '@utils/ataTools';
 
 const schema = yup.object().shape({
   governedAccount: yup
     .object()
     .nullable()
     .required('Governed account is required'),
-  sourceA: yup.string().required('Pool Source A is required'),
-  sourceB: yup.string().required('Pool Source B is required'),
-  uiTokenAmountA: yup
-    .number()
-    .moreThan(0, 'Amount for Token A should be more than 0')
-    .required('Amount for Token A is required'),
-  uiTokenAmountB: yup
-    .number()
-    .moreThan(0, 'Amount for Token B should be more than 0')
-    .required('Amount for Token B is required'),
+  uiTokenAmountA: yup.number().required('Amount for Token A is required'),
+  uiTokenAmountB: yup.number().required('Amount for Token B is required'),
   uiMinimumPoolTokenAmount: yup
     .number()
     .moreThan(0, 'Minimum Pool Token Amount should be more than 0')
@@ -44,10 +37,19 @@ const Deposit = ({
 }) => {
   const connection = useWalletStore((s) => s.connection);
   const [pool, setPool] = useState<Pool | null>(null);
+  const [
+    associatedTokenAccounts,
+    setAssociatedTokenAccounts,
+  ] = useState<null | {
+    A: PublicKey;
+    B: PublicKey;
+  }>(null);
+
   const {
     form,
     handleSetForm,
     formErrors,
+    governedAccountPubkey,
   } = useInstructionFormBuilder<SaberPoolsDepositForm>({
     index,
     initialFormValues: {
@@ -58,11 +60,16 @@ const Deposit = ({
       if (!pool) {
         throw new Error('Saber Pool not found');
       }
+
+      if (!associatedTokenAccounts) {
+        throw new Error('Associated token accounts not found');
+      }
+
       return deposit({
         authority: governedAccountPubkey,
         pool,
-        sourceA: new PublicKey(form.sourceA!),
-        sourceB: new PublicKey(form.sourceB!),
+        sourceA: associatedTokenAccounts.A,
+        sourceB: associatedTokenAccounts.B,
 
         tokenAmountA: uiAmountToNativeBN(
           form.uiTokenAmountA!.toString(),
@@ -79,6 +86,40 @@ const Deposit = ({
       });
     },
   });
+
+  useEffect(() => {
+    if (!governedAccountPubkey) {
+      return;
+    }
+
+    if (!pool) {
+      setAssociatedTokenAccounts(null);
+      return;
+    }
+
+    console.log('governedAccountPubkey', governedAccountPubkey.toBase58());
+    console.log(
+      'pool.tokenAccountA.mint',
+      pool.tokenAccountA.name,
+      pool.tokenAccountA.tokenMint.toBase58(),
+    );
+    console.log(
+      'pool.tokenAccountB.mint',
+      pool.tokenAccountB.name,
+      pool.tokenAccountB.tokenMint.toBase58(),
+    );
+
+    setAssociatedTokenAccounts({
+      A: findATAAddrSync(
+        governedAccountPubkey,
+        pool.tokenAccountA.tokenMint,
+      )[0],
+      B: findATAAddrSync(
+        governedAccountPubkey,
+        pool.tokenAccountB.tokenMint,
+      )[0],
+    });
+  }, [pool, governedAccountPubkey]);
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
@@ -110,31 +151,19 @@ const Deposit = ({
 
       {pool && (
         <>
-          <Input
-            label={`${pool.tokenAccountA.name} Source Account`}
-            value={form.sourceA}
-            type="string"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'sourceA',
-              })
-            }
-            error={formErrors['sourceA']}
-          />
+          <div className="flex flex-col">
+            <span>{pool.tokenAccountA.name} ATA</span>
+            <span className="text-fgd-3 text-sm">
+              {associatedTokenAccounts?.A.toBase58() ?? '-'}
+            </span>
+          </div>
 
-          <Input
-            label={`${pool.tokenAccountB.name} Source Account`}
-            value={form.sourceB}
-            type="string"
-            onChange={(evt) =>
-              handleSetForm({
-                value: evt.target.value,
-                propertyName: 'sourceB',
-              })
-            }
-            error={formErrors['sourceB']}
-          />
+          <div className="flex flex-col">
+            <span>{pool.tokenAccountB.name} ATA</span>
+            <span className="text-fgd-3 text-sm">
+              {associatedTokenAccounts?.B.toBase58() ?? '-'}
+            </span>
+          </div>
 
           <Input
             label={`${pool.tokenAccountA.name} Amount`}
