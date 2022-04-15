@@ -295,7 +295,14 @@ const SendTokens = ({ isNft = false }) => {
         {isNFT ? (
           <NFTSelector
             onNftSelect={(nfts) => setSelectedNfts(nfts)}
-            ownerPk={currentAccount.extensions.transferAddress!}
+            ownersPk={
+              currentAccount.isSol
+                ? [
+                    currentAccount.extensions.transferAddress!,
+                    currentAccount.governance.pubkey,
+                  ]
+                : [currentAccount.governance.pubkey]
+            }
           ></NFTSelector>
         ) : (
           <Input

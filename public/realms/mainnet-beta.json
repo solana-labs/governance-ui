@@ -45,7 +45,8 @@
     "realmId": "896vmJYkitEGhnBnRo8XxywUJu2qtgxidR9HXm5kjwrM",
     "website": "https://www.thesporagers.io",
     "twitter": "@TheSporagers",
-    "ogImage": "/realms/TheSporagers/img/the_sporagers.png"
+    "ogImage": "/realms/TheSporagers/img/the_sporagers.png",
+    "bannerImage": "/realms/TheSporagers/img/the_sporagers_banner.jpeg"
   },
   {
     "symbol": "POOR",
@@ -587,11 +588,11 @@
   },
   {
     "symbol": "EVS",
-    "displayName": "EverSOL",
+    "displayName": "Eversol DAO",
     "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
     "realmId": "7pX17rs38WKHVw5mpJNBCjGXRz5eZsPj5QHAEZv1Zu4d",
     "bannerImage": "/realms/EverSol/img/EverSol_Banner.jpg",
-    "ogImage": "/realms/EverSol/img/EverSol_Logo.jpg",
+    "ogImage": "/realms/EverSol/img/EverSol_Logo.png",
     "website": "https://eversol.one/",
     "twitter": "@eversol_pool"
   },

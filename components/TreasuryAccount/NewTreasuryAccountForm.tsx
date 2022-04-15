@@ -78,21 +78,21 @@ const NewAccountForm = () => {
         hide: !isCurrentVersionHigherThenV1(),
       },
       {
-        name: 'NFT Account',
-        value: NFT,
-        defaultMint: DEFAULT_NFT_TREASURY_MINT,
-        hide: isCurrentVersionHigherThenV1(),
-      },
-      {
         name: 'Token Account',
         value: OTHER,
         defaultMint: '',
         hide: isCurrentVersionHigherThenV1(),
       },
+      {
+        name: 'NFT Account',
+        value: NFT,
+        defaultMint: DEFAULT_NFT_TREASURY_MINT,
+        hide: isCurrentVersionHigherThenV1(),
+      },
     ]
     setTypes(accTypes)
   }, [realmInfo?.programVersion])
-
+  const filteredTypes = types.filter((x) => !x.hide)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
@@ -116,8 +116,8 @@ const NewAccountForm = () => {
     setForm({ ...form, [propertyName]: value })
   }
   useEffect(() => {
-    setTreasuryType(types[0])
-  }, [types.length])
+    setTreasuryType(filteredTypes[0])
+  }, [filteredTypes.length])
   const handleCreate = async () => {
     try {
       if (!realm) {
@@ -277,22 +277,21 @@ const NewAccountForm = () => {
           <h1>Create new DAO wallet</h1>
         </div>
       </div>
-      {types.filter((x) => !x.hide).length < 2 && (
+
+      {filteredTypes.length > 1 && (
         <Select
           label={'Type'}
           onChange={setTreasuryType}
           placeholder="Please select..."
           value={treasuryType?.name}
         >
-          {types
-            .filter((x) => !x.hide)
-            .map((x) => {
-              return (
-                <Select.Option key={x.value} value={x}>
-                  {x.name}
-                </Select.Option>
-              )
-            })}
+          {filteredTypes.map((x) => {
+            return (
+              <Select.Option key={x.value} value={x}>
+                {x.name}
+              </Select.Option>
+            )
+          })}
         </Select>
       )}
 
