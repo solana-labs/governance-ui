@@ -7,17 +7,25 @@ import {
   tryGetRealmConfig,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
-import { getOwnedTokenAccounts } from '@utils/tokens'
+import tokenService from '@utils/services/token'
+import { getOwnedTokenAccounts, tryGetMint } from '@utils/tokens'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
+import BigNumber from 'bignumber.js'
+import BN from 'bn.js'
+import { WSOL_MINT_PK } from '@components/instructions/tools'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection('https://ssc-dao.genesysgo.net/', 'recent')
 
+  console.log('fetching spl-gov instances...')
   // Get all realms
-  const allProgramIds = getAllSplGovernanceProgramIds().slice(0, 1)
-  //const allProgramIds = getAllSplGovernanceProgramIds()
+  //const allProgramIds = getAllSplGovernanceProgramIds().slice(0, 1)
+  const allProgramIds = getAllSplGovernanceProgramIds()
 
+  console.log(`spl-gov instance count: ${allProgramIds.length}`)
+
+  console.log('fetching realms...')
   let allRealms: ProgramAccount<Realm>[] = []
 
   for (const programId of allProgramIds) {
@@ -26,13 +34,29 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     allRealms = allRealms.concat(allProgramRealms)
   }
 
-  const nftRealms: ProgramAccount<Realm>[] = []
+  console.log(`realms count: ${allRealms.length}`)
 
-  for (const realm of allRealms) {
+  const nftRealms: ProgramAccount<Realm>[] = []
+  const tokenAmountMap = new Map<string, BigNumber>()
+
+  const updateTokenAmount = (mintPk: PublicKey, amount: BN) => {
+    const mintKey = mintPk.toBase58()
+    tokenAmountMap.set(
+      mintKey,
+      (tokenAmountMap.get(mintKey) ?? new BigNumber(0)).plus(
+        new BigNumber(amount.toString())
+      )
+    )
+  }
+
+  for (const [idx, realm] of allRealms.entries()) {
+    console.log(
+      `fetching ${realm.account.name} governances and token accounts ${idx}/${allRealms.length}...`
+    )
+
     const programId = realm.owner
 
     // Get NFT DAOs
-
     if (realm.account.config.useCommunityVoterWeightAddin) {
       const realmConfig = await tryGetRealmConfig(conn, programId, realm.pubkey)
       if (
@@ -44,24 +68,60 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       }
     }
 
-    // Get governances
+    // Get Governances
     const governances = await getAllGovernances(conn, programId, realm.pubkey)
     for (const governance of governances) {
       // Check governance owned token accounts
       let tokenAccounts = await getOwnedTokenAccounts(conn, governance.pubkey)
-      for (const tokenAccount of tokenAccounts) {
-        console.log('ACC 1', tokenAccount)
+      for (const tokenAccount of tokenAccounts.filter(
+        (ta) => !ta.account.amount.isZero()
+      )) {
+        updateTokenAmount(
+          tokenAccount.account.mint,
+          tokenAccount.account.amount
+        )
       }
 
       // Check SOL wallet owned token accounts
-      const solWallet = await getNativeTreasuryAddress(
+      const solWalletPk = await getNativeTreasuryAddress(
         programId,
         governance.pubkey
       )
-      tokenAccounts = await getOwnedTokenAccounts(conn, solWallet)
-      for (const tokenAccount of tokenAccounts) {
-        console.log('ACC 1', tokenAccount)
+
+      const solWallet = await conn.getAccountInfo(solWalletPk)
+
+      if (solWallet) {
+        if (solWallet.lamports > 0) {
+          updateTokenAmount(WSOL_MINT_PK, new BN(solWallet.lamports))
+        }
+
+        tokenAccounts = await getOwnedTokenAccounts(conn, solWalletPk)
+        for (const tokenAccount of tokenAccounts.filter(
+          (ta) => !ta.account.amount.isZero()
+        )) {
+          updateTokenAmount(
+            tokenAccount.account.mint,
+            tokenAccount.account.amount
+          )
+        }
       }
+    }
+  }
+
+  console.log('fetching tokens and prices...')
+
+  await tokenService.fetchSolanaTokenList()
+  await tokenService.fetchTokenPrices([...tokenAmountMap.keys()])
+
+  let totalUsdAmount = 0
+
+  for (const [mintPk, amount] of tokenAmountMap.entries()) {
+    const tokenUsdPrice = tokenService.getUSDTokenPrice(mintPk)
+    if (tokenUsdPrice > 0) {
+      const mint = await tryGetMint(conn, new PublicKey(mintPk))
+      const decimalAmount = amount.shiftedBy(-mint!.account.decimals)
+      const usdAmount = decimalAmount.toNumber() * tokenUsdPrice
+      totalUsdAmount += usdAmount
     }
   }
 
@@ -70,7 +130,10 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     programIdCount: allProgramIds.length,
     daoCount: allRealms.length,
     nftDaoCount: nftRealms.length,
+    totalUsdAmount,
   }
+
+  console.log('STATS', daoStatistics)
 
   res.status(200).json(daoStatistics)
 }
