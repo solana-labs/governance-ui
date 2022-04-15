@@ -1,4 +1,4 @@
-import Button from './Button'
+import Button, { PopUpButtonWhite, ExploreButton } from './Button'
 
 const KickstartSolana = () => {
   return (
@@ -14,16 +14,15 @@ const KickstartSolana = () => {
         </div>
         <div className="ml-auto">
           <div className="">
-            <button className="border border-500 border-white p-4 mr-8 text-xs font-medium">
+            <PopUpButtonWhite className="mr-4">
+              {/* <PopUpButtonWhite className="border border-500 border-white inline-flex items-center p-4 mr-8 text-xs font-medium"> */}
               Read the Docs
-              <img
-                src="/img/realms-web/buttons/Export-white.svg"
-                className="h-2.5"
-              />
-            </button>
-            <button className="border border-500 border-white p-4 text-xs font-medium">
+            </PopUpButtonWhite>
+            {/* <button className="border border-500 border-white p-4 text-xs font-medium"> */}
+            <ExploreButton className="border border-gradient-to-r-blue-red">
+              {/* <ExploreButton className="border border-gradient-to-r from-realms-theme-blue to-realms-theme-turquoise"> */}
               Explore DAOs
-            </button>
+            </ExploreButton>
           </div>
         </div>
       </div>

@@ -1,3 +1,5 @@
+import { PopUpButtonBlack } from './Button'
+
 const SplGov = () => {
   return (
     <div className="bg-cover bg-spl-gov h-fit w-480 py-10 pt-12 px-12">
@@ -31,13 +33,10 @@ const SplGov = () => {
           <p className="mt-7 text-black">
             Solana has compiled a robust library of information to read.
           </p>
-          <button className="border border-500 border-white py-2 px-4 text-black text-xs font-medium">
+          {/* <button className="border border-500 border-white py-2 px-4 text-black text-xs font-medium"> */}
+          <PopUpButtonBlack className="mt-4">
             Read about SPL Governance
-            <img
-              src="/img/realms-web/buttons/Export-black.svg"
-              className="h-2.5"
-            />
-          </button>
+          </PopUpButtonBlack>
         </div>
       </div>
     </div>

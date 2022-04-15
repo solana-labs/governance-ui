@@ -26,6 +26,7 @@
   --bkg-11: theme('colors.realms-theme.bkg-11');
   --bkg-12: theme('colors.realms-theme.bkg-12');
   --bkg-13: theme('colors.realms-theme.bkg-13');
+  --blue: theme('colors.realms-theme.blue');
   --lightblue: theme('colors.realms-theme.lightblue');
   --turquoise: theme('colors.realms-theme.turquoise');
 }
