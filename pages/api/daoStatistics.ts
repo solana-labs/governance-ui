@@ -1,19 +1,20 @@
 import {
+  getAllGovernances,
+  getNativeTreasuryAddress,
   getRealms,
   ProgramAccount,
   Realm,
   tryGetRealmConfig,
 } from '@solana/spl-governance'
 import { Connection, PublicKey } from '@solana/web3.js'
+import { getOwnedTokenAccounts } from '@utils/tokens'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { getAllSplGovernanceProgramIds } from './tools/realms'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection('https://ssc-dao.genesysgo.net/', 'recent')
-  // Get all realms
 
-  // use first programId (Ukraine.SOL) for testings
-  //const allProgramIds = getAllSplGovernanceProgramIds()
+  // Get all realms
   const allProgramIds = getAllSplGovernanceProgramIds().slice(0, 1)
   //const allProgramIds = getAllSplGovernanceProgramIds()
 
@@ -27,17 +28,40 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const nftRealms: ProgramAccount<Realm>[] = []
 
-  for (const realm of allRealms.filter(
-    (r) => r.account.config.useCommunityVoterWeightAddin
-  )) {
+  for (const realm of allRealms) {
+    const programId = realm.owner
+
     // Get NFT DAOs
-    const realmConfig = await tryGetRealmConfig(conn, realm.owner, realm.pubkey)
-    if (
-      realmConfig.account.communityVoterWeightAddin?.equals(
-        new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw')
+
+    if (realm.account.config.useCommunityVoterWeightAddin) {
+      const realmConfig = await tryGetRealmConfig(conn, programId, realm.pubkey)
+      if (
+        realmConfig.account.communityVoterWeightAddin?.equals(
+          new PublicKey('GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw')
+        )
+      ) {
+        nftRealms.push(realm)
+      }
+    }
+
+    // Get governances
+    const governances = await getAllGovernances(conn, programId, realm.pubkey)
+    for (const governance of governances) {
+      // Check governance owned token accounts
+      let tokenAccounts = await getOwnedTokenAccounts(conn, governance.pubkey)
+      for (const tokenAccount of tokenAccounts) {
+        console.log('ACC 1', tokenAccount)
+      }
+
+      // Check SOL wallet owned token accounts
+      const solWallet = await getNativeTreasuryAddress(
+        programId,
+        governance.pubkey
       )
-    ) {
-      nftRealms.push(realm)
+      tokenAccounts = await getOwnedTokenAccounts(conn, solWallet)
+      for (const tokenAccount of tokenAccounts) {
+        console.log('ACC 1', tokenAccount)
+      }
     }
   }
 
