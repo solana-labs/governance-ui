@@ -6,7 +6,11 @@ import { getAllSplGovernanceProgramIds } from './tools/realms'
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const conn = new Connection('https://ssc-dao.genesysgo.net/', 'recent')
   // Get all realms
-  const allProgramIds = getAllSplGovernanceProgramIds()
+
+  // use first programId (Ukraine.SOL) for testings
+  const allProgramIds = getAllSplGovernanceProgramIds().slice(0, 1)
+  //const allProgramIds = getAllSplGovernanceProgramIds()
+
   let allRealms: ProgramAccount<Realm>[] = []
 
   for (const programId of allProgramIds) {
