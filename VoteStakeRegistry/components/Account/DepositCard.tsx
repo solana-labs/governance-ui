@@ -152,6 +152,10 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             label="Lockup Type"
             value={typeName.charAt(0).toUpperCase() + typeName.slice(1)}
           />
+          <CardLabel
+            label="Allow dao to clawback"
+            value={deposit.allowClawback ? 'Yes' : 'No'}
+          />
           {isVest && (
             <CardLabel
               label="Initial Amount"
