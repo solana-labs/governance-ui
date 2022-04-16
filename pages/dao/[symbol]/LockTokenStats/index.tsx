@@ -3,12 +3,22 @@ import useRealm from '@hooks/useRealm'
 import { PublicKey } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { Deposit } from 'VoteStakeRegistry/sdk/accounts'
 
-const LockedMngoStats = () => {
-  const { realmInfo } = useRealm()
+interface DepositWithWallet {
+  voter: PublicKey
+  wallet: PublicKey
+  deposit: Deposit
+}
+
+const LockTokenStats = () => {
+  const { realmInfo, realm } = useRealm()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
+  )
+  const voteStakeRegistryRegistrar = useVotePluginsClientStore(
+    (s) => s.state.voteStakeRegistryRegistrar
   )
   const [voters, setVoters] = useState<
     {
@@ -16,6 +26,41 @@ const LockedMngoStats = () => {
       account: any
     }[]
   >([])
+  const [depositsWithWallets, setDepositsWithWallets] = useState<
+    DepositWithWallet[]
+  >([])
+  useEffect(() => {
+    const depositsWithWallets: DepositWithWallet[] = []
+    for (const voter of voters) {
+      const deposits = voter.account.deposits.filter(
+        (x) =>
+          x.isUsed &&
+          typeof x.lockup?.kind.none === 'undefined' &&
+          x.votingMintConfigIdx ===
+            voteStakeRegistryRegistrar?.votingMints.findIndex(
+              (votingMint) =>
+                votingMint.mint.toBase58() ===
+                realm?.account.communityMint.toBase58()
+            )
+      )
+      for (const deposit of deposits) {
+        const depositWithWallet = {
+          voter: voter.publicKey,
+          wallet: voter.account.voterAuthority,
+          deposit: deposit,
+        }
+        depositsWithWallets.push(depositWithWallet)
+      }
+    }
+    setDepositsWithWallets(
+      depositsWithWallets.sort((a, b) =>
+        b.deposit.amountDepositedNative
+          .sub(a.deposit.amountDepositedNative)
+          .toNumber()
+      )
+    )
+  }, [voters.length])
+
   useEffect(() => {
     const getLockedDeposits = async () => {
       const allVoters = await vsrClient?.program.account.voter.all()
@@ -55,8 +100,13 @@ const LockedMngoStats = () => {
           </div>
           <div className="pt-4">
             <div className="flex flex-col">
-              {voters.map((x) => (
-                <div key={x.publicKey.toBase58()}>{x.publicKey.toBase58()}</div>
+              {depositsWithWallets.map((x, index) => (
+                <div key={index}>
+                  <div>{x.wallet.toBase58()}</div>
+                  {/* Monthly to vested map */}
+                  <div>{Object.keys(x.deposit.lockup.kind)[0]}</div>
+                  <div>{x.deposit.amountDepositedNative.toNumber()}</div>
+                </div>
               ))}
             </div>
           </div>
@@ -66,4 +116,4 @@ const LockedMngoStats = () => {
   )
 }
 
-export default LockedMngoStats
+export default LockTokenStats
