@@ -2020,10 +2020,10 @@
     tweetnacl "^1.0.3"
     webpack-dev-server "^3.11.2"
 
-"@solana/spl-token-registry@^0.2.3300":
-  version "0.2.3300"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.3300.tgz#bd6a338d7e63f98e9ef29f1fb16b217ee6183dde"
-  integrity sha512-ac1XUOTLYzjC99hYoNhLw416WarBtzvCHO/dVmSiWgeaWwfWgBNV8n1LJ3MS/bkwWjWIN4SfPs8/YY5osbhbxA==
+"@solana/spl-token-registry@^0.2.3470":
+  version "0.2.3470"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.3470.tgz#ca419a46d1699101e4da389ec51697c285dc38cf"
+  integrity sha512-g95PyEnIieVpYqyv/uu2d3f/IQN2csJPSUuReIGr0EH36+s06kfgKHBGwqFNigpc7ASzJO7npcTvuWs/ut8r0Q==
   dependencies:
     cross-fetch "3.0.6"
 
