@@ -614,5 +614,23 @@
     "ogImage": "https://raw.githubusercontent.com/cmgonsalves/token/main/carrot-logo.png",
     "website": "https://www.begrudgedbunnies.com/",
     "twitter": "@begrudgeddao"
+  },
+  {
+    "symbol": "STR",
+    "displayName": "StreamDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FUjE8nZ9WLch6bYMfxd2ybyfzw19odi6Yfnio9Dc2v2V",
+    "ogImage": "/realms/StreamDAO/img/stream_dao.png",
+    "website": "https://www.streamdao.org/",
+    "twitter": "@dao_stream"
+  },
+  {
+    "symbol": "Fyfy",
+    "displayName": "FyfyDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4kofKQxGvnq5nXumXJaqPnPoHfmZxgH2YUqpxGWYjZ5c",
+    "ogImage": "/realms/FyfyDAO/img/logo.png",
+    "website": "https://www.fyfy.io/",
+    "twitter": "@fyfyio"
   }
 ]
