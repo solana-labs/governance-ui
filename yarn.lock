@@ -8519,10 +8519,10 @@ neo-async@^2.6.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-next-router-mock@^0.6.3:
-  version "0.6.3"
-  resolved "https://registry.npmjs.org/next-router-mock/-/next-router-mock-0.6.3.tgz"
-  integrity sha512-CHMg8ci0Cg10t4nVClgYuWf7rc4Ipj9MvcgY36U+4RSb7CHsSZhn9XX4ZeQzACMQ4gTx5I9IwlX7iDb2/L5X2w==
+next-router-mock@^0.6.7:
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/next-router-mock/-/next-router-mock-0.6.7.tgz#8883ed81f245074462e72199fe94002cd85db5e2"
+  integrity sha512-y3yFyTkplpmvCpy1TnOuMTUQDLt2wg9RwTwvg9WcCRko4lqkBYAQM+ph5sqtNpKQ1xngDwzjPjshVBQJvhb/hg==
 
 next-themes@^0.1.1:
   version "0.1.1"
