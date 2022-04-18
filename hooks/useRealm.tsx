@@ -17,7 +17,11 @@ import {
 } from '../models/voteWeights'
 
 import useWalletStore from '../stores/useWalletStore'
-import { nftPluginsPks, vsrPluginsPks } from './useVotingPlugins'
+import {
+  nftPluginsPks,
+  vsrPluginsPks,
+  switchboardPluginsPks,
+} from './useVotingPlugins'
 
 export default function useRealm() {
   const router = useRouter()
@@ -163,6 +167,9 @@ const getVoterWeight = (
         ownCouncilTokenRecord,
         nftVotingPower
       )
+    }
+    if (switchboardPluginsPks.includes(currentPluginPk.toBase58())) {
+      //return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
     }
   }
   return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)

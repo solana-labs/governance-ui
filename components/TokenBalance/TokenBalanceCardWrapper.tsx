@@ -2,7 +2,11 @@ import { Proposal } from '@solana/spl-governance'
 import { Option } from 'tools/core/option'
 import useRealm from '@hooks/useRealm'
 import dynamic from 'next/dynamic'
-import { nftPluginsPks, vsrPluginsPks } from '@hooks/useVotingPlugins'
+import {
+  nftPluginsPks,
+  vsrPluginsPks,
+  switchboardPluginsPks,
+} from '@hooks/useVotingPlugins'
 
 const LockPluginTokenBalanceCard = dynamic(
   () =>
@@ -12,6 +16,9 @@ const LockPluginTokenBalanceCard = dynamic(
 )
 const TokenBalanceCard = dynamic(() => import('./TokenBalanceCard'))
 const NftBalanceCard = dynamic(() => import('./NftBalanceCard'))
+const SwitchboardPermissionCard = dynamic(
+  () => import('./SwitchboardPermissionCard')
+)
 
 const TokenBalanceCardWrapper = ({
   proposal,
@@ -31,6 +38,9 @@ const TokenBalanceCardWrapper = ({
       currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
     const isNftMode =
       currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
+    const isSwitchboardMode =
+      currentPluginPk &&
+      switchboardPluginsPks.includes(currentPluginPk?.toBase58())
     if (
       isLockTokensMode &&
       (!ownTokenRecord ||
@@ -46,6 +56,21 @@ const TokenBalanceCardWrapper = ({
       return (
         <>
           <NftBalanceCard></NftBalanceCard>
+          {(!ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero() ||
+            !councilTokenAccount?.account.amount.isZero()) && (
+            <TokenBalanceCard proposal={proposal}></TokenBalanceCard>
+          )}
+        </>
+      )
+    }
+    if (
+      isSwitchboardMode &&
+      (!ownTokenRecord ||
+        ownTokenRecord.account.governingTokenDepositAmount.isZero())
+    ) {
+      return (
+        <>
+          <SwitchboardPermissionCard></SwitchboardPermissionCard>
           {(!ownCouncilTokenRecord?.account.governingTokenDepositAmount.isZero() ||
             !councilTokenAccount?.account.amount.isZero()) && (
             <TokenBalanceCard proposal={proposal}></TokenBalanceCard>

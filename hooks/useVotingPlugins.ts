@@ -17,6 +17,10 @@ export const nftPluginsPks: string[] = [
   'GnftV5kLjd67tvHpNGyodwWveEKivz3ZWvvE3Z4xi2iw',
 ]
 
+export const switchboardPluginsPks: string[] = [
+  '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC',
+]
+
 export function useVotingPlugins() {
   const { realm, config } = useRealm()
   const {
@@ -129,6 +133,22 @@ export function useVotingPlugins() {
       }
     }
     const handleNftplugin = () => {
+      if (
+        nftClient &&
+        currentPluginPk &&
+        nftPluginsPks.includes(currentPluginPk.toBase58())
+      ) {
+        handleSetNftRegistrar(nftClient!, realm)
+        if (connected) {
+          handleSetCurrentRealmVotingClient({
+            client: nftClient,
+            realm,
+            walletPk: wallet?.publicKey,
+          })
+        }
+      }
+    }
+    const handleSwitchboardPlugin = () => {
       if (
         nftClient &&
         currentPluginPk &&
