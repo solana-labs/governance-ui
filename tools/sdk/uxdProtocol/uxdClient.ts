@@ -1,14 +1,11 @@
 import { Cluster } from '@blockworks-foundation/mango-client';
 import { EndpointTypes } from '@models/types';
-import { Program, Provider } from '@project-serum/anchor';
-import Wallet from '@project-serum/sol-wallet-adapter';
 import { Connection, PublicKey } from '@solana/web3.js';
 import {
   createAndInitializeMango,
   findAddrSync,
   MangoDepository,
-  UXD,
-  UXDHelpers,
+  UXDClient,
 } from '@uxdprotocol/uxd-client';
 
 export const DEPOSITORY_MINTS = {
@@ -100,35 +97,8 @@ export const getGovernanceMintKey = (
 export const getGovernanceToken = (cluster: Cluster, symbol: string) =>
   GOVERNANCE_MINTS[cluster][symbol];
 
-export const isDepositoryRegistered = async (
-  connection: Connection,
-  cluster: Cluster,
-  uxdProgram: Program,
-  collateralName: string,
-  insuranceName: string,
-  wallet: Wallet,
-): Promise<boolean> => {
-  const uxdHelper = new UXDHelpers();
-  try {
-    await uxdHelper.getMangoDepositoryAccount(
-      new Provider(connection, wallet, Provider.defaultOptions()),
-      instantiateMangoDepository(
-        uxdProgram.programId,
-        getDepositoryMintKey(cluster, collateralName),
-        getInsuranceMintKey(cluster, insuranceName),
-      ),
-      Provider.defaultOptions(),
-    );
-
-    return true;
-  } catch (e) {
-    console.error(e);
-    return false;
-  }
-};
-
-export const uxdClient = (programId: PublicKey): UXD => {
-  return new UXD(programId);
+export const uxdClient = (programId: PublicKey): UXDClient => {
+  return new UXDClient(programId);
 };
 
 export const initializeMango = async (
