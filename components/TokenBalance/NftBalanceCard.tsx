@@ -128,7 +128,7 @@ const NftBalanceCard = () => {
             onNftSelect={() => {
               return null
             }}
-            ownerPk={wallet!.publicKey!}
+            ownersPk={[wallet!.publicKey!]}
             nftHeight="50px"
             nftWidth="50px"
             selectable={false}

@@ -29,7 +29,6 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
   const totalPriceFormatted = amount
     ? new BigNumber(totalPrice).toFormat(0)
     : ''
-
   const info = tokenService.getTokenInfo(mintAddress!)
   const symbol =
     account.type === AccountType.NFT
@@ -66,5 +65,6 @@ export const getTreasuryAccountItemInfoV2 = (account: AssetAccount) => {
     displayPrice,
     info,
     symbol,
+    totalPrice,
   }
 }
