@@ -26,11 +26,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log('fetching proposals...')
   let allProposals: ProgramAccount<Proposal>[] = []
 
-  // for (const programId of allProgramIds) {
-  //   const allProgramProposals = await getGovernanceAccounts(conn,new PublicKey(programId), Proposal);
+  for (const programId of allProgramIds) {
+    const allProgramProposals = await getGovernanceAccounts(
+      conn,
+      new PublicKey(programId),
+      Proposal
+    )
 
-  //   allProposals = allProposals.concat(allProgramProposals)
-  // }
+    allProposals = allProposals.concat(allProgramProposals)
+  }
 
   console.log('fetching vote records...')
   let allVoteRecords: ProgramAccount<VoteRecord>[] = []
