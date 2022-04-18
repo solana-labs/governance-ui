@@ -1,10 +1,19 @@
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
+import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
+import { fmtMintAmount } from '@tools/sdk/units'
+import { abbreviateAddress } from '@utils/formatting'
+import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
-import { Deposit } from 'VoteStakeRegistry/sdk/accounts'
-
+import { Deposit, LockupType } from 'VoteStakeRegistry/sdk/accounts'
+import {
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+} from 'VoteStakeRegistry/tools/dateTools'
+const isBetween = require('dayjs/plugin/isBetween')
 interface DepositWithWallet {
   voter: PublicKey
   wallet: PublicKey
@@ -12,7 +21,10 @@ interface DepositWithWallet {
 }
 
 const LockTokenStats = () => {
-  const { realmInfo, realm } = useRealm()
+  const { realmInfo, realm, mint } = useRealm()
+  const governedTokenAccounts = useGovernanceAssetsStore(
+    (s) => s.governedTokenAccounts
+  )
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
@@ -29,6 +41,56 @@ const LockTokenStats = () => {
   const [depositsWithWallets, setDepositsWithWallets] = useState<
     DepositWithWallet[]
   >([])
+  const walletsCount = [
+    ...new Set(depositsWithWallets.map((x) => x.wallet.toBase58())),
+  ].length
+  const fmtMangoAmount = (val) => {
+    return mint ? fmtMintAmount(mint!, val) : '0'
+  }
+  const mngoValut = governedTokenAccounts.find(
+    (x) =>
+      x.extensions.mint?.publicKey.toBase58() ===
+      realm?.account.communityMint.toBase58()
+  )
+  const circulatingSupply =
+    mngoValut && mint
+      ? mint.supply.sub(mngoValut.extensions.amount!)
+      : new BN(0)
+  const circulatingSupplyFmt = fmtMangoAmount(circulatingSupply)
+  const mngoLocked = depositsWithWallets.reduce(
+    (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
+    new BN(0)
+  )
+  const mngoLockedFmt = fmtMangoAmount(mngoLocked)
+  const mngoLockedWithClawback = depositsWithWallets
+    .filter((x) => x.deposit.allowClawback)
+    .reduce(
+      (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
+      new BN(0)
+    )
+  const mngoLockedWithClawbackFmt = fmtMangoAmount(mngoLockedWithClawback)
+  const calcVestingAmountsPerLastXMonths = (monthsNumber: number) => {
+    const months: string[] = []
+    const currentDate = dayjs()
+    const oldestDate = dayjs().subtract(monthsNumber, 'month')
+    for (let i = 0; i < monthsNumber; i++) {
+      const monthNumber = i + 1
+      const date = dayjs().subtract(monthNumber, 'month')
+      months.push(date.format('MMM'))
+    }
+    for (const vestedDeposit of depositsWithWallets) {
+      const unixStart = vestedDeposit.deposit.lockup.startTs.toNumber() * 1000
+      const unixEnd = vestedDeposit.deposit.lockup.endTs.toNumber() * 1000
+      const isPossibleToVest =
+        typeof vestedDeposit.deposit.lockup.kind.monthly !== 'undefined' &&
+        currentDate.isAfter(unixStart) &&
+        oldestDate.isBefore(unixEnd)
+      if (isPossibleToVest) {
+      }
+    }
+    console.log(months)
+  }
+  calcVestingAmountsPerLastXMonths(6)
   useEffect(() => {
     const depositsWithWallets: DepositWithWallet[] = []
     for (const voter of voters) {
@@ -70,7 +132,6 @@ const LockTokenStats = () => {
             x.account.registrar.toBase58() ===
             voteStakeRegistryRegistrarPk?.toBase58()
         ) || []
-      console.log(currentRealmVoters)
       setVoters(currentRealmVoters)
     }
 
@@ -79,7 +140,6 @@ const LockTokenStats = () => {
     vsrClient?.program.programId.toBase58(),
     voteStakeRegistryRegistrarPk?.toBase58(),
   ])
-
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -98,19 +158,69 @@ const LockTokenStats = () => {
               </div>
             </div>
           </div>
+          <div className="flex">
+            <div className="flex flex-col w-1/3">
+              <div>
+                Circulating supply
+                <div>{circulatingSupplyFmt}</div>
+              </div>
+              <div>
+                MNGO Locked
+                <div>{mngoLockedFmt}</div>
+              </div>
+              <div>
+                Locked with clawback
+                <div>{mngoLockedWithClawbackFmt}</div>
+              </div>
+              <div></div>
+            </div>
+            <div className="w-2/3">asdasd</div>
+          </div>
           <div className="pt-4">
+            <div>Members with Locked MNGO ({walletsCount})</div>
             <div className="flex flex-col">
+              <div className="grid grid-cols-4">
+                <div>Address</div>
+                <div>Lock type</div>
+                <div>Lock duration</div>
+                <div>MNGO Locked</div>
+              </div>
               {depositsWithWallets.map((x, index) => (
-                <div key={index}>
-                  <div>{x.wallet.toBase58()}</div>
-                  {/* Monthly to vested map */}
-                  <div>{Object.keys(x.deposit.lockup.kind)[0]}</div>
-                  <div>{x.deposit.amountDepositedNative.toNumber()}</div>
-                </div>
+                <LockTokenRow depositWithWallet={x} key={index}></LockTokenRow>
               ))}
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  )
+}
+
+const LockTokenRow = ({
+  depositWithWallet,
+}: {
+  depositWithWallet: DepositWithWallet
+}) => {
+  const { mint } = useRealm()
+
+  const type = Object.keys(
+    depositWithWallet.deposit.lockup.kind
+  )[0] as LockupType
+  const typeName = type !== 'monthly' ? type : 'Vested'
+  const isConstant = type === 'constant'
+  const lockedTokens = mint
+    ? fmtMintAmount(mint!, depositWithWallet.deposit.amountDepositedNative)
+    : '0'
+  const abbreviateWalletAddress = abbreviateAddress(depositWithWallet.wallet)
+  return (
+    <div className="grid grid-cols-4">
+      <div>{abbreviateWalletAddress}</div>
+      <div>{typeName}</div>
+      <div>{lockedTokens}</div>
+      <div>
+        {isConstant
+          ? getMinDurationFmt(depositWithWallet.deposit as any)
+          : getTimeLeftFromNowFmt(depositWithWallet.deposit as any)}
       </div>
     </div>
   )
