@@ -1,9 +1,7 @@
 import {
   getGovernanceAccounts,
-  getRealms,
   ProgramAccount,
   Proposal,
-  Realm,
   TokenOwnerRecord,
   VoteRecord,
 } from '@solana/spl-governance'
@@ -37,11 +35,15 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   console.log('fetching vote records...')
   let allVoteRecords: ProgramAccount<VoteRecord>[] = []
 
-  // for (const programId of allProgramIds) {
-  //   const allProgramVoteRecords = await getGovernanceAccounts(conn,new PublicKey(programId), VoteRecord);
+  for (const programId of allProgramIds) {
+    const allProgramVoteRecords = await getGovernanceAccounts(
+      conn,
+      new PublicKey(programId),
+      VoteRecord
+    )
 
-  //   allVoteRecords = allVoteRecords.concat(allProgramVoteRecords)
-  // }
+    allVoteRecords = allVoteRecords.concat(allProgramVoteRecords)
+  }
 
   console.log('fetching members...')
   let allMembers = new Set<string>()
