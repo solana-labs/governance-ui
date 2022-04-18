@@ -33,7 +33,7 @@ const NotificationsCard = () => {
   const [isLoading, setLoading] = useState<boolean>(false)
   const [hasUnsavedChanges, setUnsavedChanges] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>('')
-  const enableTelegramInput = false
+  const [telegramEnabled, setTelegramEnabled] = useState<boolean>(true)
 
   const wallet = useWalletStore((s) => s.current)
   const connected = useWalletStore((s) => s.connected)
@@ -56,6 +56,7 @@ const NotificationsCard = () => {
     isAuthenticated,
     createAlert,
     updateAlert,
+    // getSupportedTargetTypesForDapp
   } = useNotifiClient({
     dappAddress: realm?.pubkey?.toBase58() ?? '',
     walletPublicKey: wallet?.publicKey?.toString() ?? '',
@@ -73,6 +74,19 @@ const NotificationsCard = () => {
     setPhone(firstOrNull(targetGroup?.smsTargets)?.phoneNumber ?? '')
     setTelegram(firstOrNull(targetGroup?.telegramTargets)?.telegramId ?? '')
   }, [data])
+
+  /*
+  useEffect(() => {
+    if (realm?.pubkey) {
+      const targetTypes = getSupportedTargetTypesForDapp({dappAddress: realm.pubkey.toBase58()})
+      targetTypes.array.forEach(element => {
+        if (element == TargetType.TELEGRAM) {
+          setTelegramEnabled(true)
+        }
+      });
+    }
+  }, [])
+*/
 
   const handleError = (errors: { message: string }[]) => {
     const error = errors.length > 0 ? errors[0] : null
@@ -121,14 +135,23 @@ const NotificationsCard = () => {
     if (connected && isAuthenticated()) {
       try {
         if (alert !== null) {
-          await updateAlert({
+          const alertResult = await updateAlert({
             alertId: alert.id ?? '',
             emailAddress: email === '' ? null : email,
             phoneNumber: phone.length < 12 ? null : phone,
             telegramId: telegram === '' ? null : telegram,
           })
+
+          if (alertResult) {
+            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
+              const target = alertResult.targetGroup?.telegramTargets[0]
+              if (target && !target.isConfirmed) {
+                console.log(target.confirmationUrl)
+              }
+            }
+          }
         } else {
-          await createAlert({
+          const alertResult = await createAlert({
             name: `${realm?.account.name} notifications`,
             emailAddress: email === '' ? null : email,
             phoneNumber: phone.length < 12 ? null : phone,
@@ -136,6 +159,15 @@ const NotificationsCard = () => {
             sourceId: source?.id ?? '',
             filterId: filter?.id ?? '',
           })
+
+          if (alertResult) {
+            if (alertResult.targetGroup?.telegramTargets?.length > 0) {
+              const target = alertResult.targetGroup?.telegramTargets[0]
+              if (target && !target.isConfirmed) {
+                console.log(target.confirmationUrl)
+              }
+            }
+          }
         }
         setUnsavedChanges(false)
       } catch (e) {
@@ -174,7 +206,7 @@ const NotificationsCard = () => {
   const disabled = isAuthenticated() && !hasUnsavedChanges
 
   return (
-    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
+    <div className="bg-bkg-2 p-4 md:p-6 rounded-lg w-1/2">
       <h3 className="mb-4">Notifications</h3>
       {hasLoaded ? (
         !connected ? (
@@ -201,10 +233,10 @@ const NotificationsCard = () => {
             </div>
             <InputRow
               label="E-mail"
-              icon={<MailIcon className="mr-1.5 h-4 text-primary-light w-4" />}
+              icon={<MailIcon className="h-8 text-primary-light w-4" />}
             >
               <Input
-                className="my-4"
+                className="w-full min-w-full"
                 type="email"
                 value={email}
                 onChange={handleEmail}
@@ -214,11 +246,10 @@ const NotificationsCard = () => {
 
             <InputRow
               label="SMS"
-              icon={
-                <ChatAltIcon className="mr-1.5 h-4 text-primary-light w-4" />
-              }
+              icon={<ChatAltIcon className="h-8 text-primary-light w-4" />}
             >
               <Input
+                className="w-full min-w-full"
                 type="tel"
                 value={phone}
                 onChange={handlePhone}
@@ -226,17 +257,18 @@ const NotificationsCard = () => {
               />
             </InputRow>
 
-            {enableTelegramInput && (
+            {telegramEnabled && (
               <InputRow
                 label="Telegram"
                 icon={
                   <PaperAirplaneIcon
-                    className="mr-1.5 h-4 text-primary-light w-4"
+                    className="h-8 text-primary-light w-8"
                     style={{ transform: 'rotate(45deg)' }}
                   />
                 }
               >
                 <Input
+                  className="w-full min-w-full"
                   type="text"
                   value={telegram}
                   onChange={handleTelegram}
@@ -253,7 +285,7 @@ const NotificationsCard = () => {
                     ? 'Save settings for notifications'
                     : 'Fetch stored values for existing accounts'
                 }
-                className="sm:w-1/2"
+                className="sm:w-full"
                 disabled={disabled}
                 onClick={
                   hasUnsavedChanges || isAuthenticated()
@@ -264,19 +296,22 @@ const NotificationsCard = () => {
               >
                 {hasUnsavedChanges || isAuthenticated() ? 'Save' : 'Refresh'}
               </Button>
-              <div className="flex flex-row justify-start text-xs items-center w-full sm:w-1/2">
-                Powered by&nbsp;
-                <NotifiLogo className="h-3 pb-0.5" />
-                <span className="flex-grow" />
-                <a
-                  href="https://docs.notifi.network/NotifiIntegrationsFAQ.html"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-xs text-primary-dark"
-                  title="Questions? Click to learn more!"
-                >
-                  Learn More
-                </a>
+              <div className="h-3 grid grid-cols-2 text-xs w-full">
+                <div className="flex flex-row text-xs w-full">
+                  Powered by&nbsp;
+                  <NotifiLogo className="min-w-12 w-12 h-3 min-h-3" />
+                </div>
+                <div className="grid justify-items-end">
+                  <a
+                    href="https://www.notifi.network/faqs"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="text-xs text-primary-dark"
+                    title="Questions? Click to learn more!"
+                  >
+                    Learn More
+                  </a>
+                </div>
               </div>
             </div>
           </>
@@ -302,8 +337,8 @@ const InputRow: FunctionComponent<InputRowProps> = ({
   label,
 }) => {
   return (
-    <div className="flex justify-between items-center content-center mt-4">
-      <div className="mr-2 py-1 text-sm w-40 h-8 flex items-center">
+    <div className="flex justify-between items-center content-center mt-4 w-full">
+      <div className="mr-2 py-1 text-sm w-20 h-8 flex items-center">
         {icon}
         {label}
       </div>
