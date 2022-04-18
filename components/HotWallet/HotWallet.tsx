@@ -2,7 +2,10 @@ import useHotWallet from '@hooks/useHotWallet';
 import { FireIcon } from '@heroicons/react/solid';
 import HotWalletName from './HotWalletName';
 import HotWalletPluginTribecaGauges from './plugins/TribecaGauges/TribecaGauges';
-import { saberTribecaConfiguration } from '@tools/sdk/tribeca/configurations';
+import {
+  saberTribecaConfiguration,
+  sunnyTribecaConfiguration,
+} from '@tools/sdk/tribeca/configurations';
 import HotWalletPluginTokenAccounts from './plugins/TokenAccounts/TokenAccounts';
 import HotWalletPluginSaberStats from './plugins/SaberStats/SaberStats';
 import HotWalletPluginUXDStaking from './plugins/UXDStaking/UXDStaking';
@@ -33,6 +36,10 @@ const HotWallet = (): JSX.Element => {
 
         <HotWalletPluginTribecaGauges
           tribecaConfiguration={saberTribecaConfiguration}
+        />
+
+        <HotWalletPluginTribecaGauges
+          tribecaConfiguration={sunnyTribecaConfiguration}
         />
 
         <HotWalletPluginSaberStats hotWalletAccount={hotWalletAccount} />
