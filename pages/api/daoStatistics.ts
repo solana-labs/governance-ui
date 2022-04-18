@@ -16,7 +16,10 @@ import BN from 'bn.js'
 import { WSOL_MINT_PK } from '@components/instructions/tools'
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const conn = new Connection('https://ssc-dao.genesysgo.net/', 'recent')
+  const conn = new Connection(
+    'https://explorer-api.mainnet-beta.solana.com',
+    'recent'
+  )
 
   console.log('fetching spl-gov instances...')
   // Get all realms
@@ -33,6 +36,8 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 
     allRealms = allRealms.concat(allProgramRealms)
   }
+
+  //allRealms = allRealms.slice(251)
 
   console.log(`realms count: ${allRealms.length}`)
 
