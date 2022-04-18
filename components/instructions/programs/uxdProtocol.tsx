@@ -1,11 +1,12 @@
 import { Connection } from '@solana/web3.js';
-import { struct, u8, u48 } from 'buffer-layout';
+import { struct, u8, nu64 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
 import { u128, u64 } from '@project-serum/borsh';
 import { INSURANCE_MINTS } from '@tools/sdk/uxdProtocol/uxdClient';
 import { UXD_DECIMALS } from '@uxdprotocol/uxd-client';
 import { nativeAmountToFormattedUiAmount } from '@tools/sdk/units';
 import { BN } from '@project-serum/anchor';
+import { tryGetTokenMint } from '@utils/tokens';
 
 export const UXD_PROGRAM_INSTRUCTIONS = {
   UXD8m9cvwk4RcSxnX2HZ9VudQCEeDH6fRnB4CAP57Dr: {
@@ -216,35 +217,56 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
         'authority',
         'controller',
         'depository',
+        'collateralMint',
         'insuranceMint',
         'authorityInsurance',
         'depositoryInsurancePassthroughAccount',
         'depositoryMangoAccount',
-        // mango accounts for CPI
         'mangoGroup',
         'mangoCache',
         'mangoSigner',
         'mangoRootBank',
         'mangoNodeBank',
         'mangoVault',
-        //
+        'systemProgram',
         'tokenProgram',
         'mangoProgram',
       ],
-      getDataUI: (
-        _connection: Connection,
+      getDataUI: async (
+        connection: Connection,
         data: Uint8Array,
-        _accounts: AccountMetaData[],
+        accounts: AccountMetaData[],
       ) => {
-        const dataLayout = struct([u48('redeemable_global_supply_cap')]);
+        const dataLayout = struct([
+          u8('instruction'),
+          u8('SIGHASH_1'),
+          u8('SIGHASH_2'),
+          u8('SIGHASH_3'),
+          u8('SIGHASH_4'),
+          u8('SIGHASH_5'),
+          u8('SIGHASH_6'),
+          u8('SIGHASH_7'),
+          nu64('insuranceAmount'),
+        ]);
+
+        const collateralMint = accounts[3].pubkey;
+
+        const mintInfo = await tryGetTokenMint(connection, collateralMint);
+
+        if (!mintInfo) {
+          throw new Error(
+            `Cannot load Mint infos for ${collateralMint.toBase58()}`,
+          );
+        }
 
         const args = dataLayout.decode(Buffer.from(data)) as any;
-        console.log('args', args);
-        return (
-          <>
-            <p>{args}</p>
-          </>
+
+        const uiInsuranceAmount = nativeAmountToFormattedUiAmount(
+          new BN(args.insuranceAmount.toString()),
+          mintInfo.account.decimals,
         );
+
+        return <p>{uiInsuranceAmount}</p>;
       },
     },
   },
