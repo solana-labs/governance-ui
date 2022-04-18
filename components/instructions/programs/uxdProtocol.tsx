@@ -250,22 +250,32 @@ export const UXD_PROGRAM_INSTRUCTIONS = {
 
         const collateralMint = accounts[3].pubkey;
 
+        const args = dataLayout.decode(Buffer.from(data)) as any;
+
         const mintInfo = await tryGetTokenMint(connection, collateralMint);
 
         if (!mintInfo) {
-          throw new Error(
-            `Cannot load Mint infos for ${collateralMint.toBase58()}`,
+          return (
+            <>
+              <span>Native amount</span>
+              <span className="ml-2">
+                {Number(args.insuranceAmount).toLocaleString()}
+              </span>
+            </>
           );
         }
-
-        const args = dataLayout.decode(Buffer.from(data)) as any;
 
         const uiInsuranceAmount = nativeAmountToFormattedUiAmount(
           new BN(args.insuranceAmount.toString()),
           mintInfo.account.decimals,
         );
 
-        return <p>{uiInsuranceAmount}</p>;
+        return (
+          <>
+            <span>UI amount</span>
+            <span className="ml-2">{uiInsuranceAmount}</span>
+          </>
+        );
       },
     },
   },
