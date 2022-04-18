@@ -17,11 +17,6 @@
     "test-all": "yarn lint && yarn type-check && yarn test",
     "notifier": "ts-node scripts/governance-notifier.ts"
   },
-  "lint-staged": {
-    "*.@(ts|tsx|js|jsx)": [
-      "yarn format"
-    ]
-  },
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.4.3",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",

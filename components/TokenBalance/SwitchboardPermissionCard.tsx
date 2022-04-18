@@ -23,9 +23,9 @@ const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
-  //const client = useVotePluginsClientStore(
+  const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
-  )
+  );
   //const nfts = useNftPluginStore((s) => s.state.votingNfts)
   //const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   //const connection = useWalletStore((s) => s.connection)
