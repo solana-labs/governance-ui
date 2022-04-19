@@ -18,7 +18,7 @@ const DaoCommunity = () => {
         </p>
         <br />
         <p>
-          Think of them like an internet-native business that's collectively
+          Think of them like an internet-native business that`s collectively
           owned and managed by its members. They have built-in treasuries that
           no one has the authority to access without the approval of the group.
           Decisions are governed by proposals and voting to ensure everyone in

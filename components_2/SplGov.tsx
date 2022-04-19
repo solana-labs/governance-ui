@@ -20,11 +20,11 @@ const SplGov = () => {
         <p className="text-black">
           The Solana Program Library (SPL) is a collection of on-chain programs
           targeting the Sealevel parallel runtime. These programs are tested
-          against Solana's implementation of Sealevel, solana-runtime, and
+          against Solana`s implementation of Sealevel, solana-runtime, and
           deployed to its mainnet. As others implement Sealevel, we will
           graciously accept patches. The Token Swap Program allows simple
           trading of token pairs without a centralized limit order book. The
-          program uses a mathematical formula called "curve" to calculate the
+          program uses a mathematical formula called curve to calculate the
           price of all trades. Curves aim to mimic normal market dynamics: for
           example, as traders buy a lot of one token type, the value of the
           other token type goes up.
