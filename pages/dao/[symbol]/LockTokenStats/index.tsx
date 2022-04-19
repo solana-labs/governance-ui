@@ -10,10 +10,12 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { Deposit, LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
+  DAYS_PER_MONTH,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
 const isBetween = require('dayjs/plugin/isBetween')
+dayjs.extend(isBetween)
 interface DepositWithWallet {
   voter: PublicKey
   wallet: PublicKey
@@ -25,6 +27,18 @@ const LockTokenStats = () => {
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const [vestPerMonthStats, setVestPerMonthStats] = useState<{
+    [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
+  }>({})
+  const [statsMonths, setStatsMonths] = useState<string[]>([])
+  const currentMonthName = statsMonths.length ? statsMonths[0] : ''
+  const vestingThisMonth =
+    currentMonthName && vestPerMonthStats[currentMonthName]
+      ? vestPerMonthStats[currentMonthName].reduce(
+          (acc, val) => acc.add(val.vestingAmount),
+          new BN(0)
+        )
+      : new BN(0)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
@@ -47,6 +61,7 @@ const LockTokenStats = () => {
   const fmtMangoAmount = (val) => {
     return mint ? fmtMintAmount(mint!, val) : '0'
   }
+  const vestingThisMonthFmt = fmtMangoAmount(vestingThisMonth)
   const mngoValut = governedTokenAccounts.find(
     (x) =>
       x.extensions.mint?.publicKey.toBase58() ===
@@ -70,26 +85,53 @@ const LockTokenStats = () => {
     )
   const mngoLockedWithClawbackFmt = fmtMangoAmount(mngoLockedWithClawback)
   const calcVestingAmountsPerLastXMonths = (monthsNumber: number) => {
-    const months: string[] = []
+    const months: dayjs.Dayjs[] = []
+    const vestingPerMonth = {}
     const currentDate = dayjs()
     const oldestDate = dayjs().subtract(monthsNumber, 'month')
     for (let i = 0; i < monthsNumber; i++) {
-      const monthNumber = i + 1
-      const date = dayjs().subtract(monthNumber, 'month')
-      months.push(date.format('MMM'))
+      const date = dayjs().subtract(i, 'month')
+      months.push(date)
+      vestingPerMonth[date.format('MMM')] = []
     }
     for (const vestedDeposit of depositsWithWallets) {
-      const unixStart = vestedDeposit.deposit.lockup.startTs.toNumber() * 1000
-      const unixEnd = vestedDeposit.deposit.lockup.endTs.toNumber() * 1000
+      const unixLockupStart =
+        vestedDeposit.deposit.lockup.startTs.toNumber() * 1000
+      const unixLockupEnd = vestedDeposit.deposit.lockup.endTs.toNumber() * 1000
       const isPossibleToVest =
         typeof vestedDeposit.deposit.lockup.kind.monthly !== 'undefined' &&
-        currentDate.isAfter(unixStart) &&
-        oldestDate.isBefore(unixEnd)
-      return isPossibleToVest
+        currentDate.isAfter(unixLockupStart) &&
+        oldestDate.isBefore(unixLockupEnd)
+      if (isPossibleToVest) {
+        const vestingCount = Math.ceil(
+          dayjs(unixLockupEnd).diff(unixLockupStart, 'month', true)
+        )
+        const vestingAmount = vestedDeposit.deposit.amountInitiallyLockedNative.divn(
+          vestingCount
+        )
+        for (let i = 1; i <= vestingCount; i++) {
+          const nextVestinDays = i * DAYS_PER_MONTH
+          const vestingDate = dayjs(unixLockupStart).add(nextVestinDays, 'day')
+          for (const date of months) {
+            if (
+              //@ts-ignore
+              vestingDate.isBetween(date.startOf('month'), date.endOf('month'))
+            ) {
+              vestingPerMonth[date.format('MMM')] = [
+                ...vestingPerMonth[date.format('MMM')],
+                {
+                  vestingDate,
+                  vestingAmount,
+                },
+              ]
+            }
+          }
+        }
+      }
     }
-    console.log(months)
+    return { vestingPerMonth, months }
   }
-  calcVestingAmountsPerLastXMonths(6)
+
   useEffect(() => {
     const depositsWithWallets: DepositWithWallet[] = []
     for (const voter of voters) {
@@ -139,6 +181,12 @@ const LockTokenStats = () => {
     vsrClient?.program.programId.toBase58(),
     voteStakeRegistryRegistrarPk?.toBase58(),
   ])
+  useEffect(() => {
+    const { vestingPerMonth, months } = calcVestingAmountsPerLastXMonths(6)
+    const monthsFormat = months.map((x) => x.format('MMM'))
+    setVestPerMonthStats(vestingPerMonth)
+    setStatsMonths(monthsFormat)
+  }, [depositsWithWallets.length])
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -170,6 +218,14 @@ const LockTokenStats = () => {
               <div>
                 Locked with clawback
                 <div>{mngoLockedWithClawbackFmt}</div>
+              </div>
+              <div>
+                Vesting this month
+                <div>{vestingThisMonthFmt}</div>
+              </div>
+              <div>
+                Liquidity mining emissions
+                <div>{0}</div>
               </div>
               <div></div>
             </div>
@@ -215,12 +271,12 @@ const LockTokenRow = ({
     <div className="grid grid-cols-4">
       <div>{abbreviateWalletAddress}</div>
       <div>{typeName}</div>
-      <div>{lockedTokens}</div>
       <div>
         {isConstant
           ? getMinDurationFmt(depositWithWallet.deposit as any)
           : getTimeLeftFromNowFmt(depositWithWallet.deposit as any)}
       </div>
+      <div>{lockedTokens}</div>
     </div>
   )
 }
