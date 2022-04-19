@@ -160,6 +160,13 @@ export class VotingClient {
       )
       return { voterWeightPk, maxVoterWeightRecord }
     }
+    if (this.client instanceof SwitchboardQueueVoterClient) {
+      console.log("It's a switchboard client.");
+      console.log("the realm is");
+      console.log(this.realm);
+      console.log("the wallet is");
+      console.log(this.walletPk);
+    }
   }
   withCastPluginVote = async (
     instructions,

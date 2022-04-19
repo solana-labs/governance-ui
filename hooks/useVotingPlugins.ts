@@ -176,6 +176,7 @@ export function useVotingPlugins() {
     ) {
       handleNftplugin()
       handleVsrPlugin()
+      handleSwitchboardPlugin()
     }
   }, [
     currentPluginPk?.toBase58(),
