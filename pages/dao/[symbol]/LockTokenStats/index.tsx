@@ -85,8 +85,7 @@ const LockTokenStats = () => {
         typeof vestedDeposit.deposit.lockup.kind.monthly !== 'undefined' &&
         currentDate.isAfter(unixStart) &&
         oldestDate.isBefore(unixEnd)
-      if (isPossibleToVest) {
-      }
+      return isPossibleToVest
     }
     console.log(months)
   }
