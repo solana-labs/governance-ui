@@ -1,3 +1,8 @@
+import {
+  Config,
+  MangoClient,
+  PerpMarket,
+} from '@blockworks-foundation/mango-client'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
 import { BN } from '@project-serum/anchor'
@@ -8,6 +13,7 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import useWalletStore from 'stores/useWalletStore'
 import { Deposit, LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DAYS_PER_MONTH,
@@ -24,9 +30,11 @@ interface DepositWithWallet {
 
 const LockTokenStats = () => {
   const { realmInfo, realm, mint } = useRealm()
+  const connection = useWalletStore((s) => s.connection)
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const [perpMarket, setPerpMarket] = useState<PerpMarket | null>(null)
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -187,6 +195,37 @@ const LockTokenStats = () => {
     setVestPerMonthStats(vestingPerMonth)
     setStatsMonths(monthsFormat)
   }, [depositsWithWallets.length])
+  useEffect(() => {
+    const mngoPerpMarket = async () => {
+      const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
+      const groupConfig = Config.ids().getGroupWithName(GROUP)!
+      const marketConfig = groupConfig!.perpMarkets.find(
+        (x) => x.baseSymbol === 'MNGO'
+      )!
+      const client = new MangoClient(
+        connection.current,
+        groupConfig.mangoProgramId
+      )
+      const group = await client.getMangoGroup(groupConfig.publicKey)
+
+      const [perpMarket] = await Promise.all([
+        group.loadPerpMarket(
+          connection.current,
+          marketConfig.marketIndex,
+          marketConfig.baseDecimals,
+          marketConfig.quoteDecimals
+        ),
+        group.loadRootBanks(connection.current),
+      ])
+      setPerpMarket(perpMarket)
+    }
+    mngoPerpMarket()
+  }, [connection.cluster])
+  const maxDepthUi = perpMarket
+    ? (perpMarket.liquidityMiningInfo.maxDepthBps.toNumber() *
+        perpMarket.baseLotSize.toNumber()) /
+      Math.pow(10, perpMarket.baseDecimals)
+    : 0
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -225,7 +264,7 @@ const LockTokenStats = () => {
               </div>
               <div>
                 Liquidity mining emissions
-                <div>{0}</div>
+                <div>{maxDepthUi}</div>
               </div>
               <div></div>
             </div>
