@@ -12,6 +12,7 @@ import {
 } from '../models/registry/api'
 import {
   VoteNftWeight,
+  SwitchboardQueueVoteWeight,
   VoteRegistryVoterWeight,
   VoterWeight,
 } from '../models/voteWeights'
@@ -124,7 +125,9 @@ export default function useRealm() {
     ownTokenRecord,
     votingPower,
     nftVotingPower,
-    ownCouncilTokenRecord
+    ownCouncilTokenRecord,
+    realm,
+    wallet.publicKey,
   )
 
   return {
@@ -155,7 +158,9 @@ const getVoterWeight = (
   ownTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
   votingPower: BN,
   nftVotingPower: BN,
-  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined
+  ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
+  realm: PublicKey | undefined,
+  wallet: PublicKey | undefined,
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
@@ -169,7 +174,13 @@ const getVoterWeight = (
       )
     }
     if (switchboardPluginsPks.includes(currentPluginPk.toBase58())) {
+      console.log("getting Switchboard voter Weight");
+      console.log("the realm...");
+      console.log(realm);
+      console.log("the wallet...");
+      console.log(wallet);
       //return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
+      return new SwitchboardQueueVoteWeight
     }
   }
   return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
