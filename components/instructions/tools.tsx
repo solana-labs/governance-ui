@@ -160,6 +160,7 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 )
 
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
+export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
