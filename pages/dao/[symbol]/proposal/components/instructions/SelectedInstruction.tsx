@@ -56,6 +56,7 @@ import UXDStakingFinalizeStakingCampaign from './UXDStaking/FinalizeStakingCampa
 import UXDStakingAddStakingOption from './UXDStaking/AddStakingOption';
 import UXDStakingActivateStakingOption from './UXDStaking/ActivateStakingOption';
 import UXDStakingRefillRewardVault from './UXDStaking/RefillRewardVault';
+import TransferTokens from './Native/TransferTokens';
 
 const SelectedInstruction = ({
   itxType,
@@ -379,6 +380,8 @@ const SelectedInstruction = ({
       );
     case InstructionEnum.SoceanVest:
       return <SoceanVest index={index} governedAccount={governedAccount} />;
+    case InstructionEnum.NativeTransferTokensForm:
+      return <TransferTokens index={index} governedAccount={governedAccount} />;
     default:
       return null;
   }

@@ -513,9 +513,15 @@ export default function useGovernanceAssets() {
       packageId: PackageEnum.UXDStaking,
     },
     [InstructionEnum.UXDStakingRefillRewardVault]: {
-      name: 'UXD Staking: Refill Reward Vault',
+      name: 'Refill Reward Vault',
       isVisible: canUseAnyInstruction,
       packageId: PackageEnum.UXDStaking,
+    },
+    [InstructionEnum.NativeTransferTokensForm]: {
+      name: 'Transfer Tokens',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.Native,
+      tag: 'beta',
     },
   };
 

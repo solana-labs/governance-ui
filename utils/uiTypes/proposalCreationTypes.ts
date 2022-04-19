@@ -405,6 +405,13 @@ export interface UXDStakingRefillRewardVaultForm {
   uiRewardRefillAmount?: number;
 }
 
+export interface NativeTransferTokensForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  source?: string;
+  destination?: string;
+  uiAmount?: string;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -462,6 +469,7 @@ export enum InstructionEnum {
   UXDStakingAddStakingOption,
   UXDStakingActivateStakingOption,
   UXDStakingRefillRewardVault,
+  NativeTransferTokensForm,
 }
 
 export enum PackageEnum {
