@@ -49,7 +49,7 @@ export async function gaugeRevertVoteInstruction({
   );
 
   console.log('Gauge Revert Vote', {
-    gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
+    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
     gauge: gauge.toString(),
     gaugeVoter: gaugeVoter.toString(),
     gaugeVote: gaugeVote.toString(),
@@ -63,7 +63,7 @@ export async function gaugeRevertVoteInstruction({
 
   return programs.Gauge.instruction.gaugeRevertVote({
     accounts: {
-      gaugemeister: ATribecaConfiguration.gaugemeister,
+      gaugemeister: tribecaConfiguration.gaugemeister,
       gauge,
       gaugeVoter,
       gaugeVote,

@@ -30,7 +30,7 @@ export async function resetEpochGaugeVoterInstruction({
   );
 
   console.log('Reset Epoch Gauge Voter', {
-    gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
+    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
     locker: tribecaConfiguration.locker.toString(),
     escrow: escrow.toString(),
     gaugeVoter: gaugeVoter.toString(),
@@ -39,7 +39,7 @@ export async function resetEpochGaugeVoterInstruction({
 
   return programs.Gauge.instruction.resetEpochGaugeVoter({
     accounts: {
-      gaugemeister: ATribecaConfiguration.gaugemeister,
+      gaugemeister: tribecaConfiguration.gaugemeister,
       locker: tribecaConfiguration.locker,
       escrow,
       gaugeVoter,

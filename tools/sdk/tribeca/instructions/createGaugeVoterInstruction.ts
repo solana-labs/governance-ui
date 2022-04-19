@@ -27,14 +27,14 @@ export async function createGaugeVoterInstruction({
   console.log('Create Gauge Voter', {
     escrow: escrow.toString(),
     gaugeVoter: gaugeVoter.toString(),
-    gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
+    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
     payer: payer.toString(),
   });
 
   return programs.Gauge.instruction.createGaugeVoter(bump, {
     accounts: {
       gaugeVoter,
-      gaugemeister: ATribecaConfiguration.gaugemeister,
+      gaugemeister: tribecaConfiguration.gaugemeister,
       escrow,
       payer,
       systemProgram: SystemProgram.programId,

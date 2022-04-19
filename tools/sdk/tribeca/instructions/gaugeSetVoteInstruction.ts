@@ -30,13 +30,13 @@ export async function gaugeSetVoteInstruction({
     gauge: gauge.toString(),
     gaugeVoter: gaugeVoter.toString(),
     gaugeVote: gaugeVote.toString(),
-    gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
+    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
   });
 
   return programs.Gauge.instruction.gaugeSetVote(weight, {
     accounts: {
       escrow,
-      gaugemeister: ATribecaConfiguration.gaugemeister,
+      gaugemeister: tribecaConfiguration.gaugemeister,
       gauge,
       gaugeVoter,
       gaugeVote,

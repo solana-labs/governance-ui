@@ -55,14 +55,11 @@ export default abstract class ATribecaConfiguration {
     'QMNeHCGYnLVDn1icRAfQZpjPLBNkfGbSKRB83G5d8KB',
   );
 
-  public static readonly gaugemeister = new PublicKey(
-    '28ZDtf6d2wsYhBvabTxUHTRT6MDxqjmqR7RMCp348tyU',
-  );
-
   // ---------------- Abstract ----------------
   public abstract readonly name: string;
 
   public abstract readonly locker: PublicKey;
+  public abstract readonly gaugemeister: PublicKey;
 
   public abstract readonly token: {
     name: string;
@@ -106,7 +103,7 @@ export default abstract class ATribecaConfiguration {
     return PublicKey.findProgramAddress(
       [
         utils.bytes.utf8.encode('GaugeVoter'),
-        ATribecaConfiguration.gaugemeister.toBuffer(),
+        this.gaugemeister.toBuffer(),
         escrow.toBuffer(),
       ],
       ATribecaConfiguration.gaugeProgramId,
@@ -188,9 +185,7 @@ export default abstract class ATribecaConfiguration {
   public async fetchAllGauge(programs: TribecaPrograms): Promise<GaugeInfos> {
     const gauges = (await programs.Gauge.account.gauge.all()).filter(
       ({ account: { isDisabled, gaugemeister } }) =>
-        !isDisabled ||
-        gaugemeister.toString() !==
-          ATribecaConfiguration.gaugemeister.toString(),
+        !isDisabled || gaugemeister.toString() !== this.gaugemeister.toString(),
     );
 
     // Fetch the info of the quarry behind the gauge to get name + logo behind the gauge
@@ -252,13 +247,11 @@ export default abstract class ATribecaConfiguration {
     gaugeProgram: GaugeProgram,
   ): Promise<GaugemeisterData> {
     const data = await gaugeProgram.account.gaugemeister.fetchNullable(
-      ATribecaConfiguration.gaugemeister,
+      this.gaugemeister,
     );
 
     if (!data) {
-      throw new Error(
-        `Empty Gaugemeister data ${ATribecaConfiguration.gaugemeister}`,
-      );
+      throw new Error(`Empty Gaugemeister data ${this.gaugemeister}`);
     }
 
     return data;

@@ -57,7 +57,7 @@ export async function gaugeCommitVoteInstruction({
 
   return programs.Gauge.instruction.gaugeCommitVote(voteBump, {
     accounts: {
-      gaugemeister: ATribecaConfiguration.gaugemeister,
+      gaugemeister: tribecaConfiguration.gaugemeister,
       gauge,
       gaugeVoter,
       gaugeVote,

@@ -10,6 +10,9 @@ class SaberTribecaConfiguration extends ATribecaConfiguration {
   public readonly locker = new PublicKey(
     '8erad8kmNrLJDJPe9UkmTHomrMV3EW48sjGeECyVjbYX',
   );
+  public readonly gaugemeister = new PublicKey(
+    '28ZDtf6d2wsYhBvabTxUHTRT6MDxqjmqR7RMCp348tyU',
+  );
 
   public readonly token = SPL_TOKENS.SBR;
   public readonly name = 'Saber';
@@ -18,6 +21,9 @@ class SaberTribecaConfiguration extends ATribecaConfiguration {
 class SunnyTribecaConfiguration extends ATribecaConfiguration {
   public readonly locker = new PublicKey(
     '4tr9CDSgZRLYPGdcsm9PztaGSfJtX5CEmqDbEbvCTX2G',
+  );
+  public readonly gaugemeister = new PublicKey(
+    'GBYZGgJks1re9BkJ8RB5QUMmmoyb7MsQ9ABFrgX5c5GZ',
   );
 
   public readonly token = SPL_TOKENS.SUNNY;

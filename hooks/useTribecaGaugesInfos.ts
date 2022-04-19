@@ -71,7 +71,7 @@ export default function useTribecaGaugeInfos(
         programs.LockedVoter.account.escrow.fetch(escrow),
 
         programs.Gauge.account.gaugemeister.fetch(
-          ATribecaConfiguration.gaugemeister,
+          tribecaConfiguration.gaugemeister,
         ),
       ]);
 

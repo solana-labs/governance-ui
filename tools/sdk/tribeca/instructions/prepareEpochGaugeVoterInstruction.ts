@@ -41,12 +41,12 @@ export async function prepareEpochGaugeVoterInstruction({
     escrow: escrow.toString(),
     gaugeVoter: gaugeVoter.toString(),
     epochGaugeVoter: epochGaugeVoter.toString(),
-    gaugemeister: ATribecaConfiguration.gaugemeister.toString(),
+    gaugemeister: tribecaConfiguration.gaugemeister.toString(),
   });
 
   return programs.Gauge.instruction.prepareEpochGaugeVoter(bump, {
     accounts: {
-      gaugemeister: ATribecaConfiguration.gaugemeister,
+      gaugemeister: tribecaConfiguration.gaugemeister,
       locker,
       escrow,
       gaugeVoter,
