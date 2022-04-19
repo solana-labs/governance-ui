@@ -24,6 +24,7 @@ import { SOLEND_PROGRAM_INSTRUCTIONS } from './programs/solend';
 import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount';
 import { UXD_PROTOCOL_STAKING_INSTRUCTIONS } from './programs/uxdProtocolStaking';
 import { LIFINITY_PROGRAM_INSTRUCTIONS } from './programs/lifinity';
+import { TRIBECA_PROGRAM_INSTRUCTIONS } from './programs/tribeca';
 /**
  * Default governance program id instance
  */
@@ -119,6 +120,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...VOTE_STAKE_REGISTRY_INSTRUCTIONS,
   ...UXD_PROTOCOL_STAKING_INSTRUCTIONS,
   ...LIFINITY_PROGRAM_INSTRUCTIONS,
+  ...TRIBECA_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(
@@ -138,6 +140,7 @@ export async function getInstructionDescriptor(
   const descriptor = !instruction.data.length
     ? descriptors
     : descriptors && descriptors[instruction.data[0]];
+
   const dataUI = (descriptor?.getDataUI &&
     (await descriptor?.getDataUI(
       connection,
