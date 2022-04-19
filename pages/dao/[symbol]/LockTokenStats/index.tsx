@@ -20,6 +20,7 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
+import { ResponsiveBar } from '@nivo/bar'
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
 interface DepositWithWallet {
@@ -226,6 +227,86 @@ const LockTokenStats = () => {
         perpMarket.baseLotSize.toNumber()) /
       Math.pow(10, perpMarket.baseDecimals)
     : 0
+  const MyResponsiveBar = ({ data /* see data tab */ }) => (
+    <ResponsiveBar
+      data={data}
+      keys={['amount']}
+      indexBy="month"
+      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
+      padding={0.3}
+      valueScale={{ type: 'linear' }}
+      indexScale={{ type: 'band', round: true }}
+      colors={{ scheme: 'nivo' }}
+      defs={[
+        {
+          id: 'dots',
+          type: 'patternDots',
+          background: 'inherit',
+          color: '#38bcb2',
+          size: 4,
+          padding: 1,
+          stagger: true,
+        },
+        {
+          id: 'lines',
+          type: 'patternLines',
+          background: 'inherit',
+          color: '#eed312',
+          rotation: -45,
+          lineWidth: 6,
+          spacing: 10,
+        },
+      ]}
+      fill={[
+        {
+          match: {
+            id: 'fries',
+          },
+          id: 'dots',
+        },
+        {
+          match: {
+            id: 'sandwich',
+          },
+          id: 'lines',
+        },
+      ]}
+      borderColor={{
+        from: 'color',
+        modifiers: [['darker', 1.6]],
+      }}
+      axisTop={null}
+      axisRight={null}
+      axisBottom={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: 'month',
+        legendPosition: 'middle',
+        legendOffset: 32,
+      }}
+      axisLeft={{
+        tickSize: 5,
+        tickPadding: 5,
+        tickRotation: 0,
+        legend: 'food',
+        legendPosition: 'middle',
+        legendOffset: -40,
+      }}
+      labelSkipWidth={12}
+      labelSkipHeight={12}
+      labelTextColor={{
+        from: 'color',
+        modifiers: [['darker', 1.6]],
+      }}
+      role="application"
+      ariaLabel="Nivo bar chart demo"
+      barAriaLabel={function (e) {
+        return e.id + ': ' + e.formattedValue + ' in month: ' + e.indexValue
+      }}
+    />
+  )
+
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -268,7 +349,20 @@ const LockTokenStats = () => {
               </div>
               <div></div>
             </div>
-            <div className="w-2/3">asdasd</div>
+            <div className="w-2/3">
+              <MyResponsiveBar
+                data={[
+                  ...statsMonths.map((x) => {
+                    return {
+                      month: x,
+                      amount: vestPerMonthStats[x].reduce((acc, curr) => {
+                        return acc.add(curr.vestingAmount)
+                      }, new BN(0)),
+                    }
+                  }),
+                ]}
+              ></MyResponsiveBar>
+            </div>
           </div>
           <div className="pt-4">
             <div>Members with Locked MNGO ({walletsCount})</div>
