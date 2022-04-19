@@ -148,7 +148,9 @@ const NotificationsCard = () => {
               const target = alertResult.targetGroup?.telegramTargets[0]
               if (target && !target.isConfirmed) {
                 console.log(target.confirmationUrl)
-                window.open(target.confirmationUrl)
+                if (target.confirmationUrl) {
+                  window.open(target.confirmationUrl)
+                }
               }
             }
           }
@@ -167,7 +169,9 @@ const NotificationsCard = () => {
               const target = alertResult.targetGroup?.telegramTargets[0]
               if (target && !target.isConfirmed) {
                 console.log(target.confirmationUrl)
-                window.open(target.confirmationUrl)
+                if (target.confirmationUrl) {
+                  window.open(target.confirmationUrl)
+                }
               }
             }
           }
