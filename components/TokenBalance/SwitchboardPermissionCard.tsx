@@ -14,18 +14,18 @@ import {
 //import { sendTransaction } from '@utils/send'
 import Link from 'next/link'
 //import { getNftVoterWeightRecord } from 'NftVotePlugin/sdk/accounts'
-import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+//import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 import { useState, useEffect } from 'react'
-import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+//import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 
 const SwitchboardPermissionCard = () => {
   const { fmtUrlWithCluster } = useQueryContext()
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
-  const client = useVotePluginsClientStore(
+  /*const client = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
-  );
+  );*/
   //const nfts = useNftPluginStore((s) => s.state.votingNfts)
   //const isLoading = useNftPluginStore((s) => s.state.isLoadingNfts)
   //const connection = useWalletStore((s) => s.connection)

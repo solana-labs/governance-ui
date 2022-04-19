@@ -1,6 +1,7 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { Metadata } from '@metaplex-foundation/mpl-token-metadata'
 import { NftVoterClient } from '@solana/governance-program-library'
+import { SwitchboardQueueVoterClient } from '../../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
 import {
   ProgramAccount,
   Realm,
@@ -28,7 +29,7 @@ type updateVoterWeightRecordTypes =
   | 'signOffProposal'
 
 export interface VotingClientProps {
-  client: VsrClient | NftVoterClient | undefined
+  client: VsrClient | NftVoterClient | SwitchboardQueueVoterClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
 }
@@ -65,7 +66,7 @@ interface ProgramAddresses {
 
 //Abstract for common functions that plugins will implement
 export class VotingClient {
-  client: VsrClient | NftVoterClient | undefined
+  client: VsrClient | NftVoterClient | SwitchboardQueueVoterClient | undefined
   realm: ProgramAccount<Realm> | undefined
   walletPk: PublicKey | null | undefined
   votingNfts: NFTWithMeta[]

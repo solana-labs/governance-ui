@@ -27,6 +27,7 @@ export function useVotingPlugins() {
     handleSetVsrRegistrar,
     handleSetVsrClient,
     handleSetNftClient,
+    handleSetSwitchboardClient,
     handleSetNftRegistrar,
     handleSetCurrentRealmVotingClient,
   } = useVotePluginsClientStore()
@@ -41,6 +42,7 @@ export function useVotingPlugins() {
   const connected = useWalletStore((s) => s.connected)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const nftClient = useVotePluginsClientStore((s) => s.state.nftClient)
+  const switchboardClient = useVotePluginsClientStore((s) => s.state.switchboardClient)
   const currentClient = useVotePluginsClientStore(
     (s) => s.state.currentRealmVotingClient
   )
@@ -113,6 +115,7 @@ export function useVotingPlugins() {
   useEffect(() => {
     handleSetVsrClient(wallet, connection)
     handleSetNftClient(wallet, connection)
+    handleSetSwitchboardClient(wallet, connection)
   }, [connection.endpoint])
 
   useEffect(() => {
@@ -150,14 +153,16 @@ export function useVotingPlugins() {
     }
     const handleSwitchboardPlugin = () => {
       if (
-        nftClient &&
+        switchboardClient &&
         currentPluginPk &&
-        nftPluginsPks.includes(currentPluginPk.toBase58())
+        switchboardPluginsPks.includes(currentPluginPk.toBase58())
       ) {
-        handleSetNftRegistrar(nftClient!, realm)
+        // Switchboard: don't think we need this
+        //handleSetNftRegistrar(nftClient!, realm)
+        console.log("Switchboard");
         if (connected) {
           handleSetCurrentRealmVotingClient({
-            client: nftClient,
+            client: switchboardClient,
             realm,
             walletPk: wallet?.publicKey,
           })
