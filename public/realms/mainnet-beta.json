@@ -30,6 +30,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "ORCA",
+    "displayName": "Orca DAO",
+    "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
+    "realmId": "66Du7mXgS2KMQBUk6m9h3TszMjqZqdWhsG3Duuf69VNW",
+    "website": "https://www.orca.so/",
+    "twitter": "@orca_so",
+    "ogImage": "https://learn.orca.so/static/media/logomark.1ef55f8f.svg"
+  },
+  {
     "symbol": "JET",
     "displayName": "Jet DAO",
     "programId": "JPGov2SBA6f7XSJF5R4Si5jEJekGiyrwP2m7gSEqLUs",
