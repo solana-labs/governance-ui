@@ -90,7 +90,7 @@ export const PopUpButtonBlack: FunctionComponent<ButtonProps> = ({
       disabled={disabled}
       className={`${className} border border-white default-transition px-8 ${
         small ? 'py-2' : 'py-4'
-      } inline-flex items-center text-fgd-1 text-sm font-bold text-black hover:bg-white hover:bg-opacity-30 focus:outline-none active:bg-white active:bg-opacity-20`}
+      } inline-flex items-center text-fgd-1 text-xs font-bold text-black hover:bg-white hover:bg-opacity-30 focus:outline-none active:bg-white active:bg-opacity-20`}
       {...props}
     >
       <Tooltip content={tooltipMessage}>

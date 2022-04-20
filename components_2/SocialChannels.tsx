@@ -6,8 +6,8 @@ const SocialChannels = () => {
       <div className="flex justify-center items-center">
         <img src="/img/realms-web/icons/Realms-logo.svg" />
       </div>
-      <div className="text-center py-7 px-40">
-        <p>
+      <div className="text-center py-7 px-56">
+        <p className="text-lg tracking-tight">
           The web3 world moves fast and Realms is no exception. Whether it’s
           improvements to our product or updates to SPL-Governance, participate
           in the conversation via our social channels.
