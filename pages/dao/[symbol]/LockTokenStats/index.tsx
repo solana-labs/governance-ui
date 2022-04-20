@@ -10,6 +10,7 @@ import { PublicKey } from '@solana/web3.js'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { abbreviateAddress } from '@utils/formatting'
 import dayjs from 'dayjs'
+import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
@@ -20,7 +21,12 @@ import {
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
-import { ResponsiveBar } from '@nivo/bar'
+const VestingVsTime = dynamic(() => import('./VestingVsTime'), {
+  ssr: false,
+})
+const LockedVsTime = dynamic(() => import('./LockedVsTime'), {
+  ssr: false,
+})
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
 interface DepositWithWallet {
@@ -96,6 +102,7 @@ const LockTokenStats = () => {
   const calcVestingAmountsPerLastXMonths = (monthsNumber: number) => {
     const months: dayjs.Dayjs[] = []
     const vestingPerMonth = {}
+    const lockedPerMonthToToday = {}
     const currentDate = dayjs()
     const oldestDate = dayjs().subtract(monthsNumber, 'month')
     for (let i = 0; i < monthsNumber; i++) {
@@ -103,19 +110,21 @@ const LockTokenStats = () => {
       months.push(date)
       vestingPerMonth[date.format('MMM')] = []
     }
-    for (const vestedDeposit of depositsWithWallets) {
+    for (const depositWithWallet of depositsWithWallets) {
       const unixLockupStart =
-        vestedDeposit.deposit.lockup.startTs.toNumber() * 1000
-      const unixLockupEnd = vestedDeposit.deposit.lockup.endTs.toNumber() * 1000
+        depositWithWallet.deposit.lockup.startTs.toNumber() * 1000
+      const unixLockupEnd =
+        depositWithWallet.deposit.lockup.endTs.toNumber() * 1000
+
       const isPossibleToVest =
-        typeof vestedDeposit.deposit.lockup.kind.monthly !== 'undefined' &&
+        typeof depositWithWallet.deposit.lockup.kind.monthly !== 'undefined' &&
         currentDate.isAfter(unixLockupStart) &&
         oldestDate.isBefore(unixLockupEnd)
       if (isPossibleToVest) {
         const vestingCount = Math.ceil(
           dayjs(unixLockupEnd).diff(unixLockupStart, 'month', true)
         )
-        const vestingAmount = vestedDeposit.deposit.amountInitiallyLockedNative.divn(
+        const vestingAmount = depositWithWallet.deposit.amountInitiallyLockedNative.divn(
           vestingCount
         )
         for (let i = 1; i <= vestingCount; i++) {
@@ -227,85 +236,6 @@ const LockTokenStats = () => {
         perpMarket.baseLotSize.toNumber()) /
       Math.pow(10, perpMarket.baseDecimals)
     : 0
-  const MyResponsiveBar = ({ data /* see data tab */ }) => (
-    <ResponsiveBar
-      data={data}
-      keys={['amount']}
-      indexBy="month"
-      margin={{ top: 50, right: 130, bottom: 50, left: 60 }}
-      padding={0.3}
-      valueScale={{ type: 'linear' }}
-      indexScale={{ type: 'band', round: true }}
-      colors={{ scheme: 'nivo' }}
-      defs={[
-        {
-          id: 'dots',
-          type: 'patternDots',
-          background: 'inherit',
-          color: '#38bcb2',
-          size: 4,
-          padding: 1,
-          stagger: true,
-        },
-        {
-          id: 'lines',
-          type: 'patternLines',
-          background: 'inherit',
-          color: '#eed312',
-          rotation: -45,
-          lineWidth: 6,
-          spacing: 10,
-        },
-      ]}
-      fill={[
-        {
-          match: {
-            id: 'fries',
-          },
-          id: 'dots',
-        },
-        {
-          match: {
-            id: 'sandwich',
-          },
-          id: 'lines',
-        },
-      ]}
-      borderColor={{
-        from: 'color',
-        modifiers: [['darker', 1.6]],
-      }}
-      axisTop={null}
-      axisRight={null}
-      axisBottom={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: 'month',
-        legendPosition: 'middle',
-        legendOffset: 32,
-      }}
-      axisLeft={{
-        tickSize: 5,
-        tickPadding: 5,
-        tickRotation: 0,
-        legend: 'food',
-        legendPosition: 'middle',
-        legendOffset: -40,
-      }}
-      labelSkipWidth={12}
-      labelSkipHeight={12}
-      labelTextColor={{
-        from: 'color',
-        modifiers: [['darker', 1.6]],
-      }}
-      role="application"
-      ariaLabel="Nivo bar chart demo"
-      barAriaLabel={function (e) {
-        return e.id + ': ' + e.formattedValue + ' in month: ' + e.indexValue
-      }}
-    />
-  )
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
@@ -350,18 +280,87 @@ const LockTokenStats = () => {
               <div></div>
             </div>
             <div className="w-2/3">
-              <MyResponsiveBar
-                data={[
-                  ...statsMonths.map((x) => {
-                    return {
-                      month: x,
-                      amount: vestPerMonthStats[x].reduce((acc, curr) => {
-                        return acc.add(curr.vestingAmount)
-                      }, new BN(0)),
-                    }
-                  }),
-                ]}
-              ></MyResponsiveBar>
+              <div>
+                MNGO Vesting vs. Time
+                <div style={{ height: '350px' }}>
+                  <VestingVsTime
+                    data={[
+                      ...statsMonths.map((x) => {
+                        return {
+                          month: x,
+                          amount: vestPerMonthStats[x].reduce((acc, curr) => {
+                            return acc.add(curr.vestingAmount)
+                          }, new BN(0)),
+                        }
+                      }),
+                    ].reverse()}
+                    fmtMangoAmount={fmtMangoAmount}
+                  ></VestingVsTime>
+                </div>
+              </div>
+              <div>
+                MNGO Locked vs. Time
+                <div style={{ height: '350px' }}>
+                  <LockedVsTime
+                    data={[
+                      {
+                        id: 'japan',
+                        color: 'hsl(69, 70%, 50%)',
+                        data: [
+                          {
+                            x: 'plane',
+                            y: 94,
+                          },
+                          {
+                            x: 'helicopter',
+                            y: 228,
+                          },
+                          {
+                            x: 'boat',
+                            y: 292,
+                          },
+                          {
+                            x: 'train',
+                            y: 133,
+                          },
+                          {
+                            x: 'subway',
+                            y: 89,
+                          },
+                          {
+                            x: 'bus',
+                            y: 249,
+                          },
+                          {
+                            x: 'car',
+                            y: 164,
+                          },
+                          {
+                            x: 'moto',
+                            y: 46,
+                          },
+                          {
+                            x: 'bicycle',
+                            y: 122,
+                          },
+                          {
+                            x: 'horse',
+                            y: 247,
+                          },
+                          {
+                            x: 'skateboard',
+                            y: 292,
+                          },
+                          {
+                            x: 'others',
+                            y: 107,
+                          },
+                        ],
+                      },
+                    ]}
+                  ></LockedVsTime>
+                </div>
+              </div>
             </div>
           </div>
           <div className="pt-4">
