@@ -7,6 +7,10 @@ export const SWITCHBOARD_ID = new PublicKey(
   '7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC',
 );
 
+export const QUEUE_LIST: PublicKey[] = [
+  new PublicKey("F3VbF712S59pUyvGN5Vt5vTBDzsop4i8ftYDJjLTdzmF")
+];
+
 export class SwitchboardQueueVoterClient {
   constructor(public program: Program<Switchboard>, public devnet?: boolean) {}
 
