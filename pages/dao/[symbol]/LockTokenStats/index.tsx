@@ -42,6 +42,10 @@ const LockTokenStats = () => {
     (s) => s.governedTokenAccounts
   )
   const [perpMarket, setPerpMarket] = useState<PerpMarket | null>(null)
+  const [
+    lockupPerMonthIncrementally,
+    setLockupPerMonthsIncrementally,
+  ] = useState<{ [key: string]: BN }>({})
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -100,9 +104,14 @@ const LockTokenStats = () => {
     )
   const mngoLockedWithClawbackFmt = fmtMangoAmount(mngoLockedWithClawback)
   const calcVestingAmountsPerLastXMonths = (monthsNumber: number) => {
+    const depositsWithWalletsSortedByDate = depositsWithWallets.sort(
+      (x, y) =>
+        x.deposit.lockup.startTs.toNumber() * 1000 -
+        y.deposit.lockup.startTs.toNumber() * 1000
+    )
+    const lockupsPerMonthsWithYear = {}
     const months: dayjs.Dayjs[] = []
     const vestingPerMonth = {}
-    const lockedPerMonthToToday = {}
     const currentDate = dayjs()
     const oldestDate = dayjs().subtract(monthsNumber, 'month')
     for (let i = 0; i < monthsNumber; i++) {
@@ -110,16 +119,20 @@ const LockTokenStats = () => {
       months.push(date)
       vestingPerMonth[date.format('MMM')] = []
     }
-    for (const depositWithWallet of depositsWithWallets) {
+    for (const depositWithWallet of depositsWithWalletsSortedByDate) {
+      const lockupStartDayjs = dayjs(
+        depositWithWallet.deposit.lockup.startTs.toNumber() * 1000
+      )
+      const lockupStartsInFuture = currentDate.isBefore(lockupStartDayjs)
       const unixLockupStart =
         depositWithWallet.deposit.lockup.startTs.toNumber() * 1000
       const unixLockupEnd =
         depositWithWallet.deposit.lockup.endTs.toNumber() * 1000
-
       const isPossibleToVest =
         typeof depositWithWallet.deposit.lockup.kind.monthly !== 'undefined' &&
         currentDate.isAfter(unixLockupStart) &&
         oldestDate.isBefore(unixLockupEnd)
+
       if (isPossibleToVest) {
         const vestingCount = Math.ceil(
           dayjs(unixLockupEnd).diff(unixLockupStart, 'month', true)
@@ -146,8 +159,36 @@ const LockTokenStats = () => {
           }
         }
       }
+      if (!lockupStartsInFuture) {
+        const amountInitiallyLockedNative =
+          depositWithWallet.deposit.amountInitiallyLockedNative
+        const monthWithYear = lockupStartDayjs.format('MMM-YYYY')
+        lockupsPerMonthsWithYear[monthWithYear] = lockupsPerMonthsWithYear[
+          monthWithYear
+        ]
+          ? lockupsPerMonthsWithYear[monthWithYear].add(
+              amountInitiallyLockedNative
+            )
+          : amountInitiallyLockedNative
+      }
     }
-    return { vestingPerMonth, months }
+
+    const lockupPerMonthIncrementally = {}
+    const lockupPerMonthIncrementallyKeys = Object.keys(
+      lockupsPerMonthsWithYear
+    )
+    for (let i = 0; i < lockupPerMonthIncrementallyKeys.length; i++) {
+      const prevMonth =
+        lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i - 1]]
+      lockupPerMonthIncrementally[
+        dayjs(lockupPerMonthIncrementallyKeys[i]).format('MMM')
+      ] = prevMonth
+        ? lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i]].iadd(
+            prevMonth
+          )
+        : lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i]]
+    }
+    return { vestingPerMonth, months, lockupPerMonthIncrementally }
   }
 
   useEffect(() => {
@@ -200,10 +241,15 @@ const LockTokenStats = () => {
     voteStakeRegistryRegistrarPk?.toBase58(),
   ])
   useEffect(() => {
-    const { vestingPerMonth, months } = calcVestingAmountsPerLastXMonths(6)
+    const {
+      vestingPerMonth,
+      months,
+      lockupPerMonthIncrementally,
+    } = calcVestingAmountsPerLastXMonths(6)
     const monthsFormat = months.map((x) => x.format('MMM'))
     setVestPerMonthStats(vestingPerMonth)
     setStatsMonths(monthsFormat)
+    setLockupPerMonthsIncrementally(lockupPerMonthIncrementally)
   }, [depositsWithWallets.length])
   useEffect(() => {
     const mngoPerpMarket = async () => {
@@ -304,60 +350,20 @@ const LockTokenStats = () => {
                   <LockedVsTime
                     data={[
                       {
-                        id: 'japan',
-                        color: 'hsl(69, 70%, 50%)',
+                        id: 'mango',
                         data: [
-                          {
-                            x: 'plane',
-                            y: 94,
-                          },
-                          {
-                            x: 'helicopter',
-                            y: 228,
-                          },
-                          {
-                            x: 'boat',
-                            y: 292,
-                          },
-                          {
-                            x: 'train',
-                            y: 133,
-                          },
-                          {
-                            x: 'subway',
-                            y: 89,
-                          },
-                          {
-                            x: 'bus',
-                            y: 249,
-                          },
-                          {
-                            x: 'car',
-                            y: 164,
-                          },
-                          {
-                            x: 'moto',
-                            y: 46,
-                          },
-                          {
-                            x: 'bicycle',
-                            y: 122,
-                          },
-                          {
-                            x: 'horse',
-                            y: 247,
-                          },
-                          {
-                            x: 'skateboard',
-                            y: 292,
-                          },
-                          {
-                            x: 'others',
-                            y: 107,
-                          },
+                          ...Object.keys(lockupPerMonthIncrementally).map(
+                            (x) => {
+                              return {
+                                x: x,
+                                y: lockupPerMonthIncrementally[x],
+                              }
+                            }
+                          ),
                         ],
                       },
                     ]}
+                    fmtMangoAmount={fmtMangoAmount}
                   ></LockedVsTime>
                 </div>
               </div>

@@ -2,7 +2,7 @@
 // yarn add @nivo/core @nivo/line
 import { ResponsiveLine } from '@nivo/line'
 
-const LockedVsTime = ({ data /* see data tab */ }) => (
+const LockedVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
   <ResponsiveLine
     data={data}
     margin={{ top: 25, right: 25, bottom: 25, left: 70 }}
@@ -17,6 +17,7 @@ const LockedVsTime = ({ data /* see data tab */ }) => (
     colors={{ scheme: 'greys' }}
     pointColor={{ theme: 'background' }}
     pointLabelYOffset={-12}
+    axisLeft={{ format: (v) => fmtMangoAmount(v) }}
     isInteractive={false}
     enableGridX={false}
     theme={{
