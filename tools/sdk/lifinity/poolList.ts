@@ -1,4 +1,21 @@
-export const PoolList = {
+export interface IPoolInfo {
+  amm: string;
+  poolMint: string;
+  feeAccount: string;
+  pythAccount: string;
+  pythPcAccount: string;
+  configAccount: string;
+  poolCoinTokenAccount: string;
+  poolCoinMint: string;
+  poolCoinDecimal: number;
+  poolPcTokenAccount: string;
+  poolPcMint: string;
+  poolPcDecimal: number;
+  poolMintDecimal: number;
+  pythBaseDecimal: number;
+}
+
+export const PoolList: { [poolLabel: string]: IPoolInfo } = {
   'UXD-USDC': {
     amm: '5BJUhcBnysAmCpaU6pABof7FUqxx7ZnCZXbctpP48o3C',
     poolMint: 'DM2Grhnear76DwNiRUSfeiFMt6jSj2op9GWinQDc7Yqh',

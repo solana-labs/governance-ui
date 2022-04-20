@@ -10,17 +10,17 @@ const withdrawFromPool = async ({
   wallet,
   liquidityPool,
   userTransferAuthority,
-  amountTokenLP,
-  amountTokenA,
-  amountTokenB,
+  uiAmountTokenLP,
+  uiAmountTokenA,
+  uiAmountTokenB,
 }: {
   connection: Connection;
   wallet: SignerWalletAdapter;
   liquidityPool: string;
   userTransferAuthority: PublicKey;
-  amountTokenLP: number;
-  amountTokenA: number;
-  amountTokenB: number;
+  uiAmountTokenLP: number;
+  uiAmountTokenA: number;
+  uiAmountTokenB: number;
 }) => {
   const program = buildLifinity({ connection, wallet });
 
@@ -44,9 +44,9 @@ const withdrawFromPool = async ({
   );
 
   const itx = program.instruction.withdrawAllTokenTypes(
-    uiAmountToNativeBN(amountTokenLP, pool.poolMintDecimal),
-    uiAmountToNativeBN(amountTokenA, pool.poolCoinDecimal),
-    uiAmountToNativeBN(amountTokenB, pool.poolPcDecimal),
+    uiAmountToNativeBN(uiAmountTokenLP, pool.poolMintDecimal),
+    uiAmountToNativeBN(uiAmountTokenA, pool.poolCoinDecimal),
+    uiAmountToNativeBN(uiAmountTokenB, pool.poolPcDecimal),
     {
       accounts: {
         amm: new PublicKey(pool.amm),

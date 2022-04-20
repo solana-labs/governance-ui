@@ -7,25 +7,25 @@ const depositToPool = async ({
   authority,
   liquidityPool,
   wallet,
-  amountTokenA,
-  amountTokenB,
-  amountTokenLP,
+  uiAmountTokenA,
+  uiAmountTokenB,
+  uiAmountTokenLP,
 }: {
   connection: Connection;
   authority: PublicKey;
   liquidityPool: string;
   wallet: SignerWalletAdapter;
-  amountTokenA: number; // amount in UXD
-  amountTokenB: number; // amount in USDC
-  amountTokenLP: number;
+  uiAmountTokenA: number;
+  uiAmountTokenB: number;
+  uiAmountTokenLP: number;
   slippage: number;
 }) => {
   const depositItx = await depositAllTokenTypesItx({
     connection,
     liquidityPool,
-    amountTokenA,
-    amountTokenB,
-    amountTokenLP,
+    uiAmountTokenA,
+    uiAmountTokenB,
+    uiAmountTokenLP,
     userTransferAuthority: authority,
     wallet,
   });

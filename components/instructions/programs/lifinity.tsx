@@ -1,7 +1,10 @@
 import { Connection } from '@solana/web3.js';
 import { nu64, struct, u8 } from 'buffer-layout';
 import { AccountMetaData } from '@solana/spl-governance';
-import { AMM_PROGRAM_ADDR } from '@tools/sdk/lifinity/lifinity';
+import {
+  AMM_PROGRAM_ADDR,
+  getPoolLabelByPoolMint,
+} from '@tools/sdk/lifinity/lifinity';
 import { tryGetMint } from '@utils/tokens';
 import BigNumber from 'bignumber.js';
 
@@ -74,9 +77,12 @@ export const LIFINITY_PROGRAM_INSTRUCTIONS = {
           .shiftedBy(-tokenLPInfo.account.decimals)
           .toString();
 
+        const poolLabel = getPoolLabelByPoolMint(tokenLPAcc.toBase58());
+
         return (
           <>
-            <p>{`Max Amount of Token A to deposit: ${uiAmountTokenA}`}</p>
+            <p>{`Liquidity Pool: ${poolLabel}`}</p>
+            <p>{`Amount of Token A to deposit: ${uiAmountTokenA}`}</p>
             <p>{`Max Amount of Token B to deposit: ${uiAmountTokenB}`}</p>
             <p>{`LP Token to be minted: ${uiAmountTokenLP}`}</p>
           </>

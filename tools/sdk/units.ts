@@ -175,3 +175,11 @@ export function uiAmountToNativeBN(
     new BigNumber(amount).shiftedBy(decimals).integerValue().toString(),
   );
 }
+
+export const uiAmountToNativeBigN = (
+  amount: string,
+  decimals: number,
+): BigNumber =>
+  new BigNumber(amount).multipliedBy(
+    new BigNumber(10).pow(new BigNumber(decimals)),
+  );

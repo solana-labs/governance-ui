@@ -23,7 +23,7 @@ const schema = yup.object().shape({
     .nullable()
     .required('Governed account is required'),
   liquidityPool: yup.string().required('Liquidity Pool is required'),
-  amountTokenLP: yup
+  uiAmountTokenLP: yup
     .number()
     .moreThan(0, 'LP Token Amount to withdraw must be more than 0')
     .required('LP Token Amount to withdraw value is required'),
@@ -39,8 +39,8 @@ const WithdrawFromPool = ({
 }) => {
   const [maxLPTokenAmount, setMaxLPTokenAmount] = useState(0);
   const [tokenAmounts, setTokenAmounts] = useState({
-    amountTokenA: 0,
-    amountTokenB: 0,
+    uiAmountTokenA: 0,
+    uiAmountTokenB: 0,
   });
   const {
     form,
@@ -52,7 +52,7 @@ const WithdrawFromPool = ({
     index,
     initialFormValues: {
       governedAccount,
-      amountTokenLP: 0,
+      uiAmountTokenLP: 0,
       slippage: 0.5,
     },
     schema,
@@ -62,10 +62,10 @@ const WithdrawFromPool = ({
       wallet,
       governedAccountPubkey,
     }) {
-      const { amountTokenA, amountTokenB } = await getWithdrawOut({
+      const { uiAmountTokenA, uiAmountTokenB } = await getWithdrawOut({
         connection: connection,
         liquidityPool: form.liquidityPool!,
-        lpTokenAmount: form.amountTokenLP!,
+        lpTokenAmount: form.uiAmountTokenLP!,
         slippage: form.slippage,
       });
 
@@ -74,9 +74,9 @@ const WithdrawFromPool = ({
         wallet,
         liquidityPool: form.liquidityPool!,
         userTransferAuthority: governedAccountPubkey,
-        amountTokenLP: form.amountTokenLP!,
-        amountTokenA,
-        amountTokenB,
+        uiAmountTokenLP: form.uiAmountTokenLP!,
+        uiAmountTokenA,
+        uiAmountTokenB,
       });
     },
   });
@@ -105,20 +105,20 @@ const WithdrawFromPool = ({
 
   useEffect(() => {
     debounce.debounceFcn(async () => {
-      if (!form.amountTokenLP || !form.liquidityPool) return;
-      const { amountTokenA, amountTokenB } = await getWithdrawOut({
+      if (!form.uiAmountTokenLP || !form.liquidityPool) return;
+      const { uiAmountTokenA, uiAmountTokenB } = await getWithdrawOut({
         connection: connection.current,
         liquidityPool: form.liquidityPool,
-        lpTokenAmount: form.amountTokenLP!,
+        lpTokenAmount: form.uiAmountTokenLP!,
         slippage: form.slippage,
       });
 
       setTokenAmounts({
-        amountTokenA,
-        amountTokenB,
+        uiAmountTokenA,
+        uiAmountTokenB,
       });
     });
-  }, [form.liquidityPool, form.amountTokenLP, form.slippage]);
+  }, [form.liquidityPool, form.uiAmountTokenLP, form.slippage]);
 
   return (
     <>
@@ -138,17 +138,17 @@ const WithdrawFromPool = ({
         <>
           <Input
             label={`Amount of LP Token to redeem - max: ${maxLPTokenAmount}`}
-            value={form.amountTokenLP}
+            value={form.uiAmountTokenLP}
             type="number"
             max={String(maxLPTokenAmount)}
             min="0"
             onChange={(evt) =>
               handleSetForm({
                 value: evt.target.value,
-                propertyName: 'amountTokenLP',
+                propertyName: 'uiAmountTokenLP',
               })
             }
-            error={formErrors['amountTokenLP']}
+            error={formErrors['uiAmountTokenLP']}
           />
           <Select
             label="Slippage (%)"
@@ -162,14 +162,14 @@ const WithdrawFromPool = ({
           </Select>
           <Input
             label="Amount of Token A to Withdraw"
-            value={tokenAmounts.amountTokenA}
+            value={tokenAmounts.uiAmountTokenA}
             type="number"
             min={0}
             disabled={true}
           />
           <Input
             label="Amount of Token B to Withdraw"
-            value={tokenAmounts.amountTokenB}
+            value={tokenAmounts.uiAmountTokenB}
             type="number"
             min={0}
             disabled={true}
