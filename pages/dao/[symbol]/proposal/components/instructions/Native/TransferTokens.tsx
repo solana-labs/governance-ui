@@ -8,6 +8,10 @@ import { PublicKey } from '@solana/web3.js';
 import Input from '@components/inputs/Input';
 import useGovernanceUnderlyingTokenAccounts from '@hooks/useGovernanceUnderlyingTokenAccounts';
 import TokenAccountSelect from '../../TokenAccountSelect';
+import Switch from '@components/Switch';
+import { useState } from 'react';
+import GovernedAccountSelect from '../../GovernedAccountSelect';
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts';
 
 function validatePubkey(value: string): PublicKey | false {
   try {
@@ -24,6 +28,29 @@ const TransferTokens = ({
   index: number;
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
+  const [
+    destinationAccountIsAGovernanceUnderlyingAccount,
+    setDestinationAccountIsAGovernanceUnderlyingAccount,
+  ] = useState<boolean>(true);
+
+  // Use the following variable only if the destination account is an governance owned account
+  const {
+    governedMultiTypeAccounts,
+    getGovernedAccountPublicKey,
+  } = useGovernedMultiTypeAccounts();
+
+  const [destinationGovernedAccount, setDestinationGovernedAccount] = useState<
+    GovernedMultiTypeAccount | undefined
+  >();
+
+  // Governance underlying accounts that can be selected as destination
+  const {
+    ownedTokenAccountsInfo: destinationGovernedAccountOwnedTokenAccountsInfo,
+  } = useGovernanceUnderlyingTokenAccounts(
+    getGovernedAccountPublicKey(destinationGovernedAccount, true),
+  );
+  // ----
+
   const schema = yup.object().shape({
     governedAccount: yup
       .object()
@@ -177,18 +204,75 @@ const TransferTokens = ({
         />
       )}
 
-      <Input
-        label="Destination Account"
-        value={form.destination}
-        type="string"
-        onChange={(evt) =>
-          handleSetForm({
-            value: evt.target.value,
-            propertyName: 'destination',
-          })
-        }
-        error={formErrors['destination']}
-      />
+      <div>
+        <span>Destination Account Selection</span>
+
+        <div className="p-4 border border-fgd-4 mt-3">
+          <div className="flex mb-2">
+            <span className="text-sm">Governance owned account</span>
+
+            <Switch
+              className="ml-2"
+              checked={destinationAccountIsAGovernanceUnderlyingAccount}
+              onChange={(b) => {
+                if (b) {
+                  // From Custom to Governance -> Reset the destination to not make the select to bug
+                  handleSetForm({ value: '', propertyName: 'destination' });
+                }
+
+                setDestinationAccountIsAGovernanceUnderlyingAccount(b);
+              }}
+            />
+          </div>
+
+          {destinationAccountIsAGovernanceUnderlyingAccount ? (
+            <div className="space-y-3">
+              <div>
+                <span className="text-sm">Related governance</span>
+
+                <GovernedAccountSelect
+                  governedAccounts={governedMultiTypeAccounts}
+                  onChange={(governedAccount) => {
+                    setDestinationGovernedAccount(governedAccount ?? undefined);
+                  }}
+                  value={governedAccount}
+                  governance={governedAccount?.governance}
+                />
+              </div>
+
+              {destinationGovernedAccount &&
+              destinationGovernedAccountOwnedTokenAccountsInfo ? (
+                <TokenAccountSelect
+                  label="Destination Account"
+                  value={form.destination}
+                  onChange={(value) =>
+                    handleSetForm({ value, propertyName: 'destination' })
+                  }
+                  error={formErrors['destination']}
+                  ownedTokenAccountsInfo={
+                    destinationGovernedAccountOwnedTokenAccountsInfo
+                  }
+                />
+              ) : (
+                <></>
+              )}
+            </div>
+          ) : (
+            <Input
+              label="Custom Destination Account"
+              value={form.destination}
+              type="string"
+              onChange={(evt) =>
+                handleSetForm({
+                  value: evt.target.value,
+                  propertyName: 'destination',
+                })
+              }
+              error={formErrors['destination']}
+            />
+          )}
+        </div>
+      </div>
 
       <Input
         label="Amount to transfer"
