@@ -6,36 +6,58 @@ const RealmsMetrics = () => {
       <div className="px-16">
         <img
           src="/img/realms-web/backgrounds/divider-glow.png"
-          className="my-2 border border-500 border-white"
+          className=""
           alt=""
         />
       </div>
-      <div className="py-28 px-56">
-        <div className="text-blue">
-          <h1 className="md:text-3xl font-thin">
-            <GradientTitle>Key Metrics on Realms</GradientTitle>
-          </h1>
-        </div>
-        <div>
-          <div>
-            <h1>$</h1>
-            <h1>31.8B</h1>
-            <p>Total value locked</p>
+      <div className="pb-28 px-56">
+        <div className="flex flex-row">
+          <div className="basis-1/2">
+            {/* <div className="flex-none"> */}
+            <h1 className="md:text-3xl font-thin">
+              <GradientTitle>Key Metrics on Realms</GradientTitle>
+            </h1>
           </div>
-          <div>
-            <h1>3.8K</h1>
-            <h1>+</h1>
-            <p>Proposals created</p>
-          </div>
-          <div>
-            <h1>289</h1>
-            <h1>+</h1>
-            <p>DAOs created on Realms</p>
-          </div>
-          <div>
-            <h1>23.7K</h1>
-            <h1>+</h1>
-            <p>DAO members</p>
+
+          <div className="basis-1/2 grow">
+            <div className="grid grid-cols-2 gap-y-32">
+              <div>
+                <h1 className="inline text-5xl font-thin tracking-tight">$</h1>
+                <h1 className="inline text-7xl font-thin tracking-tight">
+                  31.8B
+                </h1>
+                <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
+                  Total value locked
+                </p>
+              </div>
+              <div>
+                <h1 className="inline text-7xl font-thin tracking-tight">
+                  3.8K
+                </h1>
+                <h1 className="inline text-5xl font-thin tracking-tight">+</h1>
+                <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
+                  Proposals created
+                </p>
+              </div>
+              <div>
+                <h1 className="inline text-7xl font-thin tracking-tight">
+                  289
+                </h1>
+                <h1 className="inline text-5xl font-thin tracking-tight">+</h1>
+                <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
+                  DAOs created on Realms
+                </p>
+              </div>
+              <div>
+                <h1 className="inline text-7xl font-thin tracking-tight">
+                  23.7K
+                </h1>
+                <h1 className="inline text-5xl font-thin tracking-tight">+</h1>
+                <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
+                  DAO members
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       </div>

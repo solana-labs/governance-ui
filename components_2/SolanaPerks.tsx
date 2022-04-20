@@ -5,7 +5,7 @@ const SolanaPerks = () => {
     <div className="py-28 px-56">
       <div className="flex">
         <div className="flex-none w-80">
-          <div className="text-bkg-13">
+          <div>
             <h1 className="md:text-3xl font-thin">
               <GradientTitle>Why is Solana</GradientTitle>
             </h1>
