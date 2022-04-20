@@ -104,7 +104,7 @@ const LockTokenStats = () => {
     )
   const mngoLockedWithClawbackFmt = fmtMangoAmount(mngoLockedWithClawback)
   const calcVestingAmountsPerLastXMonths = (monthsNumber: number) => {
-    const depositsWithWalletsSortedByDate = depositsWithWallets.sort(
+    const depositsWithWalletsSortedByDate = [...depositsWithWallets].sort(
       (x, y) =>
         x.deposit.lockup.startTs.toNumber() * 1000 -
         y.deposit.lockup.startTs.toNumber() * 1000
@@ -178,6 +178,7 @@ const LockTokenStats = () => {
       lockupsPerMonthsWithYear
     )
     for (let i = 0; i < lockupPerMonthIncrementallyKeys.length; i++) {
+      //substract vesting
       const prevMonth =
         lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i - 1]]
       lockupPerMonthIncrementally[
@@ -192,7 +193,7 @@ const LockTokenStats = () => {
   }
 
   useEffect(() => {
-    const depositsWithWallets: DepositWithWallet[] = []
+    const depositsWithWalletsInner: DepositWithWallet[] = []
     for (const voter of voters) {
       const deposits = voter.account.deposits.filter(
         (x) =>
@@ -211,16 +212,15 @@ const LockTokenStats = () => {
           wallet: voter.account.voterAuthority,
           deposit: deposit,
         }
-        depositsWithWallets.push(depositWithWallet)
+        depositsWithWalletsInner.push(depositWithWallet)
       }
     }
-    setDepositsWithWallets(
-      depositsWithWallets.sort((a, b) =>
-        b.deposit.amountDepositedNative
-          .sub(a.deposit.amountDepositedNative)
-          .toNumber()
-      )
+    const depositWithWalletSorted = depositsWithWalletsInner.sort(
+      (a, b) =>
+        b.deposit.amountDepositedNative.toNumber() -
+        a.deposit.amountDepositedNative.toNumber()
     )
+    setDepositsWithWallets(depositWithWalletSorted)
   }, [voters.length])
 
   useEffect(() => {
@@ -321,7 +321,7 @@ const LockTokenStats = () => {
               </div>
               <div>
                 Liquidity mining emissions
-                <div>{maxDepthUi}</div>
+                <div>{0}</div>
               </div>
               <div></div>
             </div>
@@ -334,9 +334,11 @@ const LockTokenStats = () => {
                       ...statsMonths.map((x) => {
                         return {
                           month: x,
-                          amount: vestPerMonthStats[x].reduce((acc, curr) => {
-                            return acc.add(curr.vestingAmount)
-                          }, new BN(0)),
+                          amount: vestPerMonthStats[x]
+                            .reduce((acc, curr) => {
+                              return acc.add(curr.vestingAmount)
+                            }, new BN(0))
+                            .toNumber(),
                         }
                       }),
                     ].reverse()}
@@ -352,14 +354,14 @@ const LockTokenStats = () => {
                       {
                         id: 'mango',
                         data: [
-                          ...Object.keys(lockupPerMonthIncrementally).map(
-                            (x) => {
+                          ...Object.keys(lockupPerMonthIncrementally)
+                            .filter((x) => statsMonths.includes(x))
+                            .map((x) => {
                               return {
                                 x: x,
-                                y: lockupPerMonthIncrementally[x],
+                                y: lockupPerMonthIncrementally[x].toNumber(),
                               }
-                            }
-                          ),
+                            }),
                         ],
                       },
                     ]}
