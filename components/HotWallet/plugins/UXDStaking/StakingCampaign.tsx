@@ -116,7 +116,7 @@ const StakingCampaign = ({
           <span className="text-xs">total current staking accounts:</span>
           <span className="text-xs">
             {Number(
-              stakingCampaignInfo.totalCreatedStakingAccounts,
+              stakingCampaignInfo.totalCurrentStakingAccounts,
             ).toLocaleString()}
           </span>
         </div>
