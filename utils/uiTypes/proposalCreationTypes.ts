@@ -145,6 +145,7 @@ export interface RefreshReserveForm {
 export interface IDLForm {
   programID?: string
   selectedInstruction?: string
+  instructionsToSubmit: any
 }
 
 export enum Instructions {

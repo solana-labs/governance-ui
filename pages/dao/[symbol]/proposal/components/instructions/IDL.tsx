@@ -1,4 +1,4 @@
-import React, { /* useContext, useEffect, */ useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 // import * as yup from 'yup'
 import {
   // getInstructionDataFromBase64,
@@ -8,21 +8,22 @@ import {
 // import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
-// import { validateInstruction } from '@utils/instructionTools'
+import { validateInstruction } from '@utils/instructionTools'
 import {
   // Base64InstructionForm,
   IDLForm,
-  // UiInstruction,
+  UiInstruction,
 } from '@utils/uiTypes/proposalCreationTypes'
 
 import useWalletStore from 'stores/useWalletStore'
 
-// import { NewProposalContext } from '../../new'
+import { NewProposalContext } from '../../new'
 // import GovernedAccountSelect from '../GovernedAccountSelect'
-// import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import * as anchor from '@project-serum/anchor'
-import { IdlInstruction } from '@project-serum/anchor/src/idl'
+import { IdlInstruction, IdlTypeDef } from '@project-serum/anchor/src/idl'
 import { /* Keypair, */ Connection, ConfirmOptions } from '@solana/web3.js'
+import { validateBuffer } from '@utils/validations'
 // import { useAnchorWallet } from '@solana/wallet-adapter-react'
 // import { NodeWallet } from '@blockworks-foundation/voter-stake-registry-client/node_modules/@project-serum/anchor/dist/cjs/provider'
 
@@ -35,17 +36,19 @@ const IDLInstructions = ({
 }) => {
   console.log(index, governance)
   const wallet = useWalletStore((s) => s.current)
-  // const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  // const shouldBeGoverned = index !== 0 && governance
+  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<IDLForm>({
     programID: '',
     selectedInstruction: '',
+    instructionsToSubmit: {},
   })
   const [formErrors, setFormErrors] = useState({})
   const [programInstructions, setProgramInstructions] = useState<
     IdlInstruction[]
   >([])
-  // const { handleSetInstructions } = useContext(NewProposalContext)
+  const [programTypes, setProgramTypes] = useState<IdlTypeDef[]>([])
+  const { handleSetInstructions } = useContext(NewProposalContext)
   const handleSetForm = ({ propertyName, value }) => {
     setFormErrors({})
     setForm({ ...form, [propertyName]: value })
@@ -53,20 +56,20 @@ const IDLInstructions = ({
       !form.programID && fetchIDL(wallet! as any, testConnection, value)
     } // TODO test to see if it breaks on 2nd IDL input and then switch instructions
   }
-  // async function getInstruction(): Promise<UiInstruction> {
-  //   const isValid = await validateInstruction({ schema, form, setFormErrors })
-  //   let serializedInstruction = ''
-  //   if (isValid && form.programID && wallet?.publicKey) {
-  //     serializedInstruction = form.programID
-  //   }
-  //   const obj: UiInstruction = {
-  //     serializedInstruction: serializedInstruction,
-  //     isValid,
-  //     governance: form.governedAccount?.governance,
-  //     customHoldUpTime: form.holdUpTime,
-  //   }
-  //   return obj
-  // }
+  async function getInstruction(): Promise<UiInstruction> {
+    const isValid = await validateInstruction({ schema, form, setFormErrors })
+    let serializedInstruction = ''
+    if (isValid && form.programID && wallet?.publicKey) {
+      serializedInstruction = form.programID
+    }
+    const obj: UiInstruction = {
+      serializedInstruction: serializedInstruction,
+      isValid,
+      governance: form.governedAccount?.governance,
+      customHoldUpTime: form.holdUpTime,
+    }
+    return obj
+  }
   // useEffect(() => {
   //   handleSetInstructions(
   //     { governedAccount: form.governedAccount?.governance, getInstruction },
@@ -117,10 +120,11 @@ const IDLInstructions = ({
       preflightCommitment: 'recent',
     })
     const fetchedIDL = await anchor.Program.fetchIdl(idl, provider)
+    // console.log("fetchedIDL", fetchedIDL)
     setProgramInstructions(fetchedIDL!.instructions)
-    console.log('fetchedIDL', fetchedIDL!.instructions)
-    // console.log("test", fetchedIDL!.instructions.filter((obj) => {return obj.name === "mintNft"}))
+    setProgramTypes(fetchedIDL!.types!)
   }
+  console.log('form', form)
 
   return (
     <>
@@ -161,26 +165,55 @@ const IDLInstructions = ({
             return obj.name === form.selectedInstruction
           })
           .map((account) => {
-            console.log('account', account)
+            return account.args.map((args, idx) => {
+              if (args) {
+                // create object here
+                return (
+                  <Textarea
+                    key={idx}
+                    label={args.name}
+                    placeholder={args.type}
+                    value={form.instructionsToSubmit[args.name]}
+                    onChange={(event) => {
+                      handleSetForm({
+                        value: {
+                          ...form['instructionsToSubmit'],
+                          [args.name]: event.target.value,
+                        },
+                        propertyName: 'instructionsToSubmit',
+                      })
+                    }}
+                  ></Textarea>
+                )
+              }
+            })
+          })}
+      {form.selectedInstruction &&
+        programInstructions
+          .filter((obj) => {
+            return obj.name === form.selectedInstruction
+          })
+          .map((account) => {
+            // console.log("account", account)
             return account.accounts.map((actualaccount, idx) => {
               return (
-                <Select
+                <Textarea
                   key={idx}
                   label={actualaccount.name}
                   placeholder={'wallet/program id'}
-                  value={''}
-                  onChange={() => {}}
-                ></Select>
+                  value={form.instructionsToSubmit[actualaccount.name]}
+                  onChange={(event) => {
+                    handleSetForm({
+                      value: {
+                        ...form['instructionsToSubmit'],
+                        [actualaccount.name]: event.target.value,
+                      },
+                      propertyName: 'instructionsToSubmit',
+                    })
+                  }}
+                ></Textarea>
               )
             })
-
-            //   return (
-            //     <Select label={account.name} placeholder={account.name} value={"test"} onChange={() => {}}>
-
-            //       {console.log(account)}
-            //     </Select>
-
-            //   )
           })}
       {/* TODO make sure programID is valid */}
     </>
