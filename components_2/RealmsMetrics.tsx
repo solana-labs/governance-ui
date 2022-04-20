@@ -22,37 +22,53 @@ const RealmsMetrics = () => {
           <div className="basis-1/2 grow">
             <div className="grid grid-cols-2 gap-y-32">
               <div>
-                <h1 className="inline text-5xl font-thin tracking-tight">$</h1>
-                <h1 className="inline text-7xl font-thin tracking-tight">
-                  31.8B
-                </h1>
+                <div className="flex items-center">
+                  <h1 className="inline text-5xl font-thin tracking-tight">
+                    $
+                  </h1>
+                  <h1 className="inline text-7xl font-thin tracking-tight">
+                    31.8B
+                  </h1>
+                </div>
                 <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
                   Total value locked
                 </p>
               </div>
               <div>
-                <h1 className="inline text-7xl font-thin tracking-tight">
-                  3.8K
-                </h1>
-                <h1 className="inline text-5xl font-thin tracking-tight">+</h1>
+                <div className="flex items-center">
+                  <h1 className="inline text-7xl font-thin tracking-tight">
+                    3.8K
+                  </h1>
+                  <h1 className="inline text-5xl font-thin tracking-tight">
+                    +
+                  </h1>
+                </div>
                 <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
                   Proposals created
                 </p>
               </div>
               <div>
-                <h1 className="inline text-7xl font-thin tracking-tight">
-                  289
-                </h1>
-                <h1 className="inline text-5xl font-thin tracking-tight">+</h1>
+                <div className="flex items-center">
+                  <h1 className="inline text-7xl font-thin tracking-tight">
+                    289
+                  </h1>
+                  <h1 className="inline text-5xl font-thin tracking-tight">
+                    +
+                  </h1>
+                </div>
                 <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
                   DAOs created on Realms
                 </p>
               </div>
               <div>
-                <h1 className="inline text-7xl font-thin tracking-tight">
-                  23.7K
-                </h1>
-                <h1 className="inline text-5xl font-thin tracking-tight">+</h1>
+                <div className="flex items-center">
+                  <h1 className="inline text-7xl font-thin tracking-tight">
+                    23.7K
+                  </h1>
+                  <h1 className="inline text-5xl font-thin tracking-tight">
+                    +
+                  </h1>
+                </div>
                 <p className="text-lg font-thin opacity-70 mt-3 tracking-tight">
                   DAO members
                 </p>

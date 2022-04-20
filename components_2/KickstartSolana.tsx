@@ -3,24 +3,19 @@ import Button, { PopUpButtonWhite, ExploreButton } from './Button'
 const KickstartSolana = () => {
   return (
     <div className="bg-cover bg-hero-graphic pt-10 pb-16 px-56">
-      <div className="flex">
+      <div className="flex items-center">
         <div>
           <img src="/img/realms-web/icons/Realms-logo.svg" className="mr-2" />
         </div>
-        <div className="flex-1 mt-1">
+        <div className="flex-1">
           <a rel="noreferrer" href="" target="_blank">
             Realms
           </a>
         </div>
         <div className="ml-auto">
           <div className="">
-            <PopUpButtonWhite className="mr-4">
-              {/* <PopUpButtonWhite className="border border-500 border-white inline-flex items-center p-4 mr-8 text-xs font-medium"> */}
-              Read the Docs
-            </PopUpButtonWhite>
-            {/* <button className="border border-500 border-white p-4 text-xs font-medium"> */}
+            <PopUpButtonWhite className="mr-4">Read the Docs</PopUpButtonWhite>
             <ExploreButton className="border border-gradient-to-r-blue-red">
-              {/* <ExploreButton className="border border-gradient-to-r from-realms-theme-blue to-realms-theme-turquoise"> */}
               Explore DAOs
             </ExploreButton>
           </div>

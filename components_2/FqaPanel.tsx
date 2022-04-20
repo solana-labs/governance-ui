@@ -23,7 +23,7 @@ export function FqaPanel() {
               </Disclosure.Button>
 
               <Disclosure.Panel>
-                <p className="pt-2 md:pr-20">
+                <p className="pt-2 opacity-70 md:pr-20">
                   Lorem ipsum on how DAOs on Realms works. Lorem ipsum dolor sit
                   amet, consectetur adipiscing elit, sed do eiusmod tempor
                   incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -52,7 +52,7 @@ export function FqaPanel() {
               </Disclosure.Button>
 
               <Disclosure.Panel>
-                <p className="pt-2 md:pr-20">
+                <p className="pt-2 opacity-70 md:pr-20">
                   Lorem ipsum on how DAOs on Realms works. Lorem ipsum dolor sit
                   amet, consectetur adipiscing elit, sed do eiusmod tempor
                   incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -81,7 +81,7 @@ export function FqaPanel() {
               </Disclosure.Button>
 
               <Disclosure.Panel>
-                <p className="pt-2 md:pr-20">
+                <p className="pt-2 opacity-70 md:pr-20">
                   Lorem ipsum on how DAOs on Realms works. Lorem ipsum dolor sit
                   amet, consectetur adipiscing elit, sed do eiusmod tempor
                   incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -110,7 +110,7 @@ export function FqaPanel() {
               </Disclosure.Button>
 
               <Disclosure.Panel>
-                <p className="pt-2 md:pr-20">
+                <p className="pt-2 opacity-70 md:pr-20">
                   Lorem ipsum on how DAOs on Realms works. Lorem ipsum dolor sit
                   amet, consectetur adipiscing elit, sed do eiusmod tempor
                   incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing
@@ -139,7 +139,7 @@ export function FqaPanel() {
               </Disclosure.Button>
 
               <Disclosure.Panel>
-                <p className="pt-2 md:pr-20">
+                <p className="pt-2 opacity-70 md:pr-20">
                   Lorem ipsum on how DAOs on Realms works. Lorem ipsum dolor sit
                   amet, consectetur adipiscing elit, sed do eiusmod tempor
                   incididunt. Lorem ipsum dolor sit amet, consectetur adipiscing
