@@ -321,7 +321,7 @@ const LockTokenStats = () => {
               </div>
               <div>
                 Liquidity mining emissions
-                <div>{0}</div>
+                <div>{maxDepthUi}</div>
               </div>
               <div></div>
             </div>
