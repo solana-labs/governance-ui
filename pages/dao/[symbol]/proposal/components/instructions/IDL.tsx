@@ -18,12 +18,14 @@ import {
 import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../new'
-// import GovernedAccountSelect from '../GovernedAccountSelect'
+import GovernedAccountSelect from '../GovernedAccountSelect'
 // import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import * as anchor from '@project-serum/anchor'
 import { IdlInstruction } from '@project-serum/anchor/src/idl'
 import { Connection, ConfirmOptions } from '@solana/web3.js'
 // import { validateBuffer } from '@utils/validations'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
+import useRealm from '@hooks/useRealm'
 
 const IDLInstructions = ({
   index,
@@ -35,7 +37,9 @@ const IDLInstructions = ({
   console.log(governance)
   const wallet = useWalletStore((s) => s.current)
   // const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  // const shouldBeGoverned = index !== 0 && governance
+  const shouldBeGoverned = index !== 0 && governance
+  const { assetAccounts } = useGovernanceAssets()
+  const { ownVoterWeight } = useRealm()
   const [form, setForm] = useState<IDLForm>({
     governedAccount: undefined,
     programID: '',
@@ -131,6 +135,19 @@ const IDLInstructions = ({
 
   return (
     <>
+      <GovernedAccountSelect
+        label="Governance"
+        governedAccounts={assetAccounts.filter((x) =>
+          ownVoterWeight.canCreateProposal(x.governance.account.config)
+        )}
+        onChange={(value) => {
+          handleSetForm({ value, propertyName: 'governedAccount' })
+        }}
+        value={form.governedAccount}
+        error={formErrors['governedAccount']}
+        shouldBeGoverned={shouldBeGoverned}
+        governance={governance}
+      />
       <Textarea
         label="Program ID"
         placeholder="Program ID"
