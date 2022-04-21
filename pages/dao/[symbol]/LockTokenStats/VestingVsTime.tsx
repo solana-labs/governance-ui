@@ -28,7 +28,7 @@ const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
         },
       },
     }}
-    label={(v) => fmtMangoAmount(v.value).split('.')[0]}
+    label={(v) => fmtMangoAmount(v.value)}
     axisLeft={{ format: (v) => fmtMangoAmount(v) }}
     labelSkipWidth={12}
     labelSkipHeight={12}

@@ -3,18 +3,32 @@ import {
   MangoClient,
   PerpMarket,
 } from '@blockworks-foundation/mango-client'
+import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
+import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import useRealm from '@hooks/useRealm'
 import { BN } from '@project-serum/anchor'
+import {
+  getAccountTypes,
+  getGovernanceSchemaForAccount,
+  GovernanceAccountClass,
+  GovernanceAccountType,
+  InstructionExecutionStatus,
+  ProgramAccount,
+  ProposalTransaction,
+} from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import { fmtMintAmount } from '@tools/sdk/units'
+import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { deserializeBorsh } from '@utils/borsh'
 import { abbreviateAddress } from '@utils/formatting'
+import axios from 'axios'
 import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
 import { useEffect, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
+import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
 import { Deposit, LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DAYS_PER_MONTH,
@@ -22,9 +36,6 @@ import {
   getTimeLeftFromNowFmt,
 } from 'VoteStakeRegistry/tools/dateTools'
 const VestingVsTime = dynamic(() => import('./VestingVsTime'), {
-  ssr: false,
-})
-const LockedVsTime = dynamic(() => import('./LockedVsTime'), {
   ssr: false,
 })
 const isBetween = require('dayjs/plugin/isBetween')
@@ -36,16 +47,20 @@ interface DepositWithWallet {
 }
 
 const LockTokenStats = () => {
-  const { realmInfo, realm, mint } = useRealm()
+  const { realmInfo, realm, mint, proposals } = useRealm()
+  const possibleGrantProposals = Object.values(proposals).filter(
+    (x) =>
+      x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
+      x.account.accountType === GovernanceAccountType.ProposalV2
+  )
   const connection = useWalletStore((s) => s.connection)
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const [givenGrantsTokenAmount, setGivernGrantsTokenAmount] = useState(
+    new BN(0)
+  )
   const [perpMarket, setPerpMarket] = useState<PerpMarket | null>(null)
-  const [
-    lockupPerMonthIncrementally,
-    setLockupPerMonthsIncrementally,
-  ] = useState<{ [key: string]: BN }>({})
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -78,7 +93,7 @@ const LockTokenStats = () => {
     ...new Set(depositsWithWallets.map((x) => x.wallet.toBase58())),
   ].length
   const fmtMangoAmount = (val) => {
-    return mint ? fmtMintAmount(mint!, val) : '0'
+    return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
   }
   const vestingThisMonthFmt = fmtMangoAmount(vestingThisMonth)
   const mngoValut = governedTokenAccounts.find(
@@ -109,7 +124,6 @@ const LockTokenStats = () => {
         x.deposit.lockup.startTs.toNumber() * 1000 -
         y.deposit.lockup.startTs.toNumber() * 1000
     )
-    const lockupsPerMonthsWithYear = {}
     const months: dayjs.Dayjs[] = []
     const vestingPerMonth = {}
     const currentDate = dayjs()
@@ -120,10 +134,6 @@ const LockTokenStats = () => {
       vestingPerMonth[date.format('MMM')] = []
     }
     for (const depositWithWallet of depositsWithWalletsSortedByDate) {
-      const lockupStartDayjs = dayjs(
-        depositWithWallet.deposit.lockup.startTs.toNumber() * 1000
-      )
-      const lockupStartsInFuture = currentDate.isBefore(lockupStartDayjs)
       const unixLockupStart =
         depositWithWallet.deposit.lockup.startTs.toNumber() * 1000
       const unixLockupEnd =
@@ -159,39 +169,105 @@ const LockTokenStats = () => {
           }
         }
       }
-      if (!lockupStartsInFuture) {
-        const amountInitiallyLockedNative =
-          depositWithWallet.deposit.amountInitiallyLockedNative
-        const monthWithYear = lockupStartDayjs.format('MMM-YYYY')
-        lockupsPerMonthsWithYear[monthWithYear] = lockupsPerMonthsWithYear[
-          monthWithYear
-        ]
-          ? lockupsPerMonthsWithYear[monthWithYear].add(
-              amountInitiallyLockedNative
-            )
-          : amountInitiallyLockedNative
-      }
     }
-
-    const lockupPerMonthIncrementally = {}
-    const lockupPerMonthIncrementallyKeys = Object.keys(
-      lockupsPerMonthsWithYear
-    )
-    for (let i = 0; i < lockupPerMonthIncrementallyKeys.length; i++) {
-      //substract vesting
-      const prevMonth =
-        lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i - 1]]
-      lockupPerMonthIncrementally[
-        dayjs(lockupPerMonthIncrementallyKeys[i]).format('MMM')
-      ] = prevMonth
-        ? lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i]].iadd(
-            prevMonth
-          )
-        : lockupsPerMonthsWithYear[lockupPerMonthIncrementallyKeys[i]]
-    }
-    return { vestingPerMonth, months, lockupPerMonthIncrementally }
+    return { vestingPerMonth, months }
   }
+  useEffect(() => {
+    const getProposalsInstructions = async () => {
+      const getTransactions = await axios.request({
+        url: connection.endpoint,
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        data: JSON.stringify([
+          ...possibleGrantProposals.map((x) => {
+            return {
+              jsonrpc: '2.0',
+              id: 1,
+              method: 'getProgramAccounts',
+              params: [
+                realmInfo!.programId.toBase58(),
+                {
+                  commitment: connection.current.commitment,
+                  encoding: 'base64',
+                  filters: [
+                    {
+                      memcmp: {
+                        offset: 0, // number of bytes
+                        bytes: 'E', // base58 encoded string
+                      },
+                    },
+                    {
+                      memcmp: {
+                        offset: 1,
+                        bytes: x.pubkey.toBase58(),
+                      },
+                    },
+                  ],
+                },
+              ],
+            }
+          }),
+        ]),
+      })
 
+      const accounts: ProgramAccount<ProposalTransaction>[] = []
+      const rawAccounts = getTransactions.data
+        ? getTransactions.data.flatMap((x) => x.result)
+        : []
+      for (const rawAccount of rawAccounts) {
+        try {
+          const getSchema = getGovernanceSchemaForAccount
+          const data = Buffer.from(rawAccount.account.data[0], 'base64')
+          const accountTypes = getAccountTypes(
+            (ProposalTransaction as any) as GovernanceAccountClass
+          )
+          const account: ProgramAccount<ProposalTransaction> = {
+            pubkey: new PublicKey(rawAccount.pubkey),
+            account: deserializeBorsh(
+              getSchema(accountTypes[1]),
+              ProposalTransaction,
+              data
+            ),
+            owner: new PublicKey(rawAccount.account.owner),
+          }
+
+          accounts.push(account)
+        } catch (ex) {
+          console.info(`Can't deserialize @ ${rawAccount.pubkey}, ${ex}.`)
+        }
+      }
+
+      const givenGrantsTokenAmount = accounts
+        .filter(
+          (x) =>
+            x.account.executionStatus === InstructionExecutionStatus.Success
+        )
+        .flatMap((x) =>
+          x.account.instructions
+            .filter(
+              (x) =>
+                x.data[0] === 145 &&
+                x.accounts[9].pubkey.toBase58() === MANGO_MINT
+            )
+            .map(
+              (instruction) =>
+                (vsrClient?.program.coder.instruction.decode(
+                  Buffer.from(instruction.data)
+                )?.data as GrantInstruction | null)?.amount
+            )
+        )
+        .reduce(
+          (acc, amount) => (amount ? acc!.add(amount) : acc!.add(new BN(0))),
+          new BN(0)
+        )
+      setGivernGrantsTokenAmount(givenGrantsTokenAmount!)
+    }
+    if (realmInfo?.programId && vsrClient) {
+      getProposalsInstructions()
+    }
+  }, [possibleGrantProposals.length, realmInfo?.programId])
   useEffect(() => {
     const depositsWithWalletsInner: DepositWithWallet[] = []
     for (const voter of voters) {
@@ -241,15 +317,10 @@ const LockTokenStats = () => {
     voteStakeRegistryRegistrarPk?.toBase58(),
   ])
   useEffect(() => {
-    const {
-      vestingPerMonth,
-      months,
-      lockupPerMonthIncrementally,
-    } = calcVestingAmountsPerLastXMonths(6)
+    const { vestingPerMonth, months } = calcVestingAmountsPerLastXMonths(6)
     const monthsFormat = months.map((x) => x.format('MMM'))
     setVestPerMonthStats(vestingPerMonth)
     setStatsMonths(monthsFormat)
-    setLockupPerMonthsIncrementally(lockupPerMonthIncrementally)
   }, [depositsWithWallets.length])
   useEffect(() => {
     const mngoPerpMarket = async () => {
@@ -308,6 +379,10 @@ const LockTokenStats = () => {
                 <div>{circulatingSupplyFmt}</div>
               </div>
               <div>
+                Emission by grants
+                <div>{fmtMangoAmount(givenGrantsTokenAmount)}</div>
+              </div>
+              <div>
                 MNGO Locked
                 <div>{mngoLockedFmt}</div>
               </div>
@@ -344,29 +419,6 @@ const LockTokenStats = () => {
                     ].reverse()}
                     fmtMangoAmount={fmtMangoAmount}
                   ></VestingVsTime>
-                </div>
-              </div>
-              <div>
-                MNGO Locked vs. Time
-                <div style={{ height: '350px' }}>
-                  <LockedVsTime
-                    data={[
-                      {
-                        id: 'mango',
-                        data: [
-                          ...Object.keys(lockupPerMonthIncrementally)
-                            .filter((x) => statsMonths.includes(x))
-                            .map((x) => {
-                              return {
-                                x: x,
-                                y: lockupPerMonthIncrementally[x].toNumber(),
-                              }
-                            }),
-                        ],
-                      },
-                    ]}
-                    fmtMangoAmount={fmtMangoAmount}
-                  ></LockedVsTime>
                 </div>
               </div>
             </div>

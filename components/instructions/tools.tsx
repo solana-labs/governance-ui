@@ -32,6 +32,8 @@ export const DEFAULT_GOVERNANCE_PROGRAM_ID =
 export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
   'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
 
+export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
+
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   AQeo6r6jdwnmf48AMejgoKdUGtV8qzbVJH42Gb5sWdi: 'Deprecated: Mango IDO program',
@@ -39,7 +41,7 @@ export const ACCOUNT_NAMES = {
     'Mango Developer Council Mint',
 
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
-  '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
+  MANGO_DAO_TREASURY: 'Mango DAO MNGO Treasury',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
   '65u1A86RC2U6whcHeD2mRG1tXCSmH2GsiktmEFQmzZgq': 'Mango DAO USDC Treasury',
