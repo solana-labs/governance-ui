@@ -1,6 +1,5 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import ImgWithLoader from '@components/ImgWithLoader'
-import { PhotographIcon } from '@heroicons/react/outline'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -30,10 +29,7 @@ const NFTSCompactWrapper = () => {
           </a>
         </Link>
       </div>
-      <div
-        className="overflow-y-auto"
-        style={{ maxHeight: '210px', minHeight: '50px' }}
-      >
+      <div className="overflow-y-auto" style={{ maxHeight: '210px' }}>
         <div className="grid grid-cols-4 grid-flow-row gap-3">
           {isLoading ? (
             <>
@@ -58,11 +54,7 @@ const NFTSCompactWrapper = () => {
                 />
               </a>
             ))
-          ) : (
-            <div className="col-span-3 text-fgd-3 flex flex-col items-center">
-              <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
