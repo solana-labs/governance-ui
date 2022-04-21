@@ -17,6 +17,7 @@ import { Proposal } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { cancelProposal } from 'actions/cancelProposal'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const ProposalActionsPanel = () => {
   const { governance, proposal, proposalOwner } = useWalletStore(
@@ -27,11 +28,11 @@ const ProposalActionsPanel = () => {
   const connected = useWalletStore((s) => s.connected)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
   const signatories = useWalletStore((s) => s.selectedProposal.signatories)
-  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const connection = useWalletStore((s) => s.connection)
-
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
   const [signatoryRecord, setSignatoryRecord] = useState<any>(undefined)
-
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const canFinalizeVote =
     hasVoteTimeExpired && proposal?.account.state === ProposalState.Voting
 
@@ -114,9 +115,13 @@ const ProposalActionsPanel = () => {
           connection.endpoint
         )
 
-        await finalizeVote(rpcContext, governance?.account.realm, proposal)
-
-        await fetchProposal(proposal.pubkey)
+        await finalizeVote(
+          rpcContext,
+          governance?.account.realm,
+          proposal,
+          maxVoterWeight
+        )
+        await refetchProposals()
       }
     } catch (error) {
       notify({
@@ -147,7 +152,7 @@ const ProposalActionsPanel = () => {
           signatoryRecord
         )
 
-        await fetchProposal(proposal.pubkey)
+        await refetchProposals()
       }
     } catch (error) {
       notify({
@@ -174,7 +179,7 @@ const ProposalActionsPanel = () => {
 
         await cancelProposal(rpcContext, realmInfo.realmId, proposal)
 
-        await fetchProposal(proposal.pubkey)
+        await refetchProposals()
       }
     } catch (error) {
       notify({

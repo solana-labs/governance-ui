@@ -8,22 +8,21 @@ import { Option } from '@tools/core/option'
 import { GoverningTokenType } from '@solana/spl-governance'
 import { fmtMintAmount } from '@tools/sdk/units'
 import { getMintMetadata } from '@components/instructions/programs/splToken'
-import { ArrowsExpandIcon } from '@heroicons/react/outline'
 import useQueryContext from '@hooks/useQueryContext'
 import DepositCommunityTokensBtn from './DepositCommunityTokensBtn'
 import WithDrawCommunityTokens from './WithdrawCommunityTokensBtn'
 import useDepositStore from 'VoteStakeRegistry/stores/useDepositStore'
 import VotingPowerBox from './VotingPowerBox'
-import Tooltip from '@components/Tooltip'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
+import { ChevronRightIcon } from '@heroicons/react/solid'
+import InlineNotification from '@components/InlineNotification'
+import Link from 'next/link'
 
 const LockPluginTokenBalanceCard = ({
   proposal,
 }: {
   proposal?: Option<Proposal>
 }) => {
-  const router = useRouter()
   const { fmtUrlWithCluster } = useQueryContext()
   const { councilMint, mint, realm, symbol } = useRealm()
   const [tokenOwnerRecordPk, setTokenOwneRecordPk] = useState('')
@@ -71,30 +70,25 @@ const LockPluginTokenBalanceCard = ({
   const hasLoaded = mint || councilMint
   return (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg">
-      <h3>
-        <Tooltip content={!connected ? 'Please connect your wallet' : ''}>
-          <div
-            className={
+      <div className="flex items-center justify-between">
+        <h3 className="mb-0">Your Account</h3>
+        <Link
+          href={fmtUrlWithCluster(
+            `/dao/${symbol}/account/${tokenOwnerRecordPk}`
+          )}
+        >
+          <a
+            className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3 ${
               !connected || !tokenOwnerRecordPk
-                ? 'opacity-0.6 pointer-events-none'
+                ? 'opacity-50 pointer-events-none'
                 : ''
-            }
-            onClick={() => {
-              const url = fmtUrlWithCluster(
-                `/dao/${symbol}/account/${tokenOwnerRecordPk}`
-              )
-              router.push(url)
-            }}
+            }`}
           >
-            <div className="cursor-pointer flex items-center">
-              Account
-              <a className="flex-shrink-0 h-4 w-4 ml-1 cursor-pointer text-primary-light">
-                <ArrowsExpandIcon></ArrowsExpandIcon>
-              </a>
-            </div>
-          </div>
-        </Tooltip>
-      </h3>
+            View
+            <ChevronRightIcon className="flex-shrink-0 h-6 w-6" />
+          </a>
+        </Link>
+      </div>
       {hasLoaded ? (
         <>
           {communityDepositVisible && (
@@ -200,6 +194,14 @@ const TokenDeposit = ({
 
   return (
     <>
+      {canShowAvailableTokensMessage ? (
+        <div className="pt-2">
+          <InlineNotification
+            desc={`You have ${tokensToShow} tokens available to ${canExecuteAction}`}
+            type="info"
+          />
+        </div>
+      ) : null}
       <div className="flex space-x-4 items-center mt-4">
         <VotingPowerBox
           votingPower={votingPower}
@@ -208,21 +210,25 @@ const TokenDeposit = ({
           className="w-full px-4 py-2"
         ></VotingPowerBox>
       </div>
-      <p className="flex flex-row mt-2 items-center">
-        <span className="text-xs">{depositTokenName} Deposited:</span>
-        <span className="ml-auto">{availableTokens}</span>
-      </p>
-      <p className="flex flex-row mt-2 items-center">
-        <span className="text-xs">{depositTokenName} Locked:</span>
-        <span className="ml-auto">{lockTokensFmt}</span>
-      </p>
-      <p
+      <div className="pt-4 px-4">
+        <p className="flex mb-1.5 text-xs">
+          <span>{depositTokenName} Deposited</span>
+          <span className="font-bold ml-auto text-fgd-1">
+            {availableTokens}
+          </span>
+        </p>
+        <p className="flex text-xs">
+          <span>{depositTokenName} Locked</span>
+          <span className="font-bold ml-auto text-fgd-1">{lockTokensFmt}</span>
+        </p>
+      </div>
+      {/* <p
         className={`mt-2 opacity-70 mb-4 text-xs ${
           canShowAvailableTokensMessage ? 'block' : 'hidden'
         }`}
       >
         You have {tokensToShow} tokens available to {canExecuteAction}.
-      </p>
+      </p> */}
 
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0 mt-4">
         <DepositCommunityTokensBtn></DepositCommunityTokensBtn>

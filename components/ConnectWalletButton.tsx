@@ -1,5 +1,5 @@
 import { Menu } from '@headlessui/react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
@@ -16,7 +16,6 @@ import {
 import { BackspaceIcon } from '@heroicons/react/solid'
 import { UserCircleIcon } from '@heroicons/react/outline'
 import { abbreviateAddress } from '@utils/formatting'
-import { useRouter } from 'next/router'
 import TwitterIcon from './TwitterIcon'
 import Switch from './Switch'
 
@@ -39,15 +38,17 @@ const ConnectWalletButton = (props) => {
   ])
 
   const [useDevnet, setUseDevnet] = useState(false)
-  const router = useRouter()
   const handleToggleDevnet = () => {
     setUseDevnet(!useDevnet)
     if (useDevnet) {
-      router.push(`${window.location.pathname}`)
+      window.location.replace(`${window.location.pathname}`)
     } else {
-      router.push(`${window.location.href}?cluster=devnet`)
+      window.location.replace(`${window.location.href}?cluster=devnet`)
     }
   }
+  useEffect(() => {
+    setUseDevnet(connection.cluster === 'devnet')
+  }, [connection.cluster])
 
   const handleConnectDisconnect = async () => {
     try {
@@ -71,48 +72,57 @@ const ConnectWalletButton = (props) => {
   const walletAddressFormatted = current?.publicKey
     ? abbreviateAddress(current?.publicKey)
     : ''
-
+  const displayAddressComponent = useMemo(() => {
+    return connected && current?.publicKey ? (
+      <DisplayAddress
+        connection={connection.current}
+        address={current.publicKey!}
+        width="100px"
+        height="20px"
+        dark={true}
+      />
+    ) : null
+  }, [current?.publicKey?.toBase58()])
+  const displayAddressImage = useMemo(() => {
+    return connected && current?.publicKey ? (
+      <div className="w-12 pr-2">
+        <AddressImage
+          dark={true}
+          connection={connection.current}
+          address={current?.publicKey}
+          height="40px"
+          width="40px"
+          placeholder={
+            <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10 mr-2">
+              <UserCircleIcon className="h-9 text-fgd-3 w-9" />
+            </div>
+          }
+        />{' '}
+      </div>
+    ) : (
+      <div className="pr-2 pl-2">
+        <img src={provider?.icon} className="h-5 w-5" />
+      </div>
+    )
+  }, [])
   return (
     <div className="flex">
-      <button
+      <div
         disabled={connected}
         className={`bg-transparent border border-fgd-4 border-r-0 default-transition flex h-12 items-center pl-1 pr-2 rounded-l-full rounded-r-none ${
-          connected ? 'cursor-default' : 'hover:bg-bkg-3 focus:outline-none'
+          connected
+            ? 'cursor-default'
+            : 'cursor-pointer hover:bg-bkg-3 focus:outline-none'
         }`}
         onClick={handleConnectDisconnect}
         {...props}
       >
         <div className="flex font-bold items-center text-fgd-1 text-left text-sm relative">
-          {connected && current?.publicKey ? (
-            <div className="w-12 pr-2">
-              <AddressImage
-                dark={true}
-                connection={connection.current}
-                address={current?.publicKey}
-                height="40px"
-                width="40px"
-                placeholder={
-                  <div className="bg-bkg-4 flex flex-shrink-0 items-center justify-center h-10 rounded-full w-10 mr-2">
-                    <UserCircleIcon className="h-9 text-fgd-3 w-9" />
-                  </div>
-                }
-              />
-            </div>
-          ) : (
-            <div className="pr-2 pl-2">
-              <img src={provider?.icon} className="h-5 w-5" />
-            </div>
-          )}
+          {displayAddressImage}
           <div>
             {connected && current?.publicKey ? (
               <>
-                <DisplayAddress
-                  connection={connection.current}
-                  address={current?.publicKey}
-                  width="100px"
-                  height="20px"
-                  dark={true}
-                />
+                {displayAddressComponent}
                 <StyledWalletProviderLabel className="font-normal text-fgd-3">
                   {walletAddressFormatted}
                 </StyledWalletProviderLabel>
@@ -127,7 +137,7 @@ const ConnectWalletButton = (props) => {
             )}
           </div>
         </div>
-      </button>
+      </div>
 
       <div className="relative ">
         <Menu>

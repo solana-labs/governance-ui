@@ -6,14 +6,14 @@ export default function CommandLineInfo({
   info: string | undefined
 }) {
   return (
-    <div className="flex flex-row text-xs items-center break-all mb-3">
-      <span className="text-fgd-3">{info}</span>
+    <div className="flex flex-row text-xs items-center break-all">
+      <span className="text-fgd-1">{info}</span>
       <DuplicateIcon
-        className="ml-4 text-th-fgd-1 w-5 h-5 hover:cursor-pointer text-primary-light"
+        className="flex-shrink-0 ml-4 w-4 h-4 cursor-pointer text-primary-light"
         onClick={() => {
           navigator.clipboard.writeText(info ?? '')
         }}
-      ></DuplicateIcon>
+      />
     </div>
   )
 }

@@ -1,6 +1,6 @@
 import { TokenRecordsWithWalletAddress } from './types'
 import useRealm from '@hooks/useRealm'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import {
   getMultipleAccountInfoChunked,
@@ -19,11 +19,12 @@ import { BN } from '@project-serum/anchor'
 import { PublicKey } from '@solana/web3.js'
 import { usePrevious } from '@hooks/usePrevious'
 import { capitalize } from '@utils/helpers'
+import useMembersStore from 'stores/useMembersStore'
 export default function useMembers() {
   const { tokenRecords, councilTokenOwnerRecords, realm } = useRealm()
   const connection = useWalletStore((s) => s.connection)
   const previousRealmPubKey = usePrevious(realm?.pubkey.toBase58()) as string
-
+  const setMembers = useMembersStore((s) => s.setMembers)
   const fetchCouncilMembersWithTokensOutsideRealm = async () => {
     if (realm?.account.config.councilMint) {
       const tokenAccounts = await getTokenAccountsByMint(
@@ -63,7 +64,8 @@ export default function useMembers() {
           ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
           TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
           realm!.account.communityMint, // mint
-          new PublicKey(walletAddress) // owner
+          new PublicKey(walletAddress), // owner
+          true
         )
         ATAS.push(ata)
       }
@@ -131,7 +133,6 @@ export default function useMembers() {
         : [],
     [JSON.stringify(tokenRecords)]
   )
-  const [members, setMembers] = useState<Member[]>([])
 
   const councilRecordArray: TokenRecordsWithWalletAddress[] = useMemo(
     () =>
@@ -215,19 +216,18 @@ export default function useMembers() {
       members = matchMembers(members, communityMembers, 'community')
       setMembers(members)
     }
-    if (previousRealmPubKey !== realm?.pubkey.toBase58()) {
+    if (
+      realm?.pubkey &&
+      previousRealmPubKey !== realm?.pubkey.toBase58() &&
+      !realm?.account.config.useCommunityVoterWeightAddin
+    ) {
       handleSetMembers()
     }
+    if (
+      !realm?.pubkey ||
+      (realm.pubkey && realm?.account.config.useCommunityVoterWeightAddin)
+    ) {
+      setMembers([])
+    }
   }, [realm?.pubkey.toBase58()])
-
-  const activeMembers: Member[] = members.filter(
-    (x) => !x.councilVotes.isZero() || !x.communityVotes.isZero()
-  )
-
-  return {
-    tokenRecordArray,
-    councilRecordArray,
-    members,
-    activeMembers,
-  }
 }

@@ -28,7 +28,7 @@ const NotificationList = () => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 z-2000`}
+      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 z-99999`}
     >
       <div className={`flex flex-col w-full`}>
         {notifications.map((n, idx) => (

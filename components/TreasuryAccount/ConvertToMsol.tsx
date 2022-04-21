@@ -3,7 +3,6 @@ import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import AccountLabel from './AccountHeader'
 import GovernedAccountSelect from 'pages/dao/[symbol]/proposal/components/GovernedAccountSelect'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import { useEffect, useState } from 'react'
 import {
   StakingViewForm,
@@ -20,41 +19,27 @@ import Tooltip from '@components/Tooltip'
 import useWalletStore from 'stores/useWalletStore'
 import { getStakeSchema } from '@utils/validations'
 import { getConvertToMsolInstruction } from '@utils/instructionTools'
-import { PublicKey } from '@solana/web3.js'
 import {
   getInstructionDataFromBase64,
   Governance,
   ProgramAccount,
-  RpcContext,
 } from '@solana/spl-governance'
-import { getProgramVersionForRealm } from '@models/registry/api'
-import { createProposal } from 'actions/createProposal'
 import useQueryContext from '@hooks/useQueryContext'
 import { useRouter } from 'next/router'
 import { notify } from '@utils/notifications'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useCreateProposal from '@hooks/useCreateProposal'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const ConvertToMsol = () => {
-  const {
-    canChooseWhoVote,
-    realm,
-    realmInfo,
-    ownVoterWeight,
-    mint,
-    councilMint,
-    symbol,
-  } = useRealm()
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const { canChooseWhoVote, realm, symbol } = useRealm()
   const { canUseTransferInstruction } = useGovernanceAssets()
   const { governedTokenAccounts } = useGovernanceAssets()
   const { fmtUrlWithCluster } = useQueryContext()
   const router = useRouter()
+  const { handleCreateProposal } = useCreateProposal()
   const connection = useWalletStore((s) => s.connection)
-  const wallet = useWalletStore((s) => s.current)
   const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
-  const currentAccount = useTreasuryAccountStore(
-    (s) => s.compact.currentAccount
-  )
+  const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
   const notConnectedMessage =
     'You need to be connected to your wallet to have the ability to create a staking proposal'
 
@@ -72,11 +57,13 @@ const ConvertToMsol = () => {
 
   const mSolTokenAccounts = governedTokenAccounts.filter(
     (acc) =>
-      acc.mint?.publicKey.toString() ===
+      acc.extensions.mint?.publicKey.toString() ===
       'mSoLzYCxHdYgdzU16g5QSh3i5K3z3KZK7ytfqcJm7So'
   )
-  const mintMinAmount = form.governedTokenAccount?.mint
-    ? getMintMinAmountAsDecimal(form.governedTokenAccount.mint.account)
+  const mintMinAmount = form.governedTokenAccount?.extensions?.mint
+    ? getMintMinAmountAsDecimal(
+        form.governedTokenAccount.extensions.mint.account
+      )
     : 1
   const proposalTitle = `Convert ${form.amount} SOL to mSOL`
   const schema = getStakeSchema({ form })
@@ -102,13 +89,6 @@ const ConvertToMsol = () => {
       }
 
       const governance = currentAccount?.governance
-      const rpcContext = new RpcContext(
-        new PublicKey(realm.owner.toString()),
-        getProgramVersionForRealm(realmInfo!),
-        wallet!,
-        connection.current,
-        connection.endpoint
-      )
       const holdUpTime = governance?.account?.config.minInstructionHoldUpTime
 
       const instructionData = {
@@ -125,40 +105,14 @@ const ConvertToMsol = () => {
           currentAccount?.governance?.pubkey
         )) as ProgramAccount<Governance>
 
-        const ownTokenRecord = ownVoterWeight.getTokenRecordToCreateProposal(
-          governance!.account.config
-        )
-
-        const defaultProposalMint = !mint?.supply.isZero()
-          ? realm.account.communityMint
-          : !councilMint?.supply.isZero()
-          ? realm.account.config.councilMint
-          : undefined
-
-        const proposalMint =
-          canChooseWhoVote && voteByCouncil
-            ? realm.account.config.councilMint
-            : defaultProposalMint
-
-        if (!proposalMint) {
-          throw new Error(
-            'There is no suitable governing token for the proposal'
-          )
-        }
-
-        const proposalAddress = await createProposal(
-          rpcContext,
-          realm,
-          selectedGovernance.pubkey,
-          ownTokenRecord.pubkey,
-          form.title ? form.title : proposalTitle,
-          form.description ? form.description : '',
-          proposalMint,
-          selectedGovernance?.account?.proposalCount,
-          [instructionData],
-          false,
-          client
-        )
+        const proposalAddress = await handleCreateProposal({
+          title: form.title ? form.title : proposalTitle,
+          description: form.description ? form.description : '',
+          governance: selectedGovernance,
+          instructionsData: [instructionData],
+          voteByCouncil,
+          isDraft: false,
+        })
         const url = fmtUrlWithCluster(
           `/dao/${symbol}/proposal/${proposalAddress}`
         )
@@ -175,7 +129,7 @@ const ConvertToMsol = () => {
       value: currentAccount,
       propertyName: 'governedTokenAccount',
     })
-  }, [currentAccount])
+  }, [currentAccount, form.destinationAccount])
 
   return (
     <>
@@ -184,7 +138,7 @@ const ConvertToMsol = () => {
       <div className="space-y-4 w-full pb-4">
         <GovernedAccountSelect
           label="mSOL Treasury account"
-          governedAccounts={mSolTokenAccounts as GovernedMultiTypeAccount[]}
+          governedAccounts={mSolTokenAccounts as AssetAccount[]}
           shouldBeGoverned={false}
           governance={currentAccount?.governance}
           value={form.destinationAccount}

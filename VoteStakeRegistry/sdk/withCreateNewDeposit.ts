@@ -33,6 +33,7 @@ export const withCreateNewDeposit = async ({
   lockUpPeriodInDays,
   lockupKind,
   client,
+  allowClawback = false,
 }: {
   instructions: TransactionInstruction[]
   walletPk: PublicKey
@@ -43,6 +44,7 @@ export const withCreateNewDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   lockUpPeriodInDays: number
   lockupKind: LockupType
+  allowClawback?: boolean
   client?: VsrClient
 }) => {
   if (!client) {
@@ -73,7 +75,8 @@ export const withCreateNewDeposit = async ({
     ASSOCIATED_TOKEN_PROGRAM_ID,
     TOKEN_PROGRAM_ID,
     mintPk,
-    voter
+    voter,
+    true
   )
 
   //spl governance tokenownerrecord pubkey
@@ -130,7 +133,6 @@ export const withCreateNewDeposit = async ({
   if (createNewDeposit) {
     //in case we do monthly close up we pass months not days.
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
-    const allowClawback = false
     const startTime = new BN(new Date().getTime() / 1000)
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,

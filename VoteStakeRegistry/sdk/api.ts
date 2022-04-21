@@ -1,4 +1,5 @@
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
+import { NftVoterClient } from '@solana/governance-program-library'
 import { PublicKey } from '@solana/web3.js'
 import { Registrar, Voter } from './accounts'
 
@@ -19,6 +20,20 @@ export const tryGetRegistrar = async (
       registrarPk
     )
     return existingRegistrar as Registrar
+  } catch (e) {
+    return null
+  }
+}
+
+export const tryGetNftRegistrar = async (
+  registrarPk: PublicKey,
+  client: NftVoterClient
+) => {
+  try {
+    const existingRegistrar = await client.program.account.registrar.fetch(
+      registrarPk
+    )
+    return existingRegistrar
   } catch (e) {
     return null
   }

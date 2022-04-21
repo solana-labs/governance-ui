@@ -6,7 +6,6 @@ import {
 } from '@solana/spl-governance'
 import * as yup from 'yup'
 import { PublicKey } from '@solana/web3.js'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 import useRealm from '@hooks/useRealm'
 import { createObligationAccount } from '@tools/sdk/solend/createObligationAccount'
 import { isFormValid } from '@utils/formValidation'
@@ -20,6 +19,7 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const CreateObligationAccount = ({
   index,
@@ -36,7 +36,7 @@ const CreateObligationAccount = ({
   if (connection.cluster !== 'mainnet') {
     return <>This instruction does not support {connection.cluster}</>
   }
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
   const shouldBeGoverned = index !== 0 && governance
   const programId: PublicKey | undefined = realmInfo?.programId
   const [form, setForm] = useState<CreateSolendObligationAccountForm>({})
@@ -110,7 +110,7 @@ const CreateObligationAccount = ({
   return (
     <GovernedAccountSelect
       label="Governance"
-      governedAccounts={governedMultiTypeAccounts}
+      governedAccounts={assetAccounts}
       onChange={(value) => {
         handleSetForm({ value, propertyName: 'governedAccount' })
       }}

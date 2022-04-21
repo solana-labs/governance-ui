@@ -1,12 +1,14 @@
 import { useTotalTreasuryPrice } from '@hooks/useTotalTreasuryPrice'
 const HoldTokensTotalPrice = () => {
   const { totalPriceFormatted } = useTotalTreasuryPrice()
-  return totalPriceFormatted ? (
+  return (
     <div className="bg-bkg-1 mb-3 px-4 py-2 rounded-md w-full">
-      <p className="text-fgd-3 text-xs">Treasury Balance</p>
-      <h3 className="mb-0">${totalPriceFormatted}</h3>
+      <p className="text-fgd-3">Treasury Balance</p>
+      <span className="hero-text">
+        ${totalPriceFormatted ? totalPriceFormatted : 0}
+      </span>
     </div>
-  ) : null
+  )
 }
 
 export default HoldTokensTotalPrice

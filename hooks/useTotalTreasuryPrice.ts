@@ -1,4 +1,3 @@
-import { WSOL_MINT } from '@components/instructions/tools'
 import { BN } from '@project-serum/anchor'
 import { getMintDecimalAmountFromNatural } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
@@ -12,17 +11,19 @@ export function useTotalTreasuryPrice() {
   useEffect(() => {
     async function calcTotalTokensPrice() {
       const totalPrice = governedTokenAccountsWithoutNfts
-        .filter(
-          (x) => typeof x.mint !== 'undefined' && typeof x.token !== 'undefined'
-        )
+        .filter((x) => typeof x.extensions.mint !== 'undefined')
         .map((x) => {
           return (
             getMintDecimalAmountFromNatural(
-              x.mint!.account,
-              new BN(x.isSol ? x.solAccount!.lamports : x.token!.account.amount)
+              x.extensions.mint!.account,
+              new BN(
+                x.isSol
+                  ? x.extensions.solAccount!.lamports
+                  : x.extensions.token!.account.amount
+              )
             ).toNumber() *
             tokenService.getUSDTokenPrice(
-              x.isSol ? WSOL_MINT : x.mint!.publicKey.toBase58()
+              x.extensions.mint!.publicKey.toBase58()
             )
           )
         })

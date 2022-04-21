@@ -10,11 +10,7 @@ import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import { tryParseKey } from '@tools/validators/pubkey'
 import useWalletStore from 'stores/useWalletStore'
-import {
-  GovernedMultiTypeAccount,
-  TokenProgramAccount,
-  tryGetTokenAccount,
-} from '@utils/tokens'
+import { TokenProgramAccount, tryGetTokenAccount } from '@utils/tokens'
 import { GrantForm, UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { getAccountName } from '@components/instructions/tools'
 import { debounce } from '@utils/debounce'
@@ -37,8 +33,9 @@ import * as yup from 'yup'
 import { getGrantInstruction } from 'VoteStakeRegistry/actions/getGrantInstruction'
 import { getRegistrarPDA } from 'VoteStakeRegistry/sdk/accounts'
 import { tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
-import useVoteStakeRegistryClientStore from 'VoteStakeRegistry/stores/voteStakeRegistryClientStore'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const Grant = ({
   index,
@@ -47,7 +44,7 @@ const Grant = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
-  const client = useVoteStakeRegistryClientStore((s) => s.state.client)
+  const client = useVotePluginsClientStore((s) => s.state.vsrClient)
   const dateNow = dayjs().unix()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
@@ -114,15 +111,16 @@ const Grant = ({
     const prerequisiteInstructions: TransactionInstruction[] = []
     if (
       isValid &&
-      form.governedTokenAccount?.token?.publicKey &&
-      form.governedTokenAccount?.token &&
-      form.governedTokenAccount?.mint?.account
+      form.governedTokenAccount?.extensions?.token?.publicKey &&
+      form.governedTokenAccount?.extensions?.token &&
+      form.governedTokenAccount?.extensions.mint?.account
     ) {
-      const sourceAccount = form.governedTokenAccount.token?.account.address
+      const sourceAccount =
+        form.governedTokenAccount.extensions.token?.account.address
       const destinationAccount = new PublicKey(form.destinationAccount)
       const mintAmount = parseMintNaturalAmountFromDecimal(
         form.amount!,
-        form.governedTokenAccount.mint.account.decimals
+        form.governedTokenAccount.extensions.mint.account.decimals
       )
       const currentTokenOwnerRecord = tokenRecords[form.destinationAccount]
       if (!currentTokenOwnerRecord) {
@@ -142,7 +140,7 @@ const Grant = ({
         realmPk: realm!.pubkey,
         communityMintPk: realm!.account.communityMint,
         grantAuthority: form.governedTokenAccount.governance!.pubkey,
-        grantMintPk: form.governedTokenAccount.mint.publicKey,
+        grantMintPk: form.governedTokenAccount.extensions.mint.publicKey,
         amount: mintAmount,
         lockupPeriod: form.periods,
         startTime: form.startDateUnixSeconds,
@@ -216,7 +214,7 @@ const Grant = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
-    setMintInfo(form.governedTokenAccount?.mint?.account)
+    setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
   const destinationAccountName =
     destinationAccount?.publicKey &&
@@ -276,8 +274,9 @@ const Grant = ({
         governedAccounts={
           governedTokenAccountsWithoutNfts.filter(
             (x) =>
-              x.mint && useableGrantMints.includes(x.mint.publicKey.toBase58())
-          ) as GovernedMultiTypeAccount[]
+              x.extensions.mint &&
+              useableGrantMints.includes(x.extensions.mint.publicKey.toBase58())
+          ) as AssetAccount[]
         }
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
@@ -377,9 +376,12 @@ const Grant = ({
         error={formErrors['amount']}
         onBlur={validateAmountOnBlur}
       />
-      {form.lockupKind.value === 'monthly' && form.amount && (
-        <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
-      )}
+      {form.lockupKind.value === 'monthly' &&
+        form.amount &&
+        !isNaN(form.amount) &&
+        !isNaN(form.periods) && (
+          <div>Vesting rate: {(form.amount / form.periods).toFixed(2)} p/m</div>
+        )}
     </>
   )
 }

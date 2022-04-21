@@ -1,9 +1,8 @@
 import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
 
 export interface Period {
-  value: number
+  defaultValue: number
   display: string
-  multiplier: number
 }
 export interface LockupKind {
   value: LockupType

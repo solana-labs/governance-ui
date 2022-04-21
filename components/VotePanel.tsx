@@ -11,13 +11,21 @@ import { RpcContext } from '@solana/spl-governance'
 import { GoverningTokenType } from '@solana/spl-governance'
 
 import useWalletStore from '../stores/useWalletStore'
-import Button from './Button'
+import Button, { SecondaryButton } from './Button'
 import VoteCommentModal from './VoteCommentModal'
 import { getProgramVersionForRealm } from '@models/registry/api'
+import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { useRouter } from 'next/router'
+import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)
   const [vote, setVote] = useState<YesNoVote | null>(null)
+  const client = useVotePluginsClientStore(
+    (s) => s.state.currentRealmVotingClient
+  )
+  const router = useRouter()
+  const { pk } = router.query
   const {
     governance,
     proposal,
@@ -34,9 +42,11 @@ const VotePanel = () => {
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
-  const fetchRealm = useWalletStore((s) => s.actions.fetchRealm)
+  const refetchProposals = useWalletStore((s) => s.actions.refetchProposals)
+  const fetchProposal = useWalletStore((s) => s.actions.fetchProposal)
   const hasVoteTimeExpired = useHasVoteTimeExpired(governance, proposal!)
-
+  const maxVoterWeight =
+    useNftPluginStore((s) => s.state.maxVoteRecord)?.pubkey || undefined
   const ownVoteRecord =
     wallet?.publicKey && voteRecordsByVoter[wallet.publicKey.toBase58()]
 
@@ -71,8 +81,6 @@ const VotePanel = () => {
       proposal!.account.state === ProposalState.Defeated)
 
   const submitRelinquishVote = async () => {
-    const programId = realmInfo?.programId
-    const realmId = realmInfo?.realmId
     const rpcContext = new RpcContext(
       proposal!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -95,7 +103,8 @@ const VotePanel = () => {
           proposal.account.governance,
           proposal.pubkey,
           proposal.account.tokenOwnerRecord,
-          proposal.account.governingTokenMint
+          proposal.account.governingTokenMint,
+          maxVoterWeight
         )
       }
 
@@ -105,13 +114,16 @@ const VotePanel = () => {
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         voterTokenRecord!.pubkey,
         ownVoteRecord!.pubkey,
-        instructions
+        instructions,
+        client
       )
+      await refetchProposals()
+      if (pk) {
+        fetchProposal(pk)
+      }
     } catch (ex) {
       console.error("Can't relinquish vote", ex)
     }
-
-    await fetchRealm(programId, realmId)
   }
 
   const handleShowVoteModal = (vote: YesNoVote) => {
@@ -125,7 +137,9 @@ const VotePanel = () => {
 
   const actionLabel =
     !isVoteCast || !connected
-      ? 'Cast your vote'
+      ? `Cast your ${
+          tokenType === GoverningTokenType.Community ? 'community' : 'council'
+        } vote`
       : isVoting
       ? 'Withdraw your vote'
       : 'Release your tokens'
@@ -172,13 +186,14 @@ const VotePanel = () => {
 
           <div className="items-center justify-center flex w-full gap-5">
             {isVoteCast && connected ? (
-              <Button
+              <SecondaryButton
+                small
                 tooltipMessage={withdrawTooltipContent}
                 onClick={() => submitRelinquishVote()}
                 disabled={!isWithdrawEnabled}
               >
                 {isVoting ? 'Withdraw' : 'Release Tokens'}
-              </Button>
+              </SecondaryButton>
             ) : (
               <>
                 {isVoting && (
