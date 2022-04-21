@@ -32,9 +32,10 @@ const IDLInstructions = ({
   index: number
   governance: ProgramAccount<Governance> | null
 }) => {
+  console.log(governance)
   const wallet = useWalletStore((s) => s.current)
   // const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
-  const shouldBeGoverned = index !== 0 && governance
+  // const shouldBeGoverned = index !== 0 && governance
   const [form, setForm] = useState<IDLForm>({
     governedAccount: undefined,
     programID: '',
