@@ -1,5 +1,5 @@
 export type Switchboard = {
-  "version": "0.0.0",
+  "version": "0.1.0",
   "name": "switchboard_v2",
   "instructions": [
     {
@@ -45,11 +45,6 @@ export type Switchboard = {
         },
         {
           "name": "queue",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authorWallet",
           "isMut": false,
           "isSigner": false
         },
@@ -141,6 +136,11 @@ export type Switchboard = {
         },
         {
           "name": "dataBuffer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -243,6 +243,11 @@ export type Switchboard = {
         {
           "name": "historyBuffer",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -534,6 +539,11 @@ export type Switchboard = {
           "name": "queueDataBuffer",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -612,7 +622,7 @@ export type Switchboard = {
           "isSigner": false
         },
         {
-          "name": "authorWallet",
+          "name": "authority",
           "isMut": false,
           "isSigner": false
         },
@@ -671,6 +681,11 @@ export type Switchboard = {
         },
         {
           "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -734,6 +749,11 @@ export type Switchboard = {
         },
         {
           "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -815,6 +835,11 @@ export type Switchboard = {
         },
         {
           "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -949,6 +974,11 @@ export type Switchboard = {
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -1653,8 +1683,13 @@ export type Switchboard = {
             }
           },
           {
-            "name": "authorWallet",
-            "type": "publicKey"
+            "name": "reserved1",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "queuePubkey",
@@ -1774,11 +1809,24 @@ export type Switchboard = {
             "type": "u64"
           },
           {
+            "name": "disableCrank",
+            "type": "bool"
+          },
+          {
+            "name": "jobWeights",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          },
+          {
             "name": "ebuf",
             "type": {
               "array": [
                 "u8",
-                164
+                147
               ]
             }
           }
@@ -1984,11 +2032,15 @@ export type Switchboard = {
             "type": "bool"
           },
           {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
             "name": "ebuf",
             "type": {
               "array": [
                 "u8",
-                1001
+                969
               ]
             }
           },
@@ -2143,7 +2195,7 @@ export type Switchboard = {
             }
           },
           {
-            "name": "authorWallet",
+            "name": "authority",
             "type": "publicKey"
           },
           {
@@ -2166,6 +2218,14 @@ export type Switchboard = {
           {
             "name": "referenceCount",
             "type": "u32"
+          },
+          {
+            "name": "totalSpent",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
           }
         ]
       }
@@ -2250,7 +2310,14 @@ export type Switchboard = {
       "name": "AggregatorAddJobParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "weight",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
       }
     },
     {
@@ -2313,6 +2380,10 @@ export type Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          },
+          {
+            "name": "disableCrank",
+            "type": "bool"
           }
         ]
       }
@@ -2615,6 +2686,10 @@ export type Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          },
+          {
+            "name": "walletBumps",
+            "type": "bytes"
           }
         ]
       }
@@ -2639,6 +2714,10 @@ export type Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          },
+          {
+            "name": "walletBumps",
+            "type": "bytes"
           }
         ]
       }
@@ -2887,6 +2966,120 @@ export type Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultTransferParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfInitParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "callback",
+            "type": {
+              "defined": "Callback"
+            }
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfProveParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proof",
+            "type": "bytes"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfProveAndVerifyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
+          },
+          {
+            "name": "proof",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfRequestRandomnessParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "permissionBump",
+            "type": "u8"
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfVerifyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
           }
         ]
       }
@@ -3709,115 +3902,165 @@ export type Switchboard = {
       }
     },
     {
-      "name": "VaultTransferParams",
+      "name": "Lanes",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "C"
           },
           {
-            "name": "amount",
-            "type": "u64"
+            "name": "D"
+          },
+          {
+            "name": "AB"
+          },
+          {
+            "name": "AC"
+          },
+          {
+            "name": "CD"
+          },
+          {
+            "name": "AD"
+          },
+          {
+            "name": "BC"
+          },
+          {
+            "name": "ABCD"
           }
         ]
       }
     },
     {
-      "name": "VrfInitParams",
+      "name": "Shuffle",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "callback",
-            "type": {
-              "defined": "Callback"
-            }
+            "name": "AAAA"
           },
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "BBBB"
+          },
+          {
+            "name": "CACA"
+          },
+          {
+            "name": "DBBD"
+          },
+          {
+            "name": "ADDA"
+          },
+          {
+            "name": "CBCB"
+          },
+          {
+            "name": "ABAB"
+          },
+          {
+            "name": "BADC"
+          },
+          {
+            "name": "BACD"
+          },
+          {
+            "name": "ABDC"
           }
         ]
       }
     },
     {
-      "name": "VrfProveParams",
+      "name": "Shuffle",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "proof",
-            "type": "bytes"
+            "name": "AAAA"
           },
           {
-            "name": "idx",
-            "type": "u32"
+            "name": "BBBB"
+          },
+          {
+            "name": "BADC"
+          },
+          {
+            "name": "BACD"
+          },
+          {
+            "name": "ADDA"
+          },
+          {
+            "name": "CBCB"
+          },
+          {
+            "name": "ABDC"
+          },
+          {
+            "name": "ABAB"
+          },
+          {
+            "name": "DBBD"
+          },
+          {
+            "name": "CACA"
           }
         ]
       }
     },
     {
-      "name": "VrfProveAndVerifyParams",
+      "name": "Lanes",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "nonce",
-            "type": {
-              "option": "u32"
-            }
+            "name": "D"
           },
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "C"
           },
           {
-            "name": "idx",
-            "type": "u32"
+            "name": "AB"
           },
           {
-            "name": "proof",
-            "type": "bytes"
+            "name": "AC"
+          },
+          {
+            "name": "AD"
+          },
+          {
+            "name": "BCD"
           }
         ]
       }
     },
     {
-      "name": "VrfRequestRandomnessParams",
+      "name": "Error",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "permissionBump",
-            "type": "u8"
+            "name": "InvalidPublicKey"
           },
           {
-            "name": "stateBump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "VrfVerifyParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": {
-              "option": "u32"
-            }
+            "name": "SerializationError",
+            "fields": [
+              {
+                "defined": "bincode::Error"
+              }
+            ]
           },
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "DeserializationError",
+            "fields": [
+              {
+                "defined": "bincode::Error"
+              }
+            ]
           },
           {
-            "name": "idx",
-            "type": "u32"
+            "name": "InvalidDataError"
           }
         ]
       }
@@ -3860,242 +4103,6 @@ export type Switchboard = {
       }
     },
     {
-      "name": "SwitchboardError",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "ArrayOperationError"
-          },
-          {
-            "name": "QueueOperationError"
-          },
-          {
-            "name": "IncorrectProgramOwnerError"
-          },
-          {
-            "name": "InvalidAggregatorRound"
-          },
-          {
-            "name": "TooManyAggregatorJobs"
-          },
-          {
-            "name": "AggregatorCurrentRoundClosed"
-          },
-          {
-            "name": "AggregatorInvalidSaveResult"
-          },
-          {
-            "name": "InvalidStrDecimalConversion"
-          },
-          {
-            "name": "AccountLoaderMissingSignature"
-          },
-          {
-            "name": "MissingRequiredSignature"
-          },
-          {
-            "name": "ArrayOverflowError"
-          },
-          {
-            "name": "ArrayUnderflowError"
-          },
-          {
-            "name": "PubkeyNotFoundError"
-          },
-          {
-            "name": "AggregatorIllegalRoundOpenCall"
-          },
-          {
-            "name": "AggregatorIllegalRoundCloseCall"
-          },
-          {
-            "name": "AggregatorClosedError"
-          },
-          {
-            "name": "IllegalOracleIdxError"
-          },
-          {
-            "name": "OracleAlreadyRespondedError"
-          },
-          {
-            "name": "ProtoDeserializeError"
-          },
-          {
-            "name": "UnauthorizedStateUpdateError"
-          },
-          {
-            "name": "MissingOracleAccountsError"
-          },
-          {
-            "name": "OracleMismatchError"
-          },
-          {
-            "name": "CrankMaxCapacityError"
-          },
-          {
-            "name": "AggregatorLeaseInsufficientFunds"
-          },
-          {
-            "name": "IncorrectTokenAccountMint"
-          },
-          {
-            "name": "InvalidEscrowAccount"
-          },
-          {
-            "name": "CrankEmptyError"
-          },
-          {
-            "name": "PdaDeriveError"
-          },
-          {
-            "name": "AggregatorAccountNotFound"
-          },
-          {
-            "name": "PermissionAccountNotFound"
-          },
-          {
-            "name": "LeaseAccountDeriveFailure"
-          },
-          {
-            "name": "PermissionAccountDeriveFailure"
-          },
-          {
-            "name": "EscrowAccountNotFound"
-          },
-          {
-            "name": "LeaseAccountNotFound"
-          },
-          {
-            "name": "DecimalConversionError"
-          },
-          {
-            "name": "PermissionDenied"
-          },
-          {
-            "name": "QueueAtCapacity"
-          },
-          {
-            "name": "ExcessiveCrankRowsError"
-          },
-          {
-            "name": "AggregatorLockedError"
-          },
-          {
-            "name": "AggregatorInvalidBatchSizeError"
-          },
-          {
-            "name": "AggregatorJobChecksumMismatch"
-          },
-          {
-            "name": "IntegerOverflowError"
-          },
-          {
-            "name": "InvalidUpdatePeriodError"
-          },
-          {
-            "name": "NoResultsError"
-          },
-          {
-            "name": "InvalidExpirationError"
-          },
-          {
-            "name": "InsufficientStakeError"
-          },
-          {
-            "name": "LeaseInactiveError"
-          },
-          {
-            "name": "NoAggregatorJobsFound"
-          },
-          {
-            "name": "IntegerUnderflowError"
-          },
-          {
-            "name": "OracleQueueMismatch"
-          },
-          {
-            "name": "OracleWalletMismatchError"
-          },
-          {
-            "name": "InvalidBufferAccountError"
-          },
-          {
-            "name": "InsufficientOracleQueueError"
-          },
-          {
-            "name": "InvalidAuthorityError"
-          },
-          {
-            "name": "InvalidTokenAccountMintError"
-          },
-          {
-            "name": "ExcessiveLeaseWithdrawlError"
-          },
-          {
-            "name": "InvalideHistoryAccountError"
-          },
-          {
-            "name": "InvalidLeaseAccountEscrowError"
-          },
-          {
-            "name": "InvalidCrankAccountError"
-          },
-          {
-            "name": "CrankNoElementsReadyError"
-          },
-          {
-            "name": "IndexOutOfBoundsError"
-          },
-          {
-            "name": "VrfInvalidRequestError"
-          },
-          {
-            "name": "VrfInvalidProofSubmissionError"
-          },
-          {
-            "name": "VrfVerifyError"
-          },
-          {
-            "name": "VrfCallbackError"
-          },
-          {
-            "name": "VrfCallbackParamsError"
-          },
-          {
-            "name": "VrfCallbackAlreadyCalledError"
-          },
-          {
-            "name": "VrfInvalidPubkeyError"
-          },
-          {
-            "name": "VrfTooManyVerifyCallsError"
-          },
-          {
-            "name": "VrfRequestAlreadyLaunchedError"
-          },
-          {
-            "name": "VrfInsufficientVerificationError"
-          },
-          {
-            "name": "InvalidVrfProducerError"
-          },
-          {
-            "name": "InvalidGovernancePidError"
-          },
-          {
-            "name": "InvalidGovernanceAccountError"
-          },
-          {
-            "name": "MissingOptionalAccount"
-          },
-          {
-            "name": "InvalidSpawnRecordOwner"
-          }
-        ]
-      }
-    },
-    {
       "name": "VrfStatus",
       "type": {
         "kind": "enum",
@@ -4117,36 +4124,6 @@ export type Switchboard = {
           },
           {
             "name": "StatusVerifyFailure"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Error",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "InvalidPublicKey"
-          },
-          {
-            "name": "SerializationError",
-            "fields": [
-              {
-                "defined": "bincode::Error"
-              }
-            ]
-          },
-          {
-            "name": "DeserializationError",
-            "fields": [
-              {
-                "defined": "bincode::Error"
-              }
-            ]
-          },
-          {
-            "name": "InvalidDataError"
           }
         ]
       }
@@ -4610,13 +4587,417 @@ export type Switchboard = {
       ]
     }
   ],
-  "metadata": {
-    "address": "7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"
-  }
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ArrayOperationError",
+      "msg": "Illegal operation on a Switchboard array."
+    },
+    {
+      "code": 6001,
+      "name": "QueueOperationError",
+      "msg": "Illegal operation on a Switchboard queue."
+    },
+    {
+      "code": 6002,
+      "name": "IncorrectProgramOwnerError",
+      "msg": "An account required to be owned by the program has a different owner."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidAggregatorRound",
+      "msg": "Aggregator is not currently populated with a valid round."
+    },
+    {
+      "code": 6004,
+      "name": "TooManyAggregatorJobs",
+      "msg": "Aggregator cannot fit any more jobs."
+    },
+    {
+      "code": 6005,
+      "name": "AggregatorCurrentRoundClosed",
+      "msg": "Aggregator's current round is closed. No results are being accepted."
+    },
+    {
+      "code": 6006,
+      "name": "AggregatorInvalidSaveResult",
+      "msg": "Aggregator received an invalid save result instruction."
+    },
+    {
+      "code": 6007,
+      "name": "InvalidStrDecimalConversion",
+      "msg": "Failed to convert string to decimal format."
+    },
+    {
+      "code": 6008,
+      "name": "AccountLoaderMissingSignature",
+      "msg": "AccountLoader account is missing a required signature."
+    },
+    {
+      "code": 6009,
+      "name": "MissingRequiredSignature",
+      "msg": "Account is missing a required signature."
+    },
+    {
+      "code": 6010,
+      "name": "ArrayOverflowError",
+      "msg": "The attempted action will overflow a zero-copy account array."
+    },
+    {
+      "code": 6011,
+      "name": "ArrayUnderflowError",
+      "msg": "The attempted action will underflow a zero-copy account array."
+    },
+    {
+      "code": 6012,
+      "name": "PubkeyNotFoundError",
+      "msg": "The queried public key was not found."
+    },
+    {
+      "code": 6013,
+      "name": "AggregatorIllegalRoundOpenCall",
+      "msg": "Aggregator round open called too early."
+    },
+    {
+      "code": 6014,
+      "name": "AggregatorIllegalRoundCloseCall",
+      "msg": "Aggregator round close called too early."
+    },
+    {
+      "code": 6015,
+      "name": "AggregatorClosedError",
+      "msg": "Aggregator is closed. Illegal action."
+    },
+    {
+      "code": 6016,
+      "name": "IllegalOracleIdxError",
+      "msg": "Illegal oracle index."
+    },
+    {
+      "code": 6017,
+      "name": "OracleAlreadyRespondedError",
+      "msg": "The provided oracle has already responded this round."
+    },
+    {
+      "code": 6018,
+      "name": "ProtoDeserializeError",
+      "msg": "Failed to deserialize protocol buffer."
+    },
+    {
+      "code": 6019,
+      "name": "UnauthorizedStateUpdateError",
+      "msg": "Unauthorized program state modification attempted."
+    },
+    {
+      "code": 6020,
+      "name": "MissingOracleAccountsError",
+      "msg": "Not enough oracle accounts provided to closeRounds."
+    },
+    {
+      "code": 6021,
+      "name": "OracleMismatchError",
+      "msg": "An unexpected oracle account was provided for the transaction."
+    },
+    {
+      "code": 6022,
+      "name": "CrankMaxCapacityError",
+      "msg": "Attempted to push to a Crank that's at capacity"
+    },
+    {
+      "code": 6023,
+      "name": "AggregatorLeaseInsufficientFunds",
+      "msg": "Aggregator update call attempted but attached lease has insufficient funds."
+    },
+    {
+      "code": 6024,
+      "name": "IncorrectTokenAccountMint",
+      "msg": "The provided token account does not point to the Switchboard token mint."
+    },
+    {
+      "code": 6025,
+      "name": "InvalidEscrowAccount",
+      "msg": "An invalid escrow account was provided."
+    },
+    {
+      "code": 6026,
+      "name": "CrankEmptyError",
+      "msg": "Crank empty. Pop failed."
+    },
+    {
+      "code": 6027,
+      "name": "PdaDeriveError",
+      "msg": "Failed to derive a PDA from the provided seed."
+    },
+    {
+      "code": 6028,
+      "name": "AggregatorAccountNotFound",
+      "msg": "Aggregator account missing from provided account list."
+    },
+    {
+      "code": 6029,
+      "name": "PermissionAccountNotFound",
+      "msg": "Permission account missing from provided account list."
+    },
+    {
+      "code": 6030,
+      "name": "LeaseAccountDeriveFailure",
+      "msg": "Failed to derive a lease account."
+    },
+    {
+      "code": 6031,
+      "name": "PermissionAccountDeriveFailure",
+      "msg": "Failed to derive a permission account."
+    },
+    {
+      "code": 6032,
+      "name": "EscrowAccountNotFound",
+      "msg": "Escrow account missing from provided account list."
+    },
+    {
+      "code": 6033,
+      "name": "LeaseAccountNotFound",
+      "msg": "Lease account missing from provided account list."
+    },
+    {
+      "code": 6034,
+      "name": "DecimalConversionError",
+      "msg": "Decimal conversion method failed."
+    },
+    {
+      "code": 6035,
+      "name": "PermissionDenied",
+      "msg": "Permission account is missing required flags for the given action."
+    },
+    {
+      "code": 6036,
+      "name": "QueueAtCapacity",
+      "msg": "Oracle queue is at lease capacity."
+    },
+    {
+      "code": 6037,
+      "name": "ExcessiveCrankRowsError",
+      "msg": "Data feed is already pushed on a crank."
+    },
+    {
+      "code": 6038,
+      "name": "AggregatorLockedError",
+      "msg": "Aggregator is locked, no setting modifications or job additions allowed."
+    },
+    {
+      "code": 6039,
+      "name": "AggregatorInvalidBatchSizeError",
+      "msg": "Aggregator invalid batch size."
+    },
+    {
+      "code": 6040,
+      "name": "AggregatorJobChecksumMismatch",
+      "msg": "Oracle provided an incorrect aggregator job checksum."
+    },
+    {
+      "code": 6041,
+      "name": "IntegerOverflowError",
+      "msg": "An integer overflow occurred."
+    },
+    {
+      "code": 6042,
+      "name": "InvalidUpdatePeriodError",
+      "msg": "Minimum update period is 5 seconds."
+    },
+    {
+      "code": 6043,
+      "name": "NoResultsError",
+      "msg": "Aggregator round evaluation attempted with no results."
+    },
+    {
+      "code": 6044,
+      "name": "InvalidExpirationError",
+      "msg": "An expiration constraint was broken."
+    },
+    {
+      "code": 6045,
+      "name": "InsufficientStakeError",
+      "msg": "An account provided insufficient stake for action."
+    },
+    {
+      "code": 6046,
+      "name": "LeaseInactiveError",
+      "msg": "The provided lease account is not active."
+    },
+    {
+      "code": 6047,
+      "name": "NoAggregatorJobsFound",
+      "msg": "No jobs are currently included in the aggregator."
+    },
+    {
+      "code": 6048,
+      "name": "IntegerUnderflowError",
+      "msg": "An integer underflow occurred."
+    },
+    {
+      "code": 6049,
+      "name": "OracleQueueMismatch",
+      "msg": "An invalid oracle queue account was provided."
+    },
+    {
+      "code": 6050,
+      "name": "OracleWalletMismatchError",
+      "msg": "An unexpected oracle wallet account was provided for the transaction."
+    },
+    {
+      "code": 6051,
+      "name": "InvalidBufferAccountError",
+      "msg": "An invalid buffer account was provided."
+    },
+    {
+      "code": 6052,
+      "name": "InsufficientOracleQueueError",
+      "msg": "Insufficient oracle queue size."
+    },
+    {
+      "code": 6053,
+      "name": "InvalidAuthorityError",
+      "msg": "Invalid authority account provided."
+    },
+    {
+      "code": 6054,
+      "name": "InvalidTokenAccountMintError",
+      "msg": "A provided token wallet is associated with an incorrect mint."
+    },
+    {
+      "code": 6055,
+      "name": "ExcessiveLeaseWithdrawlError",
+      "msg": "You must leave enough funds to perform at least 1 update in the lease."
+    },
+    {
+      "code": 6056,
+      "name": "InvalideHistoryAccountError",
+      "msg": "Invalid history account provided."
+    },
+    {
+      "code": 6057,
+      "name": "InvalidLeaseAccountEscrowError",
+      "msg": "Invalid lease account escrow."
+    },
+    {
+      "code": 6058,
+      "name": "InvalidCrankAccountError",
+      "msg": "Invalid crank provided."
+    },
+    {
+      "code": 6059,
+      "name": "CrankNoElementsReadyError",
+      "msg": "No elements ready to be popped."
+    },
+    {
+      "code": 6060,
+      "name": "IndexOutOfBoundsError",
+      "msg": "Index out of bounds"
+    },
+    {
+      "code": 6061,
+      "name": "VrfInvalidRequestError",
+      "msg": "Invalid vrf request params"
+    },
+    {
+      "code": 6062,
+      "name": "VrfInvalidProofSubmissionError",
+      "msg": "Vrf proof failed to verify"
+    },
+    {
+      "code": 6063,
+      "name": "VrfVerifyError",
+      "msg": "Error in verifying vrf proof."
+    },
+    {
+      "code": 6064,
+      "name": "VrfCallbackError",
+      "msg": "Vrf callback function failed."
+    },
+    {
+      "code": 6065,
+      "name": "VrfCallbackParamsError",
+      "msg": "Invalid vrf callback params provided."
+    },
+    {
+      "code": 6066,
+      "name": "VrfCallbackAlreadyCalledError",
+      "msg": "Vrf callback has already been triggered."
+    },
+    {
+      "code": 6067,
+      "name": "VrfInvalidPubkeyError",
+      "msg": "The provided pubkey is invalid to use in ecvrf proofs"
+    },
+    {
+      "code": 6068,
+      "name": "VrfTooManyVerifyCallsError",
+      "msg": "Number of required verify calls exceeded"
+    },
+    {
+      "code": 6069,
+      "name": "VrfRequestAlreadyLaunchedError",
+      "msg": "Vrf request is already pending"
+    },
+    {
+      "code": 6070,
+      "name": "VrfInsufficientVerificationError",
+      "msg": "Insufficient amount of proofs collected for VRF callback"
+    },
+    {
+      "code": 6071,
+      "name": "InvalidVrfProducerError",
+      "msg": "An incorrect oracle attempted to submit a proof"
+    },
+    {
+      "code": 6072,
+      "name": "InvalidGovernancePidError",
+      "msg": "Invalid SPLGovernance Account Supplied"
+    },
+    {
+      "code": 6073,
+      "name": "InvalidGovernanceAccountError",
+      "msg": "An Invalid Governance Account was supplied"
+    },
+    {
+      "code": 6074,
+      "name": "MissingOptionalAccount",
+      "msg": "Expected an optional account"
+    },
+    {
+      "code": 6075,
+      "name": "InvalidSpawnRecordOwner",
+      "msg": "Invalid Owner for Spawn Record"
+    },
+    {
+      "code": 6076,
+      "name": "NoopError",
+      "msg": "Noop error"
+    },
+    {
+      "code": 6077,
+      "name": "MissingRequiredAccountsError",
+      "msg": "A required instruction account was not included"
+    },
+    {
+      "code": 6078,
+      "name": "InvalidMintError",
+      "msg": "Invalid mint account passed for instruction"
+    },
+    {
+      "code": 6079,
+      "name": "InvalidTokenAccountKeyError",
+      "msg": "An invalid token account was passed into the instruction"
+    },
+    {
+      "code": 6080,
+      "name": "InvalidJobAccountError",
+      "msg": ""
+    }
+  ]
 }
 
 export const IDL: Switchboard = {
-  "version": "0.0.0",
+  "version": "0.1.0",
   "name": "switchboard_v2",
   "instructions": [
     {
@@ -4662,11 +5043,6 @@ export const IDL: Switchboard = {
         },
         {
           "name": "queue",
-          "isMut": false,
-          "isSigner": false
-        },
-        {
-          "name": "authorWallet",
           "isMut": false,
           "isSigner": false
         },
@@ -4758,6 +5134,11 @@ export const IDL: Switchboard = {
         },
         {
           "name": "dataBuffer",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -4860,6 +5241,11 @@ export const IDL: Switchboard = {
         {
           "name": "historyBuffer",
           "isMut": true,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
           "isSigner": false
         }
       ],
@@ -5151,6 +5537,11 @@ export const IDL: Switchboard = {
           "name": "queueDataBuffer",
           "isMut": false,
           "isSigner": false
+        },
+        {
+          "name": "mint",
+          "isMut": false,
+          "isSigner": false
         }
       ],
       "args": [
@@ -5229,7 +5620,7 @@ export const IDL: Switchboard = {
           "isSigner": false
         },
         {
-          "name": "authorWallet",
+          "name": "authority",
           "isMut": false,
           "isSigner": false
         },
@@ -5288,6 +5679,11 @@ export const IDL: Switchboard = {
         },
         {
           "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -5351,6 +5747,11 @@ export const IDL: Switchboard = {
         },
         {
           "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -5432,6 +5833,11 @@ export const IDL: Switchboard = {
         },
         {
           "name": "programState",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -5566,6 +5972,11 @@ export const IDL: Switchboard = {
         },
         {
           "name": "systemProgram",
+          "isMut": false,
+          "isSigner": false
+        },
+        {
+          "name": "mint",
           "isMut": false,
           "isSigner": false
         }
@@ -6270,8 +6681,13 @@ export const IDL: Switchboard = {
             }
           },
           {
-            "name": "authorWallet",
-            "type": "publicKey"
+            "name": "reserved1",
+            "type": {
+              "array": [
+                "u8",
+                32
+              ]
+            }
           },
           {
             "name": "queuePubkey",
@@ -6391,11 +6807,24 @@ export const IDL: Switchboard = {
             "type": "u64"
           },
           {
+            "name": "disableCrank",
+            "type": "bool"
+          },
+          {
+            "name": "jobWeights",
+            "type": {
+              "array": [
+                "u8",
+                16
+              ]
+            }
+          },
+          {
             "name": "ebuf",
             "type": {
               "array": [
                 "u8",
-                164
+                147
               ]
             }
           }
@@ -6601,11 +7030,15 @@ export const IDL: Switchboard = {
             "type": "bool"
           },
           {
+            "name": "mint",
+            "type": "publicKey"
+          },
+          {
             "name": "ebuf",
             "type": {
               "array": [
                 "u8",
-                1001
+                969
               ]
             }
           },
@@ -6760,7 +7193,7 @@ export const IDL: Switchboard = {
             }
           },
           {
-            "name": "authorWallet",
+            "name": "authority",
             "type": "publicKey"
           },
           {
@@ -6783,6 +7216,14 @@ export const IDL: Switchboard = {
           {
             "name": "referenceCount",
             "type": "u32"
+          },
+          {
+            "name": "totalSpent",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "i64"
           }
         ]
       }
@@ -6867,7 +7308,14 @@ export const IDL: Switchboard = {
       "name": "AggregatorAddJobParams",
       "type": {
         "kind": "struct",
-        "fields": []
+        "fields": [
+          {
+            "name": "weight",
+            "type": {
+              "option": "u8"
+            }
+          }
+        ]
       }
     },
     {
@@ -6930,6 +7378,10 @@ export const IDL: Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          },
+          {
+            "name": "disableCrank",
+            "type": "bool"
           }
         ]
       }
@@ -7232,6 +7684,10 @@ export const IDL: Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          },
+          {
+            "name": "walletBumps",
+            "type": "bytes"
           }
         ]
       }
@@ -7256,6 +7712,10 @@ export const IDL: Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          },
+          {
+            "name": "walletBumps",
+            "type": "bytes"
           }
         ]
       }
@@ -7504,6 +7964,120 @@ export const IDL: Switchboard = {
           {
             "name": "stateBump",
             "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VaultTransferParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfInitParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "callback",
+            "type": {
+              "defined": "Callback"
+            }
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfProveParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "proof",
+            "type": "bytes"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfProveAndVerifyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
+          },
+          {
+            "name": "proof",
+            "type": "bytes"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfRequestRandomnessParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "permissionBump",
+            "type": "u8"
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "VrfVerifyParams",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "nonce",
+            "type": {
+              "option": "u32"
+            }
+          },
+          {
+            "name": "stateBump",
+            "type": "u8"
+          },
+          {
+            "name": "idx",
+            "type": "u32"
           }
         ]
       }
@@ -8326,115 +8900,165 @@ export const IDL: Switchboard = {
       }
     },
     {
-      "name": "VaultTransferParams",
+      "name": "Lanes",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "C"
           },
           {
-            "name": "amount",
-            "type": "u64"
+            "name": "D"
+          },
+          {
+            "name": "AB"
+          },
+          {
+            "name": "AC"
+          },
+          {
+            "name": "CD"
+          },
+          {
+            "name": "AD"
+          },
+          {
+            "name": "BC"
+          },
+          {
+            "name": "ABCD"
           }
         ]
       }
     },
     {
-      "name": "VrfInitParams",
+      "name": "Shuffle",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "callback",
-            "type": {
-              "defined": "Callback"
-            }
+            "name": "AAAA"
           },
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "BBBB"
+          },
+          {
+            "name": "CACA"
+          },
+          {
+            "name": "DBBD"
+          },
+          {
+            "name": "ADDA"
+          },
+          {
+            "name": "CBCB"
+          },
+          {
+            "name": "ABAB"
+          },
+          {
+            "name": "BADC"
+          },
+          {
+            "name": "BACD"
+          },
+          {
+            "name": "ABDC"
           }
         ]
       }
     },
     {
-      "name": "VrfProveParams",
+      "name": "Shuffle",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "proof",
-            "type": "bytes"
+            "name": "AAAA"
           },
           {
-            "name": "idx",
-            "type": "u32"
+            "name": "BBBB"
+          },
+          {
+            "name": "BADC"
+          },
+          {
+            "name": "BACD"
+          },
+          {
+            "name": "ADDA"
+          },
+          {
+            "name": "CBCB"
+          },
+          {
+            "name": "ABDC"
+          },
+          {
+            "name": "ABAB"
+          },
+          {
+            "name": "DBBD"
+          },
+          {
+            "name": "CACA"
           }
         ]
       }
     },
     {
-      "name": "VrfProveAndVerifyParams",
+      "name": "Lanes",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "nonce",
-            "type": {
-              "option": "u32"
-            }
+            "name": "D"
           },
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "C"
           },
           {
-            "name": "idx",
-            "type": "u32"
+            "name": "AB"
           },
           {
-            "name": "proof",
-            "type": "bytes"
+            "name": "AC"
+          },
+          {
+            "name": "AD"
+          },
+          {
+            "name": "BCD"
           }
         ]
       }
     },
     {
-      "name": "VrfRequestRandomnessParams",
+      "name": "Error",
       "type": {
-        "kind": "struct",
-        "fields": [
+        "kind": "enum",
+        "variants": [
           {
-            "name": "permissionBump",
-            "type": "u8"
+            "name": "InvalidPublicKey"
           },
           {
-            "name": "stateBump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "VrfVerifyParams",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nonce",
-            "type": {
-              "option": "u32"
-            }
+            "name": "SerializationError",
+            "fields": [
+              {
+                "defined": "bincode::Error"
+              }
+            ]
           },
           {
-            "name": "stateBump",
-            "type": "u8"
+            "name": "DeserializationError",
+            "fields": [
+              {
+                "defined": "bincode::Error"
+              }
+            ]
           },
           {
-            "name": "idx",
-            "type": "u32"
+            "name": "InvalidDataError"
           }
         ]
       }
@@ -8477,242 +9101,6 @@ export const IDL: Switchboard = {
       }
     },
     {
-      "name": "SwitchboardError",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "ArrayOperationError"
-          },
-          {
-            "name": "QueueOperationError"
-          },
-          {
-            "name": "IncorrectProgramOwnerError"
-          },
-          {
-            "name": "InvalidAggregatorRound"
-          },
-          {
-            "name": "TooManyAggregatorJobs"
-          },
-          {
-            "name": "AggregatorCurrentRoundClosed"
-          },
-          {
-            "name": "AggregatorInvalidSaveResult"
-          },
-          {
-            "name": "InvalidStrDecimalConversion"
-          },
-          {
-            "name": "AccountLoaderMissingSignature"
-          },
-          {
-            "name": "MissingRequiredSignature"
-          },
-          {
-            "name": "ArrayOverflowError"
-          },
-          {
-            "name": "ArrayUnderflowError"
-          },
-          {
-            "name": "PubkeyNotFoundError"
-          },
-          {
-            "name": "AggregatorIllegalRoundOpenCall"
-          },
-          {
-            "name": "AggregatorIllegalRoundCloseCall"
-          },
-          {
-            "name": "AggregatorClosedError"
-          },
-          {
-            "name": "IllegalOracleIdxError"
-          },
-          {
-            "name": "OracleAlreadyRespondedError"
-          },
-          {
-            "name": "ProtoDeserializeError"
-          },
-          {
-            "name": "UnauthorizedStateUpdateError"
-          },
-          {
-            "name": "MissingOracleAccountsError"
-          },
-          {
-            "name": "OracleMismatchError"
-          },
-          {
-            "name": "CrankMaxCapacityError"
-          },
-          {
-            "name": "AggregatorLeaseInsufficientFunds"
-          },
-          {
-            "name": "IncorrectTokenAccountMint"
-          },
-          {
-            "name": "InvalidEscrowAccount"
-          },
-          {
-            "name": "CrankEmptyError"
-          },
-          {
-            "name": "PdaDeriveError"
-          },
-          {
-            "name": "AggregatorAccountNotFound"
-          },
-          {
-            "name": "PermissionAccountNotFound"
-          },
-          {
-            "name": "LeaseAccountDeriveFailure"
-          },
-          {
-            "name": "PermissionAccountDeriveFailure"
-          },
-          {
-            "name": "EscrowAccountNotFound"
-          },
-          {
-            "name": "LeaseAccountNotFound"
-          },
-          {
-            "name": "DecimalConversionError"
-          },
-          {
-            "name": "PermissionDenied"
-          },
-          {
-            "name": "QueueAtCapacity"
-          },
-          {
-            "name": "ExcessiveCrankRowsError"
-          },
-          {
-            "name": "AggregatorLockedError"
-          },
-          {
-            "name": "AggregatorInvalidBatchSizeError"
-          },
-          {
-            "name": "AggregatorJobChecksumMismatch"
-          },
-          {
-            "name": "IntegerOverflowError"
-          },
-          {
-            "name": "InvalidUpdatePeriodError"
-          },
-          {
-            "name": "NoResultsError"
-          },
-          {
-            "name": "InvalidExpirationError"
-          },
-          {
-            "name": "InsufficientStakeError"
-          },
-          {
-            "name": "LeaseInactiveError"
-          },
-          {
-            "name": "NoAggregatorJobsFound"
-          },
-          {
-            "name": "IntegerUnderflowError"
-          },
-          {
-            "name": "OracleQueueMismatch"
-          },
-          {
-            "name": "OracleWalletMismatchError"
-          },
-          {
-            "name": "InvalidBufferAccountError"
-          },
-          {
-            "name": "InsufficientOracleQueueError"
-          },
-          {
-            "name": "InvalidAuthorityError"
-          },
-          {
-            "name": "InvalidTokenAccountMintError"
-          },
-          {
-            "name": "ExcessiveLeaseWithdrawlError"
-          },
-          {
-            "name": "InvalideHistoryAccountError"
-          },
-          {
-            "name": "InvalidLeaseAccountEscrowError"
-          },
-          {
-            "name": "InvalidCrankAccountError"
-          },
-          {
-            "name": "CrankNoElementsReadyError"
-          },
-          {
-            "name": "IndexOutOfBoundsError"
-          },
-          {
-            "name": "VrfInvalidRequestError"
-          },
-          {
-            "name": "VrfInvalidProofSubmissionError"
-          },
-          {
-            "name": "VrfVerifyError"
-          },
-          {
-            "name": "VrfCallbackError"
-          },
-          {
-            "name": "VrfCallbackParamsError"
-          },
-          {
-            "name": "VrfCallbackAlreadyCalledError"
-          },
-          {
-            "name": "VrfInvalidPubkeyError"
-          },
-          {
-            "name": "VrfTooManyVerifyCallsError"
-          },
-          {
-            "name": "VrfRequestAlreadyLaunchedError"
-          },
-          {
-            "name": "VrfInsufficientVerificationError"
-          },
-          {
-            "name": "InvalidVrfProducerError"
-          },
-          {
-            "name": "InvalidGovernancePidError"
-          },
-          {
-            "name": "InvalidGovernanceAccountError"
-          },
-          {
-            "name": "MissingOptionalAccount"
-          },
-          {
-            "name": "InvalidSpawnRecordOwner"
-          }
-        ]
-      }
-    },
-    {
       "name": "VrfStatus",
       "type": {
         "kind": "enum",
@@ -8734,36 +9122,6 @@ export const IDL: Switchboard = {
           },
           {
             "name": "StatusVerifyFailure"
-          }
-        ]
-      }
-    },
-    {
-      "name": "Error",
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "InvalidPublicKey"
-          },
-          {
-            "name": "SerializationError",
-            "fields": [
-              {
-                "defined": "bincode::Error"
-              }
-            ]
-          },
-          {
-            "name": "DeserializationError",
-            "fields": [
-              {
-                "defined": "bincode::Error"
-              }
-            ]
-          },
-          {
-            "name": "InvalidDataError"
           }
         ]
       }
@@ -9227,7 +9585,411 @@ export const IDL: Switchboard = {
       ]
     }
   ],
-  "metadata": {
-    "address": "7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"
-  }
+  "errors": [
+    {
+      "code": 6000,
+      "name": "ArrayOperationError",
+      "msg": "Illegal operation on a Switchboard array."
+    },
+    {
+      "code": 6001,
+      "name": "QueueOperationError",
+      "msg": "Illegal operation on a Switchboard queue."
+    },
+    {
+      "code": 6002,
+      "name": "IncorrectProgramOwnerError",
+      "msg": "An account required to be owned by the program has a different owner."
+    },
+    {
+      "code": 6003,
+      "name": "InvalidAggregatorRound",
+      "msg": "Aggregator is not currently populated with a valid round."
+    },
+    {
+      "code": 6004,
+      "name": "TooManyAggregatorJobs",
+      "msg": "Aggregator cannot fit any more jobs."
+    },
+    {
+      "code": 6005,
+      "name": "AggregatorCurrentRoundClosed",
+      "msg": "Aggregator's current round is closed. No results are being accepted."
+    },
+    {
+      "code": 6006,
+      "name": "AggregatorInvalidSaveResult",
+      "msg": "Aggregator received an invalid save result instruction."
+    },
+    {
+      "code": 6007,
+      "name": "InvalidStrDecimalConversion",
+      "msg": "Failed to convert string to decimal format."
+    },
+    {
+      "code": 6008,
+      "name": "AccountLoaderMissingSignature",
+      "msg": "AccountLoader account is missing a required signature."
+    },
+    {
+      "code": 6009,
+      "name": "MissingRequiredSignature",
+      "msg": "Account is missing a required signature."
+    },
+    {
+      "code": 6010,
+      "name": "ArrayOverflowError",
+      "msg": "The attempted action will overflow a zero-copy account array."
+    },
+    {
+      "code": 6011,
+      "name": "ArrayUnderflowError",
+      "msg": "The attempted action will underflow a zero-copy account array."
+    },
+    {
+      "code": 6012,
+      "name": "PubkeyNotFoundError",
+      "msg": "The queried public key was not found."
+    },
+    {
+      "code": 6013,
+      "name": "AggregatorIllegalRoundOpenCall",
+      "msg": "Aggregator round open called too early."
+    },
+    {
+      "code": 6014,
+      "name": "AggregatorIllegalRoundCloseCall",
+      "msg": "Aggregator round close called too early."
+    },
+    {
+      "code": 6015,
+      "name": "AggregatorClosedError",
+      "msg": "Aggregator is closed. Illegal action."
+    },
+    {
+      "code": 6016,
+      "name": "IllegalOracleIdxError",
+      "msg": "Illegal oracle index."
+    },
+    {
+      "code": 6017,
+      "name": "OracleAlreadyRespondedError",
+      "msg": "The provided oracle has already responded this round."
+    },
+    {
+      "code": 6018,
+      "name": "ProtoDeserializeError",
+      "msg": "Failed to deserialize protocol buffer."
+    },
+    {
+      "code": 6019,
+      "name": "UnauthorizedStateUpdateError",
+      "msg": "Unauthorized program state modification attempted."
+    },
+    {
+      "code": 6020,
+      "name": "MissingOracleAccountsError",
+      "msg": "Not enough oracle accounts provided to closeRounds."
+    },
+    {
+      "code": 6021,
+      "name": "OracleMismatchError",
+      "msg": "An unexpected oracle account was provided for the transaction."
+    },
+    {
+      "code": 6022,
+      "name": "CrankMaxCapacityError",
+      "msg": "Attempted to push to a Crank that's at capacity"
+    },
+    {
+      "code": 6023,
+      "name": "AggregatorLeaseInsufficientFunds",
+      "msg": "Aggregator update call attempted but attached lease has insufficient funds."
+    },
+    {
+      "code": 6024,
+      "name": "IncorrectTokenAccountMint",
+      "msg": "The provided token account does not point to the Switchboard token mint."
+    },
+    {
+      "code": 6025,
+      "name": "InvalidEscrowAccount",
+      "msg": "An invalid escrow account was provided."
+    },
+    {
+      "code": 6026,
+      "name": "CrankEmptyError",
+      "msg": "Crank empty. Pop failed."
+    },
+    {
+      "code": 6027,
+      "name": "PdaDeriveError",
+      "msg": "Failed to derive a PDA from the provided seed."
+    },
+    {
+      "code": 6028,
+      "name": "AggregatorAccountNotFound",
+      "msg": "Aggregator account missing from provided account list."
+    },
+    {
+      "code": 6029,
+      "name": "PermissionAccountNotFound",
+      "msg": "Permission account missing from provided account list."
+    },
+    {
+      "code": 6030,
+      "name": "LeaseAccountDeriveFailure",
+      "msg": "Failed to derive a lease account."
+    },
+    {
+      "code": 6031,
+      "name": "PermissionAccountDeriveFailure",
+      "msg": "Failed to derive a permission account."
+    },
+    {
+      "code": 6032,
+      "name": "EscrowAccountNotFound",
+      "msg": "Escrow account missing from provided account list."
+    },
+    {
+      "code": 6033,
+      "name": "LeaseAccountNotFound",
+      "msg": "Lease account missing from provided account list."
+    },
+    {
+      "code": 6034,
+      "name": "DecimalConversionError",
+      "msg": "Decimal conversion method failed."
+    },
+    {
+      "code": 6035,
+      "name": "PermissionDenied",
+      "msg": "Permission account is missing required flags for the given action."
+    },
+    {
+      "code": 6036,
+      "name": "QueueAtCapacity",
+      "msg": "Oracle queue is at lease capacity."
+    },
+    {
+      "code": 6037,
+      "name": "ExcessiveCrankRowsError",
+      "msg": "Data feed is already pushed on a crank."
+    },
+    {
+      "code": 6038,
+      "name": "AggregatorLockedError",
+      "msg": "Aggregator is locked, no setting modifications or job additions allowed."
+    },
+    {
+      "code": 6039,
+      "name": "AggregatorInvalidBatchSizeError",
+      "msg": "Aggregator invalid batch size."
+    },
+    {
+      "code": 6040,
+      "name": "AggregatorJobChecksumMismatch",
+      "msg": "Oracle provided an incorrect aggregator job checksum."
+    },
+    {
+      "code": 6041,
+      "name": "IntegerOverflowError",
+      "msg": "An integer overflow occurred."
+    },
+    {
+      "code": 6042,
+      "name": "InvalidUpdatePeriodError",
+      "msg": "Minimum update period is 5 seconds."
+    },
+    {
+      "code": 6043,
+      "name": "NoResultsError",
+      "msg": "Aggregator round evaluation attempted with no results."
+    },
+    {
+      "code": 6044,
+      "name": "InvalidExpirationError",
+      "msg": "An expiration constraint was broken."
+    },
+    {
+      "code": 6045,
+      "name": "InsufficientStakeError",
+      "msg": "An account provided insufficient stake for action."
+    },
+    {
+      "code": 6046,
+      "name": "LeaseInactiveError",
+      "msg": "The provided lease account is not active."
+    },
+    {
+      "code": 6047,
+      "name": "NoAggregatorJobsFound",
+      "msg": "No jobs are currently included in the aggregator."
+    },
+    {
+      "code": 6048,
+      "name": "IntegerUnderflowError",
+      "msg": "An integer underflow occurred."
+    },
+    {
+      "code": 6049,
+      "name": "OracleQueueMismatch",
+      "msg": "An invalid oracle queue account was provided."
+    },
+    {
+      "code": 6050,
+      "name": "OracleWalletMismatchError",
+      "msg": "An unexpected oracle wallet account was provided for the transaction."
+    },
+    {
+      "code": 6051,
+      "name": "InvalidBufferAccountError",
+      "msg": "An invalid buffer account was provided."
+    },
+    {
+      "code": 6052,
+      "name": "InsufficientOracleQueueError",
+      "msg": "Insufficient oracle queue size."
+    },
+    {
+      "code": 6053,
+      "name": "InvalidAuthorityError",
+      "msg": "Invalid authority account provided."
+    },
+    {
+      "code": 6054,
+      "name": "InvalidTokenAccountMintError",
+      "msg": "A provided token wallet is associated with an incorrect mint."
+    },
+    {
+      "code": 6055,
+      "name": "ExcessiveLeaseWithdrawlError",
+      "msg": "You must leave enough funds to perform at least 1 update in the lease."
+    },
+    {
+      "code": 6056,
+      "name": "InvalideHistoryAccountError",
+      "msg": "Invalid history account provided."
+    },
+    {
+      "code": 6057,
+      "name": "InvalidLeaseAccountEscrowError",
+      "msg": "Invalid lease account escrow."
+    },
+    {
+      "code": 6058,
+      "name": "InvalidCrankAccountError",
+      "msg": "Invalid crank provided."
+    },
+    {
+      "code": 6059,
+      "name": "CrankNoElementsReadyError",
+      "msg": "No elements ready to be popped."
+    },
+    {
+      "code": 6060,
+      "name": "IndexOutOfBoundsError",
+      "msg": "Index out of bounds"
+    },
+    {
+      "code": 6061,
+      "name": "VrfInvalidRequestError",
+      "msg": "Invalid vrf request params"
+    },
+    {
+      "code": 6062,
+      "name": "VrfInvalidProofSubmissionError",
+      "msg": "Vrf proof failed to verify"
+    },
+    {
+      "code": 6063,
+      "name": "VrfVerifyError",
+      "msg": "Error in verifying vrf proof."
+    },
+    {
+      "code": 6064,
+      "name": "VrfCallbackError",
+      "msg": "Vrf callback function failed."
+    },
+    {
+      "code": 6065,
+      "name": "VrfCallbackParamsError",
+      "msg": "Invalid vrf callback params provided."
+    },
+    {
+      "code": 6066,
+      "name": "VrfCallbackAlreadyCalledError",
+      "msg": "Vrf callback has already been triggered."
+    },
+    {
+      "code": 6067,
+      "name": "VrfInvalidPubkeyError",
+      "msg": "The provided pubkey is invalid to use in ecvrf proofs"
+    },
+    {
+      "code": 6068,
+      "name": "VrfTooManyVerifyCallsError",
+      "msg": "Number of required verify calls exceeded"
+    },
+    {
+      "code": 6069,
+      "name": "VrfRequestAlreadyLaunchedError",
+      "msg": "Vrf request is already pending"
+    },
+    {
+      "code": 6070,
+      "name": "VrfInsufficientVerificationError",
+      "msg": "Insufficient amount of proofs collected for VRF callback"
+    },
+    {
+      "code": 6071,
+      "name": "InvalidVrfProducerError",
+      "msg": "An incorrect oracle attempted to submit a proof"
+    },
+    {
+      "code": 6072,
+      "name": "InvalidGovernancePidError",
+      "msg": "Invalid SPLGovernance Account Supplied"
+    },
+    {
+      "code": 6073,
+      "name": "InvalidGovernanceAccountError",
+      "msg": "An Invalid Governance Account was supplied"
+    },
+    {
+      "code": 6074,
+      "name": "MissingOptionalAccount",
+      "msg": "Expected an optional account"
+    },
+    {
+      "code": 6075,
+      "name": "InvalidSpawnRecordOwner",
+      "msg": "Invalid Owner for Spawn Record"
+    },
+    {
+      "code": 6076,
+      "name": "NoopError",
+      "msg": "Noop error"
+    },
+    {
+      "code": 6077,
+      "name": "MissingRequiredAccountsError",
+      "msg": "A required instruction account was not included"
+    },
+    {
+      "code": 6078,
+      "name": "InvalidMintError",
+      "msg": "Invalid mint account passed for instruction"
+    },
+    {
+      "code": 6079,
+      "name": "InvalidTokenAccountKeyError",
+      "msg": "An invalid token account was passed into the instruction"
+    },
+    {
+      "code": 6080,
+      "name": "InvalidJobAccountError",
+      "msg": ""
+    }
+  ]
 }

@@ -42,6 +42,9 @@ import {
 } from '@models/api'
 import { accountsToPubkeyMap } from '@tools/sdk/accounts'
 import { HIDDEN_PROPOSALS } from '@components/instructions/tools'
+import { QUEUE_LIST } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient';
+/*import * as sbv2 from '../../switchboardv2-api';
+import * as anchor from "@project-serum/anchor";*/
 
 interface WalletStore extends State {
   connected: boolean
@@ -126,6 +129,7 @@ const useWalletStore = create<WalletStore>((set, get) => ({
   selectedProposal: INITIAL_PROPOSAL_STATE,
   providerUrl: undefined,
   tokenAccounts: [],
+  switchboardProgram: undefined,
   set: (fn) => set(produce(fn)),
   actions: {
     async fetchRealmBySymbol(cluster: string, symbol: string) {

@@ -17,7 +17,8 @@ import {
   VoterWeight,
 } from '../models/voteWeights'
 
-import { QUEUE_LIST, IDL, Switchboard } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient';
+import { QUEUE_LIST,  } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient';
+import { Switchboard, IDL } from '../SwitchboardVotePlugin/SwitchboardIdl';
 import * as sbv2 from "../../switchboardv2-api";
 import * as anchor from "@project-serum/anchor";
 
@@ -34,6 +35,8 @@ export default function useRealm() {
   const connection = useWalletStore((s) => s.connection)
   const connected = useWalletStore((s) => s.connected)
   const wallet = useWalletStore((s) => s.current)
+  /*const provider = new anchor.Provider(connection, wallet);
+  const switchboardProgram = new anchor.Program<Switchboard>(IDL, new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);*/
   const tokenAccounts = useWalletStore((s) => s.tokenAccounts)
   const {
     realm,
@@ -49,10 +52,10 @@ export default function useRealm() {
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
+  const { getQueuesForSelectedRealm } = useWalletStore((s) => s.actions);
+  //getQueuesForSelectedRealm();
 
   //const anchorProvider = new anchor.AnchorProvider(connection, wallet);
-  const provider = new anchor.Provider(connection, wallet);
-  let switchboardProgram = new anchor.Program<Switchboard>(IDL, new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);
 
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
@@ -108,6 +111,26 @@ export default function useRealm() {
         : undefined,
     [tokenRecords, wallet, connected]
   )
+
+  const switchboardVotingPower = useMemo(
+    () => {
+      //console.log("Realm!!!!");
+      const provider = new anchor.Provider(connection, wallet);
+      //const idl = await anchor.Program.fetchIdl(new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);
+      //console.log("The IDL");
+      //console.log(IDL);
+      const switchboardProgram = new anchor.Program(IDL, new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);
+      let queues = QUEUE_LIST.map((q) => {
+        let queue = new sbv2.OracleQueueAccount({
+          program: switchboardProgram,
+          publicKey: q
+        });
+        console.log(queue);
+        queue.loadData().then((d) => console.log);
+      });
+    },
+    [realm, wallet, connected]
+  );
 
   const canChooseWhoVote =
     realm?.account.communityMint &&
