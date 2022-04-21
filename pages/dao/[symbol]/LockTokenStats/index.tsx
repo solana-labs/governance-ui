@@ -20,6 +20,7 @@ import {
 import { PublicKey } from '@solana/web3.js'
 import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
 import { deserializeBorsh } from '@utils/borsh'
+import { ConnectionContext } from '@utils/connection'
 import { abbreviateAddress } from '@utils/formatting'
 import axios from 'axios'
 import dayjs from 'dayjs'
@@ -174,70 +175,11 @@ const LockTokenStats = () => {
   }
   useEffect(() => {
     const getProposalsInstructions = async () => {
-      const getTransactions = await axios.request({
-        url: connection.endpoint,
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        data: JSON.stringify([
-          ...possibleGrantProposals.map((x) => {
-            return {
-              jsonrpc: '2.0',
-              id: 1,
-              method: 'getProgramAccounts',
-              params: [
-                realmInfo!.programId.toBase58(),
-                {
-                  commitment: connection.current.commitment,
-                  encoding: 'base64',
-                  filters: [
-                    {
-                      memcmp: {
-                        offset: 0, // number of bytes
-                        bytes: 'E', // base58 encoded string
-                      },
-                    },
-                    {
-                      memcmp: {
-                        offset: 1,
-                        bytes: x.pubkey.toBase58(),
-                      },
-                    },
-                  ],
-                },
-              ],
-            }
-          }),
-        ]),
-      })
-
-      const accounts: ProgramAccount<ProposalTransaction>[] = []
-      const rawAccounts = getTransactions.data
-        ? getTransactions.data.flatMap((x) => x.result)
-        : []
-      for (const rawAccount of rawAccounts) {
-        try {
-          const getSchema = getGovernanceSchemaForAccount
-          const data = Buffer.from(rawAccount.account.data[0], 'base64')
-          const accountTypes = getAccountTypes(
-            (ProposalTransaction as any) as GovernanceAccountClass
-          )
-          const account: ProgramAccount<ProposalTransaction> = {
-            pubkey: new PublicKey(rawAccount.pubkey),
-            account: deserializeBorsh(
-              getSchema(accountTypes[1]),
-              ProposalTransaction,
-              data
-            ),
-            owner: new PublicKey(rawAccount.account.owner),
-          }
-
-          accounts.push(account)
-        } catch (ex) {
-          console.info(`Can't deserialize @ ${rawAccount.pubkey}, ${ex}.`)
-        }
-      }
+      const accounts = await getProposalsTransactions(
+        possibleGrantProposals.map((x) => x.pubkey),
+        connection,
+        realmInfo!.programId
+      )
 
       const givenGrantsTokenAmount = accounts
         .filter(
@@ -383,7 +325,7 @@ const LockTokenStats = () => {
                 <div>{fmtMangoAmount(givenGrantsTokenAmount)}</div>
               </div>
               <div>
-                MNGO Locked
+                Total MNGO Locked
                 <div>{mngoLockedFmt}</div>
               </div>
               <div>
@@ -471,6 +413,79 @@ const LockTokenRow = ({
       <div>{lockedTokens}</div>
     </div>
   )
+}
+
+//TODO fcn specific to grant instruction => make it generic for all governanceAccounts and move to sdk
+const getProposalsTransactions = async (
+  pubkeys: PublicKey[],
+  connection: ConnectionContext,
+  programId: PublicKey
+) => {
+  const getTransactions = await axios.request({
+    url: connection.endpoint,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    data: JSON.stringify([
+      ...pubkeys.map((x) => {
+        return {
+          jsonrpc: '2.0',
+          id: 1,
+          method: 'getProgramAccounts',
+          params: [
+            programId.toBase58(),
+            {
+              commitment: connection.current.commitment,
+              encoding: 'base64',
+              filters: [
+                {
+                  memcmp: {
+                    offset: 0, // number of bytes
+                    bytes: 'E', // base58 encoded string
+                  },
+                },
+                {
+                  memcmp: {
+                    offset: 1,
+                    bytes: x.toBase58(),
+                  },
+                },
+              ],
+            },
+          ],
+        }
+      }),
+    ]),
+  })
+
+  const accounts: ProgramAccount<ProposalTransaction>[] = []
+  const rawAccounts = getTransactions.data
+    ? getTransactions.data.flatMap((x) => x.result)
+    : []
+  for (const rawAccount of rawAccounts) {
+    try {
+      const getSchema = getGovernanceSchemaForAccount
+      const data = Buffer.from(rawAccount.account.data[0], 'base64')
+      const accountTypes = getAccountTypes(
+        (ProposalTransaction as any) as GovernanceAccountClass
+      )
+      const account: ProgramAccount<ProposalTransaction> = {
+        pubkey: new PublicKey(rawAccount.pubkey),
+        account: deserializeBorsh(
+          getSchema(accountTypes[1]),
+          ProposalTransaction,
+          data
+        ),
+        owner: new PublicKey(rawAccount.account.owner),
+      }
+
+      accounts.push(account)
+    } catch (ex) {
+      console.info(`Can't deserialize @ ${rawAccount.pubkey}, ${ex}.`)
+    }
+  }
+  return accounts
 }
 
 export default LockTokenStats
