@@ -30,6 +30,16 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "MangoLiquidityDAO",
+    "displayName": "Mango Liquidity DAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "DnWHRVRbA2XGwWth2da7iF3Q81cqRHhqJXSPS8J3G6fo",
+    "website": "https://mango.markets",
+    "keywords": "Mango Markets, REALM, Governance, Serum, SRM, Serum DEX, DEFI, Decentralized Finance, Decentralised Finance, Crypto, ERC20, Ethereum, Decentralize, Solana, SOL, SPL, Cross-Chain, Trading, Fastest, Fast, SerumBTC, SerumUSD, SRM Tokens, SPL Tokens",
+    "twitter": "@mangomarkets",
+    "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
+  },
+  {
     "symbol": "ORCA",
     "displayName": "Orca DAO",
     "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
