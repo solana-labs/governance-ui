@@ -56,7 +56,9 @@ const DepositNFTAddress = ({ additionalBtns }: { additionalBtns?: any }) => {
       throw 'no realm selected'
     }
     const mintPK = new PublicKey(form.mint)
-    const owner = currentAccount!.governance!.pubkey
+    const owner = currentAccount?.isSol
+      ? currentAccount.extensions.transferAddress!
+      : currentAccount!.governance!.pubkey
     const ataPk = await Token.getAssociatedTokenAddress(
       ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
       TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID

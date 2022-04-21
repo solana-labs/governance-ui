@@ -15,7 +15,6 @@ import useWalletStore from 'stores/useWalletStore'
 import AccountHeader from './AccountHeader'
 import DepositNFT from './DepositNFT'
 import SendTokens from './SendTokens'
-import GenericSendTokens, { GenericSendTokensProps } from './GenericSendTokens'
 import {
   ExternalLinkIcon,
   PlusCircleIcon,
@@ -39,10 +38,10 @@ import LoadingRows from './LoadingRows'
 const AccountOverview = () => {
   const router = useRouter()
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
-      ? governanceNfts[currentAccount?.governance?.pubkey.toBase58()]?.length
+      ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
       : 0
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
@@ -69,10 +68,6 @@ const AccountOverview = () => {
     TreasuryStrategy[]
   >([])
   const [showStrategies, setShowStrategies] = useState(false)
-  const [
-    genericSendTokenInfo,
-    setGenericSendTokenInfo,
-  ] = useState<GenericSendTokensProps | null>(null)
   const [
     proposedInvestment,
     setProposedInvestment,
@@ -157,9 +152,7 @@ const AccountOverview = () => {
             <p
               className="cursor-pointer default-transition text-primary-light hover:text-primary-dark"
               onClick={() => {
-                const url = fmtUrlWithCluster(
-                  `/dao/${symbol}/gallery/${currentAccount.extensions.transferAddress}`
-                )
+                const url = fmtUrlWithCluster(`/dao/${symbol}/gallery`)
                 router.push(url)
               }}
             >
@@ -382,17 +375,6 @@ const AccountOverview = () => {
           isOpen={openMsolConvertModal}
         >
           <ConvertToMsol />
-        </Modal>
-      )}
-      {genericSendTokenInfo && (
-        <Modal
-          sizeClassName="sm:max-w-3xl"
-          onClose={() => {
-            setGenericSendTokenInfo(null)
-          }}
-          isOpen={!!genericSendTokenInfo}
-        >
-          <GenericSendTokens {...genericSendTokenInfo} />
         </Modal>
       )}
     </>

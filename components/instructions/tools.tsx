@@ -124,6 +124,9 @@ export const ACCOUNT_NAMES = {
   wpSyytRSgo1b5RE6PYT9GMWubdq6EdbGC8PEbcz4Kff: 'DAOPool Fee Collection',
   xuEfu6gmCn1RSXSAVpWLTYttx685m9rAbzqwwYUjYXJ: 'DAOJones Fractionalized Tokens',
   GQDFqZ7URyWAiPMQs4ywZ9pKBqrUg4srdkqnZpRUstQz: 'Merch Escrow Holdings',
+  '7JPpGyJTEXwR9uQSqhi6RAK5GiSTr41oq72PJ4fU5CXf': 'Marketing Wallet SOL',
+  '2FCKVvw3JmRD6Q2DFb3ZzW697GKjYka8JwGMSF7juWZd': 'Marketing Wallet USDC',
+  '8Ha82qmXrTYPKvy65scFA3SWHEGENBYP8CVg8iC4Hx5b': 'Merch Escrow Holdings',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -142,11 +145,11 @@ export const HIDDEN_PROPOSALS = new Map<string, string>([
   ['E8XgiVpDJgDf4XgBKjZnMs3S1K7cmibtbDqjw5aNobCZ', ''],
 ])
 
-export const DEFAULT_NFT_TREASURY_MINT =
-  'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
-
 export const DEFAULT_NATIVE_SOL_MINT =
   'GSoLvSToqaUmMyqP12GffzcirPAickrpZmVUFtek6x5u'
+
+export const DEFAULT_NFT_TREASURY_MINT =
+  'GNFTm5rz1Kzvq94G7DJkcrEUnCypeQYf7Ya8arPoHWvw'
 
 export function getAccountName(accountPk: PublicKey) {
   return ACCOUNT_NAMES[accountPk.toBase58()] ?? getProgramName(accountPk)
@@ -157,6 +160,7 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 )
 
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
+export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',
@@ -167,6 +171,8 @@ const HIDDEN_MNGO_TREASURES = [
   '6VYcrmbK4QNC7WpfVRXBAXP59ZH2FkUMBoMYhtgENGMn',
   '4Z8nAK9grjokaUqJNtw2AEkYAR1vcw8pkCWZcbVEEdh5',
   'FTiWWq3cgETfPkYqP36xFUhT7KMoFYyCiPKeYQU1e4U8',
+  'FrkLPsCadx4tE4qDobbu2GTD5ffjWBpormHbLLy35PUS',
+  'CaoFkVyPJugKMdzDT1NGnsQJ8dWe4kZFaETCbtWz1QBr',
 ]
 
 export const HIDDEN_TREASURES = [...HIDDEN_MNGO_TREASURES]

@@ -58,11 +58,15 @@ export default function useGovernanceAssets() {
         realm?.account.config.councilMint?.toBase58()
     )
   }
-  // TODO: Check governedAccounts from all governances plus search for token accounts owned by governances
-  const canUseTransferInstruction = canUseGovernanceForInstruction([
-    GovernanceAccountType.TokenGovernanceV1,
-    GovernanceAccountType.TokenGovernanceV2,
-  ])
+  const canUseTransferInstruction = governedTokenAccounts.some((acc) => {
+    const governance = governancesArray.find(
+      (x) => acc.governance.pubkey.toBase58() === x.pubkey.toBase58()
+    )
+    return (
+      governance &&
+      ownVoterWeight.canCreateProposal(governance?.account?.config)
+    )
+  })
 
   const canUseProgramUpgradeInstruction = canUseGovernanceForInstruction([
     GovernanceAccountType.ProgramGovernanceV1,
@@ -246,6 +250,11 @@ export default function useGovernanceAssets() {
       id: Instructions.CreateNftPluginMaxVoterWeight,
       name: 'Create NFT plugin max voter weight',
       isVisible: canUseAuthorityInstruction,
+    },
+    {
+      id: Instructions.CloseTokenAccount,
+      name: 'Close token account',
+      isVisible: canUseTransferInstruction,
     },
     {
       id: Instructions.None,

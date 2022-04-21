@@ -18,14 +18,14 @@ export interface NftSelectorFunctions {
 
 function NFTSelector(
   {
-    ownerPk,
+    ownersPk,
     onNftSelect,
     nftWidth = '150px',
     nftHeight = '150px',
     selectable = true,
     predefinedNfts,
   }: {
-    ownerPk: PublicKey
+    ownersPk: PublicKey[]
     onNftSelect: (nfts: NFTWithMint[]) => void
     nftWidth?: string
     nftHeight?: string
@@ -50,7 +50,10 @@ function NFTSelector(
   }
   const handleGetNfts = async () => {
     setIsLoading(true)
-    const nfts = await getNfts(connection.current, ownerPk)
+    const response = await Promise.all(
+      ownersPk.map((x) => getNfts(connection.current, x))
+    )
+    const nfts = response.flatMap((x) => x)
     if (nfts.length === 1) {
       handleSelectNft(nfts[0])
     } else {
@@ -64,10 +67,10 @@ function NFTSelector(
   }))
 
   useEffect(() => {
-    if (ownerPk && !isPredefinedMode) {
+    if (ownersPk.length && !isPredefinedMode) {
       handleGetNfts()
     }
-  }, [ownerPk])
+  }, [ownersPk.length])
   useEffect(() => {
     if (!isPredefinedMode) {
       onNftSelect(selectedNfts)
@@ -110,7 +113,7 @@ function NFTSelector(
             </div>
           ) : (
             <div className="text-fgd-3 flex flex-col items-center">
-              {"Connected wallet doesn't have any NFTs"}
+              {"Account doesn't have any NFTs"}
               <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
             </div>
           )

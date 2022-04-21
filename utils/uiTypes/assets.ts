@@ -1,3 +1,4 @@
+import { BN } from '@project-serum/anchor'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
 import { AccountInfo, MintInfo, u64 } from '@solana/spl-token'
 import { ParsedAccountData, PublicKey } from '@solana/web3.js'
@@ -115,7 +116,6 @@ export class AccountTypeSol implements AssetAccount {
   pubkey: PublicKey
   isSol: boolean
   constructor(
-    tokenAccount: TokenProgramAccount<AccountInfo>,
     mint: TokenProgramAccount<MintInfo>,
     solAddress: PublicKey,
     solAccount: AccountInfoGen<Buffer | ParsedAccountData>,
@@ -123,12 +123,12 @@ export class AccountTypeSol implements AssetAccount {
   ) {
     this.governance = governance
     this.type = AccountType.SOL
-    this.pubkey = tokenAccount.publicKey
+    this.pubkey = solAddress
     this.extensions = {
-      token: tokenAccount,
+      token: undefined,
       mint: mint,
       transferAddress: solAddress,
-      amount: tokenAccount.account.amount,
+      amount: new BN(solAccount.lamports),
       solAccount: solAccount,
     }
     this.isSol = true

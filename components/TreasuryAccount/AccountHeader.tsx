@@ -7,10 +7,10 @@ import BaseAccountHeader from './BaseAccountHeader'
 
 const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
-      ? governanceNfts[currentAccount?.governance?.pubkey.toBase58()]?.length
+      ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
       : 0
   const isNFT = currentAccount?.isNft
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)

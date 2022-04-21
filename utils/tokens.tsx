@@ -281,12 +281,10 @@ export function getSolAccountLabel(acc: AssetAccount | undefined) {
   let amount = ''
   let imgUrl = ''
 
-  if (acc?.extensions.token && acc.extensions.mint) {
+  if (acc?.extensions.mint) {
     const info = tokenService.getTokenInfo(WSOL_MINT)
     imgUrl = info?.logoURI ? info.logoURI : ''
-    tokenAccount =
-      acc.extensions.transferAddress?.toBase58() ||
-      acc.extensions.token.publicKey.toBase58()
+    tokenAccount = acc.extensions.transferAddress!.toBase58()
     tokenName = 'SOL'
 
     tokenAccountName = acc.extensions.transferAddress
