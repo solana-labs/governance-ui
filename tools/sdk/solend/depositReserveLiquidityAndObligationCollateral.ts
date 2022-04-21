@@ -1,22 +1,39 @@
 import { BN } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { depositReserveLiquidityAndObligationCollateralInstruction } from '@solendprotocol/solend-sdk';
-import { SupportedMintName } from './configuration';
-
-import SolendConfiguration from './configuration';
-
-import { deriveObligationAddressFromWalletAndSeed } from './utils';
 import { findATAAddrSync } from '@utils/ataTools';
+import SolendConfiguration, {
+  SupportedLendingMarketName,
+  SupportedTokenName,
+} from './configuration';
+import { deriveObligationAddressFromWalletAndSeed } from './utils';
 
 export async function depositReserveLiquidityAndObligationCollateral({
   obligationOwner,
   liquidityAmount,
-  mintName,
+  lendingMarketName,
+  tokenName,
 }: {
   obligationOwner: PublicKey;
   liquidityAmount: number | BN;
-  mintName: SupportedMintName;
+  lendingMarketName: SupportedLendingMarketName;
+  tokenName: SupportedTokenName;
 }) {
+  const {
+    supportedTokens,
+    lendingMarket,
+    lendingMarketAuthority,
+    seed,
+  } = SolendConfiguration.getSupportedLendingMarketInformation(
+    lendingMarketName,
+  );
+
+  if (!supportedTokens[tokenName]) {
+    throw new Error(
+      `Unsupported token ${tokenName} for Lending market ${lendingMarketName}`,
+    );
+  }
+
   const {
     relatedCollateralMint,
     mint,
@@ -25,7 +42,7 @@ export async function depositReserveLiquidityAndObligationCollateral({
     pythOracle,
     switchboardFeedAddress,
     reserveCollateralSupplySplTokenAccount,
-  } = SolendConfiguration.getSupportedMintInformation(mintName);
+  } = supportedTokens[tokenName]!;
 
   const reserveCollateralMint = relatedCollateralMint.mint;
 
@@ -41,6 +58,7 @@ export async function depositReserveLiquidityAndObligationCollateral({
 
   const obligation = await deriveObligationAddressFromWalletAndSeed(
     obligationOwner,
+    seed,
   );
 
   const transferAuthority = obligationOwner;
@@ -67,8 +85,8 @@ export async function depositReserveLiquidityAndObligationCollateral({
     // Example: cUSDC mint (must be related to sourceLiquidity)
     reserveCollateralMint,
 
-    SolendConfiguration.lendingMarket,
-    SolendConfiguration.lendingMarketAuthority,
+    lendingMarket,
+    lendingMarketAuthority,
 
     destinationCollateral,
     obligation,

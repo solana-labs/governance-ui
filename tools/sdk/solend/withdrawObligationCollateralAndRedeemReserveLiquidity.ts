@@ -2,28 +2,47 @@ import { BN } from '@project-serum/anchor';
 import { PublicKey } from '@solana/web3.js';
 import { withdrawObligationCollateralAndRedeemReserveLiquidity as originalWithdrawFunction } from '@solendprotocol/solend-sdk';
 import { findATAAddrSync } from '@utils/ataTools';
-import SolendConfiguration, { SupportedMintName } from './configuration';
-
+import SolendConfiguration, {
+  SupportedLendingMarketName,
+  SupportedTokenName,
+} from './configuration';
 import { deriveObligationAddressFromWalletAndSeed } from './utils';
 
 export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
   obligationOwner,
   liquidityAmount,
-  mintName,
+  lendingMarketName,
   destinationLiquidity,
+  tokenName,
 }: {
   obligationOwner: PublicKey;
   liquidityAmount: number | BN;
-  mintName: SupportedMintName;
+  lendingMarketName: SupportedLendingMarketName;
+  tokenName: SupportedTokenName;
   destinationLiquidity?: PublicKey;
 }) {
+  const {
+    supportedTokens,
+    lendingMarket,
+    lendingMarketAuthority,
+    seed,
+  } = SolendConfiguration.getSupportedLendingMarketInformation(
+    lendingMarketName,
+  );
+
+  if (!supportedTokens[tokenName]) {
+    throw new Error(
+      `Unsupported token ${tokenName} for Lending market ${lendingMarketName}`,
+    );
+  }
+
   const {
     relatedCollateralMint,
     mint,
     reserve,
     reserveLiquiditySupply,
     reserveCollateralSupplySplTokenAccount,
-  } = SolendConfiguration.getSupportedMintInformation(mintName);
+  } = supportedTokens[tokenName]!;
 
   const reserveCollateralMint = relatedCollateralMint.mint;
 
@@ -35,6 +54,7 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
 
   const obligation = await deriveObligationAddressFromWalletAndSeed(
     obligationOwner,
+    seed,
   );
 
   const transferAuthority = obligationOwner;
@@ -48,8 +68,8 @@ export async function withdrawObligationCollateralAndRedeemReserveLiquidity({
     destinationCollateral,
     withdrawReserve,
     obligation,
-    SolendConfiguration.lendingMarket,
-    SolendConfiguration.lendingMarketAuthority,
+    lendingMarket,
+    lendingMarketAuthority,
     destinationLiquidity ?? usdcTokenAccount,
     reserveCollateralMint,
     reserveLiquiditySupply,

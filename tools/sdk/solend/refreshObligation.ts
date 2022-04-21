@@ -1,30 +1,33 @@
 import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { refreshObligationInstruction } from '@solendprotocol/solend-sdk';
-
-import SolendConfiguration, { SupportedMintName } from './configuration';
-
+import SolendConfiguration, {
+  SupportedLendingMarketName,
+} from './configuration';
 import { deriveObligationAddressFromWalletAndSeed } from './utils';
 
-// Would be nice if we could automatically detect which reserves needs to be refreshed
-// based on the obligationOwner assets in solend
 export async function refreshObligation({
   obligationOwner,
-  mintNames,
+  lendingMarketName,
 }: {
   obligationOwner: PublicKey;
-  mintNames: SupportedMintName[];
+  lendingMarketName: SupportedLendingMarketName;
 }): Promise<TransactionInstruction> {
-  const obligationAddress = await deriveObligationAddressFromWalletAndSeed(
-    obligationOwner,
+  const {
+    seed,
+    supportedTokens,
+  } = SolendConfiguration.getSupportedLendingMarketInformation(
+    lendingMarketName,
   );
 
-  const depositReserves = SolendConfiguration.getReserveOfGivenMints(mintNames);
+  const obligationAddress = await deriveObligationAddressFromWalletAndSeed(
+    obligationOwner,
+    seed,
+  );
 
   return refreshObligationInstruction(
     obligationAddress,
-    // Both deposit reserves + borrow reserves parameters leads to the same data in instruction
-    // they are concatenate
-    depositReserves,
+    // Both deposit reserves + borrow reserves parameters leads to the same data in instruction they are concatenated
+    Object.values(supportedTokens).map(({ reserve }) => reserve),
     [],
     SolendConfiguration.programID,
   );

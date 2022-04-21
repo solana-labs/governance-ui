@@ -1,8 +1,8 @@
 import { nu64, struct, u8 } from 'buffer-layout';
-import SolendConfiguration from '@tools/sdk/solend/configuration';
 import { LendingInstruction } from '@solendprotocol/solend-sdk/dist/instructions/instruction';
 import { Connection } from '@solana/web3.js';
 import { AccountMetaData } from '@solana/spl-governance';
+import SolendConfiguration from '@tools/sdk/solend/configuration';
 
 export const SOLEND_PROGRAM_INSTRUCTIONS = {
   [SolendConfiguration.programID.toBase58()]: {
@@ -52,7 +52,7 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
 
         const reserveNames = reserveAccounts.map(
           (reserveAcc) =>
-            SolendConfiguration.getTokenNameByReservePublicKey(
+            SolendConfiguration.retroEngineerTokenNameUsingReserve(
               reserveAcc.pubkey,
             ) ?? 'unknown',
         );
@@ -81,8 +81,9 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
         const reserve = accounts[0];
 
         const tokenName =
-          SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown';
+          SolendConfiguration.retroEngineerTokenNameUsingReserve(
+            reserve.pubkey,
+          ) ?? 'unknown';
 
         return (
           <div className="flex justify-between">
@@ -123,8 +124,9 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
         const reserve = accounts[2];
 
         const tokenName =
-          SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown';
+          SolendConfiguration.retroEngineerTokenNameUsingReserve(
+            reserve.pubkey,
+          ) ?? 'unknown';
 
         return (
           <div className="flex flex-col">
@@ -176,8 +178,9 @@ export const SOLEND_PROGRAM_INSTRUCTIONS = {
         const reserve = accounts[2];
 
         const tokenName =
-          SolendConfiguration.getTokenNameByReservePublicKey(reserve.pubkey) ??
-          'unknown';
+          SolendConfiguration.retroEngineerTokenNameUsingReserve(
+            reserve.pubkey,
+          ) ?? 'unknown';
 
         return (
           <div className="flex flex-col">

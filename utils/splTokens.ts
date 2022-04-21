@@ -1,6 +1,6 @@
 import { PublicKey } from '@solana/web3.js';
-import SolendConfiguration, {
-  SupportedCollateralMintNames as SolendSupportedCollateralMintNames,
+import solendConfiguration, {
+  SupportedCollateralMintName as SolendSupportedCollateralMintName,
 } from '@tools/sdk/solend/configuration';
 import { abbreviateAddress } from './formatting';
 
@@ -21,7 +21,7 @@ export type SupportedSplTokenNames =
   | 'Saber UXD-USDC LP'
   | 'Saber IOU Token'
   | 'Lifinity UXD-USDC LP'
-  | SolendSupportedCollateralMintNames;
+  | SolendSupportedCollateralMintName;
 
 export const SPL_TOKENS: {
   [key in SupportedSplTokenNames]: SplTokenInformation;
@@ -85,7 +85,7 @@ export const SPL_TOKENS: {
     decimals: 6,
   },
 
-  ...SolendConfiguration.getSupportedCollateralMintsInformation(),
+  ...solendConfiguration.getSupportedCollateralMintsInformation(),
 } as const;
 
 export type SplTokenUIName = typeof SPL_TOKENS[keyof typeof SPL_TOKENS]['name'];

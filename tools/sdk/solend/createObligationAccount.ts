@@ -1,27 +1,32 @@
 import { PublicKey, SystemProgram } from '@solana/web3.js';
-import SolendConfiguration from './configuration';
+import SolendConfiguration, {
+  SupportedLendingMarketName,
+} from './configuration';
 import { deriveObligationAddressFromWalletAndSeed } from './utils';
 
 export async function createObligationAccount({
-  fundingAddress,
-  walletAddress,
+  payer,
+  authority,
+  lendingMarketName,
 }: {
-  fundingAddress: PublicKey;
-  walletAddress: PublicKey;
+  payer: PublicKey;
+  authority: PublicKey;
+  lendingMarketName: SupportedLendingMarketName;
 }) {
-  const newAccountPubkey = await deriveObligationAddressFromWalletAndSeed(
-    walletAddress,
+  const { seed } = SolendConfiguration.getSupportedLendingMarketInformation(
+    lendingMarketName,
   );
 
-  const {
+  const newAccountPubkey = await deriveObligationAddressFromWalletAndSeed(
+    authority,
     seed,
-    lamports,
-    space,
-  } = SolendConfiguration.createObligationConfiguration;
+  );
+
+  const { lamports, space } = SolendConfiguration.createObligationConfiguration;
 
   return SystemProgram.createAccountWithSeed({
-    basePubkey: walletAddress,
-    fromPubkey: fundingAddress,
+    basePubkey: authority,
+    fromPubkey: payer,
     newAccountPubkey,
     programId: SolendConfiguration.programID,
     seed,

@@ -14,7 +14,8 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governed account is required'),
-  mintName: yup.string().required('Token Name is required'),
+  lendingMarketName: yup.string().required('Lending market is required'),
+  tokenName: yup.string().required('Token name is required'),
   uiAmount: yup
     .number()
     .moreThan(0, 'Amount should be more than 0')
@@ -42,14 +43,27 @@ const DepositReserveLiquidityAndObligationCollateral = ({
       },
       schema,
       buildInstruction: async function ({ governedAccountPubkey, form }) {
+        const {
+          supportedTokens,
+        } = SolendConfiguration.getSupportedLendingMarketInformation(
+          form.lendingMarketName!,
+        );
+
+        if (!supportedTokens[form.tokenName!]) {
+          throw new Error(
+            `Unsupported token ${form.tokenName!} for Lending market ${
+              form.lendingMarketName
+            }`,
+          );
+        }
         return depositReserveLiquidityAndObligationCollateral({
           obligationOwner: governedAccountPubkey,
           liquidityAmount: uiAmountToNativeBN(
-            form.uiAmount,
-            SolendConfiguration.getSupportedMintInformation(form.mintName!)
-              .decimals,
+            form.uiAmount!,
+            supportedTokens[form.tokenName!]!.decimals,
           ),
-          mintName: form.mintName!,
+          lendingMarketName: form.lendingMarketName!,
+          tokenName: form.tokenName!,
         });
       },
     },
@@ -63,14 +77,37 @@ const DepositReserveLiquidityAndObligationCollateral = ({
   return (
     <>
       <Select
-        label="Token Name"
-        value={form.mintName}
+        label="Lending Market"
+        value={form.lendingMarketName}
         placeholder="Please select..."
-        onChange={(value) => handleSetForm({ value, propertyName: 'mintName' })}
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'lendingMarketName' })
+        }
         error={formErrors['baseTokenName']}
       >
-        <SelectOptionList list={SolendConfiguration.getSupportedMintNames()} />
+        <SelectOptionList
+          list={SolendConfiguration.getSupportedLendingMarketNames()}
+        />
       </Select>
+      {form.lendingMarketName && (
+        <Select
+          label="Token Name"
+          value={form.tokenName}
+          placeholder="Please select..."
+          onChange={(value) =>
+            handleSetForm({ value, propertyName: 'tokenName' })
+          }
+          error={formErrors['tokenName']}
+        >
+          <SelectOptionList
+            list={Object.keys(
+              SolendConfiguration.getSupportedLendingMarketInformation(
+                form.lendingMarketName,
+              ).supportedTokens,
+            )}
+          />
+        </Select>
+      )}
 
       <Input
         label="Amount to deposit"

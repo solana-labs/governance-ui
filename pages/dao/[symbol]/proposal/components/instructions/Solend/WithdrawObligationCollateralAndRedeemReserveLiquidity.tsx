@@ -4,7 +4,6 @@ import Input from '@components/inputs/Input';
 import Select from '@components/inputs/Select';
 import useInstructionFormBuilder from '@hooks/useInstructionFormBuilder';
 import SolendConfiguration from '@tools/sdk/solend/configuration';
-import { SOLEND_MINT_NAME_OPTIONS } from '@tools/sdk/solend/utils';
 import { withdrawObligationCollateralAndRedeemReserveLiquidity } from '@tools/sdk/solend/withdrawObligationCollateralAndRedeemReserveLiquidity';
 import { uiAmountToNativeBN } from '@tools/sdk/units';
 import { GovernedMultiTypeAccount } from '@utils/tokens';
@@ -16,7 +15,7 @@ const schema = yup.object().shape({
     .object()
     .nullable()
     .required('Governed account is required'),
-  mintName: yup.string().required('Token Name is required'),
+  tokenName: yup.string().required('Token Name is required'),
   uiAmount: yup
     .number()
     .moreThan(0, 'Amount should be more than 0')
@@ -44,17 +43,28 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
       },
       schema,
       buildInstruction: async function ({ form, governedAccountPubkey }) {
+        const {
+          supportedTokens,
+        } = SolendConfiguration.getSupportedLendingMarketInformation(
+          form.lendingMarketName!,
+        );
+        const token = supportedTokens[form.tokenName!];
+
+        if (!token) {
+          throw new Error(
+            `Unsupported token ${form.tokenName!} for Lending market ${
+              form.lendingMarketName
+            }`,
+          );
+        }
         return withdrawObligationCollateralAndRedeemReserveLiquidity({
           obligationOwner: governedAccountPubkey,
-          liquidityAmount: uiAmountToNativeBN(
-            form.uiAmount,
-            SolendConfiguration.getSupportedMintInformation(form.mintName!)
-              .decimals,
-          ),
-          mintName: form.mintName!,
+          liquidityAmount: uiAmountToNativeBN(form.uiAmount!, token.decimals),
+          lendingMarketName: form.lendingMarketName!,
           ...(form.destinationLiquidity && {
             destinationLiquidity: new PublicKey(form.destinationLiquidity),
           }),
+          tokenName: form.tokenName!,
         });
       },
     },
@@ -68,14 +78,38 @@ const WithdrawObligationCollateralAndRedeemReserveLiquidity = ({
   return (
     <>
       <Select
-        label="Token Name"
-        value={form.mintName}
+        label="Lending Market"
+        value={form.lendingMarketName}
         placeholder="Please select..."
-        onChange={(value) => handleSetForm({ value, propertyName: 'mintName' })}
-        error={formErrors['baseTokenName']}
+        onChange={(value) =>
+          handleSetForm({ value, propertyName: 'lendingMarketName' })
+        }
+        error={formErrors['lendingMarketName']}
       >
-        <SelectOptionList list={SOLEND_MINT_NAME_OPTIONS} />
+        <SelectOptionList
+          list={SolendConfiguration.getSupportedLendingMarketNames()}
+        />
       </Select>
+
+      {form.lendingMarketName && (
+        <Select
+          label="Token Name"
+          value={form.tokenName}
+          placeholder="Please select..."
+          onChange={(value) =>
+            handleSetForm({ value, propertyName: 'tokenName' })
+          }
+          error={formErrors['tokenName']}
+        >
+          <SelectOptionList
+            list={Object.keys(
+              SolendConfiguration.getSupportedLendingMarketInformation(
+                form.lendingMarketName,
+              ).supportedTokens,
+            )}
+          />
+        </Select>
+      )}
 
       <Input
         label="Amount to withdraw"

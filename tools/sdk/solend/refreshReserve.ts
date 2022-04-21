@@ -1,18 +1,32 @@
 import { TransactionInstruction } from '@solana/web3.js';
 import { refreshReserveInstruction } from '@solendprotocol/solend-sdk';
-
-import SolendConfiguration, { SupportedMintName } from './configuration';
+import SolendConfiguration, {
+  SupportedLendingMarketName,
+  SupportedTokenName,
+} from './configuration';
 
 export async function refreshReserve({
-  mintName,
+  lendingMarketName,
+  tokenName,
 }: {
-  mintName: SupportedMintName;
+  lendingMarketName: SupportedLendingMarketName;
+  tokenName: SupportedTokenName;
 }): Promise<TransactionInstruction> {
   const {
-    reserve,
-    pythOracle,
-    switchboardFeedAddress,
-  } = SolendConfiguration.getSupportedMintInformation(mintName);
+    supportedTokens,
+  } = SolendConfiguration.getSupportedLendingMarketInformation(
+    lendingMarketName,
+  );
+
+  if (!supportedTokens[tokenName]) {
+    throw new Error(
+      `Unsupported token ${tokenName} for Lending market ${lendingMarketName}`,
+    );
+  }
+
+  const { reserve, pythOracle, switchboardFeedAddress } = supportedTokens[
+    tokenName
+  ]!;
 
   return refreshReserveInstruction(
     reserve,

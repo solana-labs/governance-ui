@@ -4,7 +4,10 @@ import { RpcContext } from '@solana/spl-governance';
 import { MintInfo } from '@solana/spl-token';
 import { PublicKey, Keypair, TransactionInstruction } from '@solana/web3.js';
 import { getNameOf } from '@tools/core/script';
-import { SupportedMintName } from '@tools/sdk/solend/configuration';
+import {
+  SupportedLendingMarketName as SolendSupportedLendingMarketName,
+  SupportedTokenName as SolendSupportedTokenName,
+} from '@tools/sdk/solend/configuration';
 import { SupportedMintName as QuarryMineSupportedMintName } from '@tools/sdk/quarryMine/configuration';
 import {
   GovernedMintInfoAccount,
@@ -128,33 +131,38 @@ export interface CreateAssociatedTokenAccountForm {
 
 export interface CreateSolendObligationAccountForm {
   governedAccount?: GovernedMultiTypeAccount;
+  lendingMarketName?: SolendSupportedLendingMarketName;
 }
 
 export interface InitSolendObligationAccountForm {
   governedAccount?: GovernedMultiTypeAccount;
+  lendingMarketName?: SolendSupportedLendingMarketName;
 }
 
 export interface DepositReserveLiquidityAndObligationCollateralForm {
   governedAccount?: GovernedMultiTypeAccount;
   uiAmount: number;
-  mintName?: SupportedMintName;
+  lendingMarketName?: SolendSupportedLendingMarketName;
+  tokenName?: SolendSupportedTokenName;
 }
 
 export interface WithdrawObligationCollateralAndRedeemReserveLiquidityForm {
   governedAccount?: GovernedMultiTypeAccount;
   uiAmount: number;
-  mintName?: SupportedMintName;
+  tokenName?: SolendSupportedTokenName;
+  lendingMarketName?: SolendSupportedLendingMarketName;
   destinationLiquidity?: string;
 }
 
 export interface RefreshObligationForm {
   governedAccount?: GovernedMultiTypeAccount;
-  mintName?: SupportedMintName;
+  lendingMarketName?: SolendSupportedLendingMarketName;
 }
 
 export interface RefreshReserveForm {
   governedAccount?: GovernedMultiTypeAccount;
-  mintName?: SupportedMintName;
+  tokenName?: SolendSupportedTokenName;
+  lendingMarketName?: SolendSupportedLendingMarketName;
 }
 
 export interface AddLiquidityRaydiumForm {
