@@ -6,6 +6,7 @@ import MyProposalsBtn from 'pages/dao/[symbol]/proposal/components/MyProposalsBt
 import useWalletStore from 'stores/useWalletStore'
 
 const NotificationsCard = dynamic(() => import('@components/NotificationsCard'))
+const DelegateCard = dynamic(() => import('@components/DelegateCard'))
 
 const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
   const connected = useWalletStore((s) => s.connected)
@@ -40,7 +41,7 @@ const NotificationsPlugin = () => {
   const { realmInfo } = useRealm()
   if (realmInfo?.enableNotifi) {
     return (
-      <div className="col-span-12">
+      <div className="col-span-6">
         <NotificationsCard />
       </div>
     )
@@ -49,12 +50,21 @@ const NotificationsPlugin = () => {
   return null
 }
 
+const DelegatePlugin = () => {
+  return (
+    <div className="col-span-6">
+      <DelegateCard />
+    </div>
+  )
+}
+
 const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
   if (withHeader) {
     return (
       <div className="col-span-12 grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} />
         <NotificationsPlugin />
+        <DelegatePlugin />
       </div>
     )
   } else {
@@ -62,6 +72,7 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
       <>
         <AccountInner withHeader={withHeader} />
         <NotificationsPlugin />
+        <DelegatePlugin />
       </>
     )
   }
