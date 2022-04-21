@@ -1,8 +1,4 @@
-import {
-  Config,
-  MangoClient,
-  PerpMarket,
-} from '@blockworks-foundation/mango-client'
+import { Config, MangoClient } from '@blockworks-foundation/mango-client'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
@@ -35,6 +31,7 @@ import {
   DAYS_PER_MONTH,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
+  SECS_PER_MONTH,
 } from 'VoteStakeRegistry/tools/dateTools'
 const VestingVsTime = dynamic(() => import('./VestingVsTime'), {
   ssr: false,
@@ -46,40 +43,24 @@ interface DepositWithWallet {
   wallet: PublicKey
   deposit: Deposit
 }
+interface DepoistWithVoter {
+  amount: BN | undefined
+  voterPk: PublicKey
+  startTs: BN | undefined
+}
 
 const LockTokenStats = () => {
   const { realmInfo, realm, mint, proposals } = useRealm()
-  const possibleGrantProposals = Object.values(proposals).filter(
-    (x) =>
-      x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
-      x.account.accountType === GovernanceAccountType.ProposalV2
-  )
-  const connection = useWalletStore((s) => s.connection)
-  const governedTokenAccounts = useGovernanceAssetsStore(
-    (s) => s.governedTokenAccounts
-  )
-  const [givenGrantsTokenAmount, setGivernGrantsTokenAmount] = useState(
-    new BN(0)
-  )
-  const [perpMarket, setPerpMarket] = useState<PerpMarket | null>(null)
-  const [vestPerMonthStats, setVestPerMonthStats] = useState<{
-    [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
-  }>({})
-  const [statsMonths, setStatsMonths] = useState<string[]>([])
-  const currentMonthName = statsMonths.length ? statsMonths[0] : ''
-  const vestingThisMonth =
-    currentMonthName && vestPerMonthStats[currentMonthName]
-      ? vestPerMonthStats[currentMonthName].reduce(
-          (acc, val) => acc.add(val.vestingAmount),
-          new BN(0)
-        )
-      : new BN(0)
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
   )
   const voteStakeRegistryRegistrar = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrar
+  )
+  const connection = useWalletStore((s) => s.connection)
+  const governedTokenAccounts = useGovernanceAssetsStore(
+    (s) => s.governedTokenAccounts
   )
   const [voters, setVoters] = useState<
     {
@@ -90,6 +71,35 @@ const LockTokenStats = () => {
   const [depositsWithWallets, setDepositsWithWallets] = useState<
     DepositWithWallet[]
   >([])
+  const [givenGrantsTokenAmounts, setGivenGrantsTokenAmounts] = useState<
+    DepoistWithVoter[]
+  >([])
+  const [unlockedFromGrants, setUnlockedFromGrants] = useState(new BN(0))
+  const [
+    liqudiityMiningEmissionPerMonth,
+    setLiqudiityMiningEmissionPerMonth,
+  ] = useState(new BN(0))
+  const [vestPerMonthStats, setVestPerMonthStats] = useState<{
+    [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
+  }>({})
+  const [statsMonths, setStatsMonths] = useState<string[]>([])
+  const givenGrantsTokenAmount = givenGrantsTokenAmounts.reduce(
+    (acc, curr) => acc.add(curr.amount!),
+    new BN(0)
+  )
+  const possibleGrantProposals = Object.values(proposals).filter(
+    (x) =>
+      x.account.governance.toBase58() === MANGO_DAO_TREASURY &&
+      x.account.accountType === GovernanceAccountType.ProposalV2
+  )
+  const currentMonthName = statsMonths.length ? statsMonths[0] : ''
+  const vestingThisMonth =
+    currentMonthName && vestPerMonthStats[currentMonthName]
+      ? vestPerMonthStats[currentMonthName].reduce(
+          (acc, val) => acc.add(val.vestingAmount),
+          new BN(0)
+        )
+      : new BN(0)
   const walletsCount = [
     ...new Set(depositsWithWallets.map((x) => x.wallet.toBase58())),
   ].length
@@ -181,7 +191,7 @@ const LockTokenStats = () => {
         realmInfo!.programId
       )
 
-      const givenGrantsTokenAmount = accounts
+      const givenGrantsTokenAmounts = accounts
         .filter(
           (x) =>
             x.account.executionStatus === InstructionExecutionStatus.Success
@@ -193,18 +203,19 @@ const LockTokenStats = () => {
                 x.data[0] === 145 &&
                 x.accounts[9].pubkey.toBase58() === MANGO_MINT
             )
-            .map(
-              (instruction) =>
-                (vsrClient?.program.coder.instruction.decode(
-                  Buffer.from(instruction.data)
-                )?.data as GrantInstruction | null)?.amount
-            )
+            .map((instruction) => {
+              const data = vsrClient?.program.coder.instruction.decode(
+                Buffer.from(instruction.data)
+              )?.data as GrantInstruction | null
+
+              return {
+                voterPk: instruction.accounts[1].pubkey,
+                amount: data?.amount,
+                startTs: data?.startTs,
+              }
+            })
         )
-        .reduce(
-          (acc, amount) => (amount ? acc!.add(amount) : acc!.add(new BN(0))),
-          new BN(0)
-        )
-      setGivernGrantsTokenAmount(givenGrantsTokenAmount!)
+      setGivenGrantsTokenAmounts(givenGrantsTokenAmounts)
     }
     if (realmInfo?.programId && vsrClient) {
       getProposalsInstructions()
@@ -265,36 +276,62 @@ const LockTokenStats = () => {
     setStatsMonths(monthsFormat)
   }, [depositsWithWallets.length])
   useEffect(() => {
+    if (depositsWithWallets.length && givenGrantsTokenAmounts.length) {
+      const currentlyUnlocked = new BN(0)
+      for (const depostiWithVoter of givenGrantsTokenAmounts) {
+        const grantDeposit = depositsWithWallets.find((x) => {
+          return (
+            x.deposit.amountInitiallyLockedNative.cmp(
+              depostiWithVoter.amount!
+            ) === 0 &&
+            x.deposit.lockup.startTs.cmp(depostiWithVoter.startTs!) === 0 &&
+            x.voter.toBase58() === depostiWithVoter.voterPk.toBase58()
+          )
+        })
+        if (grantDeposit) {
+          currentlyUnlocked.iadd(
+            grantDeposit.deposit.amountInitiallyLockedNative.sub(
+              grantDeposit.deposit.amountDepositedNative
+            )
+          )
+        } else {
+          currentlyUnlocked.iadd(depostiWithVoter.amount!)
+        }
+      }
+      setUnlockedFromGrants(currentlyUnlocked)
+    }
+  }, [depositsWithWallets.length, givenGrantsTokenAmounts.length])
+  useEffect(() => {
     const mngoPerpMarket = async () => {
       const GROUP = connection.cluster === 'devnet' ? 'devnet.2' : 'mainnet.1'
       const groupConfig = Config.ids().getGroupWithName(GROUP)!
-      const marketConfig = groupConfig!.perpMarkets.find(
-        (x) => x.baseSymbol === 'MNGO'
-      )!
       const client = new MangoClient(
         connection.current,
         groupConfig.mangoProgramId
       )
       const group = await client.getMangoGroup(groupConfig.publicKey)
-
-      const [perpMarket] = await Promise.all([
-        group.loadPerpMarket(
-          connection.current,
-          marketConfig.marketIndex,
-          marketConfig.baseDecimals,
-          marketConfig.quoteDecimals
+      const perpMarkets = await Promise.all([
+        ...groupConfig!.perpMarkets.map((x) =>
+          group.loadPerpMarket(
+            connection.current,
+            x.marketIndex,
+            x.baseDecimals,
+            x.quoteDecimals
+          )
         ),
-        group.loadRootBanks(connection.current),
       ])
-      setPerpMarket(perpMarket)
+
+      const emissionPerMonth = perpMarkets
+        .reduce(
+          (acc, next) => acc.iadd(next.liquidityMiningInfo.mngoPerPeriod),
+          new BN(0)
+        )
+        .muln(SECS_PER_MONTH)
+        .div(perpMarkets[0].liquidityMiningInfo.targetPeriodLength)
+      setLiqudiityMiningEmissionPerMonth(emissionPerMonth)
     }
     mngoPerpMarket()
   }, [connection.cluster])
-  const maxDepthUi = perpMarket
-    ? (perpMarket.liquidityMiningInfo.maxDepthBps.toNumber() *
-        perpMarket.baseLotSize.toNumber()) /
-      Math.pow(10, perpMarket.baseDecimals)
-    : 0
 
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
@@ -321,10 +358,6 @@ const LockTokenStats = () => {
                 <div>{circulatingSupplyFmt}</div>
               </div>
               <div>
-                Emission by grants
-                <div>{fmtMangoAmount(givenGrantsTokenAmount)}</div>
-              </div>
-              <div>
                 Total MNGO Locked
                 <div>{mngoLockedFmt}</div>
               </div>
@@ -333,12 +366,20 @@ const LockTokenStats = () => {
                 <div>{mngoLockedWithClawbackFmt}</div>
               </div>
               <div>
+                Locked in grants
+                <div>{fmtMangoAmount(givenGrantsTokenAmount)}</div>
+              </div>
+              <div>
+                Unlocked from grants
+                <div>{fmtMangoAmount(unlockedFromGrants)}</div>
+              </div>
+              <div>
                 Vesting this month
                 <div>{vestingThisMonthFmt}</div>
               </div>
               <div>
-                Liquidity mining emissions
-                <div>{maxDepthUi}</div>
+                Liquidity mining emissions per month
+                <div>{fmtMangoAmount(liqudiityMiningEmissionPerMonth)}</div>
               </div>
               <div></div>
             </div>
