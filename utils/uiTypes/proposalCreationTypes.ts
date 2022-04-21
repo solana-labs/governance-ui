@@ -143,6 +143,7 @@ export interface RefreshReserveForm {
  * @param programID
  */
 export interface IDLForm {
+  governedAccount?: GovernedMultiTypeAccount
   programID?: string
   selectedInstruction?: string
   instructionsToSubmit: any
