@@ -34,6 +34,8 @@ export function useTotalTreasuryPrice() {
     }
     if (governedTokenAccountsWithoutNfts.length) {
       calcTotalTokensPrice()
+    } else {
+      setTotalPriceFormatted('')
     }
   }, [
     JSON.stringify(governedTokenAccountsWithoutNfts),
