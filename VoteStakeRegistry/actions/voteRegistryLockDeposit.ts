@@ -27,6 +27,7 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk,
   sourceTokenAccount,
   communityMintPk,
+  allowClawback = false,
 }: {
   rpcContext: RpcContext
   mintPk: PublicKey
@@ -41,6 +42,7 @@ export const voteRegistryLockDeposit = async ({
   tokenOwnerRecordPk: PublicKey | null
   sourceTokenAccount: PublicKey
   communityMintPk: PublicKey
+  allowClawback?: boolean
   client?: VsrClient
 }) => {
   const signers: Keypair[] = []
@@ -71,6 +73,7 @@ export const voteRegistryLockDeposit = async ({
     lockupKind,
     communityMintPk,
     client,
+    allowClawback,
   })
 
   if (!amountFromVoteRegistryDeposit.isZero()) {

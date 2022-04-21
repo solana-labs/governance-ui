@@ -30,6 +30,15 @@
     "ogImage": "https://trade.mango.markets/assets/icons/logo.svg"
   },
   {
+    "symbol": "ORCA",
+    "displayName": "Orca DAO",
+    "programId": "J9uWvULFL47gtCPvgR3oN7W357iehn5WF2Vn9MJvcSxz",
+    "realmId": "66Du7mXgS2KMQBUk6m9h3TszMjqZqdWhsG3Duuf69VNW",
+    "website": "https://www.orca.so/",
+    "twitter": "@orca_so",
+    "ogImage": "https://learn.orca.so/static/media/logomark.1ef55f8f.svg"
+  },
+  {
     "symbol": "JET",
     "displayName": "Jet DAO",
     "programId": "JPGov2SBA6f7XSJF5R4Si5jEJekGiyrwP2m7gSEqLUs",
@@ -614,5 +623,23 @@
     "ogImage": "https://raw.githubusercontent.com/cmgonsalves/token/main/carrot-logo.png",
     "website": "https://www.begrudgedbunnies.com/",
     "twitter": "@begrudgeddao"
+  },
+  {
+    "symbol": "STR",
+    "displayName": "StreamDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "FUjE8nZ9WLch6bYMfxd2ybyfzw19odi6Yfnio9Dc2v2V",
+    "ogImage": "/realms/StreamDAO/img/stream_dao.png",
+    "website": "https://www.streamdao.org/",
+    "twitter": "@dao_stream"
+  },
+  {
+    "symbol": "Fyfy",
+    "displayName": "FyfyDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "4kofKQxGvnq5nXumXJaqPnPoHfmZxgH2YUqpxGWYjZ5c",
+    "ogImage": "/realms/FyfyDAO/img/logo.png",
+    "website": "https://www.fyfy.io/",
+    "twitter": "@fyfyio"
   }
 ]
