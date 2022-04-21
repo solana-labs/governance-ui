@@ -366,7 +366,7 @@ const LockTokenStats = () => {
                 <div>{mngoLockedWithClawbackFmt}</div>
               </div>
               <div>
-                Locked in grants
+                Initially locked in grants
                 <div>{fmtMangoAmount(givenGrantsTokenAmount)}</div>
               </div>
               <div>
