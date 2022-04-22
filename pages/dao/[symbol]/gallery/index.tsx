@@ -1,16 +1,12 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import useWalletStore from 'stores/useWalletStore'
 import { PhotographIcon, PlusCircleIcon } from '@heroicons/react/outline'
 import { NFTWithMint } from '@utils/uiTypes/nfts'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import Select from '@components/inputs/Select'
 import AccountItemNFT from '@components/TreasuryAccount/AccountItemNFT'
-import useRealm from '@hooks/useRealm'
-import useQueryContext from '@hooks/useQueryContext'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import ImgWithLoader from '@components/ImgWithLoader'
 import Modal from '@components/Modal'
@@ -18,26 +14,19 @@ import DepositNFT from '@components/TreasuryAccount/DepositNFT'
 import { LinkButton } from '@components/Button'
 import SendTokens from '@components/TreasuryAccount/SendTokens'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 const gallery = () => {
-  const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
   const isLoadingGovernances = useGovernanceAssetsStore(
     (s) => s.loadGovernedAccounts
   )
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
-  const { symbol } = useRealm()
-  const governancePk = router?.query?.governancePk
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
-  const { fmtUrlWithCluster } = useQueryContext()
-  const fetchAllNftsForRealm = DEFAULT_NFT_TREASURY_MINT === governancePk
-  const currentAccount = nftsGovernedTokenAccounts.find(
-    (x) => x.governance?.pubkey.toBase58() === governancePk
-  )
   const { setCurrentAccount } = useTreasuryAccountStore()
-
+  const [currentAccount, setStateAccount] = useState<AssetAccount | null>(null)
   const [nfts, setNfts] = useState<NFTWithMint[]>([])
   const [openNftDepositModal, setOpenNftDepositModal] = useState(false)
   const [openSendNftsModal, setOpenSendNftsModal] = useState(false)
@@ -48,13 +37,35 @@ const gallery = () => {
     setOpenSendNftsModal(false)
   }
   useEffect(() => {
-    const governedNfts = governanceNfts[governancePk as string]
-    if (fetchAllNftsForRealm) {
+    if (currentAccount === null) {
       setNfts(realmNfts)
-    } else if (governedNfts) {
-      setNfts(governanceNfts[governancePk as string])
+    } else {
+      const curretnAccountNfts: NFTWithMint[] = []
+      const hasNftsInWithGovernanceOwner =
+        nftsPerPubkey[currentAccount.governance.pubkey.toBase58()].length
+      const hasNftsInSolAccount =
+        currentAccount.isSol &&
+        nftsPerPubkey[currentAccount.extensions.transferAddress!.toBase58()]
+          .length
+      if (hasNftsInWithGovernanceOwner) {
+        curretnAccountNfts.push(
+          ...nftsPerPubkey[currentAccount.governance.pubkey.toBase58()]
+        )
+      }
+      if (hasNftsInSolAccount) {
+        curretnAccountNfts.push(
+          ...nftsPerPubkey[
+            currentAccount.extensions.transferAddress!.toBase58()
+          ]
+        )
+      }
+      setNfts(curretnAccountNfts)
     }
-  }, [realmNfts.length, JSON.stringify(governanceNfts), governancePk])
+  }, [
+    realmNfts.length,
+    JSON.stringify(nftsPerPubkey),
+    currentAccount?.extensions.transferAddress?.toBase58(),
+  ])
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -90,12 +101,8 @@ const gallery = () => {
             </div>
             <Select
               className="sm:w-44 mt-2 sm:mt-0"
-              onChange={(value) => {
-                router.push(
-                  fmtUrlWithCluster(`/dao/${symbol}/gallery/${value}`)
-                )
-              }}
-              value={currentAccount?.governance?.pubkey.toBase58()}
+              onChange={(value) => setStateAccount(value)}
+              value={currentAccount}
               componentLabel={
                 currentAccount ? (
                   <AccountItemNFT
@@ -113,10 +120,7 @@ const gallery = () => {
                 )
               }
             >
-              <Select.Option
-                key={DEFAULT_NFT_TREASURY_MINT}
-                value={DEFAULT_NFT_TREASURY_MINT}
-              >
+              <Select.Option key={null} value={null}>
                 <div>
                   <div className="mb-0.5 text-xs text-fgd-1">Show All</div>
                   <div className="text-xs text-fgd-3">
@@ -125,11 +129,8 @@ const gallery = () => {
                 </div>
               </Select.Option>
 
-              {nftsGovernedTokenAccounts.map((accountWithGovernance) => (
-                <Select.Option
-                  key={accountWithGovernance?.governance?.pubkey.toBase58()}
-                  value={accountWithGovernance.governance?.pubkey.toBase58()}
-                >
+              {nftsGovernedTokenAccounts.map((accountWithGovernance, index) => (
+                <Select.Option key={index} value={accountWithGovernance}>
                   <AccountItemNFT
                     onClick={() => null}
                     className="m-0 p-0 py-0 px-0 border-0 hover:bg-bkg-2"

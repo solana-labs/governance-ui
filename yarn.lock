@@ -523,9 +523,9 @@
     yargs "^17.0.1"
 
 "@blockworks-foundation/voter-stake-registry-client@^0.2.0":
-  version "0.2.0"
-  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.2.0.tgz#46aebc1c4f075146ffe7d90b8fbec0d2cb3cdb7c"
-  integrity sha512-N4GZm4BxxPTHEw9ecG0ZoOtH3goPnMpJppDX4FguB7blYsTdM3jqf+prNv/UgnX2QR98Gx/08cP6PfD27r7UPQ==
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@blockworks-foundation/voter-stake-registry-client/-/voter-stake-registry-client-0.2.1.tgz#81fca48a7dd46d4ae6e1d5b4968c9227f60d0410"
+  integrity sha512-ocBcXc5FGSZyAcVfB3afnmpM6iRGfN4mkK6n8byFo8BaE35eQxHmvP2cQnvmvXKSmvcWiV5QxNHKPPqk6wgVFw==
   dependencies:
     "@project-serum/anchor" "^0.18.0"
     "@project-serum/serum" "^0.13.61"
@@ -608,7 +608,7 @@
   version "1.4.0"
   resolved "https://registry.npmjs.org/@csstools/convert-colors/-/convert-colors-1.4.0.tgz"
 
-"@emotion/babel-plugin@^11.3.0", "@emotion/babel-plugin@^11.7.1":
+"@emotion/babel-plugin@^11.7.1":
   version "11.7.2"
   resolved "https://registry.yarnpkg.com/@emotion/babel-plugin/-/babel-plugin-11.7.2.tgz#fec75f38a6ab5b304b0601c74e2a5e77c95e5fa0"
   integrity sha512-6mGSCWi9UzXut/ZAN6lGFu33wGR3SJisNl3c0tvlmb8XChH1b2SUvxvnOh7hvLpqyRdHHU9AiazV3Cwbk5SXKQ==
@@ -641,10 +641,10 @@
   version "0.8.0"
   resolved "https://registry.npmjs.org/@emotion/hash/-/hash-0.8.0.tgz"
 
-"@emotion/is-prop-valid@^1.1.1":
-  version "1.1.1"
-  resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-1.1.1.tgz#cbd843d409dfaad90f9404e7c0404c55eae8c134"
-  integrity sha512-bW1Tos67CZkOURLc0OalnfxtSXQJMrAMV0jZTVGJUPSOd4qgjF3+tTD5CwJM13PHA8cltGW1WGbbvV9NpvUZPw==
+"@emotion/is-prop-valid@^1.1.2":
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/@emotion/is-prop-valid/-/is-prop-valid-1.1.2.tgz#34ad6e98e871aa6f7a20469b602911b8b11b3a95"
+  integrity sha512-3QnhqeL+WW88YjYbQL5gUIkthuMw7a0NGbZ7wfFVk2kg/CK5w8w5FFa0RzWjyY1+sujN0NWbtSHH6OJmWHtJpQ==
   dependencies:
     "@emotion/memoize" "^0.7.4"
 
@@ -681,16 +681,16 @@
   resolved "https://registry.yarnpkg.com/@emotion/sheet/-/sheet-1.1.0.tgz#56d99c41f0a1cda2726a05aa6a20afd4c63e58d2"
   integrity sha512-u0AX4aSo25sMAygCuQTzS+HsImZFuS8llY8O7b9MDRzbJM0kVJlAz6KNDqcG7pOuQZJmj/8X/rAW+66kMnMW+g==
 
-"@emotion/styled@^11.3.0", "@emotion/styled@^11.6.0":
-  version "11.6.0"
-  resolved "https://registry.yarnpkg.com/@emotion/styled/-/styled-11.6.0.tgz#9230d1a7bcb2ebf83c6a579f4c80e0664132d81d"
-  integrity sha512-mxVtVyIOTmCAkFbwIp+nCjTXJNgcz4VWkOYQro87jE2QBTydnkiYusMrRGFtzuruiGK4dDaNORk4gH049iiQuw==
+"@emotion/styled@^11.6.0", "@emotion/styled@^11.8.1":
+  version "11.8.1"
+  resolved "https://registry.yarnpkg.com/@emotion/styled/-/styled-11.8.1.tgz#856f6f63aceef0eb783985fa2322e2bf66d04e17"
+  integrity sha512-OghEVAYBZMpEquHZwuelXcRjRJQOVayvbmNR0zr174NHdmMgrNkLC6TljKC5h9lZLkN5WGrdUcrKlOJ4phhoTQ==
   dependencies:
     "@babel/runtime" "^7.13.10"
-    "@emotion/babel-plugin" "^11.3.0"
-    "@emotion/is-prop-valid" "^1.1.1"
+    "@emotion/babel-plugin" "^11.7.1"
+    "@emotion/is-prop-valid" "^1.1.2"
     "@emotion/serialize" "^1.0.2"
-    "@emotion/utils" "^1.0.0"
+    "@emotion/utils" "^1.1.0"
 
 "@emotion/unitless@^0.7.5":
   version "0.7.5"
@@ -819,8 +819,9 @@
   integrity sha512-aaRnYxBb3MU2FNJf3Ut9RMTUqqU3as0aI1lQhgo2n9Fa67wRu14iOGqx93xB+uMNVfNwZ5B3y/Ndm7qZGuFeMQ==
 
 "@heroicons/react@^1.0.1":
-  version "1.0.1"
-  resolved "https://registry.npmjs.org/@heroicons/react/-/react-1.0.1.tgz"
+  version "1.0.6"
+  resolved "https://registry.yarnpkg.com/@heroicons/react/-/react-1.0.6.tgz#35dd26987228b39ef2316db3b1245c42eb19e324"
+  integrity sha512-JJCXydOFWMDpCP4q13iEplA503MQO3xLoZiKum+955ZCtHINWnx26CUxVxxFQu/uLb4LW3ge15ZpzIkXKkJ8oQ==
 
 "@humanwhocodes/config-array@^0.9.2":
   version "0.9.2"
@@ -1159,10 +1160,10 @@
     crypto-hash "^1.3.0"
     form-data "^4.0.0"
 
-"@next/bundle-analyzer@^12.1.4":
-  version "12.1.4"
-  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-12.1.4.tgz#22afb920b769a54a8da118af0786df0a1f4fca47"
-  integrity sha512-Xw3gxBTOAS5bcayUl2hDYeCbAFIR+7poiGW4Wi/KGcsjgVRetKBS6akZ1AZsz36CUOdCxajKO45B6CeAaKtcqA==
+"@next/bundle-analyzer@^12.1.5":
+  version "12.1.5"
+  resolved "https://registry.yarnpkg.com/@next/bundle-analyzer/-/bundle-analyzer-12.1.5.tgz#07079b892efe0a2a7e8add703ad7cacfa3cc4e88"
+  integrity sha512-A9MkhWCPvSp1vl0Ox7IjJ/qpugDC5YAb40btGGIPPXHQtkal107Sf8dbay4fqw4Hekee5gdS0WUMfe1BaSur7w==
   dependencies:
     webpack-bundle-analyzer "4.3.0"
 
@@ -1262,30 +1263,30 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
-"@notifi-network/notifi-axios-adapter@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-adapter/-/notifi-axios-adapter-0.11.0.tgz#59bbf06f26c45823b25f1acd36f07d3dafe90266"
-  integrity sha512-MtpyvuIkFeAkYxUhid8fjtsQt8kUqAyKCJSIwS8EMBAcTNqs+OyT7almqGE9BwQ5w+A6mQuoa+npXyCxPviqSQ==
+"@notifi-network/notifi-axios-adapter@^0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-adapter/-/notifi-axios-adapter-0.12.1.tgz#aae412465230b7a3d7e86c93a7d43210568282c6"
+  integrity sha512-vRVPN1uJHXNrxMzZ1F4OsmwbkytXy2kYBCnq+riRHKIgPykun51LGi5Y2ljW545j1YedtafY4vpPJNmMOhTuFw==
   dependencies:
-    "@notifi-network/notifi-axios-utils" "^0.11.0"
+    "@notifi-network/notifi-axios-utils" "^0.12.0"
 
-"@notifi-network/notifi-axios-utils@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-utils/-/notifi-axios-utils-0.11.0.tgz#8ebbe1e9a02fafb4772a7d4e3ff787aba48b1979"
-  integrity sha512-LFTtrnjNXs8jB7vfE8U4RldzwQSvDjraqpwexPoQCG8cvi3PCp/nzFo1JiBgwREXniNm7kxAZrDlhkcp5vcNwg==
+"@notifi-network/notifi-axios-utils@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-axios-utils/-/notifi-axios-utils-0.12.0.tgz#4eea3088cab39c9a2c1482e94c9d020296f42339"
+  integrity sha512-NVyS7x+z5wSLdNOSyxfB7XePZ1sSaSEKVPGEBnJuH5xpXkLBz1o+WlJTkA9/IcQFdSwLeLCdXGEb8jQPSjEWrA==
 
-"@notifi-network/notifi-core@^0.10.1":
-  version "0.10.1"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.10.1.tgz#b3cf25b2bc816732311655f7fff94cd0aa700d7d"
-  integrity sha512-l+lQz3Q+YmoNI4n7jckx7MO75NS/1ZwgLgQOIVazZSI6XvlgnEFDxB855zk62YQfGuy56kK9H5NCD1YAg2NXyg==
+"@notifi-network/notifi-core@^0.12.0":
+  version "0.12.0"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-core/-/notifi-core-0.12.0.tgz#871f16155952f8cdd2e4797ba58fb769b2730c30"
+  integrity sha512-O9rqcsZ7V6BDjO5nmL1t28QmS29MqTZrG9XAr/yxWD4QuMQyMrqTXyN4ue6GbtEPzzSkAsC9j69BbCrn7plXsQ==
 
-"@notifi-network/notifi-react-hooks@^0.11.0":
-  version "0.11.0"
-  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.11.0.tgz#778b8aeb3977f2b6b2c98afd3705bb58b12c443a"
-  integrity sha512-pUNyZB+038xU4W30OEeO9/Ln7WkQYA2Ko/z0uRWjhLGYDonZNmAFR7KdAv55QuCoP/P2JN1wZK/VC4ObZaDcoQ==
+"@notifi-network/notifi-react-hooks@^0.12.1":
+  version "0.12.1"
+  resolved "https://registry.yarnpkg.com/@notifi-network/notifi-react-hooks/-/notifi-react-hooks-0.12.1.tgz#e84dcb751a0f0bbd9ceb2e0378b46014a9570bc7"
+  integrity sha512-77bxZ/r19023x+yPjzW3LBMYxL4VyP7aR6owak51x76dEUqgi/oqzOh9+YSNXXeTvwr37jhtjYE+DHMVXD+y+g==
   dependencies:
-    "@notifi-network/notifi-axios-adapter" "^0.11.0"
-    "@notifi-network/notifi-axios-utils" "^0.11.0"
+    "@notifi-network/notifi-axios-adapter" "^0.12.1"
+    "@notifi-network/notifi-axios-utils" "^0.12.0"
     axios "^0.26.0"
     localforage "^1.10.0"
     typedoc-plugin-missing-exports "^0.22.6"
@@ -2019,10 +2020,10 @@
     tweetnacl "^1.0.3"
     webpack-dev-server "^3.11.2"
 
-"@solana/spl-token-registry@^0.2.3300":
-  version "0.2.3300"
-  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.3300.tgz#bd6a338d7e63f98e9ef29f1fb16b217ee6183dde"
-  integrity sha512-ac1XUOTLYzjC99hYoNhLw416WarBtzvCHO/dVmSiWgeaWwfWgBNV8n1LJ3MS/bkwWjWIN4SfPs8/YY5osbhbxA==
+"@solana/spl-token-registry@^0.2.3470":
+  version "0.2.3470"
+  resolved "https://registry.yarnpkg.com/@solana/spl-token-registry/-/spl-token-registry-0.2.3470.tgz#ca419a46d1699101e4da389ec51697c285dc38cf"
+  integrity sha512-g95PyEnIieVpYqyv/uu2d3f/IQN2csJPSUuReIGr0EH36+s06kfgKHBGwqFNigpc7ASzJO7npcTvuWs/ut8r0Q==
   dependencies:
     cross-fetch "3.0.6"
 
@@ -2288,10 +2289,10 @@
     lz-string "^1.4.4"
     pretty-format "^26.6.2"
 
-"@testing-library/jest-dom@^5.16.1":
-  version "5.16.1"
-  resolved "https://registry.npmjs.org/@testing-library/jest-dom/-/jest-dom-5.16.1.tgz"
-  integrity sha512-ajUJdfDIuTCadB79ukO+0l8O+QwN0LiSxDaYUTI4LndbbUsGi6rWU1SCexXzBA2NSjlVB9/vbkasQIL3tmPBjw==
+"@testing-library/jest-dom@^5.16.4":
+  version "5.16.4"
+  resolved "https://registry.yarnpkg.com/@testing-library/jest-dom/-/jest-dom-5.16.4.tgz#938302d7b8b483963a3ae821f1c0808f872245cd"
+  integrity sha512-Gy+IoFutbMQcky0k+bqqumXZ1cTGswLsFqmNLzNdSKkU9KGV2u9oXhukCbbJ9/LRPKiqwxEE8VpV/+YZlfkPUA==
   dependencies:
     "@babel/runtime" "^7.9.2"
     "@types/testing-library__jest-dom" "^5.9.1"
@@ -3160,9 +3161,9 @@ async-limiter@~1.0.0:
   integrity sha512-csOlWGAcRFJaI6m+F2WKdnMKr4HhdhFVBk0H/QbJFMCr+uO2kwohwXQPxw/9OCxp05r5ghVBFSyioixx3gfkNQ==
 
 async@^2.6.2:
-  version "2.6.3"
-  resolved "https://registry.npmjs.org/async/-/async-2.6.3.tgz"
-  integrity sha512-zflvls11DCy+dQWzTW2dzuilv8Z5X/pjfmZOWba6TNIVDm+2UDaJmXSOXlasHKfNBs8oo3M0aT50fDEWfKZjXg==
+  version "2.6.4"
+  resolved "https://registry.yarnpkg.com/async/-/async-2.6.4.tgz#706b7ff6084664cd7eae713f6f965433b5504221"
+  integrity sha512-mzo5dfJYwAn29PeiJ0zvwTo04zj8HDJj0Mn8TD7sno7q12prdbnasKJHhkm2c1LgrhlJ0teaea8860oxi51mGA==
   dependencies:
     lodash "^4.17.14"
 
@@ -4644,11 +4645,7 @@ doctrine@^3.0.0:
   dependencies:
     esutils "^2.0.2"
 
-dom-accessibility-api@^0.5.4:
-  version "0.5.4"
-  resolved "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.4.tgz"
-
-dom-accessibility-api@^0.5.6:
+dom-accessibility-api@^0.5.4, dom-accessibility-api@^0.5.6:
   version "0.5.10"
   resolved "https://registry.npmjs.org/dom-accessibility-api/-/dom-accessibility-api-0.5.10.tgz"
   integrity sha512-Xu9mD0UjrJisTmv7lmVSDMagQcU9R5hwAbxsaAE/35XPnPLJobbuREfV/rraiSaEj/UOvgrzQs66zyTWTlyd+g==
@@ -8518,10 +8515,10 @@ neo-async@^2.6.0:
   resolved "https://registry.yarnpkg.com/neo-async/-/neo-async-2.6.2.tgz#b4aafb93e3aeb2d8174ca53cf163ab7d7308305f"
   integrity sha512-Yd3UES5mWCSqR+qNT93S3UoYUkqAZ9lLg8a7g9rimsWmYGK8cVToA4/sF3RrshdyV3sAGMXVUmpMYOw+dLpOuw==
 
-next-router-mock@^0.6.3:
-  version "0.6.3"
-  resolved "https://registry.npmjs.org/next-router-mock/-/next-router-mock-0.6.3.tgz"
-  integrity sha512-CHMg8ci0Cg10t4nVClgYuWf7rc4Ipj9MvcgY36U+4RSb7CHsSZhn9XX4ZeQzACMQ4gTx5I9IwlX7iDb2/L5X2w==
+next-router-mock@^0.6.7:
+  version "0.6.7"
+  resolved "https://registry.yarnpkg.com/next-router-mock/-/next-router-mock-0.6.7.tgz#8883ed81f245074462e72199fe94002cd85db5e2"
+  integrity sha512-y3yFyTkplpmvCpy1TnOuMTUQDLt2wg9RwTwvg9WcCRko4lqkBYAQM+ph5sqtNpKQ1xngDwzjPjshVBQJvhb/hg==
 
 next-themes@^0.1.1:
   version "0.1.1"

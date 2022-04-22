@@ -39,6 +39,8 @@ export const ACCOUNT_NAMES = {
     'Mango Developer Council Mint',
 
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF':
+    'Mango DAO SOL Treasury Vault',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
   '4PdEyhrV3gaUj4ffwjKGXBLo42jF2CQCCBoXenwCRWXf':
     'Mango DAO USDC Treasury Vault',
@@ -110,22 +112,22 @@ export const ACCOUNT_NAMES = {
     'ClubDAO Main NFT Treasury Vault',
 
   //MonkeDAO
-  Cb4uLreZRcb7kbu6gbsGJp2xjnU5K25MDZbvFknBFyqU: 'ClubDAO NMBC Royalties Vault',
-  '9Z6x8sVq78saCddcveTSmQWFHCS9vaMS7eoeQMrGMUXw': 'Luna Holdings',
   DKdBj8KF9sieWq2XWkZVnRPyDrw9PwAHinkCMvjAkRdZ: "MonkeDAO NFT's",
-  EdNP7sERADU525E9bov6YdfL3oK3idnRTMdKUh2J7FCM:
-    'SMB SOL Royalty Treasury Holdings',
-  '5bAHkmagXYJzjzxYPDht7AVZRxjiJ6r12NQU3L67bkTr': 'SMB USDC Royalty Holdings',
-  CYLSMKuMiDFNg4eDrZdaaWYCJedsLMAEQgUCtnoUq4n1:
-    'Primary USDC Treasury Holdings',
-  '2qhApGpizKoCyw45oho8Z4F7c14Es4tKvHmBuTnCqubn':
-    'Primary SOL Treasury Holdings',
-  J45sC6ow6u2cXZU8tvewC548CcFiU6VGnFpnxW71WNgm: 'GG SHDW Tokens',
-  wpSyytRSgo1b5RE6PYT9GMWubdq6EdbGC8PEbcz4Kff: 'DAOPool Fee Collection',
-  xuEfu6gmCn1RSXSAVpWLTYttx685m9rAbzqwwYUjYXJ: 'DAOJones Fractionalized Tokens',
-  GQDFqZ7URyWAiPMQs4ywZ9pKBqrUg4srdkqnZpRUstQz: 'Merch Escrow Holdings',
-  '7JPpGyJTEXwR9uQSqhi6RAK5GiSTr41oq72PJ4fU5CXf': 'Marketing Wallet SOL',
-  '2FCKVvw3JmRD6Q2DFb3ZzW697GKjYka8JwGMSF7juWZd': 'Marketing Wallet USDC',
+  '7r6xoSMC9xvrmM3LDV6p67hW4MqDmf4iocQB7CarqWGv': 'Primary Treasury Wallet',
+  '3Gaxab6KF9SHVq8qvKLAdDQMX6ZYJxctmLL8QYk5gGRE': 'Treasury USDC',
+  BQxsFSHwoWAi6MQyUXusvNjD6kAbBtcxGcZZ11zz2vGy: 'Treasury SOL',
+  BQ2nz8oWcZ4PuEskvFboUtJDa1AVzdXaJh1vHajgUWiq: 'Marketing Wallet',
+  H3fxHgqXBpXjoSnWHPYSsNkVTuZcP9jRXDE6eT6kganp: 'Marketing USDC',
+  HAryckvjyViFQEmhmMoCtqqBMJnpXEYViamyDhZUJfnG: 'SMB Royalty Wallet',
+  E3KpSoZL3EDeXw8EtgHfi83n663LFfyEZ8r9J7kdaEC2: 'SMB Royalty SOL',
+  CNz3mg35f5HQ7wT2XsrBVNcSVdpWSSG8dwVLhCzsmUPo: 'Merch Escrow Wallet',
+  '2rhSFgwgwuKYMaQUa5QcHBpaW5zoBL32ib3aqDW9zkcM': 'Merch USDC',
+  '6VWfsPjYRGetHhQMJBh7cksKoN7MWimgeyeYHg824jRR': 'UST',
+  '2eBFMe5jCG4hw3ooNr3UFQbVs6hE7bacHuuhZg4n8nCP': 'SHDW',
+  Gr6PqrrZqiay44937AKthj7FEpShCBb94Jgw89BUr2b2: 'daoSOL',
+  '2fEL6au59KfmtarX5cJD4a6EaxRr6gLBvFkE65uEPJ4U': 'DAOJONES',
+  FboFh3DkwmAeH4GyM5Ttd8ismd2wq6c8MrRkSsmr5nQW: 'LUNA',
+  GnfeSuTwbXcxVnuXJTzx172174PJAHUfXpNgsBdGCncd: 'Solend Holdings',
 }
 
 // Blacklisted governances which should not be displayed in the UI
@@ -159,6 +161,7 @@ export const CHAT_PROGRAM_ID = new PublicKey(
 )
 
 export const WSOL_MINT = 'So11111111111111111111111111111111111111112'
+export const WSOL_MINT_PK = new PublicKey(WSOL_MINT)
 
 const HIDDEN_MNGO_TREASURES = [
   'GZQSF4Fh9xK7rf9WBEhawXYFw8qPXeatZLUqVQeuW3X8',

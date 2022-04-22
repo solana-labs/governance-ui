@@ -1,7 +1,5 @@
 import { getExplorerUrl } from '@components/explorer/tools'
 import ImgWithLoader from '@components/ImgWithLoader'
-import { DEFAULT_NFT_TREASURY_MINT } from '@components/instructions/tools'
-import { PhotographIcon } from '@heroicons/react/outline'
 import { ChevronRightIcon } from '@heroicons/react/solid'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useQueryContext from '@hooks/useQueryContext'
@@ -10,23 +8,24 @@ import React from 'react'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
 import useWalletStore from 'stores/useWalletStore'
 import Link from 'next/link'
+import Loading from '@components/Loading'
+import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 
 const NFTSCompactWrapper = () => {
   const { nftsGovernedTokenAccounts } = useGovernanceAssets()
   const connection = useWalletStore((s) => s.connection)
   const realmNfts = useTreasuryAccountStore((s) => s.allNfts)
   const isLoading = useTreasuryAccountStore((s) => s.isLoadingNfts)
+  const isLoadingAssets = useGovernanceAssetsStore(
+    (s) => s.loadGovernedAccounts
+  )
   const { symbol } = useRealm()
   const { fmtUrlWithCluster } = useQueryContext()
   return nftsGovernedTokenAccounts.length ? (
     <div className="bg-bkg-2 p-4 md:p-6 rounded-lg transition-all">
       <div className="flex items-center justify-between pb-4">
         <h3 className="mb-0">NFTs</h3>
-        <Link
-          href={fmtUrlWithCluster(
-            `/dao/${symbol}/gallery/${DEFAULT_NFT_TREASURY_MINT}`
-          )}
-        >
+        <Link href={fmtUrlWithCluster(`/dao/${symbol}/gallery`)}>
           <a
             className={`default-transition flex items-center text-fgd-2 text-sm transition-all hover:text-fgd-3`}
           >
@@ -37,16 +36,16 @@ const NFTSCompactWrapper = () => {
       </div>
       <div
         className="overflow-y-auto"
-        style={{ maxHeight: '210px', minHeight: '50px' }}
+        style={{
+          maxHeight: '210px',
+          minHeight: isLoading || isLoadingAssets ? '25px' : '0',
+        }}
       >
         <div className="grid grid-cols-4 grid-flow-row gap-3">
-          {isLoading ? (
-            <>
-              <div className="animate-pulse bg-bkg-3 col-span-1 h-20 rounded-md" />
-              <div className="animate-pulse bg-bkg-3 col-span-1 h-20 rounded-md" />
-              <div className="animate-pulse bg-bkg-3 col-span-1 h-20 rounded-md" />
-              <div className="animate-pulse bg-bkg-3 col-span-1 h-20 rounded-md" />
-            </>
+          {isLoading || isLoadingAssets ? (
+            <div>
+              <Loading></Loading>
+            </div>
           ) : realmNfts.length ? (
             realmNfts.map((x, idx) => (
               <a
@@ -63,11 +62,7 @@ const NFTSCompactWrapper = () => {
                 />
               </a>
             ))
-          ) : (
-            <div className="col-span-3 text-fgd-3 flex flex-col items-center">
-              <PhotographIcon className="opacity-5 w-56 h-56"></PhotographIcon>
-            </div>
-          )}
+          ) : null}
         </div>
       </div>
     </div>
