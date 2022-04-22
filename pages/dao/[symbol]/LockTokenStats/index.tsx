@@ -3,57 +3,43 @@ import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import Tooltip from '@components/Tooltip'
 import { SearchIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { BN } from '@project-serum/anchor'
 import {
-  getAccountTypes,
-  getGovernanceSchemaForAccount,
-  GovernanceAccountClass,
   GovernanceAccountType,
   InstructionExecutionStatus,
-  ProgramAccount,
-  ProposalTransaction,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
 import { getMintDecimalAmount } from '@tools/sdk/units'
-import { deserializeBorsh } from '@utils/borsh'
-import { ConnectionContext } from '@utils/connection'
-import { abbreviateAddress } from '@utils/formatting'
-import tokenService from '@utils/services/token'
-import axios from 'axios'
 import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useWalletStore from 'stores/useWalletStore'
 import { MANGO_MINT } from 'Strategies/protocols/mango/tools'
-import { Deposit, LockupType } from 'VoteStakeRegistry/sdk/accounts'
 import {
   DAYS_PER_MONTH,
-  getMinDurationFmt,
-  getTimeLeftFromNowFmt,
   SECS_PER_MONTH,
 } from 'VoteStakeRegistry/tools/dateTools'
+import InfoBox from './InfoBox'
+import LockTokenRow from './LockTokenRow'
+import {
+  DepoistWithVoter,
+  DepositWithWallet,
+  getProposalsTransactions,
+} from './tools'
+import PaginationComponent from '@components/Pagination'
 const VestingVsTime = dynamic(() => import('./VestingVsTime'), {
   ssr: false,
 })
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
-interface DepositWithWallet {
-  voter: PublicKey
-  wallet: PublicKey
-  deposit: Deposit
-}
-interface DepoistWithVoter {
-  amount: BN | undefined
-  voterPk: PublicKey
-  startTs: BN | undefined
-}
 
 const LockTokenStats = () => {
+  const walletsPerPage = 10
+  const pagination = useRef<{ setPage: (val) => void }>(null)
   const { realmInfo, realm, mint, proposals } = useRealm()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
@@ -88,6 +74,12 @@ const LockTokenStats = () => {
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
   const [statsMonths, setStatsMonths] = useState<string[]>([])
+  const [paginatedWallets, setPaginatedWallets] = useState<DepositWithWallet[]>(
+    []
+  )
+  const filteredDepositWithWallets = depositsWithWallets.filter((x) =>
+    search ? x.wallet.toBase58().includes(search) : x
+  )
   const givenGrantsTokenAmount = givenGrantsTokenAmounts.reduce(
     (acc, curr) => acc.add(curr.amount!),
     new BN(0)
@@ -339,6 +331,19 @@ const LockTokenStats = () => {
     }
     mngoPerpMarket()
   }, [connection.cluster])
+  useEffect(() => {
+    setPaginatedWallets(paginateWallets(0))
+    pagination?.current?.setPage(0)
+  }, [JSON.stringify(filteredDepositWithWallets)])
+  const onPageChange = (page) => {
+    setPaginatedWallets(paginateWallets(page))
+  }
+  const paginateWallets = (page) => {
+    return filteredDepositWithWallets.slice(
+      page * walletsPerPage,
+      (page + 1) * walletsPerPage
+    )
+  }
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -373,7 +378,7 @@ const LockTokenStats = () => {
                 val={givenGrantsTokenAmount}
               ></InfoBox>
               <InfoBox
-                title="Liquidity mining emissions per month"
+                title="Liquidity mining emission per month"
                 val={liquidityMiningEmissionPerMonth}
               ></InfoBox>
             </div>
@@ -434,165 +439,34 @@ const LockTokenStats = () => {
               </div>
             </div>
             <div className="flex flex-col mt-4">
-              <div className="grid grid-cols-4 text-fgd-3 pb-1">
+              <div className="grid grid-cols-4 text-fgd-3 pb-1 px-2">
                 <div>Address</div>
                 <div>Lock type</div>
                 <div>Lock duration</div>
                 <div>MNGO Locked</div>
               </div>
-              {depositsWithWallets.map((x, index) => (
-                <LockTokenRow depositWithWallet={x} key={index}></LockTokenRow>
+              {paginatedWallets.map((x, index) => (
+                <LockTokenRow
+                  index={index}
+                  depositWithWallet={x}
+                  key={index}
+                ></LockTokenRow>
               ))}
+              <div>
+                <PaginationComponent
+                  ref={pagination}
+                  totalPages={Math.ceil(
+                    filteredDepositWithWallets.length / walletsPerPage
+                  )}
+                  onPageChange={onPageChange}
+                ></PaginationComponent>
+              </div>
             </div>
           </div>
         </div>
       </div>
     </div>
   )
-}
-
-const LockTokenRow = ({
-  depositWithWallet,
-}: {
-  depositWithWallet: DepositWithWallet
-}) => {
-  const { mint } = useRealm()
-  const fmtMangoAmount = (val) => {
-    return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
-  }
-  const type = Object.keys(
-    depositWithWallet.deposit.lockup.kind
-  )[0] as LockupType
-  const typeName = type !== 'monthly' ? type : 'Vested'
-  const isConstant = type === 'constant'
-  const lockedTokens = fmtMangoAmount(
-    depositWithWallet.deposit.amountDepositedNative
-  )
-  const abbreviateWalletAddress = abbreviateAddress(depositWithWallet.wallet)
-  return (
-    <div className="grid grid-cols-4 py-2">
-      <div className="underline hover:cursor-pointer">
-        {abbreviateWalletAddress}
-      </div>
-      <div>{typeName}</div>
-      <div>
-        {isConstant
-          ? getMinDurationFmt(depositWithWallet.deposit as any)
-          : getTimeLeftFromNowFmt(depositWithWallet.deposit as any)}
-      </div>
-      <div>{lockedTokens}</div>
-    </div>
-  )
-}
-
-const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
-  const { mint } = useRealm()
-  const formatter = Intl.NumberFormat('en', {
-    notation: 'compact',
-  })
-  const fmtMangoAmount = (val) => {
-    return mint
-      ? formatter.format(getMintDecimalAmount(mint!, val).toNumber())
-      : '0'
-  }
-  const price = tokenService.getUSDTokenPrice(MANGO_MINT)
-  const totalPrice = mint
-    ? formatter.format(getMintDecimalAmount(mint!, val).toNumber() * price)
-    : ''
-  return (
-    <div className={`border border-fgd-4 p-3 rounded-md mb-4 ${className}`}>
-      <div className="text-fgd-3 text-xs">
-        {title}
-        {tooltip && (
-          <Tooltip content={tooltip}>
-            <span>i</span>
-          </Tooltip>
-        )}
-      </div>
-      <div>
-        <span className="font-bold text-xl">{fmtMangoAmount(val)}</span>
-        {totalPrice && (
-          <span className="text-xs font-normal text-fgd-2">
-            {' '}
-            = ${totalPrice}
-          </span>
-        )}
-      </div>
-    </div>
-  )
-}
-
-//TODO fcn specific to grant instruction => make it generic for all governanceAccounts and move to sdk
-const getProposalsTransactions = async (
-  pubkeys: PublicKey[],
-  connection: ConnectionContext,
-  programId: PublicKey
-) => {
-  const getTransactions = await axios.request({
-    url: connection.endpoint,
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    data: JSON.stringify([
-      ...pubkeys.map((x) => {
-        return {
-          jsonrpc: '2.0',
-          id: 1,
-          method: 'getProgramAccounts',
-          params: [
-            programId.toBase58(),
-            {
-              commitment: connection.current.commitment,
-              encoding: 'base64',
-              filters: [
-                {
-                  memcmp: {
-                    offset: 0, // number of bytes
-                    bytes: 'E', // base58 encoded string
-                  },
-                },
-                {
-                  memcmp: {
-                    offset: 1,
-                    bytes: x.toBase58(),
-                  },
-                },
-              ],
-            },
-          ],
-        }
-      }),
-    ]),
-  })
-
-  const accounts: ProgramAccount<ProposalTransaction>[] = []
-  const rawAccounts = getTransactions.data
-    ? getTransactions.data.flatMap((x) => x.result)
-    : []
-  for (const rawAccount of rawAccounts) {
-    try {
-      const getSchema = getGovernanceSchemaForAccount
-      const data = Buffer.from(rawAccount.account.data[0], 'base64')
-      const accountTypes = getAccountTypes(
-        (ProposalTransaction as any) as GovernanceAccountClass
-      )
-      const account: ProgramAccount<ProposalTransaction> = {
-        pubkey: new PublicKey(rawAccount.pubkey),
-        account: deserializeBorsh(
-          getSchema(accountTypes[1]),
-          ProposalTransaction,
-          data
-        ),
-        owner: new PublicKey(rawAccount.account.owner),
-      }
-
-      accounts.push(account)
-    } catch (ex) {
-      console.info(`Can't deserialize @ ${rawAccount.pubkey}, ${ex}.`)
-    }
-  }
-  return accounts
 }
 
 export default LockTokenStats
