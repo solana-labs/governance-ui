@@ -368,17 +368,24 @@ const LockTokenStats = () => {
                 title="Circulating supply"
                 val={circulatingSupply}
               ></InfoBox>
-              <InfoBox title="Total MNGO Locked" val={mngoLocked}></InfoBox>
+              <InfoBox
+                tooltip="Total current amount of MNGO locked"
+                title="Total MNGO Locked"
+                val={mngoLocked}
+              ></InfoBox>
               <InfoBox
                 title="Locked with clawback"
+                tooltip="Currently locked MNGO that DAO can clawback to treasury vault"
                 val={mngoLockedWithClawback}
               ></InfoBox>
               <InfoBox
-                title="Initially locked in grants"
+                tooltip="Historical total amount of MNGO granted to contributors "
+                title="Total amount from grants"
                 val={givenGrantsTokenAmount}
               ></InfoBox>
               <InfoBox
                 title="Liquidity mining emission per month"
+                tooltip="Total MNGO emission from all perp markets per month"
                 val={liquidityMiningEmissionPerMonth}
               ></InfoBox>
             </div>
@@ -393,6 +400,7 @@ const LockTokenStats = () => {
 
                   <InfoBox
                     className="w-1/2"
+                    tooltip="Historical total amount unlocked from grants"
                     title="Unlocked from grants"
                     val={unlockedFromGrants}
                   ></InfoBox>

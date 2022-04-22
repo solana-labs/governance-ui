@@ -1,4 +1,5 @@
 import Tooltip from '@components/Tooltip'
+import { InformationCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { getMintDecimalAmount } from '@tools/sdk/units'
 import tokenService from '@utils/services/token'
@@ -20,11 +21,13 @@ const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
     : ''
   return (
     <div className={`border border-fgd-4 p-3 rounded-md mb-4 ${className}`}>
-      <div className="text-fgd-3 text-xs">
+      <div className="text-fgd-3 text-xs flex items-center">
         {title}
         {tooltip && (
           <Tooltip content={tooltip}>
-            <span>i</span>
+            <span>
+              <InformationCircleIcon className="w-4 h-4 ml-1"></InformationCircleIcon>
+            </span>
           </Tooltip>
         )}
       </div>
