@@ -13,10 +13,7 @@ const RealmsMetrics = () => {
       <div className="pb-28 px-56">
         <div className="flex flex-row">
           <div className="basis-1/2">
-            {/* <div className="flex-none"> */}
-            <h1 className="md:text-3xl font-thin">
-              <GradientTitle>Key Metrics on Realms</GradientTitle>
-            </h1>
+            <GradientTitle>Key Metrics on Realms</GradientTitle>
           </div>
 
           <div className="basis-1/2 grow">

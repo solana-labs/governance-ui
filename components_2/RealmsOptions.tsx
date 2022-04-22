@@ -4,9 +4,7 @@ const RealmsOptions = () => {
   return (
     <div className="py-28 px-56">
       <div className="text-blue">
-        <h1 className="md:text-3xl font-thin">
-          <GradientTitle>What you can do on Realms</GradientTitle>
-        </h1>
+        <GradientTitle>What you can do on Realms</GradientTitle>
       </div>
       <div>
         <img

@@ -1,86 +1,54 @@
 import GradientTitle from './GradientTitle'
+import { IconInfoBox } from './IconInfoBox'
 
 const SolanaPerks = () => {
   return (
     <div className="py-28 px-56">
       <div className="flex">
         <div className="flex-none w-80">
-          <div>
-            <h1 className="md:text-3xl font-thin">
-              <GradientTitle>Why is Solana</GradientTitle>
-            </h1>
-            <h1 className="md:text-3xl font-thin">
-              <GradientTitle>perfect for DAOs?</GradientTitle>
-            </h1>
-          </div>
+          <GradientTitle>Why is Solana</GradientTitle>
+          <GradientTitle>perfect for DAOs?</GradientTitle>
         </div>
 
         <div className="grow">
           <div className="grid grid-cols-3 gap-16">
+            <IconInfoBox
+              imgSrc="pie-chart"
+              title="Near-Zero Fees"
+              text="Never worry about fees when launching a DAO, voting, or
+            participating."
+            />
+            <IconInfoBox
+              imgSrc="treasury"
+              title="Treasury Management"
+              text="Leverage shared wallets to decide as a community on resource
+                allocation."
+            />
+            <IconInfoBox
+              imgSrc="blockchain"
+              title="Fully On-Chain"
+              text="Cement governance decisions to ensure censorship resistance."
+            />
+            <IconInfoBox
+              imgSrc="devices"
+              title="One Product"
+              text="All the tools and resources you need under the same roof."
+            />
+            <IconInfoBox
+              imgSrc="magic"
+              title="Easy Creation"
+              text="Create and participate in fully on-chain DAOs of all kinds."
+            />
             <div>
-              <img
-                src="/img/realms-web/icons/pie-chart.svg"
-                className="my-2 h-7"
-                alt=""
+              <IconInfoBox
+                imgSrc="solana-logo"
+                title="Solana Standard"
+                text="The standard framework for building and scaling DAOs on Solana."
               />
-              <h3>Near-Zero Fees</h3>
-              <p>
-                Never worry about fees when launching a DAO, voting, or
-                participating.
-              </p>
-            </div>
-            <div>
-              <img
-                src="/img/realms-web/icons/treasury.svg"
-                className="my-2 h-7"
-                alt=""
-              />
-              <h3>Treasury Management</h3>
-              <p>
-                Leverage shared wallets to decide as a community on resource
-                allocation.
-              </p>
-            </div>
-            <div>
-              <img
-                src="/img/realms-web/icons/blockchain.svg"
-                className="my-2 h-7"
-                alt=""
-              />
-              <h3>Fully On-Chain</h3>
-              <p>
-                Cement governance decisions to ensure censorship resistance.
-              </p>
-            </div>
-            <div>
-              <img
-                src="/img/realms-web/icons/devices.svg"
-                className="my-2 h-7"
-                alt=""
-              />
-              <h3>One Product</h3>
-              <p>All the tools and resources you need under the same roof.</p>
-            </div>
-            <div>
-              <img
-                src="/img/realms-web/icons/magic.svg"
-                className="my-2 h-7"
-                alt=""
-              />
-              <h3>Easy Creation</h3>
-              <p>Create and participate in fully on-chain DAOs of all kinds.</p>
-            </div>
-            <div>
-              <img
-                src="/img/realms-web/icons/solana-logo.svg"
-                className="my-2 h-7"
-                alt=""
-              />
-              <h3>Solana Standard</h3>
-              <p className="mb-3">
-                The standard framework for building and scaling DAOs on Solana.
-              </p>
-              <a href="" className="text-xs opacity-70 underline">
+              <a
+                href=""
+                className="inline-block mt-3 text-xs opacity-50 underline hover:text-realms-theme-blue hover:opacity-90 active:text-white"
+              >
                 Learn More
               </a>
             </div>

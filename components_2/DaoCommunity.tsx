@@ -1,15 +1,11 @@
-import GradientTitle from './GradientTitle'
+import GradientTitle, { GradientText } from './GradientTitle'
 
 const DaoCommunity = () => {
   return (
     <div className="py-24 px-56">
       <div className="pb-16">
-        <h1 className="md:text-3xl font-thin">
-          <GradientTitle>A DAO is a community working</GradientTitle>
-        </h1>
-        <h1 className="md:text-3xl font-thin">
-          <GradientTitle>together to make decisions</GradientTitle>
-        </h1>
+        <GradientTitle>A DAO is a community working</GradientTitle>
+        <GradientTitle>together to make decisions</GradientTitle>
       </div>
       <div className="flex flex-row">
         <div className="basis-1/2">
@@ -29,7 +25,7 @@ const DaoCommunity = () => {
         </div>
         <div className="basis-1/2">
           <div className="mb-6">
-            <GradientTitle>Industries DAOs Impact:</GradientTitle>
+            <GradientText>Industries DAOs Impact:</GradientText>
           </div>
           <div className="grid grid-rows-4 grid-flow-col gap-y-4">
             <div className="pr-16">
