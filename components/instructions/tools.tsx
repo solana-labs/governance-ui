@@ -32,6 +32,8 @@ export const DEFAULT_GOVERNANCE_PROGRAM_ID =
 export const DEFAULT_TEST_GOVERNANCE_PROGRAM_ID =
   'GTesTBiEWE32WHXXE2S4XbZvA5CrEc4xs6ZgRe895dP'
 
+export const MANGO_DAO_TREASURY = '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3'
+
 // Well known account names displayed on the instruction card
 export const ACCOUNT_NAMES = {
   AQeo6r6jdwnmf48AMejgoKdUGtV8qzbVJH42Gb5sWdi: 'Deprecated: Mango IDO program',
