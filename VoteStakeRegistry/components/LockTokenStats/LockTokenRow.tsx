@@ -41,8 +41,8 @@ const LockTokenRow = ({
         dark={true}
         connection={connection.current}
         address={new PublicKey(depositWithWallet.wallet)}
-        height="32px"
-        width="32px"
+        height="25px"
+        width="25px"
         placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
       />
     ),
