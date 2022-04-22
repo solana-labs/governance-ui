@@ -236,11 +236,11 @@ export default function useGovernanceAssets() {
       name: 'Create NFT plugin registrar',
       isVisible: canUseAuthorityInstruction,
     },
-    {
-      id: Instructions.IDL,
-      name: 'Execute IDL Instruction',
-      isVisible: canUseAnyInstruction,
-    },
+    // {
+    //   id: Instructions.IDL, // Feature not complete -RW 4/2022
+    //   name: 'Execute IDL Instruction',
+    //   isVisible: canUseAnyInstruction,
+    // },
     {
       id: Instructions.ConfigureNftPluginCollection,
       name: 'Configure NFT plugin collection',

@@ -5,7 +5,6 @@ import {
   Governance,
   ProgramAccount,
 } from '@solana/spl-governance'
-// import Input from '@components/inputs/Input'
 import Textarea from '@components/inputs/Textarea'
 import Select from '@components/inputs/Select'
 import { validateInstruction } from '@utils/instructionTools'
@@ -187,7 +186,6 @@ const IDLInstructions = ({
           .map((account) => {
             return account.args.map((args, idx) => {
               if (args) {
-                // create object here
                 return (
                   <Textarea
                     key={idx}
