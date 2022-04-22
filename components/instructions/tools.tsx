@@ -110,7 +110,6 @@ export const ACCOUNT_NAMES = {
     'ClubDAO Main NFT Treasury Vault',
 
   //MonkeDAO
-
   DKdBj8KF9sieWq2XWkZVnRPyDrw9PwAHinkCMvjAkRdZ: "MonkeDAO NFT's",
   '7r6xoSMC9xvrmM3LDV6p67hW4MqDmf4iocQB7CarqWGv': 'Primary Treasury Wallet',
   '3Gaxab6KF9SHVq8qvKLAdDQMX6ZYJxctmLL8QYk5gGRE': 'Treasury USDC',
@@ -137,8 +136,6 @@ export const HIDDEN_GOVERNANCES = new Map<string, string>([
   ['2j2oe8YXdYJyS7G8CeEW5KARijdjjZkuPy5MnN8gBQqQ', ''],
   ['56yqzBEr9BqDGjYPJz9G8LVQrbXsQM2t2Yq3Gk8S56d1', ''],
   ['4styeLGsBRpV4xKsCNMRPb94U7JN8ZXoXJTLZA5hdjo9', ''],
-  ['CKWNNwtn5nbsGMkvtRwHDv4QTyoHMByKVd7Ypo2deNpc', ''],
-  ['GgATi9VL2Am5U7vHaikWNnr3iXJqK56DdwKoDQ38vA6T', ''],
 ])
 
 // Blacklisted proposals which should not be displayed in the UI
