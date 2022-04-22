@@ -2,6 +2,7 @@ import { Config, MangoClient } from '@blockworks-foundation/mango-client'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
+import Tooltip from '@components/Tooltip'
 import useRealm from '@hooks/useRealm'
 import { BN } from '@project-serum/anchor'
 import {
@@ -103,10 +104,6 @@ const LockTokenStats = () => {
   const walletsCount = [
     ...new Set(depositsWithWallets.map((x) => x.wallet.toBase58())),
   ].length
-  const fmtMangoAmount = (val) => {
-    return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
-  }
-  const vestingThisMonthFmt = fmtMangoAmount(vestingThisMonth)
   const mngoValut = governedTokenAccounts.find(
     (x) =>
       x.extensions.mint?.publicKey.toBase58() ===
@@ -116,19 +113,16 @@ const LockTokenStats = () => {
     mngoValut && mint
       ? mint.supply.sub(mngoValut.extensions.amount!)
       : new BN(0)
-  const circulatingSupplyFmt = fmtMangoAmount(circulatingSupply)
   const mngoLocked = depositsWithWallets.reduce(
     (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
     new BN(0)
   )
-  const mngoLockedFmt = fmtMangoAmount(mngoLocked)
   const mngoLockedWithClawback = depositsWithWallets
     .filter((x) => x.deposit.allowClawback)
     .reduce(
       (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
       new BN(0)
     )
-  const mngoLockedWithClawbackFmt = fmtMangoAmount(mngoLockedWithClawback)
   const calcVestingAmountsPerLastXMonths = (monthsNumber: number) => {
     const depositsWithWalletsSortedByDate = [...depositsWithWallets].sort(
       (x, y) =>
@@ -332,7 +326,9 @@ const LockTokenStats = () => {
     }
     mngoPerpMarket()
   }, [connection.cluster])
-
+  const fmtMangoAmount = (val) => {
+    return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
+  }
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -351,42 +347,46 @@ const LockTokenStats = () => {
               </div>
             </div>
           </div>
-          <div className="flex">
+          <div className="flex pt-5">
             <div className="flex flex-col w-1/3">
-              <div>
-                Circulating supply
-                <div>{circulatingSupplyFmt}</div>
-              </div>
-              <div>
-                Total MNGO Locked
-                <div>{mngoLockedFmt}</div>
-              </div>
-              <div>
-                Locked with clawback
-                <div>{mngoLockedWithClawbackFmt}</div>
-              </div>
-              <div>
-                Initially locked in grants
-                <div>{fmtMangoAmount(givenGrantsTokenAmount)}</div>
-              </div>
-              <div>
-                Unlocked from grants
-                <div>{fmtMangoAmount(unlockedFromGrants)}</div>
-              </div>
-              <div>
-                Vesting this month
-                <div>{vestingThisMonthFmt}</div>
-              </div>
-              <div>
-                Liquidity mining emissions per month
-                <div>{fmtMangoAmount(liqudiityMiningEmissionPerMonth)}</div>
-              </div>
-              <div></div>
+              <InfoBox
+                title="Circulating supply"
+                val={fmtMangoAmount(circulatingSupply)}
+              ></InfoBox>
+              <InfoBox
+                title="Total MNGO Locked"
+                val={fmtMangoAmount(mngoLocked)}
+              ></InfoBox>
+              <InfoBox
+                title="Locked with clawback"
+                val={fmtMangoAmount(mngoLockedWithClawback)}
+              ></InfoBox>
+              <InfoBox
+                title="Initially locked in grants"
+                val={fmtMangoAmount(givenGrantsTokenAmount)}
+              ></InfoBox>
+              <InfoBox
+                title="Liquidity mining emissions per month"
+                val={fmtMangoAmount(liqudiityMiningEmissionPerMonth)}
+              ></InfoBox>
             </div>
             <div className="w-2/3">
               <div>
-                MNGO Vesting vs. Time
-                <div style={{ height: '350px' }}>
+                <div className="flex pl-8">
+                  <InfoBox
+                    className="w-1/2 mr-3"
+                    title="Vesting this month"
+                    val={fmtMangoAmount(vestingThisMonth)}
+                  ></InfoBox>
+
+                  <InfoBox
+                    className="w-1/2"
+                    title="Unlocked from grants"
+                    val={fmtMangoAmount(unlockedFromGrants)}
+                  ></InfoBox>
+                </div>
+                <div className="pl-8">MNGO Vesting vs. Time</div>
+                <div style={{ height: '330px' }}>
                   <VestingVsTime
                     data={[
                       ...statsMonths.map((x) => {
@@ -452,6 +452,23 @@ const LockTokenRow = ({
           : getTimeLeftFromNowFmt(depositWithWallet.deposit as any)}
       </div>
       <div>{lockedTokens}</div>
+    </div>
+  )
+}
+
+const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
+  return (
+    <div className={`border border-fgd-4 p-3 rounded-md mb-4 ${className}`}>
+      <div className="text-fgd-3 text-xs pb-2">
+        {title}
+        {tooltip && (
+          <Tooltip content={tooltip}>
+            <span>i</span>
+          </Tooltip>
+        )}
+      </div>
+
+      <div>{val} </div>
     </div>
   )
 }
