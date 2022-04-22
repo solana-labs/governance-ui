@@ -9,8 +9,8 @@ const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
     padding={0.3}
     valueScale={{ type: 'linear' }}
     indexScale={{ type: 'band', round: true }}
-    colors={{ scheme: 'greys' }}
     isInteractive={false}
+    borderRadius={4}
     theme={{
       axis: {
         ticks: {
@@ -23,6 +23,7 @@ const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
         },
       },
     }}
+    colors={() => '#A4ACB7'}
     label={(v) => fmtMangoAmount(v.value)}
     axisLeft={{ format: (v) => fmtMangoAmount(v) }}
     labelSkipWidth={12}

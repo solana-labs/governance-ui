@@ -1,8 +1,10 @@
 import { Config, MangoClient } from '@blockworks-foundation/mango-client'
+import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
 import Tooltip from '@components/Tooltip'
+import { SearchIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { BN } from '@project-serum/anchor'
 import {
@@ -15,10 +17,11 @@ import {
   ProposalTransaction,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import { fmtMintAmount, getMintDecimalAmount } from '@tools/sdk/units'
+import { getMintDecimalAmount } from '@tools/sdk/units'
 import { deserializeBorsh } from '@utils/borsh'
 import { ConnectionContext } from '@utils/connection'
 import { abbreviateAddress } from '@utils/formatting'
+import tokenService from '@utils/services/token'
 import axios from 'axios'
 import dayjs from 'dayjs'
 import dynamic from 'next/dynamic'
@@ -63,6 +66,7 @@ const LockTokenStats = () => {
   const governedTokenAccounts = useGovernanceAssetsStore(
     (s) => s.governedTokenAccounts
   )
+  const [search, setSearch] = useState('')
   const [voters, setVoters] = useState<
     {
       publicKey: PublicKey
@@ -77,7 +81,7 @@ const LockTokenStats = () => {
   >([])
   const [unlockedFromGrants, setUnlockedFromGrants] = useState(new BN(0))
   const [
-    liqudiityMiningEmissionPerMonth,
+    liquidityMiningEmissionPerMonth,
     setLiqudiityMiningEmissionPerMonth,
   ] = useState(new BN(0))
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
@@ -177,6 +181,15 @@ const LockTokenStats = () => {
     }
     return { vestingPerMonth, months }
   }
+  const fmtMangoAmount = (val) => {
+    const formatter = Intl.NumberFormat('en', {
+      notation: 'compact',
+    })
+    return mint
+      ? formatter.format(getMintDecimalAmount(mint!, val).toNumber())
+      : '0'
+  }
+
   useEffect(() => {
     const getProposalsInstructions = async () => {
       const accounts = await getProposalsTransactions(
@@ -326,9 +339,6 @@ const LockTokenStats = () => {
     }
     mngoPerpMarket()
   }, [connection.cluster])
-  const fmtMangoAmount = (val) => {
-    return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
-  }
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
       <div className="grid grid-cols-12 gap-6">
@@ -351,23 +361,20 @@ const LockTokenStats = () => {
             <div className="flex flex-col w-1/3">
               <InfoBox
                 title="Circulating supply"
-                val={fmtMangoAmount(circulatingSupply)}
+                val={circulatingSupply}
               ></InfoBox>
-              <InfoBox
-                title="Total MNGO Locked"
-                val={fmtMangoAmount(mngoLocked)}
-              ></InfoBox>
+              <InfoBox title="Total MNGO Locked" val={mngoLocked}></InfoBox>
               <InfoBox
                 title="Locked with clawback"
-                val={fmtMangoAmount(mngoLockedWithClawback)}
+                val={mngoLockedWithClawback}
               ></InfoBox>
               <InfoBox
                 title="Initially locked in grants"
-                val={fmtMangoAmount(givenGrantsTokenAmount)}
+                val={givenGrantsTokenAmount}
               ></InfoBox>
               <InfoBox
                 title="Liquidity mining emissions per month"
-                val={fmtMangoAmount(liqudiityMiningEmissionPerMonth)}
+                val={liquidityMiningEmissionPerMonth}
               ></InfoBox>
             </div>
             <div className="w-2/3">
@@ -376,40 +383,58 @@ const LockTokenStats = () => {
                   <InfoBox
                     className="w-1/2 mr-3"
                     title="Vesting this month"
-                    val={fmtMangoAmount(vestingThisMonth)}
+                    val={vestingThisMonth}
                   ></InfoBox>
 
                   <InfoBox
                     className="w-1/2"
                     title="Unlocked from grants"
-                    val={fmtMangoAmount(unlockedFromGrants)}
+                    val={unlockedFromGrants}
                   ></InfoBox>
                 </div>
-                <div className="pl-8">MNGO Vesting vs. Time</div>
-                <div style={{ height: '330px' }}>
-                  <VestingVsTime
-                    data={[
-                      ...statsMonths.map((x) => {
-                        return {
-                          month: x,
-                          amount: vestPerMonthStats[x]
-                            .reduce((acc, curr) => {
-                              return acc.add(curr.vestingAmount)
-                            }, new BN(0))
-                            .toNumber(),
-                        }
-                      }),
-                    ].reverse()}
-                    fmtMangoAmount={fmtMangoAmount}
-                  ></VestingVsTime>
+                <div className="border border-fgd-4 p-3 rounded-md ml-8">
+                  <div className="pl-8">MNGO Vesting vs. Time</div>
+                  <div style={{ height: '279px' }}>
+                    <VestingVsTime
+                      data={[
+                        ...statsMonths.map((x) => {
+                          return {
+                            month: x,
+                            amount: vestPerMonthStats[x]
+                              .reduce((acc, curr) => {
+                                return acc.add(curr.vestingAmount)
+                              }, new BN(0))
+                              .toNumber(),
+                          }
+                        }),
+                      ].reverse()}
+                      fmtMangoAmount={fmtMangoAmount}
+                    ></VestingVsTime>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
           <div className="pt-4">
-            <div>Members with Locked MNGO ({walletsCount})</div>
-            <div className="flex flex-col">
-              <div className="grid grid-cols-4">
+            <div className="flex items-center">
+              Members with Locked MNGO ({walletsCount}){' '}
+              <div className="ml-auto">
+                <Input
+                  style={{ maxWidth: '200px' }}
+                  className="pl-8"
+                  type="text"
+                  placeholder="Search by wallet"
+                  value={search}
+                  noMaxWidth
+                  onChange={(e) => {
+                    return setSearch(e.target.value)
+                  }}
+                  prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />}
+                />
+              </div>
+            </div>
+            <div className="flex flex-col mt-4">
+              <div className="grid grid-cols-4 text-fgd-3 pb-1">
                 <div>Address</div>
                 <div>Lock type</div>
                 <div>Lock duration</div>
@@ -432,19 +457,23 @@ const LockTokenRow = ({
   depositWithWallet: DepositWithWallet
 }) => {
   const { mint } = useRealm()
-
+  const fmtMangoAmount = (val) => {
+    return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
+  }
   const type = Object.keys(
     depositWithWallet.deposit.lockup.kind
   )[0] as LockupType
   const typeName = type !== 'monthly' ? type : 'Vested'
   const isConstant = type === 'constant'
-  const lockedTokens = mint
-    ? fmtMintAmount(mint!, depositWithWallet.deposit.amountDepositedNative)
-    : '0'
+  const lockedTokens = fmtMangoAmount(
+    depositWithWallet.deposit.amountDepositedNative
+  )
   const abbreviateWalletAddress = abbreviateAddress(depositWithWallet.wallet)
   return (
-    <div className="grid grid-cols-4">
-      <div>{abbreviateWalletAddress}</div>
+    <div className="grid grid-cols-4 py-2">
+      <div className="underline hover:cursor-pointer">
+        {abbreviateWalletAddress}
+      </div>
       <div>{typeName}</div>
       <div>
         {isConstant
@@ -457,9 +486,22 @@ const LockTokenRow = ({
 }
 
 const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
+  const { mint } = useRealm()
+  const formatter = Intl.NumberFormat('en', {
+    notation: 'compact',
+  })
+  const fmtMangoAmount = (val) => {
+    return mint
+      ? formatter.format(getMintDecimalAmount(mint!, val).toNumber())
+      : '0'
+  }
+  const price = tokenService.getUSDTokenPrice(MANGO_MINT)
+  const totalPrice = mint
+    ? formatter.format(getMintDecimalAmount(mint!, val).toNumber() * price)
+    : ''
   return (
     <div className={`border border-fgd-4 p-3 rounded-md mb-4 ${className}`}>
-      <div className="text-fgd-3 text-xs pb-2">
+      <div className="text-fgd-3 text-xs">
         {title}
         {tooltip && (
           <Tooltip content={tooltip}>
@@ -467,8 +509,15 @@ const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
           </Tooltip>
         )}
       </div>
-
-      <div>{val} </div>
+      <div>
+        <span className="font-bold text-xl">{fmtMangoAmount(val)}</span>
+        {totalPrice && (
+          <span className="text-xs font-normal text-fgd-2">
+            {' '}
+            = ${totalPrice}
+          </span>
+        )}
+      </div>
     </div>
   )
 }

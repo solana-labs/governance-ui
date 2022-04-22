@@ -257,6 +257,7 @@ const LockTokensModal = ({
     if (!depositToUnlock) {
       throw 'No deposit to unlock selected'
     }
+
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -405,7 +406,9 @@ const LockTokensModal = ({
                     min={1}
                     value={lockupPeriodDays}
                     type="number"
-                    onChange={(e) => setLockupPeriodDays(e.target.value)}
+                    onChange={(e) =>
+                      setLockupPeriodDays(Number(e.target.value))
+                    }
                     step={1}
                   />
                 </>
@@ -468,19 +471,21 @@ const LockTokensModal = ({
                   className="bg-primary-light h-2 rounded-lg"
                 ></div>
               </div>
-              <div className="flex text-sm text-fgd-2">
-                <div className="pr-5">
-                  Allow dao to clawback -{' '}
-                  <small>
-                    It will give ability to propose clawback of your locked
-                    tokens to any given address
-                  </small>
+              {!depositToUnlock && (
+                <div className="flex text-sm text-fgd-2">
+                  <div className="pr-5">
+                    Allow dao to clawback -{' '}
+                    <small>
+                      It will give ability to propose clawback of your locked
+                      tokens to any given address
+                    </small>
+                  </div>
+                  <Switch
+                    checked={allowClawback}
+                    onChange={(checked) => setAllowClawback(checked)}
+                  />
                 </div>
-                <Switch
-                  checked={allowClawback}
-                  onChange={(checked) => setAllowClawback(checked)}
-                />
-              </div>
+              )}
             </div>
           </>
         )
