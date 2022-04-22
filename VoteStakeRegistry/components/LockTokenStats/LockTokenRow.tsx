@@ -61,6 +61,7 @@ const LockTokenRow = ({
       className={`grid grid-cols-4 py-2 px-2 ${
         index % 2 === 0 ? 'bg-bkg-3' : ''
       } rounded`}
+      style={{ maxHeight: '40px' }}
     >
       <div className="underline hover:cursor-pointer flex">
         <span className="mr-2">{renderAddressImage}</span> {renderAddressName}
