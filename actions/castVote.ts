@@ -91,12 +91,16 @@ export async function castVote(
   const chunkTreshold = message ? 4 : 2
   const shouldChunk = instructions.length > chunkTreshold
   if (shouldChunk) {
-    const insertChunks = chunks(instructions, 2)
+    const insertChunks = chunks(instructions, 1)
+    const chunkWithLastTwoMerge = [
+      ...insertChunks.splice(0, insertChunks.length - 2),
+      [...insertChunks.splice(-2).flatMap((x) => x)],
+    ]
     const signerChunks = Array(instructions.length).fill([])
     await sendTransactions(
       connection,
       wallet,
-      [...insertChunks],
+      [...chunkWithLastTwoMerge],
       [[], [], ...signerChunks],
       SequenceType.Sequential
     )
