@@ -291,20 +291,42 @@ export class VotingClient {
         )
         remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
       }
-      instructions.push(
-        this.client.program.instruction.relinquishNftVote({
-          accounts: {
-            registrar,
-            voterWeightRecord: voterWeightPk,
-            governance: proposal.account.governance,
-            proposal: proposal.pubkey,
-            governingTokenOwner: walletPk,
-            voteRecord: voteRecordPk,
-            beneficiary: walletPk,
-          },
-          remainingAccounts: remainingAccounts,
-        })
-      )
+
+      if (remainingAccounts.length > 12) {
+        const nftsChunk = chunks(remainingAccounts, 12).reverse()
+        for (const i of nftsChunk) {
+          instructions.push(
+            this.client.program.instruction.relinquishNftVote({
+              accounts: {
+                registrar,
+                voterWeightRecord: voterWeightPk,
+                governance: proposal.account.governance,
+                proposal: proposal.pubkey,
+                governingTokenOwner: walletPk,
+                voteRecord: voteRecordPk,
+                beneficiary: walletPk,
+              },
+              remainingAccounts: i,
+            })
+          )
+        }
+      } else {
+        instructions.push(
+          this.client.program.instruction.relinquishNftVote({
+            accounts: {
+              registrar,
+              voterWeightRecord: voterWeightPk,
+              governance: proposal.account.governance,
+              proposal: proposal.pubkey,
+              governingTokenOwner: walletPk,
+              voteRecord: voteRecordPk,
+              beneficiary: walletPk,
+            },
+            remainingAccounts: remainingAccounts,
+          })
+        )
+      }
+
       return { voterWeightPk, maxVoterWeightRecord }
     }
   }
