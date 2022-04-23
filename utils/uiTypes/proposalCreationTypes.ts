@@ -21,6 +21,7 @@ import { AmountSide } from '@raydium-io/raydium-sdk';
 import ATribecaConfiguration from '@tools/sdk/tribeca/ATribecaConfiguration';
 import { InstructionType } from '@hooks/useGovernanceAssets';
 import { SupportedSaberPoolNames } from '@tools/sdk/saberPools/configuration';
+import { PoolName as MapleFinancePoolName } from '@tools/sdk/mapleFinance/configuration';
 
 export interface FormInstructionData {
   serializedInstruction: string;
@@ -420,6 +421,13 @@ export interface NativeTransferTokensForm {
   uiAmount?: string;
 }
 
+export interface MapleFinanceLenderDepositForm {
+  governedAccount?: GovernedMultiTypeAccount;
+  uiDepositAmount?: number;
+  sourceAccount?: string;
+  poolName?: MapleFinancePoolName;
+}
+
 export enum InstructionEnum {
   Transfer,
   ProgramUpgrade,
@@ -427,8 +435,8 @@ export enum InstructionEnum {
   Mint,
   Base64,
   None,
-  Grant,
-  Clawback,
+  // Grant,
+  // Clawback,
   CreateAssociatedTokenAccount,
   FriktionDepositIntoVolt,
   LifinityDepositToPool,
@@ -478,11 +486,12 @@ export enum InstructionEnum {
   UXDStakingActivateStakingOption,
   UXDStakingRefillRewardVault,
   NativeTransferTokensForm,
+  MapleFinanceLenderDepositForm,
 }
 
 export enum PackageEnum {
   Native = 1,
-  VoteStakeRegistry,
+  // VoteStakeRegistry,
   Solend,
   Raydium,
   UXD,
@@ -493,6 +502,7 @@ export enum PackageEnum {
   Saber,
   Quarry,
   Lifinity,
+  MapleFinance,
 }
 
 export type createParams = [

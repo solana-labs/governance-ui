@@ -49,14 +49,13 @@ import UXDRegisterMangoDeposiory from './UXD/RegisterMangoDepository';
 import UXDSetMangoDepositoriesRedeemableSoftCap from './UXD/SetMangoDepositoriesRedeemableSoftCap';
 import UXDSetRedeemableGlobalSupplyCap from './UXD/SetRedeemGlobalSupplyCap';
 import UXDWithdrawInsuranceFromMangoDepository from './UXD/WithdrawInsuranceFromMangoDepository';
-import VoteStakeRegistryGrant from 'VoteStakeRegistry/components/instructions/Grant';
-import VoteStakeRegistryClawback from 'VoteStakeRegistry/components/instructions/Clawback';
 import UXDStakingInitializeStakingCampaign from './UXDStaking/InitializeStakingCampaign';
 import UXDStakingFinalizeStakingCampaign from './UXDStaking/FinalizeStakingCampaign';
 import UXDStakingAddStakingOption from './UXDStaking/AddStakingOption';
 import UXDStakingActivateStakingOption from './UXDStaking/ActivateStakingOption';
 import UXDStakingRefillRewardVault from './UXDStaking/RefillRewardVault';
 import TransferTokens from './Native/TransferTokens';
+import MapleFinanceLenderDeposit from './MapleFinance/LenderDeposit';
 
 const SelectedInstruction = ({
   itxType,
@@ -68,6 +67,13 @@ const SelectedInstruction = ({
   governedAccount?: GovernedMultiTypeAccount;
 }) => {
   switch (itxType) {
+    case InstructionEnum.MapleFinanceLenderDepositForm:
+      return (
+        <MapleFinanceLenderDeposit
+          index={index}
+          governedAccount={governedAccount}
+        />
+      );
     case InstructionEnum.Transfer:
       return <SplTokenTransfer index={index} governance={null} />;
     case InstructionEnum.ProgramUpgrade:
@@ -338,10 +344,10 @@ const SelectedInstruction = ({
       return <FriktionDeposit index={index} governance={null} />;
     case InstructionEnum.Mint:
       return <NativeMint index={index} governance={null} />;
-    case InstructionEnum.Grant:
+    /*case InstructionEnum.Grant:
       return <VoteStakeRegistryGrant index={index} governance={null} />;
     case InstructionEnum.Clawback:
-      return <VoteStakeRegistryClawback index={index} governance={null} />;
+      return <VoteStakeRegistryClawback index={index} governance={null} />;*/
     case InstructionEnum.Base64:
       return (
         <NativeCustomBase64 index={index} governedAccount={governedAccount} />

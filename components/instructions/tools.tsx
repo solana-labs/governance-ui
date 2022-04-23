@@ -25,6 +25,7 @@ import { ATA_PROGRAM_INSTRUCTIONS } from './programs/associatedTokenAccount';
 import { UXD_PROTOCOL_STAKING_INSTRUCTIONS } from './programs/uxdProtocolStaking';
 import { LIFINITY_PROGRAM_INSTRUCTIONS } from './programs/lifinity';
 import { TRIBECA_PROGRAM_INSTRUCTIONS } from './programs/tribeca';
+import { MAPLE_FINANCE_PROGRAM_INSTRUCTIONS } from './programs/mapleFinance';
 /**
  * Default governance program id instance
  */
@@ -121,6 +122,7 @@ export const INSTRUCTION_DESCRIPTORS = {
   ...UXD_PROTOCOL_STAKING_INSTRUCTIONS,
   ...LIFINITY_PROGRAM_INSTRUCTIONS,
   ...TRIBECA_PROGRAM_INSTRUCTIONS,
+  ...MAPLE_FINANCE_PROGRAM_INSTRUCTIONS,
 };
 
 export async function getInstructionDescriptor(

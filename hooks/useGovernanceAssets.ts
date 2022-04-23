@@ -172,10 +172,6 @@ export default function useGovernanceAssets() {
     [PackageEnum.Native]: {
       name: 'Native',
     },
-    [PackageEnum.VoteStakeRegistry]: {
-      name: 'Vote Stake Registry',
-      image: '/img/vote-stake-registry.png',
-    },
     [PackageEnum.Solend]: {
       name: 'Solend',
       image: '/img/solend.png',
@@ -216,9 +212,19 @@ export default function useGovernanceAssets() {
       name: 'Quarry',
       image: '/img/quarry.png',
     },
+    [PackageEnum.MapleFinance]: {
+      name: 'Maple Finance',
+      image: '/img/mapleFinance.png',
+    },
   };
 
   const instructions: Instructions = {
+    [InstructionEnum.MapleFinanceLenderDepositForm]: {
+      name: 'Lender Deposit',
+      isVisible: canUseAnyInstruction,
+      packageId: PackageEnum.MapleFinance,
+      tag: 'beta',
+    },
     [InstructionEnum.LifinityDepositToPool]: {
       name: 'Deposit To Pool',
       isVisible: canUseAnyInstruction,
@@ -438,22 +444,6 @@ export default function useGovernanceAssets() {
       name: 'Transfer Tokens',
       isVisible: canUseTokenTransferInstruction,
       packageId: PackageEnum.Native,
-      tag: 'deprecated',
-    },
-    [InstructionEnum.Grant]: {
-      name: 'Grant',
-      isVisible:
-        canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
-      packageId: PackageEnum.VoteStakeRegistry,
-      tag: 'deprecated',
-    },
-    [InstructionEnum.Clawback]: {
-      name: 'Clawback',
-      isVisible:
-        canUseTokenTransferInstruction &&
-        realm?.account.config.useCommunityVoterWeightAddin,
-      packageId: PackageEnum.VoteStakeRegistry,
       tag: 'deprecated',
     },
     [InstructionEnum.CreateAssociatedTokenAccount]: {
