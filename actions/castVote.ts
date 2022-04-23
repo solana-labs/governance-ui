@@ -96,6 +96,7 @@ export async function castVote(
       ...insertChunks.splice(0, insertChunks.length - chunkTreshold),
       ...chunks([...insertChunks.splice(-chunkTreshold).flatMap((x) => x)], 2),
     ]
+    console.log({ chunks: chunkWithLastTwoMerge }, '@@@@@')
     const signerChunks = Array(chunkWithLastTwoMerge.length).fill([])
     const singersMap = message
       ? [...signerChunks.splice(0, signerChunks.length - 1), signers]
