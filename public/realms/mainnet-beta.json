@@ -651,5 +651,14 @@
     "ogImage": "/realms/FyfyDAO/img/logo.png",
     "website": "https://www.fyfy.io/",
     "twitter": "@fyfyio"
+  },
+  {
+    "symbol": "LoS",
+    "displayName": "Legion of Sol",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "8PqcJBBsZRMHQwMYrP6wx7BFrX4TNpBTWTVegGDNiFEJ",
+    "ogImage": "https://raw.githubusercontent.com/SolStonez/Legion-Key-Logo/main/demon_logo.png",
+    "website": "https://www.legionofsol.io/",
+    "twitter": "@legion_of_sol"
   }
 ]
