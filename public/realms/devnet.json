@@ -125,5 +125,14 @@
     "ogImage": "https://media.discordapp.net/attachments/933224453326909490/952347955157950504/alpha-illuminati-logo.png",
     "website": "https://www.alphailluminati.xyz",
     "twitter": "@illuminatialpha"
+  },
+  {
+    "symbol": "LEO",
+    "displayName": "LeoDao New York City",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "hno4ciEEAB6P7MWkX7xWZx1RkpZqxRBJKveDg4YWoRP",
+    "ogImage": "https://images.squarespace-cdn.com/content/v1/5f09de13169cec7a4b6c23ac/3dd28380-4a26-40cf-b18c-684d73492feb/LeoDao.jpg",
+    "website": "https://leodaonyc.xyz",
+    "twitter": "@LeoDAONYC"
   }
 ]
