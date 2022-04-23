@@ -292,8 +292,8 @@ export class VotingClient {
         remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
       }
 
-      if (remainingAccounts.length > 12) {
-        const nftsChunk = chunks(remainingAccounts, 12).reverse()
+      if (remainingAccounts.length > 10) {
+        const nftsChunk = chunks(remainingAccounts, 10).reverse()
         for (const i of nftsChunk) {
           instructions.push(
             this.client.program.instruction.relinquishNftVote({
