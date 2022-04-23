@@ -19,8 +19,10 @@ import { RpcContext } from '@solana/spl-governance'
 import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { chunks } from '@utils/helpers'
+import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import { sendTransaction } from '@utils/send'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -86,9 +88,22 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
+  const chunkTreshold = message ? 4 : 2
+  const shouldChunk = instructions.length > chunkTreshold
+  if (shouldChunk) {
+    const insertChunks = chunks(instructions, 2)
+    const signerChunks = Array(instructions.length).fill([])
+    await sendTransactions(
+      connection,
+      wallet,
+      [...insertChunks],
+      [[], [], ...signerChunks],
+      SequenceType.Sequential
+    )
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
-
-  await sendTransaction({ transaction, wallet, connection, signers })
+    await sendTransaction({ transaction, wallet, connection, signers })
+  }
 }
