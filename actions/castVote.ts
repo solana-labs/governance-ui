@@ -19,8 +19,11 @@ import { RpcContext } from '@solana/spl-governance'
 import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { chunks } from '@utils/helpers'
+import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import { sendTransaction } from '@utils/send'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -86,9 +89,30 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
+  const chunkTreshold = message ? 4 : 2
+  const shouldChunk = votingPlugin?.client instanceof NftVoterClient
+  if (shouldChunk) {
+    const insertChunks = chunks(instructions, 1)
+    const chunkWithLastTwoMerge = [
+      ...insertChunks.splice(0, insertChunks.length - chunkTreshold),
+      ...chunks([...insertChunks.splice(-chunkTreshold).flatMap((x) => x)], 2),
+    ]
+    const signerChunks = Array(chunkWithLastTwoMerge.length).fill([])
+    const singersMap = message
+      ? [...signerChunks.splice(0, signerChunks.length - 1), signers]
+      : signerChunks
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+    await sendTransactions(
+      connection,
+      wallet,
+      [...chunkWithLastTwoMerge],
+      singersMap,
+      SequenceType.Sequential
+    )
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
 
-  await sendTransaction({ transaction, wallet, connection, signers })
+    await sendTransaction({ transaction, wallet, connection, signers })
+  }
 }

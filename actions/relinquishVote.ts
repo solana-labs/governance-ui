@@ -11,6 +11,8 @@ import { ProgramAccount } from '@solana/spl-governance'
 import { sendTransaction } from '../utils/send'
 import { withRelinquishVote } from '@solana/spl-governance'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { chunks } from '@utils/helpers'
+import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 
 export const relinquishVote = async (
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -38,8 +40,22 @@ export const relinquishVote = async (
 
   await plugin.withRelinquishVote(instructions, proposal, voteRecord)
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
+  const chunkTreshold = 2
+  const shouldChunk = instructions.length > chunkTreshold
+  if (shouldChunk) {
+    const insertChunks = chunks(instructions, 2)
+    const signerChunks = Array(instructions.length).fill([])
+    await sendTransactions(
+      connection,
+      wallet,
+      [...insertChunks],
+      [[], [], ...signerChunks],
+      SequenceType.Sequential
+    )
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
 
-  await sendTransaction({ transaction, wallet, connection, signers })
+    await sendTransaction({ transaction, wallet, connection, signers })
+  }
 }
