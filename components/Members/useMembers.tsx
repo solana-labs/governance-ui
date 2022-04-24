@@ -183,9 +183,13 @@ export default function useMembers() {
                   }
                   if (curr.community) {
                     obj['votesCasted'] += curr.community.account.totalVotesCount
+                    obj['delegateWalletCommunity'] =
+                      curr.community.account.governanceDelegate
                   }
                   if (curr.council) {
                     obj['votesCasted'] += curr.council.account.totalVotesCount
+                    obj['delegateWalletCouncil'] =
+                      curr.council.account.governanceDelegate
                   }
                   return obj
                 },
