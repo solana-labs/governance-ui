@@ -8,6 +8,7 @@ import {
   Proposal,
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
+import { chunks } from '@utils/helpers'
 import {
   getNftRegistrarPDA,
   getNftVoterWeightRecord,
@@ -20,7 +21,7 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
 
-type updateVoterWeightRecordTypes =
+type UpdateVoterWeightRecordTypes =
   | 'castVote'
   | 'commentProposal'
   | 'createGovernance'
@@ -89,7 +90,7 @@ export class VotingClient {
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
-    type: updateVoterWeightRecordTypes
+    type: UpdateVoterWeightRecordTypes
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -153,7 +154,7 @@ export class VotingClient {
               registrar,
               voterWeightRecord: voterWeightPk,
             },
-            remainingAccounts: remainingAccounts,
+            remainingAccounts: remainingAccounts.splice(0, 10),
           }
         )
       )
@@ -206,18 +207,37 @@ export class VotingClient {
           new AccountData(nftVoteRecord, false, true)
         )
       }
-      instructions.push(
-        this.client.program.instruction.castNftVote(proposalPk, {
-          accounts: {
-            registrar,
-            voterWeightRecord: voterWeightPk,
-            governingTokenOwner: walletPk,
-            payer: walletPk,
-            systemProgram: SYSTEM_PROGRAM_ID,
-          },
-          remainingAccounts: remainingAccounts,
-        })
-      )
+      if (remainingAccounts.length / 3 > 5) {
+        const nftsChunk = chunks(remainingAccounts, 15).reverse()
+        for (const i of nftsChunk) {
+          instructions.push(
+            this.client.program.instruction.castNftVote(proposalPk, {
+              accounts: {
+                registrar,
+                voterWeightRecord: voterWeightPk,
+                governingTokenOwner: walletPk,
+                payer: walletPk,
+                systemProgram: SYSTEM_PROGRAM_ID,
+              },
+              remainingAccounts: i,
+            })
+          )
+        }
+      } else {
+        instructions.push(
+          this.client.program.instruction.castNftVote(proposalPk, {
+            accounts: {
+              registrar,
+              voterWeightRecord: voterWeightPk,
+              governingTokenOwner: walletPk,
+              payer: walletPk,
+              systemProgram: SYSTEM_PROGRAM_ID,
+            },
+            remainingAccounts: remainingAccounts,
+          })
+        )
+      }
+
       return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof VsrClient) {
@@ -271,20 +291,42 @@ export class VotingClient {
         )
         remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
       }
-      instructions.push(
-        this.client.program.instruction.relinquishNftVote({
-          accounts: {
-            registrar,
-            voterWeightRecord: voterWeightPk,
-            governance: proposal.account.governance,
-            proposal: proposal.pubkey,
-            governingTokenOwner: walletPk,
-            voteRecord: voteRecordPk,
-            beneficiary: walletPk,
-          },
-          remainingAccounts: remainingAccounts,
-        })
-      )
+
+      if (remainingAccounts.length > 10) {
+        const nftsChunk = chunks(remainingAccounts, 10).reverse()
+        for (const i of nftsChunk) {
+          instructions.push(
+            this.client.program.instruction.relinquishNftVote({
+              accounts: {
+                registrar,
+                voterWeightRecord: voterWeightPk,
+                governance: proposal.account.governance,
+                proposal: proposal.pubkey,
+                governingTokenOwner: walletPk,
+                voteRecord: voteRecordPk,
+                beneficiary: walletPk,
+              },
+              remainingAccounts: i,
+            })
+          )
+        }
+      } else {
+        instructions.push(
+          this.client.program.instruction.relinquishNftVote({
+            accounts: {
+              registrar,
+              voterWeightRecord: voterWeightPk,
+              governance: proposal.account.governance,
+              proposal: proposal.pubkey,
+              governingTokenOwner: walletPk,
+              voteRecord: voteRecordPk,
+              beneficiary: walletPk,
+            },
+            remainingAccounts: remainingAccounts,
+          })
+        )
+      }
+
       return { voterWeightPk, maxVoterWeightRecord }
     }
   }
