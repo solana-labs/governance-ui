@@ -23,6 +23,7 @@ import { VotingClient } from '@utils/uiTypes/VotePlugin'
 import { chunks } from '@utils/helpers'
 import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { sendTransaction } from '@utils/send'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -89,14 +90,13 @@ export async function castVote(
     )
   }
   const chunkTreshold = message ? 4 : 2
-  const shouldChunk = instructions.length > chunkTreshold
+  const shouldChunk = votingPlugin?.client instanceof NftVoterClient
   if (shouldChunk) {
     const insertChunks = chunks(instructions, 1)
     const chunkWithLastTwoMerge = [
       ...insertChunks.splice(0, insertChunks.length - chunkTreshold),
       ...chunks([...insertChunks.splice(-chunkTreshold).flatMap((x) => x)], 2),
     ]
-    console.log({ chunks: chunkWithLastTwoMerge }, '@@@@@')
     const signerChunks = Array(chunkWithLastTwoMerge.length).fill([])
     const singersMap = message
       ? [...signerChunks.splice(0, signerChunks.length - 1), signers]

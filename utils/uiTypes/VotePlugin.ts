@@ -21,7 +21,7 @@ import {
 } from 'VoteStakeRegistry/sdk/accounts'
 import { NFTWithMint } from './nfts'
 
-type updateVoterWeightRecordTypes =
+type UpdateVoterWeightRecordTypes =
   | 'castVote'
   | 'commentProposal'
   | 'createGovernance'
@@ -90,7 +90,7 @@ export class VotingClient {
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
-    type: updateVoterWeightRecordTypes
+    type: UpdateVoterWeightRecordTypes
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
