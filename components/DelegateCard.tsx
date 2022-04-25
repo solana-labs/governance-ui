@@ -17,12 +17,8 @@ import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
 import Checkbox from '@components/inputs/Checkbox'
 
-import useMembersStore from 'stores/useMembersStore'
-
 const DelegateCard = () => {
   const {
-    councilMint,
-    mint,
     realm,
     ownTokenRecord, // community
     ownCouncilTokenRecord, // council
@@ -32,8 +28,6 @@ const DelegateCard = () => {
   const connection = useWalletStore((s) => s.connection.current)
   const [delegateKey, setDelegateKey] = useState('')
   const [tokenType, setTokenType] = useState<'community' | 'council'>('council')
-
-  // const activeMembers = useMembersStore((s) => s.compact.activeMembers)
 
   const handleDelegate = async () => {
     const signers: Keypair[] = []
