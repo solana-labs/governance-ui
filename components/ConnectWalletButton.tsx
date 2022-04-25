@@ -1,5 +1,5 @@
 import { Menu } from '@headlessui/react'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo } from 'react'
 import { CheckCircleIcon, ChevronDownIcon } from '@heroicons/react/solid'
 import styled from '@emotion/styled'
 import useWalletStore from '../stores/useWalletStore'
