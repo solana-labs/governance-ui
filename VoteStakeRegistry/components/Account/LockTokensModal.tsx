@@ -477,7 +477,13 @@ const LockTokensModal = ({
               </div>
               <div className="w-full h-2 bg-bkg-1 rounded-lg mb-4">
                 <div
-                  style={{ width: `${currentPercentOfMaxMultiplier}%` }}
+                  style={{
+                    width: `${
+                      currentPercentOfMaxMultiplier > 100
+                        ? 100
+                        : currentPercentOfMaxMultiplier
+                    }%`,
+                  }}
                   className="bg-primary-light h-2 rounded-lg"
                 ></div>
               </div>
