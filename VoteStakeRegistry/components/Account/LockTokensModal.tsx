@@ -98,7 +98,8 @@ const LockTokensModal = ({
     },
   ].filter((x) =>
     depositToUnlock
-      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue
+      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
+        x.display === 'Custom'
       : true
   )
 
@@ -476,7 +477,13 @@ const LockTokensModal = ({
               </div>
               <div className="w-full h-2 bg-bkg-1 rounded-lg mb-4">
                 <div
-                  style={{ width: `${currentPercentOfMaxMultiplier}%` }}
+                  style={{
+                    width: `${
+                      currentPercentOfMaxMultiplier > 100
+                        ? 100
+                        : currentPercentOfMaxMultiplier
+                    }%`,
+                  }}
                   className="bg-primary-light h-2 rounded-lg"
                 ></div>
               </div>
@@ -486,7 +493,9 @@ const LockTokensModal = ({
                     Allow dao to clawback -{' '}
                     <small>
                       It will give ability to propose clawback of your locked
-                      tokens to any given address
+                      tokens to any given address If you use constant lockup
+                      type with this option turn on only way to retrieve tokens
+                      from that deposit will be dao vote
                     </small>
                   </div>
                   <Switch
