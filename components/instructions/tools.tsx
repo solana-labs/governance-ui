@@ -41,6 +41,8 @@ export const ACCOUNT_NAMES = {
     'Mango Developer Council Mint',
 
   Guiwem4qBivtkSFrxZAEfuthBz6YuWyCwS4G3fjBYu5Z: 'Mango DAO MNGO Treasury Vault',
+  '7zGXUAeUkY9pEGfApsY26amibvqsf2dmty1cbtxHdfaQ':
+    'Mango DAO SOL Treasury Vault Governance',
   '5tgfd6XgwiXB9otEnzFpXK11m7Q7yZUaAJzWK4oT5UGF':
     'Mango DAO SOL Treasury Vault',
   '9RGoboEjmaAjSCXsKi6p6zJucnwF3Eg5NUN9jPS6ziL3': 'Mango DAO MNGO Treasury',
