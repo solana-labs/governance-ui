@@ -1,4 +1,5 @@
 import GradientTitle, { GradientText } from './GradientTitle'
+import { TextBox } from './TextBox'
 
 const DaoCommunity = () => {
   return (
@@ -28,40 +29,22 @@ const DaoCommunity = () => {
             <GradientText>Industries DAOs Impact:</GradientText>
           </div>
           <div className="grid grid-rows-4 grid-flow-col gap-y-4">
-            <div className="pr-16">
-              <p className="font-bold">Defi</p>
-              <p className="opacity-70">Enable equitable financial markets</p>
-            </div>
-            <div className="pr-16">
-              <p className="font-bold">Gaming</p>
-              <p className="opacity-70">
-                Unlock new models of gameplay and digital content
-              </p>
-            </div>
-            <div className="pr-16">
-              <p className="font-bold">Creators</p>
-              <p className="opacity-70">No middlemen, own your work</p>
-            </div>
-            <div className="pr-16">
-              <p className="font-bold">Corporations</p>
-              <p className="opacity-70">Reinvent loyalty programs</p>
-            </div>
-            <div className="pr-16">
-              <p className="font-bold">Investing</p>
-              <p className="opacity-70">
-                Inclusive group access to capital allocation
-              </p>
-            </div>
-            <div className="pr-16">
-              <p className="font-bold">Communities</p>
-              <p className="opacity-70">Build shared resources</p>
-            </div>
-            <div className="pr-16">
-              <p className="font-bold">Startups</p>
-              <p className="opacity-70">
-                Reward risk-taking contributors to new products and ideas
-              </p>
-            </div>
+            <TextBox title="Defi" text="Enable equitable financial markets" />
+            <TextBox
+              title="Gaming"
+              text="Unlock new models of gameplay and digital content"
+            />
+            <TextBox title="Creators" text="No middlemen, own your work" />
+            <TextBox title="Corporations" text="Reinvent loyalty programs" />
+            <TextBox
+              title="Investing"
+              text="Inclusive group access to capital allocation"
+            />
+            <TextBox title="Communities" text="Build shared resources" />
+            <TextBox
+              title="Startups"
+              text="Reward risk-taking contributors to new products and ideas"
+            />
           </div>
         </div>
       </div>
