@@ -70,7 +70,6 @@ export const getDeposits = async ({
       .filter((x) => typeof isUsed === 'undefined' || x.isUsed === isUsed)
     const usedDeposits = deposits.filter((x) => x.isUsed)
     const areThereAnyUsedDeposits = usedDeposits.length
-
     if (areThereAnyUsedDeposits) {
       const events = await getDepositsAdditionalInfoEvents(
         client,
@@ -223,8 +222,8 @@ const getDepositsAdditionalInfoEvents = async (
   const events: any[] = []
   const parser = new EventParser(client.program.programId, client.program.coder)
   const maxRange = 8
-  const itemsCount = usedDeposits.length
-  const numberOfSimulations = Math.ceil(itemsCount / maxRange)
+  const maxIndex = Math.max(...usedDeposits.map((x) => x.index)) + 1
+  const numberOfSimulations = Math.ceil(maxIndex / maxRange)
   for (let i = 0; i < numberOfSimulations; i++) {
     const take = maxRange
     const transaction = new Transaction({ feePayer: walletPk })
