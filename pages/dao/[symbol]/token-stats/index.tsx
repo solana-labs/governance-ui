@@ -364,7 +364,7 @@ const LockTokenStats = () => {
   }
 
   useEffect(() => {
-    if (symbol !== 'MNGO') {
+    if (symbol && symbol !== 'MNGO') {
       router.push(`/dao/${symbol}`, undefined, { shallow: true })
     }
   }, [symbol])
