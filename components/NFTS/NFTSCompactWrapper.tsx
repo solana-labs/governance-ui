@@ -51,7 +51,7 @@ const NFTSCompactWrapper = () => {
               <a
                 className="bg-bkg-4 col-span-1 flex items-center justify-center rounded-lg filter drop-shadow-lg"
                 key={idx}
-                href={getExplorerUrl(connection.endpoint, x.mint)}
+                href={getExplorerUrl(connection.cluster, x.mint)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
