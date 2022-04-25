@@ -49,7 +49,7 @@ export const relinquishVote = async (
       connection,
       wallet,
       [...insertChunks],
-      [[], [], ...signerChunks],
+      [...signerChunks],
       SequenceType.Sequential
     )
   } else {
