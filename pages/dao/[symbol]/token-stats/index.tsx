@@ -3,7 +3,7 @@ import Input from '@components/inputs/Input'
 import { GrantInstruction } from '@components/instructions/programs/voteStakeRegistry'
 import { MANGO_DAO_TREASURY } from '@components/instructions/tools'
 import PreviousRouteBtn from '@components/PreviousRouteBtn'
-import { SearchIcon } from '@heroicons/react/outline'
+import { SearchIcon, UserCircleIcon } from '@heroicons/react/outline'
 import useRealm from '@hooks/useRealm'
 import { BN } from '@project-serum/anchor'
 import {
@@ -23,17 +23,33 @@ import {
   DAYS_PER_MONTH,
   SECS_PER_MONTH,
 } from 'VoteStakeRegistry/tools/dateTools'
-import InfoBox from './InfoBox'
-import LockTokenRow from './LockTokenRow'
+import InfoBox from 'VoteStakeRegistry/components/LockTokenStats/InfoBox'
+import { AddressImage, DisplayAddress } from '@cardinal/namespaces-components'
+import { LockupType } from 'VoteStakeRegistry/sdk/accounts'
+import {
+  getMinDurationFmt,
+  getTimeLeftFromNowFmt,
+} from 'VoteStakeRegistry/tools/dateTools'
 import {
   DepoistWithVoter,
   DepositWithWallet,
   getProposalsTransactions,
-} from './tools'
+} from 'VoteStakeRegistry/components/LockTokenStats/tools'
 import PaginationComponent from '@components/Pagination'
-const VestingVsTime = dynamic(() => import('./VestingVsTime'), {
-  ssr: false,
-})
+import {
+  ExpandableRow,
+  Table,
+  Td,
+  Th,
+  TrBody,
+  TrHead,
+} from '@components/TableElements'
+const VestingVsTime = dynamic(
+  () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
+  {
+    ssr: false,
+  }
+)
 const isBetween = require('dayjs/plugin/isBetween')
 dayjs.extend(isBetween)
 
@@ -344,133 +360,254 @@ const LockTokenStats = () => {
       (page + 1) * walletsPerPage
     )
   }
+
+  const renderAddressName = (wallet) => {
+    return (
+      <DisplayAddress
+        connection={connection.current}
+        address={new PublicKey(wallet)}
+        height="25px"
+        width="100px"
+        dark={true}
+      />
+    )
+  }
+  const renderAddressImage = (wallet) => (
+    <AddressImage
+      dark={true}
+      connection={connection.current}
+      address={new PublicKey(wallet)}
+      height="25px"
+      width="25px"
+      placeholder={<UserCircleIcon className="h-6 text-fgd-3 w-6" />}
+    />
+  )
+
   return (
     <div className="bg-bkg-2 rounded-lg p-4 md:p-6">
-      <div className="grid grid-cols-12 gap-6">
+      <div className="grid grid-cols-12 gap-4">
         <div className="col-span-12">
           <div className="mb-4">
             <PreviousRouteBtn />
           </div>
-          <div className="border-b border-fgd-4 flex flex-col md:flex-row justify-between pb-4">
-            <div className="flex items-center mb-2 md:mb-0 py-2">
-              {realmInfo?.ogImage ? (
-                <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
-              ) : null}
-              <div>
-                <p>{realmInfo?.displayName}</p>
-                <h1 className="mb-0">Stats</h1>
-              </div>
+          <div className="flex items-center mb-2 md:mb-0 py-2">
+            {realmInfo?.ogImage ? (
+              <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
+            ) : null}
+            <h1 className="mb-0">{realmInfo?.symbol} Stats</h1>
+          </div>
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoBox
+            className="h-full"
+            title="Circulating Supply"
+            val={circulatingSupply}
+          />
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoBox
+            className="h-full"
+            tooltip="Total current amount of MNGO locked"
+            title="Total MNGO Locked"
+            val={mngoLocked}
+          />
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoBox
+            className="h-full"
+            title="Locked With Clawback"
+            tooltip="Currently locked MNGO that the DAO can clawback to the treasury vault"
+            val={mngoLockedWithClawback}
+          />
+        </div>
+        <div className="col-span-12 md:col-span-6 lg:col-span-3">
+          <InfoBox
+            className="h-full"
+            title="Liquidity Mining Emissions P/M"
+            tooltip="Total MNGO emissions from all perp markets per month"
+            val={liquidityMiningEmissionPerMonth}
+          />
+        </div>
+        <div className="col-span-12 mt-4">
+          <h2>Vesting and Grants</h2>
+        </div>
+        <div className="col-span-12 lg:col-span-4">
+          <div className="flex flex-col md:flex-row md:space-x-4 lg:flex-col lg:space-x-0">
+            <InfoBox
+              className="mb-4 w-full md:mb-0 lg:mb-4"
+              title="Vesting This Month"
+              val={vestingThisMonth}
+            />
+            <InfoBox
+              className="mb-4 w-full md:mb-0 lg:mb-4"
+              tooltip="Historical total amount of MNGO granted to contributors "
+              title="Total Amount From Grants"
+              val={givenGrantsTokenAmount}
+            />
+            <InfoBox
+              className="w-full"
+              tooltip="Historical total amount unlocked from grants"
+              title="Total Unlocked From Grants"
+              val={unlockedFromGrants}
+            />
+          </div>
+        </div>
+        <div className="col-span-12 lg:col-span-8">
+          <div className="border border-fgd-4 p-3 rounded-md">
+            <h3 className="p-3">MNGO Vesting vs. Time</h3>
+            <div style={{ height: '240px' }}>
+              <VestingVsTime
+                data={[
+                  ...statsMonths.map((x) => {
+                    return {
+                      month: x,
+                      amount: vestPerMonthStats[x]
+                        .reduce((acc, curr) => {
+                          return acc.add(curr.vestingAmount)
+                        }, new BN(0))
+                        .toNumber(),
+                    }
+                  }),
+                ].reverse()}
+                fmtMangoAmount={fmtMangoAmount}
+              ></VestingVsTime>
             </div>
           </div>
-          <div className="flex pt-5">
-            <div className="flex flex-col w-1/3">
-              <InfoBox
-                title="Circulating supply"
-                val={circulatingSupply}
-              ></InfoBox>
-              <InfoBox
-                tooltip="Total current amount of MNGO locked"
-                title="Total MNGO Locked"
-                val={mngoLocked}
-              ></InfoBox>
-              <InfoBox
-                title="Locked with clawback"
-                tooltip="Currently locked MNGO that DAO can clawback to treasury vault"
-                val={mngoLockedWithClawback}
-              ></InfoBox>
-              <InfoBox
-                tooltip="Historical total amount of MNGO granted to contributors "
-                title="Total amount from grants"
-                val={givenGrantsTokenAmount}
-              ></InfoBox>
-              <InfoBox
-                title="Liquidity mining emission per month"
-                tooltip="Total MNGO emission from all perp markets per month"
-                val={liquidityMiningEmissionPerMonth}
-              ></InfoBox>
-            </div>
-            <div className="w-2/3">
-              <div>
-                <div className="flex pl-8">
-                  <InfoBox
-                    className="w-1/2 mr-3"
-                    title="Vesting this month"
-                    val={vestingThisMonth}
-                  ></InfoBox>
-
-                  <InfoBox
-                    className="w-1/2"
-                    tooltip="Historical total amount unlocked from grants"
-                    title="Unlocked from grants"
-                    val={unlockedFromGrants}
-                  ></InfoBox>
-                </div>
-                <div className="border border-fgd-4 p-3 rounded-md ml-8">
-                  <div className="pl-8">MNGO Vesting vs. Time</div>
-                  <div style={{ height: '279px' }}>
-                    <VestingVsTime
-                      data={[
-                        ...statsMonths.map((x) => {
-                          return {
-                            month: x,
-                            amount: vestPerMonthStats[x]
-                              .reduce((acc, curr) => {
-                                return acc.add(curr.vestingAmount)
-                              }, new BN(0))
-                              .toNumber(),
-                          }
-                        }),
-                      ].reverse()}
-                      fmtMangoAmount={fmtMangoAmount}
-                    ></VestingVsTime>
-                  </div>
-                </div>
-              </div>
+        </div>
+        <div className="col-span-12">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 mt-6 w-full">
+            <h2 className="mb-3 sm:mb-0">
+              Members with Locked MNGO{' '}
+              <span className="text-sm text-fgd-3 font-normal">
+                ({walletsCount})
+              </span>
+            </h2>
+            <div className="w-full sm:w-auto">
+              <Input
+                className="pl-8 sm:max-w-[240px] w-full"
+                type="text"
+                placeholder="Search by wallet"
+                value={search}
+                noMaxWidth
+                onChange={(e) => {
+                  return setSearch(e.target.value)
+                }}
+                prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />}
+              />
             </div>
           </div>
-          <div className="pt-4">
-            <div className="flex items-center">
-              Members with Locked MNGO ({walletsCount}){' '}
-              <div className="ml-auto">
-                <Input
-                  style={{ maxWidth: '200px' }}
-                  className="pl-8"
-                  type="text"
-                  placeholder="Search by wallet"
-                  value={search}
-                  noMaxWidth
-                  onChange={(e) => {
-                    return setSearch(e.target.value)
-                  }}
-                  prefix={<SearchIcon className="h-5 w-5 text-fgd-3" />}
+          <div className="hidden md:block">
+            <Table>
+              <thead>
+                <TrHead>
+                  <Th>Address</Th>
+                  <Th>Lock Type</Th>
+                  <Th>Duration</Th>
+                  <Th>Amount (MNGO)</Th>
+                </TrHead>
+              </thead>
+              <tbody>
+                {paginatedWallets.map((x, index) => {
+                  const fmtMangoAmount = (val) => {
+                    return mint
+                      ? getMintDecimalAmount(mint!, val).toFormat(0)
+                      : '0'
+                  }
+                  const type = Object.keys(
+                    x.deposit.lockup.kind
+                  )[0] as LockupType
+                  const typeName = type !== 'monthly' ? type : 'Vested'
+                  const isConstant = type === 'constant'
+                  const lockedTokens = fmtMangoAmount(
+                    x.deposit.amountDepositedNative
+                  )
+                  return (
+                    <TrBody key={`${x.deposit}${index}`}>
+                      <Td>
+                        <div className="underline hover:no-underline hover:cursor-pointer flex items-center">
+                          <div className="mr-2">
+                            {renderAddressImage(x.wallet)}
+                          </div>{' '}
+                          {renderAddressName(x.wallet)}
+                        </div>
+                      </Td>
+                      <Td>
+                        {typeName.charAt(0).toUpperCase() + typeName.slice(1)}
+                      </Td>
+                      <Td>
+                        {isConstant
+                          ? getMinDurationFmt(x.deposit as any)
+                          : getTimeLeftFromNowFmt(x.deposit as any)}
+                      </Td>
+                      <Td>{lockedTokens}</Td>
+                    </TrBody>
+                  )
+                })}
+              </tbody>
+            </Table>
+          </div>
+          <div className="border-b border-bkg-4 md:hidden">
+            <div className="flex justify-between pb-2 pl-4 pr-12 text-xs text-fgd-3">
+              <div>Address</div>
+              <div>Amount</div>
+            </div>
+            {paginatedWallets.map((x, index) => {
+              const fmtMangoAmount = (val) => {
+                return mint ? getMintDecimalAmount(mint!, val).toFormat(0) : '0'
+              }
+              const type = Object.keys(x.deposit.lockup.kind)[0] as LockupType
+              const typeName = type !== 'monthly' ? type : 'Vested'
+              const isConstant = type === 'constant'
+              const lockedTokens = fmtMangoAmount(
+                x.deposit.amountDepositedNative
+              )
+              return (
+                <ExpandableRow
+                  buttonTemplate={
+                    <div className="flex w-full items-center justify-between text-fgd-2 text-sm">
+                      <div className="underline hover:no-underline hover:cursor-pointer flex items-center">
+                        <div className="mr-2">
+                          {renderAddressImage(x.wallet)}
+                        </div>
+                        {renderAddressName(x.wallet)}
+                      </div>
+                      {lockedTokens}
+                    </div>
+                  }
+                  key={`${x.deposit}${index}`}
+                  panelTemplate={
+                    <div className="grid grid-flow-row grid-cols-2 gap-4">
+                      <div className="text-left">
+                        <div className="pb-0.5 text-xs text-fgd-3">
+                          Lock Type
+                        </div>
+                        <div className="text-fgd-2 text-sm">
+                          {typeName.charAt(0).toUpperCase() + typeName.slice(1)}
+                        </div>
+                      </div>
+                      <div className="text-left">
+                        <div className="pb-0.5 text-xs text-fgd-3">
+                          Duration
+                        </div>
+                        <div className="text-fgd-2 text-sm">
+                          {isConstant
+                            ? getMinDurationFmt(x.deposit as any)
+                            : getTimeLeftFromNowFmt(x.deposit as any)}
+                        </div>
+                      </div>
+                    </div>
+                  }
                 />
-              </div>
-            </div>
-            <div className="flex flex-col mt-4">
-              <div className="grid grid-cols-4 text-fgd-3 pb-1 px-2">
-                <div>Address</div>
-                <div>Lock type</div>
-                <div>Lock duration</div>
-                <div>MNGO Locked</div>
-              </div>
-              {paginatedWallets.map((x, index) => (
-                <LockTokenRow
-                  index={index}
-                  depositWithWallet={x}
-                  key={index}
-                ></LockTokenRow>
-              ))}
-              <div>
-                <PaginationComponent
-                  ref={pagination}
-                  totalPages={Math.ceil(
-                    filteredDepositWithWallets.length / walletsPerPage
-                  )}
-                  onPageChange={onPageChange}
-                ></PaginationComponent>
-              </div>
-            </div>
+              )
+            })}
           </div>
+          <PaginationComponent
+            ref={pagination}
+            totalPages={Math.ceil(
+              filteredDepositWithWallets.length / walletsPerPage
+            )}
+            onPageChange={onPageChange}
+          ></PaginationComponent>
         </div>
       </div>
     </div>

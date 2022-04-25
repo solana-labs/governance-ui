@@ -20,8 +20,10 @@ const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
     ? formatter.format(getMintDecimalAmount(mint!, val).toNumber() * price)
     : ''
   return (
-    <div className={`border border-fgd-4 p-3 rounded-md mb-4 ${className}`}>
-      <div className="text-fgd-3 text-xs flex items-center">
+    <div
+      className={`border border-fgd-4 flex flex-col justify-center p-3 rounded-md ${className}`}
+    >
+      <div className="mb-1 text-fgd-3 text-sm flex items-center">
         {title}
         {tooltip && (
           <Tooltip content={tooltip}>
@@ -32,11 +34,11 @@ const InfoBox = ({ title, val, tooltip = '', className = '' }) => {
         )}
       </div>
       <div>
-        <span className="font-bold text-xl">{fmtMangoAmount(val)}</span>
+        <span className="font-bold text-2xl">{fmtMangoAmount(val)}</span>
         {totalPrice && (
           <span className="text-xs font-normal text-fgd-2">
             {' '}
-            = ${totalPrice}
+            ≈ ${totalPrice}
           </span>
         )}
       </div>
