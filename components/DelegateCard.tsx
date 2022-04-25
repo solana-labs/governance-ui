@@ -126,7 +126,9 @@ const DelegateCard = () => {
             className="sm:w-full mt-4"
             onClick={handleDelegate}
             isLoading={isLoading}
-            disabled={delegateKey.length !== 44}
+            disabled={
+              delegateKey.length !== 44 || (!ownTokenRecord && !ownTokenRecord)
+            }
           >
             Delegate
           </Button>
