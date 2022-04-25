@@ -43,6 +43,7 @@ import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
 import Switch from '@components/Switch'
+import { notify } from '@utils/notifications'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -224,6 +225,14 @@ const LockTokensModal = ({
     const amountFromDeposit = whatWillBeLeftInsideDeposit.isNeg()
       ? totalAmountInDeposit
       : totalAmountToLock
+    if (!amountFromDeposit.isZero() && allowClawback) {
+      notify({
+        type: 'warn',
+        message: `Please withdraw your tokens to the wallet`,
+        description: `To lock tokens with clawback option you must first withdraw them to wallet`,
+      })
+      throw 'To lock tokens with clawback option you must first withdraw them to wallet'
+    }
     await voteRegistryLockDeposit({
       rpcContext,
       mintPk: realm!.account.communityMint!,
