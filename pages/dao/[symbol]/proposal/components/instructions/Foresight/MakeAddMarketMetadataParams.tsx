@@ -5,7 +5,6 @@ import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import {
   governance as foresightGov,
-  types as foresightTypes,
   consts as foresightConsts,
   utils,
 } from '@foresight-tmp/foresight-sdk'
