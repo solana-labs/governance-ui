@@ -281,6 +281,7 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
+      const nftVoteRecords = await this.client.program.account.nftVoteRecord.all()
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         const [nftVoteRecord] = await PublicKey.findProgramAddress(
@@ -291,7 +292,13 @@ export class VotingClient {
           ],
           clientProgramId
         )
-        remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
+        if (
+          nftVoteRecords.find(
+            (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
+          )
+        ) {
+          remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
+        }
       }
 
       const firstFiveNfts = remainingAccounts.slice(0, 5)
