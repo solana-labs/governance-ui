@@ -44,6 +44,7 @@ import {
   TrBody,
   TrHead,
 } from '@components/TableElements'
+import { useRouter } from 'next/router'
 const VestingVsTime = dynamic(
   () => import('VoteStakeRegistry/components/LockTokenStats/VestingVsTime'),
   {
@@ -56,7 +57,8 @@ dayjs.extend(isBetween)
 const LockTokenStats = () => {
   const walletsPerPage = 10
   const pagination = useRef<{ setPage: (val) => void }>(null)
-  const { realmInfo, realm, mint, proposals } = useRealm()
+  const { realmInfo, realm, symbol, mint, proposals } = useRealm()
+  const router = useRouter()
   const vsrClient = useVotePluginsClientStore((s) => s.state.vsrClient)
   const voteStakeRegistryRegistrarPk = useVotePluginsClientStore(
     (s) => s.state.voteStakeRegistryRegistrarPk
@@ -361,6 +363,12 @@ const LockTokenStats = () => {
     )
   }
 
+  useEffect(() => {
+    if (symbol !== 'MNGO') {
+      router.push(`/dao/${symbol}`, undefined, { shallow: true })
+    }
+  }, [symbol])
+
   const renderAddressName = (wallet) => {
     return (
       <DisplayAddress
@@ -394,7 +402,7 @@ const LockTokenStats = () => {
             {realmInfo?.ogImage ? (
               <img src={realmInfo?.ogImage} className="h-8 mr-3 w-8"></img>
             ) : null}
-            <h1 className="mb-0">{realmInfo?.symbol} Stats</h1>
+            <h1 className="mb-0">{symbol} Stats</h1>
           </div>
         </div>
         <div className="col-span-12 md:col-span-6 lg:col-span-3">
