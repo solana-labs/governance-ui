@@ -7,6 +7,7 @@ import {
   governance as foresightGov,
   types as foresightTypes,
   consts as foresightConsts,
+  utils,
 } from '@foresight-tmp/foresight-sdk'
 import {
   commonAssets,
@@ -15,6 +16,7 @@ import {
   ForesightMarketListIdInput,
   ForesightMarketMetadataFieldSelect,
 } from './utils'
+import { PublicKey } from '@solana/web3.js'
 
 const MakeAddMarketMetadataParams = ({
   index,
@@ -42,15 +44,15 @@ const MakeAddMarketMetadataParams = ({
   )
   async function ixCreator(
     form: ForesightMakeAddMarketMetadataParams,
-    program: foresightTypes.PredictionMarketProgram
+    programId: PublicKey
   ) {
     const field = foresightConsts.MARKET_METADATA_FIELDS[form.field]
     const { ix } = await foresightGov.genWriteToFieldMarketMetadataIx(
-      Uint8Array.from([form.marketId]),
+      utils.intToArray(form.marketId, 1),
       Buffer.from(form.marketListId.padEnd(20)),
       form.content,
-      field,
-      program,
+      new field(),
+      programId,
       wallet!.publicKey!
     )
     return ix

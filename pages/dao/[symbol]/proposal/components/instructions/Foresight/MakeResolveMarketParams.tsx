@@ -3,16 +3,14 @@ import React from 'react'
 import { ForesightMakeResolveMarketParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import {
-  governance as foresightGov,
-  types as foresightTypes,
-} from '@foresight-tmp/foresight-sdk'
+import { governance as foresightGov, utils } from '@foresight-tmp/foresight-sdk'
 import {
   commonAssets,
   ForesightMarketIdInput,
   ForesightMarketListIdInput,
   ForesightWinnerInput,
 } from './utils'
+import { PublicKey } from '@solana/web3.js'
 
 const MakeResolveMarketParams = ({
   index,
@@ -32,13 +30,13 @@ const MakeResolveMarketParams = ({
   )
   async function ixCreator(
     form: ForesightMakeResolveMarketParams,
-    program: foresightTypes.PredictionMarketProgram
+    programId: PublicKey
   ) {
     const ix = await foresightGov.genResolveMarketIx(
       form.winner,
-      Uint8Array.from([form.marketId]),
+      utils.intToArray(form.marketId, 1),
       Buffer.from(form.marketListId.padEnd(20)),
-      program,
+      programId,
       form.governedAccount.transferAddress!
     )
     return ix

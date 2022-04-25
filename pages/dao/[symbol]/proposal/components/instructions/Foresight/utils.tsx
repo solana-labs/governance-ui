@@ -24,7 +24,6 @@ import {
 import Input from '@components/inputs/Input'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
-import { PredictionMarketProgram } from '@foresight-tmp/foresight-sdk/dist/types'
 import * as yup from 'yup'
 import { ObjectSchema, StringSchema, NumberSchema } from 'yup'
 import useRealm from '@hooks/useRealm'
@@ -93,7 +92,7 @@ type GetInstruction = () => Promise<UiInstruction>
 
 type IxCreator<T extends ForesightHasGovernedAccount> = (
   form: T,
-  program: PredictionMarketProgram
+  programId: PublicKey
 ) => Promise<TransactionInstruction>
 
 function makeGetInstruction<T extends ForesightHasGovernedAccount>(
@@ -113,10 +112,7 @@ function makeGetInstruction<T extends ForesightHasGovernedAccount>(
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
-      const program = foresightGov.readonlyProgram(
-        new PublicKey(foresightConsts.DEVNET_PID)
-      )
-      const ix = await ixCreator(form, program)
+      const ix = await ixCreator(form, programId)
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     return getUiInstruction(serializedInstruction, isValid, form)

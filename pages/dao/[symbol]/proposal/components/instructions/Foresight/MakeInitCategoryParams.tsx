@@ -3,11 +3,9 @@ import React from 'react'
 import { ForesightHasCategoryId } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import {
-  governance as foresightGov,
-  types as foresightTypes,
-} from '@foresight-tmp/foresight-sdk'
+import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
 import { commonAssets, ForesightCategoryIdInput } from './utils'
+import { PublicKey } from '@solana/web3.js'
 
 const MakeInitCategoryParams = ({
   index,
@@ -26,13 +24,10 @@ const MakeInitCategoryParams = ({
     index,
     governance
   )
-  async function ixCreator(
-    form: ForesightHasCategoryId,
-    program: foresightTypes.PredictionMarketProgram
-  ) {
+  async function ixCreator(form: ForesightHasCategoryId, programId: PublicKey) {
     const { ix } = await foresightGov.genInitCategoryIx(
       Buffer.from(form.categoryId.padEnd(20)),
-      program,
+      programId,
       wallet!.publicKey!
     )
     return ix
