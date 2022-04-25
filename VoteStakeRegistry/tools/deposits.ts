@@ -163,16 +163,16 @@ export const getPeriod = (
     lockupKind !== MONTHLY
       ? lockUpPeriodInDays
       : lockUpPeriodInDays / DAYS_PER_MONTH
-  const maxMonthsNumber = 72
-  const daysLimit = 2190
+  //   const maxMonthsNumber = 72
+  //   const daysLimit = 2190
   //additional prevention of lockup being to high in case of monthly lockup 72 months as 6 years
   //in case of other types 2190 days as 6 years
-  if (lockupKind === MONTHLY && period > maxMonthsNumber) {
-    throw 'lockup period is to hight'
-  }
-  if (lockupKind !== MONTHLY && period > daysLimit) {
-    throw 'lockup period is to hight'
-  }
+  //   if (lockupKind === MONTHLY && period > maxMonthsNumber) {
+  //     throw 'lockup period is to hight'
+  //   }
+  //   if (lockupKind !== MONTHLY && period > daysLimit) {
+  //     throw 'lockup period is to hight'
+  //   }
   return period
 }
 
