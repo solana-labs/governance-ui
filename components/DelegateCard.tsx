@@ -1,60 +1,66 @@
 import useRealm from '../hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, FunctionComponent } from 'react'
 import {
   Transaction,
   TransactionInstruction,
   Keypair,
   PublicKey,
 } from '@solana/web3.js'
+import Input from './inputs/Input'
 import {
   withSetGovernanceDelegate,
   getGovernanceProgramVersion,
 } from '@solana/spl-governance'
 import { sendTransaction } from 'utils/send'
-
+import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
+import Checkbox from '@components/inputs/Checkbox'
 
 import useMembersStore from 'stores/useMembersStore'
 
 const DelegateCard = () => {
-  const { councilMint, mint, realm } = useRealm()
+  const {
+    councilMint,
+    mint,
+    realm,
+    ownTokenRecord, // community
+    ownCouncilTokenRecord, // council
+  } = useRealm()
   const [isLoading, setLoading] = useState<boolean>(false)
   const wallet = useWalletStore((s) => s.current)
   const connection = useWalletStore((s) => s.connection.current)
-  const [delegateKey, setDelegateKey] = useState(
-    '4warKVthQCTP1LmhKyJQHJGb1jvCUrzVnVhmA8pxE3Nt'
-  )
+  const [delegateKey, setDelegateKey] = useState('')
+  const [tokenType, setTokenType] = useState<'community' | 'council'>('council')
 
   const activeMembers = useMembersStore((s) => s.compact.activeMembers)
-
-  console.log('ACTIVE MEMBERS', activeMembers)
-  console.log('realm', realm)
-  console.log('wallet', wallet)
-  console.log('My public key', wallet?.publicKey?.toBase58())
-  console.log('council mint', councilMint)
 
   const handleDelegate = async () => {
     const signers: Keypair[] = []
     const instructions: TransactionInstruction[] = []
     setLoading(true)
-    console.log('Attempt delegate')
+
     if (!realm || !realm?.account?.config?.councilMint || !wallet?.publicKey) {
       return
     }
-    // twitter wallet: 4warKVthQCTP1LmhKyJQHJGb1jvCUrzVnVhmA8pxE3Nt
-    // twitch wallet: 5YWDXAX1xygHp4t7wjmPzzfWuybEuKWmd3ojUBnJtkxq
+
     try {
       const programVersion = await getGovernanceProgramVersion(
         connection,
         realm.owner // governance program public key
       )
+
+      const tokenMintToDelegateWith =
+        tokenType === 'council'
+          ? realm?.account?.config?.councilMint
+          : realm.account.communityMint
+
       withSetGovernanceDelegate(
         instructions,
         realm.owner, // publicKey of program/programId
         programVersion, // program version of realm
         realm.pubkey, // realm public key
-        realm?.account?.config?.councilMint, // mint of governance token
+        tokenMintToDelegateWith, // mint of governance token
         wallet?.publicKey, // governingTokenOwner (walletId) publicKey of for tokenOwnerRecord of this wallet
         wallet?.publicKey, // governanceAuthority: publicKey of connected wallet
         new PublicKey(delegateKey) // public key of wallet who to delegated vote to
@@ -85,10 +91,48 @@ const DelegateCard = () => {
             This will not allow the delegated wallet to withdraw or send tokens.
           </div>
 
+          <InputRow
+            label="Token Type"
+            icon={<CashIcon className="h-8 text-primary-light w-4 mr-2" />}
+          >
+            <div className="form-check">
+              <Checkbox
+                checked={tokenType === 'council'}
+                label={'Council Token'}
+                disabled={ownCouncilTokenRecord ? false : true}
+                onChange={() => setTokenType('council')}
+              />
+            </div>
+            <div className="form-check">
+              <Checkbox
+                checked={tokenType === 'community'}
+                label={'Community Token'}
+                disabled={ownTokenRecord ? false : true}
+                onChange={() => setTokenType('community')}
+              />
+            </div>
+          </InputRow>
+
+          <InputRow
+            label="Wallet"
+            icon={
+              <CreditCardIcon className="h-8 text-primary-light w-4 mr-2" />
+            }
+          >
+            <Input
+              className="w-full min-w-full"
+              type="text"
+              value={delegateKey}
+              onChange={(e) => setDelegateKey(e.target.value)}
+              placeholder="Public key"
+            />
+          </InputRow>
+
           <Button
             className="sm:w-full mt-4"
             onClick={handleDelegate}
             isLoading={isLoading}
+            disabled={delegateKey.length !== 44}
           >
             Delegate
           </Button>
@@ -98,6 +142,27 @@ const DelegateCard = () => {
           Connect wallet to delegate
         </div>
       )}
+    </div>
+  )
+}
+
+interface InputRowProps {
+  label: string
+  icon: React.ReactNode
+}
+
+const InputRow: FunctionComponent<InputRowProps> = ({
+  children,
+  icon,
+  label,
+}) => {
+  return (
+    <div className="flex justify-between items-center content-center mt-4 w-full">
+      <div className="mr-2 py-1 text-sm w-40 h-8 flex items-center">
+        {icon}
+        {label}
+      </div>
+      {children}
     </div>
   )
 }
