@@ -48,7 +48,13 @@ const MemberOverview = ({ member }: { member: Member }) => {
     votesCasted,
     hasCouncilTokenOutsideRealm,
     hasCommunityTokenOutsideRealm,
+    delegateWalletCommunity,
+    delegateWalletCouncil,
   } = member
+
+  console.log('MEMBER', member)
+  console.log('Delegate council', delegateWalletCouncil)
+  console.log('Delegate community', delegateWalletCommunity)
 
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm

@@ -1,6 +1,6 @@
 import useRealm from '../hooks/useRealm'
 import useWalletStore from '../stores/useWalletStore'
-import React, { useEffect, useState, FunctionComponent } from 'react'
+import React, { useState, FunctionComponent } from 'react'
 import {
   Transaction,
   TransactionInstruction,
@@ -33,7 +33,7 @@ const DelegateCard = () => {
   const [delegateKey, setDelegateKey] = useState('')
   const [tokenType, setTokenType] = useState<'community' | 'council'>('council')
 
-  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
+  // const activeMembers = useMembersStore((s) => s.compact.activeMembers)
 
   const handleDelegate = async () => {
     const signers: Keypair[] = []
