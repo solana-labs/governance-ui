@@ -20,6 +20,7 @@ import { TokenOwnerRecord } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
 import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
+import { sleep } from '@blockworks-foundation/mango-client'
 
 interface VoteCommentModalProps {
   onClose: () => void
@@ -73,6 +74,7 @@ const VoteCommentModal: FunctionComponent<VoteCommentModalProps> = ({
         msg,
         client
       )
+      await sleep(100)
       await refetchProposals()
     } catch (ex) {
       //TODO: How do we present transaction errors to users? Just the notification?

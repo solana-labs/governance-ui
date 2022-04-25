@@ -89,23 +89,31 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
-  const chunkTreshold = message ? 4 : 2
   const shouldChunk = votingPlugin?.client instanceof NftVoterClient
+  const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
   if (shouldChunk) {
-    const insertChunks = chunks(instructions, 1)
-    const chunkWithLastTwoMerge = [
-      ...insertChunks.splice(0, insertChunks.length - chunkTreshold),
-      ...chunks([...insertChunks.splice(-chunkTreshold).flatMap((x) => x)], 2),
-    ]
-    const signerChunks = Array(chunkWithLastTwoMerge.length).fill([])
+    const instructionsWithTheirOwnChunk = instructions.slice(
+      -instructionsCountThatMustHaveTheirOwnChunk
+    )
+    const remainingInstructionsToChunk = instructions.slice(
+      0,
+      instructions.length - instructionsCountThatMustHaveTheirOwnChunk
+    )
+    const splInstructionsWithAccountsChunk = chunks(
+      instructionsWithTheirOwnChunk,
+      2
+    )
+    const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
+    const signerChunks = Array(
+      splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
+    ).fill([])
     const singersMap = message
-      ? [...signerChunks.splice(0, signerChunks.length - 1), signers]
+      ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
       : signerChunks
-
     await sendTransactions(
       connection,
       wallet,
-      [...chunkWithLastTwoMerge],
+      [...nftsAccountsChunks, ...splInstructionsWithAccountsChunk],
       singersMap,
       SequenceType.Sequential
     )

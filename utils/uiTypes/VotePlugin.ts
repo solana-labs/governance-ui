@@ -154,7 +154,7 @@ export class VotingClient {
               registrar,
               voterWeightRecord: voterWeightPk,
             },
-            remainingAccounts: remainingAccounts.splice(0, 10),
+            remainingAccounts: remainingAccounts.slice(0, 10),
           }
         )
       )
@@ -207,23 +207,14 @@ export class VotingClient {
           new AccountData(nftVoteRecord, false, true)
         )
       }
-      if (remainingAccounts.length / 3 > 5) {
-        const nftsChunk = chunks(remainingAccounts, 15).reverse()
-        for (const i of nftsChunk) {
-          instructions.push(
-            this.client.program.instruction.castNftVote(proposalPk, {
-              accounts: {
-                registrar,
-                voterWeightRecord: voterWeightPk,
-                governingTokenOwner: walletPk,
-                payer: walletPk,
-                systemProgram: SYSTEM_PROGRAM_ID,
-              },
-              remainingAccounts: i,
-            })
-          )
-        }
-      } else {
+      //1 nft is 3 accounts
+      const firstFiveNfts = remainingAccounts.slice(0, 15)
+      const remainingNftsToChunk = remainingAccounts.slice(
+        15,
+        remainingAccounts.length
+      )
+      const nftsChunk = chunks(remainingNftsToChunk, 12)
+      for (const i of nftsChunk) {
         instructions.push(
           this.client.program.instruction.castNftVote(proposalPk, {
             accounts: {
@@ -233,11 +224,22 @@ export class VotingClient {
               payer: walletPk,
               systemProgram: SYSTEM_PROGRAM_ID,
             },
-            remainingAccounts: remainingAccounts,
+            remainingAccounts: i,
           })
         )
       }
-
+      instructions.push(
+        this.client.program.instruction.castNftVote(proposalPk, {
+          accounts: {
+            registrar,
+            voterWeightRecord: voterWeightPk,
+            governingTokenOwner: walletPk,
+            payer: walletPk,
+            systemProgram: SYSTEM_PROGRAM_ID,
+          },
+          remainingAccounts: firstFiveNfts,
+        })
+      )
       return { voterWeightPk, maxVoterWeightRecord }
     }
     if (this.client instanceof VsrClient) {
@@ -279,6 +281,7 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
+      const nftVoteRecords = await this.client.program.account.nftVoteRecord.all()
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         const [nftVoteRecord] = await PublicKey.findProgramAddress(
@@ -289,28 +292,36 @@ export class VotingClient {
           ],
           clientProgramId
         )
-        remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
+        if (
+          nftVoteRecords.find(
+            (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
+          )
+        ) {
+          remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
+        }
       }
 
-      if (remainingAccounts.length > 10) {
-        const nftsChunk = chunks(remainingAccounts, 10).reverse()
-        for (const i of nftsChunk) {
-          instructions.push(
-            this.client.program.instruction.relinquishNftVote({
-              accounts: {
-                registrar,
-                voterWeightRecord: voterWeightPk,
-                governance: proposal.account.governance,
-                proposal: proposal.pubkey,
-                governingTokenOwner: walletPk,
-                voteRecord: voteRecordPk,
-                beneficiary: walletPk,
-              },
-              remainingAccounts: i,
-            })
-          )
-        }
-      } else {
+      const firstFiveNfts = remainingAccounts.slice(0, 5)
+      const remainingNftsToChunk = remainingAccounts.slice(
+        5,
+        remainingAccounts.length
+      )
+      const nftsChunk = chunks(remainingNftsToChunk, 12)
+      instructions.push(
+        this.client.program.instruction.relinquishNftVote({
+          accounts: {
+            registrar,
+            voterWeightRecord: voterWeightPk,
+            governance: proposal.account.governance,
+            proposal: proposal.pubkey,
+            governingTokenOwner: walletPk,
+            voteRecord: voteRecordPk,
+            beneficiary: walletPk,
+          },
+          remainingAccounts: firstFiveNfts,
+        })
+      )
+      for (const i of nftsChunk) {
         instructions.push(
           this.client.program.instruction.relinquishNftVote({
             accounts: {
@@ -322,7 +333,7 @@ export class VotingClient {
               voteRecord: voteRecordPk,
               beneficiary: walletPk,
             },
-            remainingAccounts: remainingAccounts,
+            remainingAccounts: i,
           })
         )
       }
