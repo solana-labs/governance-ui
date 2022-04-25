@@ -455,7 +455,7 @@ const LockTokenStats = () => {
         <div className="col-span-12 lg:col-span-8">
           <div className="border border-fgd-4 p-3 rounded-md">
             <h3 className="p-3">MNGO Vesting vs. Time</h3>
-            <div style={{ height: '240px' }}>
+            <div style={{ height: '196px' }}>
               <VestingVsTime
                 data={[
                   ...statsMonths.map((x) => {
