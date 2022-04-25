@@ -52,10 +52,6 @@ const MemberOverview = ({ member }: { member: Member }) => {
     delegateWalletCouncil,
   } = member
 
-  console.log('MEMBER', member)
-  console.log('Delegate council', delegateWalletCouncil)
-  console.log('Delegate community', delegateWalletCommunity)
-
   const walletPublicKey = tryParsePublicKey(walletAddress)
   const tokenName = realm
     ? tokenService.getTokenInfo(realm?.account.communityMint.toBase58())?.symbol
@@ -166,6 +162,11 @@ const MemberOverview = ({ member }: { member: Member }) => {
   const paginateVotes = (page) => {
     return ownVoteRecords.slice(page * perPage, (page + 1) * perPage)
   }
+
+  const abbreviatePublicKey = (publicKey: string) => {
+    return `${publicKey.slice(0, 4)}...${publicKey.slice(-4)}`
+  }
+
   const Address = useMemo(() => {
     return (
       <DisplayAddress
@@ -206,6 +207,13 @@ const MemberOverview = ({ member }: { member: Member }) => {
                 <LogoutIcon className="w-4 h-4 ml-1"></LogoutIcon>
               )}
             </div>
+            {delegateWalletCommunity && (
+              <div>
+                <p className="text-fgd-3 text-xs">{`Delegated to: ${abbreviatePublicKey(
+                  delegateWalletCommunity.toBase58()
+                )}`}</p>
+              </div>
+            )}
             <p>Vote Power Rank: {memberVotePowerRank}</p>
           </div>
         )}
@@ -218,7 +226,13 @@ const MemberOverview = ({ member }: { member: Member }) => {
                 <LogoutIcon className="w-3 h-3 ml-1"></LogoutIcon>
               )}
             </div>
-            <div></div>
+            {delegateWalletCouncil && (
+              <div>
+                <p className="text-fgd-3 text-xs">{`Delegated to: ${abbreviatePublicKey(
+                  delegateWalletCouncil.toBase58()
+                )}`}</p>
+              </div>
+            )}
           </div>
         )}
         <div className="bg-bkg-1 px-4 py-2 rounded-md w-full break-all">
