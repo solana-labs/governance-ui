@@ -1,6 +1,6 @@
 import React from 'react'
 import useRealm from 'hooks/useRealm'
-import { CogIcon, UsersIcon } from '@heroicons/react/outline'
+import { ChartPieIcon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon, BadgeCheckIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
@@ -78,10 +78,10 @@ const RealmHeader = () => {
             </Link>
           )}
           {isLockTokensMode && symbol === 'MNGO' && (
-            <Link href={fmtUrlWithCluster(`/dao/${symbol}/members`)}>
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
               <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
-                <UsersIcon className="flex-shrink-0 h-5 mr-1 w-5" />
-                Locked MNGO stats
+                <ChartPieIcon className="flex-shrink-0 h-5 mr-1 w-5" />
+                MNGO stats
               </a>
             </Link>
           )}

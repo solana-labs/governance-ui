@@ -5,7 +5,7 @@ const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
     data={data}
     keys={['amount']}
     indexBy="month"
-    margin={{ top: 10, right: 25, bottom: 25, left: 85 }}
+    margin={{ bottom: 40, left: 56, right: 24 }}
     padding={0.3}
     valueScale={{ type: 'linear' }}
     indexScale={{ type: 'band', round: true }}
@@ -15,20 +15,34 @@ const VestingVsTime = ({ data, fmtMangoAmount /* see data tab */ }) => (
       axis: {
         ticks: {
           line: {
-            stroke: 'var(--fgd-3)',
+            stroke: 'var(--bkg-2)',
           },
           text: {
             fill: 'var(--fgd-3)',
           },
         },
       },
+      grid: {
+        line: { stroke: 'var(--bkg-4)' },
+      },
     }}
-    colors={() => '#A4ACB7'}
+    defs={[
+      {
+        id: 'gradient',
+        type: 'linearGradient',
+        colors: [
+          { offset: 0, color: 'var(--secondary-2-light)' },
+          { offset: 20, color: 'var(--secondary-2-dark)' },
+          { offset: 100, color: 'var(--bkg-2)' },
+        ],
+      },
+    ]}
+    fill={[{ match: '*', id: 'gradient' }]}
     label={(v) => fmtMangoAmount(v.value)}
     axisLeft={{ format: (v) => fmtMangoAmount(v) }}
     labelSkipWidth={12}
     labelSkipHeight={12}
-    labelTextColor="black"
+    labelTextColor="#fff"
     role="application"
   />
 )

@@ -1,22 +1,10 @@
 import useRealm from '@hooks/useRealm'
-import LockTokenStats from 'VoteStakeRegistry/components/LockTokenStats/LockTokensPage'
 import Members from './Members'
-import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 const MembersPage = () => {
-  const { realm, symbol, config } = useRealm()
-  const isLockTokensMode =
-    config?.account.communityVoterWeightAddin &&
-    vsrPluginsPks.includes(
-      config?.account.communityVoterWeightAddin?.toBase58()
-    )
+  const { realm } = useRealm()
   return (
     <div>
-      {!realm?.account.config.useCommunityVoterWeightAddin && (
-        <Members></Members>
-      )}
-      {isLockTokensMode && symbol === 'MNGO' && (
-        <LockTokenStats></LockTokenStats>
-      )}
+      {!realm?.account.config.useCommunityVoterWeightAddin ? <Members /> : null}
     </div>
   )
 }
