@@ -36,7 +36,7 @@ const DepositNFT = ({ onClose }) => {
           href={
             currentAccount?.governance?.pubkey
               ? getExplorerUrl(
-                  connection.endpoint,
+                  connection.cluster,
                   currentAccount!.governance!.pubkey.toBase58()
                 )
               : ''
