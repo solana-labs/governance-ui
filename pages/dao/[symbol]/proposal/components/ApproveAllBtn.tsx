@@ -76,7 +76,7 @@ const ApproveAllBtn = () => {
             proposal.pubkey,
             proposal.account.tokenOwnerRecord,
             ownTokenRecord.pubkey,
-            ownTokenRecord.pubkey,
+            governanceAuthority,
             proposal.account.governingTokenMint,
             Vote.fromYesNoVote(YesNoVote.Yes),
             payer,
