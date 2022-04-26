@@ -110,10 +110,14 @@ export async function castVote(
     const singersMap = message
       ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
       : signerChunks
+    const instructionsChunks = [
+      ...nftsAccountsChunks,
+      ...splInstructionsWithAccountsChunk,
+    ]
     await sendTransactions(
       connection,
       wallet,
-      [...nftsAccountsChunks, ...splInstructionsWithAccountsChunk],
+      instructionsChunks,
       singersMap,
       SequenceType.Sequential
     )
