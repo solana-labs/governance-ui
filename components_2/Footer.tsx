@@ -7,7 +7,7 @@ const Footer = () => {
   else
     return (
       <div className="bg-cover bg-bkg-12 px-56 pt-12 pb-24">
-        <div className="flex items-centers">
+        <div className="flex items-center">
           <div>
             <img src="/img/realms-web/icons/Realms-logo.svg" className="mr-2" />
           </div>

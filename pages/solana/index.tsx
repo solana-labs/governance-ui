@@ -1,4 +1,5 @@
 import KickstartSolana from '../../components_2/KickstartSolana'
+import NavBar from '../../components_2/NavBar'
 import SolanaPerks from '../../components_2/SolanaPerks'
 import DaoTypes from '../../components_2/DaoTypes'
 import RealmsOptions from '../../components_2/RealmsOptions'
@@ -13,6 +14,7 @@ const Solana = () => {
   return (
     <div>
       <KickstartSolana />
+      <NavBar />
       <SolanaPerks />
       <DaoTypes />
       <RealmsOptions />
