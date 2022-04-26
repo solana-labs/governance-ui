@@ -11,7 +11,6 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { BN } from '@project-serum/anchor'
 import {
   getRegistrarPDA,
   getVoterPDA,
