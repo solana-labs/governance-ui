@@ -57,7 +57,12 @@ const Treasury = () => {
           (x) => x.extensions.transferAddress
         )
       ) {
-        setTreasuryAccounts(governedTokenAccountsWithoutNfts)
+        const accountsSorted = governedTokenAccountsWithoutNfts.sort((a, b) => {
+          const infoA = getTreasuryAccountItemInfoV2(a)
+          const infoB = getTreasuryAccountItemInfoV2(b)
+          return infoB.totalPrice - infoA.totalPrice
+        })
+        setTreasuryAccounts(accountsSorted)
       }
     }
     prepTreasuryAccounts()

@@ -203,7 +203,11 @@ export default function useMembers() {
         })
         .reverse(),
 
-    [JSON.stringify(tokenRecordArray), JSON.stringify(councilRecordArray)]
+    [
+      JSON.stringify(tokenRecordArray),
+      JSON.stringify(councilRecordArray),
+      realm?.pubkey.toBase58(),
+    ]
   )
 
   //Move to store if will be used more across application

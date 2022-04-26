@@ -19,8 +19,11 @@ import { RpcContext } from '@solana/spl-governance'
 import { Vote } from '@solana/spl-governance'
 
 import { withCastVote } from '@solana/spl-governance'
-import { sendTransaction } from '../utils/send'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { chunks } from '@utils/helpers'
+import { sendTransactions, SequenceType } from '@utils/sendTransactions'
+import { sendTransaction } from '@utils/send'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export async function castVote(
   { connection, wallet, programId, walletPubkey }: RpcContext,
@@ -86,9 +89,38 @@ export async function castVote(
       plugin?.voterWeightPk
     )
   }
+  const shouldChunk = votingPlugin?.client instanceof NftVoterClient
+  const instructionsCountThatMustHaveTheirOwnChunk = message ? 4 : 2
+  if (shouldChunk) {
+    const instructionsWithTheirOwnChunk = instructions.slice(
+      -instructionsCountThatMustHaveTheirOwnChunk
+    )
+    const remainingInstructionsToChunk = instructions.slice(
+      0,
+      instructions.length - instructionsCountThatMustHaveTheirOwnChunk
+    )
+    const splInstructionsWithAccountsChunk = chunks(
+      instructionsWithTheirOwnChunk,
+      2
+    )
+    const nftsAccountsChunks = chunks(remainingInstructionsToChunk, 2)
+    const signerChunks = Array(
+      splInstructionsWithAccountsChunk.length + nftsAccountsChunks.length
+    ).fill([])
+    const singersMap = message
+      ? [...signerChunks.slice(0, signerChunks.length - 1), signers]
+      : signerChunks
+    await sendTransactions(
+      connection,
+      wallet,
+      [...nftsAccountsChunks, ...splInstructionsWithAccountsChunk],
+      singersMap,
+      SequenceType.Sequential
+    )
+  } else {
+    const transaction = new Transaction()
+    transaction.add(...instructions)
 
-  const transaction = new Transaction()
-  transaction.add(...instructions)
-
-  await sendTransaction({ transaction, wallet, connection, signers })
+    await sendTransaction({ transaction, wallet, connection, signers })
+  }
 }

@@ -138,7 +138,7 @@ const MakeCreatePerpMarket = ({
       tx.add(makeAskAccountInstruction.instruction)
 
       tx.recentBlockhash = (
-        await connection.getRecentBlockhash('max')
+        await connection.getLatestBlockhash('max')
       ).blockhash
       const signers = [
         makeEventQueueAccountInstruction.account,
