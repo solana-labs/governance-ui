@@ -43,7 +43,6 @@ const TokenBalanceCardWrapper = ({
       (!ownTokenRecord ||
         ownTokenRecord.account.governingTokenDepositAmount.isZero())
     ) {
-      console.log(ownCouncilTokenRecord, councilTokenAccount)
       return (
         <>
           <NftBalanceCard></NftBalanceCard>
