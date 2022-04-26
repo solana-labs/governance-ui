@@ -191,15 +191,17 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      const nftVoteRecordsFiltred = await this.client.program.account.nftVoteRecord.all(
-        [
+      const nftVoteRecordsFiltered = (
+        await this.client.program.account.nftVoteRecord.all([
           {
             memcmp: {
               offset: 8,
               bytes: proposalPk.toBase58(),
             },
           },
-        ]
+        ])
+      ).filter(
+        (x) => x.account.governingTokenOwner.toBase58() === walletPk.toBase58()
       )
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
@@ -212,7 +214,7 @@ export class VotingClient {
           clientProgramId
         )
         if (
-          !nftVoteRecordsFiltred.find(
+          !nftVoteRecordsFiltered.find(
             (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
           )
         )
@@ -296,33 +298,22 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      const nftVoteRecordsFiltred = await this.client.program.account.nftVoteRecord.all(
-        [
+      const nftVoteRecordsFiltered = (
+        await this.client.program.account.nftVoteRecord.all([
           {
             memcmp: {
               offset: 8,
               bytes: proposal.pubkey.toBase58(),
             },
           },
-        ]
+        ])
+      ).filter(
+        (x) => x.account.governingTokenOwner.toBase58() === walletPk.toBase58()
       )
-      for (let i = 0; i < this.votingNfts.length; i++) {
-        const nft = this.votingNfts[i]
-        const [nftVoteRecord] = await PublicKey.findProgramAddress(
-          [
-            Buffer.from('nft-vote-record'),
-            proposal.pubkey.toBuffer(),
-            new PublicKey(nft.metadata.data.mint).toBuffer(),
-          ],
-          clientProgramId
+      for (const voteRecord of nftVoteRecordsFiltered) {
+        remainingAccounts.push(
+          new AccountData(voteRecord.publicKey, false, true)
         )
-        if (
-          nftVoteRecordsFiltred.find(
-            (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
-          )
-        ) {
-          remainingAccounts.push(new AccountData(nftVoteRecord, false, true))
-        }
       }
 
       const firstFiveNfts = remainingAccounts.slice(0, 5)
@@ -361,7 +352,6 @@ export class VotingClient {
           })
         )
       }
-
       return { voterWeightPk, maxVoterWeightRecord }
     }
   }
