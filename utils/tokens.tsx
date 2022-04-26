@@ -371,22 +371,26 @@ export const getNfts = async (connection: Connection, ownerPk: PublicKey) => {
       publicAddress: ownerPk.toBase58(),
       connection: connection,
     })
+    const tokenAccounts = await getOwnedTokenAccounts(connection, ownerPk)
     const data = Object.keys(nfts).map((key) => nfts[key])
     const arr: NFTWithMint[] = []
     for (let i = 0; i < data.length; i++) {
       try {
         const val = (await axios.get(data[i].data.uri)).data
-        const tokenAccounts = await getTokenAccountsByMint(
-          connection,
-          data[i].mint
-        )
-        arr.push({
-          val,
-          mint: data[i].mint,
-          tokenAddress: tokenAccounts
-            .find((x) => x.account.owner.toBase58() === ownerPk.toBase58())!
-            .publicKey.toBase58(),
-        })
+        const tokenAddress = tokenAccounts
+          .find(
+            (x) =>
+              x.account.mint.toBase58() === data[i].mint &&
+              x.account.amount.cmpn(1) === 0
+          )
+          ?.publicKey.toBase58()
+        if (tokenAddress) {
+          arr.push({
+            val,
+            mint: data[i].mint,
+            tokenAddress: tokenAddress,
+          })
+        }
       } catch (e) {
         console.log(e)
       }
