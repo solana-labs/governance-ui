@@ -143,5 +143,14 @@
     "ogImage": "https://avatars.githubusercontent.com/u/46954203?s=400&u=6c777850a155eeb75586049e7c91dc2baeb97dd1&v=4",
     "website": "https://fashers.xyz",
     "twitter": "@Fashers"
+  },
+  {
+    "symbol": "SquatchDAO",
+    "displayName": "SquatchDAO",
+    "programId": "GovER5Lthms3bLBqWub97yVrMmEogzX7xNjdXpPPCVZw",
+    "realmId": "5DqXtnSqxUukgQ8ZJQhTEdF7y3cu3zQuBpREC1g3bNjf",
+    "ogImage": "https://raw.githubusercontent.com/Exonft/SquatchDAO/main/SquatchDAO.jpg",
+    "website": "www.squatchdao.com",
+    "twitter": "@Squatch_DAO"
   }
 ]
