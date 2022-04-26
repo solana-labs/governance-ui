@@ -24,7 +24,7 @@ module.exports = {
         'dark-theme': {
           primary: { light: '#E1CE7A', dark: '#D2B537' },
           'secondary-1': { light: '#AFD803', dark: '#6CBF00' },
-          'secondary-2': { light: '#E54033', dark: '#C7251A' },
+          'secondary-2': { light: '#FFCB1B', dark: '#F48F25' },
           'bkg-1': '#121417',
           'bkg-2': '#202429',
           'bkg-3': '#2F343B',

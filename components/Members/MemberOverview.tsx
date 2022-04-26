@@ -179,7 +179,7 @@ const MemberOverview = ({ member }: { member: Member }) => {
           className="default-transition flex items-center text-primary-light hover:text-primary-dark text-sm"
           href={
             walletAddress
-              ? getExplorerUrl(connection.endpoint, walletAddress)
+              ? getExplorerUrl(connection.cluster, walletAddress)
               : ''
           }
           target="_blank"

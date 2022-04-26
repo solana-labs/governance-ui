@@ -25,6 +25,7 @@ import { sendTransactions, SequenceType } from '@utils/sendTransactions'
 import { chunks } from '@utils/helpers'
 import { UiInstruction } from '@utils/uiTypes/proposalCreationTypes'
 import { VotingClient } from '@utils/uiTypes/VotePlugin'
+import { NftVoterClient } from '@solana/governance-program-library'
 
 export interface InstructionDataWithHoldUpTime {
   data: InstructionData | null
@@ -207,7 +208,11 @@ export const createProposal = async (
       sendingMessage: `inserting into ${notificationTitle}`,
       successMessage: `inserted into ${notificationTitle}`,
     })
-  } else if (insertInstructionCount <= 2 && !splitToChunkByDefault) {
+  } else if (
+    insertInstructionCount <= 2 &&
+    !splitToChunkByDefault &&
+    !(client?.client instanceof NftVoterClient)
+  ) {
     // This is an arbitrary threshold and we assume that up to 2 instructions can be inserted as a single Tx
     // This is conservative setting and we might need to revise it if we have more empirical examples or
     // reliable way to determine Tx size
