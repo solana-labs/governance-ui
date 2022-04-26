@@ -57,7 +57,7 @@ export async function castVote(
     proposal.pubkey,
     proposal.account.tokenOwnerRecord,
     tokeOwnerRecord,
-    governanceAuthority,
+    tokeOwnerRecord, // governance authority
     proposal.account.governingTokenMint,
     Vote.fromYesNoVote(yesNoVote),
     payer,
