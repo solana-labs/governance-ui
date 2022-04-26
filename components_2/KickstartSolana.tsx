@@ -13,7 +13,7 @@ const KickstartSolana = () => {
           </a>
         </div>
         <div className="ml-auto">
-          <div className="">
+          <div className="flex items-center">
             <PopUpButtonWhite className="mr-4">Read the Docs</PopUpButtonWhite>
             <ExploreButton className="border border-gradient-to-r-blue-red">
               Explore DAOs
