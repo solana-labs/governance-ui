@@ -137,7 +137,7 @@ export const withCreateNewDeposit = async ({
       firstFreeIdx,
       { [lockupKind]: {} },
       //lockup starts now
-      new BN(0),
+      null,
       period,
       allowClawback,
       {
