@@ -5,7 +5,7 @@ import {
   consts as foresightConsts,
 } from '@foresight-tmp/foresight-sdk'
 import { isFormValid } from '@utils/formValidation'
-import { GovernedMultiTypeAccount, GovernedTokenAccount } from '@utils/tokens'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import {
   Governance,
   ProgramAccount,
@@ -34,10 +34,10 @@ import Select from '@components/inputs/Select'
 type EmptyObject = Record<string, never>
 type SetFormErrors = Dispatch<React.SetStateAction<EmptyObject>>
 
-export function getFilteredTokenAccounts(): GovernedTokenAccount[] {
+export function getFilteredTokenAccounts(): AssetAccount[] {
   const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
   return governedTokenAccountsWithoutNfts.filter((x) =>
-    x.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
+    x.extensions.transferAddress?.equals(foresightGov.DEVNET_TREASURY)
   )
 }
 
@@ -263,7 +263,7 @@ function getUiInstruction(
 }
 
 function ForesightGovernedAccountSelect(props: {
-  filteredTokenAccounts: GovernedTokenAccount[]
+  filteredTokenAccounts: AssetAccount[]
   form: ForesightHasGovernedAccount
   handleSetForm: HandleSetForm
   index: number
@@ -273,9 +273,7 @@ function ForesightGovernedAccountSelect(props: {
   return (
     <GovernedAccountSelect
       label="Program"
-      governedAccounts={
-        props.filteredTokenAccounts as GovernedMultiTypeAccount[]
-      }
+      governedAccounts={props.filteredTokenAccounts}
       onChange={(value) => {
         props.handleSetForm({ value, propertyName: 'governedAccount' })
       }}

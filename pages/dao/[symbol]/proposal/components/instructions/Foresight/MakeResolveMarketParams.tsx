@@ -38,7 +38,7 @@ const MakeResolveMarketParams = ({
       utils.intToArray(form.marketId, 1),
       Buffer.from(form.marketListId.padEnd(20)),
       new PublicKey(consts.DEVNET_PID),
-      form.governedAccount.transferAddress!
+      form.governedAccount.extensions.transferAddress!
     )
     return ix
   }

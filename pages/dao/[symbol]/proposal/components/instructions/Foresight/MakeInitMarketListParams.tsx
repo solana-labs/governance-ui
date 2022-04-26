@@ -32,7 +32,7 @@ const MakeInitMarketListParams = ({
       Buffer.from(form.marketListId.padEnd(20)),
       new PublicKey(consts.DEVNET_PID),
       wallet!.publicKey!,
-      form.governedAccount.transferAddress!
+      form.governedAccount.extensions.transferAddress!
     )
     return ix
   }
