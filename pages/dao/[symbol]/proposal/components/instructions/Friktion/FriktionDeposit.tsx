@@ -5,7 +5,6 @@ import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import {
   FriktionDepositForm,
   UiInstruction,
@@ -119,7 +118,7 @@ const FriktionDeposit = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
-    setMintInfo(form.governedTokenAccount?.mint?.account)
+    setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
   const schema = getFriktionDepositSchema({ form })
 
@@ -127,9 +126,7 @@ const FriktionDeposit = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}

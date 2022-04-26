@@ -2,14 +2,14 @@ import create, { State } from 'zustand'
 import { VsrClient } from '@blockworks-foundation/voter-stake-registry-client'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { getRegistrarPDA, Registrar } from 'VoteStakeRegistry/sdk/accounts'
-import { Provider } from '@project-serum/anchor'
-import { Wallet } from '@project-serum/sol-wallet-adapter'
+import { Provider, Wallet } from '@project-serum/anchor'
 import { tryGetNftRegistrar, tryGetRegistrar } from 'VoteStakeRegistry/sdk/api'
 import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import { ConnectionContext } from '@utils/connection'
 import { ProgramAccount, Realm } from '@solana/spl-governance'
 import { getNftRegistrarPDA } from 'NftVotePlugin/sdk/accounts'
 import { VotingClient, VotingClientProps } from '@utils/uiTypes/VotePlugin'
+import { PublicKey } from '@solana/web3.js'
 
 interface UseVotePluginsClientStore extends State {
   state: {
@@ -19,6 +19,7 @@ interface UseVotePluginsClientStore extends State {
     voteStakeRegistryRegistrar: Registrar | null
     nftMintRegistrar: any
     currentRealmVotingClient: VotingClient
+    voteStakeRegistryRegistrarPk: PublicKey | null
   }
   handleSetVsrClient: (
     wallet: SignerWalletAdapter | undefined,
@@ -47,6 +48,7 @@ const defaultState = {
   vsrClient: undefined,
   nftClient: undefined,
   voteStakeRegistryRegistrar: null,
+  voteStakeRegistryRegistrarPk: null,
   nftMintRegistrar: null,
   currentRealmVotingClient: new VotingClient({
     client: undefined,
@@ -85,6 +87,7 @@ const useVotePluginsClientStore = create<UseVotePluginsClientStore>(
       const existingRegistrar = await tryGetRegistrar(registrar, client!)
       set((s) => {
         s.state.voteStakeRegistryRegistrar = existingRegistrar
+        s.state.voteStakeRegistryRegistrarPk = registrar
       })
     },
     handleSetNftClient: async (wallet, connection) => {

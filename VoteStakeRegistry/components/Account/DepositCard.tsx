@@ -14,14 +14,17 @@ import tokenService from '@utils/services/token'
 import LockTokensModal from './LockTokensModal'
 import { useState } from 'react'
 import {
+  getFormattedStringFromDays,
   getMinDurationFmt,
   getTimeLeftFromNowFmt,
+  SECS_PER_DAY,
 } from 'VoteStakeRegistry/tools/dateTools'
 import { closeDeposit } from 'VoteStakeRegistry/actions/closeDeposit'
 import { abbreviateAddress } from '@utils/formatting'
 import { notify } from '@utils/notifications'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import dayjs from 'dayjs'
+import { BN } from '@project-serum/anchor'
 
 const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
   const { getOwnedDeposits } = useDepositStore()
@@ -149,6 +152,10 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
             label="Lockup Type"
             value={typeName.charAt(0).toUpperCase() + typeName.slice(1)}
           />
+          <CardLabel
+            label="Allow dao to clawback"
+            value={deposit.allowClawback ? 'Yes' : 'No'}
+          />
           {isVest && (
             <CardLabel
               label="Initial Amount"
@@ -172,10 +179,12 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
           )}
           {isVest && deposit.nextVestingTimestamp !== null && (
             <CardLabel
-              label="Next Vesting"
-              value={dayjs(
-                deposit.nextVestingTimestamp?.toNumber() * 1000
-              ).format('DD-MM-YYYY')}
+              label="Next Vesting in"
+              value={getFormattedStringFromDays(
+                deposit!.nextVestingTimestamp
+                  .sub(new BN(dayjs().unix()))
+                  .toNumber() / SECS_PER_DAY
+              )}
             />
           )}
           {isRealmCommunityMint && (

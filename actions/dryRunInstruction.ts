@@ -12,12 +12,23 @@ export async function dryRunInstruction(
   connection: Connection,
   wallet: WalletAdapter,
   instructionData: InstructionData,
-  prerequisiteInstructionsToRun?: TransactionInstruction[] | undefined
+  prerequisiteInstructionsToRun?: TransactionInstruction[] | undefined,
+  additionalInstructions?: InstructionData[]
 ) {
   const transaction = new Transaction({ feePayer: wallet.publicKey })
   if (prerequisiteInstructionsToRun) {
     prerequisiteInstructionsToRun.map((x) => transaction.add(x))
   }
+  if (additionalInstructions) {
+    for (const i of additionalInstructions) {
+      transaction.add({
+        keys: i.accounts,
+        programId: i.programId,
+        data: Buffer.from(i.data),
+      })
+    }
+  }
+
   transaction.add({
     keys: instructionData.accounts,
     programId: instructionData.programId,

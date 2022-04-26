@@ -58,8 +58,8 @@ const NewProposalBtn = () => {
                   : ''
               } flex items-center cursor-pointer text-primary-light hover:text-primary-dark text-sm`}
             >
-              <PlusCircleIcon className="h-5 mr-1 w-5" />
-              New
+              <PlusCircleIcon className="flex-shrink-0 h-5 mr-1 w-5" />
+              New Proposal
             </a>
           </Link>
         </div>

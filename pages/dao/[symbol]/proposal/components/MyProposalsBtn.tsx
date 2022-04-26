@@ -19,6 +19,7 @@ import Loading from '@components/Loading'
 import { sendSignedTransaction } from '@utils/sendTransactions'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
+import { sleep } from '@project-serum/common'
 
 const MyProposalsBn = () => {
   const [modalIsOpen, setModalIsOpen] = useState(false)
@@ -79,11 +80,13 @@ const MyProposalsBn = () => {
       now > timestamp
     )
   })
-  const unReleased = myProposals.filter(
+  const unReleased = [...Object.values(proposals)].filter(
     (x) =>
-      (x.account.state === ProposalState.Succeeded ||
-        x.account.state === ProposalState.Completed) &&
-      x.account.isVoteFinalized() &&
+      (x.account.state === ProposalState.Completed ||
+        x.account.state === ProposalState.Executing ||
+        x.account.state === ProposalState.SigningOff ||
+        x.account.state === ProposalState.Succeeded ||
+        x.account.state === ProposalState.ExecutingWithErrors) &&
       ownVoteRecordsByProposal[x.pubkey.toBase58()] &&
       !ownVoteRecordsByProposal[x.pubkey.toBase58()]?.account.isRelinquished
   )
@@ -102,7 +105,7 @@ const MyProposalsBn = () => {
     try {
       const {
         blockhash: recentBlockhash,
-      } = await connection.getRecentBlockhash()
+      } = await connection.getLatestBlockhash()
 
       const transactions: Transaction[] = []
       for (let i = 0; i < proposalsArray.length; i++) {
@@ -130,6 +133,7 @@ const MyProposalsBn = () => {
           sendSignedTransaction({ signedTransaction: transaction, connection })
         )
       )
+      await sleep(500)
       await refetchProposals()
     } catch (e) {
       console.log(e)
@@ -138,7 +142,7 @@ const MyProposalsBn = () => {
     setIsLoading(false)
   }
 
-  const cleanDrafts = () => {
+  const cleanDrafts = (toIndex = null) => {
     const withInstruction = (instructions, proposal) => {
       return withCancelProposal(
         instructions,
@@ -151,9 +155,9 @@ const MyProposalsBn = () => {
         wallet!.publicKey!
       )
     }
-    cleanSelected(drafts, withInstruction)
+    cleanSelected(drafts.slice(0, toIndex || drafts.length), withInstruction)
   }
-  const releaseAllTokens = () => {
+  const releaseAllTokens = (toIndex = null) => {
     const withInstruction = async (
       instructions,
       proposal: ProgramAccount<Proposal>
@@ -165,7 +169,7 @@ const MyProposalsBn = () => {
           : ownCouncilTokenRecord
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
-      const inst = withRelinquishVote(
+      const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
         proposal.account.governance,
@@ -183,9 +187,12 @@ const MyProposalsBn = () => {
       )
       return inst
     }
-    cleanSelected(unReleased, withInstruction)
+    cleanSelected(
+      unReleased.slice(0, toIndex || unReleased.length),
+      withInstruction
+    )
   }
-  const finalizeAll = () => {
+  const finalizeAll = (toIndex = null) => {
     const withInstruction = (
       instructions,
       proposal: ProgramAccount<Proposal>
@@ -202,7 +209,10 @@ const MyProposalsBn = () => {
         maxVoterWeight
       )
     }
-    cleanSelected(notfinalized, withInstruction)
+    cleanSelected(
+      notfinalized.slice(0, toIndex || notfinalized.length),
+      withInstruction
+    )
   }
   return (
     <>
@@ -224,21 +234,21 @@ const MyProposalsBn = () => {
             <ProposalList
               title="Drafts"
               fcn={cleanDrafts}
-              btnName="Cancel all"
+              btnName="Cancel"
               proposals={drafts}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unfinalized"
               fcn={finalizeAll}
-              btnName="Finalize all"
+              btnName="Finalize"
               proposals={notfinalized}
               isLoading={isLoading}
             ></ProposalList>
             <ProposalList
               title="Unreleased tokens"
               fcn={releaseAllTokens}
-              btnName="Release all"
+              btnName="Release"
               proposals={unReleased}
               isLoading={isLoading}
             ></ProposalList>
@@ -264,7 +274,7 @@ const ProposalList = ({
   isLoading,
 }: {
   title: string
-  fcn: () => void
+  fcn: (count?) => void
   btnName: string
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
@@ -275,9 +285,19 @@ const ProposalList = ({
       <h4 className="flex items-center mb-3">
         {title} ({proposals.length})
         {btnName && proposals.length !== 0 && (
-          <Button small className="ml-auto" onClick={fcn} disabled={isLoading}>
-            {btnName}
-          </Button>
+          <div className="ml-auto">
+            <Button
+              small
+              className="mr-3"
+              onClick={() => fcn(5)}
+              disabled={isLoading}
+            >
+              {btnName} first 5
+            </Button>
+            <Button small onClick={() => fcn()} disabled={isLoading}>
+              {btnName} all
+            </Button>
+          </div>
         )}
       </h4>
       <div className="mb-3 ">

@@ -1,7 +1,7 @@
+import { SignerWalletAdapter } from '@solana/wallet-adapter-base'
 import {
   Commitment,
   Connection,
-  FeeCalculator,
   RpcResponseAndContext,
   SignatureStatus,
   SimulatedTransactionResponse,
@@ -10,7 +10,6 @@ import {
   TransactionSignature,
   Keypair,
 } from '@solana/web3.js'
-import { SignerWalletAdapter } from '@project-serum/sol-wallet-adapter'
 
 // TODO: sendTransactions() was imported from Oyster as is and needs to be reviewed and updated
 // In particular common primitives should be unified with send.tsx and also ensure the same resiliency mechanism
@@ -163,7 +162,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 30000
+const DEFAULT_TIMEOUT = 60000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,
@@ -264,7 +263,6 @@ export const sendTransactions = async (
     false,
   block?: {
     blockhash: string
-    feeCalculator: FeeCalculator
   }
 ): Promise<number> => {
   if (!wallet.publicKey) throw new Error('Wallet not connected!')
@@ -272,7 +270,7 @@ export const sendTransactions = async (
   const unsignedTxns: Transaction[] = []
 
   if (!block) {
-    block = await connection.getRecentBlockhash(commitment)
+    block = await connection.getLatestBlockhash(commitment)
   }
 
   for (let i = 0; i < instructionSet.length; i++) {
@@ -298,9 +296,7 @@ export const sendTransactions = async (
 
     unsignedTxns.push(transaction)
   }
-
   const signedTxns = await wallet.signAllTransactions(unsignedTxns)
-
   const pendingTxns: Promise<{ txid: string; slot: number }>[] = []
 
   const breakEarlyObject = { breakEarly: false }

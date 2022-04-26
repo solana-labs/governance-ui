@@ -1,20 +1,25 @@
 import React from 'react'
 import useRealm from 'hooks/useRealm'
-import { CogIcon, UsersIcon } from '@heroicons/react/outline'
+import { ChartPieIcon, CogIcon, UsersIcon } from '@heroicons/react/outline'
 import { ChevronLeftIcon, BadgeCheckIcon } from '@heroicons/react/solid'
 import Link from 'next/link'
 import useQueryContext from 'hooks/useQueryContext'
 import { ExternalLinkIcon } from '@heroicons/react/outline'
 import { getRealmExplorerHost } from 'tools/routing'
 import Tooltip from './Tooltip'
-import useMembers from './Members/useMembers'
+import useMembersStore from 'stores/useMembersStore'
+import { vsrPluginsPks } from '@hooks/useVotingPlugins'
 
 const RealmHeader = () => {
   const { fmtUrlWithCluster } = useQueryContext()
-  const { realm, realmInfo, realmDisplayName, symbol } = useRealm()
+  const { realm, realmInfo, realmDisplayName, symbol, config } = useRealm()
   const { REALM } = process.env
-  const { activeMembers } = useMembers()
-
+  const activeMembers = useMembersStore((s) => s.compact.activeMembers)
+  const isLockTokensMode =
+    config?.account.communityVoterWeightAddin &&
+    vsrPluginsPks.includes(
+      config?.account.communityVoterWeightAddin?.toBase58()
+    )
   const isBackNavVisible = realmInfo?.symbol !== REALM // hide backnav for the default realm
 
   const explorerHost = getRealmExplorerHost(realmInfo)
@@ -69,6 +74,14 @@ const RealmHeader = () => {
               <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
                 <UsersIcon className="flex-shrink-0 h-5 mr-1 w-5" />
                 Members ({activeMembers.length})
+              </a>
+            </Link>
+          )}
+          {isLockTokensMode && symbol === 'MNGO' && (
+            <Link href={fmtUrlWithCluster(`/dao/${symbol}/token-stats`)}>
+              <a className="default-transition flex items-center cursor-pointer text-fgd-2 hover:text-fgd-3 text-sm">
+                <ChartPieIcon className="flex-shrink-0 h-5 mr-1 w-5" />
+                MNGO stats
               </a>
             </Link>
           )}

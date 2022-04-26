@@ -71,7 +71,7 @@ const NftBalanceCard = () => {
 
     await sendTransaction({
       transaction: transaction,
-      wallet,
+      wallet: wallet!,
       connection: connection.current,
       signers: [],
       sendingMessage: `Registering`,
@@ -128,7 +128,7 @@ const NftBalanceCard = () => {
             onNftSelect={() => {
               return null
             }}
-            ownerPk={wallet!.publicKey!}
+            ownersPk={[wallet!.publicKey!]}
             nftHeight="50px"
             nftWidth="50px"
             selectable={false}
@@ -140,7 +140,7 @@ const NftBalanceCard = () => {
       </div>
       {connected && !ownTokenRecord && (
         <Button className="w-full" onClick={handleRegister}>
-          Register
+          Join
         </Button>
       )}
     </div>

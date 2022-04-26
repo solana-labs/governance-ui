@@ -74,7 +74,7 @@ const CreateRefForm = ({
       transaction.add(instruction)
       await sendTransaction({
         transaction,
-        wallet,
+        wallet: wallet!,
         connection: connection.current,
         signers,
         sendingMessage: 'Creating ref link',

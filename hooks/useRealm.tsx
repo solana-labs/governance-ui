@@ -31,8 +31,6 @@ export default function useRealm() {
     mint,
     councilMint,
     governances,
-    tokenMints,
-    tokenAccounts: realmTokenAccounts,
     proposals,
     tokenRecords,
     councilTokenOwnerRecords,
@@ -45,7 +43,9 @@ export default function useRealm() {
   useMemo(async () => {
     let realmInfo = isPublicKey(symbol as string)
       ? realm
-        ? createUnchartedRealmInfo(realm)
+        ? // Realm program data needs to contain config options to enable/disable things such as notifications
+          // Currently defaulting to false here for now
+          createUnchartedRealmInfo(realm)
         : undefined
       : getCertifiedRealmInfo(symbol as string, connection)
 
@@ -130,8 +130,6 @@ export default function useRealm() {
     mint,
     councilMint,
     governances,
-    realmTokenAccounts,
-    tokenMints,
     proposals,
     tokenRecords,
     realmTokenAccount,

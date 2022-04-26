@@ -7,21 +7,21 @@ import BaseAccountHeader from './BaseAccountHeader'
 
 const AccountHeader = () => {
   const currentAccount = useTreasuryAccountStore((s) => s.currentAccount)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
   const nftsCount =
     currentAccount?.governance && currentAccount.isNft
-      ? governanceNfts[currentAccount?.governance?.pubkey.toBase58()]?.length
+      ? nftsPerPubkey[currentAccount?.governance?.pubkey.toBase58()]?.length
       : 0
   const isNFT = currentAccount?.isNft
   const tokenInfo = useTreasuryAccountStore((s) => s.tokenInfo)
   const amount =
-    currentAccount && currentAccount.mint?.account
+    currentAccount && currentAccount.extensions.mint?.account
       ? getMintDecimalAmountFromNatural(
-          currentAccount.mint?.account,
+          currentAccount.extensions.mint?.account,
           new BN(
             !currentAccount.isSol
-              ? currentAccount.token!.account.amount
-              : currentAccount.solAccount!.lamports
+              ? currentAccount.extensions.token!.account.amount
+              : currentAccount.extensions.solAccount!.lamports
           )
         ).toNumber()
       : 0

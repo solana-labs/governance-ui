@@ -1,30 +1,43 @@
 import { PublicKey } from '@solana/web3.js'
-import { GovernedTokenAccount } from '@utils/tokens'
 import { abbreviateAddress } from '@utils/formatting'
 import useWalletStore from '../../stores/useWalletStore'
 import useTreasuryAccountStore from 'stores/useTreasuryAccountStore'
+import { AssetAccount } from '@utils/uiTypes/assets'
+import tokenService from '@utils/services/token'
+import { WSOL_MINT } from '@components/instructions/tools'
 const AccountItemNFT = ({
   governedAccountTokenAccount,
   className,
   onClick,
   border = false,
 }: {
-  governedAccountTokenAccount: GovernedTokenAccount
+  governedAccountTokenAccount: AssetAccount
   className?: string
   onClick?: () => void
   border?: boolean
 }) => {
   const connection = useWalletStore((s) => s.connection)
-  const governanceNfts = useTreasuryAccountStore((s) => s.governanceNfts)
+  const nftsPerPubkey = useTreasuryAccountStore((s) => s.nftsPerPubkey)
   const { setCurrentAccount } = useTreasuryAccountStore()
 
   const accountPublicKey = governedAccountTokenAccount
-    ? governedAccountTokenAccount.governance?.pubkey
+    ? governedAccountTokenAccount.extensions.transferAddress
     : null
   //TODO move to outside component
   async function handleGoToAccountOverview() {
     setCurrentAccount(governedAccountTokenAccount, connection)
   }
+  const info = governedAccountTokenAccount.isSol
+    ? tokenService.getTokenInfo(WSOL_MINT)
+    : undefined
+  const nftsCount = governedAccountTokenAccount.isSol
+    ? nftsPerPubkey[governedAccountTokenAccount.governance.pubkey.toBase58()]
+        ?.length +
+      nftsPerPubkey[
+        governedAccountTokenAccount.extensions.transferAddress!.toBase58()
+      ]?.length
+    : nftsPerPubkey[governedAccountTokenAccount.governance.pubkey.toBase58()]
+        ?.length
   return (
     <div
       onClick={onClick ? onClick : handleGoToAccountOverview}
@@ -34,10 +47,18 @@ const AccountItemNFT = ({
         className && className
       }`}
     >
-      <img
-        src="/img/collectablesIcon.svg"
-        className="flex-shrink-0 h-5 w-5 mr-2.5"
-      />
+      {governedAccountTokenAccount.isSol ? (
+        <img
+          src={info?.logoURI}
+          className="flex-shrink-0 h-5 w-5 mr-2.5 rounded-full"
+        />
+      ) : (
+        <img
+          src="/img/collectablesIcon.svg"
+          className="flex-shrink-0 h-5 w-5 mr-2.5"
+        />
+      )}
+
       <div className="w-full">
         <div className="flex items-start justify-between mb-0.5">
           <div className="text-xs text-th-fgd-1">
@@ -45,12 +66,7 @@ const AccountItemNFT = ({
           </div>
         </div>
         <div className="text-fgd-3 text-xs flex flex-col">
-          {governedAccountTokenAccount.governance
-            ? governanceNfts[
-                governedAccountTokenAccount.governance?.pubkey.toBase58()
-              ]?.length
-            : 0}{' '}
-          NFTS
+          {governedAccountTokenAccount.governance ? nftsCount : 0} NFTS
         </div>
       </div>
     </div>

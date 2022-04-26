@@ -1,4 +1,4 @@
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import useRealm from '@hooks/useRealm'
 import {
   MintMaxVoteWeightSource,
@@ -9,15 +9,15 @@ import {
   getMintMinAmountAsDecimal,
 } from '@tools/sdk/units'
 import { precision } from '@utils/formatting'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import BigNumber from 'bignumber.js'
+import { AssetAccount } from '@utils/uiTypes/assets'
 import InstructionForm, {
   InstructionInput,
   InstructionInputType,
 } from '../instructions/FormCreator'
 
 export interface RealmConfigForm {
-  governedAccount: GovernedMultiTypeAccount | undefined
+  governedAccount: AssetAccount | undefined
   minCommunityTokensToCreateGovernance: number
   communityVoterWeightAddin: string
   removeCouncil: boolean
@@ -37,13 +37,13 @@ const RealmConfigFormComponent = ({
   setForm: React.Dispatch<React.SetStateAction<any>>
   setFormErrors: React.Dispatch<React.SetStateAction<any>>
   formErrors: any
-  governedAccount: GovernedMultiTypeAccount | null
+  governedAccount: AssetAccount | null
   shouldBeGoverned: boolean
   form: any
   hideGovSelector?: boolean
 }) => {
   const { realm, mint, realmInfo, councilMint, config } = useRealm()
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
   const minCommunity = mint ? getMintMinAmountAsDecimal(mint) : 0
   const minCommunityTokensToCreateProposal =
     realm && mint
@@ -92,7 +92,7 @@ const RealmConfigFormComponent = ({
       type: InstructionInputType.GOVERNED_ACCOUNT,
       shouldBeGoverned: shouldBeGoverned as any,
       governance: governedAccount?.governance,
-      options: governedMultiTypeAccounts.filter(
+      options: assetAccounts.filter(
         (x) =>
           x.governance.pubkey.toBase58() ===
           realm?.account.authority?.toBase58()
@@ -154,6 +154,7 @@ const RealmConfigFormComponent = ({
       hide: typeof councilMint === 'undefined',
     },
   ]
+
   return (
     <>
       {form && (

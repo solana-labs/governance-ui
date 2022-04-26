@@ -28,7 +28,8 @@ const NotificationList = () => {
 
   return (
     <div
-      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6 z-2000`}
+      style={{ zIndex: 99999 }}
+      className={`fixed inset-0 flex items-end px-4 py-6 pointer-events-none sm:p-6`}
     >
       <div className={`flex flex-col w-full`}>
         {notifications.map((n, idx) => (

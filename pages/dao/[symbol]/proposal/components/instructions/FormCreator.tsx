@@ -58,7 +58,7 @@ const InstructionForm = ({
     setInnerForm({
       ...inputs.reduce((a, v) => ({ ...a, [v.name]: v.initialValue }), {}),
     })
-  }, [])
+  }, [JSON.stringify(inputs.map((x) => x.initialValue))])
   return (
     <>
       {inputs
@@ -98,6 +98,7 @@ const InstructionInput = ({
       case InstructionInputType.GOVERNED_ACCOUNT:
         return (
           <GovernedAccountSelect
+            autoselectFirst={false}
             label={input.label}
             governedAccounts={input.options!}
             onChange={(value) => {

@@ -21,7 +21,7 @@ const StyledAlertCount = styled.span`
   font-size: 0.6rem;
 `
 
-const ProposalFilter = ({ filters, setFilters }) => {
+const ProposalFilter = ({ disabled, filters, setFilters }) => {
   const [filterSettings, setFilterSettings] = useReducer(
     (state, newState) => ({ ...state, ...newState }),
     initialFilterSettings
@@ -48,11 +48,12 @@ const ProposalFilter = ({ filters, setFilters }) => {
       {({ open }) => (
         <>
           <Disclosure.Button
-            className={`bg-bkg-4 default-transition font-normal h-10 pl-3 pr-2 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none`}
+            className={`border border-fgd-3 default-transition font-normal h-10 pl-3 pr-2 rounded-md text-fgd-1 text-sm hover:bg-bkg-3 focus:outline-none disabled:cursor-not-allowed disabled:hover:bg-bkg-2 disabled:opacity-60`}
+            disabled={disabled}
           >
             {filters.length > 0 ? (
               <div className="absolute -top-3 -right-1.5 z-20">
-                <StyledAlertCount className="w-4 h-4 bg-red relative inline-flex rounded-full flex items-center justify-center">
+                <StyledAlertCount className="w-4 h-4 bg-red text-white relative inline-flex rounded-full flex items-center justify-center">
                   {filters.length}
                 </StyledAlertCount>
               </div>
@@ -60,7 +61,7 @@ const ProposalFilter = ({ filters, setFilters }) => {
             <div className="flex items-center justify-between">
               Filter
               <ChevronDownIcon
-                className={`default-transition h-5 w-5 ml-1 text-primary-light ${
+                className={`default-transition h-5 w-5 ml-1 text-fgd-2 ${
                   open ? 'transform rotate-180' : 'transform rotate-360'
                 }`}
               />

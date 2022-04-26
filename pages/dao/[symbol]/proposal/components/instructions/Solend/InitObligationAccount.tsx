@@ -7,7 +7,6 @@ import {
   serializeInstructionToBase64,
 } from '@solana/spl-governance'
 import { PublicKey } from '@solana/web3.js'
-import useGovernedMultiTypeAccounts from '@hooks/useGovernedMultiTypeAccounts'
 
 import useRealm from '@hooks/useRealm'
 import { initObligationAccount } from '@tools/sdk/solend/initObligationAccount'
@@ -21,6 +20,7 @@ import useWalletStore from 'stores/useWalletStore'
 
 import { NewProposalContext } from '../../../new'
 import GovernedAccountSelect from '../../GovernedAccountSelect'
+import useGovernanceAssets from '@hooks/useGovernanceAssets'
 
 const InitObligationAccount = ({
   index,
@@ -33,7 +33,7 @@ const InitObligationAccount = ({
   const wallet = useWalletStore((s) => s.current)
   const { realmInfo } = useRealm()
 
-  const { governedMultiTypeAccounts } = useGovernedMultiTypeAccounts()
+  const { assetAccounts } = useGovernanceAssets()
 
   // Hardcoded gate used to be clear about what cluster is supported for now
   if (connection.cluster !== 'mainnet') {
@@ -112,7 +112,7 @@ const InitObligationAccount = ({
   return (
     <GovernedAccountSelect
       label="Governance"
-      governedAccounts={governedMultiTypeAccounts}
+      governedAccounts={assetAccounts}
       onChange={(value) => {
         handleSetForm({ value, propertyName: 'governedAccount' })
       }}

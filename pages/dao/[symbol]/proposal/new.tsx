@@ -68,6 +68,8 @@ import MakeResolveMarketParams from './components/instructions/Foresight/MakeRes
 import MakeAddMarketListToCategoryParams from './components/instructions/Foresight/MakeAddMarketListToCategoryParams'
 import RealmConfig from './components/instructions/RealmConfig'
 import MakeAddMarketMetadataParams from './components/instructions/Foresight/MakeAddMarketMetadataParams'
+import CloseTokenAccount from './components/instructions/CloseTokenAccount'
+import { InstructionDataWithHoldUpTime } from 'actions/createProposal'
 
 const schema = yup.object().shape({
   title: yup.string().required('Title is required'),
@@ -99,10 +101,7 @@ const New = () => {
 
   const { getAvailableInstructions } = useGovernanceAssets()
   const availableInstructions = getAvailableInstructions()
-  const {
-    fetchRealmGovernance,
-    fetchTokenAccountsForSelectedRealmGovernances,
-  } = useWalletStore((s) => s.actions)
+  const { fetchRealmGovernance } = useWalletStore((s) => s.actions)
   const [voteByCouncil, setVoteByCouncil] = useState(false)
   const [form, setForm] = useState({
     title: '',
@@ -209,20 +208,45 @@ const New = () => {
         handleTurnOffLoaders()
         throw Error('No governance selected')
       }
-      const instructionsData = instructions.map((x) => {
-        return {
-          data: x.serializedInstruction
-            ? getInstructionDataFromBase64(x.serializedInstruction)
-            : null,
-          holdUpTime: x.customHoldUpTime
-            ? getTimestampFromDays(x.customHoldUpTime)
-            : selectedGovernance?.account?.config.minInstructionHoldUpTime,
-          prerequisiteInstructions: x.prerequisiteInstructions || [],
-          chunkSplitByDefault: x.chunkSplitByDefault || false,
-          signers: x.signers,
-          shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
-        }
-      })
+
+      const additionalInstructions = [
+        ...(instructions
+          .flatMap((instruction) => {
+            return instruction.additionalSerializedInstructions?.map((x) => {
+              return {
+                data: x ? getInstructionDataFromBase64(x) : null,
+                holdUpTime: instruction.customHoldUpTime
+                  ? getTimestampFromDays(instruction.customHoldUpTime)
+                  : selectedGovernance?.account?.config
+                      .minInstructionHoldUpTime,
+                prerequisiteInstructions: [],
+                chunkSplitByDefault: instruction.chunkSplitByDefault || false,
+                signers: instruction.signers,
+                shouldSplitIntoSeparateTxs:
+                  instruction.shouldSplitIntoSeparateTxs,
+              }
+            })
+          })
+          .filter((x) => x) as InstructionDataWithHoldUpTime[]),
+      ]
+
+      const instructionsData = [
+        ...additionalInstructions,
+        ...instructions.map((x) => {
+          return {
+            data: x.serializedInstruction
+              ? getInstructionDataFromBase64(x.serializedInstruction)
+              : null,
+            holdUpTime: x.customHoldUpTime
+              ? getTimestampFromDays(x.customHoldUpTime)
+              : selectedGovernance?.account?.config.minInstructionHoldUpTime,
+            prerequisiteInstructions: x.prerequisiteInstructions || [],
+            chunkSplitByDefault: x.chunkSplitByDefault || false,
+            signers: x.signers,
+            shouldSplitIntoSeparateTxs: x.shouldSplitIntoSeparateTxs,
+          }
+        }),
+      ]
 
       try {
         // Fetch governance to get up to date proposalCount
@@ -263,11 +287,6 @@ const New = () => {
 
     setGovernance(governedAccount)
   }, [instructionsData])
-
-  useEffect(() => {
-    //fetch to be up to date with amounts
-    fetchTokenAccountsForSelectedRealmGovernances()
-  }, [])
 
   const getCurrentInstruction = ({ typeId, idx }) => {
     switch (typeId) {
@@ -433,6 +452,13 @@ const New = () => {
         return <Grant index={idx} governance={governance}></Grant>
       case Instructions.Clawback:
         return <Clawback index={idx} governance={governance}></Clawback>
+      case Instructions.CloseTokenAccount:
+        return (
+          <CloseTokenAccount
+            index={idx}
+            governance={governance}
+          ></CloseTokenAccount>
+        )
       default:
         null
     }
@@ -504,7 +530,7 @@ const New = () => {
                 setGovernance,
               }}
             >
-              <h2>Instructions</h2>
+              <h2>Transactions</h2>
               {instructionsData.map((instruction, idx) => {
                 const availableInstructionsForIdx = getAvailableInstructionsForIndex(
                   idx
@@ -522,7 +548,7 @@ const New = () => {
                           ? 'Select instruction'
                           : 'No available instructions'
                       }`}
-                      label={`Instruction ${idx + 1}`}
+                      label={`Transaction ${idx + 1}`}
                       onChange={(value) => setInstructionType({ value, idx })}
                       value={instruction.type?.name}
                     >
@@ -562,7 +588,7 @@ const New = () => {
                 onClick={addInstruction}
               >
                 <PlusCircleIcon className="h-5 mr-1.5 text-green w-5" />
-                Add instruction
+                Add transaction
               </LinkButton>
             </div>
             <div className="border-t border-fgd-4 flex justify-end mt-6 pt-6 space-x-4">

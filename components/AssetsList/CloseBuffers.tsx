@@ -16,7 +16,7 @@ import { notify } from 'utils/notifications'
 import useQueryContext from 'hooks/useQueryContext'
 import { validateInstruction } from 'utils/instructionTools'
 import * as yup from 'yup'
-import { BPF_UPGRADE_LOADER_ID, GovernedProgramAccount } from '@utils/tokens'
+import { BPF_UPGRADE_LOADER_ID } from '@utils/tokens'
 import Loading from '@components/Loading'
 import useCreateProposal from '@hooks/useCreateProposal'
 import { getExplorerUrl } from '@components/explorer/tools'
@@ -25,9 +25,10 @@ import { createCloseBuffer } from '@tools/sdk/bpfUpgradeableLoader/createCloseBu
 import { abbreviateAddress } from '@utils/formatting'
 import useGovernanceAssets from '@hooks/useGovernanceAssets'
 import { Governance, ProgramAccount } from '@solana/spl-governance'
+import { AssetAccount } from '@utils/uiTypes/assets'
 
 interface CloseBuffersForm {
-  governedAccount: GovernedProgramAccount | undefined
+  governedAccount: AssetAccount | undefined
   programId: string | undefined
   solReceiverAddress: string
   description: string
@@ -36,13 +37,16 @@ interface CloseBuffersForm {
 
 const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const { handleCreateProposal } = useCreateProposal()
-  const { governedTokenAccountsWithoutNfts } = useGovernanceAssets()
+  const {
+    governedTokenAccountsWithoutNfts,
+    assetAccounts,
+  } = useGovernanceAssets()
   const router = useRouter()
   const connection = useWalletStore((s) => s.connection)
   const wallet = useWalletStore((s) => s.current)
-  const governedAccount = {
-    governance: program!,
-  }
+  const governedAccount = assetAccounts.find(
+    (x) => x.governance.pubkey.toBase58() === program.pubkey.toBase58()
+  )
   const { fmtUrlWithCluster } = useQueryContext()
   const { symbol } = router.query
   const { realmInfo, canChooseWhoVote, realm } = useRealm()
@@ -57,7 +61,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
   const highestLampartsAmountInGovernedTokenAccounts = Math.max(
     ...governedTokenAccountsWithoutNfts
       .filter((x) => x.isSol)
-      .map((x) => x.solAccount!.lamports)
+      .map((x) => x.extensions!.solAccount!.lamports)
   )
   const solAccounts = governedTokenAccountsWithoutNfts.filter((x) => x.isSol)
   const [form, setForm] = useState<CloseBuffersForm>({
@@ -67,10 +71,10 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
       ? solAccounts
           .find(
             (x) =>
-              x.solAccount?.lamports ===
+              x.extensions.solAccount?.lamports ===
               highestLampartsAmountInGovernedTokenAccounts
           )!
-          .transferAddress!.toBase58()
+          .extensions.transferAddress!.toBase58()
       : wallet?.publicKey?.toBase58()
       ? wallet?.publicKey?.toBase58()
       : '',
@@ -244,7 +248,7 @@ const CloseBuffers = ({ program }: { program: ProgramAccount<Governance> }) => {
                 <a
                   className="default-transition flex items-center text-fgd-1 hover:text-fgd-3 text-xs"
                   key={x.pubkey.toBase58()}
-                  href={getExplorerUrl(connection.endpoint, x.pubkey)}
+                  href={getExplorerUrl(connection.cluster, x.pubkey)}
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={(e) => e.stopPropagation()}

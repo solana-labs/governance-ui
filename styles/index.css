@@ -5,24 +5,45 @@
 /* Theme */
 
 :root {
-  --primary-light: theme('colors.sierra-theme.primary.light');
-  --primary-dark: theme('colors.sierra-theme.primary.dark');
-  --secondary-1: theme('colors.sierra-theme["secondary-1"].light');
-  --secondary-1-dark: theme('colors.sierra-theme["secondary-1"].dark');
-  --secondary-2: theme('colors.sierra-theme["secondary-2"].light');
-  --secondary-2-dark: theme('colors.sierra-theme["secondary-2"].dark');
-  --red: theme('colors.sierra-theme.red');
-  --green: theme('colors.sierra-theme.green');
-  --orange: theme('colors.sierra-theme.orange');
-  --blue: theme('colors.sierra-theme.blue');
-  --bkg-1: theme('colors.sierra-theme["bkg-1"]');
-  --bkg-2: theme('colors.sierra-theme["bkg-2"]');
-  --bkg-3: theme('colors.sierra-theme["bkg-3"]');
-  --bkg-4: theme('colors.sierra-theme["bkg-4"]');
-  --fgd-1: theme('colors.sierra-theme["fgd-1"]');
-  --fgd-2: theme('colors.sierra-theme["fgd-2"]');
-  --fgd-3: theme('colors.sierra-theme["fgd-3"]');
-  --fgd-4: theme('colors.sierra-theme["fgd-4"]');
+  --primary-light: theme('colors.dark-theme.primary.light');
+  --primary-dark: theme('colors.dark-theme.primary.dark');
+  --secondary-1-light: theme('colors.dark-theme.secondary-1.light');
+  --secondary-1-dark: theme('colors.dark-theme.secondary-1.dark');
+  --secondary-2-light: theme('colors.dark-theme.secondary-2.light');
+  --secondary-2-dark: theme('colors.dark-theme.secondary-2.dark');
+  --red: theme('colors.dark-theme.red');
+  --green: theme('colors.dark-theme.green');
+  --orange: theme('colors.dark-theme.orange');
+  --blue: theme('colors.dark-theme.blue');
+  --bkg-1: theme('colors.dark-theme.bkg-1');
+  --bkg-2: theme('colors.dark-theme.bkg-2');
+  --bkg-3: theme('colors.dark-theme.bkg-3');
+  --bkg-4: theme('colors.dark-theme.bkg-4');
+  --fgd-1: theme('colors.dark-theme.fgd-1');
+  --fgd-2: theme('colors.dark-theme.fgd-2');
+  --fgd-3: theme('colors.dark-theme.fgd-3');
+  --fgd-4: theme('colors.dark-theme.fgd-4');
+}
+
+[data-theme='Light'] {
+  --primary-light: theme('colors.light-theme.primary.light');
+  --primary-dark: theme('colors.light-theme.primary.dark');
+  --secondary-1-light: theme('colors.light-theme.secondary-1.light');
+  --secondary-1-dark: theme('colors.light-theme.secondary-1.dark');
+  --secondary-2-light: theme('colors.light-theme.secondary-2.light');
+  --secondary-2-dark: theme('colors.light-theme.secondary-2.dark');
+  --red: theme('colors.light-theme.red');
+  --green: theme('colors.light-theme.green');
+  --orange: theme('colors.light-theme.orange');
+  --blue: theme('colors.light-theme.blue');
+  --bkg-1: theme('colors.light-theme.bkg-1');
+  --bkg-2: theme('colors.light-theme.bkg-2');
+  --bkg-3: theme('colors.light-theme.bkg-3');
+  --bkg-4: theme('colors.light-theme.bkg-4');
+  --fgd-1: theme('colors.light-theme.fgd-1');
+  --fgd-2: theme('colors.light-theme.fgd-2');
+  --fgd-3: theme('colors.light-theme.fgd-3');
+  --fgd-4: theme('colors.light-theme.fgd-4');
 }
 
 /* base */
@@ -53,6 +74,10 @@ h4 {
 
 p {
   @apply break-words leading-normal text-fgd-2 text-sm;
+}
+
+tbody {
+  @apply border-t border-bkg-4;
 }
 
 .hero-text {

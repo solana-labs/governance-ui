@@ -35,7 +35,9 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
     setIsLoading(true)
     setSendingSuccess(false)
     try {
-      const governance = currentAccount!.governance!.pubkey
+      const owner = currentAccount?.isSol
+        ? currentAccount.extensions.transferAddress!
+        : currentAccount!.governance!.pubkey
       const ConnectedWalletAddress = wallet?.publicKey
       const selectedNft = selectedNfts[0]
       const nftMintPk = new PublicKey(selectedNft.mint)
@@ -47,23 +49,24 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       const fromAddress = tokenAccountsWithNftMint.find(
         (x) => x.account.owner.toBase58() === ConnectedWalletAddress?.toBase58()
       )?.publicKey
-      //we check is there ata created for nft before inside governance
-      const isAtaForGovernanceExist = tokenAccountsWithNftMint.find(
-        (x) => x.account.owner.toBase58() === governance.toBase58()
+      //we check is there ata created for nft before
+      const doseAtaForReciverAddressExisit = tokenAccountsWithNftMint.find(
+        (x) => x.account.owner.toBase58() === owner.toBase58()
       )
 
       const ataPk = await Token.getAssociatedTokenAddress(
         ASSOCIATED_TOKEN_PROGRAM_ID, // always ASSOCIATED_TOKEN_PROGRAM_ID
         TOKEN_PROGRAM_ID, // always TOKEN_PROGRAM_ID
         nftMintPk, // mint
-        governance! // owner
+        owner!, // owner
+        true
       )
-      if (!isAtaForGovernanceExist) {
+      if (!doseAtaForReciverAddressExisit) {
         await createATA(
           connection.current,
           wallet,
           nftMintPk,
-          governance,
+          owner!,
           wallet!.publicKey!
         )
       }
@@ -79,7 +82,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       )
       await sendTransaction({
         connection: connection.current,
-        wallet,
+        wallet: wallet!,
         transaction,
         sendingMessage: 'Depositing NFT',
         successMessage: 'NFT has been deposited',
@@ -111,7 +114,7 @@ const DepositNFTFromWallet = ({ additionalBtns }: { additionalBtns?: any }) => {
       ></NFTAccountSelect>
       <NFTSelector
         ref={nftSelectorRef}
-        ownerPk={wallet!.publicKey!}
+        ownersPk={[wallet!.publicKey!]}
         onNftSelect={(selected) => setSelectedNfts(selected)}
       ></NFTSelector>
       <div className="flex flex-col sm:flex-row sm:space-x-4 space-y-4 sm:space-y-0">

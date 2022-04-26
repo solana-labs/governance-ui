@@ -5,7 +5,6 @@ import { getMintMinAmountAsDecimal } from '@tools/sdk/units'
 import { PublicKey } from '@solana/web3.js'
 import { precision } from '@utils/formatting'
 import useWalletStore from 'stores/useWalletStore'
-import { GovernedMultiTypeAccount } from '@utils/tokens'
 import {
   FriktionWithdrawForm,
   UiInstruction,
@@ -120,7 +119,7 @@ const FriktionWithdraw = ({
   }, [form])
   useEffect(() => {
     setGovernedAccount(form.governedTokenAccount?.governance)
-    setMintInfo(form.governedTokenAccount?.mint?.account)
+    setMintInfo(form.governedTokenAccount?.extensions.mint?.account)
   }, [form.governedTokenAccount])
   const schema = getFriktionWithdrawSchema()
 
@@ -128,9 +127,7 @@ const FriktionWithdraw = ({
     <>
       <GovernedAccountSelect
         label="Source account"
-        governedAccounts={
-          governedTokenAccountsWithoutNfts as GovernedMultiTypeAccount[]
-        }
+        governedAccounts={governedTokenAccountsWithoutNfts}
         onChange={(value) => {
           handleSetForm({ value, propertyName: 'governedTokenAccount' })
         }}
