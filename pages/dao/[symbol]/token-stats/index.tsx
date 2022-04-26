@@ -123,14 +123,14 @@ const LockTokenStats = () => {
       x.extensions.mint?.publicKey.toBase58() ===
       realm?.account.communityMint.toBase58()
   )
-  const circulatingSupply =
-    mngoValut && mint
-      ? mint.supply.sub(mngoValut.extensions.amount!)
-      : new BN(0)
   const mngoLocked = depositsWithWallets.reduce(
     (acc, curr) => acc.add(curr.deposit.amountDepositedNative),
     new BN(0)
   )
+  const circulatingSupply =
+    mngoValut && mint
+      ? mint.supply.sub(mngoValut.extensions.amount!).sub(mngoLocked)
+      : new BN(0)
   const mngoLockedWithClawback = depositsWithWallets
     .filter((x) => x.deposit.allowClawback)
     .reduce(
