@@ -76,7 +76,7 @@ export const getProposalsTransactions = async (
       const getSchema = getGovernanceSchemaForAccount
       const data = Buffer.from(rawAccount.account.data[0], 'base64')
       const accountTypes = getAccountTypes(
-        (ProposalTransaction as any) as GovernanceAccountClass
+        ProposalTransaction as any as GovernanceAccountClass
       )
       const account: ProgramAccount<ProposalTransaction> = {
         pubkey: new PublicKey(rawAccount.pubkey),

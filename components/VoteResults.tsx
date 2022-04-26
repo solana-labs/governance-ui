@@ -8,12 +8,8 @@ type VoteResultsProps = {
 }
 
 const VoteResults = ({ isListView, proposal }: VoteResultsProps) => {
-  const {
-    yesVoteCount,
-    noVoteCount,
-    relativeNoVotes,
-    relativeYesVotes,
-  } = useProposalVotes(proposal)
+  const { yesVoteCount, noVoteCount, relativeNoVotes, relativeYesVotes } =
+    useProposalVotes(proposal)
   return (
     <div className="flex space-x-4 items-center">
       {proposal ? (

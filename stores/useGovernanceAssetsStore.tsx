@@ -316,20 +316,20 @@ const getSolAccountObj = async (
   solAcc: SolAccInfo
 ) => {
   if (solAcc.acc) {
-    const tokenAccountsOwnedBySolAccountInfo = await connection.current.getTokenAccountsByOwner(
-      solAcc.nativeSolAddress,
-      {
-        programId: TOKEN_PROGRAM_ID,
-      }
-    )
-    const tokenAccountsOwnedBySolAccounts = tokenAccountsOwnedBySolAccountInfo.value.map(
-      (x) => {
+    const tokenAccountsOwnedBySolAccountInfo =
+      await connection.current.getTokenAccountsByOwner(
+        solAcc.nativeSolAddress,
+        {
+          programId: TOKEN_PROGRAM_ID,
+        }
+      )
+    const tokenAccountsOwnedBySolAccounts =
+      tokenAccountsOwnedBySolAccountInfo.value.map((x) => {
         const publicKey = x.pubkey
         const data = Buffer.from(x.account.data)
         const account = parseTokenAccountData(publicKey, data)
         return { publicKey, account }
-      }
-    )
+      })
 
     const mintAccounts = tokenAccountsOwnedBySolAccounts.length
       ? await getMintAccountsInfo(
@@ -343,9 +343,8 @@ const getSolAccountObj = async (
         accounts.push(account)
       }
     }
-    const minRentAmount = await connection.current.getMinimumBalanceForRentExemption(
-      0
-    )
+    const minRentAmount =
+      await connection.current.getMinimumBalanceForRentExemption(0)
     const solAccount = solAcc.acc as AccountInfoGen<Buffer | ParsedAccountData>
     solAccount.lamports =
       solAccount.lamports !== 0

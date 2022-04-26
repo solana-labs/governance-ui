@@ -109,15 +109,16 @@ const CloseTokenAccount = ({
       wallet?.publicKey &&
       realm
     ) {
-      instructions = !form!.governedAccount.extensions.token!.account.amount?.isZero()
-        ? await getTransferInstructionObj({
-            connection: connection,
-            governedTokenAccount: form!.governedAccount!,
-            amount: form!.governedAccount.extensions.token!.account.amount!,
-            destinationAccount: form!.fundsDestinationAccount!,
-            wallet: wallet,
-          })
-        : null
+      instructions =
+        !form!.governedAccount.extensions.token!.account.amount?.isZero()
+          ? await getTransferInstructionObj({
+              connection: connection,
+              governedTokenAccount: form!.governedAccount!,
+              amount: form!.governedAccount.extensions.token!.account.amount!,
+              destinationAccount: form!.fundsDestinationAccount!,
+              wallet: wallet,
+            })
+          : null
       const closeInstruction = Token.createCloseAccountInstruction(
         TOKEN_PROGRAM_ID,
         form!.governedAccount.extensions.token!.publicKey!,
@@ -128,9 +129,8 @@ const CloseTokenAccount = ({
       serializedTransfer = instructions?.transferInstruction
         ? serializeInstructionToBase64(instructions?.transferInstruction)
         : ''
-      serializedInstructionClose = serializeInstructionToBase64(
-        closeInstruction
-      )
+      serializedInstructionClose =
+        serializeInstructionToBase64(closeInstruction)
     }
     const obj: UiInstruction = {
       prerequisiteInstructions: [],

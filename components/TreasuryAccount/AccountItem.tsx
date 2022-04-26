@@ -5,13 +5,8 @@ const AccountItem = ({
 }: {
   governedAccountTokenAccount: AssetAccount
 }) => {
-  const {
-    amountFormatted,
-    logo,
-    name,
-    symbol,
-    displayPrice,
-  } = getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
+  const { amountFormatted, logo, name, symbol, displayPrice } =
+    getTreasuryAccountItemInfoV2(governedAccountTokenAccount)
   return (
     <div className="flex items-center text-fgd-1 border border-fgd-4 p-3 rounded-lg w-full">
       {logo && (

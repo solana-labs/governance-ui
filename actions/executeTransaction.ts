@@ -76,7 +76,7 @@ export const executeTransaction = async (
         { transaction: proposalTransaction },
         { transaction: adjacentTransaction },
       ],
-      wallet: (wallet as unknown) as Wallet,
+      wallet: wallet as unknown as Wallet,
       connection,
     })
     // Send proposal transaction with prepended adjacent transaction

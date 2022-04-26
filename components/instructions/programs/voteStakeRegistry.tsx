@@ -157,8 +157,10 @@ export const VOTE_STAKE_REGISTRY_INSTRUCTIONS = {
               <div>
                 Max multiplier:{' '}
                 {calcMultiplier({
-                  depositScaledFactor: baselineVoteWeightScaledFactor.toNumber(),
-                  maxExtraLockupVoteWeightScaledFactor: maxExtraLockupVoteWeightScaledFactor.toNumber(),
+                  depositScaledFactor:
+                    baselineVoteWeightScaledFactor.toNumber(),
+                  maxExtraLockupVoteWeightScaledFactor:
+                    maxExtraLockupVoteWeightScaledFactor.toNumber(),
                   lockupSaturationSecs: lockupSaturationSecs.toNumber(),
                   lockupSecs: lockupSaturationSecs.toNumber(),
                 })}

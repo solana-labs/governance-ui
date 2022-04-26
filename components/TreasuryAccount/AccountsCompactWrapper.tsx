@@ -15,10 +15,8 @@ import useGovernanceAssetsStore from 'stores/useGovernanceAssetsStore'
 import Loading from '@components/Loading'
 
 const AccountsCompactWrapper = () => {
-  const {
-    governedTokenAccountsWithoutNfts,
-    auxiliaryTokenAccounts,
-  } = useGovernanceAssets()
+  const { governedTokenAccountsWithoutNfts, auxiliaryTokenAccounts } =
+    useGovernanceAssets()
   const accounts = [
     ...governedTokenAccountsWithoutNfts,
     ...auxiliaryTokenAccounts,

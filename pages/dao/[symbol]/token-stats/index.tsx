@@ -83,10 +83,8 @@ const LockTokenStats = () => {
     DepoistWithVoter[]
   >([])
   const [unlockedFromGrants, setUnlockedFromGrants] = useState(new BN(0))
-  const [
-    liquidityMiningEmissionPerMonth,
-    setLiqudiityMiningEmissionPerMonth,
-  ] = useState(new BN(0))
+  const [liquidityMiningEmissionPerMonth, setLiqudiityMiningEmissionPerMonth] =
+    useState(new BN(0))
   const [vestPerMonthStats, setVestPerMonthStats] = useState<{
     [key: string]: { vestingDate: dayjs.Dayjs; vestingAmount: BN }[]
   }>({})
@@ -165,9 +163,10 @@ const LockTokenStats = () => {
         const vestingCount = Math.ceil(
           dayjs(unixLockupEnd).diff(unixLockupStart, 'month', true)
         )
-        const vestingAmount = depositWithWallet.deposit.amountInitiallyLockedNative.divn(
-          vestingCount
-        )
+        const vestingAmount =
+          depositWithWallet.deposit.amountInitiallyLockedNative.divn(
+            vestingCount
+          )
         for (let i = 1; i <= vestingCount; i++) {
           const nextVestinDays = i * DAYS_PER_MONTH
           const vestingDate = dayjs(unixLockupStart).add(nextVestinDays, 'day')

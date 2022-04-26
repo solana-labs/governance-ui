@@ -66,8 +66,8 @@ const DepositCard = ({ deposit }: { deposit: DepositWithMintAccount }) => {
       amount: depositEntry.available,
       communityMintPk: realm!.account.communityMint,
       closeDepositAfterOperation: depositEntry.currentlyLocked.isZero(),
-      tokenOwnerRecordPubKey: tokenRecords[wallet!.publicKey!.toBase58()]
-        .pubkey!,
+      tokenOwnerRecordPubKey:
+        tokenRecords[wallet!.publicKey!.toBase58()].pubkey!,
       depositIndex: depositEntry.index,
       client: client,
     })

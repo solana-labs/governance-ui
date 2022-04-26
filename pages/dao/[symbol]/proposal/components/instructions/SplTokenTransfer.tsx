@@ -49,10 +49,8 @@ const SplTokenTransfer = ({
   const [governedAccount, setGovernedAccount] = useState<
     ProgramAccount<Governance> | undefined
   >(undefined)
-  const [
-    destinationAccount,
-    setDestinationAccount,
-  ] = useState<TokenProgramAccount<AccountInfo> | null>(null)
+  const [destinationAccount, setDestinationAccount] =
+    useState<TokenProgramAccount<AccountInfo> | null>(null)
   const [formErrors, setFormErrors] = useState({})
   const mintMinAmount = form.mintInfo
     ? getMintMinAmountAsDecimal(form.mintInfo)
