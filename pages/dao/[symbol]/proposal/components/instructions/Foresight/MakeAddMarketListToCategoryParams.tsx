@@ -3,7 +3,10 @@ import React from 'react'
 import { ForesightMakeAddMarketListToCategoryParams } from '@utils/uiTypes/proposalCreationTypes'
 import { Governance } from '@solana/spl-governance'
 import { ProgramAccount } from '@solana/spl-governance'
-import { governance as foresightGov } from '@foresight-tmp/foresight-sdk'
+import {
+  governance as foresightGov,
+  consts,
+} from '@foresight-tmp/foresight-sdk'
 import {
   commonAssets,
   ForesightCategoryIdInput,
@@ -28,14 +31,11 @@ function MakeAddMarketListToCategoryParams({
     index,
     governance
   )
-  async function ixCreator(
-    form: ForesightMakeAddMarketListToCategoryParams,
-    programId: PublicKey
-  ) {
+  async function ixCreator(form: ForesightMakeAddMarketListToCategoryParams) {
     const { ix } = await foresightGov.genAddMarketListToCategoryIx(
       Buffer.from(form.categoryId.padEnd(20)),
       Buffer.from(form.marketListId.padEnd(20)),
-      programId,
+      new PublicKey(consts.DEVNET_PID),
       wallet!.publicKey!
     )
     return ix

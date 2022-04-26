@@ -7,6 +7,7 @@ import {
   governance as foresightGov,
   consts as foresightConsts,
   utils,
+  consts,
 } from '@foresight-tmp/foresight-sdk'
 import {
   commonAssets,
@@ -41,17 +42,14 @@ const MakeAddMarketMetadataParams = ({
     index,
     governance
   )
-  async function ixCreator(
-    form: ForesightMakeAddMarketMetadataParams,
-    programId: PublicKey
-  ) {
+  async function ixCreator(form: ForesightMakeAddMarketMetadataParams) {
     const field = foresightConsts.MARKET_METADATA_FIELDS[form.field]
     const { ix } = await foresightGov.genWriteToFieldMarketMetadataIx(
       utils.intToArray(form.marketId, 1),
       Buffer.from(form.marketListId.padEnd(20)),
       form.content,
       new field(),
-      programId,
+      new PublicKey(consts.DEVNET_PID),
       wallet!.publicKey!
     )
     return ix

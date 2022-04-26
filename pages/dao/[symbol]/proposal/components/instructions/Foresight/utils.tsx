@@ -91,8 +91,7 @@ function makeHandleSetFormWithErrors<T extends ForesightHasGovernedAccount>(
 type GetInstruction = () => Promise<UiInstruction>
 
 type IxCreator<T extends ForesightHasGovernedAccount> = (
-  form: T,
-  programId: PublicKey
+  form: T
 ) => Promise<TransactionInstruction>
 
 function makeGetInstruction<T extends ForesightHasGovernedAccount>(
@@ -112,7 +111,7 @@ function makeGetInstruction<T extends ForesightHasGovernedAccount>(
     const isValid = await validateInstruction()
     let serializedInstruction = ''
     if (isValid && programId && wallet?.publicKey) {
-      const ix = await ixCreator(form, programId)
+      const ix = await ixCreator(form)
       serializedInstruction = serializeInstructionToBase64(ix)
     }
     return getUiInstruction(serializedInstruction, isValid, form)
