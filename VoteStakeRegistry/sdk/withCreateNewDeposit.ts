@@ -11,7 +11,6 @@ import {
   Token,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token'
-import { BN } from '@project-serum/anchor'
 import {
   getRegistrarPDA,
   getVoterPDA,
@@ -133,11 +132,11 @@ export const withCreateNewDeposit = async ({
   if (createNewDeposit) {
     //in case we do monthly close up we pass months not days.
     const period = getPeriod(lockUpPeriodInDays, lockupKind)
-    const startTime = new BN(new Date().getTime() / 1000)
     const createDepositEntryInstruction = client?.program.instruction.createDepositEntry(
       firstFreeIdx,
       { [lockupKind]: {} },
-      startTime,
+      //lockup starts now
+      null,
       period,
       allowClawback,
       {

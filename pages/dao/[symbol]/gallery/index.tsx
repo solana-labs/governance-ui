@@ -155,7 +155,7 @@ const gallery = () => {
                   key={idx}
                   href={
                     connection.endpoint && x.mint
-                      ? getExplorerUrl(connection.endpoint, x.mint)
+                      ? getExplorerUrl(connection.cluster, x.mint)
                       : ''
                   }
                   target="_blank"

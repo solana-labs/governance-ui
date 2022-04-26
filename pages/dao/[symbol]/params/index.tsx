@@ -30,9 +30,8 @@ const Params = () => {
     (s) => s.loadGovernedAccounts
   )
 
-  const realmAuthorityGovernance = assetAccounts.find(
-    (x) =>
-      x.governance.pubkey.toBase58() === realm?.account.authority?.toBase58()
+  const realmAuthorityGovernance = governancesArray.find(
+    (x) => x.pubkey.toBase58() === realm?.account.authority?.toBase58()
   )
   const [isRealmProposalModalOpen, setIsRealmProposalModalOpen] = useState(
     false

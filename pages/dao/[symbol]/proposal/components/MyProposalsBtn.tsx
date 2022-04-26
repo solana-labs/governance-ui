@@ -169,7 +169,7 @@ const MyProposalsBn = () => {
           : ownCouncilTokenRecord
       const governanceAuthority = wallet!.publicKey!
       const beneficiary = wallet!.publicKey!
-      const inst = withRelinquishVote(
+      const inst = await withRelinquishVote(
         instructions,
         realm!.owner,
         proposal.account.governance,

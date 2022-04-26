@@ -43,6 +43,7 @@ import ButtonGroup from '@components/ButtonGroup'
 import InlineNotification from '@components/InlineNotification'
 import Tooltip from '@components/Tooltip'
 import Switch from '@components/Switch'
+import { notify } from '@utils/notifications'
 
 const YES = 'Yes'
 const NO = 'No'
@@ -97,7 +98,8 @@ const LockTokensModal = ({
     },
   ].filter((x) =>
     depositToUnlock
-      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue
+      ? getMinDurationInDays(depositToUnlock) <= x.defaultValue ||
+        x.display === 'Custom'
       : true
   )
 
@@ -224,6 +226,14 @@ const LockTokensModal = ({
     const amountFromDeposit = whatWillBeLeftInsideDeposit.isNeg()
       ? totalAmountInDeposit
       : totalAmountToLock
+    if (!amountFromDeposit.isZero() && allowClawback) {
+      notify({
+        type: 'warn',
+        message: `Please withdraw your tokens to the wallet`,
+        description: `To lock tokens with clawback option you must first withdraw them to wallet`,
+      })
+      throw 'To lock tokens with clawback option you must first withdraw them to wallet'
+    }
     await voteRegistryLockDeposit({
       rpcContext,
       mintPk: realm!.account.communityMint!,
@@ -257,6 +267,7 @@ const LockTokensModal = ({
     if (!depositToUnlock) {
       throw 'No deposit to unlock selected'
     }
+
     const rpcContext = new RpcContext(
       realm!.owner,
       getProgramVersionForRealm(realmInfo!),
@@ -405,7 +416,9 @@ const LockTokensModal = ({
                     min={1}
                     value={lockupPeriodDays}
                     type="number"
-                    onChange={(e) => setLockupPeriodDays(e.target.value)}
+                    onChange={(e) =>
+                      setLockupPeriodDays(Number(e.target.value))
+                    }
                     step={1}
                   />
                 </>
@@ -464,23 +477,33 @@ const LockTokensModal = ({
               </div>
               <div className="w-full h-2 bg-bkg-1 rounded-lg mb-4">
                 <div
-                  style={{ width: `${currentPercentOfMaxMultiplier}%` }}
+                  style={{
+                    width: `${
+                      currentPercentOfMaxMultiplier > 100
+                        ? 100
+                        : currentPercentOfMaxMultiplier
+                    }%`,
+                  }}
                   className="bg-primary-light h-2 rounded-lg"
                 ></div>
               </div>
-              <div className="flex text-sm text-fgd-2">
-                <div className="pr-5">
-                  Allow dao to clawback -{' '}
-                  <small>
-                    It will give ability to propose clawback of your locked
-                    tokens to any given address
-                  </small>
+              {!depositToUnlock && (
+                <div className="flex text-sm text-fgd-2">
+                  <div className="pr-5">
+                    Allow dao to clawback -{' '}
+                    <small>
+                      It will give ability to propose clawback of your locked
+                      tokens to any given address If you use constant lockup
+                      type with this option turn on only way to retrieve tokens
+                      from that deposit will be dao vote
+                    </small>
+                  </div>
+                  <Switch
+                    checked={allowClawback}
+                    onChange={(checked) => setAllowClawback(checked)}
+                  />
                 </div>
-                <Switch
-                  checked={allowClawback}
-                  onChange={(checked) => setAllowClawback(checked)}
-                />
-              </div>
+              )}
             </div>
           </>
         )
