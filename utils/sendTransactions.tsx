@@ -162,7 +162,7 @@ export const getUnixTs = () => {
   return new Date().getTime() / 1000
 }
 
-const DEFAULT_TIMEOUT = 30000
+const DEFAULT_TIMEOUT = 50000
 /////////////////////////////////////////////////
 export async function sendSignedTransaction({
   signedTransaction,

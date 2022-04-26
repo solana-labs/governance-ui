@@ -191,6 +191,16 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
+      const nftVoteRecordsFiltred = await this.client.program.account.nftVoteRecord.all(
+        [
+          {
+            memcmp: {
+              offset: 8,
+              bytes: proposalPk.toBase58(),
+            },
+          },
+        ]
+      )
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         const [nftVoteRecord] = await PublicKey.findProgramAddress(
@@ -201,11 +211,16 @@ export class VotingClient {
           ],
           clientProgramId
         )
-        remainingAccounts.push(
-          new AccountData(nft.tokenAddress),
-          new AccountData(nft.metadata.pubkey),
-          new AccountData(nftVoteRecord, false, true)
+        if (
+          !nftVoteRecordsFiltred.find(
+            (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
+          )
         )
+          remainingAccounts.push(
+            new AccountData(nft.tokenAddress),
+            new AccountData(nft.metadata.pubkey),
+            new AccountData(nftVoteRecord, false, true)
+          )
       }
       //1 nft is 3 accounts
       const firstFiveNfts = remainingAccounts.slice(0, 15)
@@ -281,7 +296,16 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      const nftVoteRecords = await this.client.program.account.nftVoteRecord.all()
+      const nftVoteRecordsFiltred = await this.client.program.account.nftVoteRecord.all(
+        [
+          {
+            memcmp: {
+              offset: 8,
+              bytes: proposal.pubkey.toBase58(),
+            },
+          },
+        ]
+      )
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
         const [nftVoteRecord] = await PublicKey.findProgramAddress(
@@ -293,7 +317,7 @@ export class VotingClient {
           clientProgramId
         )
         if (
-          nftVoteRecords.find(
+          nftVoteRecordsFiltred.find(
             (x) => x.publicKey.toBase58() === nftVoteRecord.toBase58()
           )
         ) {
