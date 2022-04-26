@@ -191,17 +191,15 @@ export class VotingClient {
         isSigner: boolean
         isWritable: boolean
       }[] = []
-      const nftVoteRecordsFiltered = (
-        await this.client.program.account.nftVoteRecord.all([
+      const nftVoteRecordsFiltered = await this.client.program.account.nftVoteRecord.all(
+        [
           {
             memcmp: {
               offset: 8,
               bytes: proposalPk.toBase58(),
             },
           },
-        ])
-      ).filter(
-        (x) => x.account.governingTokenOwner.toBase58() === walletPk.toBase58()
+        ]
       )
       for (let i = 0; i < this.votingNfts.length; i++) {
         const nft = this.votingNfts[i]
