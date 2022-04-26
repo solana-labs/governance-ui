@@ -71,7 +71,7 @@
     "remark-gfm": "^3.0.1",
     "superstruct": "^0.15.4",
     "ts-node": "^10.5.0",
-    "tsconfig-paths": "^3.12.0",
+    "tsconfig-paths": "^3.14.1",
     "yup": "^0.32.11",
     "zustand": "^3.7.2"
   },
