@@ -25,9 +25,6 @@
   "dependencies": {
     "@blockworks-foundation/mango-client": "^3.4.4",
     "@blockworks-foundation/voter-stake-registry-client": "^0.2.0",
-    "@cardinal/namespaces-components": "^2.5.0",
-    "@emotion/react": "^11.1.5",
-    "@emotion/styled": "^11.3.0",
     "@cardinal/namespaces-components": "^2.5.5",
     "@emotion/react": "^11.9.0",
     "@emotion/styled": "^11.8.1",
