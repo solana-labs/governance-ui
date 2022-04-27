@@ -66,6 +66,7 @@
     "react": "^18.0.0",
     "react-dom": "^18.0.0",
     "react-headless-pagination": "^0.1.0",
+    "react-intersection-observer": "^9.1.0",
     "react-markdown": "^7.0.0",
     "react-portal": "^4.2.2",
     "remark-gfm": "^3.0.1",

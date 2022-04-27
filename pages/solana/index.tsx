@@ -1,33 +1,16 @@
-import KickstartSolana from '../../components_2/KickstartSolana'
-import NavBar from '../../components_2/NavBar'
-import SolanaPerks from '../../components_2/SolanaPerks'
-import DaoTypes from '../../components_2/DaoTypes'
-import RealmsOptions from '../../components_2/RealmsOptions'
-import SplGov from '../../components_2/SplGov'
-import DaoCommunity from '../../components_2/DaoCommunity'
-import RealmsMetrics from '../../components_2/RealmsMetrics'
-import SocialChannels from '../../components_2/SocialChannels'
-import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuestions'
-import Footer from '../../components_2/Footer'
+import { useInView } from 'react-intersection-observer'
+import ScrollWrapper from '../../components_2/ScrollWrapper'
 
 const Solana = () => {
+  const { ref, inView } = useInView({
+    threshold: 0,
+  })
+
   return (
     <div>
-      <KickstartSolana />
-      <NavBar />
-      <SolanaPerks />
-      <DaoTypes />
-      <RealmsOptions />
-      <div className="px-56">
-        <SplGov />
-      </div>
-      <DaoCommunity />
-      <RealmsMetrics />
-      <div className="px-32">
-        <SocialChannels />
-      </div>
-      <FreequentlyAskedQuestions />
-      <Footer />
+      <ScrollWrapper inView={inView}>
+        <div ref={ref} className="inview-block"></div>
+      </ScrollWrapper>
     </div>
   )
 }
