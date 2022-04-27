@@ -127,7 +127,9 @@ const DelegateCard = () => {
             onClick={handleDelegate}
             isLoading={isLoading}
             disabled={
-              delegateKey.length !== 44 || (!ownTokenRecord && !ownTokenRecord)
+              delegateKey.length < 43 ||
+              delegateKey.length > 46 ||
+              (!ownCouncilTokenRecord && !ownTokenRecord)
             }
           >
             Delegate
