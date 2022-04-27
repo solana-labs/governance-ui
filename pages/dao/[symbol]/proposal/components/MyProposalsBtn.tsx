@@ -279,12 +279,13 @@ const ProposalList = ({
   proposals: ProgramAccount<Proposal>[]
   isLoading: boolean
 }) => {
+  const { isNftMode } = useRealm()
   return (
     <>
       {' '}
       <h4 className="flex items-center mb-3">
         {title} ({proposals.length})
-        {btnName && proposals.length !== 0 && (
+        {!isNftMode && btnName && proposals.length !== 0 && (
           <div className="ml-auto">
             <Button
               small

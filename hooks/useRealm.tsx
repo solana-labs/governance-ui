@@ -114,7 +114,11 @@ export default function useRealm() {
       realmCfgMaxOutstandingProposalCount
 
   const currentPluginPk = config?.account?.communityVoterWeightAddin
-
+  //based on realm config it will provide proper tokenBalanceCardComponent
+  const isLockTokensMode =
+    currentPluginPk && vsrPluginsPks.includes(currentPluginPk?.toBase58())
+  const isNftMode =
+    currentPluginPk && nftPluginsPks.includes(currentPluginPk?.toBase58())
   const ownVoterWeight = getVoterWeight(
     currentPluginPk,
     ownTokenRecord,
@@ -143,6 +147,9 @@ export default function useRealm() {
     toManyCouncilOutstandingProposalsForUse,
     toManyCommunityOutstandingProposalsForUser,
     config,
+    currentPluginPk,
+    isLockTokensMode,
+    isNftMode,
   }
 }
 

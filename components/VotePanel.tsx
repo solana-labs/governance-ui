@@ -17,7 +17,6 @@ import { getProgramVersionForRealm } from '@models/registry/api'
 import useVotePluginsClientStore from 'stores/useVotePluginsClientStore'
 import { useRouter } from 'next/router'
 import useNftPluginStore from 'NftVotePlugin/store/nftPluginStore'
-import Loading from './Loading'
 
 const VotePanel = () => {
   const [showVoteModal, setShowVoteModal] = useState(false)

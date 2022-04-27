@@ -99,6 +99,7 @@ const REALM = () => {
     tokenRecords,
     ownVoterWeight,
     ownTokenRecord,
+    isNftMode,
   } = useRealm()
   const proposalsPerPage = 20
   const [filters, setFilters] = useState<ProposalState[]>([])
@@ -291,7 +292,10 @@ const REALM = () => {
   }
 
   const showMultiVote = useMemo(
-    () => (realm ? realm.account.votingProposalCount > 1 && connected : false),
+    () =>
+      realm
+        ? realm.account.votingProposalCount > 1 && connected && !isNftMode
+        : false,
     [realm, connected]
   )
 
