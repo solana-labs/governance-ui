@@ -182,3 +182,11 @@ body::-webkit-scrollbar-corner {
 ::-webkit-calendar-picker-indicator {
   filter: invert(1);
 }
+
+#glow {
+  width: 285px;
+  height: 151px;
+  background: #88d8ee;
+  mix-blend-mode: hard-light;
+  filter: blur(270px);
+}

@@ -118,7 +118,7 @@ export const ExploreButton: FunctionComponent<ButtonProps> = ({
     <button
       onClick={onClick}
       disabled={disabled}
-      className={`${className} default-transition px-8 ${
+      className={`${className} default-transition px-8 bg-origin-border ${
         small ? 'py-2' : 'py-3.5'
         // bg-cover bg-btn-blue text-bkg-1 hover:bg-btn-blue-hover active:bg-btn-blue-active active:text-fgd-1
         // <span className="bg-gradient-to-r from-realms-theme-blue to-realms-theme-turquoise bg-clip-text text-transparent">
