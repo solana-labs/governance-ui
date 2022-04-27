@@ -227,6 +227,18 @@ export interface RefreshReserveForm {
   mintName?: SupportedMintName
 }
 
+/**
+ * Form used for Executing IDL Instructions when adding new proposal
+ *
+ * @param programID
+ */
+export interface IDLForm {
+  governedAccount?: any
+  programID?: string
+  selectedInstruction?: string
+  instructionsToSubmit: any
+}
+
 export enum Instructions {
   Transfer,
   ProgramUpgrade,
@@ -251,6 +263,7 @@ export enum Instructions {
   WithdrawObligationCollateralAndRedeemReserveLiquidity,
   RefreshSolendObligation,
   RefreshSolendReserve,
+  IDL,
   RealmConfig,
   CreateNftPluginRegistrar,
   CreateNftPluginMaxVoterWeight,
