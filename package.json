@@ -63,7 +63,7 @@
     "next-transpile-modules": "^8.0.0",
     "node-fetch": "^2.6.1",
     "rc-slider": "^9.7.5",
-    "react": "^18.0.0",
+    "react": "^18.1.0",
     "react-dom": "^18.0.0",
     "react-headless-pagination": "^0.1.0",
     "react-markdown": "^7.0.0",
