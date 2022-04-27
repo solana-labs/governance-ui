@@ -803,21 +803,20 @@
     yargs "^17.0.1"
 
 "@friktion-labs/friktion-sdk@^1.1.25":
-  version "1.1.70"
-  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.70.tgz#416e4636a063bc40c2a32f48d4c229bd421160f3"
-  integrity sha512-oskE5e2uYBjRJvX9GMcqXMttE11UVOAUx4xWj+X3W95b15Vcr5jdWj8d+1JiGm5o1mkYu27vfHFS/ZO0Hf+dUA==
+  version "1.1.25"
+  resolved "https://registry.yarnpkg.com/@friktion-labs/friktion-sdk/-/friktion-sdk-1.1.25.tgz#9233d3252cf38f04dc8cf8e5afef5047507c9291"
+  integrity sha512-RMnXNngfizYipSLBE+1fpSoptL940NYZTDv9vlDP+YdDVOyvAWc06pa2KLdKFyXQg/3pvcRRkaM12/+FgJtCWg==
   dependencies:
-    "@friktion-labs/entropy-client" "^1.4.7"
+    "@friktion-labs/entropy-client" "^1.0.0"
     "@oclif/command" "^1.8.16"
-    "@project-serum/anchor" "^0.23.0"
-    "@project-serum/common" "^0.0.1-beta.3"
+    "@project-serum/anchor" "^0.22.1"
     "@project-serum/serum" "^0.13.61"
     "@saberhq/anchor-contrib" "^1.11.3"
     "@saberhq/chai-solana" "^1.11.3"
     "@saberhq/solana-contrib" "^1.11.3"
     "@saberhq/token-utils" "^1.11.3"
     "@solana/spl-token" "^0.1.8"
-    "@solana/web3.js" "^1.31.0"
+    "@solana/web3.js" "1.31.0"
     "@switchboard-xyz/switchboard-v2" "^0.0.34"
     bn.js "^5.2.0"
     chalk "^5.0.0"
@@ -11772,7 +11771,7 @@ ts-proto@^1.79.0:
     ts-poet "^4.5.0"
     ts-proto-descriptors "1.6.0"
 
-tsconfig-paths@^3.12.0:
+tsconfig-paths@^3.14.1:
   version "3.14.1"
   resolved "https://registry.yarnpkg.com/tsconfig-paths/-/tsconfig-paths-3.14.1.tgz#ba0734599e8ea36c862798e920bcf163277b137a"
   integrity sha512-fxDhWnFSLt3VuTwtvJt5fpwxBHg5AdKWMsgcPOOIilyjymcYVZoCQF8fvFRezCNfblEXmi+PcM1eYHeOAgXCOQ==
