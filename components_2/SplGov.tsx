@@ -1,4 +1,4 @@
-import { PopUpButtonBlack } from './Button'
+import { PopUpButtonBorder } from './Button'
 
 const SplGov = () => {
   return (
@@ -39,9 +39,9 @@ const SplGov = () => {
             <p className="text-black tracking-tight mb-5">
               Solana has compiled a robust library of information to read.
             </p>
-            <PopUpButtonBlack className="">
+            <PopUpButtonBorder className="">
               Read about SPL Governance
-            </PopUpButtonBlack>
+            </PopUpButtonBorder>
           </div>
         </div>
       </div>

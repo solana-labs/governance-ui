@@ -29,7 +29,7 @@ const Button: FunctionComponent<ButtonProps> = ({
       } text-base font-bold focus:outline-none ${
         disabled
           ? 'bg-cover bg-btn-blue cursor-not-allowed text-fgd-3'
-          : 'bg-cover bg-btn-blue text-bkg-1 hover:bg-btn-blue-hover active:bg-btn-blue-active active:text-fgd-1'
+          : 'bg-cover bg-btn-blue text-bkg-1 hover:bg-btn-blue-hover active:bg-btn-blue-hover active:text-fgd-1'
       }`}
       {...props}
       style={style}
@@ -44,7 +44,7 @@ const Button: FunctionComponent<ButtonProps> = ({
 
 export default Button
 
-export const PopUpButtonWhite: FunctionComponent<ButtonProps> = ({
+export const PopUpButton: FunctionComponent<ButtonProps> = ({
   children,
   onClick,
   disabled = false,
@@ -74,7 +74,7 @@ export const PopUpButtonWhite: FunctionComponent<ButtonProps> = ({
   )
 }
 
-export const PopUpButtonBlack: FunctionComponent<ButtonProps> = ({
+export const PopUpButtonBorder: FunctionComponent<ButtonProps> = ({
   children,
   onClick,
   disabled = false,
@@ -90,7 +90,7 @@ export const PopUpButtonBlack: FunctionComponent<ButtonProps> = ({
       disabled={disabled}
       className={`${className} border border-white default-transition px-8 ${
         small ? 'py-2' : 'py-4'
-      } inline-flex items-center text-fgd-1 text-xs font-bold text-black hover:bg-white hover:bg-opacity-30 focus:outline-none active:bg-white active:bg-opacity-20`}
+      } inline-flex items-center text-fgd-1 text-black text-xs font-bold hover:bg-white hover:bg-opacity-30 focus:outline-none active:bg-white active:bg-opacity-20`}
       {...props}
     >
       <Tooltip content={tooltipMessage}>

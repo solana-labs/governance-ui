@@ -1,4 +1,4 @@
-import Button, { PopUpButtonWhite, ExploreButton } from './Button'
+import Button, { PopUpButton, ExploreButton } from './Button'
 
 const KickstartSolana = () => {
   return (
@@ -14,7 +14,7 @@ const KickstartSolana = () => {
         </div>
         <div className="ml-auto">
           <div className="flex items-center">
-            <PopUpButtonWhite className="mr-4">Read the Docs</PopUpButtonWhite>
+            <PopUpButton className="mr-4">Read the Docs</PopUpButton>
             <ExploreButton className="border border-gradient-to-r-blue-red">
               Explore DAOs
             </ExploreButton>
