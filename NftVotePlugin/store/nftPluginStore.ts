@@ -39,13 +39,14 @@ const useNftPluginStore = create<nftPluginStore>((set, _get) => ({
     })
   },
   setVotingNfts: (nfts, votingClient, nftMintRegistrar) => {
-    votingClient._setCurrentVoterNfts(nfts)
+    const filteredNfts = nfts.filter(
+      (x) => x.token.account.amount.cmpn(1) === 0
+    )
+    votingClient._setCurrentVoterNfts(filteredNfts)
     set((s) => {
-      s.state.votingNfts = nfts.filter(
-        (x) => x.token.account.amount.cmpn(1) === 0
-      )
+      s.state.votingNfts = filteredNfts
     })
-    _get().setVotingPower(nfts, nftMintRegistrar)
+    _get().setVotingPower(filteredNfts, nftMintRegistrar)
   },
   setVotingPower: (nfts, nftMintRegistrar) => {
     const votingPower = nfts
