@@ -17,10 +17,11 @@ import {
   VoterWeight,
 } from '../models/voteWeights'
 
-import { QUEUE_LIST,  } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient';
-import { Switchboard, IDL } from '../SwitchboardVotePlugin/SwitchboardIdl';
-import * as sbv2 from "../../switchboardv2-api";
-import * as anchor from "@project-serum/anchor";
+import { Wallet } from '@project-serum/common'
+import { QUEUE_LIST } from '../SwitchboardVotePlugin/SwitchboardQueueVoterClient'
+import { Switchboard, IDL } from '../SwitchboardVotePlugin/SwitchboardIdl'
+import * as sbv2 from '../../switchboardv2-api'
+import * as anchor from '@project-serum/anchor'
 
 import useWalletStore from '../stores/useWalletStore'
 import {
@@ -28,6 +29,7 @@ import {
   vsrPluginsPks,
   switchboardPluginsPks,
 } from './useVotingPlugins'
+import useSwitchboardPluginStore from 'SwitchboardVotePlugin/store/switchboardStore'
 
 export default function useRealm() {
   const router = useRouter()
@@ -51,8 +53,9 @@ export default function useRealm() {
   } = useWalletStore((s) => s.selectedRealm)
   const votingPower = useDepositStore((s) => s.state.votingPower)
   const nftVotingPower = useNftPluginStore((s) => s.state.votingPower)
+  const sbVotingPower = useSwitchboardPluginStore((s) => s.state.votingPower)
   const [realmInfo, setRealmInfo] = useState<RealmInfo | undefined>(undefined)
-  const { getQueuesForSelectedRealm } = useWalletStore((s) => s.actions);
+  const { getQueuesForSelectedRealm } = useWalletStore((s) => s.actions)
   //getQueuesForSelectedRealm();
 
   //const anchorProvider = new anchor.AnchorProvider(connection, wallet);
@@ -112,26 +115,6 @@ export default function useRealm() {
     [tokenRecords, wallet, connected]
   )
 
-  const switchboardVotingPower = useMemo(
-    () => {
-      //console.log("Realm!!!!");
-      const provider = new anchor.Provider(connection, wallet);
-      //const idl = await anchor.Program.fetchIdl(new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);
-      //console.log("The IDL");
-      //console.log(IDL);
-      const switchboardProgram = new anchor.Program(IDL, new PublicKey("7PMP6yE6qb3XzBQr5TK2GhuruYayZzBnT8U92ySaLESC"), provider);
-      let queues = QUEUE_LIST.map((q) => {
-        let queue = new sbv2.OracleQueueAccount({
-          program: switchboardProgram,
-          publicKey: q
-        });
-        console.log(queue);
-        queue.loadData().then((d) => console.log);
-      });
-    },
-    [realm, wallet, connected]
-  );
-
   const canChooseWhoVote =
     realm?.account.communityMint &&
     (!mint?.supply.isZero() ||
@@ -158,9 +141,10 @@ export default function useRealm() {
     votingPower,
     nftVotingPower,
     ownCouncilTokenRecord,
-    realm,
-    wallet,
+    sbVotingPower
   )
+
+  console.log(ownVoterWeight)
 
   return {
     realm,
@@ -191,8 +175,7 @@ const getVoterWeight = (
   votingPower: BN,
   nftVotingPower: BN,
   ownCouncilTokenRecord: ProgramAccount<TokenOwnerRecord> | undefined,
-  realm: PublicKey | undefined,
-  wallet: PublicKey | undefined,
+  sbVotingPower: BN
 ) => {
   if (currentPluginPk) {
     if (vsrPluginsPks.includes(currentPluginPk.toBase58())) {
@@ -206,15 +189,7 @@ const getVoterWeight = (
       )
     }
     if (switchboardPluginsPks.includes(currentPluginPk.toBase58())) {
-      //return new VoteRegistryVoterWeight(ownTokenRecord, votingPower)
-      //QUEUE_LIST.map((x) => {
-        /*let q = new sbv2.OracleQueueAccount({
-          program: switchboardProgram,
-          publicKey: x,
-        });
-        console.log(q);*/
-      //});
-      return new SwitchboardQueueVoteWeight
+      return new SwitchboardQueueVoteWeight(undefined, undefined, sbVotingPower)
     }
   }
   return new VoterWeight(ownTokenRecord, ownCouncilTokenRecord)
