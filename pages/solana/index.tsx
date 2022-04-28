@@ -12,36 +12,28 @@ import FreequentlyAskedQuestions from '../../components_2/FreequentlyAskedQuesti
 import Footer from '../../components_2/Footer'
 import { AltNavbar } from '../../components_2/NavBar'
 
-const Section = ({ bgColor = '', showTopGlow = false, children }) => {
+export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
-    <>
-      <div className={`w-full ${bgColor}`}>
-        {showTopGlow && <div>GLOW</div>}
-        <div className="max-w-[1440px] mx-auto col-span-12 px-4 lg:px-0 md:col-span-10">
-          {/* <div className="col-span-12 px-10 md:px-8 xl:px-4 xl:col-start-2 xl:col-span-10"> */}
+    <div className={`w-full ${bgColor}`}>
+      {showTopGlow && <div>GLOW</div>}
+      <div className="max-w-[1440px] mx-auto">
+        <div className="w-full px-8 mx-auto md:px-16 md:w-5/6 xl:px-20">
           {children}
-          {/* </div> */}
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
 const Solana = () => {
   return (
-    <div>
-      <img
-        src="/1-Landing-v2/landing-hero-desktop.png"
-        className="absolute top-0 left-0 z-[-10] bg-[#201F27] pb-[50px]"
-      />
-      {/* <div className="grid min-h-screen grid-cols-12 gap-4 pt-4 pb-44"> */}
-
+    <div className="relative">
       <AltNavbar />
-      <Section>
-        <KickstartSolana />
-      </Section>
+      <KickstartSolana />
 
+      {/* <Section bgColor='bg-[#201F27]'> */}
       <SolanaPerks />
+      {/* </Section> */}
 
       <DaoTypes />
       <RealmsOptions />

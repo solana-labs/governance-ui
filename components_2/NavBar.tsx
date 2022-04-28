@@ -28,7 +28,6 @@ export const AltNavbar = () => {
 
   useEffect(() => {
     const handleScroll = () => {
-      console.log(window.scrollY)
       setScrollY(window.scrollY)
     }
 
@@ -45,18 +44,18 @@ export const AltNavbar = () => {
 
   return (
     <div
-      className={`sticky top-0 z-10 pt-5 pb-5 ${
-        scrollY ? 'bg-gray-800 opacity-70' : ''
+      className={`fixed w-full top-0 z-10 pt-5 pb-5 transition-all duration-300 ${
+        scrollY > 200 ? 'bg-gray-800/70' : ''
       }`}
     >
       {/* <div className='col-span-10'> */}
-      <div className="flex items-center justify-between px-4 lg:px-24">
-        <div>
-          {/* <img src="1-Landing-v2/logo-realms-blue.png" alt="" /> */}
-          <p>Realms</p>
+      <div className="max-w-[1440px] mx-auto flex items-center justify-between px-4">
+        <div className="flex items-center space-x-1">
+          <img src="1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
+          <span>Realms</span>
         </div>
         <div className="flex items-center space-x-7">
-          <PopUpButton className="invisible mr-4 lg:visible">
+          <PopUpButton className="invisible mr-4 sm:visible">
             Read the Docs
           </PopUpButton>
           <ExploreButton className="border border-gradient-to-r-blue-red">
