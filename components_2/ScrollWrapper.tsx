@@ -1,4 +1,3 @@
-import Status from './Status'
 import KickstartSolana from './KickstartSolana'
 import SolanaPerks from './SolanaPerks'
 import DaoTypes from './DaoTypes'
@@ -19,7 +18,7 @@ type Props = {
  * ScrollWrapper directs the user to scroll the page to reveal it's children.
  * Use this on Modules that have scroll and/or observer triggers.
  */
-const ScrollWrapper = ({ children, inView, ...props }: Props) => {
+const ScrollWrapper = ({ children, ...props }: Props) => {
   return (
     <>
       <img
