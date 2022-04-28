@@ -1,4 +1,5 @@
-import Button from './Button'
+import { useEffect, useState } from 'react'
+import Button, { ExploreButton, PopUpButton } from './Button'
 
 const NavBar = () => {
   return (
@@ -21,3 +22,49 @@ const NavBar = () => {
 }
 
 export default NavBar
+
+export const AltNavbar = () => {
+  const [scrollY, setScrollY] = useState(0)
+
+  useEffect(() => {
+    const handleScroll = () => {
+      console.log(window.scrollY)
+      setScrollY(window.scrollY)
+    }
+
+    // just trigger this so that the initial state
+    // is updated as soon as the component is mounted
+    // related: https://stackoverflow.com/a/63408216
+    handleScroll()
+
+    window.addEventListener('scroll', handleScroll)
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+    }
+  }, [])
+
+  return (
+    <div
+      className={`sticky top-0 z-10 pt-5 pb-5 ${
+        scrollY ? 'bg-gray-800 opacity-70' : ''
+      }`}
+    >
+      {/* <div className='col-span-10'> */}
+      <div className="flex items-center justify-between px-4 lg:px-24">
+        <div>
+          {/* <img src="1-Landing-v2/logo-realms-blue.png" alt="" /> */}
+          <p>Realms</p>
+        </div>
+        <div className="flex items-center space-x-7">
+          <PopUpButton className="invisible mr-4 lg:visible">
+            Read the Docs
+          </PopUpButton>
+          <ExploreButton className="border border-gradient-to-r-blue-red">
+            Explore DAOs
+          </ExploreButton>
+        </div>
+      </div>
+      {/* </div> */}
+    </div>
+  )
+}
