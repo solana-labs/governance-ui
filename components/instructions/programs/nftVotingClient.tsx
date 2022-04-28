@@ -1,5 +1,5 @@
 import { Wallet } from '@marinade.finance/marinade-ts-sdk'
-import { Provider } from '@project-serum/anchor'
+import { AnchorProvider, Provider } from '@project-serum/anchor'
 import { NftVoterClient } from '@solana/governance-program-library'
 import { AccountMetaData, getRealm } from '@solana/spl-governance'
 import { Connection, Keypair } from '@solana/web3.js'
@@ -20,8 +20,8 @@ export const NFT_VOTER_INSTRUCTIONS = {
       ],
       getDataUI: async (connection: Connection, data: Uint8Array) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
@@ -58,8 +58,8 @@ export const NFT_VOTER_INSTRUCTIONS = {
         accounts: AccountMetaData[]
       ) => {
         try {
-          const options = Provider.defaultOptions()
-          const provider = new Provider(
+          const options = AnchorProvider.defaultOptions()
+          const provider: Provider = new AnchorProvider(
             connection,
             new Wallet(Keypair.generate()),
             options
