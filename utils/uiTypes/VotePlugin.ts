@@ -106,6 +106,7 @@ export class VotingClient {
     ) {
       return
     }
+
     if (this.client instanceof VsrClient) {
       const { registrar } = await getRegistrarPDA(
         realm.pubkey,
@@ -130,6 +131,7 @@ export class VotingClient {
       )
       return { voterWeightPk, maxVoterWeightRecord: undefined }
     }
+
     if (this.client instanceof NftVoterClient) {
       const { registrar } = await getNftRegistrarPDA(
         realm.pubkey,
@@ -186,6 +188,7 @@ export class VotingClient {
     ) {
       return
     }
+
     if (this.client instanceof NftVoterClient) {
       const { registrar } = await getNftRegistrarPDA(
         realm.pubkey,
@@ -272,6 +275,7 @@ export class VotingClient {
       )
       return { voterWeightPk, maxVoterWeightRecord }
     }
+
     if (this.client instanceof VsrClient) {
       const props = await this.withUpdateVoterWeightRecord(
         instructions,
@@ -298,6 +302,7 @@ export class VotingClient {
     ) {
       return
     }
+
     if (this.client instanceof NftVoterClient) {
       const { registrar } = await getNftRegistrarPDA(
         realm.pubkey,
@@ -384,8 +389,6 @@ export class VotingClient {
     if (this.client instanceof NftVoterClient === false) {
       throw 'Method only allowed for nft voter client'
     }
-    // let isExisting: any = undefined
-    // const client = this.client as NftVoterClient
     const {
       voterWeightPk,
       voterWeightRecordBump,
@@ -404,28 +407,6 @@ export class VotingClient {
       realm!.account.communityMint,
       clientProgramId
     )
-
-    // try {
-    //   isExisting = await client.program.account.voterWeightRecord.fetch(
-    //     voterWeightPk
-    //   )
-    // } catch (e) {
-    //   console.log('No voter, creating voter', e)
-    // }
-    // if (!isExisting) {
-    //   instructions.push(
-    //     client.program.instruction.createVoterWeightRecord(walletPk, {
-    //       accounts: {
-    //         voterWeightRecord: voterWeightPk,
-    //         governanceProgramId: realm.owner,
-    //         realm: realm.pubkey,
-    //         realmGoverningTokenMint: realm.account.communityMint,
-    //         payer: walletPk,
-    //         systemProgram: SYSTEM_PROGRAM_ID,
-    //       },
-    //     })
-    //   )
-    // }
 
     return {
       voterWeightPk,
