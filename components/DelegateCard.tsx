@@ -16,6 +16,8 @@ import { sendTransaction } from 'utils/send'
 import { CashIcon, CreditCardIcon } from '@heroicons/react/solid'
 import Button from './Button'
 import Checkbox from '@components/inputs/Checkbox'
+import Divider from './Divider'
+import { DisplayAddress } from '@cardinal/namespaces-components'
 import { tryParseKey } from 'tools/validators/pubkey'
 
 const DelegateCard = () => {
@@ -85,6 +87,33 @@ const DelegateCard = () => {
           <div className="text-sm text-fgd-3">
             This will not allow the delegated wallet to withdraw or send tokens.
           </div>
+
+          <div className="flex justify-between items-center content-center mt-4 w-full">
+            <div className="mr-2 py-1 text-sm text-fgd-2 w-40 h-8 flex items-center">
+              Council Delegation
+            </div>
+            <DisplayAddress
+              connection={connection}
+              address={ownCouncilTokenRecord?.account.governanceDelegate}
+              height="12px"
+              width="100px"
+              dark={true}
+            />
+          </div>
+          <div className="flex justify-between items-center content-center mt-4 w-full">
+            <div className="mr-2 py-1 text-sm text-fgd-2 w-40 h-8 flex items-center">
+              Community Delegation
+            </div>
+            <DisplayAddress
+              connection={connection}
+              address={ownTokenRecord?.account.governanceDelegate}
+              height="12px"
+              width="100px"
+              dark={true}
+            />
+          </div>
+
+          <Divider />
 
           <InputRow
             label="Token Type"
