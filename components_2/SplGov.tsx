@@ -6,10 +6,7 @@ const SplGov = () => {
       {/* <div className="bg-[url('/img/Spl-Gov-background.svg')]"> */}
       <div className="flex items-center justify-start">
         <div>
-          <img
-            src="/img/realms-web/icons/Solana-logo-black.svg"
-            className="mr-2"
-          />
+          <img src="/img/realms-web/icons/solana-black.svg" className="mr-2" />
         </div>
         <div>
           <p className="text-black font-bold">The Solana Standard</p>

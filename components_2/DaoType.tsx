@@ -3,7 +3,7 @@ export const DaoType = ({ imgSrc, daoTheme, text }) => {
     <div>
       <img
         src={`/img/realms-web/icons/${imgSrc}.svg`}
-        className="mb-8 h-12"
+        className="mb-8 w-32"
         alt=""
       />
       <h2>{daoTheme}</h2>

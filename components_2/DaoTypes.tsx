@@ -11,7 +11,6 @@ const DaoTypes = () => {
         </h1>
       </div>
       <div className="flex justify-between">
-        <img src="/img/realms-web/backgrounds/vr.svg" className="" />
         <div className="basis-1/3 px-6">
           <DaoType
             imgSrc="multisig"
@@ -27,23 +26,6 @@ const DaoTypes = () => {
             <DaoIcon imgSrc="sctf1-dao" daoName="SCTF1" />
           </div>
         </div>
-        <img src="/img/realms-web/backgrounds/vr.svg" className="" />
-        <div className="basis-1/3 px-6">
-          <DaoType
-            imgSrc="protocol"
-            daoTheme="Protocol DAO"
-            text="Protocol DAOs help decentralized organizations determine how its
-            treasury funds are used. This flat, transparent voting hierarchy
-            allows anyone to participate in the decision-making of the
-            organization."
-          />
-          <div className="grid grid-cols-3 gap-8 justify-items-center">
-            <DaoIcon imgSrc="mango-dao" daoName="MangoDAO" />
-            <DaoIcon imgSrc="serum-dao" daoName="Serum" />
-            <DaoIcon imgSrc="metaplex-dao" daoName="Metaplex Foundation" />
-          </div>
-        </div>
-        <img src="/img/realms-web/backgrounds/vr.svg" className="" />
         <div className="basis-1/3 px-6">
           <DaoType
             imgSrc="nft-community"
@@ -55,6 +37,18 @@ const DaoTypes = () => {
             <DaoIcon imgSrc="cardinal-dao" daoName="Cardinall" />
             <DaoIcon imgSrc="f-and-f-dao" daoName="Friends and Family DAO" />
             <DaoIcon imgSrc="monke-dao" daoName="MonkeDAO" />
+          </div>
+        </div>
+        <div className="basis-1/3 px-6">
+          <DaoType
+            imgSrc="govtoken"
+            daoTheme="Governance Token DAO"
+            text="Governance Token DAOs help orgs determine how its funds are used. This flat voting hierarchy allows anyone to participate in the decisions of the org."
+          />
+          <div className="grid grid-cols-3 gap-8 justify-items-center">
+            <DaoIcon imgSrc="mango-dao" daoName="MangoDAO" />
+            <DaoIcon imgSrc="serum-dao" daoName="Serum" />
+            <DaoIcon imgSrc="metaplex-dao" daoName="Metaplex Foundation" />
           </div>
         </div>
       </div>
