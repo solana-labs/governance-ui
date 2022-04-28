@@ -243,7 +243,12 @@ const REALM = () => {
         //will run only if plugin is connected with realm
         const plugin = await client?.withCastPluginVote(
           instructions,
-          selectedProposal.proposalPk
+          {
+            account: selectedProposal.proposal,
+            pubkey: selectedProposal.proposalPk,
+            owner: realm.pubkey,
+          },
+          ownTokenRecord
         )
         if (client.client instanceof NftVoterClient === false) {
           await withCastVote(

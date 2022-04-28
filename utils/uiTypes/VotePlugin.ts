@@ -6,6 +6,7 @@ import {
   Realm,
   SYSTEM_PROGRAM_ID,
   Proposal,
+  TokenOwnerRecord,
 } from '@solana/spl-governance'
 import { PublicKey, TransactionInstruction } from '@solana/web3.js'
 import { chunks } from '@utils/helpers'
@@ -90,6 +91,7 @@ export class VotingClient {
   }
   withUpdateVoterWeightRecord = async (
     instructions: TransactionInstruction[],
+    tokenOwnerRecord: ProgramAccount<TokenOwnerRecord>,
     type: UpdateVoterWeightRecordTypes
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
@@ -98,6 +100,12 @@ export class VotingClient {
     const clientProgramId = this.client!.program.programId
     const realm = this.realm!
     const walletPk = this.walletPk!
+    if (
+      realm.account.communityMint.toBase58() !==
+      tokenOwnerRecord.account.governingTokenMint.toBase58()
+    ) {
+      return
+    }
     if (this.client instanceof VsrClient) {
       const { registrar } = await getRegistrarPDA(
         realm.pubkey,
@@ -162,8 +170,9 @@ export class VotingClient {
     }
   }
   withCastPluginVote = async (
-    instructions,
-    proposalPk: PublicKey
+    instructions: TransactionInstruction[],
+    proposal: ProgramAccount<Proposal>,
+    tokeOwnerRecord: ProgramAccount<TokenOwnerRecord>
   ): Promise<ProgramAddresses | undefined> => {
     if (this.noClient) {
       return
@@ -171,6 +180,12 @@ export class VotingClient {
     const clientProgramId = this.client!.program.programId
     const realm = this.realm!
     const walletPk = this.walletPk!
+    if (
+      realm.account.communityMint.toBase58() !==
+      proposal.account.governingTokenMint.toBase58()
+    ) {
+      return
+    }
     if (this.client instanceof NftVoterClient) {
       const { registrar } = await getNftRegistrarPDA(
         realm.pubkey,
@@ -196,7 +211,7 @@ export class VotingClient {
           {
             memcmp: {
               offset: 8,
-              bytes: proposalPk.toBase58(),
+              bytes: proposal.pubkey.toBase58(),
             },
           },
         ]
@@ -206,7 +221,7 @@ export class VotingClient {
         const [nftVoteRecord] = await PublicKey.findProgramAddress(
           [
             Buffer.from('nft-vote-record'),
-            proposalPk.toBuffer(),
+            proposal.pubkey.toBuffer(),
             new PublicKey(nft.metadata.data.mint).toBuffer(),
           ],
           clientProgramId
@@ -231,7 +246,7 @@ export class VotingClient {
       const nftsChunk = chunks(remainingNftsToChunk, 12)
       for (const i of nftsChunk) {
         instructions.push(
-          this.client.program.instruction.castNftVote(proposalPk, {
+          this.client.program.instruction.castNftVote(proposal.pubkey, {
             accounts: {
               registrar,
               voterWeightRecord: voterWeightPk,
@@ -244,7 +259,7 @@ export class VotingClient {
         )
       }
       instructions.push(
-        this.client.program.instruction.castNftVote(proposalPk, {
+        this.client.program.instruction.castNftVote(proposal.pubkey, {
           accounts: {
             registrar,
             voterWeightRecord: voterWeightPk,
@@ -260,6 +275,7 @@ export class VotingClient {
     if (this.client instanceof VsrClient) {
       const props = await this.withUpdateVoterWeightRecord(
         instructions,
+        tokeOwnerRecord,
         'castVote'
       )
       return props
@@ -276,6 +292,12 @@ export class VotingClient {
     const clientProgramId = this.client!.program.programId
     const realm = this.realm!
     const walletPk = this.walletPk!
+    if (
+      realm.account.communityMint.toBase58() !==
+      proposal.account.governingTokenMint.toBase58()
+    ) {
+      return
+    }
     if (this.client instanceof NftVoterClient) {
       const { registrar } = await getNftRegistrarPDA(
         realm.pubkey,

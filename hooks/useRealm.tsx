@@ -126,7 +126,6 @@ export default function useRealm() {
     nftVotingPower,
     ownCouncilTokenRecord
   )
-
   return {
     realm,
     realmInfo,
