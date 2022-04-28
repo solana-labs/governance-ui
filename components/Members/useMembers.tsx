@@ -225,10 +225,16 @@ export default function useMembers() {
 
           delegateMap[walletId] = {
             councilMembers: [...oldCouncilRecords, member],
+            councilTokenCount:
+              (delegateMap[walletId]?.councilTokenCount || 0) +
+              member.councilVotes.toNumber(),
           }
         } else {
           delegateMap[walletId] = {
             councilMembers: [member],
+            councilTokenCount: member.councilVotes
+              ? member.councilVotes.toNumber()
+              : 0,
           }
         }
       }
@@ -241,10 +247,16 @@ export default function useMembers() {
 
           delegateMap[walletId] = {
             communityMembers: [...oldCommunityRecords, member],
+            councilTokenCount:
+              (delegateMap[walletId]?.communityTokenCount || 0) +
+              member.communityVotes.toNumber(),
           }
         } else {
           delegateMap[walletId] = {
             communityMembers: [member],
+            communityTokenCount: member.communityVotes
+              ? member.communityVotes.toNumber()
+              : 0,
           }
         }
       }
