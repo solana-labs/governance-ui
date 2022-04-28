@@ -1,7 +1,7 @@
 const GradientTitle = (props) => (
   <div>
     <h1 className="md:text-3xl font-thin">
-      <span className="bg-gradient-to-r from-realms-theme-lightblue to-realms-theme-turquoise bg-clip-text text-transparent">
+      <span className="bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] bg-clip-text text-transparent">
         {props.children}
       </span>
     </h1>
@@ -9,9 +9,3 @@ const GradientTitle = (props) => (
 )
 
 export default GradientTitle
-
-export const GradientText = (props) => (
-  <span className="bg-gradient-to-r from-realms-theme-lightblue to-realms-theme-turquoise bg-clip-text text-transparent">
-    {props.children}
-  </span>
-)

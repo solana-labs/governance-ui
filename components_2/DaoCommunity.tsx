@@ -1,17 +1,18 @@
-import GradientTitle, { GradientText } from './GradientTitle'
+import GradientTitle from './GradientTitle'
 import { TextBox } from './TextBox'
 
 const DaoCommunity = () => {
   return (
     <div className="py-24 px-56">
       <div className="pb-16">
-        <GradientTitle>A DAO is a community working</GradientTitle>
-        <GradientTitle>together to make decisions</GradientTitle>
+        <GradientTitle>
+          A DAO is a community working together to make decisions
+        </GradientTitle>
       </div>
       <div className="flex flex-row">
         <div className="basis-1/2">
           <div className="pr-20">
-            <p className="text-base font-thin tracking-tight opacity-70 mb-5">
+            <p className="text-base font-thin tracking-tight opacity-70 mb-2">
               DAOs (decentralized autonomous organizations) are an effective and
               safe way to work with like-minded folks around the globe.
             </p>
@@ -26,7 +27,7 @@ const DaoCommunity = () => {
         </div>
         <div className="basis-1/2">
           <div className="mb-6">
-            <GradientText>Industries DAOs Impact:</GradientText>
+            <p className="font-bold">Industries DAOs Impact:</p>
           </div>
           <div className="grid grid-rows-4 grid-flow-col gap-y-4">
             <TextBox title="Defi" text="Enable equitable financial markets" />
