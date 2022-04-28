@@ -4,14 +4,14 @@ import { DaoIcon } from './DaoIcon'
 
 const DaoTypes = () => {
   return (
-    <div className="bg-bkg-12 pt-24 pb-16 px-56">
+    <div className="pt-16">
       <div>
-        <h1 className="md:text-3xl font-thin text-center mb-16">
+        <h1 className="mb-16 font-thin text-center md:text-3xl">
           What types of DAOs can you create?
         </h1>
       </div>
       <div className="flex justify-between">
-        <div className="basis-1/3 px-6">
+        <div className="px-6 basis-1/3">
           <DaoType
             imgSrc="multisig"
             daoTheme="Multi-Signature DAO"
@@ -26,7 +26,7 @@ const DaoTypes = () => {
             <DaoIcon imgSrc="sctf1-dao" daoName="SCTF1" />
           </div>
         </div>
-        <div className="basis-1/3 px-6">
+        <div className="px-6 basis-1/3">
           <DaoType
             imgSrc="nft-community"
             daoTheme="NFT Community DAO"
@@ -39,7 +39,7 @@ const DaoTypes = () => {
             <DaoIcon imgSrc="monke-dao" daoName="MonkeDAO" />
           </div>
         </div>
-        <div className="basis-1/3 px-6">
+        <div className="px-6 basis-1/3">
           <DaoType
             imgSrc="govtoken"
             daoTheme="Governance Token DAO"
@@ -52,7 +52,7 @@ const DaoTypes = () => {
           </div>
         </div>
       </div>
-      <div className="text-center pt-4">
+      <div className="pt-4 text-center">
         <p>Ready to begin your DAO journey?</p>
         <Button className="m-5">Create DAO</Button>
       </div>

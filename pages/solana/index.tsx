@@ -14,12 +14,12 @@ import { AltNavbar } from '../../components_2/NavBar'
 
 export const Section = ({ bgColor = '', showTopGlow = false, children }) => {
   return (
-    <div className={`w-full ${bgColor}`}>
-      {showTopGlow && <div>GLOW</div>}
-      <div className="max-w-[1440px] mx-auto">
-        <div className="w-full px-8 mx-auto md:px-16 md:w-5/6 xl:px-20">
-          {children}
-        </div>
+    <div className={`w-full ${bgColor} relative`}>
+      {showTopGlow && (
+        <img src="/1-Landing-v2/divider-glow.png" className="absolute w-full" />
+      )}
+      <div className="w-full px-8 mx-auto md:px-16 md:w-5/6 xl:px-20">
+        {children}
       </div>
     </div>
   )
@@ -30,13 +30,11 @@ const Solana = () => {
     <div className="relative">
       <AltNavbar />
       <KickstartSolana />
-
-      {/* <Section bgColor='bg-[#201F27]'> */}
       <SolanaPerks />
-      {/* </Section> */}
-
       <DaoTypes />
-      <RealmsOptions />
+      <Section showTopGlow>
+        <RealmsOptions />
+      </Section>
       <div className="px-56">
         <SplGov />
       </div>
