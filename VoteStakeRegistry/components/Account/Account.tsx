@@ -11,7 +11,7 @@ const DelegateCard = dynamic(() => import('@components/DelegateCard'))
 const AccountInner = ({ withHeader = true }: { withHeader?: boolean }) => {
   const connected = useWalletStore((s) => s.connected)
   return (
-    <div className="bg-bkg-2 col-span-12  p-4 md:p-6 rounded-lg">
+    <div className="bg-bkg-2 col-span-12 p-4 md:p-6 rounded-lg">
       {withHeader && (
         <>
           <div className="mb-4">
@@ -41,7 +41,7 @@ const NotificationsPlugin = () => {
   const { realmInfo } = useRealm()
   if (realmInfo?.enableNotifi) {
     return (
-      <div className="col-span-6">
+      <div className="md:col-span-6 col-span-12">
         <NotificationsCard />
       </div>
     )
@@ -53,9 +53,9 @@ const NotificationsPlugin = () => {
 const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
   if (withHeader) {
     return (
-      <div className="col-span-12 grid grid-cols-12 gap-4">
+      <div className="grid grid-cols-12 gap-4">
         <AccountInner withHeader={withHeader} />
-        <div className="col-span-6">
+        <div className="md:col-span-6 col-span-12">
           <DelegateCard />
         </div>
         <NotificationsPlugin />
@@ -65,7 +65,7 @@ const Account = ({ withHeader = true }: { withHeader?: boolean }) => {
     return (
       <>
         <AccountInner withHeader={withHeader} />
-        <div className="col-span-6">
+        <div className="md:col-span-6 col-span-12">
           <DelegateCard />
         </div>
         <NotificationsPlugin />
