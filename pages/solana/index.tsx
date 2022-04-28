@@ -35,9 +35,9 @@ const Solana = () => {
       <Section showTopGlow>
         <RealmsOptions />
       </Section>
-      <div className="px-56">
+      <Section>
         <SplGov />
-      </div>
+      </Section>
       <DaoCommunity />
       <RealmsMetrics />
       <div className="px-32">

@@ -120,8 +120,6 @@ export const ExploreButton: FunctionComponent<ButtonProps> = ({
       disabled={disabled}
       className={`${className} default-transition px-8 bg-origin-border ${
         small ? 'py-2' : 'py-3.5'
-        // bg-cover bg-btn-blue text-bkg-1 hover:bg-btn-blue-hover active:bg-btn-blue-active active:text-fgd-1
-        // <span className="bg-gradient-to-r from-realms-theme-blue to-realms-theme-turquoise bg-clip-text text-transparent">
       } inline-flex items-center text-fgd-1 text-xs font-bold hover:bg-gradient-to-r from-realms-theme-blue to-realms-theme-turquoise active:bg-gradient-to-r active:opacity-80`}
       {...props}
     >
@@ -132,6 +130,55 @@ export const ExploreButton: FunctionComponent<ButtonProps> = ({
       <Tooltip content={tooltipMessage}>
         <div>{isLoading ? <Loading /> : children}</div>
       </Tooltip>
+    </button>
+  )
+}
+
+interface AltButtonProps {
+  disabled?: boolean
+  isLoading?: boolean
+  onClick?: () => void
+  secondary?: boolean
+  tertiary?: boolean
+  inverse?: boolean
+  withBoarder?: boolean
+}
+
+export const AltButton: FunctionComponent<AltButtonProps> = ({
+  children,
+  disabled,
+  isLoading,
+  secondary = false,
+  tertiary = false,
+  inverse = false,
+  withBoarder = false,
+  ...props
+}) => {
+  let className = `z-0 relative transition-all duration-300 rounded-full text-[16px] hover:cursor-pointer opacity-[84] hover:opacity-100 `
+
+  if (secondary && !inverse) {
+    // secondary
+    className +=
+      'py-3 px-2 bg-[#201F27] font-regular text-white transition-to-white-background hover:text-black'
+  } else if (secondary && inverse) {
+    // secondary inverse
+  } else if (tertiary) {
+    className += 'py-3 px-2 font-regular hover:bg-white/10'
+  } else if (withBoarder) {
+    className +=
+      'py-3 px-2 font-regular border border-white transition-to-white-background hover:text-black'
+  } else if (inverse) {
+    // primary inverse
+  } else {
+    // primary
+    className +=
+      'py-4 px-2 font-light text-black bg-gradient-to-r from-[#00C2FF] via-[#00E4FF] to-[#87F2FF] transition-to-white-background'
+  }
+
+  return (
+    <button className={className} {...props} disabled={disabled || isLoading}>
+      {isLoading && <Loading />}
+      <div>{children}</div>
     </button>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import Button, { ExploreButton, PopUpButton } from './Button'
+import Button, { AltButton } from './Button'
 
 const NavBar = () => {
   return (
@@ -45,25 +45,41 @@ export const AltNavbar = () => {
   return (
     <div
       className={`fixed w-full top-0 z-10 pt-5 pb-5 transition-all duration-300 ${
-        scrollY > 200 ? 'bg-gray-800/70' : ''
+        scrollY > 200 ? 'bg-gray-800/70 backdrop-blur-[3px]' : ''
       }`}
     >
-      {/* <div className='col-span-10'> */}
       <div className="max-w-[1440px] mx-auto flex items-center justify-between px-4">
         <div className="flex items-center space-x-1">
           <img src="1-Landing-v2/logo-realms-blue.png" className="w-8 h-8" />
           <span>Realms</span>
         </div>
         <div className="flex items-center space-x-7">
-          <PopUpButton className="invisible mr-4 sm:visible">
-            Read the Docs
-          </PopUpButton>
-          <ExploreButton className="border border-gradient-to-r-blue-red">
-            Explore DAOs
-          </ExploreButton>
+          <div className="invisible md:visible">
+            <AltButton tertiary>
+              <div className="relative flex items-center justify-center">
+                <div className="pl-4 pr-2">Read the Docs</div>
+                <img
+                  src="/1-Landing-v2/icon-external-link-white.png"
+                  className="w-3 h-3 mr-4"
+                  alt="External link icon"
+                />
+              </div>
+            </AltButton>
+          </div>
+          <AltButton secondary>
+            <div className="relative flex items-center justify-center">
+              <div className="bg-[#201F27] hover:bg-[#292833] rounded-full ml-2 mr-4">
+                <img
+                  src="/1-Landing-v2/icon-binoculars-blue.png"
+                  className="w-8 h-8 p-1"
+                  alt="Binoculars"
+                />
+              </div>
+              <div className="pr-8">Explore DAOs</div>
+            </div>
+          </AltButton>
         </div>
       </div>
-      {/* </div> */}
     </div>
   )
 }
